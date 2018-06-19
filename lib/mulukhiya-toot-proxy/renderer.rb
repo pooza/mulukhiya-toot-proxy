@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def type
-      return 'application/xml; charset=UTF-8'
+      return 'application/json; charset=UTF-8'
     end
 
     def to_s
