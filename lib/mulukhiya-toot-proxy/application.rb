@@ -8,6 +8,7 @@ require 'httparty'
 require 'addressable/uri'
 require 'mulukhiya-toot-proxy/logger'
 require 'mulukhiya-toot-proxy/json_renderer'
+require 'mulukhiya-toot-proxy/package'
 
 module MulukhiyaTootProxy
   class Application < Sinatra::Base
@@ -24,6 +25,9 @@ module MulukhiyaTootProxy
     before do
       @message = {request: {path: request.path, params: params}, response: {}}
       @renderer = JSONRenderer.new
+      @headers = request.env.select { |k, v| k.start_with?('HTTP_')}
+      @token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
+      @result = []
       if request.request_method == 'POST'
         @json = JSON.parse(request.body.read.to_s)
         @message[:request][:params] = @json
@@ -48,19 +52,12 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      headers = request.env.select { |k, v| k.start_with?('HTTP_')}
-      url = Addressable::URI.parse('https://st.mstdn.b-shock.org/api/v1/statuses')
-      api_response = HTTParty.post(url, {
-        body: @json.to_json,
-        headers: {
-          'Content-Type' => 'application/json',
-          'User-Agent' => headers['HTTP_USER_AGENT'],
-          'Authorization' => "Bearer #{headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]}",
-          'X-Mulukhiya' => 'rewrited',
-        },
+      response = HTTParty.post(toot_url, {
+        body: toot_body,
+        headers: request_headers
       })
-      @message[:response][:text] = @json['status']
-      @message.merge!(JSON.parse(api_response.to_s))
+      @message[:response][:result] = @result
+      @message.merge!(JSON.parse(response.to_s))
       @renderer.message = @message
       return @renderer.to_s
     end
@@ -80,6 +77,31 @@ module MulukhiyaTootProxy
       @renderer.message = @message
       Slack.all.map{ |h| h.say(@message)}
       return @renderer.to_s
+    end
+
+    private
+
+    def toot_url
+      url = Addressable::URI.parse(@headers['HTTP_ORIGIN'])
+      url.path = '/api/v1/statuses'
+      return url
+    end
+
+    def toot_body
+      body = @json.clone
+      @result.push('rewrited')
+      body['status'] += 'test'
+      @result.uniq!
+      return body.to_json
+    end
+
+    def request_headers
+      return {
+        'Content-Type' => 'application/json',
+        'User-Agent' => "#{@headers['HTTP_USER_AGENT']} +#{Package.full_name}",
+        'Authorization' => "Bearer #{@token}",
+        'X-Mulukhiya' => @result.join(', '),
+      }
     end
   end
 end
