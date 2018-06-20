@@ -26,12 +26,13 @@ module MulukhiyaTootProxy
       @message = {request: {path: request.path, params: params}, response: {}}
       @renderer = JSONRenderer.new
       @headers = request.env.select { |k, v| k.start_with?('HTTP_')}
-      @token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
       @result = []
-      if request.request_method == 'POST'
-        @json = JSON.parse(request.body.read.to_s)
-        @message[:request][:params] = @json
+      begin
+        @params = JSON.parse(request.body.read.to_s)
+      rescue
+        @params = params
       end
+      @message[:request][:params] = @params
     end
 
     after do
@@ -54,7 +55,7 @@ module MulukhiyaTootProxy
     post '/api/v1/statuses' do
       response = HTTParty.post(toot_url, {
         body: toot_body,
-        headers: request_headers
+        headers: toot_request_headers
       })
       @message[:response][:result] = @result
       @message.merge!(JSON.parse(response.to_s))
@@ -82,24 +83,26 @@ module MulukhiyaTootProxy
     private
 
     def toot_url
-      url = Addressable::URI.parse(@headers['HTTP_ORIGIN'])
+      url = Addressable::URI.parse(@config['local']['instance_url'])
       url.path = '/api/v1/statuses'
       return url
+    rescue
+      return Addressable::URI.parse("https://#{@headers['HTTP_HOST']}/api/v1/statuses")
     end
 
     def toot_body
-      body = @json.clone
+      body = @params.clone
       @result.push('rewrited')
       body['status'] += 'test'
       @result.uniq!
       return body.to_json
     end
 
-    def request_headers
+    def toot_request_headers
       return {
         'Content-Type' => 'application/json',
         'User-Agent' => "#{@headers['HTTP_USER_AGENT']} +#{Package.full_name}",
-        'Authorization' => "Bearer #{@token}",
+        'Authorization' => "Bearer #{@headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]}",
         'X-Mulukhiya' => @result.join(', '),
       }
     end
