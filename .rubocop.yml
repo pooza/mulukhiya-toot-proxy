@@ -70,6 +70,9 @@ Style/ConditionalAssignment:
 Lint/AssignmentInCondition:
   Enabled: false
 
+Lint/UnusedBlockArgument:
+  Enabled: false
+
 Style/YodaCondition:
   Enabled: false
 

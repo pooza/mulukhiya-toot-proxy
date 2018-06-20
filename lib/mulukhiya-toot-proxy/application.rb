@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
     before do
       @message = {request: {path: request.path, params: params}, response: {}}
       @renderer = JSONRenderer.new
-      @headers = request.env.select { |k, v| k.start_with?('HTTP_')}
+      @headers = request.env.select{ |k, v| k.start_with?('HTTP_')}
       @result = []
       begin
         @params = JSON.parse(request.body.read.to_s)
@@ -55,7 +55,7 @@ module MulukhiyaTootProxy
     post '/api/v1/statuses' do
       response = HTTParty.post(toot_url, {
         body: toot_body,
-        headers: toot_request_headers
+        headers: toot_request_headers,
       })
       @message[:response][:result] = @result
       @message.merge!(JSON.parse(response.to_s))
