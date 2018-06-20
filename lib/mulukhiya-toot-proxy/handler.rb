@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
     end
 
-    def exec()
+    def exec
       raise 'execが未定義です。'
     end
 

@@ -8,10 +8,6 @@ module MulukhiyaTootProxy
       URI.extract(source, ['http', 'https']).each do |link|
         uri = Addressable::URI.parse(link)
         next unless uri.host == 'goo.gl'
-
-
-
-
       end
       return source
     end
