@@ -11,10 +11,6 @@ module MulukhiyaTootProxy
       raise 'execが未定義です。'
     end
 
-    def increment!
-      @count += 1
-    end
-
     def result
       return "#{self.class}:#{@count}"
     end
@@ -25,6 +21,12 @@ module MulukhiyaTootProxy
         require "mulukhiya-toot-proxy/handler/#{handler}"
         yield "MulukhiyaTootProxy::#{handler.camelize}Handler".constantize.new
       end
+    end
+
+    private
+
+    def increment!
+      @count += 1
     end
   end
 end
