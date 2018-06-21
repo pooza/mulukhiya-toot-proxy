@@ -2,7 +2,7 @@ require 'mulukhiya-toot-proxy/handler/amazon_asin'
 
 module MulukhiyaTootProxy
   class HandlerTest < Test::Unit::TestCase
-    def test_name
+    def test_all
       Handler.all do |handler|
         assert_true(handler.is_a?(Handler))
       end
