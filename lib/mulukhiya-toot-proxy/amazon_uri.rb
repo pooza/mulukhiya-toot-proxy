@@ -3,7 +3,7 @@ require 'addressable/uri'
 module MulukhiyaTootProxy
   class AmazonURI < Addressable::URI
     def shortenable?
-      return amazon? && !asin.nil?
+      return amazon? && asin.present?
     end
 
     def amazon?
