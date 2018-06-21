@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
     end
 
     def result
-      return "#{self.class}:#{@count}"
+      return "#{self.class.to_s.split('::').last},#{@count}"
     end
 
     def self.all
