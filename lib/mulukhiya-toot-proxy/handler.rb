@@ -2,14 +2,21 @@ require 'mulukhiya-toot-proxy/config'
 
 module MulukhiyaTootProxy
   class Handler
-    attr_reader :result
-
     def initialize
       @config = Config.instance
+      @count = 0
     end
 
     def exec
       raise 'execが未定義です。'
+    end
+
+    def increment!
+      @count += 1
+    end
+
+    def result
+      return "#{self.class}:#{@count}"
     end
 
     def self.all
