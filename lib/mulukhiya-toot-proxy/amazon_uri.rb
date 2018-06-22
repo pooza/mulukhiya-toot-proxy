@@ -7,12 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def amazon?
-      return [
-        'www.amazon.co.jp',
-        'amazon.co.jp',
-        'www.amazon.com',
-        'amazon.com',
-      ].member?(host)
+      return host.split('.').member?('amazon')
     end
 
     def asin
