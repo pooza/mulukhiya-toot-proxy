@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
         'www.amazon.co.jp',
         'amazon.co.jp',
         'www.amazon.com',
-        'amazon.com'
+        'amazon.com',
       ].member?(host)
     end
 
