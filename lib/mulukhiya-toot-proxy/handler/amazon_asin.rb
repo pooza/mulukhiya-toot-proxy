@@ -4,7 +4,7 @@ require 'mulukhiya-toot-proxy/handler'
 module MulukhiyaTootProxy
   class AmazonAsinHandler < Handler
     def exec(source)
-      source.scan(%r{https?://[^ ]+}).each do |link|
+      source.scan(%r{https?://[^\s]+}).each do |link|
         uri = AmazonURI.parse(link)
         next unless uri.shortenable?
         increment!
