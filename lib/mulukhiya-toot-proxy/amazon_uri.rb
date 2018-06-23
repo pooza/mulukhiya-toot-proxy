@@ -11,8 +11,10 @@ module MulukhiyaTootProxy
     end
 
     def asin
-      if matches = path.match(%r{/dp/([A-Za-z0-9]+)})
-        return matches[1]
+      asin_patterns.each do |pattern|
+        if matches = path.match(pattern)
+          return matches[1]
+        end
       end
       return nil
     end
@@ -24,6 +26,17 @@ module MulukhiyaTootProxy
       dest.query = nil
       dest.fragment = nil
       return dest
+    end
+
+    private
+
+    def asin_patterns
+      return [
+        %r{/dp/([A-Za-z0-9]+)},
+        %r{/gp/product/([A-Za-z0-9]+)},
+        %r{/exec/obidos/ASIN/([A-Za-z0-9]+)},
+        %r{/o/ASIN/([A-Za-z0-9]+)},
+      ]
     end
   end
 end
