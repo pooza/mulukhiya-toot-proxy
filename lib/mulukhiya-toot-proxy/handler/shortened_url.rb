@@ -14,11 +14,11 @@ module MulukhiyaTootProxy
         headers = HTTParty.get(link, {follow_redirects: false, timeout: timeout}).headers
         source.sub!(link, headers['location']) if headers['location']
       end
+      return source
     rescue => e
       message = {class: self.class.to_s, message: "#{e.class}: #{e.message}"}
       Logger.new.error(message)
       Slack.all.map{ |h| h.say(message)}
-    ensure
       return source
     end
 

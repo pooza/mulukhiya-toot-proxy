@@ -12,11 +12,11 @@ module MulukhiyaTootProxy
         increment!
         source.sub!(link, uri.shorten.to_s)
       end
+      return source
     rescue => e
       message = {class: self.class.to_s, message: "#{e.class}: #{e.message}"}
       Logger.new.error(message)
       Slack.all.map{ |h| h.say(message)}
-    ensure
       return source
     end
   end
