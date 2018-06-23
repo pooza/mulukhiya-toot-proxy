@@ -29,12 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def domains
-      return [
-        't.co',
-        'goo.gl',
-        'bit.ly',
-        'ow.ly',
-      ]
+      return @config['application']['shortened_url']['domains']
     end
   end
 end

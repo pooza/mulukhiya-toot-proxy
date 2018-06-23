@@ -3,3 +3,8 @@ package:
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
+  domains:
+    - t.co
+    - goo.gl
+    - bit.ly
+    - ow.ly
