@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
     def exec(source)
       source.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         uri = AmazonURI.parse(link)
+        uri.associate_id = associate_id
         next unless uri.shortenable?
         increment!
         source.sub!(link, uri.shorten.to_s)
@@ -18,6 +19,14 @@ module MulukhiyaTootProxy
       Logger.new.error(message)
       Slack.all.map{ |h| h.say(message)}
       return source
+    end
+
+    private
+
+    def associate_id
+      return @config['local']['amazon']['associate_id']
+    rescue
+      return nil
     end
   end
 end

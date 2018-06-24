@@ -1,4 +1,5 @@
 require 'addressable/uri'
+require 'mulukhiya-toot-proxy/config'
 
 module MulukhiyaTootProxy
   class AmazonURI < Addressable::URI
@@ -19,10 +20,22 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def associate_id
+      return query_values['tag']
+    end
+
+    def associate_id=(tag)
+      values = query_values || {}
+      values['tag'] = tag
+      self.query_values = values
+    end
+
     def shorten
       return self unless shortenable?
       dest = clone
+      old_values = query_values || {}
       dest.path = "/dp/#{asin}"
+      dest.path += "/#{old_values['tag']}" if old_values['tag']
       dest.query = nil
       dest.fragment = nil
       return dest
