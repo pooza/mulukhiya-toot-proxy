@@ -21,6 +21,8 @@ module MulukhiyaTootProxy
 
     def associate_id
       return query_values['tag']
+    rescue
+      return nil
     end
 
     def associate_id=(tag)
@@ -32,10 +34,8 @@ module MulukhiyaTootProxy
     def shorten
       return self unless shortenable?
       dest = clone
-      old_values = query_values || {}
       dest.path = "/dp/#{asin}"
-      dest.path += "/#{old_values['tag']}" if old_values['tag']
-      dest.query = nil
+      dest.query_values = {tag: associate_id} if associate_id
       dest.fragment = nil
       return dest
     end
