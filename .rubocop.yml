@@ -53,6 +53,10 @@ Style/TrailingCommaInHashLiteral:
 Style/WordArray:
   EnforcedStyle: brackets
 
+Style/IdenticalConditionalBranches:
+  Exclude:
+    - test/*
+
 Metrics/LineLength:
   Max: 100
   Exclude:
