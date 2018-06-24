@@ -1,5 +1,4 @@
 require 'addressable/uri'
-require 'mulukhiya-toot-proxy/config'
 
 module MulukhiyaTootProxy
   class AmazonURI < Addressable::URI
