@@ -6,20 +6,20 @@ require 'mulukhiya-toot-proxy/slack'
 
 module MulukhiyaTootProxy
   class ShortenedUrlHandler < Handler
-    def exec(source)
-      source.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+    def exec(body, headers = {})
+      body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         uri = Addressable::URI.parse(link)
         next unless domains.member?(uri.host)
         increment!
         headers = HTTParty.get(link, {follow_redirects: false, timeout: timeout}).headers
-        source.sub!(link, headers['location']) if headers['location']
+        body['status'].sub!(link, headers['location']) if headers['location']
       end
-      return source
+      return body
     rescue => e
       message = {class: self.class.to_s, message: "#{e.class}: #{e.message}"}
       Logger.new.error(message)
       Slack.all.map{ |h| h.say(message)}
-      return source
+      return body
     end
 
     private

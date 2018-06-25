@@ -38,7 +38,7 @@ module MulukhiyaTootProxy
     after do
       @message[:response][:status] ||= @renderer.status
       if @renderer.status < 400
-        @logger.info(@message)
+        @logger.info(@message.select{ |k, v| [:request, :response, :package].member?(k)})
       else
         @logger.error(@message)
       end
@@ -60,13 +60,16 @@ module MulukhiyaTootProxy
       @message[:response][:result] = @result
       @message.merge!(JSON.parse(response.to_s))
       @renderer.message = @message
+      headers({
+        'X-Mulukhiya' => @result.join(', '),
+      })
       return @renderer.to_s
     end
 
     not_found do
       @renderer = JSONRenderer.new
       @renderer.status = 404
-      @message[:response][:message] = "Resource #{@message[:request][:path]} not found."
+      @message[:response][:error] = "Resource #{@message[:request][:path]} not found."
       @renderer.message = @message
       return @renderer.to_s
     end
@@ -74,7 +77,7 @@ module MulukhiyaTootProxy
     error do
       @renderer = JSONRenderer.new
       @renderer.status = 500
-      @message[:response][:message] = env['sinatra.error'].message
+      @message[:response][:error] = env['sinatra.error'].message
       @renderer.message = @message
       Slack.all.map{ |h| h.say(@message)}
       return @renderer.to_s
@@ -94,7 +97,7 @@ module MulukhiyaTootProxy
       body = @params.clone
       @result.push('rewrited')
       Handler.all do |handler|
-        body['status'] = handler.exec(body['status'])
+        handler.exec(body, @headers)
         @result.push(handler.result)
       end
       return body.to_json
