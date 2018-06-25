@@ -97,7 +97,7 @@ module MulukhiyaTootProxy
       body = @params.clone
       @result.push('rewrited')
       Handler.all do |handler|
-        body['status'] = handler.exec(body['status'])
+        handler.exec(body, @headers)
         @result.push(handler.result)
       end
       return body.to_json

@@ -77,6 +77,9 @@ Lint/AssignmentInCondition:
 Lint/UnusedBlockArgument:
   Enabled: false
 
+Lint/UnusedMethodArgument:
+  Enabled: false
+
 Style/YodaCondition:
   Enabled: false
 
