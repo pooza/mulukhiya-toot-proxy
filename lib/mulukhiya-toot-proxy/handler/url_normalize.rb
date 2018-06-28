@@ -1,14 +1,11 @@
 require 'addressable/uri'
-require 'mulukhiya-toot-proxy/handler'
+require 'mulukhiya-toot-proxy/handler/hrl_handler'
 
 module MulukhiyaTootProxy
-  class UrlNormalizeHandler < Handler
-    def exec(body, headers = {})
-      body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
-        increment!
-        body['status'].sub!(link, Addressable::URI.parse(link).normalize.to_s)
-      end
-      return body
+  class UrlNormalizeHandler < UrlHandler
+    def rewrite(link)
+      increment!
+      return @status.sub!(link, Addressable::URI.parse(link).normalize.to_s)
     end
   end
 end
