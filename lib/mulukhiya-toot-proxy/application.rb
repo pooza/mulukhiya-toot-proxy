@@ -96,7 +96,7 @@ module MulukhiyaTootProxy
     def toot_body
       body = @params.clone
       Handler.all do |handler|
-        handler.exec(body, @headers)
+        handler.forward(body, @headers)
         @result.push(handler.result)
       end
       return body.to_json
