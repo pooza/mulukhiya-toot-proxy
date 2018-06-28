@@ -238,7 +238,7 @@ local.yamlは、上記設置例ではconfigディレクトリ内に置いてい�
 - __ROOT_DIR__/config/local.yaml
 - __ROOT_DIR__/config/local.yml
 
-## ■経緯
+## ■最後に、これをつくった経緯
 
 プリキュア専用インスタンス「[キュアスタ！](https://precure.ml)」で、ずっと前に
 「アマゾンのURL、もっと短くならない〜？」って言われてたのを思い出して作りました。
