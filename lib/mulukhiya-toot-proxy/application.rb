@@ -95,7 +95,6 @@ module MulukhiyaTootProxy
 
     def toot_body
       body = @params.clone
-      @result.push('rewrited')
       Handler.all do |handler|
         handler.exec(body, @headers)
         @result.push(handler.result)
