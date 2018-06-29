@@ -119,13 +119,25 @@ Mastodonインスタンスに対する、トゥートのリクエストを横取
 処理後にリクエストヘッダ `X-Mulukhiya` を加えて `/api/v1/statuses` にPOSTし直す
 仕様である為、このような設定になっている。
 
+## ■設定ファイルの検索順
+
+local.yamlは、上記設置例ではconfigディレクトリ内に置いているが、
+実際には以下の順に検索している。（ROOT_DIRは設置先）
+
+- /usr/local/etc/mulukhiya-toot-proxy/local.yaml
+- /usr/local/etc/mulukhiya-toot-proxy/local.yml
+- /etc/mulukhiya-toot-proxy/local.yaml
+- /etc/mulukhiya-toot-proxy/local.yml
+- __ROOT_DIR__/config/local.yaml
+- __ROOT_DIR__/config/local.yml
+
 ## ■ハンドラについて
 
 モロヘイヤの本質は、トゥートをトリガーとして様々な処理を行うフレームワークである。
 …と言っては大げさか。  
 Mastodonインスタンスへのトゥート要求に対して、事前に設定された「ハンドラ」を順に実行
 する。今のところはトゥートを加工するハンドラだけが用意されているが、ユーザーが任意の
-ハンドラを設置して実行することも可能。（ハンドラの仕様については後日追って説明）  
+ハンドラを設置して実行することも可能。（ハンドラの仕様については、後日追って説明）  
 ハンドラが行う処理がトゥートと関連した処理である必要は必ずしもなく、例えばトゥート
 本文に書かれたJSONを読み取って、サーバに何かしらのバッチ処理を行わせる様なことも可能
 であるはず。
@@ -250,18 +262,6 @@ Server: thin
 ```
 
 必要に応じて、監視などに使って頂くとよいと思う。
-
-## ■設定ファイルの検索順
-
-local.yamlは、上記設置例ではconfigディレクトリ内に置いているが、
-実際には以下の順に検索している。（ROOT_DIRは設置先）
-
-- /usr/local/etc/mulukhiya-toot-proxy/local.yaml
-- /usr/local/etc/mulukhiya-toot-proxy/local.yml
-- /etc/mulukhiya-toot-proxy/local.yaml
-- /etc/mulukhiya-toot-proxy/local.yml
-- __ROOT_DIR__/config/local.yaml
-- __ROOT_DIR__/config/local.yml
 
 ## ■最後に、これをつくった経緯
 
