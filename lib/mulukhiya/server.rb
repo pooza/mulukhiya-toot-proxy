@@ -11,7 +11,7 @@ require 'mulukhiya/json_renderer'
 require 'mulukhiya/handler'
 
 module MulukhiyaTootProxy
-  class Application < Sinatra::Base
+  class Server < Sinatra::Base
     def initialize
       super
       @config = Config.instance
