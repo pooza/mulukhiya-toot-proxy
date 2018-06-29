@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/package'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class PackageTest < Test::Unit::TestCase

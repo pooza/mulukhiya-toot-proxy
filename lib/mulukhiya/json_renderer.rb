@@ -1,5 +1,5 @@
 require 'json'
-require 'mulukhiya-toot-proxy/renderer'
+require 'mulukhiya/renderer'
 
 module MulukhiyaTootProxy
   class JSONRenderer < Renderer

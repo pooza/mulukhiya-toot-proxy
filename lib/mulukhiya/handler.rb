@@ -1,6 +1,6 @@
-require 'mulukhiya-toot-proxy/config'
-require 'mulukhiya-toot-proxy/logger'
-require 'mulukhiya-toot-proxy/slack'
+require 'mulukhiya/config'
+require 'mulukhiya/logger'
+require 'mulukhiya/slack'
 
 module MulukhiyaTootProxy
   class Handler
@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
     def self.all
       return enum_for(__method__) unless block_given?
       Config.instance['local']['handlers'].each do |handler|
-        require "mulukhiya-toot-proxy/handler/#{handler}"
+        require "mulukhiya/handler/#{handler}"
         yield "MulukhiyaTootProxy::#{handler.camelize}Handler".constantize.new
       end
     end

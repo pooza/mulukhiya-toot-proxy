@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/handler/amazon_asin'
+require 'mulukhiya/handler/amazon_asin'
 
 module MulukhiyaTootProxy
   class HandlerTest < Test::Unit::TestCase

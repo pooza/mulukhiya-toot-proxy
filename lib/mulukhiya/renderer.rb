@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/config'
+require 'mulukhiya/config'
 
 module MulukhiyaTootProxy
   class Renderer
