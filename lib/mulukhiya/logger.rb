@@ -1,6 +1,6 @@
 require 'json'
 require 'syslog/logger'
-require 'mulukhiya-toot-proxy/package'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class Logger

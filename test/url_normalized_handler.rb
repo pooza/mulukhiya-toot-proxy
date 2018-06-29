@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/handler/url_normalize'
+require 'mulukhiya/handler/url_normalize'
 
 module MulukhiyaTootProxy
   class UrlNormalizeHandlerTest < Test::Unit::TestCase

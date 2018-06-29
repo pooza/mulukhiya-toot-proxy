@@ -1,9 +1,9 @@
 require 'addressable/uri'
 require 'httparty'
 require 'json'
-require 'mulukhiya-toot-proxy/config'
-require 'mulukhiya-toot-proxy/logger'
-require 'mulukhiya-toot-proxy/package'
+require 'mulukhiya/config'
+require 'mulukhiya/logger'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class Slack

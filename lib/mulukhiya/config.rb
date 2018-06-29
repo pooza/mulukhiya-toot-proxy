@@ -1,6 +1,6 @@
 require 'yaml'
 require 'singleton'
-require 'mulukhiya-toot-proxy/package'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class Config < Hash

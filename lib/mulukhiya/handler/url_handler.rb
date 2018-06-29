@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/handler'
+require 'mulukhiya/handler'
 
 module MulukhiyaTootProxy
   class UrlHandler < Handler

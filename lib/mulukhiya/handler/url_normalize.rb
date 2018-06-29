@@ -1,5 +1,5 @@
 require 'addressable/uri'
-require 'mulukhiya-toot-proxy/handler/url_handler'
+require 'mulukhiya/handler/url_handler'
 
 module MulukhiyaTootProxy
   class UrlNormalizeHandler < UrlHandler

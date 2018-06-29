@@ -3,12 +3,12 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'httparty'
 require 'addressable/uri'
-require 'mulukhiya-toot-proxy/config'
-require 'mulukhiya-toot-proxy/slack'
-require 'mulukhiya-toot-proxy/package'
-require 'mulukhiya-toot-proxy/logger'
-require 'mulukhiya-toot-proxy/json_renderer'
-require 'mulukhiya-toot-proxy/handler'
+require 'mulukhiya/config'
+require 'mulukhiya/slack'
+require 'mulukhiya/package'
+require 'mulukhiya/logger'
+require 'mulukhiya/json_renderer'
+require 'mulukhiya/handler'
 
 module MulukhiyaTootProxy
   class Application < Sinatra::Base

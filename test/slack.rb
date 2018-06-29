@@ -1,4 +1,4 @@
-require 'mulukhiya-toot-proxy/slack'
+require 'mulukhiya/slack'
 
 module MulukhiyaTootProxy
   class SlackTest < Test::Unit::TestCase
