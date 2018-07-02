@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
           'Content-Type' => 'application/json',
           'User-Agent' => "#{Package.full_name} #{Package.url}",
         },
-        ssl_ca_file: File.join(ROOT_DIR, 'cert/cacert.pem'),
+        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       if message.is_a?(Exception)
         @logger.error(message)
