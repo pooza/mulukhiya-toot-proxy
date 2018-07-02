@@ -74,10 +74,11 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
-    error do
+    error do |e|
       @renderer = JSONRenderer.new
       @renderer.status = 500
-      @message[:response][:error] = env['sinatra.error'].message
+      @message[:response][:error] = "#{e.class}: #{e.message}"
+      @message[:backtrace] = e.backtrace[0..5]
       @renderer.message = @message
       Slack.all.map{ |h| h.say(@message)}
       return @renderer.to_s
