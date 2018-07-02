@@ -9,16 +9,6 @@ module MulukhiyaTootProxy
       @count = 0
     end
 
-    def forward(body, headers = {})
-      exec(body, headers)
-      return body
-    rescue => e
-      message = {class: self.class.to_s, message: "#{e.class}: #{e.message}"}
-      Logger.new.error(message)
-      Slack.all.map{ |h| h.say(message)}
-      return body
-    end
-
     def exec
       raise 'execが未定義です。'
     end
