@@ -15,12 +15,13 @@ task :test do
 end
 
 [:start, :stop, :restart].each do |action|
-  desc "#{action} thin"
+  desc "alias of server:#{action}"
   task action => ["server:#{action}"]
 end
 
 namespace :server do
   [:start, :stop, :restart].each do |action|
+    desc "#{action} thin"
     task action do
       sh "thin --config config/thin.yaml #{action}"
     end
