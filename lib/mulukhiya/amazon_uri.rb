@@ -35,7 +35,11 @@ module MulukhiyaTootProxy
       return self unless shortenable?
       dest = clone
       dest.path = "/dp/#{asin}"
-      dest.query_values = {tag: associate_id} if associate_id
+      if associate_id.present?
+        dest.query_values = {tag: associate_id}
+      else
+        dest.query_values = nil
+      end
       dest.fragment = nil
       return dest
     end
