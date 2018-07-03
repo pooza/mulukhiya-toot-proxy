@@ -46,6 +46,7 @@ vi config/local.yaml
 以下、設定例。
 
 ```
+instance_url: https://mstdn.example.com/
 handlers:
   - shortened_url
   - url_normalize
@@ -53,7 +54,7 @@ handlers:
 slack:
   hooks:
     - https://hooks.slack.com/services/xxxxx
-    - https://discordapp.com/api/webhooks/xxxxx
+    - https://discordapp.com/api/webhooks/xxxxx/slack
 amazon:
   associate_id: hoge
 ```
@@ -75,6 +76,7 @@ amazon:
 tomato-tootからのトゥートもモロヘイヤで処理される為、どちらかが誤動作した場合にループする
 可能性あり。（テスト中に実際に起きた）
 申し訳ないけど当面は、おとなしくSlackやDiscordのwebhookを登録して頂きたい。
+Discordの場合は、末尾に `/slack` を加えることをお忘れなく。
 
 #### /amazon/associate_id
 
@@ -105,15 +107,29 @@ mulukhiya-toot-proxyというプログラム名で、syslogに出力している
 
 通常はMastodonインスタンスがインストールされたサーバに設置するだろうから、Mastodon本体同様、
 nginxにリバースプロキシを設定。以下、nginx.confでの設定例。
+（[公式](https://github.com/tootsuite/documentation/blob/master/Running-Mastodon/Production-guide.md)
+に載っている手順通りにnginxを設定している想定）
 
 ```
     location = /api/v1/statuses {
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header Proxy "";
       proxy_pass_header Server;
+      proxy_buffering off;
+      proxy_redirect off;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+      tcp_nodelay on;
+
       if ($http_x_mulukhiya != '') {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
       }
       if ($http_x_mulukhiya = '') {
-        proxy_pass http://localhost:3008;
+        proxy_pass http://127.0.0.1:3008;
       }
     }
 ```
@@ -123,6 +139,18 @@ nginxにリバースプロキシを設定。以下、nginx.confでの設定例�
 Mastodonインスタンスに対する、トゥートのリクエストを横取りする設定。  
 処理後にリクエストヘッダ `X-Mulukhiya` を加えて `/api/v1/statuses` にPOSTし直す
 仕様である為、このような設定になっている。
+
+### テスト
+
+サーバを起動した後に、テストを実行する。
+
+```
+bundle exec rake start
+bundle exec rake test
+```
+
+`100% passed` が表示されることを確認。  
+このテストでは、プログラムだけでなく設定ファイル等、設置環境の検証も行っている。
 
 ## ■設定ファイルの検索順
 
