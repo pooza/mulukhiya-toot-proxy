@@ -1,4 +1,5 @@
 require 'mulukhiya/config'
+require 'mulukhiya/logger'
 
 module MulukhiyaTootProxy
   class Renderer
@@ -7,6 +8,7 @@ module MulukhiyaTootProxy
     def initialize
       @status = 200
       @config = Config.instance
+      @logger = Logger.new
     end
 
     def type
