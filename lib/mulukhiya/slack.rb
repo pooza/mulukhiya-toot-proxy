@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
         body: {text: JSON.pretty_generate(message)}.to_json,
         headers: {
           'Content-Type' => 'application/json',
-          'User-Agent' => "#{Package.full_name} #{Package.url}",
+          'User-Agent' => Package.user_agent,
         },
         ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
@@ -38,6 +38,12 @@ module MulukhiyaTootProxy
         (Config.instance['local']['slack']['hooks'] || []).each do |url|
           yield Slack.new(url)
         end
+      end
+    end
+
+    def self.broadcast(message)
+      all.each do |slack|
+        slack.say(message)
       end
     end
   end
