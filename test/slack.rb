@@ -1,4 +1,5 @@
 require 'mulukhiya/slack'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class SlackTest < Test::Unit::TestCase
@@ -10,7 +11,7 @@ module MulukhiyaTootProxy
 
     def test_say
       Slack.all do |slack|
-        assert_true(slack.say({text: 'hoge'}).response.is_a?(Net::HTTPOK))
+        assert_true(slack.say({text: Package.full_name}).response.is_a?(Net::HTTPOK))
       end
     end
   end
