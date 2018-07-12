@@ -59,6 +59,7 @@ module MulukhiyaTootProxy
       })
       @message[:response][:result] = @result
       @message.merge!(JSON.parse(response.to_s))
+      @renderer.status = response.code
       @renderer.message = @message
       headers({
         'X-Mulukhiya' => @result.join(', '),
