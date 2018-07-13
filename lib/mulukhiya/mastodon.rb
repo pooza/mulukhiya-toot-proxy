@@ -4,18 +4,16 @@ require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class Mastodon
-    attr_reader :url
-    attr_accessor :token
+    def initialize(url, token)
+      @url = Addressable::URI.parse(url)
+      @token = token
+    end
 
     def toot(body)
       return HTTParty.post(toot_url, {
         body: body.to_json,
         headers: headers,
       })
-    end
-
-    def url=(value)
-      @url = Addressable::URI.parse(value)
     end
 
     private
@@ -30,7 +28,7 @@ module MulukhiyaTootProxy
       return {
         'Content-Type' => 'application/json',
         'User-Agent' => Package.user_agent,
-        'Authorization' => "Bearer #{token}",
+        'Authorization' => "Bearer #{@token}",
         'X-Mulukhiya' => '1',
       }
     end
