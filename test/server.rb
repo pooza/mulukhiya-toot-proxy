@@ -1,4 +1,5 @@
 require 'mulukhiya/config'
+require 'mulukhiya/package'
 require 'addressable/uri'
 require 'httparty'
 
@@ -21,7 +22,7 @@ module MulukhiyaTootProxy
         body: {status: 'a' * (MAX_LENGTH + 1), visibility: 'private'}.to_json,
         headers: headers,
       })
-      assert_equal(422, result.code) #文字数オーバー
+      assert_equal(422, result.code) # 文字数オーバー
     end
 
     private
@@ -36,6 +37,7 @@ module MulukhiyaTootProxy
       return {
         'Content-Type' => 'application/json',
         'Authorization' => "Bearer #{@config['local']['test']['token']}",
+        'User-Agent' => Package.user_agent,
       }
     end
   end

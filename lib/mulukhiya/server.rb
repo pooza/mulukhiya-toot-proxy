@@ -23,16 +23,16 @@ module MulukhiyaTootProxy
     end
 
     before do
-      @message = {request: {path: request.path, params: params}, response: {}}
       @renderer = JSONRenderer.new
       @headers = request.env.select{ |k, v| k.start_with?('HTTP_')}
       @result = []
+      @body = request.body.read.to_s
       begin
-        @params = JSON.parse(request.body.read.to_s)
+        @params = JSON.parse(@body)
       rescue
-        @params = params
+        @params = params.clone
       end
-      @message[:request][:params] = @params
+      @message = {request: {path: request.path, params: @params}, response: {}}
     end
 
     after do
@@ -60,6 +60,13 @@ module MulukhiyaTootProxy
       @message[:response][:result] = @result
       @message.merge!(JSON.parse(response.to_s))
       @renderer.status = response.code
+      if 400 <= response.code
+        Slack.broadcast({
+          params: @params,
+          body: @body,
+          useragent: @headers['HTTP_USER_AGENT'],
+        })
+      end
       @renderer.message = @message
       headers({
         'X-Mulukhiya' => @result.join(', '),
