@@ -47,6 +47,8 @@ vi config/local.yaml
 
 ```
 instance_url: https://mstdn.example.com/
+test:
+  token: hogehoge
 handlers:
   - shortened_url
   - url_normalize
