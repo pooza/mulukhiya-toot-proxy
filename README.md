@@ -9,6 +9,7 @@
 
 - 各種短縮URLを戻し、リンク先を明らかにする。
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
+- 貼られたURLのページがcanonicalのURLを持っていたら、そちらに書き換える。
 - アマゾンの商品URLからノイズを除去する。可能ならばアソシエイトIDを加える。
 
 ### トゥートを改変するということ
@@ -51,6 +52,7 @@ test:
   token: hogehoge
 handlers:
   - shortened_url
+  - canonical
   - url_normalize
   - amazon_asin
 slack:
@@ -196,6 +198,18 @@ Mastodonインスタンスへのトゥート要求に対して、事前に設定
   - amzn.asia
   - youtu.be
   - git.io
+- リダイレクト先が上記のサービスに該当する限り、連続する次のリダイレクトリンク先も読む。
+  実際の利用では、例えばTwitterにbit.ly短縮URLを貼った場合（t.co→bit.lyのリダイレクトが
+  発生）等で、高い頻度で該当しうると思われる。
+
+### CanonicalHandler
+
+- アンダースコア名 canonical
+- リンク先のページに以下のような記述があった場合、本文中のURLをこれに置き換える。
+
+```
+<link rel="canonical" href="https://example.com/hoge">
+```
 
 ### UrlNormalizeHandler
 
