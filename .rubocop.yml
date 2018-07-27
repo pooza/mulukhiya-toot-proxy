@@ -1,3 +1,6 @@
+AllCops:
+  AllowSymlinksInCacheRootDirectory: true
+
 Style/DoubleNegation:
   Enabled: false
 
@@ -24,7 +27,13 @@ Metrics/ClassLength:
 
 Naming/FileName:
   Exclude:
-    - 'Rakefile.rb'
+    - Rakefile.rb
+    - webapp/config/Rakefile.local.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - Rakefile.rb
+    - webapp/config/Rakefile.local.rb
 
 Style/BracesAroundHashParameters:
   Enabled: false
