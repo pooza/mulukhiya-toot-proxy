@@ -1,14 +1,13 @@
 require 'sinatra'
 require 'active_support'
 require 'active_support/core_ext'
-require 'httparty'
-require 'addressable/uri'
 require 'mulukhiya/config'
 require 'mulukhiya/slack'
 require 'mulukhiya/package'
 require 'mulukhiya/logger'
 require 'mulukhiya/json_renderer'
 require 'mulukhiya/handler'
+require 'mulukhiya/mastodon'
 
 module MulukhiyaTootProxy
   class Server < Sinatra::Base
@@ -23,16 +22,15 @@ module MulukhiyaTootProxy
     end
 
     before do
-      @message = {request: {path: request.path, params: params}, response: {}}
       @renderer = JSONRenderer.new
       @headers = request.env.select{ |k, v| k.start_with?('HTTP_')}
-      @result = []
+      @body = request.body.read.to_s
       begin
-        @params = JSON.parse(request.body.read.to_s)
+        @params = JSON.parse(@body)
       rescue
-        @params = params
+        @params = params.clone
       end
-      @message[:request][:params] = @params
+      @message = {request: {path: request.path, params: @params}, response: {result: []}}
     end
 
     after do
@@ -53,16 +51,21 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      response = HTTParty.post(toot_url, {
-        body: toot_body,
-        headers: toot_request_headers,
-      })
-      @message[:response][:result] = @result
+      Handler.all do |handler|
+        handler.exec(@params, @headers)
+        @message[:response][:result].push(handler.result)
+      end
+
+      response = Mastodon.new(
+        (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+        @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
+      ).toot(@params)
       @message.merge!(JSON.parse(response.to_s))
       @renderer.status = response.code
+      Slack.broadcast({params: @params, body: @body, headers: @headers}) if 400 <= response.code
       @renderer.message = @message
       headers({
-        'X-Mulukhiya' => @result.join(', '),
+        'X-Mulukhiya' => @message[:response][:result].join(', '),
       })
       return @renderer.to_s
     end
@@ -83,34 +86,6 @@ module MulukhiyaTootProxy
       @renderer.message = @message
       Slack.broadcast(@message)
       return @renderer.to_s
-    end
-
-    private
-
-    def toot_url
-      url = Addressable::URI.parse(@config['local']['instance_url'])
-      url.path = '/api/v1/statuses'
-      return url
-    rescue
-      return Addressable::URI.parse("https://#{@headers['HTTP_HOST']}/api/v1/statuses")
-    end
-
-    def toot_body
-      body = @params.clone
-      Handler.all do |handler|
-        handler.exec(body, @headers)
-        @result.push(handler.result)
-      end
-      return body.to_json
-    end
-
-    def toot_request_headers
-      return {
-        'Content-Type' => 'application/json',
-        'User-Agent' => "#{@headers['HTTP_USER_AGENT']} +#{Package.full_name}",
-        'Authorization' => "Bearer #{@headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]}",
-        'X-Mulukhiya' => @result.join(', '),
-      }
     end
   end
 end
