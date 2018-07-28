@@ -5,12 +5,15 @@ require 'mulukhiya/handler/url_handler'
 module MulukhiyaTootProxy
   class ShortenedUrlHandler < UrlHandler
     def rewrite(link)
-      uri = Addressable::URI.parse(link).normalize
+      uri = Addressable::URI.parse(link)
       while domains.member?(uri.host)
-        response = HTTParty.get(uri, {follow_redirects: false, timeout: timeout})
+        response = HTTParty.get(uri.normalize, {
+          follow_redirects: false,
+          timeout: timeout,
+        })
         location = response.headers['location']
         break unless location
-        uri = Addressable::URI.parse(location).normalize
+        uri = Addressable::URI.parse(location)
       end
       @status.sub!(link, uri.to_s)
     end
