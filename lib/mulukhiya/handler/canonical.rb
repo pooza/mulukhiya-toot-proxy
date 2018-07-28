@@ -5,8 +5,13 @@ require 'mulukhiya/handler/url_handler'
 
 module MulukhiyaTootProxy
   class CanonicalHandler < UrlHandler
+    def initialize
+      super
+      @canonicals = {}
+    end
+
     def rewrite(link)
-      @status.sub!(link, @canonical)
+      @status.sub!(link, @canonicals[link]) if @canonicals[link].present?
     end
 
     private
@@ -16,8 +21,9 @@ module MulukhiyaTootProxy
       body = Nokogiri::HTML.parse(HTTParty.get(uri).body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
-      @canonical = elements.first.attribute('href')
-      return @canonical.present?
+      @canonicals[link] = elements.first.attribute('href')
+      return @canonicals[link].present?
     end
+
   end
 end
