@@ -12,10 +12,11 @@ module MulukhiyaTootProxy
     private
 
     def rewritable?(link)
-      body = Nokogiri::HTML.parse(HTTParty.get(link).body, nil, 'utf-8')
-      element = body.xpath('//link[@rel="canonical"]')
-      return false unless element.present?
-      @canonical = element.first.attribute('href')
+      uri = Addressable::URI.parse(link).normalize
+      body = Nokogiri::HTML.parse(HTTParty.get(uri).body, nil, 'utf-8')
+      elements = body.xpath('//link[@rel="canonical"]')
+      return false unless elements.present?
+      @canonical = elements.first.attribute('href')
       return @canonical.present?
     end
   end
