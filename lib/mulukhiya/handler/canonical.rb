@@ -24,6 +24,5 @@ module MulukhiyaTootProxy
       @canonicals[link] = elements.first.attribute('href')
       return @canonicals[link].present?
     end
-
   end
 end
