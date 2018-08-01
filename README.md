@@ -209,6 +209,7 @@ Mastodonインスタンスへのトゥート要求に対して、事前に設定
 
 - アンダースコア名 canonical
 - リンク先ページに以下のような記述があった場合、本文中のURLをこれに置き換える。
+  但し相対URLであった場合（`href="/Login"` 等）は無視する。
 
 ```
 <link rel="canonical" href="https://example.com/hoge">
