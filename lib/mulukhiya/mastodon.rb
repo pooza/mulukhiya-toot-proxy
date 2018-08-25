@@ -1,8 +1,8 @@
 require 'httparty'
 require 'addressable/uri'
 require 'mulukhiya/package'
-require 'tempfile'
 require 'rest-client'
+require 'json'
 
 module MulukhiyaTootProxy
   class Mastodon
@@ -23,24 +23,24 @@ module MulukhiyaTootProxy
       })
     end
 
-    def upload_remote_image(url)
-      file = Tempfile.create(
-        Digest::SHA1.hexdigest(url),
-        File.join(ROOT_DIR, 'tmp/media'),
-      )
-      file.write(HTTParty.get(url))
-
+    def upload(path)
       response = RestClient.post(
-        create_url('/api/v1/media').to_s, {
-          file: File.new(file.path, 'rb'),
-        }, {
+        create_url('/api/v1/media').to_s,
+        {file: File.new(path, 'rb')},
+        {
           'User-Agent' => Package.user_agent,
           'Authorization' => "Bearer #{@token}",
-        }
+        },
       )
       return JSON.parse(response.body)['id'].to_i
+    end
+
+    def upload_remote_image(url)
+      path = File.join(ROOT_DIR, 'tmp/media', Digest::SHA1.hexdigest(url))
+      File.write(path, HTTParty.get(url))
+      return upload(path)
     ensure
-      File.unlink(file.path) if File.exist?(file.path)
+      File.unlink(path) if File.exist?(path)
     end
 
     private
@@ -49,10 +49,6 @@ module MulukhiyaTootProxy
       toot_url = @url.clone
       toot_url.path = href
       return toot_url
-    end
-
-    def headers
-      return
     end
   end
 end
