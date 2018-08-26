@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
       @count = 0
     end
 
-    def exec
+    def exec(body, headers = {})
       raise 'execが未定義です。'
     end
 
