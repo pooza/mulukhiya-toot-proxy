@@ -23,15 +23,19 @@ module MulukhiyaTootProxy
       response = Amazon::Ecs.item_lookup(uri.asin, {country: 'jp', response_group: 'Images'})
       raise response.error if response.has_error?
       raise "ASIN #{uri.asin} not found." unless response.items.present?
+      body['media_ids'] ||= []
+      body['media_ids'].push(upload(response.items.first.get('LargeImage/URL'), headers))
+      increment!
+    end
+
+    private
+
+    def upload(url, headers)
       mastodon = Mastodon.new(
         (@config['local']['instance_url'] || "https://#{headers['HTTP_HOST']}"),
         headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
-      body['media_ids'] ||= []
-      body['media_ids'].push(
-        mastodon.upload_remote_image(response.items.first.get('LargeImage/URL')),
-      )
-      increment!
+      return mastodon.upload_remote_image(url)
     end
   end
 end
