@@ -27,6 +27,7 @@ module MulukhiyaTootProxy
         (@config['local']['instance_url'] || "https://#{headers['HTTP_HOST']}"),
         headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
+      body['media_ids'] ||= []
       body['media_ids'].push(
         mastodon.upload_remote_image(response.items.first.get('LargeImage/URL')),
       )
