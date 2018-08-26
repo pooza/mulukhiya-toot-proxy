@@ -13,6 +13,7 @@
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
 - 貼られたURLのページにcanonical指定があったら、そちらに書き換える。
 - アマゾンの商品URLからノイズを除去する。可能ならばアソシエイトIDを加える。
+- アマゾンの商品URLがあったら、商品画像を添付する。
 
 ### トゥートを改変するということ
 
@@ -57,6 +58,7 @@ handlers:
   - canonical
   - url_normalize
   - amazon_asin
+  - amazon_image
 slack:
   hooks:
     - https://hooks.slack.com/services/xxxxx
@@ -99,7 +101,7 @@ Discordの場合は、末尾に `/slack` を加えることをお忘れなく。
 テスト時に使用するアクセストークンを記述。  
 省略可能だが、明示的な指定を強く推奨。指定しないと、テストが実行できない。  
 ユーザー設定→開発（/settings/applications）で作成できる。アクセス権は
-`write` のみ（インスタンスのバージョンが2.4.3以上なら `write:statuses` のみ）必要。
+`write:statuses` と `write:media` を設定。単に `write` でも可。
 
 ### syslog設定
 
@@ -239,6 +241,15 @@ Mastodonインスタンスへのトゥート要求に対して、事前に設定
   - /gp/product/__ASIN__
   - /exec/obidos/ASIN/__ASIN__
   - /o/ASIN/__ASIN__
+
+### AmazonImageHandler
+
+アマゾンの商品画像を添付する。
+
+- アンダースコア名 amazon_image
+- 本文中にアマゾンの商品URLがある場合は、商品画像を添付。
+- 複数の商品URLがある場合は、その先頭のもののみ処理する。
+- 既に4つ、画像や動画が貼られたトゥートに対しては422エラーを返す。
 
 ## ■制約
 
