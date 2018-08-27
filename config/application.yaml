@@ -12,3 +12,5 @@ shortened_url:
     - amzn.asia
     - youtu.be
     - git.io
+amazon_image:
+  retry_limit: 5
