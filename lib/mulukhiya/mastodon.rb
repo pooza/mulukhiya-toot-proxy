@@ -35,7 +35,7 @@ module MulukhiyaTootProxy
       return JSON.parse(response.body)['id'].to_i
     end
 
-    def upload_remote_image(url)
+    def upload_remote_resource(url)
       path = File.join(ROOT_DIR, 'tmp/media', Digest::SHA1.hexdigest(url))
       File.write(path, HTTParty.get(url))
       return upload(path)

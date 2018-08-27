@@ -35,7 +35,7 @@ module MulukhiyaTootProxy
         (@config['local']['instance_url'] || "https://#{headers['HTTP_HOST']}"),
         headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
-      return mastodon.upload_remote_image(url)
+      return mastodon.upload_remote_resource(url)
     end
   end
 end
