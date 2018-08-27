@@ -37,12 +37,12 @@ module MulukhiyaTootProxy
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp/dp/hoge')
 
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge')
-      uri.associate_id = 'bshockfortrbl-22'
+      uri.associate_tag = 'bshockfortrbl-22'
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22')
 
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge?a=eee')
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp/dp/hoge')
-      uri.associate_id = 'bshockfortrbl-22'
+      uri.associate_tag = 'bshockfortrbl-22'
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22')
     end
   end

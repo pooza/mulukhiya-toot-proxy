@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
   class AmazonAsinHandler < UrlHandler
     def rewrite(link)
       uri = AmazonURI.parse(link)
-      uri.associate_id = associate_id
+      uri.associate_tag = @config.associate_tag if @config['local']['amazon']['affiliate']
       @status.sub!(link, uri.shorten.to_s)
     end
 
@@ -13,12 +13,6 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       return AmazonURI.parse(link).shortenable?
-    end
-
-    def associate_id
-      return @config['local']['amazon']['associate_id']
-    rescue
-      return nil
     end
   end
 end

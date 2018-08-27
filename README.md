@@ -88,10 +88,16 @@ tomato-tootからのトゥートもモロヘイヤで処理される為、どち
 申し訳ないけど当面は、おとなしくSlackやDiscordのwebhookを登録して頂きたい。
 Discordの場合は、末尾に `/slack` を加えることをお忘れなく。
 
-#### /amazon/associate_id
+#### /amazon/associate_tag
 
-amazonのアソシエイトIDをお持ちであれば、それを指定。  
+amazonのアソシエイトタグをお持ちであれば、それを指定。
+（歴史的経緯から `/amazon/associate_id` に指定してもよいが、非推奨）  
 アフィリエイトを使用する場合、又は商品画像の添付を行う場合に要指定。
+
+#### /amazon/affiliate
+
+amazonのアフィリエイトを使用する場合は、 `true` を指定。URLの末尾に `?tag=hogefuga` が追加される。
+使用しない場合は指定不要。
 
 #### /amazon/access_key
 
