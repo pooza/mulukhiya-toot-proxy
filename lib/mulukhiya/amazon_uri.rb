@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def amazon?
-      return host.split('.').member?('amazon')
+      return absolute? && host.split('.').member?('amazon')
     end
 
     def asin
