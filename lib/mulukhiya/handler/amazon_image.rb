@@ -16,14 +16,10 @@ module MulukhiyaTootProxy
 
     def exec(body, headers = {})
       cnt = 1
-      links = body['status'].scan(%r{https?://[^\s[:cntrl:]]+})
-      return unless links.present?
-      uri = AmazonURI.parse(links.first)
+      uri = AmazonURI.parse(body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).first)
       return unless uri.amazon?
-
       response = Amazon::Ecs.item_lookup(uri.asin, {country: 'jp', response_group: 'Images'})
       raise response.error if response.has_error?
-      raise "ASIN #{uri.asin} not found." unless response.items.present?
       body['media_ids'] ||= []
       body['media_ids'].push(upload(response.items.first.get('LargeImage/URL'), headers))
       increment!
