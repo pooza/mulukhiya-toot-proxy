@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       handler = AmazonAsinHandler.new
       config = Config.instance
 
-      if config.associate_tag
+      if config['local']['amazon']['affiliate'] && config.associate_tag
         assert_equal(handler.exec({'status' => 'https://www.amazon.co.jp/日本語の長い長い商品名/dp/B07CJ4KH1T/ref=sr_1_1?s=hobby&ie=UTF8&qid=1529591544&sr=1-1'})['status'], "https://www.amazon.co.jp/dp/B07CJ4KH1T?tag=#{config.associate_tag}")
         assert_equal(handler.result, 'AmazonAsinHandler,1')
 
