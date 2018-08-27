@@ -64,7 +64,7 @@ slack:
     - https://hooks.slack.com/services/xxxxx
     - https://discordapp.com/api/webhooks/xxxxx/slack
 amazon:
-  associate_id: hoge
+  associate_tag: hoge
   access_key: fuga
   secret_key: piyo
 ```
