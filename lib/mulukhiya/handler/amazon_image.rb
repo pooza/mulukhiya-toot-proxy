@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['local']['amazon']['access_key']
         options[:AWS_secret_key] = @config['local']['amazon']['secret_key']
-        options[:associate_tag] = @config['local']['amazon']['associate_id']
+        options[:associate_tag] = @config.associate_tag
       end
     end
 

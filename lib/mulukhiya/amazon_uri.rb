@@ -19,13 +19,13 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def associate_id
+    def associate_tag
       return query_values['tag']
     rescue
       return nil
     end
 
-    def associate_id=(tag)
+    def associate_tag=(tag)
       values = query_values || {}
       values['tag'] = tag
       self.query_values = values
@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       dest.path = "/dp/#{asin}"
       dest.fragment = nil
       dest.query_values = nil
-      dest.query_values = {tag: associate_id} if associate_id.present?
+      dest.query_values = {tag: associate_tag} if associate_tag.present?
       return dest
     end
 
