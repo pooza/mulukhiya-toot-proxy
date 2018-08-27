@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       cnt = 1
       uri = AmazonURI.parse(body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).first)
+      return unless uri
       return unless uri.amazon?
       response = Amazon::Ecs.item_lookup(uri.asin, {country: 'jp', response_group: 'Images'})
       raise response.error if response.has_error?
