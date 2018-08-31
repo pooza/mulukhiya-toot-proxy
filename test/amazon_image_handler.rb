@@ -13,6 +13,12 @@ module MulukhiyaTootProxy
         {'HTTP_AUTHORIZATION' => "Bearer #{config['local']['test']['token']}"},
       )
       assert_equal(handler.result, 'AmazonImageHandler,1')
+
+      handler.exec(
+        {'status' => 'https://www.amazon.co.jp/gp/customer-reviews/R2W0VIBA0RBSLY/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8&ASIN=B00TYVQBEU'},
+        {'HTTP_AUTHORIZATION' => "Bearer #{config['local']['test']['token']}"},
+      )
+      assert_equal(handler.result, 'AmazonImageHandler,1')
     end
   end
 end

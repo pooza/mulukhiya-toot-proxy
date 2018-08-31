@@ -19,6 +19,7 @@ module MulukhiyaTootProxy
       uri = AmazonURI.parse(body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).first)
       return unless uri
       return unless uri.amazon?
+      return unless uri.asin.present?
       response = Amazon::Ecs.item_lookup(uri.asin, {country: 'jp', response_group: 'Images'})
       raise response.error if response.has_error?
       body['media_ids'] ||= []
