@@ -1,29 +1,19 @@
 require 'mulukhiya/amazon_uri'
 require 'mulukhiya/handler'
 require 'mulukhiya/mastodon'
-require 'amazon/ecs'
+require 'mulukhiya/amazon_service'
 
 module MulukhiyaTootProxy
   class AmazonImageHandler < Handler
-    def initialize
-      super
-      Amazon::Ecs.configure do |options|
-        options[:AWS_access_key_id] = @config['local']['amazon']['access_key']
-        options[:AWS_secret_key] = @config['local']['amazon']['secret_key']
-        options[:associate_tag] = @config.associate_tag
-      end
-    end
-
     def exec(body, headers = {})
       cnt = 1
-      uri = AmazonURI.parse(body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).first)
-      return unless uri
-      return unless uri.amazon?
-      return unless uri.asin.present?
-      response = Amazon::Ecs.item_lookup(uri.asin, {country: 'jp', response_group: 'Images'})
-      raise response.error if response.has_error?
+      links = body['status'].scan(%r{https?://[^\s[:cntrl:]]+})
+      return unless links.present?
+      uri = AmazonURI.parse(links.first)
+      return if !uri.amazon? || !uri.asin.present?
+      image_uri = AmazonService.new.image_uri(uri.asin)
       body['media_ids'] ||= []
-      body['media_ids'].push(upload(response.items.first.get('LargeImage/URL'), headers))
+      body['media_ids'].push(mastodon(headers).upload_remote_resource(image_uri))
       increment!
     rescue Amazon::RequestError => e
       raise "#{e.class}: retrying #{retry_limit} times." if retry_limit < cnt
@@ -38,12 +28,11 @@ module MulukhiyaTootProxy
       return @config['application']['amazon_image']['retry_limit']
     end
 
-    def upload(url, headers)
-      mastodon = Mastodon.new(
+    def mastodon(headers)
+      return Mastodon.new(
         (@config['local']['instance_url'] || "https://#{headers['HTTP_HOST']}"),
         headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
-      return mastodon.upload_remote_resource(url)
     end
   end
 end
