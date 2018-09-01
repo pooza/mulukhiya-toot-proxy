@@ -1,4 +1,5 @@
 require 'addressable/uri'
+require 'mulukhiya/amazon_service'
 
 module MulukhiyaTootProxy
   class AmazonURI < Addressable::URI
@@ -29,6 +30,19 @@ module MulukhiyaTootProxy
       values = query_values || {}
       values['tag'] = tag
       self.query_values = values
+    end
+
+    def image_uri
+      unless @image_uri
+        return nil unless amazon?
+        return nil unless asin.present?
+        @image_uri = AmazonService.new.image_uri(asin)
+      end
+      return @image_uri
+    end
+
+    def image_url
+      return image_uri
     end
 
     def shorten
