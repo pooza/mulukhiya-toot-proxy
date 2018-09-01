@@ -18,9 +18,15 @@ module MulukhiyaTootProxy
     end
 
     def image_uri(asin)
+      cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {country: 'jp', response_group: 'Images'})
       raise response.error if response.has_error?
       return Addressable::URI.parse(response.items.first.get('LargeImage/URL'))
+    rescue Amazon::RequestError => e
+      raise "#{e.class}: retried #{retry_limit} times." if retry_limit < cnt
+      sleep(1)
+      cnt += 1
+      retry
     end
   end
 end
