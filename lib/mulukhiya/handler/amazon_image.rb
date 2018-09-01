@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
       end
       increment!
     rescue Amazon::RequestError => e
-      raise "#{e.class}: retrying #{retry_limit} times." if retry_limit < cnt
+      raise "#{e.class}: retried #{retry_limit} times." if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
