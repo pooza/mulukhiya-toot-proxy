@@ -80,7 +80,11 @@ module MulukhiyaTootProxy
 
     error do |e|
       @renderer = JSONRenderer.new
-      @renderer.status = 500
+      begin
+        @renderer.status = e.status
+      rescue
+        @renderer.status = 500
+      end
       @message[:response][:error] = "#{e.class}: #{e.message}"
       @message[:backtrace] = e.backtrace[0..5]
       @renderer.message = @message
