@@ -1,8 +1,14 @@
 require 'addressable/uri'
 require 'mulukhiya/amazon_service'
+require 'mulukhiya/config'
 
 module MulukhiyaTootProxy
   class AmazonURI < Addressable::URI
+    def initialize(options = {})
+      super(options)
+      @config = Config.instance
+    end
+
     def shortenable?
       return amazon? && asin.present?
     end
@@ -12,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def asin
-      asin_patterns.each do |pattern|
+      asin_patterns do |pattern|
         if matches = path.match(pattern)
           return matches[1]
         end
@@ -58,12 +64,10 @@ module MulukhiyaTootProxy
     private
 
     def asin_patterns
-      return [
-        %r{/dp/([A-Za-z0-9]+)},
-        %r{/gp/product/([A-Za-z0-9]+)},
-        %r{/exec/obidos/ASIN/([A-Za-z0-9]+)},
-        %r{/o/ASIN/([A-Za-z0-9]+)},
-      ]
+      return enum_for(__method__) unless block_given?
+      @config['application']['amazon_uri']['patterns'].each do |pattern|
+        yield Regexp.new(pattern)
+      end
     end
   end
 end
