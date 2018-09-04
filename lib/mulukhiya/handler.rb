@@ -4,6 +4,8 @@ require 'mulukhiya/slack'
 
 module MulukhiyaTootProxy
   class Handler
+    attr_accessor :mastodon
+
     def initialize
       @config = Config.instance
       @count = 0
