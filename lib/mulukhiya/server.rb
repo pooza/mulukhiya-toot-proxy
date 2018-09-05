@@ -30,11 +30,13 @@ module MulukhiyaTootProxy
       rescue
         @params = params.clone
       end
-      @mastodon = Mastodon.new(
-        (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
-        @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
-      )
       @message = {request: {path: request.path, params: @params}, response: {result: []}}
+      if @headers['HTTP_AUTHORIZATION']
+        @mastodon = Mastodon.new(
+          (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+          @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
+        )
+      end
     end
 
     after do
