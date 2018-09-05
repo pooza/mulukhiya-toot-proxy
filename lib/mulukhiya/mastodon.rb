@@ -1,8 +1,10 @@
 require 'httparty'
 require 'addressable/uri'
-require 'mulukhiya/package'
 require 'rest-client'
+require 'digest/sha1'
 require 'json'
+require 'mulukhiya/package'
+require 'mulukhiya/external_service_error'
 
 module MulukhiyaTootProxy
   class Mastodon
@@ -37,13 +39,19 @@ module MulukhiyaTootProxy
 
     def upload_remote_resource(url)
       path = File.join(ROOT_DIR, 'tmp/media', Digest::SHA1.hexdigest(url))
-      File.write(path, HTTParty.get(url))
+      File.write(path, fetch(url))
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
     end
 
     private
+
+    def fetch(url)
+      return HTTParty.get(url)
+    rescue => e
+      raise ExternalServiceError, e.message
+    end
 
     def create_url(href)
       toot_url = @url.clone

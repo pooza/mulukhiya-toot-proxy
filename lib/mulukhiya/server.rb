@@ -31,6 +31,12 @@ module MulukhiyaTootProxy
         @params = params.clone
       end
       @message = {request: {path: request.path, params: @params}, response: {result: []}}
+      if @headers['HTTP_AUTHORIZATION']
+        @mastodon = Mastodon.new(
+          (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+          @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
+        )
+      end
     end
 
     after do
@@ -52,14 +58,12 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses' do
       Handler.all do |handler|
+        handler.mastodon = @mastodon
         handler.exec(@params, @headers)
         @message[:response][:result].push(handler.result)
       end
 
-      response = Mastodon.new(
-        (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
-        @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
-      ).toot(@params)
+      response = @mastodon.toot(@params)
       @message.merge!(JSON.parse(response.to_s))
       @renderer.status = response.code
       Slack.broadcast({params: @params, body: @body, headers: @headers}) if 400 <= response.code
