@@ -264,7 +264,7 @@ amazonの商品URLを正規化する。
   - /gp/product/__ASIN__
   - /exec/obidos/ASIN/__ASIN__
   - /o/ASIN/__ASIN__
-
+  - /gp/video/detail/__ASIN__
 ### AmazonImageHandler
 
 amazonの商品画像を添付する。
