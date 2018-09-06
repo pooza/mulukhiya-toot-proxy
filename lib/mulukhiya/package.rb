@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def self.user_agent
-      return "#{name} #{version} #{url}"
+      return "#{name}/#{version} (#{url})"
     end
   end
 end
