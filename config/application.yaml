@@ -22,5 +22,7 @@ amazon_uri:
       shortenable: true
     - pattern: /o/ASIN/([[:alnum:]]+)
       shortenable: true
+    - pattern: /gp/video/detail/([[:alnum:]]+)
+      shortenable: true
 amazon_ecs:
   retry_limit: 5
