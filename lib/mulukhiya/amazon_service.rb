@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['local']['amazon']['access_key']
         options[:AWS_secret_key] = @config['local']['amazon']['secret_key']
-        options[:associate_tag] = @config.associate_tag
+        options[:associate_tag] = AmazonService.associate_tag
       end
     end
 
@@ -32,6 +32,12 @@ module MulukhiyaTootProxy
 
     def retry_limit
       return @config['application']['amazon_ecs']['retry_limit']
+    end
+
+    def self.associate_tag
+      return Config.instance['local']['amazon']['associate_tag']
+    rescue
+      return nil
     end
   end
 end

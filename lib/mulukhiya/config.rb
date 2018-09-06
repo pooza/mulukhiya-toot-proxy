@@ -29,11 +29,5 @@ module MulukhiyaTootProxy
     def suffixes
       return ['.yaml', '.yml']
     end
-
-    def associate_tag
-      return self['local']['amazon']['associate_tag'] || self['local']['amazon']['associate_id']
-    rescue
-      return nil
-    end
   end
 end
