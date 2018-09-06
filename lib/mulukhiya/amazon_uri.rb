@@ -10,7 +10,13 @@ module MulukhiyaTootProxy
     end
 
     def shortenable?
-      return amazon? && asin.present?
+      return false unless amazon?
+      return false unless asin.present?
+      patterns.each do |entry|
+        next unless path.match(Regexp.new(entry['pattern']))
+        return entry['shortenable']
+      end
+      return false
     end
 
     def amazon?
@@ -18,8 +24,8 @@ module MulukhiyaTootProxy
     end
 
     def asin
-      asin_patterns do |pattern|
-        if matches = path.match(pattern)
+      patterns.each do |entry|
+        if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
       end
@@ -63,11 +69,8 @@ module MulukhiyaTootProxy
 
     private
 
-    def asin_patterns
-      return enum_for(__method__) unless block_given?
-      @config['application']['amazon_uri']['patterns'].each do |pattern|
-        yield Regexp.new(pattern)
-      end
+    def patterns
+      return @config['application']['amazon_uri']['patterns']
     end
   end
 end

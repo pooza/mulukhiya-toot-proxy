@@ -14,9 +14,13 @@ shortened_url:
     - git.io
 amazon_uri:
   patterns:
-    - /dp/([[:alnum:]]+)
-    - /gp/product/([[:alnum:]]+)
-    - /exec/obidos/ASIN/([[:alnum:]]+)
-    - /o/ASIN/([[:alnum:]]+)
+    - pattern: /dp/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /gp/product/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /o/ASIN/([[:alnum:]]+)
+      shortenable: true
 amazon_ecs:
   retry_limit: 5
