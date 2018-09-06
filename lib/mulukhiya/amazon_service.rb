@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['local']['amazon']['access_key']
         options[:AWS_secret_key] = @config['local']['amazon']['secret_key']
-        options[:associate_tag] = @config.associate_tag
+        options[:associate_tag] = AmazonService.associate_tag
       end
     end
 
@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
     def image_uri(asin)
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {country: 'jp', response_group: 'Images'})
-      raise response.error if response.has_error?
+      raise ExternalServiceError, response.error if response.has_error?
       return Addressable::URI.parse(response.items.first.get('LargeImage/URL'))
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
@@ -31,7 +31,13 @@ module MulukhiyaTootProxy
     end
 
     def retry_limit
-      return @config['application']['amazon_ecs']['retry_limit']
+      return @config['application']['amazon']['retry_limit']
+    end
+
+    def self.associate_tag
+      return Config.instance['local']['amazon']['associate_tag']
+    rescue
+      return nil
     end
   end
 end

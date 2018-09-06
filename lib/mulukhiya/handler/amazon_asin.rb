@@ -1,11 +1,12 @@
 require 'mulukhiya/amazon_uri'
+require 'mulukhiya/amazon_service'
 require 'mulukhiya/handler/url_handler'
 
 module MulukhiyaTootProxy
   class AmazonAsinHandler < UrlHandler
     def rewrite(link)
       uri = AmazonURI.parse(link)
-      uri.associate_tag = @config.associate_tag if @config['local']['amazon']['affiliate']
+      uri.associate_tag = AmazonService.associate_tag
       @status.sub!(link, uri.shorten.to_s)
     end
 

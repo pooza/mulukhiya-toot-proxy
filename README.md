@@ -94,11 +94,6 @@ Discordの場合は、末尾に `/slack` を加えることをお忘れなく。
 amazonのアソシエイトタグをお持ちであれば、それを指定。
 アフィリエイトを使用する場合、又は商品画像の添付を行う場合に要指定。
 
-#### /amazon/associate_id
-
-amazonのアソシエイトタグをお持ちであればそれを指定できるが、非推奨。
-`/amazon/associate_tag` をご利用頂きたい。廃止予定。
-
 #### /amazon/access_key
 
 amazonアソシエイトのアクセスキーを指定。

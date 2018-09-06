@@ -1,5 +1,5 @@
 package:
-  version: 1.2.5
+  version: 1.2.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -12,11 +12,16 @@ shortened_url:
     - amzn.asia
     - youtu.be
     - git.io
-amazon_uri:
-  patterns:
-    - /dp/([[:alnum:]]+)
-    - /gp/product/([[:alnum:]]+)
-    - /exec/obidos/ASIN/([[:alnum:]]+)
-    - /o/ASIN/([[:alnum:]]+)
-amazon_ecs:
+amazon:
   retry_limit: 5
+  patterns:
+    - pattern: /dp/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /gp/product/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /o/ASIN/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /gp/video/detail/([[:alnum:]]+)
+      shortenable: true
