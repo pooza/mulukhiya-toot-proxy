@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
     def image_uri(asin)
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {country: 'jp', response_group: 'Images'})
-      raise response.error if response.has_error?
+      raise ExternalServiceError, response.error if response.has_error?
       return Addressable::URI.parse(response.items.first.get('LargeImage/URL'))
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
