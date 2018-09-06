@@ -70,7 +70,7 @@ module MulukhiyaTootProxy
     private
 
     def patterns
-      return @config['application']['amazon_uri']['patterns']
+      return @config['application']['amazon']['patterns']
     end
   end
 end

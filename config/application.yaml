@@ -12,7 +12,8 @@ shortened_url:
     - amzn.asia
     - youtu.be
     - git.io
-amazon_uri:
+amazon:
+  retry_limit: 5
   patterns:
     - pattern: /dp/([[:alnum:]]+)
       shortenable: true
@@ -24,5 +25,3 @@ amazon_uri:
       shortenable: true
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
-amazon_ecs:
-  retry_limit: 5

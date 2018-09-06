@@ -31,7 +31,7 @@ module MulukhiyaTootProxy
     end
 
     def retry_limit
-      return @config['application']['amazon_ecs']['retry_limit']
+      return @config['application']['amazon']['retry_limit']
     end
 
     def self.associate_tag
