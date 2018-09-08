@@ -24,6 +24,16 @@ module MulukhiyaTootProxy
       retry
     end
 
+    def lookup_artist(id)
+      cnt = 1
+      return RSpotify::Artist.find(id)
+    rescue => e
+      raise ExternalServiceError, e.message if retry_limit < cnt
+      sleep(1)
+      cnt += 1
+      retry
+    end
+
     def retry_limit
       return @config['application']['spotify']['retry_limit']
     end

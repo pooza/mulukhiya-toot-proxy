@@ -10,12 +10,15 @@ module MulukhiyaTootProxy
       body['status'].each_line do |line|
         lines.push(line)
         next if updated
-        next unless matches = line.strip.match(/^#nowplaying\s(.*)$/i)
+        next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
         keyword = matches[1]
         updated = true
         spotify = Spotify.new
         next unless track = spotify.search_track(keyword)
         lines.push(track.external_urls['spotify'])
+        track.artists.each do |artist|
+          lines.push(artist.external_urls['spotify'])
+        end
       end
       body['status'] = lines.join("\n")
     end

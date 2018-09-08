@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       body['status'].each_line do |line|
         lines.push(line)
         next if updated
-        next unless matches = line.strip.match(/^#nowplaying\s(.*)$/i)
+        next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
         keyword = matches[1]
         updated = true
         amazon = AmazonService.new
