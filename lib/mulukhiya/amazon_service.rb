@@ -1,6 +1,6 @@
 require 'amazon/ecs'
-require 'addressable/uri'
 require 'mulukhiya/config'
+require 'mulukhiya/amazon_uri'
 require 'mulukhiya/external_service_error'
 
 module MulukhiyaTootProxy
@@ -20,14 +20,43 @@ module MulukhiyaTootProxy
 
     def image_uri(asin)
       cnt = 1
-      response = Amazon::Ecs.item_lookup(asin, {country: 'jp', response_group: 'Images'})
+      response = Amazon::Ecs.item_lookup(asin, {
+        country: @config['application']['amazon']['country'],
+        response_group: 'Images',
+      })
       raise ExternalServiceError, response.error if response.has_error?
-      return Addressable::URI.parse(response.items.first.get('LargeImage/URL'))
+      return AmazonURI.parse(response.items.first.get('LargeImage/URL'))
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
+    end
+    
+    def search(keyword, categories = 'Books')
+      cnt = 1
+      response = Amazon::Ecs.item_search(keyword, {
+        search_index: categories,
+        response_group: 'ItemAttributes',
+        country: @config['application']['amazon']['country'],
+      })
+      return nil unless response.items.present?
+      return response.items.first.get('ASIN')
+    rescue Amazon::RequestError => e
+      raise ExternalServiceError, e.message if retry_limit < cnt
+      sleep(1)
+      cnt += 1
+      retry
+    end
+
+    def item_url(asin)
+      return item_uri(asin)
+    end
+
+    def item_uri(asin)
+      uri = AmazonURI.parse(@config['application']['amazon']['url'])
+      uri.path = "/dp/#{asin}"
+      return uri
     end
 
     def retry_limit
