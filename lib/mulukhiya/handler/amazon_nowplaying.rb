@@ -3,7 +3,7 @@ require 'mulukhiya/handler'
 require 'mulukhiya/slack'
 
 module MulukhiyaTootProxy
-  class AmazonMusicTrackHandler < Handler
+  class AmazonNowplayingHandler < Handler
     def exec(body, headers = {})
       lines = []
       updated = false

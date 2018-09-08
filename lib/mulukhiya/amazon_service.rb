@@ -32,7 +32,7 @@ module MulukhiyaTootProxy
       cnt += 1
       retry
     end
-    
+
     def search(keyword, categories = 'Books')
       cnt = 1
       response = Amazon::Ecs.item_search(keyword, {
