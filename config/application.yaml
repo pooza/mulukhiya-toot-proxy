@@ -27,3 +27,5 @@ amazon:
       shortenable: true
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
+spotify:
+  retry_limit: 5
