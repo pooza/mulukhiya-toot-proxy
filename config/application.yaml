@@ -29,4 +29,3 @@ amazon:
       shortenable: true
 spotify:
   retry_limit: 5
-  artists_limit: 3

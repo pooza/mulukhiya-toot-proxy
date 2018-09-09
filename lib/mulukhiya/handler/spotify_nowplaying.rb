@@ -18,9 +18,6 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track.external_urls['spotify'])
-      track.artists[0..(artists_limit - 1)].each do |artist|
-        status.push(artist.external_urls['spotify'])
-      end
     end
 
     private
