@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
       lines = []
       updated = false
       body['status'].each_line do |line|
-        lines.push(line)
+        lines.push(line.chomp)
         next if updated
         next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
         keyword = matches[1]
