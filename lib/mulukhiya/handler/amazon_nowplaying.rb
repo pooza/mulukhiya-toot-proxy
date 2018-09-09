@@ -1,25 +1,26 @@
 require 'mulukhiya/amazon_service'
-require 'mulukhiya/handler'
-require 'mulukhiya/slack'
+require 'mulukhiya/handler/nowplaying_handler'
 
 module MulukhiyaTootProxy
-  class AmazonNowplayingHandler < Handler
-    def exec(body, headers = {})
-      lines = []
-      updated = false
-      body['status'].each_line do |line|
-        lines.push(line.chomp)
-        next if updated
-        next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
-        keyword = matches[1]
-        updated = true
-        amazon = AmazonService.new
-        next unless asin = amazon.search(keyword, 'Music')
-        uri = amazon.item_uri(asin)
-        uri.associate_tag = AmazonService.associate_tag
-        lines.push(uri.to_s)
-      end
-      body['status'] = lines.join("\n")
+  class AmazonNowplayingHandler < NowplayingHandler
+    def initialize
+      super
+      @asins = {}
+      @amazon = AmazonService.new
+    end
+
+    def updatable?(keyword)
+      asin = (@amazon.search(keyword, 'DigitalMusic') || @amazon.search(keyword, 'Music'))
+      return false unless asin
+      @asins[keyword] = asin
+      return true
+    end
+
+    def update(keyword, status)
+      return unless asin = @asins[keyword]
+      uri = @amazon.item_uri(asin)
+      uri.associate_tag = AmazonService.associate_tag
+      status.push(uri.to_s)
     end
   end
 end

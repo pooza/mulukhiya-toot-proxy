@@ -3,7 +3,7 @@ require 'mulukhiya/config'
 require 'mulukhiya/external_service_error'
 
 module MulukhiyaTootProxy
-  class Spotify
+  class SpotifyService
     def initialize
       @config = Config.instance
       RSpotify.authenticate(

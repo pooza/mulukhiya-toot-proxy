@@ -33,10 +33,10 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def search(keyword, categories = 'Books')
+    def search(keyword, category = 'Books')
       cnt = 1
       response = Amazon::Ecs.item_search(keyword, {
-        search_index: categories,
+        search_index: category,
         response_group: 'ItemAttributes',
         country: @config['application']['amazon']['country'],
       })

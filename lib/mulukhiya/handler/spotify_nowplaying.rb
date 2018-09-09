@@ -1,26 +1,32 @@
-require 'addressable/uri'
-require 'mulukhiya/spotify'
-require 'mulukhiya/handler'
+require 'mulukhiya/spotify_service'
+require 'mulukhiya/handler/nowplaying_handler'
 
 module MulukhiyaTootProxy
-  class SpotifyNowplayingHandler < Handler
-    def exec(body, headers = {})
-      lines = []
-      updated = false
-      body['status'].each_line do |line|
-        lines.push(line.chomp)
-        next if updated
-        next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
-        keyword = matches[1]
-        updated = true
-        spotify = Spotify.new
-        next unless track = spotify.search_track(keyword)
-        lines.push(track.external_urls['spotify'])
-        track.artists.each do |artist|
-          lines.push(artist.external_urls['spotify'])
-        end
+  class SpotifyNowplayingHandler < NowplayingHandler
+    def initialize
+      super
+      @tracks = {}
+      @spotify = SpotifyService.new
+    end
+
+    def updatable?(keyword)
+      return false unless track = @spotify.search_track(keyword)
+      @tracks[keyword] = track
+      return true
+    end
+
+    def update(keyword, status)
+      return unless track = @tracks[keyword]
+      status.push(track.external_urls['spotify'])
+      track.artists[0..(artists_limit - 1)].each do |artist|
+        status.push(artist.external_urls['spotify'])
       end
-      body['status'] = lines.join("\n")
+    end
+
+    private
+
+    def artists_limit
+      return @config['application']['spotify']['artists_limit']
     end
   end
 end
