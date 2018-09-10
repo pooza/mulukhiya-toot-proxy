@@ -12,8 +12,8 @@
 - 各種短縮URLを戻し、リンク先を明らかにする。
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
 - 貼られたURLのページにcanonical指定があったら、そちらに書き換える。
-- amazonの商品URLからノイズを除去する。可能ならばアソシエイトタグを加える。
-- amazonの商品URLがあったら、商品画像を添付する。
+- amazonの商品URLからノイズを除去する。商品画像を添付する。可能ならばアソシエイトタグを加える。
+- `#nowplaying` を含んだトゥートに、amazonのCD商品や、Spotify再生のリンクを挿入。
 
 ### トゥートを改変するということ
 
@@ -57,8 +57,10 @@ handlers:
   - shortened_url
   - canonical
   - url_normalize
+  - amazon_nowplaying
   - amazon_asin
   - amazon_image
+  - spotify_nowplaying
 slack:
   hooks:
     - https://hooks.slack.com/services/xxxxx
@@ -68,6 +70,9 @@ amazon:
   access_key: fuga
   secret_key: piyo
   affiliate: true
+spotify:
+  client_id: hoge
+  client_secret: fuga
 ```
 
 以下、YPath表記。
@@ -97,12 +102,12 @@ amazonのアソシエイトタグをお持ちであれば、それを指定。
 #### /amazon/access_key
 
 amazonアソシエイトのアクセスキーを指定。
-商品画像の添付を行う場合に要指定。
+商品画像の添付、音楽CD商品リンクの挿入を行う場合に要指定。
 
 #### /amazon/secret_key
 
 amazonアソシエイトのシークレットキーを指定。
-商品画像の添付を行う場合に要指定。
+商品画像の添付、音楽CD商品リンクの挿入を行う場合に要指定。
 
 
 #### /amazon/affiliate
@@ -124,6 +129,16 @@ amazonのアフィリエイトを使用する場合は `true` を指定。URLの
 
 なお、既存のアクセストークンにあとから権限の付与を行っても正常動作しない模様。  
 トークンを作り直すこと。
+
+### /spotify/client_id
+
+SpotifyのClient IDを指定。
+Spotify再生のリンクを挿入する為に必要。
+
+### /spotify/client_secret
+
+SpotifyのClient Secretを指定。
+Spotify再生のリンクを挿入する為に必要。
 
 ### syslog設定
 
@@ -265,15 +280,35 @@ amazonの商品URLを正規化する。
   - /exec/obidos/ASIN/__ASIN__
   - /o/ASIN/__ASIN__
   - /gp/video/detail/__ASIN__
+
 ### AmazonImageHandler
 
 amazonの商品画像を添付する。
 
 - アンダースコア名 amazon_image
 - 本文中にamazonの商品URLがある場合は、商品画像を添付。
+- 使用する画像の優先順位は、LargeImage→MediumImage→SmallImageの順。
 - 複数の商品URLがある場合は、その先頭のもののみ処理する。
 - 画像や動画が既に4つ貼られたトゥートに対して添付画像を加えることは出来ない為、422エラーを返す。
-- amazonが503を5回返してきたら、ユーザーにもそのまま503を返す。
+- amazonが5回エラー返してきたら、ユーザーには503を返す。
+
+### AmazonNowplayingHandler
+
+`#nowplaying` を含んだトゥートに対して、amazonのCD商品へのリンクを挿入。
+
+- アンダースコア名 amazon_nowplaying
+- 本文中に `#nowplaying アーティスト名 曲名\n` パターンを含んだトゥートに対して、
+  amazonのCD商品へのリンクを挿入。
+- 大文字小文字を区別しない為、実際には `#NowPlaying` も可。
+- 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
+- アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
+
+### SpotifyNowplayingHandler
+
+`#nowplaying` を含んだトゥートに対して、Spotifyの楽曲再生リンクを挿入。
+
+- アンダースコア名 spotify_nowplaying
+- AmazonNowplayingHandler とほぼ同じ。Spotifyに対して同じことをする。
 
 ## ■制約
 
