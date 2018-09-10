@@ -311,6 +311,7 @@ amazonの商品画像を添付する。
 
 - アンダースコア名 spotify_nowplaying
 - AmazonNowplayingHandler とほぼ同じ。Spotifyに対して同じことをする。
+- amazonのリンクとどちらを先に表示するかは、 AmazonNowplayingHandler との間で順番を調整することで対応。
 
 ## ■制約
 
