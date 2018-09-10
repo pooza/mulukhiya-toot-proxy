@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
         next unless updatable?(keyword)
         update(keyword, status)
         updated = true
+        increment!
       end
       body['status'] = status.join("\n")
     end
