@@ -18,9 +18,7 @@ module MulukhiyaTootProxy
 
     def update(keyword, status)
       return unless asin = @asins[keyword]
-      uri = @amazon.item_uri(asin)
-      uri.associate_tag = AmazonService.associate_tag
-      status.push(uri.to_s)
+      status.push(@amazon.item_uri(asin).to_s)
     end
   end
 end
