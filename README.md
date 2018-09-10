@@ -131,12 +131,12 @@ URLの末尾に `?tag=hogefuga` が追加される。
 なお、既存のアクセストークンにあとから権限の付与を行っても正常動作しない模様。  
 トークンを作り直すこと。
 
-### /spotify/client_id
+#### /spotify/client_id
 
 SpotifyのClient IDを指定。  
 Spotify再生のリンクを挿入する為に必要。
 
-### /spotify/client_secret
+#### /spotify/client_secret
 
 SpotifyのClient Secretを指定。  
 Spotify再生のリンクを挿入する為に必要。
