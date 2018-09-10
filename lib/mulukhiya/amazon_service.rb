@@ -25,7 +25,11 @@ module MulukhiyaTootProxy
         response_group: 'Images',
       })
       raise ExternalServiceError, response.error if response.has_error?
-      return AmazonURI.parse(response.items.first.get('LargeImage/URL'))
+      ['Large', 'Medium', 'Small'].each do |size|
+        uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
+        return uri if uri
+      end
+      raise ExternalServiceError, "asin '#{asin}' has no image."
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
       sleep(1)
