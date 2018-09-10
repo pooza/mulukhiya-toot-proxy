@@ -13,7 +13,7 @@
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
 - 貼られたURLのページにcanonical指定があったら、そちらに書き換える。
 - amazonの商品URLからノイズを除去する。商品画像を添付する。可能ならばアソシエイトタグを加える。
-- `#nowplaying` を含んだトゥートに、amazonのCD商品や、Spotify再生のリンクを挿入。
+- ハッシュタグ `#nowplaying` を含んだトゥートに、amazonのCD商品や、Spotify再生のリンクを挿入。
 
 ### トゥートを改変するということ
 
@@ -96,23 +96,24 @@ Discordの場合は、末尾に `/slack` を加えることをお忘れなく。
 
 #### /amazon/associate_tag
 
-amazonのアソシエイトタグをお持ちであれば、それを指定。
+amazonのアソシエイトタグをお持ちであれば、それを指定。  
 アフィリエイトを使用する場合、又は商品画像の添付を行う場合に要指定。
 
 #### /amazon/access_key
 
-amazonアソシエイトのアクセスキーを指定。
+amazonアソシエイトのアクセスキーを指定。  
 商品画像の添付、音楽CD商品リンクの挿入を行う場合に要指定。
 
 #### /amazon/secret_key
 
-amazonアソシエイトのシークレットキーを指定。
+amazonアソシエイトのシークレットキーを指定。  
 商品画像の添付、音楽CD商品リンクの挿入を行う場合に要指定。
 
 
 #### /amazon/affiliate
 
-amazonのアフィリエイトを使用する場合は `true` を指定。URLの末尾に `?tag=hogefuga` が追加される。
+amazonのアフィリエイトを使用する場合は `true` を指定。  
+URLの末尾に `?tag=hogefuga` が追加される。  
 アフィリエイトを使用しない場合は指定不要。
 
 #### /instance_url
@@ -125,19 +126,19 @@ amazonのアフィリエイトを使用する場合は `true` を指定。URLの
 テスト時に使用するアクセストークンを記述。  
 省略可能だが、明示的な指定を強く推奨。指定しないと、テストが実行できない。  
 ユーザー設定→開発（/settings/applications）で作成できる。アクセス権は
-`write:statuses` と `write:media` を設定。単に `write` でも可。
+`write:statuses` と `write:media` を設定。（単に `write` でも可）
 
 なお、既存のアクセストークンにあとから権限の付与を行っても正常動作しない模様。  
 トークンを作り直すこと。
 
 ### /spotify/client_id
 
-SpotifyのClient IDを指定。
+SpotifyのClient IDを指定。  
 Spotify再生のリンクを挿入する為に必要。
 
 ### /spotify/client_secret
 
-SpotifyのClient Secretを指定。
+SpotifyのClient Secretを指定。  
 Spotify再生のリンクを挿入する為に必要。
 
 ### syslog設定
@@ -241,7 +242,7 @@ Mastodonインスタンスへのトゥート要求に対して、事前に設定
   - git.io
 - リダイレクト先が上記サービスのいずれかに該当する限り、連続するリダイレクトを読み続ける。
   例えば、Twitterにbit.ly短縮URLを貼った場合
-  （t.co→bit.ly→本来のURLというリダイレクトが発生）にも、本来のURLに戻すことが出来る。
+  （t.co→bit.ly→本来のURLというリダイレクトが発生）にも、元のURLに戻すことが出来る。
 
 ### CanonicalHandler
 
@@ -299,7 +300,8 @@ amazonの商品画像を添付する。
 - アンダースコア名 amazon_nowplaying
 - 本文中に `#nowplaying アーティスト名 曲名\n` パターンを含んだトゥートに対して、
   amazonのCD商品へのリンクを挿入。
-- 大文字小文字を区別しない為、実際には `#NowPlaying` も可。
+  （従って、AmazonAsinHandlerより前に実行したほうがよい）
+- ハッシュタグの大文字小文字を区別しない為、実際には `#NowPlaying` でも可。
 - 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
 - アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
 
