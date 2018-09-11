@@ -23,6 +23,10 @@ module MulukhiyaTootProxy
       return absolute? && host.split('.').member?('amazon')
     end
 
+    def asin=(id)
+      self.path = "/dp/#{id}"
+    end
+
     def asin
       patterns.each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
@@ -61,7 +65,7 @@ module MulukhiyaTootProxy
     def shorten
       return self unless shortenable?
       dest = clone
-      dest.path = "/dp/#{asin}"
+      dest.asin = asin
       dest.fragment = nil
       dest.query_values = nil
       dest.query_values = {tag: associate_tag} if associate_tag.present?
