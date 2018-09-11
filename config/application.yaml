@@ -29,5 +29,7 @@ amazon:
       shortenable: true
 spotify:
   retry_limit: 5
+  urls:
+    track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
