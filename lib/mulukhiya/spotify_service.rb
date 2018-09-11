@@ -1,5 +1,6 @@
 require 'rspotify'
 require 'mulukhiya/config'
+require 'mulukhiya/spotify_uri'
 require 'mulukhiya/external_service_error'
 
 module MulukhiyaTootProxy
@@ -24,6 +25,16 @@ module MulukhiyaTootProxy
       retry
     end
 
+    def lookup_track(id)
+      cnt = 1
+      return RSpotify::Track.find(id)
+    rescue => e
+      raise ExternalServiceError, e.message if retry_limit < cnt
+      sleep(1)
+      cnt += 1
+      retry
+    end
+
     def lookup_artist(id)
       cnt = 1
       return RSpotify::Artist.find(id)
@@ -32,6 +43,16 @@ module MulukhiyaTootProxy
       sleep(1)
       cnt += 1
       retry
+    end
+
+    def track_url(id)
+      return item_uri(id)
+    end
+
+    def track_uri(id)
+      uri = SpotifyURI.parse(@config['application']['spotify']['url'])
+      uri.path = "/track/#{id}"
+      return uri
     end
 
     def retry_limit
