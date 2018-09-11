@@ -16,6 +16,7 @@ module MulukhiyaTootProxy
         increment!
       end
       body['status'] = status.join("\n")
+      return body
     end
 
     def updatable?(keyword)
