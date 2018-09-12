@@ -59,18 +59,20 @@ module MulukhiyaTootProxy
 
     def item_uri(asin)
       uri = AmazonURI.parse(@config['application']['amazon']['url'])
-      uri.path = "/dp/#{asin}"
+      uri.asin = asin
       return uri
-    end
-
-    def retry_limit
-      return @config['application']['amazon']['retry_limit']
     end
 
     def self.associate_tag
       return Config.instance['local']['amazon']['associate_tag']
     rescue
       return nil
+    end
+
+    private
+
+    def retry_limit
+      return @config['application']['amazon']['retry_limit']
     end
   end
 end

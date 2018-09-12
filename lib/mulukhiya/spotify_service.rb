@@ -41,9 +41,11 @@ module MulukhiyaTootProxy
 
     def track_uri(id)
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
-      uri.path = "/track/#{id}"
+      uri.track_id = id
       return uri
     end
+
+    private
 
     def retry_limit
       return @config['application']['spotify']['retry_limit']
