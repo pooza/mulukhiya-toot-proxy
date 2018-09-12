@@ -8,14 +8,14 @@ module MulukhiyaTootProxy
     def initialize
       super
       @results = {}
-      @spotify = SpotifyService.new
+      @service = SpotifyService.new
     end
 
     def updatable?(keyword)
       uri = SpotifyURI.parse(keyword)
       if uri.spotify?
         result = {track: uri.track, uri: true}
-      elsif track = @spotify.search_track(keyword)
+      elsif track = @service.search_track(keyword)
         result = {track: track}
       end
       return false unless result
