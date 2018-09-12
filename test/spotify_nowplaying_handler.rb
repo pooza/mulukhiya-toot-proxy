@@ -4,8 +4,11 @@ module MulukhiyaTootProxy
   class SpotifyNowplayingHandlerTest < Test::Unit::TestCase
     def test_exec
       handler = SpotifyNowplayingHandler.new
-      assert_equal(handler.exec({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})['status'], "#nowplaying #五條真由美 ガンバランス de ダンス\nhttps://open.spotify.com/track/0x970Bre8Q1NuuzROmFqKU")
+      handler.exec({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})
       assert_equal(handler.result, 'SpotifyNowplayingHandler,1')
+
+      handler.exec({'status' => "#nowplaying https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS\n"})
+      assert_equal(handler.result, 'SpotifyNowplayingHandler,2')
     end
   end
 end
