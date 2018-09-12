@@ -45,6 +45,10 @@ module MulukhiyaTootProxy
       File.unlink(path) if File.exist?(path)
     end
 
+    def self.create_tag(word)
+      return '#' + word.gsub(/[#＃・〜～！ ]/, '_')
+    end
+
     private
 
     def fetch(url)
