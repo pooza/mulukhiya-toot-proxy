@@ -13,7 +13,8 @@
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
 - 貼られたURLのページにcanonical指定があったら、そちらに書き換える。
 - amazonの商品URLからノイズを除去する。商品画像を添付する。可能ならばアソシエイトタグを加える。
-- ハッシュタグ `#nowplaying` を含んだトゥートに、amazonのCD商品や、Spotify再生のリンクを挿入。
+- ハッシュタグ `#nowplaying` を含んだトゥートに、amazonの商品リンクや、Spotify再生のリンク、
+  トラック情報等を挿入。
 
 ### トゥートを改変するということ
 
@@ -57,10 +58,10 @@ handlers:
   - shortened_url
   - canonical
   - url_normalize
+  - spotify_nowplaying
   - amazon_nowplaying
   - amazon_asin
   - amazon_image
-  - spotify_nowplaying
 slack:
   hooks:
     - https://hooks.slack.com/services/xxxxx
@@ -73,6 +74,8 @@ amazon:
 spotify:
   client_id: hoge
   client_secret: fuga
+nowplaying:
+  hashtag: false
 ```
 
 以下、YPath表記。
@@ -140,6 +143,11 @@ Spotify再生のリンクを挿入する為に必要。
 
 SpotifyのClient Secretを指定。  
 Spotify再生のリンクを挿入する為に必要。
+
+#### /nowplaying/hashtag
+
+`#nowplaying` 対応にて、アーティスト名をハッシュタグにするなら `true` を。  
+実験的機能につき、本番環境での使用は今のところ非推奨。
 
 ### syslog設定
 
@@ -298,20 +306,28 @@ amazonの商品画像を添付する。
 `#nowplaying` を含んだトゥートに対して、amazonのCD商品へのリンクを挿入。
 
 - アンダースコア名 amazon_nowplaying
+- AmazonAsinHandlerより前の実行を推奨。
 - 本文中に `#nowplaying アーティスト名 曲名\n` パターンを含んだトゥートに対して、
   amazonのCD商品へのリンクを挿入。
-  （従って、AmazonAsinHandlerより前に実行したほうがよい）
-- ハッシュタグの大文字小文字を区別しない為、実際には `#NowPlaying` でも可。
-- 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
-- アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
+  - ハッシュタグの大文字小文字を区別しない為、実際には `#NowPlaying` でも可。
+  - 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
+  - アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
 
 ### SpotifyNowplayingHandler
 
 `#nowplaying` を含んだトゥートに対して、Spotifyの楽曲再生リンクを挿入。
 
 - アンダースコア名 spotify_nowplaying
-- AmazonNowplayingHandler とほぼ同じ。Spotifyに対して同じことをする。
-- amazonのリンクとどちらを先に表示するかは、 AmazonNowplayingHandler との間で順番を調整することで対応。
+- AmazonNowplayingHandler直前の実行を推奨。
+- 本文中に `#nowplaying アーティスト名 曲名\n` パターンを含んだトゥートに対して、
+  Spotifyのリンクを挿入。
+  - ハッシュタグの大文字小文字を区別しない為、実際には `#NowPlaying` でも可。
+  - 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
+  - アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
+- 本文中に `#nowplaying SpotifyトラックのURL\n` パターンを含んだトゥートに対して、
+  トラック情報を挿入。
+- 設定ファイルにて `/nowplaying/hashtag` が `true` に設定されている場合は、
+  アーティスト名をハッシュタグにする。（実験的機能）
 
 ## ■制約
 
