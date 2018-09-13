@@ -72,7 +72,7 @@ module MulukhiyaTootProxy
     private
 
     def retry_limit
-      return @config['application']['amazon']['retry_limit']
+      return @config['application']['amazon']['retry_limit'] || 5
     end
   end
 end

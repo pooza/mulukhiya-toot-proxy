@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
     private
 
     def retry_limit
-      return @config['application']['spotify']['retry_limit']
+      return @config['application']['spotify']['retry_limit'] || 5
     end
   end
 end
