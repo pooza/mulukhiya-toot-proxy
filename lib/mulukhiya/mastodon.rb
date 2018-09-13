@@ -54,7 +54,7 @@ module MulukhiyaTootProxy
     def fetch(url)
       return HTTParty.get(url)
     rescue => e
-      raise ExternalServiceError, e.message
+      raise ExternalServiceError, "外部ファイルが取得できません。 #{e.message}"
     end
 
     def create_url(href)
