@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
     def updatable?(keyword)
       uri = SpotifyURI.parse(keyword)
-      if uri.spotify?
+      if uri.spotify? && uri.track.present?
         result = {track: uri.track, uri: true}
       elsif track = @service.search_track(keyword)
         result = {track: track}
@@ -27,7 +27,7 @@ module MulukhiyaTootProxy
 
     def update(keyword, status)
       return unless result = @results[keyword]
-      track = result[:track]
+      return unless track = result[:track]
       return status.push(result[:track].external_urls['spotify']) unless result[:uri]
       artists = []
       track.artists.each do |artist|
