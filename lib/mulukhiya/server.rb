@@ -91,6 +91,7 @@ module MulukhiyaTootProxy
       end
       @message[:response][:error] = "#{e.class}: #{e.message}"
       @message[:backtrace] = e.backtrace[0..5]
+      @message[:error] = e.message
       @renderer.message = @message
       Slack.broadcast(@message)
       return @renderer.to_s

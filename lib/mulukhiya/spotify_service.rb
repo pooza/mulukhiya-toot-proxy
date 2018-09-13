@@ -18,31 +18,31 @@ module MulukhiyaTootProxy
       return nil if tracks.nil?
       return tracks.first
     rescue => e
-      raise ExternalServiceError, e.message
+      raise ExternalServiceError, "曲が見つかりません。 #{e.message}"
     end
 
     def lookup_track(id)
       return RSpotify::Track.find(id)
     rescue => e
-      raise ExternalServiceError, e.message
+      raise ExternalServiceError, "曲が見つかりません。 #{e.message}"
     end
 
     def lookup_artist(id)
       return RSpotify::Artist.find(id)
     rescue => e
-      raise ExternalServiceError, e.message
+      raise ExternalServiceError, "アーティストが見つかりません。 #{e.message}"
     end
 
     def track_url(id)
       return item_uri(id)
-    rescue => e
-      raise ExternalServiceError, e.message
     end
 
     def track_uri(id)
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
       uri.track_id = id
       return uri
+    rescue => e
+      raise ExternalServiceError, "曲が見つかりません。 #{e.message}"
     end
 
     private
