@@ -35,14 +35,14 @@ module MulukhiyaTootProxy
 
     def track_url(id)
       return item_uri(id)
-    rescue => e
-      raise ExternalServiceError, e.message
     end
 
     def track_uri(id)
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
       uri.track_id = id
       return uri
+    rescue => e
+      raise ExternalServiceError, e.message
     end
 
     private

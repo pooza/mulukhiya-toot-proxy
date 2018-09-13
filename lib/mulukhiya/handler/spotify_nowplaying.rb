@@ -21,6 +21,8 @@ module MulukhiyaTootProxy
       return false unless result
       @results[keyword] = result
       return true
+    rescue
+      return false
     end
 
     def update(keyword, status)
