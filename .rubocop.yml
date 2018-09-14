@@ -16,6 +16,9 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 Metrics/AbcSize:
   Max: 30
   Exclude:
