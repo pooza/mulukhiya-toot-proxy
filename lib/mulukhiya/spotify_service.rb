@@ -1,12 +1,14 @@
 require 'rspotify'
 require 'mulukhiya/config'
 require 'mulukhiya/spotify_uri'
+require 'mulukhiya/amazon_service'
 require 'mulukhiya/external_service_error'
 
 module MulukhiyaTootProxy
   class SpotifyService
     def initialize
       @config = Config.instance
+      @amazon = AmazonService.new
       RSpotify.authenticate(
         @config['local']['spotify']['client_id'],
         @config['local']['spotify']['client_secret'],
@@ -46,13 +48,26 @@ module MulukhiyaTootProxy
     end
 
     def track_url(id)
-      return item_uri(id)
+      return track_uri(id)
     end
 
     def track_uri(id)
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
       uri.track_id = id
       return uri
+    end
+
+    def amazon_url(track)
+      return amazon_uri(track)
+    end
+
+    def amazon_uri(track)
+      keyword = "#{track.name} #{track.artists.first.name}"
+      keyword = track.name
+      asin = @amazon.search(keyword, 'DigitalMusic')
+      asin ||= @amazon.search(keyword, 'Music')
+      return nil unless asin
+      return @amazon.item_uri(asin)
     end
 
     private
