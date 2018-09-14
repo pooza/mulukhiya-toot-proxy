@@ -1,52 +1,25 @@
 require 'mulukhiya/spotify_service'
-require 'mulukhiya/spotify_uri'
-require 'mulukhiya/mastodon'
 require 'mulukhiya/handler/nowplaying_handler'
 
 module MulukhiyaTootProxy
   class SpotifyNowplayingHandler < NowplayingHandler
     def initialize
       super
-      @results = {}
+      @tracks = {}
       @service = SpotifyService.new
     end
 
     def updatable?(keyword)
-      uri = SpotifyURI.parse(keyword)
-      if uri.spotify? && uri.track.present?
-        result = {track: uri.track, uri: true}
-      elsif track = @service.search_track(keyword)
-        result = {track: track}
-      end
-      return false unless result
-      @results[keyword] = result
+      return false unless track = @service.search_track(keyword)
+      @tracks[keyword] = track
       return true
     rescue
       return false
     end
 
     def update(keyword, status)
-      return unless result = @results[keyword]
-      return unless track = result[:track]
-      return status.push(result[:track].external_urls['spotify']) unless result[:uri]
-      artists = []
-      track.artists.each do |artist|
-        artists.push(create_tag(artist.name))
-      end
-      status.push([track.name, artists.join(' ')].join("\n"))
-    end
-
-    private
-
-    def create_tag(name)
-      return name unless @config['local']['nowplaying']['hashtag']
-      return Mastodon.create_tag(name)
-    rescue NoMethodError
-      return name
-    end
-
-    def artists_limit
-      return @config['application']['spotify']['artists_limit']
+      return unless track = @tracks[keyword]
+      status.push(track.external_urls['spotify'])
     end
   end
 end
