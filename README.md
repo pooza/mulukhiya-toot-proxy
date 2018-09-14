@@ -60,6 +60,7 @@ handlers:
   - url_normalize
   - spotify_nowplaying
   - amazon_nowplaying
+  - spotify_url_nowplaying
   - amazon_asin
   - amazon_image
 slack:
@@ -146,7 +147,8 @@ Spotify再生のリンクを挿入する為に必要。
 #### /nowplaying/hashtag
 
 `#nowplaying` 対応にて、アーティスト名をハッシュタグにするなら `true` を。  
-実験的機能につき、本番環境での使用は今のところ非推奨。
+これを `true` にすると、Masotodonからのレスポンスのうちtags配列の破棄も行う。（Webクライアントでの正常動作の為）
+tags配列の存在を前提としたクライアントや機能が誤動作する可能性があり、リスクも検討の上で利用すること。
 
 ### syslog設定
 
@@ -317,17 +319,25 @@ amazonの商品画像を添付する。
 `#nowplaying` を含んだトゥートに対して、Spotifyの楽曲再生リンクを挿入。
 
 - アンダースコア名 spotify_nowplaying
-- AmazonNowplayingHandler直前の実行を推奨。
 - 本文中に `#nowplaying アーティスト名 曲名\n` パターンを含んだトゥートに対して、
   Spotifyのリンクを挿入。
   - ハッシュタグの大文字小文字を区別しない為、実際には `#NowPlaying` でも可。
   - 複数の `#nowplaying` がある場合は、その先頭のもののみ処理する。
   - アーティスト名は省略できるが、検索の精度が落ちる。可能な限り省略しないことを推奨。
+
+### SpotifyUrlNowplayingHandler
+
+`#nowplaying` とSpotifyの楽曲URLを含んだトゥートに対して、Spotifyの楽曲情報等を挿入。
+
+- アンダースコア名 spotify_nowplaying
+- `amazon_asin` より前の実行を推奨。
+- Spotifyの楽曲情報、amazonの商品URL（もしあれば）の追記等を行う。
 - 本文中に `#nowplaying SpotifyトラックのURL\n` パターンを含んだトゥートに対して、
   曲情報を挿入。
-  - そのトラックが存在しない場合等は、503を返す。
-  - 設定ファイルにて `/nowplaying/hashtag` が `true` に設定されている場合は、
-    アーティスト名をハッシュタグにする。（実験的機能）
+- そのトラックが存在しない場合等は、503を返す。
+- 設定ファイルにて `/nowplaying/hashtag` が `true` に設定されている場合は、
+  アーティスト名をハッシュタグにする。この場合、Mastodon本体から返されるtags配列も
+  破棄するので、リスクも含め利用を検討すること。
 
 ## ■制約
 
