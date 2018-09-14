@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
         next unless uri.image_uri.present?
         body['media_ids'].push(@mastodon.upload_remote_resource(uri.image_uri))
         increment!
-        return
+        break
       end
     end
   end
