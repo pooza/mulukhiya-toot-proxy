@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
       end
-      raise ExternalServiceError, "ASIN '#{asin}' には画像がありません。"
+      return nil
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
       sleep(1)
