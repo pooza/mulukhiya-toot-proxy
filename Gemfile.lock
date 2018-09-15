@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/pooza/rspotify.git
+  revision: 2937e4397e6d163fa0029947ac1b63668204efc8
+  specs:
+    rspotify (2.2.1)
+      omniauth-oauth2 (~> 1.3.1)
+      rest-client (~> 2.0.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -60,9 +68,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rspotify (2.2.1)
-      omniauth-oauth2 (~> 1.3.1)
-      rest-client (~> 2.0.2)
     ruby-hmac (0.4.0)
     sinatra (2.0.3)
       mustermann (~> 1.0)
@@ -95,7 +100,7 @@ DEPENDENCIES
   nokogiri
   rake
   rest-client
-  rspotify
+  rspotify!
   sinatra
   syslog-logger
   test-unit
