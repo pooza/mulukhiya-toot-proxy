@@ -63,7 +63,11 @@ module MulukhiyaTootProxy
     end
 
     def amazon_uri(track)
-      keyword = "#{track.name} #{track.artists.first.name}"
+      keyword = [track.name]
+      track.artists.each do |artist|
+        keyword.push(artist.name)
+      end
+      keyword = keyword.join(' ')
       asin = @amazon.search(keyword, 'DigitalMusic')
       asin ||= @amazon.search(keyword, 'Music')
       return nil unless asin
