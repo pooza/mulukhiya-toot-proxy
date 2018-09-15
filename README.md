@@ -75,6 +75,7 @@ amazon:
 spotify:
   client_id: hoge
   client_secret: fuga
+  language: ja
 nowplaying:
   hashtag: true
 ```
@@ -143,6 +144,11 @@ Spotify再生のリンクを挿入する為に必要。
 
 SpotifyのClient Secretを指定。  
 Spotify再生のリンクを挿入する為に必要。
+
+#### /spotify/language
+
+ハッシュタグを日本語化するなら `ja` 。
+SpotifyのAPIにリクエストヘッダ `Accept-Language` として送信される。
 
 #### /nowplaying/hashtag
 
