@@ -68,9 +68,7 @@ module MulukhiyaTootProxy
         keyword.push(artist.name)
       end
       keyword = keyword.join(' ')
-      asin = @amazon.search(keyword, 'DigitalMusic')
-      asin ||= @amazon.search(keyword, 'Music')
-      return nil unless asin
+      return nil unless asin = @amazon.search(keyword, ['DigitalMusic', 'Music'])
       return @amazon.item_uri(asin)
     end
 
