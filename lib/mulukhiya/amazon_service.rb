@@ -37,15 +37,17 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def search(keyword, category = 'Books')
+    def search(keyword, categories)
       cnt = 1
-      response = Amazon::Ecs.item_search(keyword, {
-        search_index: category,
-        response_group: 'ItemAttributes',
-        country: @config['application']['amazon']['country'],
-      })
-      return nil unless response.items.present?
-      return response.items.first.get('ASIN')
+      categories.each do |category|
+        response = Amazon::Ecs.item_search(keyword, {
+          search_index: category,
+          response_group: 'ItemAttributes',
+          country: @config['application']['amazon']['country'],
+        })
+        return response.items.first.get('ASIN') if response.items.present?
+      end
+      return nil
     rescue Amazon::RequestError => e
       raise ExternalServiceError, e.message if retry_limit < cnt
       sleep(1)
