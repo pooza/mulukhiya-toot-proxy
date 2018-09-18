@@ -12,6 +12,7 @@ shortened_url:
     - amzn.asia
     - youtu.be
     - git.io
+    - spoti.fi
 amazon:
   country: jp
   url: https://www.amazon.co.jp/
