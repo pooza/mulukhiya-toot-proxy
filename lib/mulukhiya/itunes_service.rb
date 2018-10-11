@@ -31,8 +31,8 @@ module MulukhiyaTootProxy
       uri.query_values = {
         term: keyword,
         media: category,
-        country: @config['application']['itunes']['country'],
-        lang: @config['application']['itunes']['lang'],
+        country: @config['local']['itunes']['country'],
+        lang: @config['local']['itunes']['lang'],
       }
       return uri
     end

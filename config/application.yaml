@@ -14,7 +14,6 @@ shortened_url:
     - git.io
     - spoti.fi
 amazon:
-  country: jp
   url: https://www.amazon.co.jp/
   retry_limit: 5
   patterns:
@@ -35,7 +34,5 @@ spotify:
   patterns:
     - pattern: /track/([[:alnum:]]+)
 itunes:
-  country: jp
-  lang: ja_jp
   urls:
     search: https://itunes.apple.com/search
