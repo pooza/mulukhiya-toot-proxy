@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
           'User-Agent' => Package.user_agent,
         },
       })
-      response = JSON.parse(response.strip.to_s)
+      response = JSON.parse(response.strip)
       return unless response['results'].present?
       return response['results'].first
     rescue => e
