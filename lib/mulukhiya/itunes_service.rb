@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
         },
       })
       response = JSON.parse(response.strip)
-      return unless response['results'].present?
+      return nil unless response['results'].present?
       return response['results'].first
     rescue => e
       raise ExternalServiceError, e.message
