@@ -60,7 +60,9 @@ module MulukhiyaTootProxy
     end
 
     def item_uri(asin)
-      uri = AmazonURI.parse(@config['application']['amazon']['url'])
+      country = @config['local']['amazon']['country']
+      raise ExternalServiceError, '設定ファイルで /amazon/country が未設定です。' unless country
+      uri = AmazonURI.parse(@config['application']['amazon']['urls'][country])
       uri.asin = asin
       return uri
     end

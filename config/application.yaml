@@ -14,7 +14,8 @@ shortened_url:
     - git.io
     - spoti.fi
 amazon:
-  url: https://www.amazon.co.jp/
+  urls:
+    jp: https://www.amazon.co.jp/
   retry_limit: 5
   patterns:
     - pattern: /dp/([[:alnum:]]+)
