@@ -1,5 +1,5 @@
 package:
-  version: 1.3.5
+  version: 1.3.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -34,3 +34,8 @@ spotify:
     track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
+itunes:
+  country: jp
+  lang: ja_jp
+  urls:
+    search: https://itunes.apple.com/search
