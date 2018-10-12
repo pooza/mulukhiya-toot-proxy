@@ -1,4 +1,5 @@
 require 'rspotify'
+require 'addressable/uri'
 require 'mulukhiya/config'
 require 'mulukhiya/spotify_uri'
 require 'mulukhiya/amazon_service'
@@ -56,6 +57,14 @@ module MulukhiyaTootProxy
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
       uri.track_id = id
       return uri
+    end
+
+    def image_url(track)
+      return image_uri(track)
+    end
+
+    def image_uri(track)
+      return Addressable::URI.parse(track.album.images.first['url'])
     end
 
     def amazon_url(track)
