@@ -38,9 +38,7 @@ module MulukhiyaTootProxy
     def image_uri
       return nil unless spotify?
       return nil unless track_id.present?
-      unless @image_uri
-        @image_uri = @spotify.image_uri(@spotify.lookup_track(track_id))
-      end
+      @image_uri ||= @spotify.image_uri(@spotify.lookup_track(track_id))
       return @image_uri
     end
 
