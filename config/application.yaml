@@ -37,3 +37,6 @@ spotify:
 itunes:
   urls:
     search: https://itunes.apple.com/search
+    lookup: https://itunes.apple.com/lookup
+  patterns:
+    - pattern: ([[:digit:]]+)$
