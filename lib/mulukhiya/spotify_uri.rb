@@ -31,6 +31,17 @@ module MulukhiyaTootProxy
       return @spotify.lookup_track(track_id)
     end
 
+    def image_url
+      return image_uri
+    end
+
+    def image_uri
+      return nil unless spotify?
+      return nil unless track_id.present?
+      @image_uri ||= @spotify.image_uri(@spotify.lookup_track(track_id))
+      return @image_uri
+    end
+
     private
 
     def patterns

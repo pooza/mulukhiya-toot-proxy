@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
     def image_uri(asin)
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
-        country: @config['application']['amazon']['country'],
+        country: @config['local']['amazon']['country'],
         response_group: 'Images',
       })
       raise ExternalServiceError, response.error if response.has_error?
@@ -43,7 +43,7 @@ module MulukhiyaTootProxy
         response = Amazon::Ecs.item_search(keyword, {
           search_index: category,
           response_group: 'ItemAttributes',
-          country: @config['application']['amazon']['country'],
+          country: @config['local']['amazon']['country'],
         })
         return response.items.first.get('ASIN') if response.items.present?
       end
@@ -60,7 +60,9 @@ module MulukhiyaTootProxy
     end
 
     def item_uri(asin)
-      uri = AmazonURI.parse(@config['application']['amazon']['url'])
+      country = @config['local']['amazon']['country']
+      raise ExternalServiceError, '設定ファイルで /amazon/country が未設定です。' unless country
+      uri = AmazonURI.parse(@config['application']['amazon']['urls'][country])
       uri.asin = asin
       return uri
     end
