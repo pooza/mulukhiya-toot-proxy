@@ -1,20 +1,18 @@
 require 'mulukhiya/amazon_uri'
-require 'mulukhiya/handler'
+require 'mulukhiya/handler/image_handler'
 
 module MulukhiyaTootProxy
-  class AmazonImageHandler < Handler
-    def exec(body, headers = {})
-      links = body['status'].scan(%r{https?://[^\s[:cntrl:]]+})
-      body['media_ids'] ||= []
-      links.each do |link|
-        uri = AmazonURI.parse(link)
-        next unless uri.amazon?
-        next unless uri.asin.present?
-        next unless uri.image_uri.present?
-        body['media_ids'].push(@mastodon.upload_remote_resource(uri.image_uri))
-        increment!
-        break
-      end
+  class AmazonImageHandler < ImageHandler
+    def updatable?(link)
+      uri = AmazonURI.parse(link)
+      return false unless uri.amazon?
+      return false unless uri.asin.present?
+      return false unless uri.image_uri.present?
+      return true
+    end
+
+    def image_container(link)
+      return AmazonURI.parse(link)
     end
   end
 end

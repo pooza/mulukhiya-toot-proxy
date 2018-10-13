@@ -1,20 +1,18 @@
 require 'mulukhiya/spotify_uri'
-require 'mulukhiya/handler'
+require 'mulukhiya/handler/image_handler'
 
 module MulukhiyaTootProxy
-  class SpotifyImageHandler < Handler
-    def exec(body, headers = {})
-      links = body['status'].scan(%r{https?://[^\s[:cntrl:]]+})
-      body['media_ids'] ||= []
-      links.each do |link|
-        uri = SpotifyURI.parse(link)
-        next unless uri.spotify?
-        next unless uri.track_id.present?
-        next unless uri.image_uri.present?
-        body['media_ids'].push(@mastodon.upload_remote_resource(uri.image_uri))
-        increment!
-        break
-      end
+  class SpotifyImageHandler < ImageHandler
+    def updatable?(link)
+      uri = SpotifyURI.parse(link)
+      return false unless uri.spotify?
+      return false unless uri.track_id.present?
+      return false unless uri.image_uri.present?
+      return true
+    end
+
+    def image_container(link)
+      return SpotifyURI.parse(link)
     end
   end
 end
