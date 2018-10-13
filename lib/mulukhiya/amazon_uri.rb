@@ -50,9 +50,9 @@ module MulukhiyaTootProxy
     end
 
     def image_uri
+      return nil unless amazon?
+      return nil unless asin.present?
       unless @image_uri
-        return nil unless amazon?
-        return nil unless asin.present?
         @image_uri = AmazonService.new.image_uri(asin)
       end
       return @image_uri
