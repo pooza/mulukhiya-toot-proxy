@@ -1,4 +1,4 @@
-require 'addressable/uri'
+require 'mulukhiya/amazon_uri'
 
 module MulukhiyaTootProxy
   class AmazonURITest < Test::Unit::TestCase
