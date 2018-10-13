@@ -65,6 +65,8 @@ module MulukhiyaTootProxy
 
     def image_uri(track)
       return Addressable::URI.parse(track.album.images.first['url'])
+    rescue
+      return nil
     end
 
     def amazon_url(track)
