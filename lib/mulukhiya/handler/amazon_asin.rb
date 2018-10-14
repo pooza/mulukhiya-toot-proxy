@@ -1,6 +1,6 @@
 require 'mulukhiya/amazon_uri'
 require 'mulukhiya/amazon_service'
-require 'mulukhiya/handler/url_handler'
+require 'mulukhiya/url_handler'
 
 module MulukhiyaTootProxy
   class AmazonAsinHandler < UrlHandler

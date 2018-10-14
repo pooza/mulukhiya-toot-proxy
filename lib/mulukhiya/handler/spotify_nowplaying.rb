@@ -1,5 +1,5 @@
 require 'mulukhiya/spotify_service'
-require 'mulukhiya/handler/nowplaying_handler'
+require 'mulukhiya/nowplaying_handler'
 
 module MulukhiyaTootProxy
   class SpotifyNowplayingHandler < NowplayingHandler

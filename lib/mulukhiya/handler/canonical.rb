@@ -1,7 +1,7 @@
 require 'addressable/uri'
 require 'httparty'
 require 'nokogiri'
-require 'mulukhiya/handler/url_handler'
+require 'mulukhiya/url_handler'
 
 module MulukhiyaTootProxy
   class CanonicalHandler < UrlHandler

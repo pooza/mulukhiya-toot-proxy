@@ -1,5 +1,5 @@
 require 'mulukhiya/amazon_uri'
-require 'mulukhiya/handler/image_handler'
+require 'mulukhiya/image_handler'
 
 module MulukhiyaTootProxy
   class AmazonImageHandler < ImageHandler

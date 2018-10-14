@@ -1,6 +1,6 @@
 require 'addressable/uri'
 require 'httparty'
-require 'mulukhiya/handler/url_handler'
+require 'mulukhiya/url_handler'
 
 module MulukhiyaTootProxy
   class ShortenedUrlHandler < UrlHandler

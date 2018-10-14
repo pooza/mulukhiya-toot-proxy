@@ -2,7 +2,7 @@ require 'mulukhiya/spotify_service'
 require 'mulukhiya/spotify_uri'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/mastodon'
-require 'mulukhiya/handler/nowplaying_handler'
+require 'mulukhiya/nowplaying_handler'
 
 module MulukhiyaTootProxy
   class SpotifyUrlNowplayingHandler < NowplayingHandler
