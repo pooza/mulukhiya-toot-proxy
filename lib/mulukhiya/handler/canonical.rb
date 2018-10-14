@@ -2,6 +2,7 @@ require 'addressable/uri'
 require 'httparty'
 require 'nokogiri'
 require 'mulukhiya/url_handler'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class CanonicalHandler < UrlHandler
@@ -18,7 +19,12 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
-      body = Nokogiri::HTML.parse(HTTParty.get(uri.normalize).body, nil, 'utf-8')
+      response = HTTParty.get(uri.normalize, {
+        headers: {
+          'User-Agent' => Package.user_agent,
+        },
+      })
+      body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
       uri = Addressable::URI.parse(elements.first.attribute('href'))
