@@ -2,10 +2,6 @@ require 'mulukhiya/handler'
 
 module MulukhiyaTootProxy
   class UrlHandler < Handler
-    def rewrite(link)
-      raise 'rewriteが未定義です。'
-    end
-
     def exec(body, headers = {})
       @status = body['status']
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
@@ -16,7 +12,9 @@ module MulukhiyaTootProxy
       return body
     end
 
-    private
+    def rewrite(link)
+      raise 'rewriteが未定義です。'
+    end
 
     def rewritable?(link)
       return true
