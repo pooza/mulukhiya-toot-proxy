@@ -1,6 +1,6 @@
 require 'amazon/ecs'
 require 'mulukhiya/config'
-require 'mulukhiya/amazon_uri'
+require 'mulukhiya/uri/amazon'
 require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy

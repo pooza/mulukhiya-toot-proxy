@@ -1,4 +1,4 @@
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 require 'mulukhiya/image_handler'
 
 module MulukhiyaTootProxy

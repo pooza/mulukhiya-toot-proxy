@@ -1,4 +1,4 @@
-require 'mulukhiya/amazon_uri'
+require 'mulukhiya/uri/amazon'
 require 'mulukhiya/image_handler'
 
 module MulukhiyaTootProxy

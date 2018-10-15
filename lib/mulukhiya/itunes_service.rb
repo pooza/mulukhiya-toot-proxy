@@ -1,7 +1,7 @@
 require 'httparty'
 require 'mulukhiya/config'
 require 'mulukhiya/package'
-require 'mulukhiya/itunes_uri'
+require 'mulukhiya/uri/itunes'
 require 'mulukhiya/error/external_service'
 require 'json'
 

@@ -1,4 +1,4 @@
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 
 module MulukhiyaTootProxy
   class SpotifyURITest < Test::Unit::TestCase

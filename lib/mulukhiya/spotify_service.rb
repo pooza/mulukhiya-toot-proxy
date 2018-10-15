@@ -1,7 +1,7 @@
 require 'rspotify'
 require 'addressable/uri'
 require 'mulukhiya/config'
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/error/external_service'
 

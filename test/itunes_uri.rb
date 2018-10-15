@@ -1,4 +1,4 @@
-require 'mulukhiya/itunes_uri'
+require 'mulukhiya/uri/itunes'
 
 module MulukhiyaTootProxy
   class ItunesURITest < Test::Unit::TestCase

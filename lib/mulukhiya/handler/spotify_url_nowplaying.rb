@@ -1,5 +1,5 @@
 require 'mulukhiya/spotify_service'
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/mastodon'
 require 'mulukhiya/nowplaying_handler'
