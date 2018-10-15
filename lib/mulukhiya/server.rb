@@ -5,7 +5,7 @@ require 'mulukhiya/config'
 require 'mulukhiya/slack'
 require 'mulukhiya/package'
 require 'mulukhiya/logger'
-require 'mulukhiya/json_renderer'
+require 'mulukhiya/renderer/json'
 require 'mulukhiya/handler'
 require 'mulukhiya/mastodon'
 
