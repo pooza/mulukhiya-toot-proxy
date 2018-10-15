@@ -4,7 +4,7 @@ require 'rest-client'
 require 'digest/sha1'
 require 'json'
 require 'mulukhiya/package'
-require 'mulukhiya/external_service_error'
+require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
   class Mastodon

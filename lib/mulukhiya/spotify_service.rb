@@ -3,7 +3,7 @@ require 'addressable/uri'
 require 'mulukhiya/config'
 require 'mulukhiya/spotify_uri'
 require 'mulukhiya/amazon_service'
-require 'mulukhiya/external_service_error'
+require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
   class SpotifyService
