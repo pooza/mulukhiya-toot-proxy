@@ -1,7 +1,7 @@
 require 'amazon/ecs'
 require 'mulukhiya/config'
-require 'mulukhiya/amazon_uri'
-require 'mulukhiya/external_service_error'
+require 'mulukhiya/uri/amazon'
+require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
   class AmazonService
@@ -12,10 +12,6 @@ module MulukhiyaTootProxy
         options[:AWS_secret_key] = @config['local']['amazon']['secret_key']
         options[:associate_tag] = AmazonService.associate_tag
       end
-    end
-
-    def image_url(asin)
-      return image_uri(asin)
     end
 
     def image_uri(asin)
@@ -53,10 +49,6 @@ module MulukhiyaTootProxy
       sleep(1)
       cnt += 1
       retry
-    end
-
-    def item_url(asin)
-      return item_uri(asin)
     end
 
     def item_uri(asin)

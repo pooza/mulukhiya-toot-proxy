@@ -1,5 +1,5 @@
 package:
-  version: 1.3.6
+  version: 1.3.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -13,6 +13,7 @@ shortened_url:
     - youtu.be
     - git.io
     - spoti.fi
+    - apple.co
 amazon:
   urls:
     jp: https://www.amazon.co.jp/

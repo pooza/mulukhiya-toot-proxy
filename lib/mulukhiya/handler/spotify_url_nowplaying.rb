@@ -1,8 +1,8 @@
 require 'mulukhiya/spotify_service'
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/mastodon'
-require 'mulukhiya/handler/nowplaying_handler'
+require 'mulukhiya/nowplaying_handler'
 
 module MulukhiyaTootProxy
   class SpotifyUrlNowplayingHandler < NowplayingHandler
@@ -35,6 +35,8 @@ module MulukhiyaTootProxy
       end
       status.push(artists.join(' '))
       return unless uri = @service.amazon_uri(track)
+      status.push(uri.to_s)
+      return unless uri = @service.itunes_uri(track)
       status.push(uri.to_s)
     end
   end

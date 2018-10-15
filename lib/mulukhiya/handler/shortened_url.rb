@@ -1,6 +1,7 @@
 require 'addressable/uri'
 require 'httparty'
-require 'mulukhiya/handler/url_handler'
+require 'mulukhiya/url_handler'
+require 'mulukhiya/package'
 
 module MulukhiyaTootProxy
   class ShortenedUrlHandler < UrlHandler
@@ -10,6 +11,9 @@ module MulukhiyaTootProxy
         response = HTTParty.get(uri.normalize, {
           follow_redirects: false,
           timeout: timeout,
+          headers: {
+            'User-Agent' => Package.user_agent,
+          },
         })
         location = response.headers['location']
         break unless location

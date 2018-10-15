@@ -1,15 +1,15 @@
 require 'rspotify'
 require 'addressable/uri'
 require 'mulukhiya/config'
-require 'mulukhiya/spotify_uri'
+require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
-require 'mulukhiya/external_service_error'
+require 'mulukhiya/itunes_service'
+require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
   class SpotifyService
     def initialize
       @config = Config.instance
-      @amazon = AmazonService.new
       ENV['ACCEPT_LANGUAGE'] ||= @config['local']['spotify']['language']
       RSpotify.authenticate(
         @config['local']['spotify']['client_id'],
@@ -49,18 +49,10 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def track_url(id)
-      return track_uri(id)
-    end
-
-    def track_uri(id)
-      uri = SpotifyURI.parse(@config['application']['spotify']['url'])
-      uri.track_id = id
+    def track_uri(track)
+      uri = SpotifyURI.parse(@config['application']['spotify']['urls']['track'])
+      uri.track_id = track.id
       return uri
-    end
-
-    def image_url(track)
-      return image_uri(track)
     end
 
     def image_uri(track)
@@ -69,18 +61,26 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def amazon_url(track)
-      return amazon_uri(track)
-    end
-
     def amazon_uri(track)
       keyword = [track.name]
       track.artists.each do |artist|
         keyword.push(artist.name)
       end
       keyword = keyword.join(' ')
-      return nil unless asin = @amazon.search(keyword, ['DigitalMusic', 'Music'])
-      return @amazon.item_uri(asin)
+      amazon = AmazonService.new
+      return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
+      return amazon.item_uri(asin)
+    end
+
+    def itunes_uri(track)
+      keyword = [track.name]
+      track.artists.each do |artist|
+        keyword.push(artist.name)
+      end
+      keyword = keyword.join(' ')
+      itunes = ItunesService.new
+      return nil unless track = itunes.search(keyword, 'music')
+      return itunes.track_uri(track)
     end
 
     private

@@ -1,5 +1,5 @@
-require 'mulukhiya/spotify_uri'
-require 'mulukhiya/handler/image_handler'
+require 'mulukhiya/uri/spotify'
+require 'mulukhiya/image_handler'
 
 module MulukhiyaTootProxy
   class SpotifyImageHandler < ImageHandler
