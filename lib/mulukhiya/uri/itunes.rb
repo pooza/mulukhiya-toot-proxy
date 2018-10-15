@@ -28,8 +28,9 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def image_url
-      return image_uri
+    def track
+      return nil unless track_id.present?
+      return @service.lookup(track_id)
     end
 
     def image_uri

@@ -9,7 +9,6 @@ module MulukhiyaTootProxy
   class SpotifyService
     def initialize
       @config = Config.instance
-      @amazon = AmazonService.new
       ENV['ACCEPT_LANGUAGE'] ||= @config['local']['spotify']['language']
       RSpotify.authenticate(
         @config['local']['spotify']['client_id'],
@@ -67,8 +66,9 @@ module MulukhiyaTootProxy
         keyword.push(artist.name)
       end
       keyword = keyword.join(' ')
-      return nil unless asin = @amazon.search(keyword, ['DigitalMusic', 'Music'])
-      return @amazon.item_uri(asin)
+      amazon = AmazonService.new
+      return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
+      return amazon.item_uri(asin)
     end
 
     private

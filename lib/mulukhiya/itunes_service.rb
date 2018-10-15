@@ -2,6 +2,7 @@ require 'httparty'
 require 'mulukhiya/config'
 require 'mulukhiya/package'
 require 'mulukhiya/uri/itunes'
+require 'mulukhiya/amazon_service'
 require 'mulukhiya/error/external_service'
 require 'json'
 
@@ -35,6 +36,16 @@ module MulukhiyaTootProxy
       return response['results'].first
     rescue => e
       raise ExternalServiceError, e.message
+    end
+
+    def amazon_uri(track)
+      keyword = [
+        track['trackName'],
+        track['artistName'],
+      ].join(' ')
+      amazon = AmazonService.new
+      return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
+      return amazon.item_uri(asin)
     end
 
     private
