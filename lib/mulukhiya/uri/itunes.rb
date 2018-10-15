@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       return nil unless itunes?
       return nil unless track_id.present?
       unless @image_uri
-        [160, 100, 30].each do |size|
+        [160, 100, 60, 30].each do |size|
           @image_uri = Addressable::URI.parse(@service.lookup(track_id)["artworkUrl#{size}"])
           break if @image_uri
         end

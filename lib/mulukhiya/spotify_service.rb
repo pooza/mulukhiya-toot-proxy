@@ -3,6 +3,7 @@ require 'addressable/uri'
 require 'mulukhiya/config'
 require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
+require 'mulukhiya/itunes_service'
 require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
@@ -48,9 +49,9 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def track_uri(id)
-      uri = SpotifyURI.parse(@config['application']['spotify']['url'])
-      uri.track_id = id
+    def track_uri(track)
+      uri = SpotifyURI.parse(@config['application']['spotify']['urls']['track'])
+      uri.track_id = track.id
       return uri
     end
 
@@ -69,6 +70,17 @@ module MulukhiyaTootProxy
       amazon = AmazonService.new
       return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
       return amazon.item_uri(asin)
+    end
+
+    def itunes_uri(track)
+      keyword = [track.name]
+      track.artists.each do |artist|
+        keyword.push(artist.name)
+      end
+      keyword = keyword.join(' ')
+      itunes = ItunesService.new
+      return nil unless track = itunes.search(keyword, 'music')
+      return itunes.track_uri(track)
     end
 
     private

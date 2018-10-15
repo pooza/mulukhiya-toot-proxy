@@ -28,6 +28,8 @@ module MulukhiyaTootProxy
       status.push(Mastodon.create_tag(track['artistName']))
       return unless uri = @service.amazon_uri(track)
       status.push(uri.to_s)
+      return unless uri = @service.spotify_uri(track)
+      status.push(uri.to_s)
     end
   end
 end

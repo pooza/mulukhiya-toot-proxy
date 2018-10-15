@@ -3,6 +3,7 @@ require 'mulukhiya/config'
 require 'mulukhiya/package'
 require 'mulukhiya/uri/itunes'
 require 'mulukhiya/amazon_service'
+require 'mulukhiya/spotify_service'
 require 'mulukhiya/error/external_service'
 require 'json'
 
@@ -38,6 +39,12 @@ module MulukhiyaTootProxy
       raise ExternalServiceError, e.message
     end
 
+    def track_uri(track)
+      return ItunesURI.parse(track['collectionViewUrl'])
+    rescue
+      return nil
+    end
+
     def amazon_uri(track)
       keyword = [
         track['trackName'],
@@ -46,6 +53,16 @@ module MulukhiyaTootProxy
       amazon = AmazonService.new
       return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
       return amazon.item_uri(asin)
+    end
+
+    def spotify_uri(track)
+      keyword = [
+        track['trackName'],
+        track['artistName'],
+      ].join(' ')
+      spotify = SpotifyService.new
+      return nil unless track = spotify.search_track(keyword)
+      return spotify.track_uri(track)
     end
 
     private

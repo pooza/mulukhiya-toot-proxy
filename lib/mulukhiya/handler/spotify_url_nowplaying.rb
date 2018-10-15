@@ -36,6 +36,8 @@ module MulukhiyaTootProxy
       status.push(artists.join(' '))
       return unless uri = @service.amazon_uri(track)
       status.push(uri.to_s)
+      return unless uri = @service.itunes_uri(track)
+      status.push(uri.to_s)
     end
   end
 end
