@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     end
 
     def toot(body)
-      return HTTParty.post(create_url('/api/v1/statuses'), {
+      return HTTParty.post(create_uri('/api/v1/statuses'), {
         body: body.to_json,
         headers: {
           'Content-Type' => 'application/json',
@@ -27,7 +27,7 @@ module MulukhiyaTootProxy
 
     def upload(path)
       response = RestClient.post(
-        create_url('/api/v1/media').to_s,
+        create_uri('/api/v1/media').to_s,
         {file: File.new(path, 'rb')},
         {
           'User-Agent' => Package.user_agent,
@@ -61,7 +61,7 @@ module MulukhiyaTootProxy
       raise ExternalServiceError, "外部ファイルが取得できません。 #{e.message}"
     end
 
-    def create_url(href)
+    def create_uri(href)
       toot_url = @url.clone
       toot_url.path = href
       return toot_url

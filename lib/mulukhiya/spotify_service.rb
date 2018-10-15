@@ -49,28 +49,16 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def track_url(id)
-      return track_uri(id)
-    end
-
     def track_uri(id)
       uri = SpotifyURI.parse(@config['application']['spotify']['url'])
       uri.track_id = id
       return uri
     end
 
-    def image_url(track)
-      return image_uri(track)
-    end
-
     def image_uri(track)
       return Addressable::URI.parse(track.album.images.first['url'])
     rescue
       return nil
-    end
-
-    def amazon_url(track)
-      return amazon_uri(track)
     end
 
     def amazon_uri(track)

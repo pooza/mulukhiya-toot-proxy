@@ -14,10 +14,6 @@ module MulukhiyaTootProxy
       end
     end
 
-    def image_url(asin)
-      return image_uri(asin)
-    end
-
     def image_uri(asin)
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
@@ -53,10 +49,6 @@ module MulukhiyaTootProxy
       sleep(1)
       cnt += 1
       retry
-    end
-
-    def item_url(asin)
-      return item_uri(asin)
     end
 
     def item_uri(asin)
