@@ -5,6 +5,7 @@ require 'mulukhiya/uri/spotify'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/itunes_service'
 require 'mulukhiya/error/external_service'
+require 'mulukhiya/error/request'
 
 module MulukhiyaTootProxy
   class SpotifyService
@@ -22,6 +23,8 @@ module MulukhiyaTootProxy
       tracks = RSpotify::Track.search(keyword)
       return nil if tracks.nil?
       return tracks.first
+    rescue RestClient::BadRequest
+      raise RequestError, '曲が見つかりません。'
     rescue => e
       raise ExternalServiceError, "曲が見つかりません。 #{e.message}" if retry_limit < cnt
       sleep(1)
@@ -32,6 +35,8 @@ module MulukhiyaTootProxy
     def lookup_track(id)
       cnt = 1
       return RSpotify::Track.find(id)
+    rescue RestClient::BadRequest
+      raise RequestError, '曲が見つかりません。'
     rescue => e
       raise ExternalServiceError, "曲が見つかりません。 #{e.message}" if retry_limit < cnt
       sleep(1)
@@ -42,6 +47,8 @@ module MulukhiyaTootProxy
     def lookup_artist(id)
       cnt = 1
       return RSpotify::Artist.find(id)
+    rescue RestClient::BadRequest
+      raise RequestError, 'アーティストが見つかりません。'
     rescue => e
       raise ExternalServiceError, "アーティストが見つかりません。 #{e.message}" if retry_limit < cnt
       sleep(1)
