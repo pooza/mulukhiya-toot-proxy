@@ -2,6 +2,7 @@ require 'amazon/ecs'
 require 'mulukhiya/config'
 require 'mulukhiya/uri/amazon'
 require 'mulukhiya/error/external_service'
+require 'mulukhiya/error/request'
 
 module MulukhiyaTootProxy
   class AmazonService
@@ -20,7 +21,7 @@ module MulukhiyaTootProxy
         country: @config['local']['amazon']['country'],
         response_group: 'Images',
       })
-      raise ExternalServiceError, response.error if response.has_error?
+      raise RequestError, response.error if response.has_error?
       ['Large', 'Medium', 'Small'].each do |size|
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri

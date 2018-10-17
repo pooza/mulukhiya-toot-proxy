@@ -5,6 +5,7 @@ require 'mulukhiya/uri/itunes'
 require 'mulukhiya/amazon_service'
 require 'mulukhiya/spotify_service'
 require 'mulukhiya/error/external_service'
+require 'mulukhiya/error/request'
 require 'json'
 
 module MulukhiyaTootProxy
@@ -20,8 +21,11 @@ module MulukhiyaTootProxy
         },
       })
       response = JSON.parse(response.strip)
+      raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
+    rescue RequestError
+      raise RequestError, "#{category} ’#{keyword}' が見つかりません。"
     rescue => e
       raise ExternalServiceError, e.message
     end
@@ -33,8 +37,11 @@ module MulukhiyaTootProxy
         },
       })
       response = JSON.parse(response.strip)
+      raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
+    rescue RequestError
+      raise RequestError, "ID '#{id}' が見つかりません。"
     rescue => e
       raise ExternalServiceError, e.message
     end
