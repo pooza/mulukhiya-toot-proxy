@@ -1,6 +1,7 @@
 require 'mulukhiya/config'
 require 'mulukhiya/logger'
 require 'mulukhiya/slack'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class Handler
@@ -12,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise 'execが未定義です。'
+      raise ImprementError, 'execが未定義です。'
     end
 
     def result
@@ -21,6 +22,7 @@ module MulukhiyaTootProxy
 
     def self.all
       return enum_for(__method__) unless block_given?
+      Config.validate('/local/handlers')
       Config.instance['local']['handlers'].each do |handler|
         require "mulukhiya/handler/#{handler}"
         yield "MulukhiyaTootProxy::#{handler.camelize}Handler".constantize.new

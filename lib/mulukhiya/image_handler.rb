@@ -1,4 +1,5 @@
 require 'mulukhiya/handler'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class ImageHandler < Handler
@@ -16,11 +17,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(link)
-      raise 'updatable?が未定義です。'
+      raise ImprementError, 'updatable?が未定義です。'
     end
 
     def image_container(link)
-      raise 'image_containerが未定義です。'
+      raise ImprementError, 'image_containerが未定義です。'
     end
   end
 end

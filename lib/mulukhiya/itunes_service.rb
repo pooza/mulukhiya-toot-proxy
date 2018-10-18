@@ -1,4 +1,5 @@
 require 'httparty'
+require 'json'
 require 'mulukhiya/config'
 require 'mulukhiya/package'
 require 'mulukhiya/uri/itunes'
@@ -6,11 +7,12 @@ require 'mulukhiya/amazon_service'
 require 'mulukhiya/spotify_service'
 require 'mulukhiya/error/external_service'
 require 'mulukhiya/error/request'
-require 'json'
 
 module MulukhiyaTootProxy
   class ItunesService
     def initialize
+      Config.validate('/local/itunes/country')
+      Config.validate('/local/itunes/lang')
       @config = Config.instance
     end
 
@@ -24,8 +26,8 @@ module MulukhiyaTootProxy
       raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue RequestError
-      raise RequestError, "#{category} ’#{keyword}' が見つかりません。"
+    rescue RequestError => e
+      raise RequestError, "#{category} ’#{keyword}' が見つかりません。 (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end
@@ -40,8 +42,8 @@ module MulukhiyaTootProxy
       raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue RequestError
-      raise RequestError, "ID '#{id}' が見つかりません。"
+    rescue RequestError => e
+      raise RequestError, "'#{id}' が見つかりません。 (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end
@@ -53,26 +55,22 @@ module MulukhiyaTootProxy
     end
 
     def amazon_uri(track)
-      keyword = [
-        track['trackName'],
-        track['artistName'],
-      ].join(' ')
       amazon = AmazonService.new
-      return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
+      return nil unless asin = amazon.search(create_keyword(track), ['DigitalMusic', 'Music'])
       return amazon.item_uri(asin)
     end
 
     def spotify_uri(track)
-      keyword = [
-        track['trackName'],
-        track['artistName'],
-      ].join(' ')
       spotify = SpotifyService.new
-      return nil unless track = spotify.search_track(keyword)
+      return nil unless track = spotify.search_track(create_keyword(track))
       return spotify.track_uri(track)
     end
 
     private
+
+    def create_keyword(track)
+      return [track['trackName'], track['artistName']].join(' ')
+    end
 
     def create_search_uri(keyword, category)
       uri = ItunesURI.parse(@config['application']['itunes']['urls']['search'])

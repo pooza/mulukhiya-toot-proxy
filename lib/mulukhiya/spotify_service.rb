@@ -10,6 +10,8 @@ require 'mulukhiya/error/request'
 module MulukhiyaTootProxy
   class SpotifyService
     def initialize
+      Config.validate('/local/spotify/client_id')
+      Config.validate('/local/spotify/client_secret')
       @config = Config.instance
       ENV['ACCEPT_LANGUAGE'] ||= @config['local']['spotify']['language']
       RSpotify.authenticate(
@@ -38,7 +40,7 @@ module MulukhiyaTootProxy
     rescue RestClient::BadRequest
       raise RequestError, '曲が見つかりません。'
     rescue => e
-      raise ExternalServiceError, "曲が見つかりません。 #{e.message}" if retry_limit < cnt
+      raise ExternalServiceError, "曲が見つかりません。 (#{e.message})" if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -50,7 +52,7 @@ module MulukhiyaTootProxy
     rescue RestClient::BadRequest
       raise RequestError, 'アーティストが見つかりません。'
     rescue => e
-      raise ExternalServiceError, "アーティストが見つかりません。 #{e.message}" if retry_limit < cnt
+      raise ExternalServiceError, "アーティストが見つかりません。 (#{e.message})" if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
