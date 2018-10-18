@@ -7,6 +7,10 @@ require 'mulukhiya/error/request'
 module MulukhiyaTootProxy
   class AmazonService
     def initialize
+      Config.validate('/local/amazon/access_key')
+      Config.validate('/local/amazon/secret_key')
+      Config.validate('/local/amazon/country')
+      Config.validate('/local/amazon/associate_tag')
       @config = Config.instance
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['local']['amazon']['access_key']
@@ -21,7 +25,7 @@ module MulukhiyaTootProxy
         country: @config['local']['amazon']['country'],
         response_group: 'Images',
       })
-      raise RequestError, response.error if response.has_error?
+      raise RequestError, "ASIN '#{asin}' が見つかりません。 (#{response.error})" if response.has_error?
       ['Large', 'Medium', 'Small'].each do |size|
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
@@ -54,7 +58,6 @@ module MulukhiyaTootProxy
 
     def item_uri(asin)
       country = @config['local']['amazon']['country']
-      raise ExternalServiceError, '設定ファイルで /amazon/country が未設定です。' unless country
       uri = AmazonURI.parse(@config['application']['amazon']['urls'][country])
       uri.asin = asin
       return uri

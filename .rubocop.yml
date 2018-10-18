@@ -1,5 +1,8 @@
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
+  DisplayCopNames: true
+  Exclude:
+    - '**/._*'
 
 Style/DoubleNegation:
   Enabled: false

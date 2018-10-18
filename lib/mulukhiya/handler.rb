@@ -1,6 +1,7 @@
 require 'mulukhiya/config'
 require 'mulukhiya/logger'
 require 'mulukhiya/slack'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class Handler
@@ -12,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise 'execが未定義です。'
+      raise ImprementError, 'execが未定義です。'
     end
 
     def result

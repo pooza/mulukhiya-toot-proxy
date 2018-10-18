@@ -10,6 +10,8 @@ require 'mulukhiya/error/request'
 module MulukhiyaTootProxy
   class SpotifyService
     def initialize
+      Config.validate('/local/spotify/client_id')
+      Config.validate('/local/spotify/client_secret')
       @config = Config.instance
       ENV['ACCEPT_LANGUAGE'] ||= @config['local']['spotify']['language']
       RSpotify.authenticate(
@@ -24,7 +26,7 @@ module MulukhiyaTootProxy
       return nil if tracks.nil?
       return tracks.first
     rescue RestClient::BadRequest
-      raise RequestError, '曲が見つかりません。'
+      raise RequestError, "曲が見つかりません。 (#{e.message})"
     rescue => e
       raise ExternalServiceError, "曲が見つかりません。 #{e.message}" if retry_limit < cnt
       sleep(1)
@@ -36,9 +38,9 @@ module MulukhiyaTootProxy
       cnt = 1
       return RSpotify::Track.find(id)
     rescue RestClient::BadRequest
-      raise RequestError, '曲が見つかりません。'
+      raise RequestError, "曲が見つかりません。 (#{e.message})"
     rescue => e
-      raise ExternalServiceError, "曲が見つかりません。 #{e.message}" if retry_limit < cnt
+      raise ExternalServiceError, "曲が見つかりません。 (#{e.message})" if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -48,9 +50,9 @@ module MulukhiyaTootProxy
       cnt = 1
       return RSpotify::Artist.find(id)
     rescue RestClient::BadRequest
-      raise RequestError, 'アーティストが見つかりません。'
+      raise RequestError, "アーティストが見つかりません。 (#{e.message})"
     rescue => e
-      raise ExternalServiceError, "アーティストが見つかりません。 #{e.message}" if retry_limit < cnt
+      raise ExternalServiceError, "アーティストが見つかりません。 (#{e.message})" if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry

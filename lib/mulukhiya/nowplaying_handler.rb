@@ -1,4 +1,5 @@
 require 'mulukhiya/handler'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class NowplayingHandler < Handler
@@ -20,11 +21,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      raise 'updatable?が未定義です。'
+      raise ImprementError, 'updatable?が未定義です。'
     end
 
     def update(keyword, status)
-      raise 'updateが未定義です。'
+      raise ImprementError, 'updateが未定義です。'
     end
   end
 end

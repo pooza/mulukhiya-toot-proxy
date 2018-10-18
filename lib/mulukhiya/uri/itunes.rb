@@ -1,5 +1,6 @@
 require 'addressable/uri'
 require 'mulukhiya/itunes_service'
+require 'mulukhiya/error/request'
 
 module MulukhiyaTootProxy
   class ItunesURI < Addressable::URI
@@ -36,9 +37,11 @@ module MulukhiyaTootProxy
     def image_uri
       return nil unless itunes?
       return nil unless track_id.present?
+      track = @service.lookup(track_id)
+      raise RequestError, "ID '#{track_id}' が見つかりません。" unless track
       unless @image_uri
         [160, 100, 60, 30].each do |size|
-          @image_uri = Addressable::URI.parse(@service.lookup(track_id)["artworkUrl#{size}"])
+          @image_uri = Addressable::URI.parse(track["artworkUrl#{size}"])
           break if @image_uri
         end
       end

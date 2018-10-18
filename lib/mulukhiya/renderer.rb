@@ -1,5 +1,6 @@
 require 'mulukhiya/config'
 require 'mulukhiya/logger'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class Renderer
@@ -16,7 +17,7 @@ module MulukhiyaTootProxy
     end
 
     def to_s
-      raise 'to_sが未定義です。'
+      raise ImprementError, 'to_sが未定義です。'
     end
   end
 end

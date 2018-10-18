@@ -1,4 +1,5 @@
 require 'mulukhiya/handler'
+require 'mulukhiya/error/imprement'
 
 module MulukhiyaTootProxy
   class UrlHandler < Handler
@@ -13,7 +14,7 @@ module MulukhiyaTootProxy
     end
 
     def rewrite(link)
-      raise 'rewriteが未定義です。'
+      raise ImprementError, 'rewriteが未定義です。'
     end
 
     def rewritable?(link)
