@@ -34,7 +34,7 @@ module MulukhiyaTootProxy
     def self.validate(name)
       keys = name.split('/')
       keys.shift
-      config = self.instance
+      config = instance
       keys.each do |key|
         config = config[key]
         raise ConfigError, "#{name} が未定義です。" unless config.present?
