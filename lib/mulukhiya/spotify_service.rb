@@ -61,38 +61,37 @@ module MulukhiyaTootProxy
     def track_uri(track)
       uri = SpotifyURI.parse(@config['application']['spotify']['urls']['track'])
       uri.track_id = track.id
+      return nil unless uri.absolute?
       return uri
     end
 
     def image_uri(track)
-      return Addressable::URI.parse(track.album.images.first['url'])
-    rescue
-      return nil
+      uri = Addressable::URI.parse(track.album.images.first['url'])
+      return nil unless uri.absolute?
+      return uri
     end
 
     def amazon_uri(track)
-      keyword = [track.name]
-      track.artists.each do |artist|
-        keyword.push(artist.name)
-      end
-      keyword = keyword.join(' ')
       amazon = AmazonService.new
-      return nil unless asin = amazon.search(keyword, ['DigitalMusic', 'Music'])
+      return nil unless asin = amazon.search(create_keyword(track), ['DigitalMusic', 'Music'])
       return amazon.item_uri(asin)
     end
 
     def itunes_uri(track)
-      keyword = [track.name]
-      track.artists.each do |artist|
-        keyword.push(artist.name)
-      end
-      keyword = keyword.join(' ')
       itunes = ItunesService.new
-      return nil unless track = itunes.search(keyword, 'music')
+      return nil unless track = itunes.search(create_keyword(track), 'music')
       return itunes.track_uri(track)
     end
 
     private
+
+    def create_keyword(track)
+      keyword = [track.name]
+      track.artists.each do |artist|
+        keyword.push(artist.name)
+      end
+      return keyword.join(' ')
+    end
 
     def retry_limit
       return @config['application']['spotify']['retry_limit'] || 5

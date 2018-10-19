@@ -49,9 +49,9 @@ module MulukhiyaTootProxy
     end
 
     def track_uri(track)
-      return ItunesURI.parse(track['collectionViewUrl'])
-    rescue
-      return nil
+      uri = ItunesURI.parse(track['collectionViewUrl'])
+      return nil unless uri.absolute?
+      return uri
     end
 
     def amazon_uri(track)
