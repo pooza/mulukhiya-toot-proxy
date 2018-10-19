@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 require 'active_support'
 require 'active_support/core_ext'
 require 'mulukhiya/config'
@@ -27,7 +28,7 @@ module MulukhiyaTootProxy
       @body = request.body.read.to_s
       begin
         @params = JSON.parse(@body)
-      rescue
+      rescue JSON::ParserError
         @params = params.clone
       end
       @message = {request: {path: request.path, params: @params}, response: {result: []}}
@@ -88,7 +89,7 @@ module MulukhiyaTootProxy
       @renderer = JSONRenderer.new
       begin
         @renderer.status = e.status
-      rescue
+      rescue ::NoMethodError
         @renderer.status = 500
       end
       @message[:response][:error] = "#{e.class}: #{e.message}"

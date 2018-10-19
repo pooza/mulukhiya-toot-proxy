@@ -38,7 +38,7 @@ module MulukhiyaTootProxy
 
     def associate_tag
       return query_values['tag']
-    rescue
+    rescue ::NoMethodError
       return nil
     end
 
