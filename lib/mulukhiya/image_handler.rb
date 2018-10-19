@@ -17,11 +17,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(link)
-      raise ImprementError, 'updatable?が未定義です。'
+      raise ImprementError, "#{__method__}が未定義です。"
     end
 
     def image_container(link)
-      raise ImprementError, 'image_containerが未定義です。'
+      raise ImprementError, "#{__method__}が未定義です。"
     end
   end
 end

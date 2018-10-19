@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise ImprementError, 'execが未定義です。'
+      raise ImprementError, "#{__method__}が未定義です。"
     end
 
     def result
