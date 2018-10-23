@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
       return true
     end
 
-    def image_container(link)
+    def create_image_container(link)
       return ItunesURI.parse(link)
     end
   end

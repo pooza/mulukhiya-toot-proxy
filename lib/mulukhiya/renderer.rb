@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
     end
 
     def to_s
-      raise ImprementError, 'to_sが未定義です。'
+      raise ImprementError, "#{__method__}が未定義です。"
     end
   end
 end

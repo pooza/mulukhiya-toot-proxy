@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
         },
       })
     rescue => e
-      raise ExternalServiceError, "外部ファイルが取得できません。 #{e.message}"
+      raise ExternalServiceError, "外部ファイルが取得できません。 (#{e.message})"
     end
 
     def create_uri(href)

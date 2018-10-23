@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     end
 
     def rewrite(link)
-      raise ImprementError, 'rewriteが未定義です。'
+      raise ImprementError, "#{__method__}が未定義です。"
     end
 
     def rewritable?(link)
