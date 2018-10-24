@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
         },
         ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
-      if message.is_a?(::StandardError)
+      if message.is_a?(Exception)
         @logger.error(message)
       else
         @logger.info(message)
