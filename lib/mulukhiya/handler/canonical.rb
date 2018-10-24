@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
         headers: {
           'User-Agent' => Package.user_agent,
         },
+        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
