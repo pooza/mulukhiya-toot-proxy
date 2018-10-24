@@ -39,6 +39,7 @@ module MulukhiyaTootProxy
         config = config[key]
         raise ConfigError, "#{name} が未定義です。" unless config.present?
       end
+      return true
     end
   end
 end
