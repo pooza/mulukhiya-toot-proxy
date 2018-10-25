@@ -8,8 +8,8 @@ require 'mulukhiya/error/external_service'
 
 module MulukhiyaTootProxy
   class Mastodon
-    def initialize(url, token)
-      @url = Addressable::URI.parse(url)
+    def initialize(uri, token)
+      @uri = Addressable::URI.parse(uri)
       @token = token
     end
 
@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
           'Content-Type' => 'application/json',
           'User-Agent' => Package.user_agent,
           'Authorization' => "Bearer #{@token}",
-          'X-Mulukhiya' => '1',
+          'X-Mulukhiya' => Package.full_name,
         },
         ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
@@ -38,9 +38,9 @@ module MulukhiyaTootProxy
       return JSON.parse(response.body)['id'].to_i
     end
 
-    def upload_remote_resource(url)
-      path = File.join(ROOT_DIR, 'tmp/media', Digest::SHA1.hexdigest(url))
-      File.write(path, fetch(url))
+    def upload_remote_resource(uri)
+      path = File.join(ROOT_DIR, 'tmp/media', Digest::SHA1.hexdigest(uri))
+      File.write(path, fetch(uri))
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
@@ -52,8 +52,8 @@ module MulukhiyaTootProxy
 
     private
 
-    def fetch(url)
-      return HTTParty.get(url, {
+    def fetch(uri)
+      return HTTParty.get(uri, {
         headers: {
           'User-Agent' => Package.user_agent,
         },
@@ -64,9 +64,9 @@ module MulukhiyaTootProxy
     end
 
     def create_uri(href)
-      toot_url = @url.clone
-      toot_url.path = href
-      return toot_url
+      uri = @uri.clone
+      uri.path = href
+      return uri
     end
   end
 end
