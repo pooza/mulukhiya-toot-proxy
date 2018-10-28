@@ -9,27 +9,19 @@ module MulukhiyaTootProxy
     end
 
     def info(message)
-      @logger.info(jsonize(message))
+      @logger.info(message.to_json)
     end
 
-    def warning(message)
-      @logger.warn(jsonize(message))
+    def warn(message)
+      @logger.warn(message.to_json)
     end
 
     def error(message)
-      @logger.error(jsonize(message))
+      @logger.error(message.to_json)
     end
 
     def fatal(message)
-      @logger.fatal(jsonize(message))
-    end
-
-    private
-
-    def jsonize(message)
-      message = message.clone
-      message['package'] = {name: Package.name, version: Package.version}
-      return message.to_json
+      @logger.fatal(message.to_json)
     end
   end
 end
