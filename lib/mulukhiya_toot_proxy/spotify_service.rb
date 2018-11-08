@@ -91,7 +91,7 @@ module MulukhiyaTootProxy
       end
       return tags
     rescue
-      return Mastodon.create_tag(artist)
+      return [Mastodon.create_tag(artist)]
     end
 
     private
