@@ -1,0 +1,13 @@
+machine:
+  timezone:
+    Asia/Tokyo
+  ruby:
+    version:
+      2.5.3
+dependencies:
+  override:
+    - bundle install:
+        timeout: 180
+test:
+  override:
+    - rake test
