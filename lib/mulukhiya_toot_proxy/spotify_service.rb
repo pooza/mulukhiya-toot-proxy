@@ -80,7 +80,7 @@ module MulukhiyaTootProxy
     def self.create_tags(artist)
       tags = []
       artist.sub!(/^(歌|語り):/, '')
-      if matches = artist.match(/(.*)\(CV: ?(.*)\)/)
+      if matches = artist.match(/(.*) ?\(CV: ?(.*)\)/)
         tags.push(Mastodon.create_tag(matches[1]))
         tags.push("CV:#{Mastodon.create_tag(matches[2])}")
       elsif matches = artist.match(/(.*)\((.*)\)/)
@@ -91,7 +91,7 @@ module MulukhiyaTootProxy
       end
       return tags
     rescue
-      return [names]
+      return Mastodon.create_tag(artist)
     end
 
     private

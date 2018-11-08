@@ -19,15 +19,15 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track['trackName'])
-      artists = []
       if @config['local']['nowplaying']['hashtag']
+        artists = []
         ItunesService.create_tags(track['artistName']).each do |tag|
           artists.push(tag)
         end
+        status.push(artists.join(' '))
       else
-        rags.push(artists['artistName'])
+        status.push(track['artistName'])
       end
-      status.push(artists.join(' '))
       return unless uri = @service.amazon_uri(track)
       status.push(uri.to_s)
       return unless uri = @service.spotify_uri(track)
