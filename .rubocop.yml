@@ -40,12 +40,12 @@ Metrics/ClassLength:
 Naming/FileName:
   Exclude:
     - Rakefile.rb
-    - webapp/config/Rakefile.local.rb
+    - '**/Rakefile*.rb'
 
 Metrics/BlockLength:
   Exclude:
     - Rakefile.rb
-    - webapp/config/Rakefile.local.rb
+    - '**/Rakefile*.rb'
 
 Style/BracesAroundHashParameters:
   Enabled: false
@@ -115,3 +115,4 @@ Metrics/CyclomaticComplexity:
 
 Metrics/PerceivedComplexity:
   Max: 10
+
