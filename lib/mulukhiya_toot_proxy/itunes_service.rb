@@ -64,6 +64,7 @@ module MulukhiyaTootProxy
     def self.create_tags(names)
       tags = []
       names.strip.split(/[・、]/).each do |part|
+        part.sub!(/^(歌|語り):/, '')
         if matches = part.match(/(.*)\(CV: ?(.*)\)/)
           tags.push(Mastodon.create_tag(matches[1]))
           tags.push("CV:#{Mastodon.create_tag(matches[2])}")
@@ -73,7 +74,7 @@ module MulukhiyaTootProxy
       end
       return tags
     rescue
-      return names
+      return [names]
     end
 
     private

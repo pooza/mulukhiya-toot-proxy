@@ -91,7 +91,7 @@ module MulukhiyaTootProxy
       end
       return tags
     rescue
-      return names
+      return [names]
     end
 
     private
