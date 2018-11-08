@@ -22,7 +22,7 @@ end
 
 namespace :server do
   [:start, :stop, :restart].each do |action|
-    desc "#{action} thin"
+    desc "#{action} server"
     task action do
       sh "thin --config config/thin.yaml #{action}"
     end
