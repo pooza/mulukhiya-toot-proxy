@@ -22,7 +22,9 @@ module MulukhiyaTootProxy
       artists = []
       track.artists.each do |artist|
         if @config['local']['nowplaying']['hashtag']
-          artists.push(Mastodon.create_tag(artist.name))
+          SpotifyService.create_tags(artist.name).each do |tag|
+            artists.push(tag)
+          end
         else
           artists.push(artist.name)
         end

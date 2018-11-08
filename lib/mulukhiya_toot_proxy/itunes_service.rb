@@ -61,6 +61,20 @@ module MulukhiyaTootProxy
       return spotify.track_uri(track)
     end
 
+    def self.create_tags(names)
+      Slack.broadcast(names)
+      tags = []
+      names.strip.split(/[・、]/).each do |part|
+        if matches = part.match(/(.*)\(CV: ?(.*)\)/)
+          tags.push(Mastodon.create_tag(matches[1]))
+          tags.push("CV:#{Mastodon.create_tag(matches[2])}")
+        else
+          tags.push(Mastodon.create_tag(part))
+        end
+      end
+      return tags
+    end
+
     private
 
     def create_keyword(track)
