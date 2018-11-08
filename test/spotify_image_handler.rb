@@ -1,14 +1,10 @@
-require 'mulukhiya/handler/spotify_image'
-require 'mulukhiya/mastodon'
-require 'mulukhiya/config'
-
 module MulukhiyaTootProxy
   class SpotifyImageHandlerTest < Test::Unit::TestCase
     def test_exec
       config = Config.instance
       return unless config['local']['spotify']
 
-      handler = SpotifyImageHandler.new
+      handler = Handler.create('spotify_image')
       handler.mastodon = Mastodon.new(
         config['local']['instance_url'],
         config['local']['test']['token'],

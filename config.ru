@@ -4,5 +4,6 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(ROOT_DIR, 'Gemfile')
 ENV['SSL_CERT_FILE'] ||= File.join(ROOT_DIR, 'cert/cacert.pem')
 
 require 'bundler/setup'
-require 'mulukhiya/server'
+require 'mulukhiya_toot_proxy'
+
 run MulukhiyaTootProxy::Server

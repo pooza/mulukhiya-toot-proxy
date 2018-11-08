@@ -1,9 +1,7 @@
-require 'mulukhiya/handler/amazon_asin'
-
 module MulukhiyaTootProxy
   class ShortenedUrlHandlerTest < Test::Unit::TestCase
     def test_exec
-      handler = ShortenedUrlHandler.new
+      handler = Handler.create('shortened_url')
       assert_equal(handler.exec({'status' => 'https://www.google.co.jp/?q=日本語'})['status'], 'https://www.google.co.jp/?q=日本語')
       assert_equal(handler.result, 'ShortenedUrlHandler,0')
 
