@@ -67,7 +67,7 @@ module MulukhiyaTootProxy
       tag = Config.instance['local']['amazon']['associate_tag']
       return nil unless tag.present?
       return tag
-    rescue ::NoMethodError
+    rescue NoMethodError
       return nil
     end
 

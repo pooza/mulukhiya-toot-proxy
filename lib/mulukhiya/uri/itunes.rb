@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
 
     def track_id
       return query_values['i']
-    rescue ::NoMethodError
+    rescue NoMethodError
       return nil
     end
 

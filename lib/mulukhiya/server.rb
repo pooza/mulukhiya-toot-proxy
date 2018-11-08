@@ -89,7 +89,7 @@ module MulukhiyaTootProxy
       @renderer = JSONRenderer.new
       begin
         @renderer.status = e.status
-      rescue ::NoMethodError
+      rescue NoMethodError
         @renderer.status = 500
       end
       @message[:response][:error] = "#{e.class}: #{e.message}"

@@ -4,7 +4,7 @@ require 'mulukhiya/package'
 require 'mulukhiya/error/config'
 
 module MulukhiyaTootProxy
-  class Config < ::Hash
+  class Config < Hash
     include Singleton
 
     def initialize
