@@ -13,12 +13,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
-
-      - save_cache:
-          paths:
-            - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+            bundle install
 
       - run:
           name: run tests
@@ -27,6 +22,7 @@ jobs:
 
       - store_test_results:
           path: /tmp/test-results
+
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
