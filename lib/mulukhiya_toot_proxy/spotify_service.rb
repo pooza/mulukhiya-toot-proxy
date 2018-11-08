@@ -90,6 +90,8 @@ module MulukhiyaTootProxy
         tags.push(Mastodon.create_tag(artist))
       end
       return tags
+    rescue
+      return names
     end
 
     private

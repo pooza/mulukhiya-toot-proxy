@@ -62,7 +62,6 @@ module MulukhiyaTootProxy
     end
 
     def self.create_tags(names)
-      Slack.broadcast(names)
       tags = []
       names.strip.split(/[・、]/).each do |part|
         if matches = part.match(/(.*)\(CV: ?(.*)\)/)
@@ -73,6 +72,8 @@ module MulukhiyaTootProxy
         end
       end
       return tags
+    rescue
+      return names
     end
 
     private
