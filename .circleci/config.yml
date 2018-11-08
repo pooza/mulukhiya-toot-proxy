@@ -1,6 +1,9 @@
 ersion: 2
 jobs:
   build:
+    docker:
+      - image: circleci/ruby:2.5.3-node-browsers
+
     working_directory: ~/repo
 
     steps:
