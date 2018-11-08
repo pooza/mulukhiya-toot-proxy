@@ -45,7 +45,7 @@ module MulukhiyaTootProxy
     end
 
     def self.create_tag(word)
-      return '#' + word.gsub(/[^[:alnum:]]+/, '_').sub(/^_/, '').sub(/_$/, '')
+      return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').sub(/^_/, '').sub(/_$/, '')
     end
 
     private

@@ -20,11 +20,7 @@ module MulukhiyaTootProxy
       return unless track = @tracks[keyword]
       status.push(track['trackName'])
       if @config['local']['nowplaying']['hashtag']
-        artists = []
-        ItunesService.create_tags(track['artistName']).each do |tag|
-          artists.push(tag)
-        end
-        status.push(artists.join(' '))
+        status.push(ItunesService.create_tags(track['artistName']).join(' '))
       else
         status.push(track['artistName'])
       end
