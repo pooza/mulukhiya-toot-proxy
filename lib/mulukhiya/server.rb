@@ -19,6 +19,7 @@ module MulukhiyaTootProxy
       @logger.info({
         message: 'starting...',
         server: {port: @config['thin']['port']},
+        version: Package.version,
       })
     end
 
