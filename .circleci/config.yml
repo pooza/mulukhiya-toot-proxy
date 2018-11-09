@@ -8,9 +8,7 @@ jobs:
       - checkout
       - run:
           name: install dependencies
-          command: |
-            bundle install
+          command: bundle install
       - run:
           name: run RuboCop
-          command: |
-            rubocop
+          command: bundle exec rubocop
