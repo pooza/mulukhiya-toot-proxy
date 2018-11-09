@@ -4,8 +4,7 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(ROOT_DIR, 'Gemfile')
 ENV['SSL_CERT_FILE'] ||= File.join(ROOT_DIR, 'cert/cacert.pem')
 
 require 'bundler/setup'
-require 'active_support'
-require 'active_support/core_ext'
+require 'mulukhiya_toot_proxy'
 
 desc 'test'
 task :test do
@@ -22,7 +21,7 @@ end
 
 namespace :server do
   [:start, :stop, :restart].each do |action|
-    desc "#{action} thin"
+    desc "#{action} server"
     task action do
       sh "thin --config config/thin.yaml #{action}"
     end

@@ -1,9 +1,7 @@
-require 'mulukhiya/handler/canonical'
-
 module MulukhiyaTootProxy
   class CanonicalHandlerTest < Test::Unit::TestCase
     def test_exec
-      handler = CanonicalHandler.new
+      handler = Handler.create('canonical')
       assert_equal(handler.exec({'status' => 'https://www.google.co.jp/?q=日本語'})['status'], 'https://www.google.co.jp/?q=日本語')
       assert_equal(handler.result, 'CanonicalHandler,0')
 

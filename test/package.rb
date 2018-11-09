@@ -1,5 +1,3 @@
-require 'mulukhiya/package'
-
 module MulukhiyaTootProxy
   class PackageTest < Test::Unit::TestCase
     def test_name

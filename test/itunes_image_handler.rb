@@ -1,14 +1,10 @@
-require 'mulukhiya/handler/itunes_image'
-require 'mulukhiya/mastodon'
-require 'mulukhiya/config'
-
 module MulukhiyaTootProxy
   class ItunesImageHandlerTest < Test::Unit::TestCase
     def test_exec
       config = Config.instance
       return unless config['local']['amazon']
 
-      handler = ItunesImageHandler.new
+      handler = Handler.create('itunes_image')
       handler.mastodon = Mastodon.new(
         config['local']['instance_url'],
         config['local']['test']['token'],

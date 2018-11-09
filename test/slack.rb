@@ -1,6 +1,3 @@
-require 'mulukhiya/slack'
-require 'mulukhiya/package'
-
 module MulukhiyaTootProxy
   class SlackTest < Test::Unit::TestCase
     def test_all

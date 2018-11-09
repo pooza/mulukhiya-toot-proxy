@@ -1,9 +1,7 @@
-require 'mulukhiya/handler/spotify_url_nowplaying'
-
 module MulukhiyaTootProxy
   class SpotifyUrlNowplayingHandlerTest < Test::Unit::TestCase
     def test_exec
-      handler = SpotifyUrlNowplayingHandler.new
+      handler = Handler.create('spotify_url_nowplaying')
       handler.exec({'status' => "#nowplaying https://open.spotify.com/\n"})
       assert_equal(handler.result, 'SpotifyUrlNowplayingHandler,0')
 

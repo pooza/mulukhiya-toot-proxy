@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.5.3-node-browsers
+    working_directory: ~/repos
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: bundle install
+      - run:
+          name: run RuboCop
+          command: bundle exec rubocop

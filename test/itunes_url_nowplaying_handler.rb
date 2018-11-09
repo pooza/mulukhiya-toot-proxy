@@ -1,9 +1,7 @@
-require 'mulukhiya/handler/itunes_url_nowplaying'
-
 module MulukhiyaTootProxy
   class ItunesUrlNowplayingHandlerTest < Test::Unit::TestCase
     def test_exec
-      handler = ItunesUrlNowplayingHandler.new
+      handler = Handler.create('itunes_url_nowplaying')
       handler.exec({'status' => "#nowplaying https://itunes.apple.com\n"})
       assert_equal(handler.result, 'ItunesUrlNowplayingHandler,0')
 

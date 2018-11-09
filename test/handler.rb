@@ -1,5 +1,3 @@
-require 'mulukhiya/handler/amazon_asin'
-
 module MulukhiyaTootProxy
   class HandlerTest < Test::Unit::TestCase
     def test_all

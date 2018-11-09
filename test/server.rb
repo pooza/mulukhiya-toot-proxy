@@ -1,8 +1,3 @@
-require 'mulukhiya/config'
-require 'mulukhiya/package'
-require 'addressable/uri'
-require 'httparty'
-
 module MulukhiyaTootProxy
   class ServerTest < Test::Unit::TestCase
     MAX_LENGTH = 500
