@@ -6,6 +6,10 @@ jobs:
     working_directory: ~/repos
     steps:
       - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
       - run:
           name: install dependencies
           command: |
@@ -14,3 +18,8 @@ jobs:
           name: run RuboCop
           command: |
             rubocop
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
