@@ -80,7 +80,7 @@ module MulukhiyaTootProxy
     def self.create_tags(artist)
       tags = []
       artist.sub!(/^(歌|語り):/, '')
-      if matches = artist.match(/^(.*) ?\(CV: ?(.*)\)$/i)
+      if matches = artist.match(/^(.*) ?\(CV[.:] ?(.*)\)$/i)
         matches[1].split(%r{[/]}).each do |v|
           tags.push(Mastodon.create_tag(v))
         end

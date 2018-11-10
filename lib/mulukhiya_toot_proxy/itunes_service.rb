@@ -65,7 +65,7 @@ module MulukhiyaTootProxy
       tags = []
       names.strip.split(/[・、]/).each do |part|
         part.sub!(/^(歌|語り):/, '')
-        if matches = part.match(/^(.*) ?\(CV: ?(.*)\)$/i)
+        if matches = part.match(/^(.*) ?\(CV[.:] ?(.*)\)$/i)
           matches[1].split(%r{[/]}).each do |v|
             tags.push(Mastodon.create_tag(v))
           end
