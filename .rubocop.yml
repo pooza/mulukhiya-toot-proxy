@@ -3,6 +3,10 @@ AllCops:
   DisplayCopNames: true
   Exclude:
     - '**/._*'
+  TargetRubyVersion: 2.5
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
 
 Style/DoubleNegation:
   Enabled: false
@@ -115,4 +119,3 @@ Metrics/CyclomaticComplexity:
 
 Metrics/PerceivedComplexity:
   Max: 10
-
