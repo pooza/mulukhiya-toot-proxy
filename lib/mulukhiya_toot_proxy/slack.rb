@@ -39,7 +39,7 @@ module MulukhiyaTootProxy
     end
 
     def self.broadcast(message)
-      all.each do |slack|
+      all do |slack|
         slack.say(message)
       end
     end
