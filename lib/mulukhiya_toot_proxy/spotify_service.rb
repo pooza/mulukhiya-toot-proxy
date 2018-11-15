@@ -85,6 +85,9 @@ module MulukhiyaTootProxy
           tags.push(Mastodon.create_tag(v))
         end
         tags.push("CV:#{Mastodon.create_tag(matches[2]).tr('_', '')}")
+      elsif matches = artist.match(/^(.*)\s*\(as\s*(.*)\)$/)
+        tags.push(Mastodon.create_tag(matches[2]))
+        tags.push("CV:#{Mastodon.create_tag(matches[1]).tr('_', '')}")
       elsif matches = artist.match(/^(.*)\s*\((.*)\)$/)
         tags.push(Mastodon.create_tag(matches[1]))
         tags.push(Mastodon.create_tag(matches[2]))
