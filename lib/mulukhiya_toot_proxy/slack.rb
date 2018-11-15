@@ -6,11 +6,10 @@ module MulukhiyaTootProxy
   class Slack
     def initialize(url)
       @url = Addressable::URI.parse(url)
-      @logger = Logger.new
     end
 
     def say(message)
-      response = HTTParty.post(@url, {
+      return HTTParty.post(@url, {
         body: {text: JSON.pretty_generate(message)}.to_json,
         headers: {
           'Content-Type' => 'application/json',
@@ -18,12 +17,6 @@ module MulukhiyaTootProxy
         },
         ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
-      if message.is_a?(::StandardError)
-        @logger.error(message)
-      else
-        @logger.info(message)
-      end
-      return response
     end
 
     def self.all

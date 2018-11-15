@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ExternalServiceError < StandardError
+  class ExternalServiceError < Error
     def status
       return 502
     end

@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
 
   autoload :AmazonService
   autoload :Config
+  autoload :Error
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService
