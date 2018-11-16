@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
       artists = []
       track.artists.each do |artist|
         if @config['local']['nowplaying']['hashtag']
-          artists.push(SpotifyService.create_tags(artist.name))
+          artists.push(ArtistParser.new(artist.name).parse)
         else
           artists.push(artist.name)
         end
