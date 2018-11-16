@@ -77,25 +77,6 @@ module MulukhiyaTootProxy
       return itunes.track_uri(track)
     end
 
-    def self.create_tags(artist)
-      tags = []
-      artist.sub!(/^(歌|語り):/, '')
-      if matches = artist.match(/^(.*)\s*\(CV[.:] ?(.*)\)$/i)
-        matches[1].split(%r{[/]}).each do |v|
-          tags.push(Mastodon.create_tag(v))
-        end
-        tags.push("CV:#{Mastodon.create_tag(matches[2]).tr('_', '')}")
-      elsif matches = artist.match(/^(.*)\s*\((.*)\)$/)
-        tags.push(Mastodon.create_tag(matches[1]))
-        tags.push(Mastodon.create_tag(matches[2]))
-      else
-        tags.push(Mastodon.create_tag(artist))
-      end
-      return tags.uniq.compact
-    rescue
-      return [Mastodon.create_tag(artist)]
-    end
-
     private
 
     def create_keyword(track)

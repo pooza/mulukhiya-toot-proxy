@@ -6,7 +6,9 @@ module MulukhiyaTootProxy
   extend ActiveSupport::Autoload
 
   autoload :AmazonService
+  autoload :ArtistParser
   autoload :Config
+  autoload :Error
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService
