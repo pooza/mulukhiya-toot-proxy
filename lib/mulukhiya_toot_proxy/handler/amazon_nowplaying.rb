@@ -7,9 +7,8 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      return false unless asin = @service.search(keyword, ['DigitalMusic', 'Music'])
-      @asins[keyword] = asin
-      return true
+      return true if @asins[keyword] = @service.search(keyword, ['DigitalMusic', 'Music'])
+      return false
     end
 
     def update(keyword, status)
