@@ -52,6 +52,7 @@ module MulukhiyaTootProxy
 
       r = @mastodon.toot(@params)
       @renderer.message = JSON.parse(r.to_s)
+      @renderer.message['results'] = results.join(', ')
       @renderer.message['tags'] = [] if @config['local']['nowplaying']['hashtag']
 
       @renderer.status = r.code
