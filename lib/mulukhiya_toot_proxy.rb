@@ -16,6 +16,7 @@ module MulukhiyaTootProxy
   autoload :Mastodon
   autoload :NowplayingHandler
   autoload :Package
+  autoload :Redis
   autoload :Renderer
   autoload :Server
   autoload :Slack
@@ -27,6 +28,7 @@ module MulukhiyaTootProxy
     autoload :ExternalServiceError
     autoload :ImprementError
     autoload :NotFoundError
+    autoload :RedisError
     autoload :RequestError
   end
 

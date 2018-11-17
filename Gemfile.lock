@@ -64,6 +64,7 @@ GEM
       rack
     rainbow (3.0.0)
     rake (12.3.1)
+    redis (4.0.3)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -112,6 +113,7 @@ DEPENDENCIES
   httparty
   nokogiri
   rake
+  redis
   rest-client
   rspotify
   rubocop
