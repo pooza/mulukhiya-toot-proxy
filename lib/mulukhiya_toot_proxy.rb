@@ -16,6 +16,7 @@ module MulukhiyaTootProxy
   autoload :Mastodon
   autoload :NowplayingHandler
   autoload :Package
+  autoload :Postgres
   autoload :Redis
   autoload :Renderer
   autoload :Server
@@ -25,6 +26,7 @@ module MulukhiyaTootProxy
 
   autoload_under 'error' do
     autoload :ConfigError
+    autoload :DatabaseError
     autoload :ExternalServiceError
     autoload :ImprementError
     autoload :NotFoundError
