@@ -12,15 +12,16 @@ module MulukhiyaTootProxy
         i = 1
         pattern_entry[:items].each do |item|
           split_artist(matches[i], item['split']).each do |tag|
-            tag = create_tag(tag, item['strip'], item['prefix'])
-            @tags.push(tag) if tag.present?
+            @tags.push(create_tag(tag, item['strip'], item['prefix']))
           end
           i += 1
         end
         break
       end
-      return @tags.uniq.compact if @tags.present?
-      return [Mastodon.create_tag(@source)]
+      @tags.uniq!
+      @tags.compact!
+      return @tags if @tags.present?
+      return [Mastodon.create_tag(dest)]
     rescue
       return [Mastodon.create_tag(@source)]
     end
