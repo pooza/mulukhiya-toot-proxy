@@ -2,24 +2,25 @@ module MulukhiyaTootProxy
   class ArtistParser
     def initialize(source)
       @source = source
+      @dest = @source.sub(prefixes_pattern, '')
       @tags = []
     end
 
     def parse
-      dest = @source.sub(prefixes_pattern, '')
       cv_patterns do |pattern_entry|
-        next unless matches = dest.match(pattern_entry[:pattern])
+        next unless matches = @dest.match(pattern_entry[:pattern])
         i = 1
         pattern_entry[:items].each do |item|
           split_artist(matches[i], item['split']).each do |tag|
-            tag = create_tag(tag, item['strip'], item['prefix'])
-            @tags.push(tag) if tag.present?
+            @tags.push(create_tag(tag, item['strip'], item['prefix']))
           end
           i += 1
         end
         break
       end
-      return @tags.uniq.compact if @tags.present?
+      @tags.uniq!
+      @tags.compact!
+      return @tags if @tags.present?
       return [Mastodon.create_tag(@source)]
     rescue
       return [Mastodon.create_tag(@source)]
