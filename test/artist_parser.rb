@@ -1,6 +1,9 @@
 module MulukhiyaTootProxy
   class ArtistParserTest < Test::Unit::TestCase
     def test_parse
+      parser = ArtistParser.new('キュア・カルテット')
+      assert_equal(parser.parse, ['#キュア_カルテット'])
+
       parser = ArtistParser.new('キュアソード/剣崎真琴(CV:宮本佳那子)')
       assert_equal(parser.parse, ['#キュアソード', '#剣崎真琴', 'CV:#宮本佳那子'])
 
