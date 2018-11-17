@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def set(key, value)
-      return super(key,value)
+      return super(key, value)
     rescue => e
       raise RedisError, e.message
     end
