@@ -5,10 +5,10 @@ module MulukhiyaTootProxy
   class ShortenedUrlHandler < URLHandler
     def rewrite(link)
       uri = Addressable::URI.parse(link)
-      while domains.member?(uri.host)
+      while @config['/shortened_url/domains'].member?(uri.host)
         response = HTTParty.get(uri.normalize, {
           follow_redirects: false,
-          timeout: timeout,
+          timeout: @config['/shortened_url/timeout'],
           headers: {
             'User-Agent' => Package.user_agent,
           },
@@ -24,15 +24,7 @@ module MulukhiyaTootProxy
     private
 
     def rewritable?(link)
-      return domains.member?(Addressable::URI.parse(link).host)
-    end
-
-    def timeout
-      return @config['/shortened_url/timeout']
-    end
-
-    def domains
-      return @config['/shortened_url/domains']
+      return @config['/shortened_url/domains'].member?(Addressable::URI.parse(link).host)
     end
   end
 end
