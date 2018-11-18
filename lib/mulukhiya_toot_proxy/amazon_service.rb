@@ -49,8 +49,7 @@ module MulukhiyaTootProxy
     end
 
     def item_uri(asin)
-      country = @config['/amazon/country']
-      uri = AmazonURI.parse(@config["/amazon/urls/#{country}"])
+      uri = AmazonURI.parse(@config["/amazon/urls/#{@config['/amazon/country']}"])
       uri.asin = asin
       return uri
     end

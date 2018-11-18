@@ -60,9 +60,7 @@ module MulukhiyaTootProxy
     end
 
     def self.delimiters_pattern
-      return Regexp.new(
-        "[#{Config.instance['/itunes/artist/delimiters'].join}]",
-      )
+      return Regexp.new("[#{Config.instance['/itunes/artist/delimiters'].join}]")
     end
 
     private

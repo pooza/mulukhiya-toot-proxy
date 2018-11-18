@@ -27,17 +27,13 @@ module MulukhiyaTootProxy
     end
 
     def self.delimiters_pattern
-      return Regexp.new(
-        "[#{Config.instance['/artist_parser/delimiters'].join}]",
-      )
+      return Regexp.new("[#{Config.instance['/artist_parser/delimiters'].join}]")
     end
 
     private
 
     def prefixes_pattern
-      return Regexp.new(
-        "^(#{Config.instance['/artist_parser/prefixes'].join('|')}):",
-      )
+      return Regexp.new("^(#{Config.instance['/artist_parser/prefixes'].join('|')}):")
     end
 
     def cv_patterns
