@@ -8,24 +8,8 @@ module MulukhiyaTootProxy
 
     def initialize
       @config = Config.instance
-      begin
-        @db = PG.connect({
-          host: @config['local']['postgresql']['host'],
-          user: @config['local']['postgresql']['user'],
-          password: @config['local']['postgresql']['password'],
-          dbname: @config['local']['postgresql']['dbname'],
-          port: @config['local']['postgresql']['port'],
-        })
-      rescue
-        @db = PG.connect({
-          host: 'localhost',
-          user: 'postgres',
-          password: nil,
-          dbname: 'mastodon',
-          port: 5432,
-        })
-      end
-    rescue => e
+      @db = PG.connect(Postgres.dsn)
+    rescue PG::Error => e
       raise DatabaseError, e.message
     end
 
@@ -42,8 +26,27 @@ module MulukhiyaTootProxy
 
     def execute(name, params = {})
       return @db.exec(create_sql(name, params)).to_a
-    rescue => e
+    rescue PG::Error => e
       raise DatabaseError, e.message
+    end
+
+    def self.dsn
+      config = Config.instance
+      return {
+        host: config['local']['postgresql']['host'],
+        user: config['local']['postgresql']['user'],
+        password: config['local']['postgresql']['password'],
+        dbname: config['local']['postgresql']['dbname'],
+        port: config['local']['postgresql']['port'],
+      }
+    rescue
+      return {
+        host: 'localhost',
+        user: 'postgres',
+        password: nil,
+        dbname: 'mastodon',
+        port: 5432,
+      }
     end
   end
 end
