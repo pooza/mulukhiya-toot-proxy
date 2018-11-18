@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
       assert_equal(@dsn.password, 'nice_password')
     end
 
-    def to_h
+    def test_to_h
       assert_equal(@dsn.to_h, {
         host: 'localhost',
         user: 'postgres',
