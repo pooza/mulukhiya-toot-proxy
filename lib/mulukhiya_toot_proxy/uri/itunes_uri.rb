@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def album_id
-      patterns.each do |entry|
+      @config['/itunes/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
@@ -44,12 +44,6 @@ module MulukhiyaTootProxy
         end
       end
       return @image_uri
-    end
-
-    private
-
-    def patterns
-      return @config['/itunes/patterns']
     end
   end
 end

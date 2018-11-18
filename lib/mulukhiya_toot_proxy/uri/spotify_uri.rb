@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def track_id
-      patterns.each do |entry|
+      @config['/spotify/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
@@ -35,12 +35,6 @@ module MulukhiyaTootProxy
       return nil unless track_id.present?
       @image_uri ||= @spotify.image_uri(@spotify.lookup_track(track_id))
       return @image_uri
-    end
-
-    private
-
-    def patterns
-      return @config['/spotify/patterns']
     end
   end
 end
