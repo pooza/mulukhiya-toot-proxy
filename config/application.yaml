@@ -47,30 +47,30 @@ itunes:
       - '、'
 nowplaying:
   hashtag: false
-artist_parser:
-  delimiters:
-    - '/'
-    - '・'
-    - '、'
-  prefixes:
-    - 歌
-    - 語り
-  cv_patterns:
-    - pattern: '^(.+)\s*\(CV[.:]\s*(.+)\)$'
-      items:
-        - split: true
-        - strip: true
-          prefix: 'CV:'
-    - pattern: '^(.+)\s*\(as\s*(.+)\)$'
-      items:
-        - strip: true
-          prefix: 'CV:'
-        - split: true
-    - pattern: '^(.+)\s*\((.+)\)$'
-      items:
-        - split: true
-        - strip: true
-          split: true
+  artist_parser:
+    delimiters:
+      - '/'
+      - '・'
+      - '、'
+    prefixes:
+      - 歌
+      - 語り
+    cv_patterns:
+      - pattern: '^(.+)\s*\(CV[.:]\s*(.+)\)$'
+        items:
+          - split: true
+          - strip: true
+            prefix: 'CV:'
+      - pattern: '^(.+)\s*\(as\s*(.+)\)$'
+        items:
+          - strip: true
+            prefix: 'CV:'
+          - split: true
+      - pattern: '^(.+)\s*\((.+)\)$'
+        items:
+          - split: true
+          - strip: true
+            split: true
 redis:
   dsn: redis://localhost:6379/1
 postgres:

@@ -27,18 +27,18 @@ module MulukhiyaTootProxy
     end
 
     def self.delimiters_pattern
-      return Regexp.new("[#{Config.instance['/artist_parser/delimiters'].join}]")
+      return Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
     end
 
     private
 
     def prefixes_pattern
-      return Regexp.new("^(#{Config.instance['/artist_parser/prefixes'].join('|')}):")
+      return Regexp.new("^(#{Config.instance['/nowplaying/artist_parser/prefixes'].join('|')}):")
     end
 
     def cv_patterns
       return enum_for(__method__) unless block_given?
-      Config.instance['/artist_parser/cv_patterns'].each do |entry|
+      Config.instance['/nowplaying/artist_parser/cv_patterns'].each do |entry|
         entry = {
           pattern: Regexp.new(entry['pattern']),
           items: entry['items'],
