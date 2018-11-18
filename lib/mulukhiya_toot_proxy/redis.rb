@@ -1,16 +1,13 @@
 require 'redis'
+require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class Redis < ::Redis
     def initialize
-      @config = Config.instance
-      Config.validate('/local/redis/url')
-      @url = Addressable::URI.parse(@config['local']['redis']['url'])
-      raise RedisError, '正しいURLではありません。' unless @url.absolute?
-      raise RedisError, '正しいスキームではありません。' unless @url.scheme == 'redis'
-      super({url: @url.to_s})
-    rescue => e
-      raise RedisError, e.message
+      dsn = Redis.dsn
+      raise RedisError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
+      raise RedisError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
+      super({url: dsn.to_s})
     end
 
     def get(key)
@@ -31,8 +28,10 @@ module MulukhiyaTootProxy
       raise RedisError, e.message
     end
 
-    def url
-      return Addressable::URI.parse(@url)
+    def self.dsn
+      return Addressable::URI.parse(Config.instance['local']['redis']['dsn'])
+    rescue
+      return Addressable::URI.parse('redis://localhost:6379/1')
     end
   end
 end
