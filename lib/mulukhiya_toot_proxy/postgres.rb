@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
       dsn.dbname ||= 'mastodon'
       raise DatabaseError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
       raise DatabaseError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'postgres'
-      @db = PG.connect(Postgres.dsn.to_h)
+      @db = PG.connect(dsn.to_h)
     rescue PG::Error => e
       raise DatabaseError, e.message
     end
