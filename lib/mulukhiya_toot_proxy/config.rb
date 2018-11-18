@@ -44,8 +44,7 @@ module MulukhiyaTootProxy
       values = {}
       if node.instance_of?(Hash)
         node.each do |key, value|
-          key = prefix + glue + key
-          values.update(flatten(key, value, glue))
+          values.update(flatten("#{prefix}#{glue}#{key}", value, glue))
         end
       else
         values[prefix.downcase] = node
