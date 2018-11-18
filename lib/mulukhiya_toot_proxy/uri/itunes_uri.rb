@@ -49,7 +49,7 @@ module MulukhiyaTootProxy
     private
 
     def patterns
-      return @config['application']['itunes']['patterns']
+      return @config['/itunes/patterns']
     end
   end
 end

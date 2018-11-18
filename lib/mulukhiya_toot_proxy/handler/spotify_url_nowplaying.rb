@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
       status.push(track.name)
       artists = []
       track.artists.each do |artist|
-        if @config['local']['nowplaying']['hashtag']
+        if @config['/nowplaying/hashtag']
           artists.concat(ArtistParser.new(artist.name).parse)
         else
           artists.push(artist.name)

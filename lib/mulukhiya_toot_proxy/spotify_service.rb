@@ -4,14 +4,9 @@ require 'addressable/uri'
 module MulukhiyaTootProxy
   class SpotifyService
     def initialize
-      Config.validate('/local/spotify/client_id')
-      Config.validate('/local/spotify/client_secret')
       @config = Config.instance
-      ENV['ACCEPT_LANGUAGE'] ||= @config['local']['spotify']['language']
-      RSpotify.authenticate(
-        @config['local']['spotify']['client_id'],
-        @config['local']['spotify']['client_secret'],
-      )
+      ENV['ACCEPT_LANGUAGE'] ||= @config['/spotify/language']
+      RSpotify.authenticate(@config['/spotify/client_id'], @config['/spotify/client_secret'])
     end
 
     def search_track(keyword)
@@ -53,7 +48,7 @@ module MulukhiyaTootProxy
     end
 
     def track_uri(track)
-      uri = SpotifyURI.parse(@config['application']['spotify']['urls']['track'])
+      uri = SpotifyURI.parse(@config['/spotify/urls/track'])
       uri.track_id = track.id
       return nil unless uri.absolute?
       return uri
@@ -88,7 +83,7 @@ module MulukhiyaTootProxy
     end
 
     def retry_limit
-      return @config['application']['spotify']['retry_limit'] || 5
+      return @config['/spotify/retry_limit']
     end
   end
 end

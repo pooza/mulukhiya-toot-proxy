@@ -28,11 +28,11 @@ module MulukhiyaTootProxy
     end
 
     def timeout
-      return @config['application']['shortened_url']['timeout']
+      return @config['/shortened_url/timeout']
     end
 
     def domains
-      return @config['application']['shortened_url']['domains']
+      return @config['/shortened_url/domains']
     end
   end
 end

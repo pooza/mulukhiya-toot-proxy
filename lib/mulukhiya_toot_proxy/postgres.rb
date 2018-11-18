@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
       params.each do |k, v|
         params[k] = escape_string(v) if v.is_a?(String)
       end
-      return ERB.new(@config['query'][name]).result(binding).gsub(/\s+/, ' ')
+      return ERB.new(@config["/query/#{name}"]).result(binding).gsub(/\s+/, ' ')
     end
 
     def execute(name, params = {})
@@ -35,9 +35,7 @@ module MulukhiyaTootProxy
     end
 
     def self.dsn
-      return PostgresDSN.parse(Config.instance['local']['postgres']['dsn'])
-    rescue
-      return PostgresDSN.parse('postgres://postgres@localhost:5432/mastodon')
+      return PostgresDSN.parse(Config.instance['/postgres/dsn'])
     end
   end
 end

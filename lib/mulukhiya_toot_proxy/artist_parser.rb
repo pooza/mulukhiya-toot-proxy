@@ -28,7 +28,7 @@ module MulukhiyaTootProxy
 
     def self.delimiters_pattern
       return Regexp.new(
-        "[#{Config.instance['application']['artist_parser']['delimiters'].join}]",
+        "[#{Config.instance['/artist_parser/delimiters'].join}]",
       )
     end
 
@@ -36,13 +36,13 @@ module MulukhiyaTootProxy
 
     def prefixes_pattern
       return Regexp.new(
-        "^(#{Config.instance['application']['artist_parser']['prefixes'].join('|')}):",
+        "^(#{Config.instance['/artist_parser/prefixes'].join('|')}):",
       )
     end
 
     def cv_patterns
       return enum_for(__method__) unless block_given?
-      Config.instance['application']['artist_parser']['cv_patterns'].each do |entry|
+      Config.instance['/artist_parser/cv_patterns'].each do |entry|
         entry = {
           pattern: Regexp.new(entry['pattern']),
           items: entry['items'],

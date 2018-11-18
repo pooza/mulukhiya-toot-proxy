@@ -4,8 +4,6 @@ require 'json'
 module MulukhiyaTootProxy
   class ItunesService
     def initialize
-      Config.validate('/local/itunes/country')
-      Config.validate('/local/itunes/lang')
       @config = Config.instance
     end
 
@@ -63,7 +61,7 @@ module MulukhiyaTootProxy
 
     def self.delimiters_pattern
       return Regexp.new(
-        "[#{Config.instance['application']['itunes']['artist']['delimiters'].join}]",
+        "[#{Config.instance['/itunes/artist/delimiters'].join}]",
       )
     end
 
@@ -74,22 +72,22 @@ module MulukhiyaTootProxy
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesURI.parse(@config['application']['itunes']['urls']['search'])
+      uri = ItunesURI.parse(@config['/itunes/urls/search'])
       uri.query_values = {
         term: keyword,
         media: category,
-        country: @config['local']['itunes']['country'],
-        lang: @config['local']['itunes']['lang'],
+        country: @config['/itunes/country'],
+        lang: @config['/itunes/lang'],
       }
       return uri
     end
 
     def create_lookup_uri(id)
-      uri = ItunesURI.parse(@config['application']['itunes']['urls']['lookup'])
+      uri = ItunesURI.parse(@config['/itunes/urls/lookup'])
       uri.query_values = {
         id: id,
-        country: @config['local']['itunes']['country'],
-        lang: @config['local']['itunes']['lang'],
+        country: @config['/itunes/country'],
+        lang: @config['/itunes/lang'],
       }
       return uri
     end

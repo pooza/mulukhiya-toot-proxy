@@ -22,8 +22,7 @@ module MulukhiyaTootProxy
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Config.validate('/local/handlers')
-      Config.instance['local']['handlers'].each do |handler|
+      Config.instance['/handlers'].each do |handler|
         yield create(handler)
       end
     end

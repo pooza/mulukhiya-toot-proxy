@@ -10,8 +10,11 @@ module MulukhiyaTootProxy
       dirs.each do |dir|
         suffixes.each do |suffix|
           Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
-            key = File.basename(f, suffix)
-            self[key] = YAML.load_file(f) unless self[key]
+            update(flatten("/#{File.basename(f, suffix)}", YAML.load_file(f), '/'))
+          end
+          ['application', 'local'].each do |basename|
+            path = File.join(dir, "#{basename}#{suffix}")
+            update(flatten('', YAML.load_file(path), '/')) if File.exist?(path)
           end
         end
       end
@@ -26,18 +29,28 @@ module MulukhiyaTootProxy
     end
 
     def suffixes
-      return ['.yaml', '.yml']
+      return ['.yml', '.yaml']
     end
 
-    def self.validate(name)
-      keys = name.split('/')
-      keys.shift
-      config = instance
-      keys.each do |key|
-        config = config[key]
-        raise ConfigError, "#{name} が未定義です。" unless config.present?
+    def [](key)
+      value = super(key)
+      return value if value.present?
+      raise ConfigError, "'#{key}' が未設定です。"
+    end
+
+    private
+
+    def flatten(prefix, node, glue)
+      values = {}
+      if node.instance_of?(Hash)
+        node.each do |key, value|
+          key = prefix + glue + key
+          values.update(flatten(key, value, glue))
+        end
+      else
+        values[prefix.downcase] = node
       end
-      return true
+      return values
     end
   end
 end

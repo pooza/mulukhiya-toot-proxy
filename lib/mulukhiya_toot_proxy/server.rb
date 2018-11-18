@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
       @logger = Logger.new
       @logger.info({
         message: 'starting...',
-        server: {port: @config['thin']['port']},
+        server: {port: @config['/thin/port']},
         version: Package.version,
       })
     end
@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
           @params = params.clone
         end
         @mastodon = Mastodon.new(
-          (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+          (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
           @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
         )
       end
@@ -53,7 +53,7 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(@params)
       @renderer.message = JSON.parse(r.to_s)
       @renderer.message['results'] = results.join(', ')
-      @renderer.message['tags'] = [] if @config['local']['nowplaying']['hashtag']
+      @renderer.message['tags'] = [] if @config['/nowplaying/hashtag']
 
       @renderer.status = r.code
       Slack.broadcast({params: @params, body: @body, headers: @headers}) if 400 <= r.code

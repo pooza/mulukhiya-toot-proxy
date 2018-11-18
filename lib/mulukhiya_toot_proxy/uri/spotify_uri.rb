@@ -40,7 +40,7 @@ module MulukhiyaTootProxy
     private
 
     def patterns
-      return @config['application']['spotify']['patterns']
+      return @config['/spotify/patterns']
     end
   end
 end

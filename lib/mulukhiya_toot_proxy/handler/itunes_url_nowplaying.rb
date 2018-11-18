@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track['trackName'])
-      if @config['local']['nowplaying']['hashtag']
+      if @config['/nowplaying/hashtag']
         artists = []
         track['artistName'].split(ItunesService.delimiters_pattern).each do |artist|
           artists.concat(ArtistParser.new(artist).parse)

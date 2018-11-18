@@ -30,9 +30,7 @@ module MulukhiyaTootProxy
     end
 
     def self.dsn
-      return RedisDSN.parse(Config.instance['local']['redis']['dsn'])
-    rescue
-      return RedisDSN.parse('redis://localhost:6379/1')
+      return RedisDSN.parse(Config.instance['/redis/dsn'])
     end
   end
 end

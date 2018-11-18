@@ -68,3 +68,7 @@ artist_parser:
         - split: true
         - strip: true
           split: true
+redis:
+  dsn: redis://localhost:6379/1
+postgres:
+  dsn: postgres://postgres@localhost:5432/mastodon

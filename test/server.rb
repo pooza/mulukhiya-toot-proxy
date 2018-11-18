@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
     private
 
     def toot_url
-      url = Addressable::URI.parse(@config['local']['instance_url'])
+      url = Addressable::URI.parse(@config['/instance_url'])
       url.path = '/api/v1/statuses'
       return url
     end
@@ -33,7 +33,7 @@ module MulukhiyaTootProxy
     def headers
       return {
         'Content-Type' => 'application/json',
-        'Authorization' => "Bearer #{@config['local']['test']['token']}",
+        'Authorization' => "Bearer #{@config['/test/token']}",
         'User-Agent' => Package.user_agent,
       }
     end

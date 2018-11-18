@@ -5,11 +5,11 @@ module MulukhiyaTootProxy
     end
 
     def self.version
-      return Config.instance['application']['package']['version']
+      return Config.instance['/package/version']
     end
 
     def self.url
-      return Config.instance['application']['package']['url']
+      return Config.instance['/package/url']
     end
 
     def self.full_name
