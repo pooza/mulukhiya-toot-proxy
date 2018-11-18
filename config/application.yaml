@@ -29,6 +29,7 @@ amazon:
       shortenable: true
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
+  affiliate: true
 spotify:
   retry_limit: 5
   urls:
@@ -44,6 +45,8 @@ itunes:
   artist:
     delimiters:
       - '、'
+nowplaying:
+  hashtag: false
 artist_parser:
   delimiters:
     - '/'
@@ -72,3 +75,5 @@ redis:
   dsn: redis://localhost:6379/1
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
+slack:
+  hooks: []
