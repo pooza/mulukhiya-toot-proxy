@@ -2,7 +2,7 @@ require 'addressable/uri'
 require 'httparty'
 
 module MulukhiyaTootProxy
-  class ShortenedUrlHandler < UrlHandler
+  class ShortenedUrlHandler < URLHandler
     def rewrite(link)
       uri = Addressable::URI.parse(link)
       while domains.member?(uri.host)

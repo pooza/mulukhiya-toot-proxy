@@ -53,7 +53,7 @@ module MulukhiyaTootProxy
     end
 
     def track_uri(track)
-      uri = SpotifyUri.parse(@config['application']['spotify']['urls']['track'])
+      uri = SpotifyURI.parse(@config['application']['spotify']['urls']['track'])
       uri.track_id = track.id
       return nil unless uri.absolute?
       return uri

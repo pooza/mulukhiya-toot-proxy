@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class SpotifyUri < Addressable::URI
+  class SpotifyURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance

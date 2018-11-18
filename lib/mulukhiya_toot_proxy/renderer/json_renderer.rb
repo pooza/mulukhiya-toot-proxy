@@ -1,7 +1,7 @@
 require 'json'
 
 module MulukhiyaTootProxy
-  class JsonRenderer < Renderer
+  class JSONRenderer < Renderer
     attr_accessor :message
 
     def to_s

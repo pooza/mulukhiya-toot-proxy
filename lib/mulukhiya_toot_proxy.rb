@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
   autoload :Server
   autoload :Slack
   autoload :SpotifyService
-  autoload :UrlHandler
+  autoload :URLHandler, 'mulukhiya_toot_proxy/url_handler'
 
   autoload_under 'error' do
     autoload :ConfigError
@@ -34,13 +34,9 @@ module MulukhiyaTootProxy
     autoload :RequestError
   end
 
-  autoload_under 'renderer' do
-    autoload :JsonRenderer
-  end
+  autoload :JSONRenderer, 'mulukhiya_toot_proxy/renderer/json_renderer'
 
-  autoload_under 'uri' do
-    autoload :AmazonUri
-    autoload :ItunesUri
-    autoload :SpotifyUri
-  end
+  autoload :AmazonURI, 'mulukhiya_toot_proxy/uri/amazon_uri'
+  autoload :ItunesURI, 'mulukhiya_toot_proxy/uri/itunes_uri'
+  autoload :SpotifyURI, 'mulukhiya_toot_proxy/uri/spotify_uri'
 end

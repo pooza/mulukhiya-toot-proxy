@@ -3,7 +3,7 @@ require 'httparty'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class CanonicalHandler < UrlHandler
+  class CanonicalHandler < URLHandler
     def initialize
       super
       @canonicals = {}

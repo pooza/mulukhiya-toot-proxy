@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class UrlHandler < Handler
+  class URLHandler < Handler
     def exec(body, headers = {})
       @status = body['status']
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|

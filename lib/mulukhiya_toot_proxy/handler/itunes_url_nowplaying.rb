@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      return false unless uri = ItunesUri.parse(keyword)
+      return false unless uri = ItunesURI.parse(keyword)
       return false unless uri.itunes?
       return false unless uri.track.present?
       @tracks[keyword] = uri.track

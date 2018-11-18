@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
       })
       raise RequestError, "ASIN '#{asin}' が見つかりません。 (#{response.error})" if response.has_error?
       ['Large', 'Medium', 'Small'].each do |size|
-        uri = AmazonUri.parse(response.items.first.get("#{size}Image/URL"))
+        uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
       end
       return nil
@@ -54,7 +54,7 @@ module MulukhiyaTootProxy
 
     def item_uri(asin)
       country = @config['local']['amazon']['country']
-      uri = AmazonUri.parse(@config['application']['amazon']['urls'][country])
+      uri = AmazonURI.parse(@config['application']['amazon']['urls'][country])
       uri.asin = asin
       return uri
     end

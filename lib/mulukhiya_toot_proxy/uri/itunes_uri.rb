@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class ItunesUri < Addressable::URI
+  class ItunesURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance

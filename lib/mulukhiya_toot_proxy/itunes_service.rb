@@ -44,7 +44,7 @@ module MulukhiyaTootProxy
     end
 
     def track_uri(track)
-      uri = ItunesUri.parse(track['collectionViewUrl'])
+      uri = ItunesURI.parse(track['collectionViewUrl'])
       return nil unless uri.absolute?
       return uri
     end
@@ -74,7 +74,7 @@ module MulukhiyaTootProxy
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesUri.parse(@config['application']['itunes']['urls']['search'])
+      uri = ItunesURI.parse(@config['application']['itunes']['urls']['search'])
       uri.query_values = {
         term: keyword,
         media: category,
@@ -85,7 +85,7 @@ module MulukhiyaTootProxy
     end
 
     def create_lookup_uri(id)
-      uri = ItunesUri.parse(@config['application']['itunes']['urls']['lookup'])
+      uri = ItunesURI.parse(@config['application']['itunes']['urls']['lookup'])
       uri.query_values = {
         id: id,
         country: @config['local']['itunes']['country'],

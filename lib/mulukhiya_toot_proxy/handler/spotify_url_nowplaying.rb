@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      return false unless uri = SpotifyUri.parse(keyword)
+      return false unless uri = SpotifyURI.parse(keyword)
       return false unless uri.spotify?
       return false unless uri.track.present?
       @tracks[keyword] = uri.track

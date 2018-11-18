@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class AmazonUri < Addressable::URI
+  class AmazonURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance
