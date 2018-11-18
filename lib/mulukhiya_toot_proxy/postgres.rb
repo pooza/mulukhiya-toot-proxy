@@ -8,7 +8,11 @@ module MulukhiyaTootProxy
 
     def initialize
       @config = Config.instance
-      @db = PG.connect(Postgres.dsn)
+      dsn = Postgres.dsn
+      dsn.dbname ||= 'mastodon'
+      raise DatabaseError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
+      raise DatabaseError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'postgres'
+      @db = PG.connect(Postgres.dsn.to_h)
     rescue PG::Error => e
       raise DatabaseError, e.message
     end
@@ -31,22 +35,9 @@ module MulukhiyaTootProxy
     end
 
     def self.dsn
-      config = Config.instance
-      return {
-        host: config['local']['postgresql']['host'],
-        user: config['local']['postgresql']['user'],
-        password: config['local']['postgresql']['password'],
-        dbname: config['local']['postgresql']['dbname'],
-        port: config['local']['postgresql']['port'],
-      }
+      return PostgresDSN.parse(Config.instance['local']['postgres']['dsn'])
     rescue
-      return {
-        host: 'localhost',
-        user: 'postgres',
-        password: nil,
-        dbname: 'mastodon',
-        port: 5432,
-      }
+      return PostgresDSN.parse('postgres://postgres@localhost:5432/mastodon')
     end
   end
 end

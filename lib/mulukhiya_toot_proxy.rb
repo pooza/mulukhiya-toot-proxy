@@ -36,6 +36,9 @@ module MulukhiyaTootProxy
 
   autoload :JSONRenderer, 'mulukhiya_toot_proxy/renderer/json_renderer'
 
+  autoload :RedisDSN, 'mulukhiya_toot_proxy/dsn/redis_dsn'
+  autoload :PostgresDSN, 'mulukhiya_toot_proxy/dsn/postgres_dsn'
+
   autoload :AmazonURI, 'mulukhiya_toot_proxy/uri/amazon_uri'
   autoload :ItunesURI, 'mulukhiya_toot_proxy/uri/itunes_uri'
   autoload :SpotifyURI, 'mulukhiya_toot_proxy/uri/spotify_uri'
