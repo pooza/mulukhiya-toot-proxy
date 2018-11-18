@@ -13,8 +13,8 @@ module MulukhiyaTootProxy
             update(flatten("/#{File.basename(f, suffix)}", YAML.load_file(f), '/'))
           end
           ['application', 'local'].each do |basename|
-            path = File.join(dir, "#{basename}#{suffix}")
-            update(flatten('', YAML.load_file(path), '/')) if File.exist?(path)
+            f = File.join(dir, "#{basename}#{suffix}")
+            update(flatten('', YAML.load_file(f), '/')) if File.exist?(f)
           end
         end
       end
@@ -22,8 +22,8 @@ module MulukhiyaTootProxy
 
     def dirs
       return [
-        File.join('/usr/local/etc', Package.name),
         File.join('/etc', Package.name),
+        File.join('/usr/local/etc', Package.name),
         File.join(ROOT_DIR, 'config'),
       ]
     end
