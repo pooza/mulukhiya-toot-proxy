@@ -39,6 +39,7 @@ module MulukhiyaTootProxy
       dest.update(values)
       dest.compact!
       redis.set(key, dest.to_json)
+      redis.save
     end
   end
 end
