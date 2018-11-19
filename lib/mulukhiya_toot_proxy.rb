@@ -25,6 +25,7 @@ module MulukhiyaTootProxy
   autoload :Slack
   autoload :SpotifyService
   autoload :URLHandler, 'mulukhiya_toot_proxy/url_handler'
+  autoload :UserConfigStorage
 
   autoload_under 'error' do
     autoload :ConfigError
