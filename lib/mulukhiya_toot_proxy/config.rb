@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
           Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
             update(flatten("/#{File.basename(f, suffix)}", YAML.load_file(f), '/'))
           end
-          ['application', 'local'].each do |basename|
+          basenames.each do |basename|
             f = File.join(dir, "#{basename}#{suffix}")
             update(flatten('', YAML.load_file(f), '/')) if File.exist?(f)
           end
@@ -30,6 +30,14 @@ module MulukhiyaTootProxy
 
     def suffixes
       return ['.yml', '.yaml']
+    end
+
+    def basenames
+      return [
+        'application',
+        Environment.hostname,
+        'local',
+      ]
     end
 
     def [](key)
