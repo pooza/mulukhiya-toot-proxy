@@ -12,28 +12,28 @@ module MulukhiyaTootProxy
         next unless values = send(method, body['status'])
         body['visibility'] = 'direct'
         body['status'] = YAML.dump(values)
-        exec_command(values)
+        dispatch(values)
         break
       end
     end
 
     def parse_yaml(body)
       values = YAML.safe_load(body)
-      return values if values['command'] == command_name
-      return nil
+      return nil unless values['command'] == command_name
+      return value
     rescue
       return nil
     end
 
     def parse_json(body)
       values = JSON.parse(body)
-      return values if values['command'] == command_name
-      return nil
+      return nil unless values['command'] == command_name
+      return value
     rescue
       return nil
     end
 
-    def exec_command(values)
+    def dispatch(values)
       raise ImprementError, "#{__method__}が未定義です。"
     end
   end
