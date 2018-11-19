@@ -28,10 +28,10 @@ module MulukhiyaTootProxy
         end
       end
       status.push(artists.uniq.compact.join(' '))
-      return unless uri = @service.amazon_uri(track)
-      status.push(uri.to_s)
-      return unless uri = @service.itunes_uri(track)
-      status.push(uri.to_s)
+      [:amazon_uri, :itunes_uri].each do |method|
+        next unless uri = @service.send(method, track)
+        status.push(uri.to_s)
+      end
     end
   end
 end

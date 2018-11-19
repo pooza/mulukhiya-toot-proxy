@@ -28,10 +28,10 @@ module MulukhiyaTootProxy
       else
         status.push(track['artistName'])
       end
-      return unless uri = @service.amazon_uri(track)
-      status.push(uri.to_s)
-      return unless uri = @service.spotify_uri(track)
-      status.push(uri.to_s)
+      [:amazon_uri, :spotify_uri].each do |method|
+        next unless uri = @service.send(method, track)
+        status.push(uri.to_s)
+      end
     end
   end
 end
