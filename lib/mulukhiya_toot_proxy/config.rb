@@ -42,7 +42,7 @@ module MulukhiyaTootProxy
 
     def flatten(prefix, node, glue)
       values = {}
-      if node.instance_of?(Hash)
+      if node.is_a?(Hash)
         node.each do |key, value|
           values.update(flatten("#{prefix}#{glue}#{key}", value, glue))
         end
