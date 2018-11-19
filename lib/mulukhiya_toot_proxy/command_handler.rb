@@ -34,7 +34,7 @@ module MulukhiyaTootProxy
     end
 
     def dispatch(values)
-      raise ImprementError, "#{__method__}が未定義です。"
+      raise ImprementError, "#{__method__}が未実装です。"
     end
   end
 end

@@ -18,11 +18,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      raise ImprementError, "#{__method__}が未定義です。"
+      raise ImprementError, "#{__method__}が未実装です。"
     end
 
     def update(keyword, status)
-      raise ImprementError, "#{__method__}が未定義です。"
+      raise ImprementError, "#{__method__}が未実装です。"
     end
   end
 end
