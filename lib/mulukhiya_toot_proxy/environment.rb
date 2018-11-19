@@ -13,9 +13,5 @@ module MulukhiyaTootProxy
       udp.close
       return addr
     end
-
-    def self.cron?
-      return ENV['CRON'].present?
-    end
   end
 end
