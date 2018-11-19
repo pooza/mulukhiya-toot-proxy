@@ -1,5 +1,5 @@
 token_owner: >-
   SELECT
   resource_owner_id
-  FROM oauth_access_token
+  FROM oauth_access_tokens
   WHERE (token='<%= params[:token] %>');
