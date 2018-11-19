@@ -11,9 +11,9 @@ module MulukhiyaTootProxy
     end
 
     def get(key)
-      v = super(create_key(key))
-      v = JSON.parse(v) if v.present?
-      return v || {}
+      value = super(create_key(key))
+      value = JSON.parse(value) if value.present?
+      return value || {}
     end
 
     def set(key, values)
