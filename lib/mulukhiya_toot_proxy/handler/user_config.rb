@@ -4,22 +4,17 @@ require 'json'
 module MulukhiyaTootProxy
   class UserConfigHandler < Handler
     def exec(body, headers = {})
-      if values = parse_yaml(body['status'])
+      [:parse_yaml, :parse_json].each do |method|
+        next unless values = send(method, body['status'])
         body['visibility'] = 'direct'
         body['status'] = YAML.dump(values)
         save(values)
-        return
-      end
-      if values = parse_json(body['status'])
-        body['visibility'] = 'direct'
-        body['status'] = YAML.dump(values)
-        save(values)
-        return
+        break
       end
     end
 
     def parse_yaml(body)
-      values = YAML.load(body)
+      values = YAML.safe_load(body)
       return values if values['user_config']
       return nil
     rescue
