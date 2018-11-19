@@ -11,6 +11,12 @@ module MulukhiyaTootProxy
       @token = token
     end
 
+    def account_id
+      rows = Postgres.instance.execute('token_owner', {token: @token})
+      return rows.first['resource_owner_id'].to_i if rows.present?
+      return nil
+    end
+
     def toot(body)
       return HTTParty.post(create_uri('/api/v1/statuses'), {
         body: body.to_json,
