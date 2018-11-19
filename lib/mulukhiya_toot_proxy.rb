@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
 
   autoload :AmazonService
   autoload :ArtistParser
+  autoload :CommandHandler
   autoload :Config
   autoload :Environment
   autoload :Error

@@ -11,6 +11,10 @@ module MulukhiyaTootProxy
       raise ImprementError, "#{__method__}が未定義です。"
     end
 
+    def underscore_name
+      return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
+    end
+
     def result
       return "#{self.class.to_s.split('::').last},#{@count}"
     end
