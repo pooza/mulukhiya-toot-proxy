@@ -10,6 +10,7 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       [:parse_yaml, :parse_json].each do |method|
         next unless values = send(method, body['status'])
+        next unless values['command'] == command_name
         body['visibility'] = 'direct'
         body['status'] = YAML.dump(values)
         dispatch(values)
@@ -18,17 +19,13 @@ module MulukhiyaTootProxy
     end
 
     def parse_yaml(body)
-      values = YAML.safe_load(body)
-      return nil unless values['command'] == command_name
-      return value
+      return YAML.safe_load(body)
     rescue
       return nil
     end
 
     def parse_json(body)
-      values = JSON.parse(body)
-      return nil unless values['command'] == command_name
-      return value
+      return JSON.parse(body)
     rescue
       return nil
     end
