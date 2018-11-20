@@ -12,11 +12,12 @@ module MulukhiyaTootProxy
 
     def get(key)
       value = super(create_key(key))
-      value = JSON.parse(value) if value.present?
+      value = JSON.parse(value) unless value.nil?
       return value || {}
     end
 
     def set(key, values)
+      values.delete('command') if values.member?('command')
       super(create_key(key), values.to_json)
       save
     end
