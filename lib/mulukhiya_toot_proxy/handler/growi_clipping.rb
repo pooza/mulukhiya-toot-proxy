@@ -3,7 +3,7 @@ require 'crowi-client'
 module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
-      return unless body['status'].match(/#growi/m)
+      return unless body['status'] =~ /#growi/m
       growi.request(CPApiRequestPagesCreate.new({
         path: "/user/pooza/メモ/#{Date.today.strftime('%Y/%m/%d')}",
         body: body['status'],
