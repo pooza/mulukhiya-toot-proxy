@@ -9,12 +9,19 @@ module MulukhiyaTootProxy
     def initialize(uri, token)
       @uri = Addressable::URI.parse(uri)
       @token = token
+      @account
     end
 
     def account_id
-      rows = Postgres.instance.execute('token_owner', {token: @token})
-      return nil unless rows.present?
-      return rows.first['resource_owner_id'].to_i
+      return account['id'].to_i
+    end
+
+    def account
+      unless @account
+        rows = Postgres.instance.execute('token_owner', {token: @token})
+        @account = rows.first if rows.present?
+      end
+      return @account
     end
 
     def toot(body)

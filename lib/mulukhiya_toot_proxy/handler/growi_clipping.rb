@@ -3,22 +3,26 @@ require 'crowi-client'
 module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
-      return unless body['status'] =~ /#growi/m
-      growi.request(CPApiRequestPagesCreate.new({
-        path: "/user/pooza/メモ/#{Date.today.strftime('%Y/%m/%d')}",
-        body: body['status'],
-      }))
+      return unless body['status'] =~ /#growi/mi
+      growi.request(CPApiRequestPagesCreate.new({path: path, body: body['status']}))
+    rescue => e
+      raise ExternalServiceError, e.message
+    end
+
+    def path
+      return "/%s/users/%s/%s" % [
+        Package.name,
+        mastodon.account['username'],
+        Time.now.strftime('%Y/%m/%d/%H%M%S'),
+      ]
     end
 
     def growi
-      storage = UserConfigStorage.new
-      userconfig = storage[mastodon.account_id]
+      userconfig = UserConfigStorage.new[mastodon.account_id]
       return CrowiClient.new({
         crowi_url: userconfig['growi']['servers'].first['url'],
         access_token: userconfig['growi']['servers'].first['token'],
       })
-    rescue => e
-      return ExternalServiceError, e.message
     end
   end
 end

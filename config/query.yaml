@@ -1,5 +1,8 @@
 token_owner: >-
   SELECT
-  resource_owner_id
-  FROM oauth_access_tokens
-  WHERE (token='<%= params[:token] %>');
+  accounts.id,
+  accounts.username,
+  accounts.display_name
+  FROM oauth_access_tokens AS tokens
+  LEFT JOIN accounts ON tokens.resource_owner_id=accounts.id
+  WHERE (tokens.token='<%= params[:token] %>');
