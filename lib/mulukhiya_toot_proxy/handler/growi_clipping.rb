@@ -1,12 +1,21 @@
 require 'crowi-client'
+require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
       return unless body['status'] =~ /#growi/mi
       growi.request(CPApiRequestPagesCreate.new({path: path, body: body['status']}))
-    rescue => e
-      raise ExternalServiceError, e.message
+      body['status'] += "\n#{uri}"
+    end
+
+    def uri
+      unless @uri
+        values = UserConfigStorage.new[mastodon.account_id]
+        uri = Addressable::URI.parse(values['growi']['url'])
+        uri.path = path
+      end
+      return uri
     end
 
     def path
@@ -18,11 +27,14 @@ module MulukhiyaTootProxy
     end
 
     def growi
-      values = UserConfigStorage.new[mastodon.account_id]
-      return CrowiClient.new({
-        crowi_url: values['growi']['url'],
-        access_token: values['growi']['token'],
-      })
+      unless @growi
+        values = UserConfigStorage.new[mastodon.account_id]
+        return CrowiClient.new({
+          crowi_url: values['growi']['url'],
+          access_token: values['growi']['token'],
+        })
+      end
+      return @growi
     end
   end
 end
