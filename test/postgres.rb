@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     end
 
     def test_create_sql
-      assert_equal(@db.create_sql('token_owner', {token: '40c547ba8d383345002ecff58ae5e45e57631d42a3b4b65f817b2d8a558b6116'}), %!SELECT resource_owner_id FROM oauth_access_tokens WHERE (token='40c547ba8d383345002ecff58ae5e45e57631d42a3b4b65f817b2d8a558b6116');!)
+      assert_equal(@db.create_sql('token_owner', {token: '40c547ba8d383345002ecff58ae5e45e57631d42a3b4b65f817b2d8a558b6116'}), %!SELECT accounts.id, accounts.username, accounts.display_name FROM oauth_access_tokens AS tokens LEFT JOIN accounts ON tokens.resource_owner_id=accounts.id WHERE (tokens.token='40c547ba8d383345002ecff58ae5e45e57631d42a3b4b65f817b2d8a558b6116');!)
     end
   end
 end

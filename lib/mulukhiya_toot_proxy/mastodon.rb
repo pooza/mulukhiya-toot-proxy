@@ -9,7 +9,6 @@ module MulukhiyaTootProxy
     def initialize(uri, token)
       @uri = Addressable::URI.parse(uri)
       @token = token
-      @account
     end
 
     def account_id
