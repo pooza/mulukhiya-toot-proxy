@@ -20,8 +20,8 @@ module MulukhiyaTootProxy
     def growi
       userconfig = UserConfigStorage.new[mastodon.account_id]
       return CrowiClient.new({
-        crowi_url: userconfig['growi']['servers'].first['url'],
-        access_token: userconfig['growi']['servers'].first['token'],
+        crowi_url: userconfig['growi']['url'],
+        access_token: userconfig['growi']['token'],
       })
     end
   end

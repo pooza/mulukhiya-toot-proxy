@@ -15,6 +15,8 @@ module MulukhiyaTootProxy
         body['status'] = YAML.dump(values)
         dispatch(values)
         break
+      rescue
+        next
       end
     end
 
