@@ -11,7 +11,7 @@ Style/FrozenStringLiteralComment:
 Style/DoubleNegation:
   Enabled: false
 
-Stype/FormatStringToken:
+Style/FormatStringToken:
   EnforcedStyle: template
 
 Layout/IndentHash:
