@@ -35,6 +35,8 @@ module MulukhiyaTootProxy
         })
       end
       return @growi
+    rescue
+      raise ExternalServiceError, 'Growiの接続情報が取得できませんでした。'
     end
   end
 end
