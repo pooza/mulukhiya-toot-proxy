@@ -1,6 +1,3 @@
-require 'crowi-client'
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
