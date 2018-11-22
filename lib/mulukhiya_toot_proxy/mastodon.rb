@@ -6,7 +6,7 @@ require 'json'
 
 module MulukhiyaTootProxy
   class Mastodon
-    def initialize(uri, token)
+    def initialize(uri, token = nil)
       @uri = Addressable::URI.parse(uri)
       @token = token
     end
@@ -21,6 +21,12 @@ module MulukhiyaTootProxy
         @account = rows.first if rows.present?
       end
       return @account
+    end
+
+    def fetch_toot(id)
+      uri = @uri.clone
+      uri.path = "/api/v1/statuses/#{id}"
+      return fetch(uri)
     end
 
     def toot(body)
@@ -70,7 +76,7 @@ module MulukhiyaTootProxy
         ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
     rescue => e
-      raise ExternalServiceError, "外部ファイルが取得できません。 (#{e.message})"
+      raise ExternalServiceError, "外部リソースから取得できません。 (#{e.message})"
     end
 
     def create_uri(href)
