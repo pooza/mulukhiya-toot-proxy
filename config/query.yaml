@@ -5,6 +5,6 @@ token_owner: >-
   accounts.display_name
   FROM oauth_access_tokens AS tokens
   LEFT JOIN accounts ON tokens.resource_owner_id=accounts.id
-  WHERE (tokens.token='<%= params[:token] %>');
+  WHERE (tokens.token='<%= params[:token] %>')
   AND (accounts.domain IS NULL)
-  AND (accounts.locked='f')
+  AND (accounts.locked='f');

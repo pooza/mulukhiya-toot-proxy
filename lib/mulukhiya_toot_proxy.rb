@@ -11,6 +11,7 @@ module MulukhiyaTootProxy
   autoload :Config
   autoload :Environment
   autoload :Error
+  autoload :Growi
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService
@@ -44,5 +45,6 @@ module MulukhiyaTootProxy
 
   autoload :AmazonURI, 'mulukhiya_toot_proxy/uri/amazon_uri'
   autoload :ItunesURI, 'mulukhiya_toot_proxy/uri/itunes_uri'
+  autoload :MastodonURI, 'mulukhiya_toot_proxy/uri/mastodon_uri'
   autoload :SpotifyURI, 'mulukhiya_toot_proxy/uri/spotify_uri'
 end

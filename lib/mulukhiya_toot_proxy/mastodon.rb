@@ -1,13 +1,13 @@
 require 'httparty'
-require 'addressable/uri'
 require 'rest-client'
 require 'digest/sha1'
+require 'reverse_markdown'
 require 'json'
 
 module MulukhiyaTootProxy
   class Mastodon
     def initialize(uri, token = nil)
-      @uri = Addressable::URI.parse(uri)
+      @uri = MastodonURI.parse(uri)
       @token = token
     end
 
@@ -24,9 +24,7 @@ module MulukhiyaTootProxy
     end
 
     def fetch_toot(id)
-      uri = @uri.clone
-      uri.path = "/api/v1/statuses/#{id}"
-      return fetch(uri)
+      return fetch(create_uri("/api/v1/statuses/#{id}"))
     end
 
     def toot(body)
@@ -60,6 +58,19 @@ module MulukhiyaTootProxy
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
+    end
+
+    def clip_to_growi(params)
+      toot = fetch_toot(params[:id])
+      body = [ReverseMarkdown.convert(toot['content'])]
+      body.push(toot['url'])
+      body.concat(toot['media_attachments'].map{ |attachment| attachment['url']})
+      params[:growi].push({path: params[:path], body: body.join("\n")})
+    end
+
+    def growi
+      @growi ||= Growi.create({account_id: account_id})
+      return @growi
     end
 
     def self.create_tag(word)
