@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       uri = MastodonURI.parse(values['uri'])
       raise RequestError, "Invalid URL '#{values['uri']}'" unless uri.absolute?
       raise RequestError, 'Invalid toot ID' unless uri.toot_id.present?
-      uri.service.clip_to_growi({path: path, id: uri.toot_id, growi: mastodon.growi})
+      uri.clip({growi: mastodon.growi, path: path})
     end
 
     def path

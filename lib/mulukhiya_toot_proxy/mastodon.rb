@@ -1,7 +1,6 @@
 require 'httparty'
 require 'rest-client'
 require 'digest/sha1'
-require 'reverse_markdown'
 require 'json'
 
 module MulukhiyaTootProxy
@@ -58,14 +57,6 @@ module MulukhiyaTootProxy
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
-    end
-
-    def clip_to_growi(params)
-      toot = fetch_toot(params[:id])
-      body = [ReverseMarkdown.convert(toot['content'])]
-      body.push(toot['url'])
-      body.concat(toot['media_attachments'].map{ |attachment| attachment['url']})
-      params[:growi].push({path: params[:path], body: body.join("\n")})
     end
 
     def growi
