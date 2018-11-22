@@ -12,8 +12,7 @@ module MulukhiyaTootProxy
         crowi_url: values['growi']['url'],
         access_token: values['growi']['token'],
       })
-    rescue => e
-      Slack.broadcast(Error.create(e).to_h)
+    rescue
       raise ExternalServiceError, 'Growiの接続情報が取得できませんでした。'
     end
   end

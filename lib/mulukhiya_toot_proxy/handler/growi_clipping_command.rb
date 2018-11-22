@@ -10,11 +10,12 @@ module MulukhiyaTootProxy
     end
 
     def path
-      return '/%{package}/users/%{username}/%{date}' % {
+      @path ||= '/%{package}/users/%{username}/%{date}' % {
         package: Package.name,
         username: mastodon.account['username'],
         date: Time.now.strftime('%Y/%m/%d/%H%M%S'),
       }
+      return @path
     end
   end
 end
