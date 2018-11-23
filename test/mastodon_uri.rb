@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_id
-      assert_equal(@uri.toot_id, 101118840135913675)
+      assert_equal(@uri.toot_id, 101_118_840_135_913_675)
     end
 
     def test_service
