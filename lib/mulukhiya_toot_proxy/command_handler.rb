@@ -15,8 +15,7 @@ module MulukhiyaTootProxy
         body['visibility'] = 'direct'
         body['status'] = YAML.dump(values)
         break
-      rescue => e
-        Slack.broadcast(Error.create(e).to_h)
+      rescue
         next
       end
       dispatch(values) if values.present?
