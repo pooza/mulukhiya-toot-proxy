@@ -17,9 +17,7 @@ module MulukhiyaTootProxy
       raise ExternalServiceError, "トゥートが取得できません。 #{self}" unless toot
       account = toot['account']
       body = ['## アカウント', "[#{account['display_name']}](#{account['url']})"]
-      if toot['content'].present?
-        body.concat(['## 本文', ReverseMarkdown.convert(toot['content'])])
-      end
+      body.concat(['## 本文', ReverseMarkdown.convert(toot['content'])]) if toot['content'].present?
       if toot['media_attachments'].present?
         body.push('## メディア')
         body.concat(toot['media_attachments'].map{ |attachment| "- #{attachment['url']}"})
