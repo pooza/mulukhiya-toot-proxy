@@ -15,12 +15,11 @@ module MulukhiyaTootProxy
     def to_md
       toot = service.fetch_toot(toot_id)
       raise ExternalServiceError, "トゥートが取得できません。 #{self}" unless toot
-      body = [
-        '## アカウント',
-        "[#{toot['account']['display_name']}](#{toot['account']['url']})",
-        '## 本文',
-        ReverseMarkdown.convert(toot['content']),
-      ]
+      account = toot['account']
+      body = ['## アカウント', "[#{account['display_name']}](#{account['url']})"]
+      if toot['content'].present?
+        body.concat(['## 本文', ReverseMarkdown.convert(toot['content'])])
+      end
       if toot['media_attachments'].present?
         body.push('## メディア')
         body.concat(toot['media_attachments'].map{ |attachment| "- #{attachment['url']}"})
