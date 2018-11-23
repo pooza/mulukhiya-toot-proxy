@@ -2,6 +2,9 @@ module MulukhiyaTootProxy
   class RedisTest < Test::Unit::TestCase
     def setup
       @redis = Redis.new
+    end
+
+    def setup_new
       assert_true(@redis.is_a?(Redis))
     end
 

@@ -14,6 +14,7 @@ module MulukhiyaTootProxy
         next unless values['command'] == command_name
         body['visibility'] = 'direct'
         body['status'] = YAML.dump(values)
+        increment!
         break
       rescue
         next
