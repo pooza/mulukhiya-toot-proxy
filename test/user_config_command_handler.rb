@@ -20,10 +20,10 @@ module MulukhiyaTootProxy
       @handler.exec({'status' => "command: user_config\n#{key}: null"})
       assert_equal(@handler.result, 'UserConfigCommandHandler,2')
 
-      @handler.exec({'status' => "{\"command\": \"user_config\", \"#{key}\": 2}"})
+      @handler.exec({'status' => %({"command": "user_config", "#{key}": 2})})
       assert_equal(@handler.result, 'UserConfigCommandHandler,3')
 
-      @handler.exec({'status' => "{\"command\": \"user_config\", \"#{key}\": null}"})
+      @handler.exec({'status' => %({"command": "user_config", "#{key}": null})})
       assert_equal(@handler.result, 'UserConfigCommandHandler,4')
     end
   end

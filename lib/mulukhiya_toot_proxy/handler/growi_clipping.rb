@@ -4,6 +4,7 @@ module MulukhiyaTootProxy
       return unless body['status'] =~ /#growi/mi
       mastodon.growi.push({path: uri.path, body: body['status']})
       body['status'] += "\n#{uri}"
+      increment!
     end
 
     def uri

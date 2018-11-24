@@ -2,6 +2,9 @@ module MulukhiyaTootProxy
   class RedisDSNTest < Test::Unit::TestCase
     def setup
       @dsn = RedisDSN.parse('redis://localhost:6379/1')
+    end
+
+    def test_new
       assert_true(@dsn.is_a?(RedisDSN))
     end
 

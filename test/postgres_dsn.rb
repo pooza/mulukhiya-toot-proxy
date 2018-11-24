@@ -2,6 +2,9 @@ module MulukhiyaTootProxy
   class PostgresDSNTest < Test::Unit::TestCase
     def setup
       @dsn = PostgresDSN.parse('postgres://postgres:nice_password@localhost:5432/mastodon')
+    end
+
+    def test_new
       assert_true(@dsn.is_a?(PostgresDSN))
     end
 

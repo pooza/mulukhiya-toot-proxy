@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       @redis = Redis.new
     end
 
-    def setup_new
+    def test_new
       assert_true(@redis.is_a?(Redis))
     end
 
