@@ -1,3 +1,4 @@
+require 'zlib'
 require 'addressable/uri'
 require 'reverse_markdown'
 
@@ -17,7 +18,7 @@ module MulukhiyaTootProxy
       raise ExternalServiceError, "トゥートが取得できません。 #{self}" unless toot
       account = toot['account']
       body = ['## アカウント', "[#{account['display_name']}](#{account['url']})"]
-      body.concat(['## 本文', ReverseMarkdown.convert(toot['content'])]) if toot['content'].present?
+      body.concat(['## 本文', html2md(toot['content'])]) if toot['content'].present?
       if toot['media_attachments'].present?
         body.push('## メディア')
         body.concat(toot['media_attachments'].map{ |attachment| "- #{attachment['url']}"})
@@ -35,6 +36,16 @@ module MulukhiyaTootProxy
         @service = Mastodon.new(uri)
       end
       return @service
+    end
+
+    private
+
+    def html2md(text)
+      text = ReverseMarkdown.convert(text)
+      text.gsub!(%r{```.*?```}m) do |block|
+        block.gsub('\_', '_').gsub('\*', '*').gsub('\<', '<').gsub('\>', '>')
+      end
+      return text
     end
   end
 end
