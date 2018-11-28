@@ -42,7 +42,7 @@ module MulukhiyaTootProxy
 
     def html2md(text)
       text = ReverseMarkdown.convert(text)
-      text.gsub!(%r{```.*?```}m) do |block|
+      text.gsub!(/```.*?```/m) do |block|
         block.gsub('\_', '_').gsub('\*', '*').gsub('\<', '<').gsub('\>', '>')
       end
       return text

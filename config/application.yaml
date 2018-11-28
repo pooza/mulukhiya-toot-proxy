@@ -36,6 +36,9 @@ spotify:
     track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
+twitter:
+  patterns:
+    tweet: ^/(.+?)/status/([[:digit:]]+)
 itunes:
   urls:
     search: https://itunes.apple.com/search

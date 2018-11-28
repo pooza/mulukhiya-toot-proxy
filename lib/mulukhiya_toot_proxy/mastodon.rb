@@ -15,6 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def account
+      raise ExternalServiceError, "#{__method__}: access token not found." unless @token
       unless @account
         rows = Postgres.instance.execute('token_owner', {token: @token})
         @account = rows.first if rows.present?
@@ -27,7 +28,7 @@ module MulukhiyaTootProxy
     end
 
     def toot(body)
-      return HTTParty.post(create_uri('/api/v1/statuses'), {
+      return HTTParty.post(create_uri, {
         body: body.to_json,
         headers: {
           'Content-Type' => 'application/json',
@@ -81,7 +82,7 @@ module MulukhiyaTootProxy
       raise ExternalServiceError, "外部リソースから取得できません。 (#{e.message})"
     end
 
-    def create_uri(href)
+    def create_uri(href = '/api/v1/statuses')
       uri = @uri.clone
       uri.path = href
       return uri

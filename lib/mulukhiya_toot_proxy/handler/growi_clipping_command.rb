@@ -3,10 +3,13 @@ module MulukhiyaTootProxy
     def dispatch(values)
       values['uri'] ||= values['url']
       raise RequestError, 'Empty URL' unless values['uri'].present?
-      uri = MastodonURI.parse(values['uri'])
-      raise RequestError, "Invalid URL '#{values['uri']}'" unless uri.absolute?
-      raise RequestError, 'Invalid toot ID' unless uri.toot_id.present?
-      uri.clip({growi: mastodon.growi, path: path})
+      if (uri = TwitterURI.parse(values['uri'])) && uri.twitter?
+        raise RequestError, 'Invalid tweet ID' unless uri.tweet_id.present?
+        uri.clip({growi: mastodon.growi, path: path})
+      elsif (uri = MastodonURI.parse(values['uri'])) && uri.absolute?
+        raise RequestError, 'Invalid toot ID' unless uri.toot_id.present?
+        uri.clip({growi: mastodon.growi, path: path})
+      end
     end
 
     def path

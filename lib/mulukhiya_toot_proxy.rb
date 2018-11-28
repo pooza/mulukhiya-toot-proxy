@@ -25,6 +25,7 @@ module MulukhiyaTootProxy
   autoload :Server
   autoload :Slack
   autoload :SpotifyService
+  autoload :TwitterService
   autoload :URLHandler, 'mulukhiya_toot_proxy/url_handler'
   autoload :UserConfigStorage
 
@@ -47,4 +48,5 @@ module MulukhiyaTootProxy
   autoload :ItunesURI, 'mulukhiya_toot_proxy/uri/itunes_uri'
   autoload :MastodonURI, 'mulukhiya_toot_proxy/uri/mastodon_uri'
   autoload :SpotifyURI, 'mulukhiya_toot_proxy/uri/spotify_uri'
+  autoload :TwitterURI, 'mulukhiya_toot_proxy/uri/twitter_uri'
 end
