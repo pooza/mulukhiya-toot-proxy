@@ -33,6 +33,7 @@ module MulukhiyaTootProxy
   autoload :Redis
   autoload :Renderer
   autoload :Server
+  autoload :SidekiqHandler
   autoload :Slack
   autoload :SpotifyService
   autoload :TwitterService
