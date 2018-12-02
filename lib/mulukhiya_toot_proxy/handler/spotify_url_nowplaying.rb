@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class SpotifyUrlNowplayingHandler < NowplayingHandler
+  class SpotifyURLNowplayingHandler < NowplayingHandler
     def initialize
       super
       @tracks = {}

@@ -2,6 +2,14 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
 
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.acronym 'JSON'
+  inflect.acronym 'URL'
+  inflect.acronym 'URI'
+  inflect.acronym 'DSN'
+  inflect.acronym 'ASIN'
+end
+
 module MulukhiyaTootProxy
   extend ActiveSupport::Autoload
 
@@ -26,7 +34,7 @@ module MulukhiyaTootProxy
   autoload :Slack
   autoload :SpotifyService
   autoload :TwitterService
-  autoload :URLHandler, 'mulukhiya_toot_proxy/url_handler'
+  autoload :URLHandler
   autoload :UserConfigStorage
 
   autoload_under 'error' do
@@ -39,14 +47,20 @@ module MulukhiyaTootProxy
     autoload :RequestError
   end
 
-  autoload :JSONRenderer, 'mulukhiya_toot_proxy/renderer/json_renderer'
+  autoload_under 'renderer' do
+    autoload :JSONRenderer
+  end
 
-  autoload :RedisDSN, 'mulukhiya_toot_proxy/dsn/redis_dsn'
-  autoload :PostgresDSN, 'mulukhiya_toot_proxy/dsn/postgres_dsn'
+  autoload_under 'dsn' do
+    autoload :RedisDSN
+    autoload :PostgresDSN
+  end
 
-  autoload :AmazonURI, 'mulukhiya_toot_proxy/uri/amazon_uri'
-  autoload :ItunesURI, 'mulukhiya_toot_proxy/uri/itunes_uri'
-  autoload :MastodonURI, 'mulukhiya_toot_proxy/uri/mastodon_uri'
-  autoload :SpotifyURI, 'mulukhiya_toot_proxy/uri/spotify_uri'
-  autoload :TwitterURI, 'mulukhiya_toot_proxy/uri/twitter_uri'
+  autoload_under 'uri' do
+    autoload :AmazonURI
+    autoload :ItunesURI
+    autoload :MastodonURI
+    autoload :SpotifyURI
+    autoload :TwitterURI
+  end
 end

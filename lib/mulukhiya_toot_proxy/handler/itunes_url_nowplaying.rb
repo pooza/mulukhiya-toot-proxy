@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesUrlNowplayingHandler < NowplayingHandler
+  class ItunesURLNowplayingHandler < NowplayingHandler
     def initialize
       super
       @tracks = {}
