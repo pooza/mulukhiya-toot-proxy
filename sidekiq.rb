@@ -7,7 +7,6 @@ ENV['SSL_CERT_FILE'] ||= File.join(ROOT_DIR, 'cert/cacert.pem')
 require 'bundler/setup'
 require 'mulukhiya_toot_proxy'
 
-run Rack::URLMap.new(
-  '/' => MulukhiyaTootProxy::Server,
-  '/mulukhiya/sidekiq' => Sidekiq::Web,
-)
+Dir.glob(File.join(ROOT_DIR, 'app/worker/*')).each do |worker|
+  require worker
+end

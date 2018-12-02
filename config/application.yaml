@@ -82,5 +82,5 @@ slack:
   hooks: []
 sidekiq:
   redis:
-    dsn: redis://localhost:6379/0
+    dsn: redis://localhost:6379/2
     queue: mulukhiya

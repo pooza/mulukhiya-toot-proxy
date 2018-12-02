@@ -28,3 +28,15 @@ namespace :server do
     end
   end
 end
+
+namespace :sidekiq do
+  desc 'start sidekiq'
+  task :start do
+    sh "sidekiq -C #{File.join(ROOT_DIR, 'config/sidekiq.yaml')} -r #{File.join(ROOT_DIR, 'sidekiq.rb')}"
+  end
+
+  desc 'stop sidekiq'
+  task :stop do
+    sh "kill `#{File.join(ROOT_DIR, 'tmp/pids/sidekiq.pid')}`"
+  end
+end
