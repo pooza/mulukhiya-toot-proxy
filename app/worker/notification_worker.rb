@@ -1,7 +1,9 @@
-class NotificationWorker
-  include Sidekiq::Worker
+module MulukhiyaTootProxy
+  class NotificationWorker
+    include Sidekiq::Worker
 
-  def perform(id)
-    MulukhiyaTootProxy::Slack.broadcast(id)
+    def perform(id)
+      Slack.broadcast(id)
+    end
   end
 end
