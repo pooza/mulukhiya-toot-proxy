@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def self.create(name)
-      require "handler/#{name}"
+      require "mulukhiya_toot_proxy/handler/#{name}"
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new
     end
 

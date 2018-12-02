@@ -1,8 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
-require 'sidekiq'
-require 'sidekiq/web'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'JSON'
@@ -40,6 +38,11 @@ module MulukhiyaTootProxy
   autoload :URLHandler
   autoload :UserConfigStorage
 
+  autoload_under 'dsn' do
+    autoload :RedisDSN
+    autoload :PostgresDSN
+  end
+
   autoload_under 'error' do
     autoload :ConfigError
     autoload :DatabaseError
@@ -54,11 +57,6 @@ module MulukhiyaTootProxy
     autoload :JSONRenderer
   end
 
-  autoload_under 'dsn' do
-    autoload :RedisDSN
-    autoload :PostgresDSN
-  end
-
   autoload_under 'uri' do
     autoload :AmazonURI
     autoload :ItunesURI
@@ -66,12 +64,8 @@ module MulukhiyaTootProxy
     autoload :SpotifyURI
     autoload :TwitterURI
   end
-end
 
-Sidekiq.configure_server do |config|
-  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
-end
-
-Sidekiq.configure_client do |config|
-  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
+  autoload_under 'worker' do
+    autoload :NotificationWorker
+  end
 end

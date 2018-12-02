@@ -11,7 +11,3 @@ require 'sidekiq'
 Sidekiq.configure_server do |config|
   config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
 end
-
-Dir.glob(File.join(ROOT_DIR, 'app/worker/*')).each do |worker|
-  require worker
-end
