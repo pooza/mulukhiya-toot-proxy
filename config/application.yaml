@@ -80,3 +80,7 @@ postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
 slack:
   hooks: []
+sidekiq:
+  redis:
+    dsn: redis://localhost:6379/0
+    queue: mulukhiya

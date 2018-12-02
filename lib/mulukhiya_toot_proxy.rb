@@ -1,6 +1,7 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
+require 'sidekiq'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'JSON'
@@ -63,4 +64,11 @@ module MulukhiyaTootProxy
     autoload :SpotifyURI
     autoload :TwitterURI
   end
+end
+
+Sidekiq.configure_server do |config|
+  config.redis = {
+    url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn'],
+    namespace: 'sidekiq',
+  }
 end
