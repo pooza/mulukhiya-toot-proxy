@@ -36,7 +36,6 @@ module MulukhiyaTootProxy
           'Authorization' => "Bearer #{@token}",
           'X-Mulukhiya' => Package.full_name,
         },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
     end
 
@@ -76,7 +75,6 @@ module MulukhiyaTootProxy
         headers: {
           'User-Agent' => Package.user_agent,
         },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
     rescue => e
       raise ExternalServiceError, "外部リソースから取得できません。 (#{e.message})"

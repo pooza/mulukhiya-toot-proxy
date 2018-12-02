@@ -12,7 +12,6 @@ module MulukhiyaTootProxy
           headers: {
             'User-Agent' => Package.user_agent,
           },
-          ssl_ca_file: ENV['SSL_CERT_FILE'],
         })
         location = response.headers['location']
         break unless location

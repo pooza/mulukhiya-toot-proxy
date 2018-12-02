@@ -12,7 +12,6 @@ module MulukhiyaTootProxy
         headers: {
           'User-Agent' => Package.user_agent,
         },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']
@@ -29,7 +28,6 @@ module MulukhiyaTootProxy
         headers: {
           'User-Agent' => Package.user_agent,
         },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']

@@ -10,14 +10,12 @@ module MulukhiyaTootProxy
       result = HTTParty.post(toot_url, {
         body: {status: 'a' * MAX_LENGTH, visibility: 'private'}.to_json,
         headers: headers,
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       assert_equal(200, result.code)
 
       result = HTTParty.post(toot_url, {
         body: {status: 'a' * (MAX_LENGTH + 1), visibility: 'private'}.to_json,
         headers: headers,
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       assert_equal(422, result.code) # 文字数オーバー
     end
