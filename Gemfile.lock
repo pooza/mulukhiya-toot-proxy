@@ -14,6 +14,7 @@ GEM
     ast (2.4.0)
     buftok (0.2.0)
     concurrent-ruby (1.1.3)
+    connection_pool (2.2.2)
     crowi-client (0.1.4)
       json (~> 2.1)
       rest-client (~> 2.0)
@@ -101,6 +102,10 @@ GEM
       unicode-display_width (~> 1.4.0)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.10.0)
+    sidekiq (5.2.3)
+      connection_pool (~> 2.2, >= 2.2.2)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     simple_oauth (0.3.1)
     sinatra (2.0.4)
       mustermann (~> 1.0)
@@ -108,14 +113,14 @@ GEM
       rack-protection (= 2.0.4)
       tilt (~> 2.0)
     syslog-logger (1.6.8)
-    test-unit (3.2.8)
+    test-unit (3.2.9)
       power_assert
     thin (1.7.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
       rack (>= 1, < 3)
     thread_safe (0.3.6)
-    tilt (2.0.8)
+    tilt (2.0.9)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -151,6 +156,7 @@ DEPENDENCIES
   reverse_markdown
   rspotify
   rubocop
+  sidekiq
   sinatra
   syslog-logger
   test-unit
