@@ -6,6 +6,11 @@ ENV['SSL_CERT_FILE'] ||= File.join(ROOT_DIR, 'cert/cacert.pem')
 
 require 'bundler/setup'
 require 'mulukhiya_toot_proxy'
+require 'sidekiq'
+
+Sidekiq.configure_server do |config|
+  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
+end
 
 Dir.glob(File.join(ROOT_DIR, 'app/worker/*')).each do |worker|
   require worker

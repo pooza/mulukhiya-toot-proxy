@@ -15,11 +15,6 @@ task :test do
   end
 end
 
-[:start, :stop, :restart].each do |action|
-  desc "alias of server:#{action}"
-  task action => ["server:#{action}"]
-end
-
 namespace :server do
   [:start, :stop, :restart].each do |action|
     desc "#{action} server"

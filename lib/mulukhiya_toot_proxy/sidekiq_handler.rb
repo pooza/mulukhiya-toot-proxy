@@ -1,5 +1,14 @@
+require 'sidekiq'
+
 module MulukhiyaTootProxy
   class SidekiqHandler < Handler
+    def initialize
+      super
+      Sidekiq.configure_client do |config|
+        config.redis = {url: @config['/sidekiq/redis/dsn']}
+      end
+    end
+
     def exec(body, headers = {})
       @body = body
       @headers = headers
