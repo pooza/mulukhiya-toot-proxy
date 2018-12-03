@@ -15,9 +15,32 @@ task :test do
   end
 end
 
+namespace :cert do
+  desc 'update cert'
+  task :update do
+    require 'httparty'
+    File.write(
+      File.join(ROOT_DIR, 'cert/cacert.pem'),
+      HTTParty.get('https://curl.haxx.se/ca/cacert.pem'),
+    )
+  end
+end
+
+desc 'start API server / Sidekiq'
+task start: ['server:run', 'sidekiq:start']
+
+desc 'stop API server / Sidekiq'
+task stop: ['server:stop', 'sidekiq:stop']
+
+desc 'restart API server / Sidekiq'
+task restart: [:stop, :start]
+
 namespace :server do
+  desc 'start API server (after cert:update)'
+  task run: ['cert:update', :start]
+
   [:start, :stop, :restart].each do |action|
-    desc "#{action} server"
+    desc "#{action} API server"
     task action do
       sh "thin --config config/thin.yaml #{action}"
     end
@@ -25,13 +48,16 @@ namespace :server do
 end
 
 namespace :sidekiq do
-  desc 'start sidekiq'
+  desc 'start Sidekiq'
   task :start do
-    sh 'sidekiq -C config/sidekiq.yaml -r ./sidekiq.rb'
+    sh 'sidekiq --daemon --config config/sidekiq.yaml --require ./sidekiq.rb'
   end
 
-  desc 'stop sidekiq'
+  desc 'stop Sidekiq'
   task :stop do
-    sh 'kill `cat tmp/pids/sidekiq.pid`'
+    sh 'kill `cat tmp/pids/sidekiq.pid`' rescue nil
   end
+
+  desc 'restart Sidekiq'
+  task restart: [:stop, :start]
 end
