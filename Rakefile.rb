@@ -26,19 +26,12 @@ namespace :cert do
   end
 end
 
-desc 'start API server / Sidekiq'
-task start: ['server:run', 'sidekiq:start']
-
-desc 'stop API server / Sidekiq'
-task stop: ['server:stop', 'sidekiq:stop']
-
-desc 'restart API server / Sidekiq'
-task restart: [:stop, :start]
+[:start, :stop, :restart].each do |action|
+  desc "#{action} API API server / Sidekiq"
+  task action => ["server:#{action}", "sidekiq:#{action}"]
+end
 
 namespace :server do
-  desc 'start API server (after cert:update)'
-  task run: ['cert:update', :start]
-
   [:start, :stop, :restart].each do |action|
     desc "#{action} API server"
     task action do
