@@ -1,4 +1,6 @@
 require 'addressable/uri'
+require 'httparty'
+require 'nokogiri'
 
 module MulukhiyaTootProxy
   class ItunesURI < Addressable::URI
@@ -38,9 +40,18 @@ module MulukhiyaTootProxy
       track = @service.lookup(track_id)
       raise RequestError, "ID '#{track_id}' が見つかりません。" unless track
       unless @image_uri
-        [160, 100, 60, 30].each do |size|
-          @image_uri = Addressable::URI.parse(track["artworkUrl#{size}"])
-          break if @image_uri
+        response = HTTParty.get(track['trackViewUrl'], {
+          headers: {
+            'User-Agent' => Package.user_agent,
+          },
+        })
+        body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
+        elements = body.xpath('//picture/source')
+        return nil unless elements.present?
+        elements.first.attribute('srcset').text.split(/,/).each do |uri|
+          next unless matches = uri.match(/^(.*) +3x$/)
+          @image_uri = Addressable::URI.parse(matches[1])
+          break
         end
       end
       return @image_uri
