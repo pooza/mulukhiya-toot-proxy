@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
         break if body['media_ids'].present?
         next unless updatable?(link)
         body['media_ids'].push(
-          @mastodon.upload_remote_resource(create_image_container(link).image_uri),
+          @mastodon.upload_remote_resource(create_image_uri(link)),
         )
         increment!
         break
@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
       raise ImprementError, "#{__method__}が未実装です。"
     end
 
-    def create_image_container(link)
+    def create_image_uri(link)
       raise ImprementError, "#{__method__}が未実装です。"
     end
   end

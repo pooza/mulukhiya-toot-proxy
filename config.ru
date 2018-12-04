@@ -7,7 +7,7 @@ require 'bundler/setup'
 require 'sidekiq/web'
 require 'mulukhiya_toot_proxy'
 
-run Rack::URLMap.new(
+run Rack::URLMap.new({
   '/' => MulukhiyaTootProxy::Server,
   '/mulukhiya/sidekiq' => Sidekiq::Web,
-)
+})

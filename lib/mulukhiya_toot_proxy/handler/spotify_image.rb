@@ -8,8 +8,8 @@ module MulukhiyaTootProxy
       return true
     end
 
-    def create_image_container(link)
-      return SpotifyURI.parse(link)
+    def create_image_uri(link)
+      return SpotifyURI.parse(link).image_uri
     end
   end
 end
