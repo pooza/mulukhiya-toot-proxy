@@ -18,11 +18,11 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track['trackName'])
-      artists = []
+      tags = []
       track['artistName'].split(ItunesService.delimiters_pattern).each do |artist|
-        artists.concat(ArtistParser.new(artist).parse)
+        tags.concat(ArtistParser.new(artist).parse)
       end
-      status.push(artists.uniq.compact.join(' '))
+      status.push(tags.uniq.compact.join(' '))
       [:amazon_uri, :spotify_uri].each do |method|
         next unless uri = @service.send(method, track)
         status.push(uri.to_s)
