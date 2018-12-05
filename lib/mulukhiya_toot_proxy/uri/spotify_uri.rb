@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
     end
 
     def track
+      return nil unless spotify?
       return nil unless track_id.present?
       return @spotify.lookup_track(track_id)
     end

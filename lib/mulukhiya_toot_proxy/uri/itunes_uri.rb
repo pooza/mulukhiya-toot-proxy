@@ -30,6 +30,7 @@ module MulukhiyaTootProxy
     end
 
     def track
+      return nil unless itunes?
       return nil unless track_id.present?
       return @service.lookup(track_id)
     end
