@@ -20,11 +20,7 @@ module MulukhiyaTootProxy
       status.push(track.name)
       artists = []
       track.artists.each do |artist|
-        if @config['/nowplaying/hashtag']
-          artists.concat(ArtistParser.new(artist.name).parse)
-        else
-          artists.push(artist.name)
-        end
+        artists.concat(ArtistParser.new(artist.name).parse)
       end
       status.push(artists.uniq.compact.join(' '))
       [:amazon_uri, :itunes_uri].each do |method|

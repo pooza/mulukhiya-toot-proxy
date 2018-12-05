@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def parse
+      return [@source] unless @config['/nowplaying/hashtag']
       dest = @source.sub(prefixes_pattern, '')
       cv_patterns do |pattern_entry|
         next unless matches = dest.match(pattern_entry[:pattern])
