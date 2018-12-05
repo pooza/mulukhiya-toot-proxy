@@ -35,7 +35,7 @@ module MulukhiyaTootProxy
     end
 
     def dispatch(values)
-      raise ImprementError, "#{__method__}が未実装です。"
+      raise ImplementError, "'#{__method__}' not implemented"
     end
   end
 end

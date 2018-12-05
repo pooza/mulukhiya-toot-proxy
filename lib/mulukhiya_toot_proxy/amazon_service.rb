@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
         country: @config['/amazon/country'],
         response_group: 'Images',
       })
-      raise RequestError, "ASIN '#{asin}' が見つかりません。 (#{response.error})" if response.has_error?
+      raise RequestError, "ASIN '#{asin}' not found' (#{response.error})" if response.has_error?
       ['Large', 'Medium', 'Small'].each do |size|
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri

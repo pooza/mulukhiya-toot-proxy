@@ -27,7 +27,7 @@ module MulukhiyaTootProxy
 
     def to_md
       tweet = service.lookup_tweet(tweet_id)
-      raise ExternalServiceError, "ツイートが取得できません。 #{self}" unless tweet
+      raise ExternalServiceError, "Tweet '#{self}' not found" unless tweet
       return [
         '## アカウント',
         "[@#{account_name}](https://twitter.com/#{account_name})",

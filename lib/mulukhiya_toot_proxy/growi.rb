@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
         access_token: values['growi']['token'],
       })
     rescue
-      raise ExternalServiceError, 'Growiの接続情報が取得できませんでした。'
+      raise ExternalServiceError, 'GROWI not found'
     end
   end
 end

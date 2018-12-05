@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise ImprementError, "#{__method__}が未実装です。"
+      raise ImplementError, "'#{__method__}' not implemented"
     end
 
     def underscore_name

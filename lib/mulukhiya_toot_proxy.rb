@@ -47,7 +47,7 @@ module MulukhiyaTootProxy
     autoload :ConfigError
     autoload :DatabaseError
     autoload :ExternalServiceError
-    autoload :ImprementError
+    autoload :ImplementError
     autoload :NotFoundError
     autoload :RedisError
     autoload :RequestError

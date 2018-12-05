@@ -14,11 +14,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(link)
-      raise ImprementError, "#{__method__}が未実装です。"
+      raise ImplementError, "'#{__method__}' not implemented"
     end
 
     def create_image_uri(link)
-      raise ImprementError, "#{__method__}が未実装です。"
+      raise ImplementError, "'#{__method__}' not implemented"
     end
   end
 end

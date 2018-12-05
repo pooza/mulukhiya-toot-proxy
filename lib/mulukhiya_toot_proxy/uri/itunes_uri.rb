@@ -38,7 +38,7 @@ module MulukhiyaTootProxy
       return nil unless itunes?
       return nil unless track_id.present?
       track = @service.lookup(track_id)
-      raise RequestError, "ID '#{track_id}' が見つかりません。" unless track
+      raise RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
         response = HTTParty.get(track['trackViewUrl'], {
           headers: {

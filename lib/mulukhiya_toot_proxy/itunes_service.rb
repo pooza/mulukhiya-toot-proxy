@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
       return nil unless response['results'].present?
       return response['results'].first
     rescue RequestError => e
-      raise RequestError, "#{category} ’#{keyword}' が見つかりません。 (#{e.message})"
+      raise RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end
@@ -34,7 +34,7 @@ module MulukhiyaTootProxy
       return nil unless response['results'].present?
       return response['results'].first
     rescue RequestError => e
-      raise RequestError, "'#{id}' が見つかりません。 (#{e.message})"
+      raise RequestError, "'#{id}' not found (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end

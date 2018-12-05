@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def account
-      raise ExternalServiceError, "#{__method__}: access token not found." unless @token
+      raise ExternalServiceError, 'Invalid access token' unless @token
       unless @account
         rows = Postgres.instance.execute('token_owner', {token: @token})
         @account = rows.first if rows.present?
@@ -77,7 +77,7 @@ module MulukhiyaTootProxy
         },
       })
     rescue => e
-      raise ExternalServiceError, "外部リソースから取得できません。 (#{e.message})"
+      raise ExternalServiceError, "Fetch error (#{e.message})"
     end
 
     def create_uri(href = '/api/v1/statuses')

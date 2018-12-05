@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
 
     def to_md
       toot = service.fetch_toot(toot_id)
-      raise ExternalServiceError, "トゥートが取得できません。 #{self}" unless toot
+      raise ExternalServiceError, "Toot '#{self}' not found" unless toot
       account = toot['account']
       body = ['## アカウント', "[#{account['display_name']}](#{account['url']})"]
       body.concat(['## 本文', html2md(toot['content'])]) if toot['content'].present?
