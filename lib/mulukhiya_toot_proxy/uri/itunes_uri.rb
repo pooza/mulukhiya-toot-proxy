@@ -52,7 +52,7 @@ module MulukhiyaTootProxy
         elements.first.attribute('srcset').text.split(/,/).each do |uri|
           next unless matches = uri.match(/^(.*) +3x$/)
           @image_uri = Addressable::URI.parse(matches[1])
-          break
+          break if @image_uri&.absolute?
         end
       end
       return @image_uri
