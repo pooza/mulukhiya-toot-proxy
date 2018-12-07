@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def param
-      return 'あああああ'
+      return @mastodon.account_id
     end
   end
 end
