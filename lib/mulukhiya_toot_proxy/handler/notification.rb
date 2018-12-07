@@ -1,7 +1,9 @@
 module MulukhiyaTootProxy
   class NotificationHandler < SidekiqHandler
     def executable?
-      return @mastodon.account['admin'] || @mastodon.account['moderator']
+      return true if @mastodon.account['admin'] == 't'
+      return true if @mastodon.account['moderator'] == 't'
+      return false
     end
 
     def param
