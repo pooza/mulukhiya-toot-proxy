@@ -10,10 +10,8 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      @body = body
-      @headers = headers
-      return unless executable?
-      worker_name.constantize.perform_async(param)
+      return unless executable?(body, headers)
+      worker_name.constantize.perform_async(create_params(body, headers))
       increment!
     end
 
@@ -21,11 +19,11 @@ module MulukhiyaTootProxy
       return self.class.to_s.sub(/Handler$/, 'Worker')
     end
 
-    def executable?
+    def executable?(body, headers)
       raise ImplementError, "'#{__method__}' not implemented"
     end
 
-    def param
+    def create_params(body, headers)
       raise ImplementError, "'#{__method__}' not implemented"
     end
   end

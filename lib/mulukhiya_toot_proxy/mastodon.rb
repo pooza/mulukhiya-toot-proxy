@@ -5,6 +5,8 @@ require 'json'
 
 module MulukhiyaTootProxy
   class Mastodon
+    attr_reader :token
+
     def initialize(uri, token = nil)
       @uri = MastodonURI.parse(uri)
       @token = token

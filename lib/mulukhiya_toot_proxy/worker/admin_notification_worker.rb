@@ -2,8 +2,8 @@ module MulukhiyaTootProxy
   class AdminNotificationWorker
     include Sidekiq::Worker
 
-    def perform(param)
-      Slack.broadcast(param)
+    def perform(params)
+      Slack.broadcast(params)
     end
   end
 end
