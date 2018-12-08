@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
       return {
         id: @mastodon.account_id,
         token: @mastodon.token,
-        body: body,
+        status: body['status'],
       }
     end
   end
