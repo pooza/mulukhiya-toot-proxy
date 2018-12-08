@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class NotificationWorker
+  class AdminNotificationWorker
     include Sidekiq::Worker
 
     def perform(param)

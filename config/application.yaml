@@ -15,6 +15,7 @@ shortened_url:
     - spoti.fi
     - apple.co
 amazon:
+  country: jp
   urls:
     jp: https://www.amazon.co.jp/
   retry_limit: 5
@@ -31,6 +32,7 @@ amazon:
       shortenable: true
   affiliate: true
 spotify:
+  language: ja
   retry_limit: 5
   urls:
     track: https://open.spotify.com/
@@ -40,6 +42,8 @@ twitter:
   patterns:
     tweet: ^/(.+?)/status/([[:digit:]]+)
 itunes:
+  country: jp
+  lang: ja_jp
   urls:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
