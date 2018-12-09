@@ -1,16 +1,18 @@
+require 'addressable/uri'
+
 module MulukhiyaTootProxy
   class AdminNotificationWorker
     include Sidekiq::Worker
 
     def perform(params)
       db.execute('notificatable_accounts', {id: params['id']}).each do |row|
-        connect_slack(row['id']).say(create_message({
+        next unless slack = connect_slack(row['id'])
+        slack.say(create_message({
           account: db.execute('account', {id: params['id']}).first,
           status: params['status'],
         }), :text)
       rescue => e
-        e = Error.create(e)
-        Slack.broadcast(e.to_h)
+        Slack.broadcast(Error.create(e).to_h)
         next
       end
     end
@@ -18,11 +20,11 @@ module MulukhiyaTootProxy
     private
 
     def connect_slack(id)
-      return Slack.new(
-        UserConfigStorage.new[id]['slack']['webhook'],
-      )
+      return nil unless uri = Addressable::URI.parse(UserConfigStorage.new[id]['slack']['webhook'])
+      return nil unless uri.absolute?
+      return Slack.new(uri)
     rescue
-      raise ConfigError, 'Invalid webhook (Slack compatible)'
+      return nil
     end
 
     def create_message(params)
