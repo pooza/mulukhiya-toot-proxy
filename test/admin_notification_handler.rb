@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
       handler.exec({'status' => 'ふつうのトゥート。'})
       assert_equal(handler.result, 'AdminNotificationHandler,0')
-      handler.exec({'status' => '周知を含むトゥート。 #notify'})
+      handler.exec({'status' => "周知を含むトゥート\n#notify"})
       assert_equal(handler.result, 'AdminNotificationHandler,1')
     end
   end
