@@ -20,11 +20,13 @@ module MulukhiyaTootProxy
     private
 
     def connect_slack(id)
-      return nil unless uri = Addressable::URI.parse(UserConfigStorage.new[id]['slack']['webhook'])
-      return nil unless uri.absolute?
+      uri = UserConfigStorage.new[id]['slack']['webhook']
+      return nil unless uri
+      uri = Addressable::URI.parse(uri)
+      raise 'invalid URI' unless uri.absolute?
       return Slack.new(uri)
     rescue
-      return nil
+      raise ConfigError, 'Invalid webhook (Slack compatible)'
     end
 
     def create_message(params)
