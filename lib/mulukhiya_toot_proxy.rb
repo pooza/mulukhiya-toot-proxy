@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
   autoload :Logger
   autoload :Mastodon
   autoload :NowplayingHandler
+  autoload :NotificationWorker
   autoload :Package
   autoload :Postgres
   autoload :Redis
