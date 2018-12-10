@@ -47,10 +47,12 @@ notificatable_accounts: >-
   WHERE target_account_id='<%= params[:id] %>'
   ) AS muters ON accounts.id=muters.account_id
   WHERE (accounts.domain IS NULL)
-  AND ((accounts.actor_type='Person') OR (accounts.actor_type IS NULL))
   AND (accounts.silenced='f')
   AND (accounts.suspended='f')
   AND (blockers.account_id IS NULL)
   AND (muters.account_id IS NULL)
   AND (users.disabled='f')
+  <% if params[:pattern] %>
+  AND (accounts.username ~ '<%= params[:pattern] %>')
+  <% end %>
   GROUP BY accounts.id;

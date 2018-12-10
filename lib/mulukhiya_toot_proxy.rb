@@ -68,5 +68,6 @@ module MulukhiyaTootProxy
 
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
+    autoload :MentionNotificationWorker
   end
 end
