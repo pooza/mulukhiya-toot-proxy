@@ -4,6 +4,10 @@ module MulukhiyaTootProxy
       return 'mulukhiya-toot-proxy'
     end
 
+    def self.short_name
+      return 'mulukhiya'
+    end
+
     def self.version
       return Config.instance['/package/version']
     end

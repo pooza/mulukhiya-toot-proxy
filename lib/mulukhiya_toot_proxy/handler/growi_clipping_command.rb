@@ -13,11 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def path
-      @path ||= '/%{package}/users/%{username}/%{date}' % {
-        package: Package.name,
-        username: mastodon.account['username'],
-        date: Time.now.strftime('%Y/%m/%d/%H%M%S'),
-      }
+      @path ||= Growi.create_path(mastodon.account['username'])
       return @path
     end
   end

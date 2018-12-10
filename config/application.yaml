@@ -1,5 +1,5 @@
 package:
-  version: 2.0.0b2
+  version: 2.0.0b3
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5

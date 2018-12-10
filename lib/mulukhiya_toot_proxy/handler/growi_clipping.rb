@@ -11,11 +11,7 @@ module MulukhiyaTootProxy
       unless @uri
         values = UserConfigStorage.new[mastodon.account_id]
         @uri = MastodonURI.parse(values['growi']['url'])
-        @uri.path = '/%{package}/users/%{username}/%{date}' % {
-          package: Package.name,
-          username: mastodon.account['username'],
-          date: Time.now.strftime('%Y/%m/%d/%H%M%S'),
-        }
+        @uri.path = Growi.create_path(mastodon.account['username'])
       end
       return @uri
     end
