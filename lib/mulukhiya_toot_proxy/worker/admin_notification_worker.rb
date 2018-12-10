@@ -7,8 +7,7 @@ module MulukhiyaTootProxy
           account: db.execute('account', {id: params['id']}).first,
           status: params['status'],
         }), :text)
-      rescue => e
-        Slack.broadcast(Error.create(e).to_h)
+      rescue
         next
       end
     end

@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class MentionNotificationWorker < NotificationWorker
     def perform(params)
-      accounts = params['status'].scan(/@([[:word:]]+)(\s|$)/).map {|a| a.first}.uniq
+      accounts = params['status'].scan(/@([[:word:]]+)(\s|$)/).map(&:first).uniq
       pattern = "(#{accounts.join('|')})"
       db.execute('notificatable_accounts', {id: params['id'], pattern: pattern}).each do |row|
         next unless slack = connect_slack(row['id'])
@@ -9,8 +9,7 @@ module MulukhiyaTootProxy
           account: db.execute('account', {id: params['id']}).first,
           status: params['status'],
         }), :text)
-      rescue => e
-        Slack.broadcast(Error.create(e).to_h)
+      rescue
         next
       end
     end
