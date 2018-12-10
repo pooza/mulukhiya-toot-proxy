@@ -7,8 +7,8 @@ token_owner: >-
   users.moderator,
   accounts.locked
   FROM oauth_access_tokens AS tokens
-  INNER JOIN accounts ON tokens.resource_owner_id=accounts.id
-  LEFT JOIN users ON accounts.id=users.account_id
+  INNER JOIN users ON tokens.resource_owner_id=users.id
+  INNER JOIN accounts ON users.account_id=accounts.id
   WHERE (accounts.domain IS NULL)
   AND (accounts.silenced='f')
   AND (accounts.suspended='f')
