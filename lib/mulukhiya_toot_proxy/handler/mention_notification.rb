@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class MentionNotificationHandler < SidekiqHandler
     def executable?(body, headers)
-      return body['status'] =~ /(\s|^)@[[:word:]]+(\s|$)/i
+      return body['status'] =~ /(\s|^)@[[:word:]]+(\s|$)/
     end
 
     def create_params(body, headers)
