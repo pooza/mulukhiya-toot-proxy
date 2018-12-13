@@ -42,9 +42,7 @@ module MulukhiyaTootProxy
       raise RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
         response = HTTParty.get(track['trackViewUrl'], {
-          headers: {
-            'User-Agent' => Package.user_agent,
-          },
+          headers: {'User-Agent' => Package.user_agent},
         })
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
         elements = body.xpath('//picture/source')

@@ -74,9 +74,7 @@ module MulukhiyaTootProxy
 
     def fetch(uri)
       return HTTParty.get(uri, {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
+        headers: {'User-Agent' => Package.user_agent},
       })
     rescue => e
       raise ExternalServiceError, "Fetch error (#{e.message})"

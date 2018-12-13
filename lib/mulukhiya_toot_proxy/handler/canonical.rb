@@ -18,9 +18,7 @@ module MulukhiyaTootProxy
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
       response = HTTParty.get(uri.normalize, {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
+        headers: {'User-Agent' => Package.user_agent},
       })
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')

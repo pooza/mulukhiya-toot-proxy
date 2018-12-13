@@ -9,9 +9,7 @@ module MulukhiyaTootProxy
         response = HTTParty.get(uri.normalize, {
           follow_redirects: false,
           timeout: @config['/shortened_url/timeout'],
-          headers: {
-            'User-Agent' => Package.user_agent,
-          },
+          headers: {'User-Agent' => Package.user_agent},
         })
         location = response.headers['location']
         break unless location

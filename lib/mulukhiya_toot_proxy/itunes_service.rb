@@ -9,9 +9,7 @@ module MulukhiyaTootProxy
 
     def search(keyword, category)
       response = HTTParty.get(create_search_uri(keyword, category), {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
+        headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']
@@ -25,9 +23,7 @@ module MulukhiyaTootProxy
 
     def lookup(id)
       response = HTTParty.get(create_lookup_uri(id), {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
+        headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']
