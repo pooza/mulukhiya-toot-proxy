@@ -1,5 +1,5 @@
 package:
-  version: 2.0.0b3
+  version: 2.0.0rc1
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -57,7 +57,6 @@ nowplaying:
   artist_parser:
     delimiters:
       - '/'
-      - '・'
       - '、'
     prefixes:
       - 歌
