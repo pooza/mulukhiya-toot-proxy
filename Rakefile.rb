@@ -26,7 +26,7 @@ namespace :cert do
 end
 
 [:start, :stop, :restart].each do |action|
-  desc "#{action} API API server / Sidekiq"
+  desc "#{action} API server / Sidekiq"
   task action => ["server:#{action}", "sidekiq:#{action}"]
 end
 
