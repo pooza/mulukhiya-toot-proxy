@@ -7,9 +7,8 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      return false unless track = @service.search_track(keyword)
-      @tracks[keyword] = track
-      return true
+      return true if @tracks[keyword] = @service.search_track(keyword)
+      return false
     rescue
       return false
     end

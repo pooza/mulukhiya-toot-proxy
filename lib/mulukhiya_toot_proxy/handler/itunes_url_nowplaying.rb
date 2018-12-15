@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesUrlNowplayingHandler < NowplayingHandler
+  class ItunesURLNowplayingHandler < NowplayingHandler
     def initialize
       super
       @tracks = {}
@@ -7,8 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      return false unless uri = ItunesUri.parse(keyword)
-      return false unless uri.itunes?
+      return false unless uri = ItunesURI.parse(keyword)
       return false unless uri.track.present?
       @tracks[keyword] = uri.track
       return true
@@ -19,19 +18,15 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track['trackName'])
-      if @config['local']['nowplaying']['hashtag']
-        artists = []
-        track['artistName'].split(ItunesService.delimiters_pattern).each do |artist|
-          artists.concat(ArtistParser.new(artist).parse)
-        end
-        status.push(artists.uniq.compact.join(' '))
-      else
-        status.push(track['artistName'])
+      tags = []
+      track['artistName'].split(ItunesService.delimiters_pattern).each do |artist|
+        tags.concat(ArtistParser.new(artist).parse)
       end
-      return unless uri = @service.amazon_uri(track)
-      status.push(uri.to_s)
-      return unless uri = @service.spotify_uri(track)
-      status.push(uri.to_s)
+      status.push(tags.uniq.compact.join(' '))
+      [:amazon_uri, :spotify_uri].each do |method|
+        next unless uri = @service.send(method, track)
+        status.push(uri.to_s)
+      end
     end
   end
 end

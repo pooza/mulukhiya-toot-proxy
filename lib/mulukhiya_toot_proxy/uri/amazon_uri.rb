@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class AmazonUri < Addressable::URI
+  class AmazonURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance
@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     def shortenable?
       return false unless amazon?
       return false unless asin.present?
-      patterns.each do |entry|
+      @config['/amazon/patterns'].each do |entry|
         next unless path.match(Regexp.new(entry['pattern']))
         return entry['shortenable']
       end
@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
     end
 
     def asin
-      patterns.each do |entry|
+      @config['/amazon/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
@@ -62,12 +62,6 @@ module MulukhiyaTootProxy
       dest.query_values = nil
       dest.query_values = {tag: associate_tag} if associate_tag.present?
       return dest
-    end
-
-    private
-
-    def patterns
-      return @config['application']['amazon']['patterns']
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class SpotifyUri < Addressable::URI
+  class SpotifyURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance
@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def track_id
-      patterns.each do |entry|
+      @config['/spotify/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
     end
 
     def track
+      return nil unless spotify?
       return nil unless track_id.present?
       return @spotify.lookup_track(track_id)
     end
@@ -35,12 +36,6 @@ module MulukhiyaTootProxy
       return nil unless track_id.present?
       @image_uri ||= @spotify.image_uri(@spotify.lookup_track(track_id))
       return @image_uri
-    end
-
-    private
-
-    def patterns
-      return @config['application']['spotify']['patterns']
     end
   end
 end

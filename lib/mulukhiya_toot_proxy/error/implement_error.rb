@@ -1,4 +1,4 @@
 module MulukhiyaTootProxy
-  class ImprementError < Error
+  class ImplementError < Error
   end
 end

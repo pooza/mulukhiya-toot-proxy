@@ -9,14 +9,14 @@ module MulukhiyaTootProxy
       @logger = Logger.new
       @logger.info({
         message: 'starting...',
-        server: {port: @config['thin']['port']},
+        server: {port: @config['/thin/port']},
         version: Package.version,
       })
     end
 
     before do
       @logger.info({request: {path: request.path, params: @params}})
-      @renderer = JsonRenderer.new
+      @renderer = JSONRenderer.new
       @headers = request.env.select{ |k, v| k.start_with?('HTTP_')}
       if @headers['HTTP_AUTHORIZATION'] && (request.request_method == 'POST')
         @body = request.body.read.to_s
@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
           @params = params.clone
         end
         @mastodon = Mastodon.new(
-          (@config['local']['instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+          (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
           @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
         )
       end
@@ -53,7 +53,7 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(@params)
       @renderer.message = JSON.parse(r.to_s)
       @renderer.message['results'] = results.join(', ')
-      @renderer.message['tags'] = [] if @config['local']['nowplaying']['hashtag']
+      @renderer.message['tags'] = [] if @config['/nowplaying/hashtag']
 
       @renderer.status = r.code
       Slack.broadcast({params: @params, body: @body, headers: @headers}) if 400 <= r.code
@@ -64,7 +64,7 @@ module MulukhiyaTootProxy
     end
 
     not_found do
-      @renderer = JsonRenderer.new
+      @renderer = JSONRenderer.new
       @renderer.status = 404
       @renderer.message = NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
@@ -72,9 +72,10 @@ module MulukhiyaTootProxy
 
     error do |e|
       e = Error.create(e)
-      @renderer = JsonRenderer.new
+      @renderer = JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{ |k, v| k == :backtrace}
+      @renderer.message['error'] = e.message
       Slack.broadcast(e.to_h)
       @logger.error(e.to_h)
       return @renderer.to_s

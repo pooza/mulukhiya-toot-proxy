@@ -2,13 +2,9 @@ module MulukhiyaTootProxy
   class AmazonImageHandlerTest < Test::Unit::TestCase
     def test_exec
       config = Config.instance
-      return unless config['local']['amazon']
 
       handler = Handler.create('amazon_image')
-      handler.mastodon = Mastodon.new(
-        config['local']['instance_url'],
-        config['local']['test']['token'],
-      )
+      handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
 
       handler.exec({'status' => 'Amazon.co.jp | HUGっと!プリキュア オシマイダー Tシャツ ブラック XLサイズ | ホビー 通販 https://www.amazon.co.jp/dp/B07DB67ZR8'})
       assert_equal(handler.result, 'AmazonImageHandler,1')

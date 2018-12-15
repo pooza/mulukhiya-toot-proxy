@@ -2,17 +2,14 @@ require 'addressable/uri'
 require 'httparty'
 
 module MulukhiyaTootProxy
-  class ShortenedUrlHandler < UrlHandler
+  class ShortenedURLHandler < URLHandler
     def rewrite(link)
       uri = Addressable::URI.parse(link)
-      while domains.member?(uri.host)
+      while @config['/shortened_url/domains'].member?(uri.host)
         response = HTTParty.get(uri.normalize, {
           follow_redirects: false,
-          timeout: timeout,
-          headers: {
-            'User-Agent' => Package.user_agent,
-          },
-          ssl_ca_file: ENV['SSL_CERT_FILE'],
+          timeout: @config['/shortened_url/timeout'],
+          headers: {'User-Agent' => Package.user_agent},
         })
         location = response.headers['location']
         break unless location
@@ -24,15 +21,7 @@ module MulukhiyaTootProxy
     private
 
     def rewritable?(link)
-      return domains.member?(Addressable::URI.parse(link).host)
-    end
-
-    def timeout
-      return @config['application']['shortened_url']['timeout']
-    end
-
-    def domains
-      return @config['application']['shortened_url']['domains']
+      return @config['/shortened_url/domains'].member?(Addressable::URI.parse(link).host)
     end
   end
 end

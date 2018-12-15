@@ -4,47 +4,39 @@ require 'json'
 module MulukhiyaTootProxy
   class ItunesService
     def initialize
-      Config.validate('/local/itunes/country')
-      Config.validate('/local/itunes/lang')
       @config = Config.instance
     end
 
     def search(keyword, category)
       response = HTTParty.get(create_search_uri(keyword, category), {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
+        headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
     rescue RequestError => e
-      raise RequestError, "#{category} ’#{keyword}' が見つかりません。 (#{e.message})"
+      raise RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end
 
     def lookup(id)
       response = HTTParty.get(create_lookup_uri(id), {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
+        headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
       raise RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
     rescue RequestError => e
-      raise RequestError, "'#{id}' が見つかりません。 (#{e.message})"
+      raise RequestError, "'#{id}' not found (#{e.message})"
     rescue => e
       raise ExternalServiceError, e.message
     end
 
     def track_uri(track)
-      uri = ItunesUri.parse(track['collectionViewUrl'])
+      uri = ItunesURI.parse(track['collectionViewUrl'])
       return nil unless uri.absolute?
       return uri
     end
@@ -62,9 +54,7 @@ module MulukhiyaTootProxy
     end
 
     def self.delimiters_pattern
-      return Regexp.new(
-        "[#{Config.instance['application']['itunes']['artist']['delimiters'].join}]",
-      )
+      return Regexp.new("[#{Config.instance['/itunes/artist/delimiters'].join}]")
     end
 
     private
@@ -74,22 +64,22 @@ module MulukhiyaTootProxy
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesUri.parse(@config['application']['itunes']['urls']['search'])
+      uri = ItunesURI.parse(@config['/itunes/urls/search'])
       uri.query_values = {
         term: keyword,
         media: category,
-        country: @config['local']['itunes']['country'],
-        lang: @config['local']['itunes']['lang'],
+        country: @config['/itunes/country'],
+        lang: @config['/itunes/lang'],
       }
       return uri
     end
 
     def create_lookup_uri(id)
-      uri = ItunesUri.parse(@config['application']['itunes']['urls']['lookup'])
+      uri = ItunesURI.parse(@config['/itunes/urls/lookup'])
       uri.query_values = {
         id: id,
-        country: @config['local']['itunes']['country'],
-        lang: @config['local']['itunes']['lang'],
+        country: @config['/itunes/country'],
+        lang: @config['/itunes/lang'],
       }
       return uri
     end

@@ -1,18 +1,36 @@
 require 'httparty'
-require 'addressable/uri'
 require 'rest-client'
 require 'digest/sha1'
 require 'json'
 
 module MulukhiyaTootProxy
   class Mastodon
-    def initialize(uri, token)
-      @uri = Addressable::URI.parse(uri)
+    attr_reader :token
+
+    def initialize(uri, token = nil)
+      @uri = MastodonURI.parse(uri)
       @token = token
     end
 
+    def account_id
+      return account['id'].to_i
+    end
+
+    def account
+      raise ExternalServiceError, 'Invalid access token' unless @token
+      unless @account
+        rows = Postgres.instance.execute('token_owner', {token: @token})
+        @account = rows.first if rows.present?
+      end
+      return @account
+    end
+
+    def fetch_toot(id)
+      return fetch(create_uri("/api/v1/statuses/#{id}"))
+    end
+
     def toot(body)
-      return HTTParty.post(create_uri('/api/v1/statuses'), {
+      return HTTParty.post(create_uri, {
         body: body.to_json,
         headers: {
           'Content-Type' => 'application/json',
@@ -20,7 +38,6 @@ module MulukhiyaTootProxy
           'Authorization' => "Bearer #{@token}",
           'X-Mulukhiya' => Package.full_name,
         },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
     end
 
@@ -44,6 +61,11 @@ module MulukhiyaTootProxy
       File.unlink(path) if File.exist?(path)
     end
 
+    def growi
+      @growi ||= Growi.create({account_id: account_id})
+      return @growi
+    end
+
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').sub(/^_/, '').sub(/_$/, '')
     end
@@ -52,16 +74,13 @@ module MulukhiyaTootProxy
 
     def fetch(uri)
       return HTTParty.get(uri, {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
+        headers: {'User-Agent' => Package.user_agent},
       })
     rescue => e
-      raise ExternalServiceError, "外部ファイルが取得できません。 (#{e.message})"
+      raise ExternalServiceError, "Fetch error (#{e.message})"
     end
 
-    def create_uri(href)
+    def create_uri(href = '/api/v1/statuses')
       uri = @uri.clone
       uri.path = href
       return uri

@@ -1,0 +1,58 @@
+token_owner: >-
+  SELECT
+  accounts.id,
+  accounts.username,
+  accounts.display_name,
+  users.admin,
+  users.moderator,
+  accounts.locked
+  FROM oauth_access_tokens AS tokens
+  INNER JOIN users ON tokens.resource_owner_id=users.id
+  INNER JOIN accounts ON users.account_id=accounts.id
+  WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (users.disabled='f')
+  AND (tokens.token='<%= params[:token] %>');
+account: >-
+  SELECT
+  accounts.id,
+  accounts.username,
+  accounts.display_name,
+  users.admin,
+  users.moderator,
+  accounts.locked
+  FROM accounts
+  LEFT JOIN users ON accounts.id=users.account_id
+  WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (users.disabled='f')
+  AND (accounts.id='<%= params[:id] %>');
+notificatable_accounts: >-
+  SELECT
+  accounts.id
+  FROM accounts
+  LEFT JOIN users ON accounts.id=users.account_id
+  LEFT JOIN (
+  SELECT
+  account_id
+  FROM blocks
+  WHERE target_account_id='<%= params[:id] %>'
+  ) AS blockers ON accounts.id=blockers.account_id
+  LEFT JOIN (
+  SELECT
+  account_id
+  FROM mutes
+  WHERE target_account_id='<%= params[:id] %>'
+  ) AS muters ON accounts.id=muters.account_id
+  WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (blockers.account_id IS NULL)
+  AND (muters.account_id IS NULL)
+  AND (users.disabled='f')
+  <% if params[:pattern] %>
+  AND (accounts.username ~ '<%= params[:pattern] %>')
+  <% end %>
+  GROUP BY accounts.id;

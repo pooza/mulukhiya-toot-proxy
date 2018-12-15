@@ -1,0 +1,5 @@
+:pidfile: tmp/pids/sidekiq.pid
+:logfile: /dev/null
+:concurrency: 5
+:queues:
+  - default

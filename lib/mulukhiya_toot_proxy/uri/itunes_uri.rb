@@ -1,7 +1,9 @@
 require 'addressable/uri'
+require 'httparty'
+require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class ItunesUri < Addressable::URI
+  class ItunesURI < Addressable::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance
@@ -13,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def album_id
-      patterns.each do |entry|
+      @config['/itunes/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
           return matches[1]
         end
@@ -28,6 +30,7 @@ module MulukhiyaTootProxy
     end
 
     def track
+      return nil unless itunes?
       return nil unless track_id.present?
       return @service.lookup(track_id)
     end
@@ -36,20 +39,21 @@ module MulukhiyaTootProxy
       return nil unless itunes?
       return nil unless track_id.present?
       track = @service.lookup(track_id)
-      raise RequestError, "ID '#{track_id}' が見つかりません。" unless track
+      raise RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
-        [160, 100, 60, 30].each do |size|
-          @image_uri = Addressable::URI.parse(track["artworkUrl#{size}"])
-          break if @image_uri
+        response = HTTParty.get(track['trackViewUrl'], {
+          headers: {'User-Agent' => Package.user_agent},
+        })
+        body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
+        elements = body.xpath('//picture/source')
+        return nil unless elements.present?
+        elements.first.attribute('srcset').text.split(/,/).each do |uri|
+          next unless matches = uri.match(/^(.*) +3x$/)
+          @image_uri = Addressable::URI.parse(matches[1])
+          break if @image_uri&.absolute?
         end
       end
       return @image_uri
-    end
-
-    private
-
-    def patterns
-      return @config['application']['itunes']['patterns']
     end
   end
 end

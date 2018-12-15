@@ -10,14 +10,12 @@ module MulukhiyaTootProxy
       result = HTTParty.post(toot_url, {
         body: {status: 'a' * MAX_LENGTH, visibility: 'private'}.to_json,
         headers: headers,
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       assert_equal(200, result.code)
 
       result = HTTParty.post(toot_url, {
         body: {status: 'a' * (MAX_LENGTH + 1), visibility: 'private'}.to_json,
         headers: headers,
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
       })
       assert_equal(422, result.code) # 文字数オーバー
     end
@@ -25,7 +23,7 @@ module MulukhiyaTootProxy
     private
 
     def toot_url
-      url = Addressable::URI.parse(@config['local']['instance_url'])
+      url = Addressable::URI.parse(@config['/instance_url'])
       url.path = '/api/v1/statuses'
       return url
     end
@@ -33,7 +31,7 @@ module MulukhiyaTootProxy
     def headers
       return {
         'Content-Type' => 'application/json',
-        'Authorization' => "Bearer #{@config['local']['test']['token']}",
+        'Authorization' => "Bearer #{@config['/test/token']}",
         'User-Agent' => Package.user_agent,
       }
     end

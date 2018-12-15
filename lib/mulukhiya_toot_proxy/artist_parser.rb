@@ -2,10 +2,12 @@ module MulukhiyaTootProxy
   class ArtistParser
     def initialize(source)
       @source = source
+      @config = Config.instance
       @tags = []
     end
 
     def parse
+      return [@source] unless @config['/nowplaying/hashtag']
       dest = @source.sub(prefixes_pattern, '')
       cv_patterns do |pattern_entry|
         next unless matches = dest.match(pattern_entry[:pattern])
@@ -27,22 +29,18 @@ module MulukhiyaTootProxy
     end
 
     def self.delimiters_pattern
-      return Regexp.new(
-        "[#{Config.instance['application']['artist_parser']['delimiters'].join}]",
-      )
+      return Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
     end
 
     private
 
     def prefixes_pattern
-      return Regexp.new(
-        "^(#{Config.instance['application']['artist_parser']['prefixes'].join('|')}):",
-      )
+      return Regexp.new("^(#{@config['/nowplaying/artist_parser/prefixes'].join('|')}):")
     end
 
     def cv_patterns
       return enum_for(__method__) unless block_given?
-      Config.instance['application']['artist_parser']['cv_patterns'].each do |entry|
+      @config['/nowplaying/artist_parser/cv_patterns'].each do |entry|
         entry = {
           pattern: Regexp.new(entry['pattern']),
           items: entry['items'],

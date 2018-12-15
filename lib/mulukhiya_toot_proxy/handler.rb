@@ -8,7 +8,11 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise ImprementError, "#{__method__}が未定義です。"
+      raise ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def underscore_name
+      return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
     def result
@@ -22,8 +26,7 @@ module MulukhiyaTootProxy
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Config.validate('/local/handlers')
-      Config.instance['local']['handlers'].each do |handler|
+      Config.instance['/handlers'].each do |handler|
         yield create(handler)
       end
     end

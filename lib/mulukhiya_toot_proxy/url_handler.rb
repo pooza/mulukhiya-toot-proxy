@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class UrlHandler < Handler
+  class URLHandler < Handler
     def exec(body, headers = {})
       @status = body['status']
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     end
 
     def rewrite(link)
-      raise ImprementError, "#{__method__}が未定義です。"
+      raise ImplementError, "'#{__method__}' not implemented"
     end
 
     def rewritable?(link)

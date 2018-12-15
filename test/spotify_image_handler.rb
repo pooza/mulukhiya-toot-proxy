@@ -2,13 +2,9 @@ module MulukhiyaTootProxy
   class SpotifyImageHandlerTest < Test::Unit::TestCase
     def test_exec
       config = Config.instance
-      return unless config['local']['spotify']
 
       handler = Handler.create('spotify_image')
-      handler.mastodon = Mastodon.new(
-        config['local']['instance_url'],
-        config['local']['test']['token'],
-      )
+      handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
 
       handler.exec({'status' => 'https://open.spotify.com/track/1nRvy34z0NcTga59qOSYId'})
       assert_equal(handler.result, 'SpotifyImageHandler,1')

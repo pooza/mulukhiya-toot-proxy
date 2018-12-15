@@ -3,7 +3,7 @@ require 'httparty'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class CanonicalHandler < UrlHandler
+  class CanonicalHandler < URLHandler
     def initialize
       super
       @canonicals = {}
@@ -18,10 +18,7 @@ module MulukhiyaTootProxy
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
       response = HTTParty.get(uri.normalize, {
-        headers: {
-          'User-Agent' => Package.user_agent,
-        },
-        ssl_ca_file: ENV['SSL_CERT_FILE'],
+        headers: {'User-Agent' => Package.user_agent},
       })
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
