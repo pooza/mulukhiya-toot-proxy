@@ -13,7 +13,7 @@ GEM
       ruby-hmac (~> 0.3)
     ast (2.4.0)
     buftok (0.2.0)
-    concurrent-ruby (1.1.3)
+    concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
     crowi-client (0.1.4)
       json (~> 2.1)
