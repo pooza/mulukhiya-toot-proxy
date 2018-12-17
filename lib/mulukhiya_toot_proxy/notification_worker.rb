@@ -21,10 +21,10 @@ module MulukhiyaTootProxy
     end
 
     def create_message(params)
-      return [
-        "From: #{params[:account]['display_name']} (@#{params[:account]['username']})",
-        params[:status],
-      ].join("\n")
+      template = Template.new('notification')
+      template[:account] = params[:account]
+      template[:status] = params[:status]
+      return template.to_s
     end
 
     def db

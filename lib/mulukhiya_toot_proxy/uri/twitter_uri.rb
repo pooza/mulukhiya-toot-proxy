@@ -28,14 +28,11 @@ module MulukhiyaTootProxy
     def to_md
       tweet = service.lookup_tweet(tweet_id)
       raise ExternalServiceError, "Tweet '#{self}' not found" unless tweet
-      return [
-        '## アカウント',
-        "[@#{account_name}](https://twitter.com/#{account_name})",
-        '## 本文',
-        tweet.text,
-        '## URL',
-        to_s,
-      ].join("\n")
+      template = Template.new('tweet_clipping.md')
+      template[:account_name] = account_name
+      template[:status] = tweet.text
+      template[:url] = to_s
+      return template.to_s
     end
 
     def service

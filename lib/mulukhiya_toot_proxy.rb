@@ -35,6 +35,7 @@ module MulukhiyaTootProxy
   autoload :SidekiqHandler
   autoload :Slack
   autoload :SpotifyService
+  autoload :Template
   autoload :TwitterService
   autoload :URLHandler
   autoload :UserConfigStorage
