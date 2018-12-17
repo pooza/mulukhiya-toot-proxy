@@ -17,14 +17,12 @@ module MulukhiyaTootProxy
       toot = service.fetch_toot(toot_id)
       raise ExternalServiceError, "Toot '#{self}' not found" unless toot
       account = toot['account']
-      body = ['## アカウント', "[#{account['display_name']}](#{account['url']})"]
-      body.concat(['## 本文', html2md(toot['content'])]) if toot['content'].present?
-      if toot['media_attachments'].present?
-        body.push('## メディア')
-        body.concat(toot['media_attachments'].map{ |attachment| "- #{attachment['url']}"})
-      end
-      body.concat(['## URL', toot['url']])
-      return body.join("\n")
+      template = Template.new('toot_clipping.md')
+      template[:account] = account
+      template[:status] = html2md(toot['content'])
+      template[:attachments] = toot['media_attachments']
+      template[:url] = toot['url']
+      return template.to_s
     end
 
     def service

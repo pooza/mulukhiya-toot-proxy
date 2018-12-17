@@ -1,0 +1,18 @@
+<%# encoding: UTF-8 -%>
+## アカウント
+[@<%= @params[:account][:display_name] %>](<%= @params[:account][:url] %>)
+<% if @params[:status] -%>
+
+## 本文
+<%= @params[:status] %>
+<% end -%>
+<% if @params[:attachments].present? -%>
+
+## メディア
+<% @params[:attachments].each do |attachment| -%>
+- <%= attachment[:url] %>
+<% end -%>
+<% end -%>
+
+## URL
+<%= @params[:url] %>
