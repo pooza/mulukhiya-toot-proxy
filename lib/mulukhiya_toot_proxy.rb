@@ -31,6 +31,7 @@ module MulukhiyaTootProxy
   autoload :Postgres
   autoload :Redis
   autoload :Renderer
+  autoload :ReverseMarkdown
   autoload :Server
   autoload :SidekiqHandler
   autoload :Slack

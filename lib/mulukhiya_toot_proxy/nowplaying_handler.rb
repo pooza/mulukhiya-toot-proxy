@@ -1,5 +1,10 @@
 module MulukhiyaTootProxy
   class NowplayingHandler < Handler
+    def initialize
+      super
+      @tags = []
+    end
+
     def exec(body, headers = {})
       status = []
       updated = false
