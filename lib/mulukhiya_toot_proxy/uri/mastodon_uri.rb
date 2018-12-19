@@ -1,6 +1,4 @@
-require 'zlib'
 require 'addressable/uri'
-require 'reverse_markdown'
 
 module MulukhiyaTootProxy
   class MastodonURI < Addressable::URI
@@ -19,7 +17,7 @@ module MulukhiyaTootProxy
       account = toot['account']
       template = Template.new('toot_clipping.md')
       template[:account] = account
-      template[:status] = html2md(toot['content'])
+      template[:status] = ReverseMarkdown.convert(toot['content'])
       template[:attachments] = toot['media_attachments']
       template[:url] = toot['url']
       return template.to_s
@@ -34,16 +32,6 @@ module MulukhiyaTootProxy
         @service = Mastodon.new(uri)
       end
       return @service
-    end
-
-    private
-
-    def html2md(text)
-      text = ReverseMarkdown.convert(text)
-      text.gsub!(/```.*?```/m) do |block|
-        block.gsub('\_', '_').gsub('\*', '*').gsub('\<', '<').gsub('\>', '>')
-      end
-      return text
     end
   end
 end
