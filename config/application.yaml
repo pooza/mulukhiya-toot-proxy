@@ -1,5 +1,5 @@
 package:
-  version: 2.0.2
+  version: 2.0.3
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -14,6 +14,10 @@ shortened_url:
     - git.io
     - spoti.fi
     - apple.co
+mastodon:
+  patterns:
+    - pattern: ^/web/statuses/([[:digit:]]+)
+    - pattern: ^/@[[:word:]]+/([[:digit:]]+)
 amazon:
   country: jp
   urls:

@@ -3,8 +3,12 @@ require 'addressable/uri'
 module MulukhiyaTootProxy
   class MastodonURI < Addressable::URI
     def toot_id
-      return nil unless matches = path.match(%r{/web/statuses/([[:digit:]]+)})
-      return matches[1].to_i
+      config = Config.instance
+      config['/mastodon/patterns'].each do |pattern|
+        next unless matches = path.match(Regexp.new(pattern['pattern']))
+        return matches[1].to_i
+      end
+      return nil
     end
 
     def clip(params)
