@@ -10,7 +10,11 @@
 
 ## メディア
 <% @params[:attachments].each do |attachment| -%>
+<% if attachment[:type] == 'image' -%>
 - ![<%= File.basename(Addressable::URI.parse(attachment[:url]).path) %>](<%= attachment[:url] %>)
+<% else -%>
+- <%= attachment[:url] %>
+<% end -%>
 <% end -%>
 <% end -%>
 
