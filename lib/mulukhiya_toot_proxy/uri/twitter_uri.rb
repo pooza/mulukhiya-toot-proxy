@@ -33,6 +33,8 @@ module MulukhiyaTootProxy
       template[:status] = tweet.text
       template[:url] = to_s
       return template.to_s
+    rescue Twitter::Error::NotFound => e
+      raise ExternalServiceError, "Tweet '#{self}' not found"
     end
 
     def service
