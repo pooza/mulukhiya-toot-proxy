@@ -4,8 +4,8 @@ module MulukhiyaTootProxy
       @status = body['status']
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         next unless rewritable?(link)
-        increment!
         rewrite(link)
+        increment!
       end
       return body
     end
