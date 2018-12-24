@@ -3,7 +3,9 @@ require 'crowi-client'
 module MulukhiyaTootProxy
   class Growi < CrowiClient
     def push(body)
-      request(CPApiRequestPagesCreate.new(body))
+      res = request(CPApiRequestPagesCreate.new(body))
+      raise RequestError, res.msg if res.is_a?(CPInvalidRequest)
+      return res
     end
 
     def self.create(params)
@@ -14,16 +16,6 @@ module MulukhiyaTootProxy
       })
     rescue
       raise ExternalServiceError, 'GROWI not found'
-    end
-
-    def self.create_path(username)
-      return File.join(
-        '/',
-        Package.short_name,
-        'user',
-        username,
-        Time.now.strftime('%Y/%m/%d/%H%M%S'),
-      )
     end
   end
 end
