@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def valid?
-      return twitter?
+      return itunes?
     end
 
     def album_id
