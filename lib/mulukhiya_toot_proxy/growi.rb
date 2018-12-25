@@ -17,5 +17,15 @@ module MulukhiyaTootProxy
     rescue
       raise ExternalServiceError, 'GROWI not found'
     end
+
+    def self.create_path(username)
+      return File.join(
+        '/',
+        Package.short_name,
+        'user',
+        username,
+        Time.now.strftime('%Y/%m/%d/%H%M%S'),
+      )
+    end
   end
 end

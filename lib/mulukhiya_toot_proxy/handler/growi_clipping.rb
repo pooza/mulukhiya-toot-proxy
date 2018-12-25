@@ -2,7 +2,14 @@ module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
       return unless body['status'] =~ /#growi/i
-      res = mastodon.growi.push({body: body['status']})
+      begin
+        res = mastodon.growi.push({body: body['status']})
+      rescue RequestError
+        res = mastodon.growi.push({
+          body: body['status'],
+          path: Growi.create_path(mastodon.account['username']),
+        })
+      end
       body['status'] += "\n#{create_uri(res.data.path)}"
       increment!
     end
