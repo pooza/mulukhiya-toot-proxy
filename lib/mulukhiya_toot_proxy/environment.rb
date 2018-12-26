@@ -3,19 +3,23 @@ require 'socket'
 module MulukhiyaTootProxy
   class Environment
     def self.name
-      return File.basename(ROOT_DIR)
+      return File.basename(dir)
     end
 
     def self.hostname
       return Socket.gethostname
     end
 
+    def self.dir
+      return File.expand_path('../..', __dir__)
+    end
+
     def self.ip_address
       udp = UDPSocket.new
       udp.connect('128.0.0.0', 7)
-      addr = Socket.unpack_sockaddr_in(udp.getsockname)[1]
+      return Socket.unpack_sockaddr_in(udp.getsockname)[1]
+    ensure
       udp.close
-      return addr
     end
 
     def self.platform
@@ -24,15 +28,17 @@ module MulukhiyaTootProxy
     end
 
     def self.cron?
-      return ENV.member?('CRON') && (ENV['CRON'] != '')
+      return ENV['CRON'].present?
+    rescue
+      return false
     end
 
     def self.uid
-      return File.stat(ROOT_DIR).uid
+      return File.stat(dir).uid
     end
 
     def self.gid
-      return File.stat(ROOT_DIR).gid
+      return File.stat(dir).gid
     end
   end
 end
