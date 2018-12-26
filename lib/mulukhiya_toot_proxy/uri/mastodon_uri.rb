@@ -15,10 +15,6 @@ module MulukhiyaTootProxy
       return toot_id
     end
 
-    def valid?
-      return absolute?
-    end
-
     def clip(params)
       params[:growi].push({path: params[:path], body: to_md})
     end

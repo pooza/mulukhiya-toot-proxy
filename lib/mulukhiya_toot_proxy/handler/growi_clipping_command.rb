@@ -1,9 +1,8 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandler < CommandHandler
     def dispatch(values)
-      create_uris(values).each do |uri|
-        next unless uri.valid?
-        raise RequestError, "#{uri.class}: Invalid user ID" unless uri.id.present?
+      create_uris(values) do |uri|
+        next unless uri && uri.id.present?
         begin
           uri.clip({growi: mastodon.growi})
         rescue RequestError
@@ -18,10 +17,8 @@ module MulukhiyaTootProxy
     def create_uris(values)
       values['uri'] ||= values['url']
       raise RequestError, 'Empty URL' unless values['uri'].present?
-      return [
-        TwitterURI.parse(values['uri']),
-        MastodonURI.parse(values['uri']),
-      ].compact
+      yield TwitterURI.parse(values['uri'])
+      yield MastodonURI.parse(values['uri'])
     end
   end
 end

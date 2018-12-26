@@ -11,11 +11,8 @@ module MulukhiyaTootProxy
       return host == 'twitter.com'
     end
 
-    def valid?
-      return twitter?
-    end
-
     def tweet_id
+      return nil unless twitter?
       return nil unless matches = path.match(Regexp.new(@config['/twitter/patterns/tweet']))
       return matches[2].to_i
     end
