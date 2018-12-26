@@ -21,6 +21,10 @@ module MulukhiyaTootProxy
       return absolute? && host.split('.').member?('amazon')
     end
 
+    def valid?
+      return amazon?
+    end
+
     def asin
       @config['/amazon/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
@@ -32,6 +36,10 @@ module MulukhiyaTootProxy
 
     def asin=(id)
       self.path = "/dp/#{id}"
+    end
+
+    def id
+      return asin
     end
 
     def associate_tag

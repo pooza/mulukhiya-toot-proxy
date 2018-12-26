@@ -14,6 +14,10 @@ module MulukhiyaTootProxy
       return absolute? && host == 'itunes.apple.com'
     end
 
+    def valid?
+      return itunes?
+    end
+
     def album_id
       @config['/itunes/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
@@ -27,6 +31,10 @@ module MulukhiyaTootProxy
       return query_values['i']
     rescue NoMethodError
       return nil
+    end
+
+    def id
+      return track_id
     end
 
     def track

@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/crowi-client.git
-  revision: f21c3528ef24dc4d5040b79fc7a1bff4bdeaf53a
+  revision: 8a21ff404f4d6a61e808f06a04f1f7898a9bd0f0
   specs:
-    crowi-client (0.1.4)
+    crowi-client (0.1.4.1)
       json (~> 2.1)
       rest-client (~> 2.0)
 
@@ -83,7 +83,7 @@ GEM
     powerpack (0.1.2)
     public_suffix (3.0.3)
     rack (2.0.6)
-    rack-protection (2.0.4)
+    rack-protection (2.0.5)
       rack
     rainbow (3.0.0)
     rake (12.3.2)
@@ -112,10 +112,10 @@ GEM
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
     simple_oauth (0.3.1)
-    sinatra (2.0.4)
+    sinatra (2.0.5)
       mustermann (~> 1.0)
       rack (~> 2.0)
-      rack-protection (= 2.0.4)
+      rack-protection (= 2.0.5)
       tilt (~> 2.0)
     syslog-logger (1.6.8)
     test-unit (3.2.9)

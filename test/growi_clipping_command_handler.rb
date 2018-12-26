@@ -9,11 +9,15 @@ module MulukhiyaTootProxy
     def test_exec
       @handler.exec({'status' => ''})
       assert_equal(@handler.result, 'GrowiClippingCommandHandler,0')
+      sleep(1)
 
       @handler.exec({'status' => "command: growi_clipping\nurl: https://mstdn.b-shock.org/web/statuses/101125535795976504"})
       assert_equal(@handler.result, 'GrowiClippingCommandHandler,1')
+      sleep(1)
+
       @handler.exec({'status' => "command: growi_clipping\nurl: https://precure.ml/@pooza/101276312982799462"})
       assert_equal(@handler.result, 'GrowiClippingCommandHandler,2')
+      sleep(1)
     end
   end
 end
