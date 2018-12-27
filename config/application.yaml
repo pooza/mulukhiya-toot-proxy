@@ -70,6 +70,7 @@ nowplaying:
         items:
           - split: true
           - strip: true
+            split: true
             prefix: 'CV:'
       - pattern: '^(.+)\s*\(as\s*(.+)\)$'
         items:
