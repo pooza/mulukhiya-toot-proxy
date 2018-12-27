@@ -17,10 +17,6 @@ module MulukhiyaTootProxy
       assert_true(@mastodon.account.is_a?(Hash))
     end
 
-    def test_growi
-      assert_true(@mastodon.growi.is_a?(Growi))
-    end
-
     def test_create_tag
       assert_equal(Mastodon.create_tag('宮本佳那子'), '#宮本佳那子')
       assert_equal(Mastodon.create_tag('宮本 佳那子'), '#宮本_佳那子')

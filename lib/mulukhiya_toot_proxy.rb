@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
   autoload :Config
   autoload :Environment
   autoload :Error
-  autoload :Growi
+  autoload :GrowiClipper
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService

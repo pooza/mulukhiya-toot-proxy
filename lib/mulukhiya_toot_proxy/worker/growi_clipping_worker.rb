@@ -4,10 +4,11 @@ module MulukhiyaTootProxy
 
     def perform(params)
       return unless uri = params['uri']['class'].constantize.parse(params['uri']['href'])
-      return unless growi = Growi.create({account_id: params['account']})
-      uri.clip({growi: growi})
-    rescue RequestError
-      uri.clip({growi: growi, path: Growi.create_path(params['account'])})
+      return unless clipper = GrowiClipper.create({account_id: params['account']['id']})
+      clipper.clip({
+        body: uri.to_md,
+        path: GrowiClipper.create_path(params['account']['username']),
+      })
     end
   end
 end

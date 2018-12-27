@@ -26,10 +26,6 @@ module MulukhiyaTootProxy
       return matches[1]
     end
 
-    def clip(params)
-      params[:growi].push({path: params[:path], body: to_md})
-    end
-
     def to_md
       tweet = service.lookup_tweet(tweet_id)
       raise ExternalServiceError, "Tweet '#{self}' not found" unless tweet
