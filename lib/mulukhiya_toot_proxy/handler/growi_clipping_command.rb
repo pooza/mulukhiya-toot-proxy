@@ -1,27 +1,27 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandler < CommandHandler
+    def initialize
+      super
+      Sidekiq.configure_client do |config|
+        config.redis = {url: @config['/sidekiq/redis/dsn']}
+      end
+    end
+
     def dispatch(values)
-      create_uris(values).each do |uri|
-        next unless uri.valid?
-        raise RequestError, "#{uri.class}: Invalid user ID" unless uri.id.present?
-        begin
-          uri.clip({growi: mastodon.growi})
-        rescue RequestError
-          uri.clip({
-            growi: mastodon.growi,
-            path: Growi.create_path(mastodon.account['username']),
-          })
-        end
+      create_uris(values) do |uri|
+        next unless uri&.id
+        GrowiClippingWorker.perform_async({
+          uri: {href: uri.to_s, class: uri.class.to_s},
+          account: mastodon.account_id,
+        })
       end
     end
 
     def create_uris(values)
       values['uri'] ||= values['url']
       raise RequestError, 'Empty URL' unless values['uri'].present?
-      return [
-        TwitterURI.parse(values['uri']),
-        MastodonURI.parse(values['uri']),
-      ].compact
+      yield TwitterURI.parse(values['uri'])
+      yield MastodonURI.parse(values['uri'])
     end
   end
 end

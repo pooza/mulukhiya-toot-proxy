@@ -3,7 +3,7 @@ require 'erb'
 module MulukhiyaTootProxy
   class Template
     def initialize(name)
-      @path = File.join(ROOT_DIR, 'views', "#{name}.erb")
+      @path = File.join(Environment.dir, 'views', "#{name}.erb")
       @erb = ERB.new(File.read(@path), nil, '-')
       @params = {}.with_indifferent_access
     end

@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
       return [
         File.join('/etc', Package.name),
         File.join('/usr/local/etc', Package.name),
-        File.join(ROOT_DIR, 'config'),
+        File.join(Environment.dir, 'config'),
       ]
     end
 
