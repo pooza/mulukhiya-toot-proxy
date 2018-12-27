@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
     def create_uri(path)
       uri = MastodonURI.parse(UserConfigStorage.new[mastodon.account_id]['growi']['url'])
       uri.path = path
-      return nil unless @uri.absolute?
+      return nil unless uri.absolute?
       return uri
     rescue
       return nil
