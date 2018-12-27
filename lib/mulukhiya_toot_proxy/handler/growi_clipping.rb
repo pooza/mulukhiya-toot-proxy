@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       rescue ExternalServiceError
         res = mastodon.growi.clip({
           body: body['status'],
-          path: Growi.create_path(mastodon.account['username']),
+          path: GrowiClipper.create_path(mastodon.account['username']),
         })
       end
       body['status'] += "\n#{create_uri(res.data.path)}"

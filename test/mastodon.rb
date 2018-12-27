@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def test_growi
-      assert_true(@mastodon.growi.is_a?(Growi))
+      assert_true(@mastodon.growi.is_a?(GrowiClipper))
     end
 
     def test_create_tag

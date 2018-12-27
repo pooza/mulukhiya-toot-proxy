@@ -1,7 +1,7 @@
 require 'crowi-client'
 
 module MulukhiyaTootProxy
-  class Growi < CrowiClient
+  class GrowiClipper < CrowiClient
     def clip(params)
       params = {body: params} unless params.is_a?(Hash)
       res = request(CPApiRequestPagesCreate.new(params))
@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
 
     def self.create(params)
       values = UserConfigStorage.new[params[:account_id]]
-      return Growi.new({
+      return GrowiClipper.new({
         crowi_url: values['growi']['url'],
         access_token: values['growi']['token'],
       })

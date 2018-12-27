@@ -62,7 +62,7 @@ module MulukhiyaTootProxy
     end
 
     def growi
-      @growi ||= Growi.create({account_id: account_id})
+      @growi ||= GrowiClipper.create({account_id: account_id})
       return @growi
     end
 
