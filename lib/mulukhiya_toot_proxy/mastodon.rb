@@ -61,11 +61,6 @@ module MulukhiyaTootProxy
       File.unlink(path) if File.exist?(path)
     end
 
-    def growi
-      @growi ||= GrowiClipper.create({account_id: account_id})
-      return @growi
-    end
-
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').sub(/^_/, '').sub(/_$/, '')
     end

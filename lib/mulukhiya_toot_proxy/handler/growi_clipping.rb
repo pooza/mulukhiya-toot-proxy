@@ -2,10 +2,11 @@ module MulukhiyaTootProxy
   class GrowiClippingHandler < Handler
     def exec(body, headers = {})
       return unless body['status'] =~ /#growi/i
+      clipper = GrowiClipper.create({account_id: mastodon.account_id})
       begin
-        res = mastodon.growi.clip(body['status'])
+        res = clipper.clip(body['status'])
       rescue ExternalServiceError
-        res = mastodon.growi.clip({
+        res = clipper.clip({
           body: body['status'],
           path: GrowiClipper.create_path(mastodon.account['username']),
         })
