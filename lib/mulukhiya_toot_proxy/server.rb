@@ -53,9 +53,11 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(@params)
       @renderer.message = JSON.parse(r.to_s)
       @renderer.message['results'] = results.join(', ')
-      @renderer.message['tags'].delete_if do |v|
-        v['name'] !~ /^\w+$/
-      end if @config['/nowplaying/hashtag']
+      if @config['/nowplaying/hashtag']
+        @renderer.message['tags'].delete_if do |v|
+          v['name'] !~ /^\w+$/
+        end
+      end
 
       @renderer.status = r.code
       Slack.broadcast({params: @params, body: @body, headers: @headers}) if 400 <= r.code
