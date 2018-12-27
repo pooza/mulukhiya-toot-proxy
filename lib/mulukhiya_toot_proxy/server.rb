@@ -53,10 +53,8 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(@params)
       @renderer.message = JSON.parse(r.to_s)
       @renderer.message['results'] = results.join(', ')
-      if @config['/nowplaying/hashtag']
-        @renderer.message['tags'].delete_if do |v|
-          v['name'] !~ /^\w+$/
-        end
+      if @config['/nowplaying/hashtag'] && @renderer.message['tags'].present?
+        @renderer.message['tags'].delete_if{ |v| v['name'] !~ /^\w+$/}
       end
 
       @renderer.status = r.code
