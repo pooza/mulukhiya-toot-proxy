@@ -1,9 +1,17 @@
 module MulukhiyaTootProxy
   class GrowiTest < Test::Unit::TestCase
-    def test_create
+    def setup
       config = Config.instance
       mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
-      assert_true(Growi.create({account_id: mastodon.account_id}).is_a?(Growi))
+      @clipper = Growi.create({account_id: mastodon.account_id})
+    end
+
+    def test_create
+      assert_true(@clipper.is_a?(Growi))
+    end
+
+    def test_clip
+      assert_true(@clipper.clip("#{Time.now} #{__method__}").is_a?(CPApiReturn))
     end
   end
 end
