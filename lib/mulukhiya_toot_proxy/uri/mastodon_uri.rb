@@ -15,10 +15,6 @@ module MulukhiyaTootProxy
       return toot_id
     end
 
-    def clip(params)
-      params[:growi].push({path: params[:path], body: to_md})
-    end
-
     def to_md
       toot = service.fetch_toot(toot_id)
       raise ExternalServiceError, "Toot '#{self}' not found" unless toot

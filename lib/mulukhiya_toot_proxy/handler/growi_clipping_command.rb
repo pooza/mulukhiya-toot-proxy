@@ -12,10 +12,12 @@ module MulukhiyaTootProxy
         next unless uri&.id
         GrowiClippingWorker.perform_async({
           uri: {href: uri.to_s, class: uri.class.to_s},
-          account: mastodon.account_id,
+          account: {id: mastodon.account['id'], username: mastodon.account['username']},
         })
       end
     end
+
+    private
 
     def create_uris(values)
       values['uri'] ||= values['url']

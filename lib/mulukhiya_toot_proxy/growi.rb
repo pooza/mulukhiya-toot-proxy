@@ -2,9 +2,10 @@ require 'crowi-client'
 
 module MulukhiyaTootProxy
   class Growi < CrowiClient
-    def push(body)
-      res = request(CPApiRequestPagesCreate.new(body))
-      raise RequestError, res.msg if res.is_a?(CPInvalidRequest)
+    def clip(params)
+      params = {body: params} unless params.is_a?(Hash)
+      res = request(CPApiRequestPagesCreate.new(params))
+      raise ExternalServiceError, res.msg if res.is_a?(CPInvalidRequest)
       return res
     end
 
