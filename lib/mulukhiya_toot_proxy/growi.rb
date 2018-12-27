@@ -8,6 +8,10 @@ module MulukhiyaTootProxy
       return res
     end
 
+    def to_h
+      return {url: @crowi_url, token: @access_token}
+    end
+
     def self.create(params)
       values = UserConfigStorage.new[params[:account_id]]
       return Growi.new({

@@ -1,16 +1,20 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandler < CommandHandler
+    def initialize
+      super
+      Sidekiq.configure_client do |config|
+        config.redis = {url: @config['/sidekiq/redis/dsn']}
+      end
+    end
+
     def dispatch(values)
       create_uris(values) do |uri|
-        next unless uri && uri.id.present?
-        begin
-          uri.clip({growi: mastodon.growi})
-        rescue RequestError
-          uri.clip({
-            growi: mastodon.growi,
-            path: Growi.create_path(mastodon.account['username']),
-          })
-        end
+        next unless uri&.id
+        GrowiClippingWorker.perform_async({
+          uri: {href: uri.to_s, class: uri.class.to_s},
+          growi: mastodon.growi.to_h,
+          account: mastodon.account['username'],
+        })
       end
     end
 
