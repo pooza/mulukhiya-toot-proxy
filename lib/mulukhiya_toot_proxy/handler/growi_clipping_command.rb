@@ -12,8 +12,7 @@ module MulukhiyaTootProxy
         next unless uri&.id
         GrowiClippingWorker.perform_async({
           uri: {href: uri.to_s, class: uri.class.to_s},
-          growi: mastodon.growi.to_h,
-          account: mastodon.account['username'],
+          account: mastodon.account_id,
         })
       end
     end
