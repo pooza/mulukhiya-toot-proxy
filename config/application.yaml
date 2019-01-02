@@ -1,5 +1,5 @@
 package:
-  version: 2.0.7
+  version: 2.0.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -53,9 +53,6 @@ itunes:
     lookup: https://itunes.apple.com/lookup
   patterns:
     - pattern: ([[:digit:]]+)$
-  artist:
-    delimiters:
-      - '、'
 nowplaying:
   hashtag: false
   artist_parser:
@@ -72,6 +69,12 @@ nowplaying:
           - strip: true
             split: true
             prefix: 'CV:'
+      - pattern: '^(.+)\s*コーラス:(.+)$'
+        items:
+          - split: true
+          - strip: true
+            split: true
+            prefix: 'コーラス:'
       - pattern: '^(.+)\s*\(as\s*(.+)\)$'
         items:
           - strip: true
