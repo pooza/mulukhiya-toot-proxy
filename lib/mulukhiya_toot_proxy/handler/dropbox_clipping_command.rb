@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class GrowiClippingCommandHandler < CommandHandler
+  class DropboxClippingCommandHandler < CommandHandler
     def initialize
       super
       Sidekiq.configure_client do |config|
@@ -10,9 +10,9 @@ module MulukhiyaTootProxy
     def dispatch(values)
       create_uris(values) do |uri|
         next unless uri&.id
-        GrowiClippingWorker.perform_async({
+        DropboxClippingWorker.perform_async({
           uri: {href: uri.to_s, class: uri.class.to_s},
-          account: {id: mastodon.account_id, username: mastodon.account['username']},
+          account: {id: mastodon.account_id},
         })
       end
     end

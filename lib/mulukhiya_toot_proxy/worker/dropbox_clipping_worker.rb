@@ -1,13 +1,10 @@
 module MulukhiyaTootProxy
-  class GrowiClippingWorker
+  class DropboxClippingWorker
     include Sidekiq::Worker
 
     def perform(params)
-      return unless clipper = GrowiClipper.create({account_id: params['account']['id']})
-      clipper.clip({
-        body: create_body(params),
-        path: GrowiClipper.create_path(params['account']['username']),
-      })
+      return unless clipper = DropboxClipper.create({account_id: params['account']['id']})
+      clipper.clip({body: create_body(params)})
     end
 
     def create_body(params)

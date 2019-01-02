@@ -8,44 +8,49 @@ module MulukhiyaTootProxy
 
     def parse
       return [@source] unless @config['/nowplaying/hashtag']
-      dest = @source.sub(prefixes_pattern, '')
       cv_patterns do |pattern_entry|
-        next unless matches = dest.match(pattern_entry[:pattern])
-        i = 1
-        pattern_entry[:items].each do |item|
-          split_artist(matches[i], item['split']).each do |tag|
-            @tags.push(create_tag(tag, item['strip'], item['prefix']))
+        next unless matches = @source.match(pattern_entry[:pattern])
+        if pattern_entry[:delimited]
+          split_artist(@source, true).each do |artist|
+            cv_patterns do |inner_pattern_entry|
+              next unless matches = artist.match(inner_pattern_entry[:pattern])
+              parse_part(matches, inner_pattern_entry[:items])
+              break
+            end
           end
-          i += 1
+        else
+          parse_part(matches, pattern_entry[:items])
         end
         break
       end
       @tags.uniq!
       @tags.compact!
       return @tags if @tags.present?
-      return [Mastodon.create_tag(dest)]
-    rescue
       return [Mastodon.create_tag(@source)]
-    end
-
-    def self.delimiters_pattern
-      return Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
     end
 
     private
 
-    def prefixes_pattern
-      return Regexp.new("^(#{@config['/nowplaying/artist_parser/prefixes'].join('|')}):")
+    def parse_part(source, items)
+      i = 0
+      items.each do |item|
+        i += 1
+        next if item['drop']
+        split_artist(source[i], item['split']).each do |tag|
+          @tags.push(create_tag(tag, item['strip'], item['prefix']))
+        end
+      end
     end
 
     def cv_patterns
       return enum_for(__method__) unless block_given?
       @config['/nowplaying/artist_parser/cv_patterns'].each do |entry|
-        entry = {
+        output = {
           pattern: Regexp.new(entry['pattern']),
-          items: entry['items'],
+          delimited: entry['delimited'],
         }
-        yield entry
+        output[:items] = entry['items'] || []
+        yield output
       end
     end
 
@@ -57,8 +62,8 @@ module MulukhiyaTootProxy
     end
 
     def split_artist(artist, flag)
-      return artist.split(ArtistParser.delimiters_pattern) if flag
-      return [artist]
+      pattern = Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
+      return flag ? artist.split(pattern) : [artist]
     end
   end
 end

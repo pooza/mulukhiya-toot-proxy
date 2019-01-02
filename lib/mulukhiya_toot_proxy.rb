@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
   autoload :ArtistParser
   autoload :CommandHandler
   autoload :Config
+  autoload :DropboxClipper
   autoload :Environment
   autoload :Error
   autoload :GrowiClipper
@@ -70,6 +71,7 @@ module MulukhiyaTootProxy
 
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
+    autoload :DropboxClippingWorker
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
   end
