@@ -58,6 +58,8 @@ module MulukhiyaTootProxy
       return @image_uri
     end
 
+    alias image_url image_uri
+
     def shorten
       return self unless shortenable?
       dest = clone

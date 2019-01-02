@@ -41,5 +41,7 @@ module MulukhiyaTootProxy
       @image_uri ||= @spotify.image_uri(@spotify.lookup_track(track_id))
       return @image_uri
     end
+
+    alias image_url image_uri
   end
 end

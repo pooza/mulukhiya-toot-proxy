@@ -59,5 +59,7 @@ module MulukhiyaTootProxy
       end
       return @image_uri
     end
+
+    alias image_url image_uri
   end
 end
