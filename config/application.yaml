@@ -1,5 +1,5 @@
 package:
-  version: 2.0.8
+  version: 2.0.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -59,17 +59,18 @@ nowplaying:
     delimiters:
       - '/'
       - '、'
-    prefixes:
-      - 歌
-      - 語り
     cv_patterns:
-      - pattern: '^(.+)\s*\(CV[.:]\s*(.+)\)$'
+      - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
+        delimited: true
+      - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
         items:
+          - drop: true
+          - drop: true
           - split: true
           - strip: true
             split: true
             prefix: 'CV:'
-      - pattern: '^(.+)\s*コーラス:(.+)$'
+      - pattern: '^歌:(.+)\s*コーラス:(.+)$'
         items:
           - split: true
           - strip: true
