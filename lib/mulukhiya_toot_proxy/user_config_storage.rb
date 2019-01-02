@@ -3,17 +3,13 @@ require 'json'
 module MulukhiyaTootProxy
   class UserConfigStorage < Redis
     def [](key)
-      return get(key)
-    end
-
-    def []=(key, value)
-      set(key, value)
+      value = get(key)
+      return {} if value.nil?
+      return Config.flatten('', JSON.parse(value))
     end
 
     def get(key)
-      value = super(create_key(key))
-      value = JSON.parse(value) unless value.nil?
-      return value || {}
+      return super(create_key(key))
     end
 
     def set(key, values)
@@ -27,7 +23,7 @@ module MulukhiyaTootProxy
     end
 
     def update(key, values)
-      set(key, get(key).update(values).compact)
+      set(key, JSON.parse(get(key)).update(values).compact)
     end
 
     def create_key(key)
