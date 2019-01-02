@@ -53,10 +53,6 @@ module MulukhiyaTootProxy
       return spotify.track_uri(track)
     end
 
-    def self.delimiters_pattern
-      return Regexp.new("[#{Config.instance['/itunes/artist/delimiters'].join}]")
-    end
-
     private
 
     def create_keyword(track)

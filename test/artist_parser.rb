@@ -24,6 +24,9 @@ module MulukhiyaTootProxy
 
       parser = ArtistParser.new('ハピネスチャージプリキュア!(CV:中島 愛、潘 めぐみ、北川里奈、戸松 遥)')
       assert_equal(parser.parse, ['#ハピネスチャージプリキュア', 'CV:#中島愛', 'CV:#潘めぐみ', 'CV:#北川里奈', 'CV:#戸松遥'])
+
+      parser = ArtistParser.new('歌:北川理恵 コーラス:五條真由美、うちやえゆか')
+      assert_equal(parser.parse, ['#北川理恵', 'コーラス:#五條真由美', 'コーラス:#うちやえゆか'])
     end
   end
 end

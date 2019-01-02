@@ -14,9 +14,7 @@ module MulukhiyaTootProxy
       return absolute? && host == 'itunes.apple.com'
     end
 
-    def valid?
-      return itunes?
-    end
+    alias valid? itunes?
 
     def album_id
       @config['/itunes/patterns'].each do |entry|
@@ -33,9 +31,7 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def id
-      return track_id
-    end
+    alias id track_id
 
     def track
       return nil unless itunes?
@@ -63,5 +59,7 @@ module MulukhiyaTootProxy
       end
       return @image_uri
     end
+
+    alias image_url image_uri
   end
 end

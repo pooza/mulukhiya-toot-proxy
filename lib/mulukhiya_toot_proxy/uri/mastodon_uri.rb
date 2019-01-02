@@ -11,9 +11,7 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def id
-      return toot_id
-    end
+    alias id toot_id
 
     def to_md
       toot = service.fetch_toot(toot_id)

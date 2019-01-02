@@ -21,9 +21,7 @@ module MulukhiyaTootProxy
       return absolute? && host.split('.').member?('amazon')
     end
 
-    def valid?
-      return amazon?
-    end
+    alias valid? amazon?
 
     def asin
       @config['/amazon/patterns'].each do |entry|
@@ -34,12 +32,10 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    alias id asin
+
     def asin=(id)
       self.path = "/dp/#{id}"
-    end
-
-    def id
-      return asin
     end
 
     def associate_tag
@@ -61,6 +57,8 @@ module MulukhiyaTootProxy
       @image_uri ||= AmazonService.new.image_uri(asin)
       return @image_uri
     end
+
+    alias image_url image_uri
 
     def shorten
       return self unless shortenable?

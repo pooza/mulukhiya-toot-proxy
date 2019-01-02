@@ -10,11 +10,11 @@ module MulukhiyaTootProxy
       dirs.each do |dir|
         suffixes.each do |suffix|
           Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
-            update(flatten("/#{File.basename(f, suffix)}", YAML.load_file(f), '/'))
+            update(Config.flatten("/#{File.basename(f, suffix)}", YAML.load_file(f)))
           end
           basenames.each do |basename|
             f = File.join(dir, "#{basename}#{suffix}")
-            update(flatten('', YAML.load_file(f), '/')) if File.exist?(f)
+            update(Config.flatten('', YAML.load_file(f))) if File.exist?(f)
           end
         end
       end
@@ -46,13 +46,11 @@ module MulukhiyaTootProxy
       raise ConfigError, "'#{key}' not found"
     end
 
-    private
-
-    def flatten(prefix, node, glue)
+    def self.flatten(prefix, node)
       values = {}
       if node.is_a?(Hash)
         node.each do |key, value|
-          values.update(flatten("#{prefix}#{glue}#{key}", value, glue))
+          values.update(Config.flatten("#{prefix}/#{key}", value))
         end
       else
         values[prefix.downcase] = node
