@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return unless body['status'] =~ /#dropbox/i
       DropboxClippingWorker.perform_async({
         body: body['status'],
-        account: {id: mastodon.account['id']},
+        account: {id: mastodon.account_id},
       })
       increment!
     end
