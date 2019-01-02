@@ -71,6 +71,7 @@ module MulukhiyaTootProxy
 
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
+    autoload :DropboxClippingWorker
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
   end

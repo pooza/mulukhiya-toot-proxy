@@ -2,8 +2,9 @@ module MulukhiyaTootProxy
   class DropboxClippingHandler < Handler
     def exec(body, headers = {})
       return unless body['status'] =~ /#dropbox/i
-      DropboxClipper.create({account_id: mastodon.account_id}).clip({
+      DropboxClippingWorker.perform_async({
         body: body['status'],
+        account: {id: mastodon.account['id']},
       })
       increment!
     end
