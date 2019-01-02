@@ -6,6 +6,10 @@ module MulukhiyaTootProxy
       @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
+    def test_create
+      assert_true(@handler.is_a?(GrowiClippingCommandHandler))
+    end
+
     def test_exec
       @handler.exec({'status' => ''})
       assert_equal(@handler.result, 'GrowiClippingCommandHandler,0')

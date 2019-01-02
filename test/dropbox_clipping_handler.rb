@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
 
       @handler.exec({'status' => "#{Time.now} \#dropbox"})
       assert_equal(@handler.result, 'DropboxClippingHandler,1')
+      sleep(1)
     end
   end
 end

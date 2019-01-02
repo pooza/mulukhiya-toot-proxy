@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
 
       @handler.exec({'status' => "#{Time.now} \#growi"})
       assert_equal(@handler.result, 'GrowiClippingHandler,1')
+      sleep(1)
     end
   end
 end
