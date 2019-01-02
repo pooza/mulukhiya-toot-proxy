@@ -1,10 +1,17 @@
 GIT
   remote: https://github.com/pooza/crowi-client.git
-  revision: 8a21ff404f4d6a61e808f06a04f1f7898a9bd0f0
+  revision: aa2910cc3710262ba7ec31b28a172491c20558ce
   specs:
     crowi-client (0.1.4.1)
       json (~> 2.1)
       rest-client (~> 2.0)
+
+GIT
+  remote: https://github.com/pooza/dropbox-sdk-ruby.git
+  revision: 433c044223a5fed56579f7c136e9000420d53e68
+  specs:
+    dropbox-sdk-v2 (0.0.3.1)
+      http (~> 3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -152,6 +159,7 @@ DEPENDENCIES
   addressable
   amazon-ecs
   crowi-client!
+  dropbox-sdk-v2!
   httparty
   nokogiri
   pg

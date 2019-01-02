@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
   autoload :ArtistParser
   autoload :CommandHandler
   autoload :Config
+  autoload :DropboxClipper
   autoload :Environment
   autoload :Error
   autoload :GrowiClipper
