@@ -21,9 +21,7 @@ module MulukhiyaTootProxy
       return absolute? && host.split('.').member?('amazon')
     end
 
-    def valid?
-      return amazon?
-    end
+    alias valid? amazon?
 
     def asin
       @config['/amazon/patterns'].each do |entry|
@@ -34,12 +32,10 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    alias id asin
+
     def asin=(id)
       self.path = "/dp/#{id}"
-    end
-
-    def id
-      return asin
     end
 
     def associate_tag

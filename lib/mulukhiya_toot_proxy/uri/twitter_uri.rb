@@ -17,9 +17,7 @@ module MulukhiyaTootProxy
       return matches[2].to_i
     end
 
-    def id
-      return tweet_id
-    end
+    alias id tweet_id
 
     def account_name
       return nil unless matches = path.match(Regexp.new(@config['/twitter/patterns/tweet']))

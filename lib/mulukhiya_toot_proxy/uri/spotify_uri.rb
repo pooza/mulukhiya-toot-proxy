@@ -12,9 +12,7 @@ module MulukhiyaTootProxy
       return absolute? && host.split('.').member?('spotify')
     end
 
-    def valid?
-      return spotify?
-    end
+    alias valid? spotify?
 
     def track_id
       @config['/spotify/patterns'].each do |entry|
@@ -25,9 +23,7 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def id
-      return track_id
-    end
+    alias id track_id
 
     def track_id=(id)
       self.path = "/track/#{id}"
