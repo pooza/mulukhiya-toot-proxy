@@ -11,10 +11,10 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      values = UserConfigStorage.new[params[:account_id]]
+      user_config = UserConfigStorage.new[params[:account_id]]
       return GrowiClipper.new({
-        crowi_url: values['/growi/url'],
-        access_token: values['/growi/token'],
+        crowi_url: user_config['/growi/url'],
+        access_token: user_config['/growi/token'],
       })
     rescue
       raise ExternalServiceError, 'GROWI not found'

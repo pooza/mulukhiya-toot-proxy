@@ -12,14 +12,10 @@ module MulukhiyaTootProxy
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited]
           split_artist(@source, true).each do |artist|
-            cv_patterns do |inner_pattern_entry|
-              next unless matches = artist.match(inner_pattern_entry[:pattern])
-              parse_part(matches, inner_pattern_entry[:items])
-              break
-            end
+            @tags.concat(ArtistParser.new(artist).parse)
           end
         else
-          parse_part(matches, pattern_entry[:items])
+          @tags.concat(parse_part(matches, pattern_entry[:items]))
         end
         break
       end
@@ -33,13 +29,15 @@ module MulukhiyaTootProxy
 
     def parse_part(source, items)
       i = 0
+      tags = []
       items.each do |item|
         i += 1
         next if item['drop']
         split_artist(source[i], item['split']).each do |tag|
-          @tags.push(create_tag(tag, item['strip'], item['prefix']))
+          tags.push(create_tag(tag, item['strip'], item['prefix']))
         end
       end
+      return tags
     end
 
     def cv_patterns

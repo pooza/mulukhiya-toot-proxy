@@ -12,14 +12,15 @@ module MulukhiyaTootProxy
       [:parse_yaml, :parse_json].each do |method|
         next unless values = send(method, body['status'])
         next unless values['command'] == command_name
-        body['visibility'] = 'direct'
-        body['status'] = YAML.dump(values)
-        increment!
-        break
+        break if values.present?
       rescue
         next
       end
-      dispatch(values) if values.present?
+      return unless values.present?
+      body['visibility'] = 'direct'
+      body['status'] = YAML.dump(values)
+      dispatch(values)
+      increment!
     end
 
     def parse_yaml(body)

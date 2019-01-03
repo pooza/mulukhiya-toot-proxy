@@ -16,8 +16,9 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      values = UserConfigStorage.new[params[:account_id]]
-      return DropboxClipper.new(values['/dropbox/token'])
+      return DropboxClipper.new(
+        UserConfigStorage.new[params[:account_id]]['/dropbox/token'],
+      )
     rescue => e
       raise ExternalServiceError, "Dropbox auth error (#{e.message})"
     end

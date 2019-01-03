@@ -1,6 +1,7 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
+require 'sidekiq'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'JSON'
@@ -15,6 +16,8 @@ module MulukhiyaTootProxy
 
   autoload :AmazonService
   autoload :ArtistParser
+  autoload :ClippingCommandHandler
+  autoload :ClippingWorker
   autoload :CommandHandler
   autoload :Config
   autoload :DropboxClipper
@@ -27,6 +30,7 @@ module MulukhiyaTootProxy
   autoload :Logger
   autoload :Mastodon
   autoload :NowplayingHandler
+  autoload :NotificationHandler
   autoload :NotificationWorker
   autoload :Package
   autoload :Postgres
@@ -34,7 +38,6 @@ module MulukhiyaTootProxy
   autoload :Renderer
   autoload :ReverseMarkdown
   autoload :Server
-  autoload :SidekiqHandler
   autoload :Slack
   autoload :SpotifyService
   autoload :Template
@@ -75,4 +78,8 @@ module MulukhiyaTootProxy
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
   end
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
 end
