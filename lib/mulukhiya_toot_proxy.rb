@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
   autoload :AmazonService
   autoload :ArtistParser
   autoload :ClippingCommandHandler
+  autoload :ClippingWorker
   autoload :CommandHandler
   autoload :Config
   autoload :DropboxClipper
