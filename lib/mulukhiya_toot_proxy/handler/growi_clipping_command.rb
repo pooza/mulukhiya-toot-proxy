@@ -1,12 +1,5 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandler < CommandHandler
-    def initialize
-      super
-      Sidekiq.configure_client do |config|
-        config.redis = {url: @config['/sidekiq/redis/dsn']}
-      end
-    end
-
     def dispatch(values)
       create_uris(values) do |uri|
         next unless uri&.id

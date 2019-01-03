@@ -1,6 +1,7 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
+require 'sidekiq'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'JSON'
@@ -75,4 +76,8 @@ module MulukhiyaTootProxy
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
   end
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
 end

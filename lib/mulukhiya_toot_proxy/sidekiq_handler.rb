@@ -1,14 +1,5 @@
-require 'sidekiq'
-
 module MulukhiyaTootProxy
   class SidekiqHandler < Handler
-    def initialize
-      super
-      Sidekiq.configure_client do |config|
-        config.redis = {url: @config['/sidekiq/redis/dsn']}
-      end
-    end
-
     def exec(body, headers = {})
       return unless executable?(body, headers)
       worker_name.constantize.perform_async(create_params(body, headers))
