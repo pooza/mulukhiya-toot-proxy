@@ -1,15 +1,7 @@
 module MulukhiyaTootProxy
-  class MentionNotificationHandler < SidekiqHandler
+  class MentionNotificationHandler < NotificationHandler
     def executable?(body, headers)
       return body['status'] =~ /(\s|^)@[[:word:]]+(\s|$)/
-    end
-
-    def create_params(body, headers)
-      return {
-        id: @mastodon.account_id,
-        token: @mastodon.token,
-        status: body['status'],
-      }
     end
   end
 end

@@ -1,8 +1,12 @@
 module MulukhiyaTootProxy
-  class SidekiqHandler < Handler
+  class NotificationHandler < Handler
     def exec(body, headers = {})
       return unless executable?(body, headers)
-      worker_name.constantize.perform_async(create_params(body, headers))
+      worker_name.constantize.perform_async({
+        id: @mastodon.account_id,
+        token: @mastodon.token,
+        status: body['status'],
+      })
       increment!
     end
 
@@ -11,10 +15,6 @@ module MulukhiyaTootProxy
     end
 
     def executable?(body, headers)
-      raise ImplementError, "'#{__method__}' not implemented"
-    end
-
-    def create_params(body, headers)
       raise ImplementError, "'#{__method__}' not implemented"
     end
   end

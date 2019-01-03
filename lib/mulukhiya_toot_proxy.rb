@@ -28,6 +28,7 @@ module MulukhiyaTootProxy
   autoload :Logger
   autoload :Mastodon
   autoload :NowplayingHandler
+  autoload :NotificationHandler
   autoload :NotificationWorker
   autoload :Package
   autoload :Postgres
@@ -35,7 +36,6 @@ module MulukhiyaTootProxy
   autoload :Renderer
   autoload :ReverseMarkdown
   autoload :Server
-  autoload :SidekiqHandler
   autoload :Slack
   autoload :SpotifyService
   autoload :Template
