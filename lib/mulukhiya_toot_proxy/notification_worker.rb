@@ -11,9 +11,7 @@ module MulukhiyaTootProxy
     private
 
     def connect_slack(id)
-      uri = UserConfigStorage.new[id]['/slack/webhook']
-      return nil unless uri
-      uri = Addressable::URI.parse(uri)
+      uri = Addressable::URI.parse(UserConfigStorage.new[id]['/slack/webhook'])
       raise 'invalid URI' unless uri.absolute?
       return Slack.new(uri)
     rescue
