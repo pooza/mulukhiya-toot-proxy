@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     def update(keyword, status)
       return unless track = @tracks[keyword]
       status.push(track.name)
-      status.push(ArtistParser.new(track.artists.map(&:name).join('/')).parse.join(' '))
+      status.push(ArtistParser.new(track.artists.map(&:name).join('、')).parse.join(' '))
       [:amazon_uri, :itunes_uri].each do |method|
         next unless uri = @service.send(method, track)
         status.push(uri.to_s)

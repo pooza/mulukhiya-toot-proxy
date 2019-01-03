@@ -57,9 +57,11 @@ nowplaying:
   hashtag: false
   artist_parser:
     delimiters:
-      - '/'
-      - '、'
+      - /
+      - 、
     cv_patterns:
+      - pattern: ^[^():]+、
+        delimited: true
       - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
         delimited: true
       - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
