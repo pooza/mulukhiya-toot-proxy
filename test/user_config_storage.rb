@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
 
     def test_edit
       key = SecureRandom.hex(16)
-      @storage.set(key, {a: 111, b: 222})
+      @storage.update(key, {a: 111, b: 222})
       assert_equal(@storage[key], {'/a' => 111, '/b' => 222})
       @storage.update(key, {c: {d: 'hoge', e: 'gebo'}})
       assert_equal(@storage[key], {'/a' => 111, '/b' => 222, '/c/d' => 'hoge', '/c/e' => 'gebo'})
