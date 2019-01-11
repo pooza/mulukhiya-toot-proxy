@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       params = {body: params.to_s} if params.is_a?(String)
       res = request(CPApiRequestPagesCreate.new({body: params[:body]}))
       res = request(CPApiRequestPagesCreate.new(params)) if res.is_a?(CPInvalidRequest)
-      raise ExternalServiceError, res.msg if res.is_a?(CPInvalidRequest)
+      raise Ginseng::GatewayError, res.msg if res.is_a?(CPInvalidRequest)
       return res
     end
 
@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
         access_token: user_config['/growi/token'],
       })
     rescue
-      raise ExternalServiceError, 'GROWI not found'
+      raise Ginseng::GatewayError, 'GROWI not found'
     end
 
     def self.create_path(username)

@@ -1,13 +1,10 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
+require 'ginseng'
 require 'sidekiq'
 
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.acronym 'JSON'
-  inflect.acronym 'URL'
-  inflect.acronym 'URI'
-  inflect.acronym 'DSN'
   inflect.acronym 'ASIN'
 end
 
@@ -22,20 +19,17 @@ module MulukhiyaTootProxy
   autoload :Config
   autoload :DropboxClipper
   autoload :Environment
-  autoload :Error
   autoload :GrowiClipper
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService
-  autoload :Logger
   autoload :Mastodon
-  autoload :NowplayingHandler
   autoload :NotificationHandler
   autoload :NotificationWorker
+  autoload :NowplayingHandler
   autoload :Package
   autoload :Postgres
   autoload :Redis
-  autoload :Renderer
   autoload :ReverseMarkdown
   autoload :Server
   autoload :Slack
@@ -48,20 +42,6 @@ module MulukhiyaTootProxy
   autoload_under 'dsn' do
     autoload :RedisDSN
     autoload :PostgresDSN
-  end
-
-  autoload_under 'error' do
-    autoload :ConfigError
-    autoload :DatabaseError
-    autoload :ExternalServiceError
-    autoload :ImplementError
-    autoload :NotFoundError
-    autoload :RedisError
-    autoload :RequestError
-  end
-
-  autoload_under 'renderer' do
-    autoload :JSONRenderer
   end
 
   autoload_under 'uri' do

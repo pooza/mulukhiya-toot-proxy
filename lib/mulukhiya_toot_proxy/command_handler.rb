@@ -36,7 +36,7 @@ module MulukhiyaTootProxy
     end
 
     def dispatch(values)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end
 end

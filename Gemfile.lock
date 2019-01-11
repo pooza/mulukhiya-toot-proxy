@@ -13,6 +13,12 @@ GIT
     dropbox-sdk-v2 (0.0.3.1)
       http (~> 3.0)
 
+GIT
+  remote: https://github.com/pooza/ginseng-core.git
+  revision: ad62c421a98eef9fd497bd1917d8f1295ed36afa
+  specs:
+    ginseng-core (1.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -125,7 +131,6 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.5)
       tilt (~> 2.0)
-    syslog-logger (1.6.8)
     test-unit (3.2.9)
       power_assert
     thin (1.7.2)
@@ -161,6 +166,7 @@ DEPENDENCIES
   amazon-ecs
   crowi-client!
   dropbox-sdk-v2!
+  ginseng-core!
   httparty
   nokogiri
   pg
@@ -172,7 +178,6 @@ DEPENDENCIES
   rubocop
   sidekiq (< 6.0)
   sinatra
-  syslog-logger
   test-unit
   thin
   twitter

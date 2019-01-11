@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def underscore_name

@@ -26,14 +26,14 @@ module MulukhiyaTootProxy
 
     def to_md
       tweet = service.lookup_tweet(tweet_id)
-      raise ExternalServiceError, "Tweet '#{self}' not found" unless tweet
+      raise Ginseng::GatewayError, "Tweet '#{self}' not found" unless tweet
       template = Template.new('tweet_clipping.md')
       template[:account_name] = account_name
       template[:status] = tweet.text
       template[:url] = to_s
       return template.to_s
     rescue Twitter::Error::NotFound
-      raise ExternalServiceError, "Tweet '#{self}' not found"
+      raise Ginseng::GatewayError, "Tweet '#{self}' not found"
     end
 
     def service
