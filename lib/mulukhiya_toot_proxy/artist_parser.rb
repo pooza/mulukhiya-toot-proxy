@@ -23,6 +23,9 @@ module MulukhiyaTootProxy
       @tags.compact!
       return @tags if @tags.present?
       return [Mastodon.create_tag(@source)]
+    rescue => e
+      Slack.broadcast(Ginseng::Error.create(e).to_h)
+      return [Mastodon.create_tag(@source)]
     end
 
     private

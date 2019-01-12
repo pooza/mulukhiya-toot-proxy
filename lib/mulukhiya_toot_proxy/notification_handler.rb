@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def executable?(body, headers)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end
 end

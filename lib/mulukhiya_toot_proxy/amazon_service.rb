@@ -17,14 +17,16 @@ module MulukhiyaTootProxy
         country: @config['/amazon/country'],
         response_group: 'Images',
       })
-      raise RequestError, "ASIN '#{asin}' not found' (#{response.error})" if response.has_error?
+      if response.has_error?
+        raise Ginseng::RequestError, "ASIN '#{asin}' not found' (#{response.error})"
+      end
       ['Large', 'Medium', 'Small'].each do |size|
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
       end
       return nil
     rescue Amazon::RequestError => e
-      raise ExternalServiceError, e.message if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -42,7 +44,7 @@ module MulukhiyaTootProxy
       end
       return nil
     rescue Amazon::RequestError => e
-      raise ExternalServiceError, e.message if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry

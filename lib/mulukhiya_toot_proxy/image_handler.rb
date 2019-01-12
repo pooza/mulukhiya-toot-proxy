@@ -14,11 +14,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(link)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def create_image_uri(link)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end
 end

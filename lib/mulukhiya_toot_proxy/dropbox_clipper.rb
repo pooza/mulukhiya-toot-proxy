@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
         upload("/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md", file.read)
       end
     rescue Dropbox::ApiError => e
-      raise ExternalServiceError, "Dropbox upload error (#{e.message})"
+      raise Ginseng::GatewayError, "Dropbox upload error (#{e.message})"
     ensure
       File.unlink(src) if File.exist?(src)
     end
@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
         UserConfigStorage.new[params[:account_id]]['/dropbox/token'],
       )
     rescue => e
-      raise ExternalServiceError, "Dropbox auth error (#{e.message})"
+      raise Ginseng::GatewayError, "Dropbox auth error (#{e.message})"
     end
   end
 end

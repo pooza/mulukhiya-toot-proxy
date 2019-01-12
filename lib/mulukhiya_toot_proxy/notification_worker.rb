@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     include Sidekiq::Worker
 
     def perform(params)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     private
@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
       raise 'invalid URI' unless uri.absolute?
       return Slack.new(uri)
     rescue
-      raise ConfigError, 'Invalid webhook (Slack compatible)'
+      raise Ginseng::ConfigError, 'Invalid webhook (Slack compatible)'
     end
 
     def create_message(params)

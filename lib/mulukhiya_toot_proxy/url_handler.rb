@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     end
 
     def rewrite(link)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def rewritable?(link)

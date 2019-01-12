@@ -18,11 +18,11 @@ module MulukhiyaTootProxy
     end
 
     def updatable?(keyword)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def update(keyword, status)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end
 end
