@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     include Sidekiq::Worker
 
     def perform(params)
-      raise ImplementError, "'#{__method__}' not implemented"
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     private
@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
       return params['body'] if params['body'].present?
       uri = params['uri']['class'].constantize.parse(params['uri']['href'])
       return uri.to_md if uri
-      raise RequestError, 'Bad Request'
+      raise Ginseng::RequestError, 'Bad Request'
     end
   end
 end

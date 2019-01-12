@@ -12,13 +12,13 @@ module MulukhiyaTootProxy
         headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
-      raise RequestError, response['errorMessage'] if response['errorMessage']
+      raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue RequestError => e
-      raise RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
+    rescue Ginseng::RequestError => e
+      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
     rescue => e
-      raise ExternalServiceError, e.message
+      raise Ginseng::GatewayError, e.message
     end
 
     def lookup(id)
@@ -26,13 +26,13 @@ module MulukhiyaTootProxy
         headers: {'User-Agent' => Package.user_agent},
       })
       response = JSON.parse(response.strip)
-      raise RequestError, response['errorMessage'] if response['errorMessage']
+      raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue RequestError => e
-      raise RequestError, "'#{id}' not found (#{e.message})"
+    rescue Ginseng::RequestError => e
+      raise Ginseng::RequestError, "'#{id}' not found (#{e.message})"
     rescue => e
-      raise ExternalServiceError, e.message
+      raise Ginseng::GatewayError, e.message
     end
 
     def track_uri(track)

@@ -15,8 +15,8 @@ module MulukhiyaTootProxy
 
     def to_md
       toot = service.fetch_toot(toot_id)
-      raise ExternalServiceError, "Toot '#{self}' not found" unless toot
-      raise ExternalServiceError, "Toot '#{self}' not found" if toot['error']
+      raise Ginseng::GatewayError, "Toot '#{self}' not found" unless toot
+      raise Ginseng::GatewayError, "Toot '#{self}' not found" if toot['error']
       account = toot['account']
       template = Template.new('toot_clipping.md')
       template[:account] = account

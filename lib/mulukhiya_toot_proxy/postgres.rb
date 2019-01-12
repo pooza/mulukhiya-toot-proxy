@@ -10,11 +10,11 @@ module MulukhiyaTootProxy
       @config = Config.instance
       dsn = Postgres.dsn
       dsn.dbname ||= 'mastodon'
-      raise DatabaseError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
-      raise DatabaseError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'postgres'
+      raise Ginseng::DatabaseError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
+      raise Ginseng::DatabaseError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'postgres'
       @db = PG.connect(dsn.to_h)
     rescue PG::Error => e
-      raise DatabaseError, e.message
+      raise Ginseng::DatabaseError, e.message
     end
 
     def escape_string(value)
@@ -31,7 +31,7 @@ module MulukhiyaTootProxy
     def execute(name, params = {})
       return @db.exec(create_sql(name, params)).to_a
     rescue PG::Error => e
-      raise DatabaseError, e.message
+      raise Ginseng::DatabaseError, e.message
     end
 
     def self.dsn

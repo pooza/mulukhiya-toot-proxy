@@ -13,6 +13,12 @@ GIT
     dropbox-sdk-v2 (0.0.3.1)
       http (~> 3.0)
 
+GIT
+  remote: https://github.com/pooza/ginseng-core.git
+  revision: 21cd3897ebe92f11a4e86a7c462bc648b068d216
+  specs:
+    ginseng-core (1.0.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -50,7 +56,7 @@ GEM
     httparty (0.16.3)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.4.0)
+    i18n (1.5.1)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.2)
     json (2.1.0)
@@ -85,7 +91,7 @@ GEM
     parallel (1.12.1)
     parser (2.5.3.0)
       ast (~> 2.4.0)
-    pg (1.1.3)
+    pg (1.1.4)
     power_assert (1.1.3)
     powerpack (0.1.2)
     public_suffix (3.0.3)
@@ -114,8 +120,9 @@ GEM
       unicode-display_width (~> 1.4.0)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.10.0)
-    sidekiq (5.2.3)
+    sidekiq (5.2.5)
       connection_pool (~> 2.2, >= 2.2.2)
+      rack (>= 1.5.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
     simple_oauth (0.3.1)
@@ -124,7 +131,6 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.5)
       tilt (~> 2.0)
-    syslog-logger (1.6.8)
     test-unit (3.2.9)
       power_assert
     thin (1.7.2)
@@ -160,6 +166,7 @@ DEPENDENCIES
   amazon-ecs
   crowi-client!
   dropbox-sdk-v2!
+  ginseng-core!
   httparty
   nokogiri
   pg
@@ -169,9 +176,8 @@ DEPENDENCIES
   reverse_markdown
   rspotify
   rubocop
-  sidekiq
+  sidekiq (< 6.0)
   sinatra
-  syslog-logger
   test-unit
   thin
   twitter
