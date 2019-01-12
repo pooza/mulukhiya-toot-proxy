@@ -64,6 +64,8 @@ nowplaying:
         delimited: true
       - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
         delimited: true
+      - pattern: '^(.+\s*\(.+\)、?){2,}$'
+        delimited: true
       - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
         items:
           - drop: true
