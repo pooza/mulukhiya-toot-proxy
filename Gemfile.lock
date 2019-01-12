@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 85a1e8bac09be7197bea558af039cbfd122476e8
+  revision: 21cd3897ebe92f11a4e86a7c462bc648b068d216
   specs:
-    ginseng-core (1.0.2)
+    ginseng-core (1.0.3)
 
 GEM
   remote: https://rubygems.org/
