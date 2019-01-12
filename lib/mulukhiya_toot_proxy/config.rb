@@ -1,8 +1,6 @@
 module MulukhiyaTootProxy
   class Config < Ginseng::Config
-    private
-
-    def env_name
+    def environment_class
       return 'MulukhiyaTootProxy::Environment'
     end
   end
