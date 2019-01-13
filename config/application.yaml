@@ -1,5 +1,5 @@
 package:
-  version: 2.0.12
+  version: 2.0.13
   url: https://github.com/pooza/mulukhiya-toot-proxy
 shortened_url:
   timeout: 5
@@ -90,6 +90,12 @@ nowplaying:
           - split: true
           - strip: true
             split: true
+      - pattern: '^(.+)\s*feat\.\s*(.+)$'
+        items:
+          - split: true
+          - strip: true
+            split: true
+            prefix: feat.
 redis:
   dsn: redis://localhost:6379/1
 postgres:

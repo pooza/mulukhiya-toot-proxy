@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
   autoload :Handler
   autoload :ImageHandler
   autoload :ItunesService
+  autoload :Logger
   autoload :Mastodon
   autoload :NotificationHandler
   autoload :NotificationWorker

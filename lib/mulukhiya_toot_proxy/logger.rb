@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class Template < Ginseng::Template
+  class Logger < Ginseng::Logger
     include Package
   end
 end
