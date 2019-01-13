@@ -12,6 +12,10 @@ module MulukhiyaTootProxy
       return 'MulukhiyaTootProxy::Config'
     end
 
+    def logger_class
+      return 'MulukhiyaTootProxy::Logger'
+    end
+
     def self.name
       return 'mulukhiya-toot-proxy'
     end
