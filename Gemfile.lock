@@ -15,9 +15,18 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 21cd3897ebe92f11a4e86a7c462bc648b068d216
+  revision: 72ea45163c6807a9b34c20d8a152a15e31bc4ff1
   specs:
-    ginseng-core (1.0.3)
+    ginseng-core (1.0.6)
+      activesupport
+      addressable
+      bundler (< 2.0)
+      httparty
+      rake
+      rubocop
+      sinatra
+      syslog-logger
+      test-unit
 
 GEM
   remote: https://rubygems.org/
@@ -131,6 +140,7 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.5)
       tilt (~> 2.0)
+    syslog-logger (1.6.8)
     test-unit (3.2.9)
       power_assert
     thin (1.7.2)
@@ -161,7 +171,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport
   addressable
   amazon-ecs
   crowi-client!
@@ -177,8 +186,6 @@ DEPENDENCIES
   rspotify
   rubocop
   sidekiq (< 6.0)
-  sinatra
-  test-unit
   thin
   twitter
 
