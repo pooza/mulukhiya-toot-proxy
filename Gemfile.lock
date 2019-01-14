@@ -15,14 +15,15 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 337f294efcbf4f42ee0d869313f2efe5a298dc0d
+  revision: 9f7326d3d5f42c028d3ca402b4fe158ffecf5f04
   specs:
-    ginseng-core (1.0.8)
+    ginseng-core (1.0.11)
       activesupport
       addressable
       bundler (< 2.0)
       httparty
       rake
+      rest-client
       rubocop
       sinatra
       syslog-logger
@@ -65,7 +66,7 @@ GEM
     httparty (0.16.3)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.5.1)
+    i18n (1.5.2)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.2)
     json (2.1.0)
@@ -83,7 +84,7 @@ GEM
     mustermann (1.0.3)
     naught (1.1.0)
     netrc (0.11.0)
-    nokogiri (1.10.0)
+    nokogiri (1.10.1)
       mini_portile2 (~> 2.4.0)
     oauth2 (1.4.1)
       faraday (>= 0.8, < 0.16.0)
@@ -181,7 +182,6 @@ DEPENDENCIES
   pg
   rake
   redis
-  rest-client
   reverse_markdown
   rspotify
   rubocop

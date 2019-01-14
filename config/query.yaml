@@ -23,7 +23,7 @@ account: >-
   users.moderator,
   accounts.locked
   FROM accounts
-  LEFT JOIN users ON accounts.id=users.account_id
+  INNER JOIN users ON accounts.id=users.account_id
   WHERE (accounts.domain IS NULL)
   AND (accounts.silenced='f')
   AND (accounts.suspended='f')
@@ -33,7 +33,7 @@ notificatable_accounts: >-
   SELECT
   accounts.id
   FROM accounts
-  LEFT JOIN users ON accounts.id=users.account_id
+  INNER JOIN users ON accounts.id=users.account_id
   LEFT JOIN (
   SELECT
   account_id
