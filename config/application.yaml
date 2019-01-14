@@ -1,6 +1,10 @@
 package:
-  version: 2.0.13
+  version: 2.0.14
   url: https://github.com/pooza/mulukhiya-toot-proxy
+  authors:
+    - Tatsuya Koishi
+  email:
+    - tkoishi@b-shock.co.jp
 shortened_url:
   timeout: 5
   domains:
