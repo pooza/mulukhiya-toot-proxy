@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
+      return false if uri.query_values.present?
       response = HTTParty.get(uri.normalize, {
         headers: {'User-Agent' => Package.user_agent},
       })
