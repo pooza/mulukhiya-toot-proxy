@@ -29,6 +29,13 @@ GIT
       syslog-logger
       test-unit
 
+GIT
+  remote: https://github.com/pooza/ginseng-postgres.git
+  revision: 828570463bd8c0c2c1a79c61ae0cc5b43b136f51
+  specs:
+    ginseng-postgres (1.0.1)
+      pg
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -177,9 +184,9 @@ DEPENDENCIES
   crowi-client!
   dropbox-sdk-v2!
   ginseng-core!
+  ginseng-postgres!
   httparty
   nokogiri
-  pg
   rake
   redis
   reverse_markdown

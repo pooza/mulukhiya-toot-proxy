@@ -1,0 +1,26 @@
+SELECT
+  accounts.id
+FROM accounts
+  INNER JOIN users ON accounts.id=users.account_id
+  LEFT JOIN (
+    SELECT
+      account_id
+    FROM blocks
+    WHERE target_account_id='<%= params[:id] %>'
+  ) AS blockers ON accounts.id=blockers.account_id
+  LEFT JOIN (
+    SELECT
+      account_id
+    FROM mutes
+    WHERE target_account_id='<%= params[:id] %>'
+  ) AS muters ON accounts.id=muters.account_id
+WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (blockers.account_id IS NULL)
+  AND (muters.account_id IS NULL)
+  AND (users.disabled='f')
+  <% if params[:pattern] %>
+  AND (accounts.username ~ '<%= params[:pattern] %>')
+  <% end %>
+GROUP BY accounts.id

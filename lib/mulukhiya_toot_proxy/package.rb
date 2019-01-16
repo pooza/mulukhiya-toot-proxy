@@ -16,6 +16,10 @@ module MulukhiyaTootProxy
       return 'MulukhiyaTootProxy::Logger'
     end
 
+    def database_class
+      return 'MulukhiyaTootProxy::Postgres'
+    end
+
     def self.name
       return 'mulukhiya-toot-proxy'
     end
