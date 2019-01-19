@@ -84,6 +84,12 @@ nowplaying:
           - strip: true
             split: true
             prefix: 'コーラス:'
+      - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
+        items:
+          - split: true
+          - strip: true
+            split: true
+            prefix: 'コーラス:'
       - pattern: '^(.+)\s*\(as\s*(.+)\)$'
         items:
           - strip: true
