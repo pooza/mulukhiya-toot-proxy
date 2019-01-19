@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9f7326d3d5f42c028d3ca402b4fe158ffecf5f04
+  revision: a640a7356217cf0cc397a073c049ea7719317590
   specs:
-    ginseng-core (1.0.11)
+    ginseng-core (1.0.13)
       activesupport
       addressable
       bundler (< 2.0)
@@ -28,6 +28,13 @@ GIT
       sinatra
       syslog-logger
       test-unit
+
+GIT
+  remote: https://github.com/pooza/ginseng-postgres.git
+  revision: 828570463bd8c0c2c1a79c61ae0cc5b43b136f51
+  specs:
+    ginseng-postgres (1.0.1)
+      pg
 
 GEM
   remote: https://rubygems.org/
@@ -95,11 +102,11 @@ GEM
     omniauth (1.9.0)
       hashie (>= 3.4.6, < 3.7.0)
       rack (>= 1.6.2, < 3)
-    omniauth-oauth2 (1.3.1)
-      oauth2 (~> 1.0)
+    omniauth-oauth2 (1.5.0)
+      oauth2 (~> 1.1)
       omniauth (~> 1.2)
-    parallel (1.12.1)
-    parser (2.5.3.0)
+    parallel (1.13.0)
+    parser (2.6.0.0)
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.3)
@@ -117,10 +124,11 @@ GEM
       netrc (~> 0.8)
     reverse_markdown (1.1.0)
       nokogiri
-    rspotify (2.4.0)
-      omniauth-oauth2 (~> 1.3.1)
+    rspotify (2.4.1)
+      addressable (~> 2.5.2)
+      omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.62.0)
+    rubocop (0.63.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
@@ -177,10 +185,9 @@ DEPENDENCIES
   crowi-client!
   dropbox-sdk-v2!
   ginseng-core!
+  ginseng-postgres!
   httparty
   nokogiri
-  pg
-  rake
   redis
   reverse_markdown
   rspotify

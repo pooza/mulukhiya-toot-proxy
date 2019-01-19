@@ -1,5 +1,5 @@
 package:
-  version: 2.0.14
+  version: 2.0.15
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -79,6 +79,12 @@ nowplaying:
             split: true
             prefix: 'CV:'
       - pattern: '^歌:(.+)\s*コーラス:(.+)$'
+        items:
+          - split: true
+          - strip: true
+            split: true
+            prefix: 'コーラス:'
+      - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
         items:
           - split: true
           - strip: true

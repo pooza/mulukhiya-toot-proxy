@@ -19,17 +19,5 @@ module MulukhiyaTootProxy
       end
       return @account
     end
-
-    def upload_remote_resource(uri)
-      path = File.join(
-        environment_class.constantize.dir,
-        'tmp/media',
-        Digest::SHA1.hexdigest(uri),
-      )
-      File.write(path, fetch(uri))
-      return upload(path)
-    ensure
-      File.unlink(path) if File.exist?(path)
-    end
   end
 end

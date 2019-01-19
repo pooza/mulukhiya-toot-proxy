@@ -30,6 +30,12 @@ module MulukhiyaTootProxy
 
       parser = ArtistParser.new('泉こなた(平野綾)、柊かがみ(加藤英美里)、柊つかさ(福原香織)、高良みゆき(遠藤綾)')
       assert_equal(parser.parse, ['#泉こなた', '#平野綾', '#柊かがみ', '#加藤英美里', '#柊つかさ', '#福原香織', '#高良みゆき', '#遠藤綾'])
+
+      parser = ArtistParser.new('工藤真由(コーラス:五條真由美、うちやえゆか)')
+      assert_equal(parser.parse, ['#工藤真由', 'コーラス:#五條真由美', 'コーラス:#うちやえゆか'])
+
+      parser = ArtistParser.new('キュア・レインボーズ (コーラス:ヤング・フレッシュ)')
+      assert_equal(parser.parse, ['#キュア_レインボーズ', 'コーラス:#ヤングフレッシュ'])
     end
   end
 end

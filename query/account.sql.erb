@@ -1,0 +1,14 @@
+SELECT
+  accounts.id,
+  accounts.username,
+  accounts.display_name,
+  users.admin,
+  users.moderator,
+  accounts.locked
+FROM accounts
+  INNER JOIN users ON accounts.id=users.account_id
+WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (users.disabled='f')
+  AND (accounts.id='<%= params[:id] %>')

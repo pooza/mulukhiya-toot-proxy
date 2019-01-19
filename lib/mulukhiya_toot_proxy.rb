@@ -2,6 +2,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/dependencies/autoload'
 require 'ginseng'
+require 'ginseng/postgres'
 require 'sidekiq'
 
 ActiveSupport::Inflector.inflections do |inflect|
@@ -42,7 +43,6 @@ module MulukhiyaTootProxy
 
   autoload_under 'dsn' do
     autoload :RedisDSN
-    autoload :PostgresDSN
   end
 
   autoload_under 'uri' do
