@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9f7326d3d5f42c028d3ca402b4fe158ffecf5f04
+  revision: a640a7356217cf0cc397a073c049ea7719317590
   specs:
-    ginseng-core (1.0.11)
+    ginseng-core (1.0.13)
       activesupport
       addressable
       bundler (< 2.0)
@@ -188,7 +188,6 @@ DEPENDENCIES
   ginseng-postgres!
   httparty
   nokogiri
-  rake
   redis
   reverse_markdown
   rspotify
