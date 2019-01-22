@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
       end
 
       r = @mastodon.toot(@params)
-      @renderer.message = JSON.parse(r.to_s)
+      @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
       @renderer.message['tags'] = [] if @config['/nowplaying/hashtag']
 
