@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
     end
 
     def update(key, values)
-      set(key, JSON.parse(get(key) || '{}').update(values).compact)
+      set(key, Config.deep_merge(JSON.parse(get(key) || '{}'), values))
     end
 
     def create_key(key)
