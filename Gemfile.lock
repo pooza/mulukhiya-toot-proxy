@@ -150,7 +150,7 @@ GEM
       rack-protection (= 2.0.5)
       tilt (~> 2.0)
     syslog-logger (1.6.8)
-    test-unit (3.2.9)
+    test-unit (3.3.0)
       power_assert
     thin (1.7.2)
       daemons (~> 1.0, >= 1.0.9)
