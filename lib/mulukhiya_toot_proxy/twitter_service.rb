@@ -13,12 +13,8 @@ module MulukhiyaTootProxy
       end
     end
 
-    def tweet(message)
-      return update(message)
-    end
+    alias tweet update
 
-    def lookup_tweet(id)
-      return status(id)
-    end
+    alias lookup_tweet status
   end
 end
