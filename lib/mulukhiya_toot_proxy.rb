@@ -41,6 +41,10 @@ module MulukhiyaTootProxy
   autoload :URLHandler
   autoload :UserConfigStorage
 
+  autoload_under 'daemon' do
+    autoload :SidekiqDaemon
+  end
+
   autoload_under 'dsn' do
     autoload :RedisDSN
   end
