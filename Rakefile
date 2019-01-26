@@ -47,7 +47,8 @@ namespace :sidekiq do
 
   desc 'stop Sidekiq'
   task :stop do
-    sh 'kill `cat tmp/pids/sidekiq.pid`' rescue nil
+    path = File.join(MulukhiyaTootProxy::Environment.dir, 'tmp/pids/sidekiq.pid')
+    Process.kill('KILL', File.read(path).to_i) rescue nil
   end
 
   desc 'restart Sidekiq'
