@@ -26,7 +26,7 @@ namespace :cert do
 end
 
 [:start, :stop, :restart].each do |action|
-  desc "#{action} API server / Sidekiq"
+  desc "#{action} API server / Sidekiq daemon"
   task action => ["server:#{action}", "sidekiq:#{action}"]
 end
 
@@ -40,16 +40,13 @@ namespace :server do
 end
 
 namespace :sidekiq do
-  desc 'start Sidekiq'
-  task :start do
-    sh 'ruby sidekiq_daemon.rb start'
+  [:start, :stop].each do |action|
+    desc "#{action} Sidekiq daemon"
+    task action do
+      sh "#{File.join(MulukhiyaTootProxy::Environment.dir, 'bin/sidekiq_daemon.rb')} #{action}"
+    end
   end
 
-  desc 'stop Sidekiq'
-  task :stop do
-    sh 'ruby sidekiq_daemon.rb stop'
-  end
-
-  desc 'restart Sidekiq'
+  desc 'restart Sidekiq daemon'
   task restart: [:stop, :start]
 end
