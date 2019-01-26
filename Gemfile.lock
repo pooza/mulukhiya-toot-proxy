@@ -194,7 +194,7 @@ DEPENDENCIES
   reverse_markdown
   rspotify
   rubocop
-  sidekiq (< 6.0)
+  sidekiq
   thin
   twitter
 
