@@ -42,13 +42,12 @@ end
 namespace :sidekiq do
   desc 'start Sidekiq'
   task :start do
-    sh 'sidekiq --daemon --config config/sidekiq.yaml --require ./sidekiq.rb'
+    sh 'ruby sidekiq_daemon.rb start'
   end
 
   desc 'stop Sidekiq'
   task :stop do
-    path = File.join(MulukhiyaTootProxy::Environment.dir, 'tmp/pids/sidekiq.pid')
-    Process.kill('KILL', File.read(path).to_i) rescue nil
+    sh 'ruby sidekiq_daemon.rb stop'
   end
 
   desc 'restart Sidekiq'
