@@ -44,6 +44,7 @@ module MulukhiyaTootProxy
 
   autoload_under 'daemon' do
     autoload :SidekiqDaemon
+    autoload :ThinDaemon
   end
 
   autoload_under 'dsn' do

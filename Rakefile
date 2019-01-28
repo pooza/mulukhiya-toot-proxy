@@ -6,10 +6,12 @@ ENV['SSL_CERT_FILE'] ||= File.join(dir, 'cert/cacert.pem')
 require 'bundler/setup'
 require 'mulukhiya_toot_proxy'
 
+environment = MulukhiyaTootProxy::Environment
+
 desc 'test'
 task :test do
   require 'test/unit'
-  Dir.glob(File.join(MulukhiyaTootProxy::Environment.dir, 'test/*')).each do |t|
+  Dir.glob(File.join(environment.dir, 'test/*')).each do |t|
     require t
   end
 end
@@ -19,34 +21,29 @@ namespace :cert do
   task :update do
     require 'httparty'
     File.write(
-      File.join(MulukhiyaTootProxy::Environment.dir, 'cert/cacert.pem'),
+      File.join(environment.dir, 'cert/cacert.pem'),
       HTTParty.get('https://curl.haxx.se/ca/cacert.pem'),
     )
   end
 end
 
 [:start, :stop, :restart].each do |action|
-  desc "#{action} API server / Sidekiq daemon"
-  task action => ["server:#{action}", "sidekiq:#{action}"]
+  desc "#{action} thin / sidekiq"
+  task action => ["thin:#{action}", "sidekiq:#{action}"]
 end
 
-namespace :server do
-  [:start, :stop, :restart].each do |action|
-    desc "#{action} API server"
-    task action do
-      sh "thin --config config/thin.yaml #{action}"
+[:thin, :sidekiq].each do |ns|
+  namespace ns do
+    [:start, :stop].each do |action|
+      desc "#{action} #{ns}"
+      task action do
+        sh "#{File.join(environment.dir, 'bin/', "#{ns}_daemon.rb")} #{action}"
+      rescue => e
+        puts "#{e.class} #{ns}:#{action} #{e.message}"
+      end
     end
-  end
-end
 
-namespace :sidekiq do
-  [:start, :stop].each do |action|
-    desc "#{action} Sidekiq daemon"
-    task action do
-      sh "#{File.join(MulukhiyaTootProxy::Environment.dir, 'bin/sidekiq_daemon.rb')} #{action}"
-    end
+    desc "restart #{ns}"
+    task restart: [:stop, :start]
   end
-
-  desc 'restart Sidekiq daemon'
-  task restart: [:stop, :start]
 end
