@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def self.pid
-      return File.read(SidekiqDaemon.pid_path).to_i
+      return File.read(pid_path).to_i
     end
 
     def self.pid_path
