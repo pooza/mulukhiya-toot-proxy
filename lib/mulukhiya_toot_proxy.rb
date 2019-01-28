@@ -40,6 +40,7 @@ module MulukhiyaTootProxy
   autoload :TwitterService
   autoload :URLHandler
   autoload :UserConfigStorage
+  autoload :Webhook
 
   autoload_under 'daemon' do
     autoload :SidekiqDaemon

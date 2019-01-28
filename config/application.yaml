@@ -115,3 +115,5 @@ slack:
 sidekiq:
   redis:
     dsn: redis://localhost:6379/2
+webhook:
+  entries: []
