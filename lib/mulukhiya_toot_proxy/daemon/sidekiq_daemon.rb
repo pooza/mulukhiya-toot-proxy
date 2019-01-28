@@ -14,7 +14,15 @@ module MulukhiyaTootProxy
     end
 
     def stop
-      Process.kill('KILL', File.read(File.join(Environment.dir, 'tmp/pids/sidekiq.pid')).to_i)
+      Process.kill('KILL', SidekiqDaemon.pid)
+    end
+
+    def self.pid
+      return File.read(SidekiqDaemon.pid_path).to_i
+    end
+
+    def self.pid_path
+      return File.join(Environment.dir, 'tmp/pids/sidekiq.pid')
     end
   end
 end
