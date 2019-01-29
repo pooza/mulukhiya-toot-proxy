@@ -1,7 +1,5 @@
-require 'daemon_spawn'
-
 module MulukhiyaTootProxy
-  class ThinDaemon < DaemonSpawn::Base
+  class ThinDaemon < Daemon
     def start(args)
       system('thin', '--config', ThinDaemon.config_path, 'start')
     end

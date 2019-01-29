@@ -1,7 +1,5 @@
-require 'daemon_spawn'
-
 module MulukhiyaTootProxy
-  class SidekiqDaemon < DaemonSpawn::Base
+  class SidekiqDaemon < Daemon
     def start(args)
       system(
         'sidekiq',
