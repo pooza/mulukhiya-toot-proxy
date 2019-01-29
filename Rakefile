@@ -28,22 +28,24 @@ namespace :cert do
 end
 
 [:start, :stop, :restart].each do |action|
-  desc "#{action} thin / sidekiq"
+  desc "#{action} ThinDaemon / SidekiqDaemon"
   task action => ["thin:#{action}", "sidekiq:#{action}"]
 end
 
 [:thin, :sidekiq].each do |ns|
+  app_name = "#{ns.to_s.camelize}Daemon"
+
   namespace ns do
     [:start, :stop].each do |action|
-      desc "#{action} #{ns}"
+      desc "#{action} #{app_name}"
       task action do
         sh "#{File.join(environment.dir, 'bin/', "#{ns}_daemon.rb")} #{action}"
       rescue => e
-        puts "#{e.class} #{ns}:#{action} #{e.message}"
+        STDERR.puts "#{e.class} #{ns}:#{action} #{e.message}"
       end
     end
 
-    desc "restart #{ns}"
+    desc "restart #{app_name}"
     task restart: [:stop, :start]
   end
 end
