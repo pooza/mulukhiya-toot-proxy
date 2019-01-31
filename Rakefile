@@ -27,17 +27,16 @@ namespace :cert do
   end
 end
 
-[:start, :stop, :restart].each do |action|
-  desc "#{action} ThinDaemon / SidekiqDaemon"
-  task action => ["thin:#{action}", "sidekiq:#{action}"]
-end
+namespaces = [:thin, :sidekiq]
+apps = []
 
-[:thin, :sidekiq].each do |ns|
-  app_name = "#{ns.to_s.camelize}Daemon"
+namespaces.each do |ns|
+  app = "#{ns.to_s.camelize}Daemon"
+  apps.push(app)
 
   namespace ns do
     [:start, :stop].each do |action|
-      desc "#{action} #{app_name}"
+      desc "#{action} #{app}"
       task action do
         sh "#{File.join(environment.dir, 'bin/', "#{ns}_daemon.rb")} #{action}"
       rescue => e
@@ -45,7 +44,12 @@ end
       end
     end
 
-    desc "restart #{app_name}"
+    desc "restart #{app}"
     task restart: [:stop, :start]
   end
+end
+
+[:start, :stop, :restart].each do |action|
+  desc "#{action} #{apps.join('/')}"
+  task action => namespaces.map{ |ns| "#{ns}:#{action}"}
 end
