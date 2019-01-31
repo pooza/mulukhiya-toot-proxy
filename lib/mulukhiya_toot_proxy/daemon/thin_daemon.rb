@@ -1,7 +1,9 @@
 module MulukhiyaTootProxy
   class ThinDaemon < Daemon
     def start(args)
-      system('thin', '--config', ThinDaemon.config_path, 'start')
+      IO.popen(['thin', '--config', ThinDaemon.config_path, 'start']).each_line do |line|
+        @logger.info({daemon: app_name, output: line.chomp})
+      end
     end
 
     def stop

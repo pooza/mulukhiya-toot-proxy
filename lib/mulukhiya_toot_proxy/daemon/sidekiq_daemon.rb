@@ -1,14 +1,16 @@
 module MulukhiyaTootProxy
   class SidekiqDaemon < Daemon
     def start(args)
-      system(
+      cmd = [
         'sidekiq',
         '--config',
         File.join(Environment.dir, 'config/sidekiq.yaml'),
         '--require',
         File.join(Environment.dir, 'lib/initializer/sidekiq.rb'),
-        '&',
-      )
+      ]
+      IO.popen(cmd).each_line do |line|
+        @logger.info({daemon: app_name, output: line.chomp})
+      end
     end
 
     def stop
