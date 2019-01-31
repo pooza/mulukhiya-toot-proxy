@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
         '--config',
         File.join(Environment.dir, 'config/sidekiq.yaml'),
         '--require',
-        File.join(Environment.dir, 'sidekiq.rb'),
+        File.join(Environment.dir, 'lib/initializer/sidekiq.rb'),
         '&',
       )
     end

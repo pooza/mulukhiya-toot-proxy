@@ -1,4 +1,4 @@
 timeout: 30
 port: 3008
 environment: production
-rackup: config.ru
+rackup: lib/initializer/config.ru
