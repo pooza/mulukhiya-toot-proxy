@@ -50,5 +50,23 @@ module MulukhiyaTootProxy
       @renderer.message = 'OK'
       return @renderer.to_s
     end
+
+    not_found do
+      @renderer = Ginseng::JSONRenderer.new
+      @renderer.status = 404
+      @renderer.message = NotFoundError.new("Resource #{request.path} not found.").to_h
+      return @renderer.to_s
+    end
+
+    error do |e|
+      e = Ginseng::Error.create(e)
+      @renderer = Ginseng::JSONRenderer.new
+      @renderer.status = e.status
+      @renderer.message = e.to_h.delete_if{ |k, v| k == :backtrace}
+      @renderer.message['error'] = e.message
+      Slack.broadcast(e.to_h)
+      @logger.error(e.to_h)
+      return @renderer.to_s
+    end
   end
 end
