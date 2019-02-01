@@ -17,9 +17,9 @@ module MulukhiyaTootProxy
         next
       end
       return unless values.present?
+      dispatch(values)
       body['visibility'] = 'direct'
       body['status'] = YAML.dump(values)
-      dispatch(values)
       increment!
     end
 

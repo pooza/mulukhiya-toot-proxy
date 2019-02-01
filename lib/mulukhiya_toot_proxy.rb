@@ -71,3 +71,6 @@ end
 Sidekiq.configure_client do |config|
   config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
 end
+Sidekiq.configure_server do |config|
+  config.redis = {url: MulukhiyaTootProxy::Config.instance['/sidekiq/redis/dsn']}
+end

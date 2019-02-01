@@ -8,9 +8,8 @@ module MulukhiyaTootProxy
 
     def initialize(params)
       @config = Config.instance
-      @params = Config.flatten('', params)
-      @logger = Logger.new
-      @mastodon = Mastodon.new(@params['/mastodon/url'], @params['/mastodon/token'])
+      @params = params
+      @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
     end
 
     def digest
@@ -18,17 +17,17 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        shorten: shorten?,
+        toot_tags: toot_tags,
         salt: @config['/webhook/salt'],
       }.to_json)
     end
 
     def visibility
-      return (@params['/visibility'] || 'public')
+      return (@params['/webhook/visibility'] || 'public')
     end
 
     def toot_tags
-      return @params['/toot/tags'].map do |tag|
+      return @params['/webhook/tags'].map do |tag|
         Mastodon.create_tag(tag)
       end
     rescue
@@ -37,7 +36,7 @@ module MulukhiyaTootProxy
 
     def uri
       begin
-        uri = Addressable::URI.parse(@config['/root_url'])
+        uri = Addressable::URI.parse(@config['/instance_url'])
       rescue Ginseng::ConfigError
         uri = Addressable::URI.new
         uri.host = Environment.hostname
@@ -48,9 +47,9 @@ module MulukhiyaTootProxy
       return uri
     end
 
-    def shorten?
-      return @config['/bitly/token'] && @params['/shorten']
-    rescue Ginseng::ConfigError
+    def exist?
+      return Postgres.instance.execute('token_owner', {token: @mastodon.token}).present?
+    rescue
       return false
     end
 
@@ -59,7 +58,7 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        shorten: shorten?,
+        toot_tags: toot_tags,
         hook: uri.to_s,
       })
       return @json
@@ -81,9 +80,6 @@ module MulukhiyaTootProxy
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Config.instance['/webhook/entries'].each do |entry|
-        yield Webhook.new(entry)
-      end
     end
   end
 end
