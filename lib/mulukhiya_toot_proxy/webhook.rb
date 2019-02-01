@@ -16,8 +16,6 @@ module MulukhiyaTootProxy
       return Digest::SHA1.hexdigest({
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
-        visibility: visibility,
-        toot_tags: toot_tags,
         salt: @config['/webhook/salt'],
       }.to_json)
     end
@@ -48,7 +46,10 @@ module MulukhiyaTootProxy
     end
 
     def exist?
-      return Postgres.instance.execute('token_owner', {token: @mastodon.token}).present?
+      return db.execute('webhook_tokens', {
+        token: @mastodon.token,
+        owner: @mastodon.account_id,
+      }).present?
     rescue
       return false
     end
@@ -73,13 +74,24 @@ module MulukhiyaTootProxy
 
     def self.create(digest)
       all do |webhook|
-        return webhook if digest == webhook.digest
+        next unless digest == webhook.digest
+        next unless webhook.exist?
+        return Webhook.new(UserConfigStorage.new[webhook.mastodon.account_id])
       end
       return nil
     end
 
     def self.all
       return enum_for(__method__) unless block_given?
+      Postgres.instance.execute('webhook_tokens').each do |row|
+        yield Webhook.new({'/webhook/token' => row['token']})
+      end
+    end
+
+    private
+
+    def db
+      return Postgres.instance
     end
   end
 end
