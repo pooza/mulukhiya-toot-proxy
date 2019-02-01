@@ -1,13 +1,16 @@
 module MulukhiyaTootProxy
   class ThinDaemon < Daemon
-    def start(args)
-      IO.popen(['thin', '--config', ThinDaemon.config_path, 'start']).each_line do |line|
-        @logger.info({daemon: app_name, output: line.chomp})
-      end
+    def cmd
+      return [
+        'thin',
+        '--config',
+        ThinDaemon.config_path,
+        'start',
+      ]
     end
 
-    def stop
-      system('pkill', '-f', ThinDaemon.config_path)
+    def child_pid
+      return `pgrep -f #{ThinDaemon.config_path}`.to_i
     end
 
     def self.config_path

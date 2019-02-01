@@ -9,6 +9,24 @@ module MulukhiyaTootProxy
       super(opts)
     end
 
+    def start(args)
+      IO.popen(cmd).each_line do |line|
+        @logger.info({daemon: app_name, output: line.chomp})
+      end
+    end
+
+    def stop
+      Process.kill('KILL', child_pid)
+    end
+
+    def cmd
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def child_pid
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
     def fork!(args)
       Process.setsid
       exit if fork
