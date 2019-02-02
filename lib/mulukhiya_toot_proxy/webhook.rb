@@ -66,7 +66,7 @@ module MulukhiyaTootProxy
     end
 
     def toot(body)
-      @mastodon.toot({
+      return  @mastodon.toot({
         status: [body].concat(toot_tags).join(' '),
         visibility: visibility,
       })

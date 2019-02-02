@@ -21,7 +21,6 @@ module MulukhiyaTootProxy
       ].join("\n")
     end
 
-
     def self.pid_path
       return File.join(Environment.dir, 'tmp/pids/sidekiq.pid')
     end

@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     def motd
       return [
         `thin -v`.chomp,
-        "Root URL: #{root_uri.to_s}",
+        "Root URL: #{root_uri}",
       ].join("\n")
     end
 

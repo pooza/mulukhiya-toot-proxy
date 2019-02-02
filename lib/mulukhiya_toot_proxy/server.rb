@@ -38,8 +38,7 @@ module MulukhiyaTootProxy
       end
       params[:text] ||= params[:body]
       raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-      webhook.toot(params[:text])
-      @renderer.message = {text: params[:text]}
+      @renderer.message = webhook.toot(params[:text]).parsed_response
       return @renderer.to_s
     end
 
@@ -47,12 +46,11 @@ module MulukhiyaTootProxy
       unless Webhook.create(params[:digest])
         raise Ginseng::NotFoundError, "Resource #{request.path} not found."
       end
-      @renderer.message = 'OK'
+      @renderer.message = {message: 'OK'}
       return @renderer.to_s
     end
 
     not_found do
-      @renderer = Ginseng::JSONRenderer.new
       @renderer.status = 404
       @renderer.message = NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
@@ -60,7 +58,6 @@ module MulukhiyaTootProxy
 
     error do |e|
       e = Ginseng::Error.create(e)
-      @renderer = Ginseng::JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{ |k, v| k == :backtrace}
       @renderer.message['error'] = e.message
