@@ -38,7 +38,7 @@ namespaces.each do |ns|
     [:start, :stop].each do |action|
       desc "#{action} #{app}"
       task action do
-        sh "#{File.join(environment.dir, 'bin/', "#{ns}_daemon.rb")} #{action}"
+        sh "#{File.join(environment.dir, 'bin', "#{ns}_daemon.rb")} #{action}"
       rescue => e
         STDERR.puts "#{e.class} #{ns}:#{action} #{e.message}"
       end

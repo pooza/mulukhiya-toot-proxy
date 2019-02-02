@@ -4,6 +4,7 @@ module MulukhiyaTootProxy
   class Daemon < DaemonSpawn::Base
     def initialize(opts = {})
       @logger = Logger.new
+      @config = Config.instance
       opts[:application] ||= classname
       opts[:working_dir] ||= Environment.dir
       super(opts)
@@ -25,6 +26,10 @@ module MulukhiyaTootProxy
 
     def child_pid
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def motd
+      return ''
     end
 
     def fork!(args)
@@ -52,6 +57,7 @@ module MulukhiyaTootProxy
         fork do
           daemon.fork!(args)
         end
+        puts daemon.motd
       end
     end
   end

@@ -11,5 +11,9 @@ module MulukhiyaTootProxy
     def test_child_pid
       assert_true(@daemon.child_pid.is_a?(Integer))
     end
+
+    def test_motd
+      assert_true(@daemon.motd.is_a?(String))
+    end
   end
 end
