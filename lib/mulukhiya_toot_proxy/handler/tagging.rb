@@ -5,12 +5,16 @@ module MulukhiyaTootProxy
       words do |word|
         tag = Mastodon.create_tag(word.gsub(/[\s　]/, ''))
         next if body['status'].include?(tag)
-        next unless body['status'] =~ Regexp.new(word.gsub(' ', '[\s　]?'))
+        if word.include?(' ')
+          next unless body['status'] =~ Regexp.new(word.gsub(' ', '[\s　]?'))
+        else
+          next unless body['status'].include?(word)
+        end
         tags.push(tag)
         increment!
       end
-      return unless tags.present?
-      body['status'] = "#{body['status']}\n#{tags.join(' ')}"
+      body['status'] = "#{body['status']}\n#{tags.join(' ')}" if tags.present?
+      return body
     end
 
     def words
