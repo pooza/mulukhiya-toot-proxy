@@ -24,7 +24,9 @@ module MulukhiyaTootProxy
 
     def root_uri
       unless @uri
-        @uri = Addressable::URI.parse('http://localhost')
+        @uri = Addressable::URI.new
+        @uri.host = Environment.hostname
+        @uri.scheme = 'http'
         @uri.port = @config['/thin/port']
       end
       return @uri
