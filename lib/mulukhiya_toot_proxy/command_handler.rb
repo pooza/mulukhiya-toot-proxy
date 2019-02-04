@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
+      return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|
         next unless values = send(method, body['status'])
