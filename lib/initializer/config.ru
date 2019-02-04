@@ -5,6 +5,7 @@ ENV['SSL_CERT_FILE'] ||= File.join(dir, 'cert/cacert.pem')
 
 require 'bundler/setup'
 require 'sidekiq/web'
+require 'sidekiq-scheduler/web'
 require 'mulukhiya_toot_proxy'
 
 run Rack::URLMap.new({

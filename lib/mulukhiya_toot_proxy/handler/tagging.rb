@@ -2,13 +2,13 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def exec(body, headers = {})
       tags = []
-      words do |word|
-        tag = Mastodon.create_tag(word.gsub(/[\s　]/, ''))
+      dictionary.each do |k, pattern|
+        tag = Mastodon.create_tag(k.gsub(/[\s　]/, ''))
         next if body['status'].include?(tag)
-        if word.include?(' ')
-          next unless body['status'] =~ Regexp.new(word.gsub(' ', '[\s　]?'))
+        if pattern.is_a?(Regexp)
+          next unless body['status'] =~ pattern
         else
-          next unless body['status'].include?(word)
+          next unless body['status'].include?(pattern)
         end
         tags.push(tag)
         increment!
@@ -17,15 +17,11 @@ module MulukhiyaTootProxy
       return body
     end
 
-    def words
-      return enum_for(__method__) unless block_given?
-      HTTParty.get(@config['/tagging/dictionary/url']).parsed_response.each do |entry|
-        @config['/tagging/dictionary/fields'].each do |field|
-          yield entry[field] if entry[field].present?
-        end
-      rescue
-        next
+    def dictionary
+      unless File.exist?(FetchTaggingDictionaryWorker.cache_path)
+        FetchTaggingDictionaryWorker.new.perform
       end
+      return Marshal.load(File.read(FetchTaggingDictionaryWorker.cache_path))
     end
   end
 end

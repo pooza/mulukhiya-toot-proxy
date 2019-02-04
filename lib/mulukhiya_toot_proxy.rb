@@ -4,6 +4,7 @@ require 'active_support/dependencies/autoload'
 require 'ginseng'
 require 'ginseng/postgres'
 require 'sidekiq'
+require 'sidekiq-scheduler'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'ASIN'
@@ -63,6 +64,7 @@ module MulukhiyaTootProxy
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
     autoload :DropboxClippingWorker
+    autoload :FetchTaggingDictionaryWorker
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
   end
