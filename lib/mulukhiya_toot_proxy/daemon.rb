@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def motd
-      return ''
+      return self.class.to_s
     end
 
     def fork!(args)
