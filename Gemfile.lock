@@ -196,6 +196,7 @@ PLATFORMS
 DEPENDENCIES
   addressable
   amazon-ecs
+  bundler (= 1.17.3)
   crowi-client!
   daemon-spawn
   dropbox-sdk-v2!
