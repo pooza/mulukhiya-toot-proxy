@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: install bundler
-          command: gem install bundler -v '<2' 
+          command: gem install bundler -v '<2'
       - run:
           name: install dependencies
           command: bundle install
@@ -19,5 +19,8 @@ jobs:
           name: bundle check
           command: bundle check
       - run:
-          name: check fresh gems
+          name: update cert
+          command: bundle exec rake cert:update
+      - run:
+          name: check fresh
           command: bundle exec bin/check_fresh_gems.rb
