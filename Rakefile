@@ -25,6 +25,37 @@ namespace :cert do
       HTTParty.get('https://curl.haxx.se/ca/cacert.pem'),
     )
   end
+
+  desc 'check cert'
+  task :check do
+    if `git status`.include?('cacert.pem')
+      STDERR.puts 'cert is not fresh.'
+      exit 1
+    end
+  end
+end
+
+namespace :bundle do
+  desc 'update gems'
+  task :update do
+    sh 'bundle update'
+  end
+
+  desc 'check gems'
+  task :check do
+    if `git status`.include?('Gemfile.lock')
+      STDERR.puts 'gems is not fresh.'
+      exit 1
+    end
+  end
+end
+
+namespace :repos do
+  desc 'update cert/gems'
+  task update: ['cert:update', 'bundle:update']
+
+  desc 'check cert/gems'
+  task check: ['cert:check', 'bundle:check']
 end
 
 namespaces = [:thin, :sidekiq]

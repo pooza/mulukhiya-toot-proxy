@@ -16,11 +16,8 @@ jobs:
           name: run RuboCop
           command: bundle exec rubocop
       - run:
-          name: bundle check
-          command: bundle check
+          name: update repository
+          command: bundle exec rake repos:update
       - run:
-          name: update cert
-          command: bundle exec rake cert:update
-      - run:
-          name: check fresh
-          command: bundle exec bin/check_fresh_gems.rb
+          name: check repository
+          command: bundle exec rake repos:check
