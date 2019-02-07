@@ -12,9 +12,9 @@ jobs:
       - run:
           name: run RuboCop
           command: bundle exec rubocop
-      - run:
-          name: bundle check
-          command: bundle check
+      #- run:
+      #    name: bundle check
+      #    command: bundle check
       - run:
           name: check fresh gems
           command: bundle exec bin/check_fresh_gems.rb
