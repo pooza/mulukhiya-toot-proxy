@@ -12,3 +12,6 @@ jobs:
       - run:
           name: run RuboCop
           command: bundle exec rubocop
+      - run:
+          name: bundle check
+          command: bundle check
