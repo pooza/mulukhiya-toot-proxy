@@ -8,6 +8,9 @@ jobs:
       - checkout
       - run:
           name: install dependencies
+          command: gem install bundler -v '<2' 
+      - run:
+          name: install dependencies
           command: bundle install
       - run:
           name: run RuboCop
