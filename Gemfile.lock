@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 35f6ee8df41a08be5ce24399669d23572ae52ff6
+  revision: daf4d443676e0d0406a1a69d25562bd9b0874dc9
   specs:
-    ginseng-core (1.0.16)
+    ginseng-core (1.0.17)
       activesupport
       addressable
       bundler (< 2.0)
@@ -31,9 +31,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 9beee9e5274831b199fff99ebc43b49e0fd9b38e
+  revision: b961ecab936fbb3f5968e3bdbb21e92313ce9d88
   specs:
-    ginseng-postgres (1.0.3)
+    ginseng-postgres (1.0.4)
       pg
 
 GEM
