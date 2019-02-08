@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
     end
 
     def exec(body, headers = {})
+      return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|
         next unless values = send(method, body['status'])
@@ -17,9 +18,9 @@ module MulukhiyaTootProxy
         next
       end
       return unless values.present?
+      dispatch(values)
       body['visibility'] = 'direct'
       body['status'] = YAML.dump(values)
-      dispatch(values)
       increment!
     end
 

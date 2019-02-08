@@ -1,0 +1,26 @@
+SELECT
+  tokens.id,
+  tokens.token,
+  tokens.scopes,
+  accounts.id AS account_id,
+  apps.name AS apps_name
+FROM oauth_access_tokens AS tokens
+  INNER JOIN oauth_applications AS apps ON tokens.application_id=apps.id
+  INNER JOIN users ON tokens.resource_owner_id=users.id
+  INNER JOIN accounts ON accounts.id=users.account_id
+WHERE (accounts.domain IS NULL)
+  AND (accounts.silenced='f')
+  AND (accounts.suspended='f')
+  AND (tokens.scopes ~ '(^|\s)(write:statuses|write)($|\s)')
+  AND (users.disabled='f')
+  AND (apps.name ~ '^(mulukhiya|mulukhiya-toot-proxy|モロヘイヤ|webhook)$')
+  <% if params[:token] %>
+    AND (tokens.token='<%= params[:token] %>')
+  <% end %>
+  <% if params[:owner] %>
+    AND (accounts.id='<%= params[:owner] %>')
+  <% end %>
+GROUP BY
+  tokens.id,
+  accounts.id,
+  apps.name

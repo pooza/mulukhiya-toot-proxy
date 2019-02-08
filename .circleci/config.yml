@@ -7,8 +7,17 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install bundler
+          command: gem install bundler -v '<2'
+      - run:
           name: install dependencies
           command: bundle install
       - run:
           name: run RuboCop
           command: bundle exec rubocop
+      - run:
+          name: update repository
+          command: bundle exec rake repos:update
+      - run:
+          name: check repository
+          command: bundle exec rake repos:check

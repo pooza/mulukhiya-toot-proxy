@@ -122,3 +122,8 @@ Metrics/CyclomaticComplexity:
 
 Metrics/PerceivedComplexity:
   Max: 10
+
+Security/MarshalLoad:
+  Exclude:
+    - lib/mulukhiya_toot_proxy/handler/tagging.rb
+

@@ -1,5 +1,5 @@
 package:
-  version: 2.0.16
+  version: 2.1.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -115,3 +115,5 @@ slack:
 sidekiq:
   redis:
     dsn: redis://localhost:6379/2
+webhook:
+  salt: mulukhiya

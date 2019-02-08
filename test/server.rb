@@ -20,6 +20,33 @@ module MulukhiyaTootProxy
       assert_equal(422, result.code) # 文字数オーバー
     end
 
+    def test_hook_toot
+      Webhook.all do |hook|
+        next unless hook.mastodon.account['username'] == @config['/test/account'].sub(/^@/, '')
+        result = HTTParty.get(hook.uri)
+        assert_equal(result.code, 200)
+
+        result = HTTParty.post(hook.uri, {
+          body: {text: 'ひらめけ！ホーリーソード！'}.to_json,
+          headers: {'Content-Type' => 'application/json'},
+        })
+        assert_equal(result.code, 200)
+
+        result = HTTParty.post(hook.uri, {
+          body: {body: '武田信玄'}.to_json,
+          headers: {'Content-Type' => 'application/json'},
+        })
+        assert_equal(result.code, 200)
+      end
+    end
+
+    def test_not_found
+      return unless hook = Webhook.all.first
+      uri = hook.uri.clone
+      uri.path = '/not_found'
+      assert_equal(HTTParty.get(uri).code, 404)
+    end
+
     private
 
     def toot_url

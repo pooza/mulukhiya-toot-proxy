@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: a640a7356217cf0cc397a073c049ea7719317590
+  revision: daf4d443676e0d0406a1a69d25562bd9b0874dc9
   specs:
-    ginseng-core (1.0.13)
+    ginseng-core (1.0.17)
       activesupport
       addressable
       bundler (< 2.0)
@@ -31,9 +31,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 828570463bd8c0c2c1a79c61ae0cc5b43b136f51
+  revision: b961ecab936fbb3f5968e3bdbb21e92313ce9d88
   specs:
-    ginseng-postgres (1.0.1)
+    ginseng-postgres (1.0.4)
       pg
 
 GEM
@@ -53,13 +53,19 @@ GEM
     buftok (0.2.0)
     concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
+    daemon-spawn (0.4.2)
     daemons (1.3.1)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     equalizer (0.0.11)
+    et-orbi (1.1.7)
+      tzinfo
     eventmachine (1.2.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
+    fugit (1.1.8)
+      et-orbi (~> 1.1, >= 1.1.7)
+      raabro (~> 1.1)
     hashie (3.6.0)
     http (3.3.0)
       addressable (~> 2.3)
@@ -70,7 +76,7 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.1.1)
     http_parser.rb (0.6.0)
-    httparty (0.16.3)
+    httparty (0.16.4)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.5.3)
@@ -112,6 +118,7 @@ GEM
     power_assert (1.1.3)
     powerpack (0.1.2)
     public_suffix (3.0.3)
+    raabro (1.1.6)
     rack (2.0.6)
     rack-protection (2.0.5)
       rack
@@ -138,11 +145,18 @@ GEM
       unicode-display_width (~> 1.4.0)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.10.0)
+    rufus-scheduler (3.5.2)
+      fugit (~> 1.1, >= 1.1.5)
     sidekiq (5.2.5)
       connection_pool (~> 2.2, >= 2.2.2)
       rack (>= 1.5.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
+    sidekiq-scheduler (3.0.0)
+      redis (>= 3, < 5)
+      rufus-scheduler (~> 3.2)
+      sidekiq (>= 3)
+      tilt (>= 1.4.0)
     simple_oauth (0.3.1)
     sinatra (2.0.5)
       mustermann (~> 1.0)
@@ -183,16 +197,19 @@ DEPENDENCIES
   addressable
   amazon-ecs
   crowi-client!
+  daemon-spawn
   dropbox-sdk-v2!
   ginseng-core!
   ginseng-postgres!
   httparty
   nokogiri
+  omniauth-oauth2 (~> 1.5.0)
   redis
   reverse_markdown
-  rspotify
+  rspotify (~> 2.4.1)
   rubocop
-  sidekiq (< 6.0)
+  sidekiq
+  sidekiq-scheduler
   thin
   twitter
 
