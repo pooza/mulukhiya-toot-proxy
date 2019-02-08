@@ -4,8 +4,12 @@ module MulukhiyaTootProxy
   class FetchTaggingDictionaryWorker
     include Sidekiq::Worker
 
-    def perform
+    def initialize
       @config = Config.instance
+      @logger = Logger.new
+    end
+
+    def perform
       File.write(FetchTaggingDictionaryWorker.cache_path, Marshal.dump(patterns))
     end
 
@@ -17,19 +21,23 @@ module MulukhiyaTootProxy
 
     def patterns
       r = {}
-      HTTParty.get(@config['/tagging/dictionary/url']).parsed_response.each do |entry|
-        @config['/tagging/dictionary/fields'].each do |field|
-          next unless word = entry[field]
-          if word.include?(' ')
-            r[word] = Regexp.new(word.gsub(' ', '[\s　]?'))
-          else
-            r[word] = word
+      @config['/tagging/dictionaries'].each do |dictionary|
+        HTTParty.get(dictionary['url']).parsed_response.each do |entry|
+          dictionary['fields'].each do |field|
+            next unless word = entry[field]
+            r[word] = create_pattern(word) unless r[word].present?
+          rescue => e
+            @logger.error("#{dictionary} #{e.message}")
+            next
           end
         end
-      rescue
-        next
       end
       return r
+    end
+
+    def create_pattern(word)
+      return Regexp.new(word.gsub(' ', '[\s　]?')) if word.include?(' ')
+      return word
     end
   end
 end
