@@ -47,7 +47,6 @@ module MulukhiyaTootProxy
     def create_pattern(word)
       pattern = nil
       pattern = (pattern || word).gsub(/[^[:alnum:]]/, '.?') if word =~ /[^[:alnum:]]/
-      pattern = (pattern || word).gsub(' ', '[\s　]?') if word.include?(' ')
       return word if pattern.nil?
       return Regexp.new(pattern)
     end
