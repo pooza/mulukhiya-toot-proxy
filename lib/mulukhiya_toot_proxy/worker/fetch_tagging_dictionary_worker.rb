@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def self.cache_path
-      return File.join(Environment.dir, 'tmp/cache/tagging_dic')
+      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary')
     end
 
     private
