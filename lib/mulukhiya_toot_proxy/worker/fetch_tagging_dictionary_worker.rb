@@ -34,7 +34,7 @@ module MulukhiyaTootProxy
             next unless word = entry[field]
             r[word] = create_pattern(word) unless r[word].present?
           rescue => e
-            message = e.to_h.clone
+            message = Ginseng::Error.create(e).to_h.clone
             message['dictionary'] = dic
             @logger.error(message)
             next
@@ -45,8 +45,11 @@ module MulukhiyaTootProxy
     end
 
     def create_pattern(word)
-      return Regexp.new(word.gsub(' ', '[\s　]?')) if word.include?(' ')
-      return word
+      pattern = nil
+      pattern = (pattern || word).gsub(/[^[:alnum:]]/, '.?') if word =~ /[^[:alnum:]]/
+      pattern = (pattern || word).gsub(' ', '[\s　]?') if word.include?(' ')
+      return word if pattern.nil?
+      return Regexp.new(pattern)
     end
   end
 end
