@@ -3,6 +3,7 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       tags = []
       dictionary.each do |k, pattern|
+        next if k.length < @config['/tagging/word/minimum_length']
         tag = Mastodon.create_tag(k.gsub(/[\s　]/, ''))
         next if body['status'].include?(tag)
         if pattern.is_a?(Regexp)
