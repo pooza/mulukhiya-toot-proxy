@@ -115,6 +115,9 @@ slack:
 sidekiq:
   redis:
     dsn: redis://localhost:6379/2
+  auth:
+    user: admin
+    password: ''
 tagging:
   word:
     minimum_length: 4
