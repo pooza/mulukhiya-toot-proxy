@@ -9,7 +9,7 @@ require 'sidekiq-scheduler/web'
 require 'mulukhiya_toot_proxy'
 
 config = MulukhiyaTootProxy::Config.instance
-if (config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?)
+if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?
   Sidekiq::Web.use Rack::Auth::Basic do |username, password|
     MulukhiyaTootProxy::Environment.auth(username, password)
   end
