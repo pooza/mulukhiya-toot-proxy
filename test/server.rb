@@ -25,14 +25,6 @@ module MulukhiyaTootProxy
       assert_false(last_response.ok?)
     end
 
-    def test_webhook_get
-      Webhook.all do |hook|
-        header 'User-Agent', Package.user_agent
-        get File.join('/mulukhiya/webhook', hook.digest)
-        assert(last_response.ok?)
-      end
-    end
-
     def test_toot
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'User-Agent', Package.user_agent
