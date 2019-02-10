@@ -13,9 +13,9 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def update(keyword, status)
+    def update(keyword)
       return unless track = @tracks[keyword]
-      status.push(track.external_urls['spotify'])
+      push(track.external_urls['spotify'])
     end
   end
 end

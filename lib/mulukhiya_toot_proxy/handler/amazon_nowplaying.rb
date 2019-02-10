@@ -11,9 +11,9 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def update(keyword, status)
+    def update(keyword)
       return unless asin = @asins[keyword]
-      status.push(@service.item_uri(asin).to_s)
+      push(@service.item_uri(asin).to_s)
     end
   end
 end

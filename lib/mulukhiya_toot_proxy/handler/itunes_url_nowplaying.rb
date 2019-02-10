@@ -15,13 +15,13 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def update(keyword, status)
+    def update(keyword)
       return unless track = @tracks[keyword]
-      status.push(track['trackName'])
-      status.push(ArtistParser.new(track['artistName']).parse.join(' '))
+      push(track['trackName'])
+      push(ArtistParser.new(track['artistName']).parse.join(' '))
       [:amazon_uri, :spotify_uri].each do |method|
         next unless uri = @service.send(method, track)
-        status.push(uri.to_s)
+        push(uri.to_s)
       end
     end
   end

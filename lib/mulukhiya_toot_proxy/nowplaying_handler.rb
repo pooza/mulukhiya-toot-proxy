@@ -1,19 +1,20 @@
 module MulukhiyaTootProxy
   class NowplayingHandler < Handler
     def exec(body, headers = {})
-      status = []
+      @source_status = body['status'].clone
+      @status = []
       updated = false
-      body['status'].each_line do |line|
-        status.push(line.chomp)
+      @source_status.each_line do |line|
+        @status.push(line.chomp)
         next if updated
         next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
         keyword = matches[1]
         next unless updatable?(keyword)
-        update(keyword, status)
+        update(keyword)
         updated = true
         increment!
       end
-      body['status'] = status.join("\n")
+      body['status'] = @status.join("\n")
       return body
     end
 
@@ -21,8 +22,14 @@ module MulukhiyaTootProxy
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def update(keyword, status)
+    def update(keyword)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    private
+
+    def push(line)
+      @status.push(line) unless @source_status.include?(line)
     end
   end
 end

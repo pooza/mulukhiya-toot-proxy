@@ -11,9 +11,9 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def update(keyword, status)
+    def update(keyword)
       return unless track = @tracks[keyword]
-      status.push(track['trackViewUrl'])
+      push(track['trackViewUrl'])
     end
   end
 end
