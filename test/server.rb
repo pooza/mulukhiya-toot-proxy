@@ -3,7 +3,6 @@ require 'rack/test'
 module MulukhiyaTootProxy
   class ServerTest < Test::Unit::TestCase
     include ::Rack::Test::Methods
-    MAX_LENGTH = 500
 
     def setup
       @config = Config.instance
@@ -37,25 +36,25 @@ module MulukhiyaTootProxy
     def test_toot
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'User-Agent', Package.user_agent
-      post '/api/v1/statuses', {'status' => 'A' * MAX_LENGTH, 'visibility' => 'private'}
+      post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'User-Agent', Package.user_agent
-      post '/api/v1/statuses', {'status' => 'A' * (MAX_LENGTH + 1), 'visibility' => 'private'}
+      post '/api/v1/statuses', {'status' => 'A' * (max_length + 1), 'visibility' => 'private'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'User-Agent', Package.user_agent
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * MAX_LENGTH, 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * max_length, 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'User-Agent', Package.user_agent
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * (MAX_LENGTH + 1), 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
@@ -78,6 +77,12 @@ module MulukhiyaTootProxy
         post hook.uri.path, {body: '武田信玄'}.to_json
         assert(last_response.ok?)
       end
+    end
+
+    private
+
+    def max_length
+      return @config['/mastodon/max_length']
     end
   end
 end
