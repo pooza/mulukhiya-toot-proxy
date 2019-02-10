@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
       header 'User-Agent', Package.user_agent
       get '/about'
       assert(last_response.ok?)
-      assert_equal(%{"#{Package.name} #{Package.version}"}, last_response.body)
+      assert_equal(%("#{Package.name} #{Package.version}"), last_response.body)
     end
 
     def test_not_found
