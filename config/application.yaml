@@ -38,7 +38,7 @@ amazon:
       shortenable: true
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
-  affiliate: true
+  affiliate: false
 spotify:
   language: ja
   retry_limit: 5
