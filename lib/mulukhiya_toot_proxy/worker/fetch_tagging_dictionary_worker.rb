@@ -26,10 +26,7 @@ module MulukhiyaTootProxy
     def patterns
       r = {}
       @config['/tagging/dictionaries'].each do |dic|
-        response = HTTParty.get(dic['url']).parsed_response
-        raise Ginseng::GatewayError, "'#{dic['url']}' is invalid" unless response.is_a?(Array)
-        raise Ginseng::GatewayError, "'#{dic['url']}' is empty" unless response.present?
-        response.each do |entry|
+        fetch(dic['url']).each do |entry|
           dic['fields'].each do |field|
             next unless word = entry[field]
             r[word] = create_pattern(word) unless r[word].present?
@@ -49,6 +46,17 @@ module MulukhiyaTootProxy
       pattern = (pattern || word).gsub(/[^[:alnum:]]/, '.?') if word =~ /[^[:alnum:]]/
       return word if pattern.nil?
       return Regexp.new(pattern)
+    end
+
+    def fetch(url)
+      response = HTTParty.get(url, {
+        headers: {'User-Agent' => Package.user_agent},
+      }).parsed_response
+      raise 'not array' unless response.is_a?(Array)
+      raise 'empty' unless response.present?
+      return response
+    rescue => e
+      raise Ginseng::GatewayError, "'#{url}' is invalid (#{e.message})"
     end
   end
 end
