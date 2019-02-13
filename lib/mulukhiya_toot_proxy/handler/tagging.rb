@@ -2,17 +2,19 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def exec(body, headers = {})
       tags = []
-      dictionary.reverse_each do |k, pattern|
-        next if k.length < @config['/tagging/word/minimum_length']
-        tag = Mastodon.create_tag(k.gsub(/[\s　]/, ''))
+      keys = []
+      dictionary.reverse_each do |key, pattern|
+        next if key.length < @config['/tagging/word/minimum_length']
+        tag = Mastodon.create_tag(key.gsub(/[\s　]/, ''))
         next if body['status'].include?(tag)
-        next unless tags.grep(Regexp.new(k)).empty?
+        next unless keys.grep(Regexp.new(key)).empty?
         if pattern.is_a?(Regexp)
           next unless body['status'] =~ pattern
         else
           next unless body['status'].include?(pattern)
         end
         tags.push(tag)
+        keys.push(key)
         increment!
       end
       body['status'] = "#{body['status']}\n#{tags.join(' ')}" if tags.present?
