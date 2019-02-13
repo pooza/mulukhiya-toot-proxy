@@ -18,6 +18,7 @@ module MulukhiyaTootProxy
 
     def create_uris(values)
       values['uri'] ||= values['url']
+      values.delete('url')
       raise Ginseng::RequestError, 'Empty URL' unless values['uri'].present?
       yield TwitterURI.parse(values['uri'])
       yield MastodonURI.parse(values['uri'])
