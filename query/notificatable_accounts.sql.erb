@@ -23,4 +23,5 @@ WHERE (accounts.domain IS NULL)
   <% if params[:pattern] %>
     AND (accounts.username ~ '<%= params[:pattern] %>')
   <% end %>
-GROUP BY accounts.id
+GROUP BY
+  accounts.id
