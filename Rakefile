@@ -82,5 +82,5 @@ end
 
 [:start, :stop, :restart].each do |action|
   desc "#{action} #{apps.join('/')}"
-  task action => namespaces.map{ |ns| "#{ns}:#{action}"}
+  task action => namespaces.map{|ns| "#{ns}:#{action}"}
 end
