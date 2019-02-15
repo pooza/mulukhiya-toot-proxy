@@ -7,11 +7,11 @@ module MulukhiyaTootProxy
     end
 
     def test_create
-      assert_true(@clipper.is_a?(GrowiClipper))
+      assert(@clipper.is_a?(GrowiClipper))
     end
 
     def test_clip
-      assert_true(@clipper.clip("#{Time.now} #{__method__}").is_a?(CPApiReturn))
+      assert(@clipper.clip("#{Time.now} #{__method__}").is_a?(CPApiReturn))
     end
   end
 end

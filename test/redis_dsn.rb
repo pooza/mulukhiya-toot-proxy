@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_new
-      assert_true(@dsn.is_a?(RedisDSN))
+      assert(@dsn.is_a?(RedisDSN))
     end
 
     def test_scheme

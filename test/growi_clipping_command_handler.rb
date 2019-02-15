@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def test_create
-      assert_true(@handler.is_a?(GrowiClippingCommandHandler))
+      assert(@handler.is_a?(GrowiClippingCommandHandler))
     end
 
     def test_exec
