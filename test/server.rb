@@ -52,9 +52,7 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
-      Webhook.all do |hook|
-        next unless hook.mastodon.account['username'] == @config['/test/account'].sub(/^@/, '')
-
+      Webhook.owned_all(@config['/test/account']) do |hook|
         header 'User-Agent', Package.user_agent
         get hook.uri.path
         assert(last_response.ok?)
