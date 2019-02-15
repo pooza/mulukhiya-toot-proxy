@@ -1,5 +1,7 @@
 module MulukhiyaTootProxy
-  class SidekiqDaemon < Daemon
+  class SidekiqDaemon < Ginseng::Daemon
+    include Package
+
     def cmd
       return [
         'sidekiq',
