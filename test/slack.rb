@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
 
     def test_say
       Slack.all do |slack|
-        assert(slack.say({text: Package.full_name}).response.is_a?(Net::HTTPOK))
+        assert_equal(slack.say({text: Package.full_name}).code, 200)
       end
     end
   end
