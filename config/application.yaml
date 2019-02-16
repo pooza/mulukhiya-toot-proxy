@@ -5,6 +5,8 @@ package:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+cert:
+  url: https://curl.haxx.se/ca/cacert.pem
 shortened_url:
   timeout: 5
   domains:
