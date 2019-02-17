@@ -1,5 +1,5 @@
 namespace :mulukhiya do
-  desc 'mulukhiya test'
+  desc 'test mulukhiya'
   task :test do
     ENV['TEST'] = MulukhiyaTootProxy::Package.full_name
     require 'test/unit'
