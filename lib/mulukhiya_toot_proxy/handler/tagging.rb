@@ -14,8 +14,8 @@ module MulukhiyaTootProxy
         keys.delete_if{|v| key.include?(v[:key])}
         keys.delete_if{|v| v[:key].include?(key)}
         keys.push({tag: tag, key: key})
-        increment!
       end
+      @count += keys.count
       body['status'] = "#{body['status']}\n#{keys.map{|v| v[:tag]}.join(' ')}" if keys.present?
       return body
     end
