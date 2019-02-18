@@ -15,25 +15,28 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9b1b301dada95f2035006204d1f353f0bd8c14e7
+  revision: 8dfa5d54b7d4e09779c727925d58cd3a64b5faa7
   specs:
-    ginseng-core (1.0.18)
+    ginseng-core (1.1.1)
       activesupport
       addressable
       bundler (< 2.0)
+      daemon-spawn
       httparty
+      rack-test
       rake
       rest-client
       rubocop
       sinatra
       syslog-logger
       test-unit
+      thin
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: b961ecab936fbb3f5968e3bdbb21e92313ce9d88
+  revision: 7f347463b5cc5351c0455639fc8c8234cad9580d
   specs:
-    ginseng-postgres (1.0.4)
+    ginseng-postgres (1.0.6)
       pg
 
 GEM
@@ -199,21 +202,18 @@ DEPENDENCIES
   addressable
   amazon-ecs
   crowi-client!
-  daemon-spawn
   dropbox-sdk-v2!
   ginseng-core!
   ginseng-postgres!
   httparty
   nokogiri
   omniauth-oauth2 (~> 1.5.0)
-  rack-test
   redis
   reverse_markdown
   rspotify (~> 2.4.1)
   rubocop
   sidekiq
   sidekiq-scheduler
-  thin
   twitter
 
 RUBY VERSION

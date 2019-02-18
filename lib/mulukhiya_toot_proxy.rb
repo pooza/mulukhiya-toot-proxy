@@ -19,7 +19,6 @@ module MulukhiyaTootProxy
   autoload :ClippingWorker
   autoload :CommandHandler
   autoload :Config
-  autoload :Daemon
   autoload :DropboxClipper
   autoload :Environment
   autoload :GrowiClipper

@@ -88,6 +88,14 @@ module MulukhiyaTootProxy
       end
     end
 
+    def self.owned_all(account)
+      return enum_for(__method__) unless block_given?
+      all do |webhook|
+        next unless webhook.mastodon.account['username'] == account.sub(/^@/, '')
+        yield webhook
+      end
+    end
+
     private
 
     def db

@@ -1,7 +1,9 @@
 require 'addressable/uri'
 
 module MulukhiyaTootProxy
-  class ThinDaemon < Daemon
+  class ThinDaemon < Ginseng::Daemon
+    include Package
+
     def cmd
       return [
         'thin',

@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
       assert_false(uri.shortenable?)
 
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge')
-      assert_true(uri.shortenable?)
+      assert(uri.shortenable?)
     end
 
     def test_amazon?
@@ -13,10 +13,10 @@ module MulukhiyaTootProxy
       assert_false(uri.amazon?)
 
       uri = AmazonURI.parse('https://www.amazon.co.jp')
-      assert_true(uri.amazon?)
+      assert(uri.amazon?)
 
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge')
-      assert_true(uri.amazon?)
+      assert(uri.amazon?)
     end
 
     def test_asin

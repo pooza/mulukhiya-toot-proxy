@@ -6,15 +6,15 @@ module MulukhiyaTootProxy
     end
 
     def test_new
-      assert_true(@mastodon.is_a?(Mastodon))
+      assert(@mastodon.is_a?(Mastodon))
     end
 
     def test_account_id
-      assert_true(@mastodon.account_id.is_a?(Integer))
+      assert(@mastodon.account_id.is_a?(Integer))
     end
 
     def test_account
-      assert_true(@mastodon.account.is_a?(Hash))
+      assert(@mastodon.account.is_a?(Hash))
     end
 
     def test_create_tag

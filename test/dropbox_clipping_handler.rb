@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def test_create
-      assert_true(@handler.is_a?(DropboxClippingHandler))
+      assert(@handler.is_a?(DropboxClippingHandler))
     end
 
     def test_exec

@@ -22,6 +22,8 @@ Layout/SpaceBeforeBlockBraces:
 
 Layout/SpaceInsideBlockBraces:
   EnforcedStyle: no_space
+  EnforcedStyleForEmptyBraces: no_space
+  SpaceBeforeBlockParameters: false
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space

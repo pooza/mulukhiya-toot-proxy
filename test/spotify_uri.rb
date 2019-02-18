@@ -5,10 +5,10 @@ module MulukhiyaTootProxy
       assert_false(uri.spotify?)
 
       uri = SpotifyURI.parse('https://spotify.com')
-      assert_true(uri.spotify?)
+      assert(uri.spotify?)
 
       uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_true(uri.spotify?)
+      assert(uri.spotify?)
     end
 
     def test_track_id
@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
       assert_nil(uri.image_uri)
 
       uri = SpotifyURI.parse('https://open.spotify.com/track/2j7bBkmzkl2Yz6oAsHozX0')
-      assert_true(uri.image_uri.is_a?(Addressable::URI))
+      assert(uri.image_uri.is_a?(Addressable::URI))
     end
   end
 end
