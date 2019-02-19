@@ -17,6 +17,8 @@ module MulukhiyaTootProxy
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    alias executable? updatable?
+
     def create_image_uri(link)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end

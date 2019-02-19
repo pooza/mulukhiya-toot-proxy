@@ -17,5 +17,7 @@ module MulukhiyaTootProxy
     def rewritable?(link)
       return true
     end
+
+    alias executable? rewritable?
   end
 end
