@@ -22,6 +22,8 @@ module MulukhiyaTootProxy
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    alias executable? updatable?
+
     def update(keyword)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end

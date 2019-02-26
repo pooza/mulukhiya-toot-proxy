@@ -1,5 +1,5 @@
 package:
-  version: 2.1.6
+  version: 2.1.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -7,6 +7,8 @@ package:
     - tkoishi@b-shock.co.jp
 cert:
   url: https://curl.haxx.se/ca/cacert.pem
+handler:
+  timeout: 10
 shortened_url:
   timeout: 5
   domains:
@@ -66,7 +68,7 @@ nowplaying:
     delimiters:
       - /
       - 、
-    cv_patterns:
+    patterns:
       - pattern: ^[^():]+、
         delimited: true
       - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'

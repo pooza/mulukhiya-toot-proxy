@@ -15,7 +15,7 @@ task test: ['mulukhiya:test']
   task action => ["mulukhiya:thin:#{action}", "mulukhiya:sidekiq:#{action}"]
 end
 
-['Ginseng', 'Ginseng::Postgres', 'MulukhiyaTootProxy'].each do |prefix|
+['Ginseng', 'Ginseng::Postgres', ENV['RAKE_MODULE']].each do |prefix|
   Dir.glob(File.join("#{prefix}::Environment".constantize.dir, 'lib/task/*.rb')).each do |f|
     require f
   end
