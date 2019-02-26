@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
 
     def parse
       return [@source] unless @config['/nowplaying/hashtag']
-      cv_patterns do |pattern_entry|
+      patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited]
           split_artist(@source, true).each do |artist|
@@ -43,9 +43,9 @@ module MulukhiyaTootProxy
       return tags
     end
 
-    def cv_patterns
+    def patterns
       return enum_for(__method__) unless block_given?
-      @config['/nowplaying/artist_parser/cv_patterns'].each do |entry|
+      @config['/nowplaying/artist_parser/patterns'].each do |entry|
         output = {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],

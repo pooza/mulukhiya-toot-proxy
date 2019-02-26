@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandler < NotificationHandler
-    def executable?(body, headers)
+    def notifiable?(body, headers)
       return false unless body['status'] =~ /#notify(\s|$)/i
       return false if body['visibility'] =~ /^(direct|private)$/
       return true if @mastodon.account['admin'] == 't'
