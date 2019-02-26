@@ -13,37 +13,31 @@ module MulukhiyaTootProxy
     end
 
     def test_about
-      header 'User-Agent', Package.user_agent
       get '/about'
       assert(last_response.ok?)
     end
 
     def test_not_found
-      header 'User-Agent', Package.user_agent
       get '/not_found'
       assert_false(last_response.ok?)
     end
 
     def test_toot
       header 'Authorization', "Bearer #{@config['/test/token']}"
-      header 'User-Agent', Package.user_agent
       post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
-      header 'User-Agent', Package.user_agent
       post '/api/v1/statuses', {'status' => 'A' * (max_length + 1), 'visibility' => 'private'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
-      header 'User-Agent', Package.user_agent
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => 'B' * max_length, 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@config['/test/token']}"
-      header 'User-Agent', Package.user_agent
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
       assert_false(last_response.ok?)
@@ -52,16 +46,13 @@ module MulukhiyaTootProxy
 
     def test_hook_toot
       Webhook.owned_all(@config['/test/account']) do |hook|
-        header 'User-Agent', Package.user_agent
         get hook.uri.path
         assert(last_response.ok?)
 
-        header 'User-Agent', Package.user_agent
         header 'Content-Type', 'application/json'
         post hook.uri.path, {text: 'ひらめけ！ホーリーソード！'}.to_json
         assert(last_response.ok?)
 
-        header 'User-Agent', Package.user_agent
         header 'Content-Type', 'application/json'
         post hook.uri.path, {body: '武田信玄'}.to_json
         assert(last_response.ok?)

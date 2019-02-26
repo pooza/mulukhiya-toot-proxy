@@ -19,6 +19,12 @@ module MulukhiyaTootProxy
       return "#{self.class.to_s.split('::').last},#{@count}"
     end
 
+    def timeout
+      return @config["/handler/#{underscore_name}/timeout"]
+    rescue Ginseng::ConfigError
+      return @config['/handler/default/timeout']
+    end
+
     def self.create(name)
       require "mulukhiya_toot_proxy/handler/#{name}"
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new

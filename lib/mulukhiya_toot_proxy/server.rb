@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
     post '/api/v1/statuses' do
       results = []
       Handler.all do |handler|
-        Timeout.timeout(@config['/handler/timeout']) do
+        Timeout.timeout(handler.timeout) do
           handler.mastodon = @mastodon
           handler.exec(params, @headers)
           results.push(handler.result)
