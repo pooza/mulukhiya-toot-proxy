@@ -7,6 +7,8 @@ package:
     - tkoishi@b-shock.co.jp
 cert:
   url: https://curl.haxx.se/ca/cacert.pem
+handler:
+  timeout: 10
 shortened_url:
   timeout: 5
   domains:
