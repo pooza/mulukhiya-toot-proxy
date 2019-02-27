@@ -21,19 +21,19 @@ module MulukhiyaTootProxy
     end
 
     def delete
-      File.unlink(TaggingDictionary.path)
+      File.unlink(TaggingDictionary.path) if exist?
     end
 
     def patterns
       r = {}
-      @config['/tagging/dictionaries'].each do |dic|
-        fetch(dic['url']).each do |entry|
-          dic['fields'].each do |field|
+      resources.each do |resource|
+        fetch(resource['url']).each do |entry|
+          resource['fields'].each do |field|
             next unless word = entry[field]
             r[word] ||= create_pattern(word)
           rescue => e
             message = Ginseng::Error.create(e).to_h.clone
-            message['dictionary'] = dic
+            message['resource'] = resource
             @logger.error(message)
             next
           end
@@ -44,6 +44,12 @@ module MulukhiyaTootProxy
 
     def create_pattern(word)
       return Regexp.new(word.gsub(/[^[:alnum:]]/, '.?'))
+    end
+
+    def resources
+      return Config.instance['/tagging/dictionaries']
+    rescue
+      return []
     end
 
     def fetch(url)
