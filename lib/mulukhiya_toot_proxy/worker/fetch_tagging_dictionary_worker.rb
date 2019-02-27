@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
         fetch(dic['url']).each do |entry|
           dic['fields'].each do |field|
             next unless word = entry[field]
-            r[word] = create_pattern(word) unless r[word].present?
+            r[word] ||= create_pattern(word)
           rescue => e
             message = Ginseng::Error.create(e).to_h.clone
             message['dictionary'] = dic
@@ -42,10 +42,7 @@ module MulukhiyaTootProxy
     end
 
     def create_pattern(word)
-      pattern = nil
-      pattern = (pattern || word).gsub(/[^[:alnum:]]/, '.?') if word =~ /[^[:alnum:]]/
-      return word if pattern.nil?
-      return Regexp.new(pattern)
+      return Regexp.new(word.gsub(/[^[:alnum:]]/, '.?'))
     end
 
     def fetch(url)

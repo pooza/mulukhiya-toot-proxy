@@ -26,6 +26,9 @@ module MulukhiyaTootProxy
 
       assert_equal(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'], "Yes!プリキュア5 GoGo!\n#Yes_プリキュア5GoGo")
       assert_equal(handler.result, 'TaggingHandler,10')
+
+      assert_equal(handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'], "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド\n#キュアフローラ #キュアマーメイド")
+      assert_equal(handler.result, 'TaggingHandler,12')
     end
   end
 end
