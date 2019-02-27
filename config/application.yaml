@@ -15,7 +15,6 @@ handler:
   itunes_url_nowplaying:
     timeout: 20
 shortened_url:
-  timeout: 5
   domains:
     - t.co
     - goo.gl
