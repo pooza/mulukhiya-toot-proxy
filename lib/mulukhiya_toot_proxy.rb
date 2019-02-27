@@ -37,6 +37,7 @@ module MulukhiyaTootProxy
   autoload :Server
   autoload :Slack
   autoload :SpotifyService
+  autoload :TaggingDictionary
   autoload :Template
   autoload :TwitterService
   autoload :URLHandler
