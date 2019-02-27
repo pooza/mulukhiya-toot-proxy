@@ -8,7 +8,6 @@ module MulukhiyaTootProxy
       while @config['/shortened_url/domains'].member?(uri.host)
         response = HTTParty.get(uri.normalize, {
           follow_redirects: false,
-          timeout: @config['/shortened_url/timeout'],
           headers: {'User-Agent' => Package.user_agent},
         })
         location = response.headers['location']

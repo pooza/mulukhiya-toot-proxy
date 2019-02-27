@@ -3,6 +3,6 @@
 :queues:
   - default
 :schedule:
-  fetch_tagging_dictionary:
+  tagging_dictionary:
     every: '5m'
-    class: MulukhiyaTootProxy::FetchTaggingDictionaryWorker
+    class: MulukhiyaTootProxy::TaggingDictionaryWorker

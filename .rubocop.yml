@@ -127,5 +127,5 @@ Metrics/PerceivedComplexity:
 
 Security/MarshalLoad:
   Exclude:
-    - lib/mulukhiya_toot_proxy/handler/tagging.rb
+    - lib/mulukhiya_toot_proxy/tagging_dictionary.rb
 
