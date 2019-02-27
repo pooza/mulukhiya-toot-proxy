@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class FetchTaggingDictionaryWorker
+  class TaggingDictionaryWorker
     include Sidekiq::Worker
 
     def perform
