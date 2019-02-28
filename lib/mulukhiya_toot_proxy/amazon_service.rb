@@ -7,12 +7,11 @@ module MulukhiyaTootProxy
   class AmazonService
     def initialize
       @config = Config.instance
-      if AmazonService.accesskey?
-        Amazon::Ecs.configure do |options|
-          options[:AWS_access_key_id] = @config['/amazon/access_key']
-          options[:AWS_secret_key] = @config['/amazon/secret_key']
-          options[:associate_tag] = AmazonService.associate_tag
-        end
+      return unless AmazonService.accesskey?
+      Amazon::Ecs.configure do |options|
+        options[:AWS_access_key_id] = @config['/amazon/access_key']
+        options[:AWS_secret_key] = @config['/amazon/secret_key']
+        options[:associate_tag] = AmazonService.associate_tag
       end
     end
 
