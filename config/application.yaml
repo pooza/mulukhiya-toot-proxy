@@ -10,10 +10,6 @@ cert:
 handler:
   default:
     timeout: 10
-  spotify_url_nowplaying:
-    timeout: 20
-  itunes_url_nowplaying:
-    timeout: 20
 shortened_url:
   domains:
     - t.co

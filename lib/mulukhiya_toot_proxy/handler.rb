@@ -4,6 +4,7 @@ module MulukhiyaTootProxy
 
     def initialize
       @config = Config.instance
+      @logger = Logger.new
       @count = 0
     end
 

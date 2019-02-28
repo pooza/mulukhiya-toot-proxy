@@ -3,6 +3,7 @@ module MulukhiyaTootProxy
     def initialize(source)
       @source = source
       @config = Config.instance
+      @logger = Logger.new
       @tags = []
     end
 
@@ -24,7 +25,7 @@ module MulukhiyaTootProxy
       return @tags if @tags.present?
       return [Mastodon.create_tag(@source)]
     rescue => e
-      Slack.broadcast(Ginseng::Error.create(e).to_h)
+      @logger.error(Ginseng::Error.create(e).to_h)
       return [Mastodon.create_tag(@source)]
     end
 
