@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
       end
-      return nil
+      return published_image_uri(asin)
     rescue Amazon::RequestError => e
       raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
@@ -38,7 +38,24 @@ module MulukhiyaTootProxy
       retry
     end
 
+    def published_image_uri(asin)
+      response = HTTParty.get(item_uri(asin), {
+        headers: {'User-Agent' => Package.user_agent},
+      })
+      html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
+      ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
+        next unless elements = html.xpath(%{id("#{id}")})
+        json = JSON.parse(elements.first.attribute('data-a-dynamic-image').value)
+        next unless uri = Addressable::URI.parse(json.keys.first)
+        return uri
+      rescue
+        next
+      end
+      return nil
+    end
+
     def search(keyword, categories)
+      return nil unless AmazonService.accesskey?
       cnt = 1
       categories.each do |category|
         response = Amazon::Ecs.item_search(keyword, {
