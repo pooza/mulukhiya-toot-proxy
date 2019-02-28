@@ -1,17 +1,23 @@
 require 'amazon/ecs'
+require 'nokogiri'
+require 'addressable/uri'
+require 'json'
 
 module MulukhiyaTootProxy
   class AmazonService
     def initialize
       @config = Config.instance
-      Amazon::Ecs.configure do |options|
-        options[:AWS_access_key_id] = @config['/amazon/access_key']
-        options[:AWS_secret_key] = @config['/amazon/secret_key']
-        options[:associate_tag] = AmazonService.associate_tag
+      if AmazonService.accesskey?
+        Amazon::Ecs.configure do |options|
+          options[:AWS_access_key_id] = @config['/amazon/access_key']
+          options[:AWS_secret_key] = @config['/amazon/secret_key']
+          options[:associate_tag] = AmazonService.associate_tag
+        end
       end
     end
 
     def image_uri(asin)
+      return published_image_uri(asin) unless AmazonService.accesskey?
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
@@ -58,6 +64,15 @@ module MulukhiyaTootProxy
 
     def self.associate_tag
       return Config.instance['/amazon/associate_tag']
+    end
+
+    def self.accesskey?
+      config = Config.instance
+      config['/amazon/access_key']
+      config['/amazon/secret_key']
+      return true
+    rescue
+      return false
     end
 
     private
