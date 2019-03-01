@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     include Sidekiq::Worker
 
     def perform
-      TaggingDictionary.new.create
+      TaggingDictionary.new.refresh
     end
   end
 end
