@@ -20,6 +20,7 @@ module MulukhiyaTootProxy
     def test_not_found
       get '/not_found'
       assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
     end
 
     def test_toot
