@@ -1,7 +1,5 @@
 :pidfile: tmp/pids/sidekiq.pid
 :concurrency: 5
-:queues:
-  - default
 :schedule:
   tagging_dictionary:
     every: '5m'
