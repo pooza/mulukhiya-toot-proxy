@@ -57,7 +57,7 @@ module MulukhiyaTootProxy
 
     not_found do
       @renderer.status = 404
-      @renderer.message = NotFoundError.new("Resource #{request.path} not found.").to_h
+      @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
     end
 
