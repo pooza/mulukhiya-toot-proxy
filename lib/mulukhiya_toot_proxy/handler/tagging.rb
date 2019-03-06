@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
       TaggingDictionary.new.each do |key, pattern|
         next if key.length < @config['/tagging/word/minimum_length']
         tag = Mastodon.create_tag(key.gsub(/[\s　]/, ''))
-        next if body['status'] =~ Regexp.new("#{tag}[^_]")
+        next if body['status'] =~ Regexp.new("#{tag}([^[:word:]]|$)")
         next unless body['status'] =~ pattern
         keys.delete_if{|v| key.include?(v[:key])}
         keys.delete_if{|v| v[:key].include?(key)}

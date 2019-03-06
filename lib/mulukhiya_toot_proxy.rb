@@ -32,6 +32,7 @@ module MulukhiyaTootProxy
   autoload :NowplayingHandler
   autoload :Package
   autoload :Postgres
+  autoload :QueryTemplate
   autoload :Redis
   autoload :ReverseMarkdown
   autoload :Server

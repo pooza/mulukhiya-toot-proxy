@@ -20,6 +20,10 @@ module MulukhiyaTootProxy
       return 'MulukhiyaTootProxy::Postgres'
     end
 
+    def query_template_class
+      return 'MulukhiyaTootProxy::QueryTemplate'
+    end
+
     def self.name
       return 'mulukhiya-toot-proxy'
     end

@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       @dic = TaggingDictionary.new
       @dic.delete
       assert_false(@dic.exist?)
-      @dic.create
+      @dic.refresh
       assert(@dic.exist?)
     end
 

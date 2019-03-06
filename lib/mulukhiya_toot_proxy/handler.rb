@@ -2,12 +2,6 @@ module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
 
-    def initialize
-      @config = Config.instance
-      @logger = Logger.new
-      @count = 0
-    end
-
     def exec(body, headers = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -39,6 +33,12 @@ module MulukhiyaTootProxy
     end
 
     private
+
+    def initialize
+      @config = Config.instance
+      @logger = Logger.new
+      @count = 0
+    end
 
     def increment!
       @count += 1

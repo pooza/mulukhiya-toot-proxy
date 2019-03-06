@@ -6,19 +6,20 @@ module MulukhiyaTootProxy
       super
       @config = Config.instance
       @logger = Logger.new
-      create unless exist?
-      update(Marshal.load(File.read(TaggingDictionary.path)))
+      update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
     end
 
     def exist?
       return File.exist?(TaggingDictionary.path)
     end
 
-    def create
+    def refresh
       File.write(TaggingDictionary.path, Marshal.dump(patterns))
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h)
     end
+
+    alias create refresh
 
     def delete
       File.unlink(TaggingDictionary.path) if exist?
