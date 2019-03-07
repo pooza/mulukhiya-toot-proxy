@@ -3,6 +3,7 @@ module MulukhiyaTootProxy
     include Package
 
     def initialize(uri, token = nil)
+      super
       @uri = MastodonURI.parse(uri)
       @token = token
     end

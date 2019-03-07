@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
         increment!
         break
       end
-    rescue RestClient::TooManyRequests => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+    rescue Ginseng::GatewayError => e
+      @logger.error(e.to_h)
     end
 
     def updatable?(link)

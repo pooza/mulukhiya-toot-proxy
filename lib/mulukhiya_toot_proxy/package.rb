@@ -24,6 +24,10 @@ module MulukhiyaTootProxy
       return 'MulukhiyaTootProxy::QueryTemplate'
     end
 
+    def http_class
+      return 'MulukhiyaTootProxy::HTTP'
+    end
+
     def self.name
       return 'mulukhiya-toot-proxy'
     end
