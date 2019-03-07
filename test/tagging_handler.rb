@@ -1,6 +1,11 @@
 module MulukhiyaTootProxy
   class TaggingHandlerTest < Test::Unit::TestCase
-    def test_exec
+    def setup
+      @config = Config.instance
+    end
+
+    def test_exec_without_default_tags
+      @config['/tagging/default_tags'] = []
       handler = Handler.create('tagging')
 
       assert_equal(handler.exec({'status' => 'hoge'})['status'], 'hoge')
@@ -32,6 +37,17 @@ module MulukhiyaTootProxy
 
       assert_equal(handler.exec({'status' => '#キュアビューティ'})['status'], '#キュアビューティ')
       assert_equal(handler.result, 'TaggingHandler,12')
+    end
+
+    def test_exec_with_default_tag
+      @config['/tagging/default_tags'] = ['美食丼']
+      handler = Handler.create('tagging')
+
+      assert_equal(handler.exec({'status' => 'hoge'})['status'], "hoge\n#美食丼")
+      assert_equal(handler.result, 'TaggingHandler,1')
+
+      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #美食丼")
+      assert_equal(handler.result, 'TaggingHandler,3')
     end
   end
 end
