@@ -58,6 +58,9 @@ module MulukhiyaTootProxy
 
       assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #美食丼")
       assert_equal(handler.result, 'TaggingHandler,3')
+
+      assert_equal(handler.exec({'status' => '#美食丼'})['status'], '#美食丼')
+      assert_equal(handler.result, 'TaggingHandler,3')
     end
   end
 end
