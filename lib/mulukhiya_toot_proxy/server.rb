@@ -30,9 +30,7 @@ module MulukhiyaTootProxy
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
       @renderer.message['tags'] = [] if @config['/nowplaying/hashtag']
-
       @renderer.status = r.code
-      Slack.broadcast({params: params, body: @body, headers: @headers}) if 400 <= r.code
       headers({'X-Mulukhiya' => results.join(', ')})
       return @renderer.to_s
     end
