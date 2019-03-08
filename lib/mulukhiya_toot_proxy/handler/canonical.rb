@@ -1,5 +1,4 @@
 require 'addressable/uri'
-require 'httparty'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
@@ -7,6 +6,7 @@ module MulukhiyaTootProxy
     def initialize
       super
       @canonicals = {}
+      @http = HTTP.new
     end
 
     def rewrite(link)
@@ -18,9 +18,7 @@ module MulukhiyaTootProxy
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
       return false if uri.query_values.present?
-      response = HTTParty.get(uri.normalize, {
-        headers: {'User-Agent' => Package.user_agent},
-      })
+      response = @http.get(uri)
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?

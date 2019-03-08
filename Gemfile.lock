@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e1ace07bc994078f7203fceecb08d9cbcec22eaf
+  revision: 728a4f84d7d559af9514179297a73d3afb6e10a6
   specs:
-    ginseng-core (1.1.5)
+    ginseng-core (1.2.3)
       activesupport
       addressable
       bundler (< 2.0)
@@ -34,9 +34,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 80413a318f831cdd8996991ff9876c8276e3ec7c
+  revision: 5ddf246c47813fdb9f1cf961c61bd0c8b97a0b01
   specs:
-    ginseng-postgres (1.0.8)
+    ginseng-postgres (1.0.10)
       pg
 
 GIT
@@ -206,13 +206,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  addressable
   amazon-ecs
   crowi-client!
   dropbox-sdk-v2!
   ginseng-core!
   ginseng-postgres!
-  httparty
   nokogiri
   omniauth-oauth2 (~> 1.5.0)
   redis

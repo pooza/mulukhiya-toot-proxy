@@ -1,5 +1,4 @@
 require 'addressable/uri'
-require 'httparty'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
@@ -8,6 +7,7 @@ module MulukhiyaTootProxy
       super(options)
       @config = Config.instance
       @service = ItunesService.new
+      @http = HTTP.new
     end
 
     def itunes?
@@ -45,9 +45,7 @@ module MulukhiyaTootProxy
       track = @service.lookup(track_id)
       raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
-        response = HTTParty.get(track['trackViewUrl'], {
-          headers: {'User-Agent' => Package.user_agent},
-        })
+        response = @http.get(track['trackViewUrl'])
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
         elements = body.xpath('//picture/source')
         return nil unless elements.present?

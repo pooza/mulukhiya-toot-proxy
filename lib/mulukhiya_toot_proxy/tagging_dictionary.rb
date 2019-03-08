@@ -1,11 +1,10 @@
-require 'httparty'
-
 module MulukhiyaTootProxy
   class TaggingDictionary < Hash
     def initialize
       super
       @config = Config.instance
       @logger = Logger.new
+      @http = HTTP.new
       update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
     end
 
@@ -54,9 +53,7 @@ module MulukhiyaTootProxy
     end
 
     def fetch(url)
-      response = HTTParty.get(url, {
-        headers: {'User-Agent' => Package.user_agent},
-      }).parsed_response
+      response = @http.get(url).parsed_response
       raise 'not array' unless response.is_a?(Array)
       raise 'empty' unless response.present?
       return response

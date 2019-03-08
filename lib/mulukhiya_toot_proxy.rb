@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
   autoload :Environment
   autoload :GrowiClipper
   autoload :Handler
+  autoload :HTTP
   autoload :ImageHandler
   autoload :ItunesService
   autoload :Logger

@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
   class AmazonService
     def initialize
       @config = Config.instance
+      @http = HTTP.new
       return unless AmazonService.accesskey?
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['/amazon/access_key']
@@ -38,9 +39,7 @@ module MulukhiyaTootProxy
     end
 
     def published_image_uri(asin)
-      response = HTTParty.get(item_uri(asin), {
-        headers: {'User-Agent' => Package.user_agent},
-      })
+      response = @http.get(item_uri(asin))
       html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
       ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
         next unless elements = html.xpath(%{id("#{id}")})

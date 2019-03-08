@@ -1,16 +1,14 @@
-require 'httparty'
 require 'json'
 
 module MulukhiyaTootProxy
   class ItunesService
     def initialize
       @config = Config.instance
+      @http = HTTP.new
     end
 
     def search(keyword, category)
-      response = HTTParty.get(create_search_uri(keyword, category), {
-        headers: {'User-Agent' => Package.user_agent},
-      })
+      response = @http.get(create_search_uri(keyword, category))
       response = JSON.parse(response.strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
@@ -22,9 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def lookup(id)
-      response = HTTParty.get(create_lookup_uri(id), {
-        headers: {'User-Agent' => Package.user_agent},
-      })
+      response = @http.get(create_lookup_uri(id))
       response = JSON.parse(response.strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
