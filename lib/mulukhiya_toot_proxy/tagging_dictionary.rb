@@ -39,7 +39,7 @@ module MulukhiyaTootProxy
           end
         end
       end
-      return r
+      return r.sort_by{|k, v| k.length}.to_h
     end
 
     def create_pattern(word)

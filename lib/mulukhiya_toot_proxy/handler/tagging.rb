@@ -7,8 +7,7 @@ module MulukhiyaTootProxy
         tag = Mastodon.create_tag(key.gsub(/[\s　]/, ''))
         next if body['status'] =~ create_pattern(tag)
         next unless body['status'] =~ pattern
-        keys.delete_if{|v| key.include?(v[:key])}
-        keys.delete_if{|v| v[:key].include?(key)}
+        keys.delete_if{|v| key.include?(v[:key]) || v[:key].include?(key)}
         keys.push({tag: tag, key: key})
       end
       tags = keys.map{|v| v[:tag]}.concat(default_tags(body['status'])).uniq
