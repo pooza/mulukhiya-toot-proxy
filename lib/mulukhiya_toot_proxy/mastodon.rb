@@ -14,11 +14,14 @@ module MulukhiyaTootProxy
 
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
-      unless @account
-        rows = Postgres.instance.execute('token_owner', {token: @token})
-        @account = rows.first if rows.present?
-      end
+      @account ||= Mastodon.lookup_token_owner(@token)
       return @account
+    end
+
+    def self.lookup_token_owner(token)
+      rows = Postgres.instance.execute('token_owner', {token: token})
+      return rows.first if rows.present?
+      return nil
     end
   end
 end
