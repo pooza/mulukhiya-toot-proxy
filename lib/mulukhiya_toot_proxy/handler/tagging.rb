@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       container = TagContainer.new
       container.body = body['status']
-      TaggingDictionary.new.each do |key, pattern|
+      TaggingDictionary.instance.each do |key, pattern|
         next if key.length < @config['/tagging/word/minimum_length']
         next unless body['status'] =~ pattern
         container.push(key)

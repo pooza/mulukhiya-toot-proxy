@@ -1,11 +1,23 @@
 module MulukhiyaTootProxy
   class TaggingDictionary < Hash
+    include Singleton
+
     def initialize
       super
       @config = Config.instance
       @logger = Logger.new
       @http = HTTP.new
       update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
+    end
+
+    def push(word)
+      self[word] ||= create_pattern(word)
+    end
+
+    def concat(values)
+      values.each do |v|
+        push(v)
+      end
     end
 
     def exist?
