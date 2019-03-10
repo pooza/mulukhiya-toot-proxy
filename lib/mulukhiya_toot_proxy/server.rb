@@ -13,6 +13,10 @@ module MulukhiyaTootProxy
       )
     end
 
+    def tagging?
+      return @config['/nowplaying/hashtag'] || @config['/handlers'].include?('tagging')
+    end
+
     post '/api/v1/statuses' do
       results = []
       Handler.all do |handler|
@@ -29,7 +33,7 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
-      @renderer.message['tags'] = [] if @config['/nowplaying/hashtag']
+      @renderer.message['tags'] = [] if tagging?
       @renderer.status = r.code
       headers({'X-Mulukhiya' => results.join(', ')})
       return @renderer.to_s
