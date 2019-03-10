@@ -7,10 +7,17 @@ module MulukhiyaTootProxy
       super(word)
     end
 
+    def concat(values)
+      values.each do |v|
+        push(v)
+      end
+    end
+
     def create_tags
       tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
       tags = tags.concat(TagContainer.default_tags)
       tags.uniq!
+      tags.compact!
       tags.delete_if{|v| @body =~ TagContainer.create_pattern(v)} if @body
       return tags
     end
