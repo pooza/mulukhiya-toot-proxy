@@ -46,7 +46,9 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
-      Webhook.owned_all(@config['/test/account']) do |hook|
+      account = Mastodon.lookup_token_owner(@config['/test/token'])
+      assert(account.is_a?(Hash))
+      Webhook.owned_all(account['username']) do |hook|
         get hook.uri.path
         assert(last_response.ok?)
 
