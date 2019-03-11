@@ -11,7 +11,9 @@ module MulukhiyaTootProxy
         (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
         @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
-      @tags = params['status'].scan(Regexp.new(@config['/mastodon/hashtag/pattern']))
+      @tags = params['status'].scan(
+        Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE),
+      )
     end
 
     post '/api/v1/statuses' do
