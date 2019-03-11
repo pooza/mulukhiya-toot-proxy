@@ -11,10 +11,9 @@ module MulukhiyaTootProxy
         (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
         @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
-    end
-
-    def tagging?
-      return @config['/nowplaying/hashtag'] || @config['/handlers'].include?('tagging')
+      @tags = params['status'].scan(
+        Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE),
+      )
     end
 
     post '/api/v1/statuses' do
@@ -33,7 +32,7 @@ module MulukhiyaTootProxy
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
-      @renderer.message['tags'] = [] if tagging?
+      @renderer.message['tags'].keep_if{|v| @tags.include?(v['name'])}
       @renderer.status = r.code
       headers({'X-Mulukhiya' => results.join(', ')})
       return @renderer.to_s
