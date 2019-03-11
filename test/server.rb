@@ -1,4 +1,5 @@
 require 'rack/test'
+require 'json'
 
 module MulukhiyaTootProxy
   class ServerTest < Test::Unit::TestCase
@@ -43,6 +44,17 @@ module MulukhiyaTootProxy
       post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
+    end
+
+    def test_toot_response
+      return unless @config['/handlers'].include?('itunes_url_nowplaying')
+      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Content-Type', 'application/json'
+      post '/api/v1/statuses', {'status' => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
+      assert(last_response.ok?)
+      tags = JSON.parse(last_response.body)['tags']
+      assert_equal(tags[0]['name'], 'nowplaying')
+      assert_equal(tags[1]['name'], '日本語のタグ')
     end
 
     def test_hook_toot
