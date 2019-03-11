@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      tags = params['status'].scan(tag_pattern).map{|v| v.first}
+      tags = params['status'].scan(tag_pattern).map(&:first)
       results = []
       Handler.all do |handler|
         Timeout.timeout(handler.timeout) do
