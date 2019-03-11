@@ -14,9 +14,7 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      tags = params['status'].scan(
-        Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE),
-      )
+      tags = params['status'].scan(tag_pattern).map(&:first)
       results = []
       Handler.all do |handler|
         Timeout.timeout(handler.timeout) do
@@ -70,6 +68,12 @@ module MulukhiyaTootProxy
       Slack.broadcast(e.to_h) unless e.status == 404
       @logger.error(e.to_h)
       return @renderer.to_s
+    end
+
+    private
+
+    def tag_pattern
+      return Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
     end
   end
 end
