@@ -86,7 +86,7 @@ GEM
       et-orbi (~> 1.1, >= 1.1.7)
       raabro (~> 1.1)
     hashie (3.6.0)
-    http (4.1.0)
+    http (4.1.1)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
       http-form_data (~> 2.0)
