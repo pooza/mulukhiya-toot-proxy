@@ -1,5 +1,6 @@
 .DS_Store
 Thumbs.db
 ._*
+.fuse*
 config/local.yaml
 config/local.yml
