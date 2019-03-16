@@ -61,7 +61,8 @@ itunes:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
   patterns:
-    - pattern: ([[:digit:]]+)$
+    - pattern: /album/.*?/([[:digit:]]+)$
+      shortenable: true
 nowplaying:
   hashtag: false
   artist_parser:
