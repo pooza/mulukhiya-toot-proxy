@@ -45,7 +45,7 @@ amazon:
       shortenable: true
   affiliate: false
 spotify:
-  language: ja
+  language: ja,en-US;q=0.9,en;q=0.8
   retry_limit: 5
   urls:
     track: https://open.spotify.com/
