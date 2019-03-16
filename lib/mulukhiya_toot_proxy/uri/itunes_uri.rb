@@ -31,7 +31,7 @@ module MulukhiyaTootProxy
       return self unless shortenable?
       dest = clone
       dest.album_id = album_id
-      query_values = {}
+      dest.query_values = {}
       dest.track_id = track_id
       dest.fragment = nil
       return dest
@@ -57,8 +57,8 @@ module MulukhiyaTootProxy
     end
 
     def track_id=(id)
-      query_values ||= {}
-      query_values['i'] = id
+      self.query_values ||= {}
+      self.query_values['i'] = id
     end
 
     alias id track_id
