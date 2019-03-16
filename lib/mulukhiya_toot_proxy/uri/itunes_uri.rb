@@ -16,6 +16,26 @@ module MulukhiyaTootProxy
 
     alias valid? itunes?
 
+    def shortenable?
+      return false unless itunes?
+      return false unless album_id.present?
+      return false unless track_id.present?
+      @config['/itunes/patterns'].each do |entry|
+        next unless path.match(Regexp.new(entry['pattern']))
+        return entry['shortenable']
+      end
+      return false
+    end
+
+    def shorten
+      return self unless shortenable?
+      dest = clone
+      dest.album_id = album_id
+      dest.track_id = track_id
+      dest.fragment = nil
+      return dest
+    end
+
     def album_id
       @config['/itunes/patterns'].each do |entry|
         if matches = path.match(Regexp.new(entry['pattern']))
@@ -25,10 +45,20 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def album_id=(id)
+      self.path = "/#{@config['/itunes/country']}/album//#{id}"
+    end
+
     def track_id
       return query_values['i']
     rescue NoMethodError
       return nil
+    end
+
+    def track_id=(id)
+      values = query_values || {}
+      values['i'] = id
+      self.query_values = values
     end
 
     alias id track_id

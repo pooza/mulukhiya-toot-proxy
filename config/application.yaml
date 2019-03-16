@@ -1,12 +1,10 @@
 package:
-  version: 2.1.14
+  version: 2.1.15
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
-cert:
-  url: https://curl.haxx.se/ca/cacert.pem
 handler:
   default:
     timeout: 10
@@ -47,7 +45,7 @@ amazon:
       shortenable: true
   affiliate: false
 spotify:
-  language: ja
+  language: ja,en-US;q=0.9,en;q=0.8
   retry_limit: 5
   urls:
     track: https://open.spotify.com/
@@ -63,7 +61,8 @@ itunes:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
   patterns:
-    - pattern: ([[:digit:]]+)$
+    - pattern: /album/.*?/([[:digit:]]+)$
+      shortenable: true
 nowplaying:
   hashtag: false
   artist_parser:
