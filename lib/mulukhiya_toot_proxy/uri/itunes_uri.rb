@@ -31,7 +31,6 @@ module MulukhiyaTootProxy
       return self unless shortenable?
       dest = clone
       dest.album_id = album_id
-      dest.query_values = {}
       dest.track_id = track_id
       dest.fragment = nil
       return dest
@@ -47,7 +46,7 @@ module MulukhiyaTootProxy
     end
 
     def album_id=(id)
-      self.path = "/#{@config['/itunes/country']}//album/#{id}"
+      self.path = "/#{@config['/itunes/country']}/album//#{id}"
     end
 
     def track_id
@@ -57,8 +56,9 @@ module MulukhiyaTootProxy
     end
 
     def track_id=(id)
-      self.query_values ||= {}
-      self.query_values['i'] = id
+      values = query_values || {}
+      values['i'] = id
+      self.query_values = values
     end
 
     alias id track_id
