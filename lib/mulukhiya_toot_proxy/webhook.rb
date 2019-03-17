@@ -59,9 +59,11 @@ module MulukhiyaTootProxy
       return @json
     end
 
-    def toot(body)
+    def toot(status)
+      body = {'status' => [status].concat(toot_tags).join(' ')}
+      Handler.exec_all(body, @headers, @mastodon)
       return @mastodon.toot({
-        status: [body].concat(toot_tags).join(' '),
+        status: body['status'],
         visibility: visibility,
       })
     end
