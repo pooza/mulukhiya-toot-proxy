@@ -1,3 +1,5 @@
+require 'timeout'
+
 module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
@@ -30,6 +32,22 @@ module MulukhiyaTootProxy
       Config.instance['/handlers'].each do |handler|
         yield create(handler)
       end
+    end
+
+    def self.exec_all(body, headers, mastodon)
+      results = []
+      logger = Logger.new
+      Handler.all do |handler|
+        Timeout.timeout(handler.timeout) do
+          handler.mastodon = mastodon
+          handler.exec(body, headers)
+          results.push(handler.result)
+        end
+      rescue Timeout::Error => e
+        logger.error(Ginseng::Error.create(e).to_h)
+        next
+      end
+      return results
     end
 
     private

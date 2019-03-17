@@ -1,5 +1,3 @@
-require 'timeout'
-
 module MulukhiyaTootProxy
   class Server < Ginseng::Sinatra
     include Package
@@ -15,18 +13,7 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses' do
       tags = params['status'].scan(tag_pattern).map(&:first)
-      results = []
-      Handler.all do |handler|
-        Timeout.timeout(handler.timeout) do
-          handler.mastodon = @mastodon
-          handler.exec(params, @headers)
-          results.push(handler.result)
-        end
-      rescue Timeout::Error => e
-        @logger.error(Ginseng::Error.create(e).to_h)
-        next
-      end
-
+      results = Handler.exec_all(params, @headers, @mastodon)
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
