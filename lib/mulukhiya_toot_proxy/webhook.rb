@@ -60,12 +60,12 @@ module MulukhiyaTootProxy
     end
 
     def toot(status)
-      body = {'status' => [status].concat(toot_tags).join(' ')}
+      body = {
+        'status' => [status].concat(toot_tags).join(' '),
+        'visibility' => visibility,
+      }
       Handler.exec_all(body, @headers, @mastodon)
-      return @mastodon.toot({
-        status: body['status'],
-        visibility: visibility,
-      })
+      return @mastodon.toot(body)
     end
 
     def self.create(digest)
