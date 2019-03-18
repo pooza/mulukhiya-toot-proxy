@@ -48,7 +48,7 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def to_json
+    def to_json(opts)
       @json ||= JSON.pretty_generate({
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
