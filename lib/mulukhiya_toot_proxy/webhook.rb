@@ -6,12 +6,6 @@ module MulukhiyaTootProxy
   class Webhook
     attr_reader :mastodon
 
-    def initialize(params)
-      @config = Config.instance
-      @params = params
-      @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
-    end
-
     def digest
       return Digest::SHA1.hexdigest({
         mastodon: @mastodon.uri.to_s,
@@ -54,7 +48,7 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def to_json
+    def to_json(opts = nil)
       @json ||= JSON.pretty_generate({
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
@@ -65,11 +59,13 @@ module MulukhiyaTootProxy
       return @json
     end
 
-    def toot(body)
-      return @mastodon.toot({
-        status: [body].concat(toot_tags).join(' '),
-        visibility: visibility,
-      })
+    def toot(status)
+      body = {
+        'status' => [status].concat(toot_tags).join(' '),
+        'visibility' => visibility,
+      }
+      Handler.exec_all(body, @headers, @mastodon)
+      return @mastodon.toot(body)
     end
 
     def self.create(digest)
@@ -97,6 +93,12 @@ module MulukhiyaTootProxy
     end
 
     private
+
+    def initialize(params)
+      @config = Config.instance
+      @params = params
+      @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
+    end
 
     def db
       return Postgres.instance
