@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.5.3'
+ruby '2.5.5'
 gem 'amazon-ecs'
 gem 'crowi-client', git: 'https://github.com/pooza/crowi-client.git'
 gem 'dropbox-sdk-v2', git: 'https://github.com/pooza/dropbox-sdk-ruby.git'
