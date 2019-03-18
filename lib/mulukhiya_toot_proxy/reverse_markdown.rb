@@ -11,6 +11,9 @@ module MulukhiyaTootProxy
       text = ::ReverseMarkdown.convert(text)
       text.gsub!('__NEWLINE__', "\n")
       text.gsub!(/\s?````/, '```')
+      text.gsub!(/\[.+?\]/) do |block|
+        block.gsub(/#/, '\\#')
+      end
       return text
     end
   end
