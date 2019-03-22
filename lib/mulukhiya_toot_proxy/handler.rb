@@ -1,4 +1,6 @@
 require 'timeout'
+require 'httparty'
+require 'rest-client'
 
 module MulukhiyaTootProxy
   class Handler
@@ -46,6 +48,10 @@ module MulukhiyaTootProxy
       rescue Timeout::Error => e
         logger.error(Ginseng::Error.create(e).to_h)
         next
+      rescue RestClient::Exception => e
+        raise GatewayError, e.message
+      rescue HTTParty::Error => e
+        raise GatewayError, e.message
       end
       return results
     end
