@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 728a4f84d7d559af9514179297a73d3afb6e10a6
+  revision: cb11283a8e4edc2eae3ff44fae2da7c23cfe137f
   specs:
-    ginseng-core (1.2.3)
+    ginseng-core (1.2.4)
       activesupport
       addressable
       bundler (< 2.0)
@@ -34,9 +34,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 5ddf246c47813fdb9f1cf961c61bd0c8b97a0b01
+  revision: fc873689fbb20ad1f902cef02c2f0894cd57b83b
   specs:
-    ginseng-postgres (1.0.10)
+    ginseng-postgres (1.0.11)
       pg
 
 GIT
@@ -131,7 +131,7 @@ GEM
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
     parallel (1.14.0)
-    parser (2.6.0.0)
+    parser (2.6.2.0)
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.3)
