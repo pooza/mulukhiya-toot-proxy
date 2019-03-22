@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
     def self.exec_all(body, headers, mastodon)
       results = []
       logger = Logger.new
-      Handler.all do |handler|
+      all do |handler|
         Timeout.timeout(handler.timeout) do
           handler.mastodon = mastodon
           handler.exec(body, headers)
