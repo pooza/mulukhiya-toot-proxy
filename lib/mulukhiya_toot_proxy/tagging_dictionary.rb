@@ -4,7 +4,6 @@ module MulukhiyaTootProxy
 
     def initialize
       super
-      @config = Config.instance
       @logger = Logger.new
       @http = HTTP.new
       update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
@@ -25,7 +24,7 @@ module MulukhiyaTootProxy
     end
 
     def refresh
-      File.write(TaggingDictionary.path, Marshal.dump(patterns))
+      File.write(TaggingDictionary.path, Marshal.dump(fetch))
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h)
     end
@@ -36,41 +35,16 @@ module MulukhiyaTootProxy
       File.unlink(TaggingDictionary.path) if exist?
     end
 
-    def patterns
-      r = {}
-      resources.each do |resource|
-        fetch(resource['url']).each do |entry|
-          resource['fields'].each do |field|
-            next unless word = entry[field]
-            r[word] ||= create_pattern(word)
-          rescue => e
-            message = Ginseng::Error.create(e).to_h.clone
-            message['resource'] = resource
-            @logger.error(message)
-            next
-          end
+    def fetch
+      result = {}
+      TaggingResource.all do |resource|
+        resource.parse.each do |k, v|
+          result[k] ||= v
+          result[k][:words] ||= []
+          result[k][:words].concat(v[:words])
         end
       end
-      return r.sort_by{|k, v| k.length}.to_h
-    end
-
-    def create_pattern(word)
-      return Regexp.new(word.gsub(/[^[:alnum:]]/, '.?'))
-    end
-
-    def resources
-      return Config.instance['/tagging/dictionaries']
-    rescue
-      return []
-    end
-
-    def fetch(url)
-      response = @http.get(url).parsed_response
-      raise 'not array' unless response.is_a?(Array)
-      raise 'empty' unless response.present?
-      return response
-    rescue => e
-      raise Ginseng::GatewayError, "'#{url}' is invalid (#{e.message})"
+      return result.sort_by{|k, v| k.length}.to_h
     end
 
     def self.path
