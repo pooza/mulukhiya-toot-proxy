@@ -41,6 +41,7 @@ module MulukhiyaTootProxy
   autoload :SpotifyService
   autoload :TagContainer
   autoload :TaggingDictionary
+  autoload :TaggingResource
   autoload :Template
   autoload :TwitterService
   autoload :URLHandler

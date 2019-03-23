@@ -49,6 +49,7 @@ module MulukhiyaTootProxy
 
     error do |e|
       e = Ginseng::Error.create(e)
+      e.package = Package.full_name
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{|k, v| k == :backtrace}
       @renderer.message['error'] = e.message
