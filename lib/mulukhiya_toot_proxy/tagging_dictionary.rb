@@ -9,13 +9,11 @@ module MulukhiyaTootProxy
       update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
     end
 
-    def push(word)
-      self[word] ||= create_pattern(word)
-    end
-
     def concat(values)
-      values.each do |v|
-        push(v)
+      values.each do |k, v|
+        self[k] ||= v
+        self[k][:words] ||= []
+        self[k][:words].concat(v[:words])
       end
     end
 

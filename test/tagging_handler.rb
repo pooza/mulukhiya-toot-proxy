@@ -4,8 +4,12 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @config['/tagging/dictionaries'] = [
         {
-          'url' => 'https://script.googleusercontent.com/macros/echo?user_content_key=wo8gOi5Sh-9Jj2E6tEcH63gLpP1DfYNtSmg-krsg7mLQ5Yge-Zm0bUPp__23t1kqKPZk-Nq6mz4pY7JyzhNVLUasuCvtOx93m5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnJPtSF1KzUJXTo_pA3Qll7V-53MZArfz9tlhkG4eAFvRdOPYcy3-_RURs1zUK59_LTGAbNhJnlep&lib=Mz_kSmMa676sbphxvXhpTCnGac_s0g0mR',
-          'fields' => ['cure_name', 'human_name', 'cv'],
+          'url' => 'https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec',
+          'type' => 'relative',
+        },
+        {
+          'url' => 'https://script.google.com/macros/s/AKfycbzAUsRUuFLO72EgKta020v9OMtxvUtqUcPZNJ3_IMlOo8dRO7tW/exec',
+          'type' => 'relative',
         },
         {
           'url' => 'https://rubicure.herokuapp.com/series.json',
@@ -21,32 +25,32 @@ module MulukhiyaTootProxy
       assert_equal(handler.exec({'status' => 'hoge'})['status'], 'hoge')
       assert_equal(handler.result, 'TaggingHandler,0')
 
-      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子")
-      assert_equal(handler.result, 'TaggingHandler,1')
-
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本佳那子。'})['status'], "キュアソードの中の人は宮本佳那子。\n#キュアソード #宮本佳那子")
+      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #キュアソード #剣崎真琴")
       assert_equal(handler.result, 'TaggingHandler,3')
 
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status'], "キュアソードの中の人は宮本 佳那子。\n#キュアソード #宮本佳那子")
-      assert_equal(handler.result, 'TaggingHandler,5')
+      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本佳那子。'})['status'], "キュアソードの中の人は宮本佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
+      assert_equal(handler.result, 'TaggingHandler,6')
 
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status'], "キュアソードの中の人は宮本　佳那子。\n#キュアソード #宮本佳那子")
-      assert_equal(handler.result, 'TaggingHandler,7')
-
-      assert_equal(handler.exec({'status' => '#キュアソード の中の人は宮本佳那子。'})['status'], "#キュアソード の中の人は宮本佳那子。\n#宮本佳那子")
-      assert_equal(handler.result, 'TaggingHandler,8')
-
-      assert_equal(handler.exec({'status' => 'Yes!プリキュア5'})['status'], "Yes!プリキュア5\n#Yes_プリキュア5")
+      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status'], "キュアソードの中の人は宮本 佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
       assert_equal(handler.result, 'TaggingHandler,9')
 
+      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status'], "キュアソードの中の人は宮本　佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
+      assert_equal(handler.result, 'TaggingHandler,12')
+
+      assert_equal(handler.exec({'status' => '#キュアソード の中の人は宮本佳那子。'})['status'], "#キュアソード の中の人は宮本佳那子。\n#剣崎真琴 #宮本佳那子")
+      assert_equal(handler.result, 'TaggingHandler,14')
+
+      assert_equal(handler.exec({'status' => 'Yes!プリキュア5'})['status'], "Yes!プリキュア5\n#Yes_プリキュア5")
+      assert_equal(handler.result, 'TaggingHandler,15')
+
       assert_equal(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'], "Yes!プリキュア5 GoGo!\n#Yes_プリキュア5GoGo")
-      assert_equal(handler.result, 'TaggingHandler,10')
+      assert_equal(handler.result, 'TaggingHandler,16')
 
-      assert_equal(handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'], "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド\n#キュアフローラ #キュアマーメイド")
-      assert_equal(handler.result, 'TaggingHandler,12')
+      assert_equal(handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'], "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド\n#キュアフローラ #春野はるか #嶋村侑 #キュアマーメイド #海藤みなみ #浅野真澄")
+      assert_equal(handler.result, 'TaggingHandler,22')
 
-      assert_equal(handler.exec({'status' => '#キュアビューティ'})['status'], '#キュアビューティ')
-      assert_equal(handler.result, 'TaggingHandler,12')
+      assert_equal(handler.exec({'status' => '#キュアビューティ'})['status'], "#キュアビューティ\n#青木れいか #西村ちなみ")
+      assert_equal(handler.result, 'TaggingHandler,24')
     end
 
     def test_exec_with_default_tag
@@ -56,11 +60,11 @@ module MulukhiyaTootProxy
       assert_equal(handler.exec({'status' => 'hoge'})['status'], "hoge\n#美食丼")
       assert_equal(handler.result, 'TaggingHandler,1')
 
-      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #美食丼")
-      assert_equal(handler.result, 'TaggingHandler,3')
+      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #キュアソード #剣崎真琴 #美食丼")
+      assert_equal(handler.result, 'TaggingHandler,5')
 
       assert_equal(handler.exec({'status' => '#美食丼'})['status'], '#美食丼')
-      assert_equal(handler.result, 'TaggingHandler,3')
+      assert_equal(handler.result, 'TaggingHandler,5')
     end
   end
 end
