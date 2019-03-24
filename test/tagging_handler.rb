@@ -18,38 +18,68 @@ module MulukhiyaTootProxy
       ]
     end
 
+    def pattern
+      @pattern ||= Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
+      return @pattern
+    end
+
     def test_exec_without_default_tags
       @config['/tagging/default_tags'] = []
       handler = Handler.create('tagging')
 
-      assert_equal(handler.exec({'status' => 'hoge'})['status'], 'hoge')
+      tags = handler.exec({'status' => 'hoge'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 0)
       assert_equal(handler.result, 'TaggingHandler,0')
 
-      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #キュアソード #剣崎真琴")
+      tags = handler.exec({'status' => '宮本佳那子'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
+      assert(tags.member?('宮本佳那子'))
+      assert(tags.member?('剣崎真琴'))
+      assert(tags.member?('キュアソード'))
       assert_equal(handler.result, 'TaggingHandler,3')
 
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本佳那子。'})['status'], "キュアソードの中の人は宮本佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
+      tags = handler.exec({'status' => 'キュアソードの中の人は宮本佳那子。'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
       assert_equal(handler.result, 'TaggingHandler,6')
 
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status'], "キュアソードの中の人は宮本 佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
+      tags = handler.exec({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
       assert_equal(handler.result, 'TaggingHandler,9')
 
-      assert_equal(handler.exec({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status'], "キュアソードの中の人は宮本　佳那子。\n#キュアソード #剣崎真琴 #宮本佳那子")
+      tags = handler.exec({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
       assert_equal(handler.result, 'TaggingHandler,12')
 
-      assert_equal(handler.exec({'status' => '#キュアソード の中の人は宮本佳那子。'})['status'], "#キュアソード の中の人は宮本佳那子。\n#剣崎真琴 #宮本佳那子")
+      tags = handler.exec({'status' => '#キュアソード の中の人は宮本佳那子。'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
       assert_equal(handler.result, 'TaggingHandler,14')
 
-      assert_equal(handler.exec({'status' => 'Yes!プリキュア5'})['status'], "Yes!プリキュア5\n#Yes_プリキュア5")
+      tags = handler.exec({'status' => 'Yes!プリキュア5'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 1)
+      assert(tags.member?('Yes_プリキュア5'))
       assert_equal(handler.result, 'TaggingHandler,15')
 
-      assert_equal(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'], "Yes!プリキュア5 GoGo!\n#Yes_プリキュア5GoGo")
+      tags = handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 1)
+      assert(tags.member?('Yes_プリキュア5GoGo'))
       assert_equal(handler.result, 'TaggingHandler,16')
 
-      assert_equal(handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'], "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド\n#キュアフローラ #春野はるか #嶋村侑 #キュアマーメイド #海藤みなみ #浅野真澄")
+      tags = handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 7)
+      assert(tags.member?('キュアフローラ_キュアマーメイド'))
+      assert(tags.member?('キュアフローラ'))
+      assert(tags.member?('春野はるか'))
+      assert(tags.member?('嶋村侑'))
+      assert(tags.member?('キュアマーメイド'))
+      assert(tags.member?('海藤みなみ'))
+      assert(tags.member?('浅野真澄'))
       assert_equal(handler.result, 'TaggingHandler,22')
 
-      assert_equal(handler.exec({'status' => '#キュアビューティ'})['status'], "#キュアビューティ\n#青木れいか #西村ちなみ")
+      tags = handler.exec({'status' => '#キュアビューティ'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 3)
+      assert(tags.member?('キュアビューティ'))
+      assert(tags.member?('青木れいか'))
+      assert(tags.member?('西村ちなみ'))
       assert_equal(handler.result, 'TaggingHandler,24')
     end
 
@@ -57,13 +87,22 @@ module MulukhiyaTootProxy
       @config['/tagging/default_tags'] = ['美食丼']
       handler = Handler.create('tagging')
 
-      assert_equal(handler.exec({'status' => 'hoge'})['status'], "hoge\n#美食丼")
+      tags = handler.exec({'status' => 'hoge'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 1)
+      assert(tags.member?('美食丼'))
       assert_equal(handler.result, 'TaggingHandler,1')
 
-      assert_equal(handler.exec({'status' => '宮本佳那子'})['status'], "宮本佳那子\n#宮本佳那子 #キュアソード #剣崎真琴 #美食丼")
+      tags = handler.exec({'status' => '宮本佳那子'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 4)
+      assert(tags.member?('美食丼'))
+      assert(tags.member?('宮本佳那子'))
+      assert(tags.member?('剣崎真琴'))
+      assert(tags.member?('キュアソード'))
       assert_equal(handler.result, 'TaggingHandler,5')
 
-      assert_equal(handler.exec({'status' => '#美食丼'})['status'], '#美食丼')
+      tags = handler.exec({'status' => '#美食丼'})['status'].scan(pattern).map(&:first)
+      assert_equal(tags.count, 1)
+      assert(tags.member?('美食丼'))
       assert_equal(handler.result, 'TaggingHandler,5')
     end
   end
