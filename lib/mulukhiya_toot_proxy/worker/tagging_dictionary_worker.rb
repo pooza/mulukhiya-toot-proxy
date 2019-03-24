@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
     sidekiq_options retry: false
 
     def perform
-      TaggingDictionary.instance.refresh
+      TaggingDictionary.new.refresh
     end
   end
 end

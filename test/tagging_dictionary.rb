@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class TaggingDictionaryTest < Test::Unit::TestCase
     def setup
-      @dic = TaggingDictionary.instance
+      @dic = TaggingDictionary.new
     end
 
     def test_exist?
