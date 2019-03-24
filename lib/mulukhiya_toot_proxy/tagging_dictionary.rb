@@ -1,12 +1,10 @@
 module MulukhiyaTootProxy
   class TaggingDictionary < Hash
-    include Singleton
-
     def initialize
       super
       @logger = Logger.new
       @http = HTTP.new
-      update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
+      load
     end
 
     def concat(values)
@@ -21,8 +19,13 @@ module MulukhiyaTootProxy
       return File.exist?(TaggingDictionary.path)
     end
 
+    def load
+      update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
+    end
+
     def refresh
       File.write(TaggingDictionary.path, Marshal.dump(fetch))
+      load
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h)
     end
