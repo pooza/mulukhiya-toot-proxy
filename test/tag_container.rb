@@ -33,9 +33,5 @@ module MulukhiyaTootProxy
       @config['/tagging/default_tags'] = ['美食丼', 'b-shock-don']
       assert_equal(TagContainer.default_tags, ['#美食丼', '#b_shock_don'])
     end
-
-    def test_create_pattern
-      assert_equal(TagContainer.create_pattern('スターカラーペン'), /#スターカラーペン([^[:word:]]|$)/)
-    end
   end
 end
