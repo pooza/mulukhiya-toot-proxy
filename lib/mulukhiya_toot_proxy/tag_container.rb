@@ -34,5 +34,10 @@ module MulukhiyaTootProxy
       tag = Mastodon.create_tag(tag) unless tag =~ /^#/
       return Regexp.new("#{tag}([^[:word:]]|$)")
     end
+
+    def self.scan(body)
+      pattern = Regexp.new(Config.instance['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
+      return body.scan(pattern).map(&:first)
+    end
   end
 end
