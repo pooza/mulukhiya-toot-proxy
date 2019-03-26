@@ -5,12 +5,12 @@ module MulukhiyaTootProxy
       UserConfigStorage.new.update(id, values)
     end
 
-    def exec(body, headers = {})
-      raise Ginseng::GatewayError, 'Invalid access token' unless id = mastodon.account_id
-      super(body, headers)
-      body['status'] = YAML.dump(
-        JSON.parse(UserConfigStorage.new.get(id)),
+    def create_status(values)
+      return YAML.dump(
+        JSON.parse(UserConfigStorage.new.get(mastodon.account_id)),
       )
+    rescue => e
+      raise Ginseng::RequestError, e.message
     end
   end
 end
