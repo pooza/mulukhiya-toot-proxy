@@ -12,8 +12,8 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      tags = params['status'].scan(tag_pattern).map(&:first)
-      results = Handler.exec_all(params, @headers, @mastodon)
+      tags = TagContainer.scan(params['status'])
+      results = Handler.exec_all(params, @headers, {mastodon: @mastodon})
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.join(', ')
@@ -29,7 +29,10 @@ module MulukhiyaTootProxy
       end
       params[:text] ||= params[:body]
       raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-      @renderer.message = webhook.toot(params[:text]).parsed_response
+      r = webhook.toot(params[:text])
+      @renderer.message = r.parsed_response
+      @renderer.message['results'] = webhook.results.join(', ')
+      @renderer.status = r.code
       return @renderer.to_s
     end
 
@@ -56,12 +59,6 @@ module MulukhiyaTootProxy
       Slack.broadcast(e.to_h) unless e.status == 404
       @logger.error(e.to_h)
       return @renderer.to_s
-    end
-
-    private
-
-    def tag_pattern
-      return Regexp.new(@config['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
     end
   end
 end

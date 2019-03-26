@@ -34,9 +34,9 @@ module MulukhiyaTootProxy
       end
     end
 
-    def test_toot_tags
+    def test_tags
       Webhook.all do |hook|
-        assert(hook.toot_tags.is_a?(Array))
+        assert(hook.tags.is_a?(Array))
       end
     end
 

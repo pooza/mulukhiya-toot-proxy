@@ -3,7 +3,9 @@ module MulukhiyaTootProxy
     attr_accessor :body
 
     def push(word)
-      delete_if{|v| word.include?(v) || v.include?(word)}
+      delete_if do |v|
+        word.include?(v) || v.include?(word)
+      end
       super(word)
     end
 
@@ -18,7 +20,7 @@ module MulukhiyaTootProxy
       tags = tags.concat(TagContainer.default_tags)
       tags.uniq!
       tags.compact!
-      tags.delete_if{|v| @body =~ TagContainer.create_pattern(v)} if @body
+      tags.delete_if{|v| @body =~ create_pattern(v)} if @body
       return tags
     end
 
@@ -30,7 +32,14 @@ module MulukhiyaTootProxy
       return []
     end
 
-    def self.create_pattern(tag)
+    def self.scan(body)
+      pattern = Regexp.new(Config.instance['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
+      return body.scan(pattern).map(&:first)
+    end
+
+    private
+
+    def create_pattern(tag)
       tag = Mastodon.create_tag(tag) unless tag =~ /^#/
       return Regexp.new("#{tag}([^[:word:]]|$)")
     end

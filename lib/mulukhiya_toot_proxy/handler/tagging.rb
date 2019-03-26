@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def exec(body, headers = {})
       container = TagContainer.new
+      container.concat(@tags) if @tags
       container.body = body['status']
       TaggingDictionary.new.each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']

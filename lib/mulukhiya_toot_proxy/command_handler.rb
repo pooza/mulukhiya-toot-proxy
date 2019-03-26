@@ -20,8 +20,12 @@ module MulukhiyaTootProxy
       return unless values.present?
       dispatch(values)
       body['visibility'] = 'direct'
-      body['status'] = YAML.dump(values)
+      body['status'] = create_status(values)
       increment!
+    end
+
+    def create_status(values)
+      return YAML.dump(values)
     end
 
     def parse_yaml(body)
