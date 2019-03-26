@@ -52,7 +52,7 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        toot_tags: tags,
+        tags: tags,
         hook: uri.to_s,
       })
       return @json
