@@ -29,7 +29,10 @@ module MulukhiyaTootProxy
       end
       params[:text] ||= params[:body]
       raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-      @renderer.message = webhook.toot(params[:text]).parsed_response
+      r = webhook.toot(params[:text])
+      @renderer.message = r.parsed_response
+      @renderer.message['results'] = webhook.results.join(', ')
+      @renderer.status = r.code
       return @renderer.to_s
     end
 

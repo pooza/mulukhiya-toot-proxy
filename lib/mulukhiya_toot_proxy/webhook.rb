@@ -5,6 +5,7 @@ require 'json'
 module MulukhiyaTootProxy
   class Webhook
     attr_reader :mastodon
+    attr_reader :results
 
     def digest
       return Digest::SHA1.hexdigest({
@@ -64,7 +65,7 @@ module MulukhiyaTootProxy
         'status' => [status].concat(toot_tags).join(' '),
         'visibility' => visibility,
       }
-      Handler.exec_all(body, @headers, @mastodon)
+      @results = Handler.exec_all(body, @headers, @mastodon)
       return @mastodon.toot(body)
     end
 
