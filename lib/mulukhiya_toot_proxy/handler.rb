@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       end
     end
 
-    def self.exec_all(body, headers, params)
+    def self.exec_all(body, headers, params = {})
       results = []
       logger = Logger.new
       all do |handler|
