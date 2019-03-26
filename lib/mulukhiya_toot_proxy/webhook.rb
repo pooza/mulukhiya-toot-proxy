@@ -16,15 +16,11 @@ module MulukhiyaTootProxy
     end
 
     def visibility
-      return (@params['/webhook/visibility'] || 'public')
+      return @params['/webhook/visibility'] || 'public'
     end
 
     def toot_tags
-      return @params['/webhook/tags'].map do |tag|
-        Mastodon.create_tag(tag)
-      end
-    rescue
-      return []
+      return @params['/webhook/tags'] || []
     end
 
     def uri
@@ -61,11 +57,8 @@ module MulukhiyaTootProxy
     end
 
     def toot(status)
-      body = {
-        'status' => [status].concat(toot_tags).join(' '),
-        'visibility' => visibility,
-      }
-      @results = Handler.exec_all(body, @headers, @mastodon)
+      body = {'status' => status, 'visibility' => visibility}
+      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon, tags: toot_tags})
       return @mastodon.toot(body)
     end
 

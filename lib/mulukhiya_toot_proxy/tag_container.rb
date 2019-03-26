@@ -3,7 +3,9 @@ module MulukhiyaTootProxy
     attr_accessor :body
 
     def push(word)
-      delete_if{|v| word.include?(v) || v.include?(word)}
+      delete_if do |v|
+        word.include?(v) || v.include?(word)
+      end
       super(word)
     end
 
