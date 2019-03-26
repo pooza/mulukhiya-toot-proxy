@@ -19,9 +19,11 @@ module MulukhiyaTootProxy
       return @params['/webhook/visibility'] || 'public'
     end
 
-    def toot_tags
+    def tags
       return @params['/webhook/tags'] || []
     end
+
+    alias toot_tags tags
 
     def uri
       begin
@@ -50,7 +52,7 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        toot_tags: toot_tags,
+        tags: tags,
         hook: uri.to_s,
       })
       return @json
@@ -58,7 +60,7 @@ module MulukhiyaTootProxy
 
     def toot(status)
       body = {'status' => status, 'visibility' => visibility}
-      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon, tags: toot_tags})
+      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon, tags: tags})
       return @mastodon.toot(body)
     end
 
