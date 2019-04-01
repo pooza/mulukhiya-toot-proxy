@@ -49,15 +49,16 @@ module MulukhiyaTootProxy
       assert_equal(tags.count, 3)
       assert_equal(handler.result, 'TaggingHandler,14')
 
-      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5'})['status'])
-      assert_equal(tags.count, 1)
+      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})['status'])
+      assert_equal(tags.count, 2)
       assert(tags.member?('Yes_プリキュア5'))
-      assert_equal(handler.result, 'TaggingHandler,15')
+      assert(tags.member?('Yes_プリキュア5GoGo'))
+      assert_equal(handler.result, 'TaggingHandler,16')
 
       tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'])
       assert_equal(tags.count, 1)
       assert(tags.member?('Yes_プリキュア5GoGo'))
-      assert_equal(handler.result, 'TaggingHandler,16')
+      assert_equal(handler.result, 'TaggingHandler,17')
 
       tags = TagContainer.scan(handler.exec({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'])
       assert_equal(tags.count, 7)
@@ -68,14 +69,14 @@ module MulukhiyaTootProxy
       assert(tags.member?('キュアマーメイド'))
       assert(tags.member?('海藤みなみ'))
       assert(tags.member?('浅野真澄'))
-      assert_equal(handler.result, 'TaggingHandler,22')
+      assert_equal(handler.result, 'TaggingHandler,23')
 
       tags = TagContainer.scan(handler.exec({'status' => '#キュアビューティ'})['status'])
       assert_equal(tags.count, 3)
       assert(tags.member?('キュアビューティ'))
       assert(tags.member?('青木れいか'))
       assert(tags.member?('西村ちなみ'))
-      assert_equal(handler.result, 'TaggingHandler,24')
+      assert_equal(handler.result, 'TaggingHandler,25')
     end
 
     def test_exec_with_default_tag

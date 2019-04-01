@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     def test_parse
       result = @resource.parse
       assert(result.is_a?(Hash))
-      assert_equal(result['スター☆トゥインクルプリキュア'], {pattern: /スター.?トゥインクルプリキュア/})
+      assert_equal(result['スター☆トゥインクルプリキュア'], {pattern: /スター.? ?ト[ウゥ][イィ]ンクルプリキ[ユュ][アァ]/})
     end
   end
 end
