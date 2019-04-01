@@ -4,11 +4,13 @@ module MulukhiyaTootProxy
       container = TagContainer.new
       container.concat(@tags) if @tags
       container.body = body['status']
-      TaggingDictionary.new.each do |k, v|
+      tmp_body = body['status'].clone
+      TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless body['status'] =~ v[:pattern]
+        next unless tmp_body =~ v[:pattern]
         container.push(k)
         container.concat(v[:words])
+        tmp_body.gsub!(v[:pattern], '')
       end
       tags = container.create_tags
       @count += tags.count

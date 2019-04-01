@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
         self[k][:words] ||= []
         self[k][:words].concat(v[:words])
       end
+      update(sort_by{|k, v| k.length}..to_h)
     end
 
     def exist?
