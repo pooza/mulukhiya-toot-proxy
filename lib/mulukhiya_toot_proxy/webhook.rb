@@ -46,7 +46,6 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        tags: tags,
         hook: uri.to_s,
       })
       return @json
