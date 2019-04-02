@@ -43,7 +43,6 @@ module MulukhiyaTootProxy
       all do |handler|
         Timeout.timeout(handler.timeout) do
           handler.mastodon = params[:mastodon]
-          handler.tags = params[:tags]
           handler.exec(body, headers)
           results.push(handler.result)
         end

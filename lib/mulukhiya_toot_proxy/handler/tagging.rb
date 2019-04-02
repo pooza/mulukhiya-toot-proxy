@@ -2,7 +2,6 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def exec(body, headers = {})
       container = TagContainer.new
-      container.concat(@tags) if @tags
       container.body = body['status']
       tmp_body = body['status'].clone
       TaggingDictionary.new.reverse_each do |k, v|

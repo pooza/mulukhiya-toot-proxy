@@ -19,12 +19,6 @@ module MulukhiyaTootProxy
       return @params['/webhook/visibility'] || 'public'
     end
 
-    def tags
-      return @params['/webhook/tags'] || []
-    end
-
-    alias toot_tags tags
-
     def uri
       begin
         uri = Addressable::URI.parse(@config['/instance_url'])
