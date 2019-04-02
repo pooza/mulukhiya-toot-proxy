@@ -34,12 +34,6 @@ module MulukhiyaTootProxy
       end
     end
 
-    def test_tags
-      Webhook.all do |hook|
-        assert(hook.tags.is_a?(Array))
-      end
-    end
-
     def test_to_json
       Webhook.all do |hook|
         assert(hook.to_json.present?)
