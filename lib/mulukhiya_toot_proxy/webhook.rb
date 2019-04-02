@@ -54,7 +54,7 @@ module MulukhiyaTootProxy
 
     def toot(status)
       body = {'status' => status, 'visibility' => visibility}
-      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon, tags: tags})
+      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end
 
