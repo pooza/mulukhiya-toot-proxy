@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: auctionet/circleci-ruby:2.5.5
+      - image: circleci/ruby:2.5.5
     working_directory: ~/repos
     steps:
       - checkout

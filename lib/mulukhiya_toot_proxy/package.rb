@@ -1,31 +1,39 @@
 module MulukhiyaTootProxy
   module Package
+    def module_name
+      return 'MulukhiyaTootProxy'
+    end
+
     def environment_class
-      return 'MulukhiyaTootProxy::Environment'
+      return "#{module_name}::Environment"
     end
 
     def package_class
-      return 'MulukhiyaTootProxy::Package'
+      return "#{module_name}::Package"
     end
 
     def config_class
-      return 'MulukhiyaTootProxy::Config'
+      return "#{module_name}::Config"
     end
 
     def logger_class
-      return 'MulukhiyaTootProxy::Logger'
+      return "#{module_name}::Logger"
     end
 
     def database_class
-      return 'MulukhiyaTootProxy::Postgres'
+      return "#{module_name}::Postgres"
     end
 
     def query_template_class
-      return 'MulukhiyaTootProxy::QueryTemplate'
+      return "#{module_name}::QueryTemplate"
     end
 
     def http_class
-      return 'MulukhiyaTootProxy::HTTP'
+      return "#{module_name}::HTTP"
+    end
+
+    def you_tube_service_class
+      return "#{module_name}::YouTubeService"
     end
 
     def self.name
