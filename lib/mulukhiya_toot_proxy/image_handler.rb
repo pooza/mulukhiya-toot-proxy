@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
         increment!
         break
       end
-    rescue Ginseng::GatewayError => e
-      @logger.error(e.to_h)
+    rescue Ginseng::GatewayError => ex
+      @logger.error(ex.to_h)
     end
 
     def updatable?(link)

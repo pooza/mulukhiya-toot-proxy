@@ -13,10 +13,10 @@ module MulukhiyaTootProxy
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue Ginseng::RequestError => e
-      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
-    rescue => e
-      raise Ginseng::GatewayError, e.message
+    rescue Ginseng::RequestError => ex
+      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found (#{ex.message})"
+    rescue => ex
+      raise Ginseng::GatewayError, ex.message
     end
 
     def lookup(id)
@@ -25,10 +25,10 @@ module MulukhiyaTootProxy
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
-    rescue Ginseng::RequestError => e
-      raise Ginseng::RequestError, "'#{id}' not found (#{e.message})"
-    rescue => e
-      raise Ginseng::GatewayError, e.message
+    rescue Ginseng::RequestError => ex
+      raise Ginseng::RequestError, "'#{id}' not found (#{ex.message})"
+    rescue => ex
+      raise Ginseng::GatewayError, ex.message
     end
 
     def track_uri(track)

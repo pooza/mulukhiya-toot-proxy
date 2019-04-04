@@ -46,13 +46,13 @@ module MulukhiyaTootProxy
           handler.exec(body, headers)
           results.push(handler.result)
         end
-      rescue Timeout::Error => e
-        logger.error(Ginseng::Error.create(e).to_h)
+      rescue Timeout::Error => ex
+        logger.error(Ginseng::Error.create(ex).to_h)
         next
-      rescue RestClient::Exception => e
-        raise GatewayError, e.message
-      rescue HTTParty::Error => e
-        raise GatewayError, e.message
+      rescue RestClient::Exception => ex
+        raise GatewayError, ex.message
+      rescue HTTParty::Error => ex
+        raise GatewayError, ex.message
       end
       return results
     end

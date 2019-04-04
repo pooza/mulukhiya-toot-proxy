@@ -24,8 +24,8 @@ module MulukhiyaTootProxy
       @tags.compact!
       return @tags if @tags.present?
       return [Mastodon.create_tag(@source)]
-    rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+    rescue => ex
+      @logger.error(Ginseng::Error.create(ex).to_h)
       return [Mastodon.create_tag(@source)]
     end
 

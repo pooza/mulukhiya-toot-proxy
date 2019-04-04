@@ -5,8 +5,8 @@ namespace :mulukhiya do
         desc "#{action} #{ns}"
         task action do
           sh "#{File.join(MulukhiyaTootProxy::Environment.dir, 'bin', "#{ns}_daemon.rb")} #{action}"
-        rescue => e
-          STDERR.puts "#{e.class} #{ns}:#{action} #{e.message}"
+        rescue => ex
+          warn "#{e.class} #{ns}:#{action} #{ex.message}"
         end
       end
 

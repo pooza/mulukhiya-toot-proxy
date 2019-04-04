@@ -9,8 +9,8 @@ module MulukhiyaTootProxy
       File.open(src) do |file|
         upload("/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md", file.read)
       end
-    rescue Dropbox::ApiError => e
-      raise Ginseng::GatewayError, "Dropbox upload error (#{e.message})"
+    rescue Dropbox::ApiError => ex
+      raise Ginseng::GatewayError, "Dropbox upload error (#{ex.message})"
     ensure
       File.unlink(src) if File.exist?(src)
     end
@@ -19,8 +19,8 @@ module MulukhiyaTootProxy
       return DropboxClipper.new(
         UserConfigStorage.new[params[:account_id]]['/dropbox/token'],
       )
-    rescue => e
-      raise Ginseng::GatewayError, "Dropbox auth error (#{e.message})"
+    rescue => ex
+      raise Ginseng::GatewayError, "Dropbox auth error (#{ex.message})"
     end
   end
 end

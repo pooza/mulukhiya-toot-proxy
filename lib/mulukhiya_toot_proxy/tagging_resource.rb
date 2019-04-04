@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
       response = @http.get(uri).parsed_response
       raise 'empty' unless response.present?
       return response
-    rescue => e
-      raise Ginseng::GatewayError, "'#{url}' is invalid (#{e.message})"
+    rescue => ex
+      raise Ginseng::GatewayError, "'#{url}' is invalid (#{ex.message})"
     end
 
     def uri
@@ -36,7 +36,7 @@ module MulukhiyaTootProxy
     private
 
     def create_pattern(word)
-      word = Unicode::nfkc(word)
+      word = Unicode.nfkc(word)
       pattern = word.gsub(/[^[:alnum:]]/, '.? ?')
       [
         'あぁ', 'いぃ', 'うぅ', 'えぇ', 'おぉ', 'やゃ', 'ゆゅ', 'よょ',

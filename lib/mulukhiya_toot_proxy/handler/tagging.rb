@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       container = TagContainer.new
       container.body = body['status']
-      tmp_body = Unicode::nfkc(body['status'])
+      tmp_body = Unicode.nfkc(body['status'])
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
         next unless tmp_body =~ v[:pattern]
