@@ -1,4 +1,5 @@
 require 'addressable/uri'
+require 'unicode'
 
 module MulukhiyaTootProxy
   class TaggingResource
@@ -35,6 +36,7 @@ module MulukhiyaTootProxy
     private
 
     def create_pattern(word)
+      word = Unicode::nfkc(word)
       pattern = word.gsub(/[^[:alnum:]]/, '.? ?')
       [
         'あぁ', 'いぃ', 'うぅ', 'えぇ', 'おぉ', 'やゃ', 'ゆゅ', 'よょ',
