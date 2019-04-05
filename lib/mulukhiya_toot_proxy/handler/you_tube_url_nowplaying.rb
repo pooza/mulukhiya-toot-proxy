@@ -18,6 +18,7 @@ module MulukhiyaTootProxy
       return unless video = @videos[keyword]
       push(video['snippet']['title'])
       push(video['snippet']['channelTitle'])
+      @tags.push(video['snippet']['channelTitle'])
     end
   end
 end
