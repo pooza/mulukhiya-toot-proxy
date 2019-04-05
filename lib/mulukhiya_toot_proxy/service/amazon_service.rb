@@ -31,8 +31,8 @@ module MulukhiyaTootProxy
         return uri if uri
       end
       return published_image_uri(asin)
-    rescue Amazon::RequestError => ex
-      raise Ginseng::GatewayError, ex.message if retry_limit < cnt
+    rescue Amazon::RequestError => e
+      raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -64,8 +64,8 @@ module MulukhiyaTootProxy
         return response.items.first.get('ASIN') if response.items.present?
       end
       return nil
-    rescue Amazon::RequestError => ex
-      raise Ginseng::GatewayError, ex.message if retry_limit < cnt
+    rescue Amazon::RequestError => e
+      raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry

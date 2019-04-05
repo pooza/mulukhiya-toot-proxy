@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
       response = @http.get(uri).parsed_response
       raise 'empty' unless response.present?
       return response
-    rescue => ex
-      raise Ginseng::GatewayError, "'#{url}' is invalid (#{ex.message})"
+    rescue => e
+      raise Ginseng::GatewayError, "'#{url}' is invalid (#{e.message})"
     end
 
     def uri

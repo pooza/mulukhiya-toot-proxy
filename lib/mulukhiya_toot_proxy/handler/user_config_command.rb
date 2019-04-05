@@ -9,8 +9,8 @@ module MulukhiyaTootProxy
       return YAML.dump(
         JSON.parse(UserConfigStorage.new.get(mastodon.account_id)),
       )
-    rescue => ex
-      raise Ginseng::RequestError, ex.message
+    rescue => e
+      raise Ginseng::RequestError, e.message
     end
   end
 end
