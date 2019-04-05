@@ -40,9 +40,11 @@ module MulukhiyaTootProxy
     def self.exec_all(body, headers, params = {})
       results = []
       logger = Logger.new
+      tags = TagContainer.new
       all do |handler|
         Timeout.timeout(handler.timeout) do
           handler.mastodon = params[:mastodon]
+          handler.tags = tags
           handler.exec(body, headers)
           results.push(handler.result)
         end
@@ -62,7 +64,7 @@ module MulukhiyaTootProxy
     def initialize
       @config = Config.instance
       @logger = Logger.new
-      @tags = []
+      @tags = TagContainer.new
       @count = 0
     end
 

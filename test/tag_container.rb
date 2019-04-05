@@ -5,10 +5,9 @@ module MulukhiyaTootProxy
     end
 
     def test_create_tags
-      @config['/tagging/default_tags'] = ['美食丼']
       container = TagContainer.new
       container.concat(['カレー担々麺', 'コスモグミ'])
-      assert_equal(container.create_tags, ['#カレー担々麺', '#コスモグミ', '#美食丼'])
+      assert_equal(container.create_tags, ['#カレー担々麺', '#コスモグミ'])
     end
 
     def test_default_tags

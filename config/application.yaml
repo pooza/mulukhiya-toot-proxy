@@ -67,7 +67,6 @@ youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
 nowplaying:
-  hashtag: false
   artist_parser:
     delimiters:
       - /
