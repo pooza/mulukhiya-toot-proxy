@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
 
     def append(body, tags)
       return body unless tags.present?
-      lines = body.each_line.map{|line| line.chomp}.to_a
+      lines = body.each_line.map(&:chomp).to_a
       if lines.last&.match?(Regexp.new("^(#[[:word:]]+\s*)+$", Regexp::IGNORECASE))
         line = lines.pop
         body = lines.join("\n")

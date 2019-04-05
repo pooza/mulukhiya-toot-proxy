@@ -103,10 +103,10 @@ module MulukhiyaTootProxy
       handler = Handler.create('tagging')
 
       last = handler.exec({'status' => '宮本佳那子'})['status'].each_line.to_a.last.chomp
-      assert_equal(last, "#宮本佳那子")
+      assert_equal(last, '#宮本佳那子')
 
       last = handler.exec({'status' => "宮本佳那子\n#aaa #bbb"})['status'].each_line.to_a.last.chomp
-      assert_equal(last, "#aaa #bbb #宮本佳那子")
+      assert_equal(last, '#aaa #bbb #宮本佳那子')
     end
   end
 end
