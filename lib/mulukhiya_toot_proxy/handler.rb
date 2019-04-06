@@ -5,8 +5,8 @@ require 'rest-client'
 module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
+    attr_accessor :results
     attr_accessor :tags
-    attr_reader :count
 
     def exec(body, headers = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
@@ -21,6 +21,7 @@ module MulukhiyaTootProxy
     end
 
     def result
+      return nil unless @result.present?
       return {handler: self.class.to_s, entries: @result}
     end
 
@@ -50,8 +51,9 @@ module MulukhiyaTootProxy
         Timeout.timeout(handler.timeout) do
           handler.mastodon = params[:mastodon]
           handler.tags = tags
+          handler.results = results
           handler.exec(body, headers)
-          results.push(handler.result)
+          results.push(handler.result) if handler.result
         end
       rescue Timeout::Error => e
         logger.error(Ginseng::Error.create(e).to_h)

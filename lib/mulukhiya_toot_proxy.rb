@@ -68,6 +68,7 @@ module MulukhiyaTootProxy
     autoload :DropboxClippingWorker
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
+    autoload :ResultNotificationWorker
     autoload :TaggingDictionaryWorker
   end
 

@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
 
     def perform
       TaggingDictionary.new.refresh
+    rescue => e
+      @logger.error(Ginseng::Error.create(e).to_h)
     end
   end
 end
