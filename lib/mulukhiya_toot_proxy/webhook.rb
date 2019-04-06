@@ -5,7 +5,7 @@ require 'json'
 module MulukhiyaTootProxy
   class Webhook
     attr_reader :mastodon
-    attr_reader :summaries
+    attr_reader :results
 
     def digest
       return Digest::SHA1.hexdigest({
@@ -54,7 +54,7 @@ module MulukhiyaTootProxy
 
     def toot(status)
       body = {'status' => status, 'visibility' => visibility}
-      @summaries = Handler.exec_all(body, @headers, {mastodon: @mastodon})
+      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end
 
@@ -87,6 +87,7 @@ module MulukhiyaTootProxy
     def initialize(params)
       @config = Config.instance
       @params = params
+      @results = ResultContainer.new
       @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
     end
 

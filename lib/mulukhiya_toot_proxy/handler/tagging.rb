@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
       end
       tags.concat(TagContainer.default_tags) if default_tags?(body)
       body['status'] = append(body['status'], @tags)
-      @count += @tags.count
+      @result.concat(@tags)
       return body
     end
 

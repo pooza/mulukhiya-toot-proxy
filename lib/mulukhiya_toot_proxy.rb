@@ -33,6 +33,7 @@ module MulukhiyaTootProxy
   autoload :Postgres
   autoload :QueryTemplate
   autoload :Redis
+  autoload :ResultContainer
   autoload :ReverseMarkdown
   autoload :Server
   autoload :Slack

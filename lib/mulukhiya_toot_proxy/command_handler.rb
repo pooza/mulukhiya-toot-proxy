@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
       dispatch(values)
       body['visibility'] = 'direct'
       body['status'] = create_status(values)
-      increment!
+      @result.push(values)
     end
 
     def create_status(values)

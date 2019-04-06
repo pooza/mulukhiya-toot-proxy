@@ -6,7 +6,6 @@ module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
     attr_accessor :tags
-    attr_reader :result
     attr_reader :count
 
     def exec(body, headers = {})
@@ -18,7 +17,11 @@ module MulukhiyaTootProxy
     end
 
     def summary
-      return "#{self.class.to_s.split('::').last},#{@count}"
+      return "#{self.class.to_s.split('::').last},#{@result.count}"
+    end
+
+    def result
+      return {handler: self.class.to_s, entries: @result}
     end
 
     def timeout
@@ -40,15 +43,15 @@ module MulukhiyaTootProxy
     end
 
     def self.exec_all(body, headers, params = {})
-      summaries = []
       logger = Logger.new
       tags = TagContainer.new
+      results = ResultContainer.new
       all do |handler|
         Timeout.timeout(handler.timeout) do
           handler.mastodon = params[:mastodon]
           handler.tags = tags
           handler.exec(body, headers)
-          summaries.push(handler.summary)
+          results.push(handler.result)
         end
       rescue Timeout::Error => e
         logger.error(Ginseng::Error.create(e).to_h)
@@ -58,7 +61,7 @@ module MulukhiyaTootProxy
       rescue HTTParty::Error => e
         raise GatewayError, e.message
       end
-      return summaries
+      return results
     end
 
     private
@@ -67,12 +70,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @logger = Logger.new
       @tags = TagContainer.new
-      @result = {}
-      @count = 0
-    end
-
-    def increment!
-      @count += 1
+      @result = []
     end
   end
 end
