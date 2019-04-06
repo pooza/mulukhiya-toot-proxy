@@ -12,11 +12,11 @@ module MulukhiyaTootProxy
 
     def test_exec
       @handler.exec({'status' => Time.now.to_s})
-      assert_equal(@handler.result, 'DropboxClippingHandler,0')
+      assert_equal(@handler.summary, 'DropboxClippingHandler,0')
       sleep(1)
 
       @handler.exec({'status' => "#{Time.now} \#dropbox"})
-      assert_equal(@handler.result, 'DropboxClippingHandler,1')
+      assert_equal(@handler.summary, 'DropboxClippingHandler,1')
       sleep(1)
     end
   end

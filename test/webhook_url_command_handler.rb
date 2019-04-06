@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
 
     def test_exec
       @handler.exec({'status' => ''})
-      assert_equal(@handler.result, 'WebhookURLCommandHandler,0')
+      assert_equal(@handler.summary, 'WebhookURLCommandHandler,0')
     end
   end
 end

@@ -12,15 +12,15 @@ module MulukhiyaTootProxy
 
     def test_exec
       @handler.exec({'status' => ''})
-      assert_equal(@handler.result, 'DropboxClippingCommandHandler,0')
+      assert_equal(@handler.summary, 'DropboxClippingCommandHandler,0')
       sleep(1)
 
       @handler.exec({'status' => "command: dropbox_clipping\nurl: https://mstdn.b-shock.org/web/statuses/101125535795976504"})
-      assert_equal(@handler.result, 'DropboxClippingCommandHandler,1')
+      assert_equal(@handler.summary, 'DropboxClippingCommandHandler,1')
       sleep(1)
 
       @handler.exec({'status' => "command: dropbox_clipping\nurl: https://precure.ml/@pooza/101276312982799462"})
-      assert_equal(@handler.result, 'DropboxClippingCommandHandler,2')
+      assert_equal(@handler.summary, 'DropboxClippingCommandHandler,2')
       sleep(1)
     end
   end

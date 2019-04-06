@@ -4,10 +4,10 @@ module MulukhiyaTootProxy
       handler = Handler.create('spotify_url_nowplaying')
 
       handler.exec({'status' => "#nowplaying https://open.spotify.com/\n"})
-      assert_equal(handler.result, 'SpotifyURLNowplayingHandler,0')
+      assert_equal(handler.summary, 'SpotifyURLNowplayingHandler,0')
 
       handler.exec({'status' => "#nowplaying https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS\n"})
-      assert_equal(handler.result, 'SpotifyURLNowplayingHandler,1')
+      assert_equal(handler.summary, 'SpotifyURLNowplayingHandler,1')
     end
   end
 end
