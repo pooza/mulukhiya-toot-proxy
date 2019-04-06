@@ -17,7 +17,8 @@ module MulukhiyaTootProxy
       uri.path = path
       return nil unless uri.absolute?
       return uri
-    rescue
+    rescue => e
+      @logger.error(Ginseng::Error.create(e).to_h)
       return nil
     end
   end

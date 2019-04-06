@@ -10,7 +10,8 @@ module MulukhiyaTootProxy
       return false unless uri = VideoURI.parse(keyword)
       return false unless @videos[keyword] = uri.data
       return true
-    rescue
+    rescue => e
+      @logger.error(Ginseng::Error.create(e).to_h)
       return false
     end
 

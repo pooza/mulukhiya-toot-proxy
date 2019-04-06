@@ -16,8 +16,8 @@ module MulukhiyaTootProxy
         crowi_url: user_config['/growi/url'],
         access_token: user_config['/growi/token'],
       })
-    rescue
-      raise Ginseng::GatewayError, 'GROWI not found'
+    rescue => e
+      raise Ginseng::GatewayError, "GROWI initialize error (#{e.message})"
     end
 
     def self.create_path(username)

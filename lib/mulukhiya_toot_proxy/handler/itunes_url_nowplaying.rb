@@ -11,7 +11,8 @@ module MulukhiyaTootProxy
       return false unless uri.track.present?
       @tracks[keyword] = uri.track
       return true
-    rescue
+    rescue => e
+      @logger.error(Ginseng::Error.create(e).to_h)
       return false
     end
 

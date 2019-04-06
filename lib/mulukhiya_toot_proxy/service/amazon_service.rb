@@ -86,7 +86,7 @@ module MulukhiyaTootProxy
       config['/amazon/access_key']
       config['/amazon/secret_key']
       return true
-    rescue
+    rescue Ginseng::ConfigError
       return false
     end
 
