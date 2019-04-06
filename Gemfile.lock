@@ -131,7 +131,7 @@ GEM
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
     parallel (1.17.0)
-    parser (2.6.2.0)
+    parser (2.6.2.1)
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.4)
