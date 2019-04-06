@@ -4,6 +4,10 @@ module MulukhiyaTootProxy
   class NotificationWorker
     include Sidekiq::Worker
 
+    def initialize
+      @logger = Logger.new
+    end
+
     def perform(params)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
