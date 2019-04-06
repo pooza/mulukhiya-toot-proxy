@@ -3,7 +3,6 @@ module MulukhiyaTootProxy
     def initialize
       super
       @videos = {}
-      @service = YouTubeService.new
     end
 
     def updatable?(keyword)
