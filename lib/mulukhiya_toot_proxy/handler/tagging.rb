@@ -10,13 +10,20 @@ module MulukhiyaTootProxy
         @tags.concat(v[:words])
         tmp_body.gsub!(v[:pattern], '')
       end
-      tags.concat(TagContainer.default_tags)
+      tags.concat(TagContainer.default_tags) if default_tags?(body)
       body['status'] = append(body['status'], @tags)
       @count += @tags.count
       return body
     end
 
     private
+
+    def default_tags?(body)
+      return true unless body['visibility']
+      return true if body['visibility'] == 'public'
+      return true if @config['/tagging/always_default_tags']
+      return false
+    end
 
     def append(body, tags)
       return body unless tags.present?

@@ -50,14 +50,14 @@ module MulukhiyaTootProxy
       assert_equal(tags.count, 3)
 
       handler = Handler.create('tagging')
-      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})['status'])
-      assert_equal(tags.count, 2)
-      assert(tags.member?('Yes_プリキュア5'))
+      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'])
+      assert_equal(tags.count, 1)
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       handler = Handler.create('tagging')
-      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 GoGo!'})['status'])
-      assert_equal(tags.count, 1)
+      tags = TagContainer.scan(handler.exec({'status' => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})['status'])
+      assert_equal(tags.count, 2)
+      assert(tags.member?('Yes_プリキュア5'))
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       handler = Handler.create('tagging')
@@ -81,6 +81,7 @@ module MulukhiyaTootProxy
 
     def test_exec_with_default_tag
       @config['/tagging/default_tags'] = ['美食丼']
+      @config['/tagging/always_default_tags'] = true
 
       handler = Handler.create('tagging')
       tags = TagContainer.scan(handler.exec({'status' => 'hoge'})['status'])
@@ -97,6 +98,12 @@ module MulukhiyaTootProxy
       tags = TagContainer.scan(handler.exec({'status' => '#美食丼'})['status'])
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
+
+      @config['/tagging/always_default_tags'] = false
+
+      handler = Handler.create('tagging')
+      tags = TagContainer.scan(handler.exec({'status' => 'hoge', 'visibility' => 'unlisted'})['status'])
+      assert_equal(tags.count, 0)
     end
 
     def test_end_with_tags?

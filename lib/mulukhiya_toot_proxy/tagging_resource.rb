@@ -36,8 +36,7 @@ module MulukhiyaTootProxy
     private
 
     def create_pattern(word)
-      word = Unicode.nfkc(word)
-      pattern = word.gsub(/[^[:alnum:]]/, '.? ?')
+      pattern = Unicode.nfkc(word).gsub(/[^[:alnum:]]/, '.? ?')
       [
         'あぁ', 'いぃ', 'うぅ', 'えぇ', 'おぉ', 'やゃ', 'ゆゅ', 'よょ',
         'アァ', 'イィ', 'ウゥ', 'エェ', 'オォ', 'ヤャ', 'ユュ', 'ヨョ'

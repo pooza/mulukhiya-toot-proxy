@@ -127,6 +127,7 @@ sidekiq:
     user: admin
     password: ''
 tagging:
+  always_default_tags: true
   word:
     minimum_length: 4
 webhook:
