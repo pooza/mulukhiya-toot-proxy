@@ -5,8 +5,8 @@ require 'rest-client'
 module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
-    attr_accessor :results
     attr_accessor :tags
+    attr_accessor :results
 
     def exec(body, headers = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
@@ -72,6 +72,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @logger = Logger.new
       @tags = TagContainer.new
+      @results = ResultContainer.new
       @result = []
     end
   end
