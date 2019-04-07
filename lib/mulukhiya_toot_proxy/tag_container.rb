@@ -5,6 +5,7 @@ module MulukhiyaTootProxy
     attr_reader :body
 
     def push(word)
+      @tags = nil
       super(word.sub(/^#/, ''))
     end
 
@@ -13,6 +14,7 @@ module MulukhiyaTootProxy
     end
 
     def body=(body)
+      @tags = nil
       @body = Unicode.nfkc(body)
     end
 
@@ -25,11 +27,13 @@ module MulukhiyaTootProxy
     end
 
     def create_tags
-      tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
-      tags.uniq!
-      tags.compact!
-      tags.delete_if{|v| @body =~ create_pattern(v)} if @body
-      return tags
+      unless @tags
+        @tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
+        @tags.uniq!
+        @tags.compact!
+        @tags.delete_if{|v| @body =~ create_pattern(v)} if @body
+      end
+      return @tags
     end
 
     def self.default_tags
