@@ -6,17 +6,13 @@ module MulukhiyaTootProxy
       @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
-    def test_create
-      assert(@handler.is_a?(DropboxClippingHandler))
-    end
-
     def test_exec
       @handler.exec({'status' => Time.now.to_s})
-      assert_equal(@handler.summary, 'DropboxClippingHandler,0')
+      assert_nil(@handler.result)
       sleep(1)
 
       @handler.exec({'status' => "#{Time.now} \#dropbox"})
-      assert_equal(@handler.summary, 'DropboxClippingHandler,1')
+      assert_equal(@handler.result[:entries].count, 1)
       sleep(1)
     end
   end
