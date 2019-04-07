@@ -9,6 +9,8 @@ module MulukhiyaTootProxy
           account: db.execute('account', {id: params['id']}).first,
           status: params['status'],
         }), :text)
+      rescue Ginseng::ConfigError
+        next
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h)
         next
