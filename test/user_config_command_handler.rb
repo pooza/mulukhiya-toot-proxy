@@ -12,19 +12,19 @@ module MulukhiyaTootProxy
       key = SecureRandom.hex(16)
 
       @handler.exec({'status' => ''})
-      assert_equal(@handler.summary, 'UserConfigCommandHandler,0')
+      assert_nil(@handler.result)
 
       @handler.exec({'status' => "command: user_config\n#{key}: 1"})
-      assert_equal(@handler.summary, 'UserConfigCommandHandler,1')
+      assert_equal(@handler.result[:entries].count, 1)
 
       @handler.exec({'status' => "command: user_config\n#{key}: null"})
-      assert_equal(@handler.summary, 'UserConfigCommandHandler,2')
+      assert_equal(@handler.result[:entries].count, 2)
 
       @handler.exec({'status' => %({"command": "user_config", "#{key}": 2})})
-      assert_equal(@handler.summary, 'UserConfigCommandHandler,3')
+      assert_equal(@handler.result[:entries].count, 3)
 
       @handler.exec({'status' => %({"command": "user_config", "#{key}": null})})
-      assert_equal(@handler.summary, 'UserConfigCommandHandler,4')
+      assert_equal(@handler.result[:entries].count, 4)
     end
   end
 end
