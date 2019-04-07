@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
         path: path,
       })
       body['status'] += "\n#{create_uri(res.data.path)}"
-      @result.push({path: path})
+      @result.push(path)
     end
 
     private

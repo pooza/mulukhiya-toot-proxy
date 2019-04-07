@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
         next unless updatable?(keyword)
         update(keyword)
         updated = true
-        @result.push({keyword: keyword})
+        @result.push(keyword)
       end
       body['status'] = @status.join("\n")
       return body

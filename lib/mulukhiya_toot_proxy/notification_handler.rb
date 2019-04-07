@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
         token: @mastodon.token,
         status: body['status'],
       })
-      @result.push({executed: true})
+      @result.push(true)
     end
 
     def worker_name
