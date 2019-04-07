@@ -4,7 +4,6 @@ module MulukhiyaTootProxy
       @handler = Handler.create('spotify_url_nowplaying')
     end
 
-
     def test_exec
       @handler.exec({'status' => "#nowplaying https://open.spotify.com/\n"})
       assert_nil(@handler.result)
