@@ -11,14 +11,16 @@ module MulukhiyaTootProxy
       return false unless uri.track.present?
       @tracks[keyword] = uri.track
       return true
-    rescue
+    rescue => e
+      @logger.error(e)
       return false
     end
 
     def update(keyword)
       return unless track = @tracks[keyword]
       push(track.name)
-      push(ArtistParser.new(track.artists.map(&:name).join('、')).parse.join(' '))
+      push(track.artists.map(&:name).join(', '))
+      ArtistParser.new(track.artists.map(&:name).join('、'), @tags).parse
       [:itunes_uri].each do |method|
         next unless uri = @service.send(method, track)
         push(uri.to_s)

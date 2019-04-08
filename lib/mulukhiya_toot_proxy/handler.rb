@@ -6,6 +6,7 @@ module MulukhiyaTootProxy
   class Handler
     attr_accessor :mastodon
     attr_accessor :tags
+    attr_accessor :results
 
     def exec(body, headers = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
@@ -15,8 +16,13 @@ module MulukhiyaTootProxy
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
+    def summary
+      return "#{self.class.to_s.split('::').last},#{@result.count}"
+    end
+
     def result
-      return "#{self.class.to_s.split('::').last},#{@count}"
+      return nil unless @result.present?
+      return {handler: self.class.to_s, entries: @result}
     end
 
     def timeout
@@ -38,17 +44,19 @@ module MulukhiyaTootProxy
     end
 
     def self.exec_all(body, headers, params = {})
-      results = []
       logger = Logger.new
+      tags = TagContainer.new
+      results = ResultContainer.new
       all do |handler|
         Timeout.timeout(handler.timeout) do
           handler.mastodon = params[:mastodon]
-          handler.tags = params[:tags]
+          handler.tags = tags
+          handler.results = results
           handler.exec(body, headers)
-          results.push(handler.result)
+          results.push(handler.result) if handler.result
         end
       rescue Timeout::Error => e
-        logger.error(Ginseng::Error.create(e).to_h)
+        logger.error(e)
         next
       rescue RestClient::Exception => e
         raise GatewayError, e.message
@@ -63,12 +71,9 @@ module MulukhiyaTootProxy
     def initialize
       @config = Config.instance
       @logger = Logger.new
-      @tags = []
-      @count = 0
-    end
-
-    def increment!
-      @count += 1
+      @tags = TagContainer.new
+      @results = ResultContainer.new
+      @result = []
     end
   end
 end

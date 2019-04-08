@@ -125,6 +125,9 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Max: 10
 
+Naming/RescuedExceptionsVariableName:
+  PreferredName: e
+
 Security/MarshalLoad:
   Exclude:
     - lib/mulukhiya_toot_proxy/tagging_dictionary.rb

@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
         body: body['status'],
         account: {id: mastodon.account_id},
       })
-      increment!
+      @result.push(true)
     end
   end
 end

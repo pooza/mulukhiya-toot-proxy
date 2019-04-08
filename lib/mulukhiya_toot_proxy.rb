@@ -13,7 +13,6 @@ end
 module MulukhiyaTootProxy
   extend ActiveSupport::Autoload
 
-  autoload :AmazonService
   autoload :ArtistParser
   autoload :ClippingCommandHandler
   autoload :ClippingWorker
@@ -25,7 +24,6 @@ module MulukhiyaTootProxy
   autoload :Handler
   autoload :HTTP
   autoload :ImageHandler
-  autoload :ItunesService
   autoload :Logger
   autoload :Mastodon
   autoload :NotificationHandler
@@ -35,15 +33,14 @@ module MulukhiyaTootProxy
   autoload :Postgres
   autoload :QueryTemplate
   autoload :Redis
+  autoload :ResultContainer
   autoload :ReverseMarkdown
   autoload :Server
   autoload :Slack
-  autoload :SpotifyService
   autoload :TagContainer
   autoload :TaggingDictionary
   autoload :TaggingResource
   autoload :Template
-  autoload :TwitterService
   autoload :URLHandler
   autoload :UserConfigStorage
   autoload :Webhook
@@ -63,6 +60,7 @@ module MulukhiyaTootProxy
     autoload :MastodonURI
     autoload :SpotifyURI
     autoload :TwitterURI
+    autoload :VideoURI
   end
 
   autoload_under 'worker' do
@@ -70,7 +68,16 @@ module MulukhiyaTootProxy
     autoload :DropboxClippingWorker
     autoload :GrowiClippingWorker
     autoload :MentionNotificationWorker
+    autoload :ResultNotificationWorker
     autoload :TaggingDictionaryWorker
+  end
+
+  autoload_under 'Service' do
+    autoload :AmazonService
+    autoload :ItunesService
+    autoload :SpotifyService
+    autoload :TwitterService
+    autoload :YouTubeService
   end
 end
 

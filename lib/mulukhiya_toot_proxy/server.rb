@@ -16,10 +16,10 @@ module MulukhiyaTootProxy
       results = Handler.exec_all(params, @headers, {mastodon: @mastodon})
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
-      @renderer.message['results'] = results.join(', ')
+      @renderer.message['results'] = results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
       @renderer.status = r.code
-      headers({'X-Mulukhiya' => results.join(', ')})
+      headers({'X-Mulukhiya' => results.summary})
       return @renderer.to_s
     end
 
@@ -31,7 +31,7 @@ module MulukhiyaTootProxy
       raise Ginseng::RequestError, 'empty message' unless params[:text].present?
       r = webhook.toot(params[:text])
       @renderer.message = r.parsed_response
-      @renderer.message['results'] = webhook.results.join(', ')
+      @renderer.message['results'] = webhook.results.summary
       @renderer.status = r.code
       return @renderer.to_s
     end

@@ -1,32 +1,27 @@
 module MulukhiyaTootProxy
   class ArtistParser
-    def initialize(source)
+    def initialize(source, tags)
       @source = source
       @config = Config.instance
       @logger = Logger.new
-      @tags = []
+      @tags = tags
     end
 
     def parse
-      return [@source] unless @config['/nowplaying/hashtag']
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited]
           split_artist(@source, true).each do |artist|
-            @tags.concat(ArtistParser.new(artist).parse)
+            ArtistParser.new(artist, @tags).parse
           end
         else
           @tags.concat(parse_part(matches, pattern_entry[:items]))
         end
-        break
+        return
       end
-      @tags.uniq!
-      @tags.compact!
-      return @tags if @tags.present?
-      return [Mastodon.create_tag(@source)]
+      @tags.push(@source)
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
-      return [Mastodon.create_tag(@source)]
+      @logger.error(e)
     end
 
     private
@@ -37,9 +32,7 @@ module MulukhiyaTootProxy
       items.each do |item|
         i += 1
         next if item['drop']
-        split_artist(source[i], item['split']).each do |tag|
-          tags.push(create_tag(tag, item['strip'], item['prefix']))
-        end
+        split_artist(source[i], item['split']).map{|v| tags.push(v)}
       end
       return tags
     end
@@ -54,13 +47,6 @@ module MulukhiyaTootProxy
         output[:items] = entry['items'] || []
         yield output
       end
-    end
-
-    def create_tag(tag, strip, prefix)
-      tag = Mastodon.create_tag(tag)
-      tag.tr!('_', '') if strip
-      tag = "#{prefix}#{tag}" if prefix
-      return tag
     end
 
     def split_artist(artist, flag)

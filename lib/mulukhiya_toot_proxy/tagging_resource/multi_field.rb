@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
           result[entry[field]] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e
-        message = Ginseng::Error.create(e).to_h.clone
+        message = Ginseng::Error.create(e).to_h
         message['resource'] = @params
         @logger.error(message)
         next

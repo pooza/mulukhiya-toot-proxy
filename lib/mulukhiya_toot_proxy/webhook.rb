@@ -19,12 +19,6 @@ module MulukhiyaTootProxy
       return @params['/webhook/visibility'] || 'public'
     end
 
-    def tags
-      return @params['/webhook/tags'] || []
-    end
-
-    alias toot_tags tags
-
     def uri
       begin
         uri = Addressable::URI.parse(@config['/instance_url'])
@@ -43,7 +37,8 @@ module MulukhiyaTootProxy
         token: @mastodon.token,
         owner: @mastodon.account_id,
       }).present?
-    rescue
+    rescue => e
+      @logger.error(e)
       return false
     end
 
@@ -52,7 +47,6 @@ module MulukhiyaTootProxy
         mastodon: @mastodon.uri.to_s,
         token: @mastodon.token,
         visibility: visibility,
-        tags: tags,
         hook: uri.to_s,
       })
       return @json
@@ -60,7 +54,7 @@ module MulukhiyaTootProxy
 
     def toot(status)
       body = {'status' => status, 'visibility' => visibility}
-      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon, tags: tags})
+      @results = Handler.exec_all(body, @headers, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end
 
@@ -93,6 +87,7 @@ module MulukhiyaTootProxy
     def initialize(params)
       @config = Config.instance
       @params = params
+      @results = ResultContainer.new
       @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
     end
 

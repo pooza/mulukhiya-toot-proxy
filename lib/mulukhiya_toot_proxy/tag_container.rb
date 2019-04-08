@@ -1,14 +1,39 @@
+require 'unicode'
+
 module MulukhiyaTootProxy
   class TagContainer < Array
-    attr_accessor :body
+    attr_reader :body
+
+    def push(word)
+      @tags = nil
+      super(word.sub(/^#/, ''))
+    end
+
+    def concat(words)
+      words.map{|v| push(v)}
+    end
+
+    def body=(body)
+      @tags = nil
+      @body = Unicode.nfkc(body)
+    end
+
+    def count
+      return create_tags.count
+    end
+
+    def to_s
+      return create_tags.join(' ')
+    end
 
     def create_tags
-      tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
-      tags = tags.concat(TagContainer.default_tags)
-      tags.uniq!
-      tags.compact!
-      tags.delete_if{|v| @body =~ create_pattern(v)} if @body
-      return tags
+      unless @tags
+        @tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
+        @tags.uniq!
+        @tags.compact!
+        @tags.delete_if{|v| @body =~ create_pattern(v)} if @body
+      end
+      return @tags
     end
 
     def self.default_tags

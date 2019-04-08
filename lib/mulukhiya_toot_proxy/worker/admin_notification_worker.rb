@@ -7,7 +7,10 @@ module MulukhiyaTootProxy
           account: db.execute('account', {id: params['id']}).first,
           status: params['status'],
         }), :text)
-      rescue
+      rescue Ginseng::ConfigError
+        next
+      rescue => e
+        @logger.error(e)
         next
       end
     end

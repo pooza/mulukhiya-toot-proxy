@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: cb11283a8e4edc2eae3ff44fae2da7c23cfe137f
+  revision: b00367ac1cba5155325608ebd3ec4f32bca1b85f
   specs:
-    ginseng-core (1.2.4)
+    ginseng-core (1.2.6)
       activesupport
       addressable
       bundler (< 2.0)
@@ -131,14 +131,14 @@ GEM
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
     parallel (1.17.0)
-    parser (2.6.2.0)
+    parser (2.6.2.1)
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.4)
     psych (3.1.0)
     public_suffix (3.0.3)
     raabro (1.1.6)
-    rack (2.0.6)
+    rack (2.0.7)
     rack-protection (2.0.5)
       rack
     rack-test (1.1.0)
@@ -156,7 +156,7 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.66.0)
+    rubocop (0.67.2)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
@@ -198,6 +198,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
+    unicode (0.4.4.4)
     unicode-display_width (1.5.0)
 
 PLATFORMS
@@ -218,6 +219,7 @@ DEPENDENCIES
   sidekiq
   sidekiq-scheduler
   twitter!
+  unicode
 
 RUBY VERSION
    ruby 2.5.5p157

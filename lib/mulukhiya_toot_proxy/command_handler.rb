@@ -11,17 +11,17 @@ module MulukhiyaTootProxy
       return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|
-        next unless values = send(method, body['status'])
-        next unless values['command'] == command_name
-        break if values.present?
-      rescue
+        break if values = send(method, body['status'])
+      rescue => e
+        @logger.error(e)
         next
       end
       return unless values.present?
+      return unless values['command'] == command_name
       dispatch(values)
       body['visibility'] = 'direct'
       body['status'] = create_status(values)
-      increment!
+      @result.push(values)
     end
 
     def create_status(values)
