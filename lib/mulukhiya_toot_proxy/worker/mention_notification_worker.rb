@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
       rescue Ginseng::ConfigError
         next
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h)
+        @logger.error(e)
         next
       end
     end

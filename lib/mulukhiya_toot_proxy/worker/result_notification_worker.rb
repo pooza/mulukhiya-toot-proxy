@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       return unless slack = connect_slack(params['id'])
       slack.say(create_message(params['results']), :text)
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
     end
 
     def create_message(results)

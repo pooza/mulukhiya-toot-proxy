@@ -28,7 +28,7 @@ module MulukhiyaTootProxy
       File.write(TaggingDictionary.path, Marshal.dump(fetch))
       load
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
     end
 
     alias create refresh

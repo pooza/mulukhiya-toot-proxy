@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
       [:parse_yaml, :parse_json].each do |method|
         break if values = send(method, body['status'])
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h)
+        @logger.error(e)
         next
       end
       return unless values.present?

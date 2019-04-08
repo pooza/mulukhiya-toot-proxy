@@ -56,7 +56,7 @@ module MulukhiyaTootProxy
           results.push(handler.result) if handler.result
         end
       rescue Timeout::Error => e
-        logger.error(Ginseng::Error.create(e).to_h)
+        logger.error(e)
         next
       rescue RestClient::Exception => e
         raise GatewayError, e.message

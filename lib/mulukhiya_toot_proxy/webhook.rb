@@ -38,7 +38,7 @@ module MulukhiyaTootProxy
         owner: @mastodon.account_id,
       }).present?
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
       return false
     end
 

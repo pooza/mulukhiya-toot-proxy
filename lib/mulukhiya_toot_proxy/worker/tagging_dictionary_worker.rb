@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     def perform
       TaggingDictionary.new.refresh
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
     end
   end
 end

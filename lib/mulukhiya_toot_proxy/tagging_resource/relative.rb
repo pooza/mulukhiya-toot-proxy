@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
         [k, {pattern: create_pattern(k), words: v}]
       end.to_h
     rescue => e
-      message = Ginseng::Error.create(e).to_h.clone
+      message = Ginseng::Error.create(e).to_h
       message['resource'] = @params
       @logger.error(message)
     end

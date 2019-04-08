@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       return true if @tracks[keyword] = @service.search_track(keyword)
       return false
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
       return false
     end
 

@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
       @tracks[keyword] = uri.track
       return true
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
       return false
     end
 

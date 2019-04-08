@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
       end
       @tags.push(@source)
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
     end
 
     private

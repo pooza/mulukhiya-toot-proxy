@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
       return nil unless uri.absolute?
       return uri
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h)
+      @logger.error(e)
       return nil
     end
   end
