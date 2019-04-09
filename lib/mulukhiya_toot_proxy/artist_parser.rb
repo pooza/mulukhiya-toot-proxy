@@ -1,25 +1,26 @@
 module MulukhiyaTootProxy
   class ArtistParser
-    def initialize(source, tags)
+    def initialize(source)
       @source = source
       @config = Config.instance
       @logger = Logger.new
-      @tags = tags
     end
 
     def parse
+      tags = []
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited]
           split_artist(@source, true).each do |artist|
-            ArtistParser.new(artist, @tags).parse
+            tags.concat(ArtistParser.new(artist).parse)
           end
         else
-          @tags.concat(parse_part(matches, pattern_entry[:items]))
+          tags.concat(parse_part(matches, pattern_entry[:items]))
         end
-        return
+        return tags
       end
-      @tags.push(@source)
+      tags.push(@source)
+      return tags
     rescue => e
       @logger.error(e)
     end

@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
       return unless track = @tracks[keyword]
       push(track.name)
       push(track.artists.map(&:name).join(', '))
-      ArtistParser.new(track.artists.map(&:name).join('、'), @tags).parse
+      @tags.concat(ArtistParser.new(track.artists.map(&:name).join('、')).parse)
       [:itunes_uri].each do |method|
         next unless uri = @service.send(method, track)
         push(uri.to_s)
