@@ -44,9 +44,16 @@ module MulukhiyaTootProxy
       File.unlink(path) if exist?
     end
 
+    def resources
+      return enum_for(__method__) unless block_given?
+      TaggingResource.all do |r|
+        yield r
+      end
+    end
+
     def fetch
       result = {}
-      TaggingResource.all do |resource|
+      resources do |resource|
         resource.parse.each do |k, v|
           result[k] ||= v
           result[k][:words] ||= []
