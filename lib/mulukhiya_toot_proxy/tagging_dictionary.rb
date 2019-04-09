@@ -12,6 +12,9 @@ module MulukhiyaTootProxy
         self[k] ||= v
         self[k][:words] ||= []
         self[k][:words].concat(v[:words])
+      rescue => e
+        @logger.error(e)
+        next
       end
       update(sort_by{|k, v| k.length}.to_h)
     end
@@ -50,10 +53,11 @@ module MulukhiyaTootProxy
           result[k][:words].concat(v[:words]) if v[:words]
         rescue => e
           @logger.error(e)
-          retry
+          next
         end
       rescue => e
         @logger.error(e)
+        next
       end
       return result.sort_by{|k, v| k.length}.to_h
     end
