@@ -17,15 +17,19 @@ module MulukhiyaTootProxy
     end
 
     def exist?
-      return File.exist?(TaggingDictionary.path)
+      return File.exist?(path)
+    end
+
+    def path
+      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary')
     end
 
     def load
-      update(Marshal.load(File.read(TaggingDictionary.path))) if exist?
+      update(Marshal.load(File.read(path))) if exist?
     end
 
     def refresh
-      File.write(TaggingDictionary.path, Marshal.dump(fetch))
+      File.write(path, Marshal.dump(fetch))
       load
     rescue => e
       @logger.error(e)
@@ -34,7 +38,7 @@ module MulukhiyaTootProxy
     alias create refresh
 
     def delete
-      File.unlink(TaggingDictionary.path) if exist?
+      File.unlink(path) if exist?
     end
 
     def fetch
@@ -43,14 +47,15 @@ module MulukhiyaTootProxy
         resource.parse.each do |k, v|
           result[k] ||= v
           result[k][:words] ||= []
-          result[k][:words].concat(v[:words])
+          result[k][:words].concat(v[:words]) if v[:words]
+        rescue => e
+          @logger.error(e)
+          retry
         end
+      rescue => e
+        @logger.error(e)
       end
       return result.sort_by{|k, v| k.length}.to_h
-    end
-
-    def self.path
-      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary')
     end
   end
 end
