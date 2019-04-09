@@ -80,7 +80,9 @@ module MulukhiyaTootProxy
     def max_length
       length = @config['/mastodon/max_length']
       tags = TagContainer.default_tags
-      length = length - tags.join(' ').length - 1 if tags.present?
+      if @config['/tagging/always_default_tags'] && tags.present?
+        length = length - tags.join(' ').length - 1
+      end
       return length
     end
   end

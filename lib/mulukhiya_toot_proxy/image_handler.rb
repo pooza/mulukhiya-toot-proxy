@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
         break
       end
     rescue Ginseng::GatewayError => e
-      @logger.error(e.to_h)
+      @logger.error(e)
     end
 
     def updatable?(link)

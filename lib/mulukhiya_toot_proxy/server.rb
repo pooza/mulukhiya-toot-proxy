@@ -57,7 +57,7 @@ module MulukhiyaTootProxy
       @renderer.message = e.to_h.delete_if{|k, v| k == :backtrace}
       @renderer.message['error'] = e.message
       Slack.broadcast(e.to_h) unless e.status == 404
-      @logger.error(e.to_h)
+      @logger.error(e)
       return @renderer.to_s
     end
   end

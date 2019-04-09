@@ -6,8 +6,8 @@ namespace :mulukhiya do
         dic = MulukhiyaTootProxy::TaggingDictionary.new
         dic.delete if dic.exist?
         dic.create
-        puts "path: #{MulukhiyaTootProxy::TaggingDictionary.path}"
-        puts "#{MulukhiyaTootProxy::TaggingResource.all.count} resources"
+        puts "path: #{dic.path}"
+        puts "#{dic.resources.count} resources"
         puts "#{dic.count} tags"
       end
     end

@@ -1,28 +1,32 @@
 module MulukhiyaTootProxy
   class ArtistParser
-    def initialize(source, tags)
+    def initialize(source)
       @source = source
       @config = Config.instance
       @logger = Logger.new
-      @tags = tags
     end
 
     def parse
+      tags = []
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited]
-          split_artist(@source, true).each do |artist|
-            ArtistParser.new(artist, @tags).parse
+          @source.split(delimiters).each do |artist|
+            tags.concat(ArtistParser.new(artist).parse)
           end
         else
-          @tags.concat(parse_part(matches, pattern_entry[:items]))
+          tags.concat(parse_part(matches, pattern_entry[:items]))
         end
-        return
+        return tags
       end
-      @tags.push(@source)
+      tags.push(@source)
+      return tags
     rescue => e
       @logger.error(e)
+      return []
     end
+
+    alias exec parse
 
     private
 
@@ -32,7 +36,11 @@ module MulukhiyaTootProxy
       items.each do |item|
         i += 1
         next if item['drop']
-        split_artist(source[i], item['split']).map{|v| tags.push(v)}
+        if item['split']
+          source[i].split(delimiters).map{|v| tags.push(v)}
+        else
+          tags.push(source[i])
+        end
       end
       return tags
     end
@@ -49,9 +57,8 @@ module MulukhiyaTootProxy
       end
     end
 
-    def split_artist(artist, flag)
-      pattern = Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
-      return flag ? artist.split(pattern) : [artist]
+    def delimiters
+      return Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
     end
   end
 end
