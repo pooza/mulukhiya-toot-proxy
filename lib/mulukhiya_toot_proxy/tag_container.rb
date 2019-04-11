@@ -28,7 +28,10 @@ module MulukhiyaTootProxy
 
     def create_tags
       unless @tags
-        @tags = map{|v| Mastodon.create_tag(v.gsub(/[\s　]/, ''))}
+        @tags = map do |tag|
+          tag.gsub!(/[\s　]/, '') unless tag =~ /^[a-z0-9\s　]+$/i
+          Mastodon.create_tag(tag)
+        end
         @tags.uniq!
         @tags.compact!
         @tags.delete_if{|v| @body =~ create_pattern(v)} if @body
