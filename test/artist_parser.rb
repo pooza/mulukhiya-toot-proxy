@@ -48,6 +48,10 @@ module MulukhiyaTootProxy
       tags = TagContainer.new
       tags.concat(ArtistParser.new('キュア・レインボーズ (コーラス:ヤング・フレッシュ)').parse)
       assert_equal(tags.create_tags, ['#キュア_レインボーズ', '#ヤング_フレッシュ'])
+
+      tags = TagContainer.new
+      tags.concat(ArtistParser.new('琴爪ゆかり(CV:藤田咲)&剣城あきら(CV:森なな子)').parse)
+      assert_equal(tags.create_tags, ['#琴爪ゆかり', '#藤田咲', '#剣城あきら', '#森なな子'])
     end
   end
 end
