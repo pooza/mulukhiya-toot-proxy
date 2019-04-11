@@ -15,7 +15,13 @@ module MulukhiyaTootProxy
       assert_nil(@handler.result)
 
       @handler.exec({'status' => 'http://www.apple.com'})
-      assert_equal(@handler.result[:entries], ['http://www.apple.com'])
+      assert_nil(@handler.result)
+
+      @handler.exec({'status' => 'http://www.apple.com/'})
+      assert_nil(@handler.result)
+
+      @handler.exec({'status' => 'https://www.apple.com/jp/apple-music/'})
+      assert_equal(@handler.result[:entries], ['https://www.apple.com/jp/apple-music/'])
     end
   end
 end

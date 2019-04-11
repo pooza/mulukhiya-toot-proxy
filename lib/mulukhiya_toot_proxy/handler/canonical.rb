@@ -17,6 +17,8 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       uri = Addressable::URI.parse(link)
+      return false unless uri.path.present?
+      return false if uri.path == '/'
       return false if uri.query_values.present?
       response = @http.get(uri)
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
