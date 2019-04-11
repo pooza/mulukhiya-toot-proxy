@@ -37,9 +37,9 @@ module MulukhiyaTootProxy
         i += 1
         next if item['drop']
         if item['split']
-          source[i].split(delimiters).map{|v| tags.push(v)}
+          source[i].split(delimiters).map{|v| tags.push(v.strip)}
         else
-          tags.push(source[i])
+          tags.push(source[i].strip)
         end
       end
       return tags
