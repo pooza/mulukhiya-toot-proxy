@@ -109,11 +109,12 @@ module MulukhiyaTootProxy
 
     def test_end_with_tags?
       @config['/tagging/default_tags'] = []
-      @handler.clear
 
+      @handler.clear
       last = @handler.exec({'status' => '宮本佳那子'})['status'].each_line.to_a.last.chomp
       assert_equal(last, '#宮本佳那子')
 
+      @handler.clear
       last = @handler.exec({'status' => "宮本佳那子\n#aaa #bbb"})['status'].each_line.to_a.last.chomp
       assert_equal(last, '#宮本佳那子 #aaa #bbb')
     end
