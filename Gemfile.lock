@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b00367ac1cba5155325608ebd3ec4f32bca1b85f
+  revision: a87018273fda83867d9748c226dd7f35a2dc36f1
   specs:
-    ginseng-core (1.2.6)
+    ginseng-core (1.2.7)
       activesupport
       addressable
       bundler (< 2.0)
@@ -82,8 +82,8 @@ GEM
     eventmachine (1.2.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
-    fugit (1.1.9)
-      et-orbi (~> 1.1, >= 1.1.7)
+    fugit (1.1.10)
+      et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
     hashie (3.6.0)
     http (4.1.1)
@@ -168,7 +168,7 @@ GEM
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.5.2)
       fugit (~> 1.1, >= 1.1.5)
-    sidekiq (5.2.5)
+    sidekiq (5.2.6)
       connection_pool (~> 2.2, >= 2.2.2)
       rack (>= 1.5.0)
       rack-protection (>= 1.5.0)

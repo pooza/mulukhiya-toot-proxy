@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def exec(body, headers = {})
+      return body if ignore?(body['status'])
       @tags.body = body['status']
       tmp_body = @tags.body.clone
       TaggingDictionary.new.reverse_each do |k, v|
@@ -17,6 +18,13 @@ module MulukhiyaTootProxy
     end
 
     private
+
+    def ignore?(body)
+      @config['/tagging/ignore_addresses'].each do |addr|
+        return true if body =~ Regexp.new("(^|\s)#{addr}($|\s)")
+      end
+      return false
+    end
 
     def default_tags?(body)
       return true unless body['visibility']

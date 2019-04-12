@@ -25,6 +25,11 @@ module MulukhiyaTootProxy
       return {handler: self.class.to_s, entries: @result}
     end
 
+    def clear
+      @tags.clear
+      @result.clear
+    end
+
     def timeout
       return @config["/handler/#{underscore_name}/timeout"]
     rescue Ginseng::ConfigError
@@ -72,8 +77,9 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @logger = Logger.new
       @tags = TagContainer.new
-      @results = ResultContainer.new
       @result = []
+      @results = ResultContainer.new
+      clear
     end
   end
 end
