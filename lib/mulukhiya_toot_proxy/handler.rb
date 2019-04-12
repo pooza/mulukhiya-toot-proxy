@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
     end
 
     def clear
+      @tags&.clear
       @result = []
     end
 

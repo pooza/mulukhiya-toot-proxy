@@ -132,5 +132,7 @@ tagging:
   always_default_tags: true
   word:
     minimum_length: 4
+  ignore_addresses:
+    - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
   salt: mulukhiya
