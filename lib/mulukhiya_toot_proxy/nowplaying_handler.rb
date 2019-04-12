@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class NowplayingHandler < Handler
     def exec(body, headers = {})
       @source_status = body['status'].clone
+      @source_status.sub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @status = []
       updated = false
       @source_status.each_line do |line|
