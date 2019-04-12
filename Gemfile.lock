@@ -168,7 +168,7 @@ GEM
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.5.2)
       fugit (~> 1.1, >= 1.1.5)
-    sidekiq (5.2.5)
+    sidekiq (5.2.6)
       connection_pool (~> 2.2, >= 2.2.2)
       rack (>= 1.5.0)
       rack-protection (>= 1.5.0)
