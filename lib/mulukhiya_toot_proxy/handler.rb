@@ -26,8 +26,8 @@ module MulukhiyaTootProxy
     end
 
     def clear
-      @tags&.clear
-      @result = []
+      @tags.clear
+      @result.clear
     end
 
     def timeout
@@ -77,6 +77,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @logger = Logger.new
       @tags = TagContainer.new
+      @result = []
       @results = ResultContainer.new
       clear
     end
