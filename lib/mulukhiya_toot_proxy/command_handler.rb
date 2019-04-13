@@ -17,6 +17,7 @@ module MulukhiyaTootProxy
         next
       end
       return unless values.present?
+      return unless values.is_a?(Hash)
       return unless values['command'] == command_name
       dispatch(values)
       body['visibility'] = 'direct'
