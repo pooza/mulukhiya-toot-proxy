@@ -113,7 +113,7 @@ module MulukhiyaTootProxy
       @handler.clear
       body = {
         'status' => 'アンケート',
-        'poll' => {'options' => ['項目1', '項目2', 'ふたりはプリキュア']}
+        'poll' => {'options' => ['項目1', '項目2', 'ふたりはプリキュア']},
       }
       assert_equal(@handler.exec(body)['status'], "アンケート\n#ふたりはプリキュア")
     end
