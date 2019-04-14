@@ -69,11 +69,7 @@ module MulukhiyaTootProxy
     private
 
     def create_keyword(track)
-      keyword = [track.name]
-      track.artists.each do |artist|
-        keyword.push(artist.name)
-      end
-      return keyword.join(' ')
+      return [track.name].concat(track.artists.map(&:name)).join(' ')
     end
 
     def retry_limit
