@@ -50,7 +50,7 @@ module MulukhiyaTootProxy
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '！!！!！'}.to_json
-      assert_equal(JSON.parse(last_response.body)['content'], ('<p>！!！!！</p>'))
+      assert_equal(JSON.parse(last_response.body)['content'], '<p>！!！!！</p>')
     end
 
     def test_toot_response
