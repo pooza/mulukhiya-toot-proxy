@@ -38,10 +38,11 @@ module MulukhiyaTootProxy
       lines = body.each_line.map(&:chomp).to_a
       if lines.last&.match?(Regexp.new("^(#[[:word:]]+\s*)+$", Regexp::IGNORECASE))
         line = lines.pop
-        tags.body = lines.join("\n")
+        body = lines.join("\n")
+        tags.body = body
         line.split(/\s/).map{|v| tags.push(v)}
       end
-      return [tags.body, tags.to_s].join("\n")
+      return [body, tags.to_s].join("\n")
     end
   end
 end

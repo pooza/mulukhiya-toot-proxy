@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
       assert_equal(last_response.status, 404)
     end
 
-    def test_toot
+    def test_toot_length
       header 'Authorization', "Bearer #{@config['/test/token']}"
       post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
       assert(last_response.ok?)
@@ -44,6 +44,13 @@ module MulukhiyaTootProxy
       post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
+    end
+
+    def test_toot_zenkaku
+      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Content-Type', 'application/json'
+      post '/api/v1/statuses', {'status' => '！!！!！'}.to_json
+      assert_equal(JSON.parse(last_response.body)['content'], ('<p>！!！!！</p>'))
     end
 
     def test_toot_response
