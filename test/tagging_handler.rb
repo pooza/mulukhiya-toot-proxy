@@ -107,6 +107,17 @@ module MulukhiyaTootProxy
       assert_equal(tags.count, 0)
     end
 
+    def test_exec_with_poll
+      @config['/tagging/default_tags'] = []
+
+      @handler.clear
+      body = {
+        'status' => 'アンケート',
+        'poll' => {'options' => ['項目1', '項目2', 'ふたりはプリキュア']}
+      }
+      assert_equal(@handler.exec(body)['status'], "アンケート\n#ふたりはプリキュア")
+    end
+
     def test_end_with_tags?
       @config['/tagging/default_tags'] = []
 
