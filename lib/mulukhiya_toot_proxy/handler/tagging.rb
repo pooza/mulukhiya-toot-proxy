@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
         @tags.concat(v[:words])
         tmp_text.gsub!(v[:pattern], '')
       end
-      @tags.concat(TagContainer.default_tags) if default_tags?(body)
       @tags.concat(create_attachment_tags(body)) if attachment_tags?(body)
+      @tags.concat(TagContainer.default_tags) if default_tags?(body)
       body['status'] = append(body['status'], @tags)
       @result.concat(@tags.create_tags)
       return body
