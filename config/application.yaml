@@ -132,6 +132,9 @@ tagging:
   always_default_tags: true
   word:
     minimum_length: 4
+  attachment_tags:
+    image: image
+    video: video
   ignore_addresses:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:

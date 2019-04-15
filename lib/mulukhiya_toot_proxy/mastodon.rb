@@ -18,6 +18,12 @@ module MulukhiyaTootProxy
       return @account
     end
 
+    def self.lookup_attachment(id)
+      rows = Postgres.instance.execute('attachment', {id: id})
+      return rows.first if rows.present?
+      return nil
+    end
+
     def self.lookup_token_owner(token)
       rows = Postgres.instance.execute('token_owner', {token: token})
       return rows.first if rows.present?
