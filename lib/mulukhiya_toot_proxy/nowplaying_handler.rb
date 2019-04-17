@@ -32,7 +32,8 @@ module MulukhiyaTootProxy
     private
 
     def push(line)
-      @status.push(line) unless @source_status.include?(line)
+      lines = @source_status.each_line.to_a.map(&:chomp)
+      @status.push(line) unless lines.include?(line)
     end
   end
 end
