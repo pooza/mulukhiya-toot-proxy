@@ -55,6 +55,7 @@ module MulukhiyaTootProxy
       result = {}
       resources do |resource|
         resource.parse.each do |k, v|
+          k = Unicode.nfkc(k)
           result[k] ||= v
           result[k][:words] ||= []
           result[k][:words].concat(v[:words]) if v[:words]
