@@ -9,9 +9,10 @@ module MulukhiyaTootProxy
         body['media_ids'].push(@mastodon.upload_remote_resource(image))
         @result.push(image.to_s)
         break
+      rescue Ginseng::GatewayError => e
+        @logger.error(e)
+        next
       end
-    rescue Ginseng::GatewayError => e
-      @logger.error(e)
     end
 
     def updatable?(link)

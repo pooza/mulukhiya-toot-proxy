@@ -77,7 +77,7 @@ module MulukhiyaTootProxy
         assert(last_response.ok?)
 
         header 'Content-Type', 'application/json'
-        post hook.uri.path, {body: '武田信玄'}.to_json
+        post hook.uri.path, {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
         assert(last_response.ok?)
       end
     end

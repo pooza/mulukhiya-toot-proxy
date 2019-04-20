@@ -53,7 +53,20 @@ module MulukhiyaTootProxy
     end
 
     def toot(status)
-      body = {'status' => status, 'visibility' => visibility}
+      status = {text: status} if status.is_a?(String)
+      status = status.with_indifferent_access
+      body = {'status' => status[:text], 'visibility' => visibility, 'media_ids' => []}
+      if status[:attachments].is_a?(Array)
+        status[:attachments].each do |f|
+          f = f.with_indifferent_access
+          uri = Addressable::URI.parse(f[:image_url])
+          raise Ginseng::RequestError, "Invalid URL '#{f[:image_url]}'" unless uri
+          body['media_ids'].push(@mastodon.upload_remote_resource(uri))
+        rescue => e
+          @logger.error(e)
+          next
+        end
+      end
       @results = Handler.exec_all(body, @headers, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end

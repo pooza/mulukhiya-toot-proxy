@@ -27,9 +27,8 @@ module MulukhiyaTootProxy
       unless webhook = Webhook.create(params[:digest])
         raise Ginseng::NotFoundError, "Resource #{request.path} not found."
       end
-      params[:text] ||= params[:body]
       raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-      r = webhook.toot(params[:text])
+      r = webhook.toot(params)
       @renderer.message = r.parsed_response
       @renderer.message['results'] = webhook.results.summary
       @renderer.status = r.code
