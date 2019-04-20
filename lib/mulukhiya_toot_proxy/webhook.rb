@@ -53,7 +53,12 @@ module MulukhiyaTootProxy
     end
 
     def toot(status)
-      body = {'status' => status, 'visibility' => visibility}
+      status = {text: status} if status.is_a?(String)
+      body = {
+        'status' => status[:text],
+        'visibility' => visibility,
+        'attachments' => status[:attachments] || [],
+      }
       @results = Handler.exec_all(body, @headers, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end

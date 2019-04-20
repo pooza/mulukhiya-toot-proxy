@@ -2,16 +2,17 @@ module MulukhiyaTootProxy
   class ImageHandler < Handler
     def exec(body, headers = {})
       body['media_ids'] ||= []
+      return if body['media_ids'].present?
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
-        break if body['media_ids'].present?
         next unless updatable?(link)
         image = create_image_uri(link)
         body['media_ids'].push(@mastodon.upload_remote_resource(image))
         @result.push(image.to_s)
         break
+      rescue Ginseng::GatewayError => e
+        @logger.error(e)
+        next
       end
-    rescue Ginseng::GatewayError => e
-      @logger.error(e)
     end
 
     def updatable?(link)
