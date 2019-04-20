@@ -197,7 +197,7 @@ GEM
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.5)
+    unf_ext (0.0.7.6)
     unicode (0.4.4.4)
     unicode-display_width (1.5.0)
 
