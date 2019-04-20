@@ -3,13 +3,13 @@ module MulukhiyaTootProxy
     def exec(body, headers = {})
       return body if ignore?(body['status'])
       @tags.body = body['status']
-      tmp_text = create_temp_text(body)
+      temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless tmp_text =~ v[:pattern]
+        next unless temp_text =~ v[:pattern]
         @tags.push(k)
         @tags.concat(v[:words])
-        tmp_text.gsub!(v[:pattern], '')
+        temp_text.gsub!(v[:pattern], '')
       end
       @tags.concat(create_attachment_tags(body)) if attachment_tags?(body)
       @tags.concat(TagContainer.default_tags) if default_tags?(body)
