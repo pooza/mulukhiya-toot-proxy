@@ -1,18 +1,20 @@
 module MulukhiyaTootProxy
   class ArtistParser
-    def initialize(source)
+    def initialize(source, depth = 0)
       @source = source
       @config = Config.instance
       @logger = Logger.new
+      @depth = depth + 1
+      @max_depth = 3
     end
 
     def parse
       tags = []
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
-        if pattern_entry[:delimited]
+        if pattern_entry[:delimited] && (@depth <= @max_depth)
           @source.split(delimiters).each do |artist|
-            tags.concat(ArtistParser.new(artist).parse)
+            tags.concat(ArtistParser.new(artist, @depth).parse)
           end
         else
           tags.concat(parse_part(matches, pattern_entry[:items]))

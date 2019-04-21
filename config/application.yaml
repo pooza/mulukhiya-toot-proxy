@@ -1,5 +1,5 @@
 package:
-  version: 2.2.7
+  version: 2.2.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -71,14 +71,12 @@ nowplaying:
     delimiters:
       - /
       - 、
-      - '&'
-      - ＆
     patterns:
-      - pattern: ^[^():]+[、&＆]
+      - pattern: ^[^():]+、
         delimited: true
-      - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)[、&＆]?){2,}$'
+      - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
         delimited: true
-      - pattern: '^(.+\s*\(.+\)[、&＆]?){2,}$'
+      - pattern: '^(.+\s*\(.+\)、?){2,}$'
         delimited: true
       - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
         items:

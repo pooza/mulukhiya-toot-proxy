@@ -38,7 +38,10 @@ module MulukhiyaTootProxy
       assert_equal(tags, ['キュア・レインボーズ', 'ヤング・フレッシュ'])
 
       tags = ArtistParser.new('琴爪ゆかり(CV:藤田咲)&剣城あきら(CV:森なな子)').parse
-      assert_equal(tags, ['琴爪ゆかり', '藤田咲', '剣城あきら', '森なな子'])
+      assert_equal(tags, [])
+
+      tags = ArtistParser.new('キュアミラクル(CV:高橋李依)・キュアマジカル(CV:堀江由衣)').parse
+      assert_equal(tags, [])
     end
   end
 end
