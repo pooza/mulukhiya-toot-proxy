@@ -94,6 +94,7 @@ module MulukhiyaTootProxy
       @params = params
       @results = ResultContainer.new
       @mastodon = Mastodon.new(@config['/instance_url'], @params['/webhook/token'])
+      @logger = Logger.new
     end
 
     def db
