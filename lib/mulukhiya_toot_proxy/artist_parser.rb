@@ -32,16 +32,14 @@ module MulukhiyaTootProxy
 
     private
 
-    def parse_part(source, items)
-      i = 0
+    def parse_part(matches, items)
       tags = []
-      items.each do |item|
-        i += 1
+      items.each_with_index do |item, i|
         next if item['drop']
         if item['split']
-          source[i].split(delimiters).map{|v| tags.push(v.strip)}
+          matches[i + 1].split(delimiters).map{|v| tags.push(v.strip)}
         else
-          tags.push(source[i].strip)
+          tags.push(matches[i + 1].strip)
         end
       end
       return tags
