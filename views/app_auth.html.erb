@@ -2,52 +2,53 @@
 <!doctype html>
 <html lang="ja">
 <head>
-	<title><%= MulukhiyaTootProxy::Package.name %></title>
-	<meta charset="utf-8">
-	<meta name="robots" content="noindex,nofollow">
-	<meta name="viewport" content="width=800">
-	<style>
-		body {
-			width: 800px;
-			font-size: 1.2em;
-			font-family: serif;
-		}
-		h1,h2,h3,h4,h5,h6 {
-			font-family: sans-serif;
-		}
-		header {
-			background-color: green;
-			font-family: sans-serif;
-			color: white;
-			text-align: right;
-		}
-		form {
-			border: 1px solid black;
-			padding: 6px;
-		}
-		input {
-			font-size: 1.2em;
-		}
-		button {
-			font-size: 1.8em;
-		}
-	</style>
+  <title><%= MulukhiyaTootProxy::Package.name %></title>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=800">
+  <style>
+    body {
+      width: 800px;
+      font-size: 1.2em;
+      font-family: serif;
+    }
+    h1,h2,h3,h4,h5,h6 {
+      font-family: sans-serif;
+    }
+    header {
+      background-color: green;
+      font-family: sans-serif;
+      color: white;
+      text-align: right;
+    }
+    form {
+      border: 1px solid black;
+      padding: 6px;
+      border-radius: 10px;
+    }
+    input {
+      font-size: 1.2em;
+    }
+    button {
+      font-size: 1.8em;
+    }
+  </style>
 </head>
 <body>
-	<header><%= MulukhiyaTootProxy::Package.full_name %></header>
-	<h2>アプリケーションの認証</h2>
-	<p>あなたがwebhook機能を利用することを、サーバに承認させる必要があります。</p>
-	<form method="POST" action="/mulukhiya/app/auth">
-		<ol>
-			<li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
-			<li>
-				取得した認証コードを↓に貼り付けて…
-				<label><input type="text" name="code" size="64" placeholder="認証コード" maxlength="64"></label>
-			</li>
-			<li>
-				<button id="submit_button">認証する</button>
-			</li>
-		</ol>
-	</form>
+  <header><%= MulukhiyaTootProxy::Package.full_name %></header>
+  <h2>アプリケーションの認証</h2>
+  <p>あなたがwebhook機能を利用することを、サーバに認証させる必要があります。</p>
+  <form method="POST" action="/mulukhiya/app/auth">
+    <ol>
+      <li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
+      <li>
+        取得した認証コードを↓に貼り付けて…
+        <label><input type="text" name="code" size="64" placeholder="認証コード" maxlength="64"></label>
+      </li>
+      <li>
+        <button id="submit_button">認証する</button>
+      </li>
+    </ol>
+  </form>
 </body>
 </html>

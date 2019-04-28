@@ -2,44 +2,44 @@
 <!doctype html>
 <html lang="ja">
 <head>
-	<title><%= MulukhiyaTootProxy::Package.name %></title>
-	<meta charset="utf-8">
-	<meta name="robots" content="noindex,nofollow">
-	<meta name="viewport" content="width=800">
-	<style type="text/css">
-		body {
-			width: 800px;
-			font-size: 1.2em;
-			font-family: serif;
-		}
-		h1,h2,h3,h4,h5,h6 {
-			font-family: sans-serif;
-		}
-		header {
-			background-color: green;
-			font-family: sans-serif;
-			color: white;
-			text-align: right;
-		}
-		pre {
-			border: 1px solid black;
-			padding: 6px;
-			overflow: auto;
-		}
-		.alert {
-			color: red;
-		}
-	</style>
+  <title><%= MulukhiyaTootProxy::Package.name %></title>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=800">
+  <style type="text/css">
+    body {
+      width: 800px;
+      font-size: 1.2em;
+      font-family: serif;
+    }
+    h1,h2,h3,h4,h5,h6 {
+      font-family: sans-serif;
+    }
+    header {
+      background-color: green;
+      font-family: sans-serif;
+      color: white;
+      text-align: right;
+    }
+    pre {
+      border: 1px solid black;
+      padding: 6px;
+      overflow: auto;
+    }
+    .alert {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-	<header><%= MulukhiyaTootProxy::Package.full_name %></header>
-	<h2>アプリケーションの認証</h2>
-	<% if params[:status] < 400 %>
-		<p>正常終了。<a href="/oauth/authorized_applications">認証済みアプリ</a></p>
-	<% else %>
-		<p class="alert">エラー（<%= params[:status] %>）</p>
-	<% end %>
-	<pre><%= params[:result] %></pre>
-	<p><a href="/mulukhiya/app/auth">戻る</p>
+  <header><%= MulukhiyaTootProxy::Package.full_name %></header>
+  <h2>アプリケーションの認証</h2>
+  <% if params[:status] < 400 %>
+    <p>正常終了。<a href="/oauth/authorized_applications">認証済みアプリ</a></p>
+  <% else %>
+    <p class="alert">エラー（<%= params[:status] %>）</p>
+  <% end %>
+  <pre><%= params[:result] %></pre>
+  <p><a href="/mulukhiya/app/auth">戻る</p>
 </body>
 </html>
