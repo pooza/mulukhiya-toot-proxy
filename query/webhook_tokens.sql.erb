@@ -14,7 +14,9 @@ WHERE (accounts.domain IS NULL)
   AND (accounts.suspended='f')
   AND (tokens.scopes ~ '(^|\s)(write:statuses|write)($|\s)')
   AND (users.disabled='f')
-  AND (apps.name IN ('mulukhiya', 'mulukhiya-toot-proxy', 'モロヘイヤ', 'webhook'))
+  AND (apps.name='mulukhiya-toot-proxy')
+  AND (tokens.expires_in IS NULL)
+  AND (tokens.revoked_at IS NULL)
   <% if params[:token] %>
     AND (tokens.token='<%= params[:token] %>')
   <% end %>

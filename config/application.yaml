@@ -21,6 +21,11 @@ shortened_url:
     - spoti.fi
     - apple.co
 mastodon:
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)

@@ -35,6 +35,26 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    get '/mulukhiya/apps/auth' do
+      @mastodon = Mastodon.new(
+        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+      )
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'apps_auth'
+      @renderer['oauth_url'] = @mastodon.oauth_uri
+      return @renderer.to_s
+    end
+
+    post '/mulukhiya/apps/auth' do
+      @mastodon = Mastodon.new(
+        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+      )
+      r = @mastodon.auth(@params['code'])
+      @renderer.message = r.parsed_response
+      @renderer.status = r.code
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/webhook/:digest' do
       unless Webhook.create(params[:digest])
         raise Ginseng::NotFoundError, "Resource #{request.path} not found."
