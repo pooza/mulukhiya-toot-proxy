@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class HTMLRenderer < Ginseng::Renderer
     def template=(name)
+      name.sub!(/\.html/i, '')
       @template = Template.new("#{name}.html")
     end
 

@@ -82,6 +82,7 @@ GEM
     eventmachine (1.2.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
+    ffi (1.10.0)
     fugit (1.2.0)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
@@ -145,6 +146,9 @@ GEM
       rack (>= 1.0, < 3)
     rainbow (3.0.0)
     rake (12.3.2)
+    rb-fsevent (0.10.3)
+    rb-inotify (0.10.0)
+      ffi (~> 1.0)
     redis (4.1.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
@@ -168,6 +172,11 @@ GEM
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
+    sass (3.7.4)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
     sidekiq (5.2.7)
       connection_pool (~> 2.2, >= 2.2.2)
       rack (>= 1.5.0)
@@ -216,6 +225,7 @@ DEPENDENCIES
   reverse_markdown
   rspotify (~> 2.4.1)
   rubocop
+  sass
   sidekiq
   sidekiq-scheduler
   twitter!

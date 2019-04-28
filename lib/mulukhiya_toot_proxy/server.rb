@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class Server < Ginseng::Sinatra
     include Package
+    set :root, Environment.dir
 
     def before_post
       super
@@ -63,6 +64,12 @@ module MulukhiyaTootProxy
         raise Ginseng::NotFoundError, "Resource #{request.path} not found."
       end
       @renderer.message = {message: 'OK'}
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/style/default.css' do
+      @renderer = CSSRenderer.new
+      @renderer.template = 'default'
       return @renderer.to_s
     end
 
