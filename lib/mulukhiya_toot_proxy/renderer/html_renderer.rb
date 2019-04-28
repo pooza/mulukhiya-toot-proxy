@@ -5,6 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def []=(key, value)
+      raise RenderError, 'Template file undefined' unless @template
       @template[key] = value
     end
 
@@ -13,6 +14,7 @@ module MulukhiyaTootProxy
     end
 
     def to_s
+      raise RenderError, 'Template file undefined' unless @template
       return @template.to_s
     end
   end

@@ -55,6 +55,10 @@ module MulukhiyaTootProxy
     autoload :RedisDSN
   end
 
+  autoload_under 'error' do
+    autoload :RenderError
+  end
+
   autoload_under 'renderer' do
     autoload :HTMLRenderer
   end
