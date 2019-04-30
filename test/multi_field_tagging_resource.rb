@@ -2,8 +2,8 @@ module MulukhiyaTootProxy
   class MultiFieldTaggingResourceTest < Test::Unit::TestCase
     def setup
       @resource = TaggingResource.create({
-        'url' => 'https://rubicure.herokuapp.com/series.json',
-        'fields' => ['title'],
+        'url' => 'https://api.github.com/users/pooza/repos',
+        'fields' => ['name'],
       })
     end
 
@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     def test_parse
       result = @resource.parse
       assert(result.is_a?(Hash))
-      assert_equal(result['スター☆トゥインクルプリキュア'], {pattern: /スター.? ?ト[ウゥ][イィ]ンクルプリキ[ユュ][アァ]/})
+      assert_equal(result['mulukhiya-toot-proxy'], {pattern: /mulukhiya.? ?toot.? ?proxy/})
     end
   end
 end
