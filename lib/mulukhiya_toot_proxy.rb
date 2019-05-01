@@ -8,8 +8,6 @@ require 'sidekiq-scheduler'
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'ASIN'
-  inflect.acronym 'CSS'
-  inflect.acronym 'HTML'
 end
 
 module MulukhiyaTootProxy
@@ -54,10 +52,6 @@ module MulukhiyaTootProxy
 
   autoload_under 'dsn' do
     autoload :RedisDSN
-  end
-
-  autoload_under 'error' do
-    autoload :RenderError
   end
 
   autoload_under 'renderer' do

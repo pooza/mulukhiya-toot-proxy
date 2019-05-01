@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: a87018273fda83867d9748c226dd7f35a2dc36f1
+  revision: 3fa90707f9ca88270f65c010146ef6ed1bfbf802
   specs:
-    ginseng-core (1.2.7)
+    ginseng-core (1.2.8)
       activesupport
       addressable
       bundler (< 2.0)
@@ -27,6 +27,7 @@ GIT
       rake
       rest-client
       rubocop
+      sass
       sinatra
       syslog-logger
       test-unit
@@ -223,7 +224,6 @@ DEPENDENCIES
   reverse_markdown
   rspotify (~> 2.4.1)
   rubocop
-  sass
   sidekiq
   sidekiq-scheduler
   twitter!
