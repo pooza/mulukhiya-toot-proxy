@@ -4,3 +4,4 @@ Thumbs.db
 .fuse*
 config/local.yaml
 config/local.yml
+.sass-cache

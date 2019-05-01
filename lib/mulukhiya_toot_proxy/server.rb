@@ -1,12 +1,13 @@
 module MulukhiyaTootProxy
   class Server < Ginseng::Sinatra
     include Package
+    set :root, Environment.dir
 
     def before_post
       super
       return unless @headers['HTTP_AUTHORIZATION']
       @mastodon = Mastodon.new(
-        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+        @config['/instance_url'],
         @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
     end
@@ -35,11 +36,36 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    get '/mulukhiya/app/auth' do
+      @mastodon = Mastodon.new(@config['/instance_url'])
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'app_auth'
+      @renderer['oauth_url'] = @mastodon.oauth_uri
+      return @renderer.to_s
+    end
+
+    post '/mulukhiya/app/auth' do
+      @mastodon = Mastodon.new(@config['/instance_url'])
+      r = @mastodon.auth(@params['code'])
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'app_auth_result'
+      @renderer['status'] = r.code
+      @renderer['result'] = JSON.pretty_generate(r.parsed_response)
+      @renderer.status = r.code
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/webhook/:digest' do
       unless Webhook.create(params[:digest])
         raise Ginseng::NotFoundError, "Resource #{request.path} not found."
       end
       @renderer.message = {message: 'OK'}
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/style/default.css' do
+      @renderer = CSSRenderer.new
+      @renderer.template = 'default'
       return @renderer.to_s
     end
 

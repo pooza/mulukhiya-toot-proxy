@@ -13,8 +13,8 @@ module MulukhiyaTootProxy
           'type' => 'relative',
         },
         {
-          'url' => 'https://rubicure.herokuapp.com/series.json',
-          'fields' => ['title'],
+          'url' => 'https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec',
+          'type' => 'relative',
         },
       ]
       @config['/tagging/ignore_addresses'] = ['@pooza']

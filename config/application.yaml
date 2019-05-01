@@ -1,5 +1,5 @@
 package:
-  version: 2.2.8
+  version: 2.2.10
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -21,6 +21,11 @@ shortened_url:
     - spoti.fi
     - apple.co
 mastodon:
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)

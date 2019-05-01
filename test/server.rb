@@ -82,6 +82,25 @@ module MulukhiyaTootProxy
       end
     end
 
+    def test_app_auth
+      get '/mulukhiya/app/auth'
+      assert(last_response.ok?)
+
+      post '/mulukhiya/app/auth', {}
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 401)
+    end
+
+    def test_default_css
+      get '/mulukhiya/style/default.css'
+      assert(last_response.ok?)
+    end
+
+    def test_static_resource
+      get '/mulukhiya/icon.png'
+      assert(last_response.ok?)
+    end
+
     private
 
     def max_length

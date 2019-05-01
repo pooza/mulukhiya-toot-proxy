@@ -54,6 +54,19 @@ module MulukhiyaTootProxy
     autoload :RedisDSN
   end
 
+  autoload_under 'renderer' do
+    autoload :CSSRenderer
+    autoload :HTMLRenderer
+  end
+
+  autoload_under 'service' do
+    autoload :AmazonService
+    autoload :ItunesService
+    autoload :SpotifyService
+    autoload :TwitterService
+    autoload :YouTubeService
+  end
+
   autoload_under 'uri' do
     autoload :AmazonURI
     autoload :ItunesURI
@@ -70,14 +83,6 @@ module MulukhiyaTootProxy
     autoload :MentionNotificationWorker
     autoload :ResultNotificationWorker
     autoload :TaggingDictionaryWorker
-  end
-
-  autoload_under 'Service' do
-    autoload :AmazonService
-    autoload :ItunesService
-    autoload :SpotifyService
-    autoload :TwitterService
-    autoload :YouTubeService
   end
 end
 

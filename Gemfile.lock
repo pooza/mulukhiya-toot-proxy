@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: a87018273fda83867d9748c226dd7f35a2dc36f1
+  revision: 3fa90707f9ca88270f65c010146ef6ed1bfbf802
   specs:
-    ginseng-core (1.2.7)
+    ginseng-core (1.2.8)
       activesupport
       addressable
       bundler (< 2.0)
@@ -27,6 +27,7 @@ GIT
       rake
       rest-client
       rubocop
+      sass
       sinatra
       syslog-logger
       test-unit
@@ -77,11 +78,12 @@ GEM
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     equalizer (0.0.11)
-    et-orbi (1.2.0)
+    et-orbi (1.2.1)
       tzinfo
     eventmachine (1.2.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
+    ffi (1.10.0)
     fugit (1.2.0)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
@@ -131,11 +133,10 @@ GEM
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
     parallel (1.17.0)
-    parser (2.6.2.1)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.4)
-    psych (3.1.0)
     public_suffix (3.0.3)
     raabro (1.1.6)
     rack (2.0.7)
@@ -145,6 +146,9 @@ GEM
       rack (>= 1.0, < 3)
     rainbow (3.0.0)
     rake (12.3.2)
+    rb-fsevent (0.10.3)
+    rb-inotify (0.10.0)
+      ffi (~> 1.0)
     redis (4.1.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
@@ -156,11 +160,10 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.67.2)
+    rubocop (0.68.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
-      psych (>= 3.1.0)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.6)
@@ -168,6 +171,11 @@ GEM
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
+    sass (3.7.4)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
     sidekiq (5.2.7)
       connection_pool (~> 2.2, >= 2.2.2)
       rack (>= 1.5.0)

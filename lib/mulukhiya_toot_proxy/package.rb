@@ -20,6 +20,10 @@ module MulukhiyaTootProxy
       return "#{module_name}::Logger"
     end
 
+    def template_class
+      return "#{module_name}::Template"
+    end
+
     def database_class
       return "#{module_name}::Postgres"
     end
