@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       super
       return unless @headers['HTTP_AUTHORIZATION']
       @mastodon = Mastodon.new(
-        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
+        @config['/instance_url'],
         @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
       )
     end
@@ -37,9 +37,7 @@ module MulukhiyaTootProxy
     end
 
     get '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new(
-        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
-      )
+      @mastodon = Mastodon.new(@config['/instance_url'])
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
       @renderer['oauth_url'] = @mastodon.oauth_uri
@@ -47,9 +45,7 @@ module MulukhiyaTootProxy
     end
 
     post '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new(
-        (@config['/instance_url'] || "https://#{@headers['HTTP_HOST']}"),
-      )
+      @mastodon = Mastodon.new(@config['/instance_url'])
       r = @mastodon.auth(@params['code'])
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth_result'
