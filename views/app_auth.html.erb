@@ -11,7 +11,6 @@
 <body>
   <header><%= MulukhiyaTootProxy::Package.full_name %></header>
   <h2>アプリケーションの認証</h2>
-  <p>あなたがwebhook機能を利用することを、サーバに認証させる必要があります。</p>
   <form method="POST" action="/mulukhiya/app/auth">
     <ol>
       <li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
