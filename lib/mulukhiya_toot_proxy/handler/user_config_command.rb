@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
         raise GatewayError::ConfigError, 'Invalid webhook' unless @webhook.exist?
       end
       return @webhook
-    rescue => e
+    rescue
       return nil
     end
 
