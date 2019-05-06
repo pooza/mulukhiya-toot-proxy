@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 3fa90707f9ca88270f65c010146ef6ed1bfbf802
+  revision: a74e2a5257a79e6f601d3fb80104d8f612a1aafe
   specs:
-    ginseng-core (1.2.8)
+    ginseng-core (1.2.10)
       activesupport
       addressable
       bundler (< 2.0)
@@ -84,7 +84,7 @@ GEM
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     ffi (1.10.0)
-    fugit (1.2.0)
+    fugit (1.2.1)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
     hashie (3.6.0)
