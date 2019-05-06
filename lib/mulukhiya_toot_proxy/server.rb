@@ -50,7 +50,7 @@ module MulukhiyaTootProxy
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth_result'
       @renderer['status'] = r.code
-      @renderer['result'] = r.parsed_response
+      @renderer['token'] = r.parsed_response['access_token']
       @renderer.status = r.code
       return @renderer.to_s
     end

@@ -86,9 +86,9 @@ module MulukhiyaTootProxy
       get '/mulukhiya/app/auth'
       assert(last_response.ok?)
 
-      post '/mulukhiya/app/auth', {}
+      post '/mulukhiya/app/auth', {code: 'hoge'}
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 401)
+      assert_equal(last_response.status, 400)
     end
 
     def test_default_css
