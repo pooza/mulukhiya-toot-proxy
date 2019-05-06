@@ -20,14 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def uri
-      begin
-        uri = Addressable::URI.parse(@config['/instance_url'])
-      rescue Ginseng::ConfigError
-        uri = Addressable::URI.new
-        uri.host = Environment.hostname
-        uri.port = @config['/thin/port']
-        uri.scheme = 'http'
-      end
+      uri = Addressable::URI.parse(@config['/instance_url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
     end
