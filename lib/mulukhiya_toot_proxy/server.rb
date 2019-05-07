@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      tags = TagContainer.scan(params['status'])
+      tags = TagContainer.scan(params[:status])
       results = Handler.exec_all(params, @headers, {mastodon: @mastodon})
       r = @mastodon.toot(params)
       @renderer.message = r.parsed_response
@@ -46,7 +46,7 @@ module MulukhiyaTootProxy
 
     post '/mulukhiya/app/auth' do
       @mastodon = Mastodon.new(@config['/instance_url'])
-      r = @mastodon.auth(@params['code'])
+      r = @mastodon.auth(params[:code])
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth_result'
       @renderer['status'] = r.code
