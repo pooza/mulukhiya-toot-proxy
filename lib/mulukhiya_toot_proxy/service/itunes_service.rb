@@ -31,22 +31,22 @@ module MulukhiyaTootProxy
       raise Ginseng::GatewayError, e.message
     end
 
-    def track_uri(track)
+    def create_track_uri(track)
       uri = ItunesURI.parse(track['collectionViewUrl'])
       return nil unless uri.absolute?
       return uri
     end
 
-    def amazon_uri(track)
+    def create_amazon_uri(track)
       amazon = AmazonService.new
       return nil unless asin = amazon.search(create_keyword(track), ['DigitalMusic', 'Music'])
-      return amazon.item_uri(asin)
+      return amazon.create_item_uri(asin)
     end
 
-    def spotify_uri(track)
+    def create_spotify_uri(track)
       spotify = SpotifyService.new
       return nil unless track = spotify.search_track(create_keyword(track))
-      return spotify.track_uri(track)
+      return spotify.create_track_uri(track)
     end
 
     private

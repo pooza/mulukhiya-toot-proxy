@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
       push(track['trackName'])
       push(track['artistName'])
       @tags.concat(ArtistParser.new(track['artistName']).parse)
-      [:spotify_uri].each do |method|
+      [:create_spotify_uri].each do |method|
         next unless uri = @service.send(method, track)
         push(uri.to_s)
       end

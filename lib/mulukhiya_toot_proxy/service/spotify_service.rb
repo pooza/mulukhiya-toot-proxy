@@ -41,29 +41,29 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def track_uri(track)
+    def tcreate_rack_uri(track)
       uri = SpotifyURI.parse(@config['/spotify/urls/track'])
       uri.track_id = track.id
       return nil unless uri.absolute?
       return uri
     end
 
-    def image_uri(track)
+    def create_image_uri(track)
       uri = Addressable::URI.parse(track.album.images.first['url'])
       return nil unless uri.absolute?
       return uri
     end
 
-    def amazon_uri(track)
+    def create_amazon_uri(track)
       amazon = AmazonService.new
       return nil unless asin = amazon.search(create_keyword(track), ['DigitalMusic', 'Music'])
-      return amazon.item_uri(asin)
+      return amazon.create_item_uri(asin)
     end
 
-    def itunes_uri(track)
+    def create_itunes_uri(track)
       itunes = ItunesService.new
       return nil unless track = itunes.search(create_keyword(track), 'music')
-      return itunes.track_uri(track)
+      return itunes.create_track_uri(track)
     end
 
     private

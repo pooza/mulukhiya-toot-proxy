@@ -16,8 +16,8 @@ module MulukhiyaTootProxy
       end
     end
 
-    def image_uri(asin)
-      return published_image_uri(asin) unless AmazonService.accesskey?
+    def create_image_uri(asin)
+      return create_published_image_uri(asin) unless AmazonService.accesskey?
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
         uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
         return uri if uri
       end
-      return published_image_uri(asin)
+      return create_published_image_uri(asin)
     rescue Amazon::RequestError => e
       raise Ginseng::GatewayError, e.message if retry_limit < cnt
       sleep(1)
@@ -38,8 +38,8 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def published_image_uri(asin)
-      response = @http.get(item_uri(asin))
+    def create_published_image_uri(asin)
+      response = @http.get(create_item_uri(asin))
       html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
       ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
         next unless elements = html.xpath(%{id("#{id}")})
@@ -71,7 +71,7 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def item_uri(asin)
+    def create_item_uri(asin)
       uri = AmazonURI.parse(@config["/amazon/urls/#{@config['/amazon/country']}"])
       uri.asin = asin
       return uri
