@@ -35,16 +35,14 @@ module MulukhiyaTootProxy
     end
 
     get '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
-      @renderer['oauth_url'] = @mastodon.oauth_uri
+      @renderer['oauth_url'] = Mastodon.new.oauth_uri
       return @renderer.to_s
     end
 
     post '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new
-      r = @mastodon.auth(params[:code])
+      r = Mastodon.new.auth(params[:code])
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth_result'
       @renderer['status'] = r.code
