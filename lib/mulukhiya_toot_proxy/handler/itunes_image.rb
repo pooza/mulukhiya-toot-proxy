@@ -6,6 +6,9 @@ module MulukhiyaTootProxy
       return false unless uri.track_id.present?
       return false unless uri.image_uri.present?
       return true
+    rescue => e
+      @logger.error(e)
+      return false
     end
 
     def create_image_uri(link)

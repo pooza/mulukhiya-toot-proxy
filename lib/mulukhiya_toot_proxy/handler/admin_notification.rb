@@ -6,6 +6,9 @@ module MulukhiyaTootProxy
       return true if @mastodon.account['admin'] == 't'
       return true if @mastodon.account['moderator'] == 't'
       return false
+    rescue => e
+      @logger.error(e)
+      return false
     end
   end
 end

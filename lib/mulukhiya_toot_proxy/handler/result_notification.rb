@@ -2,7 +2,8 @@ module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
     def notifiable?(body, headers)
       return UserConfigStorage.new[@mastodon.account_id]['/result/enable']
-    rescue
+    rescue => e
+      @logger.error(e)
       return false
     end
 

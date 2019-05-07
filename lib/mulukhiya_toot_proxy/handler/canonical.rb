@@ -27,6 +27,9 @@ module MulukhiyaTootProxy
       uri = Addressable::URI.parse(elements.first.attribute('href'))
       @canonicals[link] = uri.to_s if uri.absolute?
       return @canonicals[link].present?
+    rescue => e
+      @logger.error(e)
+      return false
     end
   end
 end
