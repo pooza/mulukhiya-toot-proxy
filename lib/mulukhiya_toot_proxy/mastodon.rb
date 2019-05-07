@@ -3,12 +3,15 @@ require 'json'
 module MulukhiyaTootProxy
   class Mastodon < Ginseng::Mastodon
     include Package
+    attr_accessor :token
 
-    def initialize(uri, token = nil)
+    def initialize(uri = nil, token = nil)
+      @config = Config.instance
+      uri ||= @config['/instance_url']
+      token ||= @config['/test/token']
       super
       @uri = MastodonURI.parse(uri)
       @token = token
-      @config = Config.instance
     end
 
     def account_id

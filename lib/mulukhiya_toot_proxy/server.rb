@@ -6,10 +6,8 @@ module MulukhiyaTootProxy
     def before_post
       super
       return unless @headers['HTTP_AUTHORIZATION']
-      @mastodon = Mastodon.new(
-        @config['/instance_url'],
-        @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1],
-      )
+      @mastodon = Mastodon.new
+      @mastodon.token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
     end
 
     post '/api/v1/statuses' do
@@ -37,7 +35,7 @@ module MulukhiyaTootProxy
     end
 
     get '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new(@config['/instance_url'])
+      @mastodon = Mastodon.new
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
       @renderer['oauth_url'] = @mastodon.oauth_uri
@@ -45,7 +43,7 @@ module MulukhiyaTootProxy
     end
 
     post '/mulukhiya/app/auth' do
-      @mastodon = Mastodon.new(@config['/instance_url'])
+      @mastodon = Mastodon.new
       r = @mastodon.auth(params[:code])
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth_result'

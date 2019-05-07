@@ -1,8 +1,7 @@
 module MulukhiyaTootProxy
   class MastodonTest < Test::Unit::TestCase
     def setup
-      @config = Config.instance
-      @mastodon = Mastodon.new(@config['/instance_url'], @config['/test/token'])
+      @mastodon = Mastodon.new
     end
 
     def test_new
