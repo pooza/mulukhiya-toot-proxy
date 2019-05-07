@@ -1,7 +1,6 @@
 module MulukhiyaTootProxy
   class ItunesNowplayingHandlerTest < Test::Unit::TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('itunes_nowplaying')
     end
 

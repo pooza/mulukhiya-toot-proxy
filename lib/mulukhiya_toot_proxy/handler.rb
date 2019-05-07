@@ -76,6 +76,7 @@ module MulukhiyaTootProxy
     def initialize
       @config = Config.instance
       @logger = Logger.new
+      @mastodon = Mastodon.new
       @tags = TagContainer.new
       @result = []
       @results = ResultContainer.new

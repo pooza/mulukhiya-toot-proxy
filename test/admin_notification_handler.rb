@@ -1,9 +1,7 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('admin_notification')
-      @handler.mastodon = Mastodon.new(@config['/instance_url'], @config['/test/token'])
     end
 
     def test_exec

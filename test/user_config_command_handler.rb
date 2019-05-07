@@ -3,9 +3,7 @@ require 'securerandom'
 module MulukhiyaTootProxy
   class UserConfigCommandHandlerTest < Test::Unit::TestCase
     def setup
-      config = Config.instance
       @handler = Handler.create('user_config_command')
-      @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
     def test_exec

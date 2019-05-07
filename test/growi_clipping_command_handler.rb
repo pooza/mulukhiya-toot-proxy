@@ -1,9 +1,7 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandlerTest < Test::Unit::TestCase
     def setup
-      config = Config.instance
       @handler = Handler.create('growi_clipping_command')
-      @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
     def test_exec
