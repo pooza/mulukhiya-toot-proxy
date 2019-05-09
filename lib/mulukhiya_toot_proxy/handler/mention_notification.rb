@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class MentionNotificationHandler < NotificationHandler
-    def notifiable?(body, headers)
+    def notifiable?(body)
       return body['status'] =~ /(\s|^)@[[:word:]]+(\s|$)/
     rescue => e
       @logger.error(e)

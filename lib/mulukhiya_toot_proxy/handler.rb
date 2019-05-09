@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :user_config
 
-    def exec(body, headers = {})
+    def exec(body, params = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
@@ -55,7 +55,7 @@ module MulukhiyaTootProxy
       end
     end
 
-    def self.exec_all(body, headers, params = {})
+    def self.exec_all(body, params = {})
       logger = Logger.new
       tags = TagContainer.new
       results = ResultContainer.new
@@ -64,7 +64,7 @@ module MulukhiyaTootProxy
           handler.mastodon = params[:mastodon]
           handler.tags = tags
           handler.results = results
-          handler.exec(body, headers)
+          handler.exec(body, {headers: params[:headers]})
           results.push(handler.result) if handler.result
         end
       rescue Timeout::Error => e

@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class DropboxClippingHandler < Handler
-    def exec(body, headers = {})
+    def exec(body, params = {})
       return unless body['status'] =~ /#dropbox/i
       DropboxClippingWorker.perform_async({
         body: body['status'],

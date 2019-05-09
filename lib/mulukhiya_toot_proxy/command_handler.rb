@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
-    def exec(body, headers = {})
+    def exec(body, params = {})
       return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|
