@@ -41,7 +41,7 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def tcreate_rack_uri(track)
+    def create_track_uri(track)
       uri = SpotifyURI.parse(@config['/spotify/urls/track'])
       uri.track_id = track.id
       return nil unless uri.absolute?
