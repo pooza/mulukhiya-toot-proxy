@@ -5,12 +5,14 @@ module MulukhiyaTootProxy
     end
 
     def test_exec
+      @handler.clear
       @handler.exec({'status' => Time.now.to_s})
       assert_nil(@handler.result)
       sleep(1)
 
+      @handler.clear
       @handler.exec({'status' => "#{Time.now} \#dropbox"})
-      assert_equal(@handler.result[:entries].count, 1)
+      assert(@handler.result[:entries].present?)
       sleep(1)
     end
   end

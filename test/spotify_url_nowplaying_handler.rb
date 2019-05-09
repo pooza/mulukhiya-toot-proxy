@@ -5,9 +5,11 @@ module MulukhiyaTootProxy
     end
 
     def test_exec
+      @handler.clear
       @handler.exec({'status' => "#nowplaying https://open.spotify.com/\n"})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => "#nowplaying https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS\n"})
       assert_equal(@handler.result[:entries], ['https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS'])
     end

@@ -5,21 +5,27 @@ module MulukhiyaTootProxy
     end
 
     def test_exec
+      @handler.clear
       @handler.exec({'status' => 'https://www.google.co.jp/?q=日本語'})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => 'https://4sq.com/2NYeZb6'})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => 'https://www.youtube.com/watch?v=Lvinns9DJs0&feature=youtu.be&t=2252'})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => 'http://www.apple.com'})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => 'http://www.apple.com/'})
       assert_nil(@handler.result)
 
+      @handler.clear
       @handler.exec({'status' => 'https://www.apple.com/jp/apple-music/'})
       assert_equal(@handler.result[:entries], ['https://www.apple.com/jp/apple-music/'])
     end

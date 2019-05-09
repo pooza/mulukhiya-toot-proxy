@@ -6,8 +6,10 @@ module MulukhiyaTootProxy
 
     def test_exec
       return unless AmazonService.accesskey?
+
+      @handler.clear
       @handler.exec({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})
-      assert_equal(@handler.result[:entries].count, 1)
+      assert(@handler.result[:entries].present?)
     end
   end
 end

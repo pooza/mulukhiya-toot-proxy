@@ -5,8 +5,13 @@ module MulukhiyaTootProxy
     end
 
     def test_exec
+      @handler.clear
       @handler.exec({'status' => ''})
       assert_nil(@handler.result)
+
+      @handler.clear
+      @handler.exec({'status' => "command: webhook_url\n"})
+      assert(@handler.result.present?)
     end
   end
 end
