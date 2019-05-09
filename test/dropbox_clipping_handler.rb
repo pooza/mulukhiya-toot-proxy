@@ -4,14 +4,14 @@ module MulukhiyaTootProxy
       @handler = Handler.create('dropbox_clipping')
     end
 
-    def test_exec
+    def test_hook_pre_toot
       @handler.clear
-      @handler.exec({'status' => Time.now.to_s})
+      @handler.hook_pre_toot({'status' => Time.now.to_s})
       assert_nil(@handler.result)
       sleep(1)
 
       @handler.clear
-      @handler.exec({'status' => "#{Time.now} \#dropbox"})
+      @handler.hook_pre_toot({'status' => "#{Time.now} \#dropbox"})
       assert(@handler.result[:entries].present?)
       sleep(1)
     end

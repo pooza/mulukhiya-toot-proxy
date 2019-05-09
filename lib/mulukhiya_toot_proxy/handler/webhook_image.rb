@@ -2,7 +2,7 @@ require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class WebhookImageHandler < Handler
-    def exec(body, params = {})
+    def hook_pre_toot(body, params = {})
       return unless body['attachments'].is_a?(Array)
       body['media_ids'] ||= []
       return if body['media_ids'].present?

@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
-    def exec(body, params = {})
+    def hook_pre_toot(body, params = {})
       return unless notifiable?(body)
       worker_name.constantize.perform_async({
         id: @mastodon.account_id,

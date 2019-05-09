@@ -4,13 +4,13 @@ module MulukhiyaTootProxy
       @handler = Handler.create('webhook_url_command')
     end
 
-    def test_exec
+    def test_hook_pre_toot
       @handler.clear
-      @handler.exec({'status' => ''})
+      @handler.hook_pre_toot({'status' => ''})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.exec({'status' => "command: webhook_url\n"})
+      @handler.hook_pre_toot({'status' => "command: webhook_url\n"})
       assert(@handler.result.present?)
     end
   end

@@ -4,14 +4,14 @@ module MulukhiyaTootProxy
       @handler = Handler.create('growi_clipping')
     end
 
-    def test_exec
+    def test_hook_pre_toot
       @handler.clear
-      @handler.exec({'status' => Time.now.to_s})
+      @handler.hook_pre_toot({'status' => Time.now.to_s})
       assert_nil(@handler.result)
       sleep(1)
 
       @handler.clear
-      @handler.exec({'status' => "#{Time.now} \#growi"})
+      @handler.hook_pre_toot({'status' => "#{Time.now} \#growi"})
       assert(@handler.result[:entries].present?)
       sleep(1)
     end

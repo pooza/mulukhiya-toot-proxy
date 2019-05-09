@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class ImageHandler < Handler
-    def exec(body, params = {})
+    def hook_pre_toot(body, params = {})
       body['media_ids'] ||= []
       return if body['media_ids'].present?
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|

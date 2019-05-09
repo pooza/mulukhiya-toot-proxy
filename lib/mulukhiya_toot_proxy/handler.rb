@@ -9,9 +9,9 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :user_config
 
-    def exec(body, params = {})
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
-    end
+    def hook_pre_toot(body, params = {}); end
+
+    alias exec hook_pre_toot
 
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
@@ -65,7 +65,7 @@ module MulukhiyaTootProxy
       all(params) do |handler|
         next unless handler.enable?(hook)
         Timeout.timeout(handler.timeout) do
-          handler.exec(body, params)
+          handler.send("hook_#{hook}".to_sym, body, params)
           results.push(handler.result)
         end
       rescue Timeout::Error => e

@@ -4,13 +4,13 @@ module MulukhiyaTootProxy
       @handler = Handler.create('admin_notification')
     end
 
-    def test_exec
+    def test_hook_pre_toot
       @handler.clear
-      @handler.exec({'status' => 'ふつうのトゥート。'})
+      @handler.hook_pre_toot({'status' => 'ふつうのトゥート。'})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.exec({'status' => "周知を含むトゥートのテスト\n#notify"})
+      @handler.hook_pre_toot({'status' => "周知を含むトゥートのテスト\n#notify"})
       assert_equal(@handler.result[:entries], [true])
     end
   end

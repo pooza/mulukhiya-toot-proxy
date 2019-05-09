@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class TaggingHandler < Handler
-    def exec(body, params = {})
+    def hook_pre_toot(body, params = {})
       return body if ignore?(body['status'])
       @tags.body = body['status']
       temp_text = create_temp_text(body)
