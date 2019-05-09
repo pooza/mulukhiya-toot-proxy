@@ -12,13 +12,21 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses' do
       tags = TagContainer.scan(params[:status])
-      results = Handler.exec_all(:pre_toot, params, {headers: @headers, mastodon: @mastodon})
-      r = @mastodon.toot(params)
-      Handler.exec_all(:post_toot, params, {response: r, results: results, mastodon: @mastodon})
-      @renderer.message = r.parsed_response
+      results = ResultContainer.new
+      Handler.exec_all(:pre_toot, params, {
+        results: results,
+        mastodon: @mastodon,
+        headers: @headers,
+      })
+      results.response = @mastodon.toot(params)
+      Handler.exec_all(:post_toot, params, {
+        results: results,
+        mastodon: @mastodon,
+      })
+      @renderer.message = results.response.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
-      @renderer.status = r.code
+      @renderer.status = results.response.code
       headers({'X-Mulukhiya' => results.summary})
       return @renderer.to_s
     end
@@ -26,10 +34,11 @@ module MulukhiyaTootProxy
     post '/mulukhiya/webhook/:digest' do
       if webhook = Webhook.create(params[:digest])
         raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-        r = webhook.toot(params)
-        @renderer.message = r.parsed_response
-        @renderer.message['results'] = webhook.results.summary
-        @renderer.status = r.code
+        results = webhook.toot(params)
+        @renderer.message = results.response.parsed_response
+        @renderer.message['results'] = results.summary
+        @renderer.status = results.response.code
+        headers({'X-Mulukhiya' => results.summary})
       else
         @renderer.status = 404
       end

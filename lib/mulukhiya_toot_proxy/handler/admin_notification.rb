@@ -19,7 +19,12 @@ module MulukhiyaTootProxy
     private
 
     def events
-      return [:pre_toot, :post_toot]
+      return [
+        :pre_toot,
+        :post_toot,
+        :pre_webhook,
+        :post_webhook,
+      ]
     end
   end
 end

@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
     end
 
     def exist?
-      return db.execute('webhook_tokens', {
+      return @db.execute('webhook_tokens', {
         token: @mastodon.token,
         owner: @mastodon.account_id,
       }).present?
@@ -52,8 +52,16 @@ module MulukhiyaTootProxy
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {mastodon: @mastodon})
-      return @mastodon.toot(body)
+      Handler.exec_all(:pre_webhook, body, {
+        results: results,
+        mastodon: @mastodon,
+      })
+      results.response = @mastodon.toot(body)
+      Handler.exec_all(:post_webhook, body, {
+        results: results,
+        mastodon: @mastodon,
+      })
+      return results
     end
 
     def self.create(digest)
@@ -88,10 +96,7 @@ module MulukhiyaTootProxy
       @results = ResultContainer.new
       @mastodon = Mastodon.new
       @logger = Logger.new
-    end
-
-    def db
-      return Postgres.instance
+      @db = Postgres.instance
     end
   end
 end
