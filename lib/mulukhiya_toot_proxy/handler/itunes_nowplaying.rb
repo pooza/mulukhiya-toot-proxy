@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class ItunesNowplayingHandler < NowplayingHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @tracks = {}
       @service = ItunesService.new
     end

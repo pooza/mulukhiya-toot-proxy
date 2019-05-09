@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class AmazonNowplayingHandler < NowplayingHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @asins = {}
       @service = AmazonService.new
     end

@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class YouTubeURLNowplayingHandler < NowplayingHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @videos = {}
     end
 

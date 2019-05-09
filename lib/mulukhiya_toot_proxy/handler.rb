@@ -43,32 +43,28 @@ module MulukhiyaTootProxy
       @webhook = nil
     end
 
-    def self.create(name)
+    def self.create(name, params = {})
       require "mulukhiya_toot_proxy/handler/#{name}"
-      return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new
+      return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
     end
 
-    def self.all
+    def self.all(params = {})
       return enum_for(__method__) unless block_given?
-      Config.instance['/handlers'].each do |handler|
-        yield create(handler)
+      Config.instance['/handlers'].each do |v|
+        handler = create(v, params)
+        yield handler
       end
     end
 
-    def self.exec_all(body, params = {})
-      logger = Logger.new
-      tags = TagContainer.new
-      results = ResultContainer.new
-      all do |handler|
+    def self.exec_all(event, body, params = {})
+      results = params[:results] || ResultContainer.new
+      all(params) do |handler|
         Timeout.timeout(handler.timeout) do
-          handler.mastodon = params[:mastodon]
-          handler.tags = tags
-          handler.results = results
-          handler.exec(body, {headers: params[:headers]})
-          results.push(handler.result) if handler.result
+          handler.exec(body, params)
+          results.push(handler.result)
         end
       rescue Timeout::Error => e
-        logger.error(e)
+        Logger.new.error(e)
         next
       rescue RestClient::Exception => e
         raise Ginseng::GatewayError, e.message
@@ -80,13 +76,13 @@ module MulukhiyaTootProxy
 
     private
 
-    def initialize
+    def initialize(params = {})
       @config = Config.instance
       @logger = Logger.new
-      @mastodon = Mastodon.new
-      @tags = TagContainer.new
       @result = []
-      @results = ResultContainer.new
+      @mastodon = params[:mastodon] || Mastodon.new
+      @tags = params[:tags] || TagContainer.new
+      @results = params[:results] || ResultContainer.new
       clear
     end
 

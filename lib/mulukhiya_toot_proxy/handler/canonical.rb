@@ -3,8 +3,8 @@ require 'nokogiri'
 
 module MulukhiyaTootProxy
   class CanonicalHandler < URLHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @canonicals = {}
       @http = HTTP.new
     end
