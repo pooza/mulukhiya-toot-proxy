@@ -23,14 +23,24 @@ module MulukhiyaTootProxy
     end
 
     post '/mulukhiya/webhook/:digest' do
-      unless webhook = Webhook.create(params[:digest])
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found."
+      if webhook = Webhook.create(params[:digest])
+        raise Ginseng::RequestError, 'empty message' unless params[:text].present?
+        r = webhook.toot(params)
+        @renderer.message = r.parsed_response
+        @renderer.message['results'] = webhook.results.summary
+        @renderer.status = r.code
+      else
+        @renderer.status = 404
       end
-      raise Ginseng::RequestError, 'empty message' unless params[:text].present?
-      r = webhook.toot(params)
-      @renderer.message = r.parsed_response
-      @renderer.message['results'] = webhook.results.summary
-      @renderer.status = r.code
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/webhook/:digest' do
+      if Webhook.create(params[:digest])
+        @renderer.message = {message: 'OK'}
+      else
+        @renderer.status = 404
+      end
       return @renderer.to_s
     end
 
@@ -51,21 +61,16 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
-    get '/mulukhiya/webhook/:digest' do
-      unless Webhook.create(params[:digest])
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found."
-      end
-      @renderer.message = {message: 'OK'}
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/style/default.css' do
+    get '/mulukhiya/style/:style' do
       @renderer = CSSRenderer.new
-      @renderer.template = 'default'
+      @renderer.template = params[:style]
       return @renderer.to_s
+    rescue Ginseng::RenderError
+      @renderer.status = 404
     end
 
     not_found do
+      @renderer = Ginseng::JSONRenderer.new
       @renderer.status = 404
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
@@ -74,6 +79,7 @@ module MulukhiyaTootProxy
     error do |e|
       e = Ginseng::Error.create(e)
       e.package = Package.full_name
+      @renderer = Ginseng::JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{|k, v| k == :backtrace}
       @renderer.message['error'] = e.message
