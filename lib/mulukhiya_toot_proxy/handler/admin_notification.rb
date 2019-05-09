@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
     private
 
-    def enabled_hooks
+    def enabled_events
       return [:pre_toot, :post_toot]
     end
   end

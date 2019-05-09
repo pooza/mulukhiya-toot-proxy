@@ -52,7 +52,7 @@ module MulukhiyaTootProxy
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      @results = Handler.exec_all(:pre_toot, body, {mastodon: @mastodon})
+      Handler.exec_all(:pre_webhook, body, {mastodon: @mastodon})
       return @mastodon.toot(body)
     end
 

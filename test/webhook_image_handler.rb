@@ -4,8 +4,8 @@ module MulukhiyaTootProxy
       @handler = Handler.create('webhook_image')
     end
 
-    def test_hook_pre_toot
-      @handler.hook_pre_toot({
+    def test_handle_pre_toot
+      @handler.handle_pre_toot({
         'status' => '武田信玄',
         'attachments' => [
           {'image_url' => 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'},

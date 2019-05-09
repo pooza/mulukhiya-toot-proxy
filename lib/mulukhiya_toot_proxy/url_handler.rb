@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class URLHandler < Handler
-    def hook_pre_toot(body, params = {})
+    def handle_pre_toot(body, params = {})
       @status = body['status']
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         next unless rewritable?(link)

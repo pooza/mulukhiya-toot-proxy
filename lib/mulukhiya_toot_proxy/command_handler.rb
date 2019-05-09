@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
-    def hook_pre_toot(body, params = {})
+    def handle_pre_toot(body, params = {})
       return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|

@@ -9,9 +9,13 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :user_config
 
-    def hook_pre_toot(body, params = {}); end
+    def handle_pre_toot(body, params = {}); end
 
-    alias exec hook_pre_toot
+    alias exec handle_pre_toot
+
+    def handle_pre_webhook(body, params = {})
+      handle_pre_toot(body, params)
+    end
 
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
@@ -38,7 +42,7 @@ module MulukhiyaTootProxy
     end
 
     def enable?(name)
-      return enabled_hooks.include?(name)
+      return enabled_events.include?(name)
     end
 
     def mastodon=(mastodon)
@@ -60,12 +64,12 @@ module MulukhiyaTootProxy
       end
     end
 
-    def self.exec_all(hook, body, params = {})
+    def self.exec_all(event, body, params = {})
       results = params[:results] || ResultContainer.new
       all(params) do |handler|
-        next unless handler.enable?(hook)
+        next unless handler.enable?(event)
         Timeout.timeout(handler.timeout) do
-          handler.send("hook_#{hook}".to_sym, body, params)
+          handler.send("handle_#{event}".to_sym, body, params)
           results.push(handler.result)
         end
       rescue Timeout::Error => e
@@ -91,8 +95,8 @@ module MulukhiyaTootProxy
       clear
     end
 
-    def enabled_hooks
-      return [:pre_toot]
+    def enabled_events
+      return [:pre_toot, :pre_webhook]
     end
 
     def webhook

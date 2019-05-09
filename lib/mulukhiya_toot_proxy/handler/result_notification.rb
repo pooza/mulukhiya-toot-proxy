@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def hook_pre_toot(body, params = {})
+    def handle_pre_toot(body, params = {})
       return unless @results.present?
       return unless notifiable?(body)
       worker_name.constantize.perform_async({

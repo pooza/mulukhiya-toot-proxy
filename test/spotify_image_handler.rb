@@ -4,13 +4,13 @@ module MulukhiyaTootProxy
       @handler = Handler.create('spotify_image')
     end
 
-    def test_hook_pre_toot
+    def test_handle_pre_toot
       @handler.clear
-      @handler.hook_pre_toot({'status' => 'https://www.spotify.com/jp/'})
+      @handler.handle_pre_toot({'status' => 'https://www.spotify.com/jp/'})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.hook_pre_toot({'status' => 'https://open.spotify.com/track/1nRvy34z0NcTga59qOSYId'})
+      @handler.handle_pre_toot({'status' => 'https://open.spotify.com/track/1nRvy34z0NcTga59qOSYId'})
       assert(@handler.result[:entries].present?)
     end
   end

@@ -7,25 +7,25 @@ module MulukhiyaTootProxy
       @key = SecureRandom.hex(16)
     end
 
-    def test_hook_pre_toot
+    def test_handle_pre_toot
       @handler.clear
-      @handler.hook_pre_toot({'status' => ''})
+      @handler.handle_pre_toot({'status' => ''})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.hook_pre_toot({'status' => "command: user_config\n#{@key}: 1"})
+      @handler.handle_pre_toot({'status' => "command: user_config\n#{@key}: 1"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.hook_pre_toot({'status' => "command: user_config\n#{@key}: null"})
+      @handler.handle_pre_toot({'status' => "command: user_config\n#{@key}: null"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.hook_pre_toot({'status' => %({"command": "user_config", "#{@key}": 2})})
+      @handler.handle_pre_toot({'status' => %({"command": "user_config", "#{@key}": 2})})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.hook_pre_toot({'status' => %({"command": "user_config", "#{@key}": null})})
+      @handler.handle_pre_toot({'status' => %({"command": "user_config", "#{@key}": null})})
       assert(@handler.result[:entries].present?)
     end
   end
