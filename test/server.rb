@@ -90,9 +90,13 @@ module MulukhiyaTootProxy
       assert_equal(last_response.status, 400)
     end
 
-    def test_default_css
-      get '/mulukhiya/style/default.css'
+    def test_style
+      get '/mulukhiya/style/default'
       assert(last_response.ok?)
+
+      get '/mulukhiya/style/undefined'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
     end
 
     def test_static_resource
