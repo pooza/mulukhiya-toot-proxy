@@ -4,9 +4,10 @@ require 'rest-client'
 
 module MulukhiyaTootProxy
   class Handler
-    attr_accessor :mastodon
     attr_accessor :tags
     attr_accessor :results
+    attr_reader :mastodon
+    attr_reader :user_config
 
     def exec(body, headers = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
@@ -34,6 +35,12 @@ module MulukhiyaTootProxy
       return @config["/handler/#{underscore_name}/timeout"]
     rescue Ginseng::ConfigError
       return @config['/handler/default/timeout']
+    end
+
+    def mastodon=(mastodon)
+      @mastodon = mastodon
+      @user_config = UserConfigStorage.new[mastodon.account_id]
+      @webhook = nil
     end
 
     def self.create(name)
@@ -81,6 +88,16 @@ module MulukhiyaTootProxy
       @result = []
       @results = ResultContainer.new
       clear
+    end
+
+    def webhook
+      unless @webhook
+        @webhook = Webhook.new(user_config)
+        return nil unless @webhook.exist?
+      end
+      return @webhook
+    rescue
+      return nil
     end
   end
 end

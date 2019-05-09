@@ -7,16 +7,6 @@ module MulukhiyaTootProxy
 
     private
 
-    def webhook
-      unless @webhook
-        @webhook = Webhook.new(UserConfigStorage.new[mastodon.account_id])
-        return nil unless @webhook.exist?
-      end
-      return @webhook
-    rescue
-      return nil
-    end
-
     def create_status(values)
       v = JSON.parse(UserConfigStorage.new.get(mastodon.account_id))
       v['webhook']['url'] = webhook.uri.to_s if webhook
