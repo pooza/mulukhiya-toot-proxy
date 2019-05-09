@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
       return unless values.present?
       return unless values.is_a?(Hash)
       return unless values['command'] == command_name
-      dispatch(values)
+      dispatch_command(values)
       body['visibility'] = 'direct'
       body['status'] = create_status(values)
       @result.push(values)
@@ -41,8 +41,10 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def dispatch(values)
+    def dispatch_command(values)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
+
+    alias dispatch dispatch_command
   end
 end

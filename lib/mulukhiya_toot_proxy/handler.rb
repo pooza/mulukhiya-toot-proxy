@@ -64,9 +64,9 @@ module MulukhiyaTootProxy
         logger.error(e)
         next
       rescue RestClient::Exception => e
-        raise GatewayError, e.message
+        raise Ginseng::GatewayError, e.message
       rescue HTTParty::Error => e
-        raise GatewayError, e.message
+        raise Ginseng::GatewayError, e.message
       end
       return results
     end

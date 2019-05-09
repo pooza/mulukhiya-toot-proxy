@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class WebhookURLCommandHandler < CommandHandler
-    def dispatch(values)
+    def dispatch_command(values)
       raise Ginseng::RequestError, 'Invalid webhook' unless webhook
     end
 
@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     def webhook
       unless @webhook
         @webhook = Webhook.new(@user_config[mastodon.account_id])
-        raise GatewayError::ConfigError, 'Invalid webhook' unless @webhook.exist?
+        raise Ginseng::GatewayError, 'Invalid webhook' unless @webhook.exist?
       end
       return @webhook
     rescue => e

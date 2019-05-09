@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class UserConfigCommandHandler < CommandHandler
-    def dispatch(values)
+    def dispatch_command(values)
       raise Ginseng::GatewayError, 'Invalid access token' unless id = mastodon.account_id
       UserConfigStorage.new.update(id, values)
     end
@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     def webhook
       unless @webhook
         @webhook = Webhook.new(UserConfigStorage.new[mastodon.account_id])
-        raise GatewayError::ConfigError, 'Invalid webhook' unless @webhook.exist?
+        return nil unless @webhook.exist?
       end
       return @webhook
     rescue
@@ -22,6 +22,7 @@ module MulukhiyaTootProxy
       v['webhook']['url'] = webhook.uri.to_s if webhook
       return YAML.dump(v)
     rescue => e
+      @logger.error(e)
       raise Ginseng::RequestError, e.message
     end
   end
