@@ -37,6 +37,10 @@ module MulukhiyaTootProxy
       return @config['/handler/default/timeout']
     end
 
+    def enable?(name)
+      return enabled_hooks.include?(name)
+    end
+
     def mastodon=(mastodon)
       @mastodon = mastodon
       @user_config = UserConfigStorage.new[mastodon.account_id]
@@ -56,9 +60,10 @@ module MulukhiyaTootProxy
       end
     end
 
-    def self.exec_all(event, body, params = {})
+    def self.exec_all(hook, body, params = {})
       results = params[:results] || ResultContainer.new
       all(params) do |handler|
+        next unless handler.enable?(hook)
         Timeout.timeout(handler.timeout) do
           handler.exec(body, params)
           results.push(handler.result)
@@ -84,6 +89,10 @@ module MulukhiyaTootProxy
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       clear
+    end
+
+    def enabled_hooks
+      return [:pre_toot]
     end
 
     def webhook

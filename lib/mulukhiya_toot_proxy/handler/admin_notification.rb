@@ -10,5 +10,11 @@ module MulukhiyaTootProxy
       @logger.error(e)
       return false
     end
+
+    private
+
+    def enabled_hooks
+      return [:pre_toot, :post_toot]
+    end
   end
 end
