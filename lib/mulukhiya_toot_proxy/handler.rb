@@ -9,12 +9,22 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :user_config
 
-    def handle_pre_toot(body, params = {}); end
+    def handle_pre_toot(body, params = {})
+      return nil
+    end
 
     alias exec handle_pre_toot
 
+    def handle_post_toot(body, params = {})
+      return nil
+    end
+
     def handle_pre_webhook(body, params = {})
       handle_pre_toot(body, params)
+    end
+
+    def handle_post_webhook(body, params = {})
+      handle_post_toot(body, params)
     end
 
     def underscore_name
@@ -42,7 +52,7 @@ module MulukhiyaTootProxy
     end
 
     def enable?(name)
-      return enabled_events.include?(name)
+      return events.include?(name)
     end
 
     def mastodon=(mastodon)
@@ -95,7 +105,7 @@ module MulukhiyaTootProxy
       clear
     end
 
-    def enabled_events
+    def events
       return [:pre_toot, :pre_webhook]
     end
 

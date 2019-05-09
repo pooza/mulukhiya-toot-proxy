@@ -14,6 +14,7 @@ module MulukhiyaTootProxy
       tags = TagContainer.scan(params[:status])
       results = Handler.exec_all(:pre_toot, params, {headers: @headers, mastodon: @mastodon})
       r = @mastodon.toot(params)
+      Handler.exec_all(:post_toot, params, {response: r, results: results, mastodon: @mastodon})
       @renderer.message = r.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}

@@ -11,9 +11,14 @@ module MulukhiyaTootProxy
       return false
     end
 
+    def handle_post_toot(body, params = {})
+      return unless notifiable?(body)
+      Slack.broadcast('aaaaa')
+    end
+
     private
 
-    def enabled_events
+    def events
       return [:pre_toot, :post_toot]
     end
   end

@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
 
     private
 
-    def enabled_events
+    def events
       return [:pre_webhook]
     end
   end
