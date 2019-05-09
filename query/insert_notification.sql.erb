@@ -1,0 +1,16 @@
+<%# encoding: UTF-8 -%>
+INSERT INTO notifications (
+  activity_id,
+  activity_type,
+  account_id,
+  from_account_id,
+  created_at,
+  updated_at
+) VALUES (
+  '<%= params[:activity_id] %>',
+  '<%= params[:activity_type] %>',
+  '<%= params[:account_id] %>',
+  '<%= params[:from_account_id] %>',
+  now(),
+  now()
+)

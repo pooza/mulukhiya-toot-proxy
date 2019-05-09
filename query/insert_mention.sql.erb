@@ -1,0 +1,12 @@
+<%# encoding: UTF-8 -%>
+INSERT INTO mentions (
+  status_id,
+  account_id,
+  created_at,
+  updated_at
+) VALUES (
+  '<%= params[:status_id] %>',
+  '<%= params[:account_id] %>',
+  now(),
+  now()
+)
