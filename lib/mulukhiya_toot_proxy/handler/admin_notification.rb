@@ -13,11 +13,13 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      NotificationTimelineWorker.perform_async({
+      worker_name.constantize.perform_async({
         from_account_id: @mastodon.account_id,
+        token: @mastodon.token,
+        status: body['status'],
         status_id: params[:results].response['id'],
       })
-      super(body, params)
+      @result.push(true)
     end
   end
 end
