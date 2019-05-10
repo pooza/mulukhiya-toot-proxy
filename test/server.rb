@@ -55,7 +55,7 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_response
-      return unless @config['/handlers'].include?('itunes_url_nowplaying')
+      return if Handler.create('itunes_url_nowplaying').disabled?
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
