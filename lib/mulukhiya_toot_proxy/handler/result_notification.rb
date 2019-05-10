@@ -7,10 +7,6 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def handle_pre_toot(body, params = {})
-      return nil
-    end
-
     def handle_post_toot(body, params = {})
       return unless @results.present?
       return unless notifiable?(body)
@@ -19,16 +15,6 @@ module MulukhiyaTootProxy
         token: @mastodon.token,
         results: @results,
       })
-      @result.to_json
-    end
-
-    private
-
-    def events
-      return [
-        :post_toot,
-        :post_webhook,
-      ]
     end
   end
 end

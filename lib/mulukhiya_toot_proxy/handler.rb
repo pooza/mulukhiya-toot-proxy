@@ -61,6 +61,10 @@ module MulukhiyaTootProxy
       @webhook = nil
     end
 
+    def events
+      return [:pre_toot, :pre_webhook]
+    end
+
     def self.create(name, params = {})
       require "mulukhiya_toot_proxy/handler/#{name}"
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
@@ -69,8 +73,7 @@ module MulukhiyaTootProxy
     def self.all(params = {})
       return enum_for(__method__) unless block_given?
       Config.instance['/handlers'].each do |v|
-        handler = create(v, params)
-        yield handler
+        yield create(v, params)
       end
     end
 
@@ -103,13 +106,6 @@ module MulukhiyaTootProxy
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       clear
-    end
-
-    def events
-      return [
-        :pre_toot,
-        :pre_webhook,
-      ]
     end
 
     def webhook

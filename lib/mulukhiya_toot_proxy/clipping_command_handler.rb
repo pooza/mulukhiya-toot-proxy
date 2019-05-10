@@ -14,6 +14,10 @@ module MulukhiyaTootProxy
       end
     end
 
+    def events
+      return [:post_toot, :post_webhook]
+    end
+
     private
 
     def create_uris(values)

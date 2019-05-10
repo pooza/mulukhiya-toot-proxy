@@ -8,6 +8,14 @@ module MulukhiyaTootProxy
     end
 
     def handle_pre_toot(body, params = {})
+      handle(body, params)
+    end
+
+    def handle_post_toot(body, params = {})
+      handle(body, params)
+    end
+
+    def handle(body, params = {})
       return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|

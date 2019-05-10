@@ -17,18 +17,7 @@ module MulukhiyaTootProxy
         from_account_id: @mastodon.account_id,
         status_id: params[:results].response['id'],
       })
-      @result.push(true)
-    end
-
-    private
-
-    def events
-      return [
-        :pre_toot,
-        :post_toot,
-        :pre_webhook,
-        :post_webhook,
-      ]
+      super(body, params)
     end
   end
 end
