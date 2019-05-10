@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
 
     def result
       return nil unless @result.present?
-      return {handler: self.class.to_s, entries: @result}
+      return {handler: self.class.to_s, event: @event, entries: @result}
     end
 
     def clear
@@ -79,7 +79,7 @@ module MulukhiyaTootProxy
 
     def self.exec_all(event, body, params = {})
       results = params[:results] || ResultContainer.new
-      all(params) do |handler|
+      all(params.merge({event: event})) do |handler|
         next unless handler.enable?(event)
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
@@ -105,6 +105,7 @@ module MulukhiyaTootProxy
       @mastodon = params[:mastodon] || Mastodon.new
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
+      @event = params[:event] || 'unknown'
       clear
     end
 
