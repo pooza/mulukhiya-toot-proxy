@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class AdminNotificationWorker < NotificationWorker
     def perform(params)
       @db.begin
-      account = @db.execute('account', {id: params['from_account_id']}).first
+      account = Mastodon.lookup_account(params['from_account_id'])
       @db.execute('notificatable_accounts', {id: account['id']}).each do |row|
         update_timeline({
           status_id: params['status_id'],
