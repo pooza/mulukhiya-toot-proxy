@@ -4,12 +4,27 @@ require 'rest-client'
 
 module MulukhiyaTootProxy
   class Handler
-    attr_accessor :mastodon
     attr_accessor :tags
     attr_accessor :results
+    attr_reader :mastodon
+    attr_reader :user_config
 
-    def exec(body, headers = {})
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    def handle_pre_toot(body, params = {})
+      return nil
+    end
+
+    alias exec handle_pre_toot
+
+    def handle_post_toot(body, params = {})
+      return nil
+    end
+
+    def handle_pre_webhook(body, params = {})
+      handle_pre_toot(body, params)
+    end
+
+    def handle_post_webhook(body, params = {})
+      handle_post_toot(body, params)
     end
 
     def underscore_name
@@ -22,7 +37,7 @@ module MulukhiyaTootProxy
 
     def result
       return nil unless @result.present?
-      return {handler: self.class.to_s, entries: @result}
+      return {handler: self.class.to_s, event: @event, entries: @result}
     end
 
     def clear
@@ -36,50 +51,75 @@ module MulukhiyaTootProxy
       return @config['/handler/default/timeout']
     end
 
-    def self.create(name)
-      require "mulukhiya_toot_proxy/handler/#{name}"
-      return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new
+    def disabled?
+      return @config["/handler/#{underscore_name}/disable"]
+    rescue Ginseng::ConfigError
+      return false
     end
 
-    def self.all
+    def mastodon=(mastodon)
+      @mastodon = mastodon
+      @user_config = UserConfigStorage.new[mastodon.account_id]
+      @webhook = nil
+    end
+
+    def events
+      return [:pre_toot, :pre_webhook]
+    end
+
+    def self.create(name, params = {})
+      require "mulukhiya_toot_proxy/handler/#{name}"
+      return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
+    end
+
+    def self.all(params = {})
       return enum_for(__method__) unless block_given?
-      Config.instance['/handlers'].each do |handler|
-        yield create(handler)
+      Config.instance['/handler/all'].each do |v|
+        yield create(v, params)
       end
     end
 
-    def self.exec_all(body, headers, params = {})
-      logger = Logger.new
-      tags = TagContainer.new
-      results = ResultContainer.new
-      all do |handler|
+    def self.exec_all(event, body, params = {})
+      results = params[:results] || ResultContainer.new
+      all(params.merge({event: event})) do |handler|
+        next unless handler.events.include?(event)
+        next if handler.disabled?
         Timeout.timeout(handler.timeout) do
-          handler.mastodon = params[:mastodon]
-          handler.tags = tags
-          handler.results = results
-          handler.exec(body, headers)
-          results.push(handler.result) if handler.result
+          handler.send("handle_#{event}".to_sym, body, params)
+          results.push(handler.result)
         end
       rescue Timeout::Error => e
-        logger.error(e)
+        Logger.new.error(e)
         next
       rescue RestClient::Exception => e
-        raise GatewayError, e.message
+        raise Ginseng::GatewayError, e.message
       rescue HTTParty::Error => e
-        raise GatewayError, e.message
+        raise Ginseng::GatewayError, e.message
       end
       return results
     end
 
     private
 
-    def initialize
+    def initialize(params = {})
       @config = Config.instance
       @logger = Logger.new
-      @tags = TagContainer.new
       @result = []
-      @results = ResultContainer.new
+      @mastodon = params[:mastodon] || Mastodon.new
+      @tags = params[:tags] || TagContainer.new
+      @results = params[:results] || ResultContainer.new
+      @event = params[:event] || 'unknown'
       clear
+    end
+
+    def webhook
+      unless @webhook
+        @webhook = Webhook.new(user_config)
+        return nil unless @webhook.exist?
+      end
+      return @webhook
+    rescue
+      return nil
     end
   end
 end

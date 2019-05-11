@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return self.class.to_s.sub(/CommandHandler$/, 'Worker')
     end
 
-    def dispatch(values)
+    def dispatch_command(values)
       create_uris(values) do |uri|
         next unless uri&.id
         worker_name.constantize.perform_async({
@@ -12,6 +12,10 @@ module MulukhiyaTootProxy
           account: {id: mastodon.account_id, username: mastodon.account['username']},
         })
       end
+    end
+
+    def events
+      return [:post_toot, :post_webhook]
     end
 
     private

@@ -2,16 +2,16 @@ module MulukhiyaTootProxy
   class TagContainerTest < Test::Unit::TestCase
     def setup
       @config = Config.instance
+      @container = TagContainer.new
     end
 
     def test_create_tags
-      container = TagContainer.new
-      container.concat(['カレー担々麺', 'コスモグミ'])
-      assert_equal(container.create_tags, ['#カレー担々麺', '#コスモグミ'])
+      @container.concat(['カレー担々麺', 'コスモグミ'])
+      assert_equal(@container.create_tags, ['#カレー担々麺', '#コスモグミ'])
 
-      container.push('剣崎 真琴')
-      container.push('Makoto Kenzaki')
-      assert_equal(container.create_tags, ['#カレー担々麺', '#コスモグミ', '#剣崎真琴', '#Makoto_Kenzaki'])
+      @container.push('剣崎 真琴')
+      @container.push('Makoto Kenzaki')
+      assert_equal(@container.create_tags, ['#カレー担々麺', '#コスモグミ', '#剣崎真琴', '#Makoto_Kenzaki'])
     end
 
     def test_default_tags

@@ -1,11 +1,37 @@
 package:
-  version: 2.2.12
+  version: 2.3.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
 handler:
+  all:
+    - shortened_url
+    - url_normalize
+    - spotify_nowplaying
+    - amazon_nowplaying
+    - itunes_nowplaying
+    - spotify_url_nowplaying
+    - itunes_url_nowplaying
+    - you_tube_url_nowplaying
+    - canonical
+    - amazon_asin
+    - itunes_url
+    - amazon_image
+    - spotify_image
+    - itunes_image
+    - webhook_image
+    - tagging
+    - user_config_command
+    - growi_clipping
+    - growi_clipping_command
+    - dropbox_clipping
+    - dropbox_clipping_command
+    - webhook_url_command
+    - admin_notification
+    - mention_notification
+    - result_notification
   default:
     timeout: 10
 shortened_url:

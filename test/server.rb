@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
 
     def setup
       @config = Config.instance
+      @account = Mastodon.lookup_token_owner(@config['/test/token'])
     end
 
     def app
@@ -54,7 +55,7 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_response
-      return unless @config['/handlers'].include?('itunes_url_nowplaying')
+      return if Handler.create('itunes_url_nowplaying').disabled?
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
@@ -66,9 +67,7 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
-      account = Mastodon.lookup_token_owner(@config['/test/token'])
-      assert(account.is_a?(Hash))
-      Webhook.owned_all(account['username']) do |hook|
+      Webhook.owned_all(@account['username']) do |hook|
         get hook.uri.path
         assert(last_response.ok?)
 
@@ -91,9 +90,13 @@ module MulukhiyaTootProxy
       assert_equal(last_response.status, 400)
     end
 
-    def test_default_css
-      get '/mulukhiya/style/default.css'
+    def test_style
+      get '/mulukhiya/style/default'
       assert(last_response.ok?)
+
+      get '/mulukhiya/style/undefined'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
     end
 
     def test_static_resource

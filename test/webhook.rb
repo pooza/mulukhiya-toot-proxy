@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class WebhookTest < Test::Unit::TestCase
     def setup
       @config = Config.instance
+      @account = Mastodon.lookup_token_owner(@config['/test/token'])
     end
 
     def test_all
@@ -41,10 +42,8 @@ module MulukhiyaTootProxy
     end
 
     def test_toot
-      account = Mastodon.lookup_token_owner(@config['/test/token'])
-      assert(account.is_a?(Hash))
-      Webhook.owned_all(account['username']) do |hook|
-        assert_equal(hook.toot('木の水晶球').code, 200)
+      Webhook.owned_all(@account['username']) do |hook|
+        assert_equal(hook.toot('木の水晶球').response.code, 200)
       end
     end
   end

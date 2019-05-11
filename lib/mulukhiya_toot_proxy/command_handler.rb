@@ -7,7 +7,15 @@ module MulukhiyaTootProxy
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
-    def exec(body, headers = {})
+    def handle_pre_toot(body, params = {})
+      handle(body, params)
+    end
+
+    def handle_post_toot(body, params = {})
+      handle(body, params)
+    end
+
+    def handle(body, params = {})
       return if body['status'] =~ /^[[:digit:]]+$/
       values = {}
       [:parse_yaml, :parse_json].each do |method|
@@ -19,7 +27,7 @@ module MulukhiyaTootProxy
       return unless values.present?
       return unless values.is_a?(Hash)
       return unless values['command'] == command_name
-      dispatch(values)
+      dispatch_command(values)
       body['visibility'] = 'direct'
       body['status'] = create_status(values)
       @result.push(values)
@@ -41,8 +49,10 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def dispatch(values)
+    def dispatch_command(values)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
+
+    alias dispatch dispatch_command
   end
 end

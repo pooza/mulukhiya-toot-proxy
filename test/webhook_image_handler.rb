@@ -1,13 +1,11 @@
 module MulukhiyaTootProxy
   class WebhookImageHandlerTest < Test::Unit::TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('webhook_image')
-      @handler.mastodon = Mastodon.new(@config['/instance_url'], @config['/test/token'])
     end
 
-    def test_exec
-      @handler.exec({
+    def test_handle_pre_webhook
+      @handler.handle_pre_webhook({
         'status' => '武田信玄',
         'attachments' => [
           {'image_url' => 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'},

@@ -18,6 +18,9 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       return @config['/shortened_url/domains'].member?(Addressable::URI.parse(link).host)
+    rescue => e
+      @logger.error(e)
+      return false
     end
   end
 end

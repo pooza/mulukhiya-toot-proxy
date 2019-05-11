@@ -10,6 +10,9 @@ module MulukhiyaTootProxy
 
     def rewritable?(link)
       return AmazonURI.parse(link).shortenable?
+    rescue => e
+      @logger.error(e)
+      return false
     end
   end
 end

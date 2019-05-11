@@ -1,3 +1,5 @@
+require 'yaml'
+
 module MulukhiyaTootProxy
   class ResultNotificationWorker < NotificationWorker
     sidekiq_options retry: false
@@ -10,7 +12,7 @@ module MulukhiyaTootProxy
     end
 
     def create_message(results)
-      return JSON.pretty_generate(results)
+      return YAML.dump(results)
     end
   end
 end

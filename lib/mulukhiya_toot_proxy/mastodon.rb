@@ -3,12 +3,15 @@ require 'json'
 module MulukhiyaTootProxy
   class Mastodon < Ginseng::Mastodon
     include Package
+    attr_accessor :token
 
-    def initialize(uri, token = nil)
+    def initialize(uri = nil, token = nil)
+      @config = Config.instance
+      uri ||= @config['/instance_url']
+      token ||= @config['/test/token']
       super
       @uri = MastodonURI.parse(uri)
       @token = token
-      @config = Config.instance
     end
 
     def account_id
@@ -65,6 +68,12 @@ module MulukhiyaTootProxy
 
     def self.lookup_attachment(id)
       rows = Postgres.instance.execute('attachment', {id: id})
+      return rows.first if rows.present?
+      return nil
+    end
+
+    def self.lookup_account(id)
+      rows = Postgres.instance.execute('account', {id: id})
       return rows.first if rows.present?
       return nil
     end

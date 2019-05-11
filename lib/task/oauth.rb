@@ -3,9 +3,7 @@ namespace :mulukhiya do
     namespace :client do
       desc 'clean OAuth client ID'
       task :clean do
-        config = MulukhiyaTootProxy::Config.instance
-        mastodon = MulukhiyaTootProxy::Mastodon.new(config['/instance_url'])
-        path = mastodon.oauth_client_path
+        path = MulukhiyaTootProxy::Mastodon.new.oauth_client_path
         File.unlink(path) if File.exist?(path)
       end
     end

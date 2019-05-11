@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class SpotifyNowplayingHandler < NowplayingHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @tracks = {}
       @service = SpotifyService.new
     end

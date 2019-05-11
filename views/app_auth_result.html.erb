@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="robots" content="noindex,nofollow">
   <meta name="viewport" content="width=800">
-  <link rel="stylesheet" type="text/css" href="/mulukhiya/style/default.css">
+  <link rel="stylesheet" type="text/css" href="/mulukhiya/style/default">
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('copy_button').addEventListener('click', e => {
@@ -22,7 +22,7 @@
   <h2>アプリケーションの認証</h2>
   <% if params[:status].to_i < 400 %>
     <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下の<%= MulukhiyaTootProxy::Config.instance['/mastodon/toot/label'] %>をつぶやいてください。</p>
-    <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:token]}}) %></textarea>
+    <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
     <button id="copy_button">クリップボードにコピー</button>
   <% else %>
     <p class="alert">エラー（<%= params[:status] %>）</p>

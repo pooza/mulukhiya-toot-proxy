@@ -1,14 +1,17 @@
 module MulukhiyaTootProxy
   class WebhookURLCommandHandlerTest < Test::Unit::TestCase
     def setup
-      config = Config.instance
       @handler = Handler.create('webhook_url_command')
-      @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
-    def test_exec
-      @handler.exec({'status' => ''})
+    def test_handle_pre_toot
+      @handler.clear
+      @handler.handle_pre_toot({'status' => ''})
       assert_nil(@handler.result)
+
+      @handler.clear
+      @handler.handle_pre_toot({'status' => "command: webhook_url\n"})
+      assert(@handler.result.present?)
     end
   end
 end

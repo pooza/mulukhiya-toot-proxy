@@ -4,21 +4,26 @@ module MulukhiyaTootProxy
       @handler = Handler.create('shortened_url')
     end
 
-    def test_exec
-      @handler.exec({'status' => 'https://www.google.co.jp/?q=日本語'})
+    def test_handle_pre_toot
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://www.google.co.jp/?q=日本語'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'https://4sq.com/2NYeZb6'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://4sq.com/2NYeZb6'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'キュアスタ！ https://goo.gl/uJJKpV'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'キュアスタ！ https://goo.gl/uJJKpV'})
       assert_equal(@handler.result[:entries].count, 1)
 
-      @handler.exec({'status' => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW'})
-      assert_equal(@handler.result[:entries].count, 3)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://bit.ly/2Lquwnt'})
+      assert_equal(@handler.result[:entries].count, 1)
 
-      @handler.exec({'status' => 'https://bit.ly/2Lquwnt'})
-      assert_equal(@handler.result[:entries].count, 4)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW'})
+      assert_equal(@handler.result[:entries].count, 2)
     end
   end
 end

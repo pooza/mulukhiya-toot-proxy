@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class SpotifyURLNowplayingHandler < NowplayingHandler
-    def initialize
-      super
+    def initialize(params = {})
+      super(params)
       @tracks = {}
       @service = SpotifyService.new
     end
@@ -21,10 +21,8 @@ module MulukhiyaTootProxy
       push(track.name)
       push(track.artists.map(&:name).join(', '))
       @tags.concat(ArtistParser.new(track.artists.map(&:name).join('、')).parse)
-      [:itunes_uri].each do |method|
-        next unless uri = @service.send(method, track)
-        push(uri.to_s)
-      end
+      return unless uri = @service.create_itunes_uri(track)
+      push(uri.to_s)
     end
   end
 end

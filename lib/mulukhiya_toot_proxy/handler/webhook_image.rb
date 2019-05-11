@@ -2,7 +2,7 @@ require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class WebhookImageHandler < Handler
-    def exec(body, headers = {})
+    def handle_pre_webhook(body, params = {})
       return unless body['attachments'].is_a?(Array)
       body['media_ids'] ||= []
       return if body['media_ids'].present?
@@ -16,6 +16,10 @@ module MulukhiyaTootProxy
         @logger.error(e)
         next
       end
+    end
+
+    def events
+      return [:pre_webhook]
     end
   end
 end

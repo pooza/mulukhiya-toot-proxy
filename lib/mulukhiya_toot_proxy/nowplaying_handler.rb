@@ -1,6 +1,6 @@
 module MulukhiyaTootProxy
   class NowplayingHandler < Handler
-    def exec(body, headers = {})
+    def handle_pre_toot(body, params = {})
       @source_status = body['status'].clone
       @source_status.sub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @status = []

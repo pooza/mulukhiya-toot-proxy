@@ -1,18 +1,18 @@
 module MulukhiyaTootProxy
   class GrowiClippingHandlerTest < Test::Unit::TestCase
     def setup
-      config = Config.instance
       @handler = Handler.create('growi_clipping')
-      @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
     end
 
-    def test_exec
-      @handler.exec({'status' => Time.now.to_s})
+    def test_handle_pre_toot
+      @handler.clear
+      @handler.handle_pre_toot({'status' => Time.now.to_s})
       assert_nil(@handler.result)
       sleep(1)
 
-      @handler.exec({'status' => "#{Time.now} \#growi"})
-      assert_equal(@handler.result[:entries].count, 1)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => "#{Time.now} \#growi"})
+      assert(@handler.result[:entries].present?)
       sleep(1)
     end
   end

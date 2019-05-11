@@ -4,23 +4,29 @@ module MulukhiyaTootProxy
       @handler = Handler.create('canonical')
     end
 
-    def test_exec
-      @handler.exec({'status' => 'https://www.google.co.jp/?q=日本語'})
+    def test_handle_pre_toot
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://www.google.co.jp/?q=日本語'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'https://4sq.com/2NYeZb6'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://4sq.com/2NYeZb6'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'https://www.youtube.com/watch?v=Lvinns9DJs0&feature=youtu.be&t=2252'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://www.youtube.com/watch?v=Lvinns9DJs0&feature=youtu.be&t=2252'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'http://www.apple.com'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'http://www.apple.com'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'http://www.apple.com/'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'http://www.apple.com/'})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => 'https://www.apple.com/jp/apple-music/'})
+      @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://www.apple.com/jp/apple-music/'})
       assert_equal(@handler.result[:entries], ['https://www.apple.com/jp/apple-music/'])
     end
   end

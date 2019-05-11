@@ -1,7 +1,13 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
-    def exec(body, headers = {})
-      return unless notifiable?(body, headers)
+    def notifiable?(body)
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    alias executable? notifiable?
+
+    def handle_post_toot(body, params = {})
+      return unless notifiable?(body)
       worker_name.constantize.perform_async({
         id: @mastodon.account_id,
         token: @mastodon.token,
@@ -14,10 +20,8 @@ module MulukhiyaTootProxy
       return self.class.to_s.sub(/Handler$/, 'Worker')
     end
 
-    def notifiable?(body, headers)
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    def events
+      return [:post_toot, :post_webhook]
     end
-
-    alias executable? notifiable?
   end
 end

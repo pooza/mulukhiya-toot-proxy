@@ -3,28 +3,30 @@ require 'securerandom'
 module MulukhiyaTootProxy
   class UserConfigCommandHandlerTest < Test::Unit::TestCase
     def setup
-      config = Config.instance
       @handler = Handler.create('user_config_command')
-      @handler.mastodon = Mastodon.new(config['/instance_url'], config['/test/token'])
+      @key = SecureRandom.hex(16)
     end
 
-    def test_exec
-      key = SecureRandom.hex(16)
-
-      @handler.exec({'status' => ''})
+    def test_handle_pre_toot
+      @handler.clear
+      @handler.handle_pre_toot({'status' => ''})
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => "command: user_config\n#{key}: 1"})
-      assert_equal(@handler.result[:entries].count, 1)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => "command: user_config\n#{@key}: 1"})
+      assert(@handler.result[:entries].present?)
 
-      @handler.exec({'status' => "command: user_config\n#{key}: null"})
-      assert_equal(@handler.result[:entries].count, 2)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => "command: user_config\n#{@key}: null"})
+      assert(@handler.result[:entries].present?)
 
-      @handler.exec({'status' => %({"command": "user_config", "#{key}": 2})})
-      assert_equal(@handler.result[:entries].count, 3)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => %({"command": "user_config", "#{@key}": 2})})
+      assert(@handler.result[:entries].present?)
 
-      @handler.exec({'status' => %({"command": "user_config", "#{key}": null})})
-      assert_equal(@handler.result[:entries].count, 4)
+      @handler.clear
+      @handler.handle_pre_toot({'status' => %({"command": "user_config", "#{@key}": null})})
+      assert(@handler.result[:entries].present?)
     end
   end
 end

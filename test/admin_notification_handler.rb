@@ -1,16 +1,20 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('admin_notification')
-      @handler.mastodon = Mastodon.new(@config['/instance_url'], @config['/test/token'])
+      @config = Config.instance
+      @account = Mastodon.lookup_token_owner(@config['/test/token'])
+      @params = {results: ResultContainer.new}
+      @params[:results].response = {'id' => @account['id']}
     end
 
-    def test_exec
-      @handler.exec({'status' => 'ふつうのトゥート。'})
+    def test_handle_post_toot
+      @handler.clear
+      @handler.handle_post_toot({'status' => 'ふつうのトゥート。'}, @params)
       assert_nil(@handler.result)
 
-      @handler.exec({'status' => "周知を含むトゥートのテスト\n#notify"})
+      @handler.clear
+      @handler.handle_post_toot({'status' => "周知を含むトゥートのテスト\n#notify"}, @params)
       assert_equal(@handler.result[:entries], [true])
     end
   end

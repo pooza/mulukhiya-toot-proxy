@@ -6,6 +6,7 @@ module MulukhiyaTootProxy
 
     def initialize
       @logger = Logger.new
+      @db = Postgres.instance
     end
 
     def perform(params)
@@ -28,10 +29,6 @@ module MulukhiyaTootProxy
       template[:account] = params[:account]
       template[:status] = params[:status]
       return template.to_s
-    end
-
-    def db
-      return Postgres.instance
     end
   end
 end
