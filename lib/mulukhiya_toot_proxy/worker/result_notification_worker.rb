@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def create_message(results)
-      return JSON.pretty_generate(results)
+      return YAML.dump(results)
     end
   end
 end
