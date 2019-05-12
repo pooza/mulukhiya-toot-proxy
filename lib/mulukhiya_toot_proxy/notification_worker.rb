@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
     def initialize
       @logger = Logger.new
       @db = Postgres.instance
+      @config = Config.instance
     end
 
     def perform(params)

@@ -1,5 +1,5 @@
 package:
-  version: 2.3.0
+  version: 2.3.1
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -34,6 +34,8 @@ handler:
     - result_notification
   default:
     timeout: 10
+  admin_notification:
+    update_timeline: false
 shortened_url:
   domains:
     - t.co

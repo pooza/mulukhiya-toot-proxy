@@ -7,7 +7,7 @@ INSERT INTO notifications (
   created_at,
   updated_at
 ) VALUES (
-  '<%= params[:activity_id] %>',
+  currval('mentions_id_seq'),
   '<%= params[:activity_type] %>',
   '<%= params[:account_id] %>',
   '<%= params[:from_account_id] %>',

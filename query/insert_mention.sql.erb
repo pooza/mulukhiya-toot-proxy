@@ -1,10 +1,12 @@
 <%# encoding: UTF-8 -%>
 INSERT INTO mentions (
+  id,
   status_id,
   account_id,
   created_at,
   updated_at
 ) VALUES (
+  nextval('mentions_id_seq'),
   '<%= params[:status_id] %>',
   '<%= params[:account_id] %>',
   now(),
