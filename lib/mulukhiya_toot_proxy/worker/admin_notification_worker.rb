@@ -4,11 +4,13 @@ module MulukhiyaTootProxy
       @db.begin
       account = Mastodon.lookup_account(params['from_account_id'])
       @db.execute('notificatable_accounts', {id: account['id']}).each do |row|
-        update_timeline({
-          status_id: params['status_id'],
-          account_id: row['id'],
-          from_account_id: account['id'],
-        })
+        if @config['/handler/admin_notification/update_timeline']
+          update_timeline({
+            status_id: params['status_id'],
+            account_id: row['id'],
+            from_account_id: account['id'],
+          })
+        end
         next unless slack = connect_slack(row['id'])
         slack.say(create_message({account: account, status: params['status']}), :text)
       rescue Ginseng::ConfigError
