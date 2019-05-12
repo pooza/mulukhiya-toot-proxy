@@ -28,7 +28,6 @@ module MulukhiyaTootProxy
         account_id: params[:account_id],
       })
       @db.execute('insert_notification', {
-        activity_id: @db.execute('last_mention_seq').first['id'],
         activity_type: 'Mention',
         from_account_id: params[:from_account_id],
         account_id: params[:account_id],
