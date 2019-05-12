@@ -3,8 +3,7 @@ SELECT
   tokens.id,
   tokens.token,
   tokens.scopes,
-  accounts.id AS account_id,
-  apps.name AS apps_name
+  accounts.id AS account_id
 FROM oauth_access_tokens AS tokens
   INNER JOIN oauth_applications AS apps ON tokens.application_id=apps.id
   INNER JOIN users ON tokens.resource_owner_id=users.id
@@ -25,5 +24,6 @@ WHERE (accounts.domain IS NULL)
   <% end %>
 GROUP BY
   tokens.id,
-  accounts.id,
-  apps.name
+  accounts.id
+ORDER BY
+  tokens.created_at DESC
