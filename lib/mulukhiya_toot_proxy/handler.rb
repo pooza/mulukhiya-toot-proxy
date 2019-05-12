@@ -51,11 +51,13 @@ module MulukhiyaTootProxy
       return @config['/handler/default/timeout']
     end
 
-    def disabled?
+    def disable?
       return @config["/handler/#{underscore_name}/disable"]
     rescue Ginseng::ConfigError
       return false
     end
+
+    alias disabled? disable?
 
     def mastodon=(mastodon)
       @mastodon = mastodon
@@ -83,7 +85,7 @@ module MulukhiyaTootProxy
       results = params[:results] || ResultContainer.new
       all(params.merge({event: event})) do |handler|
         next unless handler.events.include?(event)
-        next if handler.disabled?
+        next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
           results.push(handler.result)
