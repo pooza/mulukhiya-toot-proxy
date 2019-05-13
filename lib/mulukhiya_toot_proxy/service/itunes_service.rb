@@ -8,8 +8,7 @@ module MulukhiyaTootProxy
     end
 
     def search(keyword, category)
-      response = @http.get(create_search_uri(keyword, category))
-      response = JSON.parse(response.strip)
+      response = JSON.parse(@http.get(create_search_uri(keyword, category)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
@@ -20,8 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def lookup(id)
-      response = @http.get(create_lookup_uri(id))
-      response = JSON.parse(response.strip)
+      response = JSON.parse(@http.get(create_lookup_uri(id)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first

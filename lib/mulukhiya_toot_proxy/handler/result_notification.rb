@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     def handle_post_toot(body, params = {})
       return unless @results.present?
       return unless notifiable?(body)
-      worker_name.constantize.perform_async({
+      ResultNotificationWorker.perform_async({
         id: @mastodon.account_id,
         token: @mastodon.token,
         results: @results,

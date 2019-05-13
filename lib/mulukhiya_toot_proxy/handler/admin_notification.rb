@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      worker_name.constantize.perform_async({
+      AdminNotificationWorker.perform_async({
         from_account_id: @mastodon.account_id,
         token: @mastodon.token,
         status: body['status'],
