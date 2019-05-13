@@ -160,13 +160,13 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.68.1)
+    rubocop (0.69.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.5, != 2.5.1.1)
+      parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.6)
+      unicode-display_width (>= 1.4.0, < 1.7)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.6.0)
@@ -207,7 +207,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.6)
     unicode (0.4.4.4)
-    unicode-display_width (1.5.0)
+    unicode-display_width (1.6.0)
 
 PLATFORMS
   ruby
