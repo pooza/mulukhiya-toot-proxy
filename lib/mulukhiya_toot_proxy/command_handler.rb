@@ -20,6 +20,8 @@ module MulukhiyaTootProxy
       return nil unless values&.is_a?(Hash)
       return nil unless values['command'] == command_name
       return values
+    rescue JSON::ParserError
+      return nil
     end
 
     def create_status(values)
