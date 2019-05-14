@@ -4,6 +4,13 @@ module MulukhiyaTootProxy
       @handler = Handler.create('growi_clipping_command')
     end
 
+    def test_parse
+      assert_nil(@handler.parse(''))
+      assert_nil(@handler.parse('123'))
+      assert_equal(@handler.parse('{"command": growi_clipping}'), {'command' => 'growi_clipping'})
+      assert_equal(@handler.parse('command: growi_clipping'), {'command' => 'growi_clipping'})
+    end
+
     def test_handle_post_toot
       @handler.clear
       @handler.handle_post_toot({'status' => ''})
