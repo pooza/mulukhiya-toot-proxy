@@ -11,6 +11,12 @@ module MulukhiyaTootProxy
       assert_equal(@handler.parse('command: webhook_url'), {'command' => 'webhook_url'})
     end
 
+    def test_create_status
+      values = YAML.safe_load(@handler.create_status({}))
+      assert(values['url'].present?)
+      assert(values['token'].present?)
+    end
+
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})
