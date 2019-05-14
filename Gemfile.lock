@@ -114,7 +114,7 @@ GEM
     minitest (5.11.3)
     multi_json (1.13.1)
     multi_xml (0.6.0)
-    multipart-post (2.1.0)
+    multipart-post (2.1.1)
     mustermann (1.0.3)
     naught (1.1.0)
     netrc (0.11.0)
