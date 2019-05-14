@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      MentionNotificationWorker.perform_async({
+      worker_class.perform_async({
         id: @mastodon.account_id,
         token: @mastodon.token,
         status: body['status'],
