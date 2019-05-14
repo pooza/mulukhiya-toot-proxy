@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
       return unless track = @tracks[keyword]
       push(track['trackName'])
       push(track['artistName'])
-      @tags.concat(ArtistParser.new(track['artistName']).parse)
+      @local_tags = ArtistParser.new(track['artistName']).parse
       return unless uri = @service.create_spotify_uri(track)
       push(uri.to_s)
     end
