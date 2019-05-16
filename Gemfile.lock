@@ -15,12 +15,13 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 45dcb317532e55facba8248ff6979a9fd635315e
+  revision: 351d06cbe529637f6deae6480f4831051e3ec29a
   specs:
-    ginseng-core (1.3.1)
+    ginseng-core (1.3.3)
       activesupport
       addressable
-      bundler (< 2.0)
+      bundler
+      csv
       daemon-spawn
       httparty
       rack-test
@@ -35,9 +36,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: d5294fe2649814ac167e7afd7b32abf5e96bf194
+  revision: e92a05c746359b512bfa384e4f796b646c235272
   specs:
-    ginseng-postgres (1.1.0)
+    ginseng-postgres (1.1.2)
       pg
 
 GIT
@@ -73,6 +74,7 @@ GEM
     buftok (0.2.0)
     concurrent-ruby (1.1.5)
     connection_pool (2.2.2)
+    csv (3.1.1)
     daemon-spawn (0.4.2)
     daemons (1.3.1)
     domain_name (0.5.20180417)
@@ -230,7 +232,7 @@ DEPENDENCIES
   unicode
 
 RUBY VERSION
-   ruby 2.5.5p157
+   ruby 2.6.3p62
 
 BUNDLED WITH
-   1.17.3
+   2.0.1
