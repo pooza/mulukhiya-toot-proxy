@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     attr_accessor :tags
     attr_accessor :results
     attr_reader :mastodon
-    attr_reader :user_config
+    attr_reader :webhook
     attr_reader :local_tags
 
     def handle_pre_toot(body, params = {})
@@ -60,10 +60,8 @@ module MulukhiyaTootProxy
 
     alias disabled? disable?
 
-    def mastodon=(mastodon)
-      @mastodon = mastodon
-      @user_config = UserConfigStorage.new[mastodon.account_id]
-      @webhook = nil
+    def user_config
+      return UserConfigStorage.new[mastodon.account_id]
     end
 
     def events
