@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
   class WebhookURLCommandHandler < CommandHandler
     def dispatch_command(values)
       raise Ginseng::RequestError, 'Invalid webhook' unless webhook&.uri
-      raise Ginseng::RequestError, 'Invalid webhook' unless webhook&.mastodon&.token
+      raise Ginseng::RequestError, 'Invalid token' unless webhook&.mastodon&.token
     end
 
     def create_status(values)
