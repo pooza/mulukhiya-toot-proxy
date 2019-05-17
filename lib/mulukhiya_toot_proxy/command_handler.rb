@@ -20,6 +20,8 @@ module MulukhiyaTootProxy
       return nil unless values&.is_a?(Hash)
       return nil unless values['command'] == command_name
       return values
+    rescue Psych::SyntaxError
+      return nil
     rescue JSON::ParserError
       return nil
     end
