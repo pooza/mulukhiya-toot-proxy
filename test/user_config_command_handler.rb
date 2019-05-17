@@ -7,6 +7,18 @@ module MulukhiyaTootProxy
       @key = SecureRandom.hex(16)
     end
 
+    def test_parse
+      assert_nil(@handler.parse(''))
+      assert_nil(@handler.parse('123'))
+      assert_equal(@handler.parse('{"command": user_config}'), {'command' => 'user_config'})
+      assert_equal(@handler.parse('command: user_config'), {'command' => 'user_config'})
+    end
+
+    def test_create_status
+      values = YAML.safe_load(@handler.create_status({}))
+      assert(values['webhook']['url'].present?)
+    end
+
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})

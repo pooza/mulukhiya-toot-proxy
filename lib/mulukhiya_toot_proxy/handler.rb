@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
     attr_accessor :results
     attr_reader :mastodon
     attr_reader :user_config
+    attr_reader :local_tags
 
     def handle_pre_toot(body, params = {})
       return nil
@@ -82,13 +83,15 @@ module MulukhiyaTootProxy
     end
 
     def self.exec_all(event, body, params = {})
-      results = params[:results] || ResultContainer.new
+      params[:results] ||= ResultContainer.new
+      params[:tags] ||= TagContainer.new
       all(params.merge({event: event})) do |handler|
         next unless handler.events.include?(event)
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
-          results.push(handler.result)
+          params[:results].push(handler.result)
+          params[:tags].concat(handler.local_tags)
         end
       rescue Timeout::Error => e
         Logger.new.error(e)
@@ -98,7 +101,7 @@ module MulukhiyaTootProxy
       rescue HTTParty::Error => e
         raise Ginseng::GatewayError, e.message
       end
-      return results
+      return params[:results]
     end
 
     private
@@ -107,11 +110,11 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @logger = Logger.new
       @result = []
+      @local_tags = []
       @mastodon = params[:mastodon] || Mastodon.new
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'
-      clear
     end
 
     def webhook

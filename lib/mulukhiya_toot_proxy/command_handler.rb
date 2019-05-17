@@ -8,45 +8,24 @@ module MulukhiyaTootProxy
     end
 
     def handle_pre_toot(body, params = {})
-      handle(body, params)
-    end
-
-    def handle_post_toot(body, params = {})
-      handle(body, params)
-    end
-
-    def handle(body, params = {})
-      return if body['status'] =~ /^[[:digit:]]+$/
-      values = {}
-      [:parse_yaml, :parse_json].each do |method|
-        break if values = send(method, body['status'])
-      rescue => e
-        @logger.error(e)
-        next
-      end
-      return unless values.present?
-      return unless values.is_a?(Hash)
-      return unless values['command'] == command_name
+      return nil unless values = parse(body['status'])
       dispatch_command(values)
       body['visibility'] = 'direct'
       body['status'] = create_status(values)
       @result.push(values)
     end
 
+    def parse(status)
+      values = YAML.safe_load(status) || JSON.parse(status)
+      return nil unless values&.is_a?(Hash)
+      return nil unless values['command'] == command_name
+      return values
+    rescue JSON::ParserError
+      return nil
+    end
+
     def create_status(values)
       return YAML.dump(values)
-    end
-
-    def parse_yaml(body)
-      return YAML.safe_load(body)
-    rescue
-      return nil
-    end
-
-    def parse_json(body)
-      return JSON.parse(body)
-    rescue
-      return nil
     end
 
     def dispatch_command(values)

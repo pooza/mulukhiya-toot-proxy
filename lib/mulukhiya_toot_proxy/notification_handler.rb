@@ -6,18 +6,8 @@ module MulukhiyaTootProxy
 
     alias executable? notifiable?
 
-    def handle_post_toot(body, params = {})
-      return unless notifiable?(body)
-      worker_name.constantize.perform_async({
-        id: @mastodon.account_id,
-        token: @mastodon.token,
-        status: body['status'],
-      })
-      @result.push(true)
-    end
-
-    def worker_name
-      return self.class.to_s.sub(/Handler$/, 'Worker')
+    def worker_class
+      return self.class.to_s.sub(/Handler$/, 'Worker').constantize
     end
 
     def events

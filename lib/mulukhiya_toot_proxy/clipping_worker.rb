@@ -12,12 +12,12 @@ module MulukhiyaTootProxy
 
     private
 
-    def clipper_name
-      return self.class.to_s.sub(/ClippingWorker$/, 'Clipper')
+    def clipper_class
+      return self.class.to_s.sub(/ClippingWorker$/, 'Clipper').constantize
     end
 
     def create_clipper(account_id)
-      return clipper_name.constantize.create({
+      return clipper_class.create({
         account_id: account_id,
       })
     end

@@ -15,12 +15,13 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 7183618aaa122f3522bf83f96f3feb70b236080a
+  revision: 351d06cbe529637f6deae6480f4831051e3ec29a
   specs:
-    ginseng-core (1.2.12)
+    ginseng-core (1.3.3)
       activesupport
       addressable
-      bundler (< 2.0)
+      bundler
+      csv
       daemon-spawn
       httparty
       rack-test
@@ -35,9 +36,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: fc873689fbb20ad1f902cef02c2f0894cd57b83b
+  revision: e92a05c746359b512bfa384e4f796b646c235272
   specs:
-    ginseng-postgres (1.0.11)
+    ginseng-postgres (1.1.2)
       pg
 
 GIT
@@ -73,6 +74,7 @@ GEM
     buftok (0.2.0)
     concurrent-ruby (1.1.5)
     connection_pool (2.2.2)
+    csv (3.1.1)
     daemon-spawn (0.4.2)
     daemons (1.3.1)
     domain_name (0.5.20180417)
@@ -114,7 +116,7 @@ GEM
     minitest (5.11.3)
     multi_json (1.13.1)
     multi_xml (0.6.0)
-    multipart-post (2.1.0)
+    multipart-post (2.1.1)
     mustermann (1.0.3)
     naught (1.1.0)
     netrc (0.11.0)
@@ -160,13 +162,13 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.68.1)
+    rubocop (0.69.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.5, != 2.5.1.1)
+      parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.6)
+      unicode-display_width (>= 1.4.0, < 1.7)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.10.0)
     rufus-scheduler (3.6.0)
@@ -207,7 +209,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.6)
     unicode (0.4.4.4)
-    unicode-display_width (1.5.0)
+    unicode-display_width (1.6.0)
 
 PLATFORMS
   ruby
@@ -230,7 +232,7 @@ DEPENDENCIES
   unicode
 
 RUBY VERSION
-   ruby 2.5.5p157
+   ruby 2.6.3p62
 
 BUNDLED WITH
-   1.17.3
+   2.0.1

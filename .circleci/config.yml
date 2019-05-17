@@ -2,13 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.5.5
+      - image: circleci/ruby:2.6.3
     working_directory: ~/repos
     steps:
       - checkout
       - run:
           name: install bundler
-          command: gem install bundler -v '<2'
+          command: gem install bundler
       - run:
           name: install dependencies
           command: bundle install

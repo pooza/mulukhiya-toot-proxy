@@ -8,8 +8,6 @@ module MulukhiyaTootProxy
       UserConfigStorage.new.update(id, values)
     end
 
-    private
-
     def create_status(values)
       v = JSON.parse(UserConfigStorage.new.get(mastodon.account_id)) || {}
       v['webhook'] ||= {}
