@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def concat(words)
-      words.map{|v| push(v)}
+      words.map{|v| push(v)} if words.is_a?(Array)
     end
 
     def body=(body)
