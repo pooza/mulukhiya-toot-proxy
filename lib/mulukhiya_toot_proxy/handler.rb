@@ -69,7 +69,7 @@ module MulukhiyaTootProxy
     end
 
     def self.all(params = {})
-      return enum_for(__method__) unless block_given?
+      return enum_for(__method__, params) unless block_given?
       Config.instance['/handler/all'].each do |v|
         yield create(v, params)
       end
