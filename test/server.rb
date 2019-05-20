@@ -67,18 +67,18 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
-      Webhook.owned_all(@account['username']) do |hook|
-        get hook.uri.path
-        assert(last_response.ok?)
+      hook = Webhook.owned_all(@account['username']).to_a.first
 
-        header 'Content-Type', 'application/json'
-        post hook.uri.path, {text: 'ひらめけ！ホーリーソード！'}.to_json
-        assert(last_response.ok?)
+      get hook.uri.path
+      assert(last_response.ok?)
 
-        header 'Content-Type', 'application/json'
-        post hook.uri.path, {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
-        assert(last_response.ok?)
-      end
+      header 'Content-Type', 'application/json'
+      post hook.uri.path, {text: 'ひらめけ！ホーリーソード！'}.to_json
+      assert(last_response.ok?)
+
+      header 'Content-Type', 'application/json'
+      post hook.uri.path, {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
+      assert(last_response.ok?)
     end
 
     def test_app_auth

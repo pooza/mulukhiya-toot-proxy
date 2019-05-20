@@ -42,9 +42,8 @@ module MulukhiyaTootProxy
     end
 
     def test_toot
-      Webhook.owned_all(@account['username']) do |hook|
-        assert_equal(hook.toot('木の水晶球').response.code, 200)
-      end
+      hook = Webhook.owned_all(@account['username']).to_a.first
+      assert_equal(hook.toot('木の水晶球').response.code, 200)
     end
   end
 end
