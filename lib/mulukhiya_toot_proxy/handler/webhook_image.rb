@@ -7,8 +7,8 @@ module MulukhiyaTootProxy
       body['media_ids'] ||= []
       return if body['media_ids'].present?
       body['attachments'].each do |f|
-        next unless uri = Addressable::URI.parse(f['image_url'])
-        next unless uri.absolute?
+        uri = Addressable::URI.parse(f['image_url'])
+        next unless uri&.absolute?
         body['media_ids'].push(@mastodon.upload_remote_resource(uri))
         @result.push(uri.to_s)
         break
