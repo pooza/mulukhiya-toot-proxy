@@ -89,9 +89,7 @@ module MulukhiyaTootProxy
       rescue Timeout::Error => e
         Logger.new.error(e)
         next
-      rescue RestClient::Exception => e
-        raise Ginseng::GatewayError, e.message
-      rescue HTTParty::Error => e
+      rescue RestClient::Exception, HTTParty::Error => e
         raise Ginseng::GatewayError, e.message
       end
       return params[:results]
