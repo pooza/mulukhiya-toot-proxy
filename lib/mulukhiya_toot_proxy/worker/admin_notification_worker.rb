@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
       rescue Ginseng::ConfigError
         next
       rescue => e
-        @logger.error(e)
+        @logger.error(Ginseng::Error.create(e).to_h.concat({row: row}))
         next
       end
       @db.commit
