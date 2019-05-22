@@ -98,6 +98,9 @@ itunes:
   patterns:
     - pattern: /album/.*?/([[:digit:]]+)$
       shortenable: true
+  hosts:
+    - music.apple.com
+    - itunes.apple.com
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos

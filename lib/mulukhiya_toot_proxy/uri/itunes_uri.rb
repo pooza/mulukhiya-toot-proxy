@@ -11,17 +11,13 @@ module MulukhiyaTootProxy
     end
 
     def itunes?
-      return absolute? && host == 'itunes.apple.com'
-    end
-
-    def apple?
-      return absolute? && host.match(/(^|\.)apple\.com$/).present?
+      return absolute? && @config['/itunes/hosts'].include?(host)
     end
 
     alias valid? itunes?
 
     def shortenable?
-      return false unless apple?
+      return false unless itunes?
       return false unless album_id.present?
       return false unless track_id.present?
       @config['/itunes/patterns'].each do |entry|
@@ -34,6 +30,7 @@ module MulukhiyaTootProxy
     def shorten
       return self unless shortenable?
       dest = clone
+      dest.host = @config['/itunes/hosts'].first
       dest.album_id = album_id
       dest.track_id = track_id
       dest.fragment = nil
