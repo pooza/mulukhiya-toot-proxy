@@ -11,6 +11,17 @@ module MulukhiyaTootProxy
       assert(uri.itunes?)
     end
 
+    def test_apple?
+      uri = ItunesURI.parse('https://google.com')
+      assert_false(uri.apple?)
+
+      uri = ItunesURI.parse('https://apple.com')
+      assert(uri.apple?)
+
+      uri = ItunesURI.parse('https://music.apple.com')
+      assert(uri.apple?)
+    end
+
     def test_album_id
       uri = ItunesURI.parse('https://itunes.apple.com')
       assert_nil(uri.album_id)
