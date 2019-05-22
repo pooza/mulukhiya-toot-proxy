@@ -35,6 +35,10 @@ module MulukhiyaTootProxy
 
     private
 
+    def create_key(word)
+      return Unicode.nfkc(word)
+    end
+
     def create_pattern(word)
       pattern = Unicode.nfkc(word).gsub(/[^[:alnum:]]/, '.? ?')
       [

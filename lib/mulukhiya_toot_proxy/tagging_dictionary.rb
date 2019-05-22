@@ -11,9 +11,9 @@ module MulukhiyaTootProxy
       values.each do |k, v|
         self[k] ||= v
         self[k][:words] ||= []
-        self[k][:words].concat(v[:words])
+        self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        @logger.error(e)
+        @logger.error(Ginseng::Error.create(e).to_h.concat({k: k, v: v}))
         next
       end
       update(sort_by{|k, v| k.length}.to_h)
@@ -55,16 +55,18 @@ module MulukhiyaTootProxy
       result = {}
       resources do |resource|
         resource.parse.each do |k, v|
-          k = Unicode.nfkc(k)
           result[k] ||= v
           result[k][:words] ||= []
-          result[k][:words].concat(v[:words]) if v[:words]
+          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
         rescue => e
-          @logger.error(e)
+          @logger.error(Ginseng::Error.create(e).to_h.concat({
+            resource: {uri: resource.uri.to_s},
+            entry: {k: k, v: v},
+          }))
           next
         end
       rescue => e
-        @logger.error(e)
+        @logger.error(Ginseng::Error.create(e).to_h.concat({resource: {uri: resource.uri.to_s}}))
         next
       end
       return result.sort_by{|k, v| k.length}.to_h

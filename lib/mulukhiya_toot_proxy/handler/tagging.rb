@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
       rescue Ginseng::ConfigError
         next
       rescue => e
-        @logger.error(e)
+        @logger.error(Ginseng::Error.create(e).to_h.concat({media_id: id}))
         next
       end
       return tags
@@ -71,7 +71,7 @@ module MulukhiyaTootProxy
         line = lines.pop
         body = lines.join("\n")
         tags.body = body
-        line.split(/\s/).map{|v| tags.push(v)}
+        line.split(/\s+/).map{|v| tags.push(v)}
       end
       return [body, tags.to_s].join("\n")
     end

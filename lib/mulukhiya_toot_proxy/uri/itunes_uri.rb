@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     end
 
     def itunes?
-      return absolute? && host == 'itunes.apple.com'
+      return absolute? && @config['/itunes/hosts'].include?(host)
     end
 
     alias valid? itunes?
@@ -30,6 +30,7 @@ module MulukhiyaTootProxy
     def shorten
       return self unless shortenable?
       dest = clone
+      dest.host = @config['/itunes/hosts'].first
       dest.album_id = album_id
       dest.track_id = track_id
       dest.fragment = nil
@@ -46,7 +47,7 @@ module MulukhiyaTootProxy
     end
 
     def album_id=(id)
-      self.path = "/#{@config['/itunes/country']}/album//#{id}"
+      self.path = "/#{@config['/itunes/country']}/album/#{id}"
     end
 
     def track_id
@@ -75,7 +76,7 @@ module MulukhiyaTootProxy
       track = @service.lookup(track_id)
       raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
-        response = @http.get(track['trackViewUrl'])
+        response = @http.get(ItunesURI.parse(track['trackViewUrl']).shorten)
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
         elements = body.xpath('//picture/source')
         return nil unless elements.present?

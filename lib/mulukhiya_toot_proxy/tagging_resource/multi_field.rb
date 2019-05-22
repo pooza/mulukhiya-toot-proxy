@@ -4,12 +4,10 @@ module MulukhiyaTootProxy
       result = {}
       fetch.each do |entry|
         fields.each do |field|
-          result[entry[field]] ||= {pattern: create_pattern(entry[field])}
+          result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e
-        message = Ginseng::Error.create(e).to_h
-        message['resource'] = @params
-        @logger.error(message)
+        @logger.error(Ginseng::Error.create(e).to_h.concat({resource: @params}))
         next
       end
       return result

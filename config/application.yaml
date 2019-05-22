@@ -1,5 +1,5 @@
 package:
-  version: 2.3.2
+  version: 2.3.3
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -96,8 +96,11 @@ itunes:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
   patterns:
-    - pattern: /album/.*?/([[:digit:]]+)$
+    - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
+  hosts:
+    - music.apple.com
+    - itunes.apple.com
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos

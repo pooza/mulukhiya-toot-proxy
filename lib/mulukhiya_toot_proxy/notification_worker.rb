@@ -18,8 +18,7 @@ module MulukhiyaTootProxy
 
     def connect_slack(id)
       uri = Addressable::URI.parse(UserConfigStorage.new[id]['/slack/webhook'])
-      raise 'invalid URI' unless uri
-      raise 'invalid URI' unless uri.absolute?
+      raise 'invalid URI' unless uri&.absolute?
       return Slack.new(uri)
     rescue => e
       raise Ginseng::ConfigError, "Invalid webhook (#{e.message})"
