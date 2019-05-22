@@ -96,7 +96,7 @@ itunes:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
   patterns:
-    - pattern: /album/.*?/([[:digit:]]+)$
+    - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
   hosts:
     - music.apple.com

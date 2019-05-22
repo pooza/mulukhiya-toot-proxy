@@ -47,7 +47,7 @@ module MulukhiyaTootProxy
     end
 
     def album_id=(id)
-      self.path = "/#{@config['/itunes/country']}/album//#{id}"
+      self.path = "/#{@config['/itunes/country']}/album/#{id}"
     end
 
     def track_id
