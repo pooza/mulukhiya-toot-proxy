@@ -15,31 +15,37 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 351d06cbe529637f6deae6480f4831051e3ec29a
+  revision: b9c133bcaeb258996187d1f95f8e966b67c2e947
   specs:
-    ginseng-core (1.3.3)
+    ginseng-core (1.4.1)
       activesupport
       addressable
       bundler
       csv
       daemon-spawn
       httparty
-      rack-test
       rake
       rest-client
       rubocop
-      sass
-      sinatra
       syslog-logger
       test-unit
-      thin
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: e92a05c746359b512bfa384e4f796b646c235272
+  revision: 3aac7becbe6e5932fefe3512a948e1222e5b9314
   specs:
-    ginseng-postgres (1.1.2)
+    ginseng-postgres (1.1.3)
       pg
+
+GIT
+  remote: https://github.com/pooza/ginseng-web.git
+  revision: c53b04ff2cd26487ac7946c12ce6a517b0d39893
+  specs:
+    ginseng-web (1.0.0)
+      rack-test
+      sass
+      sinatra
+      thin
 
 GIT
   remote: https://github.com/pooza/twitter.git
@@ -105,7 +111,7 @@ GEM
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.2)
     json (2.2.0)
-    jwt (2.1.0)
+    jwt (2.2.1)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     mime-types (3.2.2)
@@ -138,7 +144,7 @@ GEM
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.4)
-    public_suffix (3.0.3)
+    public_suffix (3.1.0)
     raabro (1.1.6)
     rack (2.0.7)
     rack-protection (2.0.5)
@@ -150,7 +156,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
-    redis (4.1.1)
+    redis (4.1.2)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -161,14 +167,14 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.70.0)
+    rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
-    ruby-progressbar (1.10.0)
+    ruby-progressbar (1.10.1)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
     sass (3.7.4)
@@ -218,6 +224,7 @@ DEPENDENCIES
   dropbox-sdk-v2!
   ginseng-core!
   ginseng-postgres!
+  ginseng-web!
   nokogiri
   omniauth-oauth2 (~> 1.5)
   redis
@@ -233,4 +240,4 @@ RUBY VERSION
    ruby 2.6.3p62
 
 BUNDLED WITH
-   2.0.1
+   2.0.2

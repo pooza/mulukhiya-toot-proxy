@@ -9,8 +9,8 @@ FROM oauth_access_tokens AS tokens
   INNER JOIN users ON tokens.resource_owner_id=users.id
   INNER JOIN accounts ON accounts.id=users.account_id
 WHERE (accounts.domain IS NULL)
-  AND (accounts.silenced='f')
-  AND (accounts.suspended='f')
+  AND (accounts.silenced_at IS NULL)
+  AND (accounts.suspended_at IS NULL)
   AND (tokens.scopes ~ '(^|\s)(write:statuses|write)($|\s)')
   AND (users.disabled='f')
   AND (apps.name='mulukhiya-toot-proxy')

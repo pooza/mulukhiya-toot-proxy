@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class CSSRenderer < Ginseng::CSSRenderer
+  class CSSRenderer < Ginseng::Web::CSSRenderer
     include Package
   end
 end

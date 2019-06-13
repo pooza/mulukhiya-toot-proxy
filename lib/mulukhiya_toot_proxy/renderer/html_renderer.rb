@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class HTMLRenderer < Ginseng::HTMLRenderer
+  class HTMLRenderer < Ginseng::Web::HTMLRenderer
     include Package
   end
 end

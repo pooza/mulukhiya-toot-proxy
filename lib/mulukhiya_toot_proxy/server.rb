@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class Server < Ginseng::Sinatra
+  class Server < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
 
@@ -80,7 +80,7 @@ module MulukhiyaTootProxy
     end
 
     not_found do
-      @renderer = Ginseng::JSONRenderer.new
+      @renderer = Ginseng::Web::JSONRenderer.new
       @renderer.status = 404
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
@@ -89,7 +89,7 @@ module MulukhiyaTootProxy
     error do |e|
       e = Ginseng::Error.create(e)
       e.package = Package.full_name
-      @renderer = Ginseng::JSONRenderer.new
+      @renderer = Ginseng::Web::JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{|k, v| k == :backtrace}
       @renderer.message['error'] = e.message
