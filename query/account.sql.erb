@@ -10,7 +10,7 @@ SELECT
 FROM accounts
   INNER JOIN users ON accounts.id=users.account_id
 WHERE (accounts.domain IS NULL)
-  AND (accounts.silenced='f')
-  AND (accounts.suspended='f')
+  AND (accounts.silenced_at IS NULL)
+  AND (accounts.suspended_at IS NULL)
   AND (users.disabled='f')
   AND (accounts.id='<%= params[:id] %>')

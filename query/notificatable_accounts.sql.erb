@@ -16,8 +16,8 @@ FROM accounts
     WHERE target_account_id='<%= params[:id] %>'
   ) AS mute_accounts ON accounts.id=mute_accounts.id
 WHERE (accounts.domain IS NULL)
-  AND (accounts.silenced='f')
-  AND (accounts.suspended='f')
+  AND (accounts.silenced_at IS NULL)
+  AND (accounts.suspended_at IS NULL)
   AND (block_accounts.id IS NULL)
   AND (mute_accounts.id IS NULL)
   AND (users.disabled='f')
