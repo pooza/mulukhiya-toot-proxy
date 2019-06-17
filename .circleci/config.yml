@@ -16,6 +16,11 @@ jobs:
           name: run RuboCop
           command: bundle exec rubocop
       - run:
+          name: run rails-erb-lint
+          command: |
+            cd views
+            rails-erb-lint check -v
+      - run:
           name: update repository
           command: bundle exec rake repos:update
       - run:
