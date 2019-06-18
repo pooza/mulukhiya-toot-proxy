@@ -1,10 +1,13 @@
 module MulukhiyaTootProxy
   class YouTubeURLNowplayingHandlerTest < Test::Unit::TestCase
     def setup
+      return if ENV['CI'].present?
       @handler = Handler.create('you_tube_url_nowplaying')
     end
 
     def test_handle_pre_toot
+      return if ENV['CI'].present?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => "#nowplaying https://www.youtube.com\n"})
       assert_nil(@handler.result)

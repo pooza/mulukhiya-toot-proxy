@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_toot
+      return if ENV['CI'].present?
+
       @handler.clear
       @handler.handle_post_toot({'status' => Time.now.to_s})
       assert_nil(@handler.result)

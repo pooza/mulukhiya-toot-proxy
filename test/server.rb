@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
 
     def setup
       @config = Config.instance
+      return if ENV['CI'].present?
       @account = Mastodon.lookup_token_owner(@config['/test/token'])
     end
 
@@ -26,6 +27,8 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_length
+      return if ENV['CI'].present?
+
       header 'Authorization', "Bearer #{@config['/test/token']}"
       post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
       assert(last_response.ok?)
@@ -48,6 +51,8 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_zenkaku
+      return if ENV['CI'].present?
+
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '！!！!！'}.to_json
@@ -55,6 +60,8 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_response
+      return if ENV['CI'].present?
+
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@config['/test/token']}"
       header 'Content-Type', 'application/json'
@@ -67,6 +74,8 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
+      return if ENV['CI'].present?
+
       hook = Webhook.owned_all(@account['username']).to_a.first
 
       get hook.uri.path

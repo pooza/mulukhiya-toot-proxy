@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
+      return if ENV['CI'].present?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => "#nowplaying https://open.spotify.com/\n"})
       assert_nil(@handler.result)
