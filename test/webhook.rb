@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class WebhookTest < Test::Unit::TestCase
     def setup
       @config = Config.instance
+      return if ENV['CI'].present?
       @account = Mastodon.lookup_token_owner(@config['/test/token'])
     end
 
@@ -42,6 +43,7 @@ module MulukhiyaTootProxy
     end
 
     def test_toot
+      return if ENV['CI'].present?
       hook = Webhook.owned_all(@account['username']).to_a.first
       assert_equal(hook.toot('木の水晶球').response.code, 200)
     end
