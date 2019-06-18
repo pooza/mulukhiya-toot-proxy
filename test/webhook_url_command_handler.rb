@@ -12,6 +12,7 @@ module MulukhiyaTootProxy
     end
 
     def test_create_status
+      return if ENV['CI'].present?
       values = YAML.safe_load(@handler.create_status({}))
       assert(values['url'].present?)
       assert(values['token'].present?)
