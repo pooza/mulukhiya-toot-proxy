@@ -30,5 +30,5 @@ jobs:
           name: check repository
           command: bundle exec rake repos:check
       - run:
-          name: run text
+          name: run test
           command: CI=1 bundle exec rake test
