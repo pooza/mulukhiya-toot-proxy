@@ -126,7 +126,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
-    jaro_winkler (1.5.2)
+    jaro_winkler (1.5.3)
     json (2.2.0)
     jwt (2.2.1)
     loofah (2.2.3)
