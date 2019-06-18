@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class AmazonImageHandlerTest < Test::Unit::TestCase
     def setup
+      return if ENV['CI'].present?
       @handler = Handler.create('amazon_image')
     end
 

@@ -1,8 +1,9 @@
 module MulukhiyaTootProxy
   class AmazonASINHandlerTest < Test::Unit::TestCase
     def setup
-      @handler = Handler.create('amazon_asin')
       @config = Config.instance
+      @config['/test/token'] = 'hoge' if ENV['CI'].present?
+      @handler = Handler.create('amazon_asin')
     end
 
     def test_handle_pre_toot
