@@ -8,6 +8,8 @@ module MulukhiyaTootProxy
     end
 
     def test_spotify?
+      return if ENV['CI'].present?
+
       uri = SpotifyURI.parse('https://google.com')
       assert_false(uri.spotify?)
 
@@ -19,6 +21,8 @@ module MulukhiyaTootProxy
     end
 
     def test_track_id
+      return if ENV['CI'].present?
+
       uri = SpotifyURI.parse('https://open.spotify.com')
       assert_nil(uri.track_id)
 

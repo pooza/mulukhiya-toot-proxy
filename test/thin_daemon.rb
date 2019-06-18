@@ -9,6 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def test_child_pid
+      return if ENV['CI'].present?
       assert(@daemon.child_pid.is_a?(Integer))
     end
 
