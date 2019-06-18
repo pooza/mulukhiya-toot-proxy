@@ -91,6 +91,8 @@ module MulukhiyaTootProxy
     end
 
     def test_app_auth
+      return if ENV['CI'].present?
+
       get '/mulukhiya/app/auth'
       assert(last_response.ok?)
 
