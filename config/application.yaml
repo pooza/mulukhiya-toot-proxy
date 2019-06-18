@@ -5,6 +5,7 @@ package:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+instance_url: https://mstdn.example.com/
 handler:
   all:
     - shortened_url
