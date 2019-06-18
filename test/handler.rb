@@ -19,6 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def test_all
+      return if ENV['CI'].present?
       Handler.all do |handler|
         assert(handler.is_a?(Handler))
       end
