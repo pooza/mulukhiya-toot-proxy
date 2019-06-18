@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class SpotifyURLNowplayingHandlerTest < Test::Unit::TestCase
     def setup
+      return if ENV['CI'].present?
       @handler = Handler.create('spotify_url_nowplaying')
     end
 

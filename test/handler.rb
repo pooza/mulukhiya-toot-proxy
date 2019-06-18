@@ -26,8 +26,8 @@ module MulukhiyaTootProxy
     end
 
     def test_exec_all
-      return if Handler.create('spotify_url_nowplaying').disable?
       return if ENV['CI'].present?
+      return if Handler.create('spotify_url_nowplaying').disable?
       params = {}
       Handler.exec_all(
         :pre_toot,
