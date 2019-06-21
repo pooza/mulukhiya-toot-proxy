@@ -107,7 +107,7 @@ GEM
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     ffi (1.11.1)
-    fugit (1.2.1)
+    fugit (1.2.2)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
     gli (2.18.0)
