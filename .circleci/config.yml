@@ -3,6 +3,11 @@ jobs:
   build:
     docker:
       - image: circleci/ruby:2.6.3
+      - image: circleci/postgres:9.6.12
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: mastodon
+      - image: redis:4.0.14
     working_directory: ~/repos
     steps:
       - checkout
@@ -16,8 +21,14 @@ jobs:
           name: run RuboCop
           command: bundle exec rubocop
       - run:
+          name: run rails-erb-lint
+          command: bundle exec rake erb:check
+      - run:
           name: update repository
           command: bundle exec rake repos:update
       - run:
           name: check repository
           command: bundle exec rake repos:check
+      - run:
+          name: run test
+          command: CI=1 bundle exec rake test

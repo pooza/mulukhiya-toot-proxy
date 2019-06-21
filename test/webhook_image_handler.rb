@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_webhook
+      return if ENV['CI'].present?
+
       @handler.handle_pre_webhook({
         'status' => '武田信玄',
         'attachments' => [

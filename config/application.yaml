@@ -1,10 +1,11 @@
 package:
-  version: 2.3.4
+  version: 2.3.5
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+instance_url: https://mstdn.example.com/
 handler:
   all:
     - shortened_url
@@ -165,7 +166,7 @@ sidekiq:
     user: admin
     password: ''
 tagging:
-  always_default_tags: true
+  always_default_tags: false
   word:
     minimum_length: 3
   attachment_tags:
