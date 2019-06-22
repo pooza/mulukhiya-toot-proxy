@@ -49,7 +49,7 @@ module MulukhiyaTootProxy
       tags = []
       (body['media_ids'] || []).each do |id|
         type = Mastodon.lookup_attachment(id)['file_content_type']
-        ['video', 'image'].each do |mediatype|
+        ['video', 'image', 'audio'].each do |mediatype|
           if type.start_with?("#{mediatype}/")
             tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
             break

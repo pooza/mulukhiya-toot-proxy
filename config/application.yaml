@@ -1,5 +1,5 @@
 package:
-  version: 2.3.5
+  version: 2.3.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -172,6 +172,7 @@ tagging:
   attachment_tags:
     image: image
     video: video
+    audio: audio
   ignore_addresses:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
