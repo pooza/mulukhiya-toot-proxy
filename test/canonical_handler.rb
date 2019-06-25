@@ -26,6 +26,10 @@ module MulukhiyaTootProxy
       assert_nil(@handler.result)
 
       @handler.clear
+      @handler.handle_pre_toot({'status' => 'https://stats.uptimerobot.com/QOoGgF2Ak'})
+      assert_nil(@handler.result)
+
+      @handler.clear
       @handler.handle_pre_toot({'status' => 'https://www.apple.com/jp/apple-music/'})
       assert_equal(@handler.result[:entries], ['https://www.apple.com/jp/apple-music/'])
     end

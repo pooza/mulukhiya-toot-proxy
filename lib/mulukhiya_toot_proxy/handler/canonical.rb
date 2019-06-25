@@ -25,8 +25,10 @@ module MulukhiyaTootProxy
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
       uri = Addressable::URI.parse(elements.first.attribute('href'))
-      @canonicals[link] = uri.to_s if uri.absolute?
-      return @canonicals[link].present?
+      return false unless uri.absolute?
+      return false if uri.path == '/'
+      @canonicals[link] = uri.to_s
+      return true
     rescue => e
       @logger.error(e)
       return false
