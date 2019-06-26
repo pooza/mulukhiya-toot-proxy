@@ -1,5 +1,4 @@
 require 'rspotify'
-require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class SpotifyService
@@ -49,7 +48,7 @@ module MulukhiyaTootProxy
     end
 
     def create_image_uri(track)
-      uri = Addressable::URI.parse(track.album.images.first['url'])
+      uri = Ginseng::URI.parse(track.album.images.first['url'])
       return nil unless uri&.absolute?
       return uri
     end

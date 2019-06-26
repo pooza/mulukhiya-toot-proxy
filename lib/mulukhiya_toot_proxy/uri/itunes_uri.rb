@@ -1,8 +1,7 @@
-require 'addressable/uri'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class ItunesURI < Addressable::URI
+  class ItunesURI < Ginseng::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance
@@ -82,7 +81,7 @@ module MulukhiyaTootProxy
         return nil unless elements.present?
         elements.first.attribute('srcset').text.split(/,/).each do |uri|
           next unless matches = uri.match(/^(.*) +3x$/)
-          @image_uri = Addressable::URI.parse(matches[1])
+          @image_uri = Ginseng::URI.parse(matches[1])
           break if @image_uri&.absolute?
         end
       end

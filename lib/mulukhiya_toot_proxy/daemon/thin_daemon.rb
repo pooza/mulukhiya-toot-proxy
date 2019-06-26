@@ -1,5 +1,3 @@
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
   class ThinDaemon < Ginseng::Daemon
     include Package
@@ -26,7 +24,7 @@ module MulukhiyaTootProxy
 
     def root_uri
       unless @uri
-        @uri = Addressable::URI.new
+        @uri = Ginseng::URI.new
         @uri.host = Environment.hostname
         @uri.scheme = 'http'
         @uri.port = @config['/thin/port']

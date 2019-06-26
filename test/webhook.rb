@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
     def test_uri
       return if ENV['CI'].present?
       Webhook.all do |hook|
-        assert(hook.uri.is_a?(Addressable::URI))
+        assert(hook.uri.is_a?(Ginseng::URI))
       end
     end
 

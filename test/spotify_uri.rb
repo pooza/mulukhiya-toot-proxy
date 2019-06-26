@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       assert_nil(uri.image_uri)
 
       uri = SpotifyURI.parse('https://open.spotify.com/track/2j7bBkmzkl2Yz6oAsHozX0')
-      assert(uri.image_uri.is_a?(Addressable::URI))
+      assert(uri.image_uri.is_a?(Ginseng::URI))
     end
   end
 end

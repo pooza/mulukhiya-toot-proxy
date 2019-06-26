@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def test_root_uri
-      assert(@daemon.root_uri.is_a?(Addressable::URI))
+      assert(@daemon.root_uri.is_a?(Ginseng::URI))
     end
   end
 end

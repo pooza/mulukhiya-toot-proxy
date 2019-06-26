@@ -1,4 +1,3 @@
-require 'addressable/uri'
 require 'nokogiri'
 
 module MulukhiyaTootProxy
@@ -16,7 +15,7 @@ module MulukhiyaTootProxy
     private
 
     def rewritable?(link)
-      uri = Addressable::URI.parse(link)
+      uri = Ginseng::URI.parse(link)
       return false unless uri.path.present?
       return false if uri.path == '/'
       return false if uri.query_values.present?
@@ -24,7 +23,7 @@ module MulukhiyaTootProxy
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
-      uri = Addressable::URI.parse(elements.first.attribute('href'))
+      uri = Ginseng::URI.parse(elements.first.attribute('href'))
       return false unless uri.absolute?
       return false if uri.path == '/'
       @canonicals[link] = uri.to_s
