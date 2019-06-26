@@ -1,5 +1,4 @@
 require 'redis'
-require 'addressable/uri'
 
 module MulukhiyaTootProxy
   class Redis < ::Redis

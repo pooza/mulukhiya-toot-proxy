@@ -1,4 +1,3 @@
-require 'addressable/uri'
 require 'digest/sha1'
 require 'json'
 
@@ -20,7 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def uri
-      uri = Addressable::URI.parse(@config['/instance_url'])
+      uri = Ginseng::URI.parse(@config['/instance_url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
     end

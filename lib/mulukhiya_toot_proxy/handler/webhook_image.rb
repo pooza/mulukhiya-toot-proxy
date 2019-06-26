@@ -1,5 +1,3 @@
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
   class WebhookImageHandler < Handler
     def handle_pre_webhook(body, params = {})
@@ -7,7 +5,7 @@ module MulukhiyaTootProxy
       body['media_ids'] ||= []
       return if body['media_ids'].present?
       body['attachments'].each do |attachment|
-        uri = Addressable::URI.parse(attachment['image_url'])
+        uri = Ginseng::URI.parse(attachment['image_url'])
         next unless uri&.absolute?
         body['media_ids'].push(@mastodon.upload_remote_resource(uri))
         @result.push(uri.to_s)

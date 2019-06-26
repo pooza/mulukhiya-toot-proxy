@@ -1,7 +1,5 @@
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
-  class MastodonURI < Addressable::URI
+  class MastodonURI < Ginseng::URI
     def toot_id
       config = Config.instance
       config['/mastodon/patterns'].each do |pattern|

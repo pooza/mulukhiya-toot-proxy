@@ -1,5 +1,3 @@
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
   class NotificationWorker
     include Sidekiq::Worker
@@ -17,7 +15,7 @@ module MulukhiyaTootProxy
     private
 
     def connect_slack(id)
-      uri = Addressable::URI.parse(UserConfigStorage.new[id]['/slack/webhook'])
+      uri = Ginseng::URI.parse(UserConfigStorage.new[id]['/slack/webhook'])
       raise 'invalid URI' unless uri&.absolute?
       return Slack.new(uri)
     rescue => e

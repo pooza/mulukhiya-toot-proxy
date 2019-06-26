@@ -1,6 +1,5 @@
 require 'amazon/ecs'
 require 'nokogiri'
-require 'addressable/uri'
 require 'json'
 
 module MulukhiyaTootProxy
@@ -44,7 +43,7 @@ module MulukhiyaTootProxy
       ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
         next unless elements = html.xpath(%{id("#{id}")})
         json = JSON.parse(elements.first.attribute('data-a-dynamic-image').value)
-        next unless uri = Addressable::URI.parse(json.keys.first)
+        next unless uri = Ginseng::URI.parse(json.keys.first)
         return uri
       rescue
         next

@@ -1,7 +1,5 @@
-require 'addressable/uri'
-
 module MulukhiyaTootProxy
-  class TwitterURI < Addressable::URI
+  class TwitterURI < Ginseng::URI
     def initialize(options = {})
       super(options)
       @config = Config.instance

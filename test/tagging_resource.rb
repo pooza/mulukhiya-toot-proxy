@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
 
     def test_uri
       TaggingResource.all do |resource|
-        assert(resource.uri.is_a?(Addressable::URI))
+        assert(resource.uri.is_a?(Ginseng::URI))
       end
     end
 

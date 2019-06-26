@@ -1,4 +1,3 @@
-require 'addressable/uri'
 require 'unicode'
 
 module MulukhiyaTootProxy
@@ -16,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def uri
-      @uri ||= Addressable::URI.parse(@params['/url'])
+      @uri ||= Ginseng::URI.parse(@params['/url'])
       return @uri
     end
 

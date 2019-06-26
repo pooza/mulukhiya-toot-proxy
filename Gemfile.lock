@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b9c133bcaeb258996187d1f95f8e966b67c2e947
+  revision: d72778a549628ec44f03aa503653a7b381f1c104
   specs:
     ginseng-core (1.4.1)
       activesupport
@@ -164,7 +164,7 @@ GEM
       ast (~> 2.4.0)
     pg (1.1.4)
     power_assert (1.1.4)
-    public_suffix (3.1.0)
+    public_suffix (3.1.1)
     raabro (1.1.6)
     rack (2.0.7)
     rack-protection (2.0.5)
@@ -197,7 +197,7 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.71.0)
+    rubocop (0.72.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.6)
