@@ -110,7 +110,7 @@ GEM
     fugit (1.2.2)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
-    gli (2.18.0)
+    gli (2.18.1)
     hashie (3.6.0)
     http (4.1.1)
       addressable (~> 2.3)
