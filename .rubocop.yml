@@ -14,7 +14,7 @@ Style/DoubleNegation:
 Style/FormatStringToken:
   EnforcedStyle: template
 
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
 Layout/IndentFirstHashElement:
