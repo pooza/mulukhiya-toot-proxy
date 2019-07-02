@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
     private
 
     def ignore?(body)
-      return false if body['visibility'] == 'direct'
+      return true if body['visibility'] == 'direct'
       @config['/tagging/ignore_addresses'].each do |addr|
         return true if body['status'] =~ Regexp.new("(^|\s)#{addr}($|\s)")
       end
