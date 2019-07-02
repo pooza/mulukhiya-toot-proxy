@@ -32,16 +32,16 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 3aac7becbe6e5932fefe3512a948e1222e5b9314
+  revision: ca497a4ce76b32240bb7d94ee9675c0353a78ebc
   specs:
-    ginseng-postgres (1.1.3)
+    ginseng-postgres (1.1.4)
       pg
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: c53b04ff2cd26487ac7946c12ce6a517b0d39893
+  revision: bde813fbdd1d3c3d8d67907a99516b0c2fb35b9b
   specs:
-    ginseng-web (1.0.0)
+    ginseng-web (1.0.1)
       rack-test
       sass
       sinatra
