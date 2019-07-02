@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
-      return body if ignore?(body['status'])
+      return body if ignore?(body)
       @tags.body = body['status']
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
@@ -21,8 +21,9 @@ module MulukhiyaTootProxy
     private
 
     def ignore?(body)
+      return true if body['visibility'] == 'direct'
       @config['/tagging/ignore_addresses'].each do |addr|
-        return true if body =~ Regexp.new("(^|\s)#{addr}($|\s)")
+        return true if body['status'] =~ Regexp.new("(^|\s)#{addr}($|\s)")
       end
       return false
     end
@@ -40,7 +41,7 @@ module MulukhiyaTootProxy
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
-      text = [@tags.body.clone]
+      text = [@tags.body.clone.gsub(/@[-@.[:word:]]+/, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end

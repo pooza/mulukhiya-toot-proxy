@@ -16,6 +16,10 @@ module MulukhiyaTootProxy
           'url' => 'https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec',
           'type' => 'relative',
         },
+        {
+          'url' => 'https://script.google.com/macros/s/AKfycbxkcvrTTieJCeGotxlyENQ5vpS1RQnoLFzH3ti5UOHsuTFOfpE/exec',
+          'type' => 'relative',
+        },
       ]
       @config['/tagging/ignore_addresses'] = ['@pooza']
     end
@@ -80,6 +84,15 @@ module MulukhiyaTootProxy
       assert(tags.member?('西村ちなみ'))
     end
 
+    def test_handle_pre_toot_with_direct
+      @handler.clear
+      r = @handler.handle_pre_toot({
+        'status' => 'キュアソード',
+        'visibility' => 'direct',
+      })
+      assert_equal(r['status'], 'キュアソード')
+    end
+
     def test_handle_pre_toot_with_default_tag
       @config['/tagging/default_tags'] = ['美食丼']
       @config['/tagging/always_default_tags'] = true
@@ -105,6 +118,13 @@ module MulukhiyaTootProxy
       @handler.clear
       tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge', 'visibility' => 'unlisted'})['status'])
       assert_equal(tags.count, 0)
+
+      @handler.clear
+      r = @handler.handle_pre_toot({
+        'status' => '@pooza@mstdn.precure.fun',
+        'visibility' => 'private',
+      })
+      assert_equal(r['status'], '@pooza@mstdn.precure.fun')
     end
 
     def test_handle_pre_toot_with_poll
