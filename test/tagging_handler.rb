@@ -80,6 +80,15 @@ module MulukhiyaTootProxy
       assert(tags.member?('西村ちなみ'))
     end
 
+    def test_handle_pre_toot_with_direct
+      @handler.clear
+      r = @handler.handle_pre_toot({
+        'status' => 'キュアソード',
+        'visibility' => 'direct',
+      })
+      assert_equal(r['status'], 'キュアソード')
+    end
+
     def test_handle_pre_toot_with_default_tag
       @config['/tagging/default_tags'] = ['美食丼']
       @config['/tagging/always_default_tags'] = true
