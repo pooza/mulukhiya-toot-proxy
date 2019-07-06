@@ -51,8 +51,8 @@ module MulukhiyaTootProxy
         output = {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
+          items: (entry['items'] || []),
         }
-        output[:items] = entry['items'] || []
         yield output
       end
     end
