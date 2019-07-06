@@ -52,7 +52,10 @@ module MulukhiyaTootProxy
     end
 
     def disable?
-      return @config["/handler/#{underscore_name}/disable"]
+      return true if @user_config["/handler/#{underscore_name}/disable"]
+      return true if @user_config['/handler/default/disable']
+      return true if @config["/handler/#{underscore_name}/disable"]
+      return false
     rescue Ginseng::ConfigError
       return false
     end
@@ -103,6 +106,7 @@ module MulukhiyaTootProxy
       @result = []
       @local_tags = []
       @mastodon = params[:mastodon] || Mastodon.new
+      @user_config = UserConfigStorage.new[@mastodon.account_id]
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'

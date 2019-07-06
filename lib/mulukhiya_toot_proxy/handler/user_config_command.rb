@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class UserConfigCommandHandler < CommandHandler
+    def disable?
+      return false
+    end
+
     def dispatch_command(values)
       raise Ginseng::GatewayError, 'Invalid access token' unless id = mastodon.account_id
       UserConfigStorage.new.update(id, values)

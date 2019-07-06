@@ -1,10 +1,13 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
+    def disable?
+      return false unless @user_config["/handler/#{underscore_name}/disable"]
+      return false unless @user_config['/handler/default/disable']
+      return super
+    end
+
     def notifiable?(body)
-      return UserConfigStorage.new[@mastodon.account_id]['/result/enable']
-    rescue => e
-      @logger.error(e)
-      return false
+      return true
     end
 
     def handle_post_toot(body, params = {})

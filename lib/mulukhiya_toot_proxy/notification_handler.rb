@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def notifiable?(body)
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return false
     end
 
     alias executable? notifiable?
