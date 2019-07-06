@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if ENV['CI'].present?
+      return if Environment.ci?
       @handler.handle_pre_toot({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})
       assert_equal(@handler.result[:entries], ['#五條真由美 ガンバランス de ダンス'])
     end

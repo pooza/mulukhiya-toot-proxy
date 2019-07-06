@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if ENV['CI'].present?
+      return if Environment.ci?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://itunes.apple.com/lookup?id=1241907142&lang=ja_jp'})
