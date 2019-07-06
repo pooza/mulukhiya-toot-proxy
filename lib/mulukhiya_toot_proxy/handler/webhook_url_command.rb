@@ -1,5 +1,3 @@
-require 'yaml'
-
 module MulukhiyaTootProxy
   class WebhookURLCommandHandler < CommandHandler
     def dispatch_command(values)

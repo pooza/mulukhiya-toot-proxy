@@ -1,5 +1,3 @@
-require 'json'
-
 module MulukhiyaTootProxy
   class UserConfigStorage < Redis
     def [](key)

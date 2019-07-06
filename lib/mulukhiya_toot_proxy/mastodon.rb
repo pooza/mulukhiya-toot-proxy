@@ -1,5 +1,3 @@
-require 'json'
-
 module MulukhiyaTootProxy
   class Mastodon < Ginseng::Mastodon
     include Package

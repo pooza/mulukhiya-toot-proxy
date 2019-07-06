@@ -1,5 +1,4 @@
 require 'rack/test'
-require 'json'
 
 module MulukhiyaTootProxy
   class ServerTest < Test::Unit::TestCase

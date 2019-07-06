@@ -1,5 +1,3 @@
-require 'yaml'
-
 module MulukhiyaTootProxy
   class ResultNotificationWorker < NotificationWorker
     sidekiq_options retry: false

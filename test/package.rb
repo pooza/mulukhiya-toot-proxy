@@ -1,5 +1,3 @@
-require 'yaml'
-
 module MulukhiyaTootProxy
   class PackageTest < Test::Unit::TestCase
     def setup

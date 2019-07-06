@@ -1,6 +1,3 @@
-require 'json'
-require 'yaml'
-
 module MulukhiyaTootProxy
   class UserConfigCommandHandler < CommandHandler
     def dispatch_command(values)
