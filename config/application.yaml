@@ -23,12 +23,10 @@ handler:
     - itunes_image
     - tagging
     - user_config_command
-    - growi_clipping
     - growi_clipping_command
     - dropbox_clipping_command
     - webhook_url_command
   post_toot:
-    - dropbox_clipping
     - growi_clipping_command
     - dropbox_clipping_command
     - admin_notification
@@ -52,12 +50,10 @@ handler:
     - webhook_image
     - tagging
     - user_config_command
-    - growi_clipping
     - growi_clipping_command
     - dropbox_clipping_command
     - webhook_url_command
   post_webhook:
-    - dropbox_clipping
     - growi_clipping_command
     - dropbox_clipping_command
     - admin_notification
