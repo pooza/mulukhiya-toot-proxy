@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     def setup
       @config = Config.instance
       return if Environment.ci?
-      @account = Mastodon.lookup_token_owner(@config['/test/token'])
+      @account = Account.new({token: @config['/test/token']})
     end
 
     def app
@@ -75,7 +75,7 @@ module MulukhiyaTootProxy
     def test_hook_toot
       return if Environment.ci?
 
-      hook = Webhook.owned_all(@account['username']).to_a.first
+      hook = Webhook.owned_all(@account.username).to_a.first
 
       get hook.uri.path
       assert(last_response.ok?)

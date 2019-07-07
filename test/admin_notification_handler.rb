@@ -4,9 +4,9 @@ module MulukhiyaTootProxy
       return if Environment.ci?
       @handler = Handler.create('admin_notification')
       @config = Config.instance
-      @account = Mastodon.lookup_token_owner(@config['/test/token'])
+      @account = Account.new({token: @config['/test/token']})
       @params = {results: ResultContainer.new}
-      @params[:results].response = {'id' => @account['id']}
+      @params[:results].response = {'id' => @account.id}
     end
 
     def test_handle_post_toot
