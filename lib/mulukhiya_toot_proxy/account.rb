@@ -1,7 +1,5 @@
 module MulukhiyaTootProxy
   class Account
-    attr_reader :token
-
     def initialize(key)
       if @token = key[:token]
         @params = Mastodon.lookup_token_owner(@token)
