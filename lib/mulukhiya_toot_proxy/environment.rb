@@ -4,6 +4,12 @@ module MulukhiyaTootProxy
       return File.basename(dir)
     end
 
+    def self.ci?
+      return ENV['CI'].present?
+    rescue
+      return false
+    end
+
     def self.dir
       return File.expand_path('../..', __dir__)
     end
