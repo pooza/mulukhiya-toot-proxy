@@ -1,8 +1,7 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
     def disable?
-      return false unless @user_config["/handler/#{underscore_name}/disable"]
-      return false unless @user_config['/handler/default/disable']
+      return true if @user_config["/handler/#{underscore_name}/disable"].nil?
       return super
     end
 
