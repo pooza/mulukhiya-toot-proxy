@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def self.dsn
-      return RedisDSN.parse(Config.instance['/redis/dsn'])
+      return RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
     end
   end
 end

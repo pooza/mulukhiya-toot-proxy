@@ -47,7 +47,7 @@ module MulukhiyaTootProxy
 
     def patterns
       return enum_for(__method__) unless block_given?
-      @config['/nowplaying/artist_parser/patterns'].each do |entry|
+      @config['/artist_parser/patterns'].each do |entry|
         output = {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
     end
 
     def delimiters
-      return Regexp.new("[#{Config.instance['/nowplaying/artist_parser/delimiters'].join}]")
+      return Regexp.new("[#{Config.instance['/artist_parser/delimiters'].join}]")
     end
   end
 end

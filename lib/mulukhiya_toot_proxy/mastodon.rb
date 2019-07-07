@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     def initialize(uri = nil, token = nil)
       @config = Config.instance
       @logger = Logger.new
-      uri ||= @config['/instance_url']
+      uri ||= @config['/mastodon/url']
       token ||= @config['/test/token']
       super
       @uri = MastodonURI.parse(uri)

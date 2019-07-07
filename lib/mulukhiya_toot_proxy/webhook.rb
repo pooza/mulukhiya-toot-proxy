@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def uri
-      uri = Ginseng::URI.parse(@config['/instance_url'])
+      uri = Ginseng::URI.parse(@config['/mastodon/url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
     end

@@ -1,11 +1,10 @@
 package:
-  version: 2.3.9
+  version: 3.0.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
-instance_url: https://mstdn.example.com/
 handler:
   all:
     - shortened_url
@@ -50,6 +49,7 @@ shortened_url:
     - spoti.fi
     - apple.co
 mastodon:
+  url: https://mstdn.example.com/
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -107,59 +107,59 @@ itunes:
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
-nowplaying:
-  artist_parser:
-    delimiters:
-      - /
-      - 、
-    patterns:
-      - pattern: ^[^():]+、
-        delimited: true
-      - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
-        delimited: true
-      - pattern: '^(.+\s*\(.+\)、?){2,}$'
-        delimited: true
-      - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
-        items:
-          - drop: true
-          - drop: true
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'CV:'
-      - pattern: '^歌:(.+)\s*コーラス:(.+)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'コーラス:'
-      - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'コーラス:'
-      - pattern: '^(.+)\s*\(as\s*(.+)\)$'
-        items:
-          - strip: true
-            prefix: 'CV:'
-          - split: true
-      - pattern: '^(.+)\s*\((.+)\)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-      - pattern: '^(.+)\s*feat\.\s*(.+)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: feat.
-redis:
-  dsn: redis://localhost:6379/1
+artist_parser:
+  delimiters:
+    - /
+    - 、
+  patterns:
+    - pattern: ^[^():]+、
+      delimited: true
+    - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
+      delimited: true
+    - pattern: '^(.+\s*\(.+\)、?){2,}$'
+      delimited: true
+    - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
+      items:
+        - drop: true
+        - drop: true
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'CV:'
+    - pattern: '^歌:(.+)\s*コーラス:(.+)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'コーラス:'
+    - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'コーラス:'
+    - pattern: '^(.+)\s*\(as\s*(.+)\)$'
+      items:
+        - strip: true
+          prefix: 'CV:'
+        - split: true
+    - pattern: '^(.+)\s*\((.+)\)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+    - pattern: '^(.+)\s*feat\.\s*(.+)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: feat.
+user_config:
+  redis:
+    dsn: redis://localhost:6379/1
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
-slack:
+alert:
   hooks: []
 sidekiq:
   redis:
