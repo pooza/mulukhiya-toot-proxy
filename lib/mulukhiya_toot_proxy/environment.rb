@@ -4,12 +4,6 @@ module MulukhiyaTootProxy
       return File.basename(dir)
     end
 
-    def self.circleci?
-      return ENV['CIRCLECI'].present?
-    rescue
-      return false
-    end
-
     def self.dir
       return File.expand_path('../..', __dir__)
     end

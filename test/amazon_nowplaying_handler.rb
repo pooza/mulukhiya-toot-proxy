@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return unless AmazonService.accesskey?
-      return if Environment.circleci?
+      return if Environment.ci?
       @handler.clear
       @handler.handle_pre_toot({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})
       assert(@handler.result[:entries].present?)

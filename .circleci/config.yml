@@ -31,4 +31,4 @@ jobs:
           command: bundle exec rake repos:check
       - run:
           name: run test
-          command: bundle exec rake test
+          command: CI=1 bundle exec rake test

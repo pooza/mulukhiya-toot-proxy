@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class AmazonASINHandlerTest < Test::Unit::TestCase
     def setup
       @config = Config.instance
-      @config['/test/token'] = 'hoge' if Environment.circleci?
+      @config['/test/token'] = 'hoge' if Environment.ci?
       @handler = Handler.create('amazon_asin')
     end
 
