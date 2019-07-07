@@ -15,9 +15,5 @@ module MulukhiyaTootProxy
         next
       end
     end
-
-    def events
-      return [:pre_webhook]
-    end
   end
 end

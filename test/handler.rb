@@ -18,13 +18,6 @@ module MulukhiyaTootProxy
       ]
     end
 
-    def test_all
-      return if Environment.ci?
-      Handler.all do |handler|
-        assert(handler.is_a?(Handler))
-      end
-    end
-
     def test_exec_all
       return if Environment.ci?
       return if Handler.create('spotify_url_nowplaying').disable?

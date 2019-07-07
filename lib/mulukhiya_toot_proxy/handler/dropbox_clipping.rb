@@ -8,9 +8,5 @@ module MulukhiyaTootProxy
       })
       @result.push(true)
     end
-
-    def events
-      return [:post_toot, :post_webhook]
-    end
   end
 end
