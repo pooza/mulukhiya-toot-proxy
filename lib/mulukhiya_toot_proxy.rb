@@ -66,7 +66,6 @@ module MulukhiyaTootProxy
     autoload :AmazonService
     autoload :ItunesService
     autoload :SpotifyService
-    autoload :TwitterService
     autoload :YouTubeService
   end
 
@@ -75,7 +74,6 @@ module MulukhiyaTootProxy
     autoload :ItunesURI
     autoload :MastodonURI
     autoload :SpotifyURI
-    autoload :TwitterURI
     autoload :VideoURI
   end
 

@@ -89,9 +89,6 @@ spotify:
     track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
-twitter:
-  patterns:
-    tweet: ^/(.+?)/status/([[:digit:]]+)
 itunes:
   country: jp
   lang: ja_jp
