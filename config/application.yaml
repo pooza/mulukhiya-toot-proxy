@@ -187,7 +187,7 @@ user_config:
     dsn: redis://localhost:6379/1
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
-alert:
+slack:
   hooks: []
 sidekiq:
   redis:
