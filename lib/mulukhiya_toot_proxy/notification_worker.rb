@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
 
     def create_message(params)
       template = Template.new('notification')
-      template[:account] = params[:account]
+      template[:account] = params[:account].to_h
       template[:status] = params[:status]
       return template.to_s
     end

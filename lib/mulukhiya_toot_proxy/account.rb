@@ -1,15 +1,17 @@
 module MulukhiyaTootProxy
   class Account
     def initialize(key)
+      @logger = Logger.new
       if @token = key[:token]
-        @params = Mastodon.lookup_token_owner(@token).with_indifferent_access
+        @params = Mastodon.lookup_token_owner(@token)&.with_indifferent_access
       elsif key[:id]
-        @params = Mastodon.lookup_account(key[:id]).with_indifferent_access
+        @params = Mastodon.lookup_account(key[:id])&.with_indifferent_access
       end
+      @params ||= {}
     end
 
     def id
-      return self[:id]
+      return self[:id].to_i
     end
 
     def username
@@ -20,6 +22,10 @@ module MulukhiyaTootProxy
       return self[:display_name]
     end
 
+    def to_h
+      return @params.clone
+    end
+
     def [](key)
       return @params[key]
     end
@@ -27,11 +33,17 @@ module MulukhiyaTootProxy
     def config
       @config ||= UserConfigStorage.new[id]
       return @config
+    rescue => e
+      @logger.error(e)
+      return {}
     end
 
     def webhook
       @webhook ||= Webhook.new(config)
       return @webhook
+    rescue => e
+      @logger.error(e)
+      return nil
     end
 
     def admin?
