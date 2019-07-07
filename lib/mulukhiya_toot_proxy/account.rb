@@ -3,9 +3,8 @@ module MulukhiyaTootProxy
     attr_reader :token
 
     def initialize(key)
-      if key[:token]
-        @params = Mastodon.lookup_token_owner(key[:token])
-        @token = key[:token]
+      if @token = key[:token]
+        @params = Mastodon.lookup_token_owner(@token)
       elsif key[:id]
         @params = Mastodon.lookup_account(key[:id])
       end
