@@ -1,5 +1,3 @@
-require 'json'
-
 module MulukhiyaTootProxy
   class Mastodon < Ginseng::Mastodon
     include Package
@@ -7,6 +5,7 @@ module MulukhiyaTootProxy
 
     def initialize(uri = nil, token = nil)
       @config = Config.instance
+      @logger = Logger.new
       uri ||= @config['/instance_url']
       token ||= @config['/test/token']
       super
@@ -16,6 +15,9 @@ module MulukhiyaTootProxy
 
     def account_id
       return account['id'].to_i
+    rescue => e
+      @logger.error(e)
+      return nil
     end
 
     def account

@@ -1,6 +1,5 @@
 require 'amazon/ecs'
 require 'nokogiri'
-require 'json'
 
 module MulukhiyaTootProxy
   class AmazonService

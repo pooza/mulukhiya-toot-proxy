@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if ENV['CI'].present?
+      return if Environment.ci?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => Time.now.to_s})

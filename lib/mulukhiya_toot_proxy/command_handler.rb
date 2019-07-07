@@ -1,6 +1,3 @@
-require 'yaml'
-require 'json'
-
 module MulukhiyaTootProxy
   class CommandHandler < Handler
     def command_name
