@@ -5,9 +5,6 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(dir, 'Gemfile')
 require 'bundler/setup'
 require 'mulukhiya_toot_proxy'
 
-desc 'test all'
-task test: 'mulukhiya:test'
-
 [:start, :stop, :restart].each do |action|
   desc "#{action} all"
   task action => ["mulukhiya:thin:#{action}", "mulukhiya:sidekiq:#{action}"]
