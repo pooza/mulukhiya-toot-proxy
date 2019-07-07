@@ -66,17 +66,12 @@ module MulukhiyaTootProxy
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
     end
 
-    def self.all(event, params = {})
-      return enum_for(__method__, params) unless block_given?
-      Config.instance["/handler/#{event}"].each do |v|
-        yield create(v, params)
-      end
-    end
-
     def self.exec_all(event, body, params = {})
+      params[:event] = event
       params[:results] ||= ResultContainer.new
       params[:tags] ||= TagContainer.new
-      all(event, params.merge({event: event})) do |handler|
+      Config.instance["/handler/#{event}"].each do |v|
+        handler = create(v, params)
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
