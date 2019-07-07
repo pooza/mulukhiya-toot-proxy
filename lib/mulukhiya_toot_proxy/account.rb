@@ -38,10 +38,10 @@ module MulukhiyaTootProxy
       return @params['locked'] == 't'
     end
 
-    def enable?(handler_name)
-      return false if config["/handler/#{handler_name}/disable"]
-      return false if config['/handler/default/disable']
-      return true
+    def disable?(handler_name)
+      return true if config["/handler/#{handler_name}/disable"]
+      return true if config['/handler/default/disable']
+      return false
     end
   end
 end

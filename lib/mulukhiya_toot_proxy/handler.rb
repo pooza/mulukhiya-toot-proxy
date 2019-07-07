@@ -52,7 +52,7 @@ module MulukhiyaTootProxy
     end
 
     def disable?
-      return true if mastodon.account.enable?(underscore_name)
+      return true if mastodon.account.disable?(underscore_name)
       return true if @config["/handler/#{underscore_name}/disable"]
       return false
     rescue Ginseng::ConfigError
