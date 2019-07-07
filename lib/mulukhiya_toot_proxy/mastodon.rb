@@ -14,6 +14,9 @@ module MulukhiyaTootProxy
 
     def account_id
       return account['id'].to_i
+    rescue => e
+      @logger.error(e)
+      return nil
     end
 
     def account
