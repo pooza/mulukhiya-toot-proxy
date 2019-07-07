@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return if Environment.circleci?
       @handler = Handler.create('admin_notification')
       @config = Config.instance
       @account = Mastodon.lookup_token_owner(@config['/test/token'])
@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_toot
-      return if Environment.ci?
+      return if Environment.circleci?
 
       @handler.clear
       @handler.handle_post_toot({'status' => 'ふつうのトゥート。'}, @params)

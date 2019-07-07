@@ -15,13 +15,13 @@ module MulukhiyaTootProxy
     end
 
     def test_create_status
-      return if Environment.ci?
+      return if Environment.circleci?
       values = YAML.safe_load(@handler.create_status({}))
       assert(values['webhook']['url'].present?)
     end
 
     def test_handle_pre_toot
-      return if Environment.ci?
+      return if Environment.circleci?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})

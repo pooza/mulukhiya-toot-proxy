@@ -1,14 +1,14 @@
 module MulukhiyaTootProxy
   class MentionNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return if Environment.circleci?
       @config = Config.instance
       @handler = Handler.create('mention_notification')
       @account = Mastodon.lookup_token_owner(@config['/test/token'])
     end
 
     def test_handle_post_toot
-      return if Environment.ci?
+      return if Environment.circleci?
 
       @handler.clear
       @handler.handle_post_toot({'status' => 'ふつうのトゥート。'})

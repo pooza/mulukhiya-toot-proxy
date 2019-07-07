@@ -4,9 +4,8 @@ module MulukhiyaTootProxy
       return File.basename(dir)
     end
 
-    def self.ci?
-      pp ENV
-      return ENV['CI'].present?
+    def self.circleci?
+      return ENV['CIRCLECI'].present?
     rescue
       return false
     end
