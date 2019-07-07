@@ -5,6 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def self.ci?
+      pp ENV
       return ENV['CI'].present?
     rescue
       return false
