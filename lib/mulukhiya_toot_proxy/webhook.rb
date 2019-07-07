@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
     def exist?
       return @db.execute('webhook_tokens', {
         token: @mastodon.token,
-        owner: @mastodon.account_id,
+        owner: @mastodon.account.id,
       }).present?
     rescue => e
       @logger.error(e)
@@ -66,7 +66,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Webhook.new(UserConfigStorage.new[webhook.mastodon.account_id])
+        return Account.new({id: webhook.mastodon.account.id}).webhook
       end
       return nil
     end

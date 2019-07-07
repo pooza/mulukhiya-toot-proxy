@@ -52,8 +52,7 @@ module MulukhiyaTootProxy
     end
 
     def disable?
-      return true if @user_config["/handler/#{underscore_name}/disable"]
-      return true if @user_config['/handler/default/disable']
+      return true if mastodon.account.enable?(underscore_name)
       return true if @config["/handler/#{underscore_name}/disable"]
       return false
     rescue Ginseng::ConfigError
@@ -101,19 +100,14 @@ module MulukhiyaTootProxy
       @result = []
       @local_tags = []
       @mastodon = params[:mastodon] || Mastodon.new
-      @user_config = UserConfigStorage.new[@mastodon.account_id]
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'
     end
 
-    def user_config
-      return UserConfigStorage.new[mastodon.account_id]
-    end
-
     def webhook
       unless @webhook
-        @webhook = Webhook.new(user_config)
+        @webhook = mastodon.account.webhook
         return nil unless @webhook.exist?
       end
       return @webhook

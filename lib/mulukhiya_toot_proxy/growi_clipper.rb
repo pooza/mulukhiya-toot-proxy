@@ -11,10 +11,10 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      user_config = UserConfigStorage.new[params[:account_id]]
+      account = Account.new({id: params[:account_id]})
       return GrowiClipper.new({
-        crowi_url: user_config['/growi/url'],
-        access_token: user_config['/growi/token'],
+        crowi_url: account.config['/growi/url'],
+        access_token: account.config['/growi/token'],
       })
     rescue => e
       raise Ginseng::GatewayError, "GROWI initialize error (#{e.message})"

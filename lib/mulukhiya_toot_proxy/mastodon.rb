@@ -13,16 +13,9 @@ module MulukhiyaTootProxy
       @token = token
     end
 
-    def account_id
-      return account['id'].to_i
-    rescue => e
-      @logger.error(e)
-      return nil
-    end
-
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
-      @account ||= Mastodon.lookup_token_owner(@token)
+      @account ||= Account.new({token: @token})
       return @account
     end
 

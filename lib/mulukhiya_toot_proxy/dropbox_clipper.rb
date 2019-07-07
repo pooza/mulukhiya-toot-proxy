@@ -16,9 +16,8 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      return DropboxClipper.new(
-        UserConfigStorage.new[params[:account_id]]['/dropbox/token'],
-      )
+      account = Account.new({id: params[:account_id]})
+      return DropboxClipper.new(account.config['/dropbox/token'])
     rescue => e
       raise Ginseng::GatewayError, "Dropbox auth error (#{e.message})"
     end

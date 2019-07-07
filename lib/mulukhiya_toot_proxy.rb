@@ -16,6 +16,7 @@ end
 module MulukhiyaTootProxy
   extend ActiveSupport::Autoload
 
+  autoload :Account
   autoload :ArtistParser
   autoload :ClippingCommandHandler
   autoload :ClippingWorker
