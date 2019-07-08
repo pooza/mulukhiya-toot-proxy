@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def id
-      return self[:id].to_i
+      return self[:id]&.to_i
     end
 
     def username
@@ -53,6 +53,12 @@ module MulukhiyaTootProxy
     def moderator?
       return @params[:moderator] == 't'
     end
+
+    def service?
+      return @params[:actor_type] == 'Service'
+    end
+
+    alias bot? service?
 
     def locked?
       return @params[:locked] == 't'
