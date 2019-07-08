@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class AmazonASINHandler < URLHandler
     def disable?
-      return @config["/handler/#{underscore_name}/disable"] if affiliate?
+      return @config.disable?(underscore_name) if affiliate?
       return super
     rescue Ginseng::ConfigError
       return false
