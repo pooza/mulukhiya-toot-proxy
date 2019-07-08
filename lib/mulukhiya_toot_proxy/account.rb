@@ -1,5 +1,7 @@
 module MulukhiyaTootProxy
   class Account
+    attr_reader :params
+
     def initialize(key)
       @logger = Logger.new
       if @token = key[:token]
@@ -22,9 +24,7 @@ module MulukhiyaTootProxy
       return self[:display_name]
     end
 
-    def to_h
-      return @params.clone
-    end
+    alias to_h params
 
     def [](key)
       return @params[key]
