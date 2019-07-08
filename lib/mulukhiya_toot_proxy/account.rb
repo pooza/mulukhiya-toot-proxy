@@ -5,9 +5,9 @@ module MulukhiyaTootProxy
     def initialize(key)
       @logger = Logger.new
       if @token = key[:token]
-        @params = Mastodon.lookup_token_owner(@token)&.with_indifferent_access
+        @params = Mastodon.lookup_token_owner(@token)
       elsif key[:id]
-        @params = Mastodon.lookup_account(key[:id])&.with_indifferent_access
+        @params = Mastodon.lookup_account(key[:id])
       end
       @params ||= {}
     end
