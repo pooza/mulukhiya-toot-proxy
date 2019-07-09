@@ -31,6 +31,26 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    post '/api/v1/statuses/:id/favourite' do
+      results = ResultContainer.new
+      results.response = @mastodon.fav(params[:id])
+      @renderer.message = results.response.parsed_response
+      @renderer.message['results'] = results.summary
+      @renderer.status = results.response.code
+      headers({'X-Mulukhiya' => results.summary})
+      return @renderer.to_s
+    end
+
+    post '/api/v1/statuses/:id/reblog' do
+      results = ResultContainer.new
+      results.response = @mastodon.boost(params[:id])
+      @renderer.message = results.response.parsed_response
+      @renderer.message['results'] = results.summary
+      @renderer.status = results.response.code
+      headers({'X-Mulukhiya' => results.summary})
+      return @renderer.to_s
+    end
+
     post '/mulukhiya/webhook/:digest' do
       if webhook = Webhook.create(params[:digest])
         raise Ginseng::RequestError, 'empty message' unless params[:text].present?

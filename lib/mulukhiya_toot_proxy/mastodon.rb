@@ -13,6 +13,30 @@ module MulukhiyaTootProxy
       @token = token
     end
 
+    def favourite(id, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri("/api/v1/statuses/#{id}/favourite"), {
+        body: '{}',
+        headers: headers,
+      })
+    end
+
+    alias fav favourite
+
+    def reblog(id, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri("/api/v1/statuses/#{id}/reblog"), {
+        body: '{}',
+        headers: headers,
+      })
+    end
+
+    alias boost reblog
+
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
       @account ||= Account.new({token: @token})
