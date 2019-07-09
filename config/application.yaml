@@ -60,6 +60,7 @@ handler:
     - mention_notification
     - result_notification
   post_fav: []
+  post_boost: []
   default:
     timeout: 10
   admin_notification:

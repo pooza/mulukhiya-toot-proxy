@@ -45,6 +45,7 @@ module MulukhiyaTootProxy
     post '/api/v1/statuses/:id/reblog' do
       results = ResultContainer.new
       results.response = @mastodon.boost(params[:id])
+      Handler.exec_all(:post_boost, params, {results: results})
       @renderer.message = results.response.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.status = results.response.code
