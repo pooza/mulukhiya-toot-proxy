@@ -34,6 +34,7 @@ module MulukhiyaTootProxy
     post '/api/v1/statuses/:id/favourite' do
       results = ResultContainer.new
       results.response = @mastodon.fav(params[:id])
+      Handler.exec_all(:post_fav, params, {results: results})
       @renderer.message = results.response.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.status = results.response.code

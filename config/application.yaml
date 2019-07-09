@@ -59,6 +59,7 @@ handler:
     - admin_notification
     - mention_notification
     - result_notification
+  post_fav: []
   default:
     timeout: 10
   admin_notification:
