@@ -19,10 +19,10 @@ module MulukhiyaTootProxy
     def dispatch_command(values)
       create_uris(values) do |uri|
         next unless uri&.id
-        worker_class.perform_async({
+        worker_class.perform_async(
           uri: {href: uri.to_s, class: uri.class.to_s},
           account: {id: mastodon.account.id, username: mastodon.account.username},
-        })
+        )
       end
     end
 

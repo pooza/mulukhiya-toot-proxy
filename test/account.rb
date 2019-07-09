@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class AccountTest < Test::Unit::TestCase
     def setup
       return if Environment.ci?
-      @account = Account.new({token: Config.instance['/test/token']})
+      @account = Account.new(token: Config.instance['/test/token'])
     end
 
     def test_id

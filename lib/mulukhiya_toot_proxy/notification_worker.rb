@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     private
 
     def connect_slack(id)
-      uri = Ginseng::URI.parse(Account.new({id: id}).config['/slack/webhook'])
+      uri = Ginseng::URI.parse(Account.new(id: id).config['/slack/webhook'])
       raise 'invalid URI' unless uri&.absolute?
       return Slack.new(uri)
     rescue => e

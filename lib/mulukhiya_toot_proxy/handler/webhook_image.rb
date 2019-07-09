@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
         @result.push(uri.to_s)
         break
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat({attachment: attachment}))
+        @logger.error(Ginseng::Error.create(e).to_h.concat(attachment: attachment))
         next
       end
     end

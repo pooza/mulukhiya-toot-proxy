@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat({k: k, v: v}))
+        @logger.error(Ginseng::Error.create(e).to_h.concat(k: k, v: v))
         next
       end
       update(sort_by{|k, v| k.length}.to_h)

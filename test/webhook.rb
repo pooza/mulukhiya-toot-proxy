@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return if Environment.ci?
       @config = Config.instance
-      @account = Account.new({token: @config['/test/token']})
+      @account = Account.new(token: @config['/test/token'])
     end
 
     def test_all

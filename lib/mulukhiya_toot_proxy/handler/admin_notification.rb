@@ -13,12 +13,12 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      worker_class.perform_async({
+      worker_class.perform_async(
         from_account_id: @mastodon.account.id,
         token: @mastodon.token,
         status: body['status'],
         status_id: params[:results].response['id'],
-      })
+      )
       @result.push(true)
     end
   end

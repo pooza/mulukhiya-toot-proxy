@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       @db.execute('notificatable_accounts', {id: params['id'], pattern: pattern}).each do |row|
         next unless slack = connect_slack(row['id'])
         slack.say(create_message({
-          account: Account.new({id: params['id']}),
+          account: Account.new(id: params['id']),
           status: params['status'],
         }), :text)
       rescue Ginseng::ConfigError

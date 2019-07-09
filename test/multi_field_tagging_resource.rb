@@ -1,10 +1,10 @@
 module MulukhiyaTootProxy
   class MultiFieldTaggingResourceTest < Test::Unit::TestCase
     def setup
-      @resource = TaggingResource.create({
+      @resource = TaggingResource.create(
         'url' => 'https://api.github.com/users/pooza/repos',
         'fields' => ['name'],
-      })
+      )
     end
 
     def test_new

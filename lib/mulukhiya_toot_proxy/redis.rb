@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       dsn.db ||= 1
       raise Ginseng::RedisError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
       raise Ginseng::RedisError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
-      super({url: dsn.to_s})
+      super(url: dsn.to_s)
     end
 
     def get(key)

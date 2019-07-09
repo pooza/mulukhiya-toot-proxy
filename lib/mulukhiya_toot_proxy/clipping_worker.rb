@@ -17,9 +17,7 @@ module MulukhiyaTootProxy
     end
 
     def create_clipper(account_id)
-      return clipper_class.create({
-        account_id: account_id,
-      })
+      return clipper_class.create(account_id: account_id)
     end
 
     def create_body(params)

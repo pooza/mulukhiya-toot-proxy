@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return if Environment.ci?
       @config = Config.instance
       @handler = Handler.create('mention_notification')
-      @account = Account.new({token: @config['/test/token']})
+      @account = Account.new(token: @config['/test/token'])
     end
 
     def test_handle_post_toot

@@ -39,7 +39,7 @@ module MulukhiyaTootProxy
 
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
-      @account ||= Account.new({token: @token})
+      @account ||= Account.new(token: @token)
       return @account
     end
 

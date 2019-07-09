@@ -66,7 +66,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Account.new({id: webhook.mastodon.account.id}).webhook
+        return Account.new(id: webhook.mastodon.account.id).webhook
       end
       return nil
     end
@@ -74,7 +74,7 @@ module MulukhiyaTootProxy
     def self.all
       return enum_for(__method__) unless block_given?
       Postgres.instance.execute('webhook_tokens').each do |row|
-        yield Webhook.new({'/webhook/token' => row['token']})
+        yield Webhook.new('/webhook/token' => row['token'])
       end
     end
 
