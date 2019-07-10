@@ -4,10 +4,10 @@ module MulukhiyaTootProxy
   class GrowiClipper < CrowiClient
     def clip(params)
       params = {body: params.to_s} if params.is_a?(String)
-      res = request(CPApiRequestPagesCreate.new(body: params[:body]))
-      res = request(CPApiRequestPagesCreate.new(params)) if res.is_a?(CPInvalidRequest)
-      raise Ginseng::GatewayError, res.msg if res.is_a?(CPInvalidRequest)
-      return res
+      r = request(CPApiRequestPagesCreate.new(body: params[:body]))
+      r = request(CPApiRequestPagesCreate.new(params)) if r.is_a?(CPInvalidRequest)
+      raise Ginseng::GatewayError, r.msg if r.is_a?(CPInvalidRequest)
+      return r
     end
 
     def self.create(params)
@@ -17,7 +17,8 @@ module MulukhiyaTootProxy
         access_token: account.config['/growi/token'],
       )
     rescue => e
-      raise Ginseng::GatewayError, "GROWI initialize error (#{e.message})"
+      Logger.new.error(e)
+      return nil
     end
 
     def self.create_path(username)
