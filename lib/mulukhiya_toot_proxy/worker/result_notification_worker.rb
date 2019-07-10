@@ -3,10 +3,7 @@ module MulukhiyaTootProxy
     sidekiq_options retry: false
 
     def perform(params)
-      return unless slack = Account.new(id: params['account_id']).slack
-      slack.say(YAML.dump(params['results']), :text)
-    rescue Ginseng::ConfigError
-      return
+      Account.new(id: params['account_id']).slack&.say(YAML.dump(params['results']), :text)
     rescue => e
       @logger.error(e)
     end

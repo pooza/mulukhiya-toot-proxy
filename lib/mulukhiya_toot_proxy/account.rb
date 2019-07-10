@@ -53,8 +53,8 @@ module MulukhiyaTootProxy
         @slack = Slack.new(uri)
       end
       return @slack
-    rescue => e
-      raise Ginseng::ConfigError, "Invalid webhook (#{e.message})"
+    rescue
+      return nil
     end
 
     def admin?

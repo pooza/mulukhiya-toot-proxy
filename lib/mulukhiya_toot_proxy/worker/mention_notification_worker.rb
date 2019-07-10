@@ -5,10 +5,10 @@ module MulukhiyaTootProxy
       accounts = params['status'].scan(/@([[:word:]]+)(\s|$)/).map(&:first).uniq
       pattern = "(#{accounts.join('|')})"
       @db.execute('notificatable_accounts', {id: from_account.id, pattern: pattern}).each do |row|
-        next unless slack = Account.new(id: row['id']).slack
-        slack.say(create_message(account: from_account, status: params['status']), :text)
-      rescue Ginseng::ConfigError
-        next
+        Account.new(id: row['id']).slack&.say(
+          create_message(account: from_account, status: params['status']),
+          :text,
+        )
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.concat({row: row}))
         next
