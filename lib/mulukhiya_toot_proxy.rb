@@ -45,6 +45,7 @@ module MulukhiyaTootProxy
   autoload :TaggingDictionary
   autoload :TaggingResource
   autoload :Template
+  autoload :Toot
   autoload :URLHandler
   autoload :UserConfigStorage
   autoload :Webhook
