@@ -46,6 +46,17 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def slack
+      unless @slack
+        uri = Ginseng::URI.parse(config['/slack/webhook'])
+        raise 'invalid URI' unless uri&.absolute?
+        @slack = Slack.new(uri)
+      end
+      return @slack
+    rescue => e
+      raise Ginseng::ConfigError, "Invalid webhook (#{e.message})"
+    end
+
     def admin?
       return @params[:admin] == 't'
     end
