@@ -1,9 +1,5 @@
 module MulukhiyaTootProxy
   class FavNotificationHandler < NotificationHandler
-    def notifiable?(body)
-      return true
-    end
-
     def handle_post_fav(body, params = {})
       worker_class.perform_async(
         account_id: @mastodon.account.id,
