@@ -9,15 +9,9 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :local_tags
 
-    def handle_pre_toot(body, params = {})
-      return nil
-    end
+    def handle_pre_toot(body, params = {}); end
 
-    alias exec handle_pre_toot
-
-    def handle_post_toot(body, params = {})
-      return nil
-    end
+    def handle_post_toot(body, params = {}); end
 
     def handle_pre_webhook(body, params = {})
       handle_pre_toot(body, params)
@@ -26,6 +20,10 @@ module MulukhiyaTootProxy
     def handle_post_webhook(body, params = {})
       handle_post_toot(body, params)
     end
+
+    def handle_post_fav(body, params = {}); end
+
+    def handle_post_boost(body, params = {}); end
 
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
