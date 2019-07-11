@@ -27,7 +27,6 @@ module MulukhiyaTootProxy
       @renderer.message['results'] = results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
       @renderer.status = results.response.code
-      headers('X-Mulukhiya' => results.summary)
       return @renderer.to_s
     end
 
@@ -38,7 +37,6 @@ module MulukhiyaTootProxy
       @renderer.message = results.response.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.status = results.response.code
-      headers('X-Mulukhiya' => results.summary)
       return @renderer.to_s
     end
 
@@ -49,7 +47,6 @@ module MulukhiyaTootProxy
       @renderer.message = results.response.parsed_response
       @renderer.message['results'] = results.summary
       @renderer.status = results.response.code
-      headers('X-Mulukhiya' => results.summary)
       return @renderer.to_s
     end
 
@@ -60,7 +57,6 @@ module MulukhiyaTootProxy
         @renderer.message = results.response.parsed_response
         @renderer.message['results'] = results.summary
         @renderer.status = results.response.code
-        headers('X-Mulukhiya' => results.summary)
       else
         @renderer.status = 404
       end
