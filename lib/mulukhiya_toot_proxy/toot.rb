@@ -3,8 +3,8 @@ module MulukhiyaTootProxy
     attr_reader :params
 
     def initialize(key)
-      @logger = Logger.new
       @params = Mastodon.lookup_toot(key[:id])
+      @config = Config.instance
     end
 
     def id
@@ -14,6 +14,14 @@ module MulukhiyaTootProxy
     def account
       @account ||= Account.new(id: self[:account_id])
       return @account
+    end
+
+    def uri
+      unless @uri
+        @uri = MastodonURI.parse(@config['/mastodon/url'])
+        @uri.path = "/@#{account.username}/#{id}"
+      end
+      return @uri
     end
 
     alias to_h params

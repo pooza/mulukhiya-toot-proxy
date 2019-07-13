@@ -6,8 +6,7 @@ module MulukhiyaTootProxy
     end
 
     def handle_post_fav(body, params = {})
-      uri = MastodonURI.parse(@config['/mastodon/url'])
-      uri.path = "/web/statuses/#{body['id']}"
+      uri = Toot.new(id: body['id']).uri
       DropboxClippingWorker.perform_async(
         uri: {href: uri.to_s, class: uri.class.to_s},
         account_id: mastodon.account.id,
