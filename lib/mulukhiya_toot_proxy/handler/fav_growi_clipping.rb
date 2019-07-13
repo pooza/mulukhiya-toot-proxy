@@ -6,12 +6,11 @@ module MulukhiyaTootProxy
     end
 
     def handle_post_fav(body, params = {})
-      uri = Toot.new(id: body['id']).uri
       GrowiClippingWorker.perform_async(
-        uri: {href: uri.to_s, class: uri.class.to_s},
+        status_id: body['id'],
         account_id: mastodon.account.id,
       )
-      @result.push(uri.to_s)
+      @result.push(body['id'])
     end
   end
 end

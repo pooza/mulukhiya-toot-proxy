@@ -126,6 +126,8 @@ GEM
     netrc (0.11.0)
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
+    nokogumbo (2.0.1)
+      nokogiri (~> 1.8, >= 1.8.4)
     oauth2 (1.4.1)
       faraday (>= 0.8, < 0.16.0)
       jwt (>= 1.0, < 3.0)
@@ -186,6 +188,10 @@ GEM
     ruby-progressbar (1.10.1)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
+    sanitize (5.0.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.8.0)
+      nokogumbo (~> 2.0)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -240,6 +246,7 @@ DEPENDENCIES
   reverse_markdown
   rspotify (~> 2.6)
   rubocop
+  sanitize
   sidekiq
   sidekiq-scheduler
   unicode

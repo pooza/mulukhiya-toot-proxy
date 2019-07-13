@@ -91,6 +91,7 @@ mastodon:
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
+    - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   max_length: 500
   toot:
     label: トゥート
