@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
     end
 
     def dispatch_command(values)
-      create_uris(values) do |uri|
+      ClippingCommandHandler.create_uris(values) do |uri|
         next unless uri&.id
         worker_class.perform_async(
           uri: {href: uri.to_s, class: uri.class.to_s},
@@ -26,9 +26,7 @@ module MulukhiyaTootProxy
       end
     end
 
-    private
-
-    def create_uris(values)
+    def self.create_uris(values)
       values['uri'] ||= values['url']
       values.delete('url')
       raise Ginseng::RequestError, 'Empty URL' unless values['uri'].present?

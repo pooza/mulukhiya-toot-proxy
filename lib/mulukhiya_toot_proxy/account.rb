@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
     end
 
     def create_clipper(name)
-      return "#{name}_clipper".constantize.new(id: id)
+      return "MulukhiyaTootProxy::#{name.to_s.camelize}Clipper".constantize.create(account_id: id)
     end
 
     def admin?
