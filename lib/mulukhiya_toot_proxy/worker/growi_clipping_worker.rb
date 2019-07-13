@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class GrowiClippingWorker < ClippingWorker
     def perform(params)
       account = Account.new(id: params['account_id'])
-      clipper_class.create(account_id: account.id)&.clip(
+      account&.create_clipper(:growi)&.clip(
         body: create_body(params),
         path: GrowiClipper.create_path(account.username),
       )

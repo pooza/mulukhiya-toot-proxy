@@ -57,6 +57,10 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def create_clipper(name)
+      return "#{name}_clipper".constantize.new(id: id)
+    end
+
     def admin?
       return @params[:admin] == 't'
     end
