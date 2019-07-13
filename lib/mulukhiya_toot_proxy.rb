@@ -18,7 +18,6 @@ module MulukhiyaTootProxy
 
   autoload :Account
   autoload :ArtistParser
-  autoload :ClippingCommandHandler
   autoload :ClippingWorker
   autoload :CommandHandler
   autoload :Config

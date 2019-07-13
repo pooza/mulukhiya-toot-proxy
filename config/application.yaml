@@ -67,8 +67,8 @@ handler:
     - boost_notification
   default:
     timeout: 10
-  admin_notification:
-    update_timeline: false
+  fav_dropbox_clipping:
+    disable: true
 shortened_url:
   domains:
     - t.co
