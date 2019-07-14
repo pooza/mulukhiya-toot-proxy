@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class Account
     attr_reader :params
+    attr_reader :token
 
     def initialize(key)
       @logger = Logger.new

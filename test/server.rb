@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
       return if Environment.ci?
       @account = Account.new(token: @config['/test/token'])
+      @toot = @account.recent_toot
     end
 
     def app
@@ -28,21 +29,21 @@ module MulukhiyaTootProxy
     def test_toot_length
       return if Environment.ci?
 
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
       assert(last_response.ok?)
 
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       post '/api/v1/statuses', {'status' => 'A' * (max_length + 1), 'visibility' => 'private'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => 'B' * max_length, 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
 
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
       assert_false(last_response.ok?)
@@ -52,7 +53,7 @@ module MulukhiyaTootProxy
     def test_toot_zenkaku
       return if Environment.ci?
 
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '！!！!！'}.to_json
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
@@ -62,7 +63,7 @@ module MulukhiyaTootProxy
       return if Environment.ci?
 
       return if Handler.create('itunes_url_nowplaying').disable?
-      header 'Authorization', "Bearer #{@config['/test/token']}"
+      header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {'status' => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
