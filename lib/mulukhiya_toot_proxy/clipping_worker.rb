@@ -2,6 +2,10 @@ module MulukhiyaTootProxy
   class ClippingWorker
     include Sidekiq::Worker
 
+    def initialize
+      @logger = Logger.new
+    end
+
     def perform(params)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -9,7 +13,7 @@ module MulukhiyaTootProxy
     def create_body(params)
       return params['uri']['class'].constantize.parse(params['uri']['href']).to_md
     rescue => e
-      Logger.new.error(Ginseng::Error.create(e).to_h.merge(params: params))
+      @logger.error(Ginseng::Error.create(e).to_h.merge(params: params))
     end
   end
 end
