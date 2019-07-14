@@ -49,7 +49,14 @@ module MulukhiyaTootProxy
       return @config['/handler/default/timeout']
     end
 
+    def default_disable?
+      return false
+    end
+
     def disable?
+      if default_disable?
+        return true if mastodon.account.config["/handler/#{underscore_name}/disable"].nil?
+      end
       return true if mastodon.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false

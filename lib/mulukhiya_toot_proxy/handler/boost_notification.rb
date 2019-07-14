@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class BoostNotificationHandler < NotificationHandler
+    def default_disable?
+      return true
+    end
+
     def handle_post_boost(body, params = {})
       worker_class.perform_async(
         account_id: @mastodon.account.id,

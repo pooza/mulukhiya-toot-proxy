@@ -1,8 +1,7 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
-    def disable?
-      return true if mastodon.account.config["/handler/#{underscore_name}/disable"].nil?
-      return super
+    def default_disable?
+      return true
     end
 
     def notifiable?(body)

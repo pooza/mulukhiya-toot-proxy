@@ -1,8 +1,7 @@
 module MulukhiyaTootProxy
   class FavGrowiClippingHandler < Handler
-    def disable?
-      return true if mastodon.account.config["/handler/#{underscore_name}/disable"].nil?
-      return super
+    def default_disable?
+      return true
     end
 
     def handle_post_fav(body, params = {})
