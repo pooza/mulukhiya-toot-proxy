@@ -59,10 +59,11 @@ module MulukhiyaTootProxy
           result[k][:words] ||= []
           result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
         rescue => e
-          @logger.error(Ginseng::Error.create(e).to_h.merge(
+          msg = Ginseng::Error.create(e).to_h.merge(
             resource: {uri: resource.uri.to_s},
             entry: {k: k, v: v},
-          ))
+          )
+          @logger.error(msg)
           next
         end
       rescue => e
