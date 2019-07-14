@@ -1,10 +1,12 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
-    def notifiable?(body)
+    def default_disable?
       return true
     end
 
-    alias executable? notifiable?
+    def notifiable?(body)
+      return true
+    end
 
     def worker_class
       return self.class.to_s.sub(/Handler$/, 'Worker').constantize

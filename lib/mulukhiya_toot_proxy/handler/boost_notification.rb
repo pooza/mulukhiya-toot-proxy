@@ -1,9 +1,5 @@
 module MulukhiyaTootProxy
   class BoostNotificationHandler < NotificationHandler
-    def default_disable?
-      return true
-    end
-
     def notifiable?(body)
       return Toot.new(id: body['id'].to_i).present?
     rescue Ginseng::NotFoundError

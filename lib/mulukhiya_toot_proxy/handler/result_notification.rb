@@ -1,9 +1,5 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
-    def default_disable?
-      return true
-    end
-
     def notifiable?(body)
       return @results.present?
     end
