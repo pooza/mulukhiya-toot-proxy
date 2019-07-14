@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
           :text,
         )
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat({row: row}))
+        @logger.error(Ginseng::Error.create(e).to_h.merge(row: row))
         next
       end
     end

@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
           result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat(resource: @params))
+        @logger.error(Ginseng::Error.create(e).to_h.merge(resource: @params))
         next
       end
       return result

@@ -59,7 +59,7 @@ module MulukhiyaTootProxy
       rescue Ginseng::ConfigError
         next
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat(media_id: id))
+        @logger.error(Ginseng::Error.create(e).to_h.merge(media_id: id))
         next
       end
       return tags

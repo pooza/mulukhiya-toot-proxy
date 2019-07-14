@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
         access_token: account.config['/growi/token'],
       )
     rescue => e
-      Logger.new.error(e)
+      Logger.new.error(Ginseng::Error.create(e).to_h.merge(params: params))
       return nil
     end
 

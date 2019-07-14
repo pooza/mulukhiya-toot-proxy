@@ -1,9 +1,12 @@
+require 'sanitize'
+
 module MulukhiyaTootProxy
   class Toot
     attr_reader :params
 
     def initialize(key)
-      @params = Mastodon.lookup_toot(key[:id])
+      @params = Mastodon.lookup_toot(key[:id].to_i)
+      raise Ginseng::NotFoundError, "Toot '#{key.to_json}' not found" unless @params.present?
       @config = Config.instance
     end
 
@@ -17,7 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def text
-      @text ||= Sanitize.clean(self[:text])
+      @text ||= Sanitize.clean(self[:text].gsub(/<br.*?>/, "\n"))
       return @text
     end
 
@@ -33,7 +36,7 @@ module MulukhiyaTootProxy
       return uri.to_md if uri
       template = Template.new('toot_clipping.md')
       template[:account] = account.to_h
-      template[:status] = ReverseMarkdown.convert(text)
+      template[:status] = text
       template[:url] = uri.to_s
       return template.to_s
     end

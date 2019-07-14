@@ -1,3 +1,5 @@
+require 'sanitize'
+
 module MulukhiyaTootProxy
   class MastodonURI < Ginseng::URI
     def toot_id
@@ -13,15 +15,17 @@ module MulukhiyaTootProxy
 
     def to_md
       toot = service.fetch_toot(toot_id)
-      raise Ginseng::GatewayError, "Toot '#{self}' not found" unless toot
-      raise Ginseng::GatewayError, "Toot '#{self}' not found" if toot['error']
-      account = toot['account']
+      raise "Toot '#{self}' not found" unless toot
+      raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
-      template[:account] = account
-      template[:status] = ReverseMarkdown.convert(toot['content'])
+      template[:account] = toot['account']
+      template[:status] = Sanitize.clean(toot['content'].gsub(/<br.*?>/, "\n"))
       template[:attachments] = toot['media_attachments']
       template[:url] = toot['url']
       return template.to_s
+    rescue => e
+      Logger.new.info(Ginseng::Error.create(e).to_h.merge(toot_id: toot_id))
+      raise Ginseng::GatewayError, e.message
     end
 
     def service

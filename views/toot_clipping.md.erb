@@ -11,7 +11,7 @@
 ## メディア
 <% @params[:attachments].each do |attachment| -%>
 <% if attachment[:type] == 'image' -%>
-- ![<%= File.basename(Ginseng::URI.parse(attachment[:url]).path) %>](<%= attachment[:url] %>)
+![<%= File.basename(Ginseng::URI.parse(attachment[:url]).path) %>](<%= attachment[:url] %>)
 <% else -%>
 - <%= attachment[:url] %>
 <% end -%>
