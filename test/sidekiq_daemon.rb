@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
 
     def test_child_pid
       return if Environment.ci?
-      assert(@daemon.child_pid.is_a?(Integer))
+      assert(@daemon.child_pid.positive?)
     end
 
     def test_motd

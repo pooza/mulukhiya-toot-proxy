@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
     def test_id
       return if Environment.ci?
-      assert(@account.id.is_a?(Integer))
+      assert(@account.id.positive?)
     end
 
     def test_username
