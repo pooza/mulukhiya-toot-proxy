@@ -14,6 +14,7 @@ module MulukhiyaTootProxy
       return params['uri']['class'].constantize.parse(params['uri']['href']).to_md
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h.merge(params: params))
+      raise Ginseng::RequestError, e.message
     end
   end
 end

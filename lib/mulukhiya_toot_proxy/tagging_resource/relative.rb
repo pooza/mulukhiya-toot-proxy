@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
       end.to_h
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h.merge(resource: @params))
+      return {}
     end
   end
 end

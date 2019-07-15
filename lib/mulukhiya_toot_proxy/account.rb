@@ -41,6 +41,7 @@ module MulukhiyaTootProxy
 
     def webhook
       @webhook ||= Webhook.new(config)
+      raise 'Invalid webhook' unless @webhook.exist?
       return @webhook
     rescue => e
       @logger.error(e)
@@ -54,21 +55,24 @@ module MulukhiyaTootProxy
         @slack = Slack.new(uri)
       end
       return @slack
-    rescue
+    rescue => e
+      @logger.error(e)
       return nil
     end
 
     def growi
       @growi ||= GrowiClipper.create(account_id: id)
       return @growi
-    rescue
+    rescue => e
+      @logger.error(e)
       return nil
     end
 
     def dropbox
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
-    rescue
+    rescue => e
+      @logger.error(e)
       return nil
     end
 
