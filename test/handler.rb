@@ -18,6 +18,16 @@ module MulukhiyaTootProxy
       ]
     end
 
+    def test_disable?
+      [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost].each do |event|
+        @config["/handler/#{event}"].each do |v|
+          handler = Handler.create(v)
+          assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
+          assert(handler.default_disable?.is_a?(TrueClass) || handler.default_disable?.is_a?(FalseClass))
+        end
+      end
+    end
+
     def test_exec_all
       return if Environment.ci?
       return if Handler.create('spotify_url_nowplaying').disable?
