@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
 
     def create_status(values)
       values['url'] = mastodon.account.webhook&.uri.to_s
-      values['token'] = mastodon.token
+      values['token'] = mastodon.account.webhook&.mastodon.token
       return YAML.dump(values)
     end
   end
