@@ -20,15 +20,5 @@ module MulukhiyaTootProxy
       Logger.new.error(Ginseng::Error.create(e).to_h.merge(params: params))
       return nil
     end
-
-    def self.create_path(username)
-      return File.join(
-        '/',
-        Package.short_name,
-        'user',
-        username,
-        Time.now.strftime('%Y/%m/%d/%H%M%S'),
-      )
-    end
   end
 end
