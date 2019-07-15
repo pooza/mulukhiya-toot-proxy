@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      worker_class.perform_async(account_id: @mastodon.account.id, status: body['status'])
+      worker_class.perform_async(account_id: mastodon.account.id, status: body['status'])
       @result.push(true)
     end
   end
