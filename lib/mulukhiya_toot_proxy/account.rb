@@ -58,14 +58,24 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def growi
+      @growi ||= GrowiClipper.create(account_id: id)
+      return @growi
+    rescue
+      return nil
+    end
+
+    def dropbox
+      @dropbox ||= DropboxClipper.create(account_id: id)
+      return @dropbox
+    rescue
+      return nil
+    end
+
     def recent_toot
       rows = Postgres.instance.execute('recent_toot', {id: id})
       return Toot.new(id: rows.first['id'].to_i) if rows.present?
       return nil
-    end
-
-    def create_clipper(name)
-      return "MulukhiyaTootProxy::#{name.to_s.camelize}Clipper".constantize.create(account_id: id)
     end
 
     def admin?

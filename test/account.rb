@@ -36,10 +36,14 @@ module MulukhiyaTootProxy
       assert(@account.slack.is_a?(Slack))
     end
 
-    def test_create_clipper
+    def test_growi
       return if Environment.ci?
-      assert(@account.create_clipper(:growi).is_a?(GrowiClipper))
-      assert(@account.create_clipper(:dropbox).is_a?(DropboxClipper))
+      assert(@account.growi.is_a?(GrowiClipper))
+    end
+
+    def test_dropbox
+      return if Environment.ci?
+      assert(@account.dropbox.is_a?(DropboxClipper))
     end
 
     def test_disable?
