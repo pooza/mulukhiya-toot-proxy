@@ -11,5 +11,9 @@ module MulukhiyaTootProxy
     def test_service
       assert(@uri.service.is_a?(Mastodon))
     end
+
+    def test_to_md
+      assert_equal(@uri.to_md, "## アカウント\n[@ぷーざ :pooza: :sabacan:](https://precure.ml/@pooza)\n\n## 本文\n 本店わかんなかったけどw とりあえず最寄りの満州で、昼間からビールです。 \n\n## URL\nhttps://precure.ml/@pooza/101118840135913675\n")
+    end
   end
 end
