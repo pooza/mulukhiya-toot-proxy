@@ -104,15 +104,5 @@ module MulukhiyaTootProxy
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'
     end
-
-    def webhook
-      unless @webhook
-        @webhook = mastodon.account.webhook
-        return nil unless @webhook.exist?
-      end
-      return @webhook
-    rescue
-      return nil
-    end
   end
 end
