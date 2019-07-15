@@ -19,6 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def test_disable?
+      return if Environment.ci?
       [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost].each do |event|
         @config["/handler/#{event}"].each do |v|
           handler = Handler.create(v)
