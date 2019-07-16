@@ -14,11 +14,11 @@ module MulukhiyaTootProxy
 
       @handler.clear
       @handler.handle_pre_toot({'status' => 'Amazon.co.jp | HUGっと!プリキュア オシマイダー Tシャツ ブラック XLサイズ | ホビー 通販 https://www.amazon.co.jp/dp/B07DB67ZR8'})
-      assert(@handler.result[:entries]&.present?)
+      assert(@handler.result[:entries].present?) if @handler.result
 
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://www.amazon.co.jp/gp/product/B07H2B56RT?pf_rd_p=7b903293-68b0-4a33-9b7c-65c76866a371&pf_rd_r=732H9VVYDF2TD3WYVBKK'})
-      assert(@handler.result[:entries]&.present?)
+      assert(@handler.result[:entries].present?) if @handler.result
     end
   end
 end
