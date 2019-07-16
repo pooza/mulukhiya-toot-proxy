@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
         next unless updatable?(link)
         image = create_image_uri(link)
         body['media_ids'].push(mastodon.upload_remote_resource(image))
-        @result.push(image.to_s)
+        @result.push(url: image.to_s)
         break
       rescue Ginseng::GatewayError => e
         @logger.error(e)

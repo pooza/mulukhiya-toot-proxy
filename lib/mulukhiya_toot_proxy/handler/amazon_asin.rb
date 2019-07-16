@@ -11,6 +11,7 @@ module MulukhiyaTootProxy
       uri = AmazonURI.parse(link)
       uri.associate_tag = AmazonService.associate_tag if affiliate?
       @status.sub!(link, uri.shorten.to_s)
+      return uri.shorten.to_s
     end
 
     private

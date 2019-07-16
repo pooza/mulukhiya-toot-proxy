@@ -17,8 +17,8 @@ module MulukhiyaTootProxy
 
       @handler.clear
       @handler.handle_post_boost('id' => @toot.id)
-      assert(@handler.result[:entries].first.positive?)
-      assert_equal(@handler.result[:entries].first, @toot.id)
+      assert(@handler.result[:entries].first[:status_id].positive?)
+      assert_equal(@handler.result[:entries].first[:status_id], @toot.id)
     end
   end
 end

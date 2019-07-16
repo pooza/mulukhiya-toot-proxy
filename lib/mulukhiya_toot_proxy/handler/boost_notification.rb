@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
         account_id: mastodon.account.id,
         status_id: body['id'].to_i,
       )
-      @result.push(body['id'].to_i)
+      @result.push(status_id: body['id'].to_i)
     end
   end
 end

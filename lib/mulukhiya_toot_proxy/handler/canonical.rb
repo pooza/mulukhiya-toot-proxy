@@ -9,7 +9,9 @@ module MulukhiyaTootProxy
     end
 
     def rewrite(link)
-      @status.sub!(link, @canonicals[link]) if @canonicals[link].present?
+      raise Ginseng::NotFoundError, "Canonical for '#{link}' not found" unless @canonicals[link]
+      @status.sub!(link, @canonicals[link])
+      return @canonicals[link]
     end
 
     private

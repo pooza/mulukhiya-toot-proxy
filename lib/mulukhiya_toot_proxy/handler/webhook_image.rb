@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
         uri = Ginseng::URI.parse(attachment['image_url'])
         next unless uri&.absolute?
         body['media_ids'].push(mastodon.upload_remote_resource(uri))
-        @result.push(uri.to_s)
+        @result.push(source_url: uri.to_s)
         break
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(attachment: attachment))
