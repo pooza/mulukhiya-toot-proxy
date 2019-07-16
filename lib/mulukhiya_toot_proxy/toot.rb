@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def text
-      @text ||= Sanitize.clean(self[:text].gsub(/<br.*?>/, "\n"))
+      @text ||= Sanitize.clean(self[:text].gsub(/<br.*?>/, "\n")).strip
       return @text
     end
 
