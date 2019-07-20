@@ -77,6 +77,8 @@ module MulukhiyaTootProxy
 
     def self.associate_tag
       return Config.instance['/amazon/associate_tag']
+    rescue Ginseng::ConfigError
+      return nil
     end
 
     def self.accesskey?
