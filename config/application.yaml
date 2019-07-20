@@ -59,6 +59,9 @@ handler:
     - admin_notification
     - mention_notification
     - result_notification
+  pre_upload:
+    - image_resize
+  post_upload: []
   post_fav:
     - fav_notification
     - fav_dropbox_clipping

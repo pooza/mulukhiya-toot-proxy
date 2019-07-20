@@ -8,45 +8,57 @@ module MulukhiyaTootProxy
       return unless @headers['HTTP_AUTHORIZATION']
       @mastodon = Mastodon.new
       @mastodon.token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
+      @results = ResultContainer.new
     end
 
     post '/api/v1/statuses' do
       tags = TagContainer.scan(params[:status])
-      results = ResultContainer.new
       Handler.exec_all(:pre_toot, params, {
-        results: results,
+        results: @results,
         mastodon: @mastodon,
         headers: @headers,
       })
-      results.response = @mastodon.toot(params)
+      @results.response = @mastodon.toot(params)
       Handler.exec_all(:post_toot, params, {
-        results: results,
+        results: @results,
         mastodon: @mastodon,
       })
-      @renderer.message = results.response.parsed_response
-      @renderer.message['results'] = results.summary
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
-      @renderer.status = results.response.code
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    end
+
+    post '/api/v1/media' do
+      Handler.exec_all(:pre_upload, params, {
+        results: @results,
+        mastodon: @mastodon,
+        headers: @headers,
+      })
+      @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
+      Handler.exec_all(:post_upload, params, {results: @results})
+      @renderer.message = JSON.parse(@results.response.body)
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/favourite' do
-      results = ResultContainer.new
-      results.response = @mastodon.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {results: results})
-      @renderer.message = results.response.parsed_response
-      @renderer.message['results'] = results.summary
-      @renderer.status = results.response.code
+      @results.response = @mastodon.fav(params[:id])
+      Handler.exec_all(:post_fav, params, {results: @results})
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/reblog' do
-      results = ResultContainer.new
-      results.response = @mastodon.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {results: results})
-      @renderer.message = results.response.parsed_response
-      @renderer.message['results'] = results.summary
-      @renderer.status = results.response.code
+      @results.response = @mastodon.boost(params[:id])
+      Handler.exec_all(:post_boost, params, {results: @results})
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
       return @renderer.to_s
     end
 

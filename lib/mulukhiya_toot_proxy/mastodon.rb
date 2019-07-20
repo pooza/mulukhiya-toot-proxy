@@ -13,6 +13,21 @@ module MulukhiyaTootProxy
       @token = token
     end
 
+    def upload(path, params = {})
+      response = @http.upload(
+        create_uri('/api/v1/media'),
+        path,
+        {'Authorization' => "Bearer #{@token}", 'X-Mulukhiya' => Package.name},
+      )
+      return response if params[:response] == :raw
+      return JSON.parse(response.body)['id'].to_i
+    rescue Ginseng::GatewayError => e
+      if matches = e.message.match(/^422 (.*)/)
+        raise ValidateError, "Invalid media (#{matches[1]})"
+      end
+      raise Ginseng::GatewayError, e.message
+    end
+
     def favourite(id, params = {})
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{@token}"

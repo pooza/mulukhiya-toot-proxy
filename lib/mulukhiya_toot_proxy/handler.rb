@@ -21,6 +21,10 @@ module MulukhiyaTootProxy
       handle_post_toot(body, params)
     end
 
+    def handle_pre_upload(body, params = {}); end
+
+    def handle_post_upload(body, params = {}); end
+
     def handle_post_fav(body, params = {}); end
 
     def handle_post_boost(body, params = {}); end
