@@ -43,9 +43,12 @@ module MulukhiyaTootProxy
     end
 
     def associate_tag=(tag)
-      return unless tag.present?
       values = query_values || {}
-      values['tag'] = tag
+      if tag.present?
+        values['tag'] = tag
+      else
+        values.delete('tag')
+      end
       self.query_values = values
     end
 

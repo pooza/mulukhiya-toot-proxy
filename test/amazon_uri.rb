@@ -27,6 +27,17 @@ module MulukhiyaTootProxy
       assert_equal(uri.asin, 'hoge')
     end
 
+    def test_associate_tag
+      uri = AmazonURI.parse('https://www.amazon.co.jp/dp/B00LNCTX48?tag=bshockfortrbl-22')
+      assert_equal(uri.associate_tag, 'bshockfortrbl-22')
+
+      uri.associate_tag = nil
+      assert_nil(uri.associate_tag)
+
+      uri.associate_tag = 'hoge'
+      assert_equal(uri.associate_tag, 'hoge')
+    end
+
     def test_shorten
       uri = AmazonURI.parse('https://www.amazon.co.jp')
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp')
