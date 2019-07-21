@@ -72,6 +72,8 @@ handler:
     timeout: 10
   fav_dropbox_clipping:
     disable: true
+  image_resize:
+    pixel: 1280
 shortened_url:
   domains:
     - t.co

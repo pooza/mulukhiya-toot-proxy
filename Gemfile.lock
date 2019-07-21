@@ -88,6 +88,7 @@ GEM
     eventmachine (1.2.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
+    fastimage (2.1.5)
     ffi (1.11.1)
     fugit (1.2.3)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -234,6 +235,7 @@ DEPENDENCIES
   amazon-ecs
   crowi-client!
   dropbox-sdk-v2!
+  fastimage
   ginseng-core!
   ginseng-postgres!
   ginseng-web!

@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
   autoload :GrowiClipper
   autoload :Handler
   autoload :HTTP
+  autoload :ImageFile
   autoload :ImageHandler
   autoload :Logger
   autoload :Mastodon
