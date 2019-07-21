@@ -9,6 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def convertable?
+      return false unless @file.image?
       return @config['/handler/image_resize/pixel'] < @file.long_side
     end
 
