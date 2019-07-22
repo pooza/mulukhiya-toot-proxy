@@ -3,13 +3,18 @@ require 'digest/sha1'
 
 module MulukhiyaTootProxy
   class ImageFile < File
+    def initialize(path, mode = 'r', perm = 0666)
+      @logger = Logger.new
+      super(path, mode, perm)
+    end
+
     def image?
       return File.readable?(path) && type.present?
     end
 
     def mime_type
-      return "image/#{type}" if image?
-      return nil
+      return nil unless image?
+      return "image/#{type}"
     end
 
     def type
@@ -35,14 +40,14 @@ module MulukhiyaTootProxy
     end
 
     def resize(pixel)
-      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: 'resize')}.#{type}")
-      system('convert', '-resize', "#{pixel}x#{pixel}", path, dest)
+      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
+      system('convert', '-resize', "#{pixel}x#{pixel}", path, dest, {exception: true})
       return ImageFile.new(dest)
     end
 
     def convert_type(type)
-      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: 'convert_type')}.#{type}")
-      system('convert', path, dest)
+      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
+      system('convert', path, dest, {exception: true})
       return ImageFile.new(dest)
     end
 
@@ -58,7 +63,7 @@ module MulukhiyaTootProxy
       @detail_info ||= `identify -verbose #{path.shellescape}`
       return @detail_info
     rescue => e
-      Logger.new.error(e)
+      @logger.error(e)
       return nil
     end
 
@@ -69,6 +74,9 @@ module MulukhiyaTootProxy
         @size_info = {width: size[0], height: size[1]}
       end
       return @size_info
+    rescue => e
+      @logger.error(e)
+      return nil
     end
   end
 end
