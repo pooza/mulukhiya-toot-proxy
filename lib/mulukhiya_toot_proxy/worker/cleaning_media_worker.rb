@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
       Dir.glob(File.join(Environment.dir, 'tmp/media/*')).each do |f|
         next unless File.new(f).mtime < @config['/worker/cleaning_media/days'].days.ago
         File.unlink(f)
-        @logger.info(worker:'CleaningMediaWorker', action: 'delete', path:f)
+        @logger.info(worker: 'CleaningMediaWorker', action: 'delete', path: f)
       end
     rescue => e
       @logger.error(e)
