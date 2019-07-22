@@ -61,13 +61,16 @@ handler:
     - result_notification
   pre_upload:
     - image_resize
-  post_upload: []
+  post_upload:
+    - result_notification
   post_fav:
     - fav_notification
     - fav_dropbox_clipping
     - fav_growi_clipping
+    - result_notification
   post_boost:
     - boost_notification
+    - result_notification
   default:
     timeout: 10
   fav_dropbox_clipping:
