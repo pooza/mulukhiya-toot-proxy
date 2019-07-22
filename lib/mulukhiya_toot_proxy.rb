@@ -30,6 +30,7 @@ module MulukhiyaTootProxy
   autoload :ImageHandler
   autoload :Logger
   autoload :Mastodon
+  autoload :MediaConvertHandler
   autoload :NotificationHandler
   autoload :NotificationWorker
   autoload :NowplayingHandler

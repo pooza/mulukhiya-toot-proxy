@@ -4,7 +4,7 @@ require 'digest/sha1'
 module MulukhiyaTootProxy
   class ImageFile < File
     def image?
-      return type.present?
+      return File.readable?(path) && type.present?
     end
 
     def mime_type
