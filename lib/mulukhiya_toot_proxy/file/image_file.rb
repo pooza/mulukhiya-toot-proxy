@@ -31,6 +31,10 @@ module MulukhiyaTootProxy
       return size_info[:height]
     end
 
+    def aspect
+      return width / height
+    end
+
     def long_side
       return [width, height].max
     end
