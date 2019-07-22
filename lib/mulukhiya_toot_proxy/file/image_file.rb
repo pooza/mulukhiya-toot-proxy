@@ -3,7 +3,7 @@ require 'digest/sha1'
 
 module MulukhiyaTootProxy
   class ImageFile < File
-    def initialize(path, mode = 'r', perm = 0666)
+    def initialize(path, mode = 'r', perm = 0o666)
       @logger = Logger.new
       super(path, mode, perm)
     end
@@ -53,9 +53,7 @@ module MulukhiyaTootProxy
 
     def convert_type(type)
       dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
-      unless File.exist?(dest)
-        system('convert', path, dest, {exception: true})
-      end
+      system('convert', path, dest, {exception: true}) unless File.exist?(dest)
       return ImageFile.new(dest)
     end
 
