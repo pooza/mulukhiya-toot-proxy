@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class ImageFormatHandler < MediaConvertHandler
     def convert
-      return @source.convert_type(:jpeg)
+      return @source&.convert_type(:jpeg)
     end
 
     def convertable?
