@@ -1,10 +1,11 @@
 module MulukhiyaTootProxy
   class MediaConvertHandler < Handler
     def handle_pre_upload(body, params = {})
-      return unless @file = create_file(body)
+      return unless @source = source_file(body)
       return unless convertable?
+      return unless @dest = convert
       body[:file][:org_tempfile] ||= body[:file][:tempfile]
-      body[:file][:tempfile] = convert
+      body[:file][:tempfile] = @dest
       @result.push(src: body[:file][:org_tempfile].path, dest: body[:file][:tempfile].path)
     end
 
@@ -20,7 +21,7 @@ module MulukhiyaTootProxy
       return ImageFile
     end
 
-    def create_file(body)
+    def source_file(body)
       return media_class.new(body[:file][:tempfile].path)
     rescue
       return nil

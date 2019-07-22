@@ -26,7 +26,6 @@ module MulukhiyaTootProxy
   autoload :GrowiClipper
   autoload :Handler
   autoload :HTTP
-  autoload :ImageFile
   autoload :ImageHandler
   autoload :Logger
   autoload :Mastodon
@@ -61,6 +60,10 @@ module MulukhiyaTootProxy
 
   autoload_under 'error' do
     autoload :ValidateError
+  end
+
+  autoload_under 'file' do
+    autoload :ImageFile
   end
 
   autoload_under 'renderer' do
