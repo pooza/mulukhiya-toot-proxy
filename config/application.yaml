@@ -72,6 +72,9 @@ handler:
     disable: true
   image_resize:
     pixel: 1280
+worker:
+  cleaning_media:
+    days: 1
 shortened_url:
   domains:
     - t.co

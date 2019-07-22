@@ -89,6 +89,7 @@ module MulukhiyaTootProxy
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
     autoload :BoostNotificationWorker
+    autoload :CleaningMediaWorker
     autoload :DropboxClippingWorker
     autoload :FavNotificationWorker
     autoload :GrowiClippingWorker
