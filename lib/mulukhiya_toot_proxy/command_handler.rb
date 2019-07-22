@@ -12,6 +12,8 @@ module MulukhiyaTootProxy
       @result.push(values)
     end
 
+    def handle_pre_webhook(body, params = {}); end
+
     def parse(status)
       values = YAML.safe_load(status) || JSON.parse(status)
       return nil unless values&.is_a?(Hash)
