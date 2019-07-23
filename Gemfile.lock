@@ -240,10 +240,9 @@ DEPENDENCIES
   ginseng-postgres!
   ginseng-web!
   nokogiri
-  omniauth-oauth2 (~> 1.5)
   rails-erb-lint
   redis
-  rspotify (~> 2.6)
+  rspotify
   rubocop
   sanitize
   sidekiq
