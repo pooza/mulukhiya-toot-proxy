@@ -36,7 +36,7 @@ module MulukhiyaTootProxy
     end
 
     def resize(pixel)
-      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
+      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{subtype}")
       unless File.exist?(dest)
         system('convert', '-resize', "#{pixel}x#{pixel}", path, dest, {exception: true})
       end
