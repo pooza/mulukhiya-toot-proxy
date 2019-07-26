@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'mimemagic'
 
 module MulukhiyaTootProxy
   class MediaFile < File
@@ -8,15 +9,19 @@ module MulukhiyaTootProxy
     end
 
     def valid?
-      return File.readable?(path) && type.present?
+      return mediatype == self.class.to_s.split('::').last.underscore.split('_').first
     end
 
-    def mime_type
-      return `file --mime-type #{path.shellescape}`.chomp.split(' ').last
+    def mediatype
+      return mimemagic.mediatype
+    end
+
+    def subtype
+      return mimemagic.subtype
     end
 
     def type
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return mimemagic.to_s
     end
 
     def convert_type(type)
@@ -29,6 +34,11 @@ module MulukhiyaTootProxy
           content: Digest::SHA1.hexdigest(File.read(path)),
         ).to_json,
       )
+    end
+
+    def mimemagic
+      @mimemagic ||= MimeMagic.by_magic(self)
+      return @mimemagic
     end
 
     def detail_info

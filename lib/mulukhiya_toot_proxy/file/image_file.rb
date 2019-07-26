@@ -4,17 +4,6 @@ module MulukhiyaTootProxy
   class ImageFile < MediaFile
     alias image? valid?
 
-    def mime_type
-      return nil unless image?
-      return "image/#{type}"
-    end
-
-    def type
-      return FastImage.type(path)
-    rescue
-      return nil
-    end
-
     def width
       return size_info[:width]
     end

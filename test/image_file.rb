@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def test_type
-      assert_equal(@file.type, :png)
+      assert_equal(@file.type, 'image/png')
     end
 
     def test_width
@@ -46,7 +46,7 @@ module MulukhiyaTootProxy
     def test_convert_type
       converted = @file.convert_type(:jpeg)
       assert(converted.is_a?(ImageFile))
-      assert_equal(converted.type, :jpeg)
+      assert_equal(converted.type, 'image/jpeg')
     end
   end
 end

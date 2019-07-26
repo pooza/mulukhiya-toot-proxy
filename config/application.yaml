@@ -55,6 +55,8 @@ handler:
     - result_notification
   pre_upload:
     - image_format
+    - audio_format
+    - video_format
     - image_resize
   post_upload:
     - result_notification
