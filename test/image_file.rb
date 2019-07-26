@@ -8,8 +8,12 @@ module MulukhiyaTootProxy
       assert(@file.image?)
     end
 
-    def test_mime_type
-      assert_equal(@file.mime_type, 'image/png')
+    def test_mediatype
+      assert_equal(@file.mediatype, 'image')
+    end
+
+    def test_subtype
+      assert_equal(@file.subtype, 'png')
     end
 
     def test_type
