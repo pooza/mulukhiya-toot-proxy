@@ -30,6 +30,7 @@ module MulukhiyaTootProxy
   autoload :Logger
   autoload :Mastodon
   autoload :MediaConvertHandler
+  autoload :MediaFile
   autoload :NotificationHandler
   autoload :NotificationWorker
   autoload :NowplayingHandler
@@ -63,7 +64,9 @@ module MulukhiyaTootProxy
   end
 
   autoload_under 'file' do
+    autoload :AudioFile
     autoload :ImageFile
+    autoload :VideoFile
   end
 
   autoload_under 'renderer' do

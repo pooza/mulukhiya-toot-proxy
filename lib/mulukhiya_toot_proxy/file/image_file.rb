@@ -1,16 +1,8 @@
 require 'fastimage'
-require 'digest/sha1'
 
 module MulukhiyaTootProxy
-  class ImageFile < File
-    def initialize(path, mode = 'r', perm = 0o666)
-      @logger = Logger.new
-      super(path, mode, perm)
-    end
-
-    def image?
-      return File.readable?(path) && type.present?
-    end
+  class ImageFile < MediaFile
+    alias image? valid?
 
     def mime_type
       return nil unless image?
@@ -55,14 +47,6 @@ module MulukhiyaTootProxy
       dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
       system('convert', path, dest, {exception: true}) unless File.exist?(dest)
       return ImageFile.new(dest)
-    end
-
-    def digest(params)
-      return Digest::SHA1.hexdigest(
-        params.merge(
-          content: Digest::SHA1.hexdigest(File.read(path)),
-        ).to_json,
-      )
     end
 
     def detail_info
