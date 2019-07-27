@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
       detail_info['streams'].each do |stream|
         next unless stream['codec_type'] == 'video'
         next unless stream['duration'].present?
-        stream['duration'].to_f
+        return stream['duration'].to_f
       end
     end
 
