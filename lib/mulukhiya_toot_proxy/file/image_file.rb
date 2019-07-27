@@ -41,9 +41,6 @@ module MulukhiyaTootProxy
     def detail_info
       @detail_info ||= `identify -verbose #{path.shellescape}`
       return @detail_info
-    rescue => e
-      @logger.error(e)
-      return nil
     end
 
     def size_info
@@ -53,9 +50,6 @@ module MulukhiyaTootProxy
         @size_info = {width: size[0], height: size[1]}
       end
       return @size_info
-    rescue => e
-      @logger.error(e)
-      return nil
     end
   end
 end
