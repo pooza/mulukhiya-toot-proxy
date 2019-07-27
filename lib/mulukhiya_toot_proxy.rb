@@ -59,10 +59,6 @@ module MulukhiyaTootProxy
     autoload :RedisDSN
   end
 
-  autoload_under 'error' do
-    autoload :ValidateError
-  end
-
   autoload_under 'file' do
     autoload :AudioFile
     autoload :ImageFile
