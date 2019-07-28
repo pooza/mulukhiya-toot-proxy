@@ -12,12 +12,8 @@ module MulukhiyaTootProxy
       return size_info[:height]
     end
 
-    def aspect
-      return width / height
-    end
-
-    def long_side
-      return [width, height].max
+    def duration
+      return nil
     end
 
     def alpha?
@@ -25,7 +21,7 @@ module MulukhiyaTootProxy
     end
 
     def resize(pixel)
-      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{subtype}")
+      dest = create_dest_path(f: __method__, type: subtype)
       unless File.exist?(dest)
         system('convert', '-resize', "#{pixel}x#{pixel}", path, dest, {exception: true})
       end
@@ -33,7 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def convert_type(type)
-      dest = File.join(Environment.dir, 'tmp/media', "#{digest(f: __method__)}.#{type}")
+      dest = create_dest_path(f: __method__, type: type)
       system('convert', path, dest, {exception: true}) unless File.exist?(dest)
       return ImageFile.new(dest)
     end
