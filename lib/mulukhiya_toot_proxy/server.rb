@@ -56,8 +56,11 @@ module MulukhiyaTootProxy
     end
 
     post '/mulukhiya/webhook/:digest' do
-      if webhook = Webhook.create(params[:digest])
-        raise Ginseng::RequestError, 'empty message' unless params[:text].present?
+      errors = WebhookContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif webhook = Webhook.create(params[:digest])
         results = webhook.toot(params)
         @renderer.message = results.response.parsed_response
         @renderer.message['results'] = results.summary
@@ -85,12 +88,19 @@ module MulukhiyaTootProxy
     end
 
     post '/mulukhiya/app/auth' do
-      r = Mastodon.new.auth(params[:code])
       @renderer = HTMLRenderer.new
-      @renderer.template = 'app_auth_result'
-      @renderer['status'] = r.code
-      @renderer['result'] = r.parsed_response
-      @renderer.status = r.code
+      errors = AppAuthContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.template = 'app_auth'
+        @renderer['errors'] = errors
+        @renderer['oauth_url'] = Mastodon.new.oauth_uri
+      else
+        r = Mastodon.new.auth(params[:code])
+        @renderer.template = 'app_auth_result'
+        @renderer['status'] = r.code
+        @renderer['result'] = r.parsed_response
+        @renderer.status = r.code
+      end
       return @renderer.to_s
     end
 

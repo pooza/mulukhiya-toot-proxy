@@ -76,6 +76,16 @@ module MulukhiyaTootProxy
     def test_hook_toot
       return if Environment.ci?
 
+      header 'Content-Type', 'application/json'
+      post '/mulukhiya/webhook', {text: 'ひらめけ！ホーリーソード！'}.to_json
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
+
+      header 'Content-Type', 'application/json'
+      post '/mulukhiya/webhook/0', {text: 'ひらめけ！ホーリーソード！'}.to_json
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
+
       hook = Webhook.owned_all(@account.username).to_a.first
 
       get hook.uri.path
@@ -88,6 +98,11 @@ module MulukhiyaTootProxy
       header 'Content-Type', 'application/json'
       post hook.uri.path, {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
       assert(last_response.ok?)
+
+      header 'Content-Type', 'application/json'
+      post hook.uri.path, {}.to_json
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 422)
     end
 
     def test_app_auth

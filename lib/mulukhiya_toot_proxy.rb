@@ -55,6 +55,11 @@ module MulukhiyaTootProxy
     autoload :ThinDaemon
   end
 
+  autoload_under 'contract' do
+    autoload :AppAuthContract
+    autoload :WebhookContract
+  end
+
   autoload_under 'dsn' do
     autoload :RedisDSN
   end

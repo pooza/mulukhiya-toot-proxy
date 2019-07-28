@@ -16,7 +16,10 @@
       <li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
       <li>
         取得した認証コードを↓に貼り付けて…
-        <input type="text" name="code" placeholder="認証コード" maxlength="64" class="code">
+        <input type="text" name="code" placeholder="認証コード" maxlength="64" class="code"><br>
+        <% if params.dig(:errors, :code) %>
+          <span class="alert"><%= params[:errors][:code].join %></span>
+        <% end %>
       </li>
       <li>
         <button id="submit_button">認証する</button>
