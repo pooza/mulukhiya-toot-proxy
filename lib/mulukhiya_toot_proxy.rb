@@ -9,10 +9,6 @@ require 'sidekiq-scheduler'
 require 'json'
 require 'yaml'
 
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.acronym 'ASIN'
-end
-
 module MulukhiyaTootProxy
   extend ActiveSupport::Autoload
 
@@ -93,10 +89,10 @@ module MulukhiyaTootProxy
   autoload_under 'worker' do
     autoload :AdminNotificationWorker
     autoload :BoostNotificationWorker
-    autoload :CleaningMediaWorker
     autoload :DropboxClippingWorker
     autoload :FavNotificationWorker
     autoload :GrowiClippingWorker
+    autoload :MediaCleaningWorker
     autoload :MentionNotificationWorker
     autoload :ResultNotificationWorker
     autoload :TaggingDictionaryWorker

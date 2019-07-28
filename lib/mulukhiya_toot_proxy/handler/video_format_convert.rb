@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class VideoFormatHandler < MediaConvertHandler
+  class VideoFormatConvertHandler < MediaConvertHandler
     def convert
       return @source&.convert_type(:mp4)
     end

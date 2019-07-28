@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonASINHandler < URLHandler
+  class AmazonURLHandler < URLHandler
     def rewrite(link)
       uri = AmazonURI.parse(link)
       uri.associate_tag = nil

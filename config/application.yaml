@@ -15,8 +15,8 @@ handler:
     - spotify_url_nowplaying
     - itunes_url_nowplaying
     - you_tube_url_nowplaying
-    - canonical
-    - amazon_asin
+    - canonical_url
+    - amazon_url
     - itunes_url
     - amazon_image
     - spotify_image
@@ -41,8 +41,8 @@ handler:
     - spotify_url_nowplaying
     - itunes_url_nowplaying
     - you_tube_url_nowplaying
-    - canonical
-    - amazon_asin
+    - canonical_url
+    - amazon_url
     - itunes_url
     - amazon_image
     - spotify_image
@@ -54,9 +54,9 @@ handler:
     - mention_notification
     - result_notification
   pre_upload:
-    - image_format
-    - audio_format
-    - video_format
+    - image_format_convert
+    - audio_format_convert
+    - video_format_convert
     - image_resize
   post_upload:
     - result_notification
@@ -75,7 +75,7 @@ handler:
   image_resize:
     pixel: 1280
 worker:
-  cleaning_media:
+  media_cleaning:
     days: 1
 shortened_url:
   domains:

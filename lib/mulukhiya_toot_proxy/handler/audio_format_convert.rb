@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AudioFormatHandler < MediaConvertHandler
+  class AudioFormatConvertHandler < MediaConvertHandler
     def convert
       return @source&.convert_type(:mp3)
     end

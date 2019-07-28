@@ -4,6 +4,6 @@
   tagging_dictionary:
     every: '5m'
     class: MulukhiyaTootProxy::TaggingDictionaryWorker
-  cleaning_media:
+  media_cleaning:
     every: '5m'
-    class: MulukhiyaTootProxy::CleaningMediaWorker
+    class: MulukhiyaTootProxy::MediaCleaningWorker
