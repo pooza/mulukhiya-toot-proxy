@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
         @params = params.clone.with_indifferent_access
       end
       @logger.info({request: {path: request.path, params: @params}})
+      @config = Config.instance
       @mastodon = Mastodon.new
       @results = ResultContainer.new
       return unless @headers['HTTP_AUTHORIZATION']
@@ -64,6 +65,7 @@ module MulukhiyaTootProxy
     end
 
     get '/api/v2/search' do
+      params[:limit] = @config['/mastodon/search/limit']
       @results.response = @mastodon.search(params[:q], params)
       @message = @results.response.parsed_response.with_indifferent_access
       Handler.exec_all(:post_search, params, {results: @results, message: @message})
