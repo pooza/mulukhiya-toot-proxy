@@ -68,7 +68,8 @@ handler:
   post_boost:
     - boost_notification
     - result_notification
-  post_search: []
+  post_search:
+    - result_notification
   default:
     timeout: 10
   fav_dropbox_clipping:

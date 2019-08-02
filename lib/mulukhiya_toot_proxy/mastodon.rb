@@ -49,8 +49,8 @@ module MulukhiyaTootProxy
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{@token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      params['q'] = keyword
-      params['limit'] ||= @config['/mastodon/search/limit']
+      params[:q] = keyword
+      params[:limit] ||= @config['/mastodon/search/limit']
       uri = create_uri('/api/v2/search')
       uri.query_values = params
       return @http.get(uri, {headers: headers})

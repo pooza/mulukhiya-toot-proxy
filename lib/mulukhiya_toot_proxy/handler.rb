@@ -29,6 +29,8 @@ module MulukhiyaTootProxy
 
     def handle_post_boost(body, params = {}); end
 
+    def handle_post_search(body, params = {}); end
+
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end

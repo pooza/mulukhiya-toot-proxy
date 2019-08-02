@@ -3,8 +3,16 @@ module MulukhiyaTootProxy
     include Package
     set :root, Environment.dir
 
-    def before_post
-      super
+    before do
+      @renderer = default_renderer_class.new
+      @headers = request.env.select{|k, v| k.start_with?('HTTP_')}
+      @body = request.body.read.to_s
+      begin
+        @params = JSON.parse(@body).with_indifferent_access
+      rescue JSON::ParserError
+        @params = params.clone.with_indifferent_access
+      end
+      @logger.info({request: {path: request.path, params: @params}})
       @mastodon = Mastodon.new
       @results = ResultContainer.new
       return unless @headers['HTTP_AUTHORIZATION']
@@ -56,12 +64,10 @@ module MulukhiyaTootProxy
     end
 
     get '/api/v2/search' do
-      @mastodon = Mastodon.new
-      @mastodon.token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
-      @results = ResultContainer.new
       @results.response = @mastodon.search(params[:q], params)
-      Handler.exec_all(:post_search, params, {results: @results})
-      @renderer.message = @results.response.parsed_response
+      @message = @results.response.parsed_response.with_indifferent_access
+      Handler.exec_all(:post_search, params, {results: @results, message: @message})
+      @renderer.message = @message
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s

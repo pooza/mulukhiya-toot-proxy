@@ -28,5 +28,10 @@ module MulukhiyaTootProxy
       return unless notifiable?(body)
       worker_class.perform_async(account_id: mastodon.account.id, results: results)
     end
+
+    def handle_post_search(body, params = {})
+      return unless notifiable?(body)
+      worker_class.perform_async(account_id: mastodon.account.id, results: results)
+    end
   end
 end
