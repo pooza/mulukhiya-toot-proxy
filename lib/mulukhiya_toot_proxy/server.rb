@@ -55,6 +55,18 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    get '/api/v2/search' do
+      @mastodon = Mastodon.new
+      @mastodon.token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
+      @results = ResultContainer.new
+      @results.response = @mastodon.search(params[:q], params)
+      Handler.exec_all(:post_search, params, {results: @results})
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    end
+
     post '/mulukhiya/webhook/:digest' do
       errors = WebhookContract.new.call(params).errors.to_h
       if errors.present?

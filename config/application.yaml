@@ -68,6 +68,7 @@ handler:
   post_boost:
     - boost_notification
     - result_notification
+  post_search: []
   default:
     timeout: 10
   fav_dropbox_clipping:
@@ -103,6 +104,8 @@ mastodon:
   max_length: 500
   toot:
     label: トゥート
+  search:
+    limit: 40
   hashtag:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
   account:
