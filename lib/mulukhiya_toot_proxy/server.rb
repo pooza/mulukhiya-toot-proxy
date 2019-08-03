@@ -5,19 +5,19 @@ module MulukhiyaTootProxy
 
     before do
       @renderer = default_renderer_class.new
-      @headers = request.env.select{|k, v| k.start_with?('HTTP_')}
+      @headers = request.env.select{|k, v| k.start_with?('HTTP_')}.map do |k, v|
+        [k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).gsub('_', '-'), v]
+      end.to_h
       @body = request.body.read.to_s
       begin
         @params = JSON.parse(@body).with_indifferent_access
       rescue JSON::ParserError
         @params = params.clone.with_indifferent_access
       end
-      @logger.info({request: {path: request.path, params: @params}})
-      @config = Config.instance
+      @logger.info(request: {path: request.path, params: @params})
       @mastodon = Mastodon.new
+      @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       @results = ResultContainer.new
-      return unless @headers['HTTP_AUTHORIZATION']
-      @mastodon.token = @headers['HTTP_AUTHORIZATION'].split(/\s+/)[1]
     end
 
     post '/api/v1/statuses' do
@@ -133,7 +133,7 @@ module MulukhiyaTootProxy
     end
 
     not_found do
-      @renderer = Ginseng::Web::JSONRenderer.new
+      @renderer = default_renderer_class.new
       @renderer.status = 404
       @renderer.message = Ginseng::NotFoundError.new("Resource #{request.path} not found.").to_h
       return @renderer.to_s
@@ -142,7 +142,7 @@ module MulukhiyaTootProxy
     error do |e|
       e = Ginseng::Error.create(e)
       e.package = Package.full_name
-      @renderer = Ginseng::Web::JSONRenderer.new
+      @renderer = default_renderer_class.new
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if{|k, v| k == :backtrace}
       @renderer.message['error'] = e.message

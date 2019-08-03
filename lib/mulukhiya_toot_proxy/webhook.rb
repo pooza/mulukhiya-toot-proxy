@@ -50,15 +50,9 @@ module MulukhiyaTootProxy
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {
-        results: results,
-        mastodon: @mastodon,
-      })
+      Handler.exec_all(:pre_webhook, body, {results: results, mastodon: @mastodon})
       results.response = @mastodon.toot(body)
-      Handler.exec_all(:post_webhook, body, {
-        results: results,
-        mastodon: @mastodon,
-      })
+      Handler.exec_all(:post_webhook, body, {results: results, mastodon: @mastodon})
       return results
     end
 
