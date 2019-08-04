@@ -22,15 +22,15 @@ module MulukhiyaTootProxy
 
     def resize(pixel)
       dest = create_dest_path(f: __method__, type: subtype)
-      unless File.exist?(dest)
-        system('convert', '-resize', "#{pixel}x#{pixel}", path, dest, {exception: true})
-      end
+      command = ['convert', '-resize', "#{pixel}x#{pixel}", path, dest]
+      system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
       return ImageFile.new(dest)
     end
 
     def convert_type(type)
       dest = create_dest_path(f: __method__, type: type)
-      system('convert', path, dest, {exception: true}) unless File.exist?(dest)
+      command = ['convert', path, dest]
+      system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
       return ImageFile.new(dest)
     end
 

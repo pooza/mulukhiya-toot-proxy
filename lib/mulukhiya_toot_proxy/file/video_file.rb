@@ -28,7 +28,8 @@ module MulukhiyaTootProxy
 
     def convert_type(type)
       dest = create_dest_path(f: __method__, type: type)
-      system('ffmpeg', '-y', '-i', path, dest, {exception: true}) unless File.exist?(dest)
+      command = ['ffmpeg', '-y', '-i', path, dest]
+      system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
       return VideoFile.new(dest)
     end
 
