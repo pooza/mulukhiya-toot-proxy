@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def rewrite(link)
       uri = ItunesURI.parse(link).shorten
       @status.sub!(link, uri.to_s)
-      return uri.to_s
+      return uri
     end
 
     private
