@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
-    def default_disable?
-      return true
+    def disable?
+      return false
     end
 
     def notifiable?(body)
