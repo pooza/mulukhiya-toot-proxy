@@ -199,7 +199,7 @@ GEM
       gli (~> 2.1)
       json
       rainbow (>= 2.2.2, < 4.0)
-    rails-html-sanitizer (1.0.4)
+    rails-html-sanitizer (1.1.0)
       loofah (~> 2.2, >= 2.2.2)
     rainbow (3.0.0)
     rake (12.3.3)

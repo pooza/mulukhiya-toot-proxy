@@ -1,0 +1,42 @@
+module MulukhiyaTootProxy
+  class StatusSearchHandler < Handler
+    def handle_post_search(body, params = {})
+      params[:message][:statuses] = []
+      rows = Postgres.instance.execute('toots', {
+        limit: @config['/mastodon/search/limit'],
+        keyword: body[:q],
+      })
+      rows.each do |row|
+        params[:message][:statuses].push(
+          id: row['id'],
+          created_at: row['created_at'],
+          sensitive: (row['sensitive'] == 't'),
+          spoiler_text: row['spoiler_text'],
+          url: row['url'],
+          uri: row['uri'],
+          replies_count: 0,
+          reblogs_count: 0,
+          favourites_count: 0,
+          content: row['text'],
+          account: {
+            id: 1,
+            username: 'pooza',
+            acct: 'pooza',
+            display_name: 'ぷーざさん ステージング',
+            locked: false,
+            note: '',
+            url: 'https://st.mstdn.b-shock.org/@pooza',
+            avatar: 'https://st.mstdn.b-shock.org/system/accounts/avatars/000/000/001/static/12f1adb3e86ecf3b.png?1555036051',
+            avatar_static: 'https://st.mstdn.b-shock.org/system/accounts/avatars/000/000/001/static/12f1adb3e86ecf3b.png?1555036051',
+            emojis: [],
+            fields: [],
+          },
+          media_attachments: [],
+          mentions: [],
+          tags: [],
+          emojis: [],
+        )
+      end
+    end
+  end
+end
