@@ -24,7 +24,6 @@ module MulukhiyaTootProxy
         @config["/handler/#{event}"].each do |v|
           handler = Handler.create(v)
           assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
-          assert(handler.default_disable?.is_a?(TrueClass) || handler.default_disable?.is_a?(FalseClass))
         end
       end
     end

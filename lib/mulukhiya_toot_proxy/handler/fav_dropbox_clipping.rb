@@ -1,9 +1,5 @@
 module MulukhiyaTootProxy
   class FavDropboxClippingHandler < Handler
-    def default_disable?
-      return true
-    end
-
     def handle_post_fav(body, params = {})
       uri = Toot.new(id: body['id'].to_i).uri
       DropboxClippingWorker.perform_async(
