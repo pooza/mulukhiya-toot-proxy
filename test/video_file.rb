@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def test_aspect
-      assert_equal(@file.aspect, 1.0)
+      assert_equal(@file.aspect, 1.7777777777777777)
     end
 
     def test_long_side

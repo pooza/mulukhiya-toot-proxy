@@ -41,7 +41,7 @@ module MulukhiyaTootProxy
     end
 
     def aspect
-      return width / height
+      return width.to_f / height.to_f
     rescue
       return nil
     end
