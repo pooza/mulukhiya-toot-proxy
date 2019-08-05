@@ -61,9 +61,9 @@ handler:
   post_upload:
     - result_notification
   post_fav:
-    - fav_notification
     - fav_dropbox_clipping
     - fav_growi_clipping
+    - fav_notification
     - result_notification
   post_boost:
     - boost_notification
