@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
       tags = TagContainer.scan(params[:status])
       Handler.exec_all(:pre_toot, params, {results: @results, mastodon: @mastodon})
       @results.response = @mastodon.toot(params)
-      Handler.exec_all(:post_toot, params, {results: @results})
+      Handler.exec_all(:post_toot, params, {results: @results, mastodon: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
@@ -35,7 +35,7 @@ module MulukhiyaTootProxy
     post '/api/v1/media' do
       Handler.exec_all(:pre_upload, params, {results: @results, mastodon: @mastodon})
       @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
-      Handler.exec_all(:post_upload, params, {results: @results})
+      Handler.exec_all(:post_upload, params, {results: @results, mastodon: @mastodon})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
