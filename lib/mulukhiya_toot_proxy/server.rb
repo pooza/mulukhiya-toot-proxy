@@ -48,7 +48,7 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses/:id/favourite' do
       @results.response = @mastodon.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {results: @results})
+      Handler.exec_all(:post_fav, params, {results: @results, mastodon: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
@@ -57,7 +57,7 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses/:id/reblog' do
       @results.response = @mastodon.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {results: @results})
+      Handler.exec_all(:post_boost, params, {results: @results, mastodon: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
