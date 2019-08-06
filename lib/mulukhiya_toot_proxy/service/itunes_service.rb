@@ -11,9 +11,9 @@ module MulukhiyaTootProxy
       return nil unless response['results'].present?
       return response['results'].first
     rescue Ginseng::RequestError => e
-      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found (#{e.message})"
+      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
     rescue => e
-      raise Ginseng::GatewayError, e.message
+      raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
     def lookup(id)
@@ -22,9 +22,9 @@ module MulukhiyaTootProxy
       return nil unless response['results'].present?
       return response['results'].first
     rescue Ginseng::RequestError => e
-      raise Ginseng::RequestError, "'#{id}' not found (#{e.message})"
+      raise Ginseng::RequestError, "Item '#{id}' not found", e.backtrace
     rescue => e
-      raise Ginseng::GatewayError, e.message
+      raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
     def create_track_uri(track)

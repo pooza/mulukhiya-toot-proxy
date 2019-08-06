@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
       return YAML.dump(v)
     rescue => e
       @logger.error(e)
-      raise Ginseng::RequestError, e.message
+      raise Ginseng::RequestError, e.message, e.backtrace
     end
   end
 end

@@ -41,7 +41,7 @@ module MulukhiyaTootProxy
 
     def webhook
       @webhook ||= Webhook.new(config)
-      raise 'Invalid webhook' unless @webhook.exist?
+      raise "Invalid webhook #{config.to_json}" unless @webhook.exist?
       return @webhook
     rescue => e
       @logger.error(e)
@@ -51,7 +51,7 @@ module MulukhiyaTootProxy
     def slack
       unless @slack
         uri = Ginseng::URI.parse(config['/slack/webhook'])
-        raise 'invalid URI' unless uri&.absolute?
+        raise "Invalid URI #{config['/slack/webhook']}" unless uri&.absolute?
         @slack = Slack.new(uri)
       end
       return @slack

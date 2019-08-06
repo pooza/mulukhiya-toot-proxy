@@ -13,19 +13,19 @@ module MulukhiyaTootProxy
     def get(key)
       return super(key)
     rescue => e
-      raise Ginseng::RedisError, e.message
+      raise Ginseng::RedisError, e.message, e.backtrace
     end
 
     def set(key, value)
       return super(key, value)
     rescue => e
-      raise Ginseng::RedisError, e.message
+      raise Ginseng::RedisError, e.message, e.backtrace
     end
 
     def del(key)
       return super(key)
     rescue => e
-      raise Ginseng::RedisError, e.message
+      raise Ginseng::RedisError, e.message, e.backtrace
     end
 
     def self.dsn

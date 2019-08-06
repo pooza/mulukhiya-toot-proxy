@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
       return nil if tracks.nil?
       return tracks.first
     rescue => e
-      raise Ginseng::GatewayError, "Track not found (#{e.message})" if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
       cnt = 1
       return RSpotify::Track.find(id)
     rescue => e
-      raise Ginseng::GatewayError, "Track not found (#{e.message})" if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -34,7 +34,7 @@ module MulukhiyaTootProxy
       cnt = 1
       return RSpotify::Artist.find(id)
     rescue => e
-      raise Ginseng::GatewayError, "Artist not found (#{e.message})" if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Artist not found', e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry

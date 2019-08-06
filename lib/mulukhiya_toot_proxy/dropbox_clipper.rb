@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
         upload("/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md", file.read)
       end
     rescue Dropbox::ApiError => e
-      raise Ginseng::GatewayError, "Dropbox upload error (#{e.message})"
+      raise Ginseng::GatewayError, 'Dropbox upload error', e.backtrace
     ensure
       File.unlink(src) if File.exist?(src)
     end

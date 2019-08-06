@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
       return template.to_s
     rescue => e
       Logger.new.info(Ginseng::Error.create(e).to_h.merge(toot_id: toot_id))
-      raise Ginseng::GatewayError, e.message
+      raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
     def service
