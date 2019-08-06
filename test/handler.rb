@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
 
     def test_disable?
       return if Environment.ci?
-      [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost].each do |event|
+      [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost, :post_search].each do |event|
         @config["/handler/#{event}"].each do |v|
           handler = Handler.create(v)
           assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
