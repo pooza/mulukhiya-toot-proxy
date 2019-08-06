@@ -19,6 +19,10 @@ module MulukhiyaTootProxy
       return @account
     end
 
+    def local?
+      return @params[:local] == 't'
+    end
+
     def text
       @text ||= Sanitize.clean(self[:text].gsub(/<br.*?>/, "\n")).strip
       return @text
