@@ -1,0 +1,8 @@
+- 2_6_9: /instance_url
+  3_0_0: /mastodon/url
+- 2_6_9: /nowplaying/artist_parser
+  3_0_0: /artist_parser
+- 2_6_9: /redis/dsn
+  3_0_0: /user_config/redis/dsn
+- 2_6_9: /twitter
+  3_0_0: null

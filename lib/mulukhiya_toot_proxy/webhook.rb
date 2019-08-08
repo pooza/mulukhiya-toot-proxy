@@ -18,7 +18,7 @@ module MulukhiyaTootProxy
     end
 
     def uri
-      uri = Ginseng::URI.parse(@config['/instance_url'])
+      uri = Ginseng::URI.parse(@config['/mastodon/url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
     end
@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
     def exist?
       return @db.execute('webhook_tokens', {
         token: @mastodon.token,
-        owner: @mastodon.account_id,
+        owner: @mastodon.account.id,
       }).present?
     rescue => e
       @logger.error(e)
@@ -50,15 +50,9 @@ module MulukhiyaTootProxy
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {
-        results: results,
-        mastodon: @mastodon,
-      })
+      Handler.exec_all(:pre_webhook, body, {results: results, mastodon: @mastodon})
       results.response = @mastodon.toot(body)
-      Handler.exec_all(:post_webhook, body, {
-        results: results,
-        mastodon: @mastodon,
-      })
+      Handler.exec_all(:post_webhook, body, {results: results, mastodon: @mastodon})
       return results
     end
 
@@ -66,7 +60,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Webhook.new(UserConfigStorage.new[webhook.mastodon.account_id])
+        return Account.new(id: webhook.mastodon.account.id).webhook
       end
       return nil
     end
@@ -74,14 +68,14 @@ module MulukhiyaTootProxy
     def self.all
       return enum_for(__method__) unless block_given?
       Postgres.instance.execute('webhook_tokens').each do |row|
-        yield Webhook.new({'/webhook/token' => row['token']})
+        yield Webhook.new('/webhook/token' => row['token'])
       end
     end
 
     def self.owned_all(account)
       return enum_for(__method__, account) unless block_given?
       all do |webhook|
-        next unless webhook.mastodon.account['username'] == account.sub(/^@/, '')
+        next unless webhook.mastodon.account.username == account.sub(/^@/, '')
         yield webhook
       end
     end

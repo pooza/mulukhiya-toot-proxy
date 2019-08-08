@@ -6,23 +6,59 @@ module MulukhiyaTootProxy
     def initialize(uri = nil, token = nil)
       @config = Config.instance
       @logger = Logger.new
-      uri ||= @config['/instance_url']
+      uri ||= @config['/mastodon/url']
       token ||= @config['/test/token']
       super
       @uri = MastodonURI.parse(uri)
       @token = token
     end
 
-    def account_id
-      return account['id'].to_i
-    rescue => e
-      @logger.error(e)
-      return nil
+    def upload(path, params = {})
+      params[:headers] ||= {
+        'Authorization' => "Bearer #{@token}",
+        'X-Mulukhiya' => Package.name,
+      }
+      return super(path, params)
+    end
+
+    def favourite(id, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri("/api/v1/statuses/#{id}/favourite"), {
+        body: '{}',
+        headers: headers,
+      })
+    end
+
+    alias fav favourite
+
+    def reblog(id, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri("/api/v1/statuses/#{id}/reblog"), {
+        body: '{}',
+        headers: headers,
+      })
+    end
+
+    alias boost reblog
+
+    def search(keyword, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      params[:q] = keyword
+      params[:limit] ||= @config['/mastodon/search/limit']
+      uri = create_uri('/api/v2/search')
+      uri.query_values = params
+      return @http.get(uri, {headers: headers})
     end
 
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
-      @account ||= Mastodon.lookup_token_owner(@token)
+      @account ||= Account.new(token: @token)
       return @account
     end
 
@@ -70,19 +106,25 @@ module MulukhiyaTootProxy
 
     def self.lookup_attachment(id)
       rows = Postgres.instance.execute('attachment', {id: id})
-      return rows.first if rows.present?
+      return rows.first.with_indifferent_access if rows.present?
       return nil
     end
 
     def self.lookup_account(id)
       rows = Postgres.instance.execute('account', {id: id})
-      return rows.first if rows.present?
+      return rows.first.with_indifferent_access if rows.present?
+      return nil
+    end
+
+    def self.lookup_toot(id)
+      rows = Postgres.instance.execute('toot', {id: id})
+      return rows.first.with_indifferent_access if rows.present?
       return nil
     end
 
     def self.lookup_token_owner(token)
       rows = Postgres.instance.execute('token_owner', {token: token})
-      return rows.first if rows.present?
+      return rows.first.with_indifferent_access if rows.present?
       return nil
     end
   end

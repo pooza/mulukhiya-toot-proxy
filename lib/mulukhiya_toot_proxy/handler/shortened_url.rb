@@ -10,6 +10,7 @@ module MulukhiyaTootProxy
         uri = Ginseng::URI.parse(location)
       end
       @status.sub!(link, uri.to_s)
+      return uri
     end
 
     private

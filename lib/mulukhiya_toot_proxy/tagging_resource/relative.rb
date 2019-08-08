@@ -6,7 +6,8 @@ module MulukhiyaTootProxy
         [create_key(k), {pattern: create_pattern(k), words: words.map{|word| create_key(word)}}]
       end.to_h
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h.concat({resource: @params}))
+      @logger.error(Ginseng::Error.create(e).to_h.merge(resource: @params))
+      return {}
     end
   end
 end

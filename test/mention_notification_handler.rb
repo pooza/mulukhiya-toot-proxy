@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return if Environment.ci?
       @config = Config.instance
       @handler = Handler.create('mention_notification')
-      @account = Mastodon.lookup_token_owner(@config['/test/token'])
+      @account = Account.new(token: @config['/test/token'])
     end
 
     def test_handle_post_toot
@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_post_toot({'status' => "通知を含むトゥートのテスト\n @#{@account['username']}"})
+      @handler.handle_post_toot({'status' => "通知を含むトゥートのテスト\n @#{@account.username}"})
       assert_equal(@handler.result[:entries], [true])
     end
   end

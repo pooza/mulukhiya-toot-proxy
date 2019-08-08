@@ -1,11 +1,21 @@
 module MulukhiyaTootProxy
   class GrowiClippingWorker < ClippingWorker
     def perform(params)
-      return unless clipper = create_clipper(params['account']['id'])
-      clipper.clip({
+      return unless account = Account.new(id: params['account_id'])
+      account.growi&.clip(
         body: create_body(params),
-        path: GrowiClipper.create_path(params['account']['username']),
-      })
+        path: create_path(account.username),
+      )
+    end
+
+    def create_path(username)
+      return File.join(
+        '/',
+        Package.short_name,
+        'user',
+        username,
+        Time.now.strftime('%Y/%m/%d/%H%M%S'),
+      )
     end
   end
 end

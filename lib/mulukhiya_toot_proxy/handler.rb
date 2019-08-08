@@ -9,15 +9,9 @@ module MulukhiyaTootProxy
     attr_reader :mastodon
     attr_reader :local_tags
 
-    def handle_pre_toot(body, params = {})
-      return nil
-    end
+    def handle_pre_toot(body, params = {}); end
 
-    alias exec handle_pre_toot
-
-    def handle_post_toot(body, params = {})
-      return nil
-    end
+    def handle_post_toot(body, params = {}); end
 
     def handle_pre_webhook(body, params = {})
       handle_pre_toot(body, params)
@@ -26,6 +20,16 @@ module MulukhiyaTootProxy
     def handle_post_webhook(body, params = {})
       handle_post_toot(body, params)
     end
+
+    def handle_pre_upload(body, params = {}); end
+
+    def handle_post_upload(body, params = {}); end
+
+    def handle_post_fav(body, params = {}); end
+
+    def handle_post_boost(body, params = {}); end
+
+    def handle_post_search(body, params = {}); end
 
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
@@ -52,9 +56,8 @@ module MulukhiyaTootProxy
     end
 
     def disable?
-      return true if @user_config["/handler/#{underscore_name}/disable"]
-      return true if @user_config['/handler/default/disable']
-      return true if @config["/handler/#{underscore_name}/disable"]
+      return true if mastodon.account.disable?(underscore_name)
+      return true if @config.disable?(underscore_name)
       return false
     rescue Ginseng::ConfigError
       return false
@@ -62,27 +65,17 @@ module MulukhiyaTootProxy
 
     alias disabled? disable?
 
-    def events
-      return [:pre_toot, :pre_webhook]
-    end
-
     def self.create(name, params = {})
       require "mulukhiya_toot_proxy/handler/#{name}"
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
     end
 
-    def self.all(params = {})
-      return enum_for(__method__, params) unless block_given?
-      Config.instance['/handler/all'].each do |v|
-        yield create(v, params)
-      end
-    end
-
     def self.exec_all(event, body, params = {})
+      params[:event] = event
       params[:results] ||= ResultContainer.new
       params[:tags] ||= TagContainer.new
-      all(params.merge({event: event})) do |handler|
-        next unless handler.events.include?(event)
+      Config.instance["/handler/#{event}"].each do |v|
+        handler = create(v, params)
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
@@ -93,7 +86,7 @@ module MulukhiyaTootProxy
         Logger.new.error(e)
         next
       rescue RestClient::Exception, HTTParty::Error => e
-        raise Ginseng::GatewayError, e.message
+        raise Ginseng::GatewayError, e.message, e.backtrace
       end
       return params[:results]
     end
@@ -106,24 +99,9 @@ module MulukhiyaTootProxy
       @result = []
       @local_tags = []
       @mastodon = params[:mastodon] || Mastodon.new
-      @user_config = UserConfigStorage.new[@mastodon.account_id]
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'
-    end
-
-    def user_config
-      return UserConfigStorage.new[mastodon.account_id]
-    end
-
-    def webhook
-      unless @webhook
-        @webhook = Webhook.new(user_config)
-        return nil unless @webhook.exist?
-      end
-      return @webhook
-    rescue
-      return nil
     end
   end
 end

@@ -1,7 +1,9 @@
 module MulukhiyaTootProxy
   class URLNormalizeHandler < URLHandler
     def rewrite(link)
-      return @status.sub!(link, Ginseng::URI.parse(link).normalize.to_s)
+      uri = Ginseng::URI.parse(link).normalize
+      @status.sub!(link, uri.to_s)
+      return uri
     end
   end
 end

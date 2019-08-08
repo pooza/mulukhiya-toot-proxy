@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://open.spotify.com/track/1nRvy34z0NcTga59qOSYId'})
-      assert(@handler.result[:entries].present?)
+      assert(@handler.result[:entries].present?) if @handler.result
     end
   end
 end

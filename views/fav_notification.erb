@@ -1,0 +1,10 @@
+<%# encoding: UTF-8 -%>
+<%= @params[:toot][:text] %>
+
+この<%= @params[:config]['/mastodon/toot/label'] %>が、<%= '' -%>
+<% if @params[:account][:display_name].present? -%>
+<%= @params[:account][:display_name] %> (@<%= @params[:account][:username] %>)<%= '' -%>
+<% else -%>
+@<%= @params[:account][:username] -%>
+<% end -%>
+さんにお気に入り設定されました。

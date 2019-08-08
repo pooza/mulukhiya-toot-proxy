@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
       end
       return create_published_image_uri(asin)
     rescue Amazon::RequestError => e
-      raise Ginseng::GatewayError, e.message if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -63,7 +63,7 @@ module MulukhiyaTootProxy
       end
       return nil
     rescue Amazon::RequestError => e
-      raise Ginseng::GatewayError, e.message if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
       retry
@@ -77,6 +77,8 @@ module MulukhiyaTootProxy
 
     def self.associate_tag
       return Config.instance['/amazon/associate_tag']
+    rescue Ginseng::ConfigError
+      return nil
     end
 
     def self.accesskey?

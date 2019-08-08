@@ -1,13 +1,12 @@
 package:
-  version: 2.3.9
+  version: 3.0.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
-instance_url: https://mstdn.example.com/
 handler:
-  all:
+  pre_toot:
     - shortened_url
     - url_normalize
     - spotify_nowplaying
@@ -16,27 +15,70 @@ handler:
     - spotify_url_nowplaying
     - itunes_url_nowplaying
     - you_tube_url_nowplaying
-    - canonical
-    - amazon_asin
+    - canonical_url
+    - amazon_url
+    - itunes_url
+    - amazon_image
+    - spotify_image
+    - itunes_image
+    - tagging
+    - user_config_command
+    - growi_clipping_command
+    - dropbox_clipping_command
+    - webhook_url_command
+  post_toot:
+    - growi_clipping_command
+    - dropbox_clipping_command
+    - admin_notification
+    - mention_notification
+    - result_notification
+  pre_webhook:
+    - shortened_url
+    - url_normalize
+    - spotify_nowplaying
+    - amazon_nowplaying
+    - itunes_nowplaying
+    - spotify_url_nowplaying
+    - itunes_url_nowplaying
+    - you_tube_url_nowplaying
+    - canonical_url
+    - amazon_url
     - itunes_url
     - amazon_image
     - spotify_image
     - itunes_image
     - webhook_image
     - tagging
-    - user_config_command
-    - growi_clipping
-    - growi_clipping_command
-    - dropbox_clipping
-    - dropbox_clipping_command
-    - webhook_url_command
+  post_webhook:
     - admin_notification
     - mention_notification
     - result_notification
+  pre_upload:
+    - image_format_convert
+    - audio_format_convert
+    - video_format_convert
+    - image_resize
+  post_upload:
+    - result_notification
+  post_fav:
+    - fav_dropbox_clipping
+    - fav_growi_clipping
+    - fav_notification
+    - result_notification
+  post_boost:
+    - boost_notification
+    - result_notification
+  post_search:
+    - result_notification
   default:
     timeout: 10
-  admin_notification:
-    update_timeline: false
+  fav_dropbox_clipping:
+    disable: true
+  image_resize:
+    pixel: 1280
+worker:
+  media_cleaning:
+    days: 1
 shortened_url:
   domains:
     - t.co
@@ -50,6 +92,7 @@ shortened_url:
     - spoti.fi
     - apple.co
 mastodon:
+  url: https://mstdn.example.com/
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -58,9 +101,12 @@ mastodon:
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
+    - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   max_length: 500
   toot:
     label: トゥート
+  search:
+    limit: 40
   hashtag:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
   account:
@@ -89,9 +135,6 @@ spotify:
     track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
-twitter:
-  patterns:
-    tweet: ^/(.+?)/status/([[:digit:]]+)
 itunes:
   country: jp
   lang: ja_jp
@@ -107,56 +150,56 @@ itunes:
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
-nowplaying:
-  artist_parser:
-    delimiters:
-      - /
-      - 、
-    patterns:
-      - pattern: ^[^():]+、
-        delimited: true
-      - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
-        delimited: true
-      - pattern: '^(.+\s*\(.+\)、?){2,}$'
-        delimited: true
-      - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
-        items:
-          - drop: true
-          - drop: true
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'CV:'
-      - pattern: '^歌:(.+)\s*コーラス:(.+)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'コーラス:'
-      - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: 'コーラス:'
-      - pattern: '^(.+)\s*\(as\s*(.+)\)$'
-        items:
-          - strip: true
-            prefix: 'CV:'
-          - split: true
-      - pattern: '^(.+)\s*\((.+)\)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-      - pattern: '^(.+)\s*feat\.\s*(.+)$'
-        items:
-          - split: true
-          - strip: true
-            split: true
-            prefix: feat.
-redis:
-  dsn: redis://localhost:6379/1
+artist_parser:
+  delimiters:
+    - /
+    - 、
+  patterns:
+    - pattern: ^[^():]+、
+      delimited: true
+    - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
+      delimited: true
+    - pattern: '^(.+\s*\(.+\)、?){2,}$'
+      delimited: true
+    - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
+      items:
+        - drop: true
+        - drop: true
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'CV:'
+    - pattern: '^歌:(.+)\s*コーラス:(.+)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'コーラス:'
+    - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: 'コーラス:'
+    - pattern: '^(.+)\s*\(as\s*(.+)\)$'
+      items:
+        - strip: true
+          prefix: 'CV:'
+        - split: true
+    - pattern: '^(.+)\s*\((.+)\)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+    - pattern: '^(.+)\s*feat\.\s*(.+)$'
+      items:
+        - split: true
+        - strip: true
+          split: true
+          prefix: feat.
+user_config:
+  redis:
+    dsn: redis://localhost:6379/1
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
 slack:

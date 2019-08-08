@@ -6,10 +6,10 @@ module MulukhiyaTootProxy
       body['status'].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         next unless updatable?(link)
         image = create_image_uri(link)
-        body['media_ids'].push(@mastodon.upload_remote_resource(image))
-        @result.push(image.to_s)
+        body['media_ids'].push(mastodon.upload_remote_resource(image))
+        @result.push(url: image.to_s)
         break
-      rescue Ginseng::GatewayError => e
+      rescue Ginseng::GatewayError, RestClient::TooManyRequests => e
         @logger.error(e)
         next
       end

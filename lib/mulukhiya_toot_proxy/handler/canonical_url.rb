@@ -1,15 +1,17 @@
 require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class CanonicalHandler < URLHandler
+  class CanonicalURLHandler < URLHandler
     def initialize(params = {})
       super(params)
-      @canonicals = {}
+      @uris = {}
       @http = HTTP.new
     end
 
     def rewrite(link)
-      @status.sub!(link, @canonicals[link]) if @canonicals[link].present?
+      raise Ginseng::NotFoundError, "Canonical for '#{link}' not found" unless @uris[link]
+      @status.sub!(link, @uris[link].to_s)
+      return @uris[link]
     end
 
     private
@@ -26,7 +28,7 @@ module MulukhiyaTootProxy
       uri = Ginseng::URI.parse(elements.first.attribute('href'))
       return false unless uri.absolute?
       return false if uri.path == '/'
-      @canonicals[link] = uri.to_s
+      @uris[link] = uri
       return true
     rescue => e
       @logger.error(e)

@@ -7,17 +7,13 @@ module MulukhiyaTootProxy
       body['attachments'].each do |attachment|
         uri = Ginseng::URI.parse(attachment['image_url'])
         next unless uri&.absolute?
-        body['media_ids'].push(@mastodon.upload_remote_resource(uri))
-        @result.push(uri.to_s)
+        body['media_ids'].push(mastodon.upload_remote_resource(uri))
+        @result.push(source_url: uri.to_s)
         break
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.concat({attachment: attachment}))
+        @logger.error(Ginseng::Error.create(e).to_h.merge(attachment: attachment))
         next
       end
-    end
-
-    def events
-      return [:pre_webhook]
     end
   end
 end

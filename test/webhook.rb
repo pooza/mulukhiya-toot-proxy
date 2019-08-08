@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return if Environment.ci?
       @config = Config.instance
-      @account = Mastodon.lookup_token_owner(@config['/test/token'])
+      @account = Account.new(token: @config['/test/token'])
     end
 
     def test_all
@@ -50,7 +50,7 @@ module MulukhiyaTootProxy
 
     def test_toot
       return if Environment.ci?
-      hook = Webhook.owned_all(@account['username']).to_a.first
+      hook = Webhook.owned_all(@account.username).to_a.first
       assert_equal(hook.toot('木の水晶球').response.code, 200)
     end
   end

@@ -12,20 +12,16 @@ module MulukhiyaTootProxy
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    private
-
-    def connect_slack(id)
-      uri = Ginseng::URI.parse(UserConfigStorage.new[id]['/slack/webhook'])
-      raise 'invalid URI' unless uri&.absolute?
-      return Slack.new(uri)
-    rescue => e
-      raise Ginseng::ConfigError, "Invalid webhook (#{e.message})"
+    def template_name
+      return 'toot_notification'
     end
 
     def create_message(params)
-      template = Template.new('notification')
-      template[:account] = params[:account]
+      template = Template.new(template_name)
+      template[:account] = params[:account]&.to_h
+      template[:toot] = params[:toot]&.to_h
       template[:status] = params[:status]
+      template[:config] = @config
       return template.to_s
     end
   end

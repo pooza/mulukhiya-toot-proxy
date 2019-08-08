@@ -1,22 +1,22 @@
 module MulukhiyaTootProxy
-  class AmazonASINHandler < URLHandler
-    def disable?
-      return @config["/handler/#{underscore_name}/disable"] if affiliate?
-      return super
-    rescue Ginseng::ConfigError
-      return false
-    end
-
+  class AmazonURLHandler < URLHandler
     def rewrite(link)
       uri = AmazonURI.parse(link)
+      uri.associate_tag = nil
       uri.associate_tag = AmazonService.associate_tag if affiliate?
       @status.sub!(link, uri.shorten.to_s)
+      return uri.shorten
     end
 
     private
 
     def affiliate?
-      return @config['/amazon/affiliate']
+      return false if mastodon.account.config['/amazon/affiliate'].is_a?(FalseClass)
+      return false unless @config['/amazon/affiliate']
+      return true
+    rescue => e
+      @logger.error(e)
+      return true
     end
 
     def rewritable?(link)

@@ -1,43 +1,39 @@
 module MulukhiyaTootProxy
   module Package
-    def module_name
-      return 'MulukhiyaTootProxy'
-    end
-
     def environment_class
-      return "#{module_name}::Environment".constantize
+      return Environment
     end
 
     def package_class
-      return "#{module_name}::Package".constantize
+      return Package
     end
 
     def config_class
-      return "#{module_name}::Config".constantize
+      return Config
     end
 
     def logger_class
-      return "#{module_name}::Logger".constantize
+      return Logger
     end
 
     def template_class
-      return "#{module_name}::Template".constantize
+      return Template
     end
 
     def database_class
-      return "#{module_name}::Postgres".constantize
+      return Postgres
     end
 
     def query_template_class
-      return "#{module_name}::QueryTemplate".constantize
+      return QueryTemplate
     end
 
     def http_class
-      return "#{module_name}::HTTP".constantize
+      return HTTP
     end
 
     def you_tube_service_class
-      return "#{module_name}::YouTubeService".constantize
+      return YouTubeService
     end
 
     def self.name

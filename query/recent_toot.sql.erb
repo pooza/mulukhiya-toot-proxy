@@ -1,0 +1,14 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  toots.id
+FROM statuses AS toots
+  INNER JOIN accounts ON accounts.id=toots.account_id
+  INNER JOIN users ON users.account_id=accounts.id
+WHERE (toots.visibility=0)
+  AND (accounts.domain IS NULL)
+  AND (accounts.silenced_at IS NULL)
+  AND (accounts.suspended_at IS NULL)
+  AND (accounts.id='<%= params[:id] %>')
+GROUP BY toots.id
+ORDER BY toots.created_at DESC
+LIMIT 1

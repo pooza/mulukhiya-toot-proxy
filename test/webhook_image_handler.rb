@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
           {'image_url' => 'https://m.media-amazon.com/images/I/81S31QX87tL._SS500_.jpg'},
         ],
       })
-      assert_equal(@handler.result[:entries], ['https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'])
+      assert_equal(@handler.result[:entries], [{source_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]) if @handler.result
     end
   end
 end
