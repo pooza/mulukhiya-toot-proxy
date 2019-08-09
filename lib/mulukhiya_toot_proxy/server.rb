@@ -4,20 +4,17 @@ module MulukhiyaTootProxy
     set :root, Environment.dir
 
     before do
-      @renderer = default_renderer_class.new
       @headers = request.env.select{|k, v| k.start_with?('HTTP_')}.map do |k, v|
         [k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).gsub('_', '-'), v]
       end.to_h
-      @body = request.body.read.to_s
       begin
         @params = JSON.parse(@body).with_indifferent_access
       rescue JSON::ParserError
         @params = params.clone.with_indifferent_access
       end
+      @results = ResultContainer.new
       @mastodon = Mastodon.new
       @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
-      @results = ResultContainer.new
-      @logger.info(request: {path: request.path, params: @params})
     end
 
     post '/api/v1/statuses' do
