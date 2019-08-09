@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
       elsif key[:id]
         @params = Mastodon.lookup_account(key[:id].to_i)
       end
-      raise Ginseng::NotFoundError, "Toot '#{key.to_json}' not found" unless @params.present?
+      raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
     end
 
     def id
