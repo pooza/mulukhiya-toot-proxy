@@ -1,5 +1,14 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
+    def disable?
+      return true if mastodon.account.config['/handler/result_notification/disable'].nil?
+      return true if mastodon.account.disable?(underscore_name)
+      return true if @config.disable?(underscore_name)
+      return false
+    rescue Ginseng::ConfigError
+      return false
+    end
+
     def notifiable?(body)
       return false unless mastodon.account.config['/slack/webhook'].present?
       return results.present?
