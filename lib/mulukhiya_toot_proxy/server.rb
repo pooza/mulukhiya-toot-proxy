@@ -14,10 +14,10 @@ module MulukhiyaTootProxy
       rescue JSON::ParserError
         @params = params.clone.with_indifferent_access
       end
-      @logger.info(request: {path: request.path, params: @params})
       @mastodon = Mastodon.new
       @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       @results = ResultContainer.new
+      @logger.info(request: {path: request.path, params: @params})
     end
 
     post '/api/v1/statuses' do
