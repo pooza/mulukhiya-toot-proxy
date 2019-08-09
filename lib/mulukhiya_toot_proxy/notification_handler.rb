@@ -1,6 +1,8 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def disable?
+      return @config.disable?(underscore_name)
+    rescue Ginseng::ConfigError
       return false
     end
 
