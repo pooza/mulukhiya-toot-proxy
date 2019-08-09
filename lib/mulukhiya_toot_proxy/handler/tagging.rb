@@ -1,8 +1,9 @@
 module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
+      body[:status] = TagContainer.tweak(body[:status])
       return body if ignore?(body)
-      @tags.body = body['status']
+      @tags.body = body[:status]
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
@@ -13,7 +14,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body)) if attachment_tags?(body)
       @tags.concat(TagContainer.default_tags) if default_tags?(body)
-      body['status'] = append(body['status'], @tags)
+      body[:status] = append(body[:status], @tags)
       @result.concat(@tags.create_tags)
       return body
     end
@@ -21,34 +22,34 @@ module MulukhiyaTootProxy
     private
 
     def ignore?(body)
-      return true if body['visibility'] == 'direct'
+      return true if body[:visibility] == 'direct'
       @config['/tagging/ignore_addresses'].each do |addr|
-        return true if body['status'] =~ Regexp.new("(^|\s)#{addr}($|\s)")
+        return true if body[:status] =~ Regexp.new("(^|\s)#{addr}($|\s)")
       end
       return false
     end
 
     def default_tags?(body)
-      return true unless body['visibility']
-      return true if body['visibility'] == 'public'
+      return true unless body[:visibility]
+      return true if body[:visibility] == 'public'
       return true if @config['/tagging/always_default_tags']
       return false
     end
 
     def attachment_tags?(body)
-      return body['media_ids'].present?
+      return body[:media_ids].present?
     end
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
       text = [@tags.body.gsub(Regexp.new(@config['/mastodon/account/pattern']), '')]
-      text.concat(body['poll']['options']) if body['poll']
+      text.concat(body[:poll]['options']) if body[:poll]
       return text.join('///')
     end
 
     def create_attachment_tags(body)
       tags = []
-      (body['media_ids'] || []).each do |id|
+      (body[:media_ids] || []).each do |id|
         type = Mastodon.lookup_attachment(id)['file_content_type']
         ['video', 'image', 'audio'].each do |mediatype|
           if type.start_with?("#{mediatype}/")

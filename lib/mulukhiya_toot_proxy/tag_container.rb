@@ -52,6 +52,12 @@ module MulukhiyaTootProxy
       return body.scan(pattern).map(&:first)
     end
 
+    def self.tweak(body)
+      body.gsub!(/ *#/, ' #')
+      body.sub!(/^ #/, '#')
+      return body
+    end
+
     private
 
     def create_pattern(tag)
