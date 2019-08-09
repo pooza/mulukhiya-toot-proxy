@@ -154,6 +154,8 @@ itunes:
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
+twittodon:
+  pattern: \n\nvia\.\s+(.*)$
 artist_parser:
   delimiters:
     - /
