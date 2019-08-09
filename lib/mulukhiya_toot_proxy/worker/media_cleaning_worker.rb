@@ -13,9 +13,10 @@ module MulukhiyaTootProxy
         next unless File.new(f).mtime < @config['/worker/media_cleaning/days'].days.ago
         File.unlink(f)
         @logger.info(worker: 'MediaCleaningWorker', action: 'delete', path: f)
+      rescue => e
+        @logger.error(e)
+        next
       end
-    rescue => e
-      @logger.error(e)
     end
   end
 end
