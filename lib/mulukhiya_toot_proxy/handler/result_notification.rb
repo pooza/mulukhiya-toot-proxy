@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
     def notifiable?(body)
+      return false unless mastodon.account.config['/slack/webhook'].present?
       return results.present?
     end
 
