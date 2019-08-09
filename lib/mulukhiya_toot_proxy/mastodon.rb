@@ -14,10 +14,9 @@ module MulukhiyaTootProxy
     end
 
     def upload(path, params = {})
-      params[:headers] ||= {
-        'Authorization' => "Bearer #{@token}",
-        'X-Mulukhiya' => Package.name,
-      }
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       return super(path, params)
     end
 
