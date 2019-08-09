@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def perform(params)
       from_account = Account.new(id: params['account_id'])
       accounts = params['status'].scan(/@([[:word:]]+)(\s|$)/).map(&:first).uniq
-      pattern = "(#{accounts.join('|')})"
+      pattern = "^(#{accounts.join('|')})$"
       @db.execute('notificatable_accounts', {id: from_account.id, pattern: pattern}).each do |row|
         account = Account.new(id: row['id'])
         next unless account.config['/slack/webhook'].present?
