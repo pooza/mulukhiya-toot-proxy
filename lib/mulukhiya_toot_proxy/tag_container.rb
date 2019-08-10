@@ -1,4 +1,5 @@
 require 'unicode'
+require 'digest/sha1'
 
 module MulukhiyaTootProxy
   class TagContainer < Array
@@ -53,8 +54,18 @@ module MulukhiyaTootProxy
     end
 
     def self.tweak(body)
+      links = {}
+      source = body.clone
+      source.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+        key = Digest::SHA1.hexdigest(link)
+        links[key] = link
+        body.sub!(link, key)
+      end
       body.gsub!(/ *#/, ' #')
       body.sub!(/^ #/, '#')
+      links.each do |key, link|
+        body.sub!(key, link)
+      end
       return body
     end
 
