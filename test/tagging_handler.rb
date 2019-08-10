@@ -138,6 +138,14 @@ module MulukhiyaTootProxy
       assert_equal(@handler.handle_pre_toot(body)['status'], "アンケート\n#ふたりはプリキュア")
     end
 
+    def test_handle_pre_toot_with_twittodon
+      @config['/tagging/default_tags'] = []
+
+      @handler.clear
+      body = {'status' => "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア#おほしSUMMERバケーション#スタプリ#池袋プリキュア #フワ#トゥインクルブック#スタンプラリー\n\nvia. https://www.instagram.com/precure_event/p/"}
+      assert_equal(@handler.handle_pre_toot(body)['status'], "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア #おほしSUMMERバケーション #スタプリ #池袋プリキュア #フワ #トゥインクルブック #スタンプラリー\n#スター_トゥインクルプリキュア\n\nvia. https://www.instagram.com/precure_event/p/")
+    end
+
     def test_end_with_tags?
       @config['/tagging/default_tags'] = []
 
