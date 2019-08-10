@@ -20,5 +20,10 @@ module MulukhiyaTootProxy
       @config['/tagging/default_tags'] = ['美食丼', 'b-shock-don']
       assert_equal(TagContainer.default_tags, ['#美食丼', '#b_shock_don'])
     end
+
+    def test_tweak
+      text = "http://www.toei-anim.co.jp/ptr/precure/deco/#m20190809\n\nこれひめは何を持ってるの？\n\nあと一番左の人はなんでちびまるこちゃんのうじきくんみたいな唇なの？#a#b#c"
+      assert_equal(TagContainer.tweak(text), "http://www.toei-anim.co.jp/ptr/precure/deco/#m20190809\n\nこれひめは何を持ってるの？\n\nあと一番左の人はなんでちびまるこちゃんのうじきくんみたいな唇なの？ #a #b #c")
+    end
   end
 end
