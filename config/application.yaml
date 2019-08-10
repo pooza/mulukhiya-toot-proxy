@@ -1,5 +1,5 @@
 package:
-  version: 3.0.1
+  version: 3.0.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -154,6 +154,8 @@ itunes:
 youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
+twittodon:
+  pattern: \n\nvia\.\s+(.*)$
 artist_parser:
   delimiters:
     - /
