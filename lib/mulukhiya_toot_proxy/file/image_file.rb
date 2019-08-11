@@ -31,11 +31,24 @@ module MulukhiyaTootProxy
       dest = create_dest_path(f: __method__, type: type)
       command = ['convert', path, dest]
       system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
+      unless File.exist?(dest)
+        mask = File.join(
+          File.dirname(dest),
+          "#{File.basename(dest, '.*')}-*#{File.extname(dest)}",
+        )
+        dest = Dir.glob(mask).max
+      end
       return ImageFile.new(dest)
     end
 
     def detail_info
-      @detail_info ||= `identify -verbose #{path.shellescape}`
+      unless @detail_info
+        begin
+          @detail_info = `identify -verbose #{path.shellescape}`
+        rescue
+          @detail_info = `identify #{path.shellescape}`
+        end
+      end
       return @detail_info
     end
 
