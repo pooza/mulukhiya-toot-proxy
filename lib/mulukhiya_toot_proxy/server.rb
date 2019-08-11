@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
-    rescue RestClient::UnprocessableEntity => e
+    rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
       @renderer.status = e.response.code
       return @renderer.to_s

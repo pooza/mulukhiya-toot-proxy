@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
         body['media_ids'].push(mastodon.upload_remote_resource(image))
         @result.push(url: image.to_s)
         break
-      rescue Ginseng::GatewayError, RestClient::TooManyRequests => e
+      rescue Ginseng::GatewayError, RestClient::Exception => e
         @logger.error(e)
         next
       end
