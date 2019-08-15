@@ -1,7 +1,6 @@
 module MulukhiyaTootProxy
   class Mastodon < Ginseng::Mastodon
     include Package
-    attr_accessor :token
 
     def initialize(uri = nil, token = nil)
       @config = Config.instance
@@ -13,46 +12,9 @@ module MulukhiyaTootProxy
       @token = token
     end
 
-    def upload(path, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return super(path, params)
-    end
-
-    def favourite(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post(create_uri("/api/v1/statuses/#{id}/favourite"), {
-        body: '{}',
-        headers: headers,
-      })
-    end
-
-    alias fav favourite
-
-    def reblog(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post(create_uri("/api/v1/statuses/#{id}/reblog"), {
-        body: '{}',
-        headers: headers,
-      })
-    end
-
-    alias boost reblog
-
     def search(keyword, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      params[:q] = keyword
       params[:limit] ||= @config['/mastodon/search/limit']
-      uri = create_uri('/api/v2/search')
-      uri.query_values = params
-      return @http.get(uri, {headers: headers})
+      return super(keyword, params)
     end
 
     def account
