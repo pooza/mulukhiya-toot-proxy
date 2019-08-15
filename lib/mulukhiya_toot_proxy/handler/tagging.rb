@@ -77,7 +77,7 @@ module MulukhiyaTootProxy
         line.split(/\s+/).map{|v| tags.push(v)}
       end
       r = [body, tags.to_s]
-      r.push("\nvia. #{via[1]}") if via.present?
+      r.push(via[1]) if via.present?
       return r.join("\n")
     end
   end

@@ -155,7 +155,7 @@ youtube:
   urls:
     videos: https://www.googleapis.com/youtube/v3/videos
 twittodon:
-  pattern: \n\nvia\.\s+(.*)$
+  pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
   delimiters:
     - /
