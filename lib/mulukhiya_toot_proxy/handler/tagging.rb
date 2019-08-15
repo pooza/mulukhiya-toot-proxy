@@ -3,7 +3,6 @@ module MulukhiyaTootProxy
     def handle_pre_toot(body, params = {})
       return body if ignore?(body)
       @tags.body = TagContainer.tweak(body['status'])
-      via = body['status'].match(Regexp.new(@config['/twittodon/pattern']))
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
@@ -14,7 +13,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body)) if attachment_tags?(body)
       @tags.concat(TagContainer.default_tags) if default_tags?(body)
-      body['status'] = append(body['status'], @tags, via)
+      body['status'] = append(body['status'], @tags)
       @result.concat(@tags.create_tags)
       return body
     end
@@ -66,8 +65,9 @@ module MulukhiyaTootProxy
       return tags
     end
 
-    def append(body, tags, via)
+    def append(body, tags)
       return body unless tags.present?
+      via = body.match(Regexp.new(@config['/twittodon/pattern']))
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
       if lines.last&.match?(Regexp.new("^(#[[:word:]]+\s*)+$", Regexp::IGNORECASE))
@@ -77,7 +77,7 @@ module MulukhiyaTootProxy
         line.split(/\s+/).map{|v| tags.push(v)}
       end
       r = [body, tags.to_s]
-      r.push("\nvia. #{via[1]}") if via.present?
+      r.push(via[1]) if via.present?
       return r.join("\n")
     end
   end

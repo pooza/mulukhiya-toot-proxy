@@ -55,8 +55,7 @@ module MulukhiyaTootProxy
 
     def self.tweak(body)
       links = {}
-      source = body.clone
-      source.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+      body.clone.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         key = Digest::SHA1.hexdigest(link)
         links[key] = link
         body.sub!(link, key)
