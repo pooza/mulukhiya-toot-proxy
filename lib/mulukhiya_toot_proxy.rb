@@ -6,7 +6,6 @@ require 'ginseng/postgres'
 require 'ginseng/web'
 require 'sidekiq'
 require 'sidekiq-scheduler'
-require 'json'
 require 'yaml'
 
 module MulukhiyaTootProxy
