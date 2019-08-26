@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: bca4d2c45bb900838a8cb087ba3b9d40328bc9f9
+  revision: 6b315c186b7ec6540c6bb96c25209b64b3af94de
   specs:
-    ginseng-core (1.4.5)
+    ginseng-core (1.4.6)
       activesupport
       addressable
       bundler
@@ -29,6 +29,7 @@ GIT
       rubocop
       syslog-logger
       test-unit
+      yajl-ruby
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -266,6 +267,7 @@ GEM
     unf_ext (0.0.7.6)
     unicode (0.4.4.4)
     unicode-display_width (1.6.0)
+    yajl-ruby (1.4.1)
     zeitwerk (2.1.9)
 
 PLATFORMS
