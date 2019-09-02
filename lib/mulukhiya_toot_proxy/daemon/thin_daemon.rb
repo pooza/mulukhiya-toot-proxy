@@ -11,10 +11,6 @@ module MulukhiyaTootProxy
       ]
     end
 
-    def child_pid
-      return `pgrep -f #{ThinDaemon.config_path}`.to_i
-    end
-
     def motd
       return [
         `thin -v`.chomp,

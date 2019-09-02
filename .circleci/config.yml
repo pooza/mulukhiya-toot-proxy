@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.6.3
+      - image: circleci/ruby:2.6.4
       - image: circleci/postgres:9.6.12
         environment:
           POSTGRES_USER: postgres
