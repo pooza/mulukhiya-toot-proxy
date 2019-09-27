@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
 
     def test_handle_post_toot
       return if Environment.ci?
+      return if @handler.disable?
 
       @handler.clear
       @handler.handle_post_toot({'status' => ''})

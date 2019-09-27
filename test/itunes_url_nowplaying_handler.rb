@@ -6,6 +6,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return if Environment.ci?
+      return if @handler.disable?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => "#nowplaying https://itunes.apple.com\n"})
@@ -18,6 +19,8 @@ module MulukhiyaTootProxy
 
     def test_push
       return if Environment.ci?
+      return if @handler.disable?
+
       @handler.clear
       body = @handler.handle_pre_toot({'status' => "シュビドゥビ☆スイーツタイム\n#nowplaying https://itunes.apple.com/jp/album//1352845788?i=1352845804\n"})['status']
       lines = body.each_line.to_a.map(&:chomp)

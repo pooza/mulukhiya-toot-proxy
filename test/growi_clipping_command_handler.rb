@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_parse
+      return if @handler.disable?
+
       assert_nil(@handler.parse(''))
       assert_nil(@handler.parse('123'))
       assert_equal(@handler.parse('{"command": growi_clipping}'), {'command' => 'growi_clipping'})
@@ -13,6 +15,7 @@ module MulukhiyaTootProxy
 
     def test_handle_post_toot
       return if Environment.ci?
+      return if @handler.disable?
 
       @handler.clear
       @handler.handle_post_toot({'status' => ''})

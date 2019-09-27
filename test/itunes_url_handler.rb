@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
+      return if @handler.disable?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://itunes.apple.com/'})
       assert_nil(@handler.result)

@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
+      return if @handler.disable?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://www.google.co.jp/?q=日本語'})
       assert_equal(@handler.result[:entries].first, {rewrited_url: 'https://www.google.co.jp/?q=%E6%97%A5%E6%9C%AC%E8%AA%9E', source_url: 'https://www.google.co.jp/?q=日本語'})
