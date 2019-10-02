@@ -10,6 +10,8 @@ module MulukhiyaTootProxy
 
     def test_handle_post_boost
       return if Environment.ci?
+      return if @handler.disable?
+
       @handler.clear
       @handler.handle_post_fav('id' => @toot.id)
       assert(MastodonURI.parse(@handler.result[:entries].first[:url]).id.positive?)

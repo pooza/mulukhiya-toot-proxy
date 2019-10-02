@@ -1,5 +1,5 @@
 package:
-  version: 3.0.8
+  version: 3.0.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -7,25 +7,25 @@ package:
     - tkoishi@b-shock.co.jp
 handler:
   pre_toot:
+    - user_config_command
+    - webhook_url_command
+    - growi_clipping_command
+    - dropbox_clipping_command
     - shortened_url
     - url_normalize
+    - itunes_url_nowplaying
+    - spotify_url_nowplaying
+    - you_tube_url_nowplaying
+    - itunes_nowplaying
     - spotify_nowplaying
     - amazon_nowplaying
-    - itunes_nowplaying
-    - spotify_url_nowplaying
-    - itunes_url_nowplaying
-    - you_tube_url_nowplaying
     - canonical_url
     - amazon_url
     - itunes_url
-    - amazon_image
-    - spotify_image
     - itunes_image
+    - spotify_image
+    - amazon_image
     - tagging
-    - user_config_command
-    - growi_clipping_command
-    - dropbox_clipping_command
-    - webhook_url_command
   post_toot:
     - growi_clipping_command
     - dropbox_clipping_command
@@ -35,18 +35,18 @@ handler:
   pre_webhook:
     - shortened_url
     - url_normalize
+    - itunes_url_nowplaying
+    - spotify_url_nowplaying
+    - you_tube_url_nowplaying
+    - itunes_nowplaying
     - spotify_nowplaying
     - amazon_nowplaying
-    - itunes_nowplaying
-    - spotify_url_nowplaying
-    - itunes_url_nowplaying
-    - you_tube_url_nowplaying
     - canonical_url
     - amazon_url
     - itunes_url
-    - amazon_image
-    - spotify_image
     - itunes_image
+    - spotify_image
+    - amazon_image
     - webhook_image
     - tagging
   post_webhook:
@@ -71,10 +71,16 @@ handler:
   post_search:
     - result_notification
   default:
-    timeout: 10
+    timeout: 5
+  admin_notification:
+    disable: true
+  mention_notification:
+    disable: true
   fav_notification:
     disable: true
   boost_notification:
+    disable: true
+  fav_growi_clipping:
     disable: true
   fav_dropbox_clipping:
     disable: true

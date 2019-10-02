@@ -5,6 +5,8 @@ module MulukhiyaTootProxy
     end
 
     def test_parse
+      return if @handler.disable?
+
       assert_nil(@handler.parse(''))
       assert_nil(@handler.parse('123'))
       assert_equal(@handler.parse('{"command": webhook_url}'), {'command' => 'webhook_url'})
@@ -13,6 +15,8 @@ module MulukhiyaTootProxy
 
     def test_create_status
       return if Environment.ci?
+      return if @handler.disable?
+
       values = YAML.safe_load(@handler.create_status({}))
       assert(values['url'].present?)
       assert(values['token'].present?)
@@ -20,6 +24,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return if Environment.ci?
+      return if @handler.disable?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})

@@ -6,6 +6,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return if Environment.ci?
+      return if @handler.disable?
 
       @handler.clear
       @handler.handle_pre_toot({'status' => 'https://www.spotify.com/jp/'})

@@ -59,7 +59,7 @@ module MulukhiyaTootProxy
       return true if mastodon.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false
-    rescue Ginseng::ConfigError
+    rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
     end
 

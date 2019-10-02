@@ -11,6 +11,8 @@ module MulukhiyaTootProxy
 
     def test_convertable?
       return if Environment.ci?
+      return if @handler.disable?
+
       assert_false(@handler.convertable?)
     end
   end

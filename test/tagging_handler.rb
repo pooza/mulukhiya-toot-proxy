@@ -25,6 +25,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_without_default_tags
+      return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
       tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge'})['status'])
@@ -85,6 +86,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_direct
+      return if @handler.disable?
+
       @handler.clear
       r = @handler.handle_pre_toot({
         'status' => 'キュアソード',
@@ -94,6 +97,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_default_tag
+      return if @handler.disable?
       @config['/tagging/default_tags'] = ['美食丼']
       @config['/tagging/always_default_tags'] = true
 
@@ -128,6 +132,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_poll
+      return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -139,6 +144,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_twittodon
+      return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -151,6 +157,7 @@ module MulukhiyaTootProxy
     end
 
     def test_end_with_tags?
+      return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -163,7 +170,9 @@ module MulukhiyaTootProxy
     end
 
     def test_ignore_addresses
+      return if @handler.disable?
       @config['/tagging/default_tags'] = []
+
       @handler.clear
       assert_equal(@handler.handle_pre_toot({'status' => '@pooza #キュアビューティ'})['status'], '@pooza #キュアビューティ')
     end
