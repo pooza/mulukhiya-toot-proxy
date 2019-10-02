@@ -95,6 +95,10 @@ Metrics/LineLength:
   Exclude:
     - test/*
 
+Style/IfUnlessModifier:
+  Exclude:
+    - test/*
+
 Style/AsciiComments:
   Enabled: false
 
