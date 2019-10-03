@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.6.4'
+ruby '2.6.5'
 gem 'amazon-ecs'
 gem 'bootsnap'
 gem 'crowi-client', git: 'https://github.com/pooza/crowi-client.git'
