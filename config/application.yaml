@@ -72,8 +72,6 @@ handler:
     - result_notification
   default:
     timeout: 10
-  admin_notification:
-    disable: true
   mention_notification:
     disable: true
   fav_notification:
