@@ -4,8 +4,6 @@ module MulukhiyaTootProxy
 
     def perform(params)
       Account.new(id: params['account_id']).slack&.say(YAML.dump(params['results']), :text)
-    rescue => e
-      @logger.error(e)
     end
   end
 end

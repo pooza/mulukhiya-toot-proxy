@@ -9,8 +9,6 @@ module MulukhiyaTootProxy
 
     def perform
       TaggingDictionary.new.refresh
-    rescue => e
-      @logger.error(e)
     end
   end
 end

@@ -22,15 +22,15 @@ module MulukhiyaTootProxy
 
     def resize(pixel)
       dest = create_dest_path(f: __method__, p: pixel, type: subtype)
-      command = ['convert', '-resize', "#{pixel}x#{pixel}", path, dest]
-      system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
+      command = CommandLine.new(['convert', '-resize', "#{pixel}x#{pixel}", path, dest])
+      command.exec unless File.exist?(dest)
       return ImageFile.new(dest)
     end
 
     def convert_type(type)
       dest = create_dest_path(f: __method__, type: type)
-      command = ['convert', path, dest]
-      system(*command, {exception: true, out: '/dev/null'}) unless File.exist?(dest)
+      command = CommandLine.new(['convert', path, dest])
+      command.exec unless File.exist?(dest)
       unless File.exist?(dest)
         mask = File.join(
           File.dirname(dest),
@@ -43,10 +43,15 @@ module MulukhiyaTootProxy
 
     def detail_info
       unless @detail_info
+        command = CommandLine.new
         begin
-          @detail_info = `identify -verbose #{path.shellescape}`
+          command.args = ['identify', '-verbose', path]
+          command.exec
+          @detail_info = command.stdout
         rescue
-          @detail_info = `identify #{path.shellescape}`
+          command.args = ['identify', path]
+          command.exec
+          @detail_info = command.stdout
         end
       end
       return @detail_info
