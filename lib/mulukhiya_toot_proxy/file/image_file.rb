@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
     end
 
     def alpha?
-      return image? && (detail_info =~ /  alpha:/i).present?
+      return image? && (detail_info =~ /  alpha:\s+(s?rgb|none)/i).present?
     end
 
     def resize(pixel)
