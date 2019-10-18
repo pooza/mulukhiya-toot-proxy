@@ -4,6 +4,8 @@ module MulukhiyaTootProxy
       super
       @logger = Logger.new
       @http = HTTP.new
+      refresh unless exist?
+      refresh if corrupted?
       load
     end
 
@@ -23,16 +25,27 @@ module MulukhiyaTootProxy
       return File.exist?(path)
     end
 
+    def corrupted?
+      return false unless Marshal.load(File.read(path)).is_a?(Array)
+      return true
+    rescue TypeError, Errno::ENOENT => e
+      @logger.error(lib: self.class.to_s, path: path, message: e.message)
+      return true
+    end
+
     def path
       return File.join(Environment.dir, 'tmp/cache/tagging_dictionary')
     end
 
     def load
-      update(Marshal.load(File.read(path))) if exist?
+      return unless exist?
+      clear
+      update(Marshal.load(File.read(path)))
     end
 
     def refresh
       File.write(path, Marshal.dump(fetch))
+      @logger.info(lib: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
       @logger.error(e)
