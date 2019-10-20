@@ -24,7 +24,7 @@ module MulukhiyaTootProxy
     end
 
     def text
-      @text = Toot.sanitize(self[:text])
+      @text ||= Toot.sanitize(self[:text])
       return @text
     end
 
