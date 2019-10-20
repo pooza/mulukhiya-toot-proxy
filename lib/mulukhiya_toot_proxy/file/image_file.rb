@@ -31,6 +31,7 @@ module MulukhiyaTootProxy
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)
+      raise Ginseng::RequestError, command.stderr.split(/[\n`]/).first if command.status.positive?
       unless File.exist?(dest)
         mask = File.join(
           File.dirname(dest),
