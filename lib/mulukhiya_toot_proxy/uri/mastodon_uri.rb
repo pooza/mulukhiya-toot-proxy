@@ -1,5 +1,3 @@
-require 'sanitize'
-
 module MulukhiyaTootProxy
   class MastodonURI < Ginseng::URI
     def toot_id
@@ -19,7 +17,7 @@ module MulukhiyaTootProxy
       raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
       template[:account] = toot['account']
-      template[:status] = Sanitize.clean(toot['content'].gsub(/<br.*?>/, "\n")).strip
+      template[:status] = Toot.sanitize(toot['content'])
       template[:attachments] = toot['media_attachments']
       template[:url] = toot['url']
       return template.to_s
