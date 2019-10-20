@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: d1da1ca4523412b8ba6dd68c84ff56843dd3c2f3
+  revision: 3581c138930ea396ec1457f4e323de2603909ffd
   specs:
-    ginseng-core (1.4.10)
+    ginseng-core (1.4.11)
       activesupport
       addressable
       bundler
@@ -29,6 +29,7 @@ GIT
       rubocop
       syslog-logger
       test-unit
+      unicode
       yajl-ruby
 
 GIT
@@ -295,7 +296,6 @@ DEPENDENCIES
   sanitize
   sidekiq
   sidekiq-scheduler
-  unicode
 
 RUBY VERSION
    ruby 2.6.5p114
