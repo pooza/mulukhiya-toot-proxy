@@ -16,8 +16,26 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def type
+      @type ||= super
+      @type ||= detail_info.match(/\s+Mime\stype:\s*(.*)$/i)[1]
+      return @type
+    end
+
+    def mediatype
+      @mediatype ||= super
+      @mediatype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/}i)[1]
+      return @mediatype
+    end
+
+    def subtype
+      @subtype ||= super
+      @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[1]
+      return @subtype
+    end
+
     def alpha?
-      return image? && (detail_info =~ /  alpha:\s+(s?rgb|none)/i).present?
+      return image? && (detail_info =~ /\s+alpha:\s+(s?rgb|none)/i).present?
     end
 
     def resize(pixel)
@@ -31,6 +49,7 @@ module MulukhiyaTootProxy
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)
+      raise Ginseng::RequestError, command.stderr.split(/[\n`]/).first if command.status&.positive?
       unless File.exist?(dest)
         mask = File.join(
           File.dirname(dest),
@@ -58,12 +77,19 @@ module MulukhiyaTootProxy
     end
 
     def size_info
-      return nil unless image?
       unless @size_info
         size = FastImage.size(path)
-        @size_info = {width: size[0], height: size[1]}
+        if size.present?
+          @size_info = {width: size[0], height: size[1]}
+        else
+          size = detail_info.match(/\sGeometry:\s*([0-9]+)x([0-9]+)/)
+          @size_info = {width: size[1].to_i, height: size[2].to_i}
+        end
       end
       return @size_info
+    rescue => e
+      @logger.error(e)
+      return nil
     end
   end
 end

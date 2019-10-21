@@ -8,8 +8,6 @@ module MulukhiyaTootProxy
       return false unless @source&.image?
       return false if @source.type == 'image/jpeg'
       return false if @source.type == 'image/gif'
-      return false if @source.type == 'image/webp'
-      return true if @source.type == 'image/vnd.microsoft.icon'
       return false if @source.alpha?
       @logger.info(class: self.class.to_s, type: @source.type)
       return true
