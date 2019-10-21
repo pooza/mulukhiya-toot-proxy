@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
     end
 
     def mediatype
-      return mimemagic.mediatype
+      return mimemagic&.mediatype
     end
 
     def default_mediatype
@@ -21,11 +21,11 @@ module MulukhiyaTootProxy
     end
 
     def subtype
-      return mimemagic.subtype
+      return mimemagic&.subtype
     end
 
     def type
-      return mimemagic.to_s
+      return mimemagic&.to_s
     end
 
     def width
