@@ -24,18 +24,18 @@ module MulukhiyaTootProxy
 
     def mediatype
       @mediatype ||= super
-      @mediatype ||= detail_info.match(/\s+Mime\stype:\s*(.*)\//i)[1]
+      @mediatype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/}i)[1]
       return @mediatype
     end
 
     def subtype
       @subtype ||= super
-      @subtype ||= detail_info.match(/\s+Mime\stype:\s*(.*)\/(.*)/i)[1]
+      @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[1]
       return @subtype
     end
 
     def alpha?
-      return image? && (detail_info =~ /  alpha:\s+(s?rgb|none)/i).present?
+      return image? && (detail_info =~ /\s+alpha:\s+(s?rgb|none)/i).present?
     end
 
     def resize(pixel)
