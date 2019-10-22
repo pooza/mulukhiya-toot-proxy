@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class ImageeFileTest < Test::Unit::TestCase
     def setup
-      @file = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/icon.png'))
+      @file = ImageFile.new(File.join(Environment.dir, 'sample/ribbon08-009.png'))
     end
 
     def test_image?
@@ -21,19 +21,19 @@ module MulukhiyaTootProxy
     end
 
     def test_width
-      assert_equal(@file.width, 128)
+      assert_equal(@file.width, 140)
     end
 
     def test_height
-      assert_equal(@file.height, 128)
+      assert_equal(@file.height, 130)
     end
 
     def test_aspect
-      assert_equal(@file.aspect, 1.0)
+      assert_equal(@file.aspect, 1.0769230769230769)
     end
 
     def test_long_side
-      assert_equal(@file.long_side, 128)
+      assert_equal(@file.long_side, 140)
     end
 
     def test_alpha?
@@ -44,7 +44,7 @@ module MulukhiyaTootProxy
       converted = @file.resize(32)
       assert(converted.is_a?(ImageFile))
       assert_equal(converted.width, 32)
-      assert_equal(converted.height, 32)
+      assert_equal(converted.height, 30)
     end
 
     def test_convert_type

@@ -30,12 +30,15 @@ module MulukhiyaTootProxy
 
     def subtype
       @subtype ||= super
-      @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[1]
+      @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[2]
       return @subtype
     end
 
     def alpha?
-      return image? && (detail_info =~ /\s+alpha:\s+(s?rgb|none)/i).present?
+      return false unless image?
+      command = CommandLine.new(['identify', '-format', '"%[opaque]"', path])
+      command.exec
+      return command.stdout =~ /"False"/i
     end
 
     def resize(pixel)
@@ -62,16 +65,9 @@ module MulukhiyaTootProxy
 
     def detail_info
       unless @detail_info
-        command = CommandLine.new
-        begin
-          command.args = ['identify', '-verbose', path]
-          command.exec
-          @detail_info = command.stdout
-        rescue
-          command.args = ['identify', path]
-          command.exec
-          @detail_info = command.stdout
-        end
+        command = CommandLine.new(['identify', '-verbose', path])
+        command.exec
+        @detail_info = command.stdout
       end
       return @detail_info
     end

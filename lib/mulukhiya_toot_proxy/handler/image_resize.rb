@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
 
     def convertable?
       return false unless @source&.image?
-      return false if @source.long_side < @config['/handler/image_resize/pixel']
+      return false if @source.long_side <= @config['/handler/image_resize/pixel']
       @logger.info(class: self.class.to_s, width: @source.width, height: @source.height)
       return true
     end
