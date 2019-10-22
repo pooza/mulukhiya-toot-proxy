@@ -38,6 +38,7 @@ module MulukhiyaTootProxy
       return false unless image?
       command = CommandLine.new(['identify', '-format', '"%[opaque]"', path])
       command.exec
+      p command.stdout
       return command.stdout == '"False"'
     end
 
