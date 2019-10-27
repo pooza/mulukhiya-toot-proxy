@@ -36,9 +36,9 @@ module MulukhiyaTootProxy
 
     def alpha?
       return false unless image?
-      command = CommandLine.new(['identify', '-format', '"%[opaque]"', path])
+      command = CommandLine.new(['identify', '-format', '%[opaque]', path])
       command.exec
-      return command.stdout =~ /"False"/i
+      return command.stdout =~ /False/i
     end
 
     def resize(pixel)
@@ -78,8 +78,10 @@ module MulukhiyaTootProxy
         if size.present?
           @size_info = {width: size[0], height: size[1]}
         else
-          size = detail_info.match(/\sGeometry:\s*([0-9]+)x([0-9]+)/)
-          @size_info = {width: size[1].to_i, height: size[2].to_i}
+          command = CommandLine.new(['identify', '-format', '%[width]x%[height]', path])
+          command.exec
+          size = command.stdout.split('x')
+          @size_info = {width: size[0].to_i, height: size[1].to_i}
         end
       end
       return @size_info
