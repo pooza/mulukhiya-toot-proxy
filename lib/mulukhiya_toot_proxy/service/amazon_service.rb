@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def create_image_uri(asin)
-      return create_published_image_uri(asin) unless AmazonService.accesskey?
+      return fetch_image_uri(asin) unless AmazonService.accesskey?
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
@@ -36,7 +36,7 @@ module MulukhiyaTootProxy
       retry
     end
 
-    def create_published_image_uri(asin)
+    def fetch_image_uri(asin)
       response = @http.get(create_item_uri(asin))
       html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
       ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
@@ -46,6 +46,12 @@ module MulukhiyaTootProxy
         return uri
       rescue
         next
+      end
+      html.xpath(%{//div[contains(@class, 'dv-fallback-packshot-image')]//img}).each do |img|
+        img.attribute('srcset').value.split(',').reverse_each do |href|
+          next unless uri = Ginseng::URI.parse(href.strip.split(/\s+/).first)
+          return uri
+        end
       end
       return nil
     end
