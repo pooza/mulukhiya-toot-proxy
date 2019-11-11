@@ -71,7 +71,7 @@ module MulukhiyaTootProxy
 
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
-      @renderer.status = @renderer.message['status'] || 200
+      @renderer.status = @renderer.message[:status] || 200
       return @renderer.to_s
     end
 
