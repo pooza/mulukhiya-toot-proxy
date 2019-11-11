@@ -64,6 +64,11 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    get '/mulukhiya/about' do
+      @renderer.message = package_class.full_name
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message['status'] || 200
