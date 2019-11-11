@@ -18,6 +18,13 @@ module MulukhiyaTootProxy
     def test_about
       get '/about'
       assert(last_response.ok?)
+      get '/mulukhiya/about'
+      assert(last_response.ok?)
+    end
+
+    def test_health
+      get '/mulukhiya/health'
+      assert(last_response.ok?)
     end
 
     def test_not_found

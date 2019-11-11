@@ -8,6 +8,16 @@ module MulukhiyaTootProxy
       return File.expand_path('../..', __dir__)
     end
 
+    def self.health
+      values = {version: Package.version, status: 200}
+      ['Postgres', 'Redis'].each do |service|
+        health = "MulukhiyaTootProxy::#{service}".constantize.health
+        values[:status] = 503 unless health[:status] == 'OK'
+        values[service.downcase] = health
+      end
+      return values
+    end
+
     def self.auth(username, password)
       config = Config.instance
       return false unless username == config['/sidekiq/auth/user']

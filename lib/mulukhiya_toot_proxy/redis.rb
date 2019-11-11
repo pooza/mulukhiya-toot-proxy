@@ -31,5 +31,12 @@ module MulukhiyaTootProxy
     def self.dsn
       return RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
     end
+
+    def self.health
+      Redis.new.get('1')
+      return {status: 'OK'}
+    rescue
+      return {status: 'NG'}
+    end
   end
 end
