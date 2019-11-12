@@ -1,15 +1,14 @@
-require 'dropbox'
+require 'dropbox_api'
 require 'digest/sha1'
 
 module MulukhiyaTootProxy
-  class DropboxClipper < Dropbox::Client
+  class DropboxClipper < DropboxApi::Client
     def clip(params)
       src = File.join(Environment.dir, 'tmp/media', Digest::SHA1.hexdigest(params.to_s))
+      dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])
-      File.open(src) do |file|
-        upload("/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md", file.read)
-      end
-    rescue Dropbox::ApiError => e
+      upload(dest, IO.read(src), {mode: :overwrite})
+    rescue => e
       raise Ginseng::GatewayError, 'Dropbox upload error', e.backtrace
     ensure
       File.unlink(src) if File.exist?(src)
