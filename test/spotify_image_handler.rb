@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if SpotifyService.config?
+      return unless SpotifyService.config?
       return if @handler.disable?
 
       @handler.clear

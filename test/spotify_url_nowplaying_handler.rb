@@ -1,12 +1,12 @@
 module MulukhiyaTootProxy
   class SpotifyURLNowplayingHandlerTest < Test::Unit::TestCase
     def setup
-      return if SpotifyService.config?
+      return unless SpotifyService.config?
       @handler = Handler.create('spotify_url_nowplaying')
     end
 
     def test_handle_pre_toot
-      return if SpotifyService.config?
+      return unless SpotifyService.config?
       return if @handler.disable?
 
       @handler.clear
