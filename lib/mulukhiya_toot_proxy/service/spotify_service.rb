@@ -65,6 +65,15 @@ module MulukhiyaTootProxy
       return itunes.create_track_uri(track)
     end
 
+    def self.config?
+      config = Config.instance
+      config['/spotify/client_id']
+      config['/spotify/client_secret']
+      return true
+    rescue Ginseng::ConfigError
+      return false
+    end
+
     private
 
     def create_keyword(track)

@@ -99,7 +99,6 @@ module MulukhiyaTootProxy
     def test_handle_pre_toot_with_default_tag
       return if @handler.disable?
       @config['/tagging/default_tags'] = ['美食丼']
-      @config['/tagging/always_default_tags'] = true
 
       @handler.clear
       tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge'})['status'])
@@ -117,18 +116,9 @@ module MulukhiyaTootProxy
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
 
-      @config['/tagging/always_default_tags'] = false
-
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge', 'visibility' => 'unlisted'})['status'])
-      assert_equal(tags.count, 0)
-
-      @handler.clear
-      r = @handler.handle_pre_toot({
-        'status' => '@pooza@mstdn.precure.fun',
-        'visibility' => 'private',
-      })
-      assert_equal(r['status'], '@pooza@mstdn.precure.fun')
+      r = @handler.handle_pre_toot({'status' => 'プリキュア', 'visibility' => 'private'})
+      assert_equal(r['status'], 'プリキュア')
     end
 
     def test_handle_pre_toot_with_poll

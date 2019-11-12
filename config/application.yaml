@@ -1,5 +1,5 @@
 package:
-  version: 3.0.16
+  version: 3.0.17
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -221,7 +221,6 @@ sidekiq:
     user: admin
     password: ''
 tagging:
-  always_default_tags: false
   word:
     minimum_length: 3
   attachment_tags:
