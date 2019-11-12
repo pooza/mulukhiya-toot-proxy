@@ -53,7 +53,7 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
-    get %r{/api/v[12]/search} do
+    get '/api/v2/search' do
       params[:limit] = @config['/mastodon/search/limit']
       @results.response = @mastodon.search(params[:q], params)
       @message = @results.response.parsed_response.with_indifferent_access

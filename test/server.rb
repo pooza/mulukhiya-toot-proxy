@@ -33,6 +33,19 @@ module MulukhiyaTootProxy
       assert_equal(last_response.status, 404)
     end
 
+    def test_search
+      return if Environment.ci?
+
+      header 'Authorization', "Bearer #{@account.token}"
+      get '/api/v2/search?q=hoge'
+      assert(last_response.ok?)
+
+      header 'Authorization', "Bearer #{@account.token}"
+      get '/api/v1/search?q=hoge'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
+    end
+
     def test_toot_length
       return if Environment.ci?
 
