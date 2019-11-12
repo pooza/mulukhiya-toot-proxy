@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     def initialize
       @config = Config.instance
       @http = HTTP.new
-      return unless AmazonService.accesskey?
+      return unless AmazonService.config?
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['/amazon/access_key']
         options[:AWS_secret_key] = @config['/amazon/secret_key']
@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def create_image_uri(asin)
-      return fetch_image_uri(asin) unless AmazonService.accesskey?
+      return fetch_image_uri(asin) unless AmazonService.config?
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
@@ -57,7 +57,7 @@ module MulukhiyaTootProxy
     end
 
     def search(keyword, categories)
-      return nil unless AmazonService.accesskey?
+      return nil unless AmazonService.config?
       cnt = 1
       categories.each do |category|
         response = Amazon::Ecs.item_search(keyword, {
@@ -87,7 +87,7 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    def self.accesskey?
+    def self.config?
       config = Config.instance
       config['/amazon/access_key']
       config['/amazon/secret_key']
