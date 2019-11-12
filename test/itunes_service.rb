@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_lookup
-      track = @service.lookup(405905342)
+      track = @service.lookup(405_905_342)
       assert_equal(track['artistName'], '宮本佳那子')
     end
   end
