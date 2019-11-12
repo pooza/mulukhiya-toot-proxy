@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
     end
 
     def test_health
+      return if Environment.ci?
       get '/mulukhiya/health'
       assert(last_response.ok?)
     end
