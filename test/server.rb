@@ -50,22 +50,22 @@ module MulukhiyaTootProxy
       return if Environment.ci?
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * max_length, 'visibility' => 'private'}
+      post '/api/v1/statuses', {'status' => 'A' * max_length}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * (max_length + 1), 'visibility' => 'private'}
+      post '/api/v1/statuses', {'status' => 'A' * (max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * max_length, 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * max_length}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * (max_length + 1), 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * (max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
@@ -155,9 +155,7 @@ module MulukhiyaTootProxy
     def max_length
       length = @config['/mastodon/max_length']
       tags = TagContainer.default_tags
-      if @config['/tagging/always_default_tags'] && tags.present?
-        length = length - tags.join(' ').length - 1
-      end
+      length = length - tags.join(' ').length - 1 if tags.present?
       return length
     end
   end

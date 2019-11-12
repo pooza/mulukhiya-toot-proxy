@@ -221,7 +221,6 @@ sidekiq:
     user: admin
     password: ''
 tagging:
-  always_default_tags: false
   word:
     minimum_length: 3
   attachment_tags:

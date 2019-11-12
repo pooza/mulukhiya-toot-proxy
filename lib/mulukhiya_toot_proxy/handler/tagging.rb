@@ -11,8 +11,8 @@ module MulukhiyaTootProxy
         @tags.concat(v[:words])
         temp_text.gsub!(v[:pattern], '')
       end
-      @tags.concat(create_attachment_tags(body)) if attachment_tags?(body)
-      @tags.concat(TagContainer.default_tags) if default_tags?(body)
+      @tags.concat(create_attachment_tags(body))
+      @tags.concat(TagContainer.default_tags)
       body['status'] = append(body['status'], @tags)
       @result.concat(@tags.create_tags)
       return body
@@ -21,22 +21,12 @@ module MulukhiyaTootProxy
     private
 
     def ignore?(body)
-      return true if body['visibility'] == 'direct'
       @config['/tagging/ignore_addresses'].each do |addr|
         return true if body['status'] =~ Regexp.new("(^|\s)#{addr}($|\s)")
       end
-      return false
-    end
-
-    def default_tags?(body)
-      return true unless body['visibility']
-      return true if body['visibility'] == 'public'
-      return true if @config['/tagging/always_default_tags']
-      return false
-    end
-
-    def attachment_tags?(body)
-      return body['media_ids'].present?
+      return false unless body['visibility'].present?
+      return false if body['visibility'] == 'public'
+      return true
     end
 
     def create_temp_text(body)
