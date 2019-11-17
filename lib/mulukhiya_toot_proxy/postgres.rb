@@ -2,8 +2,8 @@ module MulukhiyaTootProxy
   class Postgres < Ginseng::Postgres::Database
     include Package
 
-    def default_dbname
-      return 'mastodon'
+    def execute(name, params = {})
+      return super(name, params).map(&:with_indifferent_access)
     end
 
     def self.dsn

@@ -27,10 +27,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: cbdf9f848ce957e48bd93109b34c4d4665d17a06
+  revision: 471a5e578844ce23c0893a5aa4f42024fca65cee
   specs:
-    ginseng-postgres (1.1.6)
+    ginseng-postgres (1.2.0)
       pg
+      sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -174,7 +175,7 @@ GEM
     omniauth-oauth2 (1.5.0)
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
-    parallel (1.18.0)
+    parallel (1.19.0)
     parser (2.6.5.0)
       ast (~> 2.4.0)
     pg (1.1.4)
@@ -229,6 +230,7 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
+    sequel (5.26.0)
     sidekiq (6.0.3)
       connection_pool (>= 2.2.2)
       rack (>= 2.0.0)

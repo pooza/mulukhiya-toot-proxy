@@ -83,11 +83,11 @@ module MulukhiyaTootProxy
     end
 
     def admin?
-      return @params[:admin] == 't'
+      return @params[:admin]
     end
 
     def moderator?
-      return @params[:moderator] == 't'
+      return @params[:moderator]
     end
 
     def service?
@@ -97,7 +97,7 @@ module MulukhiyaTootProxy
     alias bot? service?
 
     def locked?
-      return @params[:locked] == 't'
+      return @params[:locked]
     end
 
     def disable?(handler_name)

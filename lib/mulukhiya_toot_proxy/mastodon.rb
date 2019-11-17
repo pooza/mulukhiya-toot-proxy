@@ -66,27 +66,19 @@ module MulukhiyaTootProxy
     end
 
     def self.lookup_attachment(id)
-      rows = Postgres.instance.execute('attachment', {id: id})
-      return rows.first.with_indifferent_access if rows.present?
-      return nil
+      return Postgres.instance.execute('attachment', {id: id})&.first
     end
 
     def self.lookup_account(id)
-      rows = Postgres.instance.execute('account', {id: id})
-      return rows.first.with_indifferent_access if rows.present?
-      return nil
+      return Postgres.instance.execute('account', {id: id})&.first
     end
 
     def self.lookup_toot(id)
-      rows = Postgres.instance.execute('toot', {id: id})
-      return rows.first.with_indifferent_access if rows.present?
-      return nil
+      return Postgres.instance.execute('toot', {id: id})&.first
     end
 
     def self.lookup_token_owner(token)
-      rows = Postgres.instance.execute('token_owner', {token: token})
-      return rows.first.with_indifferent_access if rows.present?
-      return nil
+      return Postgres.instance.execute('token_owner', {token: token})&.first
     end
   end
 end

@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
     end
 
     def local?
-      return @params[:local] == 't'
+      return @params[:local]
     end
 
     def text
