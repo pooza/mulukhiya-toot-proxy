@@ -84,6 +84,8 @@ handler:
     disable: true
   image_resize:
     pixel: 1280
+  amazon_image:
+    timeout: 20
 worker:
   media_cleaning:
     days: 1
