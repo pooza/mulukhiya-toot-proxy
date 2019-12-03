@@ -28,7 +28,6 @@ module MulukhiyaTootProxy
 
     def self.create(params)
       params['type'] ||= 'multi_field'
-      require "mulukhiya_toot_proxy/tagging_resource/#{params['type']}"
       return "MulukhiyaTootProxy::#{params['type'].camelize}TaggingResource".constantize.new(params)
     end
 

@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def self.dir
-      return File.expand_path('../..', __dir__)
+      return MulukhiyaTootProxy.dir
     end
 
     def self.health

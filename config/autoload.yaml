@@ -1,0 +1,21 @@
+inflections:
+  - amazon_uri: AmazonURI
+    amazon_url_handler: AmazonURLHandler
+    canonical_url_handler: CanonicalURLHandler
+    css_renderer: CSSRenderer
+    html_renderer: HTMLRenderer
+    http: HTTP
+    itunes_uri: ItunesURI
+    itunes_url_handler: ItunesURLHandler
+    itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
+    mastodon_uri: MastodonURI
+    redis_dsn: RedisDSN
+    shortened_url_handler: ShortenedURLHandler
+    spotify_uri: SpotifyURI
+    spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler
+    uri: URI
+    url_handler: URLHandler
+    url_normalize_handler: URLNormalizeHandler
+    video_uri: VideoURI
+    webhook_url_command_handler: WebhookURLCommandHandler
+    you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler

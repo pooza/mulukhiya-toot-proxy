@@ -66,7 +66,6 @@ module MulukhiyaTootProxy
     alias disabled? disable?
 
     def self.create(name, params = {})
-      require "mulukhiya_toot_proxy/handler/#{name}"
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
     end
 
