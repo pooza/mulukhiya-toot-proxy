@@ -19,3 +19,14 @@ inflections:
     video_uri: VideoURI
     webhook_url_command_handler: WebhookURLCommandHandler
     you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler
+dirs:
+  - contract
+  - daemon
+  - dsn
+  - file
+  - handler
+  - renderer
+  - service
+  - tagging_resource
+  - uri
+  - worker

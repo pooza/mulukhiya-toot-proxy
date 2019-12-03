@@ -28,18 +28,11 @@ module MulukhiyaTootProxy
     loader.enable_reloading
     loader.push_dir(File.join(dir, 'app/lib'))
     loader.setup
-    loader.inflector.inflect(Config.instance['/autoload/inflections'].first)
-    loader.push_dir(File.join(dir, 'app/lib'))
-    loader.push_dir(File.join(dir, 'app/contract'))
-    loader.push_dir(File.join(dir, 'app/daemon'))
-    loader.push_dir(File.join(dir, 'app/dsn'))
-    loader.push_dir(File.join(dir, 'app/file'))
-    loader.push_dir(File.join(dir, 'app/handler'))
-    loader.push_dir(File.join(dir, 'app/renderer'))
-    loader.push_dir(File.join(dir, 'app/service'))
-    loader.push_dir(File.join(dir, 'app/tagging_resource'))
-    loader.push_dir(File.join(dir, 'app/uri'))
-    loader.push_dir(File.join(dir, 'app/worker'))
+    config = Config.instance
+    loader.inflector.inflect(config['/autoload/inflections'].first)
+    config['/autoload/dirs'].each do |d|
+      loader.push_dir(File.join(dir, 'app', d))
+    end
     loader.reload
   end
 

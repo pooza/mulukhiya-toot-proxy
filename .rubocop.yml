@@ -137,5 +137,5 @@ Naming/RescuedExceptionsVariableName:
 
 Security/MarshalLoad:
   Exclude:
-    - lib/mulukhiya_toot_proxy/tagging_dictionary.rb
+    - app/lib/mulukhiya_toot_proxy/tagging_dictionary.rb
 
