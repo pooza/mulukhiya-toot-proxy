@@ -7,7 +7,6 @@ namespace :mulukhiya do
         puts "#{path} deleted"
       rescue => e
         puts "#{path} #{e.class}: #{e.messagee}"
-        next
       end
     end
   end

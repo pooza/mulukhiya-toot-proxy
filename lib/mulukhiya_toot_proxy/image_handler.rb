@@ -11,7 +11,6 @@ module MulukhiyaTootProxy
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e
         @logger.error(e)
-        next
       end
     end
 

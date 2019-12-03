@@ -15,7 +15,6 @@ module MulukhiyaTootProxy
         @logger.info(worker: 'MediaCleaningWorker', action: 'delete', path: f)
       rescue => e
         @logger.error(e)
-        next
       end
     end
   end

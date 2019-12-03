@@ -10,7 +10,6 @@ module MulukhiyaTootProxy
         account.slack.say(create_message(account: from_account, toot: toot), :text)
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(row: row))
-        next
       end
     end
 

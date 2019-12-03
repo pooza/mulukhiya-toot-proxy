@@ -12,7 +12,6 @@ module MulukhiyaTootProxy
         break
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(attachment: attachment))
-        next
       end
     end
   end

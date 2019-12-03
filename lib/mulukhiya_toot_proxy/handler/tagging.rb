@@ -46,11 +46,8 @@ module MulukhiyaTootProxy
             break
           end
         end
-      rescue Ginseng::ConfigError
-        next
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(media_id: id))
-        next
       end
       return tags
     end

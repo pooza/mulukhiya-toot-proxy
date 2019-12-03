@@ -16,7 +16,6 @@ module MulukhiyaTootProxy
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(k: k, v: v))
-        next
       end
       update(sort_by{|k, v| k.length}.to_h)
     end
@@ -81,7 +80,6 @@ module MulukhiyaTootProxy
         end
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
-        next
       end
       return result.sort_by{|k, v| k.length}.to_h
     end
