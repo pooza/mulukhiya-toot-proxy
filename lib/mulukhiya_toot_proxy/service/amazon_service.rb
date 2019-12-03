@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def create_image_uri(asin)
-      return fetch_image_uri(asin) unless AmazonService.config?
+      # return fetch_image_uri(asin) unless AmazonService.config?
       cnt = 1
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
