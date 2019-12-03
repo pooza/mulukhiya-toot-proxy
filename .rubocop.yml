@@ -14,10 +14,10 @@ Style/DoubleNegation:
 Style/FormatStringToken:
   EnforcedStyle: template
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
-Layout/IndentFirstHashElement:
+Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 Layout/SpaceBeforeBlockBraces:
