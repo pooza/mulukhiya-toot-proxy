@@ -58,7 +58,7 @@ module MulukhiyaTootProxy
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
       lines.clone.reverse_each do |line|
-        break unless line =~ /^\s*(#[[:word:]]+\s*)$/
+        break unless line =~ /^\s*(#[[:word:]]+\s*)+$/
         line = lines.pop.strip
         tags.body = body = lines.join("\n")
         line.split(/\s+/).map{|v| tags.push(v)}
