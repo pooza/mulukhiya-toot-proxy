@@ -24,16 +24,14 @@ module MulukhiyaTootProxy
   end
 
   def self.loader
+    config = YAML.load_file(File.join(dir, 'config/autoload.yaml'))
     loader = Zeitwerk::Loader.new
-    loader.enable_reloading
+    loader.inflector.inflect(config['inflections'])
     loader.push_dir(File.join(dir, 'app/lib'))
-    loader.setup
-    config = Config.instance
-    loader.inflector.inflect(config['/autoload/inflections'].first)
-    config['/autoload/dirs'].each do |d|
+    config['dirs'].each do |d|
       loader.push_dir(File.join(dir, 'app', d))
     end
-    loader.reload
+    loader.setup
   end
 
   def self.sidekiq
