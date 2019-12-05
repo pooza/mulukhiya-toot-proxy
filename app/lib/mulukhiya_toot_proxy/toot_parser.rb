@@ -24,8 +24,10 @@ module MulukhiyaTootProxy
       @params ||= (YAML.safe_load(body) || JSON.parse(body))
       return nil unless @params&.is_a?(Hash)
       return @params
-    rescue Psych::DisallowedClass, Psych::SyntaxError, JSON::ParserError
+    rescue Psych::SyntaxError, JSON::ParserError
       return nil
+    rescue Psych::Exception, JSON::JSONError => e
+      return @logger.error(e)
     end
 
     alias params exec

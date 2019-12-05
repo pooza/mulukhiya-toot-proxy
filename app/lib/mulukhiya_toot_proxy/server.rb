@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/statuses' do
-      tags = TagContainer.scan(params[:status])
+      tags = TootParser.new(params[:status]).tags
       Handler.exec_all(:pre_toot, params, {results: @results, mastodon: @mastodon})
       @results.response = @mastodon.toot(params)
       Handler.exec_all(:post_toot, params, {results: @results, mastodon: @mastodon})
