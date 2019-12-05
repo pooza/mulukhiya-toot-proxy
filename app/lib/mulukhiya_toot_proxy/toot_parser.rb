@@ -8,6 +8,8 @@ module MulukhiyaTootProxy
       @logger = Logger.new
     end
 
+    alias to_s body
+
     def length
       return body.length
     end
@@ -17,6 +19,16 @@ module MulukhiyaTootProxy
     def too_long?
       return TootParser.max_length < length
     end
+
+    def parse
+      @params ||= (YAML.safe_load(body) || JSON.parse(body))
+      return nil unless @params&.is_a?(Hash)
+      return @params
+    rescue Psych::DisallowedClass, Psych::SyntaxError, JSON::ParserError
+      return nil
+    end
+
+    alias params parse
 
     def reply_to
       return body.scan(/@[[::word]]+(@.[[:alnum:]]+)?/).map(&:first)
@@ -29,17 +41,16 @@ module MulukhiyaTootProxy
     alias tags hashtags
 
     def command?
+      return command_name.present?
     end
 
     def command_name
+      return params['command']
+    rescue
+      return nil
     end
 
     alias command command_name
-
-    def command_params
-    end
-
-    alias params command_params
 
     def self.max_length
       length = Config.instance['/mastodon/toot/max_length']
