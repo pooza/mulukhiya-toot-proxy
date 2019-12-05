@@ -57,10 +57,10 @@ module MulukhiyaTootProxy
       via = body.match(Regexp.new(@config['/twittodon/pattern']))
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
-      if lines.last&.match?(Regexp.new("^(#[[:word:]]+\s*)+$", Regexp::IGNORECASE))
-        line = lines.pop
-        body = lines.join("\n")
-        tags.body = body
+      lines.clone.reverse_each do |line|
+        break unless line =~ /^\s*(#[[:word:]]+\s*)$/
+        line = lines.pop.strip
+        tags.body = body = lines.join("\n")
         line.split(/\s+/).map{|v| tags.push(v)}
       end
       r = [body, tags.to_s]
