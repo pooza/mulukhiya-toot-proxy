@@ -20,7 +20,7 @@ module MulukhiyaTootProxy
       return TootParser.max_length < length
     end
 
-    def parse
+    def exec
       @params ||= (YAML.safe_load(body) || JSON.parse(body))
       return nil unless @params&.is_a?(Hash)
       return @params
@@ -28,7 +28,7 @@ module MulukhiyaTootProxy
       return nil
     end
 
-    alias params parse
+    alias params exec
 
     def reply_to
       return body.scan(/@[[::word]]+(@.[[:alnum:]]+)?/).map(&:first)

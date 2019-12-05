@@ -5,32 +5,23 @@ module MulukhiyaTootProxy
     end
 
     def handle_pre_toot(body, params = {})
-      return nil unless values = parse(body['status'])
-      dispatch_command(values)
+      @parser = TootParser.new(body['status'])
+      return unless @parser.exec
+      return unless @parser.command_name == command_name
+      dispatch
       body['visibility'] = 'direct'
-      body['status'] = create_status(values)
-      @result.push(values)
+      body['status'] = status
+      @result.push(@parser.params)
     end
 
     def handle_pre_webhook(body, params = {}); end
 
-    def parse(status)
-      values = YAML.safe_load(status) || JSON.parse(status)
-      return nil unless values&.is_a?(Hash)
-      return nil unless values['command'] == command_name
-      return values
-    rescue Psych::DisallowedClass, Psych::SyntaxError, JSON::ParserError
-      return nil
+    def status
+      return YAML.dump(@parser.params)
     end
 
-    def create_status(values)
-      return YAML.dump(values)
-    end
-
-    def dispatch_command(values)
+    def dispatch
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
-
-    alias dispatch dispatch_command
   end
 end

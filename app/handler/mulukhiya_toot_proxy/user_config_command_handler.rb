@@ -4,12 +4,12 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def dispatch_command(values)
+    def dispatch
       raise Ginseng::GatewayError, 'Invalid access token' unless id = mastodon.account.id
-      UserConfigStorage.new.update(id, values)
+      UserConfigStorage.new.update(id, @parser.params)
     end
 
-    def create_status(values)
+    def status
       v = JSON.parse(UserConfigStorage.new.get(mastodon.account.id)) || {}
       v['webhook'] ||= {}
       v['webhook']['url'] = mastodon.account.webhook.uri.to_s if mastodon.account.webhook

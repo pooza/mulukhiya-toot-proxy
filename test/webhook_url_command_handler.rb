@@ -4,20 +4,12 @@ module MulukhiyaTootProxy
       @handler = Handler.create('webhook_url_command')
     end
 
-    def test_parse
-      return if @handler.disable?
-
-      assert_nil(@handler.parse(''))
-      assert_nil(@handler.parse('123'))
-      assert_equal(@handler.parse('{"command": webhook_url}'), {'command' => 'webhook_url'})
-      assert_equal(@handler.parse('command: webhook_url'), {'command' => 'webhook_url'})
-    end
-
-    def test_create_status
+    def test_status
       return if Environment.ci?
       return if @handler.disable?
 
-      values = YAML.safe_load(@handler.create_status({}))
+      @handler.handle_pre_toot({'status' => "command: webhook_url\n"})
+      values = YAML.safe_load(@handler.status)
       assert(values['url'].present?)
       assert(values['token'].present?)
     end
