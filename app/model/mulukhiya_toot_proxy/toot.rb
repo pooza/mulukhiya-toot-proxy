@@ -19,6 +19,8 @@ module MulukhiyaTootProxy
       return @uri
     end
 
+    alias to_h values
+
     def to_md
       return uri.to_md if uri
       template = Template.new('toot_clipping.md')

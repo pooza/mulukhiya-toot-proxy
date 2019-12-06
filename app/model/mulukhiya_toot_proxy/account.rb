@@ -2,6 +2,8 @@ module MulukhiyaTootProxy
   class Account < Sequel::Model(:accounts)
     attr_accessor :token
 
+    alias to_h values
+
     def config
       @config ||= UserConfigStorage.new[id]
       return @config

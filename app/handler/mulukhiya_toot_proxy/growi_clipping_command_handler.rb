@@ -3,6 +3,7 @@ module MulukhiyaTootProxy
     def handle_pre_toot(body, params = {})
       @parser = TootParser.new(body['status'])
       return unless @parser.exec
+      return unless @parser.command_name == command_name
       body['visibility'] = 'direct'
       body['status'] = status
     end
@@ -10,6 +11,7 @@ module MulukhiyaTootProxy
     def handle_post_toot(body, params = {})
       @parser = TootParser.new(body['status'])
       return unless @parser.exec
+      return unless @parser.command_name == command_name
       dispatch
       @result.push(@parser.params)
     end
