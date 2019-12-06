@@ -1,6 +1,5 @@
 module MulukhiyaTootProxy
   class Account < Sequel::Model(:accounts)
-    attr_reader :params
     attr_accessor :token
 
     def config
