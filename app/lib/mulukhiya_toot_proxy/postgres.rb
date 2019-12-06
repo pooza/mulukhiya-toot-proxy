@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
 
     def self.dsn
       return Ginseng::Postgres::DSN.parse(Config.instance['/postgres/dsn'])
-    rescue Ginseng::ConfigError => e
+    rescue Ginseng::ConfigError
       return nil
     end
 
