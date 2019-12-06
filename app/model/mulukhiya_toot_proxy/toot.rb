@@ -1,31 +1,14 @@
 require 'sanitize'
 
 module MulukhiyaTootProxy
-  class Toot
-    attr_reader :params
-
-    def initialize(key)
-      @params = Mastodon.lookup_toot(key[:id].to_i)
-      raise Ginseng::NotFoundError, "Toot '#{key.to_json}' not found" unless @params.present?
-      @config = Config.instance
-    end
-
-    def id
-      return self[:id]&.to_i
-    end
-
+  class Toot < Sequel::Model(:statuses)
     def account
-      @account ||= Account.new(id: self[:account_id])
+      @account ||= Account[account_id]
       return @account
     end
 
     def local?
-      return @params[:local]
-    end
-
-    def text
-      @text ||= Toot.sanitize(self[:text])
-      return @text
+      return local
     end
 
     def uri
@@ -40,15 +23,9 @@ module MulukhiyaTootProxy
       return uri.to_md if uri
       template = Template.new('toot_clipping.md')
       template[:account] = account.to_h
-      template[:status] = text
+      template[:status] = Toot.sanitize(text)
       template[:url] = uri.to_s
       return template.to_s
-    end
-
-    alias to_h params
-
-    def [](key)
-      return @params[key]
     end
 
     def self.sanitize(text)

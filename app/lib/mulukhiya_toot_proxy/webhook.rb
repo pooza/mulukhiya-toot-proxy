@@ -60,7 +60,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Account.new(id: webhook.mastodon.account.id).webhook
+        return Account[webhook.mastodon.account.id].webhook
       end
       return nil
     end

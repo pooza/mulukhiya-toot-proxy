@@ -3,22 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return if Environment.ci?
       @config = Config.instance
-      @account = Account.new(token: @config['/test/token'])
-    end
-
-    def test_params
-      return if Environment.ci?
-      assert(@account.params.is_a?(Hash))
-    end
-
-    def test_id
-      return if Environment.ci?
-      assert(@account.id.positive?)
-    end
-
-    def test_username
-      return if Environment.ci?
-      assert(@account.username.is_a?(String))
+      @account = Account.get(token: @config['/test/token'])
     end
 
     def test_config

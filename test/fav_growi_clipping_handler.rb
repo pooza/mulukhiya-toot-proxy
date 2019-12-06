@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return if Environment.ci?
       @config = Config.instance
       @handler = Handler.create('fav_growi_clipping')
-      @account = Account.new(token: @config['/test/token'])
+      @account = Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 

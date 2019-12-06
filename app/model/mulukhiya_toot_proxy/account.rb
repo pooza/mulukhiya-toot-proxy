@@ -1,35 +1,7 @@
 module MulukhiyaTootProxy
-  class Account
+  class Account < Sequel::Model(:accounts)
     attr_reader :params
-    attr_reader :token
-
-    def initialize(key)
-      @logger = Logger.new
-      if @token = key[:token]
-        @params = Mastodon.lookup_token_owner(@token)
-      elsif key[:id]
-        @params = Mastodon.lookup_account(key[:id].to_i)
-      end
-      raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
-    end
-
-    def id
-      return self[:id]&.to_i
-    end
-
-    def username
-      return self[:username]
-    end
-
-    def display_name
-      return self[:display_name]
-    end
-
-    alias to_h params
-
-    def [](key)
-      return @params[key]
-    end
+    attr_accessor :token
 
     def config
       @config ||= UserConfigStorage.new[id]
@@ -76,34 +48,50 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def params
+      @params ||= Postgres.instance.execute('account', {id: id}).first
+      return @params
+    end
+
     def recent_toot
       rows = Postgres.instance.execute('recent_toot', {id: id})
-      return Toot.new(id: rows.first['id'].to_i) if rows.present?
-      return nil
+      return rows.present? ? Toot[rows.first['id'].to_i] : nil
     end
 
     def admin?
-      return @params[:admin]
+      return params[:admin]
     end
 
     def moderator?
-      return @params[:moderator]
+      return params[:moderator]
     end
 
     def service?
-      return @params[:actor_type] == 'Service'
+      return actor_type == 'Service'
     end
 
     alias bot? service?
 
     def locked?
-      return @params[:locked]
+      return prams[:locked]
     end
 
     def disable?(handler_name)
       return true if config["/handler/#{handler_name}/disable"]
       return true if config['/handler/default/disable']
       return false
+    end
+
+    def self.get(key)
+      if token = key[:token]
+        account = Account[Mastodon.lookup_token_owner(token)[:id]]
+        account.token = token
+        return account
+      elsif key[:acct]
+        username, domain = key[:acct].sub(/^@/, '').split('@')
+        return Account.first(username: username, domain: domain)
+      end
+      raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
     end
   end
 end

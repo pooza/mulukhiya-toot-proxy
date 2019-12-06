@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class GrowiClippingWorker < ClippingWorker
     def perform(params)
-      return unless account = Account.new(id: params['account_id'])
+      return unless account = Account[params['account_id']]
       return unless account.growi
       account.growi.clip(
         body: create_body(params),

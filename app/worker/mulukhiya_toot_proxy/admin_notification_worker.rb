@@ -1,9 +1,9 @@
 module MulukhiyaTootProxy
   class AdminNotificationWorker < NotificationWorker
     def perform(params)
-      from_account = Account.new(id: params['account_id'])
+      from_account = Account[params['account_id']]
       @db.execute('notificatable_accounts', {id: from_account.id}).each do |row|
-        account = Account.new(id: row['id'])
+        account = Account[row['id']]
         next unless account.config['/slack/webhook'].present?
         account.slack.say(create_message(account: from_account, status: params['status']), :text)
       rescue => e

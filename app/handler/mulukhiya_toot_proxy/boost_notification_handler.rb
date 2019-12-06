@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class BoostNotificationHandler < NotificationHandler
     def notifiable?(body)
-      return false unless toot = Toot.new(id: body['id'].to_i)
+      return false unless toot = Toot[body['id'].to_i]
       return false unless toot.local?
       return true
     rescue Ginseng::NotFoundError
