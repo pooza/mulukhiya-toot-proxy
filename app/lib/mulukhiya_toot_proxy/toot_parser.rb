@@ -2,13 +2,18 @@ module MulukhiyaTootProxy
   class TootParser
     attr_reader :body
 
-    def initialize(body)
-      @body = body
+    def initialize(body = '')
+      self.body = body
       @config = Config.instance
       @logger = Logger.new
     end
 
     alias to_s body
+
+    def body=(body)
+      @body = body
+      @params = nil
+    end
 
     def length
       return body.length
@@ -21,9 +26,12 @@ module MulukhiyaTootProxy
     end
 
     def exec
-      @params ||= (YAML.safe_load(body) || JSON.parse(body))
-      return nil unless @params&.is_a?(Hash)
-      return @params
+      if @params.nil?
+        @params = YAML.safe_load(body)
+        @params = JSON.parse(body) unless @params&.is_a?(Hash)
+        @params = false unless @params&.is_a?(Hash)
+      end
+      return @params || nil
     rescue Psych::SyntaxError, JSON::ParserError
       return nil
     rescue Psych::Exception, JSON::JSONError => e
@@ -33,7 +41,9 @@ module MulukhiyaTootProxy
     alias params exec
 
     def reply_to
-      return body.scan(/@[[::word]]+(@.[[:alnum:]]+)?/).map(&:first)
+      return body.scan(/(@[_0-9a-z]+(@[-.0-9a-z]+)?)/i).map(&:first).keep_if do |acct|
+        acct.present?
+      end
     end
 
     def hashtags
