@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class AmazonServiceTest < Test::Unit::TestCase
     def setup
+      return unless AmazonService.config?
       @service = AmazonService.new
     end
 

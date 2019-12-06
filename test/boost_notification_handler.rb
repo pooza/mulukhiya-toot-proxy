@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class BoostNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('boost_notification')
       @account = Account.get(token: @config['/test/token'])
@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_boost
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

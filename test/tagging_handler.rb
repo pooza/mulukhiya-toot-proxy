@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_without_default_tags
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -87,7 +87,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_direct
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear
@@ -99,7 +99,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_default_tag
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = ['美食丼']
 
@@ -125,7 +125,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_poll
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -138,7 +138,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_twittodon
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -152,7 +152,7 @@ module MulukhiyaTootProxy
     end
 
     def test_end_with_tags?
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -166,7 +166,7 @@ module MulukhiyaTootProxy
     end
 
     def test_ignore_addresses
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 

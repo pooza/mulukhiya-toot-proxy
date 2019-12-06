@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_toot
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

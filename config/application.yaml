@@ -212,7 +212,7 @@ user_config:
   redis:
     dsn: redis://localhost:6379/1
 postgres:
-  dsn: postgres://postgres@localhost:5432/mastodon
+  dsn: null
 slack:
   hooks: []
 sidekiq:

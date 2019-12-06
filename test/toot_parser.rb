@@ -44,6 +44,8 @@ module MulukhiyaTootProxy
     end
 
     def test_reply_to
+      return unless Postgres.config?
+
       @parser.body = 'pooza@b-shock.org'
       assert_equal(@parser.reply_to, [])
 
