@@ -8,6 +8,8 @@ module MulukhiyaTootProxy
     end
 
     def test_edit
+      return unless Postgres.config?
+
       @storage.update(@key, {a: 111, b: 222})
       assert_equal(@storage[@key], {'/a' => 111, '/b' => 222})
 
