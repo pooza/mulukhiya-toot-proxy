@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if Environment.ci?
+      return unless AmazonService.config?
       return if @handler.disable?
 
       @handler.clear
