@@ -39,7 +39,8 @@ module MulukhiyaTootProxy
     def create_attachment_tags(body)
       tags = []
       (body['media_ids'] || []).each do |id|
-        type = Mastodon.lookup_attachment(id)['file_content_type']
+        type = Attachment[id].file_content_type
+        Slack.broadcast Attachment[id].values
         ['video', 'image', 'audio'].each do |mediatype|
           if type.start_with?("#{mediatype}/")
             tags.push(@config["/tagging/attachment_tags/#{mediatype}"])

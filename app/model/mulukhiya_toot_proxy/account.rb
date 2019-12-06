@@ -85,7 +85,8 @@ module MulukhiyaTootProxy
 
     def self.get(key)
       if token = key[:token]
-        account = Account[Mastodon.lookup_token_owner(token)[:id]]
+        account = Postgres.instance.execute('token_owner', {token: token})&.first
+        account = Account[account[:id]]
         account.token = token
         return account
       elsif key[:acct]

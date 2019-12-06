@@ -64,21 +64,5 @@ module MulukhiyaTootProxy
         },
       })
     end
-
-    def self.lookup_attachment(id)
-      return Postgres.instance.execute('attachment', {id: id})&.first
-    end
-
-    def self.lookup_account(id)
-      return Postgres.instance.execute('account', {id: id})&.first
-    end
-
-    def self.lookup_toot(id)
-      return Postgres.instance.execute('toot', {id: id})&.first
-    end
-
-    def self.lookup_token_owner(token)
-      return Postgres.instance.execute('token_owner', {token: token})&.first
-    end
   end
 end
