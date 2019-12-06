@@ -1,3 +1,6 @@
+require 'sanitize'
+require 'nokogiri'
+
 module MulukhiyaTootProxy
   class TootParser
     attr_reader :body
@@ -64,11 +67,35 @@ module MulukhiyaTootProxy
 
     alias command command_name
 
+    def service
+      @service ||= Mastodon.new
+      return @service
+    end
+
+    def to_md
+      html = Nokogiri::HTML.parse(body, nil, 'utf-8')
+      ['.u-url', '.hashtag'].each do |style_class|
+        html.css(style_class).each do |link|
+          body.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
+        rescue => e
+          @logger.error(e)
+        end
+      end
+      return TootParser.sanitize(body)
+    end
+
     def self.max_length
       length = Config.instance['/mastodon/toot/max_length']
       tags = TagContainer.default_tags
       length = length - tags.join(' ').length - 1 if tags.present?
       return length
+    end
+
+    def self.sanitize(text)
+      text.gsub!(/<br.*?>/, "\n")
+      text.gsub!(%r{</p.*?>}, "\n\n")
+      text = Sanitize.clean(text)
+      return text.strip
     end
   end
 end

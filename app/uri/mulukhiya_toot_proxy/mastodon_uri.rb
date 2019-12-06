@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
       raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
       template[:account] = toot['account']
-      template[:status] = Toot.sanitize(toot['content'])
+      template[:status] = TootParser.new(toot['content']).to_md
       template[:attachments] = toot['media_attachments']
       template[:url] = toot['url']
       return template.to_s
