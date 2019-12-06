@@ -17,7 +17,6 @@ inflections:
   url_handler: URLHandler
   url_normalize_handler: URLNormalizeHandler
   video_uri: VideoURI
-  webhook_url_command_handler: WebhookURLCommandHandler
   you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler
 dirs:
   - contract
