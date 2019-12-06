@@ -8,11 +8,15 @@ module MulukhiyaTootProxy
     end
 
     def test_status
+      return unless Postgres.config?
+
       values = YAML.safe_load(@handler.status)
       assert(values['webhook']['url'].present?)
     end
 
     def test_handle_pre_toot
+      return unless Postgres.config?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})
       assert_nil(@handler.result)
