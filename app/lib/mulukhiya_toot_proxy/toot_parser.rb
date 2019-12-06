@@ -42,7 +42,7 @@ module MulukhiyaTootProxy
 
     def reply_to
       return body.scan(/(@[_0-9a-z]+(@[-.0-9a-z]+)?)/i).map(&:first).keep_if do |acct|
-        acct.present?
+        Account.get(acct: acct)
       end
     end
 
