@@ -24,6 +24,7 @@ dirs:
   - dsn
   - file
   - handler
+  - model
   - renderer
   - service
   - tagging_resource
