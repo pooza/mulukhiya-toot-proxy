@@ -36,6 +36,7 @@ module MulukhiyaTootProxy
       retry
     end
 
+    # obsoleted
     def fetch_image_uri(asin)
       response = @http.get(create_item_uri(asin))
       html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
