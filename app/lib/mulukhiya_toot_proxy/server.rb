@@ -64,6 +64,13 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    get '/mulukhiya' do
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'home'
+      account = @mastodon.account
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/about' do
       @renderer.message = package_class.full_name
       return @renderer.to_s
