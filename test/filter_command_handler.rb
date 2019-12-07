@@ -8,6 +8,8 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
+      return unless Postgres.config?
+
       @handler.clear
       @handler.handle_pre_toot({'status' => ''})
       assert_nil(@handler.result)
