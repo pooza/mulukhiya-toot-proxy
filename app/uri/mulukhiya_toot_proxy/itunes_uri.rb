@@ -77,9 +77,8 @@ module MulukhiyaTootProxy
       unless @image_uri
         response = @http.get(ItunesURI.parse(track['trackViewUrl']).shorten)
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
-        elements = body.xpath('//picture/source')
-        return nil unless elements.present?
-        elements.first.attribute('srcset').text.split(/,/).each do |uri|
+        return nil unless element = body.xpath('//picture/source').first
+        element.attribute('srcset').text.split(/,/).each do |uri|
           next unless matches = uri.match(/^(.*) +3x$/)
           @image_uri = Ginseng::URI.parse(matches[1])
           break if @image_uri&.absolute?

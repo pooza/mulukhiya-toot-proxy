@@ -8,6 +8,7 @@ package:
 handler:
   pre_toot:
     - user_config_command
+    - filter_command
     - growi_clipping_command
     - dropbox_clipping_command
     - shortened_url
