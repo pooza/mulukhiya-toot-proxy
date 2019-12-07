@@ -3,8 +3,8 @@ require 'dry-validation'
 module MulukhiyaTootProxy
   class WebhookContract < Dry::Validation::Contract
     params do
-      required(:digest).value(:string)
-      required(:text).value(:string)
+      optional(:digest).value(:string)
+      optional(:text).value(:string)
     end
 
     rule(:digest) do

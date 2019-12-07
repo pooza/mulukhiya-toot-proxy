@@ -6,16 +6,19 @@ module MulukhiyaTootProxy
 
       case params['action']
       when 'register', nil
-        mastodon.filters.each do |filter|
-          next unless filter['phrase'] == params['phrase']
-          mastodon.unregister_filter(filter['id'])
-        end
+        remove_filter(params['phrase'])
         mastodon.register_filter(phrase: params['phrase'])
       when 'unregister'
-        mastodon.filters.each do |filter|
-          next unless filter['phrase'] == params['phrase']
-          mastodon.unregister_filter(filter['id'])
-        end
+        remove_filter(params['phrase'])
+      end
+    end
+
+    private
+
+    def remove_filter(phrase)
+      mastodon.filters.each do |filter|
+        next unless filter['phrase'] == phrase
+        mastodon.unregister_filter(filter['id'])
       end
     end
   end

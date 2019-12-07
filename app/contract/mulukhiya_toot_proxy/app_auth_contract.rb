@@ -3,7 +3,7 @@ require 'dry-validation'
 module MulukhiyaTootProxy
   class AppAuthContract < Dry::Validation::Contract
     params do
-      required(:code).value(:string)
+      optional(:code).value(:string)
     end
 
     rule(:code) do
