@@ -14,9 +14,7 @@ module MulukhiyaTootProxy
     end
 
     rule(:phrase, :tag) do
-      if !values[:phrase].present? && !values[:tag].present?
-        key.failure('phrase か tag のいずれかが必要です。')
-      end
+      key.failure('phrase か tag のいずれかが必要です。') if !values[:phrase].present? && !values[:tag].present?
     end
 
     rule(:action) do
