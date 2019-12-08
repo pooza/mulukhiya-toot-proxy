@@ -8,14 +8,14 @@ module MulukhiyaTootProxy
     end
 
     rule(:command) do
-      key.failure('コマンド名が正しくありません。') unless value == 'dropbox_clipping'
+      key.failure('command: が正しくありません。') unless value == 'dropbox_clipping'
     end
 
     rule(:url) do
       if value.present?
-        key.failure('url が正しくありません。') unless URI.parse(value).absolute?
+        key.failure('url: が正しくありません。') unless URI.parse(value).absolute?
       else
-        key.failure('url が空欄です。')
+        key.failure('url: が空欄です。')
       end
     end
   end

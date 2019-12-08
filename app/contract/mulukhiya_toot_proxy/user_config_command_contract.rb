@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     rule(:command) do
-      key.failure('コマンド名が空欄です。') unless value.present?
+      key.failure('command: が正しくありません。') unless value == 'user_config'
     end
   end
 end

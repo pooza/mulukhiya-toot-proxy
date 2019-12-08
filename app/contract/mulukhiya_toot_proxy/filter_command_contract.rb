@@ -10,16 +10,18 @@ module MulukhiyaTootProxy
     end
 
     rule(:command) do
-      key.failure('コマンド名が正しくありません。') unless value == 'filter'
+      key.failure('command: が正しくありません。') unless value == 'filter'
     end
 
     rule(:phrase, :tag) do
-      key.failure('phrase か tag のいずれかが必要です。') if !values[:phrase].present? && !values[:tag].present?
+      if !values[:phrase].present? && !values[:tag].present?
+        key.failure('phrase: か tag: のいずれかが必要です。')
+      end
     end
 
     rule(:action) do
       unless [nil, 'register', 'unregister'].member?(value)
-        key.failure('actionは "register" または "unregister" で指定してください。')
+        key.failure('action: は "register" または "unregister" で指定してください。')
       end
     end
   end
