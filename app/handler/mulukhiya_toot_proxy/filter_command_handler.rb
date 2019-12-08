@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class FilterCommandHandler < CommandHandler
     def dispatch
       params = @parser.params.clone
-      params['phrase'] ||= Mastodon.create_tag(params['tag'].sub(/^#/, ''))
+      params['phrase'] ||= Mastodon.create_tag(params['tag'])
 
       case params['action']
       when 'register', nil
