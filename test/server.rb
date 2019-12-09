@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     def setup
       @config = Config.instance
       return if Environment.ci?
-      @account = Account.new(token: @config['/test/token'])
+      @account = Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
@@ -51,22 +51,22 @@ module MulukhiyaTootProxy
       return if Environment.ci?
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * max_length}
+      post '/api/v1/statuses', {'status' => 'A' * TootParser.max_length}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * (max_length + 1)}
+      post '/api/v1/statuses', {'status' => 'A' * (TootParser.max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * max_length}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * TootParser.max_length}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * (max_length + 1)}.to_json
+      post '/api/v1/statuses', {'status' => 'B' * (TootParser.max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
@@ -149,15 +149,6 @@ module MulukhiyaTootProxy
     def test_static_resource
       get '/mulukhiya/icon.png'
       assert(last_response.ok?)
-    end
-
-    private
-
-    def max_length
-      length = @config['/mastodon/max_length']
-      tags = TagContainer.default_tags
-      length = length - tags.join(' ').length - 1 if tags.present?
-      return length
     end
   end
 end

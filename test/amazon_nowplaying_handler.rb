@@ -7,6 +7,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return unless AmazonService.config?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

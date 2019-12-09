@@ -4,15 +4,8 @@ module MulukhiyaTootProxy
       @handler = Handler.create('dropbox_clipping_command')
     end
 
-    def test_parse
-      assert_nil(@handler.parse(''))
-      assert_nil(@handler.parse('123'))
-      assert_equal(@handler.parse('{"command": dropbox_clipping}'), {'command' => 'dropbox_clipping'})
-      assert_equal(@handler.parse('command: dropbox_clipping'), {'command' => 'dropbox_clipping'})
-    end
-
     def test_handle_post_toot
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

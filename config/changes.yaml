@@ -4,5 +4,5 @@
   3_0_0: /artist_parser
 - 2_6_9: /redis/dsn
   3_0_0: /user_config/redis/dsn
-- 2_6_9: /twitter
-  3_0_0: null
+- 3_0_0: /mastodon/max_length
+  3_1_0: /mastodon/toot/max_length

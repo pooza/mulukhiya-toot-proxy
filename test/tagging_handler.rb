@@ -25,49 +25,50 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_without_default_tags
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'hoge'})['status']).tags
       assert_equal(tags.count, 0)
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => '宮本佳那子'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => '宮本佳那子'})['status']).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('宮本佳那子'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本佳那子。'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本佳那子。'})['status']).tags
       assert(tags.member?('宮本佳那子'))
       assert(tags.member?('キュアソード'))
       assert(tags.member?('剣崎真琴'))
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本 佳那子。'})['status']).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'キュアソードの中の人は宮本　佳那子。'})['status']).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => '#キュアソード の中の人は宮本佳那子。'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => '#キュアソード の中の人は宮本佳那子。'})['status']).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'Yes!プリキュア5 GoGo!'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'Yes!プリキュア5 GoGo!'})['status']).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})['status']).tags
       assert_equal(tags.count, 2)
       assert(tags.member?('Yes_プリキュア5'))
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})['status']).tags
       assert_equal(tags.count, 7)
       assert(tags.member?('キュアフローラ_キュアマーメイド'))
       assert(tags.member?('キュアフローラ'))
@@ -78,7 +79,7 @@ module MulukhiyaTootProxy
       assert(tags.member?('浅野真澄'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => '#キュアビューティ'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => '#キュアビューティ'})['status']).tags
       assert_equal(tags.count, 3)
       assert(tags.member?('キュアビューティ'))
       assert(tags.member?('青木れいか'))
@@ -86,6 +87,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_direct
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear
@@ -97,22 +99,23 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_default_tag
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = ['美食丼']
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => 'hoge'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => 'hoge'})['status']).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => '宮本佳那子'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => '宮本佳那子'})['status']).tags
       assert_equal(tags.count, 2)
       assert(tags.member?('美食丼'))
       assert(tags.member?('宮本佳那子'))
 
       @handler.clear
-      tags = TagContainer.scan(@handler.handle_pre_toot({'status' => '#美食丼'})['status'])
+      tags = TootParser.new(@handler.handle_pre_toot({'status' => '#美食丼'})['status']).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
 
@@ -122,6 +125,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_poll
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -134,6 +138,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_twittodon
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -147,6 +152,7 @@ module MulukhiyaTootProxy
     end
 
     def test_end_with_tags?
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 
@@ -160,6 +166,7 @@ module MulukhiyaTootProxy
     end
 
     def test_ignore_addresses
+      return unless Postgres.config?
       return if @handler.disable?
       @config['/tagging/default_tags'] = []
 

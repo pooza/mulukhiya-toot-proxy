@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_toot
       return unless SpotifyService.config?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.handle_pre_toot({'status' => "#nowplaying #五條真由美 ガンバランス de ダンス\n"})

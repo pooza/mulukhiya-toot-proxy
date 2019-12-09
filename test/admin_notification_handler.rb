@@ -1,15 +1,15 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless Postgres.config?
       @handler = Handler.create('admin_notification')
-      @account = Account.new(token: Config.instance['/test/token'])
+      @account = Account.get(token: Config.instance['/test/token'])
       @params = {results: ResultContainer.new}
       @params[:results].response = {'id' => @account.id}
     end
 
     def test_handle_post_toot
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

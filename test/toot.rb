@@ -1,39 +1,34 @@
 module MulukhiyaTootProxy
   class TootTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless Postgres.config?
       @config = Config.instance
-      @account = Account.new(token: @config['/test/token'])
+      @account = Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
-    def test_params
-      return if Environment.ci?
-      assert(@toot.params.is_a?(Hash))
-    end
-
     def test_id
-      return if Environment.ci?
+      return unless Postgres.config?
       assert(@toot.id.positive?)
     end
 
     def test_account
-      return if Environment.ci?
+      return unless Postgres.config?
       assert(@toot.account.is_a?(Account))
     end
 
     def test_text
-      return if Environment.ci?
+      return unless Postgres.config?
       assert(@toot.text.is_a?(String))
     end
 
     def test_uri
-      return if Environment.ci?
+      return unless Postgres.config?
       assert(@toot.uri.is_a?(MastodonURI))
     end
 
     def test_to_md
-      return if Environment.ci?
+      return unless Postgres.config?
       assert(@toot.to_md.is_a?(String))
     end
   end

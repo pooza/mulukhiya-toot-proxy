@@ -1,5 +1,5 @@
 package:
-  version: 3.0.17
+  version: 3.1.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -8,7 +8,7 @@ package:
 handler:
   pre_toot:
     - user_config_command
-    - webhook_url_command
+    - filter_command
     - growi_clipping_command
     - dropbox_clipping_command
     - shortened_url
@@ -84,6 +84,8 @@ handler:
     disable: true
   image_resize:
     pixel: 1280
+  amazon_image:
+    timeout: 20
 worker:
   media_cleaning:
     days: 1
@@ -110,9 +112,9 @@ mastodon:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
     - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-  max_length: 500
   toot:
     label: トゥート
+    max_length: 500
   search:
     limit: 40
   hashtag:
@@ -211,7 +213,7 @@ user_config:
   redis:
     dsn: redis://localhost:6379/1
 postgres:
-  dsn: postgres://postgres@localhost:5432/mastodon
+  dsn: null
 slack:
   hooks: []
 sidekiq:

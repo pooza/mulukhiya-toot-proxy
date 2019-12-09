@@ -10,6 +10,7 @@ body
 h1,h2,h3,h4,h5,h6
   margin: 0.5em
   font-family: sans-serif
+  font-weight: bold
 
 header
   background: url(/mulukhiya/icon-24x24.png) no-repeat
@@ -17,6 +18,31 @@ header
   font-family: sans-serif
   color: white
   text-align: right
+
+nav.breadcrumbs
+  margin: 5px 0
+  background-color: lightgreen
+  opacity: 0.85
+
+nav.breadcrumbs ul
+  margin: 0
+  line-height: 0.9em
+  padding: 0
+
+nav.breadcrumbs ul li
+  font-family: sans-serif
+  font-size: 0.8em
+  display: inline
+  margin: 0 5px
+
+nav.breadcrumbs ul a
+  color: dimgray
+
+nav.breadcrumbs ul a:hover
+  color: black
+
+nav.breadcrumbs ul a:after
+  content: ' >'
 
 main
   border: 1px solid black

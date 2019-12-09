@@ -1,15 +1,15 @@
 module MulukhiyaTootProxy
   class FavGrowiClippingHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('fav_growi_clipping')
-      @account = Account.new(token: @config['/test/token'])
+      @account = Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
     def test_handle_post_boost
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

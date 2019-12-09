@@ -1,12 +1,13 @@
 module MulukhiyaTootProxy
   class AmazonImageHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless AmazonService.config?
       @handler = Handler.create('amazon_image')
     end
 
     def test_handle_pre_toot
-      return if Environment.ci?
+      return unless AmazonService.config?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

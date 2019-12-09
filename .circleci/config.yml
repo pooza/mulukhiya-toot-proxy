@@ -3,11 +3,11 @@ jobs:
   build:
     docker:
       - image: circleci/ruby:2.6.5
-      - image: circleci/postgres:9.6.12
+      - image: circleci/postgres:11
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: mastodon
-      - image: redis:4.0.14
+      - image: redis:4
     working_directory: ~/repos
     steps:
       - checkout

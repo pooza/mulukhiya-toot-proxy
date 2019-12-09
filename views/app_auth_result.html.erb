@@ -19,6 +19,13 @@
 </head>
 <body>
   <header><%= MulukhiyaTootProxy::Package.full_name %></header>
+  <nav class="breadcrumbs">
+    <ul>
+      <li><a href="/web/getting-started">Mastodon</a>
+      <li><a href="/mulukhiya">モロヘイヤHOME</a>
+      <li>アプリケーションの認証
+    </ul>
+  </nav>
   <main>
     <h2>アプリケーションの認証</h2>
     <% if params[:status].to_i < 400 %>
@@ -28,7 +35,6 @@
     <% else %>
       <p class="alert">エラー（<%= params[:status] %>）</p>
     <% end %>
-    <p><a href="/mulukhiya/app/auth">戻る</p>
   </main>
 </body>
 </html>

@@ -1,14 +1,14 @@
 module MulukhiyaTootProxy
   class MentionNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return if Environment.ci?
+      return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('mention_notification')
-      @account = Account.new(token: @config['/test/token'])
+      @account = Account.get(token: @config['/test/token'])
     end
 
     def test_handle_post_toot
-      return if Environment.ci?
+      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear
