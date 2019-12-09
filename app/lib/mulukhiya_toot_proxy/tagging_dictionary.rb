@@ -76,7 +76,6 @@ module MulukhiyaTootProxy
             entry: {k: k, v: v},
           )
           @logger.error(msg)
-          next
         end
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
