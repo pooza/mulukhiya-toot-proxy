@@ -1,5 +1,5 @@
 package:
-  version: 3.1.0
+  version: 3.1.1
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -120,7 +120,7 @@ mastodon:
   hashtag:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
   account:
-    pattern: '@[-@.[:word:]]+'
+    pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
 amazon:
   country: jp
   urls:

@@ -31,7 +31,8 @@ module MulukhiyaTootProxy
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
-      text = [@tags.body.gsub(Regexp.new(@config['/mastodon/account/pattern']), '')]
+      pattern = Regexp.new(@config['/mastodon/account/pattern'])
+      text = [@tags.body.gsub(pattern, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end

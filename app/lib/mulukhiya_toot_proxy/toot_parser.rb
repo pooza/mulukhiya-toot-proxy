@@ -44,7 +44,8 @@ module MulukhiyaTootProxy
     alias params exec
 
     def reply_to
-      return body.scan(/(@[_0-9a-z]+(@[-.0-9a-z]+)?)/i).map(&:first).keep_if do |acct|
+      pattern = Regexp.new(@config['/mastodon/account/pattern'])
+      return body.scan(pattern).map(&:first).keep_if do |acct|
         Account.get(acct: acct)
       end
     end
