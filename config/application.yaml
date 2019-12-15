@@ -1,10 +1,11 @@
 package:
-  version: 3.1.1
+  version: 3.2.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+controller: mastodon
 handler:
   pre_toot:
     - user_config_command
@@ -121,6 +122,8 @@ mastodon:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
   account:
     pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
+dolphin:
+  url: https://dol.example.com/
 amazon:
   country: jp
   urls:

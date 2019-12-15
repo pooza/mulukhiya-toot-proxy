@@ -1,7 +1,7 @@
 require 'rack/test'
 
 module MulukhiyaTootProxy
-  class ServerTest < Test::Unit::TestCase
+  class MastodonControllerTest < Test::Unit::TestCase
     include ::Rack::Test::Methods
 
     def setup
@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
     end
 
     def app
-      return Server
+      return MastodonController
     end
 
     def test_about
