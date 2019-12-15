@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class Server < Ginseng::Web::Sinatra
+  class MastodonController < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
 
