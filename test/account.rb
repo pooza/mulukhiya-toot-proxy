@@ -33,7 +33,7 @@ module MulukhiyaTootProxy
 
     def test_disable?
       return unless Postgres.config?
-      @config['/handler/pre_toot'].each do |v|
+      @config['/handler/mastodon/pre_toot'].each do |v|
         assert(@account.disable?(v).is_a?(TrueClass) || @account.disable?(v).is_a?(FalseClass))
       end
     end
