@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return unless Postgres.config?
       @config = Config.instance
-      @account = Account.get(token: @config['/test/token'])
+      @account = Environment.account_class.get(token: @config['/test/token'])
     end
 
     def test_all
@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
     def test_mastodon
       return unless Postgres.config?
       Webhook.all do |hook|
-        assert(hook.mastodon.is_a?(Mastodon))
+        assert(hook.sns.is_a?(MastodonService) || hook.sns.is_a?(DolphinService))
       end
     end
 

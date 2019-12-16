@@ -1,7 +1,8 @@
 module MulukhiyaTootProxy
-  class Dolphin
+  class DolphinService
     include Package
     attr_reader :uri
+    attr_accessor :token
     attr_accessor :mulukhiya_enable
 
     def initialize(uri = nil, token = nil)
@@ -19,6 +20,10 @@ module MulukhiyaTootProxy
 
     alias mulukhiya? mulukhiya_enable?
 
+    def account
+      return Environment.account_class.get(token: @token)
+    end
+
     def note(body, params = {})
       body = {status: body.to_s} unless body.is_a?(Hash)
       headers = params[:headers] || {}
@@ -35,6 +40,14 @@ module MulukhiyaTootProxy
 
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').gsub(/(^[_#]+|_$)/, '')
+    end
+
+    def self.message_field
+      return Config.instance['/dolphin/message/field']
+    end
+
+    def self.visibility_name(name)
+      return Config.instance["/dolphin/message/visibility_name/#{name}"]
     end
   end
 end

@@ -2,12 +2,12 @@ module MulukhiyaTootProxy
   class FilterCommandHandler < CommandHandler
     def dispatch
       params = @parser.params.clone
-      params['phrase'] ||= Mastodon.create_tag(params['tag'])
+      params['phrase'] ||= MastodonService.create_tag(params['tag'])
 
       case params['action']
       when 'register', nil
         remove_filter(params['phrase'])
-        mastodon.register_filter(phrase: params['phrase'])
+        sns.register_filter(phrase: params['phrase'])
       when 'unregister'
         remove_filter(params['phrase'])
       end
@@ -16,9 +16,9 @@ module MulukhiyaTootProxy
     private
 
     def remove_filter(phrase)
-      mastodon.filters.each do |filter|
+      sns.filters.each do |filter|
         next unless filter['phrase'] == phrase
-        mastodon.unregister_filter(filter['id'])
+        sns.unregister_filter(filter['id'])
       end
     end
   end

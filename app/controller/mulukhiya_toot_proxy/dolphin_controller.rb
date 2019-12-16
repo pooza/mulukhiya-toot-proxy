@@ -5,13 +5,14 @@ module MulukhiyaTootProxy
 
     before do
       @results = ResultContainer.new
-      @dolphin = Dolphin.new
+      @dolphin = DolphinService.new
+      @dolphin.token = params[:i]
     end
 
     post '/api/notes/create' do
-      # Handler.exec_all(:pre_toot, params, {results: @results})
+      Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin})
       @results.response = @dolphin.note(params)
-      # Handler.exec_all(:post_toot, params, {results: @results})
+      Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code

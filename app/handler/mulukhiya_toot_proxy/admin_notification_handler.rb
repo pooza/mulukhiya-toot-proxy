@@ -1,10 +1,10 @@
 module MulukhiyaTootProxy
   class AdminNotificationHandler < NotificationHandler
     def notifiable?(body)
-      return false unless body['status'] =~ /#notify(\s|$)/i
+      return false unless (body[message_field]) =~ /#notify(\s|$)/i
       return false if body['visibility'] =~ /^(direct|private)$/
-      return true if mastodon.account.admin?
-      return true if mastodon.account.moderator?
+      return true if sns.account.admin?
+      return true if sns.account.moderator?
       return false
     rescue => e
       @logger.error(e)

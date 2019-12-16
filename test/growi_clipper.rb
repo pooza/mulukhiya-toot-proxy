@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class GrowiClipperTest < Test::Unit::TestCase
     def setup
       return if Environment.ci?
-      @clipper = GrowiClipper.create(account_id: Mastodon.new.account.id)
+      @clipper = GrowiClipper.create(account_id: Environment.sns_class.new.account.id)
     end
 
     def test_create

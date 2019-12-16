@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class NowplayingHandler < Handler
     def handle_pre_toot(body, params = {})
-      @source_status = body['status'].gsub(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
+      @source_status = body[message_field].gsub(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @status = []
       updated = false
       @source_status.each_line do |line|
@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
         updated = true
         @result.push(keyword)
       end
-      body['status'] = @status.join("\n")
+      body[message_field] = @status.join("\n")
       return body
     end
 

@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return unless Postgres.config?
       @config = Config.instance
-      @account = Account.get(token: @config['/test/token'])
+      @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 

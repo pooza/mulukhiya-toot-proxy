@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
   class Handler
     attr_accessor :tags
     attr_accessor :results
-    attr_reader :mastodon
+    attr_reader :sns
     attr_reader :local_tags
 
     def handle_pre_toot(body, params = {}); end
@@ -56,7 +56,7 @@ module MulukhiyaTootProxy
     end
 
     def disable?
-      return true if mastodon.account.disable?(underscore_name)
+      return true if sns.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
@@ -90,6 +90,10 @@ module MulukhiyaTootProxy
       return params[:results]
     end
 
+    def message_field
+      return Environment.sns_class.message_field
+    end
+
     private
 
     def initialize(params = {})
@@ -97,7 +101,7 @@ module MulukhiyaTootProxy
       @logger = Logger.new
       @result = []
       @local_tags = []
-      @mastodon = params[:mastodon] || Mastodon.new
+      @sns = params[:sns] || Environment.sns_class.new
       @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @event = params[:event] || 'unknown'

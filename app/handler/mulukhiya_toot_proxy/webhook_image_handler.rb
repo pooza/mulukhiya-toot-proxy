@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
       body['attachments'].each do |attachment|
         uri = Ginseng::URI.parse(attachment['image_url'])
         next unless uri&.absolute?
-        body['media_ids'].push(mastodon.upload_remote_resource(uri))
+        body['media_ids'].push(sns.upload_remote_resource(uri))
         @result.push(source_url: uri.to_s)
         break
       rescue => e

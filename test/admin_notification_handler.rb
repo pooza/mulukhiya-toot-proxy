@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       return unless Postgres.config?
       @handler = Handler.create('admin_notification')
-      @account = Account.get(token: Config.instance['/test/token'])
+      @account = Environment.account_class.get(token: Config.instance['/test/token'])
       @params = {results: ResultContainer.new}
       @params[:results].response = {'id' => @account.id}
     end

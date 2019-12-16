@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('mention_notification')
-      @account = Account.get(token: @config['/test/token'])
+      @account = Environment.account_class.get(token: @config['/test/token'])
     end
 
     def test_handle_post_toot

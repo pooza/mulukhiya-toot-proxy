@@ -8,6 +8,22 @@ module MulukhiyaTootProxy
       return MulukhiyaTootProxy.dir
     end
 
+    def self.config
+      return Config.instance
+    end
+
+    def self.sns_class
+      return "MulukhiyaTootProxy::#{config['/controller'].classify}Service".constantize
+    end
+
+    def self.controller_class
+      return "MulukhiyaTootProxy::#{config['/controller'].classify}Controller".constantize
+    end
+
+    def self.account_class
+      return "MulukhiyaTootProxy::#{config['/controller'].classify}::Account".constantize
+    end
+
     def self.health
       values = {version: Package.version, status: 200}
       ['Postgres', 'Redis'].each do |service|

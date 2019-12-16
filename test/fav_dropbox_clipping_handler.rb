@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('fav_dropbox_clipping')
-      @account = Account.get(token: @config['/test/token'])
+      @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 

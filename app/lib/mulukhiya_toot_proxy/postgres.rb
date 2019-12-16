@@ -21,7 +21,7 @@ module MulukhiyaTootProxy
     end
 
     def self.health
-      Account.get(token: Config.instance['/test/token'])
+      Environment.account_class.get(token: Config.instance['/test/token'])
       return {status: 'OK'}
     rescue
       return {status: 'NG'}

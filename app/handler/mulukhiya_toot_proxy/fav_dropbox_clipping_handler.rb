@@ -4,7 +4,7 @@ module MulukhiyaTootProxy
       return unless uri = Toot[body['id'].to_i].uri
       DropboxClippingWorker.perform_async(
         uri: {href: uri.to_s, class: uri.class.to_s},
-        account_id: mastodon.account.id,
+        account_id: sns.account.id,
       )
       @result.push(url: uri.to_s)
     end
