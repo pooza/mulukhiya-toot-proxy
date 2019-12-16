@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def contract
-      @contract ||= "MulukhiyaTootProxy::#{command_name.classify}CommandContract".constantize.new
+      @contract ||= "MulukhiyaTootProxy::#{command_name.camelize}CommandContract".constantize.new
       return @contract
     end
 

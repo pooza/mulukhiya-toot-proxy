@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      account = Account[params[:account_id]]
+      account = Environment.account_class[params[:account_id]]
       return GrowiClipper.new(
         crowi_url: account.config['/growi/url'],
         access_token: account.config['/growi/token'],

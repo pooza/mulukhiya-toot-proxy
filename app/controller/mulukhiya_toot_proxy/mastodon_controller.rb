@@ -121,7 +121,7 @@ module MulukhiyaTootProxy
         @renderer['errors'] = errors
         @renderer['oauth_url'] = MastodonService.new.oauth_uri
       else
-        r = Mastodon.new.auth(params[:code])
+        r = MastodonService.new.auth(params[:code])
         @renderer.template = 'app_auth_result'
         @renderer['status'] = r.code
         @renderer['result'] = r.parsed_response

@@ -29,7 +29,7 @@ handler:
       - amazon_image
       - tagging
     post_toot:
-      - growi_clipping_command/
+      - growi_clipping_command
       - dropbox_clipping_command
       - admin_notification
       - mention_notification

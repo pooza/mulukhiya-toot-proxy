@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
 
     def test_account
       return unless Postgres.config?
-      assert(@toot.account.is_a?(Account))
+      assert(@toot.account.is_a?(Environment.account_class))
     end
 
     def test_text

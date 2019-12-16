@@ -15,7 +15,7 @@ module MulukhiyaTootProxy
     end
 
     def self.create(params)
-      account = Account[params[:account_id]]
+      account = Environment.account_class[params[:account_id]]
       return DropboxClipper.new(account.config['/dropbox/token'])
     rescue => e
       Logger.new.error(Ginseng::Error.create(e).to_h.merge(params: params))

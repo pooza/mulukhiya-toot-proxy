@@ -60,7 +60,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Account[webhook.sns.account.id].webhook
+        return Environment.account_class[webhook.sns.account.id].webhook
       end
       return nil
     end

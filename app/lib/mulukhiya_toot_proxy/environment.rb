@@ -13,15 +13,15 @@ module MulukhiyaTootProxy
     end
 
     def self.sns_class
-      return "MulukhiyaTootProxy::#{config['/controller'].classify}Service".constantize
+      return "MulukhiyaTootProxy::#{config['/controller'].camelize}Service".constantize
     end
 
     def self.controller_class
-      return "MulukhiyaTootProxy::#{config['/controller'].classify}Controller".constantize
+      return "MulukhiyaTootProxy::#{config['/controller'].camelize}Controller".constantize
     end
 
     def self.account_class
-      return "MulukhiyaTootProxy::#{config['/controller'].classify}::Account".constantize
+      return "MulukhiyaTootProxy::#{config['/controller'].camelize}::Account".constantize
     end
 
     def self.health

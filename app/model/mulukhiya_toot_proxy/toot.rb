@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class Toot < Sequel::Model(:statuses)
     def account
-      @account ||= Account[account_id]
+      @account ||= Environment.account_class[account_id]
       return @account
     end
 

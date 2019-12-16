@@ -3,13 +3,18 @@ module MulukhiyaTootProxy
     class Account < Sequel::Model(:user)
       attr_accessor :token
 
+      def initialize
+        super
+        @logger = Logger.new
+      end
+
       alias to_h values
 
       def config
         @config ||= UserConfigStorage.new[id]
         return @config
       rescue => e
-        logger.error(e)
+        @logger.error(e)
         return {}
       end
 
@@ -25,27 +30,21 @@ module MulukhiyaTootProxy
         end
         return @slack
       rescue => e
-        logger.error(e)
+        @logger.error(e)
         return nil
       end
 
       def growi
-        @growi ||= GrowiClipper.create(account_id: id)
-        return @growi
-      rescue => e
-        logger.error(e)
         return nil
       end
 
       def dropbox
-        @dropbox ||= DropboxClipper.create(account_id: id)
-        return @dropbox
-      rescue => e
-        logger.error(e)
         return nil
       end
 
-      def recent_toot; end
+      def recent_toot
+        return nil
+      end
 
       def admin?
         return isAdmin
@@ -72,20 +71,8 @@ module MulukhiyaTootProxy
       end
 
       def self.get(key)
-        if key[:token]
-          return Account.first(token: key[:token])
-          # elsif key[:acct]
-          #  username, domain = key[:acct].sub(/^@/, '').split('@')
-          #  return Account.first(username: username, domain: domain)
-        end
+        return Account.first(token: key[:token]) if key[:token]
         raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
-      end
-
-      private
-
-      def logger
-        @logger ||= Logger.new
-        return @logger
       end
     end
   end
