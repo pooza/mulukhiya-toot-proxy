@@ -5,11 +5,17 @@ module MulukhiyaTootProxy
 
     before do
       @results = ResultContainer.new
+      @dolphin = Dolphin.new
     end
 
     post '/api/notes/create' do
-      Slack.broadcast(params)
-      Slack.broadcast(@headers)
+      #Handler.exec_all(:pre_toot, params, {results: @results})
+      @results.response = @dolphin.note(params)
+      #Handler.exec_all(:post_toot, params, {results: @results})
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
     end
 
     get '/mulukhiya' do

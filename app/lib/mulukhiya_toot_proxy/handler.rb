@@ -73,7 +73,8 @@ module MulukhiyaTootProxy
       params[:event] = event
       params[:results] ||= ResultContainer.new
       params[:tags] ||= TagContainer.new
-      Config.instance["/handler/#{event}"].each do |v|
+      config = Config.instance
+      config["/handler/#{config['/controller']}/#{event}"].each do |v|
         handler = create(v, params)
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
