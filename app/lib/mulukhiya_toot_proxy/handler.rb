@@ -73,6 +73,8 @@ module MulukhiyaTootProxy
 
     def self.create(name, params = {})
       return "MulukhiyaTootProxy::#{name.camelize}Handler".constantize.new(params)
+    rescue Ginseng::ConfigError
+      return nil
     end
 
     def self.exec_all(event, body, params = {})

@@ -2,14 +2,15 @@ module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < Test::Unit::TestCase
     def setup
       @handler = Handler.create('admin_notification')
-      return if @handler.disable?
+
+      return if @handler.nil? || @handler.disable?
       @account = Environment.account_class.get(token: Config.instance['/test/token'])
       @params = {results: ResultContainer.new}
       @params[:results].response = {'id' => @account.id}
     end
 
     def test_handle_post_toot
-      return if @handler.disable?
+      return if @handler.nil? || @handler.disable?
 
       @handler.clear
       @handler.handle_post_toot({message_field => 'ふつうのトゥート。'}, @params)
