@@ -10,13 +10,13 @@ task :test do
   if MulukhiyaTootProxy::Environment.ci?
     tests.delete_if{|t| config['/test/excludes/ci'].member?(File.basename(t, '.rb'))}
   end
-  if MulukhiyaTootProxy::Postgres.config?
+  unless MulukhiyaTootProxy::Postgres.config?
     tests.delete_if{|t| config['/test/excludes/no_db'].member?(File.basename(t, '.rb'))}
   end
-  if MulukhiyaTootProxy::AmazonService.config?
+  unless MulukhiyaTootProxy::AmazonService.config?
     tests.delete_if{|t| config['/test/excludes/no_amazon'].member?(File.basename(t, '.rb'))}
   end
-  if MulukhiyaTootProxy::SpotifyService.config?
+  unless MulukhiyaTootProxy::SpotifyService.config?
     tests.delete_if{|t| config['/test/excludes/no_spotify'].member?(File.basename(t, '.rb'))}
   end
   if config['/controller'] == 'mastodon'
