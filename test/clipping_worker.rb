@@ -5,7 +5,6 @@ module MulukhiyaTootProxy
     end
 
     def test_create_body
-      return if Environment.ci?
       body = @worker.create_body('uri' => {
         'class' => 'MulukhiyaTootProxy::MastodonURI',
         'href' => 'https://st.curesta.b-shock.org/web/statuses/102582870209671676',

@@ -1,13 +1,10 @@
 module MulukhiyaTootProxy
   class SpotifyURITest < Test::Unit::TestCase
     def setup
-      return unless SpotifyService.config?
       @config = Config.instance
     end
 
     def test_spotify?
-      return unless SpotifyService.config?
-
       uri = SpotifyURI.parse('https://google.com')
       assert_false(uri.spotify?)
 
@@ -19,8 +16,6 @@ module MulukhiyaTootProxy
     end
 
     def test_track_id
-      return unless SpotifyService.config?
-
       uri = SpotifyURI.parse('https://open.spotify.com')
       assert_nil(uri.track_id)
 
@@ -29,8 +24,6 @@ module MulukhiyaTootProxy
     end
 
     def test_image_uri
-      return unless SpotifyService.config?
-
       uri = SpotifyURI.parse('https://open.spotify.com')
       assert_nil(uri.image_uri)
 

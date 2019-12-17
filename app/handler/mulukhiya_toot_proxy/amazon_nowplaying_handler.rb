@@ -6,6 +6,10 @@ module MulukhiyaTootProxy
       @service = AmazonService.new
     end
 
+    def disable?
+      return super || !AmazonService.config?
+    end
+
     def updatable?(keyword)
       return true if @asins[keyword] = @service.search(keyword, ['DigitalMusic', 'Music'])
       return false

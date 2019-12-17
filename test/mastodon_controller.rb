@@ -6,8 +6,7 @@ module MulukhiyaTootProxy
 
     def setup
       @config = Config.instance
-      return if Environment.ci?
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = MulukhiyaTootProxy::Mastodon::Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
@@ -48,45 +47,39 @@ module MulukhiyaTootProxy
     end
 
     def test_toot_length
-      return if Environment.ci?
-
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * TootParser.max_length}
+      post '/api/v1/statuses', {message_field => 'A' * TootParser.max_length}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {'status' => 'A' * (TootParser.max_length + 1)}
+      post '/api/v1/statuses', {message_field => 'A' * (TootParser.max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * TootParser.max_length}.to_json
+      post '/api/v1/statuses', {message_field => 'B' * TootParser.max_length}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => 'B' * (TootParser.max_length + 1)}.to_json
+      post '/api/v1/statuses', {message_field => 'B' * (TootParser.max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
 
     def test_toot_zenkaku
-      return if Environment.ci?
-
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => '！!！!！'}.to_json
+      post '/api/v1/statuses', {message_field => '！!！!！'}.to_json
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
     end
 
     def test_toot_response
-      return if Environment.ci?
-
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {'status' => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {message_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['tags'].map{|v| v['name']}
       assert_equal(tags.count, 2)
@@ -95,8 +88,6 @@ module MulukhiyaTootProxy
     end
 
     def test_hook_toot
-      return if Environment.ci?
-
       header 'Content-Type', 'application/json'
       post '/mulukhiya/webhook', {text: 'ひらめけ！ホーリーソード！'}.to_json
       assert_false(last_response.ok?)
@@ -127,8 +118,6 @@ module MulukhiyaTootProxy
     end
 
     def test_app_auth
-      return if Environment.ci?
-
       get '/mulukhiya/app/auth'
       assert(last_response.ok?)
 
@@ -149,6 +138,10 @@ module MulukhiyaTootProxy
     def test_static_resource
       get '/mulukhiya/icon.png'
       assert(last_response.ok?)
+    end
+
+    def message_field
+      return Environment.sns_class.message_field
     end
   end
 end

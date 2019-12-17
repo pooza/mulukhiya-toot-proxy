@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class AmazonImageHandler < ImageHandler
+    def disable?
+      return super || !AmazonService.config?
+    end
+
     def updatable?(link)
       uri = AmazonURI.parse(link)
       return false unless uri.amazon?

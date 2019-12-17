@@ -49,15 +49,10 @@ Metrics/ClassLength:
   Exclude:
     - test/*
 
-Naming/FileName:
-  Exclude:
-    - Rakefile.rb
-    - '**/Rakefile*.rb'
-
 Metrics/BlockLength:
   Exclude:
-    - Rakefile.rb
-    - '**/Rakefile*.rb'
+    - test/*
+    - app/task/*
 
 Style/BracesAroundHashParameters:
   Enabled: false

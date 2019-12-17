@@ -19,27 +19,31 @@ module MulukhiyaTootProxy
     end
 
     def test_disable?
-      return if Environment.ci?
       [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost, :post_search].each do |event|
         @config["/handler/#{@config['/controller']}/#{event}"].each do |v|
           handler = Handler.create(v)
           assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
         end
+      rescue Ginseng::ConfigError
+        next
       end
     end
 
     def test_exec_all
-      return if Environment.ci?
       return if Handler.create('spotify_url_nowplaying').disable?
       params = {}
       Handler.exec_all(
         :pre_toot,
-        {'status' => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
+        {message_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,
       )
       assert(params[:tags].member?('宮本佳那子'))
       assert(params[:tags].member?('福山沙織'))
       assert(params[:tags].member?('井上由貴'))
+    end
+
+    def message_field
+      return Environment.sns_class.message_field
     end
   end
 end

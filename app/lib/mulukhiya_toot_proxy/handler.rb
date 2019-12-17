@@ -41,7 +41,12 @@ module MulukhiyaTootProxy
 
     def result
       return nil unless @result.present?
-      return {handler: self.class.to_s, event: @event, entries: @result}
+      return {
+        controller: Environment.controller_class.to_s,
+        handler: self.class.to_s,
+        event: @event,
+        entries: @result,
+      }
     end
 
     def clear
@@ -56,6 +61,7 @@ module MulukhiyaTootProxy
     end
 
     def disable?
+      return true unless Postgres.config?
       return true if sns.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false

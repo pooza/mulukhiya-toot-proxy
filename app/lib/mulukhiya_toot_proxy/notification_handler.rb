@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def disable?
-      return @config.disable?(underscore_name)
+      return Environment.sns_class.is_a?(DolphinService) || @config.disable?(underscore_name)
     rescue Ginseng::ConfigError
       return false
     end

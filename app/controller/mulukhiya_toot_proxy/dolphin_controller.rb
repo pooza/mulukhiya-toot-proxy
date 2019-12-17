@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     before do
       @results = ResultContainer.new
       @dolphin = DolphinService.new
-      @dolphin.token = params[:i]
+      @dolphin.token = params[:i] if params[:i]
     end
 
     post '/api/notes/create' do

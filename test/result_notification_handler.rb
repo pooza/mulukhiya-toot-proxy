@@ -5,11 +5,13 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_toot
-      return unless Postgres.config?
-
       @handler.clear
-      @handler.handle_post_toot({'status' => 'ふつうのトゥート。'})
+      @handler.handle_post_toot({message_field => 'ふつうのトゥート。'})
       assert_nil(@handler.result)
+    end
+
+    def message_field
+      return Environment.sns_class.message_field
     end
   end
 end

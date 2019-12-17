@@ -1,38 +1,35 @@
 module MulukhiyaTootProxy
   class AccountTest < Test::Unit::TestCase
     def setup
-      return unless Postgres.config?
       @config = Config.instance
       @account = Environment.account_class.get(token: @config['/test/token'])
     end
 
     def test_config
-      return unless Postgres.config?
       assert(@account.config.is_a?(Hash))
     end
 
     def test_webhook
-      return unless Postgres.config?
+      return unless @account.webhook
       assert(@account.webhook.is_a?(Webhook))
     end
 
     def test_slack
-      return unless Postgres.config?
+      return unless @account.slack
       assert(@account.slack.is_a?(Slack))
     end
 
     def test_growi
-      return unless Postgres.config?
+      return unless @account.growi
       assert(@account.growi.is_a?(GrowiClipper))
     end
 
     def test_dropbox
-      return unless Postgres.config?
+      return unless @account.dropbox
       assert(@account.dropbox.is_a?(DropboxClipper))
     end
 
     def test_disable?
-      return unless Postgres.config?
       @config['/handler/mastodon/pre_toot'].each do |v|
         assert(@account.disable?(v).is_a?(TrueClass) || @account.disable?(v).is_a?(FalseClass))
       end

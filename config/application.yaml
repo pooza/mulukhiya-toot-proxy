@@ -120,6 +120,30 @@ shortened_url:
     - git.io
     - spoti.fi
     - apple.co
+test:
+  excludes:
+    ci:
+      - clipping_worker
+      - growi_clipper
+      - handler
+      - mastodon_controller
+    no_db:
+      - account
+      - mastodon_uri
+      - query_template
+      - toot
+      - webhook
+    no_amazon:
+      - amazon_service
+    no_spotify:
+      - spotify_service
+      - spotify_uri
+    dolphin:
+      - clipping_worker
+      - mastodon_controller
+      - mastodon_uri
+      - toot
+    mastodon:
 mastodon:
   url: https://mstdn.example.com/
   oauth:

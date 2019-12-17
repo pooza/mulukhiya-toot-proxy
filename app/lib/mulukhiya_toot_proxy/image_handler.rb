@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class ImageHandler < Handler
+    def disable?
+      return super || Environment.sns_class.is_a?(DolphinService)
+    end
+
     def handle_pre_toot(body, params = {})
       body['media_ids'] ||= []
       return if body['media_ids'].present?

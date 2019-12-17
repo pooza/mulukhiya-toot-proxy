@@ -10,9 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_convertable?
-      return unless Postgres.config?
       return if @handler.disable?
-
       assert_false(@handler.convertable?)
     end
   end

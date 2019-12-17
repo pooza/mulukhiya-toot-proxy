@@ -1,15 +1,14 @@
 module MulukhiyaTootProxy
   class FavNotificationHandlerTest < Test::Unit::TestCase
     def setup
-      return unless Postgres.config?
       @config = Config.instance
       @handler = Handler.create('fav_notification')
+      return if @handler.disable?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
     def test_handle_post_boost
-      return unless Postgres.config?
       return if @handler.disable?
 
       @handler.clear

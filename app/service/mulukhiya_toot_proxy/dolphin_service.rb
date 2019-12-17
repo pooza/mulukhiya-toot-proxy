@@ -8,7 +8,7 @@ module MulukhiyaTootProxy
     def initialize(uri = nil, token = nil)
       @config = Config.instance
       @logger = Logger.new
-      @token = token
+      @token = token || @config['/test/token']
       @uri = URI.parse(uri || @config['/dolphin/url'])
       @mulukhiya_enable = false
       @http = http_class.new
