@@ -22,7 +22,6 @@ module MulukhiyaTootProxy
     end
 
     def test_health
-      return if Environment.ci?
       get '/mulukhiya/health'
       assert(last_response.ok?)
     end
@@ -34,8 +33,6 @@ module MulukhiyaTootProxy
     end
 
     def test_search
-      return if Environment.ci?
-
       header 'Authorization', "Bearer #{@account.token}"
       get '/api/v2/search?q=hoge'
       assert(last_response.ok?)
