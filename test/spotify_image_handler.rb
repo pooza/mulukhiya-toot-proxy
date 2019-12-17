@@ -1,7 +1,6 @@
 module MulukhiyaTootProxy
   class SpotifyImageHandlerTest < Test::Unit::TestCase
     def setup
-      return unless SpotifyService.config?
       @handler = Handler.create('spotify_image')
     end
 

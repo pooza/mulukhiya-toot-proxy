@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def disable?
       return (Environment.controller_name != 'mastodon') || @config.disable?(underscore_name)
     rescue Ginseng::ConfigError
-      return false
+      return true
     end
 
     def notifiable?(body)
