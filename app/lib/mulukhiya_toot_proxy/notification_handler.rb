@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def disable?
-      return Environment.sns_class.is_a?(DolphinService) || @config.disable?(underscore_name)
+      return (Environment.controller_name != 'mastodon') || @config.disable?(underscore_name)
     rescue Ginseng::ConfigError
       return false
     end

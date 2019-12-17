@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class FilterCommandHandler < CommandHandler
+    def disable?
+      return (Environment.controller_name != 'mastodon') || super
+    end
+
     def dispatch
       params = @parser.params.clone
       params['phrase'] ||= MastodonService.create_tag(params['tag'])

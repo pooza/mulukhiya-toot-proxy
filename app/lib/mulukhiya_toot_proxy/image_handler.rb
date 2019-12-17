@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class ImageHandler < Handler
     def disable?
-      return super || Environment.sns_class.is_a?(DolphinService)
+      return (Environment.controller_name != 'mastodon') || super
     end
 
     def handle_pre_toot(body, params = {})

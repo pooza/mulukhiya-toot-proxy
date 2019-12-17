@@ -13,15 +13,19 @@ module MulukhiyaTootProxy
     end
 
     def self.sns_class
-      return "MulukhiyaTootProxy::#{config['/controller'].camelize}Service".constantize
+      return "MulukhiyaTootProxy::#{controller_name.camelize}Service".constantize
+    end
+
+    def self.controller_name
+      return config['/controller']
     end
 
     def self.controller_class
-      return "MulukhiyaTootProxy::#{config['/controller'].camelize}Controller".constantize
+      return "MulukhiyaTootProxy::#{controller_name.camelize}Controller".constantize
     end
 
     def self.account_class
-      return "MulukhiyaTootProxy::#{config['/controller'].camelize}::Account".constantize
+      return "MulukhiyaTootProxy::#{controller_name.camelize}::Account".constantize
     end
 
     def self.health
@@ -35,7 +39,6 @@ module MulukhiyaTootProxy
     end
 
     def self.auth(username, password)
-      config = Config.instance
       return false unless username == config['/sidekiq/auth/user']
       return true if password.crypt(Environment.hostname) == config['/sidekiq/auth/password']
       return true if password == config['/sidekiq/auth/password']
