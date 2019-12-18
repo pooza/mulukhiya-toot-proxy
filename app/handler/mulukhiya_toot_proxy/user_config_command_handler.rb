@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class UserConfigCommandHandler < CommandHandler
     def disable?
+      return true unless Postgres.config?
       return false
     end
 

@@ -1,6 +1,7 @@
 module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
     def disable?
+      return true unless Postgres.config?
       return true if sns.account.config['/handler/result_notification/disable'].nil?
       return true if sns.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)

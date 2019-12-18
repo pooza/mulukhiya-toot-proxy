@@ -129,6 +129,7 @@ test:
       - growi_clipper
       - handler
       - mastodon_controller
+      - tagging_dictionary
     no_db:
       - account
       - mastodon_uri
