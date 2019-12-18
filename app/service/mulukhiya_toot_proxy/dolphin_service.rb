@@ -2,10 +2,12 @@ module MulukhiyaTootProxy
   class DolphinService
     include Package
     attr_reader :uri
+    attr_reader :name
     attr_accessor :token
     attr_accessor :mulukhiya_enable
 
     def initialize(uri = nil, token = nil)
+      @name = 'Dolphin'
       @config = Config.instance
       @logger = Logger.new
       @token = token || @config['/test/token']

@@ -62,5 +62,9 @@ module MulukhiyaTootProxy
       @logger.error(e)
       return @renderer.to_s
     end
+
+    def self.webhook?
+      return false
+    end
   end
 end

@@ -1,8 +1,10 @@
 module MulukhiyaTootProxy
   class MastodonService < Ginseng::Mastodon
     include Package
+    attr_reader :name
 
     def initialize(uri = nil, token = nil)
+      @name = 'Mastodon'
       @config = Config.instance
       @logger = Logger.new
       uri ||= @config['/mastodon/url']
