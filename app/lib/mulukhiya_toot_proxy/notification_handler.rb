@@ -1,7 +1,8 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def disable?
-      return (Environment.controller_name != 'mastodon') || @config.disable?(underscore_name)
+      return false if Environment.mastodon?
+      return @config.disable?(underscore_name)
     rescue Ginseng::ConfigError
       return true
     end

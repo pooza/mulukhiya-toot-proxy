@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class FilterCommandHandler < CommandHandler
     def disable?
-      return (Environment.controller_name != 'mastodon') || super
+      return !Environment.mastodon? || super
     end
 
     def dispatch

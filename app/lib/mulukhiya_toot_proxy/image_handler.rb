@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class ImageHandler < Handler
     def disable?
-      return (Environment.controller_name != 'mastodon') || super
+      return !Environment.mastodon? || super
     end
 
     def handle_pre_toot(body, params = {})

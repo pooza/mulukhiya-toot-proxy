@@ -24,6 +24,14 @@ module MulukhiyaTootProxy
       return "MulukhiyaTootProxy::#{controller_name.camelize}Controller".constantize
     end
 
+    def self.mastodon?
+      return controller_name == 'mastodon'
+    end
+
+    def self.dolphin?
+      return controller_name == 'dolphin'
+    end
+
     def self.account_class
       return "MulukhiyaTootProxy::#{controller_name.camelize}::Account".constantize
     end
