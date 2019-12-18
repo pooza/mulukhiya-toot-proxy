@@ -5,6 +5,7 @@ task :test do
   require 'sidekiq/testing'
   MulukhiyaTootProxy::Postgres.connect if MulukhiyaTootProxy::Postgres.config?
   Sidekiq::Testing.fake!
+
   config = MulukhiyaTootProxy::Config.instance
   tests = Dir.glob(File.join(MulukhiyaTootProxy::Environment.dir, 'test/*.rb'))
   if MulukhiyaTootProxy::Environment.ci?
