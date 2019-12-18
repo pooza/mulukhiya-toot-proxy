@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ImageFormatConvertHandlerTest < Test::Unit::TestCase
+  class ImageFormatConvertHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('image_format_convert')
       return if @handler.nil? || @handler.disable?

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class CanonicalURLHandlerTest < Test::Unit::TestCase
+  class CanonicalURLHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('canonical_url')
     end
@@ -32,10 +32,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.apple.com/jp/apple-music/'})
       assert_equal(@handler.result[:entries].first[:rewrited_url], 'https://www.apple.com/jp/apple-music/')
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

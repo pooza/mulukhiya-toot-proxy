@@ -1,7 +1,7 @@
 require 'rack/test'
 
 module MulukhiyaTootProxy
-  class MastodonControllerTest < Test::Unit::TestCase
+  class MastodonControllerTest < HandlerTest
     include ::Rack::Test::Methods
 
     def setup
@@ -135,10 +135,6 @@ module MulukhiyaTootProxy
     def test_static_resource
       get '/mulukhiya/icon.png'
       assert(last_response.ok?)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

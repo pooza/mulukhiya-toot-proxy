@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class FavDropboxClippingHandlerTest < Test::Unit::TestCase
+  class FavDropboxClippingHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @handler = Handler.create('fav_dropbox_clipping')

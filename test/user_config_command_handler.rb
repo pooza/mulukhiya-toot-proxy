@@ -1,7 +1,7 @@
 require 'securerandom'
 
 module MulukhiyaTootProxy
-  class UserConfigCommandHandlerTest < Test::Unit::TestCase
+  class UserConfigCommandHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('user_config_command')
       @key = SecureRandom.hex(16)
@@ -34,10 +34,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_pre_toot({message_field => %({"command": "user_config", "#{@key}": null})})
       assert(@handler.result[:entries].present?)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

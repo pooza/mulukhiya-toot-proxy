@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ShortenedURLHandlerTest < Test::Unit::TestCase
+  class ShortenedURLHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('shortened_url')
     end
@@ -24,10 +24,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW'})
       assert_equal(@handler.result[:entries].count, 2)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

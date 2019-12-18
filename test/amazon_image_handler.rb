@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonImageHandlerTest < Test::Unit::TestCase
+  class AmazonImageHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('amazon_image')
     end
@@ -18,10 +18,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.amazon.co.jp/gp/product/B07H2B56RT?pf_rd_p=7b903293-68b0-4a33-9b7c-65c76866a371&pf_rd_r=732H9VVYDF2TD3WYVBKK'})
       assert(@handler.result[:entries].present?) if @handler.result
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

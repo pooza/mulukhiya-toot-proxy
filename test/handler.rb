@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class HandlerTest < Test::Unit::TestCase
+  class HandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @config['/tagging/dictionaries'] = [
@@ -40,10 +40,6 @@ module MulukhiyaTootProxy
       assert(params[:tags].member?('宮本佳那子'))
       assert(params[:tags].member?('福山沙織'))
       assert(params[:tags].member?('井上由貴'))
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

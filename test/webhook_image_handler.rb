@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class WebhookImageHandlerTest < Test::Unit::TestCase
+  class WebhookImageHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('webhook_image')
     end
@@ -13,10 +13,6 @@ module MulukhiyaTootProxy
         ],
       })
       assert_equal(@handler.result[:entries], [{source_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]) if @handler.result
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

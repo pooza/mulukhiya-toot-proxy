@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ResultNotificationHandlerTest < Test::Unit::TestCase
+  class ResultNotificationHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('result_notification')
     end
@@ -9,10 +9,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_post_toot(message_field => 'ふつうのトゥート。')
       assert_nil(@handler.result)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

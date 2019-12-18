@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonURLHandlerTest < Test::Unit::TestCase
+  class AmazonURLHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @config['/test/token'] = 'hoge' if Environment.ci?
@@ -16,10 +16,6 @@ module MulukhiyaTootProxy
       @config['/amazon/associate_tag'] = 'pooza'
       r = @handler.handle_pre_toot({message_field => 'https://www.amazon.co.jp/日本語の長い長い商品名/dp/B07CJ4KH1T/ref=sr_1_1?s=hobby&ie=UTF8&qid=1529591544&sr=1-1'})
       assert_equal(r[message_field], 'https://www.amazon.co.jp/dp/B07CJ4KH1T?tag=pooza')
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class FavGrowiClippingHandlerTest < Test::Unit::TestCase
+  class FavGrowiClippingHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       return unless @handler = Handler.create('fav_growi_clipping')

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesURLNowplayingHandlerTest < Test::Unit::TestCase
+  class ItunesURLNowplayingHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('itunes_url_nowplaying')
     end
@@ -20,10 +20,6 @@ module MulukhiyaTootProxy
       lines = body.each_line.to_a.map(&:chomp)
       assert(lines.include?('シュビドゥビ☆スイーツタイム'))
       assert(lines.include?('宮本佳那子'))
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

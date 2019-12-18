@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TaggingHandlerTest < Test::Unit::TestCase
+  class TaggingHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @handler = Handler.create('tagging')
@@ -165,10 +165,6 @@ module MulukhiyaTootProxy
 
       @handler.clear
       assert_equal(@handler.handle_pre_toot({message_field => '@pooza #キュアビューティ'})[message_field], '@pooza #キュアビューティ')
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

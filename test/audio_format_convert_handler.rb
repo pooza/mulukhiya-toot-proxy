@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AudioFormatConvertHandlerTest < Test::Unit::TestCase
+  class AudioFormatConvertHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('audio_format_convert')
       return if @handler.nil? || @handler.disable?

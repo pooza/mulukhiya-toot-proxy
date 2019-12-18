@@ -1,7 +1,7 @@
 require 'securerandom'
 
 module MulukhiyaTootProxy
-  class FilterCommandHandlerTest < Test::Unit::TestCase
+  class FilterCommandHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('filter_command')
       @key = SecureRandom.hex(16)
@@ -25,10 +25,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_pre_toot({message_field => "command: filter\ntag: #{@key}\naction: unregister"})
       assert(@handler.result[:entries].present?)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

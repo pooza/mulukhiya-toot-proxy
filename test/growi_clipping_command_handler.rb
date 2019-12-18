@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class GrowiClippingCommandHandlerTest < Test::Unit::TestCase
+  class GrowiClippingCommandHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('growi_clipping_command')
     end
@@ -21,10 +21,6 @@ module MulukhiyaTootProxy
       @handler.handle_post_toot({message_field => "command: growi_clipping\nurl: https://precure.ml/@pooza/101276312982799462"})
       assert(@handler.result[:entries].present?)
       sleep(1)
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

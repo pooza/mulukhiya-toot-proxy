@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ImageResizeHandlerTest < Test::Unit::TestCase
+  class ImageResizeHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('image_resize')
       return if @handler.nil? || @handler.disable?

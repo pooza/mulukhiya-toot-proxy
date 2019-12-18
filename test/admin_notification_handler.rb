@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AdminNotificationHandlerTest < Test::Unit::TestCase
+  class AdminNotificationHandlerTest < HandlerTest
     def setup
       @handler = Handler.create('admin_notification')
 
@@ -19,10 +19,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_post_toot({message_field => "周知を含むトゥートのテスト\n#notify"}, @params)
       assert_equal(@handler.result[:entries], [true])
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

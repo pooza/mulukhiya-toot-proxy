@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class MentionNotificationHandlerTest < Test::Unit::TestCase
+  class MentionNotificationHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @handler = Handler.create('mention_notification')
@@ -17,10 +17,6 @@ module MulukhiyaTootProxy
       @handler.clear
       @handler.handle_post_toot({message_field => "通知を含むトゥートのテスト\n @#{@account.username}"})
       assert_equal(@handler.result[:entries], [true])
-    end
-
-    def message_field
-      return Environment.sns_class.message_field
     end
   end
 end

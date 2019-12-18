@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class FavNotificationHandlerTest < Test::Unit::TestCase
+  class FavNotificationHandlerTest < HandlerTest
     def setup
       @config = Config.instance
       @handler = Handler.create('fav_notification')
