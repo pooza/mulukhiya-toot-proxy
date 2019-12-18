@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonServiceTest < Test::Unit::TestCase
+  class AmazonServiceTest < TestCase
     def setup
       @service = AmazonService.new
     end

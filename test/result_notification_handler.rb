@@ -1,11 +1,11 @@
 module MulukhiyaTootProxy
-  class ResultNotificationHandlerTest < HandlerTest
+  class ResultNotificationHandlerTest < TestCase
     def setup
       @handler = Handler.create('result_notification')
     end
 
     def test_handle_post_toot
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
       @handler.clear
       @handler.handle_post_toot(message_field => 'ふつうのトゥート。')
       assert_nil(@handler.result)

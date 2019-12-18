@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class PackageTest < Test::Unit::TestCase
+  class PackageTest < TestCase
     def setup
       @package = YAML.load_file(File.join(Environment.dir, 'config/application.yaml'))['package']
     end

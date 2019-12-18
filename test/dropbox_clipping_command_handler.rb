@@ -1,11 +1,11 @@
 module MulukhiyaTootProxy
-  class DropboxClippingCommandHandlerTest < HandlerTest
+  class DropboxClippingCommandHandlerTest < TestCase
     def setup
       @handler = Handler.create('dropbox_clipping_command')
     end
 
     def test_handle_post_toot
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
 
       @handler.clear
       @handler.handle_post_toot({message_field => ''})

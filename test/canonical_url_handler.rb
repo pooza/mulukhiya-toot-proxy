@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class CanonicalURLHandlerTest < HandlerTest
+  class CanonicalURLHandlerTest < TestCase
     def setup
       @handler = Handler.create('canonical_url')
     end

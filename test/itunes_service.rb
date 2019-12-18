@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesServiceTest < Test::Unit::TestCase
+  class ItunesServiceTest < TestCase
     def setup
       @service = ItunesService.new
     end

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesURLHandlerTest < HandlerTest
+  class ItunesURLHandlerTest < TestCase
     def setup
       @handler = Handler.create('itunes_url')
     end

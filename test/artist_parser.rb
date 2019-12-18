@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ArtistParserTest < Test::Unit::TestCase
+  class ArtistParserTest < TestCase
     def test_parse
       tags = ArtistParser.new('キュア・カルテット').parse
       assert_equal(tags, ['キュア・カルテット'])

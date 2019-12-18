@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ThinDaemonTest < Test::Unit::TestCase
+  class ThinDaemonTest < TestCase
     def setup
       @daemon = ThinDaemon.new
     end

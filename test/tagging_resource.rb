@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TaggingResourceTest < Test::Unit::TestCase
+  class TaggingResourceTest < TestCase
     def test_all
       TaggingResource.all do |resource|
         assert(resource.is_a?(TaggingResource))

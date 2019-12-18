@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class SpotifyURITest < Test::Unit::TestCase
+  class SpotifyURITest < TestCase
     def setup
       @config = Config.instance
     end

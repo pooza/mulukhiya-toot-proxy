@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ClippingWorkerTest < Test::Unit::TestCase
+  class ClippingWorkerTest < TestCase
     def setup
       @worker = ClippingWorker.new
     end

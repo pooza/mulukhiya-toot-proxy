@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class VideoFormatConvertHandlerTest < HandlerTest
+  class VideoFormatConvertHandlerTest < TestCase
     def setup
       @handler = Handler.create('video_format_convert')
       @handler.handle_pre_upload(file: {
@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_convertable?
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
       assert_false(@handler.convertable?)
     end
   end

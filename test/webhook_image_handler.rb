@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class WebhookImageHandlerTest < HandlerTest
+  class WebhookImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('webhook_image')
     end

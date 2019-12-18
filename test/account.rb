@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AccountTest < Test::Unit::TestCase
+  class AccountTest < TestCase
     def setup
       @config = Config.instance
       @account = Environment.account_class.get(token: @config['/test/token'])

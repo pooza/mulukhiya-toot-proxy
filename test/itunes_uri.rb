@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class ItunesURITest < Test::Unit::TestCase
+  class ItunesURITest < TestCase
     def test_itunes?
       uri = ItunesURI.parse('https://google.com')
       assert_false(uri.itunes?)

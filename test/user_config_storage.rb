@@ -1,7 +1,7 @@
 require 'securerandom'
 
 module MulukhiyaTootProxy
-  class UserConfigStorageTest < Test::Unit::TestCase
+  class UserConfigStorageTest < TestCase
     def setup
       @storage = UserConfigStorage.new
       @key = SecureRandom.hex(16)

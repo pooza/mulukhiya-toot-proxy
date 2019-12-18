@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonURITest < Test::Unit::TestCase
+  class AmazonURITest < TestCase
     def test_shortenable?
       uri = AmazonURI.parse('https://google.com')
       assert_false(uri.shortenable?)

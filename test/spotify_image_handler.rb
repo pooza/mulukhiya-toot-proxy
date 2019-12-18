@@ -1,11 +1,11 @@
 module MulukhiyaTootProxy
-  class SpotifyImageHandlerTest < HandlerTest
+  class SpotifyImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('spotify_image')
     end
 
     def test_handle_pre_toot
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.spotify.com/jp/'})

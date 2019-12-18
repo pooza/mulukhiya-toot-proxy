@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class HandlerTest < HandlerTest
+  class HandlerTest < TestCase
     def setup
       @config = Config.instance
       @config['/tagging/dictionaries'] = [

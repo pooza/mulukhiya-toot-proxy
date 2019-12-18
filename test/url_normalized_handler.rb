@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class URLNormalizeHandlerTest < HandlerTest
+  class URLNormalizeHandlerTest < TestCase
     def setup
       @handler = Handler.create('url_normalize')
     end

@@ -1,11 +1,11 @@
 module MulukhiyaTootProxy
-  class YouTubeURLNowplayingHandlerTest < HandlerTest
+  class YouTubeURLNowplayingHandlerTest < TestCase
     def setup
       @handler = Handler.create('you_tube_url_nowplaying')
     end
 
     def test_handle_pre_toot
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => "#nowplaying https://www.youtube.com\n"})

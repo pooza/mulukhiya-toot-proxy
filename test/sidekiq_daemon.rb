@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class SudekiqDaemonTest < Test::Unit::TestCase
+  class SudekiqDaemonTest < TestCase
     def setup
       @daemon = SidekiqDaemon.new
     end

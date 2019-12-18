@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class MastodonURITest < Test::Unit::TestCase
+  class MastodonURITest < TestCase
     def setup
       @uri = MastodonURI.parse('https://precure.ml/web/statuses/101118840135913675')
     end

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class AmazonURLHandlerTest < HandlerTest
+  class AmazonURLHandlerTest < TestCase
     def setup
       @config = Config.instance
       @config['/test/token'] = 'hoge' if Environment.ci?

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TootParserTest < Test::Unit::TestCase
+  class TootParserTest < TestCase
     def setup
       @parser = TootParser.new
     end

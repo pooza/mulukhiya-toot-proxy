@@ -1,11 +1,11 @@
 module MulukhiyaTootProxy
-  class AmazonImageHandlerTest < HandlerTest
+  class AmazonImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('amazon_image')
     end
 
     def test_handle_pre_toot
-      return if @handler.nil? || @handler.disable?
+      return if invalid_handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.amazon.co.jp/gp/customer-reviews/R2W0VIBA0RBSLY/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8&ASIN=B00TYVQBEU'})
