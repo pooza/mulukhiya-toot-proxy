@@ -20,8 +20,7 @@ module MulukhiyaTootProxy
 
     def test_disable?
       [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost, :post_search].each do |event|
-        @config["/handler/#{Environment.controller_name}/#{event}"].each do |v|
-          handler = Handler.create(v)
+        Handler.all(event) do |handler|
           assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
         end
       rescue Ginseng::ConfigError

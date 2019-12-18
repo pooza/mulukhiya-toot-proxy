@@ -77,12 +77,19 @@ module MulukhiyaTootProxy
       return nil
     end
 
+    def self.all(event, params = {})
+      Config.instance["/handler/#{Environment.controller_name}/#{event}"].each do |v|
+        yield create(v, params)
+      rescue => e
+        Logger.new.error(e)
+      end
+    end
+
     def self.exec_all(event, body, params = {})
       params[:event] = event
       params[:results] ||= ResultContainer.new
       params[:tags] ||= TagContainer.new
-      Config.instance["/handler/#{Environment.controller_name}/#{event}"].each do |v|
-        handler = create(v, params)
+      all(event, params) do |handler|
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
