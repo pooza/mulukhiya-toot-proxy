@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class FavGrowiClippingHandlerTest < TestCase
     def setup
       @config = Config.instance
-      return unless @handler = Handler.create('fav_growi_clipping')
+      @handler = Handler.create('fav_growi_clipping')
       return if invalid_handler?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
