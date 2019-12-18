@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_post_toot
-      return if @handler.disable?
+      return if @handler.nil? || @handler.disable?
 
       @handler.clear
       @handler.handle_post_toot({message_field => ''})

@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       @config = Config.instance
       return unless @handler = Handler.create('fav_growi_clipping')
-      return if @handler.disable?
+      return if @handler.nil? || @handler.disable?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end

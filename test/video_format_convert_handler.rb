@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_convertable?
-      return if @handler.disable?
+      return if @handler.nil? || @handler.disable?
       assert_false(@handler.convertable?)
     end
   end
