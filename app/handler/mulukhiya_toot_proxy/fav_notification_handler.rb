@@ -1,5 +1,10 @@
 module MulukhiyaTootProxy
   class FavNotificationHandler < NotificationHandler
+    def disable?
+      return true unless Postgres.config?
+      return super
+    end
+
     def notifiable?(body)
       return false unless toot = Toot[body['id'].to_i]
       return false unless toot.local?

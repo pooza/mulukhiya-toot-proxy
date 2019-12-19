@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class AdminNotificationHandlerTest < TestCase
     def setup
       @handler = Handler.create('admin_notification')
+
       return if invalid_handler?
       @account = Environment.account_class.get(token: Config.instance['/test/token'])
       @params = {results: ResultContainer.new}
