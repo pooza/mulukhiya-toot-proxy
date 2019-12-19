@@ -26,5 +26,5 @@ task :test do
   if config['/controller'] == 'dolphin'
     tests.delete_if{|t| config['/test/excludes/dolphin'].member?(File.basename(t, '.rb'))}
   end
-  tests.map{|t| require t}
+  tests.each{|t| require t}
 end
