@@ -60,7 +60,6 @@ module MulukhiyaTootProxy
       post '/api/notes/create', {message_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'i' => @config['/test/token']}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['createdNote']['tags']
-      assert_equal(tags.count, 8)
       assert(tags.member?('日本語のタグ'))
       assert(tags.member?('nowplaying'))
     end
