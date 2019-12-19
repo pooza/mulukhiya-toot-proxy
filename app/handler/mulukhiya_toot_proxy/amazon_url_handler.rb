@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
     private
 
     def affiliate?
-      return false if mastodon.account.config['/amazon/affiliate'].is_a?(FalseClass)
+      return false if sns.account.config['/amazon/affiliate'].is_a?(FalseClass)
       return false unless @config['/amazon/affiliate']
       return true
     rescue => e

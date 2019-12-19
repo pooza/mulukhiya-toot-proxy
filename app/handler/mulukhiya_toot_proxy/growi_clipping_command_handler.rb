@@ -1,17 +1,17 @@
 module MulukhiyaTootProxy
   class GrowiClippingCommandHandler < CommandHandler
     def handle_pre_toot(body, params = {})
-      @parser = TootParser.new(body['status'])
+      @parser = TootParser.new(body[message_field])
       return unless @parser.exec
       return unless @parser.command_name == command_name
       errors = contract.call(@parser.params).errors.to_h
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = 'direct'
-      body['status'] = status
+      body[message_field] = status
     end
 
     def handle_post_toot(body, params = {})
-      @parser = TootParser.new(body['status'])
+      @parser = TootParser.new(body[message_field])
       return unless @parser.exec
       return unless @parser.command_name == command_name
       dispatch
@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
       return unless uri.id
       GrowiClippingWorker.perform_async(
         uri: {href: uri.to_s, class: uri.class.to_s},
-        account_id: mastodon.account.id,
+        account_id: sns.account.id,
       )
     end
   end

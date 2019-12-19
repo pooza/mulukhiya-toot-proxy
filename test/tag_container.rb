@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TagContainerTest < Test::Unit::TestCase
+  class TagContainerTest < TestCase
     def setup
       @config = Config.instance
       @container = TagContainer.new

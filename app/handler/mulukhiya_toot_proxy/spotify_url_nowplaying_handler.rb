@@ -6,6 +6,10 @@ module MulukhiyaTootProxy
       @service = SpotifyService.new
     end
 
+    def disable?
+      return super || !SpotifyService.config?
+    end
+
     def updatable?(keyword)
       return false unless uri = SpotifyURI.parse(keyword)
       return false unless uri.track.present?

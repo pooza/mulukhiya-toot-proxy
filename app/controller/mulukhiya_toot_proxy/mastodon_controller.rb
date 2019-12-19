@@ -1,19 +1,19 @@
 module MulukhiyaTootProxy
-  class Server < Ginseng::Web::Sinatra
+  class MastodonController < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
 
     before do
       @results = ResultContainer.new
-      @mastodon = Mastodon.new
+      @mastodon = MastodonService.new
       @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
     end
 
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
-      Handler.exec_all(:pre_toot, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:pre_toot, params, {results: @results, sns: @mastodon})
       @results.response = @mastodon.toot(params)
-      Handler.exec_all(:post_toot, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:post_toot, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.message['tags']&.keep_if{|v| tags.include?(v['name'])}
@@ -22,9 +22,9 @@ module MulukhiyaTootProxy
     end
 
     post '/api/v1/media' do
-      Handler.exec_all(:pre_upload, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:pre_upload, params, {results: @results, sns: @mastodon})
       @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
-      Handler.exec_all(:post_upload, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:post_upload, params, {results: @results, sns: @mastodon})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses/:id/favourite' do
       @results.response = @mastodon.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:post_fav, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
@@ -46,7 +46,7 @@ module MulukhiyaTootProxy
 
     post '/api/v1/statuses/:id/reblog' do
       @results.response = @mastodon.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {results: @results, mastodon: @mastodon})
+      Handler.exec_all(:post_boost, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
@@ -109,7 +109,7 @@ module MulukhiyaTootProxy
     get '/mulukhiya/app/auth' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
-      @renderer['oauth_url'] = Mastodon.new.oauth_uri
+      @renderer['oauth_url'] = MastodonService.new.oauth_uri
       return @renderer.to_s
     end
 
@@ -119,9 +119,9 @@ module MulukhiyaTootProxy
       if errors.present?
         @renderer.template = 'app_auth'
         @renderer['errors'] = errors
-        @renderer['oauth_url'] = Mastodon.new.oauth_uri
+        @renderer['oauth_url'] = MastodonService.new.oauth_uri
       else
-        r = Mastodon.new.auth(params[:code])
+        r = MastodonService.new.auth(params[:code])
         @renderer.template = 'app_auth_result'
         @renderer['status'] = r.code
         @renderer['result'] = r.parsed_response
@@ -155,6 +155,10 @@ module MulukhiyaTootProxy
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
+    end
+
+    def self.webhook?
+      return true
     end
   end
 end

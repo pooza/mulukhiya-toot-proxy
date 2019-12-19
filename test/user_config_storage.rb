@@ -1,15 +1,13 @@
 require 'securerandom'
 
 module MulukhiyaTootProxy
-  class UserConfigStorageTest < Test::Unit::TestCase
+  class UserConfigStorageTest < TestCase
     def setup
       @storage = UserConfigStorage.new
       @key = SecureRandom.hex(16)
     end
 
     def test_edit
-      return unless Postgres.config?
-
       @storage.update(@key, {a: 111, b: 222})
       assert_equal(@storage[@key], {'/a' => 111, '/b' => 222})
 

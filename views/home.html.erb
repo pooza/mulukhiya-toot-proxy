@@ -6,20 +6,23 @@
   <meta charset="utf-8">
   <meta name="robots" content="noindex,nofollow">
   <meta name="viewport" content="width=800">
+  <link href="https://fonts.googleapis.com/css?family=Francois+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/mulukhiya/style/default">
 </head>
 <body>
   <header><%= MulukhiyaTootProxy::Package.full_name %></header>
   <nav class="breadcrumbs">
     <ul>
-      <li><a href="/web/getting-started">Mastodon</a>
+      <li><a href="/"><%= MulukhiyaTootProxy::Environment.sns_class.name %></a>
       <li>モロヘイヤHOME
     </ul>
   </nav>
   <main>
     <h1><%= MulukhiyaTootProxy::Package.name %></h2>
     <ol>
-      <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
+      <% if MulukhiyaTootProxy::Environment.controller_class.webhook? %>
+        <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
+      <% end %>
       <li><a>環境設定</a>
       <li><a href="/mulukhiya/health">動作状況</a>
     </ol>

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class VideoFormatConvertHandlerTest < Test::Unit::TestCase
+  class VideoFormatConvertHandlerTest < TestCase
     def setup
       @handler = Handler.create('video_format_convert')
       @handler.handle_pre_upload(file: {
@@ -10,9 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def test_convertable?
-      return unless Postgres.config?
-      return if @handler.disable?
-
+      return if invalid_handler?
       assert_false(@handler.convertable?)
     end
   end

@@ -32,7 +32,7 @@ module MulukhiyaTootProxy
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        @service = Mastodon.new(uri)
+        @service = Environment.sns_class.new(uri)
       end
       return @service
     end

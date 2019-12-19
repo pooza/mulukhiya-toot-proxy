@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class HandlerTest < Test::Unit::TestCase
+  class HandlerTest < TestCase
     def setup
       @config = Config.instance
       @config['/tagging/dictionaries'] = [
@@ -19,22 +19,21 @@ module MulukhiyaTootProxy
     end
 
     def test_disable?
-      return if Environment.ci?
       [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost, :post_search].each do |event|
-        @config["/handler/#{event}"].each do |v|
-          handler = Handler.create(v)
+        Handler.all(event) do |handler|
           assert(handler.disable?.is_a?(TrueClass) || handler.disable?.is_a?(FalseClass))
         end
+      rescue Ginseng::ConfigError
+        next
       end
     end
 
     def test_exec_all
-      return if Environment.ci?
       return if Handler.create('spotify_url_nowplaying').disable?
       params = {}
       Handler.exec_all(
         :pre_toot,
-        {'status' => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
+        {message_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,
       )
       assert(params[:tags].member?('宮本佳那子'))

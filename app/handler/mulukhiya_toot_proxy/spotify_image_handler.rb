@@ -1,5 +1,9 @@
 module MulukhiyaTootProxy
   class SpotifyImageHandler < ImageHandler
+    def disable?
+      return super || !SpotifyService.config?
+    end
+
     def updatable?(link)
       uri = SpotifyURI.parse(link)
       return false unless uri.spotify?

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class Mastodon < Ginseng::Mastodon
+  class MastodonService < Ginseng::Mastodon
     include Package
 
     def initialize(uri = nil, token = nil)
@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
 
     def account
       raise Ginseng::GatewayError, 'Invalid access token' unless @token
-      @account ||= Account.get(token: @token)
+      @account ||= Environment.account_class.get(token: @token)
       return @account
     end
 
@@ -63,6 +63,18 @@ module MulukhiyaTootProxy
           'code' => code,
         },
       })
+    end
+
+    def self.name
+      return 'Mastodon'
+    end
+
+    def self.message_field
+      return Config.instance['/mastodon/message/field']
+    end
+
+    def self.visibility_name(name)
+      return Config.instance["/mastodon/message/visibility_name/#{name}"]
     end
   end
 end

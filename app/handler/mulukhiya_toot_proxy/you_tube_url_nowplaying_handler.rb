@@ -5,6 +5,10 @@ module MulukhiyaTootProxy
       @videos = {}
     end
 
+    def disable?
+      return super || !YouTubeService.config?
+    end
+
     def updatable?(keyword)
       return false unless uri = VideoURI.parse(keyword)
       return false unless @videos[keyword] = uri.data

@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TootParserTest < Test::Unit::TestCase
+  class TootParserTest < TestCase
     def setup
       @parser = TootParser.new
     end
@@ -41,16 +41,6 @@ module MulukhiyaTootProxy
       assert_equal(@parser.exec, {'command' => 'command2', 'bar' => 'buz'})
       assert_equal(@parser.command_name, 'command2')
       assert(@parser.command?)
-    end
-
-    def test_reply_to
-      return unless Postgres.config?
-
-      @parser.body = 'pooza@b-shock.org'
-      assert_equal(@parser.reply_to, [])
-
-      # @parser.body = '@pooza @pooza@precure.ml よろです。'
-      # assert_equal(@parser.reply_to, ['@pooza', '@pooza@precure.ml'])
     end
 
     def test_hashtags

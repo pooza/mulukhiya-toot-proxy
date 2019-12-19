@@ -1,75 +1,94 @@
 package:
-  version: 3.1.1
+  version: 3.2.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+controller: mastodon
 handler:
-  pre_toot:
-    - user_config_command
-    - filter_command
-    - growi_clipping_command
-    - dropbox_clipping_command
-    - shortened_url
-    - url_normalize
-    - itunes_url_nowplaying
-    - spotify_url_nowplaying
-    - you_tube_url_nowplaying
-    - itunes_nowplaying
-    - spotify_nowplaying
-    - amazon_nowplaying
-    - canonical_url
-    - amazon_url
-    - itunes_url
-    - itunes_image
-    - spotify_image
-    - amazon_image
-    - tagging
-  post_toot:
-    - growi_clipping_command
-    - dropbox_clipping_command
-    - admin_notification
-    - mention_notification
-    - result_notification
-  pre_webhook:
-    - shortened_url
-    - url_normalize
-    - itunes_url_nowplaying
-    - spotify_url_nowplaying
-    - you_tube_url_nowplaying
-    - itunes_nowplaying
-    - spotify_nowplaying
-    - amazon_nowplaying
-    - canonical_url
-    - amazon_url
-    - itunes_url
-    - itunes_image
-    - spotify_image
-    - amazon_image
-    - webhook_image
-    - tagging
-  post_webhook:
-    - admin_notification
-    - mention_notification
-    - result_notification
-  pre_upload:
-    - image_format_convert
-    - audio_format_convert
-    - video_format_convert
-    - image_resize
-  post_upload:
-    - result_notification
-  post_fav:
-    - fav_dropbox_clipping
-    - fav_growi_clipping
-    - fav_notification
-    - result_notification
-  post_boost:
-    - boost_notification
-    - result_notification
-  post_search:
-    - result_notification
+  mastodon:
+    pre_toot:
+      - user_config_command
+      - filter_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - shortened_url
+      - url_normalize
+      - itunes_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - itunes_nowplaying
+      - spotify_nowplaying
+      - amazon_nowplaying
+      - canonical_url
+      - amazon_url
+      - itunes_url
+      - itunes_image
+      - spotify_image
+      - amazon_image
+      - tagging
+    post_toot:
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - admin_notification
+      - mention_notification
+      - result_notification
+    pre_webhook:
+      - shortened_url
+      - url_normalize
+      - itunes_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - itunes_nowplaying
+      - spotify_nowplaying
+      - amazon_nowplaying
+      - canonical_url
+      - amazon_url
+      - itunes_url
+      - itunes_image
+      - spotify_image
+      - amazon_image
+      - webhook_image
+      - tagging
+    post_webhook:
+      - admin_notification
+      - mention_notification
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_fav:
+      - fav_dropbox_clipping
+      - fav_growi_clipping
+      - fav_notification
+      - result_notification
+    post_boost:
+      - boost_notification
+      - result_notification
+    post_search:
+      - result_notification
+  dolphin:
+    pre_toot:
+      - user_config_command
+      - shortened_url
+      - url_normalize
+      - itunes_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - itunes_nowplaying
+      - spotify_nowplaying
+      - amazon_nowplaying
+      - canonical_url
+      - amazon_url
+      - itunes_url
+      - tagging
+    post_toot:
+      - result_notification
   default:
     timeout: 10
   mention_notification:
@@ -101,6 +120,37 @@ shortened_url:
     - git.io
     - spoti.fi
     - apple.co
+test:
+  excludes:
+    ci:
+      - clipping_worker
+      - dolphin_controller
+      - dropbox_clipper
+      - growi_clipper
+      - handler
+      - mastodon_controller
+      - tagging_dictionary
+    no_db:
+      - account
+      - mastodon_uri
+      - note
+      - query_template
+      - toot
+      - webhook
+    no_amazon:
+      - amazon_service
+    no_spotify:
+      - spotify_service
+      - spotify_uri
+    dolphin:
+      - clipping_worker
+      - mastodon_controller
+      - mastodon_uri
+      - toot
+    mastodon:
+      - dolphin_controller
+      - dolphin_uri
+      - note
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -112,15 +162,28 @@ mastodon:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
     - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-  toot:
+  toot: &mastodon_toot
+    field: status
     label: トゥート
     max_length: 500
+    visibility_name:
+      direct: direct
+  message: *mastodon_toot
   search:
     limit: 40
   hashtag:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
   account:
     pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
+dolphin:
+  url: https://dol.example.com/
+  note: &dolphin_note
+    field: text
+    label: ノート
+    max_length: 500
+    visibility_name:
+      direct: specified
+  message: *dolphin_note
 amazon:
   country: jp
   urls:

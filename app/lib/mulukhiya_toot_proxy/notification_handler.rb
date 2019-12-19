@@ -1,9 +1,9 @@
 module MulukhiyaTootProxy
   class NotificationHandler < Handler
     def disable?
-      return @config.disable?(underscore_name)
+      return !Environment.mastodon? || @config.disable?(underscore_name)
     rescue Ginseng::ConfigError
-      return false
+      return true
     end
 
     def notifiable?(body)
@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {})
       return unless notifiable?(body)
-      worker_class.perform_async(account_id: mastodon.account.id, status: body['status'])
+      worker_class.perform_async(account_id: sns.account.id, status: body[message_field])
       @result.push(true)
     end
   end

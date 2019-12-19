@@ -20,6 +20,7 @@ inflections:
   you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler
 dirs:
   - contract
+  - controller
   - daemon
   - dsn
   - file

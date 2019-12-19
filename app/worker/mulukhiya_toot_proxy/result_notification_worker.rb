@@ -3,7 +3,10 @@ module MulukhiyaTootProxy
     sidekiq_options retry: false
 
     def perform(params)
-      Account[params['account_id']].slack&.say(YAML.dump(params['results']), :text)
+      Environment.account_class[params['account_id']].slack&.say(
+        YAML.dump(params['results']),
+        :text,
+      )
     end
   end
 end

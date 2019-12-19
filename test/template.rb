@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class TemplateTest < Test::Unit::TestCase
+  class TemplateTest < TestCase
     def setup
       @template = Template.new('toot_notification')
       @template[:account] = {username: 'pooza'}

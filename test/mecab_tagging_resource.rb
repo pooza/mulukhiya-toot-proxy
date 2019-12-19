@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class MecabTaggingResourceTest < Test::Unit::TestCase
+  class MecabTaggingResourceTest < TestCase
     def setup
       @resource = TaggingResource.create(
         'url' => 'https://script.google.com/macros/s/AKfycbws9aCXxNQt3khdJ9bEt1ADeV7HzZV_Idg-DvN5t_X3nnca0nc/exec',

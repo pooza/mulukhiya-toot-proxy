@@ -8,6 +8,34 @@ module MulukhiyaTootProxy
       return MulukhiyaTootProxy.dir
     end
 
+    def self.config
+      return Config.instance
+    end
+
+    def self.sns_class
+      return "MulukhiyaTootProxy::#{controller_name.camelize}Service".constantize
+    end
+
+    def self.controller_name
+      return config['/controller']
+    end
+
+    def self.controller_class
+      return "MulukhiyaTootProxy::#{controller_name.camelize}Controller".constantize
+    end
+
+    def self.mastodon?
+      return controller_name == 'mastodon'
+    end
+
+    def self.dolphin?
+      return controller_name == 'dolphin'
+    end
+
+    def self.account_class
+      return "MulukhiyaTootProxy::#{controller_name.camelize}::Account".constantize
+    end
+
     def self.health
       values = {version: Package.version, status: 200}
       ['Postgres', 'Redis'].each do |service|
@@ -19,7 +47,6 @@ module MulukhiyaTootProxy
     end
 
     def self.auth(username, password)
-      config = Config.instance
       return false unless username == config['/sidekiq/auth/user']
       return true if password.crypt(Environment.hostname) == config['/sidekiq/auth/password']
       return true if password == config['/sidekiq/auth/password']

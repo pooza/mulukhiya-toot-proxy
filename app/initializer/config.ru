@@ -17,6 +17,6 @@ if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].pre
 end
 
 run Rack::URLMap.new(
-  '/' => MulukhiyaTootProxy::Server,
+  '/' => MulukhiyaTootProxy::Environment.controller_class,
   '/mulukhiya/sidekiq' => Sidekiq::Web,
 )

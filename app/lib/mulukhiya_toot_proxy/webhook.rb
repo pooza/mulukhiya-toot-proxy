@@ -2,13 +2,13 @@ require 'digest/sha1'
 
 module MulukhiyaTootProxy
   class Webhook
-    attr_reader :mastodon
+    attr_reader :sns
     attr_reader :results
 
     def digest
       return Digest::SHA1.hexdigest({
-        mastodon: @mastodon.uri.to_s,
-        token: @mastodon.token,
+        sns: @sns.uri.to_s,
+        token: @sns.token,
         salt: @config['/webhook/salt'],
       }.to_json)
     end
@@ -25,8 +25,8 @@ module MulukhiyaTootProxy
 
     def exist?
       return @db.execute('webhook_tokens', {
-        token: @mastodon.token,
-        owner: @mastodon.account.id,
+        token: @sns.token,
+        owner: @sns.account.id,
       }).present?
     rescue => e
       @logger.error(e)
@@ -35,8 +35,8 @@ module MulukhiyaTootProxy
 
     def to_json(opts = nil)
       @json ||= JSON.pretty_generate({
-        mastodon: @mastodon.uri.to_s,
-        token: @mastodon.token,
+        sns: @sns.uri.to_s,
+        token: @sns.token,
         visibility: visibility,
         hook: uri.to_s,
       })
@@ -50,9 +50,9 @@ module MulukhiyaTootProxy
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {results: results, mastodon: @mastodon})
-      results.response = @mastodon.toot(body)
-      Handler.exec_all(:post_webhook, body, {results: results, mastodon: @mastodon})
+      Handler.exec_all(:pre_webhook, body, {results: results, sns: @sns})
+      results.response = @sns.toot(body)
+      Handler.exec_all(:post_webhook, body, {results: results, sns: @sns})
       return results
     end
 
@@ -60,7 +60,7 @@ module MulukhiyaTootProxy
       all do |webhook|
         next unless digest == webhook.digest
         next unless webhook.exist?
-        return Account[webhook.mastodon.account.id].webhook
+        return Environment.account_class[webhook.sns.account.id].webhook
       end
       return nil
     end
@@ -75,7 +75,7 @@ module MulukhiyaTootProxy
     def self.owned_all(account)
       return enum_for(__method__, account) unless block_given?
       all do |webhook|
-        next unless webhook.mastodon.account.username == account.sub(/^@/, '')
+        next unless webhook.sns.account.username == account.sub(/^@/, '')
         yield webhook
       end
     end
@@ -86,8 +86,8 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @params = params
       @results = ResultContainer.new
-      @mastodon = Mastodon.new
-      @mastodon.token = @params['/webhook/token']
+      @sns = Environment.sns_class.new
+      @sns.token = @params['/webhook/token']
       @logger = Logger.new
       @db = Postgres.instance
     end

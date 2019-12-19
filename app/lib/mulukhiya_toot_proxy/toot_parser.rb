@@ -43,13 +43,6 @@ module MulukhiyaTootProxy
 
     alias params exec
 
-    def reply_to
-      pattern = Regexp.new(@config['/mastodon/account/pattern'])
-      return body.scan(pattern).map(&:first).keep_if do |acct|
-        Account.get(acct: acct)
-      end
-    end
-
     def hashtags
       return TagContainer.scan(body)
     end
@@ -69,8 +62,8 @@ module MulukhiyaTootProxy
     alias command command_name
 
     def service
-      @service ||= Mastodon.new
-      return @service
+      @sns ||= Environment.sns_class.new
+      return @sns
     end
 
     def to_md
