@@ -10,6 +10,6 @@ require 'mulukhiya_toot_proxy'
   task action => ["mulukhiya:thin:#{action}", "mulukhiya:sidekiq:#{action}"]
 end
 
-Dir.glob(File.join(MulukhiyaTootProxy::Environment.dir, 'app/task/*.rb')).each do |f|
+Dir.glob(File.join(MulukhiyaTootProxy::Environment.dir, 'app/task/*.rb')).sort.each do |f|
   require f
 end

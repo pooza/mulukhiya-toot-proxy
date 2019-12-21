@@ -63,7 +63,7 @@ module MulukhiyaTootProxy
         break unless line =~ /^\s*(#[[:word:]]+\s*)+$/
         line = lines.pop.strip
         tags.body = body = lines.join("\n")
-        line.split(/\s+/).map{|v| tags.push(v)}
+        line.split(/\s+/).map {|v| tags.push(v)}
       end
       r = [body, tags.to_s]
       r.push(via[1]) if via.present?
