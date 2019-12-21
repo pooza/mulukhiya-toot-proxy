@@ -35,9 +35,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: c51c66e908e61262e48414dae8f980427e46472b
+  revision: 6445990a30e0c3f2dcd0dcfc943816f7f3be7203
   specs:
-    ginseng-web (1.0.5)
+    ginseng-web (1.0.6)
       rack-test
       sass
       sinatra
@@ -231,7 +231,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.27.0)
-    sidekiq (6.0.3)
+    sidekiq (6.0.4)
       connection_pool (>= 2.2.2)
       rack (>= 2.0.0)
       rack-protection (>= 2.0.0)
@@ -292,4 +292,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.1.1
+   2.1.2
