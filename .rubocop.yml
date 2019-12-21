@@ -85,7 +85,7 @@ Style/IdenticalConditionalBranches:
   Exclude:
     - test/*
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 100
   Exclude:
     - test/*
