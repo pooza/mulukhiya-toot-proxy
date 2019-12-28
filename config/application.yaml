@@ -1,5 +1,5 @@
 package:
-  version: 3.2.1
+  version: 3.2.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -121,36 +121,42 @@ shortened_url:
     - spoti.fi
     - apple.co
 test:
-  excludes:
-    ci:
-      - clipping_worker
-      - dolphin_controller
-      - dropbox_clipper
-      - growi_clipper
-      - handler
-      - mastodon_controller
-      - tagging_dictionary
-    no_db:
-      - account
-      - mastodon_uri
-      - note
-      - query_template
-      - toot
-      - webhook
-    no_amazon:
-      - amazon_service
-    no_spotify:
-      - spotify_service
-      - spotify_uri
-    dolphin:
-      - clipping_worker
-      - mastodon_controller
-      - mastodon_uri
-      - toot
-    mastodon:
-      - dolphin_controller
-      - dolphin_uri
-      - note
+  filters:
+    - name: ci
+      cases:
+        - clipping_worker
+        - dolphin_controller
+        - dropbox_clipper
+        - growi_clipper
+        - handler
+        - mastodon_controller
+        - tagging_dictionary
+    - name: database
+      cases:
+        - account
+        - mastodon_uri
+        - note
+        - query_template
+        - toot
+        - webhook
+    - name: amazon
+      cases:
+        - amazon_service
+    - name: spotify
+      cases:
+        - spotify_service
+        - spotify_uri
+    - name: dolphin
+      cases:
+        - clipping_worker
+        - mastodon_controller
+        - mastodon_uri
+        - toot
+    - name: mastodon
+      cases:
+        - dolphin_controller
+        - dolphin_uri
+        - note
 mastodon:
   url: https://mstdn.example.com/
   oauth:

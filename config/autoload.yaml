@@ -29,5 +29,6 @@ dirs:
   - renderer
   - service
   - tagging_resource
+  - test_case_filter
   - uri
   - worker
