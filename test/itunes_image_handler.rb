@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://itunes.apple.com/lookup?id=1241907142&lang=ja_jp'})

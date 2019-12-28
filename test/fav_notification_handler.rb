@@ -3,13 +3,13 @@ module MulukhiyaTootProxy
     def setup
       @config = Config.instance
       @handler = Handler.create('fav_notification')
-      return if invalid_handler?
+      return unless handler?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
     def test_handle_post_boost
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_post_fav('id' => 0)

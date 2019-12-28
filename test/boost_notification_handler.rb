@@ -4,13 +4,13 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @handler = Handler.create('boost_notification')
 
-      return if invalid_handler?
+      return unless handler?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot
     end
 
     def test_handle_post_boost
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_post_boost('id' => 0)

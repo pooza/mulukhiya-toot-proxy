@@ -7,8 +7,9 @@ module MulukhiyaTootProxy
       return Environment.sns_class.message_field
     end
 
-    def invalid_handler?
-      return @handler.nil? || @handler.disable?
+    def handler?
+      return false if @handler.nil? || @handler.disable?
+      return true
     end
 
     def self.load

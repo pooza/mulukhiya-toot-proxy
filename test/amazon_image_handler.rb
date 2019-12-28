@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.amazon.co.jp/gp/customer-reviews/R2W0VIBA0RBSLY/ref=cm_cr_dp_d_rvw_ttl?ie=UTF8&ASIN=B00TYVQBEU'})
