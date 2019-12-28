@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     attr_accessor :response
 
     def summary
-      return map{|v| "#{v[:handler]}:#{v.count}"}.join(', ')
+      return map {|v| "#{v[:handler]}:#{v.count}"}.join(', ')
     end
 
     def push(value)

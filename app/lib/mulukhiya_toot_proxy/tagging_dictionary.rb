@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(k: k, v: v))
       end
-      update(sort_by{|k, v| k.length}.to_h)
+      update(sort_by {|k, v| k.length}.to_h)
     end
 
     def exist?
@@ -80,7 +80,7 @@ module MulukhiyaTootProxy
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
       end
-      return result.sort_by{|k, v| k.length}.to_h
+      return result.sort_by {|k, v| k.length}.to_h
     end
   end
 end

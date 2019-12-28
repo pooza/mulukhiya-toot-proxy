@@ -21,7 +21,7 @@ Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 Layout/SpaceBeforeBlockBraces:
-  EnforcedStyle: no_space
+  EnforcedStyle: space
 
 Layout/SpaceInsideBlockBraces:
   EnforcedStyle: no_space
@@ -85,7 +85,7 @@ Style/IdenticalConditionalBranches:
   Exclude:
     - test/*
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 100
   Exclude:
     - test/*

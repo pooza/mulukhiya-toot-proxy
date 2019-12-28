@@ -97,6 +97,7 @@ module MulukhiyaTootProxy
           params[:tags].concat(handler.local_tags)
         end
       rescue Timeout::Error => e
+        Slack.broadcast(e)
         Logger.new.error(e)
       rescue RestClient::Exception, HTTParty::Error => e
         raise Ginseng::GatewayError, e.message, e.backtrace

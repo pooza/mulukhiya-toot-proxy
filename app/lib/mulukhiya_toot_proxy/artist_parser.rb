@@ -37,7 +37,7 @@ module MulukhiyaTootProxy
       items.each_with_index do |item, i|
         next if item['drop']
         if item['split']
-          matches[i + 1].split(delimiters).map{|v| tags.push(v.strip)}
+          matches[i + 1].split(delimiters).map {|v| tags.push(v.strip)}
         else
           tags.push(matches[i + 1].strip)
         end

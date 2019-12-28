@@ -11,6 +11,7 @@ module MulukhiyaTootProxy
       return false unless uri.image_uri.present?
       return true
     rescue => e
+      Slack.broadcast(e)
       @logger.error(e)
       return false
     end
