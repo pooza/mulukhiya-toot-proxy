@@ -4,10 +4,6 @@ module MulukhiyaTootProxy
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def name
-      return @params['/name']
-    end
-
     def params=(values)
       @params = Config.flatten('', values)
     end
@@ -16,10 +12,6 @@ module MulukhiyaTootProxy
       cases.delete_if do |v|
         @params['/cases'].member?(File.basename(v, '.rb'))
       end
-    end
-
-    def member?(name)
-      return cases.member?(File.basename(name, '.rb'))
     end
 
     def self.create(name)
