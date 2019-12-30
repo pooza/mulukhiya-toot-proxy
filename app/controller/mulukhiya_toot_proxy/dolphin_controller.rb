@@ -19,6 +19,20 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    post '/api/drive/files/create' do
+      Handler.exec_all(:pre_upload, params, {results: @results, sns: @dolphin})
+      @results.response = @dolphin.upload(params[:file][:tempfile].path)
+      Handler.exec_all(:post_upload, params, {results: @results, sns: @dolphin})
+      @renderer.message = JSON.parse(@results.response.body)
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    rescue RestClient::Exception => e
+      @renderer.message = JSON.parse(e.response.body)
+      @renderer.status = e.response.code
+      return @renderer.to_s
+    end
+
     get '/mulukhiya' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'home'

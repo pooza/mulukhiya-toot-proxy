@@ -32,6 +32,26 @@ module MulukhiyaTootProxy
       return @http.post(create_uri, {body: body.to_json, headers: headers})
     end
 
+    def upload(path, params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      body ||= {force: 'true'}
+      body[:i] ||= @token
+      return @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
+    end
+
+    def upload_remote_resource(uri)
+      path = File.join(
+        Environment.dir,
+        'tmp/media',
+        Digest::SHA1.hexdigest(uri),
+      )
+      File.write(path, @http.get(uri))
+      return upload(path)
+    ensure
+      File.unlink(path) if File.exist?(path)
+    end
+
     def create_uri(href = '/api/notes/create')
       uri = self.uri.clone
       uri.path = href

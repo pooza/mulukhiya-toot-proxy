@@ -89,6 +89,13 @@ handler:
       - tagging
     post_toot:
       - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
   default:
     timeout: 10
   mention_notification:
