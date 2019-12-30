@@ -3,18 +3,18 @@ module MulukhiyaTootProxy
     class Account < Sequel::Model(:accounts)
       attr_accessor :token
 
-      def initialize
-        super
-        @logger = Logger.new
-      end
-
       alias to_h values
+
+      def logger
+        @logger = Logger.new
+        return @logger
+      end
 
       def config
         @config ||= UserConfigStorage.new[id]
         return @config
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return {}
       end
 
@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
         raise "Invalid webhook #{config.to_json}" unless @webhook.exist?
         return @webhook
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return nil
       end
 
@@ -35,7 +35,7 @@ module MulukhiyaTootProxy
         end
         return @slack
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return nil
       end
 
@@ -43,7 +43,7 @@ module MulukhiyaTootProxy
         @growi ||= GrowiClipper.create(account_id: id)
         return @growi
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return nil
       end
 
@@ -51,7 +51,7 @@ module MulukhiyaTootProxy
         @dropbox ||= DropboxClipper.create(account_id: id)
         return @dropbox
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return nil
       end
 
