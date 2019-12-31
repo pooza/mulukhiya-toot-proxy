@@ -14,7 +14,7 @@ module MulukhiyaTootProxy
     alias to_s body
 
     def body=(body)
-      @body = body
+      @body = body.to_s
       @params = nil
     end
 

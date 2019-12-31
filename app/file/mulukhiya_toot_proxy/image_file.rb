@@ -20,18 +20,24 @@ module MulukhiyaTootProxy
       @type ||= super
       @type ||= detail_info.match(/\s+Mime\stype:\s*(.*)$/i)[1]
       return @type
+    rescue NoMethodError
+      return nil
     end
 
     def mediatype
       @mediatype ||= super
       @mediatype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/}i)[1]
       return @mediatype
+    rescue NoMethodError
+      return nil
     end
 
     def subtype
       @subtype ||= super
       @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[2]
       return @subtype
+    rescue NoMethodError
+      return nil
     end
 
     def alpha?
