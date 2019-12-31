@@ -3,14 +3,14 @@ module MulukhiyaTootProxy
     def setup
       @handler = Handler.create('admin_notification')
 
-      return if invalid_handler?
+      return unless handler?
       @account = Environment.account_class.get(token: Config.instance['/test/token'])
       @params = {results: ResultContainer.new}
       @params[:results].response = {'id' => @account.id}
     end
 
     def test_handle_post_toot
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_post_toot({message_field => 'ふつうのトゥート。'}, @params)

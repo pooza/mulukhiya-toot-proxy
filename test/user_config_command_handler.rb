@@ -8,12 +8,12 @@ module MulukhiyaTootProxy
     end
 
     def test_status
-      return if invalid_handler?
+      return unless handler?
       assert(YAML.safe_load(@handler.status).is_a?(Hash))
     end
 
     def test_handle_pre_toot
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => ''})

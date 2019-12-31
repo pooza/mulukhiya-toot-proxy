@@ -5,7 +5,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       @handler.handle_pre_toot({message_field => 'https://www.spotify.com/jp/'})

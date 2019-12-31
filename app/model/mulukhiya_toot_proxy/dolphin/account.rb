@@ -3,18 +3,18 @@ module MulukhiyaTootProxy
     class Account < Sequel::Model(:user)
       attr_accessor :token
 
-      def initialize
-        super
-        @logger = Logger.new
-      end
-
       alias to_h values
+
+      def logger
+        @logger = Logger.new
+        return @logger
+      end
 
       def config
         @config ||= UserConfigStorage.new[id]
         return @config
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return {}
       end
 
@@ -30,7 +30,7 @@ module MulukhiyaTootProxy
         end
         return @slack
       rescue => e
-        @logger.error(e)
+        logger.error(e)
         return nil
       end
 

@@ -25,7 +25,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_without_default_tags
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = []
 
       tags = TootParser.new(@handler.handle_pre_toot({message_field => 'hoge'})[message_field]).tags
@@ -86,7 +86,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_direct
-      return if invalid_handler?
+      return unless handler?
 
       @handler.clear
       r = @handler.handle_pre_toot({
@@ -97,7 +97,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_default_tag
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = ['美食丼']
 
       @handler.clear
@@ -122,7 +122,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_poll
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -134,7 +134,7 @@ module MulukhiyaTootProxy
     end
 
     def test_handle_pre_toot_with_twittodon
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -147,7 +147,7 @@ module MulukhiyaTootProxy
     end
 
     def test_end_with_tags?
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -160,7 +160,7 @@ module MulukhiyaTootProxy
     end
 
     def test_ignore_addresses
-      return if invalid_handler?
+      return unless handler?
       @config['/tagging/default_tags'] = []
 
       @handler.clear
