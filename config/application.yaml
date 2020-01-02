@@ -142,7 +142,7 @@ test:
         - mastodon_uri
         - note
         - query_template
-        - toot
+        - status
         - webhook
     - name: amazon
       cases:
