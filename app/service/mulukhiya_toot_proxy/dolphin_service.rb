@@ -63,9 +63,11 @@ module MulukhiyaTootProxy
     end
 
     def fetch_note(id)
-      r = @http.post(create_uri('/notes'), {body: {sinceId: id, limit: 1}.to_json})
-      # Slack.broadcast(id: id, response: r.parsed_response)
-      return r.first
+      values = @http.post(create_uri('/api/notes'), {
+        body: {local: true, sinceId: id, limit: 1}.to_json
+      }).parsed_response&.first
+      values[:url] = create_uri("/notes/#{id}").to_s if values
+      return values
     end
 
     def create_uri(href = '/api/notes/create')

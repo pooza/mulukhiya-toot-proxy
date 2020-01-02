@@ -1,22 +1,9 @@
 <%# encoding: UTF-8 -%>
 ## アカウント
-[@<%= @params[:account][:name] %>](<%= @params[:account][:url] %>)
-<% if @params[:status] -%>
+@<%= @params[:account][:username] %>]
 
 ## 本文
 <%= @params[:status] %>
-<% end -%>
-<% if @params[:attachments].present? -%>
-
-## メディア
-<% @params[:attachments].each do |attachment| -%>
-<% if attachment[:type] == 'image' -%>
-![<%= File.basename(Ginseng::URI.parse(attachment[:url]).path) %>](<%= attachment[:url] %>)
-<% else -%>
-- <%= attachment[:url] %>
-<% end -%>
-<% end -%>
-<% end -%>
 
 ## URL
 <%= @params[:url] %>
