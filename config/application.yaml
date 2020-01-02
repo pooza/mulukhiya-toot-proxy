@@ -63,8 +63,10 @@ handler:
     post_upload:
       - result_notification
     post_fav:
+      - fav_notification
       - result_notification
     post_boost:
+      - boost_notification
       - result_notification
     post_search:
       - result_notification
@@ -93,8 +95,8 @@ handler:
     post_upload:
       - result_notification
     post_bookmark:
-      - fav_dropbox_clipping
-      - fav_growi_clipping
+      - bookmark_dropbox_clipping
+      - bookmark_growi_clipping
       - result_notification
   default:
     timeout: 10

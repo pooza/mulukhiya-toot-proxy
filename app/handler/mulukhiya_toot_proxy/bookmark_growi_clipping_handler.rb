@@ -1,5 +1,5 @@
 module MulukhiyaTootProxy
-  class FavGrowiClippingHandler < Handler
+  class BookmarkGrowiClippingHandler < Handler
     def disable?
       return true unless Postgres.config?
       return true if sns.account.config["/handler/#{underscore_name}/disable"].nil?
