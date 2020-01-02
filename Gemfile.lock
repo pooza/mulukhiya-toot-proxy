@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e969ddf1e3a1bc93459ee9adce4a29461c759f1a
+  revision: ad3f077300fc4a19d3acdcb733645f169665f3cf
   specs:
-    ginseng-core (1.5.1)
+    ginseng-core (1.5.2)
       activesupport
       addressable
       bundler
@@ -125,7 +125,7 @@ GEM
     et-orbi (1.2.2)
       tzinfo
     eventmachine (1.2.7)
-    faraday (0.17.1)
+    faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
     fastimage (2.1.7)
     ffi (1.11.3)
@@ -184,7 +184,7 @@ GEM
     public_suffix (3.1.1)
     raabro (1.1.6)
     rack (2.0.8)
-    rack-protection (2.0.7)
+    rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -232,7 +232,7 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sequel (5.27.0)
+    sequel (5.28.0)
     sidekiq (6.0.4)
       connection_pool (>= 2.2.2)
       rack (>= 2.0.0)
@@ -243,10 +243,10 @@ GEM
       rufus-scheduler (~> 3.2)
       sidekiq (>= 3)
       tilt (>= 1.4.0)
-    sinatra (2.0.7)
+    sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
-      rack-protection (= 2.0.7)
+      rack-protection (= 2.0.8.1)
       tilt (~> 2.0)
     syslog-logger (1.6.8)
     test-unit (3.3.4)
