@@ -33,6 +33,15 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    post '/api/notes/favorites/create' do
+      @results.response = @dolphin.fav(params[:noteId])
+      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @dolphin})
+      @renderer.message = @results.response.parsed_response || {}
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    end
+
     get '/mulukhiya' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'home'

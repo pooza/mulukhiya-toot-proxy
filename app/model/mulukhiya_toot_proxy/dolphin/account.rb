@@ -35,10 +35,18 @@ module MulukhiyaTootProxy
       end
 
       def growi
+        @growi ||= GrowiClipper.create(account_id: id)
+        return @growi
+      rescue => e
+        logger.error(e)
         return nil
       end
 
       def dropbox
+        @dropbox ||= DropboxClipper.create(account_id: id)
+        return @dropbox
+      rescue => e
+        logger.error(e)
         return nil
       end
 

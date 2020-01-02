@@ -19,12 +19,9 @@ module MulukhiyaTootProxy
     end
 
     def dispatch
-      uri = MastodonURI.parse(@parser.params['url'])
-      return unless uri.id
-      DropboxClippingWorker.perform_async(
-        uri: {href: uri.to_s, class: uri.class.to_s},
-        account_id: sns.account.id,
-      )
+      uri = Ginseng::URI.parse(@parser.params['url'])
+      return unless uri.absolute?
+      GrowiClippingWorker.perform_async(uri: uri.to_s, account_id: sns.account.id)
     end
   end
 end

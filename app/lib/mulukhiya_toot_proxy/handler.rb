@@ -29,6 +29,8 @@ module MulukhiyaTootProxy
 
     def handle_post_boost(body, params = {}); end
 
+    def handle_post_bookmark(body, params = {}); end
+
     def handle_post_search(body, params = {}); end
 
     def underscore_name
@@ -107,6 +109,10 @@ module MulukhiyaTootProxy
 
     def message_field
       return Environment.sns_class.message_field
+    end
+
+    def message_key
+      return Environment.sns_class.message_key
     end
 
     private

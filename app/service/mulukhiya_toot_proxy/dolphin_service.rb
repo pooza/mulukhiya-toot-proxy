@@ -32,11 +32,21 @@ module MulukhiyaTootProxy
       return @http.post(create_uri, {body: body.to_json, headers: headers})
     end
 
+    def favourite(id, params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri('/api/notes/favorites/create'), {
+        body: {noteId: id, i: @token}.to_json,
+        headers: headers,
+      })
+    end
+
+    alias fav favourite
+
     def upload(path, params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      body ||= {force: 'true'}
-      body[:i] ||= @token
+      body = {force: 'true', i: @token}
       return @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
     end
 
@@ -50,6 +60,12 @@ module MulukhiyaTootProxy
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
+    end
+
+    def fetch_note(id)
+      r = @http.post(create_uri('/notes'), {body: {sinceId: id, limit: 1}.to_json})
+      # Slack.broadcast(id: id, response: r.parsed_response)
+      return r.first
     end
 
     def create_uri(href = '/api/notes/create')
@@ -68,6 +84,10 @@ module MulukhiyaTootProxy
 
     def self.message_field
       return Config.instance['/dolphin/message/field']
+    end
+
+    def self.message_key
+      return Config.instance['/dolphin/message/key']
     end
 
     def self.visibility_name(name)

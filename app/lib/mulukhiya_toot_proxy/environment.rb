@@ -36,6 +36,10 @@ module MulukhiyaTootProxy
       return "MulukhiyaTootProxy::#{controller_name.camelize}::Account".constantize
     end
 
+    def self.status_class
+      return "MulukhiyaTootProxy::#{controller_name.camelize}::Status".constantize
+    end
+
     def self.health
       values = {version: Package.version, status: 200}
       ['Postgres', 'Redis'].each do |service|

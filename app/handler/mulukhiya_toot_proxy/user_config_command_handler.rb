@@ -12,8 +12,10 @@ module MulukhiyaTootProxy
 
     def status
       v = JSON.parse(UserConfigStorage.new.get(sns.account.id)) || {}
-      v['webhook'] ||= {}
-      v['webhook']['url'] = sns.account.webhook.uri.to_s if sns.account.webhook
+      if sns.account.webhook
+        v['webhook'] ||= {}
+        v['webhook']['url'] = sns.account.webhook.uri.to_s
+      end
       return YAML.dump(v)
     rescue => e
       @logger.error(e)

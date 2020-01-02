@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     end
 
     def notifiable?(body)
-      return false unless toot = Toot[body['id'].to_i]
+      return false unless toot = Environment.status_class[body[message_key]]
       return false unless toot.local?
       return true
     rescue Ginseng::NotFoundError

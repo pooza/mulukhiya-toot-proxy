@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class ResultNotificationHandler < NotificationHandler
     def disable?
       return true unless Postgres.config?
-      return true if sns.account.config['/handler/result_notification/disable'].nil?
+      return true if sns.account.config["/handler/#{underscore_name}/disable"].nil?
       return true if sns.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false
@@ -36,6 +36,11 @@ module MulukhiyaTootProxy
     end
 
     def handle_post_boost(body, params = {})
+      return unless notifiable?(body)
+      worker_class.perform_async(account_id: sns.account.id, results: results)
+    end
+
+    def handle_post_bookmark(body, params = {})
       return unless notifiable?(body)
       worker_class.perform_async(account_id: sns.account.id, results: results)
     end

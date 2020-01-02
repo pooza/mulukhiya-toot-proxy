@@ -62,7 +62,7 @@ module MulukhiyaTootProxy
 
       def recent_toot
         rows = Postgres.instance.execute('recent_toot', {id: id})
-        return rows.present? ? Toot[rows.first['id'].to_i] : nil
+        return rows.present? ? Environment.status_class[rows.first['id']] : nil
       end
 
       def admin?

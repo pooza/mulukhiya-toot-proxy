@@ -73,6 +73,10 @@ module MulukhiyaTootProxy
       return Config.instance['/mastodon/message/field']
     end
 
+    def self.message_key
+      return Config.instance['/mastodon/message/key']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/mastodon/message/visibility_name/#{name}"]
     end

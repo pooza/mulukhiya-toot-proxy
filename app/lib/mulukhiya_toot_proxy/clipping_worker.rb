@@ -11,7 +11,9 @@ module MulukhiyaTootProxy
     end
 
     def create_body(params)
-      return params['uri']['class'].constantize.parse(params['uri']['href']).to_md
+      uri = MastodonURI.parse(params['uri'])
+      uri = DolphinURI.parse(params['uri']) unless uri.id
+      return uri.to_md if uri.id
     rescue => e
       @logger.error(Ginseng::Error.create(e).to_h.merge(params: params))
       raise Ginseng::RequestError, e.message, e.backtrace
