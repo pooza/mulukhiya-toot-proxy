@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def test_clip
-      assert(@dropbox.clip("#{Time.now} #{__method__}").is_a?(CPApiReturn))
+      @dropbox.clip("#{Time.now} #{__method__}")
     end
   end
 end
