@@ -1,6 +1,6 @@
 <%# encoding: UTF-8 -%>
 ## アカウント
-@<%= @params[:account][:username] %>]
+<%= @params[:account][:name] || @params[:account][:username] %>]
 
 ## 本文
 <%= @params[:status] %>

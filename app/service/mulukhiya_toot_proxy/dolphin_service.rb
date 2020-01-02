@@ -63,11 +63,7 @@ module MulukhiyaTootProxy
     end
 
     def fetch_note(id)
-      values = @http.post(create_uri('/api/notes'), {
-        body: {local: true, sinceId: id, limit: 1}.to_json
-      }).parsed_response&.first
-      values[:url] = create_uri("/notes/#{id}").to_s if values
-      return values
+      return @http.get(create_uri("/mulukhiya/note/#{id}")).parsed_response
     end
 
     def create_uri(href = '/api/notes/create')

@@ -15,9 +15,9 @@ module MulukhiyaTootProxy
       note = service.fetch_note(note_id)
       raise "Note '#{self}' not found" unless note
       template = Template.new('note_clipping.md')
-      template[:account] = note['account']
+      template[:account] = note['user']
       template[:status] = TootParser.new(note['text']).to_md
-      template[:url] = note['url']
+      template[:url] = note['uri']
       return template.to_s
     rescue => e
       Logger.new.info(Ginseng::Error.create(e).to_h.merge(note_id: note_id))

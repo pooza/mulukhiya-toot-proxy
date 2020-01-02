@@ -1,9 +1,11 @@
 module MulukhiyaTootProxy
   module Dolphin
     class Account < Sequel::Model(:user)
-      attr_accessor :token
-
-      alias to_h values
+      def to_h
+        v = values.clone
+        v.delete(:token)
+        return v
+      end
 
       def logger
         @logger ||= Logger.new

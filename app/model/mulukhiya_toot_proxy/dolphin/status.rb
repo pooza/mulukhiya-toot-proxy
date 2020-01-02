@@ -15,6 +15,10 @@ module MulukhiyaTootProxy
         return userHost.nil?
       end
 
+      def visible?
+        return visibility == 'public'
+      end
+
       def uri
         unless @uri
           if self[:uri].present?
@@ -28,7 +32,11 @@ module MulukhiyaTootProxy
         return @uri
       end
 
-      alias to_h values
+      def to_h
+        v = values.clone
+        v[:uri] ||= uri.to_s
+        return v
+      end
 
       def to_md
         return uri.to_md
