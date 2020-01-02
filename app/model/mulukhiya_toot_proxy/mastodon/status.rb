@@ -1,8 +1,13 @@
 module MulukhiyaTootProxy
   module Mastodon
     class Status < Sequel::Model(:statuses)
+      def logger
+        @logger ||= Logger.new
+        return @logger
+      end
+
       def account
-        @account ||= Environment.account_class[account_id]
+        @account ||= Account[account_id]
         return @account
       end
 
@@ -23,7 +28,8 @@ module MulukhiyaTootProxy
 
       def to_md
         return uri.to_md
-      rescue
+      rescue => e
+        logger.error(e)
         template = Template.new('toot_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md

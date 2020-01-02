@@ -6,8 +6,8 @@ module MulukhiyaTootProxy
     end
 
     def notifiable?(body)
-      return false unless toot = Environment.status_class[body[message_key]]
-      return false unless toot.local?
+      return false unless status = Environment.status_class[body[message_key]]
+      return false unless status.local?
       return true
     rescue Ginseng::NotFoundError
       return false
@@ -15,11 +15,8 @@ module MulukhiyaTootProxy
 
     def handle_post_boost(body, params = {})
       return unless notifiable?(body)
-      worker_class.perform_async(
-        account_id: sns.account.id,
-        status_id: body['id'].to_i,
-      )
-      @result.push(status_id: body['id'].to_i)
+      worker_class.perform_async(account_id: sns.account.id, status_id: body[message_key])
+      @result.push(status_id: body[message_key])
     end
   end
 end

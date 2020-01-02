@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     end
 
     def test_id
-      assert(@status.id.positive?)
+      assert(@status.id.present?)
     end
 
     def test_account
@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def test_uri
-      assert(@status.uri.is_a?(MastodonURI))
+      assert(@status.uri.is_a?(Ginseng::URI))
     end
 
     def test_to_md

@@ -1,8 +1,13 @@
 module MulukhiyaTootProxy
   module Dolphin
     class Status < Sequel::Model(:note)
+      def logger
+        @logger ||= Logger.new
+        return @logger
+      end
+
       def account
-        @account ||= Environment.account_class[userId]
+        @account ||= Account[userId]
         return @account
       end
 
@@ -27,7 +32,8 @@ module MulukhiyaTootProxy
 
       def to_md
         return uri.to_md
-      rescue
+      rescue => e
+        logger.error(e)
         template = Template.new('note_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md
