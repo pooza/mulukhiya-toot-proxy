@@ -153,17 +153,12 @@ test:
         - spotify_uri
     - name: dolphin
       cases:
-        - clipping_worker
-        - dropbox_clipper
-        - growi_clipper
         - mastodon_controller
         - mastodon_uri
-        - toot
     - name: mastodon
       cases:
         - dolphin_controller
         - dolphin_uri
-        - note
 mastodon:
   url: https://mstdn.example.com/
   oauth:

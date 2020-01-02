@@ -50,9 +50,12 @@ module MulukhiyaTootProxy
         return nil
       end
 
-      def recent_toot
-        return nil
+      def recent_note
+        # rows = Postgres.instance.execute('recent_toot', {id: id})
+        # return rows.present? ? Environment.status_class[rows.first['id']] : nil
       end
+
+      alias recent_status recent_note
 
       def admin?
         return isAdmin

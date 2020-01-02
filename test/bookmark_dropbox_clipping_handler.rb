@@ -1,8 +1,8 @@
 module MulukhiyaTootProxy
-  class FavGrowiClippingHandlerTest < TestCase
+  class BookmarkDropboxClippingHandlerTest < TestCase
     def setup
       @config = Config.instance
-      @handler = Handler.create('fav_growi_clipping')
+      @handler = Handler.create('bookmark_dropbox_clipping')
       return unless handler?
       @account = Environment.account_class.get(token: @config['/test/token'])
       @toot = @account.recent_toot

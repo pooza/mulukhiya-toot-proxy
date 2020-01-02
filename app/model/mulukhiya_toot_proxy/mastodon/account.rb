@@ -65,6 +65,8 @@ module MulukhiyaTootProxy
         return rows.present? ? Environment.status_class[rows.first['id']] : nil
       end
 
+      alias recent_status recent_toot
+
       def admin?
         return params[:admin]
       end
