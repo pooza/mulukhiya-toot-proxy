@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class DropboxClipperTest < TestCase
     def setup
-      @clipper = DropboxClipper.create(account_id: Environment.sns_class.new.account.id)
+      @clipper = Environment.sns_class.new.account.dropbox
     end
 
     def test_create
@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def test_clip
-      @dropbox.clip("#{Time.now} #{__method__}")
+      assert(@clipper.clip("#{Time.now} #{__method__}").is_a?(DropboxApi::Metadata::File))
     end
   end
 end
