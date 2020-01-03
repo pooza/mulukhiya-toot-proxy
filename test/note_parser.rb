@@ -8,10 +8,10 @@ module MulukhiyaTootProxy
       @parser.body = 'ローリン♪ローリン♪ココロにズッキュン'
       assert_false(@parser.too_long?)
 
-      @parser.body = '0' * TootParser.max_length
+      @parser.body = '0' * NoteParser.max_length
       assert_false(@parser.too_long?)
 
-      @parser.body = '0' * (TootParser.max_length + 1)
+      @parser.body = '0' * (NoteParser.max_length + 1)
       assert(@parser.too_long?)
     end
   end
