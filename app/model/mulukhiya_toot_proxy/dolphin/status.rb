@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
         unless @uri
           if self[:uri].present?
             @uri = MastodonURI.parse(self[:uri])
+            @uri = DolphinURI.parse(self[:uri]) unless @uri.id
             @uri = nil unless @uri.id
           else
             @uri = DolphinURI.parse(Config.instance['/dolphin/url'])

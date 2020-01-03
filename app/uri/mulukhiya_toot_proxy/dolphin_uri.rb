@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
 
     def to_md
       note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
-      note = service.fetch_note(note.id)
+      note = Environment.sns_class.new.fetch_note(note.id)
       raise "Note '#{self}' not found" unless note
       template = Template.new('note_clipping.md')
       template[:account] = note['account']
