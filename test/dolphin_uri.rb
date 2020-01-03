@@ -4,8 +4,8 @@ module MulukhiyaTootProxy
       @uri = DolphinURI.parse('https://dev.dol.b-shock.org/notes/8211d0fbnx')
     end
 
-    def test_status_id
-      assert_equal(@uri.status_id, '8211d0fbnx')
+    def test_id
+      assert_equal(@uri.id, '8211d0fbnx')
     end
 
     def test_service

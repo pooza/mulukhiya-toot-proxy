@@ -154,9 +154,11 @@ test:
     - name: dolphin
       cases:
         - mastodon_controller
+        - mastodon_uri
     - name: mastodon
       cases:
         - dolphin_controller
+        - dolphin_uri
 mastodon:
   url: https://mstdn.example.com/
   oauth:
