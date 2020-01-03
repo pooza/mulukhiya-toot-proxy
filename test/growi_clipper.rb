@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class GrowiClipperTest < TestCase
     def setup
-      @clipper = Environment.sns_class.new.account.growi
+      @clipper = Environment.test_account.growi
     end
 
     def test_create

@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class DropboxClipperTest < TestCase
     def setup
-      @clipper = Environment.sns_class.new.account.dropbox
+      @clipper = Environment.test_account.dropbox
     end
 
     def test_create

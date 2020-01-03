@@ -20,6 +20,10 @@ module MulukhiyaTootProxy
       return config['/controller']
     end
 
+    def self.test_account
+      return sns_class.new.account
+    end
+
     def self.controller_class
       return "MulukhiyaTootProxy::#{controller_name.camelize}Controller".constantize
     end
