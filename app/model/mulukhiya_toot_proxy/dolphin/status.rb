@@ -23,6 +23,7 @@ module MulukhiyaTootProxy
         unless @uri
           if self[:uri].present?
             @uri = MastodonURI.parse(self[:uri])
+            @uri = DolphinURI.parse(self[:uri]) unless @uri.id
             @uri = nil unless @uri.id
           else
             @uri = DolphinURI.parse(Config.instance['/dolphin/url'])
@@ -44,7 +45,7 @@ module MulukhiyaTootProxy
         logger.error(e)
         template = Template.new('note_clipping.md')
         template[:account] = account.to_h
-        template[:status] = TootParser.new(text).to_md
+        template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
       end

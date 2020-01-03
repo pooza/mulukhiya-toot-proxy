@@ -31,19 +31,19 @@ module MulukhiyaTootProxy
     end
 
     def test_note_length
-      post '/api/notes/create', {message_field => 'A' * TootParser.max_length, 'i' => @config['/test/token']}
+      post '/api/notes/create', {message_field => 'A' * NoteParser.max_length, 'i' => @config['/test/token']}
       assert(last_response.ok?)
 
-      post '/api/notes/create', {message_field => 'A' * (TootParser.max_length + 1), 'i' => @config['/test/token']}
+      post '/api/notes/create', {message_field => 'A' * (NoteParser.max_length + 1), 'i' => @config['/test/token']}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
 
       header 'Content-Type', 'application/json'
-      post '/api/notes/create', {message_field => 'B' * TootParser.max_length, 'i' => @config['/test/token']}.to_json
+      post '/api/notes/create', {message_field => 'B' * NoteParser.max_length, 'i' => @config['/test/token']}.to_json
       assert(last_response.ok?)
 
       header 'Content-Type', 'application/json'
-      post '/api/notes/create', {message_field => 'B' * (TootParser.max_length + 1), 'i' => @config['/test/token']}.to_json
+      post '/api/notes/create', {message_field => 'B' * (NoteParser.max_length + 1), 'i' => @config['/test/token']}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
     end

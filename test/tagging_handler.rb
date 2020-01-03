@@ -28,46 +28,46 @@ module MulukhiyaTootProxy
       return unless handler?
       @config['/tagging/default_tags'] = []
 
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'hoge'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'hoge'})[message_field]).tags
       assert_equal(tags.count, 0)
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => '宮本佳那子'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => '宮本佳那子'})[message_field]).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('宮本佳那子'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本佳那子。'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本佳那子。'})[message_field]).tags
       assert(tags.member?('宮本佳那子'))
       assert(tags.member?('キュアソード'))
       assert(tags.member?('剣崎真琴'))
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本 佳那子。'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本 佳那子。'})[message_field]).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本　佳那子。'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'キュアソードの中の人は宮本　佳那子。'})[message_field]).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => '#キュアソード の中の人は宮本佳那子。'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => '#キュアソード の中の人は宮本佳那子。'})[message_field]).tags
       assert_equal(tags.count, 3)
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'Yes!プリキュア5 GoGo!'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'Yes!プリキュア5 GoGo!'})[message_field]).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})[message_field]).tags
       assert_equal(tags.count, 2)
       assert(tags.member?('Yes_プリキュア5'))
       assert(tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})[message_field]).tags
       assert_equal(tags.count, 7)
       assert(tags.member?('キュアフローラ_キュアマーメイド'))
       assert(tags.member?('キュアフローラ'))
@@ -78,7 +78,7 @@ module MulukhiyaTootProxy
       assert(tags.member?('浅野真澄'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => '#キュアビューティ'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => '#キュアビューティ'})[message_field]).tags
       assert_equal(tags.count, 3)
       assert(tags.member?('キュアビューティ'))
       assert(tags.member?('青木れいか'))
@@ -101,18 +101,18 @@ module MulukhiyaTootProxy
       @config['/tagging/default_tags'] = ['美食丼']
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => 'hoge'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => 'hoge'})[message_field]).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => '宮本佳那子'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => '宮本佳那子'})[message_field]).tags
       assert_equal(tags.count, 2)
       assert(tags.member?('美食丼'))
       assert(tags.member?('宮本佳那子'))
 
       @handler.clear
-      tags = TootParser.new(@handler.handle_pre_toot({message_field => '#美食丼'})[message_field]).tags
+      tags = MessageParser.new(@handler.handle_pre_toot({message_field => '#美食丼'})[message_field]).tags
       assert_equal(tags.count, 1)
       assert(tags.member?('美食丼'))
 
