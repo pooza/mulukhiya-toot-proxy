@@ -12,10 +12,11 @@ module MulukhiyaTootProxy
     alias id note_id
 
     def to_md
-      note = service.fetch_note(note_id)
+      note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
+      note = service.fetch_note(note.id)
       raise "Note '#{self}' not found" unless note
       template = Template.new('note_clipping.md')
-      template[:account] = note['user']
+      template[:account] = note['account']
       template[:status] = TootParser.new(note['text']).to_md
       template[:url] = note['uri']
       return template.to_s

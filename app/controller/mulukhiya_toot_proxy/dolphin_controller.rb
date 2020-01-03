@@ -65,7 +65,7 @@ module MulukhiyaTootProxy
         @renderer.status = 404
       else
         @renderer.message = note.to_h
-        @renderer.message[:user] = Environment.account_class[note.userId].to_h
+        @renderer.message[:account] = Environment.account_class[note.userId].to_h
       end
       return @renderer.to_s
     end

@@ -1,8 +1,21 @@
 module MulukhiyaTootProxy
   module Dolphin
     class Account < Sequel::Model(:user)
+      def uri
+        unless @uri
+          if host
+            @uri = DolphinURI.parse("https://#{host}")
+          else
+            @uri = DolphinURI.parse(Config.instance['/dolphin/url'])
+          end
+          @uri.path = "/@#{username}"
+        end
+        return @uri
+      end
+
       def to_h
         v = values.clone
+        v[:url] = uri.to_s
         v.delete(:token)
         return v
       end
