@@ -3,6 +3,7 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   canonical_url_handler: CanonicalURLHandler
   css_renderer: CSSRenderer
+  dolphin_uri: DolphinURI
   html_renderer: HTMLRenderer
   http: HTTP
   itunes_uri: ItunesURI

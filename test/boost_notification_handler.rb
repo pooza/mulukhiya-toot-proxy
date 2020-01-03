@@ -1,11 +1,10 @@
 module MulukhiyaTootProxy
   class BoostNotificationHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('boost_notification')
 
       return unless handler?
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = Environment.test_account
       @toot = @account.recent_toot
     end
 

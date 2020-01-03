@@ -33,6 +33,15 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    post '/api/notes/favorites/create' do
+      @results.response = @dolphin.fav(params[:noteId])
+      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @dolphin})
+      @renderer.message = @results.response.parsed_response || {}
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    end
+
     get '/mulukhiya' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'home'
@@ -47,6 +56,17 @@ module MulukhiyaTootProxy
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/note/:note' do
+      note = Environment.status_class[params[:note]]
+      if note.nil? || !note.visible?
+        @renderer.status = 404
+      else
+        @renderer.message = note.to_h
+        @renderer.message[:account] = Environment.account_class[note.userId].to_h
+      end
       return @renderer.to_s
     end
 
@@ -70,8 +90,9 @@ module MulukhiyaTootProxy
       e.package = Package.full_name
       @renderer = default_renderer_class.new
       @renderer.status = e.status
-      @renderer.message = e.to_h.delete_if {|k, v| k == :backtrace}
-      @renderer.message['error'] = e.message
+      @renderer.message = e.to_h
+      @renderer.message.delete(:backtrace)
+      @renderer.message[:error] = e.message
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s

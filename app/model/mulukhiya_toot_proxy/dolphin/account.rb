@@ -1,12 +1,27 @@
 module MulukhiyaTootProxy
   module Dolphin
     class Account < Sequel::Model(:user)
-      attr_accessor :token
+      def uri
+        unless @uri
+          if host
+            @uri = DolphinURI.parse("https://#{host}")
+          else
+            @uri = DolphinURI.parse(Config.instance['/dolphin/url'])
+          end
+          @uri.path = "/@#{username}"
+        end
+        return @uri
+      end
 
-      alias to_h values
+      def to_h
+        v = values.clone
+        v[:url] = uri.to_s
+        v.delete(:token)
+        return v
+      end
 
       def logger
-        @logger = Logger.new
+        @logger ||= Logger.new
         return @logger
       end
 
@@ -35,16 +50,28 @@ module MulukhiyaTootProxy
       end
 
       def growi
+        @growi ||= GrowiClipper.create(account_id: id)
+        return @growi
+      rescue => e
+        logger.error(e)
         return nil
       end
 
       def dropbox
+        @dropbox ||= DropboxClipper.create(account_id: id)
+        return @dropbox
+      rescue => e
+        logger.error(e)
         return nil
       end
 
-      def recent_toot
+      def recent_note
+        rows = Postgres.instance.execute('recent_note', {id: id})
+        return Status[rows.first['id']] if rows.present?
         return nil
       end
+
+      alias recent_status recent_note
 
       def admin?
         return isAdmin

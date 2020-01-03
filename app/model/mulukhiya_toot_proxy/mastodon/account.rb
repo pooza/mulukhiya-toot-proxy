@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       alias to_h values
 
       def logger
-        @logger = Logger.new
+        @logger ||= Logger.new
         return @logger
       end
 
@@ -62,8 +62,11 @@ module MulukhiyaTootProxy
 
       def recent_toot
         rows = Postgres.instance.execute('recent_toot', {id: id})
-        return rows.present? ? Toot[rows.first['id'].to_i] : nil
+        return Status[rows.first['id']] if rows.present?
+        return nil
       end
+
+      alias recent_status recent_toot
 
       def admin?
         return params[:admin]

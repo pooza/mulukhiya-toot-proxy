@@ -1,5 +1,5 @@
 package:
-  version: 3.2.2
+  version: 3.2.3
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -63,8 +63,6 @@ handler:
     post_upload:
       - result_notification
     post_fav:
-      - fav_dropbox_clipping
-      - fav_growi_clipping
       - fav_notification
       - result_notification
     post_boost:
@@ -96,6 +94,10 @@ handler:
       - image_resize
     post_upload:
       - result_notification
+    post_bookmark:
+      - bookmark_dropbox_clipping
+      - bookmark_growi_clipping
+      - result_notification
   default:
     timeout: 10
   mention_notification:
@@ -103,10 +105,6 @@ handler:
   fav_notification:
     disable: true
   boost_notification:
-    disable: true
-  fav_growi_clipping:
-    disable: true
-  fav_dropbox_clipping:
     disable: true
   image_resize:
     pixel: 1280
@@ -144,7 +142,7 @@ test:
         - mastodon_uri
         - note
         - query_template
-        - toot
+        - status
         - webhook
     - name: amazon
       cases:
@@ -155,17 +153,12 @@ test:
         - spotify_uri
     - name: dolphin
       cases:
-        - clipping_worker
-        - dropbox_clipper
-        - growi_clipper
         - mastodon_controller
         - mastodon_uri
-        - toot
     - name: mastodon
       cases:
         - dolphin_controller
         - dolphin_uri
-        - note
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -179,6 +172,7 @@ mastodon:
     - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   toot: &mastodon_toot
     field: status
+    key: id
     label: トゥート
     max_length: 500
     visibility_name:
@@ -192,8 +186,11 @@ mastodon:
     pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
 dolphin:
   url: https://dol.example.com/
+  patterns:
+    - pattern: ^/notes/([[:alnum:]]+)
   note: &dolphin_note
     field: text
+    key: noteId
     label: ノート
     max_length: 500
     visibility_name:

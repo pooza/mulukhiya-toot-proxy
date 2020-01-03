@@ -1,10 +1,9 @@
 module MulukhiyaTootProxy
   class FavNotificationHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('fav_notification')
       return unless handler?
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = Environment.test_account
       @toot = @account.recent_toot
     end
 

@@ -1,0 +1,11 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  note.id
+FROM note
+  INNER JOIN "user" ON "user".id=note."userId"
+WHERE (note.visibility='public')
+  AND (note."userHost" IS NULL)
+  AND ("user".id='<%= params[:id] %>')
+GROUP BY note.id
+ORDER BY note."createdAt" DESC
+LIMIT 1

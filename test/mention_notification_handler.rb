@@ -1,10 +1,9 @@
 module MulukhiyaTootProxy
   class MentionNotificationHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('mention_notification')
       return unless handler?
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = Environment.test_account
     end
 
     def test_handle_post_toot

@@ -1,0 +1,11 @@
+<%# encoding: UTF-8 -%>
+## アカウント
+[<%= @params[:account][:name] || @params[:account][:username] %>](<%= @params[:account][:url] %>)
+<% if @params[:status] -%>
+
+## 本文
+<%= @params[:status] %>
+<% end -%>
+
+## URL
+<%= @params[:url] %>

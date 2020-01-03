@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class BoostNotificationWorker < NotificationWorker
     def perform(params)
       from_account = Environment.account_class[params['account_id']]
-      toot = Toot[params['status_id']]
+      toot = Environment.status_class[params['status_id']]
       pattern = "^#{toot.account.username}$"
       @db.execute('notificatable_accounts', {id: from_account.id, pattern: pattern}).each do |row|
         account = Environment.account_class[row['id']]
