@@ -1,10 +1,9 @@
 module MulukhiyaTootProxy
   class BookmarkGrowiClippingHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('bookmark_growi_clipping')
       return unless handler?
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = Environment.test_account
       @toot = @account.recent_toot
     end
 

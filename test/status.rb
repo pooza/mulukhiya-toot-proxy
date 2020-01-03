@@ -1,8 +1,7 @@
 module MulukhiyaTootProxy
   class StatusTest < TestCase
     def setup
-      @config = Config.instance
-      @account = Environment.account_class.get(token: @config['/test/token'])
+      @account = Environment.test_account
       @status = @account.recent_status
     end
 
