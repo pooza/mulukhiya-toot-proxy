@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
-  class TootParserTest < TestCase
+  class NoteParserTest < TestCase
     def setup
-      @parser = TootParser.new
+      @parser = NoteParser.new
     end
 
     def test_too_long?

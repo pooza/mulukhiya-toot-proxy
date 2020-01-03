@@ -45,7 +45,7 @@ module MulukhiyaTootProxy
         logger.error(e)
         template = Template.new('note_clipping.md')
         template[:account] = account.to_h
-        template[:status] = TootParser.new(text).to_md
+        template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
       end

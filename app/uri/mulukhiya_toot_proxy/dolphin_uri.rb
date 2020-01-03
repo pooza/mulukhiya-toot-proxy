@@ -17,7 +17,7 @@ module MulukhiyaTootProxy
       raise "Note '#{self}' not found" unless note
       template = Template.new('note_clipping.md')
       template[:account] = note['account']
-      template[:status] = TootParser.new(note['text']).to_md
+      template[:status] = NoteParser.new(note['text']).to_md
       template[:url] = note['uri']
       return template.to_s
     rescue => e
