@@ -34,10 +34,8 @@ module MulukhiyaTootProxy
       end
 
       def attachments
-        unless @attachments
-          @attachments = fields.match(/{(.*)}/)[1].split(',').map do |id|
-            Attachment[id]
-          end
+        @attachments ||= fields.match(/{(.*)}/)[1].split(',').map do |id|
+          Attachment[id]
         end
         return @attachments
       rescue
