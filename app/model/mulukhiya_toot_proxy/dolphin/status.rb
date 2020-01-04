@@ -33,6 +33,17 @@ module MulukhiyaTootProxy
         return @uri
       end
 
+      def attachments
+        unless @attachments
+          @attachments = fields.match(/{(.*)}/)[1].split(',').map do |id|
+            Attachment[id]
+          end
+        end
+        return @attachments
+      rescue
+        return []
+      end
+
       def to_h
         v = values.clone
         v[:uri] ||= uri.to_s

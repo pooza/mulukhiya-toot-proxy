@@ -44,6 +44,10 @@ module MulukhiyaTootProxy
       return "MulukhiyaTootProxy::#{controller_name.camelize}::Status".constantize
     end
 
+    def self.attachment_class
+      return "MulukhiyaTootProxy::#{controller_name.camelize}::Attachment".constantize
+    end
+
     def self.health
       values = {version: Package.version, status: 200}
       ['Postgres', 'Redis'].each do |service|

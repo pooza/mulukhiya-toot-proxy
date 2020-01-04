@@ -13,6 +13,13 @@ module MulukhiyaTootProxy
       assert_kind_of(Environment.account_class, @status.account)
     end
 
+    def test_attachments
+      @status.attachments.each do |attachment|
+        assert_kind_of(Environment.attachment_class, attachment)
+        pp attachment
+      end
+    end
+
     def test_text
       assert_kind_of(String, @status.text)
     end
