@@ -6,8 +6,8 @@ module MulukhiyaTootProxy
     end
 
     def notifiable?(body)
-      return false unless (body[message_field]) =~ /#notify(\s|$)/i
-      return false if body['visibility'] =~ /^(direct|private)$/
+      return false unless /#notify(\s|$)/i.match?((body[message_field]))
+      return false if /^(direct|private)$/.match?(body['visibility'])
       return true if sns.account.admin?
       return true if sns.account.moderator?
       return false
