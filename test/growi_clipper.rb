@@ -5,11 +5,11 @@ module MulukhiyaTootProxy
     end
 
     def test_create
-      assert(@clipper.is_a?(GrowiClipper))
+      assert_kind_of(GrowiClipper, @clipper)
     end
 
     def test_clip
-      assert(@clipper.clip("#{Time.now} #{__method__}").is_a?(CPApiReturn))
+      assert_kind_of(CPApiReturn, @clipper.clip("#{Time.now} #{__method__}"))
     end
   end
 end

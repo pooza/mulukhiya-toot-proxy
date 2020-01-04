@@ -7,13 +7,13 @@ module MulukhiyaTootProxy
       )
     end
 
-    def test_new
-      assert(@resource.is_a?(MecabTaggingResource))
+    def test_create
+      assert_kind_of(MecabTaggingResource, @resource)
     end
 
     def test_parse
       result = @resource.parse
-      assert(result.is_a?(Hash))
+      assert_kind_of(Hash, result)
       assert_equal(result['パルテノンモード'], {pattern: /パルテノンモード/})
     end
   end

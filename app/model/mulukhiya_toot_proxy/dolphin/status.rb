@@ -33,9 +33,20 @@ module MulukhiyaTootProxy
         return @uri
       end
 
+      def attachments
+        @attachments ||= fileIds.match(/{(.*)}/)[1].split(',').map do |id|
+          Attachment[id]
+        end
+        return @attachments
+      rescue => e
+        Slack.broadcast(e)
+        return []
+      end
+
       def to_h
         v = values.clone
         v[:uri] ||= uri.to_s
+        v[:attachments] = attachments.map(&:to_h)
         return v
       end
 

@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     def test_all
       return unless @account.webhook
       Webhook.all do |hook|
-        assert(hook.is_a?(Webhook))
+        assert_kind_of(Webhook, hook)
       end
     end
 
@@ -28,14 +28,14 @@ module MulukhiyaTootProxy
     def test_sns
       return unless @account.webhook
       Webhook.all do |hook|
-        assert(hook.sns.is_a?(MastodonService) || hook.sns.is_a?(DolphinService))
+        assert_kind_of([MastodonService, DolphinService], hook.sns)
       end
     end
 
     def test_uri
       return unless @account.webhook
       Webhook.all do |hook|
-        assert(hook.uri.is_a?(Ginseng::URI))
+        assert_kind_of(Ginseng::URI, hook.uri)
       end
     end
 

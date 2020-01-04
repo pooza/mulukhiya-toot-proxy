@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless temp_text =~ v[:pattern]
+        next unless temp_text&.match?(v[:pattern])
         @tags.push(k)
         @tags.concat(v[:words])
         temp_text.gsub!(v[:pattern], '')
@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
 
     def ignore?(body)
       @config['/tagging/ignore_addresses'].each do |addr|
-        next unless body[message_field] =~ Regexp.new("(^|\s)#{addr}($|\s)")
+        next unless body[message_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
         return true
       end
       return false unless body['visibility'].present?
@@ -60,7 +60,7 @@ module MulukhiyaTootProxy
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
       lines.clone.reverse_each do |line|
-        break unless line =~ /^\s*(#[[:word:]]+\s*)+$/
+        break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         line = lines.pop.strip
         tags.body = body = lines.join("\n")
         line.split(/\s+/).map {|v| tags.push(v)}

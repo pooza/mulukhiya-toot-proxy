@@ -3,6 +3,8 @@ module MulukhiyaTootProxy
     class Account < Sequel::Model(:accounts)
       attr_accessor :token
 
+      one_to_one :user
+
       alias to_h values
 
       def logger
@@ -55,11 +57,6 @@ module MulukhiyaTootProxy
         return nil
       end
 
-      def params
-        @params ||= Postgres.instance.execute('account', {id: id}).first
-        return @params
-      end
-
       def recent_toot
         rows = Postgres.instance.execute('recent_toot', {id: id})
         return Status[rows.first['id']] if rows.present?
@@ -69,11 +66,11 @@ module MulukhiyaTootProxy
       alias recent_status recent_toot
 
       def admin?
-        return params[:admin]
+        return user.admin
       end
 
       def moderator?
-        return params[:moderator]
+        return user.moderator
       end
 
       def service?
@@ -102,7 +99,7 @@ module MulukhiyaTootProxy
           username, domain = key[:acct].sub(/^@/, '').split('@')
           return Account.first(username: username, domain: domain)
         end
-        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
+        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
       end
     end
   end

@@ -1,6 +1,8 @@
 module MulukhiyaTootProxy
   module Mastodon
     class Status < Sequel::Model(:statuses)
+      one_to_many :attachment
+
       def logger
         @logger ||= Logger.new
         return @logger
@@ -14,6 +16,8 @@ module MulukhiyaTootProxy
       def local?
         return local
       end
+
+      alias attachments attachment
 
       def uri
         unless @uri

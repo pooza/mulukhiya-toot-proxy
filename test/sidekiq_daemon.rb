@@ -5,11 +5,11 @@ module MulukhiyaTootProxy
     end
 
     def test_cmd
-      assert(@daemon.cmd.is_a?(Array))
+      assert_kind_of(Array, @daemon.cmd)
     end
 
     def test_motd
-      assert(@daemon.motd.is_a?(String))
+      assert_kind_of(String, @daemon.motd)
     end
   end
 end

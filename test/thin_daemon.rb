@@ -5,15 +5,15 @@ module MulukhiyaTootProxy
     end
 
     def test_cmd
-      assert(@daemon.cmd.is_a?(Array))
+      assert_kind_of(Array, @daemon.cmd)
     end
 
     def test_motd
-      assert(@daemon.motd.is_a?(String))
+      assert_kind_of(String, @daemon.motd)
     end
 
     def test_root_uri
-      assert(@daemon.root_uri.is_a?(Ginseng::URI))
+      assert_kind_of(Ginseng::URI, @daemon.root_uri)
     end
   end
 end

@@ -26,7 +26,7 @@ module MulukhiyaTootProxy
 
     def test_convert_type
       converted = @file.convert_type(:mp3)
-      assert(converted.is_a?(AudioFile))
+      assert_kind_of(AudioFile, converted)
       assert_equal(converted.type, 'audio/mpeg')
     end
   end
