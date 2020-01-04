@@ -4,8 +4,8 @@ module MulukhiyaTootProxy
       @dsn = RedisDSN.parse('redis://localhost:6379/1')
     end
 
-    def test_new
-      assert(@dsn.is_a?(RedisDSN))
+    def test_parse
+      assert_kind_of(RedisDSN, @dsn)
     end
 
     def test_scheme

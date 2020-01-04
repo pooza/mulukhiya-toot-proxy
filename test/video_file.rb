@@ -42,7 +42,7 @@ module MulukhiyaTootProxy
 
     def test_convert_type
       converted = @file.convert_type(:mp4)
-      assert(converted.is_a?(VideoFile))
+      assert_kind_of(VideoFile, converted)
       assert_equal(converted.type, 'video/mp4')
     end
   end

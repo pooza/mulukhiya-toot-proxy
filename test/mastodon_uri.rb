@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
     end
 
     def test_service
-      assert(@uri.service.is_a?(MastodonService))
+      assert_kind_of(MastodonService, @uri.service)
     end
 
     def test_to_md

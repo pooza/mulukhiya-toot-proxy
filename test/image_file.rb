@@ -42,14 +42,14 @@ module MulukhiyaTootProxy
 
     def test_resize
       converted = @file.resize(32)
-      assert(converted.is_a?(ImageFile))
+      assert_kind_of(ImageFile, converted)
       assert_equal(converted.width, 32)
       assert_equal(converted.height, 30)
     end
 
     def test_convert_type
       converted = @file.convert_type(:jpeg)
-      assert(converted.is_a?(ImageFile))
+      assert_kind_of(ImageFile, converted)
       assert_equal(converted.type, 'image/jpeg')
     end
   end

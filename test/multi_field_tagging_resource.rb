@@ -7,13 +7,13 @@ module MulukhiyaTootProxy
       )
     end
 
-    def test_new
-      assert(@resource.is_a?(MultiFieldTaggingResource))
+    def test_create
+      assert_kind_of(MultiFieldTaggingResource, @resource)
     end
 
     def test_parse
       result = @resource.parse
-      assert(result.is_a?(Hash))
+      assert_kind_of(Hash, result)
       assert_equal(result['mulukhiya-toot-proxy'], {pattern: /mulukhiya.? ?toot.? ?proxy/})
     end
   end

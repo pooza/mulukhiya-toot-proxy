@@ -9,7 +9,7 @@ module MulukhiyaTootProxy
 
     def test_status
       return unless handler?
-      assert(YAML.safe_load(@handler.status).is_a?(Hash))
+      assert_kind_of(Hash, YAML.safe_load(@handler.status))
     end
 
     def test_handle_pre_toot

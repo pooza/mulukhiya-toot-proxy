@@ -2,13 +2,13 @@ module MulukhiyaTootProxy
   class TaggingResourceTest < TestCase
     def test_all
       TaggingResource.all do |resource|
-        assert(resource.is_a?(TaggingResource))
+        assert_kind_of(TaggingResource, resource)
       end
     end
 
     def test_uri
       TaggingResource.all do |resource|
-        assert(resource.uri.is_a?(Ginseng::URI))
+        assert_kind_of(Ginseng::URI, resource.uri)
       end
     end
 

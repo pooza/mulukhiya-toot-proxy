@@ -5,11 +5,11 @@ module MulukhiyaTootProxy
     end
 
     def test_create
-      assert(@clipper.is_a?(DropboxClipper))
+      assert_kind_of(DropboxClipper, @clipper)
     end
 
     def test_clip
-      assert(@clipper.clip("#{Time.now} #{__method__}").is_a?(DropboxApi::Metadata::File))
+      assert_kind_of(DropboxApi::Metadata::File, @clipper.clip("#{Time.now} #{__method__}"))
     end
   end
 end

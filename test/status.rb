@@ -10,19 +10,19 @@ module MulukhiyaTootProxy
     end
 
     def test_account
-      assert(@status.account.is_a?(Environment.account_class))
+      assert_kind_of(Environment.account_class, @status.account)
     end
 
     def test_text
-      assert(@status.text.is_a?(String))
+      assert_kind_of(String, @status.text)
     end
 
     def test_uri
-      assert(@status.uri.is_a?(Ginseng::URI))
+      assert_kind_of(Ginseng::URI, @status.uri)
     end
 
     def test_to_md
-      assert(@status.to_md.is_a?(String))
+      assert_kind_of(String, @status.to_md)
     end
   end
 end
