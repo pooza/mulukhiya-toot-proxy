@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def test_disable?
-      [:pre_toot, :post_toot, :pre_webhook, :post_webhook, :post_fav, :post_boost, :post_search, :post_bookmark].each do |event|
+      Environment.sns_class.events.each do |event|
         Handler.all(event) do |handler|
           assert_boolean(handler.disable?)
         end

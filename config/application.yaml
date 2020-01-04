@@ -1,5 +1,5 @@
 package:
-  version: 3.2.4
+  version: 3.2.5
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -129,21 +129,17 @@ test:
   filters:
     - name: ci
       cases:
-        - clipping_worker
         - dolphin_controller
-        - dropbox_clipper
-        - growi_clipper
         - handler
         - mastodon_controller
-        - tagging_dictionary
     - name: database
       cases:
         - account
+        - dolphin_uri
+        - clipping_worker
         - mastodon_uri
-        - note
         - query_template
         - status
-        - webhook
     - name: amazon
       cases:
         - amazon_service
@@ -159,6 +155,15 @@ test:
       cases:
         - dolphin_controller
         - dolphin_uri
+    - name: dropbox
+      cases:
+        - dropbox_clipper
+    - name: growi
+      cases:
+        - growi_clipper
+    - name: webhook
+      cases:
+        - webhook
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -166,6 +171,16 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
+  events:
+    - pre_toot
+    - post_toot
+    - pre_webhook
+    - post_webhook
+    - pre_upload
+    - post_upload
+    - post_fav
+    - post_boost
+    - post_search
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
@@ -188,6 +203,12 @@ dolphin:
   url: https://dol.example.com/
   patterns:
     - pattern: ^/notes/([[:alnum:]]+)
+  events:
+    - pre_toot
+    - post_toot
+    - pre_upload
+    - post_upload
+    - post_bookmark
   note: &dolphin_note
     field: text
     key: noteId
