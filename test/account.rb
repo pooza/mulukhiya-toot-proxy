@@ -5,6 +5,10 @@ module MulukhiyaTootProxy
       @account = Environment.test_account
     end
 
+    def test_admin?
+      assert(@account.admin?.is_a?(TrueClass) || @account.admin?.is_a?(FalseClass))
+    end
+
     def test_config
       assert(@account.config.is_a?(Hash))
     end
