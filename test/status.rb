@@ -15,8 +15,8 @@ module MulukhiyaTootProxy
 
     def test_attachments
       @status.attachments.each do |attachment|
-        assert_kind_of(Environment.attachment_class, attachment)
         pp attachment
+        assert_kind_of(Environment.attachment_class, attachment)
       end
     end
 
@@ -26,6 +26,11 @@ module MulukhiyaTootProxy
 
     def test_uri
       assert_kind_of(Ginseng::URI, @status.uri)
+    end
+
+    def test_to_h
+      pp @status
+      assert_kind_of(Hash, @status.to_h)
     end
 
     def test_to_md
