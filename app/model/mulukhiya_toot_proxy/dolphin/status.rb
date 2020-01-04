@@ -34,11 +34,12 @@ module MulukhiyaTootProxy
       end
 
       def attachments
-        @attachments ||= fields.match(/{(.*)}/)[1].split(',').map do |id|
+        @attachments ||= fileIds.match(/{(.*)}/)[1].split(',').map do |id|
           Attachment[id]
         end
         return @attachments
-      rescue
+      rescue => e
+        Slack.broadcast(e)
         return []
       end
 
