@@ -73,23 +73,17 @@ module MulukhiyaTootProxy
 
       alias recent_status recent_note
 
-      def admin?
-        return isAdmin
-      end
+      alias admin? isAdmin
 
       def moderator?
         return false
       end
 
-      def service?
-        return isBot
-      end
+      alias service? isBot
 
-      alias bot? service?
+      alias bot? isBot
 
-      def locked?
-        return isLocked
-      end
+      alias locked? isLocked
 
       def disable?(handler_name)
         return true if config["/handler/#{handler_name}/disable"]
@@ -99,7 +93,11 @@ module MulukhiyaTootProxy
 
       def self.get(key)
         return Account.first(token: key[:token]) if key[:token]
-        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
+        if key[:acct]
+          username, host = key[:acct].sub(/^@/, '').split('@')
+          return Account.first(username: username, host: host)
+        end
+        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
       end
     end
   end

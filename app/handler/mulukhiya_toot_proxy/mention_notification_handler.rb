@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
     end
 
     def notifiable?(body)
-      return body[message_field] =~ /(\s|^)@[[:word:]]+(\s|$)/
+      return body[status_field] =~ /(\s|^)@[[:word:]]+(\s|$)/
     end
   end
 end

@@ -13,9 +13,7 @@ module MulukhiyaTootProxy
         return @account
       end
 
-      def local?
-        return local
-      end
+      alias local? local
 
       alias attachments attachment
 

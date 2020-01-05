@@ -157,8 +157,32 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     end
 
+    def self.name
+      return 'Mastodon'
+    end
+
     def self.webhook?
       return true
+    end
+
+    def self.status_field
+      return Config.instance['/mastodon/status/field']
+    end
+
+    def self.status_key
+      return Config.instance['/mastodon/status/key']
+    end
+
+    def self.attachment_key
+      return Config.instance['/mastodon/attachment/key']
+    end
+
+    def self.visibility_name(name)
+      return Config.instance["/mastodon/status/visibility_names/#{name}"]
+    end
+
+    def self.events
+      return Config.instance['/mastodon/events'].map(&:to_sym)
     end
   end
 end

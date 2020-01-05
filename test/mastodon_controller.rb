@@ -45,22 +45,22 @@ module MulukhiyaTootProxy
 
     def test_toot_length
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {message_field => 'A' * TootParser.max_length}
+      post '/api/v1/statuses', {status_field => 'A' * TootParser.max_length}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {message_field => 'A' * (TootParser.max_length + 1)}
+      post '/api/v1/statuses', {status_field => 'A' * (TootParser.max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {message_field => 'B' * TootParser.max_length}.to_json
+      post '/api/v1/statuses', {status_field => 'B' * TootParser.max_length}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {message_field => 'B' * (TootParser.max_length + 1)}.to_json
+      post '/api/v1/statuses', {status_field => 'B' * (TootParser.max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
@@ -68,7 +68,7 @@ module MulukhiyaTootProxy
     def test_toot_zenkaku
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {message_field => '！!！!！'}.to_json
+      post '/api/v1/statuses', {status_field => '！!！!！'}.to_json
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
     end
 
@@ -76,7 +76,7 @@ module MulukhiyaTootProxy
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {message_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {status_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['tags'].map {|v| v['name']}
       assert_equal(tags.count, 2)

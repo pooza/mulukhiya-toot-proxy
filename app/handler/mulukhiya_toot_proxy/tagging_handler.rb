@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
       return body if ignore?(body)
-      @tags.body = TagContainer.tweak(body[message_field])
+      @tags.body = TagContainer.tweak(body[status_field])
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body))
       @tags.concat(TagContainer.default_tags)
-      body[message_field] = append(body[message_field], @tags)
+      body[status_field] = append(body[status_field], @tags)
       @result.concat(@tags.create_tags)
       return body
     end
@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
 
     def ignore?(body)
       @config['/tagging/ignore_addresses'].each do |addr|
-        next unless body[message_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
+        next unless body[status_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
         return true
       end
       return false unless body['visibility'].present?
@@ -40,18 +40,16 @@ module MulukhiyaTootProxy
 
     def create_attachment_tags(body)
       tags = []
-      (body['media_ids'] || []).each do |id|
-        type = Attachment[id].file_content_type
+      (body[attachment_key] || []).each do |id|
+        type = Environment.attachment_class[id].file_content_type
         ['video', 'image', 'audio'].each do |mediatype|
-          if type.start_with?("#{mediatype}/")
-            tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
-            break
-          end
+          next unless type.start_with?("#{mediatype}/")
+          tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
         end
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(media_id: id))
       end
-      return tags
+      return tags.uniq
     end
 
     def append(body, tags)

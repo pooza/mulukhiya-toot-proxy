@@ -10,14 +10,14 @@ module MulukhiyaTootProxy
     end
 
     def handle_pre_toot(body, params = {})
-      @parser = MessageParser.new(body[message_field])
+      @parser = MessageParser.new(body[status_field])
       return unless @parser.exec
       return unless @parser.command_name == command_name
       errors = contract.call(@parser.params).errors.to_h
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       dispatch
-      body['visibility'] = Environment.sns_class.visibility_name('direct')
-      body[message_field] = status
+      body['visibility'] = Environment.controller_class.visibility_name('direct')
+      body[status_field] = status
       @result.push(@parser.params)
     end
 

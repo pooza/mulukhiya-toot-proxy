@@ -18,9 +18,10 @@ module MulukhiyaTootProxy
     end
 
     def account
-      raise Ginseng::GatewayError, 'Invalid access token' unless @token
       @account ||= Environment.account_class.get(token: @token)
       return @account
+    rescue
+      return nil
     end
 
     def oauth_client
@@ -63,22 +64,6 @@ module MulukhiyaTootProxy
           'code' => code,
         },
       })
-    end
-
-    def self.name
-      return 'Mastodon'
-    end
-
-    def self.message_field
-      return Config.instance['/mastodon/message/field']
-    end
-
-    def self.message_key
-      return Config.instance['/mastodon/message/key']
-    end
-
-    def self.visibility_name(name)
-      return Config.instance["/mastodon/message/visibility_name/#{name}"]
     end
   end
 end

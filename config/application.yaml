@@ -1,5 +1,5 @@
 package:
-  version: 3.2.4
+  version: 3.2.5
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -129,21 +129,17 @@ test:
   filters:
     - name: ci
       cases:
-        - clipping_worker
         - dolphin_controller
-        - dropbox_clipper
-        - growi_clipper
         - handler
         - mastodon_controller
-        - tagging_dictionary
     - name: database
       cases:
         - account
+        - dolphin_uri
+        - clipping_worker
         - mastodon_uri
-        - note
         - query_template
         - status
-        - webhook
     - name: amazon
       cases:
         - amazon_service
@@ -159,6 +155,15 @@ test:
       cases:
         - dolphin_controller
         - dolphin_uri
+    - name: dropbox
+      cases:
+        - dropbox_clipper
+    - name: growi
+      cases:
+        - growi_clipper
+    - name: webhook
+      cases:
+        - webhook
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -166,6 +171,16 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
+  events:
+    - pre_toot
+    - post_toot
+    - pre_webhook
+    - post_webhook
+    - pre_upload
+    - post_upload
+    - post_fav
+    - post_boost
+    - post_search
   patterns:
     - pattern: ^/web/statuses/([[:digit:]]+)
     - pattern: ^/@[[:word:]]+/([[:digit:]]+)
@@ -175,9 +190,12 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
-    visibility_name:
+    visibility_names:
       direct: direct
-  message: *mastodon_toot
+  status: *mastodon_toot
+  media: &mastodon_media
+    key: media_ids
+  attachment: *mastodon_media
   search:
     limit: 40
   hashtag:
@@ -188,14 +206,23 @@ dolphin:
   url: https://dol.example.com/
   patterns:
     - pattern: ^/notes/([[:alnum:]]+)
+  events:
+    - pre_toot
+    - post_toot
+    - pre_upload
+    - post_upload
+    - post_bookmark
   note: &dolphin_note
     field: text
     key: noteId
     label: ノート
     max_length: 500
-    visibility_name:
+    visibility_names:
       direct: specified
-  message: *dolphin_note
+  status: *dolphin_note
+  file: &dolphin_file
+    key: fileIds
+  attachment: *dolphin_file
 amazon:
   country: jp
   urls:
@@ -304,6 +331,13 @@ tagging:
     image: image
     video: video
     audio: audio
+  dictionaries:
+    - url: https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec
+      type: relative
+    - url: https://script.google.com/macros/s/AKfycbzAUsRUuFLO72EgKta020v9OMtxvUtqUcPZNJ3_IMlOo8dRO7tW/exec
+      type: relative
+    - url: https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec
+      type: relative
   ignore_addresses:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
