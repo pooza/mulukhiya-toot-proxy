@@ -92,9 +92,8 @@ module MulukhiyaTootProxy
       end
 
       def self.get(key)
-        if token = key[:token]
-          return Account.first(token: key[:token])
-        elsif key[:acct]
+        return Account.first(token: key[:token]) if key[:token]
+        if key[:acct]
           username, host = key[:acct].sub(/^@/, '').split('@')
           return Account.first(username: username, host: host)
         end
