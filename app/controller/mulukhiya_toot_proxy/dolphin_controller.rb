@@ -10,9 +10,9 @@ module MulukhiyaTootProxy
     end
 
     post '/api/notes/create' do
-      Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin})
+      Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @results.response = @dolphin.note(params)
-      Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin})
+      Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
@@ -96,6 +96,10 @@ module MulukhiyaTootProxy
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
+    end
+
+    def renote?
+      return params[:text].nil?
     end
 
     def self.name
