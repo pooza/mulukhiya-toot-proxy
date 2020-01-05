@@ -2,7 +2,7 @@ module MulukhiyaTootProxy
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
       return body if ignore?(body)
-      @tags.body = TagContainer.tweak(body[message_field])
+      @tags.body = TagContainer.tweak(body[status_field])
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body))
       @tags.concat(TagContainer.default_tags)
-      body[message_field] = append(body[message_field], @tags)
+      body[status_field] = append(body[status_field], @tags)
       @result.concat(@tags.create_tags)
       return body
     end
@@ -22,7 +22,7 @@ module MulukhiyaTootProxy
 
     def ignore?(body)
       @config['/tagging/ignore_addresses'].each do |addr|
-        next unless body[message_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
+        next unless body[status_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
         return true
       end
       return false unless body['visibility'].present?

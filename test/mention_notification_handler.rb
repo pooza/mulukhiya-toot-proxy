@@ -10,11 +10,11 @@ module MulukhiyaTootProxy
       return unless handler?
 
       @handler.clear
-      @handler.handle_post_toot({message_field => 'ふつうのトゥート。'})
+      @handler.handle_post_toot({status_field => 'ふつうのトゥート。'})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_post_toot({message_field => "通知を含むトゥートのテスト\n @#{@account.username}"})
+      @handler.handle_post_toot({status_field => "通知を含むトゥートのテスト\n @#{@account.username}"})
       assert_equal(@handler.result[:entries], [true])
     end
   end

@@ -107,12 +107,12 @@ module MulukhiyaTootProxy
       return params[:results]
     end
 
-    def message_field
-      return Environment.controller_class.message_field
+    def status_field
+      return Environment.controller_class.status_field
     end
 
-    def message_key
-      return Environment.controller_class.message_key
+    def status_key
+      return Environment.controller_class.status_key
     end
 
     private

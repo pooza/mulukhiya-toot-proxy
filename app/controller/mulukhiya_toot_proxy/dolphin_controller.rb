@@ -106,16 +106,16 @@ module MulukhiyaTootProxy
       return false
     end
 
-    def self.message_field
-      return Config.instance['/dolphin/message/field']
+    def self.status_field
+      return Config.instance['/dolphin/status/field']
     end
 
-    def self.message_key
-      return Config.instance['/dolphin/message/key']
+    def self.status_key
+      return Config.instance['/dolphin/status/key']
     end
 
     def self.visibility_name(name)
-      return Config.instance["/dolphin/message/visibility_name/#{name}"]
+      return Config.instance["/dolphin/status/visibility_names/#{name}"]
     end
 
     def self.events

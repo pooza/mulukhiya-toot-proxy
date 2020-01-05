@@ -190,9 +190,9 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
-    visibility_name:
+    visibility_names:
       direct: direct
-  message: *mastodon_toot
+  status: *mastodon_toot
   search:
     limit: 40
   hashtag:
@@ -214,9 +214,9 @@ dolphin:
     key: noteId
     label: ノート
     max_length: 500
-    visibility_name:
+    visibility_names:
       direct: specified
-  message: *dolphin_note
+  status: *dolphin_note
 amazon:
   country: jp
   urls:

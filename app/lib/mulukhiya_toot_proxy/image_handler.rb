@@ -7,7 +7,7 @@ module MulukhiyaTootProxy
     def handle_pre_toot(body, params = {})
       body['media_ids'] ||= []
       return if body['media_ids'].present?
-      body[message_field].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+      body[status_field].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         next unless updatable?(link)
         image = create_image_uri(link)
         body['media_ids'].push(sns.upload_remote_resource(image))

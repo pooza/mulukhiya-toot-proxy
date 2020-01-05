@@ -6,7 +6,7 @@ module MulukhiyaTootProxy
 
     def test_handle_pre_webhook
       @handler.handle_pre_webhook({
-        message_field => '武田信玄',
+        status_field => '武田信玄',
         'attachments' => [
           {'image_url' => 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'},
           {'image_url' => 'https://m.media-amazon.com/images/I/81S31QX87tL._SS500_.jpg'},

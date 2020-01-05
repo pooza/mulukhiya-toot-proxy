@@ -33,7 +33,7 @@ module MulukhiyaTootProxy
       params = {}
       Handler.exec_all(
         :pre_toot,
-        {message_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
+        {status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,
       )
       assert(params[:tags].member?('宮本佳那子'))

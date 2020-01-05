@@ -3,8 +3,8 @@ require 'sidekiq/testing'
 
 module MulukhiyaTootProxy
   class TestCase < Test::Unit::TestCase
-    def message_field
-      return Environment.controller_class.message_field
+    def status_field
+      return Environment.controller_class.status_field
     end
 
     def handler?
