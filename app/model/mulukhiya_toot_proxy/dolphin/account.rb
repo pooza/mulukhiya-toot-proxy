@@ -92,8 +92,13 @@ module MulukhiyaTootProxy
       end
 
       def self.get(key)
-        return Account.first(token: key[:token]) if key[:token]
-        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found" unless @params.present?
+        if token = key[:token]
+          return Account.first(token: key[:token])
+        elsif key[:acct]
+          username, host = key[:acct].sub(/^@/, '').split('@')
+          return Account.first(username: username, host: host)
+        end
+        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
       end
     end
   end
