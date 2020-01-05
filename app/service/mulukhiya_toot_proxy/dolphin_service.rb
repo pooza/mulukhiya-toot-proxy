@@ -78,25 +78,5 @@ module MulukhiyaTootProxy
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').gsub(/(^[_#]+|_$)/, '')
     end
-
-    def self.name
-      return 'Dolphin'
-    end
-
-    def self.message_field
-      return Config.instance['/dolphin/message/field']
-    end
-
-    def self.message_key
-      return Config.instance['/dolphin/message/key']
-    end
-
-    def self.visibility_name(name)
-      return Config.instance["/dolphin/message/visibility_name/#{name}"]
-    end
-
-    def self.events
-      return Config.instance['/dolphin/events'].map(&:to_sym)
-    end
   end
 end

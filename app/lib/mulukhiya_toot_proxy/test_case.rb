@@ -4,11 +4,12 @@ require 'sidekiq/testing'
 module MulukhiyaTootProxy
   class TestCase < Test::Unit::TestCase
     def message_field
-      return Environment.sns_class.message_field
+      return Environment.controller_class.message_field
     end
 
     def handler?
-      return false if @handler.nil? || @handler.disable?
+      return false if @handler.nil?
+      return false if @handler.disable?
       return true
     end
 

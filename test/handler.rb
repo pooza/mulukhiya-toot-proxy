@@ -19,7 +19,7 @@ module MulukhiyaTootProxy
     end
 
     def test_disable?
-      Environment.sns_class.events.each do |event|
+      Environment.controller_class.events.each do |event|
         Handler.all(event) do |handler|
           assert_boolean(handler.disable?)
         end

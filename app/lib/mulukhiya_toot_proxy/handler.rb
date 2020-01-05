@@ -108,11 +108,11 @@ module MulukhiyaTootProxy
     end
 
     def message_field
-      return Environment.sns_class.message_field
+      return Environment.controller_class.message_field
     end
 
     def message_key
-      return Environment.sns_class.message_key
+      return Environment.controller_class.message_key
     end
 
     private

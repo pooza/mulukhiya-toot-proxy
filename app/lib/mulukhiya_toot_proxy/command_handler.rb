@@ -16,7 +16,7 @@ module MulukhiyaTootProxy
       errors = contract.call(@parser.params).errors.to_h
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       dispatch
-      body['visibility'] = Environment.sns_class.visibility_name('direct')
+      body['visibility'] = Environment.controller_class.visibility_name('direct')
       body[message_field] = status
       @result.push(@parser.params)
     end

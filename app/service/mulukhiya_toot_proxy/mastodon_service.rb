@@ -65,25 +65,5 @@ module MulukhiyaTootProxy
         },
       })
     end
-
-    def self.name
-      return 'Mastodon'
-    end
-
-    def self.message_field
-      return Config.instance['/mastodon/message/field']
-    end
-
-    def self.message_key
-      return Config.instance['/mastodon/message/key']
-    end
-
-    def self.visibility_name(name)
-      return Config.instance["/mastodon/message/visibility_name/#{name}"]
-    end
-
-    def self.events
-      return Config.instance['/mastodon/events'].map(&:to_sym)
-    end
   end
 end
