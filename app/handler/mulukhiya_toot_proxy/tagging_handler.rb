@@ -40,7 +40,7 @@ module MulukhiyaTootProxy
 
     def create_attachment_tags(body)
       tags = []
-      (body[attachment_key] || []).map do |id|
+      (body[attachment_key] || []).each do |id|
         type = Environment.attachment_class[id].file_content_type
         ['video', 'image', 'audio'].each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
