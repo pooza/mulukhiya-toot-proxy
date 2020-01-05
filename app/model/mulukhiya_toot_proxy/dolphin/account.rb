@@ -73,23 +73,17 @@ module MulukhiyaTootProxy
 
       alias recent_status recent_note
 
-      def admin?
-        return isAdmin
-      end
+      alias admin? isAdmin
 
       def moderator?
         return false
       end
 
-      def service?
-        return isBot
-      end
+      alias service? isBot
 
-      alias bot? service?
+      alias bot? isBot
 
-      def locked?
-        return isLocked
-      end
+      alias locked? isLocked
 
       def disable?(handler_name)
         return true if config["/handler/#{handler_name}/disable"]
