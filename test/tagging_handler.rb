@@ -1,26 +1,8 @@
 module MulukhiyaTootProxy
   class TaggingHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('tagging')
-      @config['/tagging/dictionaries'] = [
-        {
-          'url' => 'https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec',
-          'type' => 'relative',
-        },
-        {
-          'url' => 'https://script.google.com/macros/s/AKfycbzAUsRUuFLO72EgKta020v9OMtxvUtqUcPZNJ3_IMlOo8dRO7tW/exec',
-          'type' => 'relative',
-        },
-        {
-          'url' => 'https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec',
-          'type' => 'relative',
-        },
-        {
-          'url' => 'https://script.google.com/macros/s/AKfycbxkcvrTTieJCeGotxlyENQ5vpS1RQnoLFzH3ti5UOHsuTFOfpE/exec',
-          'type' => 'relative',
-        },
-      ]
+      @config = Config.instance
       @config['/tagging/ignore_addresses'] = ['@pooza']
     end
 
@@ -139,11 +121,13 @@ module MulukhiyaTootProxy
 
       @handler.clear
       body = {status_field => "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア#おほしSUMMERバケーション#スタプリ#池袋プリキュア #フワ#トゥインクルブック#スタンプラリー\n\nvia. https://www.instagram.com/precure_event/p/"}
-      assert_equal(@handler.handle_pre_toot(body)[status_field], "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア #おほしSUMMERバケーション #スタプリ #池袋プリキュア #フワ #トゥインクルブック #スタンプラリー\n#スター_トゥインクルプリキュア\n\nvia. https://www.instagram.com/precure_event/p/")
+      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      assert_equal(lines.last, 'via. https://www.instagram.com/precure_event/p/')
 
       @handler.clear
       body = {status_field => "【新商品】「プリキュアランド第2弾 SPLASH☆WATER」より『アクリルスタンド』『シーズンパスポート』『缶バッジ』が8/25(日)発売だよ！ あっつ～い夏に楽しく元気に水遊びをするみんなを見てたらこちらも涼しくなっちゃう？ それともヒートアップしちゃう？ #プリキュア #プリティストア\n\n(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)"}
-      assert_equal(@handler.handle_pre_toot(body)[status_field], "【新商品】「プリキュアランド第2弾 SPLASH☆WATER」より『アクリルスタンド』『シーズンパスポート』『缶バッジ』が8/25(日)発売だよ！ あっつ～い夏に楽しく元気に水遊びをするみんなを見てたらこちらも涼しくなっちゃう？ それともヒートアップしちゃう？ #プリキュア #プリティストア\n\n(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)")
+      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      assert_equal(lines.last, '(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)')
     end
 
     def test_end_with_tags?
@@ -151,12 +135,14 @@ module MulukhiyaTootProxy
       @config['/tagging/default_tags'] = []
 
       @handler.clear
-      last = @handler.handle_pre_toot({status_field => '宮本佳那子'})[status_field].each_line.to_a.last.chomp
-      assert_equal(last, '#宮本佳那子')
+      body = {status_field => '宮本佳那子'}
+      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      assert_equal(lines.last, '#宮本佳那子')
 
       @handler.clear
-      last = @handler.handle_pre_toot({status_field => "宮本佳那子\n#aaa #bbb"})[status_field].each_line.to_a.last.chomp
-      assert_equal(last, '#宮本佳那子 #aaa #bbb')
+      body = {status_field => "宮本佳那子\n#aaa #bbb"}
+      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      assert_equal(lines.last, '#宮本佳那子 #aaa #bbb')
     end
 
     def test_ignore_addresses
