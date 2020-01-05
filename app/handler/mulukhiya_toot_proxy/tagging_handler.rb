@@ -40,18 +40,16 @@ module MulukhiyaTootProxy
 
     def create_attachment_tags(body)
       tags = []
-      (body['media_ids'] || []).each do |id|
-        type = Attachment[id].file_content_type
+      (body[attachment_key] || []).map do |id|
+        type = Environment.attachment_class[id].file_content_type
         ['video', 'image', 'audio'].each do |mediatype|
-          if type.start_with?("#{mediatype}/")
-            tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
-            break
-          end
+          next unless type.start_with?("#{mediatype}/")
+          tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
         end
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(media_id: id))
       end
-      return tags
+      return tags.uniq
     end
 
     def append(body, tags)

@@ -193,6 +193,9 @@ mastodon:
     visibility_names:
       direct: direct
   status: *mastodon_toot
+  media: &mastodon_media
+    key: media_ids
+  attachment: *mastodon_media
   search:
     limit: 40
   hashtag:
@@ -217,6 +220,9 @@ dolphin:
     visibility_names:
       direct: specified
   status: *dolphin_note
+  file: &dolphin_file
+    key: fileIds
+  attachment: *dolphin_file
 amazon:
   country: jp
   urls:

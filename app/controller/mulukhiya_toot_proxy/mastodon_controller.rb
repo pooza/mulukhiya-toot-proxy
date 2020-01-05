@@ -173,6 +173,10 @@ module MulukhiyaTootProxy
       return Config.instance['/mastodon/status/key']
     end
 
+    def self.attachment_key
+      return Config.instance['/mastodon/attachment/key']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/mastodon/status/visibility_names/#{name}"]
     end

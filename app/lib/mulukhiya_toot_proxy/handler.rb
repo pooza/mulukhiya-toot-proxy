@@ -115,6 +115,10 @@ module MulukhiyaTootProxy
       return Environment.controller_class.status_key
     end
 
+    def attachment_key
+      return Environment.controller_class.attachment_key
+    end
+
     private
 
     def initialize(params = {})
