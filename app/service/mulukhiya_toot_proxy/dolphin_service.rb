@@ -28,7 +28,7 @@ module MulukhiyaTootProxy
     end
 
     def note(body, params = {})
-      body = {status: body.to_s} unless body.is_a?(Hash)
+      body = {text: body.to_s} unless body.is_a?(Hash)
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       body[:i] ||= @token
