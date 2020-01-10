@@ -2,6 +2,8 @@ module MulukhiyaTootProxy
   class NoteParserTest < TestCase
     def setup
       @parser = NoteParser.new
+      @config = Config.instance
+      @config['/dolphin/url'] = 'https://dol.example.com/'
     end
 
     def test_too_long?
