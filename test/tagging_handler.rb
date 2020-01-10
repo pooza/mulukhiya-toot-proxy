@@ -3,7 +3,7 @@ module MulukhiyaTootProxy
     def setup
       @handler = Handler.create('tagging')
       @config = Config.instance
-      @config['/tagging/ignore_addresses'] = ['@pooza']
+      @config['/agent/accts'] = ['@pooza']
     end
 
     def test_handle_pre_toot_without_default_tags
@@ -145,7 +145,7 @@ module MulukhiyaTootProxy
       assert_equal(lines.last, '#宮本佳那子 #aaa #bbb')
     end
 
-    def test_ignore_addresses
+    def test_ignore_accts
       return unless handler?
       @config['/tagging/default_tags'] = []
 

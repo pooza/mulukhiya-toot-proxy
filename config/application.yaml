@@ -1,5 +1,5 @@
 package:
-  version: 3.2.6
+  version: 3.2.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -200,8 +200,8 @@ mastodon:
     limit: 40
   hashtag:
     pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-  account:
-    pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
+  acct:
+    pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 dolphin:
   url: https://dol.example.com/
   patterns:
@@ -223,6 +223,10 @@ dolphin:
   file: &dolphin_file
     key: fileIds
   attachment: *dolphin_file
+  hashtag:
+    pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
+  acct:
+    pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 amazon:
   country: jp
   urls:
@@ -338,7 +342,8 @@ tagging:
       type: relative
     - url: https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec
       type: relative
-  ignore_addresses:
+agent:
+  accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
   salt: mulukhiya
