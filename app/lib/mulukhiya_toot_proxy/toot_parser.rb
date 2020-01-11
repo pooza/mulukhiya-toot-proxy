@@ -26,6 +26,7 @@ module MulukhiyaTootProxy
     def self.max_length
       length = Config.instance['/mastodon/toot/max_length']
       tags = TagContainer.default_tags
+      tags.concat(Environment.test_account.tags)
       length = length - tags.join(' ').length - 1 if tags.present?
       return length
     end

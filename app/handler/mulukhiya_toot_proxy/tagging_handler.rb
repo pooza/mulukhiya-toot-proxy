@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body))
       @tags.concat(TagContainer.default_tags)
+      @tags.concat(@sns.account.tags)
       body[status_field] = append(body[status_field], @tags)
       @result.concat(@tags.create_tags)
       return body

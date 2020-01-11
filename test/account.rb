@@ -46,5 +46,9 @@ module MulukhiyaTootProxy
         assert_boolean(@account.disable?(v))
       end
     end
+
+    def test_tags
+      assert_kind_of(Array, @account.tags)
+    end
   end
 end

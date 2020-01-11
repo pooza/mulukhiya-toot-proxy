@@ -91,6 +91,10 @@ module MulukhiyaTootProxy
         return false
       end
 
+      def tags
+        return config['/tags'] || []
+      end
+
       def self.get(key)
         return Account.first(token: key[:token]) if key[:token]
         if key[:acct]
