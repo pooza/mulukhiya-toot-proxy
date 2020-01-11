@@ -2,13 +2,6 @@ require 'nokogiri'
 
 module MulukhiyaTootProxy
   class TootParser < StatusParser
-    attr_accessor :account
-
-    def initialize(body = '')
-      super(body)
-      @account = Environment.test_account
-    end
-
     def accts
       return body.scan(TootParser.acct_pattern).map(&:first)
     end

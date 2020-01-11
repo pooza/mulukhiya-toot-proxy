@@ -3,11 +3,13 @@ require 'sanitize'
 module MulukhiyaTootProxy
   class StatusParser
     attr_reader :body
+    attr_accessor :account
 
     def initialize(body = '')
       self.body = body
       @config = Config.instance
       @logger = Logger.new
+      @account = Environment.test_account
     end
 
     alias to_s body

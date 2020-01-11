@@ -6,7 +6,6 @@ module MulukhiyaTootProxy
     def initialize(body = '')
       super(body)
       @dolphin = DolphinService.new
-      @account = Environment.test_account
     end
 
     def accts
