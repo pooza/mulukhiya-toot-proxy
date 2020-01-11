@@ -74,6 +74,7 @@ handler:
   dolphin:
     pre_toot:
       - user_config_command
+      - mention_visibility
       - shortened_url
       - url_normalize
       - itunes_url_nowplaying
