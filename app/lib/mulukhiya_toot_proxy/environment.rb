@@ -52,7 +52,7 @@ module MulukhiyaTootProxy
       case controller_name
       when 'mastodon'
         return MulukhiyaTootProxy::TootParser
-      when 'donphin'
+      when 'dolphin'
         return MulukhiyaTootProxy::NoteParser
       end
     end
