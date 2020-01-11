@@ -183,7 +183,7 @@ GEM
     power_assert (1.1.5)
     public_suffix (3.1.1)
     raabro (1.1.6)
-    rack (2.1.0)
+    rack (2.0.8)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
@@ -284,6 +284,7 @@ DEPENDENCIES
   ginseng-web!
   mimemagic
   nokogiri
+  rack (< 2.1)
   rails-erb-lint
   redis
   rspotify
