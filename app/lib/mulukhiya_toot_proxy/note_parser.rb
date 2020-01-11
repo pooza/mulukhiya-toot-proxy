@@ -7,8 +7,8 @@ module MulukhiyaTootProxy
       @dolphin = DolphinService.new
     end
 
-    def too_long?
-      return NoteParser.max_length < length
+    def too_long?(account = Environment.test_account)
+      return NoteParser.max_length(account) < length
     end
 
     def accts
@@ -32,10 +32,10 @@ module MulukhiyaTootProxy
       return MessageParser.sanitize(tmp_body)
     end
 
-    def self.max_length
+    def self.max_length(account = Environment.test_account)
       length = Config.instance['/dolphin/note/max_length']
       tags = TagContainer.default_tags
-      tags.concat(Environment.test_account.tags) if Environment.test_account
+      tags.concat(account.tags) if account
       length = length - tags.join(' ').length - 1 if tags.present?
       return length
     end
