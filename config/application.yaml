@@ -13,6 +13,7 @@ handler:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - mention_visibility
       - shortened_url
       - url_normalize
       - itunes_url_nowplaying
@@ -164,6 +165,10 @@ test:
     - name: webhook
       cases:
         - webhook
+hashtag: &root_hashtag
+  pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
+acct: &root_acct
+  pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -198,10 +203,8 @@ mastodon:
   attachment: *mastodon_media
   search:
     limit: 40
-  hashtag:
-    pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-  acct:
-    pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
+  hashtag: *root_hashtag
+  acct: *root_acct
 dolphin:
   url: https://dol.example.com/
   patterns:
@@ -223,10 +226,8 @@ dolphin:
   file: &dolphin_file
     key: fileIds
   attachment: *dolphin_file
-  hashtag:
-    pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-  acct:
-    pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
+  hashtag: *root_hashtag
+  acct: *root_acct
 amazon:
   country: jp
   urls:

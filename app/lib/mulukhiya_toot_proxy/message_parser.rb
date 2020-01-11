@@ -12,6 +12,10 @@ module MulukhiyaTootProxy
 
     alias to_s body
 
+    def accts
+      return body.scan(MessageParser.acct_pattern).map(&:first)
+    end
+
     def body=(body)
       @body = body.to_s
       @params = nil
@@ -74,6 +78,14 @@ module MulukhiyaTootProxy
       text.gsub!(%r{</p.*?>}, "\n\n")
       text = Sanitize.clean(text)
       return text.strip
+    end
+
+    def self.hashtag_pattern
+      return Regexp.new(Config.instance['/hashtag/pattern'], Regexp::IGNORECASE)
+    end
+
+    def self.acct_pattern
+      return Regexp.new(Config.instance['/acct/pattern'], Regexp::IGNORECASE)
     end
   end
 end
