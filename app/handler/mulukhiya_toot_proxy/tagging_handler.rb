@@ -13,6 +13,7 @@ module MulukhiyaTootProxy
       end
       @tags.concat(create_attachment_tags(body))
       @tags.concat(TagContainer.default_tags)
+      @tags.concat(@sns.account.tags)
       body[status_field] = append(body[status_field], @tags)
       @result.concat(@tags.create_tags)
       return body
@@ -21,9 +22,9 @@ module MulukhiyaTootProxy
     private
 
     def ignore?(body)
-      @config['/tagging/ignore_addresses'].each do |addr|
-        next unless body[status_field]&.match?(Regexp.new("(^|\s)#{addr}($|\s)"))
-        return true
+      return true unless body[status_field].present?
+      body[status_field].scan(TootParser.acct_pattern).each do |matches|
+        return true if @config['/agent/accts'].member?(matches.first)
       end
       return false unless body['visibility'].present?
       return false if body['visibility'] == 'public'
@@ -32,8 +33,7 @@ module MulukhiyaTootProxy
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
-      pattern = Regexp.new(@config['/mastodon/account/pattern'])
-      text = [@tags.body.gsub(pattern, '')]
+      text = [@tags.body.gsub(TootParser.acct_pattern, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end

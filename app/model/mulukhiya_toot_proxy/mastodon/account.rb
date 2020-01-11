@@ -89,6 +89,10 @@ module MulukhiyaTootProxy
         return false
       end
 
+      def tags
+        return config['/tags'] || []
+      end
+
       def self.get(key)
         if token = key[:token]
           account = Postgres.instance.execute('token_owner', {token: token})&.first

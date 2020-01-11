@@ -1,5 +1,5 @@
 package:
-  version: 3.2.6
+  version: 3.2.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -13,6 +13,7 @@ handler:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - mention_visibility
       - shortened_url
       - url_normalize
       - itunes_url_nowplaying
@@ -73,6 +74,7 @@ handler:
   dolphin:
     pre_toot:
       - user_config_command
+      - mention_visibility
       - shortened_url
       - url_normalize
       - itunes_url_nowplaying
@@ -164,6 +166,10 @@ test:
     - name: webhook
       cases:
         - webhook
+hashtag: &root_hashtag
+  pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
+acct: &root_acct
+  pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
   oauth:
@@ -198,10 +204,8 @@ mastodon:
   attachment: *mastodon_media
   search:
     limit: 40
-  hashtag:
-    pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-  account:
-    pattern: (@[_0-9a-zA-Z]+(@[-.0-9a-zA-Z]+)?)
+  hashtag: *root_hashtag
+  acct: *root_acct
 dolphin:
   url: https://dol.example.com/
   patterns:
@@ -223,6 +227,8 @@ dolphin:
   file: &dolphin_file
     key: fileIds
   attachment: *dolphin_file
+  hashtag: *root_hashtag
+  acct: *root_acct
 amazon:
   country: jp
   urls:
@@ -338,7 +344,8 @@ tagging:
       type: relative
     - url: https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec
       type: relative
-  ignore_addresses:
+agent:
+  accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
   salt: mulukhiya
