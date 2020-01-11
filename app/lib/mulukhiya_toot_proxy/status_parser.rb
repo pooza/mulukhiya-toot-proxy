@@ -78,7 +78,7 @@ module MulukhiyaTootProxy
     def all_tags
       container = TagContainer.new
       container.concat(tags)
-      container.concat(@account.tags)
+      container.concat(@account.tags) if @account
       container.concat(TagContainer.default_tags)
       return container.create_tags
     end
