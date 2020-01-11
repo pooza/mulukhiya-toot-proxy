@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
-  class MessageParserTest < TestCase
+  class StatusParserTest < TestCase
     def setup
-      @parser = MessageParser.new
+      @parser = StatusParser.new
     end
 
     def test_body
@@ -38,6 +38,14 @@ module MulukhiyaTootProxy
 
       @parser.body = '#aaa #bbbb @pooza @pooza@precure.ml よろです。'
       assert_equal(@parser.hashtags, ['aaa', 'bbbb'])
+    end
+
+    def test_accts
+      @parser.body = '#hoge'
+      assert_equal(@parser.accts, [])
+
+      @parser.body = '@pooza @pooza@precure.ml よろです。 pooza@b-shock.org'
+      assert_equal(@parser.accts, ['@pooza', '@pooza@precure.ml'])
     end
   end
 end

@@ -1,9 +1,12 @@
 require 'nokogiri'
 
 module MulukhiyaTootProxy
-  class TootParser < MessageParser
-    def too_long?(account = Environment.test_account)
-      return TootParser.max_length(account) < length
+  class TootParser < StatusParser
+    attr_accessor :account
+
+    def initialize(body = '')
+      super(body)
+      @account = Environment.test_account
     end
 
     def accts
@@ -20,14 +23,12 @@ module MulukhiyaTootProxy
           @logger.error(e)
         end
       end
-      return MessageParser.sanitize(tmp_body)
+      return StatusParser.sanitize(tmp_body)
     end
 
-    def self.max_length(account = Environment.test_account)
+    def max_length
       length = Config.instance['/mastodon/toot/max_length']
-      tags = TagContainer.default_tags
-      tags.concat(account.tags) if account
-      length = length - tags.join(' ').length - 1 if tags.present?
+      length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
 

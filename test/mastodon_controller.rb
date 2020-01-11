@@ -8,6 +8,7 @@ module MulukhiyaTootProxy
       @config = Config.instance
       @account = MulukhiyaTootProxy::Mastodon::Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
+      @parser = TootParser.new
     end
 
     def app
@@ -45,22 +46,22 @@ module MulukhiyaTootProxy
 
     def test_toot_length
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {status_field => 'A' * TootParser.max_length}
+      post '/api/v1/statuses', {status_field => 'A' * @parser.max_length}
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {status_field => 'A' * (TootParser.max_length + 1)}
+      post '/api/v1/statuses', {status_field => 'A' * (@parser.max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => 'B' * TootParser.max_length}.to_json
+      post '/api/v1/statuses', {status_field => 'B' * @parser.max_length}.to_json
       assert(last_response.ok?)
 
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => 'B' * (TootParser.max_length + 1)}.to_json
+      post '/api/v1/statuses', {status_field => 'B' * (@parser.max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
@@ -79,7 +80,6 @@ module MulukhiyaTootProxy
       post '/api/v1/statuses', {status_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['tags'].map {|v| v['name']}
-      assert_equal(tags.count, 2)
       assert(tags.member?('日本語のタグ'))
       assert(tags.member?('nowplaying'))
     end
@@ -95,7 +95,7 @@ module MulukhiyaTootProxy
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 404)
 
-      hook = Webhook.owned_all(@account.username).to_a.first
+      return unless hook = @account.webhook
 
       get hook.uri.path
       assert(last_response.ok?)

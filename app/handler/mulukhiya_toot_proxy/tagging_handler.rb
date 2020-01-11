@@ -23,7 +23,7 @@ module MulukhiyaTootProxy
 
     def ignore?(body)
       return true unless body[status_field].present?
-      body[status_field].scan(TootParser.acct_pattern).each do |matches|
+      body[status_field].scan(Environment.parser_class.acct_pattern).each do |matches|
         return true if @config['/agent/accts'].member?(matches.first)
       end
       return false unless body['visibility'].present?
@@ -33,7 +33,7 @@ module MulukhiyaTootProxy
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
-      text = [@tags.body.gsub(TootParser.acct_pattern, '')]
+      text = [@tags.body.gsub(Environment.parser_class.acct_pattern, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end
