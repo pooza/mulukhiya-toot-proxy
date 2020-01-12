@@ -72,14 +72,6 @@ module MulukhiyaTootProxy
       end
     end
 
-    def self.owned_all(account)
-      return enum_for(__method__, account) unless block_given?
-      all do |webhook|
-        next unless webhook.sns.account.username == account.sub(/^@/, '')
-        yield webhook
-      end
-    end
-
     private
 
     def initialize(params)
