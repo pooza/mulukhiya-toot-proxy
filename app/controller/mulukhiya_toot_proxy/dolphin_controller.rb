@@ -12,6 +12,7 @@ module MulukhiyaTootProxy
     post '/api/notes/create' do
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @results.response = @dolphin.note(params)
+Slack.broadcast(controller: self.class.to_s, status: @results.response.code, message: @results.response.parsed_response)
       Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
@@ -93,6 +94,7 @@ module MulukhiyaTootProxy
       @renderer.message = e.to_h
       @renderer.message.delete(:backtrace)
       @renderer.message[:error] = e.message
+      @sns.account&.slack.say(e)
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
