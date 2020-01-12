@@ -1,7 +1,7 @@
 module MulukhiyaTootProxy
   class StatusParserTest < TestCase
     def setup
-      @parser = StatusParser.new
+      @parser = Environment.parser_class.new
     end
 
     def test_body
