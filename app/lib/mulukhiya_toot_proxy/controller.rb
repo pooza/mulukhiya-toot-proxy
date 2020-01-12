@@ -33,7 +33,7 @@ module MulukhiyaTootProxy
     end
 
     def response_error?
-      return 400 <= @results.response.code
+      return 400 <= @results.response&.code
     end
 
     not_found do
