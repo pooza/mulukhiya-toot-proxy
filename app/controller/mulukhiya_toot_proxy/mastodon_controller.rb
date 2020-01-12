@@ -153,7 +153,6 @@ module MulukhiyaTootProxy
       @renderer.status = e.status
       @renderer.message = e.to_h.delete_if {|k, v| k == :backtrace}
       @renderer.message['error'] = e.message
-      @sns.account&.slack.say(e)
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
