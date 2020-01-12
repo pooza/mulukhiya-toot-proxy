@@ -10,7 +10,6 @@ inflections:
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
   mastodon_uri: MastodonURI
-  redis_dsn: RedisDSN
   shortened_url_handler: ShortenedURLHandler
   spotify_uri: SpotifyURI
   spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler
@@ -23,7 +22,6 @@ dirs:
   - contract
   - controller
   - daemon
-  - dsn
   - file
   - handler
   - model

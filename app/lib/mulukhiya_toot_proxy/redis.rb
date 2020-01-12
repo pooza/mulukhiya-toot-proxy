@@ -29,7 +29,7 @@ module MulukhiyaTootProxy
     end
 
     def self.dsn
-      return RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
+      return Ginseng::RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
     end
 
     def self.health
