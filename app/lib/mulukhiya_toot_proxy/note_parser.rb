@@ -1,14 +1,11 @@
 module MulukhiyaTootProxy
-  class NoteParser < MessageParser
+  class NoteParser < StatusParser
     attr_accessor :dolphin
+    attr_accessor :account
 
     def initialize(body = '')
       super(body)
       @dolphin = DolphinService.new
-    end
-
-    def too_long?(account = Environment.test_account)
-      return NoteParser.max_length(account) < length
     end
 
     def accts
@@ -29,14 +26,12 @@ module MulukhiyaTootProxy
       end
       tmp_body.gsub!('__HASH__', '#')
       tmp_body.gsub!('__ATMARK__', '@')
-      return MessageParser.sanitize(tmp_body)
+      return StatusParser.sanitize(tmp_body)
     end
 
-    def self.max_length(account = Environment.test_account)
+    def max_length
       length = Config.instance['/dolphin/note/max_length']
-      tags = TagContainer.default_tags
-      tags.concat(account.tags) if account
-      length = length - tags.join(' ').length - 1 if tags.present?
+      length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
     end
 

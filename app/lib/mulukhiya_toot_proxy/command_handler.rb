@@ -10,7 +10,7 @@ module MulukhiyaTootProxy
     end
 
     def handle_pre_toot(body, params = {})
-      @parser = MessageParser.new(body[status_field])
+      @parser = Environment.parser_class.new(body[status_field])
       return unless @parser.exec
       return unless @parser.command_name == command_name
       errors = contract.call(@parser.params).errors.to_h

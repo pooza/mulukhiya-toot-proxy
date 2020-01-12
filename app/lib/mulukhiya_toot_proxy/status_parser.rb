@@ -1,24 +1,27 @@
 require 'sanitize'
 
 module MulukhiyaTootProxy
-  class MessageParser
+  class StatusParser
     attr_reader :body
+    attr_accessor :account
 
     def initialize(body = '')
       self.body = body
       @config = Config.instance
       @logger = Logger.new
+      @account = Environment.test_account
     end
 
     alias to_s body
 
     def accts
-      return body.scan(MessageParser.acct_pattern).map(&:first)
+      return body.scan(StatusParser.acct_pattern).map(&:first)
     end
 
     def body=(body)
       @body = body.to_s
       @params = nil
+      @all_tags = nil
     end
 
     def length
@@ -28,7 +31,7 @@ module MulukhiyaTootProxy
     alias size length
 
     def too_long?
-      return false
+      return max_length < length
     end
 
     def exec
@@ -70,7 +73,24 @@ module MulukhiyaTootProxy
     end
 
     def to_md
-      return MessageParser.sanitize(body)
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def all_tags
+      unless @all_tags
+        container = TagContainer.new
+        container.concat(tags)
+        container.concat(@account.tags) if @account
+        container.concat(TagContainer.default_tags)
+        return @all_tags = container.create_tags
+      end
+      return @all_tags
+    end
+
+    alias create_tags all_tags
+
+    def max_length
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def self.sanitize(text)
