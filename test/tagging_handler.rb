@@ -2,6 +2,7 @@ module MulukhiyaTootProxy
   class TaggingHandlerTest < TestCase
     def setup
       @handler = Handler.create('tagging')
+      @parser = Environment.parser_class.new
       @config = Config.instance
       @config['/agent/accts'] = ['@pooza']
     end
@@ -10,39 +11,39 @@ module MulukhiyaTootProxy
       return unless handler?
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => '宮本佳那子'})[status_field]).all_tags
-      assert(tags.member?('#宮本佳那子'))
+      @parser.body = @handler.handle_pre_toot(status_field => '宮本佳那子')[status_field]
+      assert(@parser.all_tags.member?('#宮本佳那子'))
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => 'キュアソードの中の人は宮本佳那子。'})[status_field]).all_tags
-      assert(tags.member?('#宮本佳那子'))
-      assert(tags.member?('#キュアソード'))
-      assert(tags.member?('#剣崎真琴'))
+      @parser.body = @handler.handle_pre_toot(status_field => 'キュアソードの中の人は宮本佳那子。')[status_field]
+      assert(@parser.all_tags.member?('#宮本佳那子'))
+      assert(@parser.all_tags.member?('#キュアソード'))
+      assert(@parser.all_tags.member?('#剣崎真琴'))
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => 'Yes!プリキュア5 GoGo!'})[status_field]).all_tags
-      assert(tags.member?('#Yes_プリキュア5GoGo'))
+      @parser.body = @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 GoGo!')[status_field]
+      assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!'})[status_field]).all_tags
-      assert(tags.member?('#Yes_プリキュア5'))
-      assert(tags.member?('#Yes_プリキュア5GoGo'))
+      @parser.body = @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!')[status_field]
+      assert(@parser.all_tags.member?('#Yes_プリキュア5'))
+      assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド"})[status_field]).all_tags
-      assert(tags.member?('#キュアフローラ_キュアマーメイド'))
-      assert(tags.member?('#キュアフローラ'))
-      assert(tags.member?('#春野はるか'))
-      assert(tags.member?('#嶋村侑'))
-      assert(tags.member?('#キュアマーメイド'))
-      assert(tags.member?('#海藤みなみ'))
-      assert(tags.member?('#浅野真澄'))
+      @parser.body = @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド")[status_field]
+      assert(@parser.all_tags.member?('#キュアフローラ_キュアマーメイド'))
+      assert(@parser.all_tags.member?('#キュアフローラ'))
+      assert(@parser.all_tags.member?('#春野はるか'))
+      assert(@parser.all_tags.member?('#嶋村侑'))
+      assert(@parser.all_tags.member?('#キュアマーメイド'))
+      assert(@parser.all_tags.member?('#海藤みなみ'))
+      assert(@parser.all_tags.member?('#浅野真澄'))
 
       @handler.clear
-      tags = Environment.parser_class.new(@handler.handle_pre_toot({status_field => '#キュアビューティ'})[status_field]).all_tags
-      assert(tags.member?('#キュアビューティ'))
-      assert(tags.member?('#青木れいか'))
-      assert(tags.member?('#西村ちなみ'))
+      @parser.body = @handler.handle_pre_toot(status_field => '#キュアビューティ')[status_field]
+      assert(@parser.all_tags.member?('#キュアビューティ'))
+      assert(@parser.all_tags.member?('#青木れいか'))
+      assert(@parser.all_tags.member?('#西村ちなみ'))
     end
 
     def test_handle_pre_toot_with_direct

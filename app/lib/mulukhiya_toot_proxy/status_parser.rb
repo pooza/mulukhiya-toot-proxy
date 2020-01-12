@@ -21,6 +21,7 @@ module MulukhiyaTootProxy
     def body=(body)
       @body = body.to_s
       @params = nil
+      @all_tags = nil
     end
 
     def length
@@ -76,12 +77,17 @@ module MulukhiyaTootProxy
     end
 
     def all_tags
-      container = TagContainer.new
-      container.concat(tags)
-      container.concat(@account.tags) if @account
-      container.concat(TagContainer.default_tags)
-      return container.create_tags
+      unless @all_tags
+        container = TagContainer.new
+        container.concat(tags)
+        container.concat(@account.tags) if @account
+        container.concat(TagContainer.default_tags)
+        return @all_tags = container.create_tags
+      end
+      return @all_tags
     end
+
+    alias create_tags all_tags
 
     def max_length
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
