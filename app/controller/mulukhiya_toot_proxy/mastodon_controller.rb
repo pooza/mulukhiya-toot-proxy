@@ -13,7 +13,7 @@ module MulukhiyaTootProxy
       tags = TootParser.new(params[:status]).tags
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @mastodon})
       @results.response = @mastodon.toot(params)
-Slack.broadcast(controller: self.class.to_s, status: @results.response.code, message: @results.response.parsed_response)
+      @mastodon.account.slack&.say(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['results'] = @results.summary
@@ -157,6 +157,10 @@ Slack.broadcast(controller: self.class.to_s, status: @results.response.code, mes
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
+    end
+
+    def response_error?
+      return 400 <= @results.response.code
     end
 
     def self.name
