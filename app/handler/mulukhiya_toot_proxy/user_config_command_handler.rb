@@ -12,7 +12,7 @@ module MulukhiyaTootProxy
 
     def status
       v = JSON.parse(UserConfigStorage.new.get(sns.account.id)) || {}
-      v.merge!(@parser.params)
+      v.merge!(@parser.params) if @parser
       v.delete('command')
       if sns.account.webhook
         v['webhook'] ||= {}
