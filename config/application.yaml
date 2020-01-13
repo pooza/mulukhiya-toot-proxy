@@ -1,5 +1,5 @@
 package:
-  version: 3.2.8
+  version: 3.2.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -30,6 +30,8 @@ handler:
       - amazon_image
       - tagging
     post_toot:
+      - user_config_command
+      - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
       - admin_notification
@@ -88,6 +90,7 @@ handler:
       - itunes_url
       - tagging
     post_toot:
+      - user_config_command
       - result_notification
     pre_upload:
       - image_format_convert

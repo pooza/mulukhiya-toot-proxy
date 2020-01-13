@@ -51,9 +51,9 @@ module MulukhiyaTootProxy
     def self.parser_class
       case controller_name
       when 'mastodon'
-        return MulukhiyaTootProxy::TootParser
+        return TootParser
       when 'dolphin'
-        return MulukhiyaTootProxy::NoteParser
+        return NoteParser
       end
     end
 
