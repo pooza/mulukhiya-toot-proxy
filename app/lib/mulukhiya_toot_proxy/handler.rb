@@ -82,8 +82,6 @@ module MulukhiyaTootProxy
     def self.all(event, params = {})
       Config.instance["/handler/#{Environment.controller_name}/#{event}"].each do |v|
         yield create(v, params)
-      rescue => e
-        Logger.new.error(e)
       end
     end
 
