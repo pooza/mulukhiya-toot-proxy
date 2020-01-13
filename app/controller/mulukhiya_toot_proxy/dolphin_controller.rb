@@ -14,6 +14,11 @@ module MulukhiyaTootProxy
       @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {error: e.message}
+      @dolphin.account.slack&.say('error' => e.message)
+      @renderer.status = e.status
+      return @renderer.to_s
     end
 
     post '/api/drive/files/create' do
@@ -27,6 +32,7 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
+      @dolphin.account.slack&.say('error' => e.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end
