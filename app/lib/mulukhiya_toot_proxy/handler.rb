@@ -13,11 +13,6 @@ module MulukhiyaTootProxy
 
     def handle_post_toot(body, params = {}); end
 
-    def handle_toot(body, params = {})
-      handle_pre_toot(body, params)
-      return handle_post_toot(body, params)
-    end
-
     def handle_pre_webhook(body, params = {})
       handle_pre_toot(body, params)
     end
