@@ -90,6 +90,7 @@ handler:
       - itunes_url
       - tagging
     post_toot:
+      - user_config_command
       - result_notification
     pre_upload:
       - image_format_convert
