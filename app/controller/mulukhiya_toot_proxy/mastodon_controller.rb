@@ -16,12 +16,16 @@ module MulukhiyaTootProxy
       @renderer.message['tags']&.keep_if {|v| tags.include?(v['name'])}
       @renderer.status = @results.response.code
       return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {error: e.message}
+      @mastodon.account.slack&.say('error' => e.message)
+      @renderer.status = e.status
+      return @renderer.to_s
     end
 
     post '/api/v1/media' do
       Handler.exec_all(:pre_upload, params, {results: @results, sns: @mastodon})
       @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
-      @mastodon.account.slack&.say(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_upload, params, {results: @results, sns: @mastodon})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.message['results'] = @results.summary
@@ -29,6 +33,7 @@ module MulukhiyaTootProxy
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
+      @mastodon.account.slack&.say('error' => e.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end
