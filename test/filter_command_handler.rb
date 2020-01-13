@@ -7,23 +7,23 @@ module MulukhiyaTootProxy
       @key = SecureRandom.hex(16)
     end
 
-    def test_handle_pre_toot
+    def test_handle_root
       return unless handler?
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => ''})
+      @handler.handle_root({status_field => ''})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "command: filter\ntag: #{@key}"})
+      @handler.handle_root({status_field => "command: filter\ntag: #{@key}"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "command: filter\ntag: #{@key}\naction: register"})
+      @handler.handle_root({status_field => "command: filter\ntag: #{@key}\naction: register"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "command: filter\ntag: #{@key}\naction: unregister"})
+      @handler.handle_root({status_field => "command: filter\ntag: #{@key}\naction: unregister"})
       assert(@handler.result[:entries].present?)
     end
   end

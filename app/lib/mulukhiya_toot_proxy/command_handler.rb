@@ -4,6 +4,13 @@ module MulukhiyaTootProxy
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
+    def handle_root(body, params = {})
+      params[:results] ||= ResultContainer.new
+      params[:tags] ||= TagContainer.new
+      handle_pre_toot(body, params)
+      return handle_post_toot(body, params)
+    end
+
     def contract
       @contract ||= "MulukhiyaTootProxy::#{command_name.camelize}CommandContract".constantize.new
       return @contract

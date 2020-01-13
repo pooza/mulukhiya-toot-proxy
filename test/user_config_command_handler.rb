@@ -12,27 +12,27 @@ module MulukhiyaTootProxy
       assert_kind_of(Hash, YAML.safe_load(@handler.status))
     end
 
-    def test_handle_pre_toot
+    def test_handle_root
       return unless handler?
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => ''})
+      @handler.handle_root({status_field => ''})
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "command: user_config\n#{@key}: 1"})
+      @handler.handle_root({status_field => "command: user_config\n#{@key}: 1"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "command: user_config\n#{@key}: null"})
+      @handler.handle_root({status_field => "command: user_config\n#{@key}: null"})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => %({"command": "user_config", "#{@key}": 2})})
+      @handler.handle_root({status_field => %({"command": "user_config", "#{@key}": 2})})
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => %({"command": "user_config", "#{@key}": null})})
+      @handler.handle_root({status_field => %({"command": "user_config", "#{@key}": null})})
       assert(@handler.result[:entries].present?)
     end
   end
