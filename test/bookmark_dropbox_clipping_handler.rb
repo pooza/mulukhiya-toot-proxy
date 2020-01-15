@@ -11,7 +11,7 @@ module Mulukhiya
       return unless handler?
       @handler.clear
       @handler.handle_post_fav('id' => @toot.id)
-      assert(MastodonURI.parse(@handler.result[:entries].first[:url]).id.positive?)
+      assert(TootURI.parse(@handler.result[:entries].first[:url]).id.positive?)
     end
   end
 end

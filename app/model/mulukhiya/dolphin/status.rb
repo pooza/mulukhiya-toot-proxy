@@ -22,11 +22,11 @@ module Mulukhiya
       def uri
         unless @uri
           if self[:uri].present?
-            @uri = MastodonURI.parse(self[:uri])
-            @uri = DolphinURI.parse(self[:uri]) unless @uri.id
+            @uri = TootURI.parse(self[:uri])
+            @uri = NoteURI.parse(self[:uri]) unless @uri.id
             @uri = nil unless @uri.id
           else
-            @uri = DolphinURI.parse(Config.instance['/dolphin/url'])
+            @uri = NoteURI.parse(Config.instance['/dolphin/url'])
             @uri.path = "/notes/#{id}"
           end
         end

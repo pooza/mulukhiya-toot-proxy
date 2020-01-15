@@ -19,8 +19,8 @@ module Mulukhiya
 
       def uri
         unless @uri
-          @uri = MastodonURI.parse(self[:url] || self[:uri])
-          @uri = DolphinURI.parse(self[:url] || self[:uri]) unless @uri.id
+          @uri = TootURI.parse(self[:url] || self[:uri])
+          @uri = NoteURI.parse(self[:url] || self[:uri]) unless @uri.id
           @uri = nil unless @uri.id
         end
         return @uri
