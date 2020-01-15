@@ -1,5 +1,5 @@
 module Mulukhiya
-  class MastodonURI < Ginseng::URI
+  class TootURI < Ginseng::URI
     def toot_id
       config = Config.instance
       config['/mastodon/patterns'].each do |pattern|

@@ -1,7 +1,7 @@
 module Mulukhiya
-  class MastodonURITest < TestCase
+  class TootURITest < TestCase
     def setup
-      @uri = MastodonURI.parse('https://precure.ml/web/statuses/101118840135913675')
+      @uri = TootURI.parse('https://precure.ml/web/statuses/101118840135913675')
     end
 
     def test_id
