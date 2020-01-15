@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TootParserTest < TestCase
     def setup
       @parser = TootParser.new

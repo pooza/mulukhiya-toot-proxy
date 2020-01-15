@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class HandlerTest < TestCase
     def test_disable?
       Environment.controller_class.events.each do |event|

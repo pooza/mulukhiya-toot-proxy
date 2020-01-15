@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class NoteParserTest < TestCase
     def setup
       @parser = NoteParser.new

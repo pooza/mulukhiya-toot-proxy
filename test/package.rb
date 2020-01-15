@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class PackageTest < TestCase
     def setup
       @package = YAML.load_file(File.join(Environment.dir, 'config/application.yaml'))['package']

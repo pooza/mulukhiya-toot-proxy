@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AudioFormatConvertHandlerTest < TestCase
     def setup
       @handler = Handler.create('audio_format_convert')

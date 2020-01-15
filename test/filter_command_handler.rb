@@ -1,6 +1,6 @@
 require 'securerandom'
 
-module MulukhiyaTootProxy
+module Mulukhiya
   class FilterCommandHandlerTest < TestCase
     def setup
       @handler = Handler.create('filter_command')

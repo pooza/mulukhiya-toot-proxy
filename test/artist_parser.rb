@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ArtistParserTest < TestCase
     def test_parse
       tags = ArtistParser.new('キュア・カルテット').parse

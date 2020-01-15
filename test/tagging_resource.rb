@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TaggingResourceTest < TestCase
     def test_all
       TaggingResource.all do |resource|

@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AmazonURITest < TestCase
     def test_shortenable?
       uri = AmazonURI.parse('https://google.com')

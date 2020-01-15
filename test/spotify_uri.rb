@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class SpotifyURITest < TestCase
     def setup
       @config = Config.instance

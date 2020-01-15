@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ShortenedURLHandlerTest < TestCase
     def setup
       @handler = Handler.create('shortened_url')

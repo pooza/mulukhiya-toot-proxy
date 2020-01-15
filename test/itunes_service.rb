@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ItunesServiceTest < TestCase
     def setup
       @service = ItunesService.new

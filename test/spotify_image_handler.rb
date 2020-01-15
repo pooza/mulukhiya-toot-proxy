@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class SpotifyImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('spotify_image')

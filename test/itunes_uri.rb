@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ItunesURITest < TestCase
     def test_itunes?
       uri = ItunesURI.parse('https://google.com')

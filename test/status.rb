@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class StatusTest < TestCase
     def setup
       @account = Environment.test_account

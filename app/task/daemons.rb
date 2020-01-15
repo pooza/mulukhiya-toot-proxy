@@ -4,7 +4,7 @@ namespace :mulukhiya do
       [:start, :stop].each do |action|
         desc "#{action} #{ns}"
         task action do
-          sh "#{File.join(MulukhiyaTootProxy::Environment.dir, 'bin', "#{ns}_daemon.rb")} #{action}"
+          sh "#{File.join(Mulukhiya::Environment.dir, 'bin', "#{ns}_daemon.rb")} #{action}"
         rescue => e
           warn "#{e.class} #{ns}:#{action} #{e.message}"
         end

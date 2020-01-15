@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class VideoFileTest < TestCase
     def setup
       @file = VideoFile.new(File.join(Environment.dir, 'sample/poyke.mp4'))

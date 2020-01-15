@@ -3,6 +3,6 @@ $LOAD_PATH.unshift(File.join(dir, 'app/lib'))
 ENV['BUNDLE_GEMFILE'] ||= File.join(dir, 'Gemfile')
 
 require 'bundler/setup'
-require 'mulukhiya_toot_proxy'
+require 'mulukhiya'
 
-MulukhiyaTootProxy::Postgres.connect
+Mulukhiya::Postgres.connect

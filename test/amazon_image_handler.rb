@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AmazonImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('amazon_image')

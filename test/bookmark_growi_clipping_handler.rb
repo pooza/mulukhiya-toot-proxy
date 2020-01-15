@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class BookmarkGrowiClippingHandlerTest < TestCase
     def setup
       @handler = Handler.create('bookmark_growi_clipping')

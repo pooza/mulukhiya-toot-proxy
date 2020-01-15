@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class RedisTest < TestCase
     def setup
       @redis = Redis.new

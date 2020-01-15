@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class MentionNotificationHandlerTest < TestCase
     def setup
       @handler = Handler.create('mention_notification')

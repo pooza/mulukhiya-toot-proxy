@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class SpotifyURLNowplayingHandlerTest < TestCase
     def setup
       @handler = Handler.create('spotify_url_nowplaying')

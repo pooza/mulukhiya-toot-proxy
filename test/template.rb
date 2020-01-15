@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TemplateTest < TestCase
     def setup
       @template = Template.new('toot_notification')

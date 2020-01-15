@@ -1,6 +1,6 @@
 require 'rack/test'
 
-module MulukhiyaTootProxy
+module Mulukhiya
   class DolphinControllerTest < TestCase
     include ::Rack::Test::Methods
 

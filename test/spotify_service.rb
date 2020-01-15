@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class SpotifyServiceTest < TestCase
     def setup
       @service = SpotifyService.new

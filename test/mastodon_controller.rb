@@ -1,12 +1,12 @@
 require 'rack/test'
 
-module MulukhiyaTootProxy
+module Mulukhiya
   class MastodonControllerTest < TestCase
     include ::Rack::Test::Methods
 
     def setup
       @config = Config.instance
-      @account = MulukhiyaTootProxy::Mastodon::Account.get(token: @config['/test/token'])
+      @account = Mulukhiya::Mastodon::Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
       @parser = TootParser.new
     end

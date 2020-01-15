@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class BoostNotificationHandlerTest < TestCase
     def setup
       @handler = Handler.create('boost_notification')

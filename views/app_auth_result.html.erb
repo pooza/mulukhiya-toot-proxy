@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <title><%= MulukhiyaTootProxy::Package.name %></title>
+  <title><%= Mulukhiya::Package.name %></title>
   <meta charset="utf-8">
   <meta name="robots" content="noindex,nofollow">
   <meta name="viewport" content="width=800">
@@ -19,10 +19,10 @@
   </script>
 </head>
 <body>
-  <header><%= MulukhiyaTootProxy::Package.full_name %></header>
+  <header><%= Mulukhiya::Package.full_name %></header>
   <nav class="breadcrumbs">
     <ul>
-      <li><a href="/"><%= MulukhiyaTootProxy::Environment.controller_class.name %></a>
+      <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
       <li><a href="/mulukhiya">モロヘイヤHOME</a>
       <li>アプリケーションの認証
     </ul>
@@ -30,7 +30,7 @@
   <main>
     <h2>アプリケーションの認証</h2>
     <% if params[:status].to_i < 400 %>
-      <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= MulukhiyaTootProxy::Config.instance['/mastodon/toot/label'] %>してください。</p>
+      <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= Mulukhiya::Config.instance['/mastodon/toot/label'] %>してください。</p>
       <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
       <button id="copy_button">クリップボードにコピー</button>
     <% else %>

@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ImageResizeHandlerTest < TestCase
     def setup
       @handler = Handler.create('image_resize')

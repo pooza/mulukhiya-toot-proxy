@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class DolphinURITest < TestCase
     def setup
       @uri = DolphinURI.parse('https://dev.dol.b-shock.org/notes/8210l8qhnc')
