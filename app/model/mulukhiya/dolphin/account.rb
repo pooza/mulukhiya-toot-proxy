@@ -4,9 +4,9 @@ module Mulukhiya
       def uri
         unless @uri
           if host
-            @uri = DolphinURI.parse("https://#{host}")
+            @uri = NoteURI.parse("https://#{host}")
           else
-            @uri = DolphinURI.parse(Config.instance['/dolphin/url'])
+            @uri = NoteURI.parse(Config.instance['/dolphin/url'])
           end
           @uri.path = "/@#{username}"
         end

@@ -1,5 +1,5 @@
 module Mulukhiya
-  class DolphinURI < Ginseng::URI
+  class NoteURI < Ginseng::URI
     def note_id
       config = Config.instance
       config['/dolphin/patterns'].each do |pattern|

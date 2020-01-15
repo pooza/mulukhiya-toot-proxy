@@ -9,7 +9,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @token = token || @config['/test/token']
-      @uri = DolphinURI.parse(uri || @config['/dolphin/url'])
+      @uri = Ginseng::URI.parse(uri || @config['/dolphin/url'])
       @mulukhiya_enable = false
       @http = http_class.new
     end
