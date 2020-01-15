@@ -64,7 +64,6 @@ handler:
     post_upload:
       - result_notification
     post_fav:
-      - fav_notification
       - result_notification
     post_boost:
       - boost_notification
@@ -103,8 +102,6 @@ handler:
       - result_notification
   default:
     timeout: 10
-  fav_notification:
-    disable: true
   boost_notification:
     disable: true
   image_resize:
@@ -183,7 +180,6 @@ mastodon:
     - post_webhook
     - pre_upload
     - post_upload
-    - post_fav
     - post_boost
     - post_search
   patterns:
