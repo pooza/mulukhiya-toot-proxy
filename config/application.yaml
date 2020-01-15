@@ -35,7 +35,6 @@ handler:
       - growi_clipping_command
       - dropbox_clipping_command
       - admin_notification
-      - mention_notification
       - result_notification
     pre_webhook:
       - shortened_url
@@ -56,7 +55,6 @@ handler:
       - tagging
     post_webhook:
       - admin_notification
-      - mention_notification
       - result_notification
     pre_upload:
       - image_format_convert
@@ -105,8 +103,6 @@ handler:
       - result_notification
   default:
     timeout: 10
-  mention_notification:
-    disable: true
   fav_notification:
     disable: true
   boost_notification:
