@@ -1,12 +1,10 @@
 module Mulukhiya
-  class ThinDaemon < Ginseng::Daemon
-    include Package
-
+  class ThinDaemon < Daemon
     def cmd
       return [
         'thin',
         '--config',
-        File.join(Environment.dir, 'config/thin.yaml'),
+        config_cache_path,
         'start',
       ]
     end

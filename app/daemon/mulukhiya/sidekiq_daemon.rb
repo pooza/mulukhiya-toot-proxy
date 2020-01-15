@@ -1,12 +1,10 @@
 module Mulukhiya
-  class SidekiqDaemon < Ginseng::Daemon
-    include Package
-
+  class SidekiqDaemon < Daemon
     def cmd
       return [
         'sidekiq',
         '--config',
-        File.join(Environment.dir, 'config/sidekiq.yaml'),
+        config_cache_path,
         '--require',
         File.join(Environment.dir, 'app/initializer/sidekiq.rb'),
       ]
