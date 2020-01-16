@@ -8,7 +8,7 @@ module Mulukhiya
       uri ||= @config['/mastodon/url']
       token ||= @config['/test/token']
       super
-      @uri = Ginseng::URI.parse(uri)
+      @uri = TootURI.parse(uri)
       @token = token
     end
 
