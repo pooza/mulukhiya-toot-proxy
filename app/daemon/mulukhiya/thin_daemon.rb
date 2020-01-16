@@ -1,12 +1,7 @@
 module Mulukhiya
   class ThinDaemon < Daemon
     def cmd
-      return [
-        'thin',
-        '--config',
-        config_cache_path,
-        'start',
-      ]
+      return ['thin', '--config', config_cache_path, 'start']
     end
 
     def motd
