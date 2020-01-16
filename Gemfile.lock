@@ -264,7 +264,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.6)
     unicode (0.4.4.4)
-    unicode-display_width (1.6.0)
+    unicode-display_width (1.6.1)
     yajl-ruby (1.4.1)
     zeitwerk (2.2.2)
 
