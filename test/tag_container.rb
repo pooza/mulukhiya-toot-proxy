@@ -5,6 +5,10 @@ module MulukhiyaTootProxy
       @container = TagContainer.new
     end
 
+    def test_push
+      assert_equal(@container.push(111), ['111'])
+    end
+
     def test_default_tags
       @config['/tagging/default_tags'] = []
       assert_equal(TagContainer.default_tags, [])
