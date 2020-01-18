@@ -1,40 +1,28 @@
 <%# encoding: UTF-8 -%>
-<!doctype html>
-<html lang="ja">
-<head>
-  <title><%= Mulukhiya::Package.name %></title>
-  <meta charset="utf-8">
-  <meta name="robots" content="noindex,nofollow">
-  <meta name="viewport" content="width=800">
-  <link href="https://fonts.googleapis.com/css?family=Francois+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="/mulukhiya/style/default">
-</head>
-<body>
-  <header><%= Mulukhiya::Package.full_name %></header>
-  <nav class="breadcrumbs">
-    <ul>
-      <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
-      <li><a href="/mulukhiya">モロヘイヤHOME</a>
-      <li>アプリケーションの認証
-    </ul>
-  </nav>
-  <main>
-    <h2>アプリケーションの認証</h2>
-    <form method="POST" action="/mulukhiya/app/auth">
-      <ol>
-        <li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
-        <li>
-          取得した認証コードを↓に貼り付けて…
-          <input type="text" name="code" placeholder="認証コード" maxlength="64" class="code"><br>
-          <% if params.dig(:errors, :code) %>
-            <span class="alert"><%= params[:errors][:code].join %></span>
-          <% end %>
-        </li>
-        <li>
-          <button id="submit_button">認証する</button>
-        </li>
-      </ol>
-    </form>
-  </main>
-</body>
-</html>
+<%= render('fragment/header') %>
+<nav class="breadcrumbs">
+  <ul>
+    <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
+    <li><a href="/mulukhiya">モロヘイヤHOME</a>
+    <li>アプリケーションの認証
+  </ul>
+</nav>
+<main>
+  <h2>アプリケーションの認証</h2>
+  <form method="POST" action="/mulukhiya/app/auth">
+    <ol>
+      <li><a href="<%= params[:oauth_url] %>" target="_blank">認証コードを取得</a></li>
+      <li>
+        取得した認証コードを↓に貼り付けて…
+        <input type="text" name="code" placeholder="認証コード" maxlength="64" class="code"><br>
+        <% if params.dig(:errors, :code) %>
+          <span class="alert"><%= params[:errors][:code].join %></span>
+        <% end %>
+      </li>
+      <li>
+        <button id="submit_button">認証する</button>
+      </li>
+    </ol>
+  </form>
+</main>
+<%= render('fragment/footer') %>

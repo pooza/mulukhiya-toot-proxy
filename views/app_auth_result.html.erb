@@ -1,41 +1,29 @@
 <%# encoding: UTF-8 -%>
-<!doctype html>
-<html lang="ja">
-<head>
-  <title><%= Mulukhiya::Package.name %></title>
-  <meta charset="utf-8">
-  <meta name="robots" content="noindex,nofollow">
-  <meta name="viewport" content="width=800">
-  <link href="https://fonts.googleapis.com/css?family=Francois+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="/mulukhiya/style/default">
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('copy_button').addEventListener('click', e => {
-        const text = document.getElementById('toot_text');
-        text.select();
-        document.execCommand('copy');
-      });
+<%= render('fragment/header') %>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('copy_button').addEventListener('click', e => {
+      const text = document.getElementById('toot_text');
+      text.select();
+      document.execCommand('copy');
     });
-  </script>
-</head>
-<body>
-  <header><%= Mulukhiya::Package.full_name %></header>
-  <nav class="breadcrumbs">
-    <ul>
-      <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
-      <li><a href="/mulukhiya">モロヘイヤHOME</a>
-      <li>アプリケーションの認証
-    </ul>
-  </nav>
-  <main>
-    <h2>アプリケーションの認証</h2>
-    <% if params[:status].to_i < 400 %>
-      <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= Mulukhiya::Config.instance['/mastodon/toot/label'] %>してください。</p>
-      <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
-      <button id="copy_button">クリップボードにコピー</button>
-    <% else %>
-      <p class="alert">エラー（<%= params[:status] %>）</p>
-    <% end %>
-  </main>
-</body>
-</html>
+  });
+</script>
+<nav class="breadcrumbs">
+  <ul>
+    <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
+    <li><a href="/mulukhiya">モロヘイヤHOME</a>
+    <li>アプリケーションの認証
+  </ul>
+</nav>
+<main>
+  <h2>アプリケーションの認証</h2>
+  <% if params[:status].to_i < 400 %>
+    <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= Mulukhiya::Config.instance['/mastodon/toot/label'] %>してください。</p>
+    <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
+    <button id="copy_button">クリップボードにコピー</button>
+  <% else %>
+    <p class="alert">エラー（<%= params[:status] %>）</p>
+  <% end %>
+</main>
+<%= render('fragment/footer') %>
