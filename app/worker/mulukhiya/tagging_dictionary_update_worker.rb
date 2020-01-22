@@ -1,11 +1,7 @@
 module Mulukhiya
-  class TaggingDictionaryWorker
+  class TaggingDictionaryUpdateWorker
     include Sidekiq::Worker
     sidekiq_options retry: false
-
-    def initialize
-      @logger = Logger.new
-    end
 
     def perform
       TaggingDictionary.new.refresh

@@ -118,10 +118,6 @@ module Mulukhiya
 
     get '/mulukhiya/programs' do
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
-      if !File.exist?(path) || (File.mtime(path) < Time.now.ago(5.minute))
-        r = HTTP.new.get(@config['/programs/url'])
-        File.write(path, r.to_s) if r.code == 200
-      end
       if File.readable?(path)
         @renderer.message = JSON.parse(File.read(path))
         return @renderer.to_s

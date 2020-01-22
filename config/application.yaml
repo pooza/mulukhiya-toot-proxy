@@ -324,9 +324,12 @@ sidekiq:
     password: ''
   concurrency: 5
   schedule:
-    tagging_dictionary:
+    tagging_dictionary_update:
       every: 5m
-      class: Mulukhiya::TaggingDictionaryWorker
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
+    program_update:
+      every: 5m
+      class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
       every: 5m
       class: Mulukhiya::MediaCleaningWorker

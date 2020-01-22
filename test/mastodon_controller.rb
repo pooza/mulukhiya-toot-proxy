@@ -73,6 +73,13 @@ module Mulukhiya
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
     end
 
+    def test_programs
+      @config['/programs/url']
+      get '/mulukhiya/programs'
+      assert(last_response.ok?)
+    rescue Ginseng::ConfigError
+    end
+
     def test_toot_response
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@account.token}"
