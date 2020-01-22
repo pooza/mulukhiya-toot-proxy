@@ -74,10 +74,11 @@ module Mulukhiya
     end
 
     def test_programs
-      @config['/programs/url']
       get '/mulukhiya/programs'
       assert(last_response.ok?)
     rescue Ginseng::ConfigError
+      @config['/programs/url'] = 'https://script.google.com/macros/s/AKfycbxlqRJxUq1dIsshRF6luZvL-_T08OTZD7YKOmAhLHfZeoZy3Ox-/exec'
+      retry
     end
 
     def test_toot_response
