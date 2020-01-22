@@ -12,8 +12,8 @@ module Mulukhiya
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "#nowplaying https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS\n"})
-      assert_equal(@handler.result[:entries], ['https://open.spotify.com/track/0nfc11o6frUdWKgG51OVFS'])
+      @handler.handle_pre_toot({status_field => "#nowplaying https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ\n"})
+      assert_equal(@handler.result[:entries], ['https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ'])
     end
   end
 end
