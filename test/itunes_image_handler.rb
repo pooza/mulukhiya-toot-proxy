@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ItunesImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('itunes_image')

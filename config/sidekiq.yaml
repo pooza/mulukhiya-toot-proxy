@@ -1,8 +1,0 @@
-concurrency: 5
-schedule:
-  tagging_dictionary:
-    every: 5m
-    class: MulukhiyaTootProxy::TaggingDictionaryWorker
-  media_cleaning:
-    every: 5m
-    class: MulukhiyaTootProxy::MediaCleaningWorker

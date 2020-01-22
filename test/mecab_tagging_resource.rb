@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class MecabTaggingResourceTest < TestCase
     def setup
       @resource = TaggingResource.create(

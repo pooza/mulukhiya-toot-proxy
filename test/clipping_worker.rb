@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ClippingWorkerTest < TestCase
     def setup
       @worker = ClippingWorker.new

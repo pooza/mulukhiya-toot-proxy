@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TaggingDictionaryTest < TestCase
     def setup
       @dic = TaggingDictionary.new

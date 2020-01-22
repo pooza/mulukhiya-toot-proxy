@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AdminNotificationHandlerTest < TestCase
     def setup
       @handler = Handler.create('admin_notification')

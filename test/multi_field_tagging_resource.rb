@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class MultiFieldTaggingResourceTest < TestCase
     def setup
       @resource = TaggingResource.create(

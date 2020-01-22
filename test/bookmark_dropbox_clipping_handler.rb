@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class BookmarkDropboxClippingHandlerTest < TestCase
     def setup
       @handler = Handler.create('bookmark_dropbox_clipping')
@@ -11,7 +11,7 @@ module MulukhiyaTootProxy
       return unless handler?
       @handler.clear
       @handler.handle_post_fav('id' => @toot.id)
-      assert(MastodonURI.parse(@handler.result[:entries].first[:url]).id.positive?)
+      assert(TootURI.parse(@handler.result[:entries].first[:url]).id.positive?)
     end
   end
 end

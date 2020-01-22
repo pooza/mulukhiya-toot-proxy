@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AccountTest < TestCase
     def setup
       @config = Config.instance

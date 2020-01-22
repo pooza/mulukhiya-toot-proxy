@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ImageeFileTest < TestCase
     def setup
       @file = ImageFile.new(File.join(Environment.dir, 'sample/ribbon08-009.png'))

@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class DropboxClippingCommandHandlerTest < TestCase
     def setup
       @handler = Handler.create('dropbox_clipping_command')

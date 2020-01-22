@@ -1,17 +1,17 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class SpotifyServiceTest < TestCase
     def setup
       @service = SpotifyService.new
     end
 
     def test_search_track
-      track = @service.search_track('ガンバランス')
-      assert(track.name.include?('ガンバランス'))
+      track = @service.search_track('ありがとうのうた')
+      assert(track.name.include?('ありがとうのうた'))
     end
 
     def test_lookup_track
-      track = @service.lookup_track('0nfc11o6frUdWKgG51OVFS')
-      assert_equal(track.name, 'ツイン・テールの魔法')
+      track = @service.lookup_track('3IOVLLqm6RNpoUVjx33HKF')
+      assert_equal(track.name, 'ありがとうのうた')
     end
   end
 end

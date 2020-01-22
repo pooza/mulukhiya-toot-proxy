@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AudioFileTest < TestCase
     def setup
       @file = AudioFile.new(File.join(Environment.dir, 'sample/hugttocatch.mp3'))

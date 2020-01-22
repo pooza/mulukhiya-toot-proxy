@@ -1,12 +1,12 @@
 require 'rack/test'
 
-module MulukhiyaTootProxy
+module Mulukhiya
   class MastodonControllerTest < TestCase
     include ::Rack::Test::Methods
 
     def setup
       @config = Config.instance
-      @account = MulukhiyaTootProxy::Mastodon::Account.get(token: @config['/test/token'])
+      @account = Mulukhiya::Mastodon::Account.get(token: @config['/test/token'])
       @toot = @account.recent_toot
       @parser = TootParser.new
     end
@@ -71,6 +71,14 @@ module MulukhiyaTootProxy
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {status_field => '！!！!！'}.to_json
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
+    end
+
+    def test_programs
+      get '/mulukhiya/programs'
+      assert(last_response.ok?)
+    rescue Ginseng::ConfigError
+      @config['/programs/url'] = 'https://script.google.com/macros/s/AKfycbxlqRJxUq1dIsshRF6luZvL-_T08OTZD7YKOmAhLHfZeoZy3Ox-/exec'
+      retry
     end
 
     def test_toot_response

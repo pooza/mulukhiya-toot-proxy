@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class AmazonServiceTest < TestCase
     def setup
       @service = AmazonService.new

@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TaggingHandlerTest < TestCase
     def setup
       @handler = Handler.create('tagging')

@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class TagContainerTest < TestCase
     def setup
       @config = Config.instance

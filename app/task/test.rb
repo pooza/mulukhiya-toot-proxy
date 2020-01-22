@@ -1,4 +1,4 @@
 desc 'test all'
 task :test do
-  MulukhiyaTootProxy::TestCase.load
+  Mulukhiya::TestCase.load
 end

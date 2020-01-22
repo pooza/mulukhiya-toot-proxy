@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class MentionVisibilityHandlerTest < TestCase
     def setup
       @handler = Handler.create('mention_visibility')

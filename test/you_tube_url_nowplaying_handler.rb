@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class YouTubeURLNowplayingHandlerTest < TestCase
     def setup
       @handler = Handler.create('you_tube_url_nowplaying')

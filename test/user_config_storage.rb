@@ -1,6 +1,6 @@
 require 'securerandom'
 
-module MulukhiyaTootProxy
+module Mulukhiya
   class UserConfigStorageTest < TestCase
     def setup
       @storage = UserConfigStorage.new

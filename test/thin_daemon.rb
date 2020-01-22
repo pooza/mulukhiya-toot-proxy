@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class ThinDaemonTest < TestCase
     def setup
       @daemon = ThinDaemon.new

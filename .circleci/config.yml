@@ -12,26 +12,18 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install bundler
           command: gem install bundler
       - run:
-          name: install ffmpeg
           command: sudo apt install ffmpeg
       - run:
-          name: install dependencies
           command: bundle install
       - run:
-          name: run RuboCop
-          command: bundle exec rubocop
-      - run:
-          name: run rails-erb-lint
-          command: bundle exec rake erb:check
-      - run:
-          name: update gem
           command: bundle exec rake bundle:update
       - run:
-          name: check gem
           command: bundle exec rake bundle:check
       - run:
-          name: run test
+          command: bundle exec rubocop
+      - run:
+          command: bundle exec rake erb:check
+      - run:
           command: bundle exec rake test

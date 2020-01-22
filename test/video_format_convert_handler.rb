@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class VideoFormatConvertHandlerTest < TestCase
     def setup
       @handler = Handler.create('video_format_convert')

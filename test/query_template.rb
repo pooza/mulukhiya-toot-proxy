@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class QueryTemplateTest < TestCase
     def setup
       @template = QueryTemplate.new('token_owner')

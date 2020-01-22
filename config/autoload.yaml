@@ -3,16 +3,16 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   canonical_url_handler: CanonicalURLHandler
   css_renderer: CSSRenderer
-  dolphin_uri: DolphinURI
   html_renderer: HTMLRenderer
   http: HTTP
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
-  mastodon_uri: MastodonURI
+  note_uri: NoteURI
   shortened_url_handler: ShortenedURLHandler
   spotify_uri: SpotifyURI
   spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler
+  toot_uri: TootURI
   uri: URI
   url_handler: URLHandler
   url_normalize_handler: URLNormalizeHandler

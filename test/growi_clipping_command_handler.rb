@@ -1,4 +1,4 @@
-module MulukhiyaTootProxy
+module Mulukhiya
   class GrowiClippingCommandHandlerTest < TestCase
     def setup
       @handler = Handler.create('growi_clipping_command')

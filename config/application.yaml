@@ -1,5 +1,5 @@
 package:
-  version: 3.2.13
+  version: 3.3.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -35,7 +35,6 @@ handler:
       - growi_clipping_command
       - dropbox_clipping_command
       - admin_notification
-      - mention_notification
       - result_notification
     pre_webhook:
       - shortened_url
@@ -56,7 +55,6 @@ handler:
       - tagging
     post_webhook:
       - admin_notification
-      - mention_notification
       - result_notification
     pre_upload:
       - image_format_convert
@@ -66,10 +64,8 @@ handler:
     post_upload:
       - result_notification
     post_fav:
-      - fav_notification
       - result_notification
     post_boost:
-      - boost_notification
       - result_notification
     post_search:
       - result_notification
@@ -105,12 +101,6 @@ handler:
       - result_notification
   default:
     timeout: 10
-  mention_notification:
-    disable: true
-  fav_notification:
-    disable: true
-  boost_notification:
-    disable: true
   image_resize:
     pixel: 1280
   amazon_image:
@@ -140,11 +130,11 @@ test:
     - name: database
       cases:
         - account
-        - dolphin_uri
         - clipping_worker
-        - mastodon_uri
+        - note_uri
         - query_template
         - status
+        - toot_uri
     - name: amazon
       cases:
         - amazon_service
@@ -155,11 +145,11 @@ test:
     - name: dolphin
       cases:
         - mastodon_controller
-        - mastodon_uri
+        - toot_uri
     - name: mastodon
       cases:
         - dolphin_controller
-        - dolphin_uri
+        - note_uri
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -187,7 +177,6 @@ mastodon:
     - post_webhook
     - pre_upload
     - post_upload
-    - post_fav
     - post_boost
     - post_search
   patterns:
@@ -333,6 +322,22 @@ sidekiq:
   auth:
     user: admin
     password: ''
+  concurrency: 5
+  schedule:
+    tagging_dictionary_update:
+      every: 5m
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
+    program_update:
+      every: 5m
+      class: Mulukhiya::ProgramUpdateWorker
+    media_cleaning:
+      every: 5m
+      class: Mulukhiya::MediaCleaningWorker
+thin:
+  timeout: 30
+  port: 3008
+  environment: production
+  rackup: app/initializer/config.ru
 tagging:
   word:
     minimum_length: 3
