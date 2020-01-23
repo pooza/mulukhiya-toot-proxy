@@ -10,6 +10,18 @@ module Mulukhiya
       end
     end
 
+    def test_create_parser
+      Environment.controller_class.events.each do |event|
+        Handler.all(event) do |handler|
+          parser = handler.create_parser('command: user_config')
+          assert_kind_of(StatusParser, parser)
+          assert_equal(parser.command, 'user_config')
+        end
+      rescue Ginseng::ConfigError
+        next
+      end
+    end
+
     def test_exec_all
       return if Handler.create('spotify_url_nowplaying').disable?
       params = {}
