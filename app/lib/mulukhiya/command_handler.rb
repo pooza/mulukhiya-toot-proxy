@@ -22,10 +22,9 @@ module Mulukhiya
 
     def handle_pre_toot(body, params = {})
       unless @parser = params[:results].parser
-        parser = Environment.parser_class.new(body[status_field])
-        return unless parser.exec
-        params[:results].parser = @parser = parser
+        params[:results].parser = @parser = create_parser(body[status_field])
       end
+      return unless @parser.command?
       return unless @parser.command_name == command_name
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
