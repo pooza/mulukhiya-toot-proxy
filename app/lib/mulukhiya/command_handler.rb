@@ -29,6 +29,11 @@ module Mulukhiya
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
       body[status_field] = status
+      @prepared = true
+    end
+
+    def prepared?
+      return @prepared.present?
     end
 
     def handle_post_toot(body, params = {})
