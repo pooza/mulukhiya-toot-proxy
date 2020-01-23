@@ -5,13 +5,16 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
+      @parser = create_parser(body[status_field].to_s)
+      return if @parser.command?
       body['media_ids'] ||= []
       return if body['media_ids'].present?
-      body[status_field].scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+      @parser.uris.each do |uri|
+        link = uri.to_s
         next unless updatable?(link)
         image = create_image_uri(link)
         body['media_ids'].push(sns.upload_remote_resource(image))
-        @result.push(url: image.to_s)
+        @result.push(source_url: link, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e
         @logger.error(e)

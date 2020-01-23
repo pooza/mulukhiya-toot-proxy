@@ -2,7 +2,10 @@ module Mulukhiya
   class URLHandler < Handler
     def handle_pre_toot(body, params = {})
       @status = body[status_field].to_s
-      @status.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+      @parser = create_parser(@status)
+      return if @parser.command?
+      @parser.uris do |uri|
+        link = uri.to_s
         next unless rewritable?(link)
         @result.push(source_url: link, rewrited_url: rewrite(link).to_s)
       end

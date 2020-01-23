@@ -2,6 +2,7 @@ module Mulukhiya
   class NowplayingHandler < Handler
     def handle_pre_toot(body, params = {})
       @source_status = body[status_field].to_s
+      return if create_parser(@source_status).command?
       @source_status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @status = []
       updated = false
