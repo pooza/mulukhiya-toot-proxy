@@ -73,6 +73,10 @@ module Mulukhiya
 
     alias disabled? disable?
 
+    def create_parser(status)
+      return Environment.parser_class.new(status)
+    end
+
     def self.create(name, params = {})
       return "Mulukhiya::#{name.camelize}Handler".constantize.new(params)
     rescue Ginseng::ConfigError
