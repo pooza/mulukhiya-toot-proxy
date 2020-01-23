@@ -62,6 +62,10 @@ module Mulukhiya
       return @config['/handler/default/timeout']
     end
 
+    def prepared?
+      return false
+    end
+
     def disable?
       return true unless Postgres.config?
       return true if sns.account.disable?(underscore_name)
@@ -100,6 +104,7 @@ module Mulukhiya
           params[:results].push(handler.result)
           params[:tags].concat(handler.local_tags)
         end
+        break if handler.prepared?
       rescue Timeout::Error => e
         Slack.broadcast(e)
         Logger.new.error(e)
