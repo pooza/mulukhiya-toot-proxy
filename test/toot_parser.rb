@@ -19,5 +19,10 @@ module Mulukhiya
       @parser.body = '@pooza @poozZa @pooza@mstdn.example.com pooza@b-shock.org'
       assert_equal(@parser.accts.to_a, ['@pooza', '@poozZa', '@pooza@mstdn.example.com'])
     end
+
+    def test_uris
+      @parser.body = 'https://www.google.co.jp https://mstdn.b-shock.co.jp'
+      assert_equal(@parser.uris.to_a.map(&:to_s), ['https://www.google.co.jp', 'https://mstdn.b-shock.co.jp'])
+    end
   end
 end
