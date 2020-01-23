@@ -8,7 +8,10 @@ module Mulukhiya
     end
 
     def push(value)
-      super(value) if value
+      return unless value
+      @logger ||= Logger.new
+      @logger.info(value)
+      super(value)
     end
   end
 end
