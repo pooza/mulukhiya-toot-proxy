@@ -17,7 +17,7 @@ module Mulukhiya
 
     def test_accts
       @parser.body = '@pooza @poozZa @pooza@mstdn.example.com pooza@b-shock.org'
-      assert_equal(@parser.accts, ['@pooza', '@poozZa', '@pooza@mstdn.example.com'])
+      assert_equal(@parser.accts.to_a, ['@pooza', '@poozZa', '@pooza@mstdn.example.com'])
     end
   end
 end

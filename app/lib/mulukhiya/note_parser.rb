@@ -9,7 +9,10 @@ module Mulukhiya
     end
 
     def accts
-      return body.scan(NoteParser.acct_pattern).map(&:first)
+      return enum_for(__method__) unless block_given?
+      body.scan(NoteParser.acct_pattern).map(&:first).each do |acct|
+        yield acct
+      end
     end
 
     def to_md

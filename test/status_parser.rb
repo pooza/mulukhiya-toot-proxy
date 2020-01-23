@@ -42,10 +42,10 @@ module Mulukhiya
 
     def test_accts
       @parser.body = '#hoge'
-      assert_equal(@parser.accts, [])
+      assert_equal(@parser.accts.to_a, [])
 
       @parser.body = '@pooza @pooza@precure.ml よろです。 pooza@b-shock.org'
-      assert_equal(@parser.accts, ['@pooza', '@pooza@precure.ml'])
+      assert_equal(@parser.accts.to_a, ['@pooza', '@pooza@precure.ml'])
     end
   end
 end

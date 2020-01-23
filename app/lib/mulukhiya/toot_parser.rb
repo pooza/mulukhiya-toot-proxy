@@ -3,7 +3,10 @@ require 'nokogiri'
 module Mulukhiya
   class TootParser < StatusParser
     def accts
-      return body.scan(TootParser.acct_pattern).map(&:first)
+      return enum_for(__method__) unless block_given?
+      body.scan(TootParser.acct_pattern).map(&:first).each do |acct|
+        yield acct
+      end
     end
 
     def to_md

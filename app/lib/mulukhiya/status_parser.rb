@@ -15,7 +15,17 @@ module Mulukhiya
     alias to_s body
 
     def accts
-      return body.scan(StatusParser.acct_pattern).map(&:first)
+      return enum_for(__method__) unless block_given?
+      body.scan(StatusParser.acct_pattern).map(&:first).each do |acct|
+        yield acct
+      end
+    end
+
+    def uris
+      return enum_for(__method__) unless block_given?
+      body.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+        yield Ginseng::URI.parse(link)
+      end
     end
 
     def body=(body)
