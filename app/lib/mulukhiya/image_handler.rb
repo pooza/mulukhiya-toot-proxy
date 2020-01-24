@@ -5,11 +5,11 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @parser = create_parser(body[status_field].to_s)
-      return if @parser.command?
+      @status = body[status_field]
+      return if parser.command?
       body['media_ids'] ||= []
       return if body['media_ids'].present?
-      @parser.uris.each do |uri|
+      parser.uris.each do |uri|
         link = uri.to_s
         next unless updatable?(link)
         image = create_image_uri(link)

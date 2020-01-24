@@ -9,6 +9,7 @@ module Mulukhiya
 
     def test_status
       return unless handler?
+      @handler.handle_root({status_field => 'command: user_config'})
       assert_kind_of(Hash, YAML.safe_load(@handler.status))
     end
 

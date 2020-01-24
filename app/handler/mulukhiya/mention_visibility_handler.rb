@@ -1,7 +1,8 @@
 module Mulukhiya
   class MentionVisibilityHandler < Handler
     def handle_pre_toot(body, params = {})
-      Environment.parser_class.new(body[status_field]).accts do |acct|
+      @status = body[status_field]
+      parser.accts do |acct|
         next unless @config['/agent/accts'].member?(acct)
         body['visibility'] = Environment.controller_class.visibility_name('direct')
         @result.push(acct)
