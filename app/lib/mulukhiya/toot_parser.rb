@@ -16,7 +16,7 @@ module Mulukhiya
         html.css(style_class).each do |link|
           tmp_body.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
         rescue => e
-          @logger.error(e)
+          @logger.error(Ginseng::Error.create(e).to_h.merge(link: link.to_s))
         end
       end
       return StatusParser.sanitize(tmp_body)

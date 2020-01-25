@@ -28,7 +28,7 @@ module Mulukhiya
       return false unless Marshal.load(File.read(path)).is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(lib: self.class.to_s, path: path, message: e.message)
+      @logger.error(class: self.class.to_s, path: path, message: e.message)
       return true
     end
 
@@ -44,7 +44,7 @@ module Mulukhiya
 
     def refresh
       File.write(path, Marshal.dump(fetch))
-      @logger.info(lib: self.class.to_s, path: path, message: 'refreshed')
+      @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
       @logger.error(e)
