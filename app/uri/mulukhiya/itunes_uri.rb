@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def itunes?
-      return absolute? && @config['/itunes/hosts'].include?(host)
+      return absolute? && @config['/itunes/hosts'].member?(host)
     end
 
     alias valid? itunes?

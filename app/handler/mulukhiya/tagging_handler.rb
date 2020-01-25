@@ -1,12 +1,13 @@
 module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
+      @status = body[status_field].to_s
       return body if ignore?(body)
-      @tags.body = TagContainer.tweak(body[status_field])
+      @tags.body = TagContainer.tweak(@status)
       temp_text = create_temp_text(body)
       TaggingDictionary.new.reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless temp_text&.match?(v[:pattern])
+        next unless temp_text.match?(v[:pattern])
         @tags.push(k)
         @tags.concat(v[:words])
         temp_text.gsub!(v[:pattern], '')
@@ -14,7 +15,7 @@ module Mulukhiya
       @tags.concat(create_attachment_tags(body))
       @tags.concat(TagContainer.default_tags)
       @tags.concat(@sns.account.tags)
-      body[status_field] = append(body[status_field], @tags)
+      body[status_field] = append(@status, @tags)
       @result.concat(@tags.create_tags)
       return body
     end
@@ -22,9 +23,9 @@ module Mulukhiya
     private
 
     def ignore?(body)
-      return true unless body[status_field].present?
-      body[status_field].scan(Environment.parser_class.acct_pattern).each do |matches|
-        return true if @config['/agent/accts'].member?(matches.first)
+      return true unless @status.present?
+      parser.accts do |acct|
+        return true if @config['/agent/accts'].member?(acct)
       end
       return false unless body['visibility'].present?
       return false if body['visibility'] == 'public'

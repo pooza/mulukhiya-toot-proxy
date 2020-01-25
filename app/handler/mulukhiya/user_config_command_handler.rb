@@ -7,12 +7,12 @@ module Mulukhiya
 
     def dispatch
       raise Ginseng::GatewayError, 'Invalid access token' unless id = sns.account.id
-      UserConfigStorage.new.update(id, @parser.params)
+      UserConfigStorage.new.update(id, parser.params)
     end
 
     def status
       v = JSON.parse(UserConfigStorage.new.get(sns.account.id) || '{}')
-      v.merge!(@parser.params) if @parser
+      v.merge!(parser.params)
       v.delete('command')
       if sns.account.webhook
         v['webhook'] ||= {}

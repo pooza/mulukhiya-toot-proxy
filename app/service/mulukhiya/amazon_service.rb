@@ -15,46 +15,11 @@ module Mulukhiya
     end
 
     def create_image_uri(asin)
-      # return fetch_image_uri(asin) unless AmazonService.config?
-      cnt = 1
-      response = Amazon::Ecs.item_lookup(asin, {
-        country: @config['/amazon/country'],
-        response_group: 'Images',
-      })
-      if response.has_error?
-        raise Ginseng::RequestError, "ASIN '#{asin}' not found' (#{response.error})"
-      end
+      item = lookup(asin)
       ['Large', 'Medium', 'Small'].each do |size|
-        uri = AmazonURI.parse(response.items.first.get("#{size}Image/URL"))
+        uri = AmazonURI.parse(item.get("#{size}Image/URL"))
         return uri if uri
       end
-      return create_published_image_uri(asin)
-    rescue Amazon::RequestError => e
-      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
-      sleep(1)
-      cnt += 1
-      retry
-    end
-
-    # obsoleted
-    def fetch_image_uri(asin)
-      response = @http.get(create_item_uri(asin))
-      html = Nokogiri::HTML.parse(response.to_s.force_encoding('utf-8'), nil, 'utf-8')
-      ['landingImage', 'ebooksImgBlkFront', 'imgBlkFront'].each do |id|
-        next unless elements = html.xpath(%{id("#{id}")})
-        json = JSON.parse(elements.first.attribute('data-a-dynamic-image').value)
-        next unless uri = Ginseng::URI.parse(json.keys.first)
-        return uri
-      rescue
-        next
-      end
-      html.xpath(%{//div[contains(@class, 'dv-fallback-packshot-image')]//img}).each do |img|
-        img.attribute('srcset').value.split(',').reverse_each do |href|
-          next unless uri = Ginseng::URI.parse(href.strip.split(/\s+/).first)
-          return uri
-        end
-      end
-      return nil
     end
 
     def search(keyword, categories)
@@ -69,6 +34,23 @@ module Mulukhiya
         return response.items.first.get('ASIN') if response.items.present?
       end
       return nil
+    rescue Amazon::RequestError => e
+      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
+      sleep(1)
+      cnt += 1
+      retry
+    end
+
+    def lookup(asin)
+      cnt = 1
+      response = Amazon::Ecs.item_lookup(asin, {
+        country: @config['/amazon/country'],
+        response_group: 'Images,ItemAttributes',
+      })
+      if response.has_error?
+        raise Ginseng::RequestError, "ASIN '#{asin}' not found' (#{response.error})"
+      end
+      return response.items&.first
     rescue Amazon::RequestError => e
       raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
       sleep(1)

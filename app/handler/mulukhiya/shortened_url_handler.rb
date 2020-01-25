@@ -1,22 +1,23 @@
 module Mulukhiya
   class ShortenedURLHandler < URLHandler
-    def rewrite(link)
-      uri = Ginseng::URI.parse(link)
+    def rewrite(uri)
+      source = Ginseng::URI.parse(uri.to_s)
+      dest = source.clone
       http = HTTP.new
-      while @config['/shortened_url/domains'].member?(uri.host)
-        response = http.get(uri, {follow_redirects: false})
-        location = response.headers['location']
-        break unless location
-        uri = Ginseng::URI.parse(location)
+      while @config['/shortened_url/domains'].member?(dest.host)
+        response = http.get(dest, {follow_redirects: false})
+        break unless location = response.headers['location']
+        dest = Ginseng::URI.parse(location)
       end
-      @status.sub!(link, uri.to_s)
-      return uri
+      @status.sub!(source.to_s, dest.to_s)
+      return dest
     end
 
     private
 
-    def rewritable?(link)
-      return @config['/shortened_url/domains'].member?(Ginseng::URI.parse(link).host)
+    def rewritable?(uri)
+      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
+      return @config['/shortened_url/domains'].member?(uri.host)
     rescue => e
       @logger.error(e)
       return false

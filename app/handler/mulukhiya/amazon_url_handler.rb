@@ -1,11 +1,13 @@
 module Mulukhiya
   class AmazonURLHandler < URLHandler
-    def rewrite(link)
-      uri = AmazonURI.parse(link)
-      uri.associate_tag = nil
-      uri.associate_tag = AmazonService.associate_tag if affiliate?
-      @status.sub!(link, uri.shorten.to_s)
-      return uri.shorten
+    def rewrite(uri)
+      source = AmazonURI.parse(uri.to_s)
+      dest = source.clone
+      dest.associate_tag = nil
+      dest.associate_tag = AmazonService.associate_tag if affiliate?
+      dest = dest.shorten
+      @status.sub!(source.to_s, dest.to_s)
+      return dest
     end
 
     private
@@ -19,8 +21,9 @@ module Mulukhiya
       return true
     end
 
-    def rewritable?(link)
-      return AmazonURI.parse(link).shortenable?
+    def rewritable?(uri)
+      uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
+      return uri.shortenable?
     rescue => e
       @logger.error(e)
       return false

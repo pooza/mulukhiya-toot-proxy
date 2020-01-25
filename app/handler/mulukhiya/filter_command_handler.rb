@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def dispatch
-      params = @parser.params.clone
+      params = parser.params.clone
       params['phrase'] ||= MastodonService.create_tag(params['tag'])
 
       case params['action']
