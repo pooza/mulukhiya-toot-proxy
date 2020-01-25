@@ -107,6 +107,8 @@ handler:
     timeout: 20
   canonical_url:
     timeout: 2
+  admin_nitification:
+    disable: true
 worker:
   media_cleaning:
     days: 1

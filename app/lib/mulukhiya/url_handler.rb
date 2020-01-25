@@ -4,21 +4,18 @@ module Mulukhiya
       @status = body[status_field].to_s
       return body if parser.command?
       parser.uris do |uri|
-        link = uri.to_s
-        next unless rewritable?(link)
-        @result.push(source_url: link, rewrited_url: rewrite(link).to_s)
+        next unless rewritable?(uri)
+        @result.push(source_url: uri.to_s, rewrited_url: rewrite(uri).to_s)
       end
       return body
     end
 
-    def rewrite(link)
+    def rewrite(uri)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def rewritable?(link)
+    def rewritable?(uri)
       return true
     end
-
-    alias executable? rewritable?
   end
 end

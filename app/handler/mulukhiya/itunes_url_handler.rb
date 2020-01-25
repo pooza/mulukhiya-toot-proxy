@@ -1,15 +1,17 @@
 module Mulukhiya
   class ItunesURLHandler < URLHandler
-    def rewrite(link)
-      uri = ItunesURI.parse(link).shorten
-      @status.sub!(link, uri.to_s)
-      return uri
+    def rewrite(uri)
+      source = ItunesURI.parse(uri.to_s)
+      dest = source.shorten
+      @status.sub!(source.to_s, dest.to_s)
+      return dest
     end
 
     private
 
-    def rewritable?(link)
-      return ItunesURI.parse(link).shortenable?
+    def rewritable?(uri)
+      uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
+      return uri.shortenable?
     rescue => e
       @logger.error(e)
       return false

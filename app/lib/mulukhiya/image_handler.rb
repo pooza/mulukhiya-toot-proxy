@@ -10,11 +10,10 @@ module Mulukhiya
       body['media_ids'] ||= []
       return body if body['media_ids'].present?
       parser.uris.each do |uri|
-        link = uri.to_s
-        next unless updatable?(link)
-        image = create_image_uri(link)
+        next unless updatable?(uri)
+        image = create_image_uri(uri)
         body['media_ids'].push(sns.upload_remote_resource(image))
-        @result.push(source_url: link, image_url: image.to_s)
+        @result.push(source_url: uri.to_s, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e
         @logger.error(e)
@@ -22,13 +21,11 @@ module Mulukhiya
       return body
     end
 
-    def updatable?(link)
+    def updatable?(uri)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    alias executable? updatable?
-
-    def create_image_uri(link)
+    def create_image_uri(uri)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end

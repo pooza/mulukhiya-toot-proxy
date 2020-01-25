@@ -4,8 +4,8 @@ module Mulukhiya
       return super || !AmazonService.config?
     end
 
-    def updatable?(link)
-      uri = AmazonURI.parse(link)
+    def updatable?(uri)
+      uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
       return false unless uri.amazon?
       return false unless uri.asin.present?
       return false unless uri.image_uri.present?
@@ -16,8 +16,9 @@ module Mulukhiya
       return false
     end
 
-    def create_image_uri(link)
-      return AmazonURI.parse(link).image_uri
+    def create_image_uri(uri)
+      uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
+      return uri.image_uri
     end
   end
 end
