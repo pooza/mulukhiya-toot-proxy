@@ -18,6 +18,7 @@ handler:
       - url_normalize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
+      - amazon_url_nowplaying
       - you_tube_url_nowplaying
       - itunes_nowplaying
       - spotify_nowplaying
@@ -77,6 +78,7 @@ handler:
       - url_normalize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
+      - amazon_url_nowplaying
       - you_tube_url_nowplaying
       - itunes_nowplaying
       - spotify_nowplaying

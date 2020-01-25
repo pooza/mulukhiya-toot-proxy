@@ -3,6 +3,7 @@ module Mulukhiya
     def initialize(options = {})
       super(options)
       @config = Config.instance
+      @service = AmazonService.new
     end
 
     def shortenable?
@@ -36,6 +37,12 @@ module Mulukhiya
       self.path = "/dp/#{id}"
     end
 
+    def item
+      return nil unless amazon?
+      return nil unless asin.present?
+      return @service.lookup(asin)
+    end
+
     def associate_tag
       return query_values['tag']
     rescue NoMethodError
@@ -55,7 +62,7 @@ module Mulukhiya
     def image_uri
       return nil unless amazon?
       return nil unless asin.present?
-      @image_uri ||= AmazonService.new.create_image_uri(asin)
+      @image_uri ||= @service.create_image_uri(asin)
       return @image_uri
     end
 
