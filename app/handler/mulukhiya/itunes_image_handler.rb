@@ -14,7 +14,7 @@ module Mulukhiya
 
     def create_image_uri(uri)
       uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
-      return ItunesURI.parse(uri).image_uri
+      return uri.image_uri
     end
   end
 end

@@ -18,7 +18,7 @@ module Mulukhiya
 
     def create_image_uri(uri)
       uri = SpotifyURI.parse(uri.to_s) unless uri.is_a?(SpotifyURI)
-      return SpotifyURI.parse(uri).image_uri
+      return uri.image_uri
     end
   end
 end
