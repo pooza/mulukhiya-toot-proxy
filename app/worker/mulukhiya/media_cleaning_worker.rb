@@ -12,9 +12,9 @@ module Mulukhiya
       Dir.glob(File.join(Environment.dir, 'tmp/media/*')).each do |f|
         next unless File.new(f).mtime < @config['/worker/media_cleaning/days'].days.ago
         File.unlink(f)
-        @logger.info(worker: 'MediaCleaningWorker', action: 'delete', path: f)
+        @logger.info(class: 'MediaCleaningWorker', action: 'delete', path: f)
       rescue => e
-        @logger.error(e)
+        @logger.error(Ginseng::Error.create(e).to_h.merge(path: f))
       end
     end
   end
