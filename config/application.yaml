@@ -1,5 +1,5 @@
 package:
-  version: 3.3.3
+  version: 3.3.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -14,18 +14,18 @@ handler:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - shortened_url
       - url_normalize
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - amazon_url_nowplaying
-      - you_tube_url_nowplaying
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - amazon_nowplaying
       - canonical_url
-      - amazon_url
       - itunes_url
+      - amazon_url
       - itunes_image
       - spotify_image
       - amazon_image
@@ -38,17 +38,18 @@ handler:
       - admin_notification
       - result_notification
     pre_webhook:
-      - shortened_url
-      - url_normalize
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - itunes_url_nowplaying
+      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - amazon_nowplaying
+      - shortened_url
+      - url_normalize
       - canonical_url
-      - amazon_url
       - itunes_url
+      - amazon_url
       - itunes_image
       - spotify_image
       - amazon_image
@@ -74,18 +75,18 @@ handler:
     pre_toot:
       - user_config_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - shortened_url
       - url_normalize
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - amazon_url_nowplaying
-      - you_tube_url_nowplaying
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - amazon_nowplaying
       - canonical_url
-      - amazon_url
       - itunes_url
+      - amazon_url
       - tagging
     post_toot:
       - user_config_command
