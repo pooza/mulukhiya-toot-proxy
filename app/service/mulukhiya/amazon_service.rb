@@ -6,6 +6,7 @@ module Mulukhiya
     def initialize
       @config = Config.instance
       @http = HTTP.new
+      @logger = Logger.new
       return unless AmazonService.config?
       Amazon::Ecs.configure do |options|
         options[:AWS_access_key_id] = @config['/amazon/access_key']
@@ -24,7 +25,7 @@ module Mulukhiya
 
     def search(keyword, categories)
       return nil unless AmazonService.config?
-      cnt = 1
+      cnt ||= 0
       categories.each do |category|
         response = Amazon::Ecs.item_search(keyword, {
           search_index: category,
@@ -35,6 +36,7 @@ module Mulukhiya
       end
       return nil
     rescue Amazon::RequestError => e
+      @logger.info(e)
       raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
@@ -42,7 +44,7 @@ module Mulukhiya
     end
 
     def lookup(asin)
-      cnt = 1
+      cnt ||= 0
       response = Amazon::Ecs.item_lookup(asin, {
         country: @config['/amazon/country'],
         response_group: 'Images,ItemAttributes',
@@ -52,6 +54,7 @@ module Mulukhiya
       end
       return response.items&.first
     rescue Amazon::RequestError => e
+      @logger.info(e)
       raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1

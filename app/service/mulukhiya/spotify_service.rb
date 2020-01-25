@@ -4,16 +4,18 @@ module Mulukhiya
   class SpotifyService
     def initialize
       @config = Config.instance
+      @logger = Logger.new
       ENV['ACCEPT_LANGUAGE'] ||= @config['/spotify/language']
       RSpotify.authenticate(@config['/spotify/client_id'], @config['/spotify/client_secret'])
     end
 
     def search_track(keyword)
-      cnt = 1
+      cnt ||= 1
       tracks = RSpotify::Track.search(keyword)
       return nil if tracks.nil?
       return tracks.first
     rescue => e
+      @logger.info(e)
       raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
@@ -21,9 +23,10 @@ module Mulukhiya
     end
 
     def lookup_track(id)
-      cnt = 1
+      cnt ||= 1
       return RSpotify::Track.find(id)
     rescue => e
+      @logger.info(e)
       raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
       sleep(1)
       cnt += 1
@@ -31,7 +34,7 @@ module Mulukhiya
     end
 
     def lookup_artist(id)
-      cnt = 1
+      cnt ||= 1
       return RSpotify::Artist.find(id)
     rescue => e
       raise Ginseng::GatewayError, 'Artist not found', e.backtrace if retry_limit < cnt
