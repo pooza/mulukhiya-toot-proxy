@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field]
+      @status = body[status_field].to_s
       return unless parser.command?
       return unless parser.command_name == command_name
       raise Ginseng::ValidateError, errors.values.join if errors.present?
@@ -31,7 +31,7 @@ module Mulukhiya
     end
 
     def handle_post_toot(body, params = {})
-      @status = body[status_field]
+      @status = body[status_field].to_s
       return unless parser.command?
       return unless parser.command_name == command_name
       dispatch

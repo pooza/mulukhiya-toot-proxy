@@ -1,7 +1,7 @@
 module Mulukhiya
   class URLHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field]
+      @status = body[status_field].to_s
       return if parser.command?
       parser.uris do |uri|
         link = uri.to_s

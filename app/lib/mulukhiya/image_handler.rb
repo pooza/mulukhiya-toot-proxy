@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field]
+      @status = body[status_field].to_s
       return if parser.command?
       body['media_ids'] ||= []
       return if body['media_ids'].present?

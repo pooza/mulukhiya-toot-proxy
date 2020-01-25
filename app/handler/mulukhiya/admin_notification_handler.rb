@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def notifiable?(body)
-      return false unless /#notify(\s|$)/i.match?((body[status_field]))
+      return false unless /#notify(\s|$)/i.match?(@status)
       return false if /^(direct|private)$/.match?(body['visibility'])
       return true if sns.account.admin?
       return true if sns.account.moderator?

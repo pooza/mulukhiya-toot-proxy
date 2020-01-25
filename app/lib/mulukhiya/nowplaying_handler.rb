@@ -1,7 +1,7 @@
 module Mulukhiya
   class NowplayingHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field]
+      @status = body[status_field].to_s
       return if parser.command?
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @lines = []
