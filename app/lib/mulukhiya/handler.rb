@@ -9,7 +9,9 @@ module Mulukhiya
     attr_reader :sns
     attr_reader :local_tags
 
-    def handle_pre_toot(body, params = {}); end
+    def handle_pre_toot(body, params = {})
+      return body
+    end
 
     def handle_post_toot(body, params = {}); end
 
