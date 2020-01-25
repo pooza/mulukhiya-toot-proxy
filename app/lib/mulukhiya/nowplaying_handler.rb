@@ -34,7 +34,7 @@ module Mulukhiya
 
     def push(line)
       lines = @status.each_line.to_a.map(&:chomp)
-      @lines.push(line) unless lines.include?(line)
+      @lines.push(line) unless lines.member?(line)
     end
   end
 end
