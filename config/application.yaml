@@ -110,7 +110,7 @@ handler:
     timeout: 20
   canonical_url:
     timeout: 2
-  admin_nitification:
+  admin_notification:
     disable: true
 worker:
   media_cleaning:
