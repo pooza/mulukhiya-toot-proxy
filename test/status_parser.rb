@@ -45,7 +45,11 @@ module Mulukhiya
       assert_equal(@parser.accts.to_a, [])
 
       @parser.body = '@pooza @pooza@precure.ml よろです。 pooza@b-shock.org'
-      assert_equal(@parser.accts.to_a, ['@pooza', '@pooza@precure.ml'])
+      @parser.accts do |acct|
+        assert_kind_of(Acct, acct)
+        assert(acct.valid?)
+      end
+      assert_equal(@parser.accts.map(&:to_s), ['@pooza', '@pooza@precure.ml'])
     end
   end
 end

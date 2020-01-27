@@ -5,6 +5,12 @@ module Mulukhiya
       @account = Environment.test_account
     end
 
+    def test_acct
+      assert_kind_of(Acct, @account.acct)
+      assert(@account.acct.host.present?)
+      assert(@account.acct.username.present?)
+    end
+
     def test_to_h
       assert_kind_of(Hash, @account.to_h)
     end

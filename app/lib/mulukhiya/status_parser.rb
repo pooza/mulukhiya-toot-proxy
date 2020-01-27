@@ -17,7 +17,7 @@ module Mulukhiya
     def accts
       return enum_for(__method__) unless block_given?
       body.scan(StatusParser.acct_pattern).map(&:first).each do |acct|
-        yield acct
+        yield Acct.new(acct)
       end
     end
 

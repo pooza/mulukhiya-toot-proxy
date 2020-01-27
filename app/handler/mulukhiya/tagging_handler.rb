@@ -25,7 +25,7 @@ module Mulukhiya
     def ignore?(body)
       return true unless @status.present?
       parser.accts do |acct|
-        return true if @config['/agent/accts'].member?(acct)
+        return true if acct.agent?
       end
       return false unless body['visibility'].present?
       return false if body['visibility'] == 'public'
@@ -34,7 +34,7 @@ module Mulukhiya
 
     def create_temp_text(body)
       return '' unless @tags.body&.present?
-      text = [@tags.body.gsub(Environment.parser_class.acct_pattern, '')]
+      text = [@tags.body.gsub(Acct.pattern, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end

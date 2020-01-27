@@ -7,6 +7,11 @@ module Mulukhiya
 
       alias to_h values
 
+      def acct
+        @acct ||= Acct.new("@#{username}@#{domain || MastodonService.new.uri.host}")
+        return @acct
+      end
+
       def logger
         @logger ||= Logger.new
         return @logger
@@ -100,8 +105,9 @@ module Mulukhiya
           account.token = token
           return account
         elsif key[:acct]
-          username, domain = key[:acct].sub(/^@/, '').split('@')
-          return Account.first(username: username, domain: domain)
+          acct = key[:acct]
+          acct = Acct.new(acct) unless acct.is_a?(Acct)
+          return Account.first(username: acct.username, domain: acct.host)
         end
         raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
       end
