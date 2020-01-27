@@ -5,4 +5,4 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(dir, 'Gemfile')
 require 'bundler/setup'
 require 'mulukhiya'
 
-Mulukhiya.ruckup
+run Mulukhiya.rackup

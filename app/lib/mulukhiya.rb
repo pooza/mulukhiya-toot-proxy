@@ -54,7 +54,7 @@ module Mulukhiya
         Environment.auth(username, password)
       end
     end
-    run Rack::URLMap.new(
+    return Rack::URLMap.new(
       '/' => Environment.controller_class,
       '/mulukhiya/sidekiq' => Sidekiq::Web,
     )
