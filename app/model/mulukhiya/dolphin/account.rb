@@ -104,7 +104,7 @@ module Mulukhiya
         return Account.first(token: key[:token]) if key[:token]
         if key[:acct]
           acct = key[:acct]
-          acct = Acct.new(acct) unless acct.is_a?(Acct)
+          acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return Account.first(username: acct.username, host: acct.host)
         end
         raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
