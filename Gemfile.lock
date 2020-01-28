@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/mperham/sidekiq.git
+  revision: 3510de7df3c2eaacec9061184666aa853a0abb13
+  specs:
+    sidekiq (6.0.4)
+      connection_pool (>= 2.2.2)
+      rack (~> 2.0.8)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
+
+GIT
   remote: https://github.com/pooza/crowi-client.git
   revision: aa2910cc3710262ba7ec31b28a172491c20558ce
   specs:
@@ -8,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 0081830100f4ffe0019d8a24680f0794c061606a
+  revision: 20a7306985eedde4c5b8f6ae3ab5ba13f58b2eb4
   specs:
-    ginseng-core (1.5.5)
+    ginseng-core (1.5.6)
       activesupport
       addressable
       bundler
@@ -26,17 +36,17 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 471a5e578844ce23c0893a5aa4f42024fca65cee
+  revision: 5e974924863bf5994c5382547847e57aab993bc7
   specs:
-    ginseng-postgres (1.2.0)
+    ginseng-postgres (1.2.1)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 6445990a30e0c3f2dcd0dcfc943816f7f3be7203
+  revision: ff526b389f495066564994f9e7072df911f5c5eb
   specs:
-    ginseng-web (1.0.6)
+    ginseng-web (1.0.7)
       rack-test
       sass
       sinatra
@@ -120,6 +130,7 @@ GEM
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-schema (~> 1.4, >= 1.4.3)
+    e2mmap (0.1.0)
     erubi (1.9.0)
     et-orbi (1.2.2)
       tzinfo
@@ -149,7 +160,7 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2019.1009)
-    mimemagic (0.3.3)
+    mimemagic (0.3.4)
     mini_portile2 (2.4.0)
     minitest (5.14.0)
     msgpack (1.3.1)
@@ -182,7 +193,7 @@ GEM
     power_assert (1.1.5)
     public_suffix (3.1.1)
     raabro (1.1.6)
-    rack (2.1.1)
+    rack (2.0.8)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
@@ -207,7 +218,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rspotify (2.7.0)
+    rspotify (2.8.0)
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
@@ -234,11 +245,6 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.28.0)
-    sidekiq (6.0.4)
-      connection_pool (>= 2.2.2)
-      rack (>= 2.0.0)
-      rack-protection (>= 2.0.0)
-      redis (>= 4.1.0)
     sidekiq-scheduler (3.0.0)
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
@@ -257,6 +263,7 @@ GEM
       eventmachine (~> 1.0, >= 1.0.4)
       rack (>= 1, < 3)
     thread_safe (0.3.6)
+    thwait (0.1.0)
     tilt (2.0.10)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
@@ -277,24 +284,25 @@ DEPENDENCIES
   crowi-client!
   dropbox_api
   dry-validation
+  e2mmap
   fastimage
   ginseng-core!
   ginseng-postgres!
   ginseng-web!
   mimemagic
   nokogiri
-  rack
   rails-erb-lint
   redis
   rspotify
   rubocop
   rubocop-performance
   sanitize
-  sidekiq
+  sidekiq!
   sidekiq-scheduler
+  thwait
 
 RUBY VERSION
-   ruby 2.6.5p114
+   ruby 2.7.0p0
 
 BUNDLED WITH
    2.1.4

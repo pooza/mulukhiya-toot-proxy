@@ -42,6 +42,22 @@ module Mulukhiya
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
     end
   end
+
+  def self.rack
+    require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
+
+    config = Config.instance
+    if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?
+      Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|
+        Environment.auth(username, password)
+      end
+    end
+    return Rack::URLMap.new(
+      '/' => Environment.controller_class,
+      '/mulukhiya/sidekiq' => Sidekiq::Web,
+    )
+  end
 end
 
 Mulukhiya.bootsnap

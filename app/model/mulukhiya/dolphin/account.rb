@@ -1,6 +1,11 @@
 module Mulukhiya
   module Dolphin
     class Account < Sequel::Model(:user)
+      def acct
+        @acct ||= Acct.new("@#{username}@#{host || DolphinService.new.uri.host}")
+        return @acct
+      end
+
       def uri
         unless @uri
           if host
@@ -98,8 +103,9 @@ module Mulukhiya
       def self.get(key)
         return Account.first(token: key[:token]) if key[:token]
         if key[:acct]
-          username, host = key[:acct].sub(/^@/, '').split('@')
-          return Account.first(username: username, host: host)
+          acct = key[:acct]
+          acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
+          return Account.first(username: acct.username, host: acct.host)
         end
         raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
       end

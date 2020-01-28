@@ -4,9 +4,9 @@ module Mulukhiya
       @status = body[status_field].to_s
       return body if parser.command?
       parser.accts do |acct|
-        next unless @config['/agent/accts'].member?(acct)
+        next unless acct.agent?
         body['visibility'] = Environment.controller_class.visibility_name('direct')
-        @result.push(acct)
+        @result.push(acct.to_s)
       end
       return body
     end

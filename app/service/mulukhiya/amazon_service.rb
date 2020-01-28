@@ -37,7 +37,7 @@ module Mulukhiya
       return nil
     rescue Amazon::RequestError => e
       @logger.info(e)
-      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit <= cnt
       sleep(1)
       cnt += 1
       retry
@@ -55,7 +55,7 @@ module Mulukhiya
       return response.items&.first
     rescue Amazon::RequestError => e
       @logger.info(e)
-      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit < cnt
+      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit <= cnt
       sleep(1)
       cnt += 1
       retry

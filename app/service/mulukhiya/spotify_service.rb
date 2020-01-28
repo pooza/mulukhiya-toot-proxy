@@ -10,34 +10,34 @@ module Mulukhiya
     end
 
     def search_track(keyword)
-      cnt ||= 1
+      cnt ||= 0
       tracks = RSpotify::Track.search(keyword)
       return nil if tracks.nil?
       return tracks.first
     rescue => e
       @logger.info(e)
-      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
       sleep(1)
       cnt += 1
       retry
     end
 
     def lookup_track(id)
-      cnt ||= 1
+      cnt ||= 0
       return RSpotify::Track.find(id)
     rescue => e
       @logger.info(e)
-      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
       sleep(1)
       cnt += 1
       retry
     end
 
     def lookup_artist(id)
-      cnt ||= 1
+      cnt ||= 0
       return RSpotify::Artist.find(id)
     rescue => e
-      raise Ginseng::GatewayError, 'Artist not found', e.backtrace if retry_limit < cnt
+      raise Ginseng::GatewayError, 'Artist not found', e.backtrace if retry_limit <= cnt
       sleep(1)
       cnt += 1
       retry
