@@ -43,7 +43,7 @@ module Mulukhiya
     end
   end
 
-  def self.rackup
+  def self.rack
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
 
