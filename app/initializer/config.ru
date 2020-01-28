@@ -5,4 +5,5 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(dir, 'Gemfile')
 require 'bundler/setup'
 require 'mulukhiya'
 
+Mulukhiya::Postgres.connect
 run Mulukhiya.rack
