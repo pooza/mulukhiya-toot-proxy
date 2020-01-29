@@ -24,3 +24,11 @@
   3_2_0: /handler/mastodon/post_boost
 - 3_1_1: /handler/post_search
   3_2_0: /handler/mastodon/post_search
+- 3_3_5: /mastodon/patterns
+  3_4_0: /mastodon/toot/patterns
+- 3_3_5: /dolphin/patterns
+  3_4_0: /dolphin/note/patterns
+- 3_3_5: /handler/mastodon
+  3_4_0: /mastodon/handlers
+- 3_3_5: /handler/dolphin
+  3_4_0: /dolphin/handlers

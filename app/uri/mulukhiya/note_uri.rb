@@ -1,8 +1,13 @@
 module Mulukhiya
   class NoteURI < Ginseng::URI
+    def initialize(options = {})
+      super(options)
+      @config = Config.instance
+      @logger = Logger.new
+    end
+
     def note_id
-      config = Config.instance
-      config['/dolphin/patterns'].each do |pattern|
+      @config['/dolphin/note/patterns'].each do |pattern|
         next unless matches = path.match(Regexp.new(pattern['pattern']))
         return matches[1]
       end
@@ -22,7 +27,7 @@ module Mulukhiya
       template[:url] = note['uri']
       return template.to_s
     rescue => e
-      Logger.new.info(Ginseng::Error.create(e).to_h.merge(note_id: note_id))
+      @logger.info(Ginseng::Error.create(e).to_h.merge(note_id: note_id))
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 

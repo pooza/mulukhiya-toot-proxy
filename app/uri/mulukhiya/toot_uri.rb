@@ -1,8 +1,13 @@
 module Mulukhiya
   class TootURI < Ginseng::URI
+    def initialize(options = {})
+      super(options)
+      @config = Config.instance
+      @logger = Logger.new
+    end
+
     def toot_id
-      config = Config.instance
-      config['/mastodon/patterns'].each do |pattern|
+      @config['/mastodon/toot/patterns'].each do |pattern|
         next unless matches = path.match(Regexp.new(pattern['pattern']))
         return matches[1].to_i
       end
@@ -22,7 +27,7 @@ module Mulukhiya
       template[:url] = toot['url']
       return template.to_s
     rescue => e
-      Logger.new.info(Ginseng::Error.create(e).to_h.merge(toot_id: toot_id))
+      @logger.info(Ginseng::Error.create(e).to_h.merge(toot_id: toot_id))
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 

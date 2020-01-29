@@ -112,7 +112,11 @@ module Mulukhiya
     end
 
     def self.all(event, params = {})
-      Config.instance["/handler/#{Environment.controller_name}/#{event}"].each do |v|
+      config = Config.instance
+      unless config["#{Environment.controller_name}/events"].member?(event)
+        raise "Invalid event '#{event}'"
+      end
+      config["/#{Environment.controller_name}/handlers/#{event}"].each do |v|
         yield create(v, params)
       end
     end
