@@ -56,6 +56,15 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/api/v1/statuses/:id/bookmark' do
+      @results.response = @mastodon.bookmark(params[:id])
+      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @mastodon})
+      @renderer.message = @results.response.parsed_response
+      @renderer.message['results'] = @results.summary
+      @renderer.status = @results.response.code
+      return @renderer.to_s
+    end
+
     get '/api/v2/search' do
       params[:limit] = @config['/mastodon/search/limit']
       @results.response = @mastodon.search(params[:q], params)
