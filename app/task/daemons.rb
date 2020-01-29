@@ -15,3 +15,8 @@ namespace :mulukhiya do
     end
   end
 end
+
+[:start, :stop, :restart].each do |action|
+  desc "#{action} all"
+  task action => ["mulukhiya:thin:#{action}", "mulukhiya:sidekiq:#{action}"]
+end
