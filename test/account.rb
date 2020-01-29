@@ -48,8 +48,8 @@ module Mulukhiya
     end
 
     def test_disable?
-      @config['/handler/mastodon/pre_toot'].each do |v|
-        assert_boolean(@account.disable?(v))
+      Handler.all(:pre_toot) do |handler|
+        assert_boolean(@account.disable?(handler.underscore_name))
       end
     end
 

@@ -10,8 +10,8 @@ module Mulukhiya
     def test_handle_post_boost
       return unless handler?
       @handler.clear
-      @handler.handle_post_fav('id' => @toot.id)
-      assert(TootURI.parse(@handler.result[:entries].first[:url]).id.positive?)
+      @handler.handle_post_bookmark('id' => @toot.id)
+      assert_kind_of(Ginseng::URI, Ginseng::URI.parse(@handler.result[:entries].first[:url]))
     end
   end
 end
