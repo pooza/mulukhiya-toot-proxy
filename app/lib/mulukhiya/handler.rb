@@ -113,7 +113,7 @@ module Mulukhiya
 
     def self.all(event, params = {})
       config = Config.instance
-      unless config["#{Environment.controller_name}/events"].member?(event)
+      unless config["/#{Environment.controller_name}/events"].member?(event.to_s)
         raise "Invalid event '#{event}'"
       end
       config["/#{Environment.controller_name}/handlers/#{event}"].each do |v|
