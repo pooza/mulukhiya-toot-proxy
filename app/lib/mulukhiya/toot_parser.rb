@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def max_length
-      length = Config.instance['/mastodon/toot/max_length']
+      length = @config['/mastodon/toot/max_length']
       length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
     end

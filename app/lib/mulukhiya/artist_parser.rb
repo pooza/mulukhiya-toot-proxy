@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def delimiters
-      return Regexp.new("[#{Config.instance['/artist_parser/delimiters'].join}]")
+      return Regexp.new("[#{@config['/artist_parser/delimiters'].join}]")
     end
   end
 end
