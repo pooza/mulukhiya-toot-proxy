@@ -7,6 +7,10 @@ module Mulukhiya
       return Environment.controller_class.status_field
     end
 
+    def status_key
+      return Environment.controller_class.status_key
+    end
+
     def handler?
       return false if @handler.nil?
       return false if @handler.disable?
