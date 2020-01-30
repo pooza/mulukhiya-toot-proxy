@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mperham/sidekiq.git
-  revision: 3510de7df3c2eaacec9061184666aa853a0abb13
+  revision: 9970082a1236693ab930cf2d6cb764050b56bbb1
   specs:
     sidekiq (6.0.4)
       connection_pool (>= 2.2.2)
