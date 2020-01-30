@@ -62,7 +62,7 @@ module Mulukhiya
         break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         line = lines.pop.strip
         tags.body = body = lines.join("\n")
-        line.split(/\s+/).map {|v| tags.push(v)}
+        tags.concat(line.split(/\s+/))
       end
       r = [body, tags.to_s]
       r.push(via[1]) if via.present?
