@@ -6,7 +6,6 @@ module Mulukhiya
   class Handler
     attr_reader :results
     attr_reader :sns
-    attr_reader :tags
 
     def handle_pre_toot(body, params = {})
       return body
@@ -56,7 +55,6 @@ module Mulukhiya
       @result.clear
       @status = nil
       @parser = nil
-      @tags.clear
       @prepared = false
       @results.clear
       @results.tags.clear
@@ -90,6 +88,10 @@ module Mulukhiya
         @results.parser = @parser
       end
       return @parser
+    end
+
+    def tags
+      return @results.tags
     end
 
     def status_field
@@ -129,7 +131,6 @@ module Mulukhiya
           handler.send("handle_#{event}".to_sym, body, params)
         end
         params[:results].push(handler.result)
-        params[:results].tags.concat(handler.tags)
         break if handler.prepared?
       rescue Timeout::Error => e
         Logger.new.error(e)
@@ -145,7 +146,6 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @result = []
-      @tags = TagContainer.new
       @sns = params[:sns] || Environment.sns_class.new
       @results = params[:results] || ResultContainer.new
       @prepared = false

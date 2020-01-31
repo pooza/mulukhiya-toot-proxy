@@ -3,20 +3,15 @@ module Mulukhiya
     def handle_pre_toot(body, params = {})
       @status = body[status_field].to_s
       return body if ignore?(body)
-      @results.tags.body = TagContainer.tweak(@status)
-      temp_text = create_temp_text(body)
-      TaggingDictionary.new.reverse_each do |k, v|
-        next if k.length < @config['/tagging/word/minimum_length']
-        next unless temp_text.match?(v[:pattern])
-        @results.tags.push(k)
-        @results.tags.concat(v[:words])
-        temp_text.gsub!(v[:pattern], '')
-      end
-      @results.tags.concat(create_attachment_tags(body))
-      @results.tags.concat(TagContainer.default_tags)
-      @results.tags.concat(@sns.account.tags)
-      body[status_field] = append(@status, @results.tags)
-      @result.concat(@results.tags.create_tags)
+      tags.body = TagContainer.tweak(@status)
+      @dic = TaggingDictionary.new
+      @dic.text = create_temp_text(body)
+      tags.concat(@dic.matches)
+      tags.concat(create_attachment_tags(body))
+      tags.concat(TagContainer.default_tags)
+      tags.concat(@sns.account.tags)
+      body[status_field] = append(@status, tags)
+      @result.concat(tags.create_tags)
       return body
     end
 
@@ -33,8 +28,8 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      return '' unless @results.tags.body&.present?
-      text = [@results.tags.body.gsub(Acct.pattern, '')]
+      return '' unless tags.body&.present?
+      text = [tags.body.gsub(Acct.pattern, '')]
       text.concat(body['poll']['options']) if body['poll']
       return text.join('///')
     end
