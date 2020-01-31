@@ -6,7 +6,6 @@ module Mulukhiya
 
     def handle_root(body, params = {})
       params[:results] ||= ResultContainer.new
-      params[:tags] ||= TagContainer.new
       handle_pre_toot(body, params)
       return handle_post_toot(body, params)
     end
