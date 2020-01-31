@@ -11,7 +11,6 @@ module Mulukhiya
       @dolphin.account.slack&.say(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @renderer.message = @results.response.parsed_response
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
@@ -27,7 +26,6 @@ module Mulukhiya
       @dolphin.account.slack&.say(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_upload, params, {results: @results, sns: @dolphin})
       @renderer.message = JSON.parse(@results.response.body)
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
@@ -41,7 +39,6 @@ module Mulukhiya
       @results.response = @dolphin.fav(params[:noteId])
       Handler.exec_all(:post_bookmark, params, {results: @results, sns: @dolphin})
       @renderer.message = @results.response.parsed_response || {}
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     end

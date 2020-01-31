@@ -8,10 +8,6 @@ module Mulukhiya
       return @tags
     end
 
-    def summary
-      return map {|v| "#{v[:handler]}:#{v.count}"}.join(', ')
-    end
-
     def push(value)
       return unless value
       @logger ||= Logger.new

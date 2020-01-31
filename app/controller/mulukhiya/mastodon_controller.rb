@@ -12,7 +12,6 @@ module Mulukhiya
       @mastodon.account.slack&.say(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
-      @renderer.message['results'] = @results.summary
       @renderer.message['tags']&.keep_if {|v| tags.member?(v['name'])}
       @renderer.status = @results.response.code
       return @renderer.to_s
@@ -28,7 +27,6 @@ module Mulukhiya
       @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
       Handler.exec_all(:post_upload, params, {results: @results, sns: @mastodon})
       @renderer.message = JSON.parse(@results.response.body)
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
@@ -42,7 +40,6 @@ module Mulukhiya
       @results.response = @mastodon.fav(params[:id])
       Handler.exec_all(:post_fav, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
@@ -51,7 +48,6 @@ module Mulukhiya
       @results.response = @mastodon.boost(params[:id])
       Handler.exec_all(:post_boost, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
@@ -60,7 +56,6 @@ module Mulukhiya
       @results.response = @mastodon.bookmark(params[:id])
       Handler.exec_all(:post_bookmark, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
@@ -71,7 +66,6 @@ module Mulukhiya
       @message = @results.response.parsed_response.with_indifferent_access
       Handler.exec_all(:post_search, params, {results: @results, message: @message})
       @renderer.message = @message
-      @renderer.message['results'] = @results.summary
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
@@ -84,7 +78,6 @@ module Mulukhiya
       elsif webhook = Webhook.create(params[:digest])
         results = webhook.toot(params)
         @renderer.message = results.response.parsed_response
-        @renderer.message['results'] = results.summary
         @renderer.status = results.response.code
       else
         @renderer.status = 404
