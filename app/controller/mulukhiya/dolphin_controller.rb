@@ -8,14 +8,14 @@ module Mulukhiya
     post '/api/notes/create' do
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @results.response = @dolphin.note(params)
-      @dolphin.account.slack&.say(@results.response.parsed_response) if response_error?
+      notify(@dolphin.account, @results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin}) unless renote?
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      @dolphin.account.slack&.say('error' => e.message)
+      notify(@dolphin.account, @renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
@@ -23,14 +23,14 @@ module Mulukhiya
     post '/api/drive/files/create' do
       Handler.exec_all(:pre_upload, params, {results: @results, sns: @dolphin})
       @results.response = @dolphin.upload(params[:file][:tempfile].path)
-      @dolphin.account.slack&.say(@results.response.parsed_response) if response_error?
+      notify(@dolphin.account, @results.response.parsed_response) if response_error?
       Handler.exec_all(:post_upload, params, {results: @results, sns: @dolphin})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      @dolphin.account.slack&.say('error' => e.message)
+      notify(@dolphin.account, @renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end

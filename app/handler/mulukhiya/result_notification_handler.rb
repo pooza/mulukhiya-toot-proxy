@@ -1,5 +1,5 @@
 module Mulukhiya
-  class ResultNotificationHandler < NotificationHandler
+  class ResultNotificationHandler < Handler
     def disable?
       return true unless Postgres.config?
       return true if sns.account.config["/handler/#{underscore_name}/disable"].nil?
@@ -48,6 +48,10 @@ module Mulukhiya
     def handle_post_search(body, params = {})
       return unless notifiable?(body)
       worker_class.perform_async(account_id: sns.account.id, results: results)
+    end
+
+    def worker_class
+      return self.class.to_s.sub(/Handler$/, 'Worker').constantize
     end
   end
 end

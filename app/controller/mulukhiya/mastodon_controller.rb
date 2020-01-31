@@ -9,7 +9,7 @@ module Mulukhiya
       tags = TootParser.new(params[:status]).tags
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @mastodon})
       @results.response = @mastodon.toot(params)
-      @mastodon.account.slack&.say(@results.response.parsed_response) if response_error?
+      notify(@mastodon.account, @results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @mastodon})
       @renderer.message = @results.response.parsed_response
       @renderer.message['tags']&.keep_if {|v| tags.member?(v['name'])}
@@ -17,7 +17,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      @mastodon.account.slack&.say('error' => e.message)
+      notify(@mastodon.account, @renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
@@ -31,7 +31,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      @mastodon.account.slack&.say('error' => e.message)
+      notify(@mastodon.account, @renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end

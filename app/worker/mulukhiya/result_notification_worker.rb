@@ -1,11 +1,16 @@
 module Mulukhiya
-  class ResultNotificationWorker < NotificationWorker
+  class ResultNotificationWorker
+    include Sidekiq::Worker
     sidekiq_options retry: false
 
     def perform(params)
-      Environment.account_class[params['account_id']].slack&.say(
+      message = [
+        Environment.account_class[params['account_id']].acct.to_s,
         YAML.dump(params['results']),
-        :text,
+      ]
+      Environment.info_agent&.notify(
+        Environment.controller_class.status_field => message.join("\n"),
+        'visibility' => Environment.controller_class.visibility_name('direct'),
       )
     end
   end

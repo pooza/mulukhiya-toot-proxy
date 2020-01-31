@@ -75,5 +75,9 @@ module Mulukhiya
         },
       })
     end
+
+    def notify(message)
+      return toot(message)
+    end
   end
 end
