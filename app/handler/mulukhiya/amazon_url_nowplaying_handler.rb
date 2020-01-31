@@ -24,7 +24,7 @@ module Mulukhiya
       return unless item = @items[keyword]
       push(item.get('ItemAttributes/Title'))
       push(item.get('ItemAttributes/Creator'))
-      @local_tags = ArtistParser.new(item.get('ItemAttributes/Creator')).parse
+      @tags = ArtistParser.new(item.get('ItemAttributes/Creator')).parse
     end
   end
 end

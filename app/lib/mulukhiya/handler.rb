@@ -4,10 +4,9 @@ require 'rest-client'
 
 module Mulukhiya
   class Handler
-    attr_accessor :tags
-    attr_accessor :results
+    attr_reader :results
     attr_reader :sns
-    attr_reader :local_tags
+    attr_reader :tags
 
     def handle_pre_toot(body, params = {})
       return body
@@ -54,13 +53,13 @@ module Mulukhiya
     end
 
     def clear
-      @tags.clear
       @result.clear
       @status = nil
       @parser = nil
-      @local_tags.clear
+      @tags.clear
       @prepared = false
       @results.clear
+      @results.tags.clear
       @results.parser = nil
     end
 
@@ -124,14 +123,13 @@ module Mulukhiya
     def self.exec_all(event, body, params = {})
       params[:event] = event
       params[:results] ||= ResultContainer.new
-      params[:tags] ||= TagContainer.new
       all(event, params) do |handler|
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
         end
         params[:results].push(handler.result)
-        params[:tags].concat(handler.local_tags)
+        params[:results].tags.concat(handler.tags)
         break if handler.prepared?
       rescue Timeout::Error => e
         Logger.new.error(e)
@@ -147,9 +145,8 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @result = []
-      @local_tags = []
+      @tags = TagContainer.new
       @sns = params[:sns] || Environment.sns_class.new
-      @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @prepared = false
       @event = params[:event] || 'unknown'
