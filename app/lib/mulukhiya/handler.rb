@@ -37,10 +37,6 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
-    def summary
-      return "#{self.class.to_s.split('::').last},#{@result.count}"
-    end
-
     def result
       return nil unless @result.present?
       return {
