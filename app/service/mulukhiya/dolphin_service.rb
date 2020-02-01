@@ -75,9 +75,10 @@ module Mulukhiya
       return uri
     end
 
-    def notify(message)
+    def notify(account, message)
       return note(
         DolphinController.status_field => message,
+        'visibleUserIds' => [account.id],
         'visibility' => DolphinController.visibility_name('direct'),
       )
     end
