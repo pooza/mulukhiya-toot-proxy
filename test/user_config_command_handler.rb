@@ -7,10 +7,9 @@ module Mulukhiya
       @key = SecureRandom.hex(16)
     end
 
-    def test_status
+    def test_message
       return unless handler?
-      @handler.handle_root({status_field => 'command: user_config'})
-      assert_kind_of(Hash, YAML.safe_load(@handler.status))
+      assert_kind_of(Hash, @handler.message)
     end
 
     def test_handle_root
