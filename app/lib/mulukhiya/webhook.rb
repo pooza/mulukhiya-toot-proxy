@@ -19,6 +19,10 @@ module Mulukhiya
       return uri
     end
 
+    def visibility
+      return @params['/webhook/visibility'] || 'public'
+    end
+
     def exist?
       return @db.execute('webhook_tokens', {
         token: @sns.token,
@@ -43,7 +47,7 @@ module Mulukhiya
       status = {text: status} if status.is_a?(String)
       body = {
         'status' => status[:text],
-        'visibility' => @params['/webhook/visibility'] || 'public',
+        'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
       Handler.exec_all(:pre_webhook, body, {results: results, sns: @sns})
