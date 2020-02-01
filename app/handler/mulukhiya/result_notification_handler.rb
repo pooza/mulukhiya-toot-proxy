@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def notify
-      Environment.info_agent&.notify(results.to_s)
+      Environment.info_agent&.notify(sns.account, results.to_s)
     end
   end
 end

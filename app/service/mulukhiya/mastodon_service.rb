@@ -76,9 +76,9 @@ module Mulukhiya
       })
     end
 
-    def notify(message)
+    def notify(account, message)
       return toot(
-        MastodonController.status_field => message,
+        MastodonController.status_field => [account.acct.to_s, message].join("\n"),
         'visibility' => MastodonController.visibility_name('direct'),
       )
     end

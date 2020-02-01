@@ -2,7 +2,6 @@ module Mulukhiya
   class ResultContainer < Array
     attr_accessor :response
     attr_accessor :parser
-    attr_accessor :account
 
     def initialize(size = 0, val = nil)
       super(size, val)
@@ -34,9 +33,7 @@ module Mulukhiya
     end
 
     def to_s
-      body = [YAML.dump(to_h)]
-      body.unshift(Environment.account_class[account.id].acct.to_s) if account
-      return body.join("\n")
+      return YAML.dump(to_h)
     end
   end
 end
