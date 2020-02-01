@@ -7,31 +7,25 @@ module Mulukhiya
 
     def dispatch
       raise Ginseng::GatewayError, 'Invalid access token' unless id = sns.account.id
-      UserConfigStorage.new.update(id, parser.params)
+      @storage.update(id, parser.params)
+      Environment.info_agent&.notify(sns.account, YAML.dump(message))
     end
 
-    def status
-      v = deep_merge(
-        JSON.parse(UserConfigStorage.new.get(sns.account.id) || '{}'),
-        parser.params,
-      )
-      v.delete('command')
-      v['webhook']['url'] = sns.account.webhook&.uri.to_s if v.dig('webhook', 'token')
-      return YAML.dump(v)
-    rescue => e
-      @logger.error(e)
-      raise Ginseng::RequestError, e.message, e.backtrace
+    def message
+      v = JSON.parse(@storage.get(sns.account.id))
+      v['webhook']['url'] = sns.account.webhook.uri.to_s if v.dig('webhook', 'token')
+      return v
+    end
+
+    def notifiable?
+      return false
     end
 
     private
 
-    def deep_merge(src, target)
-      raise ArgumentError 'Not Hash' unless target.is_a?(Hash)
-      dest = src.clone || {}
-      target.each do |k, v|
-        dest[k] = v.is_a?(Hash) ? deep_merge(dest[k], v) : v
-      end
-      return dest.compact
+    def initialize(params = {})
+      super(params)
+      @storage = UserConfigStorage.new
     end
   end
 end

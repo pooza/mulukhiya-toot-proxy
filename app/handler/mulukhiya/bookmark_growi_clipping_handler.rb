@@ -6,5 +6,9 @@ module Mulukhiya
       GrowiClippingWorker.perform_async(uri: uri.to_s, account_id: sns.account.id)
       @result.push(url: uri.to_s)
     end
+
+    def notifiable?
+      return true
+    end
   end
 end

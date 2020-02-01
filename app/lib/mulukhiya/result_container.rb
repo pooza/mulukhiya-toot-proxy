@@ -13,23 +13,25 @@ module Mulukhiya
       return @tags
     end
 
-    def push(values)
-      return unless values.present?
-      super(values)
-      @logger.info(values)
+    def push(result)
+      return unless result.present?
+      super(result)
+      @logger.info(result)
+      @dump = nil
     end
 
     def to_h
-      h = {}
-      each do |values|
-        h[values[:event]] ||= {}
-        h[values[:event]][values[:handler]] = values[:entries].map do |v|
-          v.is_a?(Hash) ? v.deep_stringify_keys : v
+      unless @dump
+        @dump = {}
+        each do |result|
+          next unless result[:notifiable]
+          @dump[result[:event]] ||= {}
+          @dump[result[:event]][result[:handler]] = result[:entries].map do |v|
+            v.is_a?(Hash) ? v.deep_stringify_keys : v
+          end
         end
-      rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(v: values))
       end
-      return h
+      return @dump
     end
 
     def to_s

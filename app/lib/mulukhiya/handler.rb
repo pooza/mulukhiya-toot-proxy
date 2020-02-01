@@ -5,6 +5,7 @@ require 'rest-client'
 module Mulukhiya
   class Handler
     attr_reader :results
+    attr_reader :event
     attr_reader :sns
 
     def handle_pre_toot(body, params = {})
@@ -37,11 +38,16 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
+    def notifiable?
+      return false
+    end
+
     def result
       return nil unless @result.present?
       return {
-        event: @event.to_s,
         handler: underscore_name,
+        event: @event.to_s,
+        notifiable: notifiable?,
         entries: @result,
       }
     end
