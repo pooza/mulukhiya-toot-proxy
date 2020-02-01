@@ -13,10 +13,6 @@ module Mulukhiya
       }.to_json)
     end
 
-    def visibility
-      return @params['/webhook/visibility'] || 'public'
-    end
-
     def uri
       uri = Ginseng::URI.parse(@config['/mastodon/url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
@@ -47,7 +43,7 @@ module Mulukhiya
       status = {text: status} if status.is_a?(String)
       body = {
         'status' => status[:text],
-        'visibility' => visibility,
+        'visibility' => @params['/webhook/visibility'] || 'public',
         'attachments' => status[:attachments] || [],
       }
       Handler.exec_all(:pre_webhook, body, {results: results, sns: @sns})
