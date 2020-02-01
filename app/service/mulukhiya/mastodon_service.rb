@@ -77,7 +77,10 @@ module Mulukhiya
     end
 
     def notify(message)
-      return toot(message)
+      return toot(
+        MastodonController.status_field => message,
+        'visibility' => MastodonController.visibility_name('direct'),
+      )
     end
   end
 end

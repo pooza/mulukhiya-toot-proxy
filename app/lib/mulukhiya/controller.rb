@@ -38,10 +38,7 @@ module Mulukhiya
 
     def notify(account, message)
       message = YAML.dump(message) unless message.is_a?(String)
-      Environment.info_agent&.notify(
-        Environment.controller_class.status_field => [account.acct.to_s, message].join("\n"),
-        'visibility' => Environment.controller_class.visibility_name('direct'),
-      )
+      Environment.info_agent&.notify([account.acct.to_s, message].join("\n"))
     end
 
     not_found do

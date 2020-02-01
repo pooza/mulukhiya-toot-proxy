@@ -3,6 +3,7 @@ module Mulukhiya
     before do
       @mastodon = MastodonService.new
       @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
+      @results.account = @mastodon.account
     end
 
     post '/api/v1/statuses' do

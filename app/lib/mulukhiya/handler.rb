@@ -14,7 +14,7 @@ module Mulukhiya
     def handle_post_toot(body, params = {}); end
 
     def handle_pre_webhook(body, params = {})
-      handle_pre_toot(body, params)
+      return handle_pre_toot(body, params)
     end
 
     def handle_post_webhook(body, params = {})
@@ -40,9 +40,8 @@ module Mulukhiya
     def result
       return nil unless @result.present?
       return {
-        controller: Environment.controller_class.to_s,
-        handler: self.class.to_s,
-        event: @event,
+        event: @event.to_s,
+        handler: underscore_name,
         entries: @result,
       }
     end
