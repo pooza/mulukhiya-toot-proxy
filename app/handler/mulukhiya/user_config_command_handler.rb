@@ -8,7 +8,7 @@ module Mulukhiya
     def dispatch
       raise Ginseng::GatewayError, 'Invalid access token' unless id = sns.account.id
       @storage.update(id, parser.params)
-      Environment.info_agent&.notify(sns.account, YAML.dump(message))
+      Environment.info_agent&.notify(sns.account, YAML.dump(message)) unless Environment.test?
     end
 
     def message
