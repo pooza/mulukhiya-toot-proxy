@@ -7,7 +7,7 @@ module Mulukhiya
 
     def test_handle_pre_toot
       return unless handler?
-      @handler.handle_pre_toot({status_field => "#nowplaying エビカニクス\n"})
+      @handler.handle_pre_toot(status_field => "#nowplaying エビカニクス\n")
       assert_equal(@handler.result[:entries], ['エビカニクス'])
     end
   end

@@ -8,11 +8,11 @@ module Mulukhiya
       return unless handler?
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => 'https://www.spotify.com/jp/'})
+      @handler.handle_pre_toot(status_field => 'https://www.spotify.com/jp/')
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => 'https://open.spotify.com/track/7iNq9x3bom8XKfZsJWuWVH'})
+      @handler.handle_pre_toot(status_field => 'https://open.spotify.com/track/7iNq9x3bom8XKfZsJWuWVH')
       assert(@handler.result[:entries].present?) if @handler.result
     end
   end

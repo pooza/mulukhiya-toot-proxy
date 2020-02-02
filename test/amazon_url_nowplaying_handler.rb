@@ -8,11 +8,11 @@ module Mulukhiya
       return unless handler?
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "#nowplaying https://www.amazon.co.jp/\n"})
+      @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/\n")
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot({status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n"})
+      @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n")
       assert_equal(@handler.result[:entries], ['https://www.amazon.co.jp/dp/B00QIUDCXS'])
     end
   end
