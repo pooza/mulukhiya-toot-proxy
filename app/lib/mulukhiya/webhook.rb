@@ -44,7 +44,6 @@ module Mulukhiya
     end
 
     def toot(status)
-      status = {text: status} if status.is_a?(String)
       body = {
         'status' => status[:text],
         'visibility' => visibility,
