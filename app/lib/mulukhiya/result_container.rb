@@ -2,6 +2,7 @@ module Mulukhiya
   class ResultContainer < Array
     attr_accessor :response
     attr_accessor :parser
+    attr_accessor :account
 
     def initialize(size = 0, val = nil)
       super(size, val)
@@ -24,7 +25,7 @@ module Mulukhiya
       unless @dump
         @dump = {}
         each do |result|
-          next unless result[:notifiable]
+          next unless result[:notifiable] || @account&.notify_verbose?
           @dump[result[:event]] ||= {}
           @dump[result[:event]][result[:handler]] = result[:entries].map do |v|
             v.is_a?(Hash) ? v.deep_stringify_keys : v

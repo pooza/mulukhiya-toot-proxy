@@ -88,6 +88,10 @@ module Mulukhiya
         return prams[:locked]
       end
 
+      def notify_verbose?
+        return config['/notify/verbose'] == true
+      end
+
       def disable?(handler_name)
         return true if config["/handler/#{handler_name}/disable"]
         return true if config['/handler/default/disable']

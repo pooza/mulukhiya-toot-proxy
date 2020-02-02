@@ -3,6 +3,7 @@ module Mulukhiya
     before do
       @dolphin = DolphinService.new
       @dolphin.token = params[:i] if params[:i]
+      @results.account = @dolphin.account
     end
 
     post '/api/notes/create' do
