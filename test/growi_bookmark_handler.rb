@@ -1,7 +1,7 @@
 module Mulukhiya
-  class BookmarkDropboxClippingHandlerTest < TestCase
+  class GrowiBookmarkHandlerTest < TestCase
     def setup
-      @handler = Handler.create('bookmark_dropbox_clipping')
+      @handler = Handler.create('growi_bookmark')
       return unless handler?
       @status = Environment.test_account.recent_status
     end

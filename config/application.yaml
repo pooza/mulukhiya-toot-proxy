@@ -138,8 +138,8 @@ mastodon:
     post_search:
       - result_notification
     post_bookmark:
-      - bookmark_dropbox_clipping
-      - bookmark_growi_clipping
+      - dropbox_bookmark
+      - growi_bookmark
       - result_notification
   events:
     - pre_toot
@@ -205,8 +205,8 @@ dolphin:
     post_upload:
       - result_notification
     post_bookmark:
-      - bookmark_dropbox_clipping
-      - bookmark_growi_clipping
+      - dropbox_bookmark
+      - growi_bookmark
       - result_notification
   events:
     - pre_toot
