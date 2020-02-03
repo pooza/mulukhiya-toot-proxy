@@ -23,8 +23,8 @@ module Mulukhiya
       @logger.error(e)
     end
 
-    def decrypt(encrypted, bit = 256)
-      encrypted, salt = encrypted.split(GLUE).map {|v| decode_base64(v)}
+    def decrypt(joined, bit = 256)
+      encrypted, salt = joined.split(GLUE).map {|v| decode_base64(v)}
       dec = create_aes(bit)
       dec.decrypt
       keyiv = create_key_iv(password, salt, dec)

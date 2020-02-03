@@ -126,7 +126,17 @@ module Mulukhiya
 
     get '/mulukhiya/app/config' do
       @renderer = HTMLRenderer.new
-      @renderer.template = 'config'
+      @renderer.template = 'app_config'
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/config' do
+      if @mastodon.account
+        @renderer.message = UserConfigStorage.new.get(@mastodon.account.id)
+      else
+        @renderer.message = {error: 'bad token'}
+        @renderer.status = 400
+      end
       return @renderer.to_s
     end
 

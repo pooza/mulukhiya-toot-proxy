@@ -1,27 +1,33 @@
 <%# encoding: UTF-8 -%>
 <%= render('fragment/header') %>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('mulukhiya_token')) {
-      const link = document.getElementById('config_link');
-      link.setAttribute('href', '/mulukhiya/app/config');
-    }
-  });
-</script>
 <nav class="breadcrumbs">
   <ul>
     <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
     <li>モロヘイヤHOME
   </ul>
 </nav>
-<main>
+<main id="app">
   <h1><%= Mulukhiya::Package.name %></h1>
-  <ol>
+  <ul>
     <% if Mulukhiya::Environment.controller_class.webhook? %>
       <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
     <% end %>
-    <li><a id="config_link">環境設定</a>
+    <li v-if="config_link"><a href="/mulukhiya/app/config">環境設定</a>
+    <li v-else>環境設定 <span class="alert">未認証</span>
     <li><a href="/mulukhiya/health">動作状況</a>
-  </ol>
+  </ul>
 </main>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    config_link: false
+  },
+  mounted: function () {
+    const token = localStorage.getItem('mulukhiya_token')
+    this.config_link = (token != null)
+  },
+})
+
+</script>
 <%= render('fragment/footer') %>

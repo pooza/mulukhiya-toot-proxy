@@ -1,0 +1,47 @@
+<%# encoding: UTF-8 -%>
+<%= render('fragment/header') %>
+<nav class="breadcrumbs">
+  <ul>
+    <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
+    <li><a href="/mulukhiya">モロヘイヤHOME</a>
+    <li>環境設定
+  </ul>
+</nav>
+<main id="app">
+  <h2>環境設定</h2>
+  <div v-if="token_error" class="alert">
+    <a href="/mulukhiya/app/auth">アプリケーションの認証</a>を行ってください。
+  </div>
+  <div v-if="response_error" class="alert">
+    {{error_message}}
+  </div>
+  <div id="result-container">
+    <h3>現在の設定</h2>
+    <pre v-if="result">{{result}}</pre>
+  </div>
+</main>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    token_error: false,
+    response_error: false,
+    result: null,
+  },
+  mounted: function () {
+    const token = localStorage.getItem('mulukhiya_token')
+    if (token) {
+      axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+        .then(e => {
+          this.result = jsyaml.safeDump(e.data)
+        }).catch(e => {
+          this.response_error = true
+          this.error_message = e.message
+        })
+    } else {
+      this.token_error = true
+    }
+  },
+})
+</script>
+<%= render('fragment/footer') %>
