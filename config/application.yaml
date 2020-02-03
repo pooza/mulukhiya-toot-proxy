@@ -365,3 +365,5 @@ agent:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
   salt: mulukhiya
+crypt:
+  password: mulukhiya
