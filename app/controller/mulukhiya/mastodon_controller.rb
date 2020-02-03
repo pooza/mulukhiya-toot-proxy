@@ -2,7 +2,11 @@ module Mulukhiya
   class MastodonController < Controller
     before do
       @mastodon = MastodonService.new
-      @mastodon.token = @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
+      if params[:token].present?
+        @mastodon.token = Crypt.new.decrypt(params[:token])
+      elsif @headers['Authorization']
+        @mastodon.token = @headers['Authorization'].split(/\s+/).last
+      end
       @results.account = @mastodon.account
     end
 
@@ -98,7 +102,7 @@ module Mulukhiya
     get '/mulukhiya/app/auth' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
-      @renderer['oauth_url'] = MastodonService.new.oauth_uri
+      @renderer['oauth_url'] = @mastodon.oauth_uri
       return @renderer.to_s
     end
 
@@ -108,14 +112,21 @@ module Mulukhiya
       if errors.present?
         @renderer.template = 'app_auth'
         @renderer['errors'] = errors
-        @renderer['oauth_url'] = MastodonService.new.oauth_uri
+        @renderer['oauth_url'] = @mastodon.oauth_uri
+        @renderer.status = 422
       else
-        r = MastodonService.new.auth(params[:code])
+        r = @mastodon.auth(params[:code])
         @renderer.template = 'app_auth_result'
         @renderer['status'] = r.code
         @renderer['result'] = r.parsed_response
         @renderer.status = r.code
       end
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/app/config' do
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'config'
       return @renderer.to_s
     end
 
