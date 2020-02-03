@@ -1,5 +1,13 @@
 <%# encoding: UTF-8 -%>
 <%= render('fragment/header') %>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('mulukhiya_token')) {
+      const link = document.getElementById('config_link');
+      link.setAttribute('href', '/mulukhiya/app/config');
+    }
+  });
+</script>
 <nav class="breadcrumbs">
   <ul>
     <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
@@ -12,7 +20,7 @@
     <% if Mulukhiya::Environment.controller_class.webhook? %>
       <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
     <% end %>
-    <li><a>環境設定</a>
+    <li><a id="config_link">環境設定</a>
     <li><a href="/mulukhiya/health">動作状況</a>
   </ol>
 </main>
