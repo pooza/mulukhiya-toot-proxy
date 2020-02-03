@@ -1,7 +1,7 @@
 module Mulukhiya
   class VideoFileTest < TestCase
     def setup
-      @file = VideoFile.new(File.join(Environment.dir, 'sample/poyke.mp4'))
+      @file = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
     end
 
     def test_video?

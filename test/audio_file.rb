@@ -1,7 +1,7 @@
 module Mulukhiya
   class AudioFileTest < TestCase
     def setup
-      @file = AudioFile.new(File.join(Environment.dir, 'sample/hugttocatch.mp3'))
+      @file = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
     end
 
     def test_audio?

@@ -5,7 +5,7 @@ module Mulukhiya
       return unless handler?
       @handler.handle_pre_upload(file: {
         tmpfile: File.new(
-          File.join(Environment.dir, 'sample/hugttocatch.mp3'),
+          File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'),
         ),
       })
     end
