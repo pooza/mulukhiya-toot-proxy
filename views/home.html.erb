@@ -24,10 +24,8 @@ new Vue({
     config_link: false
   },
   mounted: function () {
-    const token = localStorage.getItem('mulukhiya_token')
-    this.config_link = (token != null)
+    this.config_link = (localStorage.getItem('mulukhiya_token') != null)
   },
 })
-
 </script>
 <%= render('fragment/footer') %>

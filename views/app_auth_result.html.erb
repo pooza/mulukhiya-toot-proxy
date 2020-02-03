@@ -1,15 +1,5 @@
 <%# encoding: UTF-8 -%>
 <%= render('fragment/header') %>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('copy_button').addEventListener('click', e => {
-      const text = document.getElementById('toot_text');
-      text.select();
-      document.execCommand('copy');
-    });
-    localStorage.setItem('mulukhiya_token', '<%= Mulukhiya::Crypt.new.encrypt(params[:result][:access_token]) %>');
-  });
-</script>
 <nav class="breadcrumbs">
   <ul>
     <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
@@ -17,14 +7,29 @@
     <li>アプリケーションの認証
   </ul>
 </nav>
-<main>
+<main id="app">
   <h2>アプリケーションの認証</h2>
   <% if params[:status].to_i < 400 %>
     <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= Mulukhiya::Config.instance['/mastodon/toot/label'] %>してください。</p>
     <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
-    <button id="copy_button">クリップボードにコピー</button>
+    <button v-on:click="copyToot">クリップボードにコピー</button>
   <% else %>
     <p class="alert">エラー（<%= params[:status] %>）</p>
   <% end %>
 </main>
+<script>
+new Vue({
+  el: '#app',
+  mounted: function () {
+    localStorage.setItem('mulukhiya_token', '<%= Mulukhiya::Crypt.new.encrypt(params[:result][:access_token]) %>')
+  },
+  methods: {
+    copyToot: function () {
+      const text = document.getElementById('toot_text')
+      text.select()
+      document.execCommand('copy')
+    },
+  },
+})
+</script>
 <%= render('fragment/footer') %>
