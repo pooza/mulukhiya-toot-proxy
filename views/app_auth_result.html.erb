@@ -10,9 +10,12 @@
 <main id="app">
   <h2>アプリケーションの認証</h2>
   <% if params[:status].to_i < 400 %>
-    <p><a href="/web/getting-started">タイムライン画面</a>に戻って、以下を<%= Mulukhiya::Config.instance['/mastodon/toot/label'] %>してください。</p>
-    <textarea id="toot_text" class="toot"><%= YAML.dump({'command' => 'user_config', 'webhook' => {'token' => params[:result][:access_token]}}) %></textarea>
-    <button v-on:click="copyToot">クリップボードにコピー</button>
+    <p>認証が完了しました。</p>
+    <textarea id="token_text" class="toot"><%= params[:result][:access_token] %></textarea>
+    <button v-on:click="copyToken">クリップボードにコピー</button>
+
+    <textarea id="webhook_text" class="toot"><%= params[:hook_url] %></textarea>
+    <button v-on:click="copyWehbook">クリップボードにコピー</button>
   <% else %>
     <p class="alert">エラー（<%= params[:status] %>）</p>
   <% end %>
@@ -24,9 +27,12 @@ new Vue({
     localStorage.setItem('mulukhiya_token', '<%= Mulukhiya::Crypt.new.encrypt(params[:result][:access_token]) %>')
   },
   methods: {
-    copyToot: function () {
-      const text = document.getElementById('toot_text')
-      text.select()
+    copyToken: function () {
+      document.getElementById('token_text').select()
+      document.execCommand('copy')
+    },
+    copyWehbook: function () {
+      document.getElementById('webhook_text').select()
       document.execCommand('copy')
     },
   },

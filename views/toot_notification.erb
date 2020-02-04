@@ -1,7 +1,0 @@
-<%# encoding: UTF-8 -%>
-<% if @params[:account][:display_name].present? -%>
-From: <%= @params[:account][:display_name] %> (@<%= @params[:account][:username] %>)
-<% else -%>
-From: @<%= @params[:account][:username] %>
-<% end -%>
-<%= @params[:status] %>

@@ -99,10 +99,20 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/config' do
+      if @mastodon.account
+        @renderer.message = UserConfigStorage.new.get(@mastodon.account.id)
+      else
+        @renderer.message = {error: 'bad token'}
+        @renderer.status = 400
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/app/auth' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
-      @renderer['oauth_url'] = @mastodon.oauth_uri
+      @renderer[:oauth_url] = @mastodon.oauth_uri
       return @renderer.to_s
     end
 
@@ -111,14 +121,17 @@ module Mulukhiya
       errors = AppAuthContract.new.call(params).errors.to_h
       if errors.present?
         @renderer.template = 'app_auth'
-        @renderer['errors'] = errors
-        @renderer['oauth_url'] = @mastodon.oauth_uri
+        @renderer[:errors] = errors
+        @renderer[:oauth_url] = @mastodon.oauth_uri
         @renderer.status = 422
       else
-        r = @mastodon.auth(params[:code])
         @renderer.template = 'app_auth_result'
-        @renderer['status'] = r.code
-        @renderer['result'] = r.parsed_response
+        r = @mastodon.auth(params[:code])
+        @mastodon.token = r.parsed_response['access_token']
+        @mastodon.account.webhook_token = @mastodon.token if @mastodon.account
+        @renderer[:hook_url] = @mastodon.account.webhook&.uri
+        @renderer[:status] = r.code
+        @renderer[:result] = r.parsed_response
         @renderer.status = r.code
       end
       return @renderer.to_s
@@ -127,16 +140,6 @@ module Mulukhiya
     get '/mulukhiya/app/config' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_config'
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/config' do
-      if @mastodon.account
-        @renderer.message = UserConfigStorage.new.get(@mastodon.account.id)
-      else
-        @renderer.message = {error: 'bad token'}
-        @renderer.status = 400
-      end
       return @renderer.to_s
     end
 

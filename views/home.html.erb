@@ -14,14 +14,14 @@
     <% end %>
     <li v-if="config_link"><a href="/mulukhiya/app/config">環境設定</a>
     <li v-else>環境設定 <span class="alert">未認証</span>
-    <li><a href="/mulukhiya/health">動作状況</a>
+    <li><a href="/mulukhiya/app/health">動作状況</a>
   </ul>
 </main>
 <script>
 new Vue({
   el: '#app',
   data: {
-    config_link: false
+    config_link: false,
   },
   mounted: function () {
     this.config_link = (localStorage.getItem('mulukhiya_token') != null)

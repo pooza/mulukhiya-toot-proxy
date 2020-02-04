@@ -18,20 +18,23 @@ module Mulukhiya
       end
 
       def config
-        @config ||= UserConfigStorage.new[id]
-        return @config
+        return UserConfigStorage.new[id]
       rescue => e
         logger.error(e)
         return {}
       end
 
       def webhook
-        @webhook ||= Webhook.new(config)
-        raise "Invalid webhook #{config.to_json}" unless @webhook.exist?
-        return @webhook
+        webhook = Webhook.new(config)
+        raise "Invalid webhook #{config.to_json}" unless webhook.exist?
+        return webhook
       rescue => e
         logger.error(e)
         return nil
+      end
+
+      def webhook_token=(new_token)
+        UserConfigStorage.new.update(id, {webhook: {token: new_token}})
       end
 
       def slack

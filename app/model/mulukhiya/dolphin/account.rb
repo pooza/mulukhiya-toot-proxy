@@ -31,8 +31,7 @@ module Mulukhiya
       end
 
       def config
-        @config ||= UserConfigStorage.new[id]
-        return @config
+        return UserConfigStorage.new[id]
       rescue => e
         logger.error(e)
         return {}
