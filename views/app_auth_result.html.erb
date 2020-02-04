@@ -11,11 +11,16 @@
   <h2>アプリケーションの認証</h2>
   <% if params[:status].to_i < 400 %>
     <p>認証が完了しました。</p>
-    <textarea id="token_text" class="toot"><%= params[:result][:access_token] %></textarea>
-    <button v-on:click="copyToken">クリップボードにコピー</button>
-
-    <textarea id="webhook_text" class="toot"><%= params[:hook_url] %></textarea>
-    <button v-on:click="copyWehbook">クリップボードにコピー</button>
+    <div>
+      <h3>アクセストークン</h3>
+      <textarea id="token_text" class="short"><%= params[:result][:access_token] %></textarea>
+      <i class="fas fa-clipboard" v-on:click="copyToken"></i>
+    </div>
+    <div>
+      <h3>Webhook URL</h3>
+      <textarea id="webhook_text"><%= params[:hook_url] %></textarea>
+      <i class="fas fa-clipboard" v-on:click="copyWehbook"></i>
+    </div>
   <% else %>
     <p class="alert">エラー（<%= params[:status] %>）</p>
   <% end %>

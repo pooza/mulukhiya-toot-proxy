@@ -12,6 +12,9 @@ h1,h2,h3,h4,h5,h6
   font-family: 'Francois One', sans-serif
   font-weight: bold
 
+p
+  margin: 0 0.5em
+
 h1
   background: url(/mulukhiya/icon.png) no-repeat
   background-position: center
@@ -19,9 +22,11 @@ h1
   font-size: 3em
   line-height: 2em
 
+h2:before
+  content: '■ '
+
 h3
   border-bottom: solid darkgray 1px
-  padding-left: 8px
 
 header
   background: url(/mulukhiya/icon-24x24.png) no-repeat
@@ -68,15 +73,23 @@ main
 
 pre
   border: 1px solid black
+  border-radius: 4px
+  margin: 0 0.5em
   padding: 6px
   overflow: auto
   font-family: Inconsolata, monospace
 
-textarea.toot
-  font-size: 1.0em
+textarea
+  border: 1px solid black
+  border-radius: 4px
+  font-size: 1em
   font-family: Inconsolata, monospace
+  margin: 0 0.5em
   width: 680px
-  height: 6em
+  height: 4em
+
+textarea.short
+  height: 1em
 
 input
   font-size: 1.2em
@@ -100,9 +113,7 @@ a:hover
   text-decoration: underline
 
 #result-container pre
-  margin: 20px
   font-size: 0.8em
-  border-radius: 4px
 
 .alert
   color: red
