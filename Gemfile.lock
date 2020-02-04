@@ -245,10 +245,12 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.29.0)
-    sidekiq-scheduler (3.0.0)
+    sidekiq-scheduler (3.0.1)
+      e2mmap
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 3)
+      thwait
       tilt (>= 1.4.0)
     sinatra (2.0.8.1)
       mustermann (~> 1.0)
@@ -284,7 +286,6 @@ DEPENDENCIES
   crowi-client!
   dropbox_api
   dry-validation
-  e2mmap
   fastimage
   ginseng-core!
   ginseng-postgres!
@@ -299,7 +300,6 @@ DEPENDENCIES
   sanitize
   sidekiq!
   sidekiq-scheduler
-  thwait
 
 RUBY VERSION
    ruby 2.7.0p0
