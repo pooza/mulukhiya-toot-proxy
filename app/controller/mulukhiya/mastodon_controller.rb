@@ -128,7 +128,7 @@ module Mulukhiya
         @renderer.template = 'app_auth_result'
         r = @mastodon.auth(params[:code])
         @mastodon.token = r.parsed_response['access_token']
-        @mastodon.account.webhook_token = @mastodon.token if @mastodon.account
+        @mastodon.account.webhook_token = @mastodon.token if @mastodon.token
         @renderer[:hook_url] = @mastodon.account.webhook&.uri
         @renderer[:status] = r.code
         @renderer[:result] = r.parsed_response

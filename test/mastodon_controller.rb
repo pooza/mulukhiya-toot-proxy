@@ -15,15 +15,32 @@ module Mulukhiya
       return MastodonController
     end
 
-    def test_about
-      get '/about'
+    def test_webui
+      get '/mulukhiya'
       assert(last_response.ok?)
+
+      get '/mulukhiya/app/health'
+      assert(last_response.ok?)
+
+      get '/mulukhiya/app/auth'
+      assert(last_response.ok?)
+
+      get '/mulukhiya/app/config'
+      assert(last_response.ok?)
+    end
+
+    def test_about
       get '/mulukhiya/about'
       assert(last_response.ok?)
     end
 
     def test_health
       get '/mulukhiya/health'
+      assert(last_response.ok?)
+    end
+
+    def test_config
+      get '/mulukhiya/config'
       assert(last_response.ok?)
     end
 
@@ -123,9 +140,6 @@ module Mulukhiya
     end
 
     def test_app_auth
-      get '/mulukhiya/app/auth'
-      assert(last_response.ok?)
-
       post '/mulukhiya/app/auth', {code: 'hoge'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
