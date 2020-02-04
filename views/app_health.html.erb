@@ -24,18 +24,13 @@ new Vue({
     result: null,
   },
   mounted: function () {
-    const token = localStorage.getItem('mulukhiya_token')
-    if (token) {
-      axios.get('/mulukhiya/health', {responseType: 'json'})
-        .then(e => {
-          this.result = e.data
-        }).catch(e => {
-          this.response_error = true
-          this.error_message = e.message
-        })
-    } else {
-      this.token_error = true
-    }
+    axios.get('/mulukhiya/health', {responseType: 'json'})
+      .then(e => {
+        this.result = e.data
+      }).catch(e => {
+        this.response_error = true
+        this.error_message = e.message
+      })
   },
 })
 </script>

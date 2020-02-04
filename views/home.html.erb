@@ -13,6 +13,9 @@
       <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
       <li v-if="config_link"><a href="/mulukhiya/app/config">環境設定</a>
       <li v-else>環境設定 <span class="alert">未認証</span>
+    <% else %>
+      <li>アプリケーションの認証 <span class="alert">未対応</span>
+      <li>環境設定 <span class="alert">未対応</span>
     <% end %>
     <li><a href="/mulukhiya/app/health">動作状況</a>
   </ul>
