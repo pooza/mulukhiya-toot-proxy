@@ -11,10 +11,14 @@ handler:
     timeout: 10
   image_resize:
     pixel: 1280
-  amazon_image:
-    timeout: 20
   canonical_url:
     timeout: 2
+  amazon_image:
+    disable: true
+  spotify_image:
+    disable: true
+  itunes_image:
+    disable: true
 worker:
   media_cleaning:
     days: 1
@@ -341,6 +345,12 @@ sidekiq:
     media_cleaning:
       every: 5m
       class: Mulukhiya::MediaCleaningWorker
+    announcement_notification:
+      every: 5m
+      class: Mulukhiya::AnnouncementNotificationWorker
+    announcement_clipping:
+      every: 5m
+      class: Mulukhiya::AnnouncementClippingWorker
 thin:
   timeout: 30
   port: 3008
