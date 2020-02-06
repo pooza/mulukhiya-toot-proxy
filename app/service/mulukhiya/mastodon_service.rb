@@ -27,6 +27,13 @@ module Mulukhiya
       })
     end
 
+    def announcements(params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.get(create_uri('/api/v1/announcements'), {headers: headers})
+    end
+
     def account
       @account ||= Environment.account_class.get(token: @token)
       return @account

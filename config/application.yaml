@@ -345,12 +345,9 @@ sidekiq:
     media_cleaning:
       every: 5m
       class: Mulukhiya::MediaCleaningWorker
-    announcement_notification:
+    announcement:
       every: 5m
-      class: Mulukhiya::AnnouncementNotificationWorker
-    announcement_clipping:
-      every: 5m
-      class: Mulukhiya::AnnouncementClippingWorker
+      class: Mulukhiya::AnnouncementWorker
 thin:
   timeout: 30
   port: 3008

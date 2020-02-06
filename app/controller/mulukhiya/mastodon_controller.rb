@@ -161,6 +161,10 @@ module Mulukhiya
       return true
     end
 
+    def self.announcement?
+      return true
+    end
+
     def self.status_field
       return Config.instance['/mastodon/status/field']
     end
