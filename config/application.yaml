@@ -152,6 +152,7 @@ mastodon:
     - post_webhook
     - pre_upload
     - post_upload
+    - post_fav
     - post_boost
     - post_search
     - post_bookmark
