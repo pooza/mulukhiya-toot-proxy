@@ -82,6 +82,10 @@ module Mulukhiya
       return @sns
     end
 
+    def to_sanitized
+      return StatusParser.sanitize(body)
+    end
+
     def to_md
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end

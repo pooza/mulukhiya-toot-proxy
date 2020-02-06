@@ -1,5 +1,3 @@
-require 'sanitize'
-
 module Mulukhiya
   class AnnouncementWorker
     include Sidekiq::Worker
@@ -13,7 +11,9 @@ module Mulukhiya
       return unless executable?
       entries.each do |entry|
         next if cache.member?(entry['id'])
-        agent.toot(Sanitize.clean(entry['content']))
+        parser = Environment.parser_class.new(entry['content'])
+        agent.toot(parser.to_sanitized)
+        agent.account.growi.clip(parser.to_md)
       end
       save
     end

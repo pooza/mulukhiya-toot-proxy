@@ -346,7 +346,7 @@ sidekiq:
       every: 5m
       class: Mulukhiya::MediaCleaningWorker
     announcement:
-      every: 5m
+      every: 2m
       class: Mulukhiya::AnnouncementWorker
 thin:
   timeout: 30
