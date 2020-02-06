@@ -1,9 +1,10 @@
 module Mulukhiya
   class HandlerTest < TestCase
-    def test_disable?
+    def test_all
       Environment.controller_class.events.each do |event|
         Handler.all(event) do |handler|
           assert_boolean(handler.disable?)
+          assert_boolean(handler.notifiable?)
         end
       rescue Ginseng::ConfigError
         next
