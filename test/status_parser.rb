@@ -40,6 +40,11 @@ module Mulukhiya
       assert_equal(@parser.hashtags, ['aaa', 'bbbb'])
     end
 
+    def test_to_sanitized
+      @parser.body = '<p>hoge<br>hoge</p><p>hoge<br>hoge</p>'
+      assert_equal(@parser.to_sanitized, "hoge\nhoge\n\n  hoge\nhoge")
+    end
+
     def test_accts
       @parser.body = '#hoge'
       assert_equal(@parser.accts.to_a, [])
