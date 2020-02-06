@@ -13,14 +13,14 @@ module Mulukhiya
       }.to_json)
     end
 
+    def visibility
+      return @params['/webhook/visibility'] || 'public'
+    end
+
     def uri
       uri = Ginseng::URI.parse(@config['/mastodon/url'])
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
-    end
-
-    def visibility
-      return @params['/webhook/visibility'] || 'public'
     end
 
     def exist?
@@ -44,6 +44,7 @@ module Mulukhiya
     end
 
     def toot(status)
+      status = {text: status} if status.is_a?(String)
       body = {
         'status' => status[:text],
         'visibility' => visibility,
