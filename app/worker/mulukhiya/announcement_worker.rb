@@ -13,7 +13,7 @@ module Mulukhiya
         next if cache.member?(entry['id'])
         parser = Environment.parser_class.new(entry['content'])
         agent.toot(parser.to_sanitized)
-        agent.account.growi.clip(parser.to_md)
+        agent.account.growi&.clip(parser.to_md)
       end
       save
     end
