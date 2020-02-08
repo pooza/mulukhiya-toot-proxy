@@ -1,3 +1,5 @@
+require 'time'
+
 module Mulukhiya
   class AnnouncementWorker
     include Sidekiq::Worker
@@ -11,14 +13,26 @@ module Mulukhiya
       return unless executable?
       entries.each do |entry|
         next if cache.member?(entry['id'])
-        parser = Environment.parser_class.new(entry['content'])
-        agent.toot(parser.to_sanitized)
-        agent.account.growi&.clip(parser.to_md)
+        agent.toot(create_body(entry, :sanitized))
+        agent.account.growi&.clip(create_body(entry, :md))
+        sleep(1)
       end
       save
     end
 
     private
+
+    def create_body(entry, format = :text)
+      parser = Environment.parser_class.new(entry['content'])
+      template = Template.new('announcement')
+      template[:body] = parser.send("to_#{format}".to_sym)
+      if entry['starts_at'] && entry['ends_at']
+        template[:start_date] = Time.parse(entry['starts_at'])
+        template[:end_date] = Time.parse(entry['ends_at'])
+        template[:all_day] = entry['all_day']
+      end
+      return template.to_s
+    end
 
     def entries
       @entries ||= announcements

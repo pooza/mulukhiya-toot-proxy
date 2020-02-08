@@ -1,0 +1,9 @@
+<%# encoding: UTF-8 -%>
+<% if @params[:start_date] && @params[:end_date] -%>
+<% if @params[:all_day] -%>
+<%= @params[:start_date].strftime('%Y/%m/%d') %> 〜 <%= @params[:end_date].strftime('%Y/%m/%d') %>
+<% else -%>
+<%= @params[:start_date].strftime('%Y/%m/%d %H:%M') %> 〜 <%= @params[:end_date].strftime('%Y/%m/%d %H:%M') %>
+<% end -%>
+<% end -%>
+<%= @params[:body] %>
