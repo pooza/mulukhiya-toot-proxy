@@ -167,6 +167,7 @@ mastodon:
     label: トゥート
     max_length: 500
     visibility_names:
+      unlisted: unlisted
       direct: direct
     patterns:
       - pattern: ^/web/statuses/([[:digit:]]+)
@@ -225,6 +226,7 @@ dolphin:
     label: ノート
     max_length: 500
     visibility_names:
+      unlisted: public
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)
