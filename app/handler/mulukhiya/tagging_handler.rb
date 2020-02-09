@@ -10,7 +10,7 @@ module Mulukhiya
       tags.concat(create_attachment_tags(body))
       tags.concat(TagContainer.default_tags)
       tags.concat(@sns.account.tags)
-      body[status_field] = append!
+      body[status_field] = append
       @result.concat(tags.create_tags)
       return body
     end
@@ -48,9 +48,9 @@ module Mulukhiya
       return tags.uniq
     end
 
-    def append!
-      return unless tags.present?
+    def append
       body = @status
+      return body unless tags.present?
       via = body.match(Regexp.new(@config['/twittodon/pattern']))
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
@@ -62,7 +62,7 @@ module Mulukhiya
       end
       body = [body, tags.to_s]
       body.push(via[1]) if via.present?
-      @status = body.join("\n")
+      return body.join("\n")
     end
   end
 end
