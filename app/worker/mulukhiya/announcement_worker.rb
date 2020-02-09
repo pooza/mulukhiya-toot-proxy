@@ -47,7 +47,7 @@ module Mulukhiya
     end
 
     def cache
-      return [] unless File.exist?(path)
+      return {} unless File.exist?(path)
       return JSON.parse(File.read(path))
     rescue => e
       Slack.broadcast(e)
