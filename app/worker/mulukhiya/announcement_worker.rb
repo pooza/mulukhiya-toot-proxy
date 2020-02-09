@@ -13,7 +13,10 @@ module Mulukhiya
       return unless executable?
       entries.each do |entry|
         next if cache.member?(entry['id'])
-        agent.toot(create_body(entry, :sanitized))
+        agent.toot(
+          Environment.controller_class.status_field => create_body(entry, :sanitized),
+          'visibility' => MastodonController.visibility_name('unlisted'),
+        )
         agent.account.growi&.clip(create_body(entry, :md))
         sleep(1)
       end

@@ -14,7 +14,7 @@
   <ul>
     <% if Mulukhiya::Environment.controller_class.webhook? %>
       <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
-      <li v-if="login"><a href="/mulukhiya/app/config">環境設定</a>
+      <li v-if="username"><a href="/mulukhiya/app/config">環境設定</a>
       <li v-else>環境設定 <span class="alert">未認証</span>
     <% else %>
       <li>アプリケーションの認証 <span class="alert">非対応</span>

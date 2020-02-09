@@ -1,5 +1,5 @@
 package:
-  version: 3.4.0
+  version: 3.4.1
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -167,6 +167,7 @@ mastodon:
     label: トゥート
     max_length: 500
     visibility_names:
+      unlisted: unlisted
       direct: direct
     patterns:
       - pattern: ^/web/statuses/([[:digit:]]+)
@@ -225,6 +226,7 @@ dolphin:
     label: ノート
     max_length: 500
     visibility_names:
+      unlisted: public
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)
