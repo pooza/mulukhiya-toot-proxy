@@ -24,7 +24,7 @@ module Mulukhiya
       return unless track = @tracks[keyword]
       push(track.name)
       push(track.artists.map(&:name).join(', '))
-      @local_tags = ArtistParser.new(track.artists.map(&:name).join('、')).parse
+      tags.concat(ArtistParser.new(track.artists.map(&:name).join('、')).parse)
     end
   end
 end

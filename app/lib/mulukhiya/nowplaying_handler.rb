@@ -28,6 +28,10 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    def notifiable?
+      return true
+    end
+
     private
 
     def push(line)

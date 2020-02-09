@@ -23,6 +23,10 @@ module Mulukhiya
       assert_boolean(@account.moderator?)
     end
 
+    def test_notify_verbose?
+      assert_boolean(@account.notify_verbose?)
+    end
+
     def test_config
       assert_kind_of(Hash, @account.config)
     end
@@ -48,8 +52,8 @@ module Mulukhiya
     end
 
     def test_disable?
-      @config['/handler/mastodon/pre_toot'].each do |v|
-        assert_boolean(@account.disable?(v))
+      Handler.all(:pre_toot) do |handler|
+        assert_boolean(@account.disable?(handler.underscore_name))
       end
     end
 

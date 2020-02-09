@@ -39,9 +39,5 @@ module Mulukhiya
         assert(hook.to_json.present?)
       end
     end
-
-    def test_toot
-      assert_equal(@account.webhook.toot('木の水晶球').response.code, 200)
-    end
   end
 end

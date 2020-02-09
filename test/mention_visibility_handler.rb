@@ -10,11 +10,11 @@ module Mulukhiya
       return unless handler?
 
       @handler.clear
-      @handler.handle_post_toot({status_field => 'ふつうのトゥート。'})
+      @handler.handle_post_toot(status_field => 'ふつうのトゥート。')
       assert_nil(@handler.result)
 
       @handler.clear
-      r = @handler.handle_pre_toot({status_field => '@relayctl@hashtag-relay.dtp-mstdn.jp subscribe #mulukhiya'})
+      r = @handler.handle_pre_toot(status_field => '@relayctl@hashtag-relay.dtp-mstdn.jp subscribe #mulukhiya')
       assert_equal(@handler.result[:entries], ['@relayctl@hashtag-relay.dtp-mstdn.jp'])
       assert_equal(r['visibility'], Environment.controller_class.visibility_name('direct'))
     end

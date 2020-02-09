@@ -13,7 +13,7 @@ module Mulukhiya
 
     rule(:url) do
       if value.present?
-        key.failure('url: が正しくありません。') unless URI.parse(value).absolute?
+        key.failure('url: が正しくありません。') unless Ginseng::URI.parse(value).absolute?
       else
         key.failure('url: が空欄です。')
       end

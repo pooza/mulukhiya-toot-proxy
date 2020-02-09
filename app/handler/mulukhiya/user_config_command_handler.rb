@@ -7,22 +7,25 @@ module Mulukhiya
 
     def dispatch
       raise Ginseng::GatewayError, 'Invalid access token' unless id = sns.account.id
-      UserConfigStorage.new.update(id, parser.params)
+      @storage.update(id, parser.params)
+      Environment.info_agent&.notify(sns.account, YAML.dump(message)) unless Environment.test?
     end
 
-    def status
-      v = JSON.parse(UserConfigStorage.new.get(sns.account.id) || '{}')
-      v.merge!(parser.params)
-      v.delete('command')
-      if sns.account.webhook
-        v['webhook'] ||= {}
-        v['webhook']['url'] = sns.account.webhook.uri.to_s
-      end
-      v.compact!
-      return YAML.dump(v)
-    rescue => e
-      @logger.error(e)
-      raise Ginseng::RequestError, e.message, e.backtrace
+    def message
+      v = JSON.parse(@storage.get(sns.account.id))
+      v['webhook']['url'] = sns.account.webhook.uri.to_s if v.dig('webhook', 'token')
+      return v
+    end
+
+    def notifiable?
+      return false
+    end
+
+    private
+
+    def initialize(params = {})
+      super(params)
+      @storage = UserConfigStorage.new
     end
   end
 end

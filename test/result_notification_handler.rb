@@ -6,7 +6,6 @@ module Mulukhiya
 
     def test_handle_post_toot
       return unless handler?
-      @handler.clear
       @handler.handle_post_toot(status_field => 'ふつうのトゥート。')
       assert_nil(@handler.result)
     end

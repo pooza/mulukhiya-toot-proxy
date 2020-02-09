@@ -75,6 +75,14 @@ module Mulukhiya
       return uri
     end
 
+    def notify(account, message)
+      return note(
+        DolphinController.status_field => message,
+        'visibleUserIds' => [account.id],
+        'visibility' => DolphinController.visibility_name('direct'),
+      )
+    end
+
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').gsub(/(^[_#]+|_$)/, '')
     end

@@ -20,7 +20,7 @@ module Mulukhiya
       return unless track = @tracks[keyword]
       push(track['trackName'])
       push(track['artistName'])
-      @local_tags = ArtistParser.new(track['artistName']).parse
+      tags.concat(ArtistParser.new(track['artistName']).parse)
     end
   end
 end

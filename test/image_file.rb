@@ -1,7 +1,7 @@
 module Mulukhiya
   class ImageeFileTest < TestCase
     def setup
-      @file = ImageFile.new(File.join(Environment.dir, 'sample/ribbon08-009.png'))
+      @file = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/ribbon08-009.png'))
     end
 
     def test_image?

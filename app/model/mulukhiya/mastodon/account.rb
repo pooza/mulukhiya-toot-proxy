@@ -5,7 +5,15 @@ module Mulukhiya
 
       one_to_one :user
 
-      alias to_h values
+      def to_h
+        unless @hash
+          @hash = values.clone
+          @hash.delete(:private_key)
+          @hash.delete(:public_key)
+          @hash.compact!
+        end
+        return @hash
+      end
 
       def acct
         @acct ||= Acct.new("@#{username}@#{domain || MastodonService.new.uri.host}")
@@ -18,20 +26,23 @@ module Mulukhiya
       end
 
       def config
-        @config ||= UserConfigStorage.new[id]
-        return @config
+        return UserConfigStorage.new[id]
       rescue => e
         logger.error(e)
         return {}
       end
 
       def webhook
-        @webhook ||= Webhook.new(config)
-        raise "Invalid webhook #{config.to_json}" unless @webhook.exist?
-        return @webhook
+        webhook = Webhook.new(config)
+        raise "Invalid webhook #{config.to_json}" unless webhook.exist?
+        return webhook
       rescue => e
         logger.error(e)
         return nil
+      end
+
+      def webhook_token=(new_token)
+        UserConfigStorage.new.update(id, {webhook: {token: new_token}})
       end
 
       def slack
@@ -86,6 +97,10 @@ module Mulukhiya
 
       def locked?
         return prams[:locked]
+      end
+
+      def notify_verbose?
+        return config['/notify/verbose'] == true
       end
 
       def disable?(handler_name)

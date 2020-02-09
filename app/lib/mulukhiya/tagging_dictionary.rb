@@ -1,12 +1,27 @@
 module Mulukhiya
   class TaggingDictionary < Hash
+    attr_accessor :text
+
     def initialize
       super
+      @config = Config.instance
       @logger = Logger.new
       @http = HTTP.new
       refresh unless exist?
       refresh if corrupted?
       load
+    end
+
+    def matches
+      r = []
+      reverse_each do |k, v|
+        next if k.length < @config['/tagging/word/minimum_length']
+        next unless @text.match?(v[:pattern])
+        r.push(k)
+        r.concat(v[:words])
+        text.gsub!(v[:pattern], '')
+      end
+      return r.uniq
     end
 
     def concat(values)

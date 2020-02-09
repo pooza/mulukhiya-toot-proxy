@@ -39,7 +39,7 @@ module Mulukhiya
         end
         return @attachments
       rescue => e
-        Slack.broadcast(e)
+        logger.error(e)
         return []
       end
 

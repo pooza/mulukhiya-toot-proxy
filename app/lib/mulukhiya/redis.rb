@@ -22,11 +22,13 @@ module Mulukhiya
       raise Ginseng::RedisError, e.message, e.backtrace
     end
 
-    def del(key)
+    def unlink(key)
       return super(key)
     rescue => e
       raise Ginseng::RedisError, e.message, e.backtrace
     end
+
+    alias del unlink
 
     def self.dsn
       return Ginseng::RedisDSN.parse(Config.instance['/user_config/redis/dsn'])

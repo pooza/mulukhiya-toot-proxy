@@ -12,6 +12,22 @@ h1,h2,h3,h4,h5,h6
   font-family: 'Francois One', sans-serif
   font-weight: bold
 
+p
+  margin: 0 0.5em
+
+h1
+  background: url(/mulukhiya/icon.png) no-repeat
+  background-position: center
+  text-align: center
+  font-size: 3em
+  line-height: 2em
+
+h2:before
+  content: '■ '
+
+h3
+  border-bottom: solid darkgray 1px
+
 header
   background: url(/mulukhiya/icon-24x24.png) no-repeat
   background-color: green
@@ -30,12 +46,15 @@ nav.breadcrumbs ul
   padding: 0
 
 nav.breadcrumbs ul li
-  font-family: sans-serif
+  font-family: 'Francois One', sans-serif
   font-size: 0.8em
   display: inline
   margin: 0 5px
 
 nav.breadcrumbs ul a
+  color: dimgray
+
+nav.breadcrumbs ul a:visited
   color: dimgray
 
 nav.breadcrumbs ul a:hover
@@ -54,15 +73,32 @@ main
 
 pre
   border: 1px solid black
+  border-radius: 4px
+  margin: 0 0.5em
   padding: 6px
   overflow: auto
-  font-family: monospace
+  font-family: Inconsolata, monospace
 
-textarea.toot
-  font-size: 1.0em
-  font-family: monospace
+#message-container
+  border: 1px solid black
+  padding: 0
+  border-radius: 4px
+  margin: 20px 10px
+  background-color: lightgray
+  opacity: 0.85
+  font-family: 'Francois One', sans-serif
+
+textarea
+  border: 1px solid black
+  border-radius: 4px
+  font-size: 1em
+  font-family: Inconsolata, monospace
+  margin: 0 0.5em
   width: 680px
-  height: 6em
+  height: 4em
+
+textarea.short
+  height: 1em
 
 input
   font-size: 1.2em
@@ -72,6 +108,21 @@ input.code
 
 button
   font-size: 1.2em
+
+a
+  color: royalblue
+  text-decoration: none
+
+a:visited
+  color: royalblue
+  text-decoration: none
+
+a:hover
+  color: navy
+  text-decoration: underline
+
+#result-container pre
+  font-size: 0.8em
 
 .alert
   color: red

@@ -22,6 +22,7 @@ module Mulukhiya
         v = values.clone
         v[:url] = uri.to_s
         v.delete(:token)
+        v.compact!
         return v
       end
 
@@ -31,8 +32,7 @@ module Mulukhiya
       end
 
       def config
-        @config ||= UserConfigStorage.new[id]
-        return @config
+        return UserConfigStorage.new[id]
       rescue => e
         logger.error(e)
         return {}
@@ -89,6 +89,10 @@ module Mulukhiya
       alias bot? isBot
 
       alias locked? isLocked
+
+      def notify_verbose?
+        return config['/notify/verbose'] == true
+      end
 
       def disable?(handler_name)
         return true if config["/handler/#{handler_name}/disable"]

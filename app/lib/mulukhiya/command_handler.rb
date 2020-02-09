@@ -6,7 +6,6 @@ module Mulukhiya
 
     def handle_root(body, params = {})
       params[:results] ||= ResultContainer.new
-      params[:tags] ||= TagContainer.new
       handle_pre_toot(body, params)
       return handle_post_toot(body, params)
     end
@@ -25,7 +24,7 @@ module Mulukhiya
       return body unless parser.command_name == command_name
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
-      body[status_field] = status
+      body[status_field] = YAML.dump(parser.params)
       @prepared = true
       return body
     end
@@ -41,8 +40,8 @@ module Mulukhiya
 
     def handle_post_webhook(body, params = {}); end
 
-    def status
-      return YAML.dump(parser.params)
+    def notifiable?
+      return true
     end
 
     def dispatch

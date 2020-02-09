@@ -1,0 +1,37 @@
+<%# encoding: UTF-8 -%>
+<%= render('fragment/header') %>
+<nav class="breadcrumbs">
+  <ul>
+    <li><a href="/"><%= Mulukhiya::Environment.controller_class.name %></a>
+    <li><a href="/mulukhiya">モロヘイヤHOME</a>
+    <li>動作状況
+  </ul>
+</nav>
+<main id="app">
+  <h2>動作状況</h2>
+  <div v-if="response_error" class="alert">
+    {{error_message}}
+  </div>
+  <div id="result-container" v-if="result">
+    <pre>{{result}}</pre>
+  </div>
+</main>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    response_error: false,
+    result: null,
+  },
+  mounted: function () {
+    axios.get('/mulukhiya/health', {responseType: 'json'})
+      .then(e => {
+        this.result = e.data
+      }).catch(e => {
+        this.response_error = true
+        this.error_message = e.message
+      })
+  },
+})
+</script>
+<%= render('fragment/footer') %>

@@ -2,16 +2,41 @@ module Mulukhiya
   class ResultContainer < Array
     attr_accessor :response
     attr_accessor :parser
+    attr_accessor :account
 
-    def summary
-      return map {|v| "#{v[:handler]}:#{v.count}"}.join(', ')
+    def initialize(size = 0, val = nil)
+      super(size, val)
+      @logger = Logger.new
     end
 
-    def push(value)
-      return unless value
-      @logger ||= Logger.new
-      @logger.info(value)
-      super(value)
+    def tags
+      @tags ||= TagContainer.new
+      return @tags
+    end
+
+    def push(result)
+      return unless result.present?
+      super(result)
+      @logger.info(result)
+      @dump = nil
+    end
+
+    def to_h
+      unless @dump
+        @dump = {}
+        each do |result|
+          next unless result[:notifiable] || @account&.notify_verbose?
+          @dump[result[:event]] ||= {}
+          @dump[result[:event]][result[:handler]] = result[:entries].map do |v|
+            v.is_a?(Hash) ? v.deep_stringify_keys : v
+          end
+        end
+      end
+      return @dump
+    end
+
+    def to_s
+      return YAML.dump(to_h)
     end
   end
 end

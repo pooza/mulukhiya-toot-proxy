@@ -14,13 +14,20 @@ module Mulukhiya
     end
 
     get '/mulukhiya/about' do
-      @renderer.message = package_class.full_name
+      path = File.join(Environment.dir, 'config/application.yaml')
+      @renderer.message = {package: YAML.load_file(path)['package']}
       return @renderer.to_s
     end
 
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/app/health' do
+      @renderer = HTMLRenderer.new
+      @renderer.template = 'app_health'
       return @renderer.to_s
     end
 
@@ -34,6 +41,11 @@ module Mulukhiya
 
     def response_error?
       return 400 <= @results.response&.code
+    end
+
+    def notify(account, message)
+      message = YAML.dump(message) unless message.is_a?(String)
+      Environment.info_agent&.notify(account, message)
     end
 
     not_found do

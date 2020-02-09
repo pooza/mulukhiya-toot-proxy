@@ -24,6 +24,12 @@ module Mulukhiya
       return sns_class.new.account
     end
 
+    def self.info_agent
+      service = service_class.new
+      service.token = Config.instance['/agent/info/token']
+      return service
+    end
+
     def self.controller_class
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
@@ -46,6 +52,10 @@ module Mulukhiya
 
     def self.attachment_class
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
+    end
+
+    def self.service_class
+      return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end
 
     def self.parser_class

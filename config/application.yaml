@@ -1,5 +1,5 @@
 package:
-  version: 3.3.5
+  version: 3.4.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -7,110 +7,17 @@ package:
     - tkoishi@b-shock.co.jp
 controller: mastodon
 handler:
-  mastodon:
-    pre_toot:
-      - user_config_command
-      - filter_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - mention_visibility
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_image
-      - spotify_image
-      - amazon_image
-      - tagging
-    post_toot:
-      - user_config_command
-      - filter_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - admin_notification
-      - result_notification
-    pre_webhook:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_image
-      - spotify_image
-      - amazon_image
-      - webhook_image
-      - tagging
-    post_webhook:
-      - admin_notification
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_fav:
-      - result_notification
-    post_boost:
-      - result_notification
-    post_search:
-      - result_notification
-  dolphin:
-    pre_toot:
-      - user_config_command
-      - mention_visibility
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - tagging
-    post_toot:
-      - user_config_command
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - bookmark_dropbox_clipping
-      - bookmark_growi_clipping
-      - result_notification
   default:
     timeout: 10
   image_resize:
     pixel: 1280
-  amazon_image:
-    timeout: 20
   canonical_url:
     timeout: 2
-  admin_notification:
+  amazon_image:
+    disable: true
+  spotify_image:
+    disable: true
+  itunes_image:
     disable: true
 worker:
   media_cleaning:
@@ -172,11 +79,72 @@ acct: &root_acct
   pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    scopes:
-      - write:statuses
-      - write:media
+  handlers:
+    pre_toot:
+      - user_config_command
+      - filter_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_image
+      - spotify_image
+      - amazon_image
+      - tagging
+    post_toot:
+      - user_config_command
+      - filter_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - result_notification
+    pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_image
+      - spotify_image
+      - amazon_image
+      - webhook_image
+      - tagging
+    post_webhook:
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_boost:
+      - result_notification
+    post_search:
+      - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
   events:
     - pre_toot
     - post_toot
@@ -184,12 +152,15 @@ mastodon:
     - post_webhook
     - pre_upload
     - post_upload
+    - post_fav
     - post_boost
     - post_search
-  patterns:
-    - pattern: ^/web/statuses/([[:digit:]]+)
-    - pattern: ^/@[[:word:]]+/([[:digit:]]+)
-    - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+    - post_bookmark
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
   toot: &mastodon_toot
     field: status
     key: id
@@ -197,6 +168,10 @@ mastodon:
     max_length: 500
     visibility_names:
       direct: direct
+    patterns:
+      - pattern: ^/web/statuses/([[:digit:]]+)
+      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
+      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   status: *mastodon_toot
   media: &mastodon_media
     key: media_ids
@@ -207,8 +182,37 @@ mastodon:
   acct: *root_acct
 dolphin:
   url: https://dol.example.com/
-  patterns:
-    - pattern: ^/notes/([[:alnum:]]+)
+  handlers:
+    pre_toot:
+      - user_config_command
+      - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - tagging
+    post_toot:
+      - user_config_command
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
   events:
     - pre_toot
     - post_toot
@@ -222,6 +226,8 @@ dolphin:
     max_length: 500
     visibility_names:
       direct: specified
+    patterns:
+      - pattern: ^/notes/([[:alnum:]]+)
   status: *dolphin_note
   file: &dolphin_file
     key: fileIds
@@ -340,6 +346,9 @@ sidekiq:
     media_cleaning:
       every: 5m
       class: Mulukhiya::MediaCleaningWorker
+    announcement:
+      every: 2m
+      class: Mulukhiya::AnnouncementWorker
 thin:
   timeout: 30
   port: 3008
@@ -364,3 +373,5 @@ agent:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 webhook:
   salt: mulukhiya
+crypt:
+  password: mulukhiya

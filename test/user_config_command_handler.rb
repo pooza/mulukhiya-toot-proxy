@@ -7,33 +7,32 @@ module Mulukhiya
       @key = SecureRandom.hex(16)
     end
 
-    def test_status
+    def test_message
       return unless handler?
-      @handler.handle_root({status_field => 'command: user_config'})
-      assert_kind_of(Hash, YAML.safe_load(@handler.status))
+      assert_kind_of(Hash, @handler.message)
     end
 
     def test_handle_root
       return unless handler?
 
       @handler.clear
-      @handler.handle_root({status_field => ''})
+      @handler.handle_root(status_field => '')
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_root({status_field => "command: user_config\n#{@key}: 1"})
+      @handler.handle_root(status_field => "command: user_config\n#{@key}: 1")
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_root({status_field => "command: user_config\n#{@key}: null"})
+      @handler.handle_root(status_field => "command: user_config\n#{@key}: null")
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_root({status_field => %({"command": "user_config", "#{@key}": 2})})
+      @handler.handle_root(status_field => %({"command": "user_config", "#{@key}": 2}))
       assert(@handler.result[:entries].present?)
 
       @handler.clear
-      @handler.handle_root({status_field => %({"command": "user_config", "#{@key}": null})})
+      @handler.handle_root(status_field => %({"command": "user_config", "#{@key}": null}))
       assert(@handler.result[:entries].present?)
     end
   end

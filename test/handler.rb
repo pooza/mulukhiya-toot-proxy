@@ -1,9 +1,10 @@
 module Mulukhiya
   class HandlerTest < TestCase
-    def test_disable?
+    def test_all
       Environment.controller_class.events.each do |event|
         Handler.all(event) do |handler|
           assert_boolean(handler.disable?)
+          assert_boolean(handler.notifiable?)
         end
       rescue Ginseng::ConfigError
         next
@@ -18,9 +19,9 @@ module Mulukhiya
         {status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,
       )
-      assert(params[:tags].member?('宮本佳那子'))
-      assert(params[:tags].member?('福山沙織'))
-      assert(params[:tags].member?('井上由貴'))
+      assert(params[:results].tags.member?('宮本佳那子'))
+      assert(params[:results].tags.member?('福山沙織'))
+      assert(params[:results].tags.member?('井上由貴'))
     end
   end
 end

@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def max_length
-      length = Config.instance['/dolphin/note/max_length']
+      length = @config['/dolphin/note/max_length']
       length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
     end

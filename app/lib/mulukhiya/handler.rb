@@ -4,10 +4,9 @@ require 'rest-client'
 
 module Mulukhiya
   class Handler
-    attr_accessor :tags
-    attr_accessor :results
+    attr_reader :results
+    attr_reader :event
     attr_reader :sns
-    attr_reader :local_tags
 
     def handle_pre_toot(body, params = {})
       return body
@@ -16,7 +15,7 @@ module Mulukhiya
     def handle_post_toot(body, params = {}); end
 
     def handle_pre_webhook(body, params = {})
-      handle_pre_toot(body, params)
+      return handle_pre_toot(body, params)
     end
 
     def handle_post_webhook(body, params = {})
@@ -39,28 +38,27 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
-    def summary
-      return "#{self.class.to_s.split('::').last},#{@result.count}"
+    def notifiable?
+      return false
     end
 
     def result
       return nil unless @result.present?
       return {
-        controller: Environment.controller_class.to_s,
-        handler: self.class.to_s,
-        event: @event,
+        handler: underscore_name,
+        event: @event.to_s,
+        notifiable: notifiable?,
         entries: @result,
       }
     end
 
     def clear
-      @tags.clear
       @result.clear
       @status = nil
       @parser = nil
-      @local_tags.clear
       @prepared = false
       @results.clear
+      @results.tags.clear
       @results.parser = nil
     end
 
@@ -93,6 +91,10 @@ module Mulukhiya
       return @parser
     end
 
+    def tags
+      return @results.tags
+    end
+
     def status_field
       return Environment.controller_class.status_field
     end
@@ -112,7 +114,11 @@ module Mulukhiya
     end
 
     def self.all(event, params = {})
-      Config.instance["/handler/#{Environment.controller_name}/#{event}"].each do |v|
+      config = Config.instance
+      unless config["/#{Environment.controller_name}/events"].member?(event.to_s)
+        raise "Invalid event '#{event}'"
+      end
+      config["/#{Environment.controller_name}/handlers/#{event}"].each do |v|
         yield create(v, params)
       end
     end
@@ -120,14 +126,12 @@ module Mulukhiya
     def self.exec_all(event, body, params = {})
       params[:event] = event
       params[:results] ||= ResultContainer.new
-      params[:tags] ||= TagContainer.new
       all(event, params) do |handler|
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
         end
         params[:results].push(handler.result)
-        params[:tags].concat(handler.local_tags)
         break if handler.prepared?
       rescue Timeout::Error => e
         Logger.new.error(e)
@@ -143,9 +147,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @result = []
-      @local_tags = []
       @sns = params[:sns] || Environment.sns_class.new
-      @tags = params[:tags] || TagContainer.new
       @results = params[:results] || ResultContainer.new
       @prepared = false
       @event = params[:event] || 'unknown'

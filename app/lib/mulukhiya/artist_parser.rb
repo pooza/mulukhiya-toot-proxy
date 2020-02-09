@@ -37,7 +37,7 @@ module Mulukhiya
       items.each_with_index do |item, i|
         next if item['drop']
         if item['split']
-          matches[i + 1].split(delimiters).map {|v| tags.push(v.strip)}
+          tags.concat(matches[i + 1].split(delimiters).map(&:strip))
         else
           tags.push(matches[i + 1].strip)
         end
@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def delimiters
-      return Regexp.new("[#{Config.instance['/artist_parser/delimiters'].join}]")
+      return Regexp.new("[#{@config['/artist_parser/delimiters'].join}]")
     end
   end
 end
