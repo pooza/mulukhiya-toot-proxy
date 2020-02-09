@@ -33,7 +33,7 @@ new Vue({
     if (token) {
       axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
         .then(e => {
-          this.result = jsyaml.safeDump(e.data)
+          this.result = jsyaml.safeDump(e.data.config)
         }).catch(e => {
           this.response_error = true
           this.error_message = e.message

@@ -5,7 +5,15 @@ module Mulukhiya
 
       one_to_one :user
 
-      alias to_h values
+      def to_h
+        unless @hash
+          @hash = values.clone
+          @hash.delete(:private_key)
+          @hash.delete(:public_key)
+          @hash.compact!
+        end
+        return @hash
+      end
 
       def acct
         @acct ||= Acct.new("@#{username}@#{domain || MastodonService.new.uri.host}")

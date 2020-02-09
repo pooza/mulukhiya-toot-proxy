@@ -22,6 +22,7 @@ module Mulukhiya
         v = values.clone
         v[:url] = uri.to_s
         v.delete(:token)
+        v.compact!
         return v
       end
 

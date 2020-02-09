@@ -101,7 +101,10 @@ module Mulukhiya
 
     get '/mulukhiya/config' do
       if @mastodon.account
-        @renderer.message = UserConfigStorage.new.get(@mastodon.account.id)
+        @renderer.message = {
+          account: @mastodon.account.to_h,
+          config: JSON.parse(UserConfigStorage.new.get(@mastodon.account.id)),
+        }
       else
         @renderer.message = {error: 'bad token'}
         @renderer.status = 400

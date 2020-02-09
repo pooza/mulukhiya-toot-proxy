@@ -8,10 +8,13 @@
 </nav>
 <main id="app">
   <h1><%= Mulukhiya::Package.name %></h1>
+  <div id="message-container" v-show="message">
+    <p>{{message}}</p>
+  </div>
   <ul>
     <% if Mulukhiya::Environment.controller_class.webhook? %>
       <li><a href="/mulukhiya/app/auth">アプリケーションの認証</a>
-      <li v-if="config_link"><a href="/mulukhiya/app/config">環境設定</a>
+      <li v-if="login"><a href="/mulukhiya/app/config">環境設定</a>
       <li v-else>環境設定 <span class="alert">未認証</span>
     <% else %>
       <li>アプリケーションの認証 <span class="alert">非対応</span>
@@ -24,10 +27,22 @@
 new Vue({
   el: '#app',
   data: {
-    config_link: false,
+    username: null,
+    message: null,
   },
   mounted: function () {
-    this.config_link = (localStorage.getItem('mulukhiya_token') != null)
+    const token = localStorage.getItem('mulukhiya_token')
+    if (token) {
+      axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+        .then(e => {
+          this.username = e.data.account.username
+          this.message = 'login: @' + this.username
+          this.result = jsyaml.safeDump(e.data.config)
+        }).catch(e => {
+          this.message = e.message
+          document.getElementById('message-container').classList.add('alert')
+        })
+    }
   },
 })
 </script>
