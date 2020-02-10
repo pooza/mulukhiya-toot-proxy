@@ -16,6 +16,10 @@ module Mulukhiya
 
     alias id toot_id
 
+    def valid?
+      return absolute? && id.present?
+    end
+
     def to_md
       toot = service.fetch_toot(toot_id)
       raise "Toot '#{self}' not found" unless toot

@@ -20,8 +20,8 @@ module Mulukhiya
       def uri
         unless @uri
           @uri = TootURI.parse(self[:url] || self[:uri])
-          @uri = NoteURI.parse(self[:url] || self[:uri]) unless @uri.id
-          @uri = nil unless @uri.id
+          @uri = NoteURI.parse(self[:url] || self[:uri]) unless @uri.valid?
+          @uri = nil unless @uri.valid?
         end
         return @uri
       end
