@@ -5,6 +5,12 @@ module Mulukhiya
       @account = Environment.test_account
     end
 
+    def test_get
+      assert_equal(Environment.account_class.get(token: @account.token).id, @account.id)
+      assert_equal(Environment.account_class.get(acct: @account.acct.to_s).id, @account.id)
+      assert_equal(Environment.account_class.get(id: @account.id).id, @account.id)
+    end
+
     def test_acct
       assert_kind_of(Acct, @account.acct)
       assert(@account.acct.host.present?)
@@ -34,11 +40,6 @@ module Mulukhiya
     def test_webhook
       return unless @account.webhook
       assert_kind_of(Webhook, @account.webhook)
-    end
-
-    def test_slack
-      return unless @account.slack
-      assert_kind_of(Slack, @account.slack)
     end
 
     def test_growi

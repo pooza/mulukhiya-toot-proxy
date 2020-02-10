@@ -19,6 +19,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/config' do
+      if @sns.account
+        @renderer.message = {
+          account: @sns.account.to_h,
+          config: JSON.parse(UserConfigStorage.new.get(@sns.account.id)),
+        }
+      else
+        @renderer.message = {error: 'bad token'}
+        @renderer.status = 400
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200

@@ -1,44 +1,48 @@
 module Mulukhiya
   class DolphinController < Controller
     before do
-      @dolphin = DolphinService.new
-      @dolphin.token = params[:i] if params[:i]
-      @results.account = @dolphin.account
+      @sns = DolphinService.new
+      if params[:token].present?
+        @sns.token = Crypt.new.decrypt(params[:token])
+      elsif params[:i]
+        @sns.token = params[:i]
+      end
+      @results.account = @sns.account
     end
 
     post '/api/notes/create' do
-      Handler.exec_all(:pre_toot, params, {results: @results, sns: @dolphin}) unless renote?
-      @results.response = @dolphin.note(params)
-      notify(@dolphin.account, @results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {results: @results, sns: @dolphin}) unless renote?
+      Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns}) unless renote?
+      @results.response = @sns.note(params)
+      notify(@sns.account, @results.response.parsed_response) if response_error?
+      Handler.exec_all(:post_toot, params, {results: @results, sns: @sns}) unless renote?
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      notify(@dolphin.account, @renderer.message)
+      notify(@sns.account, @renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
 
     post '/api/drive/files/create' do
-      Handler.exec_all(:pre_upload, params, {results: @results, sns: @dolphin})
-      @results.response = @dolphin.upload(params[:file][:tempfile].path)
-      notify(@dolphin.account, @results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_upload, params, {results: @results, sns: @dolphin})
+      Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
+      @results.response = @sns.upload(params[:file][:tempfile].path)
+      notify(@sns.account, @results.response.parsed_response) if response_error?
+      Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      notify(@dolphin.account, @renderer.message)
+      notify(@sns.account, @renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end
 
     post '/api/notes/favorites/create' do
-      @results.response = @dolphin.fav(params[:noteId])
-      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @dolphin})
+      @results.response = @sns.fav(params[:noteId])
+      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response || {}
       @renderer.status = @results.response.code
       return @renderer.to_s

@@ -15,7 +15,7 @@ module Mulukhiya
         next if cache.member?(entry['id'])
         agent.toot(
           Environment.controller_class.status_field => create_body(entry, :sanitized),
-          'visibility' => MastodonController.visibility_name('unlisted'),
+          'visibility' => Environment.controller_class.visibility_name('unlisted'),
         )
         agent.account.growi&.clip(create_body(entry, :md))
         sleep(1)

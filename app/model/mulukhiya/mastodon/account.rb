@@ -45,18 +45,6 @@ module Mulukhiya
         UserConfigStorage.new.update(id, {webhook: {token: new_token}})
       end
 
-      def slack
-        unless @slack
-          uri = Ginseng::URI.parse(config['/slack/webhook'])
-          raise "Invalid URI #{config['/slack/webhook']}" unless uri&.absolute?
-          @slack = Slack.new(uri)
-        end
-        return @slack
-      rescue => e
-        logger.error(e)
-        return nil
-      end
-
       def growi
         @growi ||= GrowiClipper.create(account_id: id)
         return @growi
@@ -122,9 +110,11 @@ module Mulukhiya
         elsif key[:acct]
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          return Account.first(username: acct.username, domain: acct.host)
+          host = acct.host
+          host = nil if acct.host == Environment.sns_class.new.uri.host
+          return Account.first(username: acct.username, domain: host)
         end
-        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
+        return Account.first(key)
       end
     end
   end

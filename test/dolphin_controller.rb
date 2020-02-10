@@ -31,6 +31,11 @@ module Mulukhiya
       assert(last_response.ok?)
     end
 
+    def test_config
+      get '/mulukhiya/config'
+      assert(last_response.ok?)
+    end
+
     def test_not_found
       get '/not_found'
       assert_false(last_response.ok?)
