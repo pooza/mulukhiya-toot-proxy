@@ -110,9 +110,11 @@ module Mulukhiya
         elsif key[:acct]
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          return Account.first(username: acct.username, domain: acct.host)
+          host = acct.host
+          host = nil if acct.host == Environment.sns_class.new.uri.host
+          return Account.first(username: acct.username, domain: host)
         end
-        raise Ginseng::NotFoundError, "Account '#{key.to_json}' not found"
+        return Account.first(key)
       end
     end
   end
