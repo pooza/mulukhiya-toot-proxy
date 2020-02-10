@@ -12,6 +12,10 @@ module Mulukhiya
       return Config.instance
     end
 
+    def self.domain_name
+      return sns_class.new.uri.host
+    end
+
     def self.sns_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end

@@ -12,7 +12,7 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{username}@#{host || DolphinService.new.uri.host}")
+        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
         return @acct
       end
 

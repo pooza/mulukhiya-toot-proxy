@@ -16,7 +16,7 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{username}@#{domain || MastodonService.new.uri.host}")
+        @acct ||= Acct.new("@#{username}@#{domain || Environment.domain_name}")
         return @acct
       end
 
