@@ -83,9 +83,7 @@ module Mulukhiya
 
       alias bot? service?
 
-      def locked?
-        return prams[:locked]
-      end
+      alias locked? locked
 
       def notify_verbose?
         return config['/notify/verbose'] == true

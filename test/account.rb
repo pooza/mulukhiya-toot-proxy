@@ -29,6 +29,10 @@ module Mulukhiya
       assert_boolean(@account.moderator?)
     end
 
+    def test_locked?
+      assert_boolean(@account.locked?)
+    end
+
     def test_notify_verbose?
       assert_boolean(@account.notify_verbose?)
     end
