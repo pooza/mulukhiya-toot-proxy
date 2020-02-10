@@ -58,7 +58,7 @@ module Mulukhiya
 
     def notify(account, message)
       message = YAML.dump(message) unless message.is_a?(String)
-      Environment.info_agent&.notify(account, message)
+      return Environment.info_agent_service&.notify(account, message)
     end
 
     not_found do
