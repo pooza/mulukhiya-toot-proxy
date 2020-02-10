@@ -12,6 +12,19 @@ module Mulukhiya
       assert(@acct.valid?)
     end
 
+    def test_username
+      assert_equal(@acct.username, 'pooza')
+    end
+
+    def test_host
+      assert_equal(@acct.host, 'example.com')
+    end
+
+    def test_domain_name
+      assert_equal(@acct.domain_name, 'example.com')
+      assert_nil(@acct_another.domain_name)
+    end
+
     def test_pattern
       assert_kind_of(Regexp, Acct.pattern)
     end
