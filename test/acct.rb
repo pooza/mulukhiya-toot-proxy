@@ -1,7 +1,8 @@
 module Mulukhiya
   class AcctTest < TestCase
     def setup
-      @acct = Acct.new('@pooza@mstdn.b-shock.org')
+      @acct = Acct.new('@pooza@example.com')
+      @acct_another = Acct.new("@#{@pooza}@#{Environment.domain_name}")
     end
 
     def test_agent?
