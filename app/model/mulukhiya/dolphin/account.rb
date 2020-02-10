@@ -95,11 +95,12 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return Account.first(token: key[:token]) if key[:token]
         if key[:acct]
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          return Account.first(username: acct.username, host: acct.host)
+          host = acct.host
+          host = nil if acct.host == Environment.sns_class.new.uri.host
+          return Account.first(username: acct.username, host: host)
         end
         return Account.first(key)
       end
