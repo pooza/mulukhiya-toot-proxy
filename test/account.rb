@@ -36,11 +36,6 @@ module Mulukhiya
       assert_kind_of(Webhook, @account.webhook)
     end
 
-    def test_slack
-      return unless @account.slack
-      assert_kind_of(Slack, @account.slack)
-    end
-
     def test_growi
       return unless @account.growi
       assert_kind_of(GrowiClipper, @account.growi)

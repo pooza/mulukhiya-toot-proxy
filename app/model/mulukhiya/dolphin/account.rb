@@ -1,6 +1,16 @@
 module Mulukhiya
   module Dolphin
     class Account < Sequel::Model(:user)
+      def to_h
+        unless @hash
+          @hash = values.clone
+          @hash[:url] = uri.to_s
+          @hash.delete(:token)
+          @hash.compact!
+        end
+        return @hash
+      end
+
       def acct
         @acct ||= Acct.new("@#{username}@#{host || DolphinService.new.uri.host}")
         return @acct
@@ -18,14 +28,6 @@ module Mulukhiya
         return @uri
       end
 
-      def to_h
-        v = values.clone
-        v[:url] = uri.to_s
-        v.delete(:token)
-        v.compact!
-        return v
-      end
-
       def logger
         @logger ||= Logger.new
         return @logger
@@ -39,18 +41,6 @@ module Mulukhiya
       end
 
       def webhook
-        return nil
-      end
-
-      def slack
-        unless @slack
-          uri = Ginseng::URI.parse(config['/slack/webhook'])
-          raise "Invalid URI #{config['/slack/webhook']}" unless uri&.absolute?
-          @slack = Slack.new(uri)
-        end
-        return @slack
-      rescue => e
-        logger.error(e)
         return nil
       end
 
