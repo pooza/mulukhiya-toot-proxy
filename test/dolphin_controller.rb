@@ -19,6 +19,9 @@ module Mulukhiya
 
       get '/mulukhiya/app/health'
       assert(last_response.ok?)
+
+      get '/mulukhiya/app/config'
+      assert(last_response.ok?)
     end
 
     def test_about

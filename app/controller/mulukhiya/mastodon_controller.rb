@@ -1,65 +1,65 @@
 module Mulukhiya
   class MastodonController < Controller
     before do
-      @mastodon = MastodonService.new
+      @sns = MastodonService.new
       if params[:token].present?
-        @mastodon.token = Crypt.new.decrypt(params[:token])
+        @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
-        @mastodon.token = @headers['Authorization'].split(/\s+/).last
+        @sns.token = @headers['Authorization'].split(/\s+/).last
       end
-      @results.account = @mastodon.account
+      @results.account = @sns.account
     end
 
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
-      Handler.exec_all(:pre_toot, params, {results: @results, sns: @mastodon})
-      @results.response = @mastodon.toot(params)
-      notify(@mastodon.account, @results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {results: @results, sns: @mastodon})
+      Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns})
+      @results.response = @sns.toot(params)
+      notify(@sns.account, @results.response.parsed_response) if response_error?
+      Handler.exec_all(:post_toot, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
       @renderer.message['tags']&.keep_if {|v| tags.member?(v['name'])}
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      notify(@mastodon.account, @renderer.message)
+      notify(@sns.account, @renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
 
     post '/api/v1/media' do
-      Handler.exec_all(:pre_upload, params, {results: @results, sns: @mastodon})
-      @results.response = @mastodon.upload(params[:file][:tempfile].path, {response: :raw})
-      Handler.exec_all(:post_upload, params, {results: @results, sns: @mastodon})
+      Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
+      @results.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
+      Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      notify(@mastodon.account, @renderer.message)
+      notify(@sns.account, @renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/favourite' do
-      @results.response = @mastodon.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {results: @results, sns: @mastodon})
+      @results.response = @sns.fav(params[:id])
+      Handler.exec_all(:post_fav, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/reblog' do
-      @results.response = @mastodon.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {results: @results, sns: @mastodon})
+      @results.response = @sns.boost(params[:id])
+      Handler.exec_all(:post_boost, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/bookmark' do
-      @results.response = @mastodon.bookmark(params[:id])
-      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @mastodon})
+      @results.response = @sns.bookmark(params[:id])
+      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
@@ -67,7 +67,7 @@ module Mulukhiya
 
     get '/api/v2/search' do
       params[:limit] = @config['/mastodon/search/limit']
-      @results.response = @mastodon.search(params[:q], params)
+      @results.response = @sns.search(params[:q], params)
       @message = @results.response.parsed_response.with_indifferent_access
       Handler.exec_all(:post_search, params, {results: @results, message: @message})
       @renderer.message = @message
@@ -99,23 +99,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/config' do
-      if @mastodon.account
-        @renderer.message = {
-          account: @mastodon.account.to_h,
-          config: JSON.parse(UserConfigStorage.new.get(@mastodon.account.id)),
-        }
-      else
-        @renderer.message = {error: 'bad token'}
-        @renderer.status = 400
-      end
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/app/auth' do
       @renderer = HTMLRenderer.new
       @renderer.template = 'app_auth'
-      @renderer[:oauth_url] = @mastodon.oauth_uri
+      @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
     end
 
@@ -125,14 +112,14 @@ module Mulukhiya
       if errors.present?
         @renderer.template = 'app_auth'
         @renderer[:errors] = errors
-        @renderer[:oauth_url] = @mastodon.oauth_uri
+        @renderer[:oauth_url] = @sns.oauth_uri
         @renderer.status = 422
       else
         @renderer.template = 'app_auth_result'
-        r = @mastodon.auth(params[:code])
-        @mastodon.token = r.parsed_response['access_token']
-        @mastodon.account.webhook_token = @mastodon.token if @mastodon.token
-        @renderer[:hook_url] = @mastodon.account.webhook&.uri
+        r = @sns.auth(params[:code])
+        @sns.token = r.parsed_response['access_token']
+        @sns.account.webhook_token = @sns.token if @sns.token
+        @renderer[:hook_url] = @sns.account.webhook&.uri
         @renderer[:status] = r.code
         @renderer[:result] = r.parsed_response
         @renderer.status = r.code
