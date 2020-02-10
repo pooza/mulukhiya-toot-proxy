@@ -1,5 +1,9 @@
 module Mulukhiya
   class HandlerTest < TestCase
+    def setup
+      @handler = Handler.create('spotify_url_nowplaying')
+    end
+
     def test_all
       Environment.controller_class.events.each do |event|
         Handler.all(event) do |handler|
@@ -12,7 +16,7 @@ module Mulukhiya
     end
 
     def test_exec_all
-      return if Handler.create('spotify_url_nowplaying').disable?
+      return unless handler?
       params = {}
       Handler.exec_all(
         :pre_toot,
