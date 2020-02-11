@@ -14,7 +14,7 @@ module Mulukhiya
     def save_config
       values = YAML.load_file(master_config_path).dig(name)
       local_values = YAML.load_file(local_config_path).dig(name)
-      values = Config.deep_merge(values, local_values) if local_values
+      values = deep_merge(values, local_values) if local_values
       File.write(config_cache_path, YAML.dump(values))
     end
 
@@ -28,6 +28,16 @@ module Mulukhiya
 
     def local_config_path
       return File.join(Environment.dir, 'config/local.yaml')
+    end
+
+    private
+
+    def deep_merge(src, target)
+      dest = src.clone || {}
+      target.each do |k, v|
+        dest[k] = v.is_a?(Hash) ? deep_merge(dest[k], v) : v
+      end
+      return dest.compact
     end
   end
 end
