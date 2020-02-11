@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def self.domain_name
-      return sns_class.new.uri.host
+      return Ginseng::URI.parse(config["/#{controller_name}/url"]).host
     end
 
     def self.sns_class
