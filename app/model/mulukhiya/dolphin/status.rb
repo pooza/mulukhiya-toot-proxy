@@ -23,8 +23,8 @@ module Mulukhiya
         unless @uri
           if self[:uri].present?
             @uri = TootURI.parse(self[:uri])
-            @uri = NoteURI.parse(self[:uri]) unless @uri.id
-            @uri = nil unless @uri.id
+            @uri = NoteURI.parse(self[:uri]) unless @uri.valid?
+            @uri = nil unless @uri.valid?
           else
             @uri = NoteURI.parse(Config.instance['/dolphin/url'])
             @uri.path = "/notes/#{id}"
@@ -44,10 +44,12 @@ module Mulukhiya
       end
 
       def to_h
-        v = values.clone
-        v[:uri] ||= uri.to_s
-        v[:attachments] = attachments.map(&:to_h)
-        return v
+        unless @hash
+          @hash = values.clone
+          @hash[:uri] ||= uri.to_s
+          @hash[:attachments] = attachments.map(&:to_h)
+        end
+        return @hash
       end
 
       def to_md

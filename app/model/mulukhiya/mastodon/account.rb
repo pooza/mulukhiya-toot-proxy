@@ -16,7 +16,7 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{username}@#{domain || MastodonService.new.uri.host}")
+        @acct ||= Acct.new("@#{username}@#{domain || Environment.domain_name}")
         return @acct
       end
 
@@ -83,9 +83,7 @@ module Mulukhiya
 
       alias bot? service?
 
-      def locked?
-        return prams[:locked]
-      end
+      alias locked? locked
 
       def notify_verbose?
         return config['/notify/verbose'] == true
@@ -110,9 +108,7 @@ module Mulukhiya
         elsif key[:acct]
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          host = acct.host
-          host = nil if acct.host == Environment.sns_class.new.uri.host
-          return Account.first(username: acct.username, domain: host)
+          return Account.first(username: acct.username, domain: acct.domain)
         end
         return Account.first(key)
       end

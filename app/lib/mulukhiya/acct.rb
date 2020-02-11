@@ -12,6 +12,13 @@ module Mulukhiya
 
     alias to_s contents
 
+    def domain_name
+      return nil if host == Environment.domain_name
+      return host
+    end
+
+    alias domain domain_name
+
     def agent?
       @config['/agent/accts'].member?(contents)
     end

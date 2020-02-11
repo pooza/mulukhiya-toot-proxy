@@ -42,6 +42,11 @@ module Mulukhiya
       return false
     end
 
+    def notify(message)
+      message = YAML.dump(message) if message.is_a?(Hash)
+      return Environment.info_agent_service&.notify(sns.account, message)
+    end
+
     def result
       return nil unless @result.present?
       return {

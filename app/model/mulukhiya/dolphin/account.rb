@@ -12,7 +12,7 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{username}@#{host || DolphinService.new.uri.host}")
+        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
         return @acct
       end
 
@@ -98,9 +98,7 @@ module Mulukhiya
         if key[:acct]
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          host = acct.host
-          host = nil if acct.host == Environment.sns_class.new.uri.host
-          return Account.first(username: acct.username, host: host)
+          return Account.first(username: acct.username, host: acct.domain)
         end
         return Account.first(key)
       end

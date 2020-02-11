@@ -16,6 +16,10 @@ module Mulukhiya
 
     alias id note_id
 
+    def valid?
+      return absolute? && id.present?
+    end
+
     def to_md
       note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
       note = DolphinService.new.fetch_note(note.id)

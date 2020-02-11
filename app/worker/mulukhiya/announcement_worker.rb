@@ -13,11 +13,11 @@ module Mulukhiya
       return unless executable?
       entries.each do |entry|
         next if cache.member?(entry['id'])
-        agent.toot(
+        service.toot(
           Environment.controller_class.status_field => create_body(entry, :sanitized),
           'visibility' => Environment.controller_class.visibility_name('unlisted'),
         )
-        agent.account.growi&.clip(create_body(entry, :md))
+        service.account.growi&.clip(create_body(entry, :md))
         sleep(1)
       end
       save
@@ -44,7 +44,7 @@ module Mulukhiya
 
     def announcements
       return enum_for(__method__) unless block_given?
-      agent.announcements.parsed_response.each do |announcement|
+      service.announcements.parsed_response.each do |announcement|
         yield announcement
       end
     end
@@ -74,8 +74,8 @@ module Mulukhiya
       return Environment.controller_class.announcement?
     end
 
-    def agent
-      return Environment.info_agent
+    def service
+      return Environment.info_agent_service
     end
   end
 end

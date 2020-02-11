@@ -12,6 +12,10 @@ module Mulukhiya
       return Config.instance
     end
 
+    def self.domain_name
+      return Ginseng::URI.parse(config["/#{controller_name}/url"]).host
+    end
+
     def self.sns_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end
@@ -24,7 +28,7 @@ module Mulukhiya
       return sns_class.new.account
     end
 
-    def self.info_agent
+    def self.info_agent_service
       service = service_class.new
       service.token = Config.instance['/agent/info/token']
       return service
