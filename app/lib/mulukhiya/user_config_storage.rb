@@ -1,13 +1,11 @@
 module Mulukhiya
   class UserConfigStorage < Redis
     def [](key)
-      value = get(key)
-      return {} if value.nil?
-      return Config.flatten('', JSON.parse(value))
+      return Config.flatten('', JSON.parse(get(key)))
     end
 
     def get(key)
-      return super(create_key(key))
+      return super(create_key(key)) || '{}'
     end
 
     def set(key, values)
@@ -21,7 +19,7 @@ module Mulukhiya
     end
 
     def update(key, values)
-      set(key, Config.deep_merge(JSON.parse(get(key) || '{}'), values))
+      set(key, JSON.parse(get(key)).deep_merge(values))
     end
 
     def create_key(key)
