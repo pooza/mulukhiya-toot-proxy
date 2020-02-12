@@ -36,7 +36,7 @@ module Mulukhiya
     end
 
     def to_s
-      return YAML.dump(to_h)
+      return to_h.to_yaml
     end
   end
 end

@@ -13,14 +13,14 @@ module Mulukhiya
     post '/api/notes/create' do
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns}) unless renote?
       @results.response = @sns.note(params)
-      notify(@sns.account, @results.response.parsed_response) if response_error?
+      notify(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @sns}) unless renote?
       @renderer.message = @results.response.parsed_response
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      notify(@sns.account, @renderer.message)
+      notify(@renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
@@ -28,14 +28,14 @@ module Mulukhiya
     post '/api/drive/files/create' do
       Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
       @results.response = @sns.upload(params[:file][:tempfile].path)
-      notify(@sns.account, @results.response.parsed_response) if response_error?
+      notify(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
       @renderer.message = JSON.parse(@results.response.body)
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      notify(@sns.account, @renderer.message)
+      notify(@renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end

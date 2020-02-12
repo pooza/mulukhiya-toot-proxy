@@ -4,8 +4,8 @@ module Mulukhiya
       @daemon = ThinDaemon.new
     end
 
-    def test_cmd
-      assert_kind_of(Array, @daemon.cmd)
+    def test_command
+      assert_kind_of(CommandLine, @daemon.command)
     end
 
     def test_motd

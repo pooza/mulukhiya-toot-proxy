@@ -17,23 +17,6 @@ module Mulukhiya
       return super(keyword, params)
     end
 
-    def bookmark(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post(create_uri("/api/v1/statuses/#{id}/bookmark"), {
-        body: '{}',
-        headers: headers,
-      })
-    end
-
-    def announcements(params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.get(create_uri('/api/v1/announcements'), {headers: headers})
-    end
-
     def account
       @account ||= Environment.account_class.get(token: @token)
       return @account

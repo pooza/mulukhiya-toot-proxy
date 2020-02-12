@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b7c9a83abbf3b52c1b4ee28cfc8f15888a2bc6a3
+  revision: 754b15387ea0d92ef9bab75f06f96872bfb8f106
   specs:
-    ginseng-core (1.5.7)
+    ginseng-core (1.5.8)
       activesupport
       addressable
       bundler
@@ -44,9 +44,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ff526b389f495066564994f9e7072df911f5c5eb
+  revision: 630978d919b0e8dac4a270cd2bc9e17523046e91
   specs:
-    ginseng-web (1.0.7)
+    ginseng-web (1.1.0)
       rack-test
       sass
       sinatra

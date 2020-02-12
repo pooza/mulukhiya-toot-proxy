@@ -24,7 +24,7 @@ module Mulukhiya
       return body unless parser.command_name == command_name
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
-      body[status_field] = YAML.dump(parser.params)
+      body[status_field] = parser.params.to_yaml
       @prepared = true
       return body
     end

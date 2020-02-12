@@ -43,7 +43,7 @@ module Mulukhiya
     end
 
     def notify(message)
-      message = YAML.dump(message) if message.is_a?(Hash)
+      message = message.to_yaml unless message.is_a?(String)
       return Environment.info_agent_service&.notify(sns.account, message)
     end
 

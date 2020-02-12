@@ -14,7 +14,7 @@ module Mulukhiya
       tags = TootParser.new(params[:status]).tags
       Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns})
       @results.response = @sns.toot(params)
-      notify(@sns.account, @results.response.parsed_response) if response_error?
+      notify(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
       @renderer.message['tags']&.keep_if {|v| tags.member?(v['name'])}
@@ -22,7 +22,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
-      notify(@sns.account, @renderer.message)
+      notify(@renderer.message)
       @renderer.status = e.status
       return @renderer.to_s
     end
@@ -36,7 +36,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = JSON.parse(e.response.body)
-      notify(@sns.account, @renderer.message)
+      notify(@renderer.message)
       @renderer.status = e.response.code
       return @renderer.to_s
     end
