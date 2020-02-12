@@ -56,9 +56,9 @@ module Mulukhiya
       return 400 <= @results.response&.code
     end
 
-    def notify(account, message)
-      message = YAML.dump(message) unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(account, message)
+    def notify(message)
+      message = message.to_yaml unless message.is_a?(String)
+      return Environment.info_agent_service&.notify(@sns.account, message)
     end
 
     not_found do
