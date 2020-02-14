@@ -20,14 +20,23 @@ module Mulukhiya
     def self.load
       ENV['TEST'] = Package.name
       Sidekiq::Testing.fake!
-      cases = Dir.glob(File.join(Environment.dir, 'test/*.rb'))
+      names.each do |name|
+        puts "case: #{name}"
+        require File.join(dir, "#{name}.rb")
+      end
+    end
+
+    def self.names
+      names = ARGV.first.split(/[^[:word:],]+/)[1]&.split(',')
+      names ||= Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
       TestCaseFilter.all do |filter|
-        filter.exec(cases) if filter.active?
+        filter.exec(names) if filter.active?
       end
-      cases.sort.each do |f|
-        puts "case: #{File.basename(f)}"
-        require f
-      end
+      return names.sort.uniq
+    end
+
+    def self.dir
+      return File.join(Environment.dir, 'test')
     end
   end
 end
