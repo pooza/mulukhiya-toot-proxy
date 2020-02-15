@@ -42,7 +42,7 @@ module Mulukhiya
     end
 
     def disable?(handler_name)
-      return self["/handler/#{handler_name}/disable"]
+      return @values["/handler/#{handler_name}/disable"] == true
     end
   end
 end

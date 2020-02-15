@@ -49,6 +49,7 @@ test:
         - query_template
         - status
         - toot_uri
+        - user_config
     - name: amazon
       cases:
         - amazon_service
