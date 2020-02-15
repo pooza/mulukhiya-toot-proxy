@@ -12,16 +12,16 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.7.x
-      - name: install ffmpeg
+      - name: Install ffmpeg
         run: |
-          sudo add-apt-repository ppa:mc3man/trusty-media
+          sudo add-apt-repository ppa:jonathonf/ffmpeg-3
           sudo apt update
           sudo apt install ffmpeg
-      - name: Build and test with Rake
+      - name: Build
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3
-      - name: check gems
+      - name: Check gems
         run: |
           bundle exec rake bundle:update
           bundle exec rake bundle:check
