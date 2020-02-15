@@ -1,0 +1,53 @@
+name: test
+
+on:
+  push:
+
+env:
+  CI: "true"
+  RUBYOPT: -EUTF-8
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container: ${{ matrix.ruby }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        ruby:
+          - ruby:2.6
+          - ruby:2.7
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install
+        run: |
+          set -xe
+          gem install bundler
+          sudo apt install ffmpeg
+          bundle install
+        continue-on-error: ${{ matrix.allow_failures == 'true' }}
+
+      - name: check gems
+        run: |
+          set -xe
+          bundle exec rake bundle:update
+          bundle exec rake bundle:check
+        continue-on-error: ${{ matrix.allow_failures == 'true' }}
+
+      - name: Run test
+        run: |
+          set -xe
+          bundle exec rake test
+        continue-on-error: ${{ matrix.allow_failures == 'true' }}
+
+      - name: Run lint
+        run: |
+          set -xe
+          bundle exec rubocop
+          bundle exec rake erb:check
+        continue-on-error: ${{ matrix.allow_failures == 'true' }}
