@@ -14,9 +14,8 @@ jobs:
           ruby-version: 2.7.x
       - name: install ffmpeg
         run: |
-          #udo apt install software-properties-common
-          #sudo add-apt-repository ppa:mc3man/trusty-media
-          #sudo apt update
+          sudo add-apt-repository ppa:mc3man/trusty-media
+          sudo apt update
           sudo apt install ffmpeg
       - name: Build and test with Rake
         run: |
