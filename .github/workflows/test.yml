@@ -6,12 +6,24 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:5
+        options: --health-cmd "redis-cli -h localhost ping" --health-interval 10s --health-timeout 5s --health-retries 15
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby 2.7
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.7.x
+      - name: Install PostgreSQL 11 client
+        run: |
+          sudo apt-apt install libpq-dev
       - name: Install ffmpeg
         run: |
           sudo add-apt-repository ppa:jonathonf/ffmpeg-4
