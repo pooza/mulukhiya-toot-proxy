@@ -1,14 +1,4 @@
 GIT
-  remote: https://github.com/mperham/sidekiq.git
-  revision: e44d5b8f75467735363d3d9f54a02ac56457037d
-  specs:
-    sidekiq (6.0.4)
-      connection_pool (>= 2.2.2)
-      rack (~> 2.0.8)
-      rack-protection (>= 2.0.0)
-      redis (>= 4.1.0)
-
-GIT
   remote: https://github.com/pooza/crowi-client.git
   revision: aa2910cc3710262ba7ec31b28a172491c20558ce
   specs:
@@ -174,7 +164,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
-    oauth2 (1.4.3)
+    oauth2 (1.4.4)
       faraday (>= 0.8, < 2.0)
       jwt (>= 1.0, < 3.0)
       multi_json (~> 1.3)
@@ -193,7 +183,7 @@ GEM
     power_assert (1.1.5)
     public_suffix (3.1.1)
     raabro (1.1.6)
-    rack (2.0.9)
+    rack (2.2.2)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
@@ -245,6 +235,11 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.29.0)
+    sidekiq (6.0.5)
+      connection_pool (>= 2.2.2)
+      rack (~> 2.0)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     sidekiq-scheduler (3.0.1)
       e2mmap
       redis (>= 3, < 5)
@@ -298,7 +293,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   sanitize
-  sidekiq!
+  sidekiq
   sidekiq-scheduler
 
 RUBY VERSION

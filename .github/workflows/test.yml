@@ -1,0 +1,42 @@
+name: test
+on:
+  - push
+env:
+  CI: "true"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:5
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby 2.7
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.x
+      - name: apt install
+        run: |
+          sudo add-apt-repository ppa:jonathonf/ffmpeg-4
+          sudo apt update
+          sudo apt install ffmpeg
+          sudo apt install libpq-dev
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+          bundle exec rake bundle:update
+          bundle exec rake bundle:check
+      - name: Run lint
+        run: |
+          bundle exec rubocop
+          bundle exec rake erb:check
+      - name: Run test
+        run: |
+          bundle exec rake test

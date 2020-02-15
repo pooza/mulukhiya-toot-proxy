@@ -1,5 +1,5 @@
 package:
-  version: 3.4.4
+  version: 3.4.5
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -49,6 +49,7 @@ test:
         - query_template
         - status
         - toot_uri
+        - user_config
     - name: amazon
       cases:
         - amazon_service

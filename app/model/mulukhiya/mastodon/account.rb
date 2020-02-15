@@ -26,10 +26,8 @@ module Mulukhiya
       end
 
       def config
-        return UserConfigStorage.new[id]
-      rescue => e
-        logger.error(e)
-        return {}
+        @config ||= UserConfig.new(id)
+        return @config
       end
 
       def webhook
@@ -39,10 +37,6 @@ module Mulukhiya
       rescue => e
         logger.error(e)
         return nil
-      end
-
-      def webhook_token=(new_token)
-        UserConfigStorage.new.update(id, {webhook: {token: new_token}})
       end
 
       def growi

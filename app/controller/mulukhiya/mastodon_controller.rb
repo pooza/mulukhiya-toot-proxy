@@ -2,7 +2,7 @@ module Mulukhiya
   class MastodonController < Controller
     before do
       @sns = MastodonService.new
-      if params[:token].present?
+      if params[:token].present? && request.path.start_with?('/mulukhiya')
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
         @sns.token = @headers['Authorization'].split(/\s+/).last
@@ -118,7 +118,7 @@ module Mulukhiya
         @renderer.template = 'app_auth_result'
         r = @sns.auth(params[:code])
         @sns.token = r.parsed_response['access_token']
-        @sns.account.webhook_token = @sns.token if @sns.token
+        @sns.account.config.webhook_token = @sns.token if @sns.token
         @renderer[:hook_url] = @sns.account.webhook&.uri
         @renderer[:status] = r.code
         @renderer[:result] = r.parsed_response

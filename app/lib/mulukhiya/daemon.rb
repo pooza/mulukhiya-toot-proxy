@@ -30,15 +30,5 @@ module Mulukhiya
     def local_config_path
       return File.join(Environment.dir, 'config/local.yaml')
     end
-
-    private
-
-    def deep_merge(src, target)
-      dest = src.clone || {}
-      target.each do |k, v|
-        dest[k] = v.is_a?(Hash) ? deep_merge(dest[k], v) : v
-      end
-      return dest.compact
-    end
   end
 end

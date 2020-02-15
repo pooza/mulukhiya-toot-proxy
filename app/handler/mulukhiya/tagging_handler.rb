@@ -30,7 +30,7 @@ module Mulukhiya
     def create_temp_text(body)
       return '' unless tags.body&.present?
       text = [tags.body.gsub(Acct.pattern, '')]
-      text.concat(body['poll']['options']) if body['poll']
+      text.concat(body['poll']['options'] || body['poll']['choices']) if body['poll']
       return text.join('///')
     end
 
