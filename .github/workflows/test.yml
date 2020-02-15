@@ -1,53 +1,35 @@
 name: test
-
 on:
-  push:
-
+  - push
 env:
   CI: "true"
-  RUBYOPT: -EUTF-8
-
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    container: ${{ matrix.ruby }}
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        ruby:
-          - ruby:2.6
-          - ruby:2.7
-
     steps:
       - uses: actions/checkout@v2
-
+      - name: Set up Ruby 2.7
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.x
       - name: install ffmpeg
         run: |
           #udo apt install software-properties-common
           #sudo add-apt-repository ppa:mc3man/trusty-media
           #sudo apt update
           sudo apt install ffmpeg
-
-      - name: install gems
+      - name: Build and test with Rake
         run: |
           gem install bundler
-          bundle install
-        continue-on-error: ${{ matrix.allow_failures == 'true' }}
-
+          bundle install --jobs 4 --retry 3
       - name: check gems
         run: |
           bundle exec rake bundle:update
           bundle exec rake bundle:check
-
       - name: Run lint
         run: |
           bundle exec rubocop
           bundle exec rake erb:check
-
       - name: Run test
         run: |
           bundle exec rake test
-        continue-on-error: ${{ matrix.allow_failures == 'true' }}
