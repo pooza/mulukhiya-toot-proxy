@@ -14,7 +14,7 @@ jobs:
           ruby-version: 2.7.x
       - name: Install ffmpeg
         run: |
-          sudo add-apt-repository ppa:jonathonf/ffmpeg-3
+          sudo add-apt-repository ppa:jonathonf/ffmpeg-4
           sudo apt update
           sudo apt install ffmpeg
       - name: Build
