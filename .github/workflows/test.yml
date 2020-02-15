@@ -28,7 +28,9 @@ jobs:
         run: |
           set -xe
           gem install bundler
-          apt-get install ffmpeg
+          add-apt-repository ppa:mc3man/trusty-media
+          apt update
+          apt install ffmpeg
           bundle install
         continue-on-error: ${{ matrix.allow_failures == 'true' }}
 
