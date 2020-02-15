@@ -23,10 +23,10 @@ module Mulukhiya
       if @sns.account
         @renderer.message = {
           account: @sns.account.to_h,
-          config: JSON.parse(UserConfigStorage.new.get(@sns.account.id)),
+          config: @sns.account.config.to_h,
         }
       else
-        @renderer.message = {error: 'bad token'}
+        @renderer.message = {error: 'Invalid access token'}
         @renderer.status = 400
       end
       return @renderer.to_s

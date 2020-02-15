@@ -14,11 +14,11 @@ module Mulukhiya
     end
 
     def visibility
-      return @params['/webhook/visibility'] || 'public'
+      return @userconfig['/webhook/visibility'] || 'public'
     end
 
     def uri
-      uri = Ginseng::URI.parse(@config['/mastodon/url'])
+      uri = @sns.uri.clone
       uri.path = "/mulukhiya/webhook/#{digest}"
       return uri
     end
@@ -68,18 +68,18 @@ module Mulukhiya
     def self.all
       return enum_for(__method__) unless block_given?
       Postgres.instance.execute('webhook_tokens').each do |row|
-        yield Webhook.new('/webhook/token' => row['token'])
+        yield Webhook.new(UserConfig.new('/webhook/token' => row['token']))
       end
     end
 
     private
 
-    def initialize(params)
+    def initialize(userconfig)
       @config = Config.instance
-      @params = params
+      @userconfig = userconfig
       @results = ResultContainer.new
       @sns = Environment.sns_class.new
-      @sns.token = @params['/webhook/token']
+      @sns.token = @userconfig.webhook_token
       @logger = Logger.new
       @db = Postgres.instance
     end

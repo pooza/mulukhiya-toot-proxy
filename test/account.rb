@@ -38,7 +38,7 @@ module Mulukhiya
     end
 
     def test_config
-      assert_kind_of(Hash, @account.config)
+      assert_kind_of(UserConfig, @account.config)
     end
 
     def test_webhook
