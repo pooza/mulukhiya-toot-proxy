@@ -23,7 +23,7 @@ jobs:
           ruby-version: 2.7.x
       - name: Install PostgreSQL 11 client
         run: |
-          sudo apt-apt install libpq-dev
+          sudo apt install libpq-dev
       - name: Install ffmpeg
         run: |
           sudo add-apt-repository ppa:jonathonf/ffmpeg-4
