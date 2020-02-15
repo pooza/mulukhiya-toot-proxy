@@ -21,20 +21,16 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.7.x
-      - name: Install PostgreSQL 11 client
-        run: |
-          sudo apt install libpq-dev
-      - name: Install ffmpeg
+      - name: apt install
         run: |
           sudo add-apt-repository ppa:jonathonf/ffmpeg-4
           sudo apt update
           sudo apt install ffmpeg
-      - name: Build
+          sudo apt install libpq-dev
+      - name: bundle install
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3
-      - name: Check gems
-        run: |
           bundle exec rake bundle:update
           bundle exec rake bundle:check
       - name: Run lint
