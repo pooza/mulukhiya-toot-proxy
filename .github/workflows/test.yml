@@ -24,33 +24,30 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: install
+      - name: install ffmpeg
         run: |
-          set -xe
+          #udo apt install software-properties-common
+          #sudo add-apt-repository ppa:mc3man/trusty-media
+          #sudo apt update
+          sudo apt install ffmpeg
+
+      - name: install gems
+        run: |
           gem install bundler
-          apt install software-properties-common
-          add-apt-repository ppa:mc3man/trusty-media
-          apt update
-          apt install ffmpeg
           bundle install
         continue-on-error: ${{ matrix.allow_failures == 'true' }}
 
       - name: check gems
         run: |
-          set -xe
           bundle exec rake bundle:update
           bundle exec rake bundle:check
-        continue-on-error: ${{ matrix.allow_failures == 'true' }}
-
-      - name: Run test
-        run: |
-          set -xe
-          bundle exec rake test
-        continue-on-error: ${{ matrix.allow_failures == 'true' }}
 
       - name: Run lint
         run: |
-          set -xe
           bundle exec rubocop
           bundle exec rake erb:check
+
+      - name: Run test
+        run: |
+          bundle exec rake test
         continue-on-error: ${{ matrix.allow_failures == 'true' }}
