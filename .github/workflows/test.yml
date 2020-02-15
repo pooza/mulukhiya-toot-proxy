@@ -28,7 +28,7 @@ jobs:
         run: |
           set -xe
           gem install bundler
-          apt install ffmpeg
+          sudo apt-get install ffmpeg
           bundle install
         continue-on-error: ${{ matrix.allow_failures == 'true' }}
 
