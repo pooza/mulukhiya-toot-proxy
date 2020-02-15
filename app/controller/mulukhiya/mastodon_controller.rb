@@ -2,7 +2,7 @@ module Mulukhiya
   class MastodonController < Controller
     before do
       @sns = MastodonService.new
-      if params[:token].present?
+      if params[:token].present? && request.path.start_with?('/mulukhiya')
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
         @sns.token = @headers['Authorization'].split(/\s+/).last

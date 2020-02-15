@@ -2,7 +2,7 @@ module Mulukhiya
   class DolphinController < Controller
     before do
       @sns = DolphinService.new
-      if params[:token].present?
+      if params[:token].present? && request.path.start_with?('/mulukhiya')
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif params[:i]
         @sns.token = params[:i]
