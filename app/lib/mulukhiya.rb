@@ -31,7 +31,7 @@ module Mulukhiya
     config['dirs'].each do |d|
       loader.push_dir(File.join(dir, 'app', d))
     end
-    loader.setup
+    return loader
   end
 
   def self.sidekiq
@@ -61,5 +61,5 @@ module Mulukhiya
 end
 
 Mulukhiya.bootsnap
-Mulukhiya.loader
+Mulukhiya.loader.setup
 Mulukhiya.sidekiq
