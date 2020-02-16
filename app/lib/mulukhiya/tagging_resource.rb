@@ -49,7 +49,7 @@ module Mulukhiya
     end
 
     def initialize(params)
-      @params = Config.flatten('', params)
+      @params = params.flatten
       @logger = Logger.new
       @http = HTTP.new
     end

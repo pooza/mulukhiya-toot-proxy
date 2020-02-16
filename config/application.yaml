@@ -1,5 +1,5 @@
 package:
-  version: 3.4.5
+  version: 3.4.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -9,16 +9,31 @@ controller: mastodon
 handler:
   default:
     timeout: 10
-  image_resize:
-    pixel: 1280
+  amazon_image:
+    timeout: 20
+    disable: true
+  amazon_nowplaying:
+    timeout: 20
+  amazon_url_nowplaying:
+    timeout: 20
   canonical_url:
     timeout: 2
-  amazon_image:
-    disable: true
-  spotify_image:
-    disable: true
+  image_resize:
+    pixel: 1280
   itunes_image:
+    timeout: 20
     disable: true
+  itunes_nowplaying:
+    timeout: 20
+  itunes_url_nowplaying:
+    timeout: 20
+  spotify_image:
+    timeout: 20
+    disable: true
+  spotify_nowplaying:
+    timeout: 20
+  spotify_url_nowplaying:
+    timeout: 20
 worker:
   media_cleaning:
     days: 1
