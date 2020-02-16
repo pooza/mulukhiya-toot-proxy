@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def params=(values)
-      @params = Config.flatten('', values)
+      @params = values.flatten
     end
 
     def exec(cases)
