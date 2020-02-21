@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 1529a5f322e342fad2d34a24de8e152421d0a3c4
+  revision: 22bb0407269e10ee90ce6cd2946c8c6286c096a5
   specs:
-    ginseng-core (1.6.1)
+    ginseng-core (1.6.2)
       activesupport
       addressable
       bundler
@@ -29,17 +29,18 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: c89ea46b71df86c2d220db585af9d3912671dc8b
+  revision: 33f6dfebd499165b2a2fcdc09b0867997cf16d35
   specs:
-    ginseng-postgres (1.2.3)
+    ginseng-postgres (1.2.4)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 3327faeaaf598d6d809ba6e66d0b9afaf67aeea5
+  revision: 4d014476dadac085f041fd58cd71db5324c788c6
   specs:
-    ginseng-web (1.1.1)
+    ginseng-web (1.1.2)
+      rack-test
       sass
       sinatra
       thin
@@ -68,9 +69,10 @@ GEM
       zeitwerk (~> 2.2)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
-    amazon-ecs (2.6.0)
-      nokogiri (~> 1.10)
     ast (2.4.0)
+    aws-eventstream (1.0.3)
+    aws-sigv4 (1.1.0)
+      aws-eventstream (~> 1.0, >= 1.0.2)
     bootsnap (1.4.5)
       msgpack (~> 1.0)
     builder (3.2.4)
@@ -85,7 +87,7 @@ GEM
     dropbox_api (0.1.18)
       faraday (<= 1.0)
       oauth2 (~> 1.1)
-    dry-configurable (0.11.0)
+    dry-configurable (0.11.2)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.7)
       dry-equalizer (~> 0.2)
@@ -109,7 +111,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
       dry-types (~> 1.2)
-    dry-types (1.3.0)
+    dry-types (1.3.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.4, >= 0.4.4)
@@ -132,14 +134,25 @@ GEM
       multipart-post (>= 1.2, < 3)
     fastimage (2.1.7)
     ffi (1.12.2)
+    ffi-compiler (1.0.1)
+      ffi (>= 1.0.0)
+      rake
     fugit (1.3.3)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.1)
     gli (2.19.0)
     hashie (3.6.0)
+    http (4.3.0)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 2.2)
+      http-parser (~> 1.2.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    httparty (0.17.3)
+    http-form_data (2.2.0)
+    http-parser (1.2.1)
+      ffi-compiler (>= 1.0, < 2.0)
+    httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.8.2)
@@ -211,15 +224,17 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rexml (3.2.4)
     rspotify (2.8.0)
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.79.0)
+    rubocop (0.80.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.7.0.1)
       rainbow (>= 2.2.2, < 4.0)
+      rexml
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
     rubocop-performance (1.5.2)
@@ -272,6 +287,9 @@ GEM
     unf_ext (0.0.7.6)
     unicode (0.4.4.4)
     unicode-display_width (1.6.1)
+    vacuum (3.3.0)
+      aws-sigv4 (~> 1.0)
+      http (~> 4.0)
     yajl-ruby (1.4.1)
     zeitwerk (2.2.2)
 
@@ -279,7 +297,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  amazon-ecs
   bootsnap
   crowi-client!
   dropbox_api
@@ -296,6 +313,7 @@ DEPENDENCIES
   sanitize
   sidekiq
   sidekiq-scheduler
+  vacuum
 
 RUBY VERSION
    ruby 2.7.0p0
