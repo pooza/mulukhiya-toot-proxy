@@ -12,7 +12,7 @@ module Mulukhiya
 
     def test_search
       assert_kind_of(String, @service.search('プリキュア', ['DigitalMusic']))
-     end
+    end
 
     def test_create_image_uri
       ['B07VHY7DBH', 'B00TYVQN3O', 'B071DNWLBR'].each do |asin|
