@@ -1,5 +1,4 @@
-require 'amazon/ecs'
-require 'nokogiri'
+require 'vacuum'
 
 module Mulukhiya
   class AmazonService
@@ -8,17 +7,18 @@ module Mulukhiya
       @http = HTTP.new
       @logger = Logger.new
       return unless AmazonService.config?
-      Amazon::Ecs.configure do |options|
-        options[:AWS_access_key_id] = @config['/amazon/access_key']
-        options[:AWS_secret_key] = @config['/amazon/secret_key']
-        options[:associate_tag] = AmazonService.associate_tag
-      end
+      @vacuum = Vacuum.new(
+        marketplace: @config['/amazon/marketplace'],
+        access_key: @config['/amazon/access_key'],
+        secret_key: @config['/amazon/secret_key'],
+        partner_tag: AmazonService.associate_tag,
+      )
     end
 
     def create_image_uri(asin)
       item = lookup(asin)
       ['Large', 'Medium', 'Small'].each do |size|
-        uri = AmazonURI.parse(item.get("#{size}Image/URL"))
+        uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
         return uri if uri
       end
     end
@@ -27,42 +27,34 @@ module Mulukhiya
       return nil unless AmazonService.config?
       cnt ||= 0
       categories.each do |category|
-        response = Amazon::Ecs.item_search(keyword, {
-          search_index: category,
-          response_group: 'ItemAttributes',
-          country: @config['/amazon/country'],
-        })
-        return response.items.first.get('ASIN') if response.items.present?
+        response = @vacuum.search_items(keywords: keyword, search_index: category)
+        raise response.status.to_s unless response.status == 200
+        return JSON.parse(response.to_s)['SearchResult']['Items'].first['ASIN']
       end
       return nil
-    rescue Amazon::RequestError => e
+    rescue => e
       @logger.info(e)
-      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit <= cnt
-      sleep(1)
       cnt += 1
+      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
+      sleep(1)
       retry
     end
 
     def lookup(asin)
       cnt ||= 0
-      response = Amazon::Ecs.item_lookup(asin, {
-        country: @config['/amazon/country'],
-        response_group: 'Images,ItemAttributes',
-      })
-      if response.has_error?
-        raise Ginseng::RequestError, "ASIN '#{asin}' not found' (#{response.error})"
-      end
-      return response.items&.first
-    rescue Amazon::RequestError => e
+      response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
+      raise response.status.to_s unless response.status == 200
+      return JSON.parse(response.to_s)['ItemsResult']['Items'].first
+    rescue => e
       @logger.info(e)
-      raise Ginseng::GatewayError, e.message, e.backtrace if retry_limit <= cnt
-      sleep(1)
       cnt += 1
+      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
+      sleep(1)
       retry
     end
 
     def create_item_uri(asin)
-      uri = AmazonURI.parse(@config["/amazon/urls/#{@config['/amazon/country']}"])
+      uri = AmazonURI.parse(@config["/amazon/urls/#{@config['/amazon/marketplace']}"])
       uri.asin = asin
       return uri
     end
@@ -75,8 +67,10 @@ module Mulukhiya
 
     def self.config?
       config = Config.instance
+      config['/amazon/marketplace']
       config['/amazon/access_key']
       config['/amazon/secret_key']
+      config['/amazon/associate_tag']
       return true
     rescue Ginseng::ConfigError
       return false

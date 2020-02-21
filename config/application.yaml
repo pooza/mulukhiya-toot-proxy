@@ -1,5 +1,5 @@
 package:
-  version: 3.4.6
+  version: 3.4.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -8,32 +8,17 @@ package:
 controller: mastodon
 handler:
   default:
-    timeout: 10
+    timeout: 20
   amazon_image:
-    timeout: 20
     disable: true
-  amazon_nowplaying:
-    timeout: 20
-  amazon_url_nowplaying:
-    timeout: 20
   canonical_url:
     timeout: 2
   image_resize:
     pixel: 1280
   itunes_image:
-    timeout: 20
     disable: true
-  itunes_nowplaying:
-    timeout: 20
-  itunes_url_nowplaying:
-    timeout: 20
   spotify_image:
-    timeout: 20
     disable: true
-  spotify_nowplaying:
-    timeout: 20
-  spotify_url_nowplaying:
-    timeout: 20
 worker:
   media_cleaning:
     days: 1
@@ -253,10 +238,28 @@ dolphin:
   hashtag: *root_hashtag
   acct: *root_acct
 amazon:
-  country: jp
+  marketplace: jp
   urls:
     jp: https://www.amazon.co.jp/
   retry_limit: 5
+  resources:
+    - Images.Primary.Small
+    - Images.Primary.Medium
+    - Images.Primary.Large
+    - Images.Variants.Small
+    - Images.Variants.Medium
+    - Images.Variants.Large
+    - ItemInfo.ByLineInfo
+    - ItemInfo.ContentInfo
+    - ItemInfo.ContentRating
+    - ItemInfo.Classifications
+    - ItemInfo.ExternalIds
+    - ItemInfo.Features
+    - ItemInfo.ManufactureInfo
+    - ItemInfo.ProductInfo
+    - ItemInfo.TechnicalInfo
+    - ItemInfo.Title
+    - ItemInfo.TradeInInfo
   patterns:
     - pattern: /dp/([[:alnum:]]+)
       shortenable: true
