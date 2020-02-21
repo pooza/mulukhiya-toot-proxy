@@ -22,9 +22,10 @@ module Mulukhiya
 
     def update(keyword)
       return unless item = @items[keyword]
-      push(item.get('ItemAttributes/Title'))
-      push(item.get('ItemAttributes/Creator'))
-      tags.concat(ArtistParser.new(item.get('ItemAttributes/Creator')).parse)
+      push(item.dig('ItemInfo', 'Title', 'DisplayValue'))
+      return unless contributor = item.dig('ItemInfo', 'ByLineInfo', 'Contributors')&.first
+      push(contributor['Name'])
+      tags.concat(ArtistParser.new(contributor['Name']).parse)
     end
   end
 end

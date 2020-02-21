@@ -1,7 +1,4 @@
 require 'bootsnap'
-require 'active_support'
-require 'active_support/core_ext'
-require 'zeitwerk'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'

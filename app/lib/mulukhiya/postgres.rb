@@ -2,10 +2,6 @@ module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
 
-    def execute(name, params = {})
-      return super(name, params).map(&:with_indifferent_access)
-    end
-
     def self.connect
       return instance
     end

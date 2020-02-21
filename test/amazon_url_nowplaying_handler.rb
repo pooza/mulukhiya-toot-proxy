@@ -13,7 +13,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n")
-      assert_equal(@handler.result[:entries], ['https://www.amazon.co.jp/dp/B00QIUDCXS'])
+      assert_equal(@handler.result[:entries], ['https://www.amazon.co.jp/dp/B00QIUDCXS']) if @handler.result
     end
   end
 end
