@@ -51,14 +51,6 @@ Metrics/ClassLength:
   Exclude:
     - test/*
 
-Metrics/BlockLength:
-  Exclude:
-    - test/*
-    - app/task/*
-
-Style/BracesAroundHashParameters:
-  Enabled: false
-
 Style/Documentation:
   Enabled: false
 
@@ -122,6 +114,15 @@ Style/RescueModifier:
 
 Style/StringLiterals:
   EnforcedStyle: single_quotes
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
 
 Metrics/CyclomaticComplexity:
   Max: 10
