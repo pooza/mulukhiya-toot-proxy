@@ -94,14 +94,14 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - itunes_image
+      - spotify_image
+      - amazon_image
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - amazon_url
-      - itunes_image
-      - spotify_image
-      - amazon_image
       - tagging
     post_toot:
       - user_config_command
@@ -117,15 +117,15 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - itunes_image
+      - spotify_image
+      - amazon_image
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - amazon_url
-      - itunes_image
-      - spotify_image
-      - amazon_image
-      - webhook_image
       - tagging
     post_webhook:
       - result_notification
