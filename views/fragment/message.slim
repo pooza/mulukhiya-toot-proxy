@@ -1,0 +1,8 @@
+#message-container v-show='message'
+  p class='alert' v-if='has_error'
+    = '{{message}}'
+  p v-if='has_token_error'
+    a href='/mulukhiya/app/auth' アプリケーションの認証
+    | を行ってください。
+  p v-else=''
+    = '{{message}}'

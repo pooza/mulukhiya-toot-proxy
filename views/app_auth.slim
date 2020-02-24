@@ -1,0 +1,66 @@
+doctype html
+html lang='ja'
+  head
+    title = package.name
+    meta charset='UTF-8'
+    meta name='robots' content='noindex,nofollow'
+    meta name='viewport' content='width=800'
+    script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'
+    script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'
+    script src='https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js'
+    link rel='stylesheet' href='/mulukhiya/style/default'
+    link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.1/css/all.css'
+    link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap'
+  body
+    == slim.render 'fragment/header'
+    nav class='breadcrumbs'
+      ul
+        li
+          a href='/' = env.controller_class.name
+        li
+          a href='/mulukhiya' モロヘイヤHOME
+        li アプリケーションの認証
+    main id='app'
+      == slim.render 'fragment/message'
+      h2 = '{{auth_command}}'
+      form method='POST' action='/mulukhiya/app/auth'
+        ol
+          li
+            a href=params[:oauth_url] target='_blank' 認証コードを取得
+          li
+            | 取得した認証コードを↓に貼り付けて…
+            br
+            input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
+            - if params.dig(:errors, :code)
+              span class='alert'
+                = params[:errors][:code].join
+          li
+            button id='submit_button' 認証する
+    == slim.render 'fragment/footer'
+    javascript:
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          has_error: false,
+          has_token_error: false,
+          auth_command: 'アプリケーションの認証',
+        },
+        mounted: function () {
+          const token = localStorage.getItem('mulukhiya_token')
+          if (token) {
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+              .then(e => {
+                this.username = e.data.account.username
+                this.message = 'login: @' + this.username
+                this.auth_command = 'アプリケーションの再認証'
+              }).catch(e => {
+                this.has_error = true
+                document.getElementById('message-container').classList.add('alert')
+              })
+          } else {
+            this.has_token_error = true
+            this.message = 'invalid token'
+          }
+        },
+      })

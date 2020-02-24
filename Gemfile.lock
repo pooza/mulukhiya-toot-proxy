@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 22bb0407269e10ee90ce6cd2946c8c6286c096a5
+  revision: b95cebe5e70c8e16867b482f7d857464d5c81ced
   specs:
-    ginseng-core (1.6.2)
+    ginseng-core (1.6.3)
       activesupport
       addressable
       bundler
@@ -87,7 +87,7 @@ GEM
     dropbox_api (0.1.18)
       faraday (<= 1.0)
       oauth2 (~> 1.1)
-    dry-configurable (0.11.2)
+    dry-configurable (0.11.3)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.7)
       dry-equalizer (~> 0.2)
@@ -196,7 +196,7 @@ GEM
     parser (2.7.0.2)
       ast (~> 2.4.0)
     pg (1.2.2)
-    power_assert (1.1.5)
+    power_assert (1.1.6)
     public_suffix (3.1.1)
     raabro (1.1.6)
     rack (2.2.2)
@@ -270,7 +270,11 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.8.1)
       tilt (~> 2.0)
+    slim (4.0.1)
+      temple (>= 0.7.6, < 0.9)
+      tilt (>= 2.0.6, < 2.1)
     syslog-logger (1.6.8)
+    temple (0.8.2)
     test-unit (3.3.5)
       power_assert
     thin (1.7.2)
@@ -313,6 +317,7 @@ DEPENDENCIES
   sanitize
   sidekiq
   sidekiq-scheduler
+  slim
   vacuum
 
 RUBY VERSION

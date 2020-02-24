@@ -1,0 +1,55 @@
+doctype html
+html lang='ja'
+  head
+    title = package.name
+    meta charset='UTF-8'
+    meta name='robots' content='noindex,nofollow'
+    meta name='viewport' content='width=800'
+    script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'
+    script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'
+    script src='https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js'
+    link rel='stylesheet' href='/mulukhiya/style/default'
+    link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.1/css/all.css'
+    link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap'
+  body
+    == slim.render 'fragment/header'
+    nav class='breadcrumbs'
+      ul
+        li
+          a href='/' = env.controller_class.name
+        li
+          a href='/mulukhiya' モロヘイヤHOME
+        li アプリケーションの認証
+    main id='app'
+      == slim.render 'fragment/message'
+      h2 アプリケーションの認証
+      - if params[:status].to_i < 400
+        p 認証が完了しました。
+        div
+          h3 アクセストークン
+          textarea id='token_text' class='short' = params[:result][:access_token]
+          i class='fas fa-clipboard' v-on:click='copyToken'
+        div
+          h3 Webhook URL
+          textarea id='webhook_text' = params[:hook_url]
+          i class='fas fa-clipboard' v-on:click='copyWehbook'
+      - else
+        p class='alert' = "エラー（#{params[:status]}）"
+    == slim.render 'fragment/footer'
+    javascript:
+      new Vue({
+        el: '#app',
+        mounted: function () {
+          localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
+        },
+        methods: {
+          copyToken: function () {
+            document.getElementById('token_text').select()
+            document.execCommand('copy')
+          },
+          copyWehbook: function () {
+            document.getElementById('webhook_text').select()
+            document.execCommand('copy')
+          },
+        },
+      })

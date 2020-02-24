@@ -100,14 +100,14 @@ module Mulukhiya
     end
 
     get '/mulukhiya/app/auth' do
-      @renderer = HTMLRenderer.new
+      @renderer = SlimRenderer.new
       @renderer.template = 'app_auth'
       @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
     end
 
     post '/mulukhiya/app/auth' do
-      @renderer = HTMLRenderer.new
+      @renderer = SlimRenderer.new
       errors = AppAuthContract.new.call(params).errors.to_h
       if errors.present?
         @renderer.template = 'app_auth'
@@ -128,7 +128,7 @@ module Mulukhiya
     end
 
     get '/mulukhiya/app/config' do
-      @renderer = HTMLRenderer.new
+      @renderer = SlimRenderer.new
       @renderer.template = 'app_config'
       return @renderer.to_s
     end
