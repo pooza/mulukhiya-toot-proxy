@@ -16,13 +16,13 @@ html lang='ja'
     nav class='breadcrumbs'
       ul
         li
-          a href='/' = env.controller_class.name
+          a href='/' = controller.name
         li モロヘイヤHOME
     main id='app'
       == slim.render 'fragment/message'
       h1 = package.name
       ul
-        - if env.controller_class.webhook?
+        - if controller.webhook?
           li
             a href='/mulukhiya/app/auth' = '{{auth_command}}'
           li v-if='username'
