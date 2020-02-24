@@ -1,7 +1,7 @@
 module Mulukhiya
   class UserConfigStorage < Redis
     def [](key)
-      return JSON.parse(get(key)).flatten
+      return JSON.parse(get(key)).key_flatten
     end
 
     def get(key)

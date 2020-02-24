@@ -1,0 +1,75 @@
+doctype html
+html lang='ja'
+  head
+    title = package.name
+    meta charset='UTF-8'
+    meta name='robots' content='noindex,nofollow'
+    meta name='viewport' content='width=800'
+    script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'
+    script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'
+    script src='https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js'
+    link rel='stylesheet' href='/mulukhiya/style/default'
+    link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.1/css/all.css'
+    link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap'
+  body
+    == slim.render 'fragment/header'
+    nav class='breadcrumbs'
+      ul
+        li
+          a href='/' = controller.name
+        li
+          a href='/mulukhiya' モロヘイヤHOME
+        li 環境設定
+    main id='app'
+      == slim.render 'fragment/message'
+      h2 環境設定
+      #result-container v-if='result'
+        h3 現在の設定
+        pre = '{{result}}'
+      div v-if='access_token'
+        h3 アクセストークン
+        textarea id='token_text' class='short' = '{{access_token}}'
+        i class='fas fa-clipboard' v-on:click='copyToken'
+      div v-if='webhook_url'
+        h3 Webhook URL
+        textarea id='webhook_text' = '{{webhook_url}}'
+        i class='fas fa-clipboard' v-on:click='copyWehbook'
+    == slim.render 'fragment/footer'
+    javascript:
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          has_error: false,
+          has_token_error: false,
+        },
+        mounted: function () {
+          const token = localStorage.getItem('mulukhiya_token')
+          if (token) {
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+              .then(e => {
+                this.result = jsyaml.safeDump(e.data.config)
+                this.access_token = e.data.config.webhook.token
+                this.webhook_url = e.data.config.webhook.url
+                this.username = e.data.account.username
+                this.message = 'login: @' + this.username
+              }).catch(e => {
+                this.has_error = true
+                this.message = e.message
+              })
+          } else {
+            this.has_token_error = true
+            this.message = 'invalid token'
+          }
+        },
+        methods: {
+          copyToken: function () {
+            document.getElementById('token_text').select()
+            document.execCommand('copy')
+          },
+          copyWehbook: function () {
+            document.getElementById('webhook_text').select()
+            document.execCommand('copy')
+          },
+        },
+      })

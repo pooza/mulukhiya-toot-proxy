@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def params=(values)
-      @params = values.flatten
+      @params = values.key_flatten
     end
 
     def exec(cases)

@@ -1,0 +1,47 @@
+doctype html
+html lang='ja'
+  head
+    title = package.name
+    meta charset='UTF-8'
+    meta name='robots' content='noindex,nofollow'
+    meta name='viewport' content='width=800'
+    script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'
+    script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'
+    script src='https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js'
+    link rel='stylesheet' href='/mulukhiya/style/default'
+    link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.1/css/all.css'
+    link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap'
+  body
+    == slim.render 'fragment/header'
+    nav class='breadcrumbs'
+      ul
+        li
+          a href='/' = controller.name
+        li
+          a href='/mulukhiya' モロヘイヤHOME
+        li 動作状況
+    main id='app'
+      == slim.render 'fragment/message'
+      h2 動作状況
+      #result-container v-if='result'
+        pre = '{{result}}'
+    == slim.render 'fragment/footer'
+    javascript:
+      new Vue({
+        el: '#app',
+        data: {
+          result: null,
+          message: null,
+          has_error: false,
+          has_token_error: false,
+        },
+        mounted: function () {
+          axios.get('/mulukhiya/health', {responseType: 'json'})
+            .then(e => {
+              this.result = e.data
+            }).catch(e => {
+              this.has_error = true
+              this.message = e.message
+            })
+        },
+      })
