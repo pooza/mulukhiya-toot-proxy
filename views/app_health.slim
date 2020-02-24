@@ -17,16 +17,16 @@ html lang='ja'
       new Vue({
         el: '#app',
         data: {
-          result: null,
           message: null,
+          username: null,
           token_error: false,
+          result: null,
         },
         mounted: function () {
           axios.get('/mulukhiya/health', {responseType: 'json'})
             .then(e => {
               this.result = e.data
             }).catch(e => {
-              document.getElementById('message-container').classList.add('alert')
               this.message = e.message
             })
         },

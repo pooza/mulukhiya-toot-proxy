@@ -34,6 +34,7 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
+          username: null,
           token_error: false,
           auth_command: 'アプリケーションの認証',
         },
@@ -43,16 +44,13 @@ html lang='ja'
             axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
-                this.message = 'login: @' + this.username
                 this.result = jsyaml.safeDump(e.data.config)
                 this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
-                document.getElementById('message-container').classList.add('alert')
                 this.message = e.message
               })
           } else {
             this.token_error = true
-            this.message = 'invalid token'
           }
         },
       })

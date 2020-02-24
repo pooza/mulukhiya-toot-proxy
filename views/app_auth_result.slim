@@ -26,6 +26,11 @@ html lang='ja'
     javascript:
       new Vue({
         el: '#app',
+        data: {
+          message: null,
+          username: null,
+          token_error: false,
+        },
         mounted: function () {
           localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
         },

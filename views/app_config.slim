@@ -27,7 +27,9 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
+          username: null,
           token_error: false,
+          result: null,
         },
         mounted: function () {
           const token = localStorage.getItem('mulukhiya_token')
@@ -38,14 +40,11 @@ html lang='ja'
                 this.access_token = e.data.config.webhook.token
                 this.webhook_url = e.data.config.webhook.url
                 this.username = e.data.account.username
-                this.message = 'login: @' + this.username
               }).catch(e => {
-                document.getElementById('message-container').classList.add('alert')
                 this.message = e.message
               })
           } else {
             this.token_error = true
-            this.message = 'invalid token'
           }
         },
         methods: {
