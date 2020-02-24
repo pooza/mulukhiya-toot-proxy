@@ -53,7 +53,7 @@ module Mulukhiya
         params: params,
         slim: SlimRenderer,
         package: Package,
-        controller: Environment.controller_class
+        controller: Environment.controller_class,
         crypt: Crypt,
       }
     end
