@@ -22,14 +22,12 @@ html lang='ja'
         h3 Webhook URL
         textarea id='webhook_text' = '{{webhook_url}}'
         i class='fas fa-clipboard' v-on:click='copyWehbook'
-    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',
         data: {
           message: null,
-          has_error: false,
-          has_token_error: false,
+          token_error: false,
         },
         mounted: function () {
           const token = localStorage.getItem('mulukhiya_token')
@@ -42,11 +40,11 @@ html lang='ja'
                 this.username = e.data.account.username
                 this.message = 'login: @' + this.username
               }).catch(e => {
-                this.has_error = true
+                document.getElementById('message-container').classList.add('alert')
                 this.message = e.message
               })
           } else {
-            this.has_token_error = true
+            this.token_error = true
             this.message = 'invalid token'
           }
         },

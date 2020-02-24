@@ -25,14 +25,12 @@ html lang='ja'
                 = params[:errors][:code].join
           li
             button id='submit_button' 認証する
-    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',
         data: {
           message: null,
-          has_error: false,
-          has_token_error: false,
+          token_error: false,
           auth_command: 'アプリケーションの認証',
         },
         mounted: function () {
@@ -44,11 +42,11 @@ html lang='ja'
                 this.message = 'login: @' + this.username
                 this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
-                this.has_error = true
+                document.getElementById('message-container').classList.add('alert')
                 this.message = e.message
               })
           } else {
-            this.has_token_error = true
+            this.token_error = true
             this.message = 'invalid token'
           }
         },

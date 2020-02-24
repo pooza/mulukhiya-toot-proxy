@@ -13,22 +13,20 @@ html lang='ja'
       h2 動作状況
       #result-container v-if='result'
         pre = '{{result}}'
-    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',
         data: {
           result: null,
           message: null,
-          has_error: false,
-          has_token_error: false,
+          token_error: false,
         },
         mounted: function () {
           axios.get('/mulukhiya/health', {responseType: 'json'})
             .then(e => {
               this.result = e.data
             }).catch(e => {
-              this.has_error = true
+              document.getElementById('message-container').classList.add('alert')
               this.message = e.message
             })
         },

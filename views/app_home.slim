@@ -29,14 +29,12 @@ html lang='ja'
             span class='alert' 非対応
         li
           a href='/mulukhiya/app/health' 動作状況
-    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',
         data: {
           message: null,
-          has_error: false,
-          has_token_error: false,
+          token_error: false,
           auth_command: 'アプリケーションの認証',
         },
         mounted: function () {
@@ -49,11 +47,11 @@ html lang='ja'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
-                this.has_error = true
+                document.getElementById('message-container').classList.add('alert')
                 this.message = e.message
               })
           } else {
-            this.has_token_error = true
+            this.token_error = true
             this.message = 'invalid token'
           }
         },
