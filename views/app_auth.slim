@@ -25,6 +25,7 @@ html lang='ja'
                 = params[:errors][:code].join
           li
             button id='submit_button' 認証する
+    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',

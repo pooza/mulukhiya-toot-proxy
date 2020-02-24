@@ -23,6 +23,7 @@ html lang='ja'
           i class='fas fa-clipboard' v-on:click='copyWehbook'
       - else
         p class='alert' = "エラー（#{params[:status]}）"
+    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',

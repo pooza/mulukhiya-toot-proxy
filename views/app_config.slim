@@ -22,6 +22,7 @@ html lang='ja'
         h3 Webhook URL
         textarea id='webhook_text' = '{{webhook_url}}'
         i class='fas fa-clipboard' v-on:click='copyWehbook'
+    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',

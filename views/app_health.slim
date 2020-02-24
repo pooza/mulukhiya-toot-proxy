@@ -13,6 +13,7 @@ html lang='ja'
       h2 動作状況
       #result-container v-if='result'
         pre = '{{result}}'
+    == slim.render 'fragment/footer'
     javascript:
       new Vue({
         el: '#app',
