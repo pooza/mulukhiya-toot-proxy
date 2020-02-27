@@ -9,6 +9,8 @@ module Mulukhiya
       Slim::Engine.set_options(
         shortcut: shortcuts,
       )
+      @config = Config.instance
+      @logger = Logger.new
       @status = 200
       @params = {}.with_indifferent_access
       self.template = template if template
@@ -29,8 +31,10 @@ module Mulukhiya
       return @slim.render({}, assign_values)
     end
 
-    def self.render(name)
-      return SlimRenderer.new(name).to_s
+    def self.render(name, values = {})
+      slim = SlimRenderer.new(name)
+      slim.params.merge!(values)
+      return slim.to_s
     rescue Ginseng::RenderError
       return nil
     end
@@ -55,6 +59,9 @@ module Mulukhiya
         package: Package,
         controller: Environment.controller_class,
         crypt: Crypt,
+        scripts: @config['/webui/scripts'],
+        stylesheets: @config['/webui/stylesheets'],
+        metadata: @config.raw.dig('application', 'webui', 'metadata'),
       }
     end
   end

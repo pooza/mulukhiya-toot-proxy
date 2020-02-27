@@ -1,5 +1,5 @@
 package:
-  version: 3.4.8
+  version: 3.4.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -74,6 +74,18 @@ test:
     - name: webhook
       cases:
         - webhook
+webui:
+  scripts:
+    - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
+    - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
+    - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
+  stylesheets:
+    - /mulukhiya/style/default
+    - https://use.fontawesome.com/releases/v5.6.1/css/all.css
+    - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+  metadata:
+    robots: noindex,nofollow
+    viewport: width=800
 hashtag: &root_hashtag
   pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
 acct: &root_acct

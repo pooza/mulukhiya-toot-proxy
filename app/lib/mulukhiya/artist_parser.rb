@@ -1,7 +1,9 @@
+require 'unicode'
+
 module Mulukhiya
   class ArtistParser
     def initialize(source, depth = 0)
-      @source = source
+      @source = Unicode.nfkc(source)
       @config = Config.instance
       @logger = Logger.new
       @depth = depth + 1

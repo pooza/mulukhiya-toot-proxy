@@ -1,11 +1,13 @@
-#message-container v-show='message'
-  p class='alert' v-if='has_error'
-    = '{{message}}'
-  p v-if='has_token_error'
+#message-container class='alert' v-if='message'
+  p = '{{message}}'
+#message-container v-else-if='username'
+  p
+    | login: @
+    = '{{username}}'
+#message-container v-else-if='token_error'
+  p
     - if controller.webhook?
       a href='/mulukhiya/app/auth' アプリケーションの認証
       | を行ってください。
     - else
-      = "#{controller.name}はアプリケーションの認証に非対応です。"
-  p v-else=''
-    = '{{message}}'
+      = "#{controller.name}はアプリケーションの認証に対応していません。"

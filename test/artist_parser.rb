@@ -14,7 +14,7 @@ module Mulukhiya
       assert_equal(tags, ['沖 佳苗', 'キュアピーチ'])
 
       tags = ArtistParser.new('ゆいま～る ふぁみり (宮本佳那子、具志堅用高、ROLLY)').parse
-      assert_equal(tags, ['ゆいま～る ふぁみり', '宮本佳那子', '具志堅用高', 'ROLLY'])
+      assert_equal(tags, ['ゆいま~る ふぁみり', '宮本佳那子', '具志堅用高', 'ROLLY'])
 
       tags = ArtistParser.new('ハピネスチャージプリキュア!(CV:中島 愛、潘 めぐみ、北川里奈、戸松 遥)').parse
       assert_equal(tags, ['ハピネスチャージプリキュア!', '中島 愛', '潘 めぐみ', '北川里奈', '戸松 遥'])

@@ -3,23 +3,11 @@ html lang='ja'
   head
     title = package.name
     meta charset='UTF-8'
-    meta name='robots' content='noindex,nofollow'
-    meta name='viewport' content='width=800'
-    script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'
-    script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'
-    script src='https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js'
-    link rel='stylesheet' href='/mulukhiya/style/default'
-    link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.6.1/css/all.css'
-    link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap'
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    nav class='breadcrumbs'
-      ul
-        li
-          a href='/' = controller.name
-        li
-          a href='/mulukhiya' モロヘイヤHOME
-        li 環境設定
+    == slim.render 'fragment/breadcrumbs', {current: '環境設定'}
     main id='app'
       == slim.render 'fragment/message'
       h2 環境設定
@@ -40,8 +28,9 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          has_error: false,
-          has_token_error: false,
+          username: null,
+          token_error: false,
+          result: null,
         },
         mounted: function () {
           const token = localStorage.getItem('mulukhiya_token')
@@ -52,14 +41,11 @@ html lang='ja'
                 this.access_token = e.data.config.webhook.token
                 this.webhook_url = e.data.config.webhook.url
                 this.username = e.data.account.username
-                this.message = 'login: @' + this.username
               }).catch(e => {
-                this.has_error = true
                 this.message = e.message
               })
           } else {
-            this.has_token_error = true
-            this.message = 'invalid token'
+            this.token_error = true
           }
         },
         methods: {
