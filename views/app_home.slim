@@ -12,24 +12,20 @@ html lang='ja'
       == slim.render 'fragment/message'
       h1 = package.name
       nav class='main-menu'
-        ul
-          - if controller.webhook?
-            li
-              a href='/mulukhiya/app/auth' = '{{auth_command}}'
-            li v-if='username'
-              a href='/mulukhiya/app/config' 環境設定
-            li v-else=''
-              | 環境設定
-              span class='alert' 未認証
-          - else
-            li
-              = '{{auth_command}}'
-              span class='alert' 非対応
-            li
-              | 環境設定
-              span class='alert' 非対応
-          li
-            a href='/mulukhiya/app/health' 動作状況
+        - if controller.webhook?
+          a href='/mulukhiya/app/auth' = '{{auth_command}}'
+          a href='/mulukhiya/app/config' v-if='username' 環境設定
+          a href='#' v-else=''
+            | 環境設定
+            span class='alert' 未認証
+        - else
+          a href='#'
+            = '{{auth_command}}'
+            span class='alert' 非対応
+          a href='#'
+            | 環境設定
+            span class='alert' 非対応
+        a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
