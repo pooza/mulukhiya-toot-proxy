@@ -1,10 +1,10 @@
 module Mulukhiya
   class PumaDaemon < Daemon
     def command
-      return CommandLine.new(['puma', '--config', config_file])
+      return CommandLine.new(['puma', '--config', initializer_path])
     end
 
-    def config_file
+    def initializer_path
       return File.join(Environment.dir, 'app/initializer/puma.rb')
     end
 
