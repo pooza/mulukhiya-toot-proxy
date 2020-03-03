@@ -40,7 +40,7 @@ module Mulukhiya
     end
 
     def corrupted?
-      return false unless Marshal.load(File.read(path)).is_a?(Array)
+      return false unless Marshal.load(File.read(path)).is_a?(Array) # rubocop:disable Security/MarshalLoad
       return true
     rescue TypeError, Errno::ENOENT => e
       @logger.error(class: self.class.to_s, path: path, message: e.message)
@@ -54,7 +54,7 @@ module Mulukhiya
     def load
       return unless exist?
       clear
-      update(Marshal.load(File.read(path)))
+      update(Marshal.load(File.read(path))) # rubocop:disable Security/MarshalLoad
     end
 
     def refresh
