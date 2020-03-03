@@ -6,7 +6,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       uri ||= @config['/mastodon/url']
-      token ||= @config['/test/token']
+      token ||= @config['/agent/test/token']
       super
       @uri = TootURI.parse(uri)
       @token = token

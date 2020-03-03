@@ -6,7 +6,7 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
-      @account = Mulukhiya::Mastodon::Account.get(token: @config['/test/token'])
+      @account = Mulukhiya::Mastodon::Account.get(token: @config['/agent/test/token'])
       @toot = @account.recent_toot
       @parser = TootParser.new
     end

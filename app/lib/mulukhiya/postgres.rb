@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def self.health
-      Environment.account_class.get(token: Config.instance['/test/token'])
+      Environment.account_class.get(token: Config.instance['/agent/test/token'])
       return {status: 'OK'}
     rescue
       return {status: 'NG'}
