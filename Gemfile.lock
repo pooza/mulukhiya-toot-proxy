@@ -309,14 +309,12 @@ DEPENDENCIES
   ginseng-web!
   mimemagic
   nokogiri
-  puma
   rails-erb-lint
   redis
   rspotify
   sanitize
   sidekiq
   sidekiq-scheduler
-  slim
   vacuum
 
 RUBY VERSION
