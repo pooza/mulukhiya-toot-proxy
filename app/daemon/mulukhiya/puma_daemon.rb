@@ -1,12 +1,16 @@
 module Mulukhiya
-  class ThinDaemon < Daemon
+  class PumaDaemon < Daemon
     def command
-      return CommandLine.new(['thin', '--config', config_cache_path, 'start'])
+      return CommandLine.new(['puma', '--config', config_file])
+    end
+
+    def config_file
+      return File.join(Environment.dir, 'app/initializer/puma.rb')
     end
 
     def motd
       return [
-        `thin -v`.chomp,
+        `puma -V`.chomp,
         "Root URL: #{root_uri}",
       ].join("\n")
     end
@@ -16,7 +20,7 @@ module Mulukhiya
         @uri = Ginseng::URI.new
         @uri.host = Environment.hostname
         @uri.scheme = 'http'
-        @uri.port = @config['/thin/port']
+        @uri.port = @config['/puma/port']
       end
       return @uri
     end

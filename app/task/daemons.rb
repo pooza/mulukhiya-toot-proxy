@@ -1,5 +1,5 @@
 namespace :mulukhiya do
-  [:thin, :sidekiq].each do |ns|
+  [:puma, :sidekiq].each do |ns|
     namespace ns do
       [:start, :stop].each do |action|
         desc "#{action} #{ns}"
@@ -18,5 +18,5 @@ end
 
 [:start, :stop, :restart].each do |action|
   desc "#{action} all"
-  task action => ["mulukhiya:thin:#{action}", "mulukhiya:sidekiq:#{action}"]
+  task action => ["mulukhiya:puma:#{action}", "mulukhiya:sidekiq:#{action}"]
 end

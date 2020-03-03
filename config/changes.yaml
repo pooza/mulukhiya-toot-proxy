@@ -32,3 +32,5 @@
   3_4_0: /mastodon/handlers
 - 3_3_5: /handler/dolphin
   3_4_0: /dolphin/handlers
+- 3_4_9: /test/token
+  3_5_0: /agent/test/token

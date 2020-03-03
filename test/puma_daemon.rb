@@ -1,7 +1,7 @@
 module Mulukhiya
-  class ThinDaemonTest < TestCase
+  class PumaDaemonTest < TestCase
     def setup
-      @daemon = ThinDaemon.new
+      @daemon = PumaDaemon.new
     end
 
     def test_command

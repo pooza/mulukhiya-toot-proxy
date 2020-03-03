@@ -1,5 +1,5 @@
 package:
-  version: 3.4.9
+  version: 3.5.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -382,10 +382,9 @@ sidekiq:
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
-thin:
-  timeout: 30
+puma:
   port: 3008
-  environment: production
+  pidfile: tmp/pids/puma.pid
   rackup: app/initializer/config.ru
 tagging:
   word:
