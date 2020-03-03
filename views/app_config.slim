@@ -1,8 +1,6 @@
 doctype html
 html lang='ja'
   head
-    title = package.name
-    meta charset='UTF-8'
     == slim.render 'fragment/metadata'
     == slim.render 'fragment/assets'
   body
@@ -35,7 +33,8 @@ html lang='ja'
         mounted: function () {
           const token = localStorage.getItem('mulukhiya_token')
           if (token) {
-            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+            const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+            axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
                 this.access_token = e.data.config.webhook.token
