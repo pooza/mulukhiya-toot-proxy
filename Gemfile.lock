@@ -293,7 +293,7 @@ GEM
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
-    zeitwerk (2.2.2)
+    zeitwerk (2.3.0)
 
 PLATFORMS
   ruby
