@@ -7,6 +7,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @http = HTTP.new
+      @text = ''
       refresh unless exist?
       refresh if corrupted?
       load
@@ -14,12 +15,13 @@ module Mulukhiya
 
     def matches
       r = []
+      temp_text = text.clone
       reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless @text.match?(v[:pattern])
+        next unless temp_text.match?(v[:pattern])
         r.push(k)
         r.concat(v[:words])
-        text.gsub!(v[:pattern], '')
+        temp_text.gsub!(v[:pattern], '')
       end
       return r.uniq
     end
@@ -40,7 +42,7 @@ module Mulukhiya
     end
 
     def corrupted?
-      return false unless Marshal.load(File.read(path)).is_a?(Array) # rubocop:disable Security/MarshalLoad
+      return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
       @logger.error(class: self.class.to_s, path: path, message: e.message)
@@ -54,11 +56,11 @@ module Mulukhiya
     def load
       return unless exist?
       clear
-      update(Marshal.load(File.read(path))) # rubocop:disable Security/MarshalLoad
+      update(load_cache)
     end
 
     def refresh
-      File.write(path, Marshal.dump(fetch))
+      save_cache
       @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
@@ -78,6 +80,8 @@ module Mulukhiya
       end
     end
 
+    private
+
     def fetch
       result = {}
       resources do |resource|
@@ -96,6 +100,16 @@ module Mulukhiya
         @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
       end
       return result.sort_by {|k, v| k.length}.to_h
+    end
+
+    def save_cache
+      File.write(path, Marshal.dump(fetch))
+      @cache = nil
+    end
+
+    def load_cache
+      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
+      return @cache
     end
   end
 end
