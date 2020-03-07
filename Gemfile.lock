@@ -127,7 +127,7 @@ GEM
       dry-schema (~> 1.4, >= 1.4.3)
     e2mmap (0.1.0)
     erubi (1.9.0)
-    et-orbi (1.2.2)
+    et-orbi (1.2.3)
       tzinfo
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
