@@ -1,6 +1,12 @@
 module Mulukhiya
   module Dolphin
     class Account < Mulukhiya::Misskey::Account
+      def recent_note
+        rows = Postgres.instance.execute('recent_note', {id: id})
+        return Status[rows.first['id']] if rows.present?
+        return nil
+      end
+
       def uri
         unless @uri
           if host
