@@ -7,6 +7,8 @@ module Mulukhiya
         return nil
       end
 
+      alias recent_status recent_note
+
       def uri
         unless @uri
           if host
