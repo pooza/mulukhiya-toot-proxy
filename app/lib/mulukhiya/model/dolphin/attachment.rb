@@ -1,9 +1,6 @@
 module Mulukhiya
   module Dolphin
-    class Attachment < Sequel::Model(:drive_file)
-      alias to_h values
-
-      alias file_content_type type
+    class Attachment < Mulukhiya::Misskey::Attachment
     end
   end
 end
