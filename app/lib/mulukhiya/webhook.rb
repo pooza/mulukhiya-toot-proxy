@@ -18,9 +18,8 @@ module Mulukhiya
     end
 
     def uri
-      uri = @sns.uri.clone
-      uri.path = "/mulukhiya/webhook/#{digest}"
-      return uri
+      @uri ||= @sns.create_uri("/mulukhiya/webhook/#{digest}")
+      return @uri
     end
 
     def exist?

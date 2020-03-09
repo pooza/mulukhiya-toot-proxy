@@ -1,11 +1,17 @@
 module Mulukhiya
   class NoteParser < StatusParser
+    ATMARK = '__ATMARK__'.freeze
+    HASH = '__HASH__'.freeze
     attr_accessor :dolphin
     attr_accessor :account
 
     def initialize(body = '')
       super(body)
-      @dolphin = DolphinService.new
+      if Environment.dolphin?
+        @service = DolphinService.new
+      else
+        @service = MisskeyService.new
+      end
     end
 
     def accts
@@ -18,17 +24,19 @@ module Mulukhiya
     def to_md
       tmp_body = body.clone
       tags.sort_by(&:length).reverse_each do |tag|
-        uri = @dolphin.uri.clone
-        uri.path = "/tags/#{tag}"
-        tmp_body.gsub!("\##{tag}", "[__HASH__#{tag}](#{uri})")
+        tmp_body.gsub!(
+          "\##{tag}",
+          "[#{HASH}#{tag}](#{@service.create_uri("/tags/#{tag}")})",
+        )
       end
       accts.sort_by {|v| v.scan(/@/).count * 100_000_000 + v.length}.reverse_each do |acct|
-        uri = @dolphin.uri.clone
-        uri.path = "/#{acct}"
-        tmp_body.sub!(acct, "[#{acct.gsub('@', '__ATMARK__')}](#{uri})")
+        tmp_body.sub!(
+          acct,
+          "[#{acct.gsub('@', ATMARK)}](#{@service.create_uri("/#{acct}")})",
+        )
       end
-      tmp_body.gsub!('__HASH__', '#')
-      tmp_body.gsub!('__ATMARK__', '@')
+      tmp_body.gsub!(HASH, '#')
+      tmp_body.gsub!(ATMARK, '@')
       return StatusParser.sanitize(tmp_body)
     end
 
