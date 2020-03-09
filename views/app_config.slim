@@ -12,15 +12,6 @@ html lang='ja'
       #result-container v-if='result'
         h3 現在の設定
         pre = '{{result}}'
-        h3 Webhook
-        .field-container v-if='access_token'
-          h4 アクセストークン
-          textarea id='token_text' class='short' = '{{access_token}}'
-          i class='fas fa-clipboard' v-on:click='copyToken'
-        .field-container v-if='webhook_url'
-          h4 URL
-          textarea id='webhook_text' = '{{webhook_url}}'
-          i class='fas fa-clipboard' v-on:click='copyWehbook'
         h3 GROWI
         .inline-field-container
           h4 トークン
@@ -36,6 +27,15 @@ html lang='ja'
           input id='dropbox_token_text' v-model='dropbox_token' maxlength='256'
         .field-update-button-container
           button v-on:click='updateDropbox' 更新
+        h3 Webhook
+        .field-container v-if='access_token'
+          h4 アクセストークン
+          textarea id='token_text' class='short' = '{{access_token}}'
+          i class='fas fa-clipboard' v-on:click='copyToken'
+        .field-container v-if='webhook_url'
+          h4 URL
+          textarea id='webhook_text' = '{{webhook_url}}'
+          i class='fas fa-clipboard' v-on:click='copyWehbook'
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -77,18 +77,22 @@ html lang='ja'
           },
           updateGrowi: function () {
             const values = {
-              growi: {url: null, token: null},
+              status: {
+                command: 'user_config',
+                growi: {url: null, token: null},
+              },
               token: localStorage.getItem('mulukhiya_token'),
             }
             if (this.growi_url) {
-              values.growi.url = this.growi_url
+              values.status.growi.url = this.growi_url
             }
             if (this.growi_token) {
-              values.growi.token = this.growi_token
+              values.status.growi.token = this.growi_token
             }
+            values.status = JSON.stringify(values.status)
             axios.post('/mulukhiya/config', values)
               .then(e => {
-                this.message = 111
+                this.result = jsyaml.safeDump(e.data.config)
               }).catch(e => {
                 this.message = e.message
                 window.scroll(0, 0)
@@ -96,15 +100,19 @@ html lang='ja'
           },
           updateDropbox: function () {
             const values = {
-              dropbox: {token: null},
+              status: {
+                command: 'user_config',
+                dropbox: {token: null},
+              },
               token: localStorage.getItem('mulukhiya_token'),
             }
             if (this.dropbox_token) {
-              values.dropbox.token = this.dropbox_token
+              values.status.dropbox.token = this.dropbox_token
             }
+            values.status = JSON.stringify(values.status)
             axios.post('/mulukhiya/config', values)
               .then(e => {
-                this.message = 111
+                this.result = jsyaml.safeDump(e.data.config)
               }).catch(e => {
                 this.message = e.message
                 window.scroll(0, 0)
