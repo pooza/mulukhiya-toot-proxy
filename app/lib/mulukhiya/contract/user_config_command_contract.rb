@@ -30,6 +30,7 @@ module Mulukhiya
           uri = Ginseng::URI.parse(value['url'])
           key.failure('/growi/url が正しいURLではありません。') unless uri.absolute?
         end
+      elsif value.nil?
       else
         key.failure('/growi がハッシュではありません。')
       end
