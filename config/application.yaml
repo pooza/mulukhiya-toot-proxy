@@ -8,11 +8,11 @@ package:
 controller: mastodon
 handler:
   default:
-    timeout: 20
+    timeout: 10
   amazon_image:
     disable: true
   canonical_url:
-    timeout: 2
+    timeout: 5
   image_resize:
     pixel: 1280
   itunes_image:
