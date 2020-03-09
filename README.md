@@ -1,6 +1,6 @@
 # mulukhiya-toot-proxy
 
-MastodonやDolphinの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
+Mastodon/Misskey/Dolphinの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## モロヘイヤに出来ること
@@ -19,7 +19,7 @@ MastodonやDolphinの投稿に対して、内容の更新等を行うプロキ�
 
 - 画像ファイルを上限ピクセルまでリサイズ。
 - アルファチャンネルを含まないPNG画像をJPEGに変換し、ファイルサイズを小さくする。
-- Mastodon/Dolphinが本来受け付けないメディアファイルを変換。
+- Mastodon/Misskey/Dolphinが本来受け付けないメディアファイルを変換。
 
 また、
 
