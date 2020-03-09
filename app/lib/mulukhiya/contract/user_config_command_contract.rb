@@ -25,9 +25,13 @@ module Mulukhiya
     end
 
     rule(:growi) do
-      if value['url']
-        uri = Ginseng::URI.parse(value['url'])
-        key.failure('/growi/url が正しいURLではありません。') unless uri.absolute?
+      if value.is_a?(Hash)
+        if value['url']
+          uri = Ginseng::URI.parse(value['url'])
+          key.failure('/growi/url が正しいURLではありません。') unless uri.absolute?
+        end
+      else
+        key.failure('/growi がハッシュではありません。')
       end
     end
   end
