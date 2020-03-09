@@ -46,6 +46,10 @@ module Mulukhiya
       return controller_name == 'dolphin'
     end
 
+    def self.misskey?
+      return controller_name == 'misskey'
+    end
+
     def self.account_class
       return "Mulukhiya::#{controller_name.camelize}::Account".constantize
     end
@@ -66,7 +70,7 @@ module Mulukhiya
       case controller_name
       when 'mastodon'
         return TootParser
-      when 'dolphin'
+      when 'dolphin', 'misskey'
         return NoteParser
       end
     end

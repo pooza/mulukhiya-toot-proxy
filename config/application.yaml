@@ -1,5 +1,5 @@
 package:
-  version: 3.4.9
+  version: 3.5.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -8,11 +8,11 @@ package:
 controller: mastodon
 handler:
   default:
-    timeout: 20
+    timeout: 10
   amazon_image:
     disable: true
   canonical_url:
-    timeout: 2
+    timeout: 5
   image_resize:
     pixel: 1280
   itunes_image:
@@ -60,11 +60,18 @@ test:
     - name: dolphin
       cases:
         - mastodon_controller
+        - misskey_controller
         - toot_uri
     - name: mastodon
       cases:
         - dolphin_controller
+        - misskey_controller
         - note_uri
+    - name: misskey
+      cases:
+        - mastodon_controller
+        - dolphin_controller
+        - toot_uri
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -181,6 +188,7 @@ mastodon:
     max_length: 500
     visibility_names:
       unlisted: unlisted
+      private: private
       direct: direct
     patterns:
       - pattern: ^/web/statuses/([[:digit:]]+)
@@ -192,6 +200,62 @@ mastodon:
   attachment: *mastodon_media
   search:
     limit: 40
+  hashtag: *root_hashtag
+  acct: *root_acct
+misskey:
+  url: https://mis.example.com/
+  handlers:
+    pre_toot:
+      - user_config_command
+      - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - tagging
+    post_toot:
+      - user_config_command
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
+  events:
+    - pre_toot
+    - post_toot
+    - pre_upload
+    - post_upload
+    - post_bookmark
+  note: &misskey_note
+    field: text
+    key: noteId
+    label: ノート
+    max_length: 500
+    visibility_names:
+      unlisted: home
+      private: followers
+      direct: specified
+    patterns:
+      - pattern: ^/notes/([[:alnum:]]+)
+  status: *misskey_note
+  file: &misskey_file
+    key: fileIds
+  attachment: *misskey_file
   hashtag: *root_hashtag
   acct: *root_acct
 dolphin:
@@ -233,20 +297,10 @@ dolphin:
     - pre_upload
     - post_upload
     - post_bookmark
-  note: &dolphin_note
-    field: text
-    key: noteId
-    label: ノート
-    max_length: 500
-    visibility_names:
-      unlisted: public
-      direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
-  status: *dolphin_note
-  file: &dolphin_file
-    key: fileIds
-  attachment: *dolphin_file
+  note: *misskey_note
+  status: *misskey_note
+  file: *misskey_file
+  attachment: *misskey_file
   hashtag: *root_hashtag
   acct: *root_acct
 amazon:
@@ -382,10 +436,9 @@ sidekiq:
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
-thin:
-  timeout: 30
+puma:
   port: 3008
-  environment: production
+  pidfile: tmp/pids/puma.pid
   rackup: app/initializer/config.ru
 tagging:
   word:

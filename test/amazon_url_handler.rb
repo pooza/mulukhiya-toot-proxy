@@ -2,7 +2,7 @@ module Mulukhiya
   class AmazonURLHandlerTest < TestCase
     def setup
       @config = Config.instance
-      @config['/test/token'] = 'hoge' if Environment.ci?
+      @config['/agent/test/token'] = 'hoge' if Environment.ci?
       @handler = Handler.create('amazon_url')
     end
 

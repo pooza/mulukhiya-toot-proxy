@@ -4,7 +4,7 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
-    def handle_root(body, params = {})
+    def handle_toot(body, params = {})
       params[:results] ||= ResultContainer.new
       handle_pre_toot(body, params)
       return handle_post_toot(body, params)

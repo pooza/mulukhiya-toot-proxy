@@ -18,16 +18,3 @@ inflections:
   url_normalize_handler: URLNormalizeHandler
   video_uri: VideoURI
   you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler
-dirs:
-  - contract
-  - controller
-  - daemon
-  - file
-  - handler
-  - model
-  - renderer
-  - service
-  - tagging_resource
-  - test_case_filter
-  - uri
-  - worker

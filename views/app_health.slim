@@ -1,8 +1,6 @@
 doctype html
 html lang='ja'
   head
-    title = package.name
-    meta charset='UTF-8'
     == slim.render 'fragment/metadata'
     == slim.render 'fragment/assets'
   body
@@ -24,7 +22,8 @@ html lang='ja'
           result: null,
         },
         mounted: function () {
-          axios.get('/mulukhiya/health', {responseType: 'json'})
+          const href = '/mulukhiya/health'
+          axios.get(href, {responseType: 'json'})
             .then(e => {
               this.result = e.data
             }).catch(e => {

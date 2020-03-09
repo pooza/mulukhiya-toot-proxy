@@ -15,7 +15,6 @@ module Mulukhiya
       uri = NoteURI.parse(params['uri']) unless uri&.valid?
       return uri.to_md if uri&.valid?
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h.merge(params: params))
       raise Ginseng::RequestError, e.message, e.backtrace
     end
   end

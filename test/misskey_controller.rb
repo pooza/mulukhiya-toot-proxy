@@ -1,7 +1,7 @@
 require 'rack/test'
 
 module Mulukhiya
-  class DolphinControllerTest < TestCase
+  class MisskeyControllerTest < TestCase
     include ::Rack::Test::Methods
 
     def setup
@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def app
-      return DolphinController
+      return MisskeyController
     end
 
     def test_webui

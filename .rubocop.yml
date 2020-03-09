@@ -133,7 +133,3 @@ Metrics/PerceivedComplexity:
 Naming/RescuedExceptionsVariableName:
   PreferredName: e
 
-Security/MarshalLoad:
-  Exclude:
-    - app/lib/mulukhiya/tagging_dictionary.rb
-
