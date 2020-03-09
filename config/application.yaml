@@ -246,7 +246,7 @@ misskey:
     label: ノート
     max_length: 500
     visibility_names:
-      unlisted: public
+      unlisted: home
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)

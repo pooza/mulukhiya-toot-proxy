@@ -1,4 +1,8 @@
 <%# encoding: UTF-8 -%>
+<% if @params[:title] -%>
+<%= @params[:title] %>
+
+<% end -%>
 <% if @params[:start_date] && @params[:end_date] -%>
 <% if @params[:all_day] -%>
 <%= @params[:start_date].strftime('%Y/%m/%d') %> 〜 <%= @params[:end_date].strftime('%Y/%m/%d') %>
@@ -7,3 +11,6 @@
 <% end -%>
 <% end -%>
 <%= @params[:body] %>
+<% if @params[:image_url] -%>
+<%= @params[:image_url] %>
+<% end -%>

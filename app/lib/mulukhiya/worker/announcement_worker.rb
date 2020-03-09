@@ -26,9 +26,11 @@ module Mulukhiya
     private
 
     def create_body(entry, format = :text)
-      parser = Environment.parser_class.new(entry['content'])
+      parser = Environment.parser_class.new(entry['content'] || entry['text'])
       template = Template.new('announcement')
       template[:body] = parser.send("to_#{format}".to_sym)
+      template[:title] = entry['title']
+      template[:image_url] = entry['imageUrl']
       if entry['starts_at'] && entry['ends_at']
         template[:start_date] = Time.parse(entry['starts_at'])
         template[:end_date] = Time.parse(entry['ends_at'])

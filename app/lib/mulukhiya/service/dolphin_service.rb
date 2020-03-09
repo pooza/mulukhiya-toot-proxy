@@ -11,6 +11,10 @@ module Mulukhiya
       @http = http_class.new
     end
 
+    def announcements(params = {})
+      raise Ginseng::GatewayError, 'Dolphin does not respond to announcements.'
+    end
+
     def notify(account, message)
       return note(
         DolphinController.status_field => message,

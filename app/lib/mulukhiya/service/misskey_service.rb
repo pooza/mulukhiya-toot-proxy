@@ -35,6 +35,8 @@ module Mulukhiya
       return @http.post(create_uri, {body: body.to_json, headers: headers})
     end
 
+    alias toot note
+
     def favourite(id, params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
@@ -63,6 +65,15 @@ module Mulukhiya
       return upload(path)
     ensure
       File.unlink(path) if File.exist?(path)
+    end
+
+    def announcements(params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post(create_uri('/api/announcements'), {
+        body: {i: @token}.to_json,
+        headers: headers,
+      })
     end
 
     def fetch_note(id)
