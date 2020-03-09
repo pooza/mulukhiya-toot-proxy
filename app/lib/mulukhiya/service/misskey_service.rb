@@ -77,7 +77,9 @@ module Mulukhiya
     end
 
     def fetch_note(id)
-      return @http.get(create_uri("/mulukhiya/note/#{id}")).parsed_response
+      response = @http.get(create_uri("/mulukhiya/note/#{id}"))
+      raise response.parsed_response['message'] unless response.code == 200
+      return response.parsed_response
     end
 
     def create_uri(href = '/api/notes/create')

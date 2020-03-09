@@ -188,6 +188,7 @@ mastodon:
     max_length: 500
     visibility_names:
       unlisted: unlisted
+      private: private
       direct: direct
     patterns:
       - pattern: ^/web/statuses/([[:digit:]]+)
@@ -247,6 +248,7 @@ misskey:
     max_length: 500
     visibility_names:
       unlisted: home
+      private: followers
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)
