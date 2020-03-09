@@ -31,7 +31,6 @@ module Mulukhiya
       template[:url] = note['uri']
       return template.to_s
     rescue => e
-      @logger.info(Ginseng::Error.create(e).to_h.merge(note_id: note_id))
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
