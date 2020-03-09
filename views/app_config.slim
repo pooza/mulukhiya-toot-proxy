@@ -93,9 +93,9 @@ html lang='ja'
             axios.post('/mulukhiya/config', values)
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
+                this.message = null
               }).catch(e => {
-                this.message = e.message
-                window.scroll(0, 0)
+                this.message = e.response.data.error || e.message
               })
           },
           updateDropbox: function () {
@@ -113,9 +113,9 @@ html lang='ja'
             axios.post('/mulukhiya/config', values)
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
+                this.message = null
               }).catch(e => {
-                this.message = e.message
-                window.scroll(0, 0)
+                this.message = e.response.data.error || e.message
               })
           },
         },

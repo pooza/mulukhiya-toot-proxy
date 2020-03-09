@@ -5,6 +5,7 @@ module Mulukhiya
     params do
       optional(:command).value(:string)
       optional(:tags)
+      optional(:growi)
     end
 
     rule(:command) do
@@ -15,11 +16,18 @@ module Mulukhiya
       if value.is_a?(Array)
         value.each do |tag|
           next if tag.is_a?(String)
-          key.failure('tags: にタグ化できない要素（数値等）が含まれています。')
+          key.failure('/tags にタグ化できない要素（数値等）が含まれています。')
         end
       elsif value.nil?
       else
-        key.failure('tags: が配列ではありません。')
+        key.failure('/tags が配列ではありません。')
+      end
+    end
+
+    rule(:growi) do
+      if value['url']
+        uri = Ginseng::URI.parse(value['url'])
+        key.failure('/growi/url が正しいURLではありません。') unless uri.absolute?
       end
     end
   end

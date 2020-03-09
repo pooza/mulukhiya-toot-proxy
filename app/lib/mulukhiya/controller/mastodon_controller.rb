@@ -135,7 +135,10 @@ module Mulukhiya
 
     post '/mulukhiya/config' do
       Handler.create('user_config_command').handle_toot(params)
-      @renderer.message = {config: @sns.account.config.to_h}
+      @renderer.message = {
+        account: @sns.account.to_h,
+        config: @sns.account.config.to_h,
+      }
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
