@@ -76,21 +76,39 @@ html lang='ja'
             document.execCommand('copy')
           },
           updateGrowi: function () {
-            values = {token: null, url: null}
+            const values = {
+              growi: {url: null, token: null},
+              token: localStorage.getItem('mulukhiya_token'),
+            }
             if (this.growi_url) {
-              values.url = this.growi_url
+              values.growi.url = this.growi_url
             }
             if (this.growi_token) {
-              values.token = this.growi_token
+              values.growi.token = this.growi_token
             }
-            alert(JSON.stringify(values))
+            axios.post('/mulukhiya/config', values)
+              .then(e => {
+                this.message = 111
+              }).catch(e => {
+                this.message = e.message
+                window.scroll(0, 0)
+              })
           },
           updateDropbox: function () {
-            values = {token: null}
-            if (this.dropbox_token) {
-              values.token = this.dropbox_token
+            const values = {
+              dropbox: {token: null},
+              token: localStorage.getItem('mulukhiya_token'),
             }
-            alert(JSON.stringify(values))
+            if (this.dropbox_token) {
+              values.dropbox.token = this.dropbox_token
+            }
+            axios.post('/mulukhiya/config', values)
+              .then(e => {
+                this.message = 111
+              }).catch(e => {
+                this.message = e.message
+                window.scroll(0, 0)
+              })
           },
         },
       })
