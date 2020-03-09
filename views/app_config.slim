@@ -12,14 +12,30 @@ html lang='ja'
       #result-container v-if='result'
         h3 現在の設定
         pre = '{{result}}'
-      div v-if='access_token'
-        h3 アクセストークン
-        textarea id='token_text' class='short' = '{{access_token}}'
-        i class='fas fa-clipboard' v-on:click='copyToken'
-      div v-if='webhook_url'
-        h3 Webhook URL
-        textarea id='webhook_text' = '{{webhook_url}}'
-        i class='fas fa-clipboard' v-on:click='copyWehbook'
+        h3 Webhook
+        .field-container v-if='access_token'
+          h4 アクセストークン
+          textarea id='token_text' class='short' = '{{access_token}}'
+          i class='fas fa-clipboard' v-on:click='copyToken'
+        .field-container v-if='webhook_url'
+          h4 URL
+          textarea id='webhook_text' = '{{webhook_url}}'
+          i class='fas fa-clipboard' v-on:click='copyWehbook'
+        h3 GROWI
+        .inline-field-container
+          h4 トークン
+          input id='growi_token_text' v-model='growi_token' maxlength='256'
+        .inline-field-container
+          h4 URL
+          input id='growi_URL_text' v-model='growi_url' maxlength='256'
+        .field-update-button-container
+          button v-on:click='updateGrowi' 更新
+        h3 Dropbox
+        .inline-field-container
+          h4 トークン
+          input id='dropbox_token_text' v-model='dropbox_token' maxlength='256'
+        .field-update-button-container
+          button v-on:click='updateDropbox' 更新
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -39,6 +55,9 @@ html lang='ja'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.access_token = e.data.config.webhook.token
                 this.webhook_url = e.data.config.webhook.url
+                this.growi_token = e.data.config.growi.token
+                this.growi_url = e.data.config.growi.url
+                this.dropbox_token = e.data.config.dropbox.token
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
@@ -55,6 +74,23 @@ html lang='ja'
           copyWehbook: function () {
             document.getElementById('webhook_text').select()
             document.execCommand('copy')
+          },
+          updateGrowi: function () {
+            values = {token: null, url: null}
+            if (this.growi_url) {
+              values.url = this.growi_url
+            }
+            if (this.growi_token) {
+              values.token = this.growi_token
+            }
+            alert(JSON.stringify(values))
+          },
+          updateDropbox: function () {
+            values = {token: null}
+            if (this.dropbox_token) {
+              values.token = this.dropbox_token
+            }
+            alert(JSON.stringify(values))
           },
         },
       })
