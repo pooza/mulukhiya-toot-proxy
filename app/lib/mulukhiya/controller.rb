@@ -9,7 +9,7 @@ module Mulukhiya
 
     get '/mulukhiya' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_home'
+      @renderer.template = 'home'
       return @renderer.to_s
     end
 
@@ -40,7 +40,7 @@ module Mulukhiya
 
     get '/mulukhiya/app/health' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_health'
+      @renderer.template = 'health'
       return @renderer.to_s
     end
 
