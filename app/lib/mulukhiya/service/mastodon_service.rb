@@ -1,6 +1,7 @@
 module Mulukhiya
   class MastodonService < Ginseng::Mastodon
     include Package
+    attr_reader :token
 
     def initialize(uri = nil, token = nil)
       @config = Config.instance
@@ -22,6 +23,11 @@ module Mulukhiya
       return @account
     rescue
       return nil
+    end
+
+    def token=(token)
+      @token = token
+      @account = nil
     end
 
     def oauth_client

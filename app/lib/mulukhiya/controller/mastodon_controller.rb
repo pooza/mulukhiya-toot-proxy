@@ -134,7 +134,7 @@ module Mulukhiya
     end
 
     post '/mulukhiya/config' do
-      Handler.create('user_config_command').handle_toot(params)
+      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
       @renderer.message = {
         account: @sns.account.to_h,
         config: @sns.account.config.to_h,

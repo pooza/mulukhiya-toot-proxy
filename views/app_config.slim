@@ -53,11 +53,17 @@ html lang='ja'
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
-                this.access_token = e.data.config.webhook.token
-                this.webhook_url = e.data.config.webhook.url
-                this.growi_token = e.data.config.growi.token
-                this.growi_url = e.data.config.growi.url
-                this.dropbox_token = e.data.config.dropbox.token
+                if (e.data.config.webhook) {
+                  this.access_token = e.data.config.webhook.token
+                  this.webhook_url = e.data.config.webhook.url
+                }
+                if (e.data.config.growi) {
+                  this.growi_token = e.data.config.growi.token
+                  this.growi_url = e.data.config.growi.url
+                }
+                if (e.data.config.dropbox) {
+                  this.dropbox_token = e.data.config.dropbox.token
+                }
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
