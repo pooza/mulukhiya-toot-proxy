@@ -19,8 +19,7 @@ html lang='ja'
             input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
             br
             - if params.dig(:errors, :code)
-              span class='alert'
-                = params[:errors][:code].join
+              span class='alert' = params[:errors][:code].join
           li
             button id='submit_button' 認証する
     == slim.render 'fragment/footer'
