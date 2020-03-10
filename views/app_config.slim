@@ -96,11 +96,14 @@ html lang='ja'
               values.status.growi.token = this.growi_token
             }
             values.status = JSON.stringify(values.status)
+            document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
               }).catch(e => {
+                document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
           },
@@ -116,11 +119,14 @@ html lang='ja'
               values.status.dropbox.token = this.dropbox_token
             }
             values.status = JSON.stringify(values.status)
+            document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
               }).catch(e => {
+                document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
           },
