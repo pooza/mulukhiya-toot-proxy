@@ -135,19 +135,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/config' do
-      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {
-        account: @sns.account.to_h,
-        config: @sns.account.config.to_h,
-      }
-      return @renderer.to_s
-    rescue Ginseng::ValidateError => e
-      @renderer.message = {error: e.message}
-      @renderer.status = e.status
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/programs' do
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)
