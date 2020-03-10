@@ -117,9 +117,11 @@ module Mulukhiya
       else
         @renderer.template = 'app_auth_result'
         r = @sns.auth(params[:code])
-        @sns.token = r.parsed_response['access_token']
-        @sns.account.config.webhook_token = @sns.token if @sns.token
-        @renderer[:hook_url] = @sns.account.webhook&.uri
+        if r.code == 200
+          @sns.token = r.parsed_response['access_token']
+          @sns.account.config.webhook_token = @sns.token
+          @renderer[:hook_url] = @sns.account.webhook&.uri
+        end
         @renderer[:status] = r.code
         @renderer[:result] = r.parsed_response
         @renderer.status = r.code
@@ -134,7 +136,7 @@ module Mulukhiya
     end
 
     post '/mulukhiya/config' do
-      Handler.create('user_config_command').handle_toot(params)
+      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
       @renderer.message = {
         account: @sns.account.to_h,
         config: @sns.account.config.to_h,

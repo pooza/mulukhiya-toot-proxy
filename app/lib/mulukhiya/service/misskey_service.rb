@@ -2,7 +2,7 @@ module Mulukhiya
   class MisskeyService
     include Package
     attr_reader :uri
-    attr_accessor :token
+    attr_reader :token
     attr_accessor :mulukhiya_enable
 
     def initialize(uri = nil, token = nil)
@@ -19,6 +19,11 @@ module Mulukhiya
     end
 
     alias mulukhiya? mulukhiya_enable?
+
+    def token=(token)
+      @token = token
+      @account = nil
+    end
 
     def account
       @account ||= Environment.account_class.get(token: @token)
