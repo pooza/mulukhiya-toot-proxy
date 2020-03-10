@@ -9,7 +9,7 @@ module Mulukhiya
 
     get '/mulukhiya' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_home'
+      @renderer.template = 'home'
       return @renderer.to_s
     end
 
@@ -32,6 +32,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/mulukhiya/config' do
+      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
+      @renderer.message = {
+        account: @sns.account.to_h,
+        config: @sns.account.config.to_h,
+      }
+      return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {error: e.message}
+      @renderer.status = e.status
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
@@ -40,7 +53,7 @@ module Mulukhiya
 
     get '/mulukhiya/app/health' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_health'
+      @renderer.template = 'health'
       return @renderer.to_s
     end
 

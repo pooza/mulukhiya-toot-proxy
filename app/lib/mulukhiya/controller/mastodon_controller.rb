@@ -101,7 +101,7 @@ module Mulukhiya
 
     get '/mulukhiya/app/auth' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_auth'
+      @renderer.template = 'auth'
       @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
     end
@@ -110,12 +110,12 @@ module Mulukhiya
       @renderer = SlimRenderer.new
       errors = AppAuthContract.new.call(params).errors.to_h
       if errors.present?
-        @renderer.template = 'app_auth'
+        @renderer.template = 'auth'
         @renderer[:errors] = errors
         @renderer[:oauth_url] = @sns.oauth_uri
         @renderer.status = 422
       else
-        @renderer.template = 'app_auth_result'
+        @renderer.template = 'auth_result'
         r = @sns.auth(params[:code])
         if r.code == 200
           @sns.token = r.parsed_response['access_token']
@@ -131,20 +131,7 @@ module Mulukhiya
 
     get '/mulukhiya/app/config' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'app_config'
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/config' do
-      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {
-        account: @sns.account.to_h,
-        config: @sns.account.config.to_h,
-      }
-      return @renderer.to_s
-    rescue Ginseng::ValidateError => e
-      @renderer.message = {error: e.message}
-      @renderer.status = e.status
+      @renderer.template = 'config'
       return @renderer.to_s
     end
 

@@ -22,8 +22,7 @@ jobs:
           - 6379:6379
     steps:
       - uses: actions/checkout@v2
-      - name: setup Ruby 2.7
-        uses: actions/setup-ruby@v1
+      - uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.7.x
       - name: apt install
@@ -39,7 +38,8 @@ jobs:
       - name: Run lint
         run: |
           bundle exec rubocop
-          bundle exec rake erb:check
+          bundle exec rake erb:lint
+          bundle exec rake slim:lint
       - name: Run test
         run: |
           bundle exec rake test

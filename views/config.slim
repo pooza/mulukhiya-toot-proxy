@@ -15,16 +15,16 @@ html lang='ja'
         h3 GROWI
         .inline-field-container
           h4 トークン
-          input id='growi_token_text' v-model='growi_token' maxlength='256'
+          input id='growi_token_text' placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
         .inline-field-container
           h4 URL
-          input id='growi_URL_text' v-model='growi_url' maxlength='256'
+          input id='growi_URL_text' placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
         .field-update-button-container
           button v-on:click='updateGrowi' 更新
         h3 Dropbox
         .inline-field-container
           h4 トークン
-          input id='dropbox_token_text' v-model='dropbox_token' maxlength='256'
+          input id='dropbox_token_text' placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
         .field-update-button-container
           button v-on:click='updateDropbox' 更新
         h3 Webhook
@@ -47,6 +47,7 @@ html lang='ja'
           result: null,
         },
         mounted: function () {
+          'use strict'
           const token = localStorage.getItem('mulukhiya_token')
           if (token) {
             const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
@@ -74,14 +75,17 @@ html lang='ja'
         },
         methods: {
           copyToken: function () {
+            'use strict'
             document.getElementById('token_text').select()
             document.execCommand('copy')
           },
           copyWehbook: function () {
+            'use strict'
             document.getElementById('webhook_text').select()
             document.execCommand('copy')
           },
           updateGrowi: function () {
+            'use strict'
             const values = {
               status: {
                 command: 'user_config',
@@ -96,15 +100,19 @@ html lang='ja'
               values.status.growi.token = this.growi_token
             }
             values.status = JSON.stringify(values.status)
+            document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
               }).catch(e => {
+                document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
           },
           updateDropbox: function () {
+            'use strict'
             const values = {
               status: {
                 command: 'user_config',
@@ -116,11 +124,14 @@ html lang='ja'
               values.status.dropbox.token = this.dropbox_token
             }
             values.status = JSON.stringify(values.status)
+            document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
               }).catch(e => {
+                document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
           },
