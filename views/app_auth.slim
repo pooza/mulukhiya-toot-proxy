@@ -34,6 +34,7 @@ html lang='ja'
           auth_command: 'アプリケーションの認証',
         },
         mounted: function () {
+          'use strict'
           const token = localStorage.getItem('mulukhiya_token')
           if (token) {
             const href = '/mulukhiya/config?token=' + encodeURIComponent(token)

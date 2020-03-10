@@ -47,6 +47,7 @@ html lang='ja'
           result: null,
         },
         mounted: function () {
+          'use strict'
           const token = localStorage.getItem('mulukhiya_token')
           if (token) {
             const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
@@ -74,14 +75,17 @@ html lang='ja'
         },
         methods: {
           copyToken: function () {
+            'use strict'
             document.getElementById('token_text').select()
             document.execCommand('copy')
           },
           copyWehbook: function () {
+            'use strict'
             document.getElementById('webhook_text').select()
             document.execCommand('copy')
           },
           updateGrowi: function () {
+            'use strict'
             const values = {
               status: {
                 command: 'user_config',
@@ -108,6 +112,7 @@ html lang='ja'
               })
           },
           updateDropbox: function () {
+            'use strict'
             const values = {
               status: {
                 command: 'user_config',

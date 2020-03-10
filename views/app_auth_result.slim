@@ -31,14 +31,17 @@ html lang='ja'
           token_error: false,
         },
         mounted: function () {
+          'use strict'
           localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
         },
         methods: {
           copyToken: function () {
+            'use strict'
             document.getElementById('token_text').select()
             document.execCommand('copy')
           },
           copyWehbook: function () {
+            'use strict'
             document.getElementById('webhook_text').select()
             document.execCommand('copy')
           },
