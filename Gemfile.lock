@@ -275,6 +275,9 @@ GEM
     slim (4.0.1)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
+    slim_lint (0.20.0)
+      rubocop (>= 0.78.0)
+      slim (>= 3.0, < 5.0)
     syslog-logger (1.6.8)
     temple (0.8.2)
     test-unit (3.3.5)
@@ -315,6 +318,7 @@ DEPENDENCIES
   sanitize
   sidekiq
   sidekiq-scheduler
+  slim_lint
   vacuum
 
 RUBY VERSION
