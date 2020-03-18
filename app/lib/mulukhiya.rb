@@ -1,6 +1,7 @@
 require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
+require 'sidekiq-failures'
 require 'ginseng'
 require 'ginseng/postgres'
 require 'ginseng/web'
