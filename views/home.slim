@@ -18,10 +18,10 @@ html lang='ja'
             span class='alert' 未認証
         - else
           a href='#'
-            = '{{auth_command}}'
+            = '{{auth_command}} '
             span class='alert' 非対応
           a href='#'
-            | 環境設定
+            = '環境設定 '
             span class='alert' 非対応
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
@@ -42,7 +42,6 @@ html lang='ja'
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
-                this.result = jsyaml.safeDump(e.data.config)
                 this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
                 this.message = e.message

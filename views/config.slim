@@ -10,8 +10,10 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 環境設定
       #result-container v-if='result'
+      section
         h3 現在の設定
         pre = '{{result}}'
+      section
         h3 GROWI
         .inline-field-container
           h4 トークン
@@ -21,12 +23,14 @@ html lang='ja'
           input id='growi_URL_text' placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
         .field-update-button-container
           button v-on:click='updateGrowi' 更新
+      section
         h3 Dropbox
         .inline-field-container
           h4 トークン
           input id='dropbox_token_text' placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
         .field-update-button-container
           button v-on:click='updateDropbox' 更新
+      section
         h3 Webhook
         .field-container v-if='access_token'
           h4 アクセストークン
