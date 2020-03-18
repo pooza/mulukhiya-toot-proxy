@@ -16,5 +16,21 @@ module Mulukhiya
         "Redis DSN: #{@config['/sidekiq/redis/dsn']}",
       ].join("\n")
     end
+
+    def self.health
+      stats = Sidekiq::Stats.new
+      pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}
+      values = {
+        queues: stats.queues['default'],
+        retry: stats.retry_size,
+        status: pids.present? ? 'OK' : 'NG',
+      }
+      pids.each do |pid|
+        raise "PID '#{pid}' was dead" unless Process.alive?(pid)
+      end
+      return values
+    rescue => e
+      return {error: e.message, status: 'NG'}
+    end
   end
 end

@@ -1,3 +1,5 @@
+require 'ginseng/postgres'
+
 module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
@@ -19,8 +21,8 @@ module Mulukhiya
     def self.health
       Environment.account_class.get(token: Config.instance['/agent/info/token'])
       return {status: 'OK'}
-    rescue
-      return {status: 'NG'}
+    rescue => e
+      return {error: e.message, status: 'NG'}
     end
   end
 end
