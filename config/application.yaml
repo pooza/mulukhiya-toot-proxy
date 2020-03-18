@@ -1,11 +1,12 @@
 package:
-  version: 3.5.2
+  version: 3.5.3
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
 controller: mastodon
+environment: development
 handler:
   default:
     timeout: 10

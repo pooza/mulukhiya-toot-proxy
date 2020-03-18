@@ -87,7 +87,7 @@ GEM
     dropbox_api (0.1.18)
       faraday (<= 1.0)
       oauth2 (~> 1.1)
-    dry-configurable (0.11.3)
+    dry-configurable (0.11.4)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.7)
       dry-equalizer (~> 0.2)
@@ -103,14 +103,14 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
-    dry-schema (1.4.3)
+    dry-schema (1.5.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
-      dry-types (~> 1.2)
+      dry-types (~> 1.4)
     dry-types (1.4.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
@@ -118,16 +118,16 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.4.2)
+    dry-validation (1.5.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
-      dry-schema (~> 1.4, >= 1.4.3)
+      dry-schema (~> 1.5)
     e2mmap (0.1.0)
     erubi (1.9.0)
-    et-orbi (1.2.3)
+    et-orbi (1.2.4)
       tzinfo
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
@@ -260,6 +260,8 @@ GEM
       rack (~> 2.0)
       rack-protection (>= 2.0.0)
       redis (>= 4.1.0)
+    sidekiq-failures (1.0.0)
+      sidekiq (>= 4.0.0)
     sidekiq-scheduler (3.0.1)
       e2mmap
       redis (>= 3, < 5)
@@ -317,6 +319,7 @@ DEPENDENCIES
   rspotify
   sanitize
   sidekiq
+  sidekiq-failures
   sidekiq-scheduler
   slim_lint
   vacuum
