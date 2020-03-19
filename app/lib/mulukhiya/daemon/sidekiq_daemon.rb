@@ -1,4 +1,4 @@
-require 'sidekiq'
+require 'sidekiq/api'
 
 module Mulukhiya
   class SidekiqDaemon < Daemon
