@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b95cebe5e70c8e16867b482f7d857464d5c81ced
+  revision: fbaf7066472c244bd37cec2580a5f3ead7f904c9
   specs:
-    ginseng-core (1.6.3)
+    ginseng-core (1.6.4)
       activesupport
       addressable
       bundler
@@ -49,20 +49,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (6.0.2.1)
-      actionview (= 6.0.2.1)
-      activesupport (= 6.0.2.1)
+    actionpack (6.0.2.2)
+      actionview (= 6.0.2.2)
+      activesupport (= 6.0.2.2)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (6.0.2.1)
-      activesupport (= 6.0.2.1)
+    actionview (6.0.2.2)
+      activesupport (= 6.0.2.2)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (6.0.2.1)
+    activesupport (6.0.2.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -195,7 +195,7 @@ GEM
     parallel (1.19.1)
     parser (2.7.0.4)
       ast (~> 2.4.0)
-    pg (1.2.2)
+    pg (1.2.3)
     power_assert (1.1.6)
     public_suffix (3.1.1)
     puma (4.3.3)
@@ -304,6 +304,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  actionview (>= 6.0.2.2)
   bootsnap
   crowi-client!
   dropbox_api
@@ -312,6 +313,7 @@ DEPENDENCIES
   ginseng-core!
   ginseng-postgres!
   ginseng-web!
+  json (>= 2.3.0)
   mimemagic
   nokogiri
   rails-erb-lint

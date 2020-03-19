@@ -13,11 +13,8 @@ module Mulukhiya
       return DolphinController
     end
 
-    def test_webui
+    def test_root
       get '/mulukhiya'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/app/health'
       assert(last_response.ok?)
     end
 

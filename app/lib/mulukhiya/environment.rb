@@ -80,32 +80,15 @@ module Mulukhiya
         version: Package.version,
         postgres: Postgres.health,
         redis: Redis.health,
-        sidekiq: sidekiq_stats,
+        sidekiq: SidekiqDaemon.health,
         status: 200,
       }
       [:postgres, :redis, :sidekiq].each do |k|
-        values[:status] = 503 unless values.dig(k, :status) == 'OK'
+        next if values.dig(k, :status) == 'OK'
+        values[:status] = 503
+        break
       end
       return values
-    end
-
-    def self.sidekiq_stats
-      stats = Sidekiq::Stats.new
-      pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}
-      values = {
-        pids: pids,
-        queues: stats.queues['default'],
-        retry: stats.retry_size,
-        status: pids.present? ? 'OK' : 'NG',
-      }
-      pids.each do |pid|
-        Process.kill(0, pid)
-      rescue
-        raise "PID '#{pid}' was dead"
-      end
-      return values
-    rescue => e
-      return {error: e.message, status: 'NG'}
     end
 
     def self.auth(username, password)

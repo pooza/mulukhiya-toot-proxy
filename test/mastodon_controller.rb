@@ -15,17 +15,8 @@ module Mulukhiya
       return MastodonController
     end
 
-    def test_webui
+    def test_root
       get '/mulukhiya'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/app/health'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/app/auth'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/app/config'
       assert(last_response.ok?)
     end
 

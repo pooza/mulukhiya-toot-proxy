@@ -1,9 +1,7 @@
 require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
-require 'sidekiq-failures'
 require 'ginseng'
-require 'ginseng/postgres'
 require 'ginseng/web'
 
 module Mulukhiya
@@ -42,6 +40,7 @@ module Mulukhiya
   def self.rack
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
+    require 'sidekiq-failures'
 
     config = Config.instance
     if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?
