@@ -1,3 +1,5 @@
+require 'sidekiq'
+
 module Mulukhiya
   class SidekiqDaemon < Daemon
     def command
