@@ -18,7 +18,7 @@ module Mulukhiya
     private
 
     def ignore?(body)
-      return true unless @status.present?
+      return true if @status.empty? && !Environment.mastodon?
       parser.accts do |acct|
         return true if acct.agent?
       end
