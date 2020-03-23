@@ -1,7 +1,7 @@
 module Mulukhiya
   class MentionVisibilityHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field].to_s
+      @status = body[status_field] || ''
       return body if parser.command?
       parser.accts do |acct|
         next unless acct.agent?

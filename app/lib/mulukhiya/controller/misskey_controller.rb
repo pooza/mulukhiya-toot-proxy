@@ -60,7 +60,7 @@ module Mulukhiya
     end
 
     def renote?
-      return params[:text].nil?
+      return params[:renoteId].present?
     end
 
     def self.name

@@ -1,7 +1,7 @@
 module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field].to_s
+      @status = body[status_field] || ''
       return body if ignore?(body)
       tags.body = TagContainer.tweak(@status)
       @dic = TaggingDictionary.new
@@ -18,7 +18,6 @@ module Mulukhiya
     private
 
     def ignore?(body)
-      return true if @status.empty? && !Environment.mastodon?
       parser.accts do |acct|
         return true if acct.agent?
       end

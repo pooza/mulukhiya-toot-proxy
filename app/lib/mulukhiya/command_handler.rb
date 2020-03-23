@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field].to_s
+      @status = body[status_field] || ''
       return body unless parser.command_name == command_name
       raise Ginseng::ValidateError, errors.values.join if errors.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def handle_post_toot(body, params = {})
-      @status = body[status_field].to_s
+      @status = body[status_field] || ''
       return unless parser.command_name == command_name
       dispatch
       @result.push(parser.params)
