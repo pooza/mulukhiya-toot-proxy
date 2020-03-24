@@ -42,6 +42,7 @@ test:
         - dolphin_controller
         - handler
         - mastodon_controller
+        - slack
     - name: database
       cases:
         - account
