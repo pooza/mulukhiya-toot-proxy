@@ -21,6 +21,7 @@ module Mulukhiya
         uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
         return uri if uri
       end
+      return nil
     end
 
     def search(keyword, categories)

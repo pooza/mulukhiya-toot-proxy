@@ -11,7 +11,7 @@ module Mulukhiya
       return body if body['media_ids'].present?
       parser.uris.each do |uri|
         next unless updatable?(uri)
-        image = create_image_uri(uri)
+        next unless image = create_image_uri(uri)
         body['media_ids'].push(sns.upload_remote_resource(image))
         @result.push(source_url: uri.to_s, image_url: image.to_s)
         break
@@ -27,6 +27,10 @@ module Mulukhiya
 
     def create_image_uri(uri)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def notifiable?
+      return true
     end
   end
 end
