@@ -36,7 +36,7 @@ module Mulukhiya
     rescue RestClient::Exception => e
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
       notify(@renderer.message)
-      @renderer.status = e.response.code
+      @renderer.status = e.response&.code || 400
       return @renderer.to_s
     end
 
