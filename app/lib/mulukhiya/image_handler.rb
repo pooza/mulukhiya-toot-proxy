@@ -28,5 +28,9 @@ module Mulukhiya
     def create_image_uri(uri)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
+
+    def notifiable?
+      return true
+    end
   end
 end
