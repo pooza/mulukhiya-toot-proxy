@@ -15,7 +15,7 @@ module Mulukhiya
     def track_id
       return nil unless SpotifyService.config?
       @config['/spotify/patterns'].each do |entry|
-        if matches = path.match(Regexp.new(entry['pattern']))
+        if matches = path.match(entry['pattern'])
           return matches[1]
         end
       end

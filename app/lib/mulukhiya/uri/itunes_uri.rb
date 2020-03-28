@@ -20,7 +20,7 @@ module Mulukhiya
       return false unless album_id.present?
       return false unless track_id.present?
       @config['/itunes/patterns'].each do |entry|
-        next unless path.match(Regexp.new(entry['pattern']))
+        next unless path.match(entry['pattern'])
         return entry['shortenable']
       end
       return false
@@ -38,7 +38,7 @@ module Mulukhiya
 
     def album_id
       @config['/itunes/patterns'].each do |entry|
-        if matches = path.match(Regexp.new(entry['pattern']))
+        if matches = path.match(entry['pattern'])
           return matches[1]
         end
       end

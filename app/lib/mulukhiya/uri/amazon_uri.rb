@@ -10,7 +10,7 @@ module Mulukhiya
       return false unless amazon?
       return false unless asin.present?
       @config['/amazon/patterns'].each do |entry|
-        next unless path.match(Regexp.new(entry['pattern']))
+        next unless path.match(entry['pattern'])
         return entry['shortenable']
       end
       return false
@@ -24,7 +24,7 @@ module Mulukhiya
 
     def asin
       @config['/amazon/patterns'].each do |entry|
-        if matches = path.match(Regexp.new(entry['pattern']))
+        if matches = path.match(entry['pattern'])
           return matches[1]
         end
       end
