@@ -12,12 +12,15 @@ gem 'ginseng-web', github: 'pooza/ginseng-web'
 gem 'json', '>=2.3.0' # CVE-2020-10663
 gem 'mimemagic'
 gem 'nokogiri'
-gem 'rails-erb-lint'
 gem 'redis'
 gem 'rspotify'
 gem 'sanitize'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler'
-gem 'slim_lint'
 gem 'vacuum'
+
+group :development do
+  gem 'rails-erb-lint'
+  gem 'slim_lint'
+end
