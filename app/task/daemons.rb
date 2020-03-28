@@ -18,5 +18,5 @@ end
 
 [:start, :stop, :restart].each do |action|
   desc "#{action} all"
-  task action => ["mulukhiya:puma:#{action}", "mulukhiya:sidekiq:#{action}"]
+  multitask action => ["mulukhiya:puma:#{action}", "mulukhiya:sidekiq:#{action}"]
 end
