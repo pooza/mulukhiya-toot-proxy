@@ -17,7 +17,7 @@ module Mulukhiya
       notify(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_toot, params, {results: @results, sns: @sns})
       @renderer.message = @results.response.parsed_response
-      @renderer.message['tags']&.keep_if {|v| tags.member?(v['name'])}
+      @renderer.message['tags']&.select {|v| tags.member?(v['name'])}
       @renderer.status = @results.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
