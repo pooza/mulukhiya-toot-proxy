@@ -38,9 +38,8 @@ module Mulukhiya
 
     def album_id
       @config['/itunes/patterns'].each do |entry|
-        if matches = path.match(entry['pattern'])
-          return matches[1]
-        end
+        next unless matches = path.match(entry['pattern'])
+        return matches[1]
       end
       return nil
     end
