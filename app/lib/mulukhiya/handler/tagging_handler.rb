@@ -50,7 +50,7 @@ module Mulukhiya
     def append
       body = @status
       return body unless tags.present?
-      via = body.match(Regexp.new(@config['/twittodon/pattern']))
+      via = body.match(@config['/twittodon/pattern'])
       body.sub!(via[0], '') if via.present?
       lines = body.each_line.map(&:chomp).to_a
       lines.clone.reverse_each do |line|

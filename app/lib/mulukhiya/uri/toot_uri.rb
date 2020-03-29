@@ -8,7 +8,7 @@ module Mulukhiya
 
     def toot_id
       @config['/mastodon/toot/patterns'].each do |pattern|
-        next unless matches = path.match(Regexp.new(pattern['pattern']))
+        next unless matches = path.match(pattern['pattern'])
         return matches[1].to_i
       end
       return nil

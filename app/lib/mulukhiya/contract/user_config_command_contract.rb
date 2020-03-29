@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     rule(:command) do
-      key.failure('command: が正しくありません。') unless value == 'user_config'
+      key.failure('/command が正しくありません。') unless value == 'user_config'
     end
 
     rule(:tags) do
