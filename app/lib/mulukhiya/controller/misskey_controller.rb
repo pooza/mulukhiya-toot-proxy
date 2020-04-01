@@ -68,7 +68,7 @@ module Mulukhiya
     end
 
     def self.webhook?
-      return false
+      return true
     end
 
     def self.announcement?

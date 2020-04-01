@@ -75,66 +75,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/webhook/:digest' do
-      errors = WebhookContract.new.call(params).errors.to_h
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = errors
-      elsif webhook = Webhook.create(params[:digest])
-        results = webhook.toot(params)
-        @renderer.message = results.response.parsed_response
-        @renderer.status = results.response.code
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/webhook/:digest' do
-      if Webhook.create(params[:digest])
-        @renderer.message = {message: 'OK'}
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/auth' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'auth'
-      @renderer[:oauth_url] = @sns.oauth_uri
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/app/auth' do
-      @renderer = SlimRenderer.new
-      errors = AppAuthContract.new.call(params).errors.to_h
-      if errors.present?
-        @renderer.template = 'auth'
-        @renderer[:errors] = errors
-        @renderer[:oauth_url] = @sns.oauth_uri
-        @renderer.status = 422
-      else
-        @renderer.template = 'auth_result'
-        r = @sns.auth(params[:code])
-        if r.code == 200
-          @sns.token = r.parsed_response['access_token']
-          @sns.account.config.webhook_token = @sns.token
-          @renderer[:hook_url] = @sns.account.webhook&.uri
-        end
-        @renderer[:status] = r.code
-        @renderer[:result] = r.parsed_response
-        @renderer.status = r.code
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/config' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'config'
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/programs' do
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)

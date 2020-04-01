@@ -1,5 +1,5 @@
 package:
-  version: 3.5.8
+  version: 3.5.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   authors:
     - Tatsuya Koishi
@@ -237,6 +237,11 @@ misskey:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+  oauth:
+    permission:
+      - write:notes
+      - write:drive
+    callback: /mulukhiya/app/auth
   events:
     - pre_toot
     - post_toot
