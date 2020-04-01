@@ -1,7 +1,6 @@
 package:
-  version: 3.5.9
+  version: 3.5.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  description: Mastodon/Misskey/Dolphinの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
     - Tatsuya Koishi
   email:
@@ -244,11 +243,6 @@ misskey:
     - pre_upload
     - post_upload
     - post_bookmark
-  oauth:
-    permission:
-      - write:notes
-      - write:drive
-    callback: /mulukhiya/app/auth
   note: &misskey_note
     field: text
     key: noteId
