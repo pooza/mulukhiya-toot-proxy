@@ -142,19 +142,6 @@ module Mulukhiya
       )
     end
 
-    def self.webhooks
-      return enum_for(__method__) unless block_given?
-      config = Config.instance
-      Misskey::AccessToken.all do |token|
-        values = {
-          digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
-          token: token.values[:hash],
-          account: token.account,
-        }
-        yield values
-      end
-    end
-
     def self.create_tag(word)
       return '#' + word.strip.gsub(/[^[:alnum:]]+/, '_').gsub(/(^[_#]+|_$)/, '')
     end

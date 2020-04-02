@@ -139,5 +139,18 @@ module Mulukhiya
     def self.events
       return Config.instance['/mastodon/events'].map(&:to_sym)
     end
+
+    def self.webhooks
+      return enum_for(__method__) unless block_given?
+      config = Config.instance
+      Postgres.instance.execute('webhook_tokens').each do |row|
+        values = {
+          digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
+          token: row['token'],
+          account: Environment.account_class[row['account_id']],
+        }
+        yield values
+      end
+    end
   end
 end
