@@ -24,7 +24,7 @@ module Mulukhiya
 
     def test_sns
       Webhook.all do |hook|
-        assert_kind_of([MastodonService, DolphinService], hook.sns)
+        assert_kind_of([MastodonService, MisskeyService], hook.sns)
       end
     end
 

@@ -59,8 +59,8 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Postgres.instance.execute('webhook_tokens').each do |row|
-        yield Webhook.new(UserConfig.new('/webhook/token' => row['token']))
+      Environment.sns_class.webhooks do |hook|
+        yield Webhook.create(hook[:digest])
       end
     end
 
