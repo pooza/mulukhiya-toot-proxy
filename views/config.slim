@@ -40,6 +40,10 @@ html lang='ja'
           h4 URL
           textarea id='webhook_text' = '{{webhook_url}}'
           i class='fas fa-clipboard' v-on:click='copyWehbook'
+        .field-container v-if='webhook_url'
+          h4 curlサンプル
+          textarea id='curl_sample_text' = '{{curl_sample}}'
+          i class='fas fa-clipboard' v-on:click='copyCurlSample'
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -61,6 +65,7 @@ html lang='ja'
                 if (e.data.config.webhook) {
                   this.access_token = e.data.config.webhook.token
                   this.webhook_url = e.data.config.webhook.url
+                  this.curl_sample = `curl -H 'Content-Type: application/json' -X POST -d '{"text":"わたしが斬るのは、あなたじゃない！\\n絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。\\nそれがわたし。王女様からもらった名前、キュアソードよ！"}' ${e.data.config.webhook.url}`
                 }
                 if (e.data.config.growi) {
                   this.growi_token = e.data.config.growi.token
@@ -86,6 +91,11 @@ html lang='ja'
           copyWehbook: function () {
             'use strict'
             document.getElementById('webhook_text').select()
+            document.execCommand('copy')
+          },
+          copyCurlSample: function () {
+            'use strict'
+            document.getElementById('curl_sample_text').select()
             document.execCommand('copy')
           },
           updateGrowi: function () {

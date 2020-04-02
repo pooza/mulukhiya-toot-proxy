@@ -39,6 +39,9 @@ module Mulukhiya
       end
 
       def webhook
+        return Webhook.new(config)
+      rescue => e
+        logger.error(e)
         return nil
       end
 

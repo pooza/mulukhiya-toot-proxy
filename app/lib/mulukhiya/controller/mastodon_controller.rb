@@ -75,40 +75,9 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/webhook/:digest' do
-      errors = WebhookContract.new.call(params).errors.to_h
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = errors
-      elsif webhook = Webhook.create(params[:digest])
-        results = webhook.toot(params)
-        @renderer.message = results.response.parsed_response
-        @renderer.status = results.response.code
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/webhook/:digest' do
-      if Webhook.create(params[:digest])
-        @renderer.message = {message: 'OK'}
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/auth' do
+    post '/mulukhiya/auth' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'auth'
-      @renderer[:oauth_url] = @sns.oauth_uri
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/app/auth' do
-      @renderer = SlimRenderer.new
-      errors = AppAuthContract.new.call(params).errors.to_h
+      errors = MastodonAuthContract.new.call(params).errors.to_h
       if errors.present?
         @renderer.template = 'auth'
         @renderer[:errors] = errors
@@ -126,12 +95,6 @@ module Mulukhiya
         @renderer[:result] = r.parsed_response
         @renderer.status = r.code
       end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/config' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'config'
       return @renderer.to_s
     end
 
@@ -175,6 +138,19 @@ module Mulukhiya
 
     def self.events
       return Config.instance['/mastodon/events'].map(&:to_sym)
+    end
+
+    def self.webhook_entries
+      return enum_for(__method__) unless block_given?
+      config = Config.instance
+      Postgres.instance.execute('webhook_tokens').each do |row|
+        values = {
+          digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
+          token: row['token'],
+          account: Environment.account_class[row['account_id']],
+        }
+        yield values
+      end
     end
   end
 end

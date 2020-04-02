@@ -6,7 +6,7 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
-      @account = Mulukhiya::Mastodon::Account.get(token: @config['/agent/test/token'])
+      @account = Environment.test_account
       @toot = @account.recent_toot
       @parser = TootParser.new
     end
@@ -131,7 +131,7 @@ module Mulukhiya
     end
 
     def test_app_auth
-      post '/mulukhiya/app/auth', {code: 'hoge'}
+      post '/mulukhiya/auth', {code: 'hoge'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
     end

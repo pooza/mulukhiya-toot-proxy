@@ -15,6 +15,10 @@ module Mulukhiya
       raise Ginseng::GatewayError, 'Dolphin does not respond to announcements.'
     end
 
+    def oauth_uri
+      return nil
+    end
+
     def notify(account, message)
       return note(
         DolphinController.status_field => message,

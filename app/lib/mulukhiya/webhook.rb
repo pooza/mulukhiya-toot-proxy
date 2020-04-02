@@ -6,11 +6,7 @@ module Mulukhiya
     attr_reader :results
 
     def digest
-      return Digest::SHA1.hexdigest({
-        sns: @sns.uri.to_s,
-        token: @sns.token,
-        salt: @config['/webhook/salt'],
-      }.to_json)
+      return Webhook.create_digest(@sns.uri, @sns.token)
     end
 
     def visibility
@@ -20,16 +16,6 @@ module Mulukhiya
     def uri
       @uri ||= @sns.create_uri("/mulukhiya/webhook/#{digest}")
       return @uri
-    end
-
-    def exist?
-      return @db.execute('webhook_tokens', {
-        token: @sns.token,
-        owner: @sns.account.id,
-      }).present?
-    rescue => e
-      @logger.error(e)
-      return false
     end
 
     def to_json(opts = nil)
@@ -45,7 +31,7 @@ module Mulukhiya
     def toot(status)
       status = {text: status} if status.is_a?(String)
       body = {
-        'status' => status[:text],
+        Environment.controller_class.status_field => status[:text],
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
@@ -55,19 +41,26 @@ module Mulukhiya
       return results
     end
 
-    def self.create(digest)
-      all do |webhook|
-        next unless digest == webhook.digest
-        next unless webhook.exist?
-        return Environment.account_class[webhook.sns.account.id].webhook
+    def self.create_digest(uri, token)
+      return Digest::SHA1.hexdigest({
+        sns: uri.to_s,
+        token: token,
+        salt: Config.instance['/webhook/salt'],
+      }.to_json)
+    end
+
+    def self.create(key)
+      return Webhook.new(key) if key.is_a?(UserConfig)
+      Environment.controller_class.webhook_entries do |hook|
+        return hook[:account].webhook if key == hook[:digest]
       end
       return nil
     end
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Postgres.instance.execute('webhook_tokens').each do |row|
-        yield Webhook.new(UserConfig.new('/webhook/token' => row['token']))
+      Environment.controller_class.webhook_entries do |hook|
+        yield Webhook.create(hook[:digest])
       end
     end
 

@@ -13,6 +13,30 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/mulukhiya/webhook/:digest' do
+      errors = WebhookContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif webhook = Webhook.create(params[:digest])
+        results = webhook.toot(params)
+        @renderer.message = results.response.parsed_response
+        @renderer.status = results.response.code
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/webhook/:digest' do
+      if Webhook.create(params[:digest])
+        @renderer.message = {message: 'OK'}
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/about' do
       path = File.join(Environment.dir, 'config/application.yaml')
       @renderer.message = {package: YAML.load_file(path)['package']}
@@ -42,6 +66,19 @@ module Mulukhiya
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
       @renderer.status = e.status
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/app/config' do
+      @renderer = SlimRenderer.new
+      @renderer.template = 'config'
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/app/auth' do
+      @renderer = SlimRenderer.new
+      @renderer.template = 'auth'
+      @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
     end
 

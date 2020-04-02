@@ -1,7 +1,7 @@
 require 'dry-validation'
 
 module Mulukhiya
-  class AppAuthContract < Dry::Validation::Contract
+  class MastodonAuthContract < Dry::Validation::Contract
     params do
       optional(:code).value(:string)
     end
