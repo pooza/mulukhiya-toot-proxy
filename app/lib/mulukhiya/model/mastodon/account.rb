@@ -31,9 +31,7 @@ module Mulukhiya
       end
 
       def webhook
-        webhook = Webhook.new(config)
-        raise "Invalid webhook #{config.to_json}" unless webhook.exist?
-        return webhook
+        return Webhook.new(config)
       rescue => e
         logger.error(e)
         return nil

@@ -48,6 +48,29 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/auth' do
+      @renderer = SlimRenderer.new
+      errors = MisskeyAuthContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.template = 'auth'
+        @renderer[:errors] = errors
+        @renderer[:oauth_url] = @sns.oauth_uri
+        @renderer.status = 422
+      else
+        @renderer.template = 'auth_result'
+        r = @sns.auth(params[:token])
+        if r.code == 200
+          @sns.token = @sns.create_access_token(r.parsed_response['accessToken'])
+          @sns.account.config.webhook_token = @sns.token
+          @renderer[:hook_url] = @sns.account.webhook&.uri
+        end
+        @renderer[:status] = r.code
+        @renderer[:result] = {access_token: @sns.token}
+        @renderer.status = r.code
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/note/:note' do
       note = Environment.status_class[params[:note]]
       if note.nil? || !note.visible?

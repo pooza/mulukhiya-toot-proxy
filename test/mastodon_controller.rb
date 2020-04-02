@@ -131,7 +131,7 @@ module Mulukhiya
     end
 
     def test_app_auth
-      post '/mulukhiya/app/auth', {code: 'hoge'}
+      post '/mulukhiya/auth', {code: 'hoge'}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
     end

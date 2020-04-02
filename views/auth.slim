@@ -9,19 +9,24 @@ html lang='ja'
     main id='app'
       == slim.render 'fragment/message'
       h2 = '{{auth_command}}'
-      form method='POST' action='/mulukhiya/app/auth'
+      - if controller.name == 'Mastodon'
+        form method='POST' action='/mulukhiya/auth'
+          ol
+            li
+              a href=params[:oauth_url] target='_blank' 認証コードを取得
+            li
+              | 取得した認証コードを↓に貼り付けて…
+              br
+              input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
+              br
+              - if params.dig(:errors, :code)
+                span class='alert' = params[:errors][:code].join
+            li
+              button id='submit_button' 認証する
+      - if controller.name == 'Misskey'
         ol
           li
-            a href=params[:oauth_url] target='_blank' 認証コードを取得
-          li
-            | 取得した認証コードを↓に貼り付けて…
-            br
-            input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
-            br
-            - if params.dig(:errors, :code)
-              span class='alert' = params[:errors][:code].join
-          li
-            button id='submit_button' 認証する
+            a href=params[:oauth_url] 認証コードを取得
     == slim.render 'fragment/footer'
     javascript:
       new Vue({

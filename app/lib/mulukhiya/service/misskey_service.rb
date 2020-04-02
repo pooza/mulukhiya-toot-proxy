@@ -1,3 +1,5 @@
+require 'digest/sha2'
+
 module Mulukhiya
   class MisskeyService
     include Package
@@ -81,6 +83,45 @@ module Mulukhiya
       })
     end
 
+    def oauth_client
+      unless File.exist?(oauth_client_path)
+        body = {
+          name: Package.name,
+          description: @config['/package/description'],
+          permission: @config['/misskey/oauth/permission'],
+          callbackUrl: create_uri(@config['/misskey/oauth/callback_url']).to_s,
+        }
+        r = @http.post(create_uri('/api/app/create'), {body: body.to_json})
+        File.write(oauth_client_path, r.parsed_response.to_json)
+      end
+      return JSON.parse(File.read(oauth_client_path))
+    end
+
+    def create_access_token(token)
+      return Digest::SHA256.hexdigest(token + oauth_client['secret'])
+    end
+
+    def oauth_client_path
+      return File.join(Environment.dir, 'tmp/cache/oauth_cilent.json')
+    end
+
+    def oauth_uri
+      body = {appSecret: oauth_client['secret']}
+      r = @http.post(create_uri('/api/auth/session/generate'), {body: body.to_json})
+      return Ginseng::URI.parse(r.parsed_response['url'])
+    end
+
+    def auth(token)
+      body = {
+        appSecret: oauth_client['secret'],
+        token: token,
+      }
+      return @http.post(
+        create_uri('/api/auth/session/userkey'),
+        {body: body.to_json},
+      )
+    end
+
     def fetch_note(id)
       response = @http.get(create_uri("/mulukhiya/note/#{id}"))
       raise response.parsed_response['message'] unless response.code == 200
@@ -99,6 +140,19 @@ module Mulukhiya
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
       )
+    end
+
+    def self.webhooks
+      return enum_for(__method__) unless block_given?
+      config = Config.instance
+      Misskey::AccessToken.all do |token|
+        values = {
+          digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
+          token: token.values[:hash],
+          account: token.account,
+        }
+        yield values
+      end
     end
 
     def self.create_tag(word)

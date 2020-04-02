@@ -82,29 +82,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/app/auth' do
-      @renderer = SlimRenderer.new
-      errors = AppAuthContract.new.call(params).errors.to_h
-      if errors.present?
-        @renderer.template = 'auth'
-        @renderer[:errors] = errors
-        @renderer[:oauth_url] = @sns.oauth_uri
-        @renderer.status = 422
-      else
-        @renderer.template = 'auth_result'
-        r = @sns.auth(params[:code])
-        if r.code == 200
-          @sns.token = r.parsed_response['access_token']
-          @sns.account.config.webhook_token = @sns.token
-          @renderer[:hook_url] = @sns.account.webhook&.uri
-        end
-        @renderer[:status] = r.code
-        @renderer[:result] = r.parsed_response
-        @renderer.status = r.code
-      end
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
