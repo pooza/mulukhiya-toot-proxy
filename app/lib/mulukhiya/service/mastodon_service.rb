@@ -13,6 +13,10 @@ module Mulukhiya
       @token = token
     end
 
+    alias note toot
+
+    alias post toot
+
     def search(keyword, params = {})
       params[:limit] ||= @config['/mastodon/search/limit']
       return super(keyword, params)
