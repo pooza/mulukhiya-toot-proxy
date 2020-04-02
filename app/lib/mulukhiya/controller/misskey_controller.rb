@@ -8,6 +8,7 @@ module Mulukhiya
         @sns.token = params[:i]
       end
       @results.account = @sns.account
+      params[Environment.controller_class.status_field] ||= params[MastodonController.status_field]
     end
 
     post '/api/notes/create' do
