@@ -51,7 +51,7 @@ module Mulukhiya
 
     def self.create(key)
       return Webhook.new(key) if key.is_a?(UserConfig)
-      Environment.controller_class.webhooks do |hook|
+      Environment.controller_class.webhook_entries do |hook|
         return hook[:account].webhook if key == hook[:digest]
       end
       return nil
@@ -59,7 +59,7 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Environment.controller_class.webhooks do |hook|
+      Environment.controller_class.webhook_entries do |hook|
         yield Webhook.create(hook[:digest])
       end
     end

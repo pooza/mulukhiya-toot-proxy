@@ -31,5 +31,9 @@ module Mulukhiya
     def self.events
       return Config.instance['/dolphin/events'].map(&:to_sym)
     end
+
+    def self.webhook_entries
+      return enum_for(__method__) unless block_given?
+    end
   end
 end

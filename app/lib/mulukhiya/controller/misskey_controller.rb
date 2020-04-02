@@ -119,7 +119,7 @@ module Mulukhiya
       return Config.instance['/misskey/events'].map(&:to_sym)
     end
 
-    def self.webhooks
+    def self.webhook_entries
       return enum_for(__method__) unless block_given?
       config = Config.instance
       Misskey::AccessToken.all do |token|

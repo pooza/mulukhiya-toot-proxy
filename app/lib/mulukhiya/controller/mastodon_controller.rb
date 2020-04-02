@@ -140,7 +140,7 @@ module Mulukhiya
       return Config.instance['/mastodon/events'].map(&:to_sym)
     end
 
-    def self.webhooks
+    def self.webhook_entries
       return enum_for(__method__) unless block_given?
       config = Config.instance
       Postgres.instance.execute('webhook_tokens').each do |row|
