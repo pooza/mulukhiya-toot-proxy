@@ -116,10 +116,9 @@ module Mulukhiya
         appSecret: oauth_client['secret'],
         token: token,
       }
-      return @http.post(
-        create_uri('/api/auth/session/userkey'),
-        {body: body.to_json},
-      )
+      return @http.post(create_uri('/api/auth/session/userkey'), {
+        body: body.to_json,
+      })
     end
 
     def fetch_note(id)
