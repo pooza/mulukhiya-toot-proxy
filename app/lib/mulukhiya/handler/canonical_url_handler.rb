@@ -20,9 +20,7 @@ module Mulukhiya
 
     def rewritable?(uri)
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
-      return false unless uri.path.present?
-      return false if uri.path == '/'
-      return false if uri.query_values.present?
+      return false if ignore?(uri)
       response = @http.get(uri)
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
@@ -34,6 +32,15 @@ module Mulukhiya
       return true
     rescue => e
       @logger.error(e)
+      return false
+    end
+
+    def ignore?(uri)
+      return true unless uri.path.present?
+      return true if uri.path == '/'
+      return true if uri.query_values.present?
+      return true if AmazonURI.parse(uri.to_s).valid?
+      return true if ItunesURI.parse(uri.to_s).valid?
       return false
     end
   end

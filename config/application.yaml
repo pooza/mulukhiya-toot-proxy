@@ -1,5 +1,5 @@
 package:
-  version: 3.5.11
+  version: 3.5.12
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -84,6 +84,7 @@ test:
     - name: webhook
       cases:
         - webhook
+        - webhook_image_handler
 webui:
   scripts:
     - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
@@ -206,7 +207,7 @@ mastodon:
   hashtag: *root_hashtag
   acct: *root_acct
 misskey:
-  url: https://mis.example.com/
+  url: https://misskey.example.com/
   handlers:
     pre_toot:
       - user_config_command
@@ -235,6 +236,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -285,7 +287,7 @@ misskey:
   hashtag: *root_hashtag
   acct: *root_acct
 dolphin:
-  url: https://dol.example.com/
+  url: https://dolphin.example.com/
   handlers:
     pre_toot:
       - user_config_command

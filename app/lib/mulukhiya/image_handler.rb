@@ -1,18 +1,18 @@
 module Mulukhiya
   class ImageHandler < Handler
     def disable?
-      return !Environment.mastodon? || super
+      return super || Environment.dolphin?
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
-      body['media_ids'] ||= []
-      return body if body['media_ids'].present?
+      return body if body[attachment_key].present?
       parser.uris.each do |uri|
         next unless updatable?(uri)
         next unless image = create_image_uri(uri)
-        body['media_ids'].push(sns.upload_remote_resource(image))
+        body[attachment_key] ||= []
+        body[attachment_key].push(sns.upload_remote_resource(image))
         @result.push(source_url: uri.to_s, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e

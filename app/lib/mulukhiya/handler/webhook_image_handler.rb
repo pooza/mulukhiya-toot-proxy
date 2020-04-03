@@ -1,13 +1,17 @@
 module Mulukhiya
   class WebhookImageHandler < Handler
+    def disable?
+      return super || sns.account.webhook.nil?
+    end
+
     def handle_pre_webhook(body, params = {})
       return unless body['attachments'].is_a?(Array)
-      body['media_ids'] ||= []
-      return if body['media_ids'].present?
+      return if body[attachment_key].present?
       body['attachments'].each do |attachment|
         uri = Ginseng::URI.parse(attachment['image_url'])
         next unless uri&.absolute?
-        body['media_ids'].push(sns.upload_remote_resource(uri))
+        body[attachment_key] ||= []
+        body[attachment_key].push(sns.upload_remote_resource(uri))
         @result.push(source_url: uri.to_s)
         break
       rescue => e

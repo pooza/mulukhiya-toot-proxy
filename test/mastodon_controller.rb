@@ -93,7 +93,7 @@ module Mulukhiya
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {status_field => '#nowplaying https://music.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['tags'].map {|v| v['name']}
       assert(tags.member?('日本語のタグ'))

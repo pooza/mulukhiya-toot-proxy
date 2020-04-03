@@ -61,7 +61,8 @@ module Mulukhiya
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       body = {force: 'true', i: @token}
-      return @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
+      response = @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
+      return JSON.parse(response.body)['id']
     end
 
     def upload_remote_resource(uri)
