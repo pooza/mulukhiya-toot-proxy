@@ -95,6 +95,10 @@ module Mulukhiya
       assert(last_response.ok?)
 
       header 'Content-Type', 'application/json'
+      post hook.uri.path, {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
+      assert(last_response.ok?)
+
+      header 'Content-Type', 'application/json'
       post hook.uri.path, {}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
