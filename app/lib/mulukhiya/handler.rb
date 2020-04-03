@@ -131,6 +131,7 @@ module Mulukhiya
     def self.exec_all(event, body, params = {})
       params[:event] = event
       params[:results] ||= ResultContainer.new
+      logger = Logger.new
       all(event, params) do |handler|
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
@@ -139,9 +140,9 @@ module Mulukhiya
         params[:results].push(handler.result)
         break if handler.prepared?
       rescue Timeout::Error => e
-        Logger.new.error(e)
+        logger.error(class: handler.class.name, message: e.message, sec: handler.timeout)
       rescue RestClient::Exception, HTTParty::Error => e
-        raise Ginseng::GatewayError, e.message, e.backtrace
+        logger.error(e)
       end
       return params[:results]
     end

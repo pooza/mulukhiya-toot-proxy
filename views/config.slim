@@ -156,7 +156,6 @@ html lang='ja'
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
-                this.webhook_url = null
               })
           },
         },

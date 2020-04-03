@@ -87,13 +87,14 @@ module Mulukhiya
 
     def oauth_client
       unless File.exist?(oauth_client_path)
-        body = {
-          name: Package.name,
-          description: @config['/package/description'],
-          permission: @config['/misskey/oauth/permission'],
-          callbackUrl: create_uri(@config['/misskey/oauth/callback_url']).to_s,
-        }
-        r = @http.post(create_uri('/api/app/create'), {body: body.to_json})
+        r = @http.post(create_uri('/api/app/create'), {
+          body: {
+            name: Package.name,
+            description: @config['/package/description'],
+            permission: @config['/misskey/oauth/permission'],
+            callbackUrl: create_uri(@config['/misskey/oauth/callback_url']).to_s,
+          }.to_json,
+        })
         File.write(oauth_client_path, r.parsed_response.to_json)
       end
       return JSON.parse(File.read(oauth_client_path))
@@ -114,12 +115,11 @@ module Mulukhiya
     end
 
     def auth(token)
-      body = {
-        appSecret: oauth_client['secret'],
-        token: token,
-      }
       return @http.post(create_uri('/api/auth/session/userkey'), {
-        body: body.to_json,
+        body: {
+          appSecret: oauth_client['secret'],
+          token: token,
+        }.to_json,
       })
     end
 

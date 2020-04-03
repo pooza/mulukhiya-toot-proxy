@@ -19,12 +19,12 @@ module Mulukhiya
     end
 
     def to_json(opts = nil)
-      @json ||= JSON.pretty_generate({
+      @json ||= JSON.pretty_generate(
         sns: @sns.uri.to_s,
         token: @sns.token,
         visibility: visibility,
         hook: uri.to_s,
-      })
+      )
       return @json
     end
 
