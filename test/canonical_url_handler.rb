@@ -30,6 +30,14 @@ module Mulukhiya
       assert_nil(@handler.result)
 
       @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://itunes.apple.com/jp/album/1369123162?i=1369123174')
+      assert_nil(@handler.result)
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://www.amazon.co.jp/dp/B00QIUDCXS')
+      assert_nil(@handler.result)
+
+      @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.apple.com/jp/apple-music/')
       assert_equal(@handler.result[:entries].first[:rewrited_url], 'https://www.apple.com/jp/apple-music/')
     end
