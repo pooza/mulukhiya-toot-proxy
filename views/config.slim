@@ -100,20 +100,16 @@ html lang='ja'
           },
           updateGrowi: function () {
             'use strict'
-            const values = {
-              status: {
-                command: 'user_config',
-                growi: {url: null, token: null},
-              },
-              token: localStorage.getItem('mulukhiya_token'),
-            }
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', growi: {url: null, token: null}}
             if (this.growi_url) {
-              values.status.growi.url = this.growi_url
+              command.growi.url = this.growi_url
             }
             if (this.growi_token) {
-              values.status.growi.token = this.growi_token
+              command.growi.token = this.growi_token
             }
-            values.status = JSON.stringify(values.status)
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
@@ -127,17 +123,13 @@ html lang='ja'
           },
           updateDropbox: function () {
             'use strict'
-            const values = {
-              status: {
-                command: 'user_config',
-                dropbox: {token: null},
-              },
-              token: localStorage.getItem('mulukhiya_token'),
-            }
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', dropbox: {token: null}}
             if (this.dropbox_token) {
-              values.status.dropbox.token = this.dropbox_token
+              command.dropbox.token = this.dropbox_token
             }
-            values.status = JSON.stringify(values.status)
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
