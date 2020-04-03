@@ -36,13 +36,14 @@ module Mulukhiya
 
     def oauth_client
       unless File.exist?(oauth_client_path)
-        body = {
-          client_name: Package.name,
-          website: @config['/package/url'],
-          redirect_uris: @config['/mastodon/oauth/redirect_uri'],
-          scopes: @config['/mastodon/oauth/scopes'].join(' '),
-        }
-        r = @http.post(create_uri('/api/v1/apps'), {body: body.to_json})
+        r = @http.post(create_uri('/api/v1/apps'), {
+          body: {
+            client_name: Package.name,
+            website: @config['/package/url'],
+            redirect_uris: @config['/mastodon/oauth/redirect_uri'],
+            scopes: @config['/mastodon/oauth/scopes'].join(' '),
+          }.to_json,
+        })
         File.write(oauth_client_path, r.parsed_response.to_json)
       end
       return JSON.parse(File.read(oauth_client_path))
