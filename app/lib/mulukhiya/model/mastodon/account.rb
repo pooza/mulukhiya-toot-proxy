@@ -83,7 +83,6 @@ module Mulukhiya
 
       def disable?(handler_name)
         return true if config["/handler/#{handler_name}/disable"]
-        return true if config['/handler/default/disable']
         return false
       end
 
