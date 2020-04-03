@@ -28,7 +28,7 @@ module Mulukhiya
       return @json
     end
 
-    def toot(status)
+    def post(status)
       status = {text: status} if status.is_a?(String)
       body = {
         Environment.controller_class.status_field => status[:text],
@@ -36,10 +36,14 @@ module Mulukhiya
         'attachments' => status[:attachments] || [],
       }
       Handler.exec_all(:pre_webhook, body, {results: results, sns: @sns})
-      results.response = @sns.toot(body)
+      results.response = @sns.post(body)
       Handler.exec_all(:post_webhook, body, {results: results, sns: @sns})
       return results
     end
+
+    alias toot post
+
+    alias note post
 
     def self.create_digest(uri, token)
       return Digest::SHA1.hexdigest({

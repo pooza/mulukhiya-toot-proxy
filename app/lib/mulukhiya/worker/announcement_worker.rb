@@ -13,7 +13,7 @@ module Mulukhiya
       return unless executable?
       entries.each do |entry|
         next if cache.member?(entry['id'])
-        service.toot(
+        service.post(
           Environment.controller_class.status_field => create_body(entry, :sanitized),
           'visibility' => Environment.controller_class.visibility_name('unlisted'),
         )

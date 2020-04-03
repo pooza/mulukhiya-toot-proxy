@@ -31,11 +31,12 @@ html lang='ja'
         .field-update-button-container
           button v-on:click='updateDropbox' 更新
       section
-        h3 Webhook
-        .field-container v-if='access_token'
-          h4 アクセストークン
-          textarea id='token_text' class='short' = '{{access_token}}'
-          i class='fas fa-clipboard' v-on:click='copyToken'
+        h3 Slack互換webhook
+        .inline-field-container
+          h4 トークン
+          input id='webhook_token_text' placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+        .field-update-button-container
+          button v-on:click='updateWebhook' 更新
         .field-container v-if='webhook_url'
           h4 URL
           textarea id='webhook_text' = '{{webhook_url}}'
@@ -63,7 +64,7 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
                 if (e.data.config.webhook) {
-                  this.access_token = e.data.config.webhook.token
+                  this.webhook_token = e.data.config.webhook.token
                   this.webhook_url = e.data.config.webhook.url
                   this.curl_sample = `curl -H 'Content-Type: application/json' -X POST -d '{"text":"わたしが斬るのは、あなたじゃない！\\n絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。\\nそれがわたし。王女様からもらった名前、キュアソードよ！"}' ${e.data.config.webhook.url}`
                 }
@@ -83,11 +84,6 @@ html lang='ja'
           }
         },
         methods: {
-          copyToken: function () {
-            'use strict'
-            document.getElementById('token_text').select()
-            document.execCommand('copy')
-          },
           copyWehbook: function () {
             'use strict'
             document.getElementById('webhook_text').select()
@@ -100,20 +96,16 @@ html lang='ja'
           },
           updateGrowi: function () {
             'use strict'
-            const values = {
-              status: {
-                command: 'user_config',
-                growi: {url: null, token: null},
-              },
-              token: localStorage.getItem('mulukhiya_token'),
-            }
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', growi: {url: null, token: null}}
             if (this.growi_url) {
-              values.status.growi.url = this.growi_url
+              command.growi.url = this.growi_url
             }
             if (this.growi_token) {
-              values.status.growi.token = this.growi_token
+              command.growi.token = this.growi_token
             }
-            values.status = JSON.stringify(values.status)
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
@@ -127,17 +119,13 @@ html lang='ja'
           },
           updateDropbox: function () {
             'use strict'
-            const values = {
-              status: {
-                command: 'user_config',
-                dropbox: {token: null},
-              },
-              token: localStorage.getItem('mulukhiya_token'),
-            }
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', dropbox: {token: null}}
             if (this.dropbox_token) {
-              values.status.dropbox.token = this.dropbox_token
+              command.dropbox.token = this.dropbox_token
             }
-            values.status = JSON.stringify(values.status)
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/config', values)
               .then(e => {
@@ -147,6 +135,28 @@ html lang='ja'
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
+              })
+          },
+          updateWebhook: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', webhook: {token: null}}
+            if (this.webhook_token) {
+              command.webhook.token = this.webhook_token
+            }
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/config', values)
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.result = jsyaml.safeDump(e.data.config)
+                this.message = null
+                this.webhook_url = e.data.config.webhook.url
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = e.response.data.error || e.message
+                this.webhook_url = null
               })
           },
         },

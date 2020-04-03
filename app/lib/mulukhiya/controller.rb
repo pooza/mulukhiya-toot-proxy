@@ -19,7 +19,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = errors
       elsif webhook = Webhook.create(params[:digest])
-        results = webhook.toot(params)
+        results = webhook.post(params)
         @renderer.message = results.response.parsed_response
         @renderer.status = results.response.code
       else

@@ -1,9 +1,5 @@
 module Mulukhiya
   class WebhookTest < TestCase
-    def setup
-      @account = Environment.test_account
-    end
-
     def test_all
       Webhook.all do |hook|
         assert_kind_of(Webhook, hook)
@@ -12,7 +8,7 @@ module Mulukhiya
 
     def test_create
       Webhook.all do |hook|
-        assert_not_nil(Webhook.create(hook.digest))
+        assert_kind_of(Webhook, Webhook.create(hook.digest))
       end
     end
 
@@ -36,7 +32,7 @@ module Mulukhiya
 
     def test_to_json
       Webhook.all do |hook|
-        assert(hook.to_json.present?)
+        assert_kind_of(Hash, JSON.parse(hook.to_json))
       end
     end
   end

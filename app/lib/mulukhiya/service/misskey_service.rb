@@ -44,6 +44,8 @@ module Mulukhiya
 
     alias toot note
 
+    alias post note
+
     def favourite(id, params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
