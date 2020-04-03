@@ -30,7 +30,7 @@ module Mulukhiya
       assert_nil(@handler.result)
 
       @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://itunes.apple.com/jp/album/1369123162?i=1369123174')
+      @handler.handle_pre_toot(status_field => 'https://music.apple.com/jp/album/1369123162?i=1369123174')
       assert_nil(@handler.result)
 
       @handler.clear

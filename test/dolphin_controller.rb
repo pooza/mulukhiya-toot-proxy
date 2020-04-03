@@ -66,7 +66,7 @@ module Mulukhiya
     def test_toot_response
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Content-Type', 'application/json'
-      post '/api/notes/create', {status_field => '#nowplaying https://itunes.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'i' => @config['/agent/test/token']}.to_json
+      post '/api/notes/create', {status_field => '#nowplaying https://music.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'i' => @config['/agent/test/token']}.to_json
       assert(last_response.ok?)
       tags = JSON.parse(last_response.body)['createdNote']['tags']
       assert(tags.member?('日本語のタグ'))
