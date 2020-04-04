@@ -16,7 +16,7 @@ html lang='ja'
           textarea id='token_text' class='short' = params[:result][:access_token]
           i class='fas fa-clipboard' v-on:click='copyToken'
         div
-          h3 Webhook URL
+          h3 Slack互換webhook URL
           textarea id='webhook_text' = params[:hook_url]
           i class='fas fa-clipboard' v-on:click='copyWehbook'
       - else
