@@ -62,6 +62,7 @@ module Mulukhiya
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       body = {force: 'true', i: @token}
       response = @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
+      return response if params[:response] == :raw
       return JSON.parse(response.body)['id']
     end
 
