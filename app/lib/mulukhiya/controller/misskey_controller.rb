@@ -27,7 +27,7 @@ module Mulukhiya
 
     post '/api/drive/files/create' do
       Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
-      @results.response = @sns.upload(params[:file][:tempfile].path)
+      @results.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
       notify(@results.response.parsed_response) if response_error?
       Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
       @renderer.message = JSON.parse(@results.response.body)
