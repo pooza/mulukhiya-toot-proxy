@@ -15,10 +15,10 @@ module Mulukhiya
       return nil if tracks.nil?
       return tracks.first
     rescue => e
-      @logger.info(e)
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      cnt += 1
       raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
       sleep(1)
-      cnt += 1
       retry
     end
 
@@ -26,10 +26,10 @@ module Mulukhiya
       cnt ||= 0
       return RSpotify::Track.find(id)
     rescue => e
-      @logger.info(e)
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      cnt += 1
       raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
       sleep(1)
-      cnt += 1
       retry
     end
 

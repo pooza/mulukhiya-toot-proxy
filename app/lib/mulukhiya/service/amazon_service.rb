@@ -30,11 +30,13 @@ module Mulukhiya
       categories.each do |category|
         response = @vacuum.search_items(keywords: keyword, search_index: category)
         raise response.status.to_s unless response.status == 200
-        return JSON.parse(response.to_s)['SearchResult']['Items'].first['ASIN']
+        items = JSON.parse(response.to_s)['SearchResult']['Items']
+        next unless items.present?
+        return items.first['ASIN']
       end
       return nil
     rescue => e
-      @logger.info(e)
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
       cnt += 1
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
       sleep(1)
@@ -47,7 +49,7 @@ module Mulukhiya
       raise response.status.to_s unless response.status == 200
       return JSON.parse(response.to_s)['ItemsResult']['Items'].first
     rescue => e
-      @logger.info(e)
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
       cnt += 1
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
       sleep(1)

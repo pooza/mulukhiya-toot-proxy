@@ -1,14 +1,11 @@
 module Mulukhiya
   module Misskey
     class Status < Sequel::Model(:note)
+      many_to_one :account, key: :userId
+
       def logger
         @logger ||= Logger.new
         return @logger
-      end
-
-      def account
-        @account ||= Account[userId]
-        return @account
       end
 
       def local?
