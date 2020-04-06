@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def handle_toot(body, params = {})
-      params[:results] ||= ResultContainer.new
+      params[:reporter] ||= Reporter.new
       params[:sns] ||= Environment.sns_class.new
       @sns = params[:sns]
       handle_pre_toot(body, params)

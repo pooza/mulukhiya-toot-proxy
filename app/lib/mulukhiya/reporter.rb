@@ -1,5 +1,5 @@
 module Mulukhiya
-  class ResultContainer < Array
+  class Reporter < Array
     attr_accessor :response
     attr_accessor :parser
     attr_accessor :account

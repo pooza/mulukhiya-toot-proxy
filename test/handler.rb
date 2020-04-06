@@ -23,9 +23,9 @@ module Mulukhiya
         {status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,
       )
-      assert(params[:results].tags.member?('宮本佳那子'))
-      assert(params[:results].tags.member?('福山沙織'))
-      assert(params[:results].tags.member?('井上由貴'))
+      assert(params[:reporter].tags.member?('宮本佳那子'))
+      assert(params[:reporter].tags.member?('福山沙織'))
+      assert(params[:reporter].tags.member?('井上由貴'))
     end
   end
 end

@@ -3,7 +3,7 @@ require 'digest/sha1'
 module Mulukhiya
   class Webhook
     attr_reader :sns
-    attr_reader :results
+    attr_reader :reporter
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)
@@ -35,10 +35,10 @@ module Mulukhiya
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {results: results, sns: @sns})
-      results.response = @sns.post(body)
-      Handler.exec_all(:post_webhook, body, {results: results, sns: @sns})
-      return results
+      Handler.exec_all(:pre_webhook, body, {reporter: reporter, sns: @sns})
+      reporter.response = @sns.post(body)
+      Handler.exec_all(:post_webhook, body, {reporter: reporter, sns: @sns})
+      return reporter
     end
 
     alias toot post
@@ -73,7 +73,7 @@ module Mulukhiya
     def initialize(userconfig)
       @config = Config.instance
       @userconfig = userconfig
-      @results = ResultContainer.new
+      @reporter = Reporter.new
       @sns = Environment.sns_class.new
       @sns.token = @userconfig.webhook_token
       @logger = Logger.new

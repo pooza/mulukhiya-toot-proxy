@@ -9,6 +9,7 @@ module Mulukhiya
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(url: uri.to_s))
       end
+      parser.body = body[status_field]
       return body
     end
 

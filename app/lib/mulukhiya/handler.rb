@@ -4,7 +4,7 @@ require 'rest-client'
 
 module Mulukhiya
   class Handler
-    attr_reader :results
+    attr_reader :reporter
     attr_reader :event
     attr_reader :sns
 
@@ -62,9 +62,9 @@ module Mulukhiya
       @status = nil
       @parser = nil
       @prepared = false
-      @results.clear
-      @results.tags.clear
-      @results.parser = nil
+      @reporter.clear
+      @reporter.tags.clear
+      @reporter.parser = nil
     end
 
     def timeout
@@ -90,14 +90,14 @@ module Mulukhiya
 
     def parser
       unless @parser
-        @parser = @results.parser || Environment.parser_class.new(@status)
-        @results.parser = @parser
+        @parser = @reporter.parser || Environment.parser_class.new(@status)
+        @reporter.parser = @parser
       end
       return @parser
     end
 
     def tags
-      return @results.tags
+      return @reporter.tags
     end
 
     def status_field
@@ -130,21 +130,21 @@ module Mulukhiya
 
     def self.exec_all(event, body, params = {})
       params[:event] = event
-      params[:results] ||= ResultContainer.new
+      params[:reporter] ||= Reporter.new
       logger = Logger.new
       all(event, params) do |handler|
         next if handler.disable?
         Timeout.timeout(handler.timeout) do
           handler.send("handle_#{event}".to_sym, body, params)
         end
-        params[:results].push(handler.result)
+        params[:reporter].push(handler.result)
         break if handler.prepared?
       rescue Timeout::Error => e
         logger.error(handler: underscore_name, message: e.message, timeout: handler.timeout)
       rescue RestClient::Exception, HTTParty::Error => e
         logger.error(e)
       end
-      return params[:results]
+      return params[:reporter]
     end
 
     private
@@ -154,7 +154,7 @@ module Mulukhiya
       @logger = Logger.new
       @result = []
       @sns = params[:sns] || Environment.sns_class.new
-      @results = params[:results] || ResultContainer.new
+      @reporter = params[:reporter] || Reporter.new
       @prepared = false
       @event = params[:event] || 'unknown'
     end

@@ -7,18 +7,18 @@ module Mulukhiya
       elsif @headers['Authorization']
         @sns.token = @headers['Authorization'].split(/\s+/).last
       end
-      @results.account = @sns.account
+      @reporter.account = @sns.account
     end
 
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
-      Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns})
-      @results.response = @sns.toot(params)
-      notify(@results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {results: @results, sns: @sns})
-      @renderer.message = @results.response.parsed_response
+      Handler.exec_all(:pre_toot, params, {reporter: @reporter, sns: @sns})
+      @reporter.response = @sns.toot(params)
+      notify(@reporter.response.parsed_response) if response_error?
+      Handler.exec_all(:post_toot, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
-      @renderer.status = @results.response.code
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
@@ -28,11 +28,11 @@ module Mulukhiya
     end
 
     post %r{/api/v[0-9]+/media} do
-      Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
-      @results.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
-      Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
-      @renderer.message = JSON.parse(@results.response.body)
-      @renderer.status = @results.response.code
+      Handler.exec_all(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      @reporter.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
+      Handler.exec_all(:post_upload, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = JSON.parse(@reporter.response.body)
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
@@ -42,36 +42,36 @@ module Mulukhiya
     end
 
     post '/api/v1/statuses/:id/favourite' do
-      @results.response = @sns.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {results: @results, sns: @sns})
-      @renderer.message = @results.response.parsed_response
-      @renderer.status = @results.response.code
+      @reporter.response = @sns.fav(params[:id])
+      Handler.exec_all(:post_fav, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/reblog' do
-      @results.response = @sns.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {results: @results, sns: @sns})
-      @renderer.message = @results.response.parsed_response
-      @renderer.status = @results.response.code
+      @reporter.response = @sns.boost(params[:id])
+      Handler.exec_all(:post_boost, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
     post '/api/v1/statuses/:id/bookmark' do
-      @results.response = @sns.bookmark(params[:id])
-      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @sns})
-      @renderer.message = @results.response.parsed_response
-      @renderer.status = @results.response.code
+      @reporter.response = @sns.bookmark(params[:id])
+      Handler.exec_all(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
     get '/api/v2/search' do
       params[:limit] = @config['/mastodon/search/limit']
-      @results.response = @sns.search(params[:q], params)
-      @message = @results.response.parsed_response.with_indifferent_access
-      Handler.exec_all(:post_search, params, {results: @results, message: @message})
+      @reporter.response = @sns.search(params[:q], params)
+      @message = @reporter.response.parsed_response.with_indifferent_access
+      Handler.exec_all(:post_search, params, {reporter: @reporter, message: @message})
       @renderer.message = @message
-      @renderer.status = @results.response.code
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
