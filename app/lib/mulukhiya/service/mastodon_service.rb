@@ -17,6 +17,15 @@ module Mulukhiya
 
     alias post toot
 
+    def upload(path, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      response = @http.upload(create_uri('/api/v2/media'), path, headers)
+      return response if params[:response] == :raw
+      return JSON.parse(response.body)['id'].to_i
+    end
+
     def search(keyword, params = {})
       params[:limit] ||= @config['/mastodon/search/limit']
       return super(keyword, params)
