@@ -4,22 +4,22 @@ module Mulukhiya
   class TootParser < StatusParser
     def accts
       return enum_for(__method__) unless block_given?
-      body.scan(TootParser.acct_pattern).map(&:first).each do |acct|
+      text.scan(TootParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
     end
 
     def to_md
-      html = Nokogiri::HTML.parse(body, nil, 'utf-8')
-      tmp_body = body.clone
+      html = Nokogiri::HTML.parse(text, nil, 'utf-8')
+      md = text.clone
       ['.u-url', '.hashtag'].each do |style_class|
         html.css(style_class).each do |link|
-          tmp_body.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
+          md.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
         rescue => e
           @logger.error(Ginseng::Error.create(e).to_h.merge(link: link.to_s))
         end
       end
-      return StatusParser.sanitize(tmp_body)
+      return StatusParser.sanitize(md)
     end
 
     def max_length

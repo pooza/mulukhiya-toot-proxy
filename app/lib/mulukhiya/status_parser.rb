@@ -2,40 +2,40 @@ require 'sanitize'
 
 module Mulukhiya
   class StatusParser
-    attr_reader :body
+    attr_reader :text
     attr_accessor :account
 
-    def initialize(body = '')
-      self.body = body
+    def initialize(text = '')
+      self.text = text
       @config = Config.instance
       @logger = Logger.new
       @account = Environment.test_account
     end
 
-    alias to_s body
+    alias to_s text
 
     def accts
       return enum_for(__method__) unless block_given?
-      body.scan(StatusParser.acct_pattern).map(&:first).each do |acct|
+      text.scan(StatusParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
     end
 
     def uris
       return enum_for(__method__) unless block_given?
-      body.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
+      text.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
         yield Ginseng::URI.parse(link)
       end
     end
 
-    def body=(body)
-      @body = body.to_s
+    def text=(text)
+      @text = text.to_s
       @params = nil
       @all_tags = nil
     end
 
     def length
-      return body.length
+      return text.length
     end
 
     alias size length
@@ -46,8 +46,8 @@ module Mulukhiya
 
     def exec
       if @params.nil?
-        @params = YAML.safe_load(body)
-        @params = JSON.parse(body) unless @params&.is_a?(Hash)
+        @params = YAML.safe_load(text)
+        @params = JSON.parse(text) unless @params&.is_a?(Hash)
         @params = false unless @params&.is_a?(Hash)
       end
       return @params || nil
@@ -60,7 +60,7 @@ module Mulukhiya
     alias params exec
 
     def hashtags
-      return TagContainer.scan(body)
+      return TagContainer.scan(text)
     end
 
     alias tags hashtags
@@ -83,7 +83,7 @@ module Mulukhiya
     end
 
     def to_sanitized
-      return StatusParser.sanitize(body)
+      return StatusParser.sanitize(text)
     end
 
     def to_md
