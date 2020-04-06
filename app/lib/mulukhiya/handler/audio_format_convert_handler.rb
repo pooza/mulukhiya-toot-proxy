@@ -7,7 +7,7 @@ module Mulukhiya
     def convertable?
       return false unless @source&.audio?
       return false if @source.type == 'audio/mpeg'
-      @logger.info(class: self.class.to_s, type: @source.type)
+      @logger.info(handler: underscore_name, type: @source.type)
       return true
     end
 

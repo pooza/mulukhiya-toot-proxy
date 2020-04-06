@@ -140,7 +140,7 @@ module Mulukhiya
         params[:results].push(handler.result)
         break if handler.prepared?
       rescue Timeout::Error => e
-        logger.error(class: handler.class.name, message: e.message, timeout: handler.timeout)
+        logger.error(handler: underscore_name, message: e.message, timeout: handler.timeout)
       rescue RestClient::Exception, HTTParty::Error => e
         logger.error(e)
       end
