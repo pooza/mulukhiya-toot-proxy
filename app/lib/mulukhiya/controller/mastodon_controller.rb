@@ -27,7 +27,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v1/media' do
+    post %r{/api/v[0-9]+/media} do
       Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
       @results.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
       Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
