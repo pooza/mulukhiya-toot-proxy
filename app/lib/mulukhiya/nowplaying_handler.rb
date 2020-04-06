@@ -16,7 +16,7 @@ module Mulukhiya
         updated = true
         @result.push(keyword)
       end
-      body[status_field] = @lines.join("\n")
+      parser.body = body[status_field] = @lines.join("\n")
       return body
     end
 

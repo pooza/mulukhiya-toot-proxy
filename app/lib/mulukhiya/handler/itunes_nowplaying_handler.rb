@@ -16,8 +16,7 @@ module Mulukhiya
 
     def update(keyword)
       return unless track = @tracks[keyword]
-      return unless uri = ItunesURI.parse(track['trackViewUrl'])
-      push(uri.shorten.to_s)
+      push(track['trackViewUrl'])
     end
   end
 end
