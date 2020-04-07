@@ -1,4 +1,3 @@
-require 'timeout'
 require 'httparty'
 require 'rest-client'
 
@@ -7,6 +6,8 @@ module Mulukhiya
     attr_reader :reporter
     attr_reader :event
     attr_reader :sns
+    attr_reader :errors
+    attr_reader :result
 
     def handle_pre_toot(body, params = {})
       return body
@@ -133,18 +134,19 @@ module Mulukhiya
     def self.exec_all(event, body, params = {})
       params[:event] = event
       params[:reporter] ||= Reporter.new
-      logger = Logger.new
       all(event, params) do |handler|
         next if handler.disable?
-        Timeout.timeout(handler.timeout) do
+        thread = Thread.new do
           handler.send("handle_#{event}".to_sym, body, params)
         end
-        params[:reporter].push(handler.result)
+        unless thread.join(handler.timeout)
+          handler.errors.push(message: 'execution expired', timeout: handler.timeout)
+        end
         break if handler.prepared?
-      rescue Timeout::Error => e
-        logger.error(handler: underscore_name, message: e.message, timeout: handler.timeout)
       rescue RestClient::Exception, HTTParty::Error => e
-        logger.error(e)
+        handler.errors.push(class: e.class.to_s, message: e.message)
+      ensure
+        params[:reporter].push(handler.summary)
       end
       return params[:reporter]
     end
@@ -155,6 +157,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       @result = []
+      @errors = []
       @sns = params[:sns] || Environment.sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @prepared = false
