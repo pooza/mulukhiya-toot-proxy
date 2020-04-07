@@ -38,8 +38,8 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
-    def notifiable?
-      return false
+    def verbose?
+      return true
     end
 
     def notify(message)
@@ -47,18 +47,20 @@ module Mulukhiya
       return Environment.info_agent_service&.notify(sns.account, message)
     end
 
-    def result
+    def summary
       return nil unless @result.present?
       return {
         handler: underscore_name,
         event: @event.to_s,
-        notifiable: notifiable?,
-        entries: @result,
+        verbose: verbose?,
+        result: @result,
+        errors: @errors,
       }
     end
 
     def clear
       @result.clear
+      @errors.clear
       @status = nil
       @parser = nil
       @prepared = false

@@ -14,9 +14,5 @@ module Mulukhiya
     def message
       return sns.account.config.to_h
     end
-
-    def notifiable?
-      return false
-    end
   end
 end

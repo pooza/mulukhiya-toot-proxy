@@ -17,14 +17,14 @@ module Mulukhiya
       return @contract
     end
 
-    def errors
+    def validate
       return contract.call(parser.params).errors.to_h
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body unless parser.command_name == command_name
-      raise Ginseng::ValidateError, errors.values.join if errors.present?
+      raise Ginseng::ValidateError, validate.values.join if validate.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
       body[status_field] = parser.params.to_yaml
       @prepared = true
@@ -42,8 +42,8 @@ module Mulukhiya
 
     def handle_post_webhook(body, params = {}); end
 
-    def notifiable?
-      return true
+    def verbose?
+      return false
     end
 
     def dispatch

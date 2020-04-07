@@ -7,7 +7,7 @@ module Mulukhiya
     def convertable?
       return false unless @source&.image?
       return false if @source.long_side <= pixel
-      @logger.info(handler: underscore_name, width: @source.width, height: @source.height)
+      @result.push(width: @source.width, height: @source.height)
       return true
     end
 

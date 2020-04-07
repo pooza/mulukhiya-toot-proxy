@@ -27,9 +27,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post %r{/api/v[0-9]+/media} do
+    post %r{/api/v([12])+/media} do
       Handler.exec_all(:pre_upload, params, {reporter: @reporter, sns: @sns})
-      @reporter.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
+      @reporter.response = @sns.upload(params[:file][:tempfile].path, {
+        response: :raw,
+        version: params['captures'].first.to_i,
+      })
       Handler.exec_all(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code

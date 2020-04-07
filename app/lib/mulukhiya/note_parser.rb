@@ -35,17 +35,17 @@ module Mulukhiya
     end
 
     def max_length
-      length = @config['/dolphin/note/max_length']
+      length = @config['/misskey/note/max_length']
       length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
     end
 
     def self.hashtag_pattern
-      return Regexp.new(Config.instance['/dolphin/hashtag/pattern'], Regexp::IGNORECASE)
+      return Regexp.new(Config.instance['/misskey/hashtag/pattern'], Regexp::IGNORECASE)
     end
 
     def self.acct_pattern
-      return Regexp.new(Config.instance['/dolphin/acct/pattern'], Regexp::IGNORECASE)
+      return Regexp.new(Config.instance['/misskey/acct/pattern'], Regexp::IGNORECASE)
     end
   end
 end

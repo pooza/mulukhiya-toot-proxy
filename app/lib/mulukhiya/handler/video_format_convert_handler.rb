@@ -7,7 +7,7 @@ module Mulukhiya
     def convertable?
       return false unless @source&.video?
       return false if @source.type == 'video/mp4'
-      @logger.info(handler: underscore_name, type: @source.type)
+      @result.push(type: @source.type)
       return true
     end
 
