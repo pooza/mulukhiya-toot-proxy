@@ -8,7 +8,7 @@ module Mulukhiya
       Environment.controller_class.events.each do |event|
         Handler.all(event) do |handler|
           assert_boolean(handler.disable?)
-          assert_boolean(handler.notifiable?)
+          assert_boolean(handler.verbose?)
         end
       rescue Ginseng::ConfigError
         next
