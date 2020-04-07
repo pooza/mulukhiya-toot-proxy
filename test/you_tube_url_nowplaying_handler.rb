@@ -9,15 +9,15 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com\n"})
-      assert_nil(@handler.result)
+      assert_nil(@handler.summary)
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.result[:entries], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
+      assert_equal(@handler.summary[:result], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying \n\nhttps://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.result[:entries], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
+      assert_equal(@handler.summary[:result], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
     end
   end
 end

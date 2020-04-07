@@ -18,10 +18,11 @@ module Mulukhiya
     alias post toot
 
     def upload(path, params = {})
+      params[:version] ||= 1
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{@token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      response = @http.upload(create_uri('/api/v2/media'), path, headers)
+      response = @http.upload(create_uri("/api/v#{params[:version]}/media"), path, headers)
       return response if params[:response] == :raw
       return JSON.parse(response.body)['id'].to_i
     end

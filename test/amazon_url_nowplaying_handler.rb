@@ -9,11 +9,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/\n")
-      assert_nil(@handler.result)
+      assert_nil(@handler.summary)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n")
-      assert_equal(@handler.result[:entries], ['https://www.amazon.co.jp/dp/B00QIUDCXS']) if @handler.result
+      assert_equal(@handler.summary[:result], ['https://www.amazon.co.jp/dp/B00QIUDCXS']) if @handler.summary
     end
   end
 end

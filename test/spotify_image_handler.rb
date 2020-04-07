@@ -9,11 +9,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.spotify.com/jp/')
-      assert_nil(@handler.result)
+      assert_nil(@handler.summary)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://open.spotify.com/track/7iNq9x3bom8XKfZsJWuWVH')
-      assert(@handler.result[:entries].present?) if @handler.result
+      assert(@handler.summary[:result].present?) if @handler.summary
     end
   end
 end

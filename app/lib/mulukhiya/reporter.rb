@@ -1,5 +1,5 @@
 module Mulukhiya
-  class ResultContainer < Array
+  class Reporter < Array
     attr_accessor :response
     attr_accessor :parser
     attr_accessor :account
@@ -14,20 +14,20 @@ module Mulukhiya
       return @tags
     end
 
-    def push(result)
-      return unless result.present?
-      super(result)
-      @logger.info(result)
+    def push(entry)
+      return unless entry.present?
+      super(entry)
+      @logger.info(entry)
       @dump = nil
     end
 
     def to_h
       unless @dump
         @dump = {}
-        each do |result|
-          next unless result[:notifiable] || @account&.notify_verbose?
-          @dump[result[:event]] ||= {}
-          @dump[result[:event]][result[:handler]] = result[:entries].map do |v|
+        each do |entry|
+          next if entry[:verbose] && !@account&.notify_verbose?
+          @dump[entry[:event]] ||= {}
+          @dump[entry[:event]][entry[:handler]] = entry[:result].map do |v|
             v.is_a?(Hash) ? v.deep_stringify_keys : v
           end
         end

@@ -9,17 +9,17 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_toot(status_field => '')
-      assert_nil(@handler.result)
+      assert_nil(@handler.summary)
       sleep(1)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: growi_clipping\nurl: https://mstdn.b-shock.org/web/statuses/101125535795976504")
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
       sleep(1)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: growi_clipping\nurl: https://precure.ml/@pooza/101276312982799462")
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
       sleep(1)
     end
   end

@@ -4,7 +4,7 @@ module Mulukhiya
     set :root, Environment.dir
 
     before do
-      @results = ResultContainer.new
+      @reporter = Reporter.new
     end
 
     get '/mulukhiya' do
@@ -19,9 +19,9 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = errors
       elsif webhook = Webhook.create(params[:digest])
-        results = webhook.post(params)
-        @renderer.message = results.response.parsed_response
-        @renderer.status = results.response.code
+        reporter = webhook.post(params)
+        @renderer.message = reporter.response.parsed_response
+        @renderer.status = reporter.response.code
       else
         @renderer.status = 404
       end
@@ -103,7 +103,7 @@ module Mulukhiya
     end
 
     def response_error?
-      return 400 <= @results.response&.code
+      return 400 <= @reporter.response&.code
     end
 
     def notify(message)

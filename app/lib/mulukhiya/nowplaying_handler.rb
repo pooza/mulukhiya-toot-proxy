@@ -16,7 +16,7 @@ module Mulukhiya
         updated = true
         @result.push(keyword)
       end
-      parser.body = body[status_field] = @lines.join("\n")
+      parser.text = body[status_field] = @lines.join("\n")
       return body
     end
 
@@ -28,8 +28,8 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def notifiable?
-      return true
+    def verbose?
+      return false
     end
 
     private

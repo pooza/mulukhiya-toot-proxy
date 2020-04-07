@@ -7,16 +7,16 @@ module Mulukhiya
       elsif params[:i]
         @sns.token = params[:i]
       end
-      @results.account = @sns.account
+      @reporter.account = @sns.account
     end
 
     post '/api/notes/create' do
-      Handler.exec_all(:pre_toot, params, {results: @results, sns: @sns}) unless renote?
-      @results.response = @sns.note(params)
-      notify(@results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {results: @results, sns: @sns}) unless renote?
-      @renderer.message = @results.response.parsed_response
-      @renderer.status = @results.response.code
+      Handler.exec_all(:pre_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      @reporter.response = @sns.note(params)
+      notify(@reporter.response.parsed_response) if response_error?
+      Handler.exec_all(:post_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
@@ -26,12 +26,12 @@ module Mulukhiya
     end
 
     post '/api/drive/files/create' do
-      Handler.exec_all(:pre_upload, params, {results: @results, sns: @sns})
-      @results.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
-      notify(@results.response.parsed_response) if response_error?
-      Handler.exec_all(:post_upload, params, {results: @results, sns: @sns})
-      @renderer.message = JSON.parse(@results.response.body)
-      @renderer.status = @results.response.code
+      Handler.exec_all(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      @reporter.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
+      notify(@reporter.response.parsed_response) if response_error?
+      Handler.exec_all(:post_upload, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = JSON.parse(@reporter.response.body)
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
@@ -41,10 +41,10 @@ module Mulukhiya
     end
 
     post '/api/notes/favorites/create' do
-      @results.response = @sns.fav(params[:noteId])
-      Handler.exec_all(:post_bookmark, params, {results: @results, sns: @sns})
-      @renderer.message = @results.response.parsed_response || {}
-      @renderer.status = @results.response.code
+      @reporter.response = @sns.fav(params[:noteId])
+      Handler.exec_all(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response || {}
+      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
