@@ -25,7 +25,7 @@ module Mulukhiya
       unless @dump
         @dump = {}
         each do |entry|
-          next unless entry[:verbose] && @account&.notify_verbose?
+          next if entry[:verbose] && !@account&.notify_verbose?
           @dump[entry[:event]] ||= {}
           @dump[entry[:event]][entry[:handler]] = entry[:result].map do |v|
             v.is_a?(Hash) ? v.deep_stringify_keys : v

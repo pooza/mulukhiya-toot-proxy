@@ -17,23 +17,23 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_toot(status_field => '')
-      assert_nil(@handler.result)
+      assert_nil(@handler.summary)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: user_config\n#{@key}: 1")
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: user_config\n#{@key}: null")
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
 
       @handler.clear
       @handler.handle_toot(status_field => %({"command": "user_config", "#{@key}": 2}))
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
 
       @handler.clear
       @handler.handle_toot(status_field => %({"command": "user_config", "#{@key}": null}))
-      assert(@handler.result[:entries].present?)
+      assert(@handler.summary[:result].present?)
     end
   end
 end

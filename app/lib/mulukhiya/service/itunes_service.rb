@@ -8,8 +8,8 @@ module Mulukhiya
     def search(keyword, category)
       response = JSON.parse(@http.get(create_search_uri(keyword, category)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
-      return nil unless response['reporter'].present?
-      return response['reporter'].first
+      return nil unless response['results'].present?
+      return response['results'].first
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
     rescue => e
@@ -19,8 +19,8 @@ module Mulukhiya
     def lookup(id)
       response = JSON.parse(@http.get(create_lookup_uri(id)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
-      return nil unless response['reporter'].present?
-      return response['reporter'].first
+      return nil unless response['results'].present?
+      return response['results'].first
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "Item '#{id}' not found", e.backtrace
     rescue => e
