@@ -7,7 +7,6 @@ module Mulukhiya
     def convertable?
       return false unless @source&.audio?
       return false if @source.type == 'audio/mpeg'
-      @result.push(type: @source.type)
       return true
     end
 
