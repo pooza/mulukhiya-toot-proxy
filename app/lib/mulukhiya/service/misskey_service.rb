@@ -115,7 +115,7 @@ module Mulukhiya
       r = @http.post('/api/auth/session/generate', {
         body: {
           appSecret: oauth_client['secret'],
-        }.to_json
+        }.to_json,
       })
       return Ginseng::URI.parse(r.parsed_response['url'])
     end
@@ -133,6 +133,10 @@ module Mulukhiya
       response = @http.get("/mulukhiya/note/#{id}")
       raise response.parsed_response['message'] unless response.code == 200
       return response.parsed_response
+    end
+
+    def create_uri(href)
+      return @http.create_uri(href)
     end
 
     def notify(account, message)

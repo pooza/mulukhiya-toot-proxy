@@ -45,6 +45,10 @@ module Mulukhiya
       @account = nil
     end
 
+    def create_uri(href)
+      return @http.create_uri(href)
+    end
+
     def oauth_client
       unless File.exist?(oauth_client_path)
         r = @http.post('/api/v1/apps', {
