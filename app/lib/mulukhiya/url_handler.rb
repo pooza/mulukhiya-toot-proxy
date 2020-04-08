@@ -5,7 +5,7 @@ module Mulukhiya
       return body if parser.command?
       parser.uris do |uri|
         next unless rewritable?(uri)
-        @result.push(source_url: uri.to_s, rewrited_url: rewrite(uri).to_s)
+        result.push(source_url: uri.to_s, rewrited_url: rewrite(uri).to_s)
       rescue => e
         @logger.error(Ginseng::Error.create(e).to_h.merge(url: uri.to_s))
       end

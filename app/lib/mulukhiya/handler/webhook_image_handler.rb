@@ -12,7 +12,7 @@ module Mulukhiya
         next unless uri&.absolute?
         body[attachment_key] ||= []
         body[attachment_key].push(sns.upload_remote_resource(uri))
-        @result.push(source_url: uri.to_s)
+        result.push(source_url: uri.to_s)
         break
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
