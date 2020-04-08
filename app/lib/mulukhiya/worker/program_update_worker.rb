@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def perform
-      File.write(path, @http.get(@config['/programs/url']).to_s)
+      File.write(path, @http.get(@config['/programs/url']))
     rescue Ginseng::ConfigError => e
       @logger.error(worker: self.class.to_s, error: e.message)
     end

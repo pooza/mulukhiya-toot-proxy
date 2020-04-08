@@ -14,6 +14,7 @@ module Mulukhiya
       @uri = NoteURI.parse(uri || @config['/misskey/url'])
       @mulukhiya_enable = false
       @http = http_class.new
+      @http.base_uri = @uri
     end
 
     def mulukhiya_enable?
@@ -39,7 +40,7 @@ module Mulukhiya
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       body[:i] ||= @token
-      return @http.post(create_uri, {body: body.to_json, headers: headers})
+      return @http.post('/api/notes/create', {body: body.to_json, headers: headers})
     end
 
     alias toot note
@@ -49,7 +50,7 @@ module Mulukhiya
     def favourite(id, params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post(create_uri('/api/notes/favorites/create'), {
+      return @http.post('/api/notes/favorites/create', {
         body: {noteId: id, i: @token}.to_json,
         headers: headers,
       })
@@ -61,7 +62,7 @@ module Mulukhiya
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       body = {force: 'true', i: @token}
-      response = @http.upload(create_uri('/api/drive/files/create'), path, headers, body)
+      response = @http.upload('/api/drive/files/create', path, headers, body)
       return response if params[:response] == :raw
       return JSON.parse(response.body)['id']
     end
@@ -81,7 +82,7 @@ module Mulukhiya
     def announcements(params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post(create_uri('/api/announcements'), {
+      return @http.post('/api/announcements', {
         body: {i: @token}.to_json,
         headers: headers,
       })
@@ -89,12 +90,12 @@ module Mulukhiya
 
     def oauth_client
       unless File.exist?(oauth_client_path)
-        r = @http.post(create_uri('/api/app/create'), {
+        r = @http.post('/api/app/create', {
           body: {
             name: Package.name,
             description: @config['/package/description'],
             permission: @config['/misskey/oauth/permission'],
-            callbackUrl: create_uri(@config['/misskey/oauth/callback_url']).to_s,
+            callbackUrl: @http.create_uri(@config['/misskey/oauth/callback_url']).to_s,
           }.to_json,
         })
         File.write(oauth_client_path, r.parsed_response.to_json)
@@ -111,13 +112,16 @@ module Mulukhiya
     end
 
     def oauth_uri
-      body = {appSecret: oauth_client['secret']}
-      r = @http.post(create_uri('/api/auth/session/generate'), {body: body.to_json})
+      r = @http.post('/api/auth/session/generate', {
+        body: {
+          appSecret: oauth_client['secret'],
+        }.to_json
+      })
       return Ginseng::URI.parse(r.parsed_response['url'])
     end
 
     def auth(token)
-      return @http.post(create_uri('/api/auth/session/userkey'), {
+      return @http.post('/api/auth/session/userkey', {
         body: {
           appSecret: oauth_client['secret'],
           token: token,
@@ -126,15 +130,9 @@ module Mulukhiya
     end
 
     def fetch_note(id)
-      response = @http.get(create_uri("/mulukhiya/note/#{id}"))
+      response = @http.get("/mulukhiya/note/#{id}")
       raise response.parsed_response['message'] unless response.code == 200
       return response.parsed_response
-    end
-
-    def create_uri(href = '/api/notes/create')
-      uri = self.uri.clone
-      uri.path = href
-      return uri
     end
 
     def notify(account, message)

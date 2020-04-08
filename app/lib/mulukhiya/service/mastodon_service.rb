@@ -10,6 +10,7 @@ module Mulukhiya
       token ||= @config['/agent/test/token']
       super
       @uri = TootURI.parse(uri)
+      @http.base_uri = @uri
       @token = token
     end
 
@@ -22,7 +23,7 @@ module Mulukhiya
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{@token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      response = @http.upload(create_uri("/api/v#{params[:version]}/media"), path, headers)
+      response = @http.upload("/api/v#{params[:version]}/media", path, headers)
       return response if params[:response] == :raw
       return JSON.parse(response.body)['id'].to_i
     end
@@ -46,7 +47,7 @@ module Mulukhiya
 
     def oauth_client
       unless File.exist?(oauth_client_path)
-        r = @http.post(create_uri('/api/v1/apps'), {
+        r = @http.post('/api/v1/apps', {
           body: {
             client_name: Package.name,
             website: @config['/package/url'],
@@ -64,7 +65,7 @@ module Mulukhiya
     end
 
     def oauth_uri
-      uri = create_uri('/oauth/authorize')
+      uri = @http.create_uri('/oauth/authorize')
       uri.query_values = {
         client_id: oauth_client['client_id'],
         response_type: 'code',
@@ -75,7 +76,7 @@ module Mulukhiya
     end
 
     def auth(code)
-      return @http.post(create_uri('/oauth/token'), {
+      return @http.post('/oauth/token', {
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
