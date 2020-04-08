@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.7.1'
+ruby '2.7.0'
 gem 'actionview', '>=6.0.2.2' # CVE-2020-5267
 gem 'bootsnap'
 gem 'crowi-client', github: 'pooza/crowi-client'
