@@ -23,7 +23,7 @@ module Mulukhiya
         access_token: account.config['/growi/token'],
       )
     rescue Ginseng::ConfigError => e
-      Logger.new.error(e.message)
+      Logger.new.error(clipper: self.class.to_s, error: e.message)
       return nil
     rescue => e
       Logger.new.error(Ginseng::Error.create(e).to_h.merge(params: params))
