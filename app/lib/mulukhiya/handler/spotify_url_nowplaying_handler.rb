@@ -16,7 +16,7 @@ module Mulukhiya
       @tracks[keyword] = uri.track
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 

@@ -16,7 +16,7 @@ module Mulukhiya
         @result.push(source_url: uri.to_s, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(url: uri.to_s))
+        errors.push(class: e.class.to_s, message: e.message)
       end
       return body
     end

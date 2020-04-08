@@ -17,7 +17,7 @@ module Mulukhiya
       return false unless @config['/amazon/affiliate']
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return true
     end
 
@@ -25,7 +25,7 @@ module Mulukhiya
       uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
       return uri.shortenable?
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
   end

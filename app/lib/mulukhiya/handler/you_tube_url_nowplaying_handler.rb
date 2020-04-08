@@ -14,7 +14,7 @@ module Mulukhiya
       return false unless @videos[keyword] = uri.data
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 
