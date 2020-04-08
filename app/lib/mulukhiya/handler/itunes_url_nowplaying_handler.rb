@@ -12,7 +12,7 @@ module Mulukhiya
       @tracks[keyword] = uri.track.merge('url' => uri.to_s)
       return true
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
+      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
       return false
     end
 

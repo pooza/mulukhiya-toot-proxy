@@ -25,7 +25,7 @@ module Mulukhiya
       uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
       return uri.shortenable?
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
+      errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       return false
     end
   end

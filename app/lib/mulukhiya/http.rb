@@ -6,7 +6,7 @@ module Mulukhiya
     def base_uri=(uri)
       unless uri.nil?
         uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
-        raise 'base_uri must be absolute' unless uri.absolute?
+        raise 'Invalid base_uri' unless uri.absolute?
       end
       @base_uri = uri
     end

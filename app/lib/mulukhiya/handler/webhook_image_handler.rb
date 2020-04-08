@@ -9,7 +9,7 @@ module Mulukhiya
       return if body[attachment_key].present?
       body['attachments'].each do |attachment|
         uri = Ginseng::URI.parse(attachment['image_url'])
-        next unless uri&.absolute?
+        raise Ginseng::RequestError 'Invalid URL' unless uri&.absolute?
         body[attachment_key] ||= []
         body[attachment_key].push(sns.upload_remote_resource(uri))
         result.push(source_url: uri.to_s)

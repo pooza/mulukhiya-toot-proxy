@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Mulukhiya
   class ItunesURI < Ginseng::URI
     def initialize(options = {})

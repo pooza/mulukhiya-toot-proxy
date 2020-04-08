@@ -7,7 +7,7 @@ module Mulukhiya
         next unless rewritable?(uri)
         result.push(source_url: uri.to_s, rewrited_url: rewrite(uri).to_s)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(url: uri.to_s))
+        errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
       parser.text = body[status_field]
       return body
