@@ -45,7 +45,7 @@ module Mulukhiya
       @account = nil
     end
 
-    def create_uri(href)
+    def create_uri(href = '/api/v1/statuses')
       return @http.create_uri(href)
     end
 
