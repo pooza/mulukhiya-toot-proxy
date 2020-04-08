@@ -9,6 +9,7 @@ module Mulukhiya
       @uri = NoteURI.parse(uri || @config['/dolphin/url'])
       @mulukhiya_enable = false
       @http = http_class.new
+      @http.base_uri = @uri
     end
 
     def announcements(params = {})
