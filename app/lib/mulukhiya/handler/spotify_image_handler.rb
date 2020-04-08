@@ -11,7 +11,7 @@ module Mulukhiya
       return false unless uri.image_uri.present?
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 

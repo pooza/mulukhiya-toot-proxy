@@ -42,7 +42,7 @@ module Mulukhiya
           tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
         end
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(media_id: id))
+        errors.push(class: e.class.to_s, message: e.message, media_id: id)
       end
       return tags.uniq
     end

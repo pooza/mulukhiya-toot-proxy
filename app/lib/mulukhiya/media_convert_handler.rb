@@ -6,7 +6,6 @@ module Mulukhiya
       return unless @dest = convert
       body[:file][:org_tempfile] ||= body[:file][:tempfile]
       body[:file][:tempfile] = @dest
-      @result.push(src: body[:file][:org_tempfile].path, dest: body[:file][:tempfile].path)
     end
 
     def convert

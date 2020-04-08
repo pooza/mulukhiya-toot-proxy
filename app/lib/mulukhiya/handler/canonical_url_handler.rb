@@ -31,7 +31,7 @@ module Mulukhiya
       @canonicals[uri.to_s] = canonical
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 

@@ -9,10 +9,10 @@ module Mulukhiya
     def updatable?(keyword)
       return false unless uri = ItunesURI.parse(keyword)
       return false unless uri.track.present?
-      @tracks[keyword] = uri.track
+      @tracks[keyword] = uri.track.merge('url' => uri.to_s)
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 
@@ -21,6 +21,7 @@ module Mulukhiya
       push(track['trackName'])
       push(track['artistName'])
       tags.concat(ArtistParser.new(track['artistName']).parse)
+      result.push(url: track['url'])
     end
   end
 end

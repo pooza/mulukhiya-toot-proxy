@@ -71,17 +71,10 @@ module Mulukhiya
     def image_uri
       return nil unless itunes?
       return nil unless track_id.present?
-      track = @service.lookup(track_id)
-      raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
       unless @image_uri
-        response = @http.get(ItunesURI.parse(track['trackViewUrl']).shorten)
-        body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
-        return nil unless element = body.xpath('//picture/source').first
-        element.attribute('srcset').text.split(/,/).each do |uri|
-          next unless matches = uri.match(/^(.*) +3x$/)
-          @image_uri = Ginseng::URI.parse(matches[1])
-          break if @image_uri&.absolute?
-        end
+        track = @service.lookup(track_id)
+        raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
+        @image_uri = Ginseng::URI.parse(track['artworkUrl100'])
       end
       return @image_uri
     end

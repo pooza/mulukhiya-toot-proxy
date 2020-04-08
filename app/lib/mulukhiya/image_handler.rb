@@ -13,10 +13,10 @@ module Mulukhiya
         next unless image = create_image_uri(uri)
         body[attachment_key] ||= []
         body[attachment_key].push(sns.upload_remote_resource(image))
-        @result.push(source_url: uri.to_s, image_url: image.to_s)
+        result.push(source_url: uri.to_s, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(url: uri.to_s))
+        errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
       return body
     end

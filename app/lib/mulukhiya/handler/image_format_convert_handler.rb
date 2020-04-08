@@ -1,6 +1,7 @@
 module Mulukhiya
   class ImageFormatConvertHandler < MediaConvertHandler
     def convert
+      result.push(source: {type: @source.type})
       return @source.convert_type(:jpeg)
     end
 

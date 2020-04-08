@@ -19,7 +19,7 @@ module Mulukhiya
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       return @config['/shortened_url/domains'].member?(uri.host)
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
   end

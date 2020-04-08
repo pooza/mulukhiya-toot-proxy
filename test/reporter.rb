@@ -12,11 +12,11 @@ module Mulukhiya
     end
 
     def test_to_h
-      assert_equal(@reporter.to_h, {'unknown' => {'itunes_url_nowplaying' => ['https://music.apple.com/jp/album//1352845788?i=1352845804']}})
+      assert_equal(@reporter.to_h, {'unknown' => {'itunes_url_nowplaying' => [{'url' => 'https://music.apple.com/jp/album//1352845788?i=1352845804'}]}})
     end
 
     def test_to_s
-      assert_equal(@reporter.to_s, "---\nunknown:\n  itunes_url_nowplaying:\n  - https://music.apple.com/jp/album//1352845788?i=1352845804\n")
+      assert_equal(@reporter.to_s, "---\nunknown:\n  itunes_url_nowplaying:\n  - url: https://music.apple.com/jp/album//1352845788?i=1352845804\n")
     end
   end
 end

@@ -49,7 +49,7 @@ module Mulukhiya
     end
 
     def summary
-      return nil unless @result.present?
+      return nil unless @result.present? || @errors.present?
       return {
         handler: underscore_name,
         event: @event.to_s,
@@ -155,7 +155,6 @@ module Mulukhiya
 
     def initialize(params = {})
       @config = Config.instance
-      @logger = Logger.new
       @result = []
       @errors = []
       @sns = params[:sns] || Environment.sns_class.new

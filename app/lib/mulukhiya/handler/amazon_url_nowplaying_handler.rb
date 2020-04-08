@@ -13,10 +13,10 @@ module Mulukhiya
     def updatable?(keyword)
       return false unless uri = AmazonURI.parse(keyword)
       return false unless uri.item.present?
-      @items[keyword] = uri.item
+      @items[keyword] = uri.item.merge('url' => uri.to_s)
       return true
     rescue => e
-      @logger.error(e)
+      errors.push(class: e.class.to_s, message: e.message)
       return false
     end
 
@@ -24,9 +24,9 @@ module Mulukhiya
       return unless item = @items[keyword]
       push(item.dig('ItemInfo', 'Title', 'DisplayValue'))
       return unless contributors = item.dig('ItemInfo', 'ByLineInfo', 'Contributors')
-      contributors = contributors.map {|v| v['Name']}.join(', ')
-      push(contributors)
-      tags.concat(ArtistParser.new(contributors).parse)
+      push(contributors.map {|v| v['Name']}.join(', '))
+      tags.concat(ArtistParser.new(contributors.map {|v| v['Name']}.join('、')).parse)
+      result.push(url: item['url'])
     end
   end
 end

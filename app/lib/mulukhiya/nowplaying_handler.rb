@@ -14,7 +14,6 @@ module Mulukhiya
         next unless updatable?(keyword)
         update(keyword)
         updated = true
-        @result.push(keyword)
       end
       parser.text = body[status_field] = @lines.join("\n")
       return body

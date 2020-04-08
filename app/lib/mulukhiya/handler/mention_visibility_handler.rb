@@ -6,7 +6,7 @@ module Mulukhiya
       parser.accts do |acct|
         next unless acct.agent?
         body['visibility'] = Environment.controller_class.visibility_name('direct')
-        @result.push(acct.to_s)
+        result.push(acct.to_s)
       end
       return body
     end
