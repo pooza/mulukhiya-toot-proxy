@@ -13,7 +13,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ\n")
-      assert_equal(@handler.summary[:result], ['https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ'])
+      assert_equal(@handler.summary[:result], [{url: 'https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ'}])
     end
   end
 end

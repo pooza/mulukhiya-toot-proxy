@@ -13,11 +13,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
+      assert_equal(@handler.summary[:result], [{url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ'}])
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying \n\nhttps://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], ['https://www.youtube.com/watch?v=uFfsTeExwbQ'])
+      assert_equal(@handler.summary[:result], [{url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ'}])
     end
   end
 end

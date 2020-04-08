@@ -21,6 +21,7 @@ module Mulukhiya
     def update(keyword)
       return unless asin = @asins[keyword]
       push(@service.create_item_uri(asin).to_s)
+      result.push(keyword: keyword)
     end
   end
 end
