@@ -135,7 +135,7 @@ module Mulukhiya
       return response.parsed_response
     end
 
-    def create_uri(href)
+    def create_uri(href = '/api/notes/create')
       return @http.create_uri(href)
     end
 
