@@ -12,45 +12,50 @@ html lang='ja'
       #result-container v-if='result'
       section
         h3 現在の設定
-        pre = '{{result}}'
-      section
-        h3 GROWI
-        .inline-field-container
-          h4 トークン
-          input placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
-        .inline-field-container
-          h4 URL
-          input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
-        .field-update-button-container
-          button v-on:click='updateGrowi' 更新
-      section
-        h3 Dropbox
-        .inline-field-container
-          h4 トークン
-          input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
-        .field-update-button-container
-          button v-on:click='updateDropbox' 更新
-      section
-        h3 固定タグ
-        .field-container
-          textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
-        .field-update-button-container
-          button v-on:click='updateTags' 更新
-      section
-        h3 Slack互換webhook
-        .inline-field-container
-          h4 トークン
-          input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
-        .field-update-button-container
-          button v-on:click='updateWebhook' 更新
-        .field-container v-if='webhook_url'
-          h4 URL
-          textarea id='webhook-url-text' = '{{webhook_url}}'
-          i class='fas fa-clipboard' v-on:click='copyWehbook'
-        .field-container v-if='webhook_url'
-          h4 curlサンプル
-          textarea id='curl-sample-text' = '{{curl_sample}}'
-          i class='fas fa-clipboard' v-on:click='copyCurlSample'
+        #result-container
+          pre = '{{result}}'
+      section class='config'
+        h3 v-on:click='toggleGrowiSection' GROWI
+        .section-contents v-show='show_growi_detail'
+          .inline-field-container
+            h4 トークン
+            input placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
+          .inline-field-container
+            h4 URL
+            input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
+          .field-update-button-container
+            button v-on:click='updateGrowi' 更新
+      section class='config'
+        h3 v-on:click='toggleDropboxSection' Dropbox
+        .section-contents v-show='show_dropbox_detail'
+          .inline-field-container
+            h4 トークン
+            input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
+          .field-update-button-container
+            button v-on:click='updateDropbox' 更新
+      section class='config'
+        h3 v-on:click='toggleTagsSection' 固定タグ
+        .section-contents v-show='show_tags_detail'
+          .field-container
+            textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
+          .field-update-button-container
+            button v-on:click='updateTags' 更新
+      section class='config'
+        h3 v-on:click='toggleWebhookSection' Slack互換webhook
+        .section-contents v-show='show_webhook_detail'
+          .inline-field-container
+            h4 トークン
+            input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+          .field-update-button-container
+            button v-on:click='updateWebhook' 更新
+          .field-container v-if='webhook_url'
+            h4 URL
+            textarea id='webhook-url-text' = '{{webhook_url}}'
+            i class='fas fa-clipboard' v-on:click='copyWehbook'
+          .field-container v-if='webhook_url'
+            h4 curlサンプル
+            textarea id='curl-sample-text' = '{{curl_sample}}'
+            i class='fas fa-clipboard' v-on:click='copyCurlSample'
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -60,6 +65,10 @@ html lang='ja'
           username: null,
           token_error: false,
           result: null,
+          show_growi_detail: false,
+          show_dropbox_detail: false,
+          show_tags_detail: false,
+          show_webhook_detail: false,
         },
         mounted: function () {
           'use strict'
@@ -117,6 +126,22 @@ html lang='ja'
             'use strict'
             document.getElementById('curl-sample-text').select()
             document.execCommand('copy')
+          },
+          toggleGrowiSection: function () {
+            'use strict'
+            this.show_growi_detail = !this.show_growi_detail
+          },
+          toggleDropboxSection: function () {
+            'use strict'
+            this.show_dropbox_detail = !this.show_dropbox_detail
+          },
+          toggleTagsSection: function () {
+            'use strict'
+            this.show_tags_detail = !this.show_tags_detail
+          },
+          toggleWebhookSection: function () {
+            'use strict'
+            this.show_webhook_detail = !this.show_webhook_detail
           },
           updateGrowi: function () {
             'use strict'
