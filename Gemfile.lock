@@ -8,24 +8,23 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: fbaf7066472c244bd37cec2580a5f3ead7f904c9
+  revision: ae04675f3fb73d4979a2c64252fab4640bdd4781
   specs:
-    ginseng-core (1.6.4)
+    ginseng-core (1.6.5)
       activesupport
       addressable
-      bundler
+      bundler (>= 2.0.0)
       csv
       daemon-spawn
       httparty
+      json (>= 2.3.0)
       rake
       rest-client
-      rubocop
-      rubocop-performance
       syslog-logger
       test-unit
       unicode
       yajl-ruby
-      zeitwerk
+      zeitwerk (>= 2.3.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -239,8 +238,6 @@ GEM
       rexml
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-performance (1.5.2)
-      rubocop (>= 0.71.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.6.0)
