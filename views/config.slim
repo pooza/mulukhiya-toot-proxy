@@ -17,33 +17,39 @@ html lang='ja'
         h3 GROWI
         .inline-field-container
           h4 トークン
-          input id='growi_token_text' placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
+          input placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
         .inline-field-container
           h4 URL
-          input id='growi_URL_text' placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
+          input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
         .field-update-button-container
           button v-on:click='updateGrowi' 更新
       section
         h3 Dropbox
         .inline-field-container
           h4 トークン
-          input id='dropbox_token_text' placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
+          input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
         .field-update-button-container
           button v-on:click='updateDropbox' 更新
+      section
+        h3 固定タグ
+        .field-container
+          textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
+        .field-update-button-container
+          button v-on:click='updateTags' 更新
       section
         h3 Slack互換webhook
         .inline-field-container
           h4 トークン
-          input id='webhook_token_text' placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+          input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
         .field-update-button-container
           button v-on:click='updateWebhook' 更新
         .field-container v-if='webhook_url'
           h4 URL
-          textarea id='webhook_text' = '{{webhook_url}}'
+          textarea id='webhook-url-text' = '{{webhook_url}}'
           i class='fas fa-clipboard' v-on:click='copyWehbook'
         .field-container v-if='webhook_url'
           h4 curlサンプル
-          textarea id='curl_sample_text' = '{{curl_sample}}'
+          textarea id='curl-sample-text' = '{{curl_sample}}'
           i class='fas fa-clipboard' v-on:click='copyCurlSample'
     == slim.render 'fragment/footer'
     javascript:
@@ -68,6 +74,9 @@ html lang='ja'
                   this.webhook_url = e.data.config.webhook.url
                   this.curl_sample = `curl -H 'Content-Type: application/json' -X POST -d '{"text":"わたしが斬るのは、あなたじゃない！\\n絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。\\nそれがわたし。王女様からもらった名前、キュアソードよ！"}' ${e.data.config.webhook.url}`
                 }
+                if (e.data.config.tags) {
+                  this.tags = e.data.config.tags.join("\n")
+                }
                 if (e.data.config.growi) {
                   this.growi_token = e.data.config.growi.token
                   this.growi_url = e.data.config.growi.url
@@ -86,12 +95,12 @@ html lang='ja'
         methods: {
           copyWehbook: function () {
             'use strict'
-            document.getElementById('webhook_text').select()
+            document.getElementById('webhook-url-text').select()
             document.execCommand('copy')
           },
           copyCurlSample: function () {
             'use strict'
-            document.getElementById('curl_sample_text').select()
+            document.getElementById('curl-sample-text').select()
             document.execCommand('copy')
           },
           updateGrowi: function () {
@@ -123,6 +132,26 @@ html lang='ja'
             const command = {command: 'user_config', dropbox: {token: null}}
             if (this.dropbox_token) {
               command.dropbox.token = this.dropbox_token
+            }
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/config', values)
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.result = jsyaml.safeDump(e.data.config)
+                this.message = null
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = e.response.data.error || e.message
+              })
+          },
+          updateTags: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', tags: null}
+            if (this.tags != '') {
+              command.tags = this.tags.split("\n")
             }
             values.status = JSON.stringify(command)
             values.text = JSON.stringify(command)
