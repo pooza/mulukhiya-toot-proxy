@@ -238,6 +238,8 @@ GEM
       rexml
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
+    rubocop-performance (1.5.2)
+      rubocop (>= 0.71.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.6.0)
@@ -301,7 +303,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  actionview (>= 6.0.2.2)
   bootsnap
   crowi-client!
   dropbox_api
@@ -310,12 +311,13 @@ DEPENDENCIES
   ginseng-core!
   ginseng-postgres!
   ginseng-web!
-  json (>= 2.3.0)
   mimemagic
   nokogiri
   rails-erb-lint
   redis
   rspotify
+  rubocop
+  rubocop-performance
   sanitize
   sidekiq
   sidekiq-failures
