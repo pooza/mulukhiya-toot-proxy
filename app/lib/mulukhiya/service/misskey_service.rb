@@ -27,8 +27,8 @@ module Mulukhiya
 
     def fetch_note(id)
       return @http.get("/mulukhiya/note/#{id}")
-      #raise GatewayError, response.parsed_response['message'] unless response.code == 200
-      #return response.parsed_response
+      # raise GatewayError, response.parsed_response['message'] unless response.code == 200
+      # return response.parsed_response
     end
 
     alias toot note
