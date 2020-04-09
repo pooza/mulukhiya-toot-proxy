@@ -76,8 +76,6 @@ module Mulukhiya
       @reporter = Reporter.new
       @sns = Environment.sns_class.new
       @sns.token = @userconfig.webhook_token
-      @logger = Logger.new
-      @db = Postgres.instance
     end
   end
 end
