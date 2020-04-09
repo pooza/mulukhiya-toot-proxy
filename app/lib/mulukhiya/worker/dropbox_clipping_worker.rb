@@ -5,7 +5,7 @@ module Mulukhiya
       return unless account.dropbox
       account.dropbox.clip(body: create_body(params))
     rescue Ginseng::RequestError => e
-      @logger.error(e.message)
+      @logger.error(worker: self.class.to_s, error: e.message)
     end
   end
 end

@@ -14,5 +14,9 @@ module Mulukhiya
     def message
       return sns.account.config.to_h
     end
+
+    def verbose?
+      return true
+    end
   end
 end

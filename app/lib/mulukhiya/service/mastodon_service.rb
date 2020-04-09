@@ -18,14 +18,8 @@ module Mulukhiya
 
     alias post toot
 
-    def upload(path, params = {})
-      params[:version] ||= 1
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      response = @http.upload("/api/v#{params[:version]}/media", path, headers)
-      return response if params[:response] == :raw
-      return JSON.parse(response.body)['id'].to_i
+    def fetch_toot(id)
+      return @http.get("/api/v1/statuses/#{id}")
     end
 
     def search(keyword, params = {})
@@ -43,10 +37,6 @@ module Mulukhiya
     def token=(token)
       @token = token
       @account = nil
-    end
-
-    def create_uri(href = '/api/v1/statuses')
-      return @http.create_uri(href)
     end
 
     def oauth_client

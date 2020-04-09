@@ -25,14 +25,14 @@ module Mulukhiya
       unless @dump
         @dump = {}
         each do |entry|
-          next if entry[:verbose] && !@account&.notify_verbose? && !entry[:errors].present?
+          unless @account&.notify_verbose?
+            next if entry[:verbose] && !entry[:errors].present?
+          end
           @dump[entry[:event]] ||= {}
           @dump[entry[:event]][entry[:handler]] ||= []
-          [:result, :errors].each do |key|
+          [:result, :errors].each do |k|
             @dump[entry[:event]][entry[:handler]].concat(
-              entry[key].map do |v|
-                v.is_a?(Hash) ? v.deep_stringify_keys : v
-              end,
+              entry[k].map {|v| v.is_a?(Hash) ? v.deep_stringify_keys : v},
             )
           end
         end

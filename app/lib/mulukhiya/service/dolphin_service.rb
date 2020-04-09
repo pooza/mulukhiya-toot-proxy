@@ -1,6 +1,7 @@
 module Mulukhiya
-  class DolphinService < MisskeyService
+  class DolphinService < Ginseng::Dolphin
     include Package
+    attr_reader :token
 
     def initialize(uri = nil, token = nil)
       @config = Config.instance
@@ -12,11 +13,15 @@ module Mulukhiya
       @http.base_uri = @uri
     end
 
-    def announcements(params = {})
-      raise Ginseng::GatewayError, 'Dolphin does not respond to announcements.'
+    def token=(token)
+      @token = token
+      @account = nil
     end
 
-    def oauth_uri
+    def account
+      @account ||= Environment.account_class.get(token: @token)
+      return @account
+    rescue
       return nil
     end
 
