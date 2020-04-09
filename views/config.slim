@@ -93,6 +93,21 @@ html lang='ja'
           }
         },
         methods: {
+          updateConfig: function (values, command) {
+            values.status = JSON.stringify(command)
+            values.text = JSON.stringify(command)
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/config', values)
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.result = jsyaml.safeDump(e.data.config)
+                this.message = null
+                this.webhook_url = e.data.config.webhook.url
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = e.response.data.error || e.message
+              })
+          },
           copyWehbook: function () {
             'use strict'
             document.getElementById('webhook-url-text').select()
@@ -113,18 +128,7 @@ html lang='ja'
             if (this.growi_token) {
               command.growi.token = this.growi_token
             }
-            values.status = JSON.stringify(command)
-            values.text = JSON.stringify(command)
-            document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
-              .then(e => {
-                document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
-                this.message = null
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
-              })
+            this.updateConfig(values, command)
           },
           updateDropbox: function () {
             'use strict'
@@ -133,38 +137,16 @@ html lang='ja'
             if (this.dropbox_token) {
               command.dropbox.token = this.dropbox_token
             }
-            values.status = JSON.stringify(command)
-            values.text = JSON.stringify(command)
-            document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
-              .then(e => {
-                document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
-                this.message = null
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
-              })
+            this.updateConfig(values, command)
           },
           updateTags: function () {
             'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', tags: null}
-            if (this.tags != '') {
+            if (this.tags) {
               command.tags = this.tags.split("\n")
             }
-            values.status = JSON.stringify(command)
-            values.text = JSON.stringify(command)
-            document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
-              .then(e => {
-                document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
-                this.message = null
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
-              })
+            this.updateConfig(values, command)
           },
           updateWebhook: function () {
             'use strict'
@@ -173,19 +155,7 @@ html lang='ja'
             if (this.webhook_token) {
               command.webhook.token = this.webhook_token
             }
-            values.status = JSON.stringify(command)
-            values.text = JSON.stringify(command)
-            document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
-              .then(e => {
-                document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
-                this.message = null
-                this.webhook_url = e.data.config.webhook.url
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
-              })
+            this.updateConfig(values, command)
           },
         },
       })
