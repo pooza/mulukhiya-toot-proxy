@@ -6,6 +6,8 @@ module Mulukhiya
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
         @sns.token = @headers['Authorization'].split(/\s+/).last
+      else
+        @sns.token = nil
       end
       @reporter.account = @sns.account
     end

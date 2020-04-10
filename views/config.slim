@@ -14,7 +14,7 @@ html lang='ja'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
-      section class='config'
+      section class='config' v-if='username'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
           .inline-field-container
@@ -25,7 +25,7 @@ html lang='ja'
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
           .field-update-button-container
             button v-on:click='updateGrowi' 更新
-      section class='config'
+      section class='config' v-if='username'
         h3 v-on:click='toggleDropboxSection' Dropbox
         .section-contents v-show='show_dropbox_detail'
           .inline-field-container
@@ -33,14 +33,14 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
           .field-update-button-container
             button v-on:click='updateDropbox' 更新
-      section class='config'
+      section class='config' v-if='username'
         h3 v-on:click='toggleTagsSection' 固定タグ
         .section-contents v-show='show_tags_detail'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
           .field-update-button-container
             button v-on:click='updateTags' 更新
-      section class='config'
+      section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
           .inline-field-container
