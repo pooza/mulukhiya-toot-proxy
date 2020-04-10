@@ -32,6 +32,16 @@ module Mulukhiya
 
     def test_config
       get '/mulukhiya/config'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 403)
+
+      header 'Authorization', 'Bearer hoge'
+      get '/mulukhiya/config'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 403)
+
+      header 'Authorization', "Bearer #{@account.token}"
+      get '/mulukhiya/config'
       assert(last_response.ok?)
     end
 

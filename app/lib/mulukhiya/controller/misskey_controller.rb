@@ -6,6 +6,8 @@ module Mulukhiya
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif params[:i]
         @sns.token = params[:i]
+      else
+        @sns.token = nil
       end
       @reporter.account = @sns.account
     end

@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.7.0'
+ruby '2.7.1'
 gem 'bootsnap'
 gem 'crowi-client', github: 'pooza/crowi-client'
 gem 'dropbox_api'

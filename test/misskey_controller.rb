@@ -31,6 +31,14 @@ module Mulukhiya
 
     def test_config
       get '/mulukhiya/config'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 403)
+
+      get '/mulukhiya/config', {'i' => 'invalid'}
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 403)
+
+      get '/mulukhiya/config', {'i' => @config['/agent/test/token']}
       assert(last_response.ok?)
     end
 

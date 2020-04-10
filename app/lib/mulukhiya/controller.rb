@@ -51,7 +51,7 @@ module Mulukhiya
         }
       else
         @renderer.message = {error: 'Invalid access token'}
-        @renderer.status = 400
+        @renderer.status = 403
       end
       return @renderer.to_s
     end
@@ -63,7 +63,7 @@ module Mulukhiya
         config: @sns.account.config.to_h,
       }
       return @renderer.to_s
-    rescue Ginseng::ValidateError => e
+    rescue AuthError, Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
       @renderer.status = e.status
       return @renderer.to_s
