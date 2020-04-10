@@ -97,8 +97,7 @@ module Mulukhiya
           account = Account[account[:id]]
           account.token = key[:token]
           return account
-        elsif key.key?(:acct)
-          acct = key[:acct]
+        elsif acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return Account.first(username: acct.username, domain: acct.domain)
         end
