@@ -91,12 +91,13 @@ module Mulukhiya
       end
 
       def self.get(key)
-        if token = key[:token]
-          account = Postgres.instance.execute('token_owner', {token: token})&.first
+        if key.key?(:token)
+          return nil if key[:token].nil?
+          account = Postgres.instance.execute('token_owner', {token: key[:token]})&.first
           account = Account[account[:id]]
-          account.token = token
+          account.token = key[:token]
           return account
-        elsif key[:acct]
+        elsif key.key?(:acct)
           acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return Account.first(username: acct.username, domain: acct.domain)
