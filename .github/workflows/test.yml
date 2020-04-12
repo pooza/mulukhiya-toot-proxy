@@ -27,6 +27,7 @@ jobs:
           ruby-version: 2.7.1
       - name: apt install
         run: |
+          sudo apt update
           sudo apt install ffmpeg
           sudo apt install libpq-dev
       - name: bundle install
