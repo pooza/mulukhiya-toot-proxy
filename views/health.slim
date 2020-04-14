@@ -11,6 +11,8 @@ html lang='ja'
       h2 動作状況
       #result-container v-if='result'
         pre = '{{result}}'
+        .field-update-button-container
+          button v-on:click='reloadPage' 再読み込み
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -29,6 +31,12 @@ html lang='ja'
               this.result = e.data
             }).catch(e => {
               this.message = e.message
+              document.getElementById('result-container').classList.add('error')
             })
+        },
+        methods: {
+          reloadPage: function () {
+            location.reload()
+          },
         },
       })

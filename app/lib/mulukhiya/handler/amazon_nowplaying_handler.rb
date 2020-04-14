@@ -4,10 +4,12 @@ module Mulukhiya
       super(params)
       @asins = {}
       @service = AmazonService.new
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message)
     end
 
     def disable?
-      return super || !AmazonService.config?
+      return super || !AmazonService.config? || !@service
     end
 
     def updatable?(keyword)
