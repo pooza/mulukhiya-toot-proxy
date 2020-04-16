@@ -4,7 +4,8 @@ module Mulukhiya
   class GrowiClipper < CrowiClient
     def clip(params)
       params = {body: params.to_s} if params.is_a?(String)
-      r = request(CPApiRequestPagesCreate.new(body: params[:body]))
+      params[:grant] ||= CrowiPage::GRANT_OWNER
+      r = request(CPApiRequestPagesCreate.new(body: params[:body], grant: params[:grant]))
       r = request(CPApiRequestPagesCreate.new(params)) if r.is_a?(CPInvalidRequest)
       raise Ginseng::GatewayError, r.msg if r.is_a?(CPInvalidRequest)
       return r
