@@ -125,7 +125,7 @@ html lang='ja'
               this.programs = e.data
               Object.values(this.programs).map(program => {
                 if (program.enable) {
-                  let label = [program.series]
+                  const label = [program.series]
                   if (program.episode) {
                     label.push(program.episode + '話')
                   }
