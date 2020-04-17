@@ -4,6 +4,10 @@ module Mulukhiya
       return File.basename(dir)
     end
 
+    def self.type
+      return config['/environment'] || 'development'
+    end
+
     def self.dir
       return Mulukhiya.dir
     end
