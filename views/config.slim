@@ -56,6 +56,15 @@ html lang='ja'
             h4 curlサンプル
             textarea id='curl-sample-text' = '{{curl_sample}}'
             i class='fas fa-clipboard' v-on:click='copyCurlSample'
+      section class='config' v-if='username'
+        h3 v-on:click='toggleNotifySection' 通知
+        .section-contents v-show='show_notify_detail'
+          .inline-field-container
+            label class='alert'
+              input type='checkbox' value='1' v-model='notify_verbose'
+              | 冗長な通知を行う（管理者・開発者向け）
+          .field-update-button-container
+            button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
       new Vue({
@@ -65,10 +74,12 @@ html lang='ja'
           username: null,
           token_error: false,
           result: null,
+          notify_verbose: null,
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,
           show_webhook_detail: false,
+          show_notify_detail: false,
         },
         mounted: function () {
           'use strict'
@@ -92,6 +103,9 @@ html lang='ja'
                 }
                 if (e.data.config.dropbox) {
                   this.dropbox_token = e.data.config.dropbox.token
+                }
+                if (e.data.config.notify) {
+                  this.notify_verbose = e.data.config.notify.verbose ? 1 : 0
                 }
                 this.username = e.data.account.username
               }).catch(e => {
@@ -143,6 +157,10 @@ html lang='ja'
             'use strict'
             this.show_webhook_detail = !this.show_webhook_detail
           },
+          toggleNotifySection: function () {
+            'use strict'
+            this.show_notify_detail = !this.show_notify_detail
+          },
           updateGrowi: function () {
             'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
@@ -179,6 +197,15 @@ html lang='ja'
             const command = {command: 'user_config', webhook: {token: null}}
             if (this.webhook_token) {
               command.webhook.token = this.webhook_token
+            }
+            this.updateConfig(values, command)
+          },
+          updateNotify: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', notify: null}
+            if (this.notify_verbose) {
+              command.notify = {verbose: true}
             }
             this.updateConfig(values, command)
           },
