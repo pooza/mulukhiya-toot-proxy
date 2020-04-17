@@ -88,10 +88,12 @@ test:
 webui:
   scripts:
     - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
+    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.min.js
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
   stylesheets:
     - /mulukhiya/style/default
+    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
     - https://use.fontawesome.com/releases/v5.6.1/css/all.css
     - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
   metadata:
