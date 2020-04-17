@@ -53,6 +53,12 @@ module Mulukhiya
       '/mulukhiya/sidekiq' => Sidekiq::Web,
     )
   end
+
+  def self.load_tasks
+    Dir.glob(File.join(dir, 'app/task/*.rb')).sort.each do |f|
+      require f
+    end
+  end
 end
 
 Mulukhiya.bootsnap
