@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.7.1'
 gem 'bootsnap'
+gem 'bundler', '>=2.0.0'
 gem 'crowi-client', github: 'pooza/crowi-client'
 gem 'dropbox_api'
 gem 'dry-validation'
