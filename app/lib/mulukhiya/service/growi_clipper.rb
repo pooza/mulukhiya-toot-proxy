@@ -1,13 +1,25 @@
-require 'crowi-client'
-
 module Mulukhiya
-  class GrowiClipper < CrowiClient
+  class GrowiClipper
+    GRANT_PUBLIC = 1
+    GRANT_RESTRICTED = 2
+    GRANT_SPECIFIED = 3
+    GRANT_OWNER = 4
+
+    def initialize(params = {})
+      uri = params[:uri]
+      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
+      @token = params[:token]
+      @http = HTTP.new
+      @http.base_uri = uri
+    end
+
     def clip(params)
       params = {body: params.to_s} if params.is_a?(String)
-      params[:grant] ||= CrowiPage::GRANT_OWNER
-      r = request(CPApiRequestPagesCreate.new(body: params[:body], grant: params[:grant]))
-      r = request(CPApiRequestPagesCreate.new(params)) if r.is_a?(CPInvalidRequest)
-      raise Ginseng::GatewayError, r.msg if r.is_a?(CPInvalidRequest)
+      params[:access_token] ||= @token
+      params[:grant] ||= GRANT_OWNER
+      r = @http.post('/_api/pages.create', {body: params.delete_if {|k, v| k == :path}.to_json})
+      r = @http.post('/_api/pages.create', {body: params.to_json}) unless r.code == 200
+      raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
       return r
     end
 
@@ -20,8 +32,8 @@ module Mulukhiya
         raise Ginseng::ConfigError, "Account #{account.acct} /growi/token undefined"
       end
       return GrowiClipper.new(
-        crowi_url: account.config['/growi/url'],
-        access_token: account.config['/growi/token'],
+        uri: account.config['/growi/url'],
+        token: account.config['/growi/token'],
       )
     rescue Ginseng::ConfigError => e
       Logger.new.error(clipper: self.class.to_s, error: e.message)

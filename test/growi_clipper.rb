@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_clip
-      assert_kind_of(CPApiReturn, @clipper.clip("#{Time.now} #{__method__}"))
+      assert_equal(200, @clipper.clip("#{Time.now} #{__method__}").code)
     end
   end
 end
