@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/pooza/crowi-client.git
-  revision: aa2910cc3710262ba7ec31b28a172491c20558ce
-  specs:
-    crowi-client (0.1.4.1)
-      json (~> 2.1)
-      rest-client (~> 2.0)
-
-GIT
   remote: https://github.com/pooza/ginseng-core.git
   revision: ae04675f3fb73d4979a2c64252fab4640bdd4781
   specs:
@@ -195,7 +187,7 @@ GEM
     parser (2.7.1.1)
       ast (~> 2.4.0)
     pg (1.2.3)
-    power_assert (1.1.7)
+    power_assert (1.2.0)
     public_suffix (3.1.1)
     puma (4.3.3)
       nio4r (~> 2.0)
@@ -305,7 +297,6 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   bundler (>= 2.0.0)
-  crowi-client!
   dropbox_api
   dry-validation
   fastimage
