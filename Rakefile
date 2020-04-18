@@ -5,6 +5,4 @@ ENV['BUNDLE_GEMFILE'] ||= File.join(dir, 'Gemfile')
 require 'bundler/setup'
 require 'mulukhiya'
 
-Dir.glob(File.join(Mulukhiya::Environment.dir, 'app/task/*.rb')).sort.each do |f|
-  require f
-end
+Mulukhiya.load_tasks

@@ -4,6 +4,10 @@ module Mulukhiya
       return File.basename(dir)
     end
 
+    def self.type
+      return config['/environment'] || 'development'
+    end
+
     def self.dir
       return Mulukhiya.dir
     end
@@ -48,6 +52,14 @@ module Mulukhiya
 
     def self.misskey?
       return controller_name == 'misskey'
+    end
+
+    def self.development?
+      return type == 'development'
+    end
+
+    def self.production?
+      return type == 'production'
     end
 
     def self.account_class

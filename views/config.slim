@@ -38,6 +38,7 @@ html lang='ja'
         .section-contents v-show='show_tags_detail'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
+            v-select :options='program_options' v-on:input='changeTags' v-model='program'
           .field-update-button-container
             button v-on:click='updateTags' 更新
       section class='config' v-if='username'
@@ -67,6 +68,7 @@ html lang='ja'
             button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
+      Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
         data: {
@@ -75,6 +77,9 @@ html lang='ja'
           token_error: false,
           result: null,
           notify_verbose: null,
+          programs: [],
+          program_options: [],
+          program: null,
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,
@@ -114,6 +119,25 @@ html lang='ja'
           } else {
             this.token_error = true
           }
+          const href = '/mulukhiya/programs'
+          axios.get(href, {responseType: 'json'})
+            .then(e => {
+              this.programs = e.data
+              Object.values(this.programs).map(program => {
+                if (program.enable) {
+                  const label = [program.series]
+                  if (program.episode) {
+                    label.push(program.episode + '話')
+                  }
+                  if (program.air) {
+                    label.push('エア番組')
+                  }
+                  this.program_options.push({label: label.join(' '), code: program.key})
+                }
+              })
+            }).catch(e => {
+              this.message = e.message
+            })
         },
         methods: {
           updateConfig: function (values, command) {
@@ -140,6 +164,20 @@ html lang='ja'
             'use strict'
             document.getElementById('curl-sample-text').select()
             document.execCommand('copy')
+          },
+          changeTags: function (e) {
+            'use strict'
+            const program = this.programs[e.code]
+            if (program) {
+              const tags = ['実況', program.series]
+              if (program.episode) {
+                tags.push(program.episode + '話')
+              }
+              if (program.air) {
+                tags.push('エア番組')
+              }
+              this.tags = tags.join("\n")
+            }
           },
           toggleGrowiSection: function () {
             'use strict'
