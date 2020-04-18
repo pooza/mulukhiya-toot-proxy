@@ -69,6 +69,16 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/programs' do
+      path = File.join(Environment.dir, 'tmp/cache/programs.json')
+      if File.readable?(path)
+        @renderer.message = JSON.parse(File.read(path))
+      else
+        @renderer.message = []
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/app/config' do
       @renderer = SlimRenderer.new
       @renderer.template = 'config'
