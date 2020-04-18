@@ -25,6 +25,7 @@ module Mulukhiya
       values = {
         queues: stats.queues['default'],
         retry: stats.retry_size,
+        version: Sidekiq::VERSION,
         status: pids.present? ? 'OK' : 'NG',
       }
       pids.each do |pid|
