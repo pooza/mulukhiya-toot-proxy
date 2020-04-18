@@ -54,6 +54,14 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
+    def self.development?
+      return type == 'development'
+    end
+
+    def self.production?
+      return type == 'production'
+    end
+
     def self.account_class
       return "Mulukhiya::#{controller_name.camelize}::Account".constantize
     end
