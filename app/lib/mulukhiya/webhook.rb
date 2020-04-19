@@ -29,7 +29,7 @@ module Mulukhiya
     end
 
     def post(status)
-      status = {text: status} if status.is_a?(String)
+      status = {text: status} unless status.is_a?(Hash)
       body = {
         Environment.controller_class.status_field => status[:text],
         'visibility' => visibility,

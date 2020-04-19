@@ -6,15 +6,13 @@ module Mulukhiya
     GRANT_OWNER = 4
 
     def initialize(params = {})
-      uri = params[:uri]
-      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       @token = params[:token]
       @http = HTTP.new
-      @http.base_uri = uri
+      @http.base_uri = params[:uri]
     end
 
     def clip(params)
-      params = {body: params.to_s} if params.is_a?(String)
+      params = {body: params.to_s} unless params.is_a?(Hash)
       params[:access_token] ||= @token
       params[:grant] ||= GRANT_OWNER
       r = @http.post('/_api/pages.create', {body: params.delete_if {|k, v| k == :path}.to_json})
