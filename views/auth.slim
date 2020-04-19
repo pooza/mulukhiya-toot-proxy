@@ -22,7 +22,7 @@ html lang='ja'
               - if params.dig(:errors, :code)
                 span class='alert' = params[:errors][:code].join
             li
-              button id='submit_button' 認証する
+              button 認証する
       - if controller.name == 'Misskey'
         ol
           li
