@@ -9,8 +9,7 @@ html lang='ja'
     main id='app'
       == slim.render 'fragment/message'
       h2 環境設定
-      #result-container v-if='result'
-      section
+      section v-if='username'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
