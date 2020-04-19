@@ -1,9 +1,13 @@
+$serif: serif
+$sans-serif: 'Francois One', sans-serif
+$monospace: Inconsolata, monospace
+
 body
   width: 780px
   margin: auto
   font:
     size: 1.2em
-    family: serif
+    family: $serif
   background:
     image: url(/mulukhiya/logo.jpg)
     repeat: no-repeat
@@ -13,7 +17,7 @@ body
 h1,h2,h3,h4,h5,h6
   margin: 0.5em
   font:
-    family: 'Francois One', sans-serif
+    family: $sans-serif
     weight: bold
 
 h1
@@ -46,14 +50,14 @@ header
     repeat: no-repeat
     color: green
   font:
-    family: 'Francois One', sans-serif
+    family: $sans-serif
   color: white
   text:
     align: right
 
 footer
   font:
-    family: 'Francois One', sans-serif
+    family: $sans-serif
     size: 0.8em
   text:
     align: center
@@ -75,7 +79,7 @@ nav.breadcrumbs
     padding: 0
     li
       font:
-        family: 'Francois One', sans-serif
+        family: $sans-serif
         size: 0.8em
       display: inline
       margin: 0 6px
@@ -101,7 +105,7 @@ nav.main-menu
     background:
       color: honeydew
     font:
-      family: 'Francois One', sans-serif
+      family: $sans-serif
     color: black
     text:
       decoration: none
@@ -112,10 +116,10 @@ nav.main-menu
 
 main
   border:
-    width: 1px
+    width: 2px
     style: solid
     color: black
-    radius: 10px
+    radius: 6px
   margin: 6px 0
   padding: 6px
   background:
@@ -132,7 +136,7 @@ pre
   padding: 6px
   overflow: auto
   font:
-    family: Inconsolata, monospace
+    family: $monospace
 
 section.config h3:hover
   background:
@@ -147,7 +151,7 @@ textarea
     radius: 6px
   font:
     size: 1em
-    family: Inconsolata, monospace
+    family: $monospace
   margin: 0 0.5em
   width: 680px
   height: 4em
@@ -165,13 +169,13 @@ input.code
 button
   font:
     size: 1.2em
-    family: 'Francois One', sans-serif
+    family: $sans-serif
     weight: bold
   border
     width: 1px
     style: solid
     color: lightgreen
-    radius: 6px
+  border-radius: 6px
   background:
     color: honeydew
   padding: 6px 30px
@@ -201,17 +205,15 @@ a:hover
 
 #message-container
   border:
-    width: 1px
-    style: solid
-    color: black
+    width: 0
     radius: 6px
   padding: 0
-  margin: 20px 10px
+  margin: 10px
   background:
     color: lightgray
   opacity: 0.85
   font:
-    family: 'Francois One', sans-serif
+    family: $sans-serif
 
 #result-container pre
   font:
@@ -241,7 +243,7 @@ a:hover
     width: 600px
     font:
       size: 1em
-      family: Inconsolata, monospace
+      family: $monospace
   input[type="checkbox"]
     margin:
       left: 0.5em
