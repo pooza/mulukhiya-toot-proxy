@@ -25,6 +25,7 @@ module Mulukhiya
         slim: SlimRenderer,
         package: Package,
         controller: Environment.controller_class,
+        environment: Environment.type,
         crypt: Crypt,
         scripts: @config['/webui/scripts'],
         stylesheets: @config['/webui/stylesheets'],

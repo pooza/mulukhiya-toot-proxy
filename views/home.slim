@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs'
-    main id='app'
+    main id='app' class=environment
       == slim.render 'fragment/message'
       h1 = package.name
       nav class='main-menu'
