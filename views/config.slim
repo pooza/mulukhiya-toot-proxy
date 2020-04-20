@@ -6,11 +6,10 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: '環境設定'}
-    main id='app'
+    main id='app' class=environment
       == slim.render 'fragment/message'
       h2 環境設定
-      #result-container v-if='result'
-      section
+      section v-if='username'
         h3 現在の設定
         #result-container
           pre = '{{result}}'

@@ -1,209 +1,273 @@
+$serif: serif
+$sans-serif: 'Francois One', sans-serif
+$monospace: Inconsolata, monospace
+
 body
   width: 780px
   margin: auto
-  font-size: 1.2em
-  font-family: serif
-  background: url(/mulukhiya/logo.jpg) no-repeat
-  background-position: top right
+  font:
+    size: 1.2em
+    family: $serif
+  background:
+    image: url(/mulukhiya/logo.jpg)
+    repeat: no-repeat
+    position: top right
   -webkit-text-size-adjust: 100%
 
 h1,h2,h3,h4,h5,h6
   margin: 0.5em
-  font-family: 'Francois One', sans-serif
-  font-weight: bold
-
-p
-  margin: 0 0.5em
+  font:
+    family: $sans-serif
+    weight: bold
 
 h1
-  background: url(/mulukhiya/icon.png) no-repeat
-  background-position: center
-  text-align: center
-  font-size: 3em
+  background:
+    image: url(/mulukhiya/icon.png)
+    repeat: no-repeat
+    position: center
+  text:
+    align: center
+  font:
+    size: 3em
   line-height: 2em
 
 h2:before
   content: '■ '
 
 h3
-  border-bottom: solid darkgray 1px
+  border:
+    bottom:
+      style: solid
+      color: darkgray
+      width: 1px
+
+p
+  margin: 0 0.5em
 
 header
-  background: url(/mulukhiya/icon-24x24.png) no-repeat
-  background-color: green
-  font-family: 'Francois One', sans-serif
+  background:
+    image: url(/mulukhiya/icon-24x24.png)
+    repeat: no-repeat
+    color: green
+  font:
+    family: $sans-serif
   color: white
-  text-align: right
+  text:
+    align: right
 
 footer
-  font-family: 'Francois One', sans-serif
-  text-align: center
-  font-size: 0.8em
-
-footer a
-  color: dimgray
-
-footer a:visited
-  color: dimgray
-
-footer a:hover
-  color: black
+  font:
+    family: $sans-serif
+    size: 0.8em
+  text:
+    align: center
+  a
+    color: dimgray
+  a:visited
+    color: dimgray
+  a:hover
+    color: black
 
 nav.breadcrumbs
-  margin: 5px 0
-  background-color: lightgreen
+  margin: 6px 0
+  border:
+    width: 0
+    radius: 6px
+  padding: 6px
+  background:
+    color: lightgreen
   opacity: 0.85
+  ul
+    margin: 0
+    line-height: 0.9em
+    padding: 0
+    li
+      font:
+        family: $sans-serif
+        size: 0.8em
+      display: inline
+      margin: 0 6px
+    a
+      color: dimgray
+    a:visited
+      color: dimgray
+    a:hover
+      color: black
+    a:after
+      content: ' >'
 
-nav.breadcrumbs ul
-  margin: 0
-  line-height: 0.9em
-  padding: 0
-
-nav.breadcrumbs ul li
-  font-family: 'Francois One', sans-serif
-  font-size: 0.8em
-  display: inline
-  margin: 0 5px
-
-nav.breadcrumbs ul a
-  color: dimgray
-
-nav.breadcrumbs ul a:visited
-  color: dimgray
-
-nav.breadcrumbs ul a:hover
-  color: black
-
-nav.breadcrumbs ul a:after
-  content: ' >'
-
-nav.main-menu a
-  display: block
-  margin: 12px 128px
-  padding: 6px 12px
-  border: 1px solid lightgreen
-  border-radius: 4px
-  background-color: honeydew
-  font-family: 'Francois One', sans-serif
-  color: black
-  text-decoration: none
-
-nav.main-menu a:hover
-  color: black
-  background-color: lightgreen
+nav.main-menu
+  a
+    display: block
+    margin: 0.5em 8em
+    padding: 0.5em 1em
+    border:
+      width: 1px
+      style: solid
+      color: lightgreen
+      radius: 6px
+    background:
+      color: honeydew
+    font:
+      family: $sans-serif
+    color: black
+    text:
+      decoration: none
+  a:hover
+    color: black
+    background:
+      color: lightgreen
 
 main
-  border: 1px solid black
+  border:
+    width: 2px
+    style: solid
+    color: black
+    radius: 6px
   margin: 6px 0
-  padding: 6px
-  border-radius: 10px
-  background: white
+  padding: 0.5em
+  background:
+    color: white
   opacity: 0.95
 
+main.development
+  background:
+    color: mistyrose
+
 pre
-  border: 1px solid black
-  border-radius: 4px
+  border:
+    width: 1px
+    style: solid
+    color: black
+    radius: 6px
   margin: 0 0.5em
-  padding: 6px
+  padding: 0.5em
   overflow: auto
-  font-family: Inconsolata, monospace
+  font:
+    family: $monospace
 
 section.config h3:hover
-  background-color: aliceblue
+  background:
+    color: aliceblue
   cursor: pointer
 
-#message-container
-  border: 1px solid black
-  padding: 0
-  border-radius: 4px
-  margin: 20px 10px
-  background-color: lightgray
-  opacity: 0.85
-  font-family: 'Francois One', sans-serif
-
 textarea
-  border: 1px solid black
-  border-radius: 4px
-  font-size: 1em
-  font-family: Inconsolata, monospace
+  border:
+    width: 1px
+    style: solid
+    color: black
+    radius: 6px
+  font:
+    size: 1em
+    family: $monospace
   margin: 0 0.5em
   width: 680px
-  height: 4em
+  height: 6em
 
 textarea.short
-  height: 1em
-
-.v-select
-  margin: 0 0.5em
-  width: 680px
-  font-size: 0.8em
-
-.inline-field-container h4
-  display: inline-block
-  width: 100px
-
-.inline-field-container input
-  border: 1px solid black
-  border-radius: 4px
-  display: inline-block
-  width: 600px
-  font-size: 1em
-  font-family: Inconsolata, monospace
-
-.inline-field-container input[type="checkbox"]
-  margin-left: 0.5em
-  width: 1.5em
-
-.inline-field-container label
-  font-size: 0.8em
-
-.field-update-button-container
-  text-align: center
-  margin: 8px 0
-
-.field-update-button-container button
-  display: inline-block
-  font-size: 0.8em
-  border-radius: 4px
+  height: 2em
 
 input
-  font-size: 1.2em
+  font:
+    size: 1em
 
 input.code
   width: 680px
 
 button
-  font-size: 1.2em
-  font-family: 'Francois One', sans-serif
-  font-weight: bold
-  border: 1px solid lightgreen
-  background-color: honeydew
-  padding: 4px 30px
+  font:
+    size: 1.2em
+    family: $sans-serif
+    weight: bold
+  border:
+    width: 1px
+    style: solid
+    color: lightgreen
+    radius: 6px
+  background:
+    color: honeydew
+  padding: 6px 30px
   cursor: pointer
 
 button:hover
-  background-color: lightgreen
+  background:
+    color: lightgreen
 
 i
   cursor: pointer
 
 a
   color: royalblue
-  text-decoration: none
+  text:
+    decoration: none
 
 a:visited
   color: royalblue
-  text-decoration: none
+  text:
+    decoration: none
 
 a:hover
   color: navy
-  text-decoration: underline
+  text:
+    decoration: underline
+
+#message-container
+  border:
+    width: 0
+    radius: 6px
+  padding: 0
+  margin: 0.5em
+  background:
+    color: lightgray
+  opacity: 0.85
+  font:
+    family: $sans-serif
 
 #result-container pre
-  font-size: 0.8em
+  font:
+    size: 0.8em
 
 #result-container.error pre
-  background-color: lightcoral
+  background:
+    color: lightcoral
+
+.v-select
+  margin: 0 0.5em
+  width: 680px
+  font:
+    size: 0.8em
+
+.inline-field-container
+  h4
+    display: inline-block
+    width: 100px
+  input
+    border:
+      width: 1px
+      style: solid
+      color: black
+      radius: 6px
+    display: inline-block
+    width: 600px
+    font:
+      size: 1em
+      family: $monospace
+  input[type="checkbox"]
+    margin:
+      left: 0.5em
+    width: 1.5em
+  label
+    font:
+      size: 0.8em
+
+.field-update-button-container
+  text:
+    align: center
+  margin: 6px 0
+  button
+    display: inline-block
+    font:
+      size: 0.8em
 
 .alert
   color: red

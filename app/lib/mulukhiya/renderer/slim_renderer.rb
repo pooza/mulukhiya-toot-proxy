@@ -2,6 +2,13 @@ module Mulukhiya
   class SlimRenderer < Ginseng::Web::SlimRenderer
     include Package
 
+    def initialize(template = nil)
+      Slim::Engine.set_options(
+        pretty: Environment.development?,
+      )
+      super(template)
+    end
+
     def self.render(name, values = {})
       slim = SlimRenderer.new(name)
       slim.params.merge!(values)
@@ -18,6 +25,7 @@ module Mulukhiya
         slim: SlimRenderer,
         package: Package,
         controller: Environment.controller_class,
+        environment: Environment.type,
         crypt: Crypt,
         scripts: @config['/webui/scripts'],
         stylesheets: @config['/webui/stylesheets'],

@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'アプリケーションの認証'}
-    main id='app'
+    main id='app' class=environment
       == slim.render 'fragment/message'
       h2 = '{{auth_command}}'
       - if controller.name == 'Mastodon'
@@ -22,7 +22,7 @@ html lang='ja'
               - if params.dig(:errors, :code)
                 span class='alert' = params[:errors][:code].join
             li
-              button id='submit_button' 認証する
+              button 認証する
       - if controller.name == 'Misskey'
         ol
           li
