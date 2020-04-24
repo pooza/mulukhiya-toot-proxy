@@ -5,7 +5,7 @@ module Mulukhiya
     attr_accessor :account
 
     def initialize(size = 0, val = nil)
-      super(size, val)
+      super
       @logger = Logger.new
     end
 
@@ -16,7 +16,7 @@ module Mulukhiya
 
     def push(entry)
       return unless entry.present?
-      super(entry)
+      super
       @logger.info(entry)
       @dump = nil
     end

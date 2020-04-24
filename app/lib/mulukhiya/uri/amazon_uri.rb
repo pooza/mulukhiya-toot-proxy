@@ -1,7 +1,7 @@
 module Mulukhiya
   class AmazonURI < Ginseng::URI
     def initialize(options = {})
-      super(options)
+      super
       @config = Config.instance
       @service = AmazonService.new
     end

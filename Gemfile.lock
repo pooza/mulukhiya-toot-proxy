@@ -1,22 +1,25 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: ae04675f3fb73d4979a2c64252fab4640bdd4781
+  revision: a98fa94f7bb6c3d2f244eec3024d45a39b1b6861
   specs:
-    ginseng-core (1.6.5)
+    ginseng-core (1.7.1)
       activesupport
       addressable
       bundler (>= 2.0.0)
-      csv
       daemon-spawn
       httparty
-      json (>= 2.3.0)
       rake
       rest-client
       syslog-logger
-      test-unit
       unicode
       yajl-ruby
       zeitwerk (>= 2.3.0)
+
+GIT
+  remote: https://github.com/pooza/ginseng-fediverse.git
+  revision: 997d24e11f5e59798d7369a2c9ead2a89979ff57
+  specs:
+    ginseng-fediverse (1.0.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -71,7 +74,6 @@ GEM
     concurrent-ruby (1.1.6)
     connection_pool (2.2.2)
     crass (1.0.6)
-    csv (3.1.2)
     daemon-spawn (0.4.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -301,6 +303,7 @@ DEPENDENCIES
   dry-validation
   fastimage
   ginseng-core!
+  ginseng-fediverse!
   ginseng-postgres!
   ginseng-web!
   mimemagic
@@ -315,6 +318,7 @@ DEPENDENCIES
   sidekiq-failures
   sidekiq-scheduler
   slim_lint
+  test-unit
   vacuum
 
 RUBY VERSION

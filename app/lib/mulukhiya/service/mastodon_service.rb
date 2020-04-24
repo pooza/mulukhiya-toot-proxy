@@ -1,37 +1,17 @@
 module Mulukhiya
-  class MastodonService < Ginseng::Mastodon
+  class MastodonService < Ginseng::Fediverse::MastodonService
     include Package
     attr_reader :token
 
     def initialize(uri = nil, token = nil)
       @config = Config.instance
-      @logger = Logger.new
-      uri ||= @config['/mastodon/url']
       token ||= @config['/agent/test/token']
       super
-      @uri = TootURI.parse(uri)
-      @http.base_uri = @uri
-      @token = token
-    end
-
-    alias note toot
-
-    alias post toot
-
-    def fetch_toot(id)
-      return @http.get("/api/v1/statuses/#{id}")
     end
 
     def search(keyword, params = {})
       params[:limit] ||= @config['/mastodon/search/limit']
-      return super(keyword, params)
-    end
-
-    def account
-      @account ||= Environment.account_class.get(token: @token)
-      return @account
-    rescue
-      return nil
+      return super
     end
 
     def token=(token)
@@ -39,47 +19,11 @@ module Mulukhiya
       @account = nil
     end
 
-    def oauth_client
-      unless File.exist?(oauth_client_path)
-        r = @http.post('/api/v1/apps', {
-          body: {
-            client_name: Package.name,
-            website: @config['/package/url'],
-            redirect_uris: @config['/mastodon/oauth/redirect_uri'],
-            scopes: @config['/mastodon/oauth/scopes'].join(' '),
-          }.to_json,
-        })
-        File.write(oauth_client_path, r.parsed_response.to_json)
-      end
-      return JSON.parse(File.read(oauth_client_path))
-    end
-
-    def oauth_client_path
-      return File.join(Environment.dir, 'tmp/cache/oauth_cilent.json')
-    end
-
-    def oauth_uri
-      uri = @http.create_uri('/oauth/authorize')
-      uri.query_values = {
-        client_id: oauth_client['client_id'],
-        response_type: 'code',
-        redirect_uri: @config['/mastodon/oauth/redirect_uri'],
-        scope: @config['/mastodon/oauth/scopes'].join(' '),
-      }
-      return uri
-    end
-
-    def auth(code)
-      return @http.post('/oauth/token', {
-        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
-        body: {
-          'grant_type' => 'authorization_code',
-          'redirect_uri' => @config['/mastodon/oauth/redirect_uri'],
-          'client_id' => oauth_client['client_id'],
-          'client_secret' => oauth_client['client_secret'],
-          'code' => code,
-        },
-      })
+    def account
+      @account ||= Environment.account_class.get(token: @token)
+      return @account
+    rescue
+      return nil
     end
 
     def notify(account, message)

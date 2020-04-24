@@ -1,7 +1,7 @@
 module Mulukhiya
   class NoteURI < Ginseng::URI
     def initialize(options = {})
-      super(options)
+      super
       @config = Config.instance
       @logger = Logger.new
     end

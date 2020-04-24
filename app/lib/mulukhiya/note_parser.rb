@@ -6,7 +6,7 @@ module Mulukhiya
     attr_accessor :account
 
     def initialize(text = '')
-      super(text)
+      super
       if Environment.dolphin?
         @service = DolphinService.new
       else

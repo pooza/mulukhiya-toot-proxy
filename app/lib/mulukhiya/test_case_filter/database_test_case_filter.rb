@@ -7,7 +7,7 @@ module Mulukhiya
     private
 
     def initialize(params)
-      super(params)
+      super
       Postgres.connect if Postgres.config?
     end
   end

@@ -3,7 +3,7 @@ require 'nokogiri'
 module Mulukhiya
   class CanonicalURLHandler < URLHandler
     def initialize(params = {})
-      super(params)
+      super
       @canonicals = {}
       @http = HTTP.new
     end
