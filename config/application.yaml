@@ -99,9 +99,9 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
-hashtag: &root_hashtag
+hashtag:
   pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-acct: &root_acct
+acct:
   pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
@@ -206,8 +206,6 @@ mastodon:
   attachment: *mastodon_media
   search:
     limit: 40
-  hashtag: *root_hashtag
-  acct: *root_acct
 misskey:
   url: https://misskey.example.com/
   handlers:
@@ -286,8 +284,6 @@ misskey:
   file: &misskey_file
     key: fileIds
   attachment: *misskey_file
-  hashtag: *root_hashtag
-  acct: *root_acct
 dolphin:
   url: https://dolphin.example.com/
   handlers:
@@ -331,8 +327,6 @@ dolphin:
   status: *misskey_note
   file: *misskey_file
   attachment: *misskey_file
-  hashtag: *root_hashtag
-  acct: *root_acct
 amazon:
   marketplace: jp
   urls:
