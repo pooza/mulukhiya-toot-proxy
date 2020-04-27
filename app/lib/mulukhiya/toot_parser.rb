@@ -27,13 +27,5 @@ module Mulukhiya
       length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
     end
-
-    def self.hashtag_pattern
-      return Regexp.new(Config.instance['/mastodon/hashtag/pattern'], Regexp::IGNORECASE)
-    end
-
-    def self.acct_pattern
-      return Regexp.new(Config.instance['/mastodon/acct/pattern'], Regexp::IGNORECASE)
-    end
   end
 end

@@ -175,6 +175,11 @@ html lang='ja'
               if (program.air) {
                 tags.push('エア番組')
               }
+              if (program.extra_tags) {
+                program.extra_tags.map(tag => {
+                  tags.push(tag)
+                })
+              }
               this.tags = tags.join("\n")
             }
           },

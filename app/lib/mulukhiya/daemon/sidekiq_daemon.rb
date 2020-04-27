@@ -3,9 +3,11 @@ require 'sidekiq/api'
 module Mulukhiya
   class SidekiqDaemon < Daemon
     def command
-      return CommandLine.new(
-        ['sidekiq', '--config', config_cache_path, '--require', initializer_path],
-      )
+      return CommandLine.new([
+        'sidekiq',
+        '--config', config_cache_path,
+        '--require', initializer_path
+      ])
     end
 
     def initializer_path

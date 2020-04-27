@@ -1,7 +1,7 @@
 module Mulukhiya
   class AmazonURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
-      super(params)
+      super
       @items = {}
       @service = AmazonService.new
     rescue => e

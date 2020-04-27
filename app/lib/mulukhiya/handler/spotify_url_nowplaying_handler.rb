@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpotifyURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
-      super(params)
+      super
       @uris = {}
       @service = SpotifyService.new
     rescue => e

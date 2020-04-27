@@ -5,7 +5,7 @@ module Mulukhiya
   class MediaFile < File
     def initialize(path, mode = 'r', perm = 0o600)
       @logger = Logger.new
-      super(path, mode, perm)
+      super
     end
 
     def valid?

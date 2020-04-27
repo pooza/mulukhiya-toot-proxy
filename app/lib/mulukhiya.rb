@@ -3,6 +3,7 @@ require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'
 require 'ginseng/web'
+require 'ginseng/fediverse'
 
 module Mulukhiya
   def self.dir

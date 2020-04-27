@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def dispatch
-      raise AuthError, 'Invalid access token' unless sns.account
+      raise Ginseng::AuthError, 'Invalid access token' unless sns.account
       sns.account.config.update(parser.params)
       notify(message) unless Environment.test?
     end

@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpotifyURI < Ginseng::URI
     def initialize(options = {})
-      super(options)
+      super
       @config = Config.instance
       @spotify = SpotifyService.new
     end

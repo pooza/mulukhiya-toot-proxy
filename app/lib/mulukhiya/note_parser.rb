@@ -6,7 +6,7 @@ module Mulukhiya
     attr_accessor :account
 
     def initialize(text = '')
-      super(text)
+      super
       if Environment.dolphin?
         @service = DolphinService.new
       else
@@ -38,14 +38,6 @@ module Mulukhiya
       length = @config['/misskey/note/max_length']
       length = length - all_tags.join(' ').length - 1 if create_tags.present?
       return length
-    end
-
-    def self.hashtag_pattern
-      return Regexp.new(Config.instance['/misskey/hashtag/pattern'], Regexp::IGNORECASE)
-    end
-
-    def self.acct_pattern
-      return Regexp.new(Config.instance['/misskey/acct/pattern'], Regexp::IGNORECASE)
     end
   end
 end

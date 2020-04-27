@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesURI < Ginseng::URI
     def initialize(options = {})
-      super(options)
+      super
       @config = Config.instance
       @service = ItunesService.new
       @http = HTTP.new

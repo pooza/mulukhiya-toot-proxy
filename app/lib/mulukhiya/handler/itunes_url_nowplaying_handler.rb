@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
-      super(params)
+      super
       @tracks = {}
       @service = ItunesService.new
     end

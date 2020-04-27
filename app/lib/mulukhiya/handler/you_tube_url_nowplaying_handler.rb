@@ -1,7 +1,7 @@
 module Mulukhiya
   class YouTubeURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
-      super(params)
+      super
       @videos = {}
     end
 

@@ -11,19 +11,19 @@ module Mulukhiya
     end
 
     def get(key)
-      return super(key)
+      return super
     rescue => e
       raise Ginseng::RedisError, e.message, e.backtrace
     end
 
     def set(key, value)
-      return super(key, value)
+      return super
     rescue => e
       raise Ginseng::RedisError, e.message, e.backtrace
     end
 
     def unlink(key)
-      return super(key)
+      return super
     rescue => e
       raise Ginseng::RedisError, e.message, e.backtrace
     end

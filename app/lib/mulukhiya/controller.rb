@@ -63,7 +63,7 @@ module Mulukhiya
         config: @sns.account.config.to_h,
       }
       return @renderer.to_s
-    rescue AuthError, Ginseng::ValidateError => e
+    rescue Ginseng::AuthError, Ginseng::ValidateError => e
       @renderer.message = {error: e.message}
       @renderer.status = e.status
       return @renderer.to_s

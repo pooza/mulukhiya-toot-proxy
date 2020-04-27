@@ -6,6 +6,7 @@ gem 'dropbox_api'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'ginseng-core', github: 'pooza/ginseng-core'
+gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
 gem 'ginseng-web', github: 'pooza/ginseng-web'
 gem 'mimemagic'
@@ -23,4 +24,5 @@ group :development do
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'slim_lint'
+  gem 'test-unit'
 end

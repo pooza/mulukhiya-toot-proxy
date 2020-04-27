@@ -23,8 +23,8 @@ module Mulukhiya
 
     def uris
       return enum_for(__method__) unless block_given?
-      text.scan(%r{https?://[^\s[:cntrl:]]+}).each do |link|
-        yield Ginseng::URI.parse(link)
+      Ginseng::URI.scan(text).each do |link|
+        yield link
       end
     end
 
