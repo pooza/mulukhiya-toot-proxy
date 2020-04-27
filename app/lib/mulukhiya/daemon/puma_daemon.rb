@@ -1,7 +1,10 @@
 module Mulukhiya
   class PumaDaemon < Daemon
     def command
-      return CommandLine.new(['puma', '--config', initializer_path])
+      return CommandLine.new([
+        'puma',
+        '--config', initializer_path
+      ])
     end
 
     def initializer_path
