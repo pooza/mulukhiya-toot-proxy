@@ -1,5 +1,5 @@
 package:
-  version: 3.6.10
+  version: 3.6.11
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -99,10 +99,6 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
-hashtag:
-  pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-acct:
-  pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
   handlers:

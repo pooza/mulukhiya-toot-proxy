@@ -6,9 +6,9 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
-      @account = Environment.test_account
-      @toot = @account.recent_toot
       @parser = TootParser.new
+      @parser.account = Environment.test_account
+      @toot = @parser.account.recent_toot
     end
 
     def app
@@ -40,7 +40,7 @@ module Mulukhiya
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 403)
 
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       get '/mulukhiya/config'
       assert(last_response.ok?)
     end
@@ -52,40 +52,40 @@ module Mulukhiya
     end
 
     def test_search
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       get '/api/v2/search?q=hoge'
       assert(last_response.ok?)
 
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       get '/api/v1/search?q=hoge'
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 404)
     end
 
     def test_toot_length
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       post '/api/v1/statuses', {status_field => 'A' * @parser.max_length}
       assert(last_response.ok?)
 
-      header 'Authorization', "Bearer #{@account.token}"
-      post '/api/v1/statuses', {status_field => 'A' * (@parser.max_length + 1)}
+      header 'Authorization', "Bearer #{@parser.account.token}"
+      post '/api/v1/statuses', {status_field => 'B' * (@parser.max_length + 1)}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
 
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => 'B' * @parser.max_length}.to_json
+      post '/api/v1/statuses', {status_field => 'C' * @parser.max_length}.to_json
       assert(last_response.ok?)
 
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => 'B' * (@parser.max_length + 1)}.to_json
+      post '/api/v1/statuses', {status_field => 'D' * (@parser.max_length + 1)}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
     end
 
     def test_toot_zenkaku
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {status_field => '！!！!！'}.to_json
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
@@ -101,7 +101,7 @@ module Mulukhiya
 
     def test_toot_response
       return if Handler.create('itunes_url_nowplaying').disable?
-      header 'Authorization', "Bearer #{@account.token}"
+      header 'Authorization', "Bearer #{@parser.account.token}"
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {status_field => '#nowplaying https://music.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
@@ -121,7 +121,7 @@ module Mulukhiya
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 404)
 
-      return unless hook = @account.webhook
+      return unless hook = @parser.account.webhook
 
       get hook.uri.path
       assert(last_response.ok?)
