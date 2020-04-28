@@ -3,6 +3,15 @@ module Mulukhiya
     include Package
     attr_accessor :account
 
+    def initialize(text = '')
+      super
+      if Environment.dolphin?
+        @service = DolphinService.new
+      else
+        @service = MisskeyService.new
+      end
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(NoteParser.acct_pattern).map(&:first).each do |acct|
