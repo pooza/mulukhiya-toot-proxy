@@ -8,7 +8,6 @@ module Mulukhiya
       @config = Config.instance
       @parser = TootParser.new
       @parser.account = Environment.test_account
-      @toot = @parser.account.recent_toot
     end
 
     def app
