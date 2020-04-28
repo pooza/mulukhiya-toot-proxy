@@ -7,8 +7,6 @@ module Mulukhiya
         body: create_body(params),
         path: create_path(account.username),
       )
-    rescue Ginseng::RequestError => e
-      @logger.error(worker: self.class.to_s, error: e.message)
     end
 
     def create_path(username)
