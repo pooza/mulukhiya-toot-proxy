@@ -19,6 +19,21 @@ module Mulukhiya
       end
     end
 
+    def to_md
+      md = text.clone
+      tags.sort_by(&:length).reverse_each do |tag|
+        md.gsub!("\##{tag}", "[#{HASH}#{tag}](#{@service.create_uri("/tags/#{tag}")})")
+      end
+      accts.sort_by do |v|
+        v.scan(/@/).count * 100_000_000 + v.length
+      end.map(&:to_s).reverse_each do |acct|
+        md.sub!(acct, "[#{acct.gsub('@', ATMARK)}](#{@service.create_uri("/#{acct}")})")
+      end
+      md.gsub!(HASH, '#')
+      md.gsub!(ATMARK, '@')
+      return NoteParser.sanitize(md)
+    end
+
     def all_tags
       unless @all_tags
         container = TagContainer.new
@@ -30,6 +45,10 @@ module Mulukhiya
       return @all_tags
     end
 
-    alias create_tags all_tags
+    def max_length
+      length = super
+      length = length - all_tags.join(' ').length - 1 if all_tags.present?
+      return length
+    end
   end
 end

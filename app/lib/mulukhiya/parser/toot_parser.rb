@@ -10,6 +10,18 @@ module Mulukhiya
       end
     end
 
+    def to_md
+      md = text.clone
+      ['.u-url', '.hashtag'].each do |style_class|
+        nokogiri.css(style_class).each do |link|
+          md.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
+        rescue => e
+          @logger.error(Ginseng::Error.create(e).to_h.merge(link: link.to_s))
+        end
+      end
+      return TootParser.sanitize(md)
+    end
+
     def all_tags
       unless @all_tags
         container = TagContainer.new
@@ -21,6 +33,10 @@ module Mulukhiya
       return @all_tags
     end
 
-    alias create_tags all_tags
+    def max_length
+      length = super
+      length = length - all_tags.join(' ').length - 1 if all_tags.present?
+      return length
+    end
   end
 end
