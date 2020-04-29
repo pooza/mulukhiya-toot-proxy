@@ -24,9 +24,7 @@ module Mulukhiya
       tags.sort_by(&:length).reverse_each do |tag|
         md.gsub!("\##{tag}", "[#{HASH}#{tag}](#{@service.create_uri("/tags/#{tag}")})")
       end
-      accts.sort_by do |v|
-        v.scan(/@/).count * 100_000_000 + v.length
-      end.map(&:to_s).reverse_each do |acct|
+      accts.sort_by do |v|v.scan(/@/).count * 100_000_000 + v.length.reverse_each do |acct|
         md.sub!(acct, "[#{acct.gsub('@', ATMARK)}](#{@service.create_uri("/#{acct}")})")
       end
       md.gsub!(HASH, '#')
