@@ -1,10 +1,18 @@
-#message-container class='alert' v-if='message'
-  p = '{{message}}'
-#message-container v-else-if='username'
+- unless environment == 'production'
+  .message-container
+    p
+      = 'environment: '
+      = environment
+
+.message-container v-if='username'
   p
     | login: @
     = '{{username}}'
-#message-container v-else-if='token_error'
+
+.message-container class='alert' v-if='message'
+  p = '{{message}}'
+
+.message-container v-if='token_error'
   p
     - if controller.webhook?
       a href='/mulukhiya/app/auth' アプリケーションの認証

@@ -6,8 +6,8 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
-      @account = Environment.test_account
       @parser = NoteParser.new
+      @parser.account = Environment.test_account
     end
 
     def app
@@ -52,16 +52,16 @@ module Mulukhiya
       post '/api/notes/create', {status_field => 'A' * @parser.max_length, 'i' => @config['/agent/test/token']}
       assert(last_response.ok?)
 
-      post '/api/notes/create', {status_field => 'A' * (@parser.max_length + 1), 'i' => @config['/agent/test/token']}
+      post '/api/notes/create', {status_field => 'B' * (@parser.max_length + 1), 'i' => @config['/agent/test/token']}
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
 
       header 'Content-Type', 'application/json'
-      post '/api/notes/create', {status_field => 'B' * @parser.max_length, 'i' => @config['/agent/test/token']}.to_json
+      post '/api/notes/create', {status_field => 'C' * @parser.max_length, 'i' => @config['/agent/test/token']}.to_json
       assert(last_response.ok?)
 
       header 'Content-Type', 'application/json'
-      post '/api/notes/create', {status_field => 'B' * (@parser.max_length + 1), 'i' => @config['/agent/test/token']}.to_json
+      post '/api/notes/create', {status_field => 'D' * (@parser.max_length + 1), 'i' => @config['/agent/test/token']}.to_json
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 400)
     end
@@ -93,7 +93,7 @@ module Mulukhiya
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 404)
 
-      return unless hook = @account.webhook
+      return unless hook = @parser.account.webhook
 
       get hook.uri.path
       assert(last_response.ok?)

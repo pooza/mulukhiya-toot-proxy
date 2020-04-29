@@ -1,5 +1,9 @@
 module Mulukhiya
   class DropboxClippingCommandHandler < CommandHandler
+    def disable?
+      return super || sns.account.dropbox.nil?
+    end
+
     def dispatch
       uri = Ginseng::URI.parse(parser.params['url'])
       return unless uri.absolute?

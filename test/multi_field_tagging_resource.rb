@@ -14,7 +14,7 @@ module Mulukhiya
     def test_parse
       result = @resource.parse
       assert_kind_of(Hash, result)
-      assert_equal(result['mulukhiya-toot-proxy'], {pattern: /mulukhiya.? ?toot.? ?proxy/})
+      assert_equal(result['ginseng-core'], {pattern: /ginseng.? ?core/})
     end
   end
 end

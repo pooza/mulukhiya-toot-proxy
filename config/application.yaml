@@ -1,5 +1,5 @@
 package:
-  version: 3.6.10
+  version: 3.6.11
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -56,10 +56,16 @@ test:
     - name: amazon
       cases:
         - amazon_service
+        - amazon_image_handler
+        - amazon_nowplaying_handler
+        - amazon_url_nowplaying_handler
     - name: spotify
       cases:
         - spotify_service
         - spotify_uri
+        - spotify_image_handler
+        - spotify_nowplaying_handler
+        - spotify_url_nowplaying_handler
     - name: dolphin
       cases:
         - mastodon_controller
@@ -78,9 +84,13 @@ test:
     - name: dropbox
       cases:
         - dropbox_clipper
+        - dropbox_bookmark_handler
+        - dropbox_clipping_command_handler
     - name: growi
       cases:
         - growi_clipper
+        - growi_bookmark_handler
+        - growi_clipping_command_handler
     - name: webhook
       cases:
         - webhook
@@ -99,10 +109,6 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
-hashtag:
-  pattern: (?:^|[^\/\)\w])#([[:word:]_]*[[:alpha:]_·][[:word:]_]*)
-acct:
-  pattern: '((?<=^|[^\/[:word:]])@(([a-z0-9_]+([a-z0-9_\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\.\-]+[a-z0-9]+)?))'
 mastodon:
   url: https://mstdn.example.com/
   handlers:

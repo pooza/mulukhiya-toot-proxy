@@ -1,9 +1,9 @@
 module Mulukhiya
-  class NoteParser < StatusParser
+  class NoteParser < Ginseng::Fediverse::NoteParser
+    include Package
+    attr_accessor :account
     ATMARK = '__ATMARK__'.freeze
     HASH = '__HASH__'.freeze
-    attr_accessor :dolphin
-    attr_accessor :account
 
     def initialize(text = '')
       super
@@ -26,17 +26,32 @@ module Mulukhiya
       tags.sort_by(&:length).reverse_each do |tag|
         md.gsub!("\##{tag}", "[#{HASH}#{tag}](#{@service.create_uri("/tags/#{tag}")})")
       end
-      accts.sort_by {|v| v.scan(/@/).count * 100_000_000 + v.length}.reverse_each do |acct|
+      accts = self.accts.map(&:to_s).sort_by do |acct|
+        v = acct.to_s
+        v.scan(/@/).count * 100_000_000 + v.length
+      end
+      accts.reverse_each do |acct|
         md.sub!(acct, "[#{acct.gsub('@', ATMARK)}](#{@service.create_uri("/#{acct}")})")
       end
       md.gsub!(HASH, '#')
       md.gsub!(ATMARK, '@')
-      return StatusParser.sanitize(md)
+      return NoteParser.sanitize(md)
+    end
+
+    def all_tags
+      unless @all_tags
+        container = TagContainer.new
+        container.concat(tags)
+        container.concat(TagContainer.default_tags)
+        container.concat(@account.tags) if @account
+        return @all_tags = container.create_tags
+      end
+      return @all_tags
     end
 
     def max_length
-      length = @config['/misskey/note/max_length']
-      length = length - all_tags.join(' ').length - 1 if create_tags.present?
+      length = super
+      length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
   end
