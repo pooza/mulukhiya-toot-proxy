@@ -17,9 +17,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 77c2f8dd2398807cfad224b21376cbe031de8906
+  revision: 53fbdfc665526f4f0c9aec855267a8e5e6353c92
   specs:
-    ginseng-fediverse (1.1.0)
+    ginseng-fediverse (1.1.1)
       nokogiri
       sanitize
 
