@@ -300,7 +300,6 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  bundler (>= 2.0.0)
   dropbox_api
   dry-validation
   fastimage
