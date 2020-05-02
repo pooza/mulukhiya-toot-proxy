@@ -72,11 +72,18 @@ module Mulukhiya
       unless @image_uri
         track = @service.lookup(track_id)
         raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
-        @image_uri = Ginseng::URI.parse(track['artworkUrl100'])
+        @image_uri = Ginseng::URI.parse(track['artworkUrl100'].sub('100x100', pixel_size))
       end
       return @image_uri
     end
 
     alias image_url image_uri
+
+    private
+
+    def pixel_size
+      pixel = @config['/handler/itunes_image/pixel']
+      return "#{pixel}x#{pixel}"
+    end
   end
 end
