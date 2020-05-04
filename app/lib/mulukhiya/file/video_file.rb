@@ -35,8 +35,12 @@ module Mulukhiya
 
     def detail_info
       unless @detail_info
-        command = CommandLine.new
-        command.args = ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_streams', path]
+        command = CommandLine.new([
+          'ffprobe', '-v', 'quiet',
+          '-print_format', 'json',
+          '-show_streams',
+          path
+        ])
         command.exec
         @detail_info = JSON.parse(command.stdout)
       end
