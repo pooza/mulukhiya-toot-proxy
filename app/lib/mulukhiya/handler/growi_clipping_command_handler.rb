@@ -4,7 +4,7 @@ module Mulukhiya
       return super || sns.account.growi.nil?
     end
 
-    def dispatch
+    def exec
       uri = Ginseng::URI.parse(parser.params['url'])
       return unless uri.absolute?
       GrowiClippingWorker.perform_async(uri: uri.to_s, account_id: sns.account.id)

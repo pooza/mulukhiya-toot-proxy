@@ -54,7 +54,7 @@ module Mulukhiya
       end
 
       def recent_toot
-        rows = Postgres.instance.execute('recent_toot', {id: id})
+        rows = Postgres.instance.exec('recent_toot', {id: id})
         return Status[rows.first['id']] if rows.present?
         return nil
       end
@@ -93,7 +93,7 @@ module Mulukhiya
       def self.get(key)
         if key.key?(:token)
           return nil if key[:token].nil?
-          account = Postgres.instance.execute('token_owner', {token: key[:token]})&.first
+          account = Postgres.instance.exec('token_owner', {token: key[:token]})&.first
           account = Account[account[:id]]
           account.token = key[:token]
           return account

@@ -1,8 +1,7 @@
-- unless environment == 'production'
+- unless env.production?
   .message-container
     p
-      = 'environment: '
-      = environment
+      = "environment: #{env.type}"
 
 .message-container v-if='username'
   p

@@ -131,6 +131,10 @@ module Mulukhiya
       return Config.instance["/mastodon/status/visibility_names/#{name}"]
     end
 
+    def self.status_label
+      return Config.instance['/mastodon/toot/label']
+    end
+
     def self.events
       return Config.instance['/mastodon/events'].map(&:to_sym)
     end
@@ -138,7 +142,7 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       config = Config.instance
-      Postgres.instance.execute('webhook_tokens').each do |row|
+      Postgres.instance.exec('webhook_tokens').each do |row|
         values = {
           digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
           token: row['token'],

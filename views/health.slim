@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: '動作状況'}
-    main id='app' class=environment
+    main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 動作状況
       #result-container v-if='result'

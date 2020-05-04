@@ -1,5 +1,5 @@
 package:
-  version: 3.6.12
+  version: 3.6.13
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -456,13 +456,13 @@ sidekiq:
   concurrency: 5
   schedule:
     tagging_dictionary_update:
-      every: 5m
+      every: 1d
       class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update:
-      every: 5m
+      every: 1d
       class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
-      every: 5m
+      every: 1d
       class: Mulukhiya::MediaCleaningWorker
     announcement:
       every: 2m

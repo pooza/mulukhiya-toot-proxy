@@ -4,6 +4,8 @@ module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
 
+    alias exec execute
+
     def self.connect
       return instance
     end

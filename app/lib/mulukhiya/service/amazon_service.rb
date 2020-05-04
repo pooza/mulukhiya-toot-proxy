@@ -29,7 +29,7 @@ module Mulukhiya
       cnt ||= 0
       categories.each do |category|
         response = @vacuum.search_items(keywords: keyword, search_index: category)
-        raise response.status.to_s unless response.status == 200
+        raise "Invalid status #{response.status}" unless response.status == 200
         items = JSON.parse(response.to_s)['SearchResult']['Items']
         next unless items.present?
         return items.first['ASIN']
@@ -46,7 +46,7 @@ module Mulukhiya
     def lookup(asin)
       cnt ||= 0
       response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
-      raise response.status.to_s unless response.status == 200
+      raise "Invalid status #{response.status}" unless response.status == 200
       return JSON.parse(response.to_s)['ItemsResult']['Items'].first
     rescue => e
       @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)

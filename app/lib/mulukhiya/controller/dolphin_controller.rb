@@ -28,6 +28,10 @@ module Mulukhiya
       return Config.instance["/dolphin/status/visibility_names/#{name}"]
     end
 
+    def self.status_label
+      return Config.instance['/dolphin/note/label']
+    end
+
     def self.events
       return Config.instance['/dolphin/events'].map(&:to_sym)
     end

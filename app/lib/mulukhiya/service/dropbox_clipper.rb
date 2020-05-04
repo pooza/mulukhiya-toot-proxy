@@ -10,7 +10,7 @@ module Mulukhiya
       File.write(src, params[:body])
       return upload(dest, IO.read(src), {mode: :overwrite})
     rescue => e
-      raise Ginseng::GatewayError, "Dropbox upload error #{e.message}", e.backtrace
+      raise Ginseng::GatewayError, "Dropbox upload error (#{e.message})", e.backtrace
     ensure
       File.unlink(src) if File.exist?(src)
     end

@@ -62,7 +62,7 @@ module Mulukhiya
       end
 
       def recent_note
-        rows = Postgres.instance.execute('recent_note', {id: id})
+        rows = Postgres.instance.exec('recent_note', {id: id})
         return Status[rows.first['id']] if rows.present?
         return nil
       end

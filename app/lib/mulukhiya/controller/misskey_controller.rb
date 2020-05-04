@@ -116,6 +116,10 @@ module Mulukhiya
       return Config.instance["/misskey/status/visibility_names/#{name}"]
     end
 
+    def self.status_label
+      return Config.instance['/misskey/note/label']
+    end
+
     def self.events
       return Config.instance['/misskey/events'].map(&:to_sym)
     end
