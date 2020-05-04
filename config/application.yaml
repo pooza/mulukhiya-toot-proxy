@@ -459,7 +459,7 @@ sidekiq:
       every: 1h
       class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update_schedule:
-      every: 5m
+      every: 1h
       class: Mulukhiya::ProgramUpdateWorker
     media_cleaning_schedule:
       every: 1h
