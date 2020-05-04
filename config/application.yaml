@@ -387,8 +387,8 @@ itunes:
   country: jp
   lang: ja_jp
   urls:
-    search: https://music.apple.com/search
-    lookup: https://music.apple.com/lookup
+    search: https://itunes.apple.com/search
+    lookup: https://itunes.apple.com/lookup
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
