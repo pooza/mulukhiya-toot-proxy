@@ -1,11 +1,10 @@
 module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
       return body if ignore?(body)
-      tags.body = TagContainer.tweak(@status)
+      tags.text = @status = body[status_field] = TagContainer.tweak(body[status_field] || '')
       @dic = TaggingDictionary.new
-      @dic.text = create_temp_text(body)
+      @dic.body = body
       tags.concat(@dic.matches)
       tags.concat(create_attachment_tags(body))
       tags.concat(@sns.account.tags)
@@ -23,13 +22,6 @@ module Mulukhiya
       return false unless body['visibility'].present?
       return false if body['visibility'] == 'public'
       return true
-    end
-
-    def create_temp_text(body)
-      return '' unless tags.body&.present?
-      text = [tags.body.gsub(Acct.pattern, '')]
-      text.concat(body.dig('poll', Environment.controller_class.poll_options_field) || [])
-      return text.join('///')
     end
 
     def create_attachment_tags(body)
@@ -55,7 +47,7 @@ module Mulukhiya
       lines.clone.reverse_each do |line|
         break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         line = lines.pop.strip
-        tags.body = body = lines.join("\n")
+        tags.text = body = lines.join("\n")
         tags.concat(line.split(/\s+/))
       end
       body = [body, tags.to_s]

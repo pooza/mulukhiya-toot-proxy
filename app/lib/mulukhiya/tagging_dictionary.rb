@@ -13,6 +13,12 @@ module Mulukhiya
       load
     end
 
+    def body=(body)
+      text = [body[Environment.controller_class.status_field]]
+      text.concat(body.dig('poll', Environment.controller_class.poll_options_field) || [])
+      @text = text.join('///').gsub(Acct.pattern, '')
+    end
+
     def matches
       r = []
       temp_text = text.clone
