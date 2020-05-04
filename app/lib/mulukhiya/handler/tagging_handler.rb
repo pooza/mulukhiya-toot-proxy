@@ -8,7 +8,7 @@ module Mulukhiya
       tags.concat(@dic.matches(body))
       tags.concat(create_attachment_tags(body))
       tags.concat(@sns.account.tags)
-      body[status_field] = append
+      body[status_field] = update_status
       @result.concat(tags.create_tags)
       return body
     end
@@ -38,21 +38,20 @@ module Mulukhiya
       return tags.uniq
     end
 
-    def append
-      body = @status
-      return body unless tags.present?
-      via = body.match(@config['/twittodon/pattern'])
-      body.sub!(via[0], '') if via.present?
-      lines = body.each_line.map(&:chomp).to_a
+    def update_status
+      return @status unless tags.present?
+      via = @status.match(@config['/twittodon/pattern'])
+      @status.sub!(via[0], '') if via.present?
+      lines = @status.each_line(chomp: true).to_a
       lines.clone.reverse_each do |line|
         break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         line = lines.pop.strip
-        tags.text = body = lines.join("\n")
+        tags.text = lines.join("\n")
         tags.concat(line.split(/\s+/))
       end
-      body = [body, tags.to_s]
-      body.push(via[1]) if via.present?
-      return body.join("\n")
+      lines.push(tags.to_s)
+      lines.push(via[1]) if via.present?
+      return @status = lines.join("\n")
     end
   end
 end
