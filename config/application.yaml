@@ -456,13 +456,13 @@ sidekiq:
   concurrency: 5
   schedule:
     tagging_dictionary_update_schedule:
-      every: 1h
+      every: 1d
       class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update_schedule:
-      every: 1h
+      every: 1d
       class: Mulukhiya::ProgramUpdateWorker
     media_cleaning_schedule:
-      every: 1h
+      every: 1d
       class: Mulukhiya::MediaCleaningWorker
     announcement_schedule:
       every: 2m
