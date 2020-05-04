@@ -8,7 +8,6 @@ module Mulukhiya
       @dic.text = create_temp_text(body)
       tags.concat(@dic.matches)
       tags.concat(create_attachment_tags(body))
-      tags.concat(TagContainer.default_tags)
       tags.concat(@sns.account.tags)
       body[status_field] = append
       @result.concat(tags.create_tags)
