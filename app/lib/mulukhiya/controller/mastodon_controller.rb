@@ -131,6 +131,10 @@ module Mulukhiya
       return Config.instance["/mastodon/status/visibility_names/#{name}"]
     end
 
+    def self.status_label
+      return Config.instance['/mastodon/toot/label']
+    end
+
     def self.events
       return Config.instance['/mastodon/events'].map(&:to_sym)
     end
