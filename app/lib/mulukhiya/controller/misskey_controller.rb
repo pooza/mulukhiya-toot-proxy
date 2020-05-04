@@ -112,6 +112,10 @@ module Mulukhiya
       return Config.instance['/misskey/attachment/key']
     end
 
+    def self.poll_options_field
+      return Config.instance['/misskey/poll/options/field']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/misskey/status/visibility_names/#{name}"]
     end

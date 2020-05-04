@@ -211,6 +211,9 @@ mastodon:
   media: &mastodon_media
     key: media_ids
   attachment: *mastodon_media
+  poll:
+    options:
+      field: options
   search:
     limit: 40
 misskey:
@@ -291,6 +294,9 @@ misskey:
   file: &misskey_file
     key: fileIds
   attachment: *misskey_file
+  poll: &misskey_poll
+    options:
+      field: choices
 dolphin:
   url: https://dolphin.example.com/
   handlers:
@@ -334,6 +340,7 @@ dolphin:
   status: *misskey_note
   file: *misskey_file
   attachment: *misskey_file
+  poll: *misskey_poll
 amazon:
   marketplace: jp
   urls:
@@ -380,8 +387,8 @@ itunes:
   country: jp
   lang: ja_jp
   urls:
-    search: https://itunes.apple.com/search
-    lookup: https://itunes.apple.com/lookup
+    search: https://music.apple.com/search
+    lookup: https://music.apple.com/lookup
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true

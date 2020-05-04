@@ -123,6 +123,10 @@ module Mulukhiya
       return Config.instance['/mastodon/status/key']
     end
 
+    def self.poll_options_field
+      return Config.instance['/mastodon/poll/options/field']
+    end
+
     def self.attachment_key
       return Config.instance['/mastodon/attachment/key']
     end

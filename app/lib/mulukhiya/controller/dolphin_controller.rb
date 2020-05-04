@@ -24,6 +24,10 @@ module Mulukhiya
       return Config.instance['/dolphin/attachment/key']
     end
 
+    def self.poll_options_field
+      return Config.instance['/dolphin/poll/options/field']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/dolphin/status/visibility_names/#{name}"]
     end
