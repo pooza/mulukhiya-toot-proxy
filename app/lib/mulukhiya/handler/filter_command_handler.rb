@@ -4,7 +4,7 @@ module Mulukhiya
       return !Environment.mastodon? || super
     end
 
-    def dispatch
+    def exec
       params = parser.params.clone
       params['phrase'] ||= MastodonService.create_tag(params['tag'])
 

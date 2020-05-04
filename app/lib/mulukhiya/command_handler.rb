@@ -34,7 +34,7 @@ module Mulukhiya
     def handle_post_toot(body, params = {})
       @status = body[status_field] || ''
       return unless parser.command_name == command_name
-      dispatch
+      exec
       result.push(parser.params)
     end
 
@@ -46,8 +46,10 @@ module Mulukhiya
       return false
     end
 
-    def dispatch
+    def exec
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
+
+    alias dispatch exec
   end
 end

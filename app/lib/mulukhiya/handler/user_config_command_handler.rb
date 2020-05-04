@@ -5,7 +5,7 @@ module Mulukhiya
       return false
     end
 
-    def dispatch
+    def exec
       raise Ginseng::AuthError, 'Invalid access token' unless sns.account
       sns.account.config.update(parser.params)
       notify(message) unless Environment.test?
