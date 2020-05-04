@@ -1,11 +1,11 @@
 module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
-      return body if ignore?(body)
-      tags.text = @status = body[status_field] = TagContainer.tweak(body[status_field] || '')
+      @status = TagContainer.tweak(body[status_field] || '')
+      return body unless executable?(body)
+      tags.text = @status
       @dic = TaggingDictionary.new
-      @dic.body = body
-      tags.concat(@dic.matches)
+      tags.concat(@dic.matches(body))
       tags.concat(create_attachment_tags(body))
       tags.concat(@sns.account.tags)
       body[status_field] = append
@@ -15,13 +15,13 @@ module Mulukhiya
 
     private
 
-    def ignore?(body)
+    def executable?(body)
       parser.accts do |acct|
-        return true if acct.agent?
+        return false if acct.agent?
       end
-      return false unless body['visibility'].present?
-      return false if body['visibility'] == 'public'
-      return true
+      return true unless body['visibility'].present?
+      return true if body['visibility'] == 'public'
+      return false
     end
 
     def create_attachment_tags(body)
