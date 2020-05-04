@@ -31,7 +31,7 @@ module Mulukhiya
         status: pids.present? ? 'OK' : 'NG',
       }
       pids.each do |pid|
-        raise "PID '#{pid}' was dead" unless Process.alive?(pid)
+        raise "PID '#{pid}' not alive" unless Process.alive?(pid)
       end
       return values
     rescue => e

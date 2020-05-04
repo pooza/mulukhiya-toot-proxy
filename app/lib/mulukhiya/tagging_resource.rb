@@ -11,7 +11,7 @@ module Mulukhiya
       raise 'empty' unless response.present?
       return response
     rescue => e
-      raise Ginseng::GatewayError, "'#{url}' is invalid", e.backtrace
+      raise Ginseng::GatewayError, "Invalid URL '#{uri}'", e.backtrace
     end
 
     def uri
