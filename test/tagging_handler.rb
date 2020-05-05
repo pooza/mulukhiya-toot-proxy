@@ -60,13 +60,7 @@ module Mulukhiya
       @handler.clear
       body = {
         status_field => 'アンケート',
-        'poll' => {'options' => ['項目1', '項目2', 'ふたりはプリキュア']},
-      }
-      assert(@handler.handle_pre_toot(body)[status_field].start_with?("アンケート\n#ふたりはプリキュア"))
-
-      body = {
-        status_field => 'アンケート',
-        'poll' => {'choices' => ['項目1', '項目2', 'ふたりはプリキュア']},
+        'poll' => {Environment.controller_class.poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
       }
       assert(@handler.handle_pre_toot(body)[status_field].start_with?("アンケート\n#ふたりはプリキュア"))
     end
