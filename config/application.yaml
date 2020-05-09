@@ -1,5 +1,5 @@
 package:
-  version: 3.6.13
+  version: 3.7.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -10,15 +10,10 @@ controller: mastodon
 environment: development
 handler:
   default:
-    timeout: 10
-  amazon_image:
-    disable: true
-  canonical_url:
     timeout: 5
   image_resize:
     pixel: 1280
   itunes_image:
-    disable: true
     pixel: 480
   spotify_image:
     disable: true
