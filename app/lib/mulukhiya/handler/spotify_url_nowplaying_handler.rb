@@ -3,13 +3,10 @@ module Mulukhiya
     def initialize(params = {})
       super
       @uris = {}
-      @service = SpotifyService.new
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
     end
 
     def disable?
-      return super || !SpotifyService.config? || !@service
+      return super || !SpotifyService.config?
     end
 
     def updatable?(keyword)
