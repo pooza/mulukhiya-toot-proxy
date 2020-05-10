@@ -2,7 +2,7 @@
 
 ![test](https://github.com/pooza/mulukhiya-toot-proxy/workflows/test/badge.svg)
 
-Mastodon/Misskey/Dolphinの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
+Mastodon / Misskey / Dolphinの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## モロヘイヤに出来ること
@@ -28,7 +28,9 @@ Mastodon/Misskey/Dolphinの投稿に対して、内容の更新等を行うプ�
 - 投稿を[GROWI](https://growi.org/)等、各種外部サービスに保存。
 - 平易なPOSTで投稿を行えるwebhook。（Slack互換）
 
-## これをつくった経緯
+等々。
+
+## モロヘイヤをつくった経緯
 
 プリキュア専用インスタンス「[キュアスタ！](https://precure.ml)」で、ずっと前に
 「amazonのURL、もっと短くならない〜？」って言われてたのを思い出して作りました。
