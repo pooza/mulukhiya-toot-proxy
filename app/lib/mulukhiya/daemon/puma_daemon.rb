@@ -1,5 +1,7 @@
 module Mulukhiya
-  class PumaDaemon < Daemon
+  class PumaDaemon < Ginseng::Daemon
+    include Package
+
     def command
       return CommandLine.new([
         'puma',

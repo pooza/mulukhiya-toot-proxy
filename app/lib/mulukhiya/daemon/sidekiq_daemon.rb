@@ -1,7 +1,9 @@
 require 'sidekiq/api'
 
 module Mulukhiya
-  class SidekiqDaemon < Daemon
+  class SidekiqDaemon < Ginseng::Daemon
+    include Package
+
     def command
       return CommandLine.new([
         'sidekiq',
