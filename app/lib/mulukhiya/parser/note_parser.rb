@@ -2,6 +2,7 @@ module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
     attr_accessor :account
+
     ATMARK = '__ATMARK__'.freeze
     HASH = '__HASH__'.freeze
 
