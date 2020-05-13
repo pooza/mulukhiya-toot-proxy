@@ -1,11 +1,10 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b369134cd2c0f8bfea2127874b226098f86ff702
+  revision: 201b1e309129ae62e8d37e35724883598535ce44
   specs:
     ginseng-core (1.7.2)
       activesupport
       addressable
-      bundler (>= 2.0.0)
       daemon-spawn
       httparty
       rake
