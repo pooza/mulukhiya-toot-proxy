@@ -100,7 +100,7 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      status = body[Environment.controller_class.status_field]
+      status = body[Environment.controller_class.status_field].clone
       status.gsub!(Acct.pattern, '')
       parts = [status]
       options = body.dig('poll', Environment.controller_class.poll_options_field)
