@@ -125,11 +125,13 @@ html lang='ja'
                 if (e.data.config.notify) {
                   this.notify_verbose = e.data.config.notify.verbose ? 1 : 0
                 }
-                e.data.filters.map(f => {
-                  if (f.phrase == '#実況') {
-                    this.livecure = '非表示'
-                  }
-                })
+		if (Array.isArray(e.data.filters)) {
+                  e.data.filters.map(f => {
+                    if (f.phrase == '#実況') {
+                      this.livecure = '非表示'
+                    }
+                  })
+		}
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
