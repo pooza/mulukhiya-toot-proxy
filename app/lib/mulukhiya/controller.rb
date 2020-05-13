@@ -48,7 +48,7 @@ module Mulukhiya
         @renderer.message = {
           account: @sns.account.to_h,
           config: @sns.account.config.to_h,
-          filters: @sns.filters.parsed_response,
+          filters: @sns.filters&.parsed_response,
         }
       else
         @renderer.message = {error: 'Invalid token'}
@@ -62,6 +62,7 @@ module Mulukhiya
       @renderer.message = {
         account: @sns.account.to_h,
         config: @sns.account.config.to_h,
+        filters: @sns.filters&.parsed_response,
       }
       return @renderer.to_s
     rescue Ginseng::AuthError, Ginseng::ValidateError => e

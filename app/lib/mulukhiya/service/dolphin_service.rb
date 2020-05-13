@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def filters
-      return []
+      return nil
     end
 
     def account
