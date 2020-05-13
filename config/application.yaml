@@ -490,7 +490,6 @@ tagging:
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
-webhook:
-  salt: mulukhiya
 crypt:
   password: mulukhiya
+  salt: mulukhiya

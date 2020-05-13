@@ -1,0 +1,3 @@
+- key: /crypt/salt
+  aliases:
+    - /webhook/salt
