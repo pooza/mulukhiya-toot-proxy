@@ -14,6 +14,10 @@ module Mulukhiya
       @account = nil
     end
 
+    def filters
+      return []
+    end
+
     def account
       @account ||= Environment.account_class.get(token: @token)
       return @account
