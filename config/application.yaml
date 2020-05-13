@@ -192,7 +192,7 @@ mastodon:
       - write:media
       - read:filters
       - write:filters
-  toot: &mastodon_toot
+  status:
     field: status
     key: id
     label: トゥート
@@ -205,10 +205,8 @@ mastodon:
       - pattern: ^/web/statuses/([[:digit:]]+)
       - pattern: ^/@[[:word:]]+/([[:digit:]]+)
       - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-  status: *mastodon_toot
-  media: &mastodon_media
+  attachment:
     key: media_ids
-  attachment: *mastodon_media
   poll:
     options:
       field: options
@@ -277,7 +275,7 @@ misskey:
     - pre_upload
     - post_upload
     - post_bookmark
-  note: &misskey_note
+  status:
     field: text
     key: noteId
     label: ノート
@@ -288,11 +286,9 @@ misskey:
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)
-  status: *misskey_note
-  file: &misskey_file
+  attachment:
     key: fileIds
-  attachment: *misskey_file
-  poll: &misskey_poll
+  poll:
     options:
       field: choices
 dolphin:
@@ -334,11 +330,22 @@ dolphin:
     - pre_upload
     - post_upload
     - post_bookmark
-  note: *misskey_note
-  status: *misskey_note
-  file: *misskey_file
-  attachment: *misskey_file
-  poll: *misskey_poll
+  status:
+    field: text
+    key: noteId
+    label: ノート
+    max_length: 500
+    visibility_names:
+      unlisted: home
+      private: followers
+      direct: specified
+    patterns:
+      - pattern: ^/notes/([[:alnum:]]+)
+  attachment:
+    key: fileIds
+  poll:
+    options:
+      field: choices
 amazon:
   marketplace: jp
   urls:

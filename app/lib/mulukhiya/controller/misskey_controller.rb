@@ -125,7 +125,7 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/misskey/note/label']
+      return Config.instance['/misskey/status/label']
     end
 
     def self.events

@@ -1,3 +1,84 @@
 - key: /crypt/salt
   aliases:
     - /webhook/salt
+- key: /mastodon/status/field
+  aliases:
+    - /mastodon/toot/field
+- key: /mastodon/status/key
+  aliases:
+    - /mastodon/toot/key
+- key: /mastodon/status/label
+  aliases:
+    - /mastodon/toot/label
+- key: /mastodon/status/max_length
+  aliases:
+    - /mastodon/toot/max_length
+- key: /mastodon/status/visibility_names/unlisted
+  aliases:
+    - /mastodon/toot/visility_names/unlisted
+- key: /mastodon/status/visibility_names/private
+  aliases:
+    - /mastodon/toot/visility_names/private
+- key: /mastodon/status/visibility_names/direct
+  aliases:
+    - /mastodon/toot/visility_names/direct
+- key: /mastodon/status/patterns
+  aliases:
+    - /mastodon/toot/patterns
+- key: /mastodon/attachment/key
+  aliases:
+    - /mastodon/media/key
+- key: /misskey/status/field
+  aliases:
+    - /misskey/note/field
+- key: /misskey/status/key
+  aliases:
+    - /misskey/note/key
+- key: /misskey/status/label
+  aliases:
+    - /misskey/note/label
+- key: /misskey/status/max_length
+  aliases:
+    - /misskey/note/max_length
+- key: /misskey/status/visibility_names/unlisted
+  aliases:
+    - /misskey/note/visility_names/unlisted
+- key: /misskey/status/visibility_names/private
+  aliases:
+    - /misskey/note/visility_names/private
+- key: /misskey/status/visibility_names/direct
+  aliases:
+    - /misskey/note/visility_names/direct
+- key: /misskey/status/patterns
+  aliases:
+    - /misskey/note/patterns
+- key: /misskey/attachment/key
+  aliases:
+    - /misskey/file/key
+- key: /dolphin/status/field
+  aliases:
+    - /dolphin/note/field
+- key: /dolphin/status/key
+  aliases:
+    - /dolphin/note/key
+- key: /dolphin/status/label
+  aliases:
+    - /dolphin/note/label
+- key: /dolphin/status/max_length
+  aliases:
+    - /dolphin/note/max_length
+- key: /dolphin/status/visibility_names/unlisted
+  aliases:
+    - /dolphin/note/visility_names/unlisted
+- key: /dolphin/status/visibility_names/private
+  aliases:
+    - /dolphin/note/visility_names/private
+- key: /dolphin/status/visibility_names/direct
+  aliases:
+    - /dolphin/note/visility_names/direct
+- key: /dolphin/status/patterns
+  aliases:
+    - /dolphin/note/patterns
+- key: /dolphin/attachment/key
+  aliases:
+    - /dolphin/file/key

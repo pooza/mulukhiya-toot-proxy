@@ -146,7 +146,7 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/mastodon/toot/label']
+      return Config.instance['/mastodon/status/label']
     end
 
     def self.events

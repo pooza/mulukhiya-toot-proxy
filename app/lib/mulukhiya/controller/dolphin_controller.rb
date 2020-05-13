@@ -37,7 +37,7 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/dolphin/note/label']
+      return Config.instance['/dolphin/status/label']
     end
 
     def self.events
