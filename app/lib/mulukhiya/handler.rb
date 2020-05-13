@@ -135,7 +135,7 @@ module Mulukhiya
       params[:event] = event
       params[:reporter] ||= Reporter.new
       all(event, params) do |handler|
-        raise Ginseng::AuthError, 'Invalid access token' unless handler.sns.account
+        raise Ginseng::AuthError, 'Invalid token' unless handler.sns.account
         next if handler.disable?
         thread = Thread.new do
           handler.send("handle_#{event}".to_sym, body, params)

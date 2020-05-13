@@ -9,7 +9,7 @@ module Mulukhiya
       tags.concat(create_attachment_tags(body))
       tags.concat(@sns.account.tags)
       body[status_field] = update_status
-      @result.concat(tags.create_tags)
+      result.push(tags: tags.create_tags)
       return body
     end
 
