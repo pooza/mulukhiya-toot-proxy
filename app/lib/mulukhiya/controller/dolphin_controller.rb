@@ -12,6 +12,10 @@ module Mulukhiya
       return false
     end
 
+    def self.filter?
+      return false
+    end
+
     def self.status_field
       return Config.instance['/dolphin/status/field']
     end

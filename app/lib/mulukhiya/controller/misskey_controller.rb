@@ -100,6 +100,10 @@ module Mulukhiya
       return true
     end
 
+    def self.filter?
+      return false
+    end
+
     def self.status_field
       return Config.instance['/misskey/status/field']
     end

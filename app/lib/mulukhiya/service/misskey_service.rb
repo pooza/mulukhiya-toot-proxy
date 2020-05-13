@@ -21,6 +21,10 @@ module Mulukhiya
       return nil
     end
 
+    def clear_oauth_client
+      File.unlink(oauth_client_path) if File.exist?(oauth_client_path)
+    end
+
     def notify(account, message)
       return note(
         MisskeyController.status_field => message,

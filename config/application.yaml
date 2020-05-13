@@ -189,6 +189,8 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
+      - read:filters
+      - write:filters
   toot: &mastodon_toot
     field: status
     key: id
