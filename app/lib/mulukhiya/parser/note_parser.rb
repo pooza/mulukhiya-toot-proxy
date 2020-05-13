@@ -50,7 +50,7 @@ module Mulukhiya
     end
 
     def max_length
-      length = super
+      length = @config['/misskey/status/max_length']
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
