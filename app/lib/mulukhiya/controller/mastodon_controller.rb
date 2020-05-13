@@ -103,6 +103,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/mulukhiya/filter' do
+      Handler.create('filter_command').handle_toot(params, {sns: @sns})
+      @renderer.message = {filters: @sns.filters}
+      return @renderer.to_s
+    end
+
     def self.name
       return 'Mastodon'
     end

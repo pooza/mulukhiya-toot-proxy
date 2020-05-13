@@ -105,6 +105,7 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
+  livecure: false
 mastodon:
   url: https://mstdn.example.com/
   handlers:
