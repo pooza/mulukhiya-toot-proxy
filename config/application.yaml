@@ -115,13 +115,6 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -130,6 +123,13 @@ mastodon:
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_toot:
       - user_config_command
@@ -138,13 +138,6 @@ mastodon:
       - dropbox_clipping_command
       - result_notification
     pre_webhook:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -154,6 +147,13 @@ mastodon:
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_webhook:
       - result_notification
@@ -218,6 +218,11 @@ misskey:
     pre_toot:
       - user_config_command
       - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
@@ -225,29 +230,25 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
       - tagging
     post_toot:
       - user_config_command
       - result_notification
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_webhook:
       - result_notification
@@ -297,6 +298,11 @@ dolphin:
     pre_toot:
       - user_config_command
       - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
@@ -304,11 +310,6 @@ dolphin:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
       - tagging
     post_toot:
       - user_config_command
