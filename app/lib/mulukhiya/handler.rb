@@ -141,7 +141,7 @@ module Mulukhiya
           handler.send("handle_#{event}".to_sym, body, params)
         end
         unless thread.join(handler.timeout)
-          handler.errors.push(message: 'execution expired', timeout: handler.timeout)
+          handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")
         end
         break if handler.prepared?
       rescue RestClient::Exception, HTTParty::Error => e
