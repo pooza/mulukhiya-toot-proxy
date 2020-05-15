@@ -14,13 +14,12 @@ module Mulukhiya
     private
 
     def affiliate?
-      return true unless sns.account
       return false if sns.account.config['/amazon/affiliate'].is_a?(FalseClass)
       return false unless @config['/amazon/affiliate']
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
-      return true
+      return false
     end
 
     def rewritable?(uri)
