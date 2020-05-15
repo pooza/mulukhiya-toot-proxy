@@ -7,7 +7,7 @@ module Mulukhiya
       dest.associate_tag = AmazonService.associate_tag if affiliate?
       dest = dest.shorten
       @status.sub!(source.to_s, dest.to_s)
-      sns.account.config.update(amazon: {affiliate: nil}) if sns.account
+      sns.account&.config&.update(amazon: {affiliate: nil})
       return dest
     end
 
