@@ -7,11 +7,6 @@ module Mulukhiya
       @key = SecureRandom.hex(16)
     end
 
-    def test_message
-      return unless handler?
-      assert_kind_of(Hash, @handler.message)
-    end
-
     def test_handle_toot
       return unless handler?
 

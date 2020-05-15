@@ -103,6 +103,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/mulukhiya/filter' do
+      Handler.create('filter_command').handle_toot(params, {sns: @sns})
+      @renderer.message = {filters: @sns.filters}
+      return @renderer.to_s
+    end
+
     def self.name
       return 'Mastodon'
     end
@@ -115,12 +121,20 @@ module Mulukhiya
       return true
     end
 
+    def self.filter?
+      return true
+    end
+
     def self.status_field
       return Config.instance['/mastodon/status/field']
     end
 
     def self.status_key
       return Config.instance['/mastodon/status/key']
+    end
+
+    def self.poll_options_field
+      return Config.instance['/mastodon/poll/options/field']
     end
 
     def self.attachment_key
@@ -132,7 +146,7 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/mastodon/toot/label']
+      return Config.instance['/mastodon/status/label']
     end
 
     def self.events

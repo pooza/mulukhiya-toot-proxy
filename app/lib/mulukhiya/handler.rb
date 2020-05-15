@@ -135,13 +135,11 @@ module Mulukhiya
       params[:event] = event
       params[:reporter] ||= Reporter.new
       all(event, params) do |handler|
-        raise Ginseng::AuthError, 'Invalid access token' unless handler.sns.account
+        raise Ginseng::AuthError, 'Invalid token' unless handler.sns.account
         next if handler.disable?
-        thread = Thread.new do
-          handler.send("handle_#{event}".to_sym, body, params)
-        end
+        thread = Thread.new {handler.send("handle_#{event}".to_sym, body, params)}
         unless thread.join(handler.timeout)
-          handler.errors.push(message: 'execution expired', timeout: handler.timeout)
+          handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")
         end
         break if handler.prepared?
       rescue RestClient::Exception, HTTParty::Error => e

@@ -26,7 +26,6 @@ module Mulukhiya
       unless @all_tags
         container = TagContainer.new
         container.concat(tags)
-        container.concat(TagContainer.default_tags)
         container.concat(@account.tags) if @account
         return @all_tags = container.create_tags
       end
@@ -34,7 +33,7 @@ module Mulukhiya
     end
 
     def max_length
-      length = super
+      length = @config['/mastodon/status/max_length']
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end

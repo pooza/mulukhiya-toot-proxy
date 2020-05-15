@@ -1,27 +1,24 @@
 module Mulukhiya
   class TaggingDictionary < Hash
-    attr_accessor :text
-
     def initialize
       super
       @config = Config.instance
       @logger = Logger.new
       @http = HTTP.new
-      @text = ''
       refresh unless exist?
       refresh if corrupted?
       load
     end
 
-    def matches
+    def matches(body)
       r = []
-      temp_text = text.clone
+      text = create_temp_text(body)
       reverse_each do |k, v|
         next if k.length < @config['/tagging/word/minimum_length']
-        next unless temp_text.match?(v[:pattern])
+        next unless text.match?(v[:pattern])
         r.push(k)
         r.concat(v[:words])
-        temp_text.gsub!(v[:pattern], '')
+        text.gsub!(v[:pattern], '')
       end
       return r.uniq
     end
@@ -100,6 +97,15 @@ module Mulukhiya
         @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
       end
       return result.sort_by {|k, v| k.length}.to_h
+    end
+
+    def create_temp_text(body)
+      status = body[Environment.controller_class.status_field].clone
+      status.gsub!(Acct.pattern, '')
+      parts = [status]
+      options = body.dig('poll', Environment.controller_class.poll_options_field)
+      parts.concat(options) if options.present?
+      return parts.join('::::')
     end
 
     def save_cache

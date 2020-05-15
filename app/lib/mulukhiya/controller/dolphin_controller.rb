@@ -12,6 +12,10 @@ module Mulukhiya
       return false
     end
 
+    def self.filter?
+      return false
+    end
+
     def self.status_field
       return Config.instance['/dolphin/status/field']
     end
@@ -24,12 +28,16 @@ module Mulukhiya
       return Config.instance['/dolphin/attachment/key']
     end
 
+    def self.poll_options_field
+      return Config.instance['/dolphin/poll/options/field']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/dolphin/status/visibility_names/#{name}"]
     end
 
     def self.status_label
-      return Config.instance['/dolphin/note/label']
+      return Config.instance['/dolphin/status/label']
     end
 
     def self.events

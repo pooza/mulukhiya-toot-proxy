@@ -3,8 +3,7 @@ namespace :mulukhiya do
     namespace :client do
       desc 'clean OAuth client ID'
       task :clean do
-        path = Mulukhiya::Environment.sns_class.new.oauth_client_path
-        File.unlink(path) if File.exist?(path)
+        Mulukhiya::Environment.sns_class.new.clear_oauth_client
       end
     end
   end

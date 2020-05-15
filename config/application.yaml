@@ -1,5 +1,5 @@
 package:
-  version: 3.6.13
+  version: 3.7.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -10,15 +10,10 @@ controller: mastodon
 environment: development
 handler:
   default:
-    timeout: 10
-  amazon_image:
-    disable: true
-  canonical_url:
     timeout: 5
   image_resize:
     pixel: 1280
   itunes_image:
-    disable: true
     pixel: 480
   spotify_image:
     disable: true
@@ -110,6 +105,7 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
+  livecure: false
 mastodon:
   url: https://mstdn.example.com/
   handlers:
@@ -119,13 +115,6 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -134,6 +123,13 @@ mastodon:
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_toot:
       - user_config_command
@@ -142,13 +138,6 @@ mastodon:
       - dropbox_clipping_command
       - result_notification
     pre_webhook:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -158,6 +147,13 @@ mastodon:
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_webhook:
       - result_notification
@@ -194,7 +190,9 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
-  toot: &mastodon_toot
+      - read:filters
+      - write:filters
+  status:
     field: status
     key: id
     label: トゥート
@@ -207,10 +205,11 @@ mastodon:
       - pattern: ^/web/statuses/([[:digit:]]+)
       - pattern: ^/@[[:word:]]+/([[:digit:]]+)
       - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-  status: *mastodon_toot
-  media: &mastodon_media
+  attachment:
     key: media_ids
-  attachment: *mastodon_media
+  poll:
+    options:
+      field: options
   search:
     limit: 40
 misskey:
@@ -219,6 +218,11 @@ misskey:
     pre_toot:
       - user_config_command
       - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
@@ -226,29 +230,25 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
       - tagging
     post_toot:
       - user_config_command
       - result_notification
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
       - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
       - tagging
     post_webhook:
       - result_notification
@@ -276,7 +276,7 @@ misskey:
     - pre_upload
     - post_upload
     - post_bookmark
-  note: &misskey_note
+  status:
     field: text
     key: noteId
     label: ノート
@@ -287,16 +287,22 @@ misskey:
       direct: specified
     patterns:
       - pattern: ^/notes/([[:alnum:]]+)
-  status: *misskey_note
-  file: &misskey_file
+  attachment:
     key: fileIds
-  attachment: *misskey_file
+  poll:
+    options:
+      field: choices
 dolphin:
   url: https://dolphin.example.com/
   handlers:
     pre_toot:
       - user_config_command
       - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
@@ -304,11 +310,6 @@ dolphin:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
       - tagging
     post_toot:
       - user_config_command
@@ -330,10 +331,22 @@ dolphin:
     - pre_upload
     - post_upload
     - post_bookmark
-  note: *misskey_note
-  status: *misskey_note
-  file: *misskey_file
-  attachment: *misskey_file
+  status:
+    field: text
+    key: noteId
+    label: ノート
+    max_length: 500
+    visibility_names:
+      unlisted: home
+      private: followers
+      direct: specified
+    patterns:
+      - pattern: ^/notes/([[:alnum:]]+)
+  attachment:
+    key: fileIds
+  poll:
+    options:
+      field: choices
 amazon:
   marketplace: jp
   urls:
@@ -488,7 +501,6 @@ tagging:
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
-webhook:
-  salt: mulukhiya
 crypt:
   password: mulukhiya
+  salt: mulukhiya

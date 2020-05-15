@@ -14,11 +14,19 @@ module Mulukhiya
       @account = nil
     end
 
+    def filters
+      return nil
+    end
+
     def account
       @account ||= Environment.account_class.get(token: @token)
       return @account
     rescue
       return nil
+    end
+
+    def clear_oauth_client
+      File.unlink(oauth_client_path) if File.exist?(oauth_client_path)
     end
 
     def notify(account, message)

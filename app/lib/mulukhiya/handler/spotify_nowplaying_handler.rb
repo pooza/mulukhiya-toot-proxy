@@ -3,17 +3,14 @@ module Mulukhiya
     def initialize(params = {})
       super
       @tracks = {}
-      @service = SpotifyService.new
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
     end
 
     def disable?
-      return super || !SpotifyService.config? || !@service
+      return super || !SpotifyService.config?
     end
 
     def updatable?(keyword)
-      return true if @tracks[keyword] = @service.search_track(keyword)
+      return true if @tracks[keyword] = SpotifyService.new.search_track(keyword)
       return false
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)

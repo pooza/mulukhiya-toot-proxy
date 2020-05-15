@@ -100,6 +100,10 @@ module Mulukhiya
       return true
     end
 
+    def self.filter?
+      return false
+    end
+
     def self.status_field
       return Config.instance['/misskey/status/field']
     end
@@ -112,12 +116,16 @@ module Mulukhiya
       return Config.instance['/misskey/attachment/key']
     end
 
+    def self.poll_options_field
+      return Config.instance['/misskey/poll/options/field']
+    end
+
     def self.visibility_name(name)
       return Config.instance["/misskey/status/visibility_names/#{name}"]
     end
 
     def self.status_label
-      return Config.instance['/misskey/note/label']
+      return Config.instance['/misskey/status/label']
     end
 
     def self.events

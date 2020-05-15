@@ -40,6 +40,13 @@ html lang='ja'
             v-select :options='program_options' v-on:input='changeTags' v-model='program'
           .field-update-button-container
             button v-on:click='updateTags' 更新
+      section class='config' v-if='username' v-show='show_livecure'
+        h3 v-on:click='toggleLivecureSection' = "実況#{status_label}"
+        .section-contents v-show='show_livecure_detail'
+          .field-container
+            v-select :options='livecure_options' v-model='livecure'
+          .field-update-button-container
+            button v-on:click='updateLivecure' 更新
       section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
@@ -79,9 +86,16 @@ html lang='ja'
           programs: [],
           program_options: [],
           program: null,
+          livecure_options: [
+            {label: '表示', code: 'unregister'},
+            {label: '非表示', code: 'register'},
+          ],
+          livecure: '表示',
+          show_livecure: #{livecure.to_s},
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,
+          show_livecure_detail: false,
           show_webhook_detail: false,
           show_notify_detail: false,
         },
@@ -111,6 +125,13 @@ html lang='ja'
                 if (e.data.config.notify) {
                   this.notify_verbose = e.data.config.notify.verbose ? 1 : 0
                 }
+		if (Array.isArray(e.data.filters)) {
+                  e.data.filters.map(f => {
+                    if (f.phrase == '#実況') {
+                      this.livecure = '非表示'
+                    }
+                  })
+		}
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
@@ -195,6 +216,10 @@ html lang='ja'
             'use strict'
             this.show_tags_detail = !this.show_tags_detail
           },
+          toggleLivecureSection: function () {
+            'use strict'
+            this.show_livecure_detail = !this.show_livecure_detail
+          },
           toggleWebhookSection: function () {
             'use strict'
             this.show_webhook_detail = !this.show_webhook_detail
@@ -232,6 +257,25 @@ html lang='ja'
               command.tags = this.tags.split("\n")
             }
             this.updateConfig(values, command)
+          },
+          updateLivecure: function () {
+            'use strict'
+            const command = {command: 'filter', tag: '実況', action: this.livecure.code}
+            const values = {
+              token: localStorage.getItem('mulukhiya_token'),
+              status: JSON.stringify(command),
+              text: JSON.stringify(command),
+            }
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/filter', values)
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.show_livecure_detail = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = e.response.data.error || e.message
+              })
           },
           updateWebhook: function () {
             'use strict'

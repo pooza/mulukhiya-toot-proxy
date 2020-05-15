@@ -49,7 +49,7 @@ module Mulukhiya
       return Digest::SHA1.hexdigest({
         sns: uri.to_s,
         token: token,
-        salt: Config.instance['/webhook/salt'],
+        salt: Config.instance['/crypt/salt'],
       }.to_json)
     end
 
