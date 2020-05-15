@@ -7,7 +7,7 @@ module Mulukhiya
       dest.associate_tag = AmazonService.associate_tag if affiliate?
       dest = dest.shorten
       @status.sub!(source.to_s, dest.to_s)
-      sns.account.config.update(amazon: {affiliate: nil})
+      sns.account.config.update(amazon: {affiliate: nil}) if sns.account
       return dest
     end
 
@@ -19,7 +19,7 @@ module Mulukhiya
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
-      return false
+      return true
     end
 
     def rewritable?(uri)
