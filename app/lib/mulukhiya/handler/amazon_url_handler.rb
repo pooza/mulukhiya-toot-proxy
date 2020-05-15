@@ -14,7 +14,8 @@ module Mulukhiya
     private
 
     def affiliate?
-      return false if sns.account&.config['/amazon/affiliate'].is_a?(FalseClass)
+      return true unless sns.account
+      return false if sns.account.config['/amazon/affiliate'].is_a?(FalseClass)
       return false unless @config['/amazon/affiliate']
       return true
     rescue => e
