@@ -1,5 +1,5 @@
 namespace :config do
-  desc 'lint all Slim templates'
+  desc 'lint local config'
   task :lint do
     if errors.present?
       puts YAML.dump(errors)
