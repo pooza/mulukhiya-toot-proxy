@@ -62,6 +62,12 @@ test:
         - spotify_image_handler
         - spotify_nowplaying_handler
         - spotify_url_nowplaying_handler
+    - name: you_tube
+      cases:
+        - youtube_service
+        - video_uri
+        - youtube_image_handler
+        - youtube_url_nowplaying_handler
     - name: dolphin
       cases:
         - mastodon_controller
@@ -118,6 +124,7 @@ mastodon:
       - itunes_image
       - spotify_image
       - amazon_image
+      - you_tube_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -141,6 +148,7 @@ mastodon:
       - itunes_image
       - spotify_image
       - amazon_image
+      - you_tube_image
       - webhook_image
       - shortened_url
       - url_normalize
