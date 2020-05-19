@@ -4,6 +4,7 @@ require 'sidekiq-scheduler'
 require 'ginseng'
 require 'ginseng/web'
 require 'ginseng/fediverse'
+require 'ginseng/you_tube'
 
 module Mulukhiya
   def self.dir

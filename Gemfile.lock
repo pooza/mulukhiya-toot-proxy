@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 201b1e309129ae62e8d37e35724883598535ce44
+  revision: 2c4cb5345d5ac562e3c62078b8422ef83a68db3a
   specs:
-    ginseng-core (1.7.2)
+    ginseng-core (1.7.3)
       activesupport
       addressable
       daemon-spawn
@@ -40,6 +40,12 @@ GIT
       sass
       sinatra
       slim
+
+GIT
+  remote: https://github.com/pooza/ginseng-youtube.git
+  revision: d00764fedfb135dbc37ff9e2eb17fe49d8f587e7
+  specs:
+    ginseng-youtube (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -191,7 +197,7 @@ GEM
     pg (1.2.3)
     power_assert (1.2.0)
     public_suffix (3.1.1)
-    puma (4.3.3)
+    puma (4.3.4)
       nio4r (~> 2.0)
     raabro (1.3.1)
     rack (2.2.2)
@@ -304,6 +310,7 @@ DEPENDENCIES
   ginseng-fediverse!
   ginseng-postgres!
   ginseng-web!
+  ginseng-youtube!
   mimemagic
   nokogiri
   rails-erb-lint
