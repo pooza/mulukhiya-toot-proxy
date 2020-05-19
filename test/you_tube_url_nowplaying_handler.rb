@@ -13,11 +13,24 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], [{url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ'}])
+      assert_equal(@handler.summary[:result], [{
+        channel: 'プリキュア公式YouTubeチャンネル',
+        url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ',
+      }])
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying \n\nhttps://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], [{url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ'}])
+      assert_equal(@handler.summary[:result], [{
+        channel: 'プリキュア公式YouTubeチャンネル',
+        url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ',
+      }])
+
+      @handler.clear
+      @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY\n"})
+      assert_equal(@handler.summary[:result], [{
+        artist: 'Kanako Miyamoto',
+        url: 'https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY',
+      }])
     end
   end
 end
