@@ -1,5 +1,5 @@
 module Mulukhiya
-  class VideoURI < Ginseng::VideoURI
+  class VideoURI < Ginseng::YouTube::URI
     include Package
   end
 end

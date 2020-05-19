@@ -1,5 +1,5 @@
 module Mulukhiya
-  class YouTubeService < Ginseng::YouTubeService
+  class YouTubeService < Ginseng::YouTube::Service
     include Package
 
     def self.config?

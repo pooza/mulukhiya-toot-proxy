@@ -2,7 +2,7 @@ module Mulukhiya
   class YouTubeURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
       super
-      @videos = {}
+      @uris = {}
     end
 
     def disable?
@@ -11,7 +11,8 @@ module Mulukhiya
 
     def updatable?(keyword)
       return false unless uri = VideoURI.parse(keyword)
-      return false unless @videos[keyword] = uri.data&.merge('url' => uri.to_s)
+      return false unless uri.id
+      @uris[keyword] = uri
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
@@ -19,11 +20,17 @@ module Mulukhiya
     end
 
     def update(keyword)
-      return unless video = @videos[keyword]
-      push(video['snippet']['title'])
-      push(video['snippet']['channelTitle'])
-      tags.push(video['snippet']['channelTitle'])
-      result.push(url: video['url'])
+      return unless uri = @uris[keyword]
+      push(uri.title)
+      if uri.music?
+        push(uri.artist)
+        tags.push(uri.artist)
+        result.push(url: uri.to_s, artist: uri.artist)
+      else
+        push(uri.channel)
+        tags.push(uri.channel)
+        result.push(url: uri.to_s, channel: uri.channel)
+      end
     end
   end
 end
