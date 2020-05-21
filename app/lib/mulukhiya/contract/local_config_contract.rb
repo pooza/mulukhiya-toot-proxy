@@ -1,5 +1,4 @@
 require 'dry-validation'
-require 'ginseng/postgres'
 
 module Mulukhiya
   class LocalConfigContract < Dry::Validation::Contract
