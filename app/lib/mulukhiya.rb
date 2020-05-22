@@ -2,9 +2,6 @@ require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'
-require 'ginseng/web'
-require 'ginseng/fediverse'
-require 'ginseng/you_tube'
 
 module Mulukhiya
   def self.dir
@@ -65,4 +62,5 @@ end
 
 Mulukhiya.bootsnap
 Mulukhiya.loader.setup
+Bundler.require
 Mulukhiya.sidekiq

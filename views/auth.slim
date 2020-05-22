@@ -8,7 +8,7 @@ html lang='ja'
     == slim.render 'fragment/breadcrumbs', {current: 'アプリケーションの認証'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 = '{{auth_command}}'
+      h2 アプリケーションの認証
       - if controller.name == 'Mastodon'
         form method='POST' action='/mulukhiya/auth'
           ol
@@ -35,7 +35,6 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
-          auth_command: 'アプリケーションの認証',
         },
         mounted: function () {
           'use strict'
@@ -45,7 +44,6 @@ html lang='ja'
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
-                this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
                 this.message = e.message
               })

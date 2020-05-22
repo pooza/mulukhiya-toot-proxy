@@ -1,0 +1,64 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: '別のユーザーでログイン'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 別のユーザーでログイン
+      nav class='menu'
+        a v-for='user in users' href='#' v-on:click='switchToken(user.token)' = '@{{user.username}}'
+    == slim.render 'fragment/footer'
+    javascript:
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          username: null,
+          token_error: false,
+          users: [],
+        },
+        mounted: function () {
+          'use strict'
+          const token = localStorage.getItem('mulukhiya_token')
+          if (token) {
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+              .then(e => {
+                this.username = e.data.account.username
+              }).catch(e => {
+                this.message = e.message
+              })
+            let tokens = [token]
+            JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
+              tokens.push(t)
+            })
+            tokens = Array.from(new Set(tokens))
+            localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+            for (let t of tokens) {
+              axios.get('/mulukhiya/config?token=' + encodeURIComponent(t), {responseType: 'json'})
+                .then(e => {
+                  this.users.push({username: e.data.account.username, token: t})
+                }).catch(e => {
+                  console.error('%j', e)
+                })
+            }
+          } else {
+            this.token_error = true
+          }
+        },
+        methods: {
+          switchToken: function (token) {
+            'use strict'
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+              .then(e => {
+                localStorage.setItem('mulukhiya_token', token)
+                this.username = e.data.account.username
+              }).catch(e => {
+                this.message = e.message
+              })
+          },
+        },
+      })

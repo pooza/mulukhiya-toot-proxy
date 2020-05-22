@@ -4,6 +4,7 @@ module Mulukhiya
       result = {}
       fetch.each do |entry|
         fields.each do |field|
+          next unless entry[field]
           result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e

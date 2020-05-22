@@ -94,6 +94,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/app/switch_user' do
+      @renderer = SlimRenderer.new
+      @renderer.template = 'switch_user'
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
