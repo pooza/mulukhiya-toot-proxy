@@ -1,5 +1,3 @@
-require 'unicode'
-
 module Mulukhiya
   class TaggingResource
     def parse
@@ -34,11 +32,11 @@ module Mulukhiya
     private
 
     def create_key(word)
-      return Unicode.nfkc(word)
+      return word.nfkc
     end
 
     def create_pattern(word)
-      pattern = Unicode.nfkc(word).gsub(/[^[:alnum:]]/, '.? ?')
+      pattern = word.nfkc.gsub(/[^[:alnum:]]/, '.? ?')
       [
         'あぁ', 'いぃ', 'うぅ', 'えぇ', 'おぉ', 'やゃ', 'ゆゅ', 'よょ',
         'アァ', 'イィ', 'ウゥ', 'エェ', 'オォ', 'ヤャ', 'ユュ', 'ヨョ'

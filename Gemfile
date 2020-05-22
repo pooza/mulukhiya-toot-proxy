@@ -19,6 +19,7 @@ gem 'sidekiq-scheduler'
 gem 'vacuum'
 
 group :development do
+  gem 'rack-test'
   gem 'rails-erb-lint'
   gem 'rubocop'
   gem 'rubocop-performance'
