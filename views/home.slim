@@ -9,16 +9,16 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h1 = package.name
-      nav class='main-menu'
+      nav class='menu'
         - if controller.webhook?
-          a href='/mulukhiya/app/auth' = '{{auth_command}}'
+          a href='/mulukhiya/app/auth' アプリケーションの認証
           a href='/mulukhiya/app/config' v-if='username' 環境設定
           a href='#' v-else=''
             | 環境設定
             span class='alert' 未認証
         - else
           a href='#'
-            = '{{auth_command}} '
+            = 'アプリケーションの認証 '
             span class='alert' 非対応
           a href='#'
             = '環境設定 '
@@ -32,7 +32,6 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
-          auth_command: 'アプリケーションの認証',
         },
         mounted: function () {
           'use strict'
@@ -42,7 +41,6 @@ html lang='ja'
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
-                this.auth_command = 'アプリケーションの再認証'
               }).catch(e => {
                 this.message = e.message
               })

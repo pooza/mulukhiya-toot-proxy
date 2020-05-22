@@ -6,7 +6,8 @@
 .message-container v-if='username'
   p
     | login: @
-    = '{{username}}'
+    = '{{username}} '
+    a class='switch-user' href='/mulukhiya/app/switch_user' switch user
 
 .message-container class='alert' v-if='message'
   p = '{{message}}'
