@@ -294,7 +294,7 @@ GEM
     unf_ext (0.0.7.7)
     unicode (0.4.4.4)
     unicode-display_width (1.7.0)
-    vacuum (3.3.0)
+    vacuum (3.4.0)
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
