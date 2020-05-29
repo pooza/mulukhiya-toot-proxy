@@ -1,5 +1,5 @@
 module Mulukhiya
-  class MecabTaggingResource < TaggingResource
+  class MecabRemoteDictionary < RemoteDictionary
     def parse
       result = {}
       fetch.each do |v|
@@ -11,7 +11,7 @@ module Mulukhiya
       end
       return result
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h.merge(resource: @params))
+      @logger.error(error: e.message, dic: uri.to_s)
       return {}
     end
   end

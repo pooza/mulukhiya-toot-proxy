@@ -42,7 +42,7 @@ module Mulukhiya
       return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(class: self.class.to_s, path: path, message: e.message)
+      @logger.error(class: self.class.to_s, path: path, error: e.message)
       return true
     end
 
@@ -70,10 +70,10 @@ module Mulukhiya
       File.unlink(path) if exist?
     end
 
-    def resources
+    def remote_dics
       return enum_for(__method__) unless block_given?
-      TaggingResource.all do |r|
-        yield r
+      RemoteDictionary.all do |dic|
+        yield dic
       end
     end
 
@@ -81,21 +81,21 @@ module Mulukhiya
 
     def fetch
       result = {}
-      resources do |resource|
-        resource.parse.each do |k, v|
-          result[k] ||= v
-          result[k][:words] ||= []
-          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
-        rescue => e
-          msg = Ginseng::Error.create(e).to_h.merge(
-            resource: {uri: resource.uri.to_s},
-            entry: {k: k, v: v},
-          )
-          @logger.error(msg)
-        end
+      threads = []
+      remote_dics do |dic|
+        threads.push(Thread.new do
+          dic.parse.each do |k, v|
+            result[k] ||= v
+            result[k][:words] ||= []
+            result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
+          rescue => e
+            @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
+          end
+        end)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
+        @logger.error(error: e.message, dic: dic.uri.to_s)
       end
+      threads.map(&:join)
       return result.sort_by {|k, v| k.length}.to_h
     end
 

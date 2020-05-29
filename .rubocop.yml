@@ -45,6 +45,9 @@ Layout/EmptyLineAfterGuardClause:
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
+Layout/FirstArgumentIndentation:
+  EnforcedStyle: consistent
+
 Metrics/AbcSize:
   Max: 30
   Exclude:

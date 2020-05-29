@@ -161,6 +161,7 @@ html lang='ja'
         },
         methods: {
           updateConfig: function (values, command) {
+            'use strict'
             values.status = JSON.stringify(command)
             values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
