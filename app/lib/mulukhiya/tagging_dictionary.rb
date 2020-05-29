@@ -70,10 +70,10 @@ module Mulukhiya
       File.unlink(path) if exist?
     end
 
-    def resources
+    def remote_dics
       return enum_for(__method__) unless block_given?
-      TaggingResource.all do |r|
-        yield r
+      RemoteDictionary.all do |dic|
+        yield dic
       end
     end
 
@@ -82,18 +82,18 @@ module Mulukhiya
     def fetch
       result = {}
       threads = []
-      resources do |resource|
+      remote_dics do |dic|
         threads.push(Thread.new do
-          resource.parse.each do |k, v|
+          dic.parse.each do |k, v|
             result[k] ||= v
             result[k][:words] ||= []
             result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
           rescue => e
-            @logger.error(error: e.message, resource: resource.uri.to_s, word: k)
+            @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
           end
         end)
       rescue => e
-        @logger.error(error: e.message, resource: resource.uri.to_s)
+        @logger.error(error: e.message, dic: dic.uri.to_s)
       end
       threads.map(&:join)
       return result.sort_by {|k, v| k.length}.to_h

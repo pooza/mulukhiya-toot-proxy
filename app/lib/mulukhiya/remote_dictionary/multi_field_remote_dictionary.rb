@@ -1,5 +1,5 @@
 module Mulukhiya
-  class MultiFieldTaggingResource < TaggingResource
+  class MultiFieldRemoteDictionary < RemoteDictionary
     def parse
       result = {}
       fetch.each do |entry|
@@ -8,7 +8,7 @@ module Mulukhiya
           result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(resource: @params))
+        @logger.error(Ginseng::Error.create(e).to_h.merge(dic: @params))
       end
       return result
     end

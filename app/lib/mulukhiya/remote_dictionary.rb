@@ -1,5 +1,5 @@
 module Mulukhiya
-  class TaggingResource
+  class RemoteDictionary
     def parse
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -20,13 +20,13 @@ module Mulukhiya
     def self.all
       return enum_for(__method__) unless block_given?
       Config.instance['/tagging/dictionaries'].each do |dic|
-        yield TaggingResource.create(dic)
+        yield RemoteDictionary.create(dic)
       end
     end
 
     def self.create(params)
       params['type'] ||= 'multi_field'
-      return "Mulukhiya::#{params['type'].camelize}TaggingResource".constantize.new(params)
+      return "Mulukhiya::#{params['type'].camelize}RemoteDictionary".constantize.new(params)
     end
 
     private
