@@ -42,7 +42,7 @@ module Mulukhiya
       return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(class: self.class.to_s, path: path, message: e.message)
+      @logger.error(class: self.class.to_s, path: path, error: e.message)
       return true
     end
 
