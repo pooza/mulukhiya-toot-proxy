@@ -81,21 +81,21 @@ module Mulukhiya
 
     def fetch
       result = {}
+      threads = []
       resources do |resource|
-        resource.parse.each do |k, v|
-          result[k] ||= v
-          result[k][:words] ||= []
-          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
-        rescue => e
-          msg = Ginseng::Error.create(e).to_h.merge(
-            resource: {uri: resource.uri.to_s},
-            entry: {k: k, v: v},
-          )
-          @logger.error(msg)
-        end
+        threads.push(Thread.new do
+          resource.parse.each do |k, v|
+            result[k] ||= v
+            result[k][:words] ||= []
+            result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
+          rescue => e
+            @logger.error(error: e.message, resource: resource.uri.to_s, word: k)
+          end
+        end)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(resource: resource.uri.to_s))
+        @logger.error(error: e.message, resource: resource.uri.to_s)
       end
+      threads.map(&:join)
       return result.sort_by {|k, v| k.length}.to_h
     end
 
