@@ -16,7 +16,7 @@ module Mulukhiya
         nokogiri.css(selector).each do |link|
           md.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
         rescue => e
-          @logger.error(Ginseng::Error.create(e).to_h.merge(link: link.to_s))
+          @logger.error(error: e.message, link: link.to_s)
         end
       end
       return TootParser.sanitize(md)

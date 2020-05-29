@@ -11,7 +11,7 @@ module Mulukhiya
       end
       return result
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h.merge(dic: @params))
+      @logger.error(error: e.message, dic: uri.to_s)
       return {}
     end
   end

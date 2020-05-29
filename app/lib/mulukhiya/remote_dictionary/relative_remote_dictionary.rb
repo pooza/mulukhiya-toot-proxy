@@ -6,7 +6,7 @@ module Mulukhiya
         [create_key(k), {pattern: create_pattern(k), words: words.map {|word| create_key(word)}}]
       end.to_h
     rescue => e
-      @logger.error(Ginseng::Error.create(e).to_h.merge(dic: @params))
+      @logger.error(error: e.message, dic: uri.to_s)
       return {}
     end
   end
