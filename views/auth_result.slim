@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 アプリケーションの認証
       - if params[:status].to_i < 400
-        p 認証が完了しました。
+        p 認証とアクセストークンの登録が完了しました。
         div
           h3 アクセストークン
           textarea id='token_text' class='short' = params[:result][:access_token]
@@ -33,6 +33,14 @@ html lang='ja'
         mounted: function () {
           'use strict'
           localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
+          const token = localStorage.getItem('mulukhiya_token')
+          const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          axios.get(href, {responseType: 'json'})
+            .then(e => {
+              this.username = e.data.account.username
+            }).catch(e => {
+              this.message = e.message
+            })
         },
         methods: {
           copyToken: function () {

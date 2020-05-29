@@ -5,14 +5,19 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: '別のユーザーでログイン'}
+    == slim.render 'fragment/breadcrumbs', {current: '別のトークンでログイン'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 別のユーザーでログイン
-      nav class='menu'
-        a v-for='user in users' href='#' v-on:click='switchToken(user.token)' = '@{{user.username}}'
+      h2 別のトークンでログイン
+      nav class='tokens'
+        .token
+          a href='/mulukhiya/app/auth' 新規トークンを登録
+        .token v-for='user in users'
+          a href='#' v-on:click='switchUser(user)' = '@{{user.username}}'
+          i class='fas fa-trash' v-on:click='deleteUser(user)' v-if="user.token!=token"
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(window.VuejsDialog.main.default)
       new Vue({
         el: '#app',
         data: {
@@ -20,18 +25,18 @@ html lang='ja'
           username: null,
           token_error: false,
           users: [],
+          token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
           'use strict'
-          const token = localStorage.getItem('mulukhiya_token')
-          if (token) {
-            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+          if (this.token) {
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(this.token), {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
               })
-            let tokens = [token]
+            let tokens = [this.token]
             JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
               tokens.push(t)
             })
@@ -50,15 +55,36 @@ html lang='ja'
           }
         },
         methods: {
-          switchToken: function (token) {
+          switchUser: function (user) {
             'use strict'
-            axios.get('/mulukhiya/config?token=' + encodeURIComponent(token), {responseType: 'json'})
+            axios.get('/mulukhiya/config?token=' + encodeURIComponent(user.token), {responseType: 'json'})
               .then(e => {
-                localStorage.setItem('mulukhiya_token', token)
+                localStorage.setItem('mulukhiya_token', user.token)
                 this.username = e.data.account.username
+                location.href = '/mulukhiya'
               }).catch(e => {
                 this.message = e.message
               })
+          },
+          deleteUser: function (user) {
+            'use strict'
+            this.$dialog.confirm({body: `@${user.username}のトークンを削除します。`}, {
+              okText: 'OK',
+              cancelText: 'キャンセル',
+            }).then(e => {
+              const tokens = []
+              const users = []
+              this.users.map(u => {
+                if (user.token != u.token) {
+                  tokens.push(u.token)
+                  users.push(u)
+                }
+              })
+              localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+              this.users = users
+            }).catch(e => {
+              this.message = e.message
+            })
           },
         },
       })
