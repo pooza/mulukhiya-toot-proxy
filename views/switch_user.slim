@@ -69,7 +69,10 @@ html lang='ja'
           },
           deleteUser: function (user) {
             'use strict'
-            this.$dialog.confirm({body: `@${user.username}のトークンを削除します。`}, {
+            this.$dialog.confirm({
+              title: 'トークンの削除',
+              body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
+            }, {
               okText: 'OK',
               cancelText: 'キャンセル',
             }).then(e => {

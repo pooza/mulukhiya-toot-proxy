@@ -15,6 +15,6 @@
   p
     - if controller.webhook?
       a href='/mulukhiya/app/auth' トークンの登録
-      | を行ってください。
+      | （アプリケーションの認証）を行ってください。
     - else
       = "#{controller.name}はトークンの登録（アプリケーションの認証）に対応していません。"
