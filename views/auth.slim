@@ -5,10 +5,10 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'アプリケーションの認証'}
+    == slim.render 'fragment/breadcrumbs', {current: 'トークンの登録'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 アプリケーションの認証
+      h2 トークンの登録
       - if controller.name == 'Mastodon'
         form method='POST' action='/mulukhiya/auth'
           ol
