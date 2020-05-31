@@ -22,6 +22,7 @@ html lang='ja'
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {

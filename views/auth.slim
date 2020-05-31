@@ -29,6 +29,7 @@ html lang='ja'
             a href=params[:oauth_url] 認証コードを取得
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {

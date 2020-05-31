@@ -5,8 +5,10 @@
 
 .message-container v-if='username'
   p
-    | login:
-    a href='/mulukhiya/app/switch_user' = ' @{{username}}'
+    | login: @{{username}}
+    a href='/mulukhiya/app/switch_user'
+      i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
+
 
 .message-container class='alert' v-if='message'
   p = '{{message}}'

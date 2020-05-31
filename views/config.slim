@@ -58,11 +58,11 @@ html lang='ja'
           .field-container v-if='webhook_url'
             h4 URL
             textarea id='webhook-url-text' = '{{webhook_url}}'
-            i class='fas fa-clipboard' v-on:click='copyWebhookURL'
+            i class='fas fa-clipboard' v-on:click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
           .field-container v-if='webhook_url'
             h4 curlサンプル
             textarea id='curl-sample-text' = '{{curl_sample}}'
-            i class='fas fa-clipboard' v-on:click='copyCurlSample'
+            i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
         h3 v-on:click='toggleNotifySection' 通知
         .section-contents v-show='show_notify_detail'
@@ -74,6 +74,7 @@ html lang='ja'
             button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
