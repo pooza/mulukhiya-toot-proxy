@@ -5,7 +5,7 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: '別のトークンでログイン'}
+    == slim.render 'fragment/breadcrumbs', {current: 'トークンの管理'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 トークンの管理
