@@ -15,6 +15,7 @@ html lang='ja'
           button v-on:click='reloadPage' 再読み込み
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {

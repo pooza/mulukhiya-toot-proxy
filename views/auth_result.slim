@@ -5,24 +5,25 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'アプリケーションの認証'}
+    == slim.render 'fragment/breadcrumbs', {current: 'トークンの登録'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 アプリケーションの認証
+      h2 トークンの登録
       - if params[:status].to_i < 400
-        p 認証とアクセストークンの登録が完了しました。
+        p アプリケーションの認証とトークンの登録が完了しました。
         div
           h3 アクセストークン
           textarea id='token_text' class='short' = params[:result][:access_token]
-          i class='fas fa-clipboard' v-on:click='copyToken'
+          i class='fas fa-clipboard' v-on:click='copyToken' v-tooltip.bottom="'クリップボードにコピー'"
         div
           h3 Slack互換webhook URL
           textarea id='webhook_text' = params[:hook_url]
-          i class='fas fa-clipboard' v-on:click='copyWehbook'
+          i class='fas fa-clipboard' v-on:click='copyWehbook' v-tooltip.bottom="'クリップボードにコピー'"
       - else
         p class='alert' = "エラー（#{params[:status]}）"
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {

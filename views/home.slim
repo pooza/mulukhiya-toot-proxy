@@ -11,21 +11,18 @@ html lang='ja'
       h1 = package.name
       nav class='menu'
         - if controller.webhook?
-          a href='/mulukhiya/app/auth' アプリケーションの認証
           a href='/mulukhiya/app/config' v-if='username' 環境設定
           a href='#' v-else=''
             | 環境設定
             span class='alert' 未認証
         - else
           a href='#'
-            = 'アプリケーションの認証 '
-            span class='alert' 非対応
-          a href='#'
             = '環境設定 '
             span class='alert' 非対応
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {

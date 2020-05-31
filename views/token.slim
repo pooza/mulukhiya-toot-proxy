@@ -5,19 +5,21 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: '別のトークンでログイン'}
+    == slim.render 'fragment/breadcrumbs', {current: 'トークンの管理'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 別のトークンでログイン
+      h2 トークンの管理
       nav class='tokens'
         .token
-          a href='/mulukhiya/app/auth' 新規トークンを登録
+          a href='/mulukhiya/app/auth' 新しいトークンを登録
         .token v-for='user in users'
           a href='#' v-on:click='switchUser(user)' = '@{{user.username}}'
-          i class='fas fa-trash' v-on:click='deleteUser(user)' v-if="user.token!=token"
+          span class='loggedin' v-if='user.token==token' ログイン中
+          i class='fas fa-trash' v-on:click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(window.VuejsDialog.main.default)
+      Vue.use(VTooltip)
       new Vue({
         el: '#app',
         data: {
@@ -68,8 +70,11 @@ html lang='ja'
           },
           deleteUser: function (user) {
             'use strict'
-            this.$dialog.confirm({body: `@${user.username}のトークンを削除します。`}, {
-              okText: 'OK',
+            this.$dialog.confirm({
+              title: 'トークンの削除',
+              body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
+            }, {
+              okText: '削除',
               cancelText: 'キャンセル',
             }).then(e => {
               const tokens = []

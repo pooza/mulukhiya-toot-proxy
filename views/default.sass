@@ -3,8 +3,6 @@ $sans-serif: 'Francois One', sans-serif
 $monospace: Inconsolata, monospace
 
 body
-  width: 780px
-  margin: auto
   font:
     size: 1.2em
     family: $serif
@@ -146,15 +144,20 @@ nav.tokens
         radius: 2px
       background:
         color: lightgreen
-
+    span.loggedin
+      float: right
+      font:
+        size: 0.8em
+      color: green
 
 main
+  margin: auto
+  width: 780px
   border:
     width: 2px
     style: solid
     color: black
     radius: 6px
-  margin: 6px 0
   padding: 0.5em
   background:
     color: white
@@ -252,10 +255,8 @@ a:hover
   opacity: 0.85
   font:
     family: $sans-serif
-  a.switch-user
+  i
     float: right
-    font:
-      size: 0.8em
 
 #result-container pre
   font:
@@ -305,3 +306,18 @@ a:hover
 
 .alert
   color: red
+
+.tooltip
+  font:
+    family: $sans-serif
+    size: 0.5em
+  padding: 2px
+  margin: 4px
+  background:
+    color: white
+  border:
+    style: solid
+    color: back
+    width: 1px
+    radius: 4px
+  opacity: 0.8

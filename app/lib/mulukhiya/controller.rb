@@ -94,9 +94,9 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/app/switch_user' do
+    get '/mulukhiya/app/token' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'switch_user'
+      @renderer.template = 'token'
       return @renderer.to_s
     end
 

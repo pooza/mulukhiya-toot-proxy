@@ -10,6 +10,9 @@ AllCops:
     - 'tmp/**/*'
   TargetRubyVersion: 2.7
 
+Naming/RescuedExceptionsVariableName:
+  PreferredName: e
+
 Style/FrozenStringLiteralComment:
   Enabled: false
 
@@ -18,50 +21,6 @@ Style/DoubleNegation:
 
 Style/FormatStringToken:
   EnforcedStyle: template
-
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: consistent
-
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-
-Layout/SpaceBeforeBlockBraces:
-  EnforcedStyle: space
-
-Layout/SpaceInsideBlockBraces:
-  EnforcedStyle: no_space
-  EnforcedStyleForEmptyBraces: no_space
-  SpaceBeforeBlockParameters: false
-
-Layout/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-
-Layout/FirstArgumentIndentation:
-  EnforcedStyle: consistent
-
-Metrics/AbcSize:
-  Max: 30
-  Exclude:
-    - test/*
-
-Metrics/MethodLength:
-  Max: 20
-  Exclude:
-    - test/*
-
-Metrics/ClassLength:
-  Max: 200
-  Exclude:
-    - test/*
 
 Style/Documentation:
   Enabled: false
@@ -91,11 +50,6 @@ Style/IdenticalConditionalBranches:
   Exclude:
     - test/*
 
-Layout/LineLength:
-  Max: 100
-  Exclude:
-    - test/*
-
 Style/IfUnlessModifier:
   Exclude:
     - test/*
@@ -107,15 +61,6 @@ Style/FormatString:
   EnforcedStyle: percent
 
 Style/ConditionalAssignment:
-  Enabled: false
-
-Lint/AssignmentInCondition:
-  Enabled: false
-
-Lint/UnusedBlockArgument:
-  Enabled: false
-
-Lint/UnusedMethodArgument:
   Enabled: false
 
 Style/YodaCondition:
@@ -136,31 +81,86 @@ Style/HashEachMethods:
 Style/HashTransformKeys:
   Enabled: true
 
+Style/ExponentialNotation:
+  Enabled: true
+
+Style/SlicingWithRange:
+  Enabled: true
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstArgumentIndentation:
+  EnforcedStyle: consistent
+
+Layout/SpaceBeforeBlockBraces:
+  EnforcedStyle: space
+
+Layout/SpaceInsideBlockBraces:
+  EnforcedStyle: no_space
+  EnforcedStyleForEmptyBraces: no_space
+  SpaceBeforeBlockParameters: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+Layout/LineLength:
+  Max: 100
+  Exclude:
+    - test/*
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
+Metrics/AbcSize:
+  Max: 30
+  Exclude:
+    - test/*
+
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - test/*
+
+Metrics/ClassLength:
+  Max: 200
+  Exclude:
+    - test/*
+
 Metrics/CyclomaticComplexity:
   Max: 10
 
 Metrics/PerceivedComplexity:
   Max: 10
 
-Naming/RescuedExceptionsVariableName:
-  PreferredName: e
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
 
 Lint/RaiseException:
   Enabled: true
 
 Lint/StructNewOverride:
-  Enabled: true
-
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
-Style/ExponentialNotation:
-  Enabled: true
-
-Layout/EmptyLinesAroundAttributeAccessor:
-  Enabled: true
-
-Style/SlicingWithRange:
   Enabled: true
 
 Lint/DeprecatedOpenSSLConstant:

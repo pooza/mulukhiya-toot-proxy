@@ -5,9 +5,9 @@
 
 .message-container v-if='username'
   p
-    | login: @
-    = '{{username}} '
-    a class='switch-user' href='/mulukhiya/app/switch_user' switch token
+    | login: @{{username}}
+    a href='/mulukhiya/app/token'
+      i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
 
 .message-container class='alert' v-if='message'
   p = '{{message}}'
@@ -15,7 +15,7 @@
 .message-container v-if='token_error'
   p
     - if controller.webhook?
-      a href='/mulukhiya/app/auth' アプリケーションの認証
-      | を行ってください。
+      a href='/mulukhiya/app/auth' トークンの登録
+      | （アプリケーションの認証）を行ってください。
     - else
-      = "#{controller.name}はアプリケーションの認証に対応していません。"
+      = "#{controller.name}はトークンの登録（アプリケーションの認証）に対応していません。"
