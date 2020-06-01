@@ -131,7 +131,7 @@ GEM
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
     fastimage (2.1.7)
-    ffi (1.12.2)
+    ffi (1.13.0)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
