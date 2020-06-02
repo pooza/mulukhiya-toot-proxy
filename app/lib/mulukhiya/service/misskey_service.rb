@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def access_token
-      return Environment.access_token_class[token] if token
+      return Environment.access_token_class.first(token: token) if token
       return nil
     end
 
