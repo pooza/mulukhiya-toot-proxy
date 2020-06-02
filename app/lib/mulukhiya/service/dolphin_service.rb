@@ -25,6 +25,10 @@ module Mulukhiya
       return nil
     end
 
+    def access_token
+      return nil
+    end
+
     def notify(account, message)
       return note(
         DolphinController.status_field => message,
