@@ -314,14 +314,5 @@ html lang='ja'
             }
             this.updateConfig(values, command)
           },
-          updateTwitter: function () {
-            'use strict'
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', twitter: null}
-            if (this.twitter) {
-              //
-            }
-            this.updateConfig(values, command)
-          },
         },
       })
