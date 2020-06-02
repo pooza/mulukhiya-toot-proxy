@@ -16,7 +16,7 @@ html lang='ja'
           a href='#' v-on:click='switchUser(user)' = '@{{user.username}}'
           span class='loggedin' v-if='user.token==token' ログイン中
           i class='fas fa-trash' v-on:click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
-          span class='scopes' = '{{user.scopes}}'
+          span class='scopes' = '権限: {{user.scopes}}'
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(window.VuejsDialog.main.default)
