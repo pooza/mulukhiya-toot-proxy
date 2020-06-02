@@ -7,6 +7,7 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.clone
+          @hash.delete(:token)
           @hash[:scopes] = scopes
           @hash.compact!
         end
