@@ -31,7 +31,7 @@ module Mulukhiya
       end
 
       def attachments
-        @attachments ||= fileIds.match(/{(.*)}/)[1].split(',').map do |id|
+        @attachments ||= fileIds.match(/\{(.*)\}/)[1].split(',').map do |id|
           Attachment[id]
         end
         return @attachments
