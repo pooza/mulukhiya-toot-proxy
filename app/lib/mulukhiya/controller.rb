@@ -48,7 +48,7 @@ module Mulukhiya
           account: @sns.account.to_h,
           config: @sns.account.config.to_h,
           filters: @sns.filters&.parsed_response,
-          token: @sns.access_token,
+          token: @sns.access_token.to_h,
         }
       else
         @renderer.message = {error: 'Invalid token'}
