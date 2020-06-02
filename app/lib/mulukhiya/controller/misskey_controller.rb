@@ -2,7 +2,7 @@ module Mulukhiya
   class MisskeyController < Controller
     before do
       @sns = Environment.sns_class.new
-      if params[:token].present? && request.path.start_with?('/mulukhiya')
+      if params[:token].present? && request.path.match?(%r{/(mulukhiya|auth)})
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif params[:i]
         @sns.token = params[:i]

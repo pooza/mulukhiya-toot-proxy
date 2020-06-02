@@ -72,6 +72,12 @@ html lang='ja'
               input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知を行う（管理者・開発者向け）
           .field-update-button-container
             button v-on:click='updateNotify' 更新
+      section class='config' v-if='username'
+        h3 v-on:click='toggleTwitterSection' Twitter
+        .section-contents v-show='show_twitter_detail'
+          .field-update-button-container
+            a :href='twitterHref'
+              img src='/mulukhiya/sign_in_twitter.png'
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)
@@ -95,6 +101,12 @@ html lang='ja'
           show_livecure_detail: false,
           show_webhook_detail: false,
           show_notify_detail: false,
+          show_twitter_detail: false,
+        },
+        computed: {
+          twitterHref: function () {
+            return '/auth/twitter?token=' + encodeURIComponent(localStorage.getItem('mulukhiya_token'))
+          },
         },
         mounted: function () {
           'use strict'
@@ -226,6 +238,10 @@ html lang='ja'
             'use strict'
             this.show_notify_detail = !this.show_notify_detail
           },
+          toggleTwitterSection: function () {
+            'use strict'
+            this.show_twitter_detail = !this.show_twitter_detail
+          },
           updateGrowi: function () {
             'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
@@ -295,6 +311,15 @@ html lang='ja'
             const command = {command: 'user_config', notify: null}
             if (this.notify_verbose) {
               command.notify = {verbose: true}
+            }
+            this.updateConfig(values, command)
+          },
+          updateTwitter: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', twitter: null}
+            if (this.twitter) {
+              //
             }
             this.updateConfig(values, command)
           },
