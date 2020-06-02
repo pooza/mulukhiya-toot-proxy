@@ -74,6 +74,10 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
     end
 
+    def self.access_token_class
+      return "Mulukhiya::#{controller_name.camelize}::AccessToken".constantize
+    end
+
     def self.service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end

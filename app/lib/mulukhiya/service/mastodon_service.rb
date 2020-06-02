@@ -26,6 +26,11 @@ module Mulukhiya
       return nil
     end
 
+    def access_token
+      return Environment.access_token_class.first(token: token) if token
+      return nil
+    end
+
     def clear_oauth_client
       File.unlink(oauth_client_path) if File.exist?(oauth_client_path)
     end

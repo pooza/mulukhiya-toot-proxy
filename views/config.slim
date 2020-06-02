@@ -43,8 +43,9 @@ html lang='ja'
       section class='config' v-if='username' v-show='show_livecure'
         h3 v-on:click='toggleLivecureSection' = "実況#{status_label}"
         .section-contents v-show='show_livecure_detail'
-          .field-container
-            v-select :options='livecure_options' v-model='livecure'
+          .inline-field-container
+            label
+              input type='checkbox' value='1' v-model='livecure' = "実況#{status_label}を隠す"
           .field-update-button-container
             button v-on:click='updateLivecure' 更新
       section class='config' v-if='username'
@@ -68,8 +69,7 @@ html lang='ja'
         .section-contents v-show='show_notify_detail'
           .inline-field-container
             label class='alert'
-              input type='checkbox' value='1' v-model='notify_verbose'
-              | 冗長な通知を行う（管理者・開発者向け）
+              input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知を行う（管理者・開発者向け）
           .field-update-button-container
             button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
@@ -84,14 +84,10 @@ html lang='ja'
           token_error: false,
           result: null,
           notify_verbose: null,
+          livecure: false,
           programs: [],
           program_options: [],
           program: null,
-          livecure_options: [
-            {label: '表示', code: 'unregister'},
-            {label: '非表示', code: 'register'},
-          ],
-          livecure: '表示',
           show_livecure: #{livecure.to_s},
           show_growi_detail: false,
           show_dropbox_detail: false,
@@ -129,7 +125,7 @@ html lang='ja'
                 if (Array.isArray(e.data.filters)) {
                   e.data.filters.map(f => {
                     if (f.phrase == '#実況') {
-                      this.livecure = '非表示'
+                      this.livecure = true
                     }
                   })
                 }
@@ -262,7 +258,12 @@ html lang='ja'
           },
           updateLivecure: function () {
             'use strict'
-            const command = {command: 'filter', tag: '実況', action: this.livecure.code}
+            const command = {command: 'filter', tag: '実況'}
+            if (this.livecure) {
+              command.action = 'register'
+            } else {
+              command.action = 'unregister'
+            }
             const values = {
               token: localStorage.getItem('mulukhiya_token'),
               status: JSON.stringify(command),
