@@ -38,8 +38,7 @@ module Mulukhiya
     end
 
     get '/mulukhiya/about' do
-      path = File.join(Environment.dir, 'config/application.yaml')
-      @renderer.message = {package: YAML.load_file(path)['package']}
+      @renderer.message = {package: @config.raw.dig('application', 'package')}
       return @renderer.to_s
     end
 
