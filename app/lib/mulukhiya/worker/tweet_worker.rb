@@ -15,10 +15,12 @@ module Mulukhiya
     private
 
     def create_status(source)
-      return [
-        source.ellipsize(@config['/twitter/status/max_length'] - tags.join(' ').length - 1),
-        tags.join(' '),
-      ].join("\n")
+      status = TweetString.new(source)
+      length = @config['/twitter/status/length/max'] - @config['/twitter/status/length/url']
+      length = length - 1 - tags.join(' ').length if tags.present?
+      status.tweetablize!(length)
+      status = [status, tags.join(' ')].join("\n") if tags.present?
+      return status
     end
 
     def tags

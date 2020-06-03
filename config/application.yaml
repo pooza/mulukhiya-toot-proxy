@@ -420,7 +420,9 @@ twitter:
   consumer:
   status:
     tags: []
-    max_length: 140
+    length:
+      max: 140
+      url: 24
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
