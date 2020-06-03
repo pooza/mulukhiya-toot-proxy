@@ -3,10 +3,12 @@ module Mulukhiya
     attr_accessor :response
     attr_accessor :parser
     attr_accessor :account
+    attr_reader :temp
 
     def initialize(size = 0, val = nil)
       super
       @logger = Logger.new
+      @temp = {}
     end
 
     def tags

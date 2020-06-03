@@ -147,6 +147,7 @@ mastodon:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - tweet
       - result_notification
     pre_webhook:
       - itunes_image
@@ -246,6 +247,7 @@ misskey:
       - tagging
     post_toot:
       - user_config_command
+      - tweet
       - result_notification
     pre_webhook:
       - itunes_nowplaying
