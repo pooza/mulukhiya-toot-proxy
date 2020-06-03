@@ -136,10 +136,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = errors
       elsif @sns.account
-        @sns.account.config.update(twitter: {
-          token: params[:oauth_token],
-          verifier: params[:oauth_verifier],
-        })
+        @sns.account.config.update(twitter: request.env['omniauth.auth'][:credentials])
         @renderer = SlimRenderer.new
         @renderer.template = 'config'
       else

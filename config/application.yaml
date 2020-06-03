@@ -140,6 +140,7 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - tweet
       - tagging
     post_toot:
       - user_config_command
@@ -241,6 +242,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - tweet
       - tagging
     post_toot:
       - user_config_command
