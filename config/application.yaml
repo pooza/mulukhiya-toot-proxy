@@ -418,6 +418,9 @@ youtube:
   url: https://www.googleapis.com/
 twitter:
   consumer:
+  status:
+    tags: []
+    max_length: 140
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
