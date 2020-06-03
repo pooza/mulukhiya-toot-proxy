@@ -130,8 +130,12 @@ module Mulukhiya
       @renderer.status = 404
     end
 
-    get '/auth/:provider/callback' do
-      if @sns.account
+    get '/auth/twitter/callback' do
+      errors = TwitterAuthContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif @sns.account
         @sns.account.config.update(twitter: {
           token: params[:oauth_token],
           verifier: params[:oauth_verifier],
