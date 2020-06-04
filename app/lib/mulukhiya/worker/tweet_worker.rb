@@ -20,11 +20,24 @@ module Mulukhiya
       else
         status = TweetString.new(params['status'])
       end
-      return [status.tweetablize(length), params['url']].join("\n")
+      status = [status.tweetablize(length)]
+      status.push(tags.join(' ')) if tags.present?
+      status.push(params['url'])
+      return status.join("\n")
     end
 
     def length
-      return @config['/twitter/status/length/max'] - @config['/twitter/status/length/url'] - 1
+      length = @config['/twitter/status/length/max']
+      length = length - @config['/twitter/status/length/url'] - 1
+      length = length - tags.join(' ').length - 1 if tags.present?
+      return length
+    end
+
+    def tags
+      @tags ||= @config['/twitter/status/tags'].map {|tag| MastodonService.create_tag(tag)}
+      return @tags
+    rescue
+      return []
     end
   end
 end
