@@ -9,7 +9,7 @@ module Mulukhiya
 
     use OmniAuth::Builder do
       config = Config.instance
-      provider :twitter, config['/twitter/consumer/key'], config['/twitter/consumer/secret']
+      provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
     end
 
     before do
