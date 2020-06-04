@@ -8,7 +8,6 @@ module Mulukhiya
     enable :sessions
 
     use OmniAuth::Builder do
-      config = Config.instance
       provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
     end
 
