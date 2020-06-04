@@ -25,6 +25,7 @@ Mastodon / Misskey / Dolphinの投稿に対して、内容の更新等を行う�
 
 また、
 
+- 投稿をTwitterにマルチポストする。
 - 投稿を[GROWI](https://growi.org/)等、各種外部サービスに保存。
 - 平易なPOSTで投稿を行えるwebhook。（Slack互換）
 
