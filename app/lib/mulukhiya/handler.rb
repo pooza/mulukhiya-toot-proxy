@@ -35,6 +35,14 @@ module Mulukhiya
 
     def handle_post_search(body, params = {}); end
 
+    def handle_toot(body, params = {})
+      params[:reporter] ||= Reporter.new
+      params[:sns] ||= Environment.sns_class.new
+      @sns = params[:sns]
+      handle_pre_toot(body, params)
+      return handle_post_toot(body, params)
+    end
+
     def underscore_name
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end

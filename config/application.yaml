@@ -68,6 +68,10 @@ test:
         - video_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
+    - name: twitter
+      cases:
+        - twitter_service
+        - tweet_handler
     - name: dolphin
       cases:
         - mastodon_controller

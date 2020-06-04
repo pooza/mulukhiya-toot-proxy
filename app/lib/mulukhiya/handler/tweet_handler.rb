@@ -12,7 +12,7 @@ module Mulukhiya
 
     def handle_post_toot(body, params = {})
       @status = reporter.temp[:tweet] || body[status_field] || ''
-      url = params[:reporter].response['url'] || params[:reporter].response['uri']
+      url = params[:reporter].response['url'] if params[:reporter].response
       return body unless tweetable?(body)
       TweetWorker.perform_async(
         account_id: sns.account.id,
