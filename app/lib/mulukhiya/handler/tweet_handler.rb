@@ -42,7 +42,7 @@ module Mulukhiya
         uri = Ginseng::URI.parse(response['url'])
       end
       return uri
-    rescue=> e
+    rescue => e
       errors.push(class: e.class.to_s, message: e.message)
       return uri
     end
