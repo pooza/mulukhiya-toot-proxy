@@ -36,7 +36,6 @@ module Mulukhiya
 
     def create_status_uri(response)
       uri = @sns.uri.clone
-      Slack.broadcast(response.parsed_response)
       if id = response.parsed_response.dig('createdNote', 'id')
         uri.path = "/notes/#{id}"
       else
