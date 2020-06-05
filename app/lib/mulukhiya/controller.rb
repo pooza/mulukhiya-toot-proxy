@@ -1,7 +1,15 @@
+require 'omniauth'
+require 'omniauth-twitter'
+
 module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
+    enable :sessions
+
+    use OmniAuth::Builder do
+      provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
+    end
 
     before do
       @reporter = Reporter.new
@@ -119,6 +127,21 @@ module Mulukhiya
       return @renderer.to_s
     rescue Ginseng::RenderError
       @renderer.status = 404
+    end
+
+    get '/auth/twitter/callback' do
+      errors = TwitterAuthContract.new.call(params).errors.to_h
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif @sns.account
+        @sns.account.config.update(twitter: request.env['omniauth.auth'][:credentials])
+        @renderer = SlimRenderer.new
+        @renderer.template = 'config'
+      else
+        @renderer.status = 403
+      end
+      return @renderer.to_s
     end
 
     def response_error?

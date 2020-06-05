@@ -4,14 +4,6 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/CommandHandler$/, '').underscore
     end
 
-    def handle_toot(body, params = {})
-      params[:reporter] ||= Reporter.new
-      params[:sns] ||= Environment.sns_class.new
-      @sns = params[:sns]
-      handle_pre_toot(body, params)
-      return handle_post_toot(body, params)
-    end
-
     def contract
       @contract ||= "Mulukhiya::#{command_name.camelize}CommandContract".constantize.new
       return @contract
@@ -49,7 +41,5 @@ module Mulukhiya
     def exec
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
-
-    alias dispatch exec
   end
 end

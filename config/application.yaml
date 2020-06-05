@@ -1,5 +1,5 @@
 package:
-  version: 3.7.5
+  version: 3.8.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -68,6 +68,10 @@ test:
         - video_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
+    - name: twitter
+      cases:
+        - twitter_service
+        - tweet_handler
     - name: dolphin
       cases:
         - mastodon_controller
@@ -140,12 +144,14 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - tweet
       - tagging
     post_toot:
       - user_config_command
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - tweet
       - result_notification
     pre_webhook:
       - itunes_image
@@ -241,9 +247,11 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - tweet
       - tagging
     post_toot:
       - user_config_command
+      - tweet
       - result_notification
     pre_webhook:
       - itunes_nowplaying
@@ -414,6 +422,13 @@ itunes:
     - itunes.apple.com
 youtube:
   url: https://www.googleapis.com/
+twitter:
+  consumer:
+  status:
+    tags: []
+    length:
+      max: 140
+      url: 12
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:

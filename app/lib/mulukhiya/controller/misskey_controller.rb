@@ -2,7 +2,7 @@ module Mulukhiya
   class MisskeyController < Controller
     before do
       @sns = Environment.sns_class.new
-      if params[:token].present? && request.path.start_with?('/mulukhiya')
+      if params[:token].present? && request.path.match?(%r{/(mulukhiya|auth)})
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif params[:i]
         @sns.token = params[:i]
@@ -13,10 +13,10 @@ module Mulukhiya
     end
 
     post '/api/notes/create' do
-      Handler.exec_all(:pre_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
       @reporter.response = @sns.note(params)
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -28,10 +28,10 @@ module Mulukhiya
     end
 
     post '/api/drive/files/create' do
-      Handler.exec_all(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {response: :raw})
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.exec_all(:post_upload, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -44,7 +44,7 @@ module Mulukhiya
 
     post '/api/notes/favorites/create' do
       @reporter.response = @sns.fav(params[:noteId])
-      Handler.exec_all(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response || {}
       @renderer.status = @reporter.response.code
       return @renderer.to_s

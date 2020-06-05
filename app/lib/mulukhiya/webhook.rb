@@ -35,9 +35,9 @@ module Mulukhiya
         'visibility' => visibility,
         'attachments' => status[:attachments] || [],
       }
-      Handler.exec_all(:pre_webhook, body, {reporter: reporter, sns: @sns})
+      Handler.dispatch(:pre_webhook, body, {reporter: reporter, sns: @sns})
       reporter.response = @sns.post(body)
-      Handler.exec_all(:post_webhook, body, {reporter: reporter, sns: @sns})
+      Handler.dispatch(:post_webhook, body, {reporter: reporter, sns: @sns})
       return reporter
     end
 
