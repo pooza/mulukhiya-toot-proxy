@@ -20,7 +20,7 @@ module Mulukhiya
       else
         status = TweetString.new(params['status'])
       end
-      status = [status.tweetablize(length)]
+      status = [status.ellipsize(length)]
       status.push(tags.join(' ')) if tags.present?
       status.push(params['url'])
       return status.join("\n")
