@@ -12,15 +12,15 @@ module Mulukhiya
 
     def handle_post_toot(body, params = {})
       @status = reporter.temp[:tweet] || body[status_field] || ''
-      url = params[:reporter].response['url'] if params[:reporter].response
       return body unless tweetable?(body)
+      uri = create_status_uri(params[:reporter].response)
       TweetWorker.perform_async(
         account_id: sns.account.id,
         status: @status,
-        url: url,
+        url: uri.to_s,
         spoiler_text: body['spoiler_text'],
       )
-      result.push(url: url)
+      result.push(url: uri.to_s)
       return body
     end
 
@@ -32,6 +32,20 @@ module Mulukhiya
       return true unless body['visibility']
       return true if body['visibility'] == 'public'
       return false
+    end
+
+    def create_status_uri(response)
+      uri = @sns.uri.clone
+      Slack.broadcast(response.parsed_response)
+      if id = response.parsed_response.dig('createdNote', 'id')
+        uri.path = "/notes/#{id}"
+      else
+        uri = Ginseng::URI.parse(response['url'])
+      end
+      return uri
+    rescue=> e
+      errors.push(class: e.class.to_s, message: e.message)
+      return uri
     end
   end
 end
