@@ -18,5 +18,14 @@ module Mulukhiya
       str = TweetString.new('ああああefefx')
       assert_equal(str.index('fx'), 5.5)
     end
+
+    def test_max_length
+      assert_kind_of(Integer, TweetString.max_length)
+      assert_false(TweetString.max_length.zero?)
+    end
+
+    def test_tags
+      assert_kind_of(Array, TweetString.tags)
+    end
   end
 end

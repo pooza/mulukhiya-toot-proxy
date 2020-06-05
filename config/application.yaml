@@ -428,7 +428,7 @@ twitter:
     tags: []
     length:
       max: 140
-      url: 24
+      url: 12
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
