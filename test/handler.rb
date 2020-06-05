@@ -15,10 +15,10 @@ module Mulukhiya
       end
     end
 
-    def test_exec_all
+    def test_dispatch
       return unless handler?
       params = {}
-      Handler.exec_all(
+      Handler.dispatch(
         :pre_toot,
         {status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq', 'visibility' => 'private'},
         params,

@@ -139,7 +139,7 @@ module Mulukhiya
       end
     end
 
-    def self.exec_all(event, body, params = {})
+    def self.dispatch(event, body, params = {})
       params[:event] = event
       params[:reporter] ||= Reporter.new
       all(event, params) do |handler|

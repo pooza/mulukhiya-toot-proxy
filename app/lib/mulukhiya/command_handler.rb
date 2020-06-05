@@ -41,7 +41,5 @@ module Mulukhiya
     def exec
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
-
-    alias dispatch exec
   end
 end

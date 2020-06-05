@@ -14,10 +14,10 @@ module Mulukhiya
 
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
-      Handler.exec_all(:pre_toot, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.toot(params)
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.exec_all(:post_toot, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
       @renderer.status = @reporter.response.code
@@ -30,12 +30,12 @@ module Mulukhiya
     end
 
     post %r{/api/v([12])/media} do
-      Handler.exec_all(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         response: :raw,
         version: params[:captures].first.to_i,
       })
-      Handler.exec_all(:post_upload, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -48,7 +48,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/favourite' do
       @reporter.response = @sns.fav(params[:id])
-      Handler.exec_all(:post_fav, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_fav, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -56,7 +56,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/reblog' do
       @reporter.response = @sns.boost(params[:id])
-      Handler.exec_all(:post_boost, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_boost, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -64,7 +64,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/bookmark' do
       @reporter.response = @sns.bookmark(params[:id])
-      Handler.exec_all(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -74,7 +74,7 @@ module Mulukhiya
       params[:limit] = @config['/mastodon/search/limit']
       @reporter.response = @sns.search(params[:q], params)
       @message = @reporter.response.parsed_response.with_indifferent_access
-      Handler.exec_all(:post_search, params, {reporter: @reporter, message: @message})
+      Handler.dispatch(:post_search, params, {reporter: @reporter, message: @message})
       @renderer.message = @message
       @renderer.status = @reporter.response.code
       return @renderer.to_s
