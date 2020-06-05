@@ -8,6 +8,7 @@ module Mulukhiya
       optional(:misskey)
       optional(:dolphin)
       optional(:postgres)
+      optional(:twitter)
     end
 
     rule(:agent) do
@@ -63,6 +64,17 @@ module Mulukhiya
           key.failure('/postgres/dsn 型不正') unless Ginseng::Postgres::DSN.parse(dsn).valid?
         else
           key.failure('/postgres/dsn 未定義')
+        end
+      end
+    end
+
+    rule(:twitter) do
+      if value.is_a?(Hash)
+        if consumer = value.dig('consumer')
+          key.failure('/twitter/consumer/key 未定義') unless consumer['key'].present?
+          key.failure('/twitter/consumer/secret 未定義') unless consumer['secret'].present?
+        else
+          key.failure('/twitter/consumer 未定義')
         end
       end
     end
