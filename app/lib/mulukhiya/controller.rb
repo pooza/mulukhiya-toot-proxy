@@ -172,5 +172,11 @@ module Mulukhiya
       @logger.error(e)
       return @renderer.to_s
     end
+
+    private
+
+    def status_field
+      return Environment.controller_class.status_field
+    end
   end
 end

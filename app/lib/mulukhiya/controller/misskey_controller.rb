@@ -14,7 +14,7 @@ module Mulukhiya
 
     post '/api/notes/create' do
       Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
-      params[Environment.controller_class.status_field] ||= '.'
+      params.delete(status_field) unless params[status_field].present?
       @reporter.response = @sns.note(params)
       notify(@reporter.response.parsed_response) if response_error?
       Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
