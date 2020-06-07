@@ -31,6 +31,8 @@ module Mulukhiya
         ['video', 'image', 'audio'].each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
           tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
+        rescue Ginseng::ConfigError => e
+          result.push(info: e.message)
         end
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, media_id: id)
