@@ -4,8 +4,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return body unless executable?(body)
       tags.text = @status
-      @dic = TaggingDictionary.new
-      tags.concat(@dic.matches(body))
+      tags.concat(TaggingDictionary.new.matches(body))
       tags.concat(create_attachment_tags(body))
       tags.concat(@sns.account.tags)
       body[status_field] = update_status
@@ -16,9 +15,7 @@ module Mulukhiya
     private
 
     def executable?(body)
-      parser.accts do |acct|
-        return false if acct.agent?
-      end
+      return false if parser.accts.any?(&:agent?)
       return true unless body['visibility'].present?
       return true if body['visibility'] == 'public'
       return false
