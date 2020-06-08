@@ -1,5 +1,5 @@
 package:
-  version: 3.8.1
+  version: 3.8.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -517,12 +517,13 @@ tagging:
     video: video
     audio: audio
   dictionaries:
-    - url: https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec
+    - url: https://precure.ml/api/dic/v1/precure.json
       type: relative
-    - url: https://script.google.com/macros/s/AKfycbzAUsRUuFLO72EgKta020v9OMtxvUtqUcPZNJ3_IMlOo8dRO7tW/exec
+    - url: https://precure.ml/api/dic/v1/singer.json
       type: relative
-    - url: https://script.google.com/macros/s/AKfycbyy5EQHvhKfm1Lg6Ae4W7knG4BCSkvepJyB6MrzQ8UIxmFfZMJj/exec
+    - url: https://precure.ml/api/dic/v1/series.json
       type: relative
+    - url: https://precure.ml/api/dic/v2/fairy.json
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
