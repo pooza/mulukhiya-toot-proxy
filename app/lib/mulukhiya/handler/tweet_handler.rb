@@ -30,6 +30,7 @@ module Mulukhiya
     def tweetable?(body)
       return false if parser.command?
       return false unless parser.accts.count.zero?
+      return false if body['visibleUserIds'].present?
       return true unless body['visibility']
       return true if body['visibility'] == 'public'
       return false
