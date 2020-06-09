@@ -1,6 +1,10 @@
+require 'json-schema'
+
 namespace :config do
   desc 'lint local config'
   task :lint do
+    puts "controller: #{controller}"
+    errors = JSON::Validator.fully_validate(schema, config)
     if errors.present?
       puts YAML.dump(errors)
       exit 1
@@ -9,16 +13,15 @@ namespace :config do
     end
   end
 
-  def errors
-    @errors ||= contract.call(config).errors.to_h
-    return @errors
-  end
-
   def config
     return Mulukhiya::Config.instance.raw['local']
   end
 
-  def contract
-    return Mulukhiya::LocalConfigContract.new
+  def schema
+    return Mulukhiya::Config.instance.raw["schema.#{controller}"]
+  end
+
+  def controller
+    return Mulukhiya::Environment.controller_name
   end
 end

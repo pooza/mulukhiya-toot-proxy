@@ -9,6 +9,7 @@ gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fe
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', require: 'ginseng/postgres'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
+gem 'json-schema'
 gem 'mimemagic'
 gem 'nokogiri'
 gem 'omniauth-twitter'
