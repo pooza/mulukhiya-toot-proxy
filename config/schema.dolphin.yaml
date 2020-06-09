@@ -1,5 +1,5 @@
 $schema: http://json-schema.org/draft-04/hyper-schema
-title: Local config (Mastodon)
+title: Local config (Dolphin)
 type: object
 required:
   - controller

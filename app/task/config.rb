@@ -3,6 +3,7 @@ require 'json-schema'
 namespace :config do
   desc 'lint local config'
   task :lint do
+    puts "controller: #{controller}"
     errors = JSON::Validator.fully_validate(schema, config)
     if errors.present?
       puts YAML.dump(errors)
