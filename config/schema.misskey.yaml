@@ -68,6 +68,21 @@ properties:
                 - multi_field
                 - relative
                 - mecab
+      attachment_tags:
+        type: object
+        properties:
+          image:
+            type:
+              - string
+              - 'null'
+          video:
+            type:
+              - string
+              - 'null'
+          audio:
+            type:
+              - string
+              - 'null'
       default_tags:
         type: array
         items:
@@ -149,6 +164,18 @@ properties:
         properties:
           key:
             type: string
+  sidekiq:
+    type: object
+    properties:
+      concurrency:
+        type: integer
+      schedule:
+        type: object
+  puma:
+    type: object
+    properties:
+      port:
+        type: integer
   crypt:
     type: object
     properties:
