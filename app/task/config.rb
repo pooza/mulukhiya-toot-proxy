@@ -7,6 +7,7 @@ namespace :config do
     errors = JSON::Validator.fully_validate(schema, config)
     if errors.present?
       puts YAML.dump(errors)
+      exit 1
     else
       puts 'OK'
     end
