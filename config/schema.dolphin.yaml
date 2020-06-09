@@ -2,6 +2,7 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 title: Local config (Mastodon)
 type: object
 required:
+  - controller
   - agent
   - dolphin
   - postgres
