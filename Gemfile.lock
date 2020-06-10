@@ -234,7 +234,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.2.0)
+    redis (4.1.4)
     regexp_parser (1.7.1)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
@@ -348,7 +348,7 @@ DEPENDENCIES
   omniauth-twitter
   rack-test
   rails-erb-lint
-  redis
+  redis (< 4.2)
   rspotify
   rubocop
   rubocop-performance
