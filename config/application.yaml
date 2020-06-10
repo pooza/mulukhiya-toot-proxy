@@ -1,5 +1,5 @@
 package:
-  version: 3.8.3
+  version: 3.8.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -13,6 +13,10 @@ handler:
     timeout: 5
   image_resize:
     pixel: 1280
+  video_format_convert:
+    timeout: 30
+  audio_format_convert:
+    timeout: 10
   itunes_image:
     pixel: 480
   spotify_image:

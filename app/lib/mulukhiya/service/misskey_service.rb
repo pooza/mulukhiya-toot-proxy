@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
@@ -12,6 +14,21 @@ module Mulukhiya
     def token=(token)
       @token = token
       @account = nil
+    end
+
+    def upload(path, params = {})
+      if filename = params[:filename]
+        dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
+        FileUtils.mkdir_p(dir)
+        file = MediaFile.new(path)
+        filename += file.valid_extname unless file.valid_extname?
+        dest = File.join(dir, filename)
+        FileUtils.copy(path, dest)
+        path = dest
+      end
+      return super
+    ensure
+      FileUtils.rm_rf(dir) if dir
     end
 
     def filters

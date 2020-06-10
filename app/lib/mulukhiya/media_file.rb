@@ -1,5 +1,6 @@
 require 'digest/sha1'
 require 'mimemagic'
+require 'rack/mime'
 
 module Mulukhiya
   class MediaFile < File
@@ -26,6 +27,18 @@ module Mulukhiya
 
     def type
       return mimemagic&.to_s
+    end
+
+    def extname
+      return File.extname(path)
+    end
+
+    def valid_extname
+      return Rack::Mime::MIME_TYPES.invert[type]
+    end
+
+    def valid_extname?
+      return extname == valid_extname
     end
 
     def width
