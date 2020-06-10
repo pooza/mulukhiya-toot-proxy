@@ -13,6 +13,10 @@ handler:
     timeout: 5
   image_resize:
     pixel: 1280
+  video_format_convert:
+    timeout: 30
+  audio_format_convert:
+    timeout: 10
   itunes_image:
     pixel: 480
   spotify_image:
