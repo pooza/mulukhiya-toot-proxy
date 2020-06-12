@@ -1,4 +1,3 @@
-
 namespace :config do
   desc 'lint local config'
   task :lint do

@@ -41,9 +41,8 @@ module Mulukhiya
             'properties' => {
               'disabled' => {'type' => 'boolean'},
               'timeout' => {'type' => 'string'},
-            }
+            },
           }
-
         end
       end
       return handlers
