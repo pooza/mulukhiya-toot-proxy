@@ -9,6 +9,8 @@ properties:
     type: string
     enum:
       - mastodon
+      - misskey
+      - dolphin
   environment:
     type: string
     enum:
