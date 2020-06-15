@@ -11,6 +11,10 @@ module Mulukhiya
 
       alias local? local
 
+      def visible?
+        return visibility == 'public'
+      end
+
       alias attachments attachment
 
       def uri
