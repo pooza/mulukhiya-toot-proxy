@@ -22,13 +22,13 @@ module Mulukhiya
 
     def to_md
       note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
-      note = Environment.sns_class.new.fetch_note(note.id)
       raise "Note '#{self}' not found" unless note
+      raise "Note '#{self}' not found" unless note.visible?
       template = Template.new('note_clipping.md')
-      template[:account] = note['account']
-      template[:status] = NoteParser.new(note['text']).to_md
-      template[:attachments] = note['attachments']
-      template[:url] = note['uri']
+      template[:account] = note.account
+      template[:status] = NoteParser.new(note.text).to_md
+      template[:attachments] = note.attachments
+      template[:url] = note.uri
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace

@@ -6,3 +6,4 @@ require 'bundler/setup'
 require 'mulukhiya'
 
 Mulukhiya::Postgres.connect
+Redis.exists_returns_integer = false

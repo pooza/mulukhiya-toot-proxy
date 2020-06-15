@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def to_md
-      toot = service.fetch_toot(toot_id)
+      toot = service.fetch_toot(id)
       raise "Toot '#{self}' not found" unless toot
       raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
