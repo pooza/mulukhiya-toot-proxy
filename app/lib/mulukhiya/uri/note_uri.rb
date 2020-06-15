@@ -27,7 +27,7 @@ module Mulukhiya
       template = Template.new('note_clipping.md')
       template[:account] = note.account
       template[:status] = NoteParser.new(note.text).to_md
-      template[:attachments] = note.attachments.all
+      template[:attachments] = note.attachments
       template[:url] = note.uri
       return template.to_s
     rescue => e
