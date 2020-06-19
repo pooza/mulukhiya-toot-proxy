@@ -21,7 +21,7 @@ Mastodon / Misskey / Dolphin / Pleromaの投稿に対して、内容の更新等
 
 - 画像ファイルを上限ピクセルまでリサイズ。
 - JPEGに変換し、ファイルサイズを小さくする。
-- Mastodon / Misskey / Dolphinが本来受け付けないメディアファイルを変換。
+- Mastodon / Misskey / Dolphin / Pleromaが本来受け付けないメディアファイルを変換。
 
 また、
 
