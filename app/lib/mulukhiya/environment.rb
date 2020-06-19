@@ -54,6 +54,10 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
+    def self.pleroma?
+      return controller_name == 'pleroma'
+    end
+
     def self.development?
       return type == 'development'
     end
@@ -88,6 +92,8 @@ module Mulukhiya
         return TootParser
       when 'dolphin', 'misskey'
         return NoteParser
+      when 'pleroma'
+        return PleromaStatusParser
       end
     end
 

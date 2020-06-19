@@ -85,17 +85,26 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
+        - pleroma_controller
         - toot_uri
     - name: mastodon
       cases:
         - dolphin_controller
         - misskey_controller
+        - pleroma_controller
         - note_uri
     - name: misskey
       cases:
         - mastodon_controller
         - dolphin_controller
+        - pleroma_controller
         - toot_uri
+    - name: pleroma
+      cases:
+        - mastodon_controller
+        - misskey_controller
+        - dolphin_controller
+        - note_uri
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -375,6 +384,90 @@ dolphin:
   poll:
     options:
       field: choices
+pleroma:
+  url: https://pleroma.example.com/
+  handlers:
+    pre_toot:
+      - user_config_command
+      - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tweet
+      - tagging
+    post_toot:
+      - user_config_command
+      - tweet
+      - result_notification
+    pre_webhook:
+      - itunes_nowplaying
+      - webhook_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
+    post_webhook:
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
+  events:
+    - pre_toot
+    - post_toot
+    - pre_webhook
+    - post_webhook
+    - pre_upload
+    - post_upload
+    - post_bookmark
+  status:
+    field: status
+    key: id
+    label: ステータス
+    max_length: 5000
+    visibility_names:
+      unlisted: unlisted
+      private: private
+      direct: direct
+    patterns:
+      - pattern: ^/web/statuses/([[:digit:]]+)
+      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
+      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+  attachment:
+    key: media_ids
+  poll:
+    options:
+      field: options
 amazon:
   marketplace: jp
   urls:
