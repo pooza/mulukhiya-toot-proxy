@@ -16,7 +16,10 @@ module Mulukhiya
     end
 
     def account
-      @account ||= access_token.account
+      unless @account
+        @account = access_token.account
+        @account.token = access_token.token
+      end
       return @account
     rescue
       return nil
