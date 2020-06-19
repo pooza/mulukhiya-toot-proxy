@@ -43,18 +43,10 @@ module Mulukhiya
       end
 
       def growi
-        @growi ||= GrowiClipper.create(account_id: id)
-        return @growi
-      rescue => e
-        logger.error(e)
         return nil
       end
 
       def dropbox
-        @dropbox ||= DropboxClipper.create(account_id: id)
-        return @dropbox
-      rescue => e
-        logger.error(e)
         return nil
       end
 
@@ -75,9 +67,9 @@ module Mulukhiya
         return nil
       end
 
-      def recent_toot; end
+      def recent_status; end
 
-      alias recent_status recent_toot
+      alias recent_toot recent_status
 
       alias username nickname
 

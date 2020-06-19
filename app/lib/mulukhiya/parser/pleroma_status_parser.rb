@@ -1,5 +1,5 @@
 module Mulukhiya
-  class PleromaStatusParser < Ginseng::Fediverse::TootParser
+  class PleromaStatusParser < Ginseng::Fediverse::Parser
     include Package
     attr_accessor :account
 
@@ -8,18 +8,6 @@ module Mulukhiya
       text.scan(PleromaStatusParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
-    end
-
-    def to_md
-      md = text.clone
-      ['.u-url', '.hashtag'].each do |selector|
-        nokogiri.css(selector).each do |link|
-          md.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
-        rescue => e
-          @logger.error(error: e.message, link: link.to_s)
-        end
-      end
-      return PleromaStatusParser.sanitize(md)
     end
 
     def all_tags
