@@ -1,3 +1,5 @@
+require 'twitter-text'
+
 module Mulukhiya
   class TweetString < String
     def length
@@ -7,8 +9,18 @@ module Mulukhiya
     end
 
     def index(search)
-      return self[0..(super - 1)].length
+      return self[0..(super.to_i - 1)].length
     end
+
+    def valid?
+      return parsed[:valid]
+    end
+
+    def parse
+      return Twitter::TwitterText::Validation.parse_tweet(self)
+    end
+
+    alias parsed parse
 
     def self.config
       return Config.instance

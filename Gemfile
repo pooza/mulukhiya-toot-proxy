@@ -19,6 +19,7 @@ gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler'
 gem 'twitter'
+gem 'twitter-text'
 gem 'vacuum'
 
 group :development do

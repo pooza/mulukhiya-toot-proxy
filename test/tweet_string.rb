@@ -19,6 +19,20 @@ module Mulukhiya
       assert_equal(str.index('fx'), 5.5)
     end
 
+    def test_valid?
+      str = TweetString.new('あ' * 140)
+      assert(str.valid?)
+
+      str = TweetString.new('あ' * 141)
+      assert_false(str.valid?)
+
+      str = TweetString.new('A' * 280)
+      assert(str.valid?)
+
+      str = TweetString.new('A' * 281)
+      assert_false(str.valid?)
+    end
+
     def test_max_length
       assert_kind_of(Integer, TweetString.max_length)
       assert_false(TweetString.max_length.zero?)
