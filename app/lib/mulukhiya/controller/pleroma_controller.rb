@@ -115,11 +115,11 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       config = Config.instance
-      Postgres.instance.exec('webhook_tokens').each do |row|
+      Pleroma::AccessToken.all do |token|
         values = {
-          digest: Webhook.create_digest(config['/pleroma/url'], row['token']),
-          token: row['token'],
-          account: Environment.account_class[row['account_id']],
+          digest: Webhook.create_digest(config['/pleroma/url'], token.values[:token]),
+          token: token.values[:token],
+          account: token.account,
         }
         yield values
       end
