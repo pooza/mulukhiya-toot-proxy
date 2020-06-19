@@ -105,6 +105,7 @@ test:
         - misskey_controller
         - dolphin_controller
         - note_uri
+        - status
     - name: dropbox
       cases:
         - dropbox_clipper
