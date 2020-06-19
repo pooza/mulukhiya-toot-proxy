@@ -1,5 +1,5 @@
 package:
-  version: 3.8.9
+  version: 3.9.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -85,17 +85,27 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
+        - pleroma_controller
         - toot_uri
     - name: mastodon
       cases:
         - dolphin_controller
         - misskey_controller
+        - pleroma_controller
         - note_uri
     - name: misskey
       cases:
         - mastodon_controller
         - dolphin_controller
+        - pleroma_controller
         - toot_uri
+    - name: pleroma
+      cases:
+        - mastodon_controller
+        - misskey_controller
+        - dolphin_controller
+        - note_uri
+        - status
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -263,7 +273,6 @@ misskey:
       - tweet
       - result_notification
     pre_webhook:
-      - itunes_nowplaying
       - webhook_image
       - shortened_url
       - url_normalize
@@ -375,6 +384,88 @@ dolphin:
   poll:
     options:
       field: choices
+pleroma:
+  url: https://pleroma.example.com/
+  handlers:
+    pre_toot:
+      - user_config_command
+      - mention_visibility
+      - amazon_image
+      - you_tube_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tweet
+      - tagging
+    post_toot:
+      - user_config_command
+      - tweet
+      - result_notification
+    pre_webhook:
+      - amazon_image
+      - you_tube_image
+      - webhook_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
+    post_webhook:
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
+  events:
+    - pre_toot
+    - post_toot
+    - pre_webhook
+    - post_webhook
+    - pre_upload
+    - post_upload
+  status:
+    field: status
+    key: id
+    label: ステータス
+    max_length: 5000
+    visibility_names:
+      unlisted: unlisted
+      private: private
+      direct: direct
+    patterns:
+      - pattern: ^/web/statuses/([[:digit:]]+)
+      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
+      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+  attachment:
+    key: media_ids
+  poll:
+    options:
+      field: options
 amazon:
   marketplace: jp
   urls:

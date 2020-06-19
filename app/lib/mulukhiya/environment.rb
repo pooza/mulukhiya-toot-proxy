@@ -54,6 +54,10 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
+    def self.pleroma?
+      return controller_name == 'pleroma'
+    end
+
     def self.development?
       return type == 'development'
     end
@@ -68,10 +72,14 @@ module Mulukhiya
 
     def self.status_class
       return "Mulukhiya::#{controller_name.camelize}::Status".constantize
+    rescue
+      return nil
     end
 
     def self.attachment_class
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
+    rescue
+      return nil
     end
 
     def self.access_token_class
@@ -88,6 +96,8 @@ module Mulukhiya
         return TootParser
       when 'dolphin', 'misskey'
         return NoteParser
+      when 'pleroma'
+        return PleromaStatusParser
       end
     end
 
