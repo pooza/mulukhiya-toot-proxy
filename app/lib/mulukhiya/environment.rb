@@ -72,10 +72,14 @@ module Mulukhiya
 
     def self.status_class
       return "Mulukhiya::#{controller_name.camelize}::Status".constantize
+    rescue
+      return nil
     end
 
     def self.attachment_class
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
+    rescue
+      return nil
     end
 
     def self.access_token_class

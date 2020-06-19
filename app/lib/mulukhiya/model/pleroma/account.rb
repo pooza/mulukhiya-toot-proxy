@@ -18,7 +18,7 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{username}@#{domain || Environment.domain_name}")
+        @acct ||= Acct.new("@#{nickname}")
         return @acct
       end
 
@@ -72,8 +72,7 @@ module Mulukhiya
         return nil
       end
 
-      def recent_toot
-      end
+      def recent_toot; end
 
       alias recent_status recent_toot
 
@@ -106,6 +105,8 @@ module Mulukhiya
 
       def self.get(key)
         if acct = key[:acct]
+          acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
+          return Account.first(username: acct.username, host: acct.domain)
         elsif key.key?(:token)
           return nil if key[:token].nil?
           return AccessToken.first(token: key[:token]).account
