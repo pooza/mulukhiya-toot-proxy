@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     def account
-      @account ||= Environment.account_class.get(token: @token)
+      @account ||= access_token.account
       return @account
     rescue
       return nil
@@ -49,38 +49,8 @@ module Mulukhiya
       return JSON.parse(response.body)['id'].to_i
     end
 
-    def favourite(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post("/api/v1/statuses/#{id}/favourite", {
-        body: '{}',
-        headers: headers,
-      })
-    end
-
-    alias fav favourite
-
-    def reblog(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post("/api/v1/statuses/#{id}/reblog", {
-        body: '{}',
-        headers: headers,
-      })
-    end
-
-    alias boost reblog
-
-    def bookmark(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post("/api/v1/statuses/#{id}/bookmark", {
-        body: '{}',
-        headers: headers,
-      })
+    def filters
+      return nil
     end
 
     def announcements(params = {})

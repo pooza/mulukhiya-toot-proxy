@@ -8,6 +8,7 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.clone
+          @hash[:username] = nickname
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
@@ -75,6 +76,8 @@ module Mulukhiya
       end
 
       alias recent_status recent_toot
+
+      alias username nickname
 
       alias admin? is_admin
 

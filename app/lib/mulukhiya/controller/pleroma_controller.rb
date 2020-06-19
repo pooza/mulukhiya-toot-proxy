@@ -15,7 +15,7 @@ module Mulukhiya
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
       Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns})
-      @reporter.response = @sns.toot(params)
+      @reporter.response = @sns.post(params)
       notify(@reporter.response.parsed_response) if response_error?
       Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
@@ -29,11 +29,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post %r{/api/v([12])/media} do
+    post '/api/v1/media' do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         response: :raw,
-        version: params[:captures].first.to_i,
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
@@ -43,14 +42,6 @@ module Mulukhiya
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
       notify(@renderer.message)
       @renderer.status = e.response&.code || 400
-      return @renderer.to_s
-    end
-
-    post '/api/v1/statuses/:id/bookmark' do
-      @reporter.response = @sns.bookmark(params[:id])
-      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
-      @renderer.message = @reporter.response.parsed_response
-      @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
@@ -77,12 +68,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/filter' do
-      Handler.create('filter_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {filters: @sns.filters}
-      return @renderer.to_s
-    end
-
     def self.name
       return 'Pleroma'
     end
@@ -92,7 +77,7 @@ module Mulukhiya
     end
 
     def self.announcement?
-      return true
+      return false
     end
 
     def self.filter?
