@@ -13,7 +13,7 @@ html lang='ja'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
-      section class='config' v-if='username'
+      section class='config' v-if='username' v-show='show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
           .inline-field-container
@@ -24,7 +24,7 @@ html lang='ja'
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
           .field-update-button-container
             button v-on:click='updateGrowi' 更新
-      section class='config' v-if='username'
+      section class='config' v-if='username' v-show='show_dropbox'
         h3 v-on:click='toggleDropboxSection' Dropbox
         .section-contents v-show='show_dropbox_detail'
           .inline-field-container
@@ -95,6 +95,8 @@ html lang='ja'
           program_options: [],
           program: null,
           show_livecure: #{livecure.to_s},
+          show_growi: #{controller.clipping?.to_s},
+          show_dropbox: #{controller.clipping?.to_s},
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,
