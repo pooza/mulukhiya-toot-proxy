@@ -8,7 +8,7 @@ module Mulukhiya
 
     def test_create
       Webhook.all do |hook|
-        assert_kind_of(Webhook, Webhook.create(hook.digest))
+        assert_kind_of([Webhook, NilClass], Webhook.create(hook.digest))
       end
     end
 
@@ -20,7 +20,7 @@ module Mulukhiya
 
     def test_sns
       Webhook.all do |hook|
-        assert_kind_of([MastodonService, MisskeyService], hook.sns)
+        assert_kind_of([MastodonService, MisskeyService, PleromaService], hook.sns)
       end
     end
 

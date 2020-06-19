@@ -116,6 +116,8 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       config = Config.instance
       Pleroma::AccessToken.all do |token|
+        next unless token.account
+        next unless token.values[:token]
         values = {
           digest: Webhook.create_digest(config['/pleroma/url'], token.values[:token]),
           token: token.values[:token],

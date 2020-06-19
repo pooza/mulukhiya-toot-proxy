@@ -56,13 +56,6 @@ module Mulukhiya
       return nil
     end
 
-    def announcements(params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.get('/api/v1/announcements', {headers: headers})
-    end
-
     def oauth_client
       unless File.exist?(oauth_client_path)
         r = @http.post('/api/v1/apps', {
