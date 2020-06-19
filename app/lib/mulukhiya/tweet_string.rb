@@ -34,7 +34,9 @@ module Mulukhiya
     end
 
     def self.tags
-      return config['/twitter/status/tags'].map {|tag| MastodonService.create_tag(tag)}
+      return config['/twitter/status/tags'].map do |tag|
+        Ginseng::Fediverse::Service.create_tag(tag)
+      end
     rescue
       return []
     end

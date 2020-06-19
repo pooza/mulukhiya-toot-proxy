@@ -33,7 +33,7 @@ module Mulukhiya
       tags = TweetString.tags
       tags.push('#実況') if params['livecure']
       tags = tags.delete_if do |tag|
-        parser.tags.map {|t| MastodonService.create_tag(t)}.member?(tag)
+        parser.tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)}.member?(tag)
       end
       return tags.uniq
     end
