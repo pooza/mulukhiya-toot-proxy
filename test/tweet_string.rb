@@ -17,6 +17,9 @@ module Mulukhiya
 
       str = TweetString.new('ああああefefx')
       assert_equal(str.index('fx'), 5.5)
+
+      str = TweetString.new('ああああefefx')
+      assert_nil(str.index('hoge'))
     end
 
     def test_valid?

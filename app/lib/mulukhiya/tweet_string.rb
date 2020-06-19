@@ -9,7 +9,8 @@ module Mulukhiya
     end
 
     def index(search)
-      return self[0..(super.to_i - 1)].length
+      return nil if super.nil?
+      return self[0..(super - 1)].length
     end
 
     def valid?
