@@ -49,6 +49,12 @@ html lang='ja'
           .field-update-button-container
             button v-on:click='updateLivecure' 更新
       section class='config' v-if='username'
+        h3 v-on:click='toggleTwitterSection' Twitter
+        .section-contents v-show='show_twitter_detail'
+          .field-update-button-container
+            a :href='twitterHref'
+              img src='/mulukhiya/sign_in_twitter.png'
+      section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
           .inline-field-container
@@ -72,12 +78,6 @@ html lang='ja'
               input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知を行う（管理者・開発者向け）
           .field-update-button-container
             button v-on:click='updateNotify' 更新
-      section class='config' v-if='username'
-        h3 v-on:click='toggleTwitterSection' Twitter
-        .section-contents v-show='show_twitter_detail'
-          .field-update-button-container
-            a :href='twitterHref'
-              img src='/mulukhiya/sign_in_twitter.png'
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)
