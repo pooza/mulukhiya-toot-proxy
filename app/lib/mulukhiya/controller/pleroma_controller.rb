@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     post '/api/v1/statuses' do
-      tags = TootParser.new(params[:status]).tags
+      tags = PleromaStatusParser.new(params[:status]).tags
       Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.post(params)
       notify(@reporter.response.parsed_response) if response_error?
