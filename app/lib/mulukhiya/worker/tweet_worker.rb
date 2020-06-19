@@ -9,7 +9,9 @@ module Mulukhiya
     def perform(params)
       return unless account = Environment.account_class[params['account_id']]
       return unless account.twitter
-      account.twitter.tweet(create_status(params))
+      status = create_status(params)
+      raise "Invalid tweet string '#{status}'" unless status.valid?
+      account.twitter.tweet(status)
     end
 
     def create_status(params)
@@ -23,7 +25,7 @@ module Mulukhiya
       status = [status]
       status.push(tags.join(' ')) if tags.present?
       status.push(params['url'])
-      return status.join("\n")
+      return TweetString.new(status.join("\n"))
     end
 
     def create_tags(params, status = nil)

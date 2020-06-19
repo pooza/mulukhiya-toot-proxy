@@ -49,20 +49,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (6.0.3.1)
-      actionview (= 6.0.3.1)
-      activesupport (= 6.0.3.1)
+    actionpack (6.0.3.2)
+      actionview (= 6.0.3.2)
+      activesupport (= 6.0.3.2)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (6.0.3.1)
-      activesupport (= 6.0.3.1)
+    actionview (6.0.3.2)
+      activesupport (= 6.0.3.2)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (6.0.3.1)
+    activesupport (6.0.3.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -72,8 +72,8 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     ast (2.4.1)
     aws-eventstream (1.1.0)
-    aws-sigv4 (1.1.4)
-      aws-eventstream (~> 1.0, >= 1.0.2)
+    aws-sigv4 (1.2.0)
+      aws-eventstream (~> 1, >= 1.0.2)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
     buftok (0.2.0)
@@ -118,7 +118,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.5.0)
+    dry-validation (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
@@ -158,6 +158,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    idn-ruby (0.1.0)
     json (2.3.0)
     json-schema (2.8.1)
       addressable (>= 2.4)
@@ -316,6 +317,9 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
+    twitter-text (3.1.0)
+      idn-ruby
+      unf (~> 0.1.0)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -358,6 +362,7 @@ DEPENDENCIES
   slim_lint
   test-unit
   twitter
+  twitter-text
   vacuum
 
 RUBY VERSION
