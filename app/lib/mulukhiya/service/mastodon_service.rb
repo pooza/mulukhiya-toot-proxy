@@ -45,7 +45,7 @@ module Mulukhiya
               scopes: @config['/mastodon/oauth/scopes'].join(' '),
             }.to_json,
           })
-          raise "Invalid response (#{r.code})" unless r.code == 200
+          raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
           client = r.body
         end
         redis.set('oauth_client', client)

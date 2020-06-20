@@ -61,7 +61,7 @@ module Mulukhiya
               callbackUrl: @http.create_uri(@config['/misskey/oauth/callback_url']).to_s,
             }.to_json,
           })
-          raise "Invalid response (#{r.code})" unless r.code == 200
+          raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
           client = r.body
         end
         redis.set('oauth_client', client)
