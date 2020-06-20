@@ -3,9 +3,7 @@ require 'twitter-text'
 module Mulukhiya
   class TweetString < String
     def length
-      return each_char.map do |c|
-        c.bytesize == 1 ? 0.5 : 1.0
-      end.reduce(:+)
+      return each_char.map {|c| c.bytesize == 1 ? 0.5 : 1.0}.reduce(:+)
     end
 
     def index(search)
@@ -22,23 +20,5 @@ module Mulukhiya
     end
 
     alias parsed parse
-
-    def self.config
-      return Config.instance
-    end
-
-    def self.max_length
-      suffixes = ['あ' * config['/twitter/status/length/url'], ' ']
-      suffixes.concat(tags)
-      return config['/twitter/status/length/max'] - TweetString.new(suffixes.join(' ')).length.ceil
-    end
-
-    def self.tags
-      return config['/twitter/status/tags'].map do |tag|
-        Ginseng::Fediverse::Service.create_tag(tag)
-      end
-    rescue
-      return []
-    end
   end
 end

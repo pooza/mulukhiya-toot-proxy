@@ -1,3 +1,5 @@
+require 'twitter-text'
+
 module Mulukhiya
   class TweetWorker
     include Sidekiq::Worker
@@ -29,19 +31,29 @@ module Mulukhiya
     end
 
     def create_tags(params, status = nil)
-      parser = Ginseng::Fediverse::Parser.new(status || params['status'])
-      tags = TweetString.tags
-      tags.push('#実況') if params['livecure']
-      tags = tags.delete_if do |tag|
-        parser.tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)}.member?(tag)
+      status || params['status']
+      exist_tags = Twitter::TwitterText::Extractor.extract_hashtags(status)
+      tags = default_tags
+      tags.push('実況') if params['livecure']
+      tags.uniq!
+      tags = tags.delete_if {|t| exist_tags.member?(t)}
+      return tags.map do |tag|
+        Ginseng::Fediverse::Service.create_tag(tag)
       end
-      return tags.uniq
+    end
+
+    def default_tags
+      return @config['/twitter/status/tags']
+    rescue Ginseng::ConfigError
+      return []
     end
 
     def create_max_length(params)
-      length = TweetString.max_length
-      length -= 3 if params['livecure']
-      return length
+      suffixes = ['あ' * @config['/twitter/status/length/url']]
+      suffixes.concat(default_tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)})
+      suffixes.push('#実況') if params['livecure']
+      suffixes_length = TweetString.new(suffixes.join(' ')).length.ceil
+      return @config['/twitter/status/length/max'] - suffixes_length
     end
   end
 end
