@@ -78,8 +78,6 @@ module Mulukhiya
 
     def self.attachment_class
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
-    rescue
-      return nil
     end
 
     def self.access_token_class

@@ -6,7 +6,7 @@ module Mulukhiya
 
     def exec
       params = parser.params.clone
-      params['phrase'] ||= Ginseng::Fediverse::Service.create_tag(params['tag'])
+      params['phrase'] ||= Environment.sns_class.create_tag(params['tag'])
 
       case params['action']
       when 'register', nil

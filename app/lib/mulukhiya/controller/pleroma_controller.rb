@@ -13,13 +13,11 @@ module Mulukhiya
     end
 
     post '/api/v1/statuses' do
-      tags = PleromaStatusParser.new(params[:status]).tags
       Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.post(params)
       notify(@reporter.response.parsed_response) if response_error?
       Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns})
       @renderer.message = @reporter.response.parsed_response
-      @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue Ginseng::ValidateError => e
