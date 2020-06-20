@@ -93,17 +93,20 @@ test:
         - misskey_controller
         - pleroma_controller
         - note_uri
+        - pleroma_status_uri
     - name: misskey
       cases:
         - mastodon_controller
         - dolphin_controller
         - pleroma_controller
         - toot_uri
+        - pleroma_status_uri
     - name: pleroma
       cases:
         - mastodon_controller
         - misskey_controller
         - dolphin_controller
+        - toot_uri
         - note_uri
         - status
     - name: dropbox
