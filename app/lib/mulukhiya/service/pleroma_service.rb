@@ -57,18 +57,30 @@ module Mulukhiya
     end
 
     def oauth_client
-      unless File.exist?(oauth_client_path)
-        r = @http.post('/api/v1/apps', {
-          body: {
-            client_name: package_class.name,
-            website: @config['/package/url'],
-            redirect_uris: @config['/pleroma/oauth/redirect_uri'],
-            scopes: @config['/pleroma/oauth/scopes'].join(' '),
-          }.to_json,
-        })
-        File.write(oauth_client_path, r.parsed_response.to_json)
+      unless client = redis.get('oauth_client')
+        if File.exist?(oauth_client_path)
+          client = File.read(oauth_client_path)
+          File.delete(oauth_client_path)
+        else
+          r = @http.post('/api/v1/apps', {
+            body: {
+              client_name: package_class.name,
+              website: @config['/package/url'],
+              redirect_uris: @config['/pleroma/oauth/redirect_uri'],
+              scopes: @config['/pleroma/oauth/scopes'].join(' '),
+            }.to_json,
+          })
+          raise "Invalid response (#{r.code})" unless r.code == 200
+          client = r.body
+        end
+        redis.set('oauth_client', client)
       end
-      return JSON.parse(File.read(oauth_client_path))
+      return JSON.parse(client)
+    end
+
+    def redis
+      @redis ||= Redis.new
+      return @redis
     end
 
     def oauth_uri
@@ -97,6 +109,7 @@ module Mulukhiya
 
     def clear_oauth_client
       File.unlink(oauth_client_path) if File.exist?(oauth_client_path)
+      Redis.new.unlink('oauth_client')
     end
 
     def notify(account, message)

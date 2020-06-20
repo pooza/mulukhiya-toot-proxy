@@ -31,8 +31,36 @@ module Mulukhiya
       return nil
     end
 
+    def oauth_client
+      unless client = redis.get('oauth_client')
+        if File.exist?(oauth_client_path)
+          client = File.read(oauth_client_path)
+          File.delete(oauth_client_path)
+        else
+          r = @http.post('/api/v1/apps', {
+            body: {
+              client_name: package_class.name,
+              website: @config['/package/url'],
+              redirect_uris: @config['/mastodon/oauth/redirect_uri'],
+              scopes: @config['/mastodon/oauth/scopes'].join(' '),
+            }.to_json,
+          })
+          raise "Invalid response (#{r.code})" unless r.code == 200
+          client = r.body
+        end
+        redis.set('oauth_client', client)
+      end
+      return JSON.parse(client)
+    end
+
     def clear_oauth_client
       File.unlink(oauth_client_path) if File.exist?(oauth_client_path)
+      Redis.new.unlink('oauth_client')
+    end
+
+    def redis
+      @redis ||= Redis.new
+      return @redis
     end
 
     def notify(account, message)
