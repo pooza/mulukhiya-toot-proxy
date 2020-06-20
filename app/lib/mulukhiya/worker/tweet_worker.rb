@@ -37,9 +37,7 @@ module Mulukhiya
       tags.push('実況') if params['livecure']
       tags.uniq!
       tags = tags.delete_if {|t| exist_tags.member?(t)}
-      return tags.map do |tag|
-        Ginseng::Fediverse::Service.create_tag(tag)
-      end
+      return tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)}
     end
 
     def default_tags
