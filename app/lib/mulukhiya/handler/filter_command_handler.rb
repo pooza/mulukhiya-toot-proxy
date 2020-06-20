@@ -6,7 +6,7 @@ module Mulukhiya
 
     def exec
       params = parser.params.clone
-      params['phrase'] ||= MastodonService.create_tag(params['tag'])
+      params['phrase'] ||= Ginseng::Fediverse::Service.create_tag(params['tag'])
 
       case params['action']
       when 'register', nil

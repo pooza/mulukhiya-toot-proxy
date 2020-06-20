@@ -76,6 +76,10 @@ module Mulukhiya
       return true
     end
 
+    def self.clipping?
+      return false
+    end
+
     def self.announcement?
       return false
     end
@@ -117,10 +121,10 @@ module Mulukhiya
       config = Config.instance
       Pleroma::AccessToken.all do |token|
         next unless token.account
-        next unless token.values[:token]
+        next unless token.token
         values = {
-          digest: Webhook.create_digest(config['/pleroma/url'], token.values[:token]),
-          token: token.values[:token],
+          digest: Webhook.create_digest(config['/pleroma/url'], token.token),
+          token: token.token,
           account: token.account,
         }
         yield values

@@ -3,12 +3,10 @@ module Mulukhiya
     class Account < Sequel::Model(:users)
       attr_accessor :token
 
-      one_to_one :user
-
       def to_h
         unless @hash
           @hash = values.clone
-          @hash[:username] = nickname
+          @hash[:username] = username
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
@@ -23,6 +21,10 @@ module Mulukhiya
           @acct.host ||= Environment.domain_name
         end
         return @acct
+      end
+
+      def username
+        return acct.username
       end
 
       def logger
@@ -70,8 +72,6 @@ module Mulukhiya
       def recent_status; end
 
       alias recent_toot recent_status
-
-      alias username nickname
 
       alias admin? is_admin
 

@@ -13,7 +13,7 @@ html lang='ja'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
-      section class='config' v-if='username'
+      section class='config' v-if='username' v-show='show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
           .inline-field-container
@@ -24,7 +24,7 @@ html lang='ja'
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
           .field-update-button-container
             button v-on:click='updateGrowi' 更新
-      section class='config' v-if='username'
+      section class='config' v-if='username' v-show='show_dropbox'
         h3 v-on:click='toggleDropboxSection' Dropbox
         .section-contents v-show='show_dropbox_detail'
           .inline-field-container
@@ -49,6 +49,12 @@ html lang='ja'
           .field-update-button-container
             button v-on:click='updateLivecure' 更新
       section class='config' v-if='username'
+        h3 v-on:click='toggleTwitterSection' Twitter
+        .section-contents v-show='show_twitter_detail'
+          .field-update-button-container
+            a :href='twitterHref'
+              img src='/mulukhiya/sign_in_twitter.png'
+      section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
           .inline-field-container
@@ -72,12 +78,6 @@ html lang='ja'
               input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知を行う（管理者・開発者向け）
           .field-update-button-container
             button v-on:click='updateNotify' 更新
-      section class='config' v-if='username'
-        h3 v-on:click='toggleTwitterSection' Twitter
-        .section-contents v-show='show_twitter_detail'
-          .field-update-button-container
-            a :href='twitterHref'
-              img src='/mulukhiya/sign_in_twitter.png'
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)
@@ -94,7 +94,9 @@ html lang='ja'
           programs: [],
           program_options: [],
           program: null,
-          show_livecure: #{livecure.to_s},
+          show_livecure: #{livecure},
+          show_growi: #{controller.clipping?},
+          show_dropbox: #{controller.clipping?},
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,

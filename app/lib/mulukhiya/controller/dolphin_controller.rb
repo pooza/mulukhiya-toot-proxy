@@ -8,6 +8,10 @@ module Mulukhiya
       return false
     end
 
+    def self.clipping?
+      return true
+    end
+
     def self.announcement?
       return false
     end

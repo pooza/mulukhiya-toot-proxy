@@ -35,14 +35,5 @@ module Mulukhiya
       str = TweetString.new('A' * 281)
       assert_false(str.valid?)
     end
-
-    def test_max_length
-      assert_kind_of(Integer, TweetString.max_length)
-      assert_false(TweetString.max_length.zero?)
-    end
-
-    def test_tags
-      assert_kind_of(Array, TweetString.tags)
-    end
   end
 end

@@ -100,6 +100,10 @@ module Mulukhiya
       return true
     end
 
+    def self.clipping?
+      return true
+    end
+
     def self.announcement?
       return true
     end
