@@ -100,7 +100,7 @@ module Mulukhiya
     end
 
     def notify(account, message)
-      return toot(
+      return post(
         PleromaController.status_field => [account.acct.to_s, message].join("\n"),
         'visibility' => PleromaController.visibility_name('direct'),
       )
