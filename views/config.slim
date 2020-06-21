@@ -164,6 +164,11 @@ html lang='ja'
                   if (program.air) {
                     label.push('エア番組')
                   }
+                  if (program.extra_tags) {
+                    program.extra_tags.map(tag => {
+                      label.push(tag)
+                    })
+                  }
                   this.program_options.push({label: label.join(' '), code: program.key})
                 }
               })
