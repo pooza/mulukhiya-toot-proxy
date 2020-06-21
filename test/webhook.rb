@@ -18,6 +18,12 @@ module Mulukhiya
       end
     end
 
+    def test_sha1_digest
+      Webhook.all do |hook|
+        assert(hook.sha1_digest.present?)
+      end
+    end
+
     def test_sns
       Webhook.all do |hook|
         assert_kind_of([MastodonService, MisskeyService, PleromaService], hook.sns)

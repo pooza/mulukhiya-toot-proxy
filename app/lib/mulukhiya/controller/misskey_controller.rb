@@ -146,6 +146,7 @@ module Mulukhiya
       Misskey::AccessToken.all do |token|
         values = {
           digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
+          sha1_digest: Webhook.create_sha1_digest(config['/misskey/url'], token.values[:hash]),
           token: token.values[:hash],
           account: token.account,
         }

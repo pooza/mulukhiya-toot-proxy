@@ -122,6 +122,7 @@ module Mulukhiya
         next unless token.token
         values = {
           digest: Webhook.create_digest(config['/pleroma/url'], token.token),
+          sha1_digest: Webhook.create_sha1_digest(config['/pleroma/url'], token.token),
           token: token.token,
           account: token.account,
         }

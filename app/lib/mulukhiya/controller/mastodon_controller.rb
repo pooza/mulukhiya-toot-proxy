@@ -163,6 +163,7 @@ module Mulukhiya
       Postgres.instance.exec('webhook_tokens').each do |row|
         values = {
           digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
+          sha1_digest: Webhook.create_sha1_digest(config['/mastodon/url'], row['token']),
           token: row['token'],
           account: Environment.account_class[row['account_id']],
         }

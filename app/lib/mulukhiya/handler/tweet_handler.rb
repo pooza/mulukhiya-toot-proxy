@@ -18,7 +18,6 @@ module Mulukhiya
         account_id: sns.account.id,
         status: @status,
         url: uri.to_s,
-        livecure: @sns.account.tags.member?('実況'),
         spoiler_text: body['spoiler_text'],
       )
       result.push(url: uri.to_s)
