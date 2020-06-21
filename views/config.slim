@@ -64,7 +64,7 @@ html lang='ja'
             button v-on:click='updateWebhook' 更新
           .field-container v-if='webhook_url'
             h4 URL
-            textarea id='webhook-url-text' class='short' = '{{webhook_url}}'
+            textarea id='webhook-url-text' = '{{webhook_url}}'
             i class='fas fa-clipboard' v-on:click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='webhook_url'
