@@ -22,20 +22,17 @@ module Mulukhiya
       else
         status = TweetString.new(params['status'])
       end
-      status.ellipsize!(create_max_length(params))
-      tags = create_tags(params, status)
+      status.ellipsize!(max_length)
+      tags = create_tags(status)
       status = [status]
       status.push(tags.join(' ')) if tags.present?
       status.push(params['url'])
       return TweetString.new(status.join("\n"))
     end
 
-    def create_tags(params, status = nil)
-      status || params['status']
+    def create_tags(status)
       exist_tags = Twitter::TwitterText::Extractor.extract_hashtags(status)
       tags = default_tags
-      tags.push('実況') if params['livecure']
-      tags.uniq!
       tags = tags.delete_if {|t| exist_tags.member?(t)}
       return tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)}
     end
@@ -46,10 +43,9 @@ module Mulukhiya
       return []
     end
 
-    def create_max_length(params)
+    def max_length
       suffixes = ['あ' * @config['/twitter/status/length/url']]
       suffixes.concat(default_tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)})
-      suffixes.push('#実況') if params['livecure']
       suffixes_length = TweetString.new(suffixes.join(' ')).length.ceil
       return @config['/twitter/status/length/max'] - suffixes_length
     end
