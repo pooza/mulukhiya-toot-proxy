@@ -57,11 +57,8 @@ module Mulukhiya
     end
 
     def debug_info
-      return nil unless @result.present? || @errors.present?
-      return {
-        result: @result,
-        errors: @errors,
-      }
+      return {result: @result, errors: @errors} if @result.present? || @errors.present?
+      return nil
     end
 
     def clear
