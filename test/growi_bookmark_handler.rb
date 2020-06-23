@@ -9,7 +9,7 @@ module Mulukhiya
     def test_handle_post_bookmark
       return unless handler?
       @handler.handle_post_bookmark(status_key => @status.id)
-      assert_kind_of(Ginseng::URI, Ginseng::URI.parse(@handler.summary[:result].first[:url]))
+      assert_kind_of(Ginseng::URI, Ginseng::URI.parse(@handler.debug_info[:result].first[:url]))
     end
   end
 end

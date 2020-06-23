@@ -9,11 +9,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.youtube.com/')
-      assert_nil(@handler.summary)
+      assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY')
-      assert(@handler.summary[:result].present?) if @handler.summary
+      assert(@handler.debug_info[:result].present?) if @handler.debug_info
     end
   end
 end

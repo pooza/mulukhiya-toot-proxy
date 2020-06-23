@@ -12,19 +12,19 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_toot(status_field => '')
-      assert_nil(@handler.summary)
+      assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: filter\ntag: #{@key}")
-      assert(@handler.summary[:result].present?)
+      assert(@handler.debug_info[:result].present?)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: filter\ntag: #{@key}\naction: register")
-      assert(@handler.summary[:result].present?)
+      assert(@handler.debug_info[:result].present?)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: filter\ntag: #{@key}\naction: unregister")
-      assert(@handler.summary[:result].present?)
+      assert(@handler.debug_info[:result].present?)
     end
   end
 end

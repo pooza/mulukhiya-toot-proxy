@@ -6,7 +6,7 @@ module Mulukhiya
 
     def test_handle_pre_toot
       @handler.handle_pre_toot(status_field => "#nowplaying #五條真由美 ガンバランス de ダンス\n")
-      assert_equal(@handler.summary[:result], [{keyword: '#五條真由美 ガンバランス de ダンス'}])
+      assert_equal(@handler.debug_info[:result], [{keyword: '#五條真由美 ガンバランス de ダンス'}])
     end
   end
 end

@@ -9,25 +9,25 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com\n"})
-      assert_nil(@handler.summary)
+      assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], [{
+      assert_equal(@handler.debug_info[:result], [{
         channel: 'プリキュア公式YouTubeチャンネル',
         url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ',
       }])
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying \n\nhttps://www.youtube.com/watch?v=uFfsTeExwbQ\n"})
-      assert_equal(@handler.summary[:result], [{
+      assert_equal(@handler.debug_info[:result], [{
         channel: 'プリキュア公式YouTubeチャンネル',
         url: 'https://www.youtube.com/watch?v=uFfsTeExwbQ',
       }])
 
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY\n"})
-      assert_equal(@handler.summary[:result], [{
+      assert_equal(@handler.debug_info[:result], [{
         artist: 'Kanako Miyamoto',
         url: 'https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY',
       }])
