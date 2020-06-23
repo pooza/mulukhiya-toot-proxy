@@ -93,6 +93,9 @@ Style/RedundantRegexpCharacterClass:
 Style/RedundantRegexpEscape:
   Enabled: true
 
+Style/RedundantFetchBlock:
+  Enabled: true
+
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 

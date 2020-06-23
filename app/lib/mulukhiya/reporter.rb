@@ -2,7 +2,6 @@ module Mulukhiya
   class Reporter < Array
     attr_accessor :response
     attr_accessor :parser
-    attr_accessor :account
     attr_reader :temp
 
     def initialize(size = 0, val = nil)
@@ -26,17 +25,9 @@ module Mulukhiya
     def to_h
       unless @dump
         @dump = {}
-        each do |entry|
-          unless @account&.notify_verbose?
-            next if entry[:verbose] && !entry[:errors].present?
-          end
-          @dump[entry[:event]] ||= {}
-          @dump[entry[:event]][entry[:handler]] ||= []
-          [:result, :errors].each do |k|
-            @dump[entry[:event]][entry[:handler]].concat(
-              entry[k].map {|v| v.is_a?(Hash) ? v.deep_stringify_keys : v},
-            )
-          end
+        each do |v|
+          @dump[v[:event]] ||= {}
+          @dump[v[:event]][v[:handler]] = v[:entries]
         end
       end
       return @dump

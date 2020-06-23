@@ -9,7 +9,6 @@ module Mulukhiya
       else
         @sns.token = nil
       end
-      @reporter.account = @sns.account
     end
 
     post '/api/v1/statuses' do
