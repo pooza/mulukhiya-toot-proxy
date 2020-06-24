@@ -108,7 +108,6 @@ test:
         - dolphin_controller
         - toot_uri
         - note_uri
-        - status
     - name: dropbox
       cases:
         - dropbox_clipper

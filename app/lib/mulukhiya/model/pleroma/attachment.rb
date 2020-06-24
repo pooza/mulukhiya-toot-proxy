@@ -14,8 +14,6 @@ module Mulukhiya
         return @uri
       end
 
-      private
-
       def data
         @data ||= JSON.parse(values[:data])
         return @data

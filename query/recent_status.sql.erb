@@ -1,0 +1,12 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  id
+FROM objects
+WHERE (data::TEXT LIKE '%"type": "Note"%')
+  AND (data::TEXT LIKE '%"actor": %<% params[:actor] %>')
+<% if params[:context_id] %>
+  AND (data::TEXT LIKE '%"context_id": %<% params[:context_id] %>')
+  AND (data::TEXT LIKE '%"content":%')
+<% end %>
+ORDER BY inserted_at DESC
+LIMIT 1
