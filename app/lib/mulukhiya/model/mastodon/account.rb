@@ -70,13 +70,13 @@ module Mulukhiya
         return nil
       end
 
-      def recent_toot
+      def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})
         return Status[rows.first['id']] if rows.present?
         return nil
       end
 
-      alias recent_status recent_toot
+      alias recent_toot recent_status
 
       def admin?
         return user.admin

@@ -1,5 +1,5 @@
 package:
-  version: 3.9.3
+  version: 3.9.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -29,6 +29,10 @@ handler:
 worker:
   media_cleaning:
     days: 1
+  growi_clipping:
+    federate: false
+  dropbox_clipping:
+    federate: false
 shortened_url:
   domains:
     - t.co
@@ -108,7 +112,6 @@ test:
         - dolphin_controller
         - toot_uri
         - note_uri
-        - status
     - name: dropbox
       cases:
         - dropbox_clipper

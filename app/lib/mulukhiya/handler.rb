@@ -57,14 +57,20 @@ module Mulukhiya
     end
 
     def summary
+      return nil if verbose? && !@sns.account.notify_verbose? && !@errors.present?
       return nil unless @result.present? || @errors.present?
       return {
-        handler: underscore_name,
         event: @event.to_s,
-        verbose: verbose?,
-        result: @result,
-        errors: @errors,
+        handler: underscore_name,
+        entries: @result.concat(@errors).map do |entry|
+          entry.is_a?(Hash) ? entry.deep_stringify_keys : entry
+        end,
       }
+    end
+
+    def debug_info
+      return {result: @result, errors: @errors} if @result.present? || @errors.present?
+      return nil
     end
 
     def clear

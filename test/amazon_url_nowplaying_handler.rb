@@ -9,12 +9,12 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/\n")
-      assert_nil(@handler.summary)
+      assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n")
-      return if @handler.summary[:errors].present?
-      assert_equal(@handler.summary[:result], ['https://www.amazon.co.jp/dp/B00QIUDCXS'])
+      return if @handler.debug_info[:errors].present?
+      assert_equal(@handler.debug_info[:result], ['https://www.amazon.co.jp/dp/B00QIUDCXS'])
     end
   end
 end

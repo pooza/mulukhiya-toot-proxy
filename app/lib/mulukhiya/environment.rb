@@ -72,8 +72,6 @@ module Mulukhiya
 
     def self.status_class
       return "Mulukhiya::#{controller_name.camelize}::Status".constantize
-    rescue
-      return nil
     end
 
     def self.attachment_class
@@ -90,12 +88,10 @@ module Mulukhiya
 
     def self.parser_class
       case controller_name
-      when 'mastodon'
+      when 'mastodon', 'pleroma'
         return TootParser
       when 'dolphin', 'misskey'
         return NoteParser
-      when 'pleroma'
-        return PleromaStatusParser
       end
     end
 

@@ -50,7 +50,11 @@ module Mulukhiya
     end
 
     def max_length
-      length = @config['/misskey/status/max_length']
+      if Environment.dolphin?
+        length = @config['/dolphin/status/max_length']
+      else
+        length = @config['/misskey/status/max_length']
+      end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
