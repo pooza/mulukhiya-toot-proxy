@@ -12,6 +12,8 @@ module Mulukhiya
 
     def federate?
       return @config["/worker/#{underscore_name}/federate"] == true
+    raise Ginseng::ConfigError
+      return false
     end
 
     def perform(params)
