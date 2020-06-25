@@ -29,6 +29,10 @@ handler:
 worker:
   media_cleaning:
     days: 1
+  growi_clipping:
+    federate: false
+  dropbox_clipping:
+    federate: false
 shortened_url:
   domains:
     - t.co
