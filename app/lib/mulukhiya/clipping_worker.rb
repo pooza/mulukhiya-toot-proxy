@@ -25,11 +25,9 @@ module Mulukhiya
       uri = TootURI.parse(params['uri'])
       uri = NoteURI.parse(params['uri']) unless uri&.valid?
       raise Ginseng::RequestError, "Invalid URL '#{params['uri']}'" unless uri&.valid?
-      if (uri.host == Environment.domain_name) || federate?
-        return uri.to_md
-      else
-        return uri.to_s
-      end
+      return uri.to_md if federate?
+      return uri.to_md if uri.host == Environment.domain_name
+      return uri.to_s
     end
   end
 end
