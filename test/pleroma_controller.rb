@@ -6,7 +6,7 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
-      @parser = PleromaStatusParser.new
+      @parser = TootParser.new
       @parser.account = Environment.test_account
     end
 
