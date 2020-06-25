@@ -33,7 +33,11 @@ module Mulukhiya
     end
 
     def max_length
-      length = @config['/mastodon/status/max_length']
+      if Environment.pleroma?
+        length = @config['/pleroma/status/max_length']
+      else
+        length = @config['/mastodon/status/max_length']
+      end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end

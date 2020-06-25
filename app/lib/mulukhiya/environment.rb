@@ -88,12 +88,10 @@ module Mulukhiya
 
     def self.parser_class
       case controller_name
-      when 'mastodon'
+      when 'mastodon', 'pleroma'
         return TootParser
       when 'dolphin', 'misskey'
         return NoteParser
-      when 'pleroma'
-        return PleromaStatusParser
       end
     end
 

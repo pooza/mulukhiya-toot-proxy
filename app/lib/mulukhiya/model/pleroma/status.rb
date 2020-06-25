@@ -16,7 +16,7 @@ module Mulukhiya
       def to_md
         template = Template.new('toot_clipping.md')
         template[:account] = account.to_h
-        template[:status] = PleromaStatusParser.new(data['content']).to_md
+        template[:status] = TootParser.new(data['content']).to_md
         template[:url] = uri.to_s
         return template.to_s
       end
