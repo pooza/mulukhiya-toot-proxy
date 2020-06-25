@@ -11,6 +11,7 @@ module Mulukhiya
     end
 
     def federate?
+      return true if Environment.test?
       return @config["/worker/#{underscore_name}/federate"] == true
     rescue Ginseng::ConfigError
       return false
