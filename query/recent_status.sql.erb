@@ -4,9 +4,9 @@ SELECT
 FROM objects
 WHERE (data::TEXT LIKE '%"type": "Note"%')
   AND (data::TEXT LIKE '%"actor": %<% params[:actor] %>')
+  AND (data::TEXT LIKE '%"content":%')
 <% if params[:context_id] %>
   AND (data::TEXT LIKE '%"context_id": %<% params[:context_id] %>')
-  AND (data::TEXT LIKE '%"content":%')
 <% end %>
 ORDER BY inserted_at DESC
 LIMIT 1
