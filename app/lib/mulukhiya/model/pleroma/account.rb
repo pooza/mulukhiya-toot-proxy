@@ -7,6 +7,8 @@ module Mulukhiya
         unless @hash
           @hash = values.clone
           @hash[:username] = username
+          @hash[:display_name] = display_name
+          @hash[:url] = uri.to_s
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
@@ -25,6 +27,13 @@ module Mulukhiya
 
       def username
         return acct.username
+      end
+
+      alias display_name name
+
+      def uri
+        @uri ||= Ginseng::URI.parse(ap_id)
+        return @uri
       end
 
       def logger
