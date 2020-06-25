@@ -78,13 +78,13 @@ module Mulukhiya
         return nil
       end
 
-      def recent_note
+      def recent_status
         rows = Postgres.instance.exec('recent_note', {id: id})
         return Status[rows.first['id']] if rows.present?
         return nil
       end
 
-      alias recent_status recent_note
+      alias recent_note recent_status
 
       alias admin? isAdmin
 

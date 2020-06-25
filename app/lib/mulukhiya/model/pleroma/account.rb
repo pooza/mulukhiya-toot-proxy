@@ -77,8 +77,6 @@ module Mulukhiya
 
       alias recent_toot recent_status
 
-      alias recent_note recent_status
-
       alias admin? is_admin
 
       alias moderator? is_moderator
