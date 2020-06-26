@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: ae906a6558c1dff364c438a6197f23077bed95ad
+  revision: c38c23060f402ec45675583d04f94ec65e389515
   specs:
-    ginseng-fediverse (1.1.2)
+    ginseng-fediverse (1.2.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -103,7 +103,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
-    dry-schema (1.5.1)
+    dry-schema (1.5.2)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
