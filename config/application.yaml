@@ -32,7 +32,7 @@ worker:
   growi_clipping:
     federate: false
   dropbox_clipping:
-    federate: false
+    federate: true
 shortened_url:
   domains:
     - t.co
