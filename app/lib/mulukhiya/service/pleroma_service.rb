@@ -61,6 +61,10 @@ module Mulukhiya
       return @redis
     end
 
+    def filters
+      return nil
+    end
+
     def notify(account, message)
       return post(
         PleromaController.status_field => [account.acct.to_s, message].join("\n"),
