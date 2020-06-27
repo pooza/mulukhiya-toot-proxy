@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
@@ -32,6 +34,21 @@ module Mulukhiya
         body: '{}',
         headers: headers,
       })
+    end
+
+    def upload(path, params = {})
+      if filename = params[:filename]
+        dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
+        FileUtils.mkdir_p(dir)
+        file = MediaFile.new(path)
+        filename += file.valid_extname unless file.valid_extname?
+        dest = File.join(dir, filename)
+        FileUtils.copy(path, dest)
+        path = dest
+      end
+      return super
+    ensure
+      FileUtils.rm_rf(dir) if dir
     end
 
     def access_token

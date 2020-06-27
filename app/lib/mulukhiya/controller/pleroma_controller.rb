@@ -30,6 +30,7 @@ module Mulukhiya
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         response: :raw,
+        filename: params[:file][:filename],
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)

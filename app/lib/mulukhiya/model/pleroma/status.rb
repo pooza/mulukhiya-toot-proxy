@@ -1,8 +1,10 @@
 module Mulukhiya
   module Pleroma
     class Status
+      attr_reader :data
+
       def initialize(id)
-        @data = PleromaService.new.fetch_status(id)
+        @data = PleromaService.new.fetch_status(id).parsed_response
       end
 
       def acct
@@ -15,7 +17,7 @@ module Mulukhiya
 
       def account
         @account ||= Account.get(acct: acct)
-        @account
+        return @account
       end
 
       def text
@@ -37,11 +39,6 @@ module Mulukhiya
         template[:status] = TootParser.new(data['content']).to_md
         template[:url] = uri.to_s
         return template.to_s
-      end
-
-      def data
-        @data ||= JSON.parse(values[:data])
-        return @data
       end
 
       alias to_h data
