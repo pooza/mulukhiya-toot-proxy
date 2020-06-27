@@ -36,10 +36,7 @@ module Mulukhiya
     end
 
     def account
-      unless @account
-        @account = access_token.account
-        @account.token = access_token.token
-      end
+      @account ||= Environment.account_class.get(token: @token)
       return @account
     rescue
       return nil
