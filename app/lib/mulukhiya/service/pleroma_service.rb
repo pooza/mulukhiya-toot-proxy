@@ -24,6 +24,16 @@ module Mulukhiya
       return nil
     end
 
+    def bookmark(id, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post("/api/v1/statuses/#{id}/bookmark", {
+        body: '{}',
+        headers: headers,
+      })
+    end
+
     def access_token
       return Environment.access_token_class.first(token: token) if token
       return nil

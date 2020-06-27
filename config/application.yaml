@@ -247,6 +247,7 @@ mastodon:
       - pattern: ^/web/statuses/([[:digit:]]+)
       - pattern: ^/@[[:word:]]+/([[:digit:]]+)
       - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+      - pattern: ^/notice/([[:word:]]+)
   attachment:
     key: media_ids
   poll:
@@ -442,6 +443,10 @@ pleroma:
       - image_resize
     post_upload:
       - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -454,6 +459,7 @@ pleroma:
     - post_webhook
     - pre_upload
     - post_upload
+    - post_bookmark
   status:
     field: status
     key: id
