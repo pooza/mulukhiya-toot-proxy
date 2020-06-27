@@ -1,16 +1,34 @@
 module Mulukhiya
   module Pleroma
-    class Status < Sequel::Model(:objects)
-      def account
-        return Account.first(ap_id: data['actor'])
+    class Status
+      def initialize(id)
+        @data = PleromaService.new.fetch_status(id)
       end
 
-      def context_id
-        return data['context_id'].to_i
+      def acct
+        unless @acct
+          @acct = Acct.new(data['account']['acct'])
+          @acct.host ||= Environment.domain_name
+        end
+        return @acct
+      end
+
+      def account
+        @account ||= Account.get(acct: acct)
+        @account
       end
 
       def text
         return data['content']
+      end
+
+      def uri
+        @uri ||= TootURI.parse(data['url'])
+        return @uri
+      end
+
+      def attachments
+        return data['media_attachments']
       end
 
       def to_md
@@ -21,32 +39,15 @@ module Mulukhiya
         return template.to_s
       end
 
-      def uri
-        @uri ||= Ginseng::URI.parse(data['context'])
-        return @uri
-      end
-
-      def attachments
-        return []
-      end
-
       def data
         @data ||= JSON.parse(values[:data])
         return @data
       end
 
-      def to_h
-        @hash = data.clone
-        @hash['url'] = uri.to_s
-        @hash['account'] = account.to_h
-        return @hash
-      end
+      alias to_h data
 
       def self.[](id)
-        record = super
-        rows = Postgres.instance.exec('recent_status', {context_id: record.context_id})
-        return Status.first(id: rows.first['id']) if rows.present?
-        return nil
+        return Status.new(id)
       end
     end
   end
