@@ -42,6 +42,14 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/api/v1/statuses/:id/bookmark' do
+      @reporter.response = @sns.bookmark(params[:id])
+      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
+      return @renderer.to_s
+    end
+
     post '/mulukhiya/auth' do
       @renderer = SlimRenderer.new
       errors = PleromaAuthContract.new.call(params).errors.to_h
@@ -74,7 +82,7 @@ module Mulukhiya
     end
 
     def self.clipping?
-      return false
+      return true
     end
 
     def self.announcement?

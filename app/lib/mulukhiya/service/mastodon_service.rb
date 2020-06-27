@@ -9,18 +9,16 @@ module Mulukhiya
       super
     end
 
-    def search(keyword, params = {})
-      params[:limit] ||= @config['/mastodon/search/limit']
-      return super
-    end
-
     def token=(token)
       @token = token
       @account = nil
     end
 
     def account
-      @account ||= Environment.account_class.get(token: @token)
+      unless @account
+        @account = access_token.account
+        @account.token = access_token.token
+      end
       return @account
     rescue
       return nil
@@ -29,6 +27,11 @@ module Mulukhiya
     def access_token
       return Environment.access_token_class.first(token: token) if token
       return nil
+    end
+
+    def search(keyword, params = {})
+      params[:limit] ||= @config['/mastodon/search/limit']
+      return super
     end
 
     def oauth_client

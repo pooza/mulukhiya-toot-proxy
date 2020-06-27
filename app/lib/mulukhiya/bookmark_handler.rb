@@ -5,6 +5,8 @@ module Mulukhiya
       return unless uri.absolute?
       worker_class.perform_async(uri: uri.to_s, account_id: sns.account.id)
       result.push(url: uri.to_s)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message)
     end
 
     def worker_class
