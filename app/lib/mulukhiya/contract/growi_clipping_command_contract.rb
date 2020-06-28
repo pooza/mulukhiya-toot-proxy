@@ -1,22 +1,16 @@
-require 'dry-validation'
-
 module Mulukhiya
-  class GrowiClippingCommandContract < Dry::Validation::Contract
+  class GrowiClippingCommandContract < Contract
     params do
-      optional(:command).value(:string)
-      optional(:url).value(:string)
+      required(:command).value(:string)
+      required(:url).value(:string)
     end
 
     rule(:command) do
-      key.failure('/command が正しくありません。') unless value == 'growi_clipping'
+      key.failure('コマンドが正しくありません。') unless value == 'growi_clipping'
     end
 
     rule(:url) do
-      if value.present?
-        key.failure('/url が正しくありません。') unless Ginseng::URI.parse(value).absolute?
-      else
-        key.failure('/url が空欄です。')
-      end
+      key.failure('URLが正しくありません。') unless Ginseng::URI.parse(value).absolute?
     end
   end
 end
