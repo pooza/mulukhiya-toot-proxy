@@ -1,6 +1,6 @@
 module Mulukhiya
   class FilterCommandContract < Contract
-    params do
+    json do
       required(:command).value(:string)
       optional(:phrase).value(:string)
       optional(:tag).value(:string)
@@ -12,9 +12,7 @@ module Mulukhiya
     end
 
     rule(:phrase, :tag) do
-      if !values[:phrase].present? && !values[:tag].present?
-        key.failure('phraseかtagのいずれかが必要です。')
-      end
+      key.failure('phraseかtagのいずれかが必要です。') if !values[:phrase].present? && !values[:tag].present?
     end
 
     rule(:action) do

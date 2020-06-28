@@ -1,6 +1,6 @@
 module Mulukhiya
   class DropboxClippingCommandContract < Contract
-    params do
+    json do
       required(:command).value(:string)
       required(:url).value(:string)
     end

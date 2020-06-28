@@ -1,6 +1,6 @@
 module Mulukhiya
   class GrowiClippingCommandContract < Contract
-    params do
+    json do
       required(:command).value(:string)
       required(:url).value(:string)
     end

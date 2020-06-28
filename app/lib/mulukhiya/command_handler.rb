@@ -10,15 +10,17 @@ module Mulukhiya
     end
 
     def validate
-      return contract.call(parser.params).errors.to_h
+      return contract.call(parser.params).errors.map do |error|
+        ['/' + error.path.map(&:to_s).join('/'), error.text]
+      end.to_h
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body unless parser.command_name == command_name
-      raise Ginseng::ValidateError, validate.values.join if validate.present?
+      raise Ginseng::ValidateError, validate if validate.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
-      body[status_field] = parser.params.to_yaml
+      body[status_field] = parser.params.select {|k, v| v.present?}.to_yaml
       @prepared = true
       return body
     end
@@ -27,7 +29,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return unless parser.command_name == command_name
       exec
-      result.push(parser.params)
+      result.push(sns.account.config.to_h)
     end
 
     def handle_pre_webhook(body, params = {}); end
