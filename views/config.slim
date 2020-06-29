@@ -75,8 +75,10 @@ html lang='ja'
         h3 v-on:click='toggleNotifySection' 通知
         .section-contents v-show='show_notify_detail'
           .inline-field-container
+            label
+              input type='checkbox' value='1' v-model='notify_user_config' 設定変更を通知
             label class='alert'
-              input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知を行う（管理者・開発者向け）
+              input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
             button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
@@ -90,6 +92,7 @@ html lang='ja'
           username: null,
           token_error: false,
           result: null,
+          notify_user_config: null,
           notify_verbose: null,
           livecure: false,
           programs: [],
@@ -135,6 +138,7 @@ html lang='ja'
                   this.dropbox_token = e.data.config.dropbox.token
                 }
                 if (e.data.config.notify) {
+                  this.notify_user_config = e.data.config.notify.user_config ? 1 : 0
                   this.notify_verbose = e.data.config.notify.verbose ? 1 : 0
                 }
                 if (Array.isArray(e.data.filters)) {
@@ -317,9 +321,12 @@ html lang='ja'
           updateNotify: function () {
             'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', notify: null}
+            const command = {command: 'user_config', notify: {verbose: null, user_config: null}}
             if (this.notify_verbose) {
-              command.notify = {verbose: true}
+              command.notify.verbose = true
+            }
+            if (this.notify_user_config) {
+              command.notify.user_config = true
             }
             this.updateConfig(values, command)
           },
