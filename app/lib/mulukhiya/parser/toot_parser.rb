@@ -10,6 +10,10 @@ module Mulukhiya
       end
     end
 
+    def command?
+      return params.key?('command')
+    end
+
     def to_md
       md = text.clone
       ['.u-url', '.hashtag'].each do |selector|

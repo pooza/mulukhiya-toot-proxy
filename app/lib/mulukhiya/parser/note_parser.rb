@@ -15,6 +15,10 @@ module Mulukhiya
       end
     end
 
+    def command?
+      return params.key?('command')
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(NoteParser.acct_pattern).map(&:first).each do |acct|

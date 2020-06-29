@@ -171,6 +171,7 @@ mastodon:
       - you_tube_url_nowplaying
       - tweet
       - tagging
+      - invalid_command
     post_toot:
       - user_config_command
       - filter_command
@@ -275,6 +276,7 @@ misskey:
       - you_tube_url_nowplaying
       - tweet
       - tagging
+      - invalid_command
     post_toot:
       - user_config_command
       - tweet
@@ -355,6 +357,7 @@ dolphin:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - tagging
+      - invalid_command
     post_toot:
       - user_config_command
       - result_notification
@@ -413,6 +416,7 @@ pleroma:
       - you_tube_url_nowplaying
       - tweet
       - tagging
+      - invalid_command
     post_toot:
       - user_config_command
       - tweet
