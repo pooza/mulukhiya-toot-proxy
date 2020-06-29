@@ -10,6 +10,17 @@ module Mulukhiya
       end
     end
 
+    def command?
+      return true if params.key?('command')
+      return false
+    rescue
+      return false
+    end
+
+    def invalid_command?
+      return !command?
+    end
+
     def to_md
       md = text.clone
       ['.u-url', '.hashtag'].each do |selector|

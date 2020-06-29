@@ -1,23 +1,9 @@
-require 'dry-validation'
-
 module Mulukhiya
-  class TwitterAuthContract < Dry::Validation::Contract
+  class TwitterAuthContract < Contract
     params do
-      optional(:token).value(:string)
-      optional(:oauth_token).value(:string)
-      optional(:oauth_verifier).value(:string)
-    end
-
-    rule(:token) do
-      key.failure('tokenが空欄です。') unless value.present?
-    end
-
-    rule(:oauth_token) do
-      key.failure('oauth_tokenが空欄です。') unless value.present?
-    end
-
-    rule(:oauth_verifier) do
-      key.failure('oauth_verifierが空欄です。') unless value.present?
+      required(:token).value(:string)
+      required(:oauth_token).value(:string)
+      required(:oauth_verifier).value(:string)
     end
   end
 end

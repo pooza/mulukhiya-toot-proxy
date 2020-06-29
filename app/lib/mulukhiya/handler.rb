@@ -91,7 +91,7 @@ module Mulukhiya
     end
 
     def prepared?
-      return @repared.present?
+      return @prepared.present?
     end
 
     def disable?

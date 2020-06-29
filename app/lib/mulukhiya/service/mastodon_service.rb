@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def account
-      @account ||= Environment.account_class.get(token: @token)
+      @account ||= Environment.account_class.get(token: token)
       return @account
     rescue
       return nil

@@ -1,0 +1,9 @@
+ja:
+  dry_validation:
+    errors:
+      key?: 空欄です。
+      int?: 数値ではありません。
+      str?: 文字列ではありません。
+      bool?: 真偽値ではありません。
+      array?: 配列ではありません。
+      hash?: ハッシュではありません。

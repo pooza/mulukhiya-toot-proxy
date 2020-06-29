@@ -1,13 +1,7 @@
-require 'dry-validation'
-
 module Mulukhiya
-  class MastodonAuthContract < Dry::Validation::Contract
+  class MastodonAuthContract < Contract
     params do
-      optional(:code).value(:string)
-    end
-
-    rule(:code) do
-      key.failure('認証コードが空欄です。') unless value.present?
+      required(:code).value(:string)
     end
   end
 end
