@@ -16,7 +16,10 @@ module Mulukhiya
     end
 
     def command?
-      return params.key?('command')
+      return true if params.key?('command')
+      return false
+    rescue
+      return false
     end
 
     def accts
