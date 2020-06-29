@@ -5,13 +5,14 @@ module Mulukhiya
       return false
     end
 
-    def validate
-      parser.params['tags'] ||= []
-      parser.params['growi'] ||= {}
-      parser.params['dropbox'] ||= {}
-      parser.params['notify'] ||= {}
-      parser.params['amazon'] ||= {}
-      return super
+    def command_params
+      params = parser.params.clone
+      params['tags'] ||= []
+      params['growi'] ||= {}
+      params['dropbox'] ||= {}
+      params['notify'] ||= {}
+      params['amazon'] ||= {}
+      return params
     end
 
     def exec
