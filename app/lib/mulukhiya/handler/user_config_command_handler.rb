@@ -5,6 +5,11 @@ module Mulukhiya
       return false
     end
 
+    def handle_post_toot(body, params = {})
+      super
+      notify(sns.account.config.to_h) if sns.account.config['/notify/user_config']
+    end
+
     def command_params
       params = parser.params.clone
       params['tags'] ||= []
