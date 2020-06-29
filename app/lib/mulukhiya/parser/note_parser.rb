@@ -22,6 +22,10 @@ module Mulukhiya
       return false
     end
 
+    def invalid_command?
+      return !command?
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(NoteParser.acct_pattern).map(&:first).each do |acct|
