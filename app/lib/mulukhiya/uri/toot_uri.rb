@@ -42,7 +42,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        @service = MastodonService.new(uri)
+        @service = Environment.sns_class.new(uri)
       end
       return @service
     end

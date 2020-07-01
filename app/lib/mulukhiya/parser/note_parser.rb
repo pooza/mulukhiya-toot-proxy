@@ -8,13 +8,7 @@ module Mulukhiya
 
     def initialize(text = '')
       super
-      if Environment.dolphin?
-        @service = DolphinService.new
-      elsif Environment.meisskey?
-        @service = MeisskeyService.new
-      else
-        @service = MisskeyService.new
-      end
+      @service = Environment.sns_class.new
     end
 
     def command?
@@ -59,13 +53,7 @@ module Mulukhiya
     end
 
     def max_length
-      if Environment.dolphin?
-        length = @config['/dolphin/status/max_length']
-      elsif Environment.meisskey?
-        length = @config['/meisskey/status/max_length']
-      else
-        length = @config['/misskey/status/max_length']
-      end
+      length = @config["/#{controller_name}/status/max_length"]
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end

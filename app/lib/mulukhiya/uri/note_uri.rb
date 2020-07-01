@@ -40,13 +40,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if Environment.dolphin?
-          @service = DolphinService.new(uri)
-        elsif Environment.meisskey?
-          @service = MeisskeyService.new(uri)
-        else
-          @service = MisskeyService.new(uri)
-        end
+        @service = Environment.sns_class.new(uri)
       end
       return @service
     end
