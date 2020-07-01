@@ -1,7 +1,7 @@
 module Mulukhiya
   class MeisskeyController < MisskeyController
     def self.name
-      return 'Meisskey'
+      return 'めいすきー'
     end
 
     def self.webhook?
@@ -9,11 +9,11 @@ module Mulukhiya
     end
 
     def self.clipping?
-      return true
+      return false
     end
 
     def self.announcement?
-      return true
+      return false
     end
 
     def self.filter?
