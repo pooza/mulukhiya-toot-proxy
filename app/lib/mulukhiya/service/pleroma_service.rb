@@ -25,7 +25,7 @@ module Mulukhiya
 
     def bookmark(id, params = {})
       headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{@token}"
+      headers['Authorization'] ||= "Bearer #{token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       return @http.post("/api/v1/statuses/#{id}/bookmark", {
         body: '{}',

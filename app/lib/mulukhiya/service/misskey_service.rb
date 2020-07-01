@@ -43,7 +43,7 @@ module Mulukhiya
     end
 
     def access_token
-      return Environment.access_token_class.first(hash: @token) if token
+      return Environment.access_token_class.first(hash: token) if token
       return nil
     end
 
