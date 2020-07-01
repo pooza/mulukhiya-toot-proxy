@@ -22,7 +22,7 @@ module Mulukhiya
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body unless parser.command_name == command_name
-      raise Ginseng::ValidateError, validate if validate.present?
+      raise ValidateError, validate if validate.present?
       body['visibility'] = Environment.controller_class.visibility_name('direct')
       @prepared = true
       return body
