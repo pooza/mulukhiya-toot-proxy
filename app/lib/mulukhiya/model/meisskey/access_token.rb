@@ -13,13 +13,26 @@ module Mulukhiya
         return @values
       end
 
-      alias to_h values
+      def to_h
+        unless @hash
+          @hash = values.clone
+          @hash.delete('token')
+          @hash['scopes'] = scopes
+          @hash.compact!
+        end
+        return @hash
+      end
 
       def account
         return Account.new(values['userId'])
       end
 
+      def application
+        return Application.new(values['appId'])
+      end
+
       def scopes
+        return application.permission
       end
 
       def self.get(key)
