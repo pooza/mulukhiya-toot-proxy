@@ -159,7 +159,7 @@ GEM
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.0)
-    json (2.3.0)
+    json (2.3.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.1)
