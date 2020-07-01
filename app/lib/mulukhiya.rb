@@ -41,6 +41,7 @@ module Mulukhiya
     require 'sidekiq-scheduler/web'
     require 'sidekiq-failures'
 
+    Environment.storage_class.connect
     config = Config.instance
     if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?
       Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|

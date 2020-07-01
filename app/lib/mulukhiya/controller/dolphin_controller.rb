@@ -20,6 +20,22 @@ module Mulukhiya
       return false
     end
 
+    def self.parser_class
+      return "Mulukhiya::#{Config.instance['/dolphin/parser'].camelize}Parser".constantize
+    end
+
+    def self.storage_class
+      return "Mulukhiya::#{Config.instance['/dolphin/storage'].camelize}".constantize
+    end
+
+    def self.postgres?
+      return Config.instance['/dolphin/storage'] == 'postgres'
+    end
+
+    def self.mongodb?
+      return Config.instance['/dolphin/storage'] == 'mongodb'
+    end
+
     def self.status_field
       return Config.instance['/dolphin/status/field']
     end

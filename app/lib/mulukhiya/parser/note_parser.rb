@@ -10,6 +10,8 @@ module Mulukhiya
       super
       if Environment.dolphin?
         @service = DolphinService.new
+      elsif Environment.meisskey?
+        @service = MeisskeyService.new
       else
         @service = MisskeyService.new
       end
@@ -59,6 +61,8 @@ module Mulukhiya
     def max_length
       if Environment.dolphin?
         length = @config['/dolphin/status/max_length']
+      elsif Environment.meisskey?
+        length = @config['/meisskey/status/max_length']
       else
         length = @config['/misskey/status/max_length']
       end

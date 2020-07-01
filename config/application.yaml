@@ -1,5 +1,5 @@
 package:
-  version: 3.9.9
+  version: 3.10.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -89,29 +89,37 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
+        - meisskey_controller
         - pleroma_controller
         - toot_uri
     - name: mastodon
       cases:
         - dolphin_controller
         - misskey_controller
+        - meisskey_controller
         - pleroma_controller
         - note_uri
-        - pleroma_status_uri
     - name: misskey
       cases:
         - mastodon_controller
+        - meisskey_controller
         - dolphin_controller
         - pleroma_controller
         - toot_uri
-        - pleroma_status_uri
+    - name: meisskey_controller
+      cases:
+        - mastodon_controller
+        - misskey_controller
+        - dolphin_controller
+        - pleroma_controller
+        - toot_uri
     - name: pleroma
       cases:
         - mastodon_controller
         - misskey_controller
         - dolphin_controller
+        - meisskey_controller
         - note_uri
-        - status
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -146,6 +154,8 @@ webui:
   livecure: false
 mastodon:
   url: https://mstdn.example.com/
+  storage: postgres
+  parser: toot
   handlers:
     pre_toot:
       - user_config_command
@@ -258,6 +268,8 @@ mastodon:
     limit: 40
 misskey:
   url: https://misskey.example.com/
+  storage: postgres
+  parser: note
   handlers:
     pre_toot:
       - user_config_command
@@ -338,8 +350,94 @@ misskey:
   poll:
     options:
       field: choices
+meisskey:
+  url: https://meisskey.example.com/
+  storage: mongo
+  parser: note
+  handlers:
+    pre_toot:
+      - user_config_command
+      - mention_visibility
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tweet
+      - tagging
+      - invalid_command
+    post_toot:
+      - user_config_command
+      - tweet
+      - result_notification
+    pre_webhook:
+      - webhook_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
+    post_webhook:
+      - result_notification
+    pre_upload:
+      - image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    post_upload:
+      - result_notification
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - result_notification
+  oauth:
+    permission:
+      - write:notes
+      - write:drive
+    callback_url: /mulukhiya/auth
+  events:
+    - pre_toot
+    - post_toot
+    - pre_webhook
+    - post_webhook
+    - pre_upload
+    - post_upload
+    - post_bookmark
+  status:
+    field: text
+    key: noteId
+    label: ノート
+    max_length: 1000
+    visibility_names:
+      unlisted: home
+      private: followers
+      direct: specified
+    patterns:
+      - pattern: ^/notes/([[:alnum:]]+)
+  attachment:
+    key: fileIds
+  poll:
+    options:
+      field: choices
 dolphin:
   url: https://dolphin.example.com/
+  storage: postgres
+  parser: note
   handlers:
     pre_toot:
       - user_config_command
@@ -396,6 +494,8 @@ dolphin:
       field: choices
 pleroma:
   url: https://pleroma.example.com/
+  storage: postgres
+  parser: toot
   handlers:
     pre_toot:
       - user_config_command
@@ -598,6 +698,8 @@ user_config:
   redis:
     dsn: redis://localhost:6379/1
 postgres:
+  dsn: null
+mongo:
   dsn: null
 slack:
   hooks: []

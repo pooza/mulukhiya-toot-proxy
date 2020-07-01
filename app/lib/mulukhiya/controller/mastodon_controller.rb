@@ -128,6 +128,22 @@ module Mulukhiya
       return true
     end
 
+    def self.parser_class
+      return "Mulukhiya::#{Config.instance['/mastodon/parser'].camelize}Parser".constantize
+    end
+
+    def self.storage_class
+      return "Mulukhiya::#{Config.instance['/mastodon/storage'].camelize}".constantize
+    end
+
+    def self.postgres?
+      return Config.instance['/mastodon/storage'] == 'postgres'
+    end
+
+    def self.mongodb?
+      return Config.instance['/mastodon/storage'] == 'mongodb'
+    end
+
     def self.status_field
       return Config.instance['/mastodon/status/field']
     end

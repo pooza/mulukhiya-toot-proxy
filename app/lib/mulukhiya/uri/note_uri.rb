@@ -42,6 +42,8 @@ module Mulukhiya
         uri.fragment = nil
         if Environment.dolphin?
           @service = DolphinService.new(uri)
+        elsif Environment.meisskey?
+          @service = MeisskeyService.new(uri)
         else
           @service = MisskeyService.new(uri)
         end

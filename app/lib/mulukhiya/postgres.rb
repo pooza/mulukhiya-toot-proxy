@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def self.config?
-      return Postgres.dsn.present?
+      return dsn.present?
     end
 
     def self.dsn

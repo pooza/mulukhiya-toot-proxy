@@ -54,8 +54,20 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
+    def self.meisskey?
+      return controller_name == 'meisskey'
+    end
+
     def self.pleroma?
       return controller_name == 'pleroma'
+    end
+
+    def self.postgres?
+      return controller_class.postgres?
+    end
+
+    def self.mongodb?
+      return controller_class.mongodb?
     end
 
     def self.development?
@@ -87,12 +99,11 @@ module Mulukhiya
     end
 
     def self.parser_class
-      case controller_name
-      when 'mastodon', 'pleroma'
-        return TootParser
-      when 'dolphin', 'misskey'
-        return NoteParser
-      end
+      return controller_class.parser_class
+    end
+
+    def self.storage_class
+      return controller_class.storage_class
     end
 
     def self.health

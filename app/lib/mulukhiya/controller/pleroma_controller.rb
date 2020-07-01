@@ -94,6 +94,22 @@ module Mulukhiya
       return false
     end
 
+    def self.parser_class
+      return "Mulukhiya::#{Config.instance['/pleroma/parser'].camelize}Parser".constantize
+    end
+
+    def self.storage_class
+      return "Mulukhiya::#{Config.instance['/pleroma/storage'].camelize}".constantize
+    end
+
+    def self.postgres?
+      return Config.instance['/pleroma/storage'] == 'postgres'
+    end
+
+    def self.mongodb?
+      return Config.instance['/pleroma/storage'] == 'mongodb'
+    end
+
     def self.status_field
       return Config.instance['/pleroma/status/field']
     end

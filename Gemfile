@@ -6,7 +6,6 @@ gem 'dry-validation'
 gem 'fastimage'
 gem 'ginseng-core', github: 'pooza/ginseng-core'
 gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fediverse'
-gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', require: 'ginseng/postgres'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'json-schema'
@@ -21,6 +20,14 @@ gem 'sidekiq-scheduler'
 gem 'twitter'
 gem 'twitter-text'
 gem 'vacuum'
+
+group :postgres do
+  gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', require: 'ginseng/postgres'
+end
+
+group :mongo do
+  gem 'mongo'
+end
 
 group :development do
   gem 'rack-test'

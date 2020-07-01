@@ -111,6 +111,22 @@ module Mulukhiya
       return false
     end
 
+    def self.parser_class
+      return "Mulukhiya::#{Config.instance['/misskey/parser'].camelize}Parser".constantize
+    end
+
+    def self.storage_class
+      return "Mulukhiya::#{Config.instance['/misskey/storage'].camelize}".constantize
+    end
+
+    def self.postgres?
+      return Config.instance['/misskey/storage'] == 'postgres'
+    end
+
+    def self.mongodb?
+      return Config.instance['/misskey/storage'] == 'mongodb'
+    end
+
     def self.status_field
       return Config.instance['/misskey/status/field']
     end

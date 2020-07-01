@@ -95,7 +95,7 @@ module Mulukhiya
     end
 
     def disable?
-      return true unless Postgres.config?
+      Environment.storage_class.config?
       return true if sns.account.disable?(underscore_name)
       return true if @config.disable?(underscore_name)
       return false
