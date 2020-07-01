@@ -74,8 +74,8 @@ module Mulukhiya
         token: @sns.access_token.to_h,
       }
       return @renderer.to_s
-    rescue Ginseng::AuthError, Ginseng::ValidateError => e
-      @renderer.message = {error: e.message}
+    rescue Ginseng::AuthError, ValidateError => e
+      @renderer.message = {'error' => e.message}
       @renderer.status = e.status
       return @renderer.to_s
     end

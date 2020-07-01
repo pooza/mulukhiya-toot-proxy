@@ -17,10 +17,6 @@ module Mulukhiya
       return false
     end
 
-    def invalid_command?
-      return !command?
-    end
-
     def to_md
       md = text.clone
       ['.u-url', '.hashtag'].each do |selector|
