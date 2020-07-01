@@ -1,8 +1,9 @@
 require 'mongo'
 
 module Mulukhiya
-  class Mongo < Mongo::Client
+  class Mongo
     include Singleton
+    attr_reader :db
 
     def self.dsn
       return MongoDSN.parse(Config.instance['/mongo/dsn'])
@@ -20,12 +21,10 @@ module Mulukhiya
 
     private
 
-    def initialize(hosts = [], params = {})
+    def initialize
       dsn = Mongo.dsn
       raise Ginseng::DatabaseError, 'Invalid DSN' unless dsn.valid?
-      hosts ||= ["#{dsn.host}:#{dsn.port}"]
-      params ||= {database: dsn.dbname}
-      super
+      @db = ::Mongo::Client.new(["#{dsn.host}:#{dsn.port}"], {database: dsn.dbname})
     end
   end
 end
