@@ -1,4 +1,3 @@
-require 'digest/sha1'
 require 'digest/sha2'
 
 module Mulukhiya
@@ -8,10 +7,6 @@ module Mulukhiya
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)
-    end
-
-    def sha1_digest
-      return Webhook.create_sha1_digest(@sns.uri, @sns.token)
     end
 
     def visibility
@@ -58,18 +53,10 @@ module Mulukhiya
       }.to_json)
     end
 
-    def self.create_sha1_digest(uri, token)
-      return Digest::SHA1.hexdigest({
-        sns: uri.to_s,
-        token: token,
-        salt: Config.instance['/crypt/salt'],
-      }.to_json)
-    end
-
     def self.create(key)
       return Webhook.new(key) if key.is_a?(UserConfig)
       Environment.controller_class.webhook_entries do |hook|
-        return hook[:account].webhook if [hook[:digest], hook[:sha1_digest]].member?(key)
+        return hook[:account].webhook if hook[:digest] == key
       end
       return nil
     end
@@ -78,7 +65,6 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       Environment.controller_class.webhook_entries do |hook|
         yield Webhook.create(hook[:digest])
-        yield Webhook.create(hook[:sha1_digest])
       end
     end
 
