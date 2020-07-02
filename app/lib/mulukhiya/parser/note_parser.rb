@@ -9,9 +9,9 @@ module Mulukhiya
     def initialize(text = '')
       super
       if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
-        @service = Environment.sns_class.new(uri)
+        @service = Environment.sns_class.new
       else
-        @service = MisskeyService.new(uri)
+        @service = MisskeyService.new
       end
     end
 
@@ -57,7 +57,11 @@ module Mulukhiya
     end
 
     def max_length
-      length = @config["/#{Environment.controller_name}/status/max_length"]
+      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        length = @config["/#{Environment.controller_name}/status/max_length"]
+      else
+        length = @config['/misskey/status/max_length']
+      end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
