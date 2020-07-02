@@ -50,7 +50,7 @@ module Mulukhiya
       end
 
       def self.all
-        self.collection.find.each do |token|
+        collection.find.each do |token|
           yield AccessToken.new(token['_id'])
         end
       end
