@@ -24,6 +24,7 @@ module Mulukhiya
         @schema = Config.load_file('schema/base')
         @schema['properties'][controller] = Config.load_file("schema/#{controller}")
         @schema['required'].push(controller)
+        @schema['required'].push(dbms)
         @schema['required'].push('controller') unless controller == 'mastodon'
         @schema['properties']['handler'] = handlers
       end
@@ -50,6 +51,10 @@ module Mulukhiya
 
     def controller
       return Environment.controller_name
+    end
+
+    def dbms
+      return Environment.dbms_name
     end
   end
 end

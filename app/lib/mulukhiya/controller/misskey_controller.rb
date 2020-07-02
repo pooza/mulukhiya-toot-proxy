@@ -112,19 +112,27 @@ module Mulukhiya
     end
 
     def self.parser_class
-      return "Mulukhiya::#{Config.instance['/misskey/parser'].camelize}Parser".constantize
+      return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end
 
     def self.dbms_class
-      return "Mulukhiya::#{Config.instance['/misskey/dbms'].camelize}".constantize
+      return "Mulukhiya::#{dbms_name.camelize}".constantize
     end
 
     def self.postgres?
-      return Config.instance['/misskey/dbms'] == 'postgres'
+      return dbms_name == 'postgres'
     end
 
     def self.mongo?
-      return Config.instance['/misskey/dbms'] == 'mongo'
+      return dbms_name == 'mongo'
+    end
+
+    def self.dbms_name
+      return Config.instance['/misskey/dbms']
+    end
+
+    def self.parser_name
+      return Config.instance['/misskey/parser']
     end
 
     def self.status_field

@@ -42,6 +42,14 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
 
+    def self.dbms_name
+      return controller_class.dbms_name
+    end
+
+    def self.parser_name
+      return controller_class.parser_name
+    end
+
     def self.mastodon?
       return controller_name == 'mastodon'
     end
