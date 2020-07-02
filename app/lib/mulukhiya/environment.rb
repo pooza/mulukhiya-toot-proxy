@@ -108,12 +108,12 @@ module Mulukhiya
 
     def self.health
       values = {
-        version: Package.version,
-        postgres: Postgres.health,
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
         status: 200,
       }
+      values[:postgres] = Postgres.health if postgres?
+      values[:mongodb] = Mongo.health if mongodb?
       [:postgres, :redis, :sidekiq].each do |k|
         next if values.dig(k, :status) == 'OK'
         values[:status] = 503
