@@ -159,7 +159,7 @@ webui:
   livecure: false
 mastodon:
   url: https://mstdn.example.com/
-  storage: postgres
+  dbms: postgres
   parser: toot
   handlers:
     pre_toot:
@@ -273,7 +273,7 @@ mastodon:
     limit: 40
 misskey:
   url: https://misskey.example.com/
-  storage: postgres
+  dbms: postgres
   parser: note
   handlers:
     pre_toot:
@@ -357,7 +357,7 @@ misskey:
       field: choices
 meisskey:
   url: https://meisskey.example.com/
-  storage: mongo
+  dbms: mongo
   parser: note
   handlers:
     pre_toot:
@@ -441,7 +441,7 @@ meisskey:
       field: choices
 dolphin:
   url: https://dolphin.example.com/
-  storage: postgres
+  dbms: postgres
   parser: note
   handlers:
     pre_toot:
@@ -499,7 +499,7 @@ dolphin:
       field: choices
 pleroma:
   url: https://pleroma.example.com/
-  storage: postgres
+  dbms: postgres
   parser: toot
   handlers:
     pre_toot:

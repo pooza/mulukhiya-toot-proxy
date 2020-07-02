@@ -102,8 +102,8 @@ module Mulukhiya
       return controller_class.parser_class
     end
 
-    def self.storage_class
-      return controller_class.storage_class
+    def self.dbms_class
+      return controller_class.dbms_class
     end
 
     def self.health

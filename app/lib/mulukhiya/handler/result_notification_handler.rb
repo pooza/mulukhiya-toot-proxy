@@ -1,7 +1,7 @@
 module Mulukhiya
   class ResultNotificationHandler < Handler
     def disable?
-      return true unless Environment.storage_class.config?
+      return true unless Environment.dbms_class.config?
       return false
     end
 
