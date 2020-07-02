@@ -22,7 +22,7 @@ gem 'twitter-text'
 gem 'vacuum'
 
 group :postgres do
-  gem 'ginseng-postgres', github: 'pooza/ginseng-postgres', require: 'ginseng/postgres'
+  gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
 end
 
 group :mongo do

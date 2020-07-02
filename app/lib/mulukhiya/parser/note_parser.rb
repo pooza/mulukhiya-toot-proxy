@@ -53,7 +53,7 @@ module Mulukhiya
     end
 
     def max_length
-      length = @config["/#{controller_name}/status/max_length"]
+      length = @config["/#{Environment.controller_name}/status/max_length"]
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end

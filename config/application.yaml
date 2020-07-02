@@ -106,7 +106,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - toot_uri
-    - name: meisskey_controller
+    - name: meisskey
       cases:
         - mastodon_controller
         - misskey_controller
