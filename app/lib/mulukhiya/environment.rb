@@ -110,15 +110,15 @@ module Mulukhiya
       values = {
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
-        status: 200,
       }
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?
-      [:postgres, :redis, :sidekiq].each do |k|
+      values.keys.clone.each do |k|
         next if values.dig(k, :status) == 'OK'
         values[:status] = 503
         break
       end
+      values[:status] ||= 200
       return values
     end
 
