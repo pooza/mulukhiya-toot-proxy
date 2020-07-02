@@ -1,7 +1,7 @@
 module Mulukhiya
   class UserConfigCommandHandler < CommandHandler
     def disable?
-      return true unless Postgres.config?
+      return true unless Environment.dbms_class.config?
       return false
     end
 

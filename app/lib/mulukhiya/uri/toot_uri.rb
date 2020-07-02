@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def to_md
-      toot = service.fetch_toot(id)
+      toot = service.fetch_status(id)
       raise "Toot '#{self}' not found" unless toot
       raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
@@ -42,7 +42,11 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        @service = MastodonService.new(uri)
+        if ['mastodon', 'pleroma'].include?(Environment.controller_name)
+          @service = Environment.sns_class.new(uri)
+        else
+          @service = MastodonService.new(uri)
+        end
       end
       return @service
     end

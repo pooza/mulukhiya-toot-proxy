@@ -8,8 +8,8 @@ module Mulukhiya
 
     def initialize(text = '')
       super
-      if Environment.dolphin?
-        @service = DolphinService.new
+      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        @service = Environment.sns_class.new
       else
         @service = MisskeyService.new
       end
@@ -57,8 +57,8 @@ module Mulukhiya
     end
 
     def max_length
-      if Environment.dolphin?
-        length = @config['/dolphin/status/max_length']
+      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        length = @config["/#{Environment.controller_name}/status/max_length"]
       else
         length = @config['/misskey/status/max_length']
       end

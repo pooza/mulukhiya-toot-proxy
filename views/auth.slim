@@ -23,7 +23,7 @@ html lang='ja'
                 span class='alert' = params[:errors][:code].join
             li
               button 認証する
-      - if ['Misskey'].member?(controller.name)
+      - if ['Misskey', 'Meisskey'].member?(controller.name)
         ol
           li
             a href=params[:oauth_url] 認証コードを取得

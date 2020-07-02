@@ -42,6 +42,14 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
 
+    def self.dbms_name
+      return controller_class.dbms_name
+    end
+
+    def self.parser_name
+      return controller_class.parser_name
+    end
+
     def self.mastodon?
       return controller_name == 'mastodon'
     end
@@ -54,8 +62,20 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
+    def self.meisskey?
+      return controller_name == 'meisskey'
+    end
+
     def self.pleroma?
       return controller_name == 'pleroma'
+    end
+
+    def self.postgres?
+      return controller_class.postgres?
+    end
+
+    def self.mongo?
+      return controller_class.mongo?
     end
 
     def self.development?
@@ -87,27 +107,26 @@ module Mulukhiya
     end
 
     def self.parser_class
-      case controller_name
-      when 'mastodon', 'pleroma'
-        return TootParser
-      when 'dolphin', 'misskey'
-        return NoteParser
-      end
+      return controller_class.parser_class
+    end
+
+    def self.dbms_class
+      return controller_class.dbms_class
     end
 
     def self.health
       values = {
-        version: Package.version,
-        postgres: Postgres.health,
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
-        status: 200,
       }
-      [:postgres, :redis, :sidekiq].each do |k|
+      values[:postgres] = Postgres.health if postgres?
+      values[:mongo] = Mongo.health if mongo?
+      values.keys.clone.each do |k|
         next if values.dig(k, :status) == 'OK'
         values[:status] = 503
         break
       end
+      values[:status] ||= 200
       return values
     end
 

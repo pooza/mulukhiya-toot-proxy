@@ -3,7 +3,6 @@ title: Local config
 type: object
 required:
   - agent
-  - postgres
 properties:
   controller:
     type: string
@@ -12,6 +11,7 @@ properties:
       - misskey
       - dolphin
       - pleroma
+      - meisskey
   environment:
     type: string
     enum:

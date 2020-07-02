@@ -64,3 +64,8 @@ Mulukhiya.bootsnap
 Mulukhiya.loader.setup
 Bundler.require
 Mulukhiya.sidekiq
+
+if Mulukhiya::Environment.postgres?
+  require 'ginseng/postgres'
+  Mulukhiya::Postgres.connect if Mulukhiya::Postgres.config?
+end

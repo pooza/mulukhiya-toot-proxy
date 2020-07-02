@@ -1,15 +1,15 @@
 module Mulukhiya
-  class DolphinController < MisskeyController
+  class MeisskeyController < MisskeyController
     def self.name
-      return 'Dolphin'
+      return 'めいすきー'
     end
 
     def self.webhook?
-      return false
+      return true
     end
 
     def self.clipping?
-      return true
+      return false
     end
 
     def self.announcement?
@@ -37,43 +37,52 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/dolphin/dbms']
+      return Config.instance['/meisskey/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/dolphin/parser']
+      return Config.instance['/meisskey/parser']
     end
 
     def self.status_field
-      return Config.instance['/dolphin/status/field']
+      return Config.instance['/meisskey/status/field']
     end
 
     def self.status_key
-      return Config.instance['/dolphin/status/key']
+      return Config.instance['/meisskey/status/key']
     end
 
     def self.attachment_key
-      return Config.instance['/dolphin/attachment/key']
+      return Config.instance['/meisskey/attachment/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/dolphin/poll/options/field']
+      return Config.instance['/meisskey/poll/options/field']
     end
 
     def self.visibility_name(name)
-      return Config.instance["/dolphin/status/visibility_names/#{name}"]
+      return Config.instance["/meisskey/status/visibility_names/#{name}"]
     end
 
     def self.status_label
-      return Config.instance['/dolphin/status/label']
+      return Config.instance['/meisskey/status/label']
     end
 
     def self.events
-      return Config.instance['/dolphin/events'].map(&:to_sym)
+      return Config.instance['/meisskey/events'].map(&:to_sym)
     end
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
+      config = Config.instance
+      Meisskey::AccessToken.all do |token|
+        values = {
+          digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
+          token: token.values[:hash],
+          account: token.account,
+        }
+        yield values
+      end
     end
   end
 end
