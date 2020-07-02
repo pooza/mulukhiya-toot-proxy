@@ -24,7 +24,10 @@ module Mulukhiya
     def initialize
       dsn = Mongo.dsn
       raise Ginseng::DatabaseError, 'Invalid DSN' unless dsn.valid?
-      @db = ::Mongo::Client.new(["#{dsn.host}:#{dsn.port}"], {database: dsn.dbname})
+      @db = ::Mongo::Client.new(["#{dsn.host}:#{dsn.port}"], {
+        database: dsn.dbname,
+        logger: Logger.new,
+      })
     end
   end
 end

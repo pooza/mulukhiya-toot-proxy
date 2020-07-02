@@ -13,6 +13,10 @@ module Mulukhiya
         return @values
       end
 
+      def hash
+        return values['hash']
+      end
+
       def to_h
         unless @hash
           @hash = values.clone
@@ -43,6 +47,12 @@ module Mulukhiya
 
       def self.first(key)
         return get(key)
+      end
+
+      def self.all
+        self.collection.find.each do |token|
+          yield AccessToken.new(token['_id'])
+        end
       end
 
       def self.collection

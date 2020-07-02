@@ -69,8 +69,8 @@ module Mulukhiya
       config = Config.instance
       Meisskey::AccessToken.all do |token|
         values = {
-          digest: Webhook.create_digest(config['/meisskey/url'], token.values[:hash]),
-          sha1_digest: Webhook.create_sha1_digest(config['/meisskey/url'], token.values[:hash]),
+          digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
+          sha1_digest: Webhook.create_sha1_digest(config['/meisskey/url'], token.hash),
           token: token.values[:hash],
           account: token.account,
         }
