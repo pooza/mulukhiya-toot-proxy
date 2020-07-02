@@ -41,6 +41,10 @@ module Mulukhiya
         return AccessToken.new(token['_id'])
       end
 
+      def self.first(key)
+        return get(key)
+      end
+
       def self.collection
         return Mongo.instance.db[:accessTokens]
       end

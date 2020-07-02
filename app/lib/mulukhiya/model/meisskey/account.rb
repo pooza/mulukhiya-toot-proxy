@@ -114,24 +114,24 @@ module Mulukhiya
         return config['/tags'] || []
       end
 
-      def twitter
-        return nil
-      end
-
       def self.[](id)
         return Account.new(id)
       end
 
       def self.get(key)
         if acct = key[:acct]
+          acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
+          entry = collection.find(username: acct.username, host: acct.domain).first
+          return Account.new(entry['_id']) if entry
+          return nil
         elsif key.key?(:token)
           return nil if key[:token].nil?
-          if entry = collection.find(token: key[:token]).first
-            return Account.new(entry['_id'])
-          else
-            return AccessToken.get(hash: key[:token]).account
-          end
+          entry = collection.find(token: key[:token]).first
+          return Account.new(entry['_id']) if entry
+          return AccessToken.get(hash: key[:token]).account
         end
+        entry = collection.find(key).first
+        return Account.new(entry['_id']) if entry
       end
 
       def self.collection
