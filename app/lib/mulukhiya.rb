@@ -67,5 +67,5 @@ Mulukhiya.sidekiq
 
 if Mulukhiya::Environment.postgres?
   require 'ginseng/postgres'
-  Mulukhiya::Postgres.connect
+  Mulukhiya::Postgres.connect if Mulukhiya::Postgres.config?
 end
