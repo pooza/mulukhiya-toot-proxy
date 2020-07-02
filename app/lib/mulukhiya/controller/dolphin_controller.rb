@@ -32,8 +32,8 @@ module Mulukhiya
       return Config.instance['/dolphin/dbms'] == 'postgres'
     end
 
-    def self.mongodb?
-      return Config.instance['/dolphin/dbms'] == 'mongodb'
+    def self.mongo?
+      return Config.instance['/dolphin/dbms'] == 'mongo'
     end
 
     def self.status_field

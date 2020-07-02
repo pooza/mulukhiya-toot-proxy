@@ -66,8 +66,8 @@ module Mulukhiya
       return controller_class.postgres?
     end
 
-    def self.mongodb?
-      return controller_class.mongodb?
+    def self.mongo?
+      return controller_class.mongo?
     end
 
     def self.development?
@@ -113,7 +113,7 @@ module Mulukhiya
         status: 200,
       }
       values[:postgres] = Postgres.health if postgres?
-      values[:mongodb] = Mongo.health if mongodb?
+      values[:mongo] = Mongo.health if mongo?
       [:postgres, :redis, :sidekiq].each do |k|
         next if values.dig(k, :status) == 'OK'
         values[:status] = 503

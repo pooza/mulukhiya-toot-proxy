@@ -32,8 +32,8 @@ module Mulukhiya
       return Config.instance['/meisskey/dbms'] == 'postgres'
     end
 
-    def self.mongodb?
-      return Config.instance['/meisskey/dbms'] == 'mongodb'
+    def self.mongo?
+      return Config.instance['/meisskey/dbms'] == 'mongo'
     end
 
     def self.status_field

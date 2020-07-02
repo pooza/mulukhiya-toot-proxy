@@ -123,8 +123,8 @@ module Mulukhiya
       return Config.instance['/misskey/dbms'] == 'postgres'
     end
 
-    def self.mongodb?
-      return Config.instance['/misskey/dbms'] == 'mongodb'
+    def self.mongo?
+      return Config.instance['/misskey/dbms'] == 'mongo'
     end
 
     def self.status_field

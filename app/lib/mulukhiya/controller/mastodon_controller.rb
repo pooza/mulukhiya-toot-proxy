@@ -140,8 +140,8 @@ module Mulukhiya
       return Config.instance['/mastodon/dbms'] == 'postgres'
     end
 
-    def self.mongodb?
-      return Config.instance['/mastodon/dbms'] == 'mongodb'
+    def self.mongo?
+      return Config.instance['/mastodon/dbms'] == 'mongo'
     end
 
     def self.status_field

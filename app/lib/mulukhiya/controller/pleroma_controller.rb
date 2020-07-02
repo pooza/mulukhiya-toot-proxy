@@ -106,8 +106,8 @@ module Mulukhiya
       return Config.instance['/pleroma/dbms'] == 'postgres'
     end
 
-    def self.mongodb?
-      return Config.instance['/pleroma/dbms'] == 'mongodb'
+    def self.mongo?
+      return Config.instance['/pleroma/dbms'] == 'mongo'
     end
 
     def self.status_field
