@@ -8,7 +8,11 @@ module Mulukhiya
 
     def initialize(text = '')
       super
-      @service = Environment.sns_class.new
+      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        @service = Environment.sns_class.new(uri)
+      else
+        @service = MisskeyService.new(uri)
+      end
     end
 
     def command?
