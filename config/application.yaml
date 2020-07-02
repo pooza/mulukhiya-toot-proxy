@@ -92,6 +92,7 @@ test:
         - meisskey_controller
         - pleroma_controller
         - toot_uri
+        - mongo
     - name: mastodon
       cases:
         - dolphin_controller
@@ -99,6 +100,7 @@ test:
         - meisskey_controller
         - pleroma_controller
         - note_uri
+        - mongo
     - name: misskey
       cases:
         - mastodon_controller
@@ -106,6 +108,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - toot_uri
+        - mongo
     - name: meisskey
       cases:
         - mastodon_controller
@@ -113,6 +116,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - toot_uri
+        - postgres
     - name: pleroma
       cases:
         - mastodon_controller
@@ -120,6 +124,7 @@ test:
         - dolphin_controller
         - meisskey_controller
         - note_uri
+        - mongo
     - name: dropbox
       cases:
         - dropbox_clipper
