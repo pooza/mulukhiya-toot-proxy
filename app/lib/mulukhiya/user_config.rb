@@ -8,12 +8,12 @@ module Mulukhiya
         @account ||= Environment.account_class.get(token: token)
       end
       @account ||= Environment.account_class[account]
-      @dbms = UserConfigStorage.new
-      @values = @dbms[@account.id]
+      @storage = UserConfigStorage.new
+      @values = @storage[@account.id]
     end
 
     def raw
-      return JSON.parse(@dbms.get(@account.id))
+      return JSON.parse(@storage.get(@account.id))
     end
 
     def [](key)
@@ -21,8 +21,8 @@ module Mulukhiya
     end
 
     def update(values)
-      @dbms.update(@account.id, values)
-      @values = @dbms[@account.id]
+      @storage.update(@account.id, values)
+      @values = @storage[@account.id]
     end
 
     def webhook_token
