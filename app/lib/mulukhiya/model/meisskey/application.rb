@@ -17,6 +17,10 @@ module Mulukhiya
         return values['permission'].join(' ')
       end
 
+      def self.[](id)
+        return Application.new(id)
+      end
+
       def self.collection
         return Mongo.instance.db[:apps]
       end
