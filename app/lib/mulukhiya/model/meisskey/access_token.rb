@@ -39,6 +39,10 @@ module Mulukhiya
         return application.permission
       end
 
+      def self.[](id)
+        return AccessToken.new(id)
+      end
+
       def self.get(key)
         return nil if key[:hash].nil?
         token = collection.find(hash: key[:hash]).first
