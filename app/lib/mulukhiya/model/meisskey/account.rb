@@ -24,18 +24,30 @@ module Mulukhiya
       end
 
       def acct
-        @acct ||= Acct.new("@#{values['username']}@#{values['host'] || Environment.domain_name}")
+        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
         return @acct
+      end
+
+      def name
+        return values['name']
+      end
+
+      def username
+        return values['username']
+      end
+
+      def host
+        return values['host']
       end
 
       def uri
         unless @uri
-          if values['host']
-            @uri = NoteURI.parse("https://#{values['host']}")
+          if host
+            @uri = NoteURI.parse("https://#{host}")
           else
             @uri = NoteURI.parse(Config.instance['/meisskey/url'])
           end
-          @uri.path = "/@#{values['username']}"
+          @uri.path = "/@#{username}"
         end
         return @uri
       end

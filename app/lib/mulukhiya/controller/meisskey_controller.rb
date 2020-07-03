@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def self.clipping?
-      return false
+      return true
     end
 
     def self.announcement?
