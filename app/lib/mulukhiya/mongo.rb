@@ -33,6 +33,8 @@ module Mulukhiya
       raise Ginseng::DatabaseError, 'Invalid DSN' unless dsn.valid?
       @db = ::Mongo::Client.new(["#{dsn.host}:#{dsn.port}"], {
         database: dsn.dbname,
+        user: dsn.user,
+        password: dsn.password,
         logger: Logger.new,
       })
     end
