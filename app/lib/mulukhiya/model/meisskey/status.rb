@@ -21,9 +21,6 @@ module Mulukhiya
         return values['visibility']
       end
 
-      def local?
-      end
-
       def visible?
         return visibility == 'public'
       end
@@ -34,8 +31,14 @@ module Mulukhiya
 
       def uri
         unless @uri
-          @uri = NoteURI.parse(Config.instance['/meisskey/url'])
-          @uri.path = "/notes/#{id}"
+          if values['uri'].present?
+            @uri = TootURI.parse(values['uri'])
+            @uri = NoteURI.parse(values['uri']) unless @uri&.valid?
+            @uri = nil unless @uri&.valid?
+          else
+            @uri = NoteURI.parse(Config.instance['/meisskey/url'])
+            @uri.path = "/notes/#{id}"
+          end
         end
         return @uri
       end
