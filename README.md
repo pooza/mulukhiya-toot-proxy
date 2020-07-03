@@ -9,7 +9,7 @@
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
 - [Dolphin](https://github.com/syuilo/dolphin)
-- [Pleroma](https://git.pleroma.social/pleroma)
+- [Pleroma](https://git.pleroma.social/pleroma/pleroma)
 - [めいすきー](https://github.com/mei23/misskey)
 
 ## モロヘイヤに出来ること
