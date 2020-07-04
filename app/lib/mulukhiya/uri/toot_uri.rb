@@ -42,7 +42,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['mastodon', 'pleroma'].include?(Environment.controller_name)
+        if ['mastodon', 'pleroma'].member?(Environment.controller_name)
           @service = Environment.sns_class.new(uri)
         else
           @service = MastodonService.new(uri)

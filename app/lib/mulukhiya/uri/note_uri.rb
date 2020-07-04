@@ -40,7 +40,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
           @service = Environment.sns_class.new(uri)
         else
           @service = MisskeyService.new(uri)
