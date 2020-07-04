@@ -259,6 +259,7 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
+      - read:search
       - read:filters
       - write:filters
   status:
