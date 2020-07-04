@@ -713,15 +713,15 @@ sidekiq:
     password: ''
   concurrency: 5
   schedule:
-    tagging_dictionary_update:
-      every: 1d
-      class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update:
-      every: 1d
+      every: '0 1 1 * * *'
       class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
-      every: 1d
+      every: '0 2 1 * * *'
       class: Mulukhiya::MediaCleaningWorker
+    tagging_dictionary_update:
+      every: '0 3 1 * * *'
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
