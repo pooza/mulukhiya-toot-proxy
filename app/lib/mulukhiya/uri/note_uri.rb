@@ -7,8 +7,8 @@ module Mulukhiya
     end
 
     def note_id
-      @config['/misskey/status/patterns'].each do |pattern|
-        next unless matches = path.match(pattern['pattern'])
+      @config['/parser/note/patterns'].each do |pattern|
+        next unless matches = path.match(pattern)
         return matches[1]
       end
       return nil
@@ -40,7 +40,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+        if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
           @service = Environment.sns_class.new(uri)
         else
           @service = MisskeyService.new(uri)

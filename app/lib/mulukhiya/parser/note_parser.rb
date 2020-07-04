@@ -8,15 +8,24 @@ module Mulukhiya
 
     def initialize(text = '')
       super
-      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+      if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
         @service = Environment.sns_class.new
       else
         @service = MisskeyService.new
       end
     end
 
+    def command_name
+      if text.start_with?('c:')
+        params['command'] ||= params['c']
+        params.delete('c')
+      end
+      return super
+    end
+
     def command?
       return true if params.key?('command')
+      return true if text.start_with?('c:') && params.key?('c')
       return false
     rescue
       return false
@@ -57,13 +66,17 @@ module Mulukhiya
     end
 
     def max_length
-      if ['misskey', 'meisskey', 'dolphin'].include?(Environment.controller_name)
+      if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
         length = @config["/#{Environment.controller_name}/status/max_length"]
       else
         length = @config['/misskey/status/max_length']
       end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
+    end
+
+    def self.visibility_name(name)
+      return Config.instance["/parser/note/visibility/#{name}"]
     end
   end
 end

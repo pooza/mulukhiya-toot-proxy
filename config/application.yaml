@@ -1,5 +1,5 @@
 package:
-  version: 3.10.1
+  version: 3.10.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -23,6 +23,7 @@ handler:
   amazon_image:
     timeout: 10
   spotify_image:
+    timeout: 10
     disable: true
   tweet:
     disable: true
@@ -33,6 +34,24 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
+parser:
+  toot:
+    patterns:
+      - ^/web/statuses/([[:digit:]]+)
+      - ^/@[[:word:]]+/([[:digit:]]+)
+      - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+      - ^/notice/([[:word:]]+)
+    visibility:
+      unlisted: unlisted
+      private: private
+      direct: direct
+  note:
+    patterns:
+      - ^/notes/([[:alnum:]]+)
+    visibility:
+      unlisted: home
+      private: followers
+      direct: specified
 shortened_url:
   domains:
     - t.co
@@ -249,6 +268,7 @@ mastodon:
     scopes:
       - write:statuses
       - write:media
+      - read:search
       - read:filters
       - write:filters
   status:
@@ -256,15 +276,6 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
-    visibility_names:
-      unlisted: unlisted
-      private: private
-      direct: direct
-    patterns:
-      - pattern: ^/web/statuses/([[:digit:]]+)
-      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
-      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-      - pattern: ^/notice/([[:word:]]+)
   attachment:
     key: media_ids
   poll:
@@ -345,12 +356,6 @@ misskey:
     key: noteId
     label: ノート
     max_length: 500
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -429,12 +434,6 @@ meisskey:
     key: noteId
     label: ノート
     max_length: 1000
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -487,12 +486,6 @@ dolphin:
     key: noteId
     label: ノート
     max_length: 500
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -575,14 +568,6 @@ pleroma:
     key: id
     label: ステータス
     max_length: 5000
-    visibility_names:
-      unlisted: unlisted
-      private: private
-      direct: direct
-    patterns:
-      - pattern: ^/web/statuses/([[:digit:]]+)
-      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
-      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   attachment:
     key: media_ids
   poll:
@@ -717,15 +702,15 @@ sidekiq:
     password: ''
   concurrency: 5
   schedule:
-    tagging_dictionary_update:
-      every: 1d
-      class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update:
-      every: 1d
+      cron: '0 1 1 * * *'
       class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
-      every: 1d
+      cron: '0 2 1 * * *'
       class: Mulukhiya::MediaCleaningWorker
+    tagging_dictionary_update:
+      cron: '0 3 1 * * *'
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker

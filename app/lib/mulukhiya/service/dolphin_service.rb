@@ -29,12 +29,14 @@ module Mulukhiya
       return nil
     end
 
-    def notify(account, message)
-      return note(
+    def notify(account, message, response = nil)
+      note = {
         DolphinController.status_field => message,
         'visibleUserIds' => [account.id],
         'visibility' => DolphinController.visibility_name('direct'),
-      )
+      }
+      note['replyId'] = response['createdNote']['id'] if response
+      return post(note)
     end
   end
 end

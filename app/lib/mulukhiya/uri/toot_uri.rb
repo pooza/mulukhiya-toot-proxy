@@ -7,8 +7,8 @@ module Mulukhiya
     end
 
     def toot_id
-      @config['/mastodon/status/patterns'].each do |pattern|
-        next unless matches = path.match(pattern['pattern'])
+      @config['/parser/toot/patterns'].each do |pattern|
+        next unless matches = path.match(pattern)
         id = matches[1]
         return id.to_i if id.match?(/^[[:digit:]]+$/)
         return id
@@ -42,7 +42,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['mastodon', 'pleroma'].include?(Environment.controller_name)
+        if ['mastodon', 'pleroma'].member?(Environment.controller_name)
           @service = Environment.sns_class.new(uri)
         else
           @service = MastodonService.new(uri)

@@ -6,12 +6,14 @@ module Mulukhiya
       super
     end
 
-    def notify(account, message)
-      return note(
+    def notify(account, message, response = nil)
+      note = {
         MeisskeyController.status_field => message,
         'visibleUserIds' => [account.id],
         'visibility' => MeisskeyController.visibility_name('direct'),
-      )
+      }
+      note['replyId'] = response['createdNote']['id'] if response
+      return post(note)
     end
   end
 end

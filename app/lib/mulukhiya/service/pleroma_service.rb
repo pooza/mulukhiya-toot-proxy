@@ -83,11 +83,13 @@ module Mulukhiya
       return nil
     end
 
-    def notify(account, message)
-      return post(
+    def notify(account, message, response = nil)
+      toot = {
         PleromaController.status_field => [account.acct.to_s, message].join("\n"),
         'visibility' => PleromaController.visibility_name('direct'),
-      )
+      }
+      toot['in_reply_to_id'] = response['id'] if response
+      return post(toot)
     end
   end
 end
