@@ -74,12 +74,13 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      return note(
+      note = {
         MisskeyController.status_field => message,
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
-        'replyId' => response ? response['createdNote']['id'] : nil,
-      )
+      }
+      note['replyId'] = response['createdNote']['id'] if response
+      return post(note)
     end
   end
 end
