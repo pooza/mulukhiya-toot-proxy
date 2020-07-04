@@ -25,7 +25,7 @@ module Mulukhiya
 
     def command?
       return true if params.key?('command')
-      return true if params.key?('c') if text.start_with?('c:')
+      return true if text.start_with?('c:') && params.key?('c')
       return false
     rescue
       return false
