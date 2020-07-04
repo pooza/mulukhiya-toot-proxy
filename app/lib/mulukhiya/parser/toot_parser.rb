@@ -4,7 +4,10 @@ module Mulukhiya
     attr_accessor :account
 
     def command_name
-      params['command'] ||= params['c'] if text.start_with?('c:')
+      if text.start_with?('c:')
+        params['command'] ||= params['c']
+        params.delete('c')
+      end
       return super
     end
 
