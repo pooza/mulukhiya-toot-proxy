@@ -6,8 +6,8 @@
 [Misskey](https://github.com/syuilo/misskey) /
 [Dolphin](https://github.com/syuilo/dolphin) /
 [Pleroma](https://git.pleroma.social/pleroma/pleroma) /
-[めいすきー](https://github.com/mei23/misskey)の投稿に対して、内容の更新等を行うプロキシ。
-通称「モロヘイヤ」。  
+[めいすきー](https://github.com/mei23/misskey)
+の投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## モロヘイヤに出来ること
