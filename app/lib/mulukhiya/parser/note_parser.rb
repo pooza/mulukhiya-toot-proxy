@@ -74,5 +74,9 @@ module Mulukhiya
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
     end
+
+    def self.visibility_name(name)
+      return Config.instance["/parser/note/visibility/#{name}"]
+    end
   end
 end

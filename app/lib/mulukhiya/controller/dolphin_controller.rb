@@ -61,7 +61,7 @@ module Mulukhiya
     end
 
     def self.visibility_name(name)
-      return Config.instance["/dolphin/status/visibility_names/#{name}"]
+      return parser_class.visibility_name(name)
     end
 
     def self.status_label

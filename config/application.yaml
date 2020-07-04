@@ -41,9 +41,17 @@ parser:
       - ^/@[[:word:]]+/([[:digit:]]+)
       - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
       - ^/notice/([[:word:]]+)
+    visibility:
+      unlisted: unlisted
+      private: private
+      direct: direct
   note:
     patterns:
       - ^/notes/([[:alnum:]]+)
+    visibility:
+      unlisted: home
+      private: followers
+      direct: specified
 shortened_url:
   domains:
     - t.co
@@ -268,10 +276,6 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
-    visibility_names:
-      unlisted: unlisted
-      private: private
-      direct: direct
   attachment:
     key: media_ids
   poll:
@@ -352,10 +356,6 @@ misskey:
     key: noteId
     label: ノート
     max_length: 500
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
   attachment:
     key: fileIds
   poll:
@@ -434,10 +434,6 @@ meisskey:
     key: noteId
     label: ノート
     max_length: 1000
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
   attachment:
     key: fileIds
   poll:
@@ -490,10 +486,6 @@ dolphin:
     key: noteId
     label: ノート
     max_length: 500
-    visibility_names:
-      unlisted: home
-      private: followers
-      direct: specified
   attachment:
     key: fileIds
   poll:
@@ -576,10 +568,6 @@ pleroma:
     key: id
     label: ステータス
     max_length: 5000
-    visibility_names:
-      unlisted: unlisted
-      private: private
-      direct: direct
   attachment:
     key: media_ids
   poll:
