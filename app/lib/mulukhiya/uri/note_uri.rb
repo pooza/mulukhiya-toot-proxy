@@ -7,8 +7,8 @@ module Mulukhiya
     end
 
     def note_id
-      @config['/misskey/status/patterns'].each do |pattern|
-        next unless matches = path.match(pattern['pattern'])
+      @config['/parser/note/patterns'].each do |pattern|
+        next unless matches = path.match(pattern)
         return matches[1]
       end
       return nil
