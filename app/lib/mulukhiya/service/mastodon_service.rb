@@ -57,7 +57,7 @@ module Mulukhiya
       return @redis
     end
 
-    def notify(account, message)
+    def notify(account, message, response = nil)
       return toot(
         MastodonController.status_field => [account.acct.to_s, message].join("\n"),
         'visibility' => MastodonController.visibility_name('direct'),

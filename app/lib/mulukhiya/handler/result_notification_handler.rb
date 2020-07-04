@@ -6,11 +6,11 @@ module Mulukhiya
     end
 
     def handle_post_toot(body, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      notify(reporter.to_h, reporter.response) if reporter.to_h.present?
     end
 
     def handle_post_webhook(body, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      notify(reporter.to_h, reporter.response) if reporter.to_h.present?
     end
 
     def handle_post_upload(body, params = {})

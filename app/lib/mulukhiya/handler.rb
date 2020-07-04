@@ -51,9 +51,9 @@ module Mulukhiya
       return true
     end
 
-    def notify(message)
+    def notify(message, response = nil)
       message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(sns.account, message)
+      return Environment.info_agent_service&.notify(sns.account, message, response)
     end
 
     def summary
