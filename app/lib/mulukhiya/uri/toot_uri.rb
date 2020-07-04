@@ -7,8 +7,8 @@ module Mulukhiya
     end
 
     def toot_id
-      @config['/mastodon/status/patterns'].each do |pattern|
-        next unless matches = path.match(pattern['pattern'])
+      @config['/parser/toot/patterns'].each do |pattern|
+        next unless matches = path.match(pattern)
         id = matches[1]
         return id.to_i if id.match?(/^[[:digit:]]+$/)
         return id

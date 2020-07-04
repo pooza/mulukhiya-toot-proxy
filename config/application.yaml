@@ -33,6 +33,16 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
+parser:
+  toot:
+    patterns:
+      - ^/web/statuses/([[:digit:]]+)
+      - ^/@[[:word:]]+/([[:digit:]]+)
+      - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+      - ^/notice/([[:word:]]+)
+  note:
+    patterns:
+      - ^/notes/([[:alnum:]]+)
 shortened_url:
   domains:
     - t.co
@@ -260,11 +270,6 @@ mastodon:
       unlisted: unlisted
       private: private
       direct: direct
-    patterns:
-      - pattern: ^/web/statuses/([[:digit:]]+)
-      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
-      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-      - pattern: ^/notice/([[:word:]]+)
   attachment:
     key: media_ids
   poll:
@@ -349,8 +354,6 @@ misskey:
       unlisted: home
       private: followers
       direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -433,8 +436,6 @@ meisskey:
       unlisted: home
       private: followers
       direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -491,8 +492,6 @@ dolphin:
       unlisted: home
       private: followers
       direct: specified
-    patterns:
-      - pattern: ^/notes/([[:alnum:]]+)
   attachment:
     key: fileIds
   poll:
@@ -579,10 +578,6 @@ pleroma:
       unlisted: unlisted
       private: private
       direct: direct
-    patterns:
-      - pattern: ^/web/statuses/([[:digit:]]+)
-      - pattern: ^/@[[:word:]]+/([[:digit:]]+)
-      - pattern: ^/users/[[:word:]]+/statuses/([[:digit:]]+)
   attachment:
     key: media_ids
   poll:
