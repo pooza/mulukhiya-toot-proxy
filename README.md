@@ -6,7 +6,8 @@
 [Misskey](https://github.com/syuilo/misskey) /
 [Dolphin](https://github.com/syuilo/dolphin) /
 [Pleroma](https://git.pleroma.social/pleroma) /
-[めいすきー](https://github.com/mei23/misskey)の投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
+[めいすきー](https://github.com/mei23/misskey)の投稿に対して、内容の更新等を行うプロキシ。
+通称「モロヘイヤ」。  
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## モロヘイヤに出来ること
@@ -25,7 +26,7 @@
 
 - 画像ファイルを上限ピクセルまで縮小。
 - JPEGに変換し、ファイルサイズを小さくする。
-- Mastodon / Misskey / Dolphin / Pleroma / めいすきーが本来受け付けないメディアファイルを変換。
+- インスタンスが本来受け付けないメディアファイルを変換。
 - メディアタイプに応じた `#image` `#video` `#audio` 等のタグを本文に挿入。
 
 また、
