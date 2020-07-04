@@ -23,6 +23,7 @@ handler:
   amazon_image:
     timeout: 10
   spotify_image:
+    timeout: 10
     disable: true
   tweet:
     disable: true
