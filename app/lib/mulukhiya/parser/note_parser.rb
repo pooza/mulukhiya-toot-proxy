@@ -15,8 +15,14 @@ module Mulukhiya
       end
     end
 
+    def command_name
+      params['command'] ||= params['c'] if text.start_with?('c:')
+      return super
+    end
+
     def command?
       return true if params.key?('command')
+      return true if params.key?('c') if text.start_with?('c:')
       return false
     rescue
       return false

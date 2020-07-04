@@ -3,18 +3,24 @@ module Mulukhiya
     include Package
     attr_accessor :account
 
+    def command_name
+      params['command'] ||= params['c'] if text.start_with?('c:')
+      return super
+    end
+
+    def command?
+      return true if params.key?('command')
+      return true if params.key?('c') if text.start_with?('c:')
+      return false
+    rescue
+      return false
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(TootParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
-    end
-
-    def command?
-      return true if params.key?('command')
-      return false
-    rescue
-      return false
     end
 
     def to_md
