@@ -1,22 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class AccessToken
-      attr_reader :id
-
-      def initialize(id)
-        @id = id.to_s
-        @logger = Logger.new
-      end
-
-      def values
-        @values ||= AccessToken.collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
-        return @values
-      end
-
-      def hash
-        return values['hash']
-      end
-
+    class AccessToken < CollectionModel
       def to_h
         unless @hash
           @hash = values.clone
@@ -25,6 +9,10 @@ module Mulukhiya
           @hash.compact!
         end
         return @hash
+      end
+
+      def hash
+        return values['hash']
       end
 
       def account
@@ -59,8 +47,10 @@ module Mulukhiya
         end
       end
 
-      def self.collection
-        return Mongo.instance.db[:accessTokens]
+      private
+
+      def collection_name
+        return :accessTokens
       end
     end
   end

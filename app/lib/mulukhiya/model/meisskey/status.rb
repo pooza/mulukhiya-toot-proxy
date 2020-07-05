@@ -1,32 +1,12 @@
 module Mulukhiya
   module Meisskey
-    class Status
-      attr_reader :id
-
-      def initialize(id)
-        @id = id.to_s
-        @logger = Logger.new
-      end
-
-      def values
-        @values ||= Status.collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
-        return @values
-      end
-
+    class Status < CollectionModel
       def account
         return Account.new(values['userId'])
       end
 
-      def visibility
-        return values['visibility']
-      end
-
       def visible?
         return visibility == 'public'
-      end
-
-      def text
-        return values['text']
       end
 
       def uri
@@ -71,19 +51,24 @@ module Mulukhiya
         return Status.new(id)
       end
 
+      def self.get(key)
+        if key.key?(:uri)
+          uri = NoteURI.parse(key[:uri])
+          return nil unless uri.valid?
+          return Status.new(uri.id)
+        end
+        entry = collection.find(key).first
+        return Status.new(entry['_id']) if entry
+      end
+
       def self.first(key)
         return get(key)
       end
 
-      def self.get(key)
-        return nil if key[:uri].nil?
-        uri = NoteURI.parse(key[:uri])
-        return nil unless uri.valid?
-        return Status.new(uri.id)
-      end
+      private
 
-      def self.collection
-        return Mongo.instance.db[:notes]
+      def collection_name
+        return :notes
       end
     end
   end
