@@ -158,5 +158,12 @@ module Mulukhiya
       get '/mulukhiya/icon.png'
       assert(last_response.ok?)
     end
+
+    def test_webhook_entries
+      return unless webhook = app.webhook_entries&.first
+      assert_kind_of(String, webhook[:digest])
+      assert_kind_of(String, webhook[:token])
+      assert_kind_of(Environment.account_class, webhook[:account])
+    end
   end
 end

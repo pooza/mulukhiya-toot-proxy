@@ -73,7 +73,7 @@ module Mulukhiya
     end
 
     def self.webhook_entries
-      return enum_for(__method__) unless block_given?
+      return nil
     end
   end
 end
