@@ -7,7 +7,6 @@ module Mulukhiya
     def initialize(id)
       @id = id.to_s
       @logger = Logger.new
-      @config = Config.instance
     end
 
     def values
@@ -20,12 +19,12 @@ module Mulukhiya
     private
 
     def method_missing(method, *args)
-      return values[method.to_s] if args.nil?
+      return values[method.to_s] if args.empty?
       return super
     end
 
     def respond_to_missing?(method, *args)
-      return args.nil?
+      return args.empty?
     end
 
     def collection_name

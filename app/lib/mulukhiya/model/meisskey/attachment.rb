@@ -5,7 +5,9 @@ module Mulukhiya
         return contentType
       end
 
-      alias type file_content_type
+      def type
+        return file_content_type
+      end
 
       def uri
         @uri ||= Ginseng::URI.parse(values['src'] || values['uri'])

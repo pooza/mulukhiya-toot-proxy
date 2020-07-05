@@ -28,15 +28,21 @@ module Mulukhiya
         return @uri
       end
 
-      alias admin? isAdmin
+      def admin?
+        return isAdmin
+      end
 
       def moderator?
         return false
       end
 
-      alias bot? isBot
+      def bot?
+        return isBot
+      end
 
-      alias locked? isLocked
+      def locked?
+        return isLocked
+      end
 
       def notify_verbose?
         return config['/notify/verbose'] == true
@@ -118,6 +124,10 @@ module Mulukhiya
 
       def self.first(key)
         return get(key)
+      end
+
+      def self.collection
+        return Mongo.instance.db[:users]
       end
 
       private

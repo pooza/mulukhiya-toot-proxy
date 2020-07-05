@@ -47,6 +47,10 @@ module Mulukhiya
         end
       end
 
+      def self.collection
+        return Mongo.instance.db[:accessTokens]
+      end
+
       private
 
       def collection_name

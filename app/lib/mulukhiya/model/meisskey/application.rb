@@ -2,7 +2,7 @@ module Mulukhiya
   module Meisskey
     class Application < CollectionModel
       def permission
-        return permission.join(' ')
+        return values['permission'].join(' ')
       end
 
       def self.[](id)
