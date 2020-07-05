@@ -81,7 +81,6 @@ module Mulukhiya
 
     def fetch
       result = {}
-      threads = []
       remote_dics do |dic|
         dic.parse.each do |k, v|
           result[k] ||= v
