@@ -4,6 +4,8 @@ module Mulukhiya
       many_to_one :status
 
       alias to_h values
+
+      alias type file_content_type
     end
   end
 end
