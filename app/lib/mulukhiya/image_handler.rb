@@ -1,9 +1,5 @@
 module Mulukhiya
   class ImageHandler < Handler
-    def disable?
-      return super || Environment.dolphin?
-    end
-
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?

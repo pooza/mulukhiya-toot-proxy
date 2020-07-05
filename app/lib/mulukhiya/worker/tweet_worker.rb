@@ -44,9 +44,9 @@ module Mulukhiya
     end
 
     def max_length
-      suffixes = ['あ' * @config['/twitter/status/length/url']]
+      suffixes = [' ', 'あ' * @config['/twitter/status/length/url']]
       suffixes.concat(default_tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)})
-      suffixes_length = TweetString.new(suffixes.join(' ')).length.ceil
+      suffixes_length = TweetString.new(suffixes.join('  ')).length.ceil
       return @config['/twitter/status/length/max'] - suffixes_length
     end
   end

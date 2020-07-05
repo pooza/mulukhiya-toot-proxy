@@ -81,21 +81,17 @@ module Mulukhiya
 
     def fetch
       result = {}
-      threads = []
       remote_dics do |dic|
-        threads.push(Thread.new do
-          dic.parse.each do |k, v|
-            result[k] ||= v
-            result[k][:words] ||= []
-            result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
-          rescue => e
-            @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
-          end
-        end)
+        dic.parse.each do |k, v|
+          result[k] ||= v
+          result[k][:words] ||= []
+          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
+        rescue => e
+          @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
+        end
       rescue => e
         @logger.error(error: e.message, dic: dic.uri.to_s)
       end
-      threads.map(&:join)
       return result.sort_by {|k, v| k.length}.to_h
     end
 

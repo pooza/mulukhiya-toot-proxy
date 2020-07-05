@@ -13,11 +13,11 @@ module Mulukhiya
         return @values
       end
 
-      def type
+      def file_content_type
         return values['contentType']
       end
 
-      alias file_content_type type
+      alias type file_content_type
 
       def uri
         @uri ||= Ginseng::URI.parse(values['src'] || values['uri'])
