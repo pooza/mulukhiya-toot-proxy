@@ -19,8 +19,13 @@ module Mulukhiya
 
     private
 
-    def method_missing (method)
-      return values[method.to_s]
+    def method_missing(method, *args)
+      return values[method.to_s] if args.nil?
+      return super
+    end
+
+    def respond_to_missing?(method, *args)
+      return args.nil?
     end
 
     def collection_name
