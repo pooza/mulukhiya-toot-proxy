@@ -1,8 +1,18 @@
 namespace :mulukhiya do
   namespace :program do
-    desc 'update program list'
+    desc 'update programs'
     task :update do
-      Mulukhiya::ProgramUpdateWorker.perform_async
+      program.update
+      puts "#{program.count} programs"
+    end
+
+    desc 'show programs'
+    task :show do
+      puts program.to_yaml
+    end
+
+    def program
+      return Mulukhiya::Program.instance
     end
   end
 end
