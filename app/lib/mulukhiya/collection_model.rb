@@ -28,7 +28,7 @@ module Mulukhiya
     end
 
     def collection_name
-      return self.class.to_s.downcase.to_sym
+      return self.class.to_s.underscore.to_sym
     end
 
     def collection
