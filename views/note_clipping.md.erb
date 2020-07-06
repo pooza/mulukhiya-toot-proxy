@@ -10,10 +10,10 @@
 
 ## メディア
 <% @params[:attachments].each do |attachment| -%>
-<% if attachment.type.split('/').first == 'image' -%>
-![<%= File.basename(attachment.uri.path) %>](<%= attachment.uri %>)
+<% if attachment[:type].split('/').first == 'image' -%>
+![<%= attachment[:name] %>](<%= attachment[:url] %>)
 <% else -%>
-- <%= attachment.uri %>
+- <%= attachment[:url] %>
 <% end -%>
 <% end -%>
 <% end -%>

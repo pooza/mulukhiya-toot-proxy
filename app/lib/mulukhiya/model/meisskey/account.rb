@@ -1,18 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class Account
-      attr_reader :id
-
-      def initialize(id)
-        @id = id.to_s
-        @logger = Logger.new
-      end
-
-      def values
-        @values ||= Account.collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
-        return @values
-      end
-
+    class Account < CollectionModel
       def to_h
         unless @hash
           @hash = values.clone
@@ -28,18 +16,6 @@ module Mulukhiya
         return @acct
       end
 
-      def name
-        return values['name']
-      end
-
-      def username
-        return values['username']
-      end
-
-      def host
-        return values['host']
-      end
-
       def uri
         unless @uri
           if host
@@ -53,7 +29,7 @@ module Mulukhiya
       end
 
       def admin?
-        return values['isAdmin']
+        return isAdmin
       end
 
       def moderator?
@@ -61,11 +37,24 @@ module Mulukhiya
       end
 
       def bot?
-        return values['isBot']
+        return isBot
       end
 
       def locked?
-        return values['isLocked']
+        return isLocked
+      end
+
+      def notify_verbose?
+        return config['/notify/verbose'] == true
+      end
+
+      def disable?(handler_name)
+        return true if config["/handler/#{handler_name}/disable"]
+        return false
+      end
+
+      def tags
+        return config['/tags'] || []
       end
 
       def config
@@ -113,19 +102,6 @@ module Mulukhiya
         return nil
       end
 
-      def notify_verbose?
-        return config['/notify/verbose'] == true
-      end
-
-      def disable?(handler_name)
-        return true if config["/handler/#{handler_name}/disable"]
-        return false
-      end
-
-      def tags
-        return config['/tags'] || []
-      end
-
       def self.[](id)
         return Account.new(id)
       end
@@ -146,8 +122,18 @@ module Mulukhiya
         return Account.new(entry['_id']) if entry
       end
 
+      def self.first(key)
+        return get(key)
+      end
+
       def self.collection
         return Mongo.instance.db[:users]
+      end
+
+      private
+
+      def collection_name
+        return :users
       end
     end
   end

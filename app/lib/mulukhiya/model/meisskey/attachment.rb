@@ -1,23 +1,13 @@
 module Mulukhiya
   module Meisskey
-    class Attachment
-      attr_reader :id
-
-      def initialize(id)
-        @id = id.to_s
-        @logger = Logger.new
-      end
-
-      def values
-        @values ||= Attachment.collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
-        return @values
-      end
-
+    class Attachment < CollectionModel
       def file_content_type
-        return values['contentType']
+        return contentType
       end
 
-      alias type file_content_type
+      def type
+        return file_content_type
+      end
 
       def uri
         @uri ||= Ginseng::URI.parse(values['src'] || values['uri'])
@@ -28,8 +18,10 @@ module Mulukhiya
         return Attachment.new(id)
       end
 
-      def self.collection
-        return Mongo.instance.db['driveFiles.files']
+      private
+
+      def collection_name
+        return 'driveFiles.files'
       end
     end
   end
