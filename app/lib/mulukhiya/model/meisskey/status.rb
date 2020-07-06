@@ -27,17 +27,17 @@ module Mulukhiya
         return query['files']
       end
 
-      def query
-        return Environment.sns_class.new.fetch_status(id)
-      end
-
       def to_h
         unless @hash
           @hash = values.clone
           @hash[:uri] ||= uri.to_s
-          @hash[:attachments] = attachments
+          @hash[:attachments] = query['files']
         end
         return @hash
+      end
+
+      def query
+        return Environment.sns_class.new.fetch_status(id)
       end
 
       def to_md
