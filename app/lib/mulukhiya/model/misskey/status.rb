@@ -43,7 +43,7 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.clone
-          @hash[:uri] ||= uri.to_s
+          @hash[:uri] = uri.to_s
           @hash[:attachments] = query['files']
         end
         return @hash

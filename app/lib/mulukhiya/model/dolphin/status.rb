@@ -6,15 +6,6 @@ module Mulukhiya
         return @account
       end
 
-      def to_h
-        unless @hash
-          @hash = values.clone
-          @hash[:uri] ||= uri.to_s
-          @hash[:attachments] = attachments.map(&:to_h)
-        end
-        return @hash
-      end
-
       def uri
         unless @uri
           if self[:uri].present?
