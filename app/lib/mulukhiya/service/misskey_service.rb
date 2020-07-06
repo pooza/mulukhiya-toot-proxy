@@ -16,6 +16,20 @@ module Mulukhiya
       @account = nil
     end
 
+    def fetch_status(id)
+      return @http.post('/api/notes/show', {
+        body: {noteId: id, i: token}.to_json,
+        headers: {'X-Mulukhiya' => package_class.full_name},
+      })
+    end
+
+    def fetch_attachment(id)
+      return @http.post('/api/drive/files/show', {
+        body: {fileId: id, i: token}.to_json,
+        headers: {'X-Mulukhiya' => package_class.full_name},
+      })
+    end
+
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))

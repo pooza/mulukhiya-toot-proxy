@@ -24,7 +24,11 @@ module Mulukhiya
       end
 
       def attachments
-        return []
+        return query['files']
+      end
+
+      def query
+        return Environment.sns_class.new.fetch_status(id)
       end
 
       def to_h
