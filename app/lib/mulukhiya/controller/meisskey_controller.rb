@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def self.announcement?
-      return false
+      return true
     end
 
     def self.filter?

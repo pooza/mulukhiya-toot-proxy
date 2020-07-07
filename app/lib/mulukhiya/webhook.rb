@@ -2,8 +2,7 @@ require 'digest/sha2'
 
 module Mulukhiya
   class Webhook
-    attr_reader :sns
-    attr_reader :reporter
+    attr_reader :sns, :reporter
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)

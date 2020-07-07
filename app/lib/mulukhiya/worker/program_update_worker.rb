@@ -3,20 +3,8 @@ module Mulukhiya
     include Sidekiq::Worker
     sidekiq_options retry: false
 
-    def initialize
-      @config = Config.instance
-      @http = HTTP.new
-      @logger = Logger.new
-    end
-
     def perform
-      File.write(path, @http.get(@config['/programs/url']))
-    rescue Ginseng::ConfigError => e
-      @logger.error(worker: self.class.to_s, error: e.message)
-    end
-
-    def path
-      return File.join(Environment.dir, 'tmp/cache/programs.json')
+      Program.instance.update
     end
   end
 end

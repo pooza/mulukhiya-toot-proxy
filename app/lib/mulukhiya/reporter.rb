@@ -1,7 +1,7 @@
 module Mulukhiya
   class Reporter < Array
-    attr_accessor :response
-    attr_accessor :parser
+    attr_accessor :response, :parser
+
     attr_reader :temp
 
     def initialize(size = 0, val = nil)

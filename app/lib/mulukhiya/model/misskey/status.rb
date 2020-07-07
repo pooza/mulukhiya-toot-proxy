@@ -18,14 +18,11 @@ module Mulukhiya
 
       def uri
         unless @uri
-          if self[:uri].present?
-            @uri = TootURI.parse(self[:uri])
-            @uri = NoteURI.parse(self[:uri]) unless @uri&.valid?
-            @uri = nil unless @uri&.valid?
-          else
-            @uri = NoteURI.parse(Config.instance['/misskey/url'])
-            @uri.path = "/notes/#{id}"
-          end
+          @uri = Ginseng::URI.parse(self[:uri]) if self[:uri].present?
+          @uri ||= Environment.sns_class.new.create_uri("/notes/#{id}")
+          @uri = TootURI.parse(@uri)
+          @uri = NoteURI.parse(@uri) unless @uri&.valid?
+          @uri = nil unless @uri&.valid?
         end
         return @uri
       end
@@ -43,7 +40,7 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.clone
-          @hash[:uri] ||= uri.to_s
+          @hash[:uri] = uri.to_s
           @hash[:attachments] = query['files']
         end
         return @hash
