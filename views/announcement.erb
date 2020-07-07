@@ -12,5 +12,5 @@
 <% end -%>
 <%= @params[:body] %>
 <% if @params[:image_url] -%>
-![<%= File.basename(Ginseng::URI.parse(attachment[:image_url]).path) %>](<%= attachment[:image_url] %>)
+![<%= File.basename(Ginseng::URI.parse(@params[:image_url]).path) %>](<%= @params[:image_url] %>)
 <% end -%>
