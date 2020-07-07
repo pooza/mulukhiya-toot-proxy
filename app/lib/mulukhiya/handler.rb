@@ -3,11 +3,7 @@ require 'rest-client'
 
 module Mulukhiya
   class Handler
-    attr_reader :reporter
-    attr_reader :event
-    attr_reader :sns
-    attr_reader :errors
-    attr_reader :result
+    attr_reader :reporter, :event, :sns, :errors, :result
 
     def handle_pre_toot(body, params = {})
       return body

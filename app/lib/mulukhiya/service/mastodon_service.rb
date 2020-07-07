@@ -1,18 +1,6 @@
 module Mulukhiya
   class MastodonService < Ginseng::Fediverse::MastodonService
     include Package
-    attr_reader :token
-
-    def initialize(uri = nil, token = nil)
-      @config = Config.instance
-      token ||= @config['/agent/test/token']
-      super
-    end
-
-    def token=(token)
-      @token = token
-      @account = nil
-    end
 
     def account
       @account ||= Environment.account_class.get(token: token)
@@ -64,6 +52,12 @@ module Mulukhiya
       }
       toot['in_reply_to_id'] = response['id'] if response
       return post(toot)
+    end
+
+    private
+
+    def default_token
+      return @config['/agent/test/token']
     end
   end
 end

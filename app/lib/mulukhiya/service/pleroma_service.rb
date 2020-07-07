@@ -3,34 +3,12 @@ require 'fileutils'
 module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
-    attr_reader :token
-
-    def initialize(uri = nil, token = nil)
-      @config = Config.instance
-      token ||= @config['/agent/test/token']
-      super
-    end
-
-    def token=(token)
-      @token = token
-      @account = nil
-    end
 
     def account
       @account ||= Environment.account_class.get(token: token)
       return @account
     rescue
       return nil
-    end
-
-    def bookmark(id, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post("/api/v1/statuses/#{id}/bookmark", {
-        body: '{}',
-        headers: headers,
-      })
     end
 
     def upload(path, params = {})
@@ -79,10 +57,6 @@ module Mulukhiya
       return @redis
     end
 
-    def filters
-      return nil
-    end
-
     def notify(account, message, response = nil)
       toot = {
         PleromaController.status_field => [account.acct.to_s, message].join("\n"),
@@ -90,6 +64,12 @@ module Mulukhiya
       }
       toot['in_reply_to_id'] = response['id'] if response
       return post(toot)
+    end
+
+    private
+
+    def default_token
+      return @config['/agent/test/token']
     end
   end
 end

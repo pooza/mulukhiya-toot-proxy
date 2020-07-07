@@ -3,32 +3,6 @@ require 'fileutils'
 module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
-    attr_reader :token
-
-    def initialize(uri = nil, token = nil)
-      @config = Config.instance
-      token ||= @config['/agent/test/token']
-      super
-    end
-
-    def token=(token)
-      @token = token
-      @account = nil
-    end
-
-    def fetch_status(id)
-      return @http.post('/api/notes/show', {
-        body: {noteId: id, i: token}.to_json,
-        headers: {'X-Mulukhiya' => package_class.full_name},
-      })
-    end
-
-    def fetch_attachment(id)
-      return @http.post('/api/drive/files/show', {
-        body: {fileId: id, i: token}.to_json,
-        headers: {'X-Mulukhiya' => package_class.full_name},
-      })
-    end
 
     def upload(path, params = {})
       if filename = params[:filename]
@@ -43,10 +17,6 @@ module Mulukhiya
       return super
     ensure
       FileUtils.rm_rf(dir) if dir
-    end
-
-    def filters
-      return nil
     end
 
     def account
@@ -95,6 +65,12 @@ module Mulukhiya
       }
       note['replyId'] = response['createdNote']['id'] if response
       return post(note)
+    end
+
+    private
+
+    def default_token
+      return @config['/agent/test/token']
     end
   end
 end
