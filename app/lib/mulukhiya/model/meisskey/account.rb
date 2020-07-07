@@ -18,11 +18,8 @@ module Mulukhiya
 
       def uri
         unless @uri
-          if host
-            @uri = NoteURI.parse("https://#{host}")
-          else
-            @uri = NoteURI.parse(Config.instance['/meisskey/url'])
-          end
+          @uri = Ginseng::URI.parse("https://#{host}") if host
+          @uri ||= Environment.sns_class.new.uri.clone
           @uri.path = "/@#{username}"
         end
         return @uri

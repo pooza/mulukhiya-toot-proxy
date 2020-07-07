@@ -11,14 +11,11 @@ module Mulukhiya
 
       def uri
         unless @uri
-          if values['uri'].present?
-            @uri = TootURI.parse(values['uri'])
-            @uri = NoteURI.parse(values['uri']) unless @uri&.valid?
-            @uri = nil unless @uri&.valid?
-          else
-            @uri = NoteURI.parse(Config.instance['/meisskey/url'])
-            @uri.path = "/notes/#{id}"
-          end
+          @uri = Ginseng::URI.parse(self['uri']) if self[:uri].present?
+          @uri ||= Environment.sns_class.new.create_uri("/notes/#{id}")
+          @uri = TootURI.parse(@uri)
+          @uri = NoteURI.parse(@uri) unless @uri&.valid?
+          @uri = nil unless @uri&.valid?
         end
         return @uri
       end
