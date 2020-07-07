@@ -342,6 +342,7 @@ misskey:
     permission:
       - write:notes
       - write:drive
+      - read:drive
     callback_url: /mulukhiya/auth
   events:
     - pre_toot
@@ -420,6 +421,7 @@ meisskey:
     permission:
       - write:notes
       - write:drive
+      - read:drive
     callback_url: /mulukhiya/auth
   events:
     - pre_toot

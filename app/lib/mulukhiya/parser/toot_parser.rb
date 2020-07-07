@@ -3,39 +3,11 @@ module Mulukhiya
     include Package
     attr_accessor :account
 
-    def command_name
-      if text.start_with?('c:')
-        params['command'] ||= params['c']
-        params.delete('c')
-      end
-      return super
-    end
-
-    def command?
-      return true if params.key?('command')
-      return true if text.start_with?('c:') && params.key?('c')
-      return false
-    rescue
-      return false
-    end
-
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(TootParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
-    end
-
-    def to_md
-      md = text.clone
-      ['.u-url', '.hashtag'].each do |selector|
-        nokogiri.css(selector).each do |link|
-          md.gsub!(link.to_s, "[#{link.inner_text}](#{link.attributes['href'].value})")
-        rescue => e
-          @logger.error(error: e.message, link: link.to_s)
-        end
-      end
-      return TootParser.sanitize(md)
     end
 
     def all_tags

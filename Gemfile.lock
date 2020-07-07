@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: c38c23060f402ec45675583d04f94ec65e389515
+  revision: 3586e8cd16efd232c36652e20f2d4e9168b86c14
   specs:
-    ginseng-fediverse (1.2.0)
+    ginseng-fediverse (1.3.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -186,7 +186,7 @@ GEM
     naught (1.1.0)
     netrc (0.11.0)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
+    nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -245,23 +245,23 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rexml (3.2.4)
-    rspotify (2.8.0)
+    rspotify (2.9.0)
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.86.0)
+    rubocop (0.87.0)
       parallel (~> 1.10)
-      parser (>= 2.7.0.1)
+      parser (>= 2.7.1.1)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.7)
       rexml
-      rubocop-ast (>= 0.0.3, < 1.0)
+      rubocop-ast (>= 0.1.0, < 1.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
     rubocop-ast (0.1.0)
       parser (>= 2.7.0.1)
-    rubocop-performance (1.6.1)
-      rubocop (>= 0.71.0)
+    rubocop-performance (1.7.0)
+      rubocop (>= 0.82.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.6.0)
