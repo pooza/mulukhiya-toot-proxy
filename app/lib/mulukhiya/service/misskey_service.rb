@@ -5,7 +5,7 @@ module Mulukhiya
     include Package
 
     def announcements(params = {})
-      return parent.parsed_response
+      return super.parsed_response
     end
 
     def upload(path, params = {})

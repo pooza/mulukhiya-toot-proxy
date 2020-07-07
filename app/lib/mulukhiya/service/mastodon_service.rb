@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def announcements(params = {})
-      return parent.parsed_response
+      return super.parsed_response
     end
 
     def oauth_client
