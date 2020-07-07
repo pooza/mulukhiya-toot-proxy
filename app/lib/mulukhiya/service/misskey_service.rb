@@ -4,6 +4,10 @@ module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
 
+    def announcements(params = {})
+      return parent.parsed_response
+    end
+
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))

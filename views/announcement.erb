@@ -1,6 +1,6 @@
 <%# encoding: UTF-8 -%>
 <% if @params[:title] -%>
-<%= @params[:title] %>
+## <%= @params[:title] %>
 
 <% end -%>
 <% if @params[:start_date] && @params[:end_date] -%>
@@ -12,5 +12,5 @@
 <% end -%>
 <%= @params[:body] %>
 <% if @params[:image_url] -%>
-<%= @params[:image_url] %>
+![<%= File.basename(Ginseng::URI.parse(attachment[:image_url]).path) %>](<%= attachment[:image_url] %>)
 <% end -%>

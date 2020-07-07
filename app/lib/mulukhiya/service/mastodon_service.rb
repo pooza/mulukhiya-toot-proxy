@@ -19,6 +19,10 @@ module Mulukhiya
       return super
     end
 
+    def announcements(params = {})
+      return parent.parsed_response
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/v1/apps', {

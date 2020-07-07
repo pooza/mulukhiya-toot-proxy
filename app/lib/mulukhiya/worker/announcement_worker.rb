@@ -46,7 +46,7 @@ module Mulukhiya
 
     def announcements
       return enum_for(__method__) unless block_given?
-      service.announcements.parsed_response.each do |announcement|
+      service.announcements.each do |announcement|
         yield announcement
       end
     end
