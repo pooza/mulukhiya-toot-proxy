@@ -76,17 +76,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/note/:note' do
-      note = Environment.status_class[params[:note]]
-      if note.nil? || !note.visible?
-        @renderer.status = 404
-      else
-        @renderer.message = note.to_h
-        @renderer.message[:account] = Environment.account_class[note.userId].to_h
-      end
-      return @renderer.to_s
-    end
-
     def renote?
       return params[:renoteId].present?
     end
