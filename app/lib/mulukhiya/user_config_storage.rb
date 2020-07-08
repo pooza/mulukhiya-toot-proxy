@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def set(key, values)
-      values.delete('command') if values.member?('command')
+      ['c', 'command'].each {|k| values.delete(k) if values.member?(k)}
       super(create_key(key), values.to_json)
       save
     end
