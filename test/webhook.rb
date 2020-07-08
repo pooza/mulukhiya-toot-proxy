@@ -18,9 +18,15 @@ module Mulukhiya
       end
     end
 
+    def test_visibility
+      Webhook.all do |hook|
+        assert(Environment.parser_class.visibility_names.values.member?(hook.visibility))
+      end
+    end
+
     def test_sns
       Webhook.all do |hook|
-        assert_kind_of([Ginseng::Fediverse::Service], hook.sns)
+        assert_kind_of(Ginseng::Fediverse::Service, hook.sns)
       end
     end
 
