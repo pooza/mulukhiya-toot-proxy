@@ -51,7 +51,7 @@ module Mulukhiya
       return {public: 'public'}.merge(
         [:unlisted, :private, :direct].map do |name|
           [name, Config.instance["/parser/note/visibility/#{name}"]]
-        end.to_h
+        end.to_h,
       )
     end
   end
