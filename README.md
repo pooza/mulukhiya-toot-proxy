@@ -1,5 +1,6 @@
 # mulukhiya-toot-proxy
 
+![release](https://img.shields.io/github/v/release/pooza/mulukhiya-toot-proxy.svg)
 ![test](https://github.com/pooza/mulukhiya-toot-proxy/workflows/test/badge.svg)
 
 各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
