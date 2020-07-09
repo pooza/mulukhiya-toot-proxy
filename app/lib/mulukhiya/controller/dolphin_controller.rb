@@ -4,20 +4,12 @@ module Mulukhiya
       return 'Dolphin'
     end
 
-    def self.webhook?
-      return false
-    end
-
     def self.clipping?
       return true
     end
 
-    def self.announcement?
-      return false
-    end
-
-    def self.filter?
-      return false
+    def self.twitter?
+      return TwitterService.config?
     end
 
     def self.parser_class

@@ -173,6 +173,30 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    def self.webhook?
+      return false
+    end
+
+    def self.clipping?
+      return false
+    end
+
+    def self.announcement?
+      return false
+    end
+
+    def self.filter?
+      return false
+    end
+
+    def self.livecure?
+      return false
+    end
+
+    def self.twitter?
+      return TwitterService.config?
+    end
+
     private
 
     def status_field

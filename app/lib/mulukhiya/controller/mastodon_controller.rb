@@ -128,6 +128,10 @@ module Mulukhiya
       return true
     end
 
+    def self.livecure?
+      return Config.instance['/webui/livecure']
+    end
+
     def self.parser_class
       return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end

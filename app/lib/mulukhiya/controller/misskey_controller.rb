@@ -96,10 +96,6 @@ module Mulukhiya
       return true
     end
 
-    def self.filter?
-      return false
-    end
-
     def self.parser_class
       return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end

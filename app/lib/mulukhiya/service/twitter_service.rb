@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def self.config?
-      return consumer_key && consumer_secret
+      return consumer_key.present? && consumer_secret.present?
     end
   end
 end
