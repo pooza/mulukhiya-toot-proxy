@@ -30,7 +30,6 @@ module Mulukhiya
         scripts: @config['/webui/scripts'],
         stylesheets: @config['/webui/stylesheets'],
         metadata: @config.raw.dig('application', 'webui', 'metadata'),
-        livecure: @config['/webui/livecure'],
         status_label: @config["/#{Environment.controller_name}/status/label"],
       }
     end

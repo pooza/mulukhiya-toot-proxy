@@ -128,8 +128,8 @@ module Mulukhiya
       return true
     end
 
-    def self.twitter?
-      return TwitterService.config?
+    def self.livecure?
+      return Config.instance['/webui/livecure']
     end
 
     def self.parser_class
