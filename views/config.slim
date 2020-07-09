@@ -13,7 +13,7 @@ html lang='ja'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
-      section class='config' v-if='username' v-show='show_growi'
+      section class='config' v-if='username && show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
           .inline-field-container
@@ -24,7 +24,7 @@ html lang='ja'
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
           .field-update-button-container
             button v-on:click='updateGrowi' 更新
-      section class='config' v-if='username' v-show='show_dropbox'
+      section class='config' v-if='username && show_dropbox'
         h3 v-on:click='toggleDropboxSection' Dropbox
         .section-contents v-show='show_dropbox_detail'
           .inline-field-container
@@ -40,7 +40,7 @@ html lang='ja'
             v-select :options='program_options' v-on:input='changeTags' v-model='program'
           .field-update-button-container
             button v-on:click='updateTags' 更新
-      section class='config' v-if='username' v-show='show_livecure'
+      section class='config' v-if='username && show_livecure'
         h3 v-on:click='toggleLivecureSection' = "実況#{status_label}"
         .section-contents v-show='show_livecure_detail'
           .inline-field-container
@@ -48,7 +48,7 @@ html lang='ja'
               input type='checkbox' value='1' v-model='livecure' = "実況#{status_label}を隠す"
           .field-update-button-container
             button v-on:click='updateLivecure' 更新
-      section class='config' v-if='username'
+      section class='config' v-if='username && show_twitter'
         h3 v-on:click='toggleTwitterSection' Twitter
         .section-contents v-show='show_twitter_detail'
           .field-update-button-container
@@ -101,6 +101,7 @@ html lang='ja'
           show_livecure: #{livecure},
           show_growi: #{controller.clipping?},
           show_dropbox: #{controller.clipping?},
+          show_twitter: #{controller.twitter?},
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,

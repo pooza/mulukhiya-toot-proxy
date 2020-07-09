@@ -20,6 +20,10 @@ module Mulukhiya
       return false
     end
 
+    def self.twitter?
+      return TwitterService.config?
+    end
+
     def self.parser_class
       return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end
