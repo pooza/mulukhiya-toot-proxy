@@ -96,7 +96,7 @@ html lang='ja'
           notify_verbose: null,
           livecure: false,
           programs: [],
-          program_options: [],
+          program_options: [{label: '全てのタグを削除', code: 'clear'}],
           program: null,
           show_livecure: #{livecure},
           show_growi: #{controller.clipping?},
@@ -225,6 +225,8 @@ html lang='ja'
                 })
               }
               this.tags = tags.join("\n")
+            } else {
+              this.tags = ''
             }
           },
           toggleGrowiSection: function () {
