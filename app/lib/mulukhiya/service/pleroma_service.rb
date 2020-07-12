@@ -57,6 +57,13 @@ module Mulukhiya
       return @redis
     end
 
+    def statuses(params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.get('/api/v1/timelines/home', {headers: headers})
+    end
+
     def notify(account, message, response = nil)
       toot = {
         PleromaController.status_field => [account.acct.to_s, message].join("\n"),

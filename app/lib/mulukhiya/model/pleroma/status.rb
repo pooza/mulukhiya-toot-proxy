@@ -1,10 +1,11 @@
 module Mulukhiya
   module Pleroma
     class Status
-      attr_reader :data
+      attr_reader :data, :id
 
       def initialize(id)
         @data = PleromaService.new.fetch_status(id).parsed_response
+        @id = id
       end
 
       def acct
