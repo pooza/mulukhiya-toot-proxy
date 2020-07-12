@@ -74,11 +74,9 @@ test:
         - slack
     - name: database
       cases:
-        - account
         - clipping_worker
         - note_uri
         - query_template
-        - status
         - toot_uri
         - user_config
     - name: amazon
