@@ -77,7 +77,6 @@ module Mulukhiya
 
       def recent_status
         note = MisskeyService.new.notes(account_id: id)&.first
-Slack.broadcast(note)
         return Status[note['id']] if note
         return nil
       end
