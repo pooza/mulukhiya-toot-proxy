@@ -73,6 +73,7 @@ test:
         - slack
         - account
         - status
+        - user_config
     - name: postgres
       cases:
         - clipping_worker
