@@ -72,13 +72,17 @@ test:
         - handler
         - mastodon_controller
         - slack
-    - name: database
+    - name: postgres
       cases:
         - clipping_worker
         - note_uri
         - query_template
         - toot_uri
-        - user_config
+    - name: mongo
+      cases:
+        - clipping_worker
+        - note_uri
+        - toot_uri
     - name: amazon
       cases:
         - amazon_service

@@ -1,5 +1,5 @@
 module Mulukhiya
-  class DatabaseTestCaseFilter < TestCaseFilter
+  class PostgresTestCaseFilter < TestCaseFilter
     def active?
       return !Environment.postgres? || !Postgres.config?
     end
