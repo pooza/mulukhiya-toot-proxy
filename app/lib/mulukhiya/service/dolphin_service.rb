@@ -13,7 +13,7 @@ module Mulukhiya
       return nil
     end
 
-    def notes(params = {})
+    def statuses(params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       return @http.post('/api/users/notes', {
@@ -21,6 +21,8 @@ module Mulukhiya
         headers: headers,
       })
     end
+
+    alias notes statuses
 
     def notify(account, message, response = nil)
       note = {

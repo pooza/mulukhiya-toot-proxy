@@ -19,6 +19,15 @@ module Mulukhiya
       return super
     end
 
+    def statuses(params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.get('/api/v1/timelines/home', {headers: headers})
+    end
+
+    alias toots statuses
+
     def announcements(params = {})
       return super.parsed_response
     end
