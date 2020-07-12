@@ -23,10 +23,10 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
-    def notes(options = {})
+    def notes(params = {})
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post('/users/notes', {
+      return @http.post('/api/users/notes', {
         body: {userId: params[:account_id], i: token}.to_json,
         headers: headers,
       })

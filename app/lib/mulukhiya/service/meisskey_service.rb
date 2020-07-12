@@ -37,6 +37,15 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def notes(params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post('/api/users/notes', {
+        body: {userId: params[:account_id], i: token}.to_json,
+        headers: headers,
+      })
+    end
+
     def account
       @account ||= Environment.account_class.get(token: token)
       return @account

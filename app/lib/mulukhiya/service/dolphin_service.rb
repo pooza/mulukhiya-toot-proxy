@@ -13,6 +13,15 @@ module Mulukhiya
       return nil
     end
 
+    def notes(params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return @http.post('/api/users/notes', {
+        body: {userId: params[:account_id], i: token}.to_json,
+        headers: headers,
+      })
+    end
+
     def notify(account, message, response = nil)
       note = {
         DolphinController.status_field => message,
