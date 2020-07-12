@@ -25,6 +25,12 @@ module Mulukhiya
         return @uri
       end
 
+      def recent_status
+        note = MeisskeyService.new.notes(account_id: id)&.first
+        return Status[note['id']] if note
+        return nil
+      end
+
       def admin?
         return isAdmin
       end

@@ -2,8 +2,8 @@ module Mulukhiya
   module Dolphin
     class Account < Mulukhiya::Misskey::Account
       def recent_status
-        rows = Postgres.instance.exec('recent_note', {id: id})
-        return Status[rows.first['id']] if rows.present?
+        note = DolphinService.new.notes(account_id: id)&.first
+        return Status[note['id']] if note
         return nil
       end
 
