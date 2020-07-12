@@ -68,10 +68,11 @@ test:
   filters:
     - name: ci
       cases:
-        - dolphin_controller
-        - handler
         - mastodon_controller
+        - handler
         - slack
+        - account
+        - status
     - name: postgres
       cases:
         - clipping_worker
