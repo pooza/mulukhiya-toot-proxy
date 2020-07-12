@@ -4,18 +4,6 @@ module Mulukhiya
       return 'めいすきー'
     end
 
-    def self.webhook?
-      return true
-    end
-
-    def self.clipping?
-      return true
-    end
-
-    def self.announcement?
-      return true
-    end
-
     def self.parser_class
       return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end
