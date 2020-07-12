@@ -62,7 +62,7 @@ module Mulukhiya
       Meisskey::AccessToken.all do |token|
         values = {
           digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
-          token: token.values[:hash].to_s,
+          token: token.hash,
           account: token.account,
         }
         yield values
