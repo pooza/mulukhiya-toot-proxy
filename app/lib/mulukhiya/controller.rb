@@ -153,6 +153,10 @@ module Mulukhiya
       return Environment.info_agent_service&.notify(@sns.account, message)
     end
 
+    def status_field
+      return Environment.controller_class.status_field
+    end
+
     not_found do
       @renderer = default_renderer_class.new
       @renderer.status = 404
@@ -197,10 +201,8 @@ module Mulukhiya
       return TwitterService.config?
     end
 
-    private
-
-    def status_field
-      return Environment.controller_class.status_field
+    def self.webhook_entries
+      return nil
     end
   end
 end

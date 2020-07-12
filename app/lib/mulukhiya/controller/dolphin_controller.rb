@@ -8,10 +8,6 @@ module Mulukhiya
       return true
     end
 
-    def self.twitter?
-      return TwitterService.config?
-    end
-
     def self.parser_class
       return "Mulukhiya::#{parser_name.camelize}Parser".constantize
     end
@@ -62,10 +58,6 @@ module Mulukhiya
 
     def self.events
       return Config.instance['/dolphin/events'].map(&:to_sym)
-    end
-
-    def self.webhook_entries
-      return nil
     end
   end
 end
