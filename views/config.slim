@@ -45,7 +45,7 @@ html lang='ja'
         .section-contents v-show='show_livecure_detail'
           .inline-field-container
             label
-              input type='checkbox' value='1' v-model='livecure' = "実況#{status_label}を隠す"
+              input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button v-on:click='updateLivecure' 更新
       section class='config' v-if='username && show_twitter'
