@@ -4,8 +4,12 @@ module Mulukhiya
       return 'Dolphin'
     end
 
-    def self.clipping?
-      return true
+    def self.webhook?
+      return false
+    end
+
+    def self.announcement?
+      return false
     end
 
     def self.parser_class

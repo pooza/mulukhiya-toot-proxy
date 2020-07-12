@@ -12,6 +12,7 @@ module Mulukhiya
     end
 
     before do
+      @sns = Environment.sns_class.new
       @reporter = Reporter.new
     end
 
