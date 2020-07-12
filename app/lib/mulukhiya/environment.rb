@@ -63,7 +63,7 @@ module Mulukhiya
     end
 
     def self.meisskey?
-      return controller_name == 'meisskey'
+      return controller_name == 'めいすきー'
     end
 
     def self.pleroma?
