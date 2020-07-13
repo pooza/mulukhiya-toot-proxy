@@ -3,11 +3,9 @@ module Mulukhiya
     class Attachment < Sequel::Model(:objects)
       alias to_h data
 
-      def file_content_type
+      def type
         return data['url'].first['mediaType']
       end
-
-      alias type file_content_type
 
       def uri
         @uri ||= Ginseng::URI.parse(data['url'].first['href'])
