@@ -50,7 +50,7 @@ module Mulukhiya
     end
 
     def clear_oauth_client
-      Redis.new.unlink('oauth_client')
+      redis.unlink('oauth_client')
     end
 
     def redis
