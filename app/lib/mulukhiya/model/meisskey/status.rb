@@ -58,12 +58,13 @@ module Mulukhiya
           return nil unless uri.valid?
           return Status.new(uri.id)
         end
-        entry = collection.find(key).first
-        return Status.new(entry['_id']) if entry
+        return first(key)
       end
 
       def self.first(key)
-        return get(key)
+        entry = collection.find(key).first
+        return Status.new(entry['_id']) if entry
+        return nil
       end
 
       private
