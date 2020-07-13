@@ -3,7 +3,10 @@ module Mulukhiya
     class Attachment < Sequel::Model(:media_attachments)
       many_to_one :status
 
-      alias to_h values
+      def to_h
+        @hash ||= values.clone.compact
+        return @hash
+      end
 
       alias type file_content_type
     end

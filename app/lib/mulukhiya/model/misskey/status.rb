@@ -42,6 +42,7 @@ module Mulukhiya
           @hash = values.clone
           @hash[:uri] = uri.to_s
           @hash[:attachments] = query['files']
+          @hash.compact!
         end
         return @hash
       end
