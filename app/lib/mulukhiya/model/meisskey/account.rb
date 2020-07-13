@@ -8,7 +8,6 @@ module Mulukhiya
           @hash = values.clone
           @hash[:url] = uri.to_s
           @hash.delete('password')
-          @hash.compact!
         end
         return @hash
       end
