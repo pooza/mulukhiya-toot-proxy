@@ -128,6 +128,7 @@ module Mulukhiya
       def self.first(key)
         entry = collection.find(key).first
         return Account.new(entry['_id']) if entry
+        return nil
       end
 
       def self.collection
