@@ -105,6 +105,21 @@ Style/BisectedAttrAccessor:
 Style/RedundantAssignment:
   Enabled: true
 
+Style/ArrayCoercion:
+  Enabled: true
+
+Style/CaseLikeIf:
+  Enabled: true
+
+Style/HashAsLastArrayItem:
+  Enabled: true
+
+Style/HashLikeCase:
+  Enabled: true
+
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
@@ -179,6 +194,9 @@ Lint/RaiseException:
   Enabled: true
 
 Lint/StructNewOverride:
+  Enabled: true
+
+Lint/DuplicateElsifCondition:
   Enabled: true
 
 Lint/DeprecatedOpenSSLConstant:
