@@ -58,19 +58,6 @@ module Mulukhiya
 
       alias locked? locked
 
-      def notify_verbose?
-        return config['/notify/verbose'] == true
-      end
-
-      def disable?(handler_name)
-        return true if config["/handler/#{handler_name}/disable"]
-        return false
-      end
-
-      def tags
-        return config['/tags'] || []
-      end
-
       def self.get(key)
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)

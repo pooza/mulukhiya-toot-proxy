@@ -49,19 +49,6 @@ module Mulukhiya
         return isLocked
       end
 
-      def notify_verbose?
-        return config['/notify/verbose'] == true
-      end
-
-      def disable?(handler_name)
-        return true if config["/handler/#{handler_name}/disable"]
-        return false
-      end
-
-      def tags
-        return config['/tags'] || []
-      end
-
       def self.[](id)
         return Account.new(id)
       end
