@@ -58,6 +58,7 @@ module Mulukhiya
           config: @sns.account.config.to_h,
           filters: @sns.filters&.parsed_response,
           token: @sns.access_token.to_h,
+          visibility_names: Environment.parser_class.visibility_names,
         }
       else
         @renderer.message = {error: 'Invalid token'}
@@ -73,6 +74,7 @@ module Mulukhiya
         config: @sns.account.config.to_h,
         filters: @sns.filters&.parsed_response,
         token: @sns.access_token.to_h,
+        visibility_names: Environment.parser_class.visibility_names,
       }
       return @renderer.to_s
     rescue Ginseng::AuthError, ValidateError => e

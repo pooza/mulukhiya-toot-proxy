@@ -60,6 +60,9 @@ html lang='ja'
           .inline-field-container
             h4 トークン
             input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+          .field-container
+            h4 公開範囲
+            v-select :options='visibility_options' v-model='visibility'
           .field-update-button-container
             button v-on:click='updateWebhook' 更新
           .field-container v-if='webhook_url'
@@ -98,6 +101,8 @@ html lang='ja'
           programs: [],
           program_options: [{label: '全てのタグを削除', code: 'clear'}],
           program: null,
+          visibility_options: [],
+          visibility: null,
           show_livecure: #{controller.livecure?},
           show_growi: #{controller.clipping?},
           show_dropbox: #{controller.clipping?},
@@ -149,6 +154,13 @@ html lang='ja'
                     }
                   })
                 }
+                Object.keys(e.data.visibility_names).map(k => {
+                  const v = e.data.visibility_names[k]
+                  this.visibility_options.push({
+                    label: k == v ? k : `${v} (${k})`,
+                    code: v,
+                  })
+                })
                 this.username = e.data.account.username
               }).catch(e => {
                 this.message = e.message
@@ -315,9 +327,12 @@ html lang='ja'
           updateWebhook: function () {
             'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', webhook: {token: null}}
+            const command = {command: 'user_config', webhook: {token: null, visibility: null}}
             if (this.webhook_token) {
               command.webhook.token = this.webhook_token
+              if (this.visibility.code != 'public') {
+                command.webhook.visibility = this.visibility.code
+              }
             }
             this.updateConfig(values, command)
           },
