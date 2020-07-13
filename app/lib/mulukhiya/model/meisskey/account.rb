@@ -110,6 +110,7 @@ module Mulukhiya
       end
 
       def self.get(key)
+        return Account.new(key[:id]) if key[:id]
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           entry = collection.find(username: acct.username, host: acct.domain).first
@@ -121,12 +122,12 @@ module Mulukhiya
           return Account.new(entry['_id']) if entry
           return AccessToken.get(hash: key[:token]).account
         end
-        entry = collection.find(key).first
-        return Account.new(entry['_id']) if entry
+        return first(key)
       end
 
       def self.first(key)
-        return get(key)
+        entry = collection.find(key).first
+        return Account.new(entry['_id']) if entry
       end
 
       def self.collection

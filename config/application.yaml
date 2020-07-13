@@ -140,7 +140,6 @@ test:
         - pleroma_controller
         - toot_uri
         - postgres
-        - account
     - name: pleroma
       cases:
         - mastodon_controller

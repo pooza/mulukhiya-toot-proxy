@@ -1,7 +1,6 @@
 module Mulukhiya
   class AccountTest < TestCase
     def setup
-      @config = Config.instance
       @account = Environment.test_account
     end
 
