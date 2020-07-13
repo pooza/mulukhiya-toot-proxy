@@ -40,9 +40,9 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        logger.error(e)
+        @logger.error(e)
         template = Template.new('note_clipping.md')
-        template[:account] = account.to_h
+        template[:account] = account
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
@@ -58,13 +58,13 @@ module Mulukhiya
           return nil unless uri.valid?
           return Status.new(uri.id)
         end
-        return first(key)
-      end
-
-      def self.first(key)
         entry = collection.find(key).first
         return Status.new(entry['_id']) if entry
         return nil
+      end
+
+      def self.first(key)
+        return get(key)
       end
 
       private
