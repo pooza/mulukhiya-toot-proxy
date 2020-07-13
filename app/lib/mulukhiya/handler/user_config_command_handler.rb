@@ -14,6 +14,7 @@ module Mulukhiya
     def command_params
       params = parser.params.clone
       params['tags'] ||= []
+      params['webhook'] ||= {}
       params['growi'] ||= {}
       params['dropbox'] ||= {}
       params['notify'] ||= {}
