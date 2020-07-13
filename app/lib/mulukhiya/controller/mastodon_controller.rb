@@ -1,7 +1,6 @@
 module Mulukhiya
   class MastodonController < Controller
     before do
-      @sns = MastodonService.new
       if params[:token].present? && request.path.match?(%r{/(mulukhiya|auth)})
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
@@ -32,6 +31,7 @@ module Mulukhiya
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         response: :raw,
+        filename: params[:file][:filename],
         version: params[:captures].first.to_i,
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})

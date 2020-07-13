@@ -3,6 +3,10 @@ module Mulukhiya
     json do
       required(:command).value(:string)
       required(:tags).maybe(:array).each(:string)
+      required(:webhook).maybe(:hash).schema do
+        optional(:token).maybe(:string)
+        optional(:visibility).maybe(:string)
+      end
       required(:growi).maybe(:hash).schema do
         optional(:url).maybe(:string)
         optional(:token).maybe(:string)

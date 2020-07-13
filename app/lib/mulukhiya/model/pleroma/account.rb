@@ -87,8 +87,9 @@ module Mulukhiya
       end
 
       def recent_status
-        rows = Postgres.instance.exec('recent_status', {actor: ap_id})
-        return Status[rows.first['id']] if rows.present?
+        notes = PleromaService.new.statuses(account_id: id)
+        note = notes.parsed_response&.first
+        return Status[note['id']] if note
         return nil
       end
 

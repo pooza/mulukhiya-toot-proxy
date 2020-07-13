@@ -76,8 +76,9 @@ module Mulukhiya
       end
 
       def recent_status
-        rows = Postgres.instance.exec('recent_note', {id: id})
-        return Status[rows.first['id']] if rows.present?
+        notes = MisskeyService.new.notes(account_id: id)
+        note = notes.parsed_response&.first
+        return Status[note['id']] if note
         return nil
       end
 

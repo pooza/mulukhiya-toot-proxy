@@ -1,5 +1,5 @@
 package:
-  version: 3.10.7
+  version: 3.10.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -68,19 +68,23 @@ test:
   filters:
     - name: ci
       cases:
-        - dolphin_controller
-        - handler
         - mastodon_controller
+        - handler
         - slack
-    - name: database
-      cases:
         - account
+        - status
+        - user_config
+    - name: postgres
+      cases:
         - clipping_worker
         - note_uri
         - query_template
-        - status
         - toot_uri
-        - user_config
+    - name: mongo
+      cases:
+        - clipping_worker
+        - note_uri
+        - toot_uri
     - name: amazon
       cases:
         - amazon_service
@@ -136,6 +140,7 @@ test:
         - pleroma_controller
         - toot_uri
         - postgres
+        - account
     - name: pleroma
       cases:
         - mastodon_controller
@@ -144,7 +149,6 @@ test:
         - meisskey_controller
         - note_uri
         - mongo
-        - status
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -556,6 +560,7 @@ pleroma:
     scopes:
       - write:statuses
       - write:media
+      - read:statuses
   events:
     - pre_toot
     - post_toot
