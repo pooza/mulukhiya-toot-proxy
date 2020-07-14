@@ -4,10 +4,7 @@ module Mulukhiya
       many_to_one :account, key: :resource_owner_id
 
       def to_h
-        unless @hash
-          @hash = values.clone
-          @hash.compact!
-        end
+        @hash ||= values.clone.compact
         return @hash
       end
     end

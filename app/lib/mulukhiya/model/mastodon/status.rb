@@ -26,7 +26,10 @@ module Mulukhiya
         return @uri
       end
 
-      alias to_h values
+      def to_h
+        @hash ||= values.clone.compact
+        return @hash
+      end
 
       def to_md
         return uri.to_md

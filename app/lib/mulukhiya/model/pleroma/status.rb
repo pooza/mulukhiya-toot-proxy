@@ -45,7 +45,10 @@ module Mulukhiya
         return template.to_s
       end
 
-      alias to_h data
+      def to_h
+        @hash ||= data.clone.compact
+        return @hash
+      end
 
       def self.[](id)
         return Status.new(id)

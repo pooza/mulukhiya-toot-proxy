@@ -1,12 +1,8 @@
 module Mulukhiya
   module Meisskey
     class Attachment < CollectionModel
-      def file_content_type
-        return contentType
-      end
-
       def type
-        return file_content_type
+        return contentType
       end
 
       def uri

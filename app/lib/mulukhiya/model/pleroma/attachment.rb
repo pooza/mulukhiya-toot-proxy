@@ -1,13 +1,9 @@
 module Mulukhiya
   module Pleroma
     class Attachment < Sequel::Model(:objects)
-      alias to_h data
-
-      def file_content_type
+      def type
         return data['url'].first['mediaType']
       end
-
-      alias type file_content_type
 
       def uri
         @uri ||= Ginseng::URI.parse(data['url'].first['href'])
@@ -17,6 +13,11 @@ module Mulukhiya
       def data
         @data ||= JSON.parse(values[:data])
         return @data
+      end
+
+      def to_h
+        @hash ||= data.clone.compact
+        return @hash
       end
     end
   end

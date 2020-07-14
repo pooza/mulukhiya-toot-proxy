@@ -29,6 +29,7 @@ module Mulukhiya
           @hash = values.clone
           @hash[:uri] = uri.to_s
           @hash[:attachments] = attachments.map(&:to_h)
+          @hash.compact!
         end
         return @hash
       end
@@ -40,9 +41,9 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        logger.error(e)
+        @logger.error(e)
         template = Template.new('note_clipping.md')
-        template[:account] = account.to_h
+        template[:account] = account
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
@@ -60,6 +61,7 @@ module Mulukhiya
         end
         entry = collection.find(key).first
         return Status.new(entry['_id']) if entry
+        return nil
       end
 
       def self.first(key)

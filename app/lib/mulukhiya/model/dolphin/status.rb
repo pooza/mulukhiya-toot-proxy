@@ -1,10 +1,7 @@
 module Mulukhiya
   module Dolphin
     class Status < Mulukhiya::Misskey::Status
-      def account
-        @account ||= Account[userId]
-        return @account
-      end
+      many_to_one :account, key: :userId
     end
   end
 end
