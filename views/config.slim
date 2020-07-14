@@ -102,7 +102,7 @@ html lang='ja'
           program_options: [{label: '全てのタグを削除', code: 'clear'}],
           program: null,
           visibility_options: [],
-          visibility: null,
+          visibility: 'public',
           show_livecure: #{controller.livecure?},
           show_growi: #{controller.clipping?},
           show_dropbox: #{controller.clipping?},
@@ -131,6 +131,7 @@ html lang='ja'
                 if (e.data.config.webhook) {
                   this.webhook_token = e.data.config.webhook.token
                   this.webhook_url = e.data.config.webhook.url
+                  this.visibility = e.data.config.webhook.visibility || 'public'
                   this.curl_sample = `curl -H 'Content-Type: application/json' -X POST -d '{"text":"わたしが斬るのは、あなたじゃない！\\n絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。\\nそれがわたし。王女様からもらった名前、キュアソードよ！"}' ${e.data.config.webhook.url}`
                 }
                 if (e.data.config.tags) {
