@@ -5,23 +5,6 @@ module Mulukhiya
   class MeisskeyService < Ginseng::Fediverse::MeisskeyService
     include Package
 
-    def announcements(params = {})
-      headers = params[:headers] || {}
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      r = @http.get('/api/meta', {
-        body: {i: token}.to_json,
-        headers: headers,
-      })
-      raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-      return r['announcements'].map do |entry|
-        {
-          'id' => Digest::SHA1.hexdigest(entry.to_json),
-          'title' => entry['title'],
-          'text' => entry['text'],
-        }
-      end
-    end
-
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
@@ -36,17 +19,6 @@ module Mulukhiya
     ensure
       FileUtils.rm_rf(dir) if dir
     end
-
-    def statuses(params = {})
-      headers = params[:headers] || {}
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post('/api/users/notes', {
-        body: {userId: params[:account_id], i: token}.to_json,
-        headers: headers,
-      })
-    end
-
-    alias notes statuses
 
     def account
       @account ||= Environment.account_class.get(token: token)

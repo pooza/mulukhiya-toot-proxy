@@ -4,10 +4,6 @@ module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
 
-    def announcements(params = {})
-      return super.parsed_response
-    end
-
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
@@ -22,17 +18,6 @@ module Mulukhiya
     ensure
       FileUtils.rm_rf(dir) if dir
     end
-
-    def statuses(params = {})
-      headers = params[:headers] || {}
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return @http.post('/api/users/notes', {
-        body: {userId: params[:account_id], i: token}.to_json,
-        headers: headers,
-      })
-    end
-
-    alias notes statuses
 
     def account
       @account ||= Environment.account_class.get(token: token)
