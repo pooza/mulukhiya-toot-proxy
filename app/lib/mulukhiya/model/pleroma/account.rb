@@ -39,7 +39,7 @@ module Mulukhiya
 
       def recent_status
         notes = PleromaService.new.statuses(account_id: id)
-        note = notes.parsed_response&.first
+        note = notes&.first
         return Status[note['id']] if note
         return nil
       end

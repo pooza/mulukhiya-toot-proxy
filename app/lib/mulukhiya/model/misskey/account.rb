@@ -29,7 +29,7 @@ module Mulukhiya
 
       def recent_status
         notes = MisskeyService.new.notes(account_id: id)
-        note = notes.parsed_response&.first
+        note = notes&.first
         return Status[note['id']] if note
         return nil
       end
