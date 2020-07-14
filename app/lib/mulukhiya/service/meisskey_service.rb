@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'digest/sha1'
 
 module Mulukhiya
   class MeisskeyService < Ginseng::Fediverse::MeisskeyService
