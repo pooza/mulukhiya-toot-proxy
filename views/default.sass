@@ -273,9 +273,11 @@ a:hover
 
 .v-select
   margin: 0 0.5em
-  width: 400px
+  width: 500px
   font:
     size: 0.8em
+  .vs__clear
+    display: none
 
 .field-container
   .alert
@@ -305,6 +307,18 @@ a:hover
   label
     font:
       size: 0.8em
+  .v-select
+    display: inline-block
+    margin: 0
+    input
+      border: none
+      height: 1em
+    .vs__selected
+      height: 1em
+    .vs__selected-options
+      width: 450px
+      height: 1em
+      margin: 6px 0
 
 .field-update-button-container
   text:

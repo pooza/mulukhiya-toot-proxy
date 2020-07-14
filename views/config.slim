@@ -60,7 +60,7 @@ html lang='ja'
           .inline-field-container
             h4 トークン
             input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
-          .field-container
+          .inline-field-container
             h4 公開範囲
             v-select :options='visibility_options' v-model='visibility'
           .field-update-button-container
