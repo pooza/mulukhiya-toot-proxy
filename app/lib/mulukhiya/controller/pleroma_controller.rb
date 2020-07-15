@@ -74,7 +74,7 @@ module Mulukhiya
         next unless token.valid?
         values = {
           digest: token.webhook_digest,
-          token: token.token,
+          token: token.to_s,
           account: token.account,
         }
         yield values

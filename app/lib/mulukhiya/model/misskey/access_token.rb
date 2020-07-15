@@ -12,6 +12,8 @@ module Mulukhiya
         return Webhook.create_digest(Config.instance['/misskey/url'], values[:hash])
       end
 
+      alias to_s token
+
       def to_h
         unless @hash
           @hash = values.clone

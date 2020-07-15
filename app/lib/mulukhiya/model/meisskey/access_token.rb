@@ -15,6 +15,8 @@ module Mulukhiya
         return @hash
       end
 
+      alias to_s hash
+
       def hash
         return values['hash']
       end

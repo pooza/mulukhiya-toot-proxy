@@ -153,7 +153,7 @@ module Mulukhiya
         next unless token.valid?
         values = {
           digest: token.webhook_digest,
-          token: token.values[:hash],
+          token: token.to_s,
           account: token.account,
         }
         yield values

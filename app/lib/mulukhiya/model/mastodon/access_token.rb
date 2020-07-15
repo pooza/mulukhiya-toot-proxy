@@ -12,6 +12,8 @@ module Mulukhiya
         return Webhook.create_digest(Config.instance['/mastodon/url'], token)
       end
 
+      alias to_s token
+
       def to_h
         @hash ||= values.clone.compact
         return @hash
