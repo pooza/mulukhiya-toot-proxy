@@ -135,19 +135,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def response_error?
-      return 400 <= @reporter.response&.code
-    end
-
-    def notify(message)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(@sns.account, message)
-    end
-
-    def status_field
-      return Environment.controller_class.status_field
-    end
-
     not_found do
       @renderer = default_renderer_class.new
       @renderer.status = 404
