@@ -14,6 +14,15 @@ module Mulukhiya
         return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
+      def scopes
+        matches = values[:scopes].match(%r{{(.*?)}})[1]
+        return matches.split(',') if matches
+        return Ginseng::GatewayError, "Invalid scopes '#{values[:scopes]}'"
+      rescue => e
+        raise Logger.new.error(e)
+        return []
+      end
+
       alias to_s token
 
       def to_h
