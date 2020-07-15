@@ -187,10 +187,12 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Postgres.instance.exec('webhook_tokens').each do |row|
+        token = Mastodon::AccessToken[row['id']]
+        next unless token.valid?
         values = {
-          digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
-          token: row['token'],
-          account: Environment.account_class[row['account_id']],
+          digest: Webhook.create_digest(config['/mastodon/url'], token.token),
+          token: token.token,
+          account: token.account,
         }
         yield values
       end

@@ -1,9 +1,6 @@
 <%# encoding: UTF-8 -%>
 SELECT
-  tokens.id,
-  tokens.token,
-  tokens.scopes,
-  accounts.id AS account_id
+  tokens.id
 FROM oauth_access_tokens AS tokens
   INNER JOIN oauth_applications AS apps ON tokens.application_id=apps.id
   INNER JOIN users ON tokens.resource_owner_id=users.id
