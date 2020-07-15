@@ -73,7 +73,7 @@ module Mulukhiya
       Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|
         next unless token.valid?
         values = {
-          digest: Webhook.create_digest(config['/pleroma/url'], token.token),
+          digest: token.webhook_digest,
           token: token.token,
           account: token.account,
         }

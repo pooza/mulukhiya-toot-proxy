@@ -8,6 +8,10 @@ module Mulukhiya
         return account && token && application.name == Package.name
       end
 
+      def webhook_digest
+        return Webhook.create_digest(Config.instance['/misskey/url'], values[:hash])
+      end
+
       def to_h
         unless @hash
           @hash = values.clone

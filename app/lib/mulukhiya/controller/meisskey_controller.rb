@@ -61,7 +61,7 @@ module Mulukhiya
       Meisskey::AccessToken.all.reverse_each do |token|
         next unless token.valid?
         values = {
-          digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
+          digest: token.webhook_digest,
           token: token.hash,
           account: token.account,
         }

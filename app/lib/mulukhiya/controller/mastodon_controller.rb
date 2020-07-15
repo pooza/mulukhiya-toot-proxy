@@ -190,7 +190,7 @@ module Mulukhiya
         token = Mastodon::AccessToken[row['id']]
         next unless token.valid?
         values = {
-          digest: Webhook.create_digest(config['/mastodon/url'], token.token),
+          digest: token.webhook_digest,
           token: token.token,
           account: token.account,
         }

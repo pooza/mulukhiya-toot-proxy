@@ -8,6 +8,10 @@ module Mulukhiya
         return expires_in.nil? && revoked_at.nil? && application.name == Package.name
       end
 
+      def webhook_digest
+        return Webhook.create_digest(Config.instance['/mastodon/url'], token)
+      end
+
       def to_h
         @hash ||= values.clone.compact
         return @hash

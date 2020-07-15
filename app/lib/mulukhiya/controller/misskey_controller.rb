@@ -152,7 +152,7 @@ module Mulukhiya
       Misskey::AccessToken.order(Sequel.desc(:createdAt)).all do |token|
         next unless token.valid?
         values = {
-          digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
+          digest: token.webhook_digest,
           token: token.values[:hash],
           account: token.account,
         }

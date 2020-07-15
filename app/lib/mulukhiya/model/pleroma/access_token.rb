@@ -8,6 +8,10 @@ module Mulukhiya
         return account && token && application.name == Package.name
       end
 
+      def webhook_digest
+        return Webhook.create_digest(Config.instance['/pleroma/url'], token)
+      end
+
       def to_h
         @hash ||= values.clone.compact
         return @hash
