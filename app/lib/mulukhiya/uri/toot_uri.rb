@@ -37,7 +37,7 @@ module Mulukhiya
       template[:account] = toot['account']
       template[:status] = TootParser.new(toot['content']).to_md
       template[:attachments] = toot['media_attachments']
-      template[:url] = toot['url']
+      template[:url] = self
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
@@ -54,6 +54,7 @@ module Mulukhiya
         else
           @service = MastodonService.new(uri)
         end
+        @service.token = nil unless uri.host == Environment.domain_name
       end
       return @service
     end

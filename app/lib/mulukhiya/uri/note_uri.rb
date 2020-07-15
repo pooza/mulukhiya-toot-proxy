@@ -50,8 +50,8 @@ module Mulukhiya
           @service = Environment.sns_class.new(uri)
         else
           @service = MisskeyService.new(uri)
-          @service.token = nil
         end
+        @service.token = nil unless uri.host == Environment.domain_name
       end
       return @service
     end
