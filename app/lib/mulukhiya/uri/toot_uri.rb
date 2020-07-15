@@ -23,10 +23,17 @@ module Mulukhiya
     end
 
     def local?
+      acct = Acct.new(toot['account']['acct'])
+      return true if acct.host.nil?
+      return true if acct.host == Environment.domain_name
+      return false
+    rescue => e
+      @logger.error(e)
+      return false
     end
 
     def to_md
-      template = Template.new('toot_clipping.md')
+      template = Template.new('status_clipping.md')
       template[:account] = toot['account']
       template[:status] = TootParser.new(toot['content']).to_md
       template[:attachments] = toot['media_attachments']
@@ -34,17 +41,6 @@ module Mulukhiya
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
-    end
-
-    private
-
-    def toot
-      unless @toot
-        @toot = service.fetch_status(id)
-        raise "Toot '#{self}' not found" unless toot
-        raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
-      end
-      return @toot
     end
 
     def service
@@ -61,5 +57,16 @@ module Mulukhiya
       end
       return @service
     end
+
+    def toot
+      unless @toot
+        @toot = service.fetch_status(id)
+        raise "Toot '#{self}' not found" unless @toot
+        raise "Toot '#{self}' is invalid (#{toot['error']})" if @toot['error']
+      end
+      return @toot
+    end
+
+    alias status toot
   end
 end

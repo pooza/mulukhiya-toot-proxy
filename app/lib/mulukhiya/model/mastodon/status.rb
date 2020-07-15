@@ -39,7 +39,7 @@ module Mulukhiya
         return uri.to_md
       rescue => e
         logger.error(e)
-        template = Template.new('toot_clipping.md')
+        template = Template.new('status_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md
         template[:url] = uri.to_s
