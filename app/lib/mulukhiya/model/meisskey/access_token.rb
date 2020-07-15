@@ -15,10 +15,6 @@ module Mulukhiya
         return @hash
       end
 
-      def webhook_digest
-        return Webhook.create_digest(Config.instance['/meisskey/url'], hash)
-      end
-
       def hash
         return values['hash']
       end
