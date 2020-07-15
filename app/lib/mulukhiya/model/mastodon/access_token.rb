@@ -18,6 +18,10 @@ module Mulukhiya
 
       alias to_s token
 
+      def scopes
+        return values[:scopes].split(/\s+/)
+      end
+
       def to_h
         unless @hash
           @hash = values.clone
