@@ -41,7 +41,7 @@ module Mulukhiya
       end
 
       def webhook_digest
-        return Webhook.create_digest(Config.instance['/meisskey/url'], to_s)
+        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def self.[](id)
