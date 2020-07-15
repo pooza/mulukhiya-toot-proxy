@@ -294,6 +294,8 @@ misskey:
   handlers:
     pre_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - mention_visibility
       - shortened_url
       - url_normalize
@@ -312,6 +314,8 @@ misskey:
       - invalid_command
     post_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - tweet
       - result_notification
     pre_webhook:
@@ -373,6 +377,8 @@ meisskey:
   handlers:
     pre_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - mention_visibility
       - shortened_url
       - url_normalize
@@ -391,6 +397,8 @@ meisskey:
       - invalid_command
     post_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - tweet
       - result_notification
     pre_webhook:
@@ -452,6 +460,8 @@ dolphin:
   handlers:
     pre_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - mention_visibility
       - shortened_url
       - url_normalize
@@ -469,6 +479,8 @@ dolphin:
       - invalid_command
     post_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - result_notification
     pre_upload:
       - image_format_convert
@@ -504,6 +516,8 @@ pleroma:
   handlers:
     pre_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - mention_visibility
       - amazon_image
       - you_tube_image
@@ -524,6 +538,8 @@ pleroma:
       - invalid_command
     post_toot:
       - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
       - tweet
       - result_notification
     pre_webhook:

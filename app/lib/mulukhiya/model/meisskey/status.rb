@@ -5,6 +5,14 @@ module Mulukhiya
         return Account.new(values['userId'])
       end
 
+      def acct
+        return account.acct
+      end
+
+      def local?
+        return acct.host == Environment.domain_name
+      end
+
       def visible?
         return visibility == 'public'
       end

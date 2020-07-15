@@ -22,10 +22,10 @@ module Mulukhiya
       return absolute? && id.present?
     end
 
+    def local?
+    end
+
     def to_md
-      toot = service.fetch_status(id)
-      raise "Toot '#{self}' not found" unless toot
-      raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
       template = Template.new('toot_clipping.md')
       template[:account] = toot['account']
       template[:status] = TootParser.new(toot['content']).to_md
@@ -34,6 +34,17 @@ module Mulukhiya
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
+    end
+
+    private
+
+    def toot
+      unless @toot
+        @toot = service.fetch_status(id)
+        raise "Toot '#{self}' not found" unless toot
+        raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
+      end
+      return @toot
     end
 
     def service

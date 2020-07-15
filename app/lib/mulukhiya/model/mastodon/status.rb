@@ -9,6 +9,10 @@ module Mulukhiya
         return @logger
       end
 
+      def acct
+        return account.acct
+      end
+
       alias local? local
 
       def visible?

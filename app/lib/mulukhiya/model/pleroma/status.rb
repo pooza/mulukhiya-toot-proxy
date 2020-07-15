@@ -16,6 +16,10 @@ module Mulukhiya
         return @acct
       end
 
+      def local?
+        return acct.host == Environment.domain_name
+      end
+
       def account
         @account ||= Account.get(acct: acct)
         return @account

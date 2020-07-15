@@ -20,10 +20,11 @@ module Mulukhiya
       return absolute? && id.present?
     end
 
+    def local?
+      return note.local?
+    end
+
     def to_md
-      note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
-      raise "Note '#{self}' not found" unless note
-      raise "Note '#{self}' not found" unless note.visible?
       template = Template.new('note_clipping.md')
       template[:account] = note.account
       template[:status] = NoteParser.new(note.text).to_md
@@ -34,19 +35,16 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
-    def service
-      unless @service
-        uri = clone
-        uri.path = '/'
-        uri.query = nil
-        uri.fragment = nil
-        if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
-          @service = Environment.sns_class.new(uri)
-        else
-          @service = MisskeyService.new(uri)
-        end
+    private
+
+    def note
+      unless @note
+        @note = Environment.status_class.first(uri: to_s)
+        @note ||= Environment.status_class[id] if host == Environment.domain_name
+        raise "Note '#{self}' not found" unless @note
+        raise "Note '#{self}' not found" unless @note.visible?
       end
-      return @service
+      return @note
     end
   end
 end
