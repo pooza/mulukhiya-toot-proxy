@@ -5,6 +5,8 @@ module Mulukhiya
         return Application.new(id)
       end
 
+      alias scopes permissions
+
       private
 
       def collection_name

@@ -37,7 +37,7 @@ module Mulukhiya
       end
 
       def scopes
-        return application.permission
+        return application.scopes
       end
 
       def webhook_digest
