@@ -32,7 +32,6 @@ module Mulukhiya
     end
 
     def test_scopes
-      pp @token.scopes
       assert_kind_of(Array, @token.scopes)
     end
   end
