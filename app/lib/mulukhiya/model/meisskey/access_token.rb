@@ -1,6 +1,10 @@
 module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
+      def valid?
+        return account && token && application.name == Package.name
+      end
+
       def to_h
         unless @hash
           @hash = values.clone
@@ -42,7 +46,8 @@ module Mulukhiya
       end
 
       def self.all
-        collection.find.reverse_each do |token|
+        return enum_for(__method__) unless block_given?
+        collection.find.each do |token|
           yield AccessToken.new(token['_id'])
         end
       end

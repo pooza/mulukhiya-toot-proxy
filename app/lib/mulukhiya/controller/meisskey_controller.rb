@@ -58,7 +58,8 @@ module Mulukhiya
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      Meisskey::AccessToken.all do |token|
+      Meisskey::AccessToken.all.reverse_each do |token|
+        next unless token.valid?
         values = {
           digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
           token: token.hash,
