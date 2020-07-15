@@ -5,7 +5,11 @@ module Mulukhiya
       many_to_one :application, key: :application_id
 
       def valid?
-        return expires_in.nil? && revoked_at.nil? && application.name == Package.name
+        return false unless expires_in.nil?
+        return false unless revoked_at.nil?
+        return false unless to_s.present?
+        return false unless account
+        return application.name == Package.name
       end
 
       def webhook_digest

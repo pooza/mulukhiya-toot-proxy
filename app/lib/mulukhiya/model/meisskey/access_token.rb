@@ -2,13 +2,15 @@ module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
       def valid?
-        return account && token && application.name == Package.name
+        return false unless to_s.present?
+        return false unless account
+        return application.name == Package.name
       end
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash.delete('token')
+          @hash = values.clone.deep_symbolize_keys
+          @hash.delete(:hash)
           @hash.merge!(
             digest: webhook_digest,
             token: to_s,
@@ -20,11 +22,11 @@ module Mulukhiya
         return @hash
       end
 
-      alias to_s hash
-
-      def hash
+      def token
         return values['hash']
       end
+
+      alias to_s token
 
       def account
         return Account.new(values['userId'])

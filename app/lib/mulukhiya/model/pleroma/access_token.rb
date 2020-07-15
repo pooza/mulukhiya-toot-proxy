@@ -5,7 +5,9 @@ module Mulukhiya
       many_to_one :application, key: :app_id
 
       def valid?
-        return account && token && application.name == Package.name
+        return false unless to_s.present?
+        return false unless account
+        return application.name == Package.name
       end
 
       def webhook_digest
