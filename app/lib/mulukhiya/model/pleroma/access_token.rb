@@ -9,13 +9,21 @@ module Mulukhiya
       end
 
       def webhook_digest
-        return Webhook.create_digest(Config.instance['/pleroma/url'], token)
+        return Webhook.create_digest(Config.instance['/pleroma/url'], to_s)
       end
 
       alias to_s token
 
       def to_h
-        @hash ||= values.clone.compact
+        unless @hash
+          @hash = values.clone.compact
+          @hash.merge!(
+            digest: webhook_digest,
+            token: to_s,
+            account: account,
+            scopes: scopes,
+          )
+        end
         return @hash
       end
     end

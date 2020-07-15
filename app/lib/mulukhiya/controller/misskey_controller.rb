@@ -150,13 +150,7 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Misskey::AccessToken.order(Sequel.desc(:createdAt)).all do |token|
-        next unless token.valid?
-        values = {
-          digest: token.webhook_digest,
-          token: token.to_s,
-          account: token.account,
-        }
-        yield values
+        yield token.to_h if token.valid?
       end
     end
   end

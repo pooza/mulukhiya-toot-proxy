@@ -9,7 +9,12 @@ module Mulukhiya
         unless @hash
           @hash = values.clone
           @hash.delete('token')
-          @hash['scopes'] = scopes
+          @hash.merge!(
+            digest: webhook_digest,
+            token: to_s,
+            account: account,
+            scopes: scopes,
+          )
           @hash.compact!
         end
         return @hash
@@ -34,7 +39,7 @@ module Mulukhiya
       end
 
       def webhook_digest
-        return Webhook.create_digest(Config.instance['/meisskey/url'], hash)
+        return Webhook.create_digest(Config.instance['/meisskey/url'], to_s)
       end
 
       def self.[](id)

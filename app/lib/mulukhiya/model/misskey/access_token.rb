@@ -9,16 +9,22 @@ module Mulukhiya
       end
 
       def webhook_digest
-        return Webhook.create_digest(Config.instance['/misskey/url'], values[:hash])
+        return Webhook.create_digest(Config.instance['/misskey/url'], to_s)
       end
 
-      alias to_s token
+      def to_s
+        return values[:hash]
+      end
 
       def to_h
         unless @hash
           @hash = values.clone
-          @hash.delete(:token)
-          @hash[:scopes] = scopes
+          @hash.merge!(
+            digest: webhook_digest,
+            token: to_s,
+            account: account,
+            scopes: scopes,
+          )
           @hash.compact!
         end
         return @hash
