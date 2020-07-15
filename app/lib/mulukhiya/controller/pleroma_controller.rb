@@ -71,8 +71,7 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|
-        next unless token.account
-        next unless token.token
+        next unless token.valid?
         values = {
           digest: Webhook.create_digest(config['/pleroma/url'], token.token),
           token: token.token,
