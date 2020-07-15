@@ -4,6 +4,10 @@ module Mulukhiya
       many_to_one :account, key: :userId
       many_to_one :application, key: :appId
 
+      def valid?
+        return account && token && application.name == Package.name
+      end
+
       def to_h
         unless @hash
           @hash = values.clone

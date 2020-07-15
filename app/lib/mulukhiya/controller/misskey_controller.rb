@@ -150,6 +150,7 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Misskey::AccessToken.order(Sequel.desc(:createdAt)).all do |token|
+        next unless token.valid?
         values = {
           digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
           token: token.values[:hash],
