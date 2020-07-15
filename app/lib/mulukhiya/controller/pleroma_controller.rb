@@ -33,27 +33,27 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/pleroma/dbms']
+      return config['/pleroma/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/pleroma/parser']
+      return config['/pleroma/parser']
     end
 
     def self.status_field
-      return Config.instance['/pleroma/status/field']
+      return config['/pleroma/status/field']
     end
 
     def self.status_key
-      return Config.instance['/pleroma/status/key']
+      return config['/pleroma/status/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/pleroma/poll/options/field']
+      return config['/pleroma/poll/options/field']
     end
 
     def self.attachment_key
-      return Config.instance['/pleroma/attachment/key']
+      return config['/pleroma/attachment/key']
     end
 
     def self.visibility_name(name)
@@ -61,16 +61,15 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/pleroma/status/label']
+      return config['/pleroma/status/label']
     end
 
     def self.events
-      return Config.instance['/pleroma/events'].map(&:to_sym)
+      return config['/pleroma/events'].map(&:to_sym)
     end
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      config = Config.instance
       Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|
         next unless token.account
         next unless token.token

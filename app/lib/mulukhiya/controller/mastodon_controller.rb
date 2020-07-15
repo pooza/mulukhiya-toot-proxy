@@ -129,7 +129,7 @@ module Mulukhiya
     end
 
     def self.livecure?
-      return Config.instance['/webui/livecure']
+      return config['/webui/livecure']
     end
 
     def self.parser_class
@@ -149,27 +149,27 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/mastodon/dbms']
+      return config['/mastodon/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/mastodon/parser']
+      return config['/mastodon/parser']
     end
 
     def self.status_field
-      return Config.instance['/mastodon/status/field']
+      return config['/mastodon/status/field']
     end
 
     def self.status_key
-      return Config.instance['/mastodon/status/key']
+      return config['/mastodon/status/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/mastodon/poll/options/field']
+      return config['/mastodon/poll/options/field']
     end
 
     def self.attachment_key
-      return Config.instance['/mastodon/attachment/key']
+      return config['/mastodon/attachment/key']
     end
 
     def self.visibility_name(name)
@@ -177,16 +177,15 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/mastodon/status/label']
+      return config['/mastodon/status/label']
     end
 
     def self.events
-      return Config.instance['/mastodon/events'].map(&:to_sym)
+      return config['/mastodon/events'].map(&:to_sym)
     end
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      config = Config.instance
       Postgres.instance.exec('webhook_tokens').each do |row|
         values = {
           digest: Webhook.create_digest(config['/mastodon/url'], row['token']),
