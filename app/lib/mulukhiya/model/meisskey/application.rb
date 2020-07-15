@@ -5,7 +5,9 @@ module Mulukhiya
         return Application.new(id)
       end
 
-      alias scopes permissions
+      def scopes
+        return permission
+      end
 
       private
 
