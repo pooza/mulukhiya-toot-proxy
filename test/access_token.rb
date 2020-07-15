@@ -30,5 +30,10 @@ module Mulukhiya
       assert(@token.to_h.key?(:account))
       assert(@token.to_h.key?(:scopes))
     end
+
+    def test_scopes
+      pp @token.scopes
+      assert_kind_of(Array, @token.scopes)
+    end
   end
 end
