@@ -112,27 +112,27 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/misskey/dbms']
+      return config['/misskey/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/misskey/parser']
+      return config['/misskey/parser']
     end
 
     def self.status_field
-      return Config.instance['/misskey/status/field']
+      return config['/misskey/status/field']
     end
 
     def self.status_key
-      return Config.instance['/misskey/status/key']
+      return config['/misskey/status/key']
     end
 
     def self.attachment_key
-      return Config.instance['/misskey/attachment/key']
+      return config['/misskey/attachment/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/misskey/poll/options/field']
+      return config['/misskey/poll/options/field']
     end
 
     def self.visibility_name(name)
@@ -140,23 +140,17 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/misskey/status/label']
+      return config['/misskey/status/label']
     end
 
     def self.events
-      return Config.instance['/misskey/events'].map(&:to_sym)
+      return config['/misskey/events'].map(&:to_sym)
     end
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      config = Config.instance
       Misskey::AccessToken.order(Sequel.desc(:createdAt)).all do |token|
-        values = {
-          digest: Webhook.create_digest(config['/misskey/url'], token.values[:hash]),
-          token: token.values[:hash],
-          account: token.account,
-        }
-        yield values
+        yield token.to_h if token.valid?
       end
     end
   end

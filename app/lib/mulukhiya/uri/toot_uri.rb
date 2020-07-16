@@ -22,15 +22,19 @@ module Mulukhiya
       return absolute? && id.present?
     end
 
+    def local?
+      return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
+    rescue => e
+      @logger.error(e)
+      return false
+    end
+
     def to_md
-      toot = service.fetch_status(id)
-      raise "Toot '#{self}' not found" unless toot
-      raise "Toot '#{self}' not found (#{toot['error']})" if toot['error']
-      template = Template.new('toot_clipping.md')
+      template = Template.new('status_clipping.md')
       template[:account] = toot['account']
       template[:status] = TootParser.new(toot['content']).to_md
       template[:attachments] = toot['media_attachments']
-      template[:url] = toot['url']
+      template[:url] = self
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
@@ -47,8 +51,20 @@ module Mulukhiya
         else
           @service = MastodonService.new(uri)
         end
+        @service.token = nil unless uri.host == Environment.domain_name
       end
       return @service
     end
+
+    def toot
+      unless @toot
+        @toot = service.fetch_status(id)
+        raise "Toot '#{self}' not found" unless @toot
+        raise "Toot '#{self}' is invalid (#{toot['error']})" if @toot['error']
+      end
+      return @toot
+    end
+
+    alias status toot
   end
 end

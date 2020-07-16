@@ -20,15 +20,21 @@ module Mulukhiya
       return absolute? && id.present?
     end
 
+    def local?
+      return true unless note['user']['host'].present?
+      return true if acct.host == Environment.domain_name
+      return false
+    rescue => e
+      @logger.error(e)
+      return false
+    end
+
     def to_md
-      note = Environment.status_class.first(uri: to_s) || Environment.status_class[id]
-      raise "Note '#{self}' not found" unless note
-      raise "Note '#{self}' not found" unless note.visible?
-      template = Template.new('note_clipping.md')
-      template[:account] = note.account
-      template[:status] = NoteParser.new(note.text).to_md
-      template[:attachments] = note.attachments
-      template[:url] = note.uri
+      template = Template.new('status_clipping.md')
+      template[:account] = account
+      template[:status] = NoteParser.new(note['text']).to_md
+      template[:attachments] = note['files']
+      template[:url] = self
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
@@ -45,8 +51,29 @@ module Mulukhiya
         else
           @service = MisskeyService.new(uri)
         end
+        @service.token = nil unless uri.host == Environment.domain_name
       end
       return @service
+    end
+
+    def note
+      unless @note
+        @note = service.fetch_status(id)
+        raise "Note '#{self}' not found" unless @note
+        raise "Note '#{self}' is invalid (#{note['error']['message']})" if note['error']
+      end
+      return @note
+    end
+
+    alias status note
+
+    def account
+      unless @account
+        @account = note['user'].clone
+        @account['display_name'] = @account['name']
+        @account['url'] = service.create_uri("/@#{@account['username']}")
+      end
+      return @account
     end
   end
 end

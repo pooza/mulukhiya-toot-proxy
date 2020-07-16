@@ -29,27 +29,27 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/dolphin/dbms']
+      return config['/dolphin/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/dolphin/parser']
+      return config['/dolphin/parser']
     end
 
     def self.status_field
-      return Config.instance['/dolphin/status/field']
+      return config['/dolphin/status/field']
     end
 
     def self.status_key
-      return Config.instance['/dolphin/status/key']
+      return config['/dolphin/status/key']
     end
 
     def self.attachment_key
-      return Config.instance['/dolphin/attachment/key']
+      return config['/dolphin/attachment/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/dolphin/poll/options/field']
+      return config['/dolphin/poll/options/field']
     end
 
     def self.visibility_name(name)
@@ -57,11 +57,11 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/dolphin/status/label']
+      return config['/dolphin/status/label']
     end
 
     def self.events
-      return Config.instance['/dolphin/events'].map(&:to_sym)
+      return config['/dolphin/events'].map(&:to_sym)
     end
   end
 end

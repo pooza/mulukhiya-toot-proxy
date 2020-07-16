@@ -1,9 +1,6 @@
 <%# encoding: UTF-8 -%>
 SELECT
-  tokens.id,
-  tokens.token,
-  tokens.scopes,
-  accounts.id AS account_id
+  tokens.id
 FROM oauth_access_tokens AS tokens
   INNER JOIN oauth_applications AS apps ON tokens.application_id=apps.id
   INNER JOIN users ON tokens.resource_owner_id=users.id
@@ -11,17 +8,10 @@ FROM oauth_access_tokens AS tokens
 WHERE (accounts.domain IS NULL)
   AND (accounts.silenced_at IS NULL)
   AND (accounts.suspended_at IS NULL)
-  AND (tokens.scopes ~ '(^|\s)(write:statuses|write)($|\s)')
   AND (users.disabled='f')
   AND (apps.name='mulukhiya-toot-proxy')
   AND (tokens.expires_in IS NULL)
   AND (tokens.revoked_at IS NULL)
-  <% if params[:token] %>
-    AND (tokens.token='<%= params[:token] %>')
-  <% end %>
-  <% if params[:owner] %>
-    AND (accounts.id='<%= params[:owner] %>')
-  <% end %>
 GROUP BY
   tokens.id,
   accounts.id

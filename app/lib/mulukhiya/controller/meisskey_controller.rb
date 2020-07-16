@@ -21,27 +21,27 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return Config.instance['/meisskey/dbms']
+      return config['/meisskey/dbms']
     end
 
     def self.parser_name
-      return Config.instance['/meisskey/parser']
+      return config['/meisskey/parser']
     end
 
     def self.status_field
-      return Config.instance['/meisskey/status/field']
+      return config['/meisskey/status/field']
     end
 
     def self.status_key
-      return Config.instance['/meisskey/status/key']
+      return config['/meisskey/status/key']
     end
 
     def self.attachment_key
-      return Config.instance['/meisskey/attachment/key']
+      return config['/meisskey/attachment/key']
     end
 
     def self.poll_options_field
-      return Config.instance['/meisskey/poll/options/field']
+      return config['/meisskey/poll/options/field']
     end
 
     def self.visibility_name(name)
@@ -49,23 +49,17 @@ module Mulukhiya
     end
 
     def self.status_label
-      return Config.instance['/meisskey/status/label']
+      return config['/meisskey/status/label']
     end
 
     def self.events
-      return Config.instance['/meisskey/events'].map(&:to_sym)
+      return config['/meisskey/events'].map(&:to_sym)
     end
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      config = Config.instance
-      Meisskey::AccessToken.all do |token|
-        values = {
-          digest: Webhook.create_digest(config['/meisskey/url'], token.hash),
-          token: token.hash,
-          account: token.account,
-        }
-        yield values
+      Meisskey::AccessToken.all.reverse_each do |token|
+        yield token.to_h if token.valid?
       end
     end
   end

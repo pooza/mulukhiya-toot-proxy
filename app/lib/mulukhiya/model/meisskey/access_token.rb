@@ -1,19 +1,32 @@
 module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
+      def valid?
+        return false unless to_s.present?
+        return false unless account
+        return application.name == Package.name
+      end
+
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash.delete('token')
-          @hash['scopes'] = scopes
+          @hash = values.clone.deep_symbolize_keys
+          @hash.delete(:hash)
+          @hash.merge!(
+            digest: webhook_digest,
+            token: to_s,
+            account: account,
+            scopes: scopes,
+          )
           @hash.compact!
         end
         return @hash
       end
 
-      def hash
+      def token
         return values['hash']
       end
+
+      alias to_s token
 
       def account
         return Account.new(values['userId'])
@@ -24,7 +37,11 @@ module Mulukhiya
       end
 
       def scopes
-        return application.permission
+        return application.scopes
+      end
+
+      def webhook_digest
+        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def self.[](id)
@@ -42,7 +59,8 @@ module Mulukhiya
       end
 
       def self.all
-        collection.find.reverse_each do |token|
+        return enum_for(__method__) unless block_given?
+        collection.find.each do |token|
           yield AccessToken.new(token['_id'])
         end
       end

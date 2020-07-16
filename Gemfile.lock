@@ -306,7 +306,8 @@ GEM
     test-unit (3.3.6)
       power_assert
     thread_safe (0.3.6)
-    thwait (0.1.0)
+    thwait (0.2.0)
+      e2mmap
     tilt (2.0.10)
     twitter (7.0.0)
       addressable (~> 2.3)
@@ -333,7 +334,7 @@ GEM
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
-    zeitwerk (2.3.1)
+    zeitwerk (2.4.0)
 
 PLATFORMS
   ruby

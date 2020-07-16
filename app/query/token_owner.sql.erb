@@ -1,12 +1,6 @@
 <%# encoding: UTF-8 -%>
 SELECT
-  accounts.id,
-  accounts.username,
-  accounts.display_name,
-  accounts.actor_type,
-  users.admin,
-  users.moderator,
-  accounts.locked
+  accounts.id
 FROM oauth_access_tokens AS tokens
   INNER JOIN users ON tokens.resource_owner_id=users.id
   INNER JOIN accounts ON users.account_id=accounts.id

@@ -53,13 +53,7 @@ module Mulukhiya
 
     get '/mulukhiya/config' do
       if @sns.account
-        @renderer.message = {
-          account: @sns.account.to_h,
-          config: @sns.account.config.to_h,
-          filters: @sns.filters&.parsed_response,
-          token: @sns.access_token.to_h,
-          visibility_names: Environment.parser_class.visibility_names,
-        }
+        @renderer.message = user_config_info
       else
         @renderer.message = {error: 'Invalid token'}
         @renderer.status = 403
@@ -69,13 +63,7 @@ module Mulukhiya
 
     post '/mulukhiya/config' do
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {
-        account: @sns.account.to_h,
-        config: @sns.account.config.to_h,
-        filters: @sns.filters&.parsed_response,
-        token: @sns.access_token.to_h,
-        visibility_names: Environment.parser_class.visibility_names,
-      }
+      @renderer.message = user_config_info
       return @renderer.to_s
     rescue Ginseng::AuthError, ValidateError => e
       @renderer.message = {'error' => e.message}
@@ -147,19 +135,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def response_error?
-      return 400 <= @reporter.response&.code
-    end
-
-    def notify(message)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(@sns.account, message)
-    end
-
-    def status_field
-      return Environment.controller_class.status_field
-    end
-
     not_found do
       @renderer = default_renderer_class.new
       @renderer.status = 404
@@ -178,6 +153,10 @@ module Mulukhiya
       Slack.broadcast(e)
       @logger.error(e)
       return @renderer.to_s
+    end
+
+    def self.config
+      return Config.instance
     end
 
     def self.webhook?
@@ -206,6 +185,31 @@ module Mulukhiya
 
     def self.webhook_entries
       return nil
+    end
+
+    private
+
+    def response_error?
+      return 400 <= @reporter.response&.code
+    end
+
+    def user_config_info
+      return {
+        account: @sns.account.to_h,
+        config: @sns.account.config.to_h,
+        filters: @sns.filters&.parsed_response,
+        token: @sns.access_token.to_h,
+        visibility_names: Environment.parser_class.visibility_names,
+      }
+    end
+
+    def notify(message)
+      message = message.to_yaml unless message.is_a?(String)
+      return Environment.info_agent_service&.notify(@sns.account, message)
+    end
+
+    def status_field
+      return Environment.controller_class.status_field
     end
   end
 end

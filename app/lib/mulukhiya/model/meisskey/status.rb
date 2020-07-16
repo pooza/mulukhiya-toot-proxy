@@ -5,6 +5,14 @@ module Mulukhiya
         return Account.new(values['userId'])
       end
 
+      def acct
+        return account.acct
+      end
+
+      def local?
+        return acct.host == Environment.domain_name
+      end
+
       def visible?
         return visibility == 'public'
       end
@@ -42,7 +50,7 @@ module Mulukhiya
         return uri.to_md
       rescue => e
         @logger.error(e)
-        template = Template.new('note_clipping.md')
+        template = Template.new('status_clipping.md')
         template[:account] = account
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s

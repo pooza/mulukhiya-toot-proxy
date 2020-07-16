@@ -16,6 +16,10 @@ module Mulukhiya
         return @acct
       end
 
+      def local?
+        return acct.host == Environment.domain_name
+      end
+
       def account
         @account ||= Account.get(acct: acct)
         return @account
@@ -38,7 +42,7 @@ module Mulukhiya
         return uri.to_md
       rescue => e
         logger.error(e)
-        template = Template.new('toot_clipping.md')
+        template = Template.new('status_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md
         template[:url] = uri.to_s
