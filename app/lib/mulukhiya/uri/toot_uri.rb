@@ -23,10 +23,7 @@ module Mulukhiya
     end
 
     def local?
-      acct = Acct.new(toot['account']['acct'])
-      return true if acct.host.nil?
-      return true if acct.host == Environment.domain_name
-      return false
+      return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
     rescue => e
       @logger.error(e)
       return false
