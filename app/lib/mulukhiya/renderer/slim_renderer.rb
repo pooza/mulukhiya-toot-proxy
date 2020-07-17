@@ -6,7 +6,7 @@ module Mulukhiya
       Slim::Engine.set_options(
         pretty: Environment.development?,
       )
-      super(template)
+      super
     end
 
     def self.render(name, values = {})

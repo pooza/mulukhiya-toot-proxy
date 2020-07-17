@@ -115,7 +115,6 @@ test:
         - misskey_controller
         - meisskey_controller
         - pleroma_controller
-        - toot_uri
         - mongo
         - access_token
     - name: mastodon
@@ -124,7 +123,6 @@ test:
         - misskey_controller
         - meisskey_controller
         - pleroma_controller
-        - note_uri
         - mongo
     - name: misskey
       cases:
@@ -132,7 +130,6 @@ test:
         - meisskey_controller
         - dolphin_controller
         - pleroma_controller
-        - toot_uri
         - mongo
     - name: meisskey
       cases:
@@ -140,7 +137,6 @@ test:
         - misskey_controller
         - dolphin_controller
         - pleroma_controller
-        - toot_uri
         - postgres
     - name: pleroma
       cases:
@@ -148,7 +144,6 @@ test:
         - misskey_controller
         - dolphin_controller
         - meisskey_controller
-        - note_uri
         - mongo
     - name: dropbox
       cases:
