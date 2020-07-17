@@ -71,7 +71,7 @@ module Mulukhiya
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|
-        yield token.to_h
+        yield token.to_h if token.valid?
       end
     end
   end
