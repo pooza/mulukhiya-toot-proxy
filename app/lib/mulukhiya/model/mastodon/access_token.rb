@@ -7,8 +7,8 @@ module Mulukhiya
       def valid?
         return false unless to_s.present?
         return false unless account
-        return true unless expires_in.nil?
-        return true unless revoked_at.nil?
+        return false if expires_in.present?
+        return false if revoked_at.present?
         return application.name == Package.name
       end
 
