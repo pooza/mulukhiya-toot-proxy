@@ -1,8 +1,8 @@
 module Mulukhiya
   module Mastodon
     class AccessToken < Sequel::Model(:oauth_access_tokens)
-      many_to_one :account, key: :resource_owner_id
-      many_to_one :application, key: :application_id
+      many_to_one :user, key: :resource_owner_id
+      many_to_one :application
 
       def valid?
         return false unless to_s.present?
@@ -28,7 +28,7 @@ module Mulukhiya
           @hash.merge!(
             digest: webhook_digest,
             token: to_s,
-            account: account,
+            account: user.account,
             scopes: scopes,
           )
           @hash.compact!
