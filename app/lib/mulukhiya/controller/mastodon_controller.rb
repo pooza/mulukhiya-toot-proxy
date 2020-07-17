@@ -188,7 +188,7 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       Postgres.instance.exec('webhook_tokens').each do |row|
         token = Mastodon::AccessToken[row['id']]
-        yield token.to_h if token.valid?
+        yield token.to_h
       end
     end
   end
