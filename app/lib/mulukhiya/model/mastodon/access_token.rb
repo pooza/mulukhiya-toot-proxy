@@ -5,10 +5,10 @@ module Mulukhiya
       many_to_one :application, key: :application_id
 
       def valid?
-        return false unless expires_in.nil?
-        return false unless revoked_at.nil?
         return false unless to_s.present?
         return false unless account
+        return true unless expires_in.nil?
+        return true unless revoked_at.nil?
         return application.name == Package.name
       end
 
