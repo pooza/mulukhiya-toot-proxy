@@ -23,15 +23,12 @@ module Mulukhiya
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      request = RestClient::Request.new(
+      return RestClient::Request.new(
         url: @http.create_uri("/api/v1/media/#{id}").to_s,
         method: :put,
         headers: headers,
-        payload: {
-          thumbnail: File.new(path, 'rb'),
-        },
-      )
-      return request.execute
+        payload: {thumbnail: File.new(path, 'rb')},
+      ).execute
     end
 
     def oauth_client
