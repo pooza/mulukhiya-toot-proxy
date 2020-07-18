@@ -46,9 +46,13 @@ module Mulukhiya
     end
 
     put '/api/v1/media/:id' do
-      Handler.dispatch(:pre_thumbnail, params, {reporter: @reporter, sns: @sns})
-      @reporter.response = @sns.upload_thumbnail(params[:id], params[:thumbnail][:tempfile].path)
-      Handler.dispatch(:post_thumbnail, params, {reporter: @reporter, sns: @sns})
+      if params[:thumbnail]
+        Handler.dispatch(:pre_thumbnail, params, {reporter: @reporter, sns: @sns})
+        @reporter.response = @sns.upload_thumbnail(params[:id], params[:thumbnail][:tempfile].path)
+        Handler.dispatch(:post_thumbnail, params, {reporter: @reporter, sns: @sns})
+      else
+        @reporter.response = @sns.update_media(params[:id], params)
+      end
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s

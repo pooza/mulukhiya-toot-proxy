@@ -31,6 +31,18 @@ module Mulukhiya
       ).execute
     end
 
+    def update_media(id, body = {}, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return RestClient::Request.new(
+        url: @http.create_uri("/api/v1/media/#{id}").to_s,
+        method: :put,
+        headers: headers,
+        payload: body,
+      ).execute
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/v1/apps', {
