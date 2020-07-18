@@ -19,6 +19,21 @@ module Mulukhiya
       return super
     end
 
+    def upload_thumbnail(id, path, params = {})
+      headers = params[:headers] || {}
+      headers['Authorization'] ||= "Bearer #{token}"
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      request = RestClient::Request.new(
+        url: @http.create_uri("/api/v1/media/#{id}").to_s,
+        method: :put,
+        headers: headers,
+        payload: {
+          thumbnail: File.new(path, 'rb'),
+        },
+      )
+      return request.execute
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/v1/apps', {

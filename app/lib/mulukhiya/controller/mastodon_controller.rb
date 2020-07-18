@@ -45,6 +45,21 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    put '/api/v1/media/:id' do
+      params[:file] = params[:thumbnail]
+      Handler.dispatch(:pre_thumbnail, params, {reporter: @reporter, sns: @sns})
+      @reporter.response = @sns.upload_thumbnail(params[:id], params[:file][:tempfile].path)
+      Handler.dispatch(:post_thumbnail, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = JSON.parse(@reporter.response.body)
+      @renderer.status = @reporter.response.code
+      return @renderer.to_s
+    rescue RestClient::Exception => e
+      @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
+      notify(@renderer.message)
+      @renderer.status = e.response&.code || 400
+      return @renderer.to_s
+    end
+
     post '/api/v1/statuses/:id/favourite' do
       @reporter.response = @sns.fav(params[:id])
       Handler.dispatch(:post_fav, params, {reporter: @reporter, sns: @sns})

@@ -5,7 +5,7 @@ module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
-    enable :sessions
+    enable :sessions, :method_override
 
     use OmniAuth::Builder do
       provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
