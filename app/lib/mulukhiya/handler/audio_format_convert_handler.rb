@@ -2,7 +2,7 @@ module Mulukhiya
   class AudioFormatConvertHandler < MediaConvertHandler
     def convert
       result.push(source: {type: @source.type})
-      return @source.convert_type(:mp3)
+      return @source.convert_type(@config['/handler/audio_format_convert/format'])
     end
 
     def convertable?
