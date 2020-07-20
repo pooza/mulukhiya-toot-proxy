@@ -82,3 +82,6 @@
 - key: /dolphin/attachment/key
   aliases:
     - /dolphin/file/key
+- key: /handler/shortened_url/domains
+  aliases:
+    - /shortened_url/domains

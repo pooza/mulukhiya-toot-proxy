@@ -31,6 +31,18 @@ handler:
     disable: true
   tweet:
     disable: true
+  shortened_url:
+    domains:
+      - t.co
+      - goo.gl
+      - bit.ly
+      - ow.ly
+      - amzn.to
+      - amzn.asia
+      - youtu.be
+      - git.io
+      - spoti.fi
+      - apple.co
 worker:
   media_cleaning:
     days: 1
@@ -56,18 +68,6 @@ parser:
       unlisted: home
       private: followers
       direct: specified
-shortened_url:
-  domains:
-    - t.co
-    - goo.gl
-    - bit.ly
-    - ow.ly
-    - amzn.to
-    - amzn.asia
-    - youtu.be
-    - git.io
-    - spoti.fi
-    - apple.co
 test:
   filters:
     - name: ci
