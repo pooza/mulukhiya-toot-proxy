@@ -19,22 +19,13 @@ module Mulukhiya
       return super
     end
 
-    def upload_thumbnail(id, path, params = {})
-      headers = params[:headers] || {}
-      headers['Authorization'] ||= "Bearer #{token}"
-      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
-      return RestClient::Request.new(
-        url: @http.create_uri("/api/v1/media/#{id}").to_s,
-        method: :put,
-        headers: headers,
-        payload: {thumbnail: File.new(path, 'rb')},
-      ).execute
-    end
-
     def update_media(id, body = {}, params = {})
       headers = params[:headers] || {}
       headers['Authorization'] ||= "Bearer #{token}"
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      if body.dig(:thumbnail, :tempfile).is_a?(File)
+        body[:thumbnail] = File.new(body[:thumbnail][:tempfile].path, 'rb')
+      end
       return RestClient::Request.new(
         url: @http.create_uri("/api/v1/media/#{id}").to_s,
         method: :put,
