@@ -768,6 +768,11 @@ tagging:
     - url: https://precure.ml/api/dic/v1/series.json
       type: relative
     - url: https://precure.ml/api/dic/v2/fairy.json
+webhook:
+  sample: |
+    わたしが斬るのは、あなたじゃない！
+    絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。
+    それがわたし。王女様からもらった名前、キュアソードよ！
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'

@@ -1,5 +1,9 @@
 module Mulukhiya
   class WebhookTest < TestCase
+    def setup
+      @test_hook = Environment.test_account.webhook
+    end
+
     def test_all
       Webhook.all do |hook|
         assert_kind_of(Webhook, hook)
@@ -40,6 +44,12 @@ module Mulukhiya
       Webhook.all do |hook|
         assert_kind_of(Hash, JSON.parse(hook.to_json))
       end
+    end
+
+    def test_command
+      command = @test_hook.command
+      command.exec
+      assert(command.stdout.start_with?('{"id":"'))
     end
   end
 end

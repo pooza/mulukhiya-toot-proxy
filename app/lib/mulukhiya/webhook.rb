@@ -44,6 +44,16 @@ module Mulukhiya
 
     alias note post
 
+    def command(text = nil)
+      return CommandLine.new([
+        'curl',
+        '-H', 'Content-Type: application/json',
+        '-X', 'POST',
+        '-d', {text: text || @config['/webhook/sample']}.to_json,
+        uri.to_s
+      ])
+    end
+
     def self.create_digest(uri, token)
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
