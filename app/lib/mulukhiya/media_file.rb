@@ -65,9 +65,11 @@ module Mulukhiya
       return nil
     end
 
-    def convert_type(type)
+    def convert_format(type)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
+
+    alias convert_type convert_format
 
     def create_dest_path(params = {})
       params[:type] ||= default_mediatype
