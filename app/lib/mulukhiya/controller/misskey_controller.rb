@@ -29,7 +29,6 @@ module Mulukhiya
     post '/api/drive/files/create' do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        response: :raw,
         filename: params[:file][:filename],
       })
       notify(@reporter.response.parsed_response) if response_error?

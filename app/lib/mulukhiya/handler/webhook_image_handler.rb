@@ -11,7 +11,7 @@ module Mulukhiya
         uri = Ginseng::URI.parse(attachment['image_url'])
         raise Ginseng::RequestError "Invalid URL '#{uri}'" unless uri&.absolute?
         body[attachment_key] ||= []
-        body[attachment_key].push(sns.upload_remote_resource(uri))
+        body[attachment_key].push(sns.upload_remote_resource(uri, {response: :id}))
         result.push(source_url: uri.to_s)
         break
       rescue => e
