@@ -54,7 +54,7 @@ module Mulukhiya
 
     get '/mulukhiya/auth' do
       @renderer = SlimRenderer.new
-      errors = MisskeyAuthContract.new.call(params).errors.to_h
+      errors = MisskeyAuthContract.new.exec(params)
       if errors.present?
         @renderer.template = 'auth'
         @renderer[:errors] = errors

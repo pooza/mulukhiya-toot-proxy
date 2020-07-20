@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     post '/mulukhiya/webhook/:digest' do
-      errors = WebhookContract.new.call(params).errors.to_h
+      errors = WebhookContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = errors
@@ -121,7 +121,7 @@ module Mulukhiya
     end
 
     get '/auth/twitter/callback' do
-      errors = TwitterAuthContract.new.call(params).errors.to_h
+      errors = TwitterAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = errors
