@@ -1,5 +1,3 @@
-require 'rest-client'
-
 module Mulukhiya
   class MediaConvertHandler < Handler
     def handle_pre_upload(body, params = {})

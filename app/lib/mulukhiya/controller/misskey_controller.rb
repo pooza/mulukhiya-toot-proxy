@@ -1,7 +1,7 @@
 module Mulukhiya
   class MisskeyController < Controller
     before do
-      if params[:token].present? && request.path.match?(%r{/(mulukhiya|auth)})
+      if params[:token].present? && home?
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif params[:i]
         @sns.token = params[:i]

@@ -193,6 +193,12 @@ module Mulukhiya
       return 400 <= @reporter.response&.code
     end
 
+    def home?
+      return true if request.path.start_with?('/mulukhiya')
+      return true if request.path.start_with?('/auth')
+      return false
+    end
+
     def user_config_info
       return {
         account: @sns.account.to_h,
