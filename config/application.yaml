@@ -14,13 +14,13 @@ handler:
   image_resize:
     pixel: 1280
   image_format_convert:
-    type: jpeg
+    format: jpeg
   video_format_convert:
     timeout: 30
-    type: mp4
+    format: mp4
   audio_format_convert:
     timeout: 10
-    type: mp3
+    format: mp3
   itunes_image:
     pixel: 480
     timeout: 10
