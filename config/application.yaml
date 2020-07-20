@@ -113,6 +113,7 @@ test:
       cases:
         - twitter_service
         - tweet_handler
+        - twitter_auth_contract
     - name: dolphin
       cases:
         - mastodon_controller
@@ -121,6 +122,7 @@ test:
         - pleroma_controller
         - mongo
         - access_token
+        - mastodon_auth_contract
     - name: mastodon
       cases:
         - dolphin_controller
@@ -128,6 +130,7 @@ test:
         - meisskey_controller
         - pleroma_controller
         - mongo
+        - misskey_auth_contract
     - name: misskey
       cases:
         - mastodon_controller
@@ -135,6 +138,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - mongo
+        - mastodon_auth_contract
     - name: meisskey
       cases:
         - mastodon_controller
@@ -142,6 +146,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - postgres
+        - mastodon_auth_contract
     - name: pleroma
       cases:
         - mastodon_controller
@@ -149,6 +154,7 @@ test:
         - dolphin_controller
         - meisskey_controller
         - mongo
+        - misskey_auth_contract
     - name: dropbox
       cases:
         - dropbox_clipper
