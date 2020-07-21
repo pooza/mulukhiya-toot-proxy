@@ -11,7 +11,7 @@ module Mulukhiya
 
     def updatable?(keyword)
       return false unless uri = SpotifyURI.parse(keyword)
-      return false unless uri.track.present?
+      return false if uri.track.nil? && uri.album.nil?
       @uris[keyword] = uri
       return true
     rescue => e
@@ -21,9 +21,15 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push(uri.track.name)
-      push(uri.track.artists.map(&:name).join(', '))
-      tags.concat(ArtistParser.new(uri.track.artists.map(&:name).join('、')).parse)
+      if uri.album
+        push(uri.album.name)
+        push(uri.album.artists.map(&:name).join(', '))
+        tags.concat(ArtistParser.new(uri.album.artists.map(&:name).join('、')).parse)
+      elsif uri.track
+        push(uri.track.name)
+        push(uri.track.artists.map(&:name).join(', '))
+        tags.concat(ArtistParser.new(uri.track.artists.map(&:name).join('、')).parse)
+      end
       result.push(url: uri.to_s)
     end
   end

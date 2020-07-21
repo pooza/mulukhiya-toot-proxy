@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def test_lookup_album
-      album = @service.lookup_album('0ownoI5JduviRJOXHTlLwS?si=22EGnSmqR1KzkNPTRdg4pA')
+      album = @service.lookup_album('0ownoI5JduviRJOXHTlLwS')
       assert_equal(album.name, 'お願いジュンブライト')
     end
   end
