@@ -13,5 +13,10 @@ module Mulukhiya
       track = @service.lookup_track('3IOVLLqm6RNpoUVjx33HKF')
       assert_equal(track.name, 'ありがとうのうた')
     end
+
+    def test_lookup_album
+      album = @service.lookup_album('0ownoI5JduviRJOXHTlLwS?si=22EGnSmqR1KzkNPTRdg4pA')
+      assert_equal(album.name, 'お願いジュンブライト')
+    end
   end
 end

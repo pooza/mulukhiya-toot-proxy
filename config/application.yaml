@@ -650,6 +650,9 @@ spotify:
     track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
+      type: track
+    - pattern: /album/([[:alnum:]]+)
+      type: album
 itunes:
   country: jp
   lang: ja_jp
@@ -659,6 +662,7 @@ itunes:
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
+      type: track
   hosts:
     - music.apple.com
     - itunes.apple.com
