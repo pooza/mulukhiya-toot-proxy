@@ -5,7 +5,7 @@ module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
-    enable :sessions
+    enable :sessions, :method_override
 
     use OmniAuth::Builder do
       provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     post '/mulukhiya/webhook/:digest' do
-      errors = WebhookContract.new.call(params).errors.to_h
+      errors = WebhookContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = errors
@@ -121,7 +121,7 @@ module Mulukhiya
     end
 
     get '/auth/twitter/callback' do
-      errors = TwitterAuthContract.new.call(params).errors.to_h
+      errors = TwitterAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = errors
@@ -191,6 +191,12 @@ module Mulukhiya
 
     def response_error?
       return 400 <= @reporter.response&.code
+    end
+
+    def home?
+      return true if request.path.start_with?('/mulukhiya')
+      return true if request.path.start_with?('/auth')
+      return false
     end
 
     def user_config_info

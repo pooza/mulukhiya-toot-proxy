@@ -1,7 +1,7 @@
 module Mulukhiya
   class MastodonController < Controller
     before do
-      if params[:token].present? && request.path.match?(%r{/(mulukhiya|auth)})
+      if params[:token].present? && home?
         @sns.token = Crypt.new.decrypt(params[:token])
       elsif @headers['Authorization']
         @sns.token = @headers['Authorization'].split(/\s+/).last
@@ -30,11 +30,28 @@ module Mulukhiya
     post %r{/api/v([12])/media} do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        response: :raw,
         filename: params[:file][:filename],
         version: params[:captures].first.to_i,
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = JSON.parse(@reporter.response.body)
+      @renderer.status = @reporter.response.code
+      return @renderer.to_s
+    rescue RestClient::Exception => e
+      @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
+      notify(@renderer.message)
+      @renderer.status = e.response&.code || 400
+      return @renderer.to_s
+    end
+
+    put '/api/v1/media/:id' do
+      if params[:thumbnail]
+        Handler.dispatch(:pre_thumbnail, params, {reporter: @reporter, sns: @sns})
+        @reporter.response = @sns.update_media(params[:id], params)
+        Handler.dispatch(:post_thumbnail, params, {reporter: @reporter, sns: @sns})
+      else
+        @reporter.response = @sns.update_media(params[:id], params)
+      end
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -81,7 +98,7 @@ module Mulukhiya
 
     post '/mulukhiya/auth' do
       @renderer = SlimRenderer.new
-      errors = MastodonAuthContract.new.call(params).errors.to_h
+      errors = MastodonAuthContract.new.exec(params)
       if errors.present?
         @renderer.template = 'auth'
         @renderer[:errors] = errors

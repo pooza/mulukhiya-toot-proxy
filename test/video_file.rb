@@ -40,8 +40,8 @@ module Mulukhiya
       assert_equal(@file.duration, 14.32)
     end
 
-    def test_convert_type
-      converted = @file.convert_type(:mp4)
+    def test_convert_format
+      converted = @file.convert_format(:mp4)
       assert_kind_of(VideoFile, converted)
       assert_equal(converted.type, 'video/mp4')
     end

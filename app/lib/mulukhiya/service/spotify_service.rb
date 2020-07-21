@@ -10,37 +10,25 @@ module Mulukhiya
     end
 
     def search_track(keyword)
-      cnt ||= 0
+      return nil unless SpotifyService.config?
       tracks = RSpotify::Track.search(keyword)
       return nil if tracks.nil?
       return tracks.first
-    rescue => e
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
-      cnt += 1
-      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
-      sleep(1)
-      retry
+    end
+
+    def lookup_album(id)
+      return nil unless SpotifyService.config?
+      return RSpotify::Album.find(id)
     end
 
     def lookup_track(id)
-      cnt ||= 0
+      return nil unless SpotifyService.config?
       return RSpotify::Track.find(id)
-    rescue => e
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
-      cnt += 1
-      raise Ginseng::GatewayError, 'Track not found', e.backtrace if retry_limit <= cnt
-      sleep(1)
-      retry
     end
 
     def lookup_artist(id)
-      cnt ||= 0
+      return nil unless SpotifyService.config?
       return RSpotify::Artist.find(id)
-    rescue => e
-      raise Ginseng::GatewayError, 'Artist not found', e.backtrace if retry_limit <= cnt
-      sleep(1)
-      cnt += 1
-      retry
     end
 
     def create_track_uri(track)

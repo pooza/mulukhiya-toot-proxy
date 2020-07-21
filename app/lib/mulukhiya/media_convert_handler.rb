@@ -8,6 +8,14 @@ module Mulukhiya
       body[:file][:tempfile] = @dest
     end
 
+    def handle_pre_thumbnail(body, params = {})
+      return unless @source = source_file(body, :thumbnail)
+      return unless convertable?
+      return unless @dest = convert
+      body[:thumbnail][:org_tempfile] ||= body[:thumbnail][:tempfile]
+      body[:thumbnail][:tempfile] = @dest
+    end
+
     def convert
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -20,8 +28,8 @@ module Mulukhiya
       return ImageFile
     end
 
-    def source_file(body)
-      return media_class.new(body[:file][:tempfile].path)
+    def source_file(body, key = :file)
+      return media_class.new(body[key][:tempfile].path)
     rescue
       return nil
     end

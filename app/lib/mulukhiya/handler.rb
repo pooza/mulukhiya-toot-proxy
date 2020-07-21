@@ -23,6 +23,10 @@ module Mulukhiya
 
     def handle_post_upload(body, params = {}); end
 
+    def handle_pre_thumbnail(body, params = {}); end
+
+    def handle_post_thumbnail(body, params = {}); end
+
     def handle_post_fav(body, params = {}); end
 
     def handle_post_boost(body, params = {}); end
