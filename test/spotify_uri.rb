@@ -21,6 +21,20 @@ module Mulukhiya
 
       uri = SpotifyURI.parse('https://open.spotify.com/track/hogehogeh')
       assert_equal(uri.track_id, 'hogehogeh')
+
+      uri = SpotifyURI.parse('https://open.spotify.com/album/fugafuga')
+      assert_nil(uri.track_id)
+    end
+
+    def test_album_id
+      uri = SpotifyURI.parse('https://open.spotify.com')
+      assert_nil(uri.album_id)
+
+      uri = SpotifyURI.parse('https://open.spotify.com/track/hogehogeh')
+      assert_nil(uri.album_id)
+
+      uri = SpotifyURI.parse('https://open.spotify.com/album/fugafuga')
+      assert_equal(uri.album_id, 'fugafuga')
     end
 
     def test_image_uri

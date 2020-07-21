@@ -15,6 +15,7 @@ module Mulukhiya
     def track_id
       return nil unless SpotifyService.config?
       @config['/spotify/patterns'].each do |entry|
+        next unless entry['type'] == 'track'
         next unless matches = path.match(entry['pattern'])
         return matches[1]
       end
@@ -25,6 +26,20 @@ module Mulukhiya
 
     def track_id=(id)
       self.path = "/track/#{id}"
+    end
+
+    def album_id
+      return nil unless SpotifyService.config?
+      @config['/spotify/patterns'].each do |entry|
+        next unless entry['type'] == 'album'
+        next unless matches = path.match(entry['pattern'])
+        return matches[1]
+      end
+      return nil
+    end
+
+    def album_id=(id)
+      self.path = "/album/#{id}"
     end
 
     def track
