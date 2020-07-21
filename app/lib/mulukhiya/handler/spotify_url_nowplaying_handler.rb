@@ -23,13 +23,13 @@ module Mulukhiya
       return unless uri = @uris[keyword]
       if uri.album
         push(uri.album.name)
-        push(uri.album.artists.map(&:name).join(', '))
-        tags.concat(ArtistParser.new(uri.album.artists.map(&:name).join('、')).parse)
+        artists = uri.album.artists
       elsif uri.track
         push(uri.track.name)
-        push(uri.track.artists.map(&:name).join(', '))
-        tags.concat(ArtistParser.new(uri.track.artists.map(&:name).join('、')).parse)
+        artists = uri.track.artists
       end
+      push(artists.map(&:name).join(', '))
+      tags.concat(ArtistParser.new(artists.map(&:name).join('、')).parse)
       result.push(url: uri.to_s)
     end
   end
