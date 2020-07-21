@@ -48,6 +48,12 @@ module Mulukhiya
       return @spotify.lookup_track(track_id)
     end
 
+    def album
+      return nil unless spotify?
+      return @spotify.lookup_album(album_id) if album_id
+      return track&.album
+    end
+
     def image_uri
       return nil unless spotify?
       return nil unless track_id.present?
