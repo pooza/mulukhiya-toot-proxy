@@ -27,6 +27,7 @@ module Mulukhiya
         controller: Environment.controller_class,
         env: Environment,
         crypt: Crypt,
+        config: @config,
         scripts: @config['/webui/scripts'],
         stylesheets: @config['/webui/stylesheets'],
         metadata: @config.raw.dig('application', 'webui', 'metadata'),

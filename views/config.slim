@@ -72,7 +72,7 @@ html lang='ja'
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='webhook_url'
             h4 curlサンプル
-            textarea id='curl-sample-text' = '{{curl_sample}}'
+            textarea id='curl-sample-text' v-html='curl_sample'
             i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
         h3 v-on:click='toggleNotifySection' 通知
@@ -103,6 +103,7 @@ html lang='ja'
           program: null,
           visibility_options: [],
           visibility: 'public',
+          curl_sample: null,
           show_livecure: #{controller.livecure?},
           show_growi: #{controller.clipping?},
           show_dropbox: #{controller.clipping?},
@@ -132,7 +133,7 @@ html lang='ja'
                   this.webhook_token = e.data.config.webhook.token
                   this.webhook_url = e.data.config.webhook.url
                   this.visibility = e.data.config.webhook.visibility || 'public'
-                  this.curl_sample = `curl -H 'Content-Type: application/json' -X POST -d '{"text":"わたしが斬るのは、あなたじゃない！\\n絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。\\nそれがわたし。王女様からもらった名前、キュアソードよ！"}' ${e.data.config.webhook.url}`
+                  this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${e.data.config.webhook.url}`
                 }
                 if (e.data.config.tags) {
                   this.tags = e.data.config.tags.join("\n")

@@ -70,9 +70,5 @@ module Mulukhiya
     def create_keyword(track)
       return [track.name].concat(track.artists.map(&:name)).join(' ')
     end
-
-    def retry_limit
-      return @config['/spotify/retry_limit']
-    end
   end
 end
