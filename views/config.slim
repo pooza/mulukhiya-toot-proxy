@@ -133,7 +133,7 @@ html lang='ja'
                   this.webhook_token = e.data.config.webhook.token
                   this.webhook_url = e.data.config.webhook.url
                   this.visibility = e.data.config.webhook.visibility || 'public'
-                  this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].to_s.gsub(/\s+/,'\n')}"}' ${e.data.config.webhook.url}`
+                  this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\s+/,'\n')}"}' ${e.data.config.webhook.url}`
                 }
                 if (e.data.config.tags) {
                   this.tags = e.data.config.tags.join("\n")
