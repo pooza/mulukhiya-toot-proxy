@@ -5,7 +5,7 @@ module Mulukhiya
     def width
       detail_info['streams'].each do |stream|
         next unless stream['codec_type'] == default_mediatype
-        next if stream['width'].empty?
+        next unless stream['width'].present?
         return stream['width'].to_i
       end
       return nil
@@ -14,7 +14,7 @@ module Mulukhiya
     def height
       detail_info['streams'].each do |stream|
         next unless stream['codec_type'] == default_mediatype
-        next if stream['height'].empty?
+        next unless stream['height'].present?
         return stream['height'].to_i
       end
       return nil
@@ -23,7 +23,7 @@ module Mulukhiya
     def duration
       detail_info['streams'].each do |stream|
         next unless stream['codec_type'] == default_mediatype
-        next if stream['duration'].empty?
+        next unless stream['duration'].present?
         return stream['duration'].to_f
       end
       return nil
