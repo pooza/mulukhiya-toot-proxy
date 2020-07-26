@@ -52,7 +52,7 @@ module Mulukhiya
       assert(command.status.zero?)
       status = JSON.parse(command.stdout)
       assert_kind_of(Hash, status)
-      assert(['id', 'createdNote'].member?(status.keys.first))
+      assert(['id', 'account', 'createdNote'].member?(status.keys.first))
     end
   end
 end
