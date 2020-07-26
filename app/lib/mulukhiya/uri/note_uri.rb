@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def local?
-      return true unless note['user']['host'].present?
+      return true if note['user']['host'].empty?
       return true if acct.host == Environment.domain_name
       return false
     rescue => e

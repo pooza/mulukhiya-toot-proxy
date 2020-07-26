@@ -2,7 +2,7 @@ module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
       def valid?
-        return false unless to_s.present?
+        return false if to_s.empty?
         return false unless account
         return application.name == Package.name
       end
