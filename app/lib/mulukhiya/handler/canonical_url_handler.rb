@@ -37,7 +37,6 @@ module Mulukhiya
     end
 
     def ignore?(uri)
-      return true unless uri.path.present?
       return true if uri.path == '/'
       return true if uri.path.empty?
       return true if uri.query_values.present?
