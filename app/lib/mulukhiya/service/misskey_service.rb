@@ -39,7 +39,7 @@ module Mulukhiya
             description: @config['/package/description'],
             permission: @config['/misskey/oauth/permission'],
             callbackUrl: @http.create_uri(@config['/misskey/oauth/callback_url']).to_s,
-          }.to_json,
+          },
         })
         raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
         client = r.body

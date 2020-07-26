@@ -8,6 +8,7 @@ module Mulukhiya
         next unless stream['width'].present?
         return stream['width'].to_i
       end
+      return nil
     end
 
     def height
@@ -16,6 +17,7 @@ module Mulukhiya
         next unless stream['height'].present?
         return stream['height'].to_i
       end
+      return nil
     end
 
     def duration
@@ -24,6 +26,7 @@ module Mulukhiya
         next unless stream['duration'].present?
         return stream['duration'].to_f
       end
+      return nil
     end
 
     def convert_format(type)

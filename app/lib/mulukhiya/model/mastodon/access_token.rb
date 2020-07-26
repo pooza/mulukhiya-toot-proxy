@@ -5,7 +5,7 @@ module Mulukhiya
       many_to_one :application
 
       def valid?
-        return false unless to_s.present?
+        return false if to_s.empty?
         return false unless user.account
         return false if expires_in.present?
         return false if revoked_at.present?

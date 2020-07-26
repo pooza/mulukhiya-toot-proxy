@@ -39,7 +39,7 @@ module Mulukhiya
             website: @config['/package/url'],
             redirect_uris: @config['/pleroma/oauth/redirect_uri'],
             scopes: @config['/pleroma/oauth/scopes'].join(' '),
-          }.to_json,
+          },
         })
         raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
         client = r.body

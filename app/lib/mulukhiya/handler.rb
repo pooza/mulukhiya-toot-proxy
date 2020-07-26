@@ -58,7 +58,7 @@ module Mulukhiya
 
     def summary
       return nil if verbose? && !@sns.account.notify_verbose? && !@errors.present?
-      return nil unless @result.present? || @errors.present?
+      return nil if @result.empty? && @errors.empty?
       return {
         event: @event.to_s,
         handler: underscore_name,

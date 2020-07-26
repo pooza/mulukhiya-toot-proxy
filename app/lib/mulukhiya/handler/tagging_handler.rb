@@ -16,7 +16,7 @@ module Mulukhiya
 
     def executable?(body)
       return false if parser.accts.any?(&:agent?)
-      return true unless body['visibility'].present?
+      return true if body['visibility'].empty?
       return true if body['visibility'] == 'public'
       return false
     end
@@ -38,7 +38,7 @@ module Mulukhiya
     end
 
     def update_status
-      return @status unless tags.present?
+      return @status if tags.empty?
       via = @status.match(@config['/twittodon/pattern'])
       @status.sub!(via[0], '') if via.present?
       lines = @status.each_line(chomp: true).to_a

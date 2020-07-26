@@ -26,8 +26,7 @@ module Mulukhiya
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
       canonical = Ginseng::URI.parse(elements.first.attribute('href'))
-      return false unless canonical.absolute?
-      return false if canonical.path == '/'
+      return false if ignore?(canonical)
       @canonicals[uri.to_s] = canonical
       return true
     rescue => e
@@ -36,8 +35,9 @@ module Mulukhiya
     end
 
     def ignore?(uri)
-      return true unless uri.path.present?
+      return true unless uri.absolute?
       return true if uri.path == '/'
+      return true if uri.path.empty?
       return true if uri.query_values.present?
       return true if AmazonURI.parse(uri.to_s).valid?
       return true if ItunesURI.parse(uri.to_s).valid?

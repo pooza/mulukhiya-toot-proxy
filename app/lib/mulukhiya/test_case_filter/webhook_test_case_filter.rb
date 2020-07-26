@@ -2,8 +2,7 @@ module Mulukhiya
   class WebhookTestCaseFilter < TestCaseFilter
     def active?
       return true unless Environment.controller_class.webhook?
-      return true unless Environment.test_account.webhook.present?
-      return false
+      return Environment.test_account.webhook.nil?
     rescue Ginseng::ConfigError
       return true
     end

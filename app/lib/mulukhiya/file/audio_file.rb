@@ -13,9 +13,10 @@ module Mulukhiya
     def duration
       detail_info['streams'].each do |stream|
         next unless stream['codec_type'] == default_mediatype
-        next unless stream['duration'].present?
+        next if stream['duration'].empty?
         return stream['duration'].to_f
       end
+      return nil
     end
 
     def convert_format(type)

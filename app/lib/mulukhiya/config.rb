@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def self.load_file(name)
-      name += '.yaml' unless File.extname(name).present?
+      name += '.yaml' if File.extname(name).empty?
       return YAML.load_file(File.join(Environment.dir, 'config', name))
     end
 

@@ -5,7 +5,7 @@ module Mulukhiya
       many_to_one :application, key: :app_id
 
       def valid?
-        return false unless to_s.present?
+        return false if to_s.empty?
         return false unless account
         return application.name == Package.name
       end
