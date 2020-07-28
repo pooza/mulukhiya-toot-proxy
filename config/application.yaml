@@ -79,6 +79,7 @@ test:
         - access_token
         - status
         - user_config
+        - tag_atom_feed_renderer
     - name: postgres
       cases:
         - clipping_worker
