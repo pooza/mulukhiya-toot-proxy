@@ -4,11 +4,11 @@ require 'time'
 module Mulukhiya
   class AtomFeedRenderer < Ginseng::Web::Renderer
     include Package
-    attr_reader :entries, :params
+    attr_reader :entries, :channel
 
-    def initialize(params = {})
+    def initialize(channel = {})
       super()
-      @params = {
+      @channel = {
         title: package_class.name,
         link: package_class.url.to_s,
         description: package_class.description,
@@ -16,7 +16,7 @@ module Mulukhiya
         date: Time.now,
         generator: package_class.user_agent,
       }
-      @params.merge!(params)
+      @channel.merge!(channel)
       @entries = []
     end
 
@@ -26,15 +26,25 @@ module Mulukhiya
 
     def push(values)
       entries.push(values.to_h)
+      @atom = nil
     end
 
     def to_s
-      atom = RSS::Maker.make('atom') do |maker|
-        maker.items.do_sort = true
-        maker.channel.id = params[:link]
-        params.symbolize_keys.each {|k, v| maker.channel.send("#{k}=", v)}
+      unless @atom
+        @atom = RSS::Maker.make('atom') do |maker|
+          maker.items.do_sort = true
+          maker.channel.id = channel[:link]
+          channel.symbolize_keys.each {|k, v| maker.channel.send("#{k}=", v)}
+          entries.each do |entry|
+            maker.items.new_item do |item|
+              item.link = item[:link]
+              item.title = item[:title]
+              item.date = Time.parse(item[:date]).getlocal
+            end
+          end
+        end
       end
-      return atom.to_s
+      return @atom.to_s
     end
   end
 end
