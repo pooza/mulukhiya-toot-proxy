@@ -1,5 +1,5 @@
 package:
-  version: 3.11.2
+  version: 3.11.3
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -79,6 +79,7 @@ test:
         - access_token
         - status
         - user_config
+        - tag_atom_feed_renderer
     - name: postgres
       cases:
         - clipping_worker
@@ -123,6 +124,7 @@ test:
         - mongo
         - access_token
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: mastodon
       cases:
         - dolphin_controller
@@ -139,6 +141,7 @@ test:
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: meisskey
       cases:
         - mastodon_controller
@@ -147,6 +150,7 @@ test:
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: pleroma
       cases:
         - mastodon_controller
@@ -155,6 +159,7 @@ test:
         - meisskey_controller
         - mongo
         - misskey_auth_contract
+        - tag_atom_feed_renderer
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -752,6 +757,9 @@ sidekiq:
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
+    tag_feed_update:
+      every: 5m
+      class: Mulukhiya::TagFeedUpdateWorker
 puma:
   port: 3008
   pidfile: tmp/pids/puma.pid
@@ -771,6 +779,9 @@ tagging:
     - url: https://precure.ml/api/dic/v1/series.json
       type: relative
     - url: https://precure.ml/api/dic/v2/fairy.json
+feed:
+  tag:
+    limit: 100
 webhook:
   sample: |
     わたしが斬るのは、あなたじゃない！

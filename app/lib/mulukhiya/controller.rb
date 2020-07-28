@@ -65,7 +65,7 @@ module Mulukhiya
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
       @renderer.message = user_config_info
       return @renderer.to_s
-    rescue Ginseng::AuthError, ValidateError => e
+    rescue Ginseng::AuthError, Ginseng::ValidateError => e
       @renderer.message = {'error' => e.message}
       @renderer.status = e.status
       return @renderer.to_s

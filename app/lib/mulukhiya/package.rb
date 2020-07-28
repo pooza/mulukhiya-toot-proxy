@@ -52,6 +52,14 @@ module Mulukhiya
       return Config.instance['/package/url']
     end
 
+    def self.description
+      return Config.instance['/package/description']
+    end
+
+    def self.authors
+      return Config.instance['/package/authors']
+    end
+
     def self.full_name
       return "#{name} #{version}"
     end

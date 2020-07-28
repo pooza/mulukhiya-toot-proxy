@@ -20,7 +20,7 @@ module Mulukhiya
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
       @renderer.status = @reporter.response.code
       return @renderer.to_s
-    rescue ValidateError => e
+    rescue Ginseng::ValidateError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
       @renderer.status = e.status
@@ -116,6 +116,13 @@ module Mulukhiya
         @renderer[:result] = r.parsed_response
         @renderer.status = r.code
       end
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/feed/tag/:tag' do
+      @renderer = TagAtomFeedRenderer.new
+      @renderer.tag = params[:tag]
+      @renderer.status = 404 unless @renderer.exist?
       return @renderer.to_s
     end
 

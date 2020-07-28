@@ -4,10 +4,10 @@ namespace :config do
     puts "controller: #{Mulukhiya::Environment.controller_name}"
     puts "environment: #{Mulukhiya::Environment.type}"
     puts 'schema:'
-    puts YAML.dump(Mulukhiya::Config.instance.schema)
+    puts Mulukhiya::Config.instance.schema.to_yaml
     if Mulukhiya::Config.instance.errors.present?
       puts 'result:'
-      puts YAML.dump(Mulukhiya::Config.instance.errors)
+      puts Mulukhiya::Config.instance.errors.to_yaml
       exit 1
     else
       puts 'result: OK'

@@ -8,7 +8,7 @@ namespace :mulukhiya do
 
       desc 'show OAuth client'
       task :show do
-        puts YAML.dump(Mulukhiya::Environment.sns_class.new.oauth_client)
+        puts Mulukhiya::Environment.sns_class.new.oauth_client.to_yaml
       end
     end
   end
