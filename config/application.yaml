@@ -771,6 +771,9 @@ tagging:
     - url: https://precure.ml/api/dic/v1/series.json
       type: relative
     - url: https://precure.ml/api/dic/v2/fairy.json
+feed:
+  tag:
+    limit: 100
 webhook:
   sample: |
     わたしが斬るのは、あなたじゃない！

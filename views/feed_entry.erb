@@ -1,0 +1,9 @@
+<%# encoding: UTF-8 -%>
+<% if params[:row][:username].present? -%>
+<%= "[@#{params[:row][:username]}]" -%>
+<% end -%>
+<% if params[:row][:text].present? -%>
+<%= params[:row][:text] %>
+<% else -%>
+(空欄)
+<% end -%>
