@@ -119,7 +119,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/feed/v1.0/tag/:tag' do
+    get '/mulukhiya/feed/tag/:tag' do
       @renderer = TagAtomFeedRenderer.new
       @renderer.tag = params[:tag]
       @renderer.status = 404 unless @renderer.exist?

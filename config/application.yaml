@@ -123,6 +123,7 @@ test:
         - mongo
         - access_token
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: mastodon
       cases:
         - dolphin_controller
@@ -139,6 +140,7 @@ test:
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: meisskey
       cases:
         - mastodon_controller
@@ -147,6 +149,7 @@ test:
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
+        - tag_atom_feed_renderer
     - name: pleroma
       cases:
         - mastodon_controller
@@ -155,6 +158,7 @@ test:
         - meisskey_controller
         - mongo
         - misskey_auth_contract
+        - tag_atom_feed_renderer
     - name: dropbox
       cases:
         - dropbox_clipper
