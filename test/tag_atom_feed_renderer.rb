@@ -3,7 +3,6 @@ module Mulukhiya
     def setup
       @renderer = TagAtomFeedRenderer.new
       @renderer.tag = TagAtomFeedRenderer.tags.first
-      @renderer.limit = 10
       @renderer.cache!
     end
 
@@ -12,7 +11,7 @@ module Mulukhiya
     end
 
     def test_limit
-      assert_equal(@renderer.limit, 10)
+      assert_equal(@renderer.limit, 100)
     end
 
     def test_path
