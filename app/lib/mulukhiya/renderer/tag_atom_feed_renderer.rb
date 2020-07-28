@@ -54,6 +54,8 @@ module Mulukhiya
         end
       end
       return super
+    rescue Ginseng::DatabaseError
+      return super
     end
 
     def self.cache_all
