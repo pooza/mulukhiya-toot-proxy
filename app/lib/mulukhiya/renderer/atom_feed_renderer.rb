@@ -30,17 +30,13 @@ module Mulukhiya
     end
 
     def to_s
-      unless @atom
-        @atom = RSS::Maker.make('atom') do |maker|
-          maker.items.do_sort = true
-          maker.channel.id = channel[:link]
-          channel.symbolize_keys.each {|k, v| maker.channel.send("#{k}=", v)}
-          entries.each do |entry|
-            maker.items.new_item do |item|
-              item.link = item[:link]
-              item.title = item[:title]
-              item.date = Time.parse(item[:date]).getlocal
-            end
+      @atom ||= RSS::Maker.make('atom') do |maker|
+        maker.items.do_sort = true
+        maker.channel.id = channel[:link]
+        channel.each {|k, v| maker.channel.send("#{k}=", v)}
+        entries.each do |entry|
+          maker.items.new_item do |item|
+            entry.each {|k, v| item.send("#{k}=", v)}
           end
         end
       end
