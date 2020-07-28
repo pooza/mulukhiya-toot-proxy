@@ -4,6 +4,7 @@ module Mulukhiya
       @renderer = TagAtomFeedRenderer.new
       @renderer.tag = TagAtomFeedRenderer.tags.first
       @renderer.limit = 10
+      @renderer.cache!
     end
 
     def test_tag
@@ -24,9 +25,8 @@ module Mulukhiya
       assert(r.include?('<entry>')) unless Environment.ci?
     end
 
-    def test_cache
-      @renderer.cache
-      assert(File.exist?(@renderer.path))
+    def test_exist?
+      assert(@renderer.exist?)
     end
   end
 end

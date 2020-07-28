@@ -29,7 +29,7 @@ module Mulukhiya
       @atom = nil
     end
 
-    def to_s
+    def atom
       @atom ||= RSS::Maker.make('atom') do |maker|
         maker.items.do_sort = true
         maker.channel.id = channel[:link]
@@ -40,7 +40,11 @@ module Mulukhiya
           end
         end
       end
-      return @atom.to_s
+      return @atom
+    end
+
+    def to_s
+      return atom.to_s
     end
   end
 end

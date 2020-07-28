@@ -30,7 +30,8 @@ module Mulukhiya
       @atom = nil
     end
 
-    def cache
+    def cache!
+      fetch
       File.write(path, to_s)
       @logger.info(action: 'cached', params: @params)
     end
@@ -43,28 +44,24 @@ module Mulukhiya
       )
     end
 
-    def to_s
-      unless @atom
-        Postgres.instance.execute('tag_feed', @params).each do |row|
-          push(
-            link: create_link(row[:uri]).to_s,
-            title: create_title(row),
-            date: Time.parse("#{row[:created_at]} UTC").getlocal,
-          )
-        end
-      end
-      return super
-    rescue Ginseng::DatabaseError
-      return super
+    def exist?
+      return File.exist?(path)
     end
 
     def self.cache_all
+      all do |renderer|
+        renderer.cache!
+      rescue => e
+        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: @tag))
+      end
+    end
+
+    def self.all
+      return enum_for(__method__) unless block_given?
       tags do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
-        renderer.cache
-      rescue => e
-        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: @tag))
+        yield renderer
       end
     end
 
@@ -76,6 +73,17 @@ module Mulukhiya
     end
 
     private
+
+    def fetch
+      return unless Postgres.config?
+      Postgres.instance.execute('tag_feed', @params).each do |row|
+        push(
+          link: create_link(row[:uri]).to_s,
+          title: create_title(row),
+          date: Time.parse("#{row[:created_at]} UTC").getlocal,
+        )
+      end
+    end
 
     def create_title(row)
       template = Template.new('feed_entry')

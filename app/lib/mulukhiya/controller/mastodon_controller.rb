@@ -119,6 +119,16 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/feed/v1.0/tag/:tag' do
+      @renderer = TagAtomFeedRenderer.new
+      @renderer.tag = params[:tag]
+      if @renderer.exist?
+        return @renderer.to_s
+      else
+        @renderer.status = 404
+      end
+    end
+
     post '/mulukhiya/filter' do
       Handler.create('filter_command').handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
