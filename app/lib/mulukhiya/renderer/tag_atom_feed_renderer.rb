@@ -8,7 +8,7 @@ module Mulukhiya
 
     def initialize(channel = {})
       super
-      @params = {tag: nil, limit: 100}
+      @params = {tag: nil, limit: @config['/feed/tag/limit']}
       @sns = Environment.sns_class.new
     end
 
@@ -60,7 +60,6 @@ module Mulukhiya
       tags do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
-        renderer.limit = Config.instance['/feed/tag/limit']
         renderer.cache
       rescue => e
         renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: @tag))
@@ -69,7 +68,7 @@ module Mulukhiya
 
     def self.tags
       return enum_for(__method__) unless block_given?
-      Config.instance['/tagging/default_tags'].each do |tag|
+      (Config.instance['/tagging/default_tags'] || []).each do |tag|
         yield tag
       end
     end
