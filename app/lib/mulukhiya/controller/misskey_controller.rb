@@ -19,7 +19,7 @@ module Mulukhiya
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
-    rescue ValidateError => e
+    rescue Ginseng::ValidateError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
       @renderer.status = e.status
