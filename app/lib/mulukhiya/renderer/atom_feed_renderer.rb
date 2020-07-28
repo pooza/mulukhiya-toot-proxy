@@ -10,7 +10,7 @@ module Mulukhiya
       super()
       @channel = {
         title: package_class.name,
-        link: package_class.url.to_s,
+        link: package_class.url,
         description: package_class.description,
         author: package_class.authors.first,
         date: Time.now,

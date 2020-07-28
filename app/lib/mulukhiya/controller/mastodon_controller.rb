@@ -122,11 +122,8 @@ module Mulukhiya
     get '/feed/v1.0/tag/:tag' do
       @renderer = TagAtomFeedRenderer.new
       @renderer.tag = params[:tag]
-      if @renderer.exist?
-        return @renderer.to_s
-      else
-        @renderer.status = 404
-      end
+      @renderer.status = 404 unless @renderer.exist?
+      return @renderer.to_s
     end
 
     post '/mulukhiya/filter' do

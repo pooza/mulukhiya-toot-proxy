@@ -31,8 +31,10 @@ module Mulukhiya
     end
 
     def cache!
-      fetch
-      File.write(path, to_s)
+      channel[:title] = "##{tag} | #{@sns.info['title']}"
+      channel[:link] = @sns.create_uri("/tags/#{tag}").to_s
+      channel[:description] = "#{@sns.info['title']} ##{tag}のタイムライン"
+      File.write(path, fetch)
       @logger.info(action: 'cached', params: @params)
     end
 
@@ -87,12 +89,14 @@ module Mulukhiya
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       end
+      @atom = nil
+      return atom
     end
 
     def create_title(row)
       template = Template.new('feed_entry')
       template[:row] = row
-      return template.to_s.chomp
+      return template.to_s.chomp.sanitize
     end
 
     def create_link(src)
