@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def to_yaml
-      return YAML.dump(data)
+      return data.to_yaml
     end
 
     alias to_s to_yaml
