@@ -10,6 +10,12 @@ html lang='ja'
       == slim.render 'fragment/message'
       h1 = package.name
       nav class='menu'
+        - if controller.tag_feed?
+          a href='/mulukhiya/app/feeds' デフォルトタグのAtomフィード
+        - else
+          a href='#'
+            = 'デフォルトタグのAtomフィード '
+            span class='alert' 非対応
         - if controller.webhook?
           a href='/mulukhiya/app/config' v-if='username' 環境設定
           a href='#' v-else=''
