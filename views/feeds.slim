@@ -11,8 +11,13 @@ html lang='ja'
       h2 デフォルトタグのAtomフィード
       ul class='tags'
         - config['/tagging/default_tags'].each do |tag|
-          li
-            a href="/mulukhiya/feed/tag/#{tag}" target='_blank' ##{tag}
+          - if controller.tag_feed?
+            li
+              a href="/mulukhiya/feed/tag/#{tag}" target='_blank' ##{tag}
+          -else
+            li
+              h3 ##{tag}
+              .alert #{controller.name}はデフォルトタグのAtomフィードに非対応です。
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)
