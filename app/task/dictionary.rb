@@ -11,15 +11,5 @@ namespace :mulukhiya do
         puts "#{dic.count} tags"
       end
     end
-
-    namespace :feed do
-      desc 'update feed'
-      task :update do
-        Mulukhiya::TagAtomFeedRenderer.cache_all
-        Mulukhiya::TagAtomFeedRenderer.all do |renderer|
-          puts "updated: ##{renderer.tag} #{renderer.path}"
-        end
-      end
-    end
   end
 end

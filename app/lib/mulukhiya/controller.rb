@@ -46,6 +46,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/feed/tag/:tag' do
+      @renderer = TagAtomFeedRenderer.new
+      if Environment.controller_class.tag_feed?
+        @renderer.tag = params[:tag]
+        @renderer.status = 404 unless @renderer.exist?
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/about' do
       @renderer.message = {package: @config.raw.dig('application', 'package')}
       return @renderer.to_s
@@ -160,6 +171,10 @@ module Mulukhiya
     end
 
     def self.webhook?
+      return false
+    end
+
+    def self.tag_feed?
       return false
     end
 
