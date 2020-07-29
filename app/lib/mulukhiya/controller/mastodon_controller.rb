@@ -89,9 +89,17 @@ module Mulukhiya
     get '/api/v2/search' do
       params[:limit] = @config['/mastodon/search/limit']
       @reporter.response = @sns.search(params[:q], params)
-      @message = @reporter.response.parsed_response.with_indifferent_access
-      Handler.dispatch(:post_search, params, {reporter: @reporter, message: @message})
-      @renderer.message = @message
+      message = @reporter.response.parsed_response
+      if message.is_a?(Hash)
+        message.deep_stringify_keys!
+        Handler.dispatch(:post_search, params, {reporter: @reporter, message: message})
+        @renderer.message = message
+      else
+        body = Nokogiri::HTML.parse(message, nil, 'utf-8')
+        @renderer.message = {path: request.path, error: body.xpath('//h1').first.inner_text.chomp}
+        Slack.broadcast(@renderer.message)
+        message.each_line {|line| @logger.error(line.chomp)}
+      end
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
