@@ -1,7 +1,7 @@
 namespace :mulukhiya do
   namespace :tagging do
-    namespace :feed do
-      desc 'update feed'
+    namespace :feeds do
+      desc 'update feeds'
       task :update do
         if Mulukhiya::Environment.controller_class.tag_feed?
           Mulukhiya::TagAtomFeedRenderer.cache_all

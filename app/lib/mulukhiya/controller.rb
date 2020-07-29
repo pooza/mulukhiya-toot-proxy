@@ -47,8 +47,8 @@ module Mulukhiya
     end
 
     get '/mulukhiya/feed/tag/:tag' do
-      @renderer = TagAtomFeedRenderer.new
       if Environment.controller_class.tag_feed?
+        @renderer = TagAtomFeedRenderer.new
         @renderer.tag = params[:tag]
         @renderer.status = 404 unless @renderer.exist?
       else
