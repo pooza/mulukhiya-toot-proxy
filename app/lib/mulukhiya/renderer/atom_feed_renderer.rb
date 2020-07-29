@@ -16,7 +16,6 @@ module Mulukhiya
         date: Time.now,
         generator: package_class.user_agent,
       }
-      @channel.merge!(channel)
       @entries = []
     end
 

@@ -4,45 +4,43 @@ module Mulukhiya
   class TagAtomFeedRenderer < AtomFeedRenderer
     include Package
 
-    attr_reader :logger
+    attr_reader :logger, :tag, :limit
 
     def initialize(channel = {})
       super
-      @params = {tag: nil, limit: @config['/feed/tag/limit']}
       @sns = Environment.sns_class.new
-    end
-
-    def tag
-      return @params[:tag]
+      channel.merge!(
+        title: "##{tag} | #{@sns.info['title']}",
+        link: @sns.create_uri("/tags/#{tag}").to_s,
+        description: "#{@sns.info['title']} ##{tag}のタイムライン",
+      )
+      @limit = @config['/feed/tag/limit']
     end
 
     def tag=(tag)
-      @params[:tag] = tag
+      @tag = tag
       @atom = nil
-    end
-
-    def limit
-      return @params[:limit]
     end
 
     def limit=(limit)
-      @params[:limit] = limit
+      @limit = limit
       @atom = nil
     end
 
+    def params
+      return {tag: tag, limit: limit}
+    end
+
     def cache!
-      channel[:title] = "##{tag} | #{@sns.info['title']}"
-      channel[:link] = @sns.create_uri("/tags/#{tag}").to_s
-      channel[:description] = "#{@sns.info['title']} ##{tag}のタイムライン"
       File.write(path, fetch)
-      @logger.info(action: 'cached', params: @params)
+      @logger.info(action: 'cached', params: params)
     end
 
     def path
       return File.join(
         Environment.dir,
         'tmp/cache/',
-        "#{Digest::SHA1.hexdigest(@params.to_json)}.atom",
+        "#{Digest::SHA1.hexdigest(params.to_json)}.atom",
       )
     end
 
@@ -54,11 +52,12 @@ module Mulukhiya
       all do |renderer|
         renderer.cache!
       rescue => e
-        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: @tag))
+        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: tag))
       end
     end
 
     def to_s
+      return nil unless exist?
       return File.read(path)
     end
 
@@ -82,7 +81,7 @@ module Mulukhiya
 
     def fetch
       return unless Postgres.config?
-      Postgres.instance.execute('tag_feed', @params).each do |row|
+      Postgres.instance.execute('tag_feed', params).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),
