@@ -5,27 +5,24 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs'
+    == slim.render 'fragment/breadcrumbs', {current: 'デフォルトタグのAtomフィード'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h1 = package.name
-      nav class='menu'
-        - if controller.tag_feed?
-          a href='/mulukhiya/app/feeds' デフォルトタグのAtomフィード
-        - else
-          a href='#'
-            = 'デフォルトタグのAtomフィード '
-            span class='alert' 非対応
-        - if controller.webhook?
-          a href='/mulukhiya/app/config' v-if='username' 環境設定
-          a href='#' v-else=''
-            | 環境設定
-            span class='alert' 未認証
-        - else
-          a href='#'
-            = '環境設定 '
-            span class='alert' 非対応
-        a href='/mulukhiya/app/health' 動作状況
+
+      h2 デフォルトタグのAtomフィード
+      - if controller.tag_feed?
+        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
+      ul class='tags'
+        - config['/tagging/default_tags'].each do |tag|
+          - if controller.tag_feed?
+            li
+              h3 ##{tag}
+              div class='link'
+                a href="/mulukhiya/feed/tag/#{tag}" target='_blank' = env.sns_class.new.create_uri("/mulukhiya/feed/tag/#{tag}")
+          -else
+            li
+              h3 ##{tag}
+              .alert #{controller.name}はデフォルトタグのAtomフィードに非対応です。
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)

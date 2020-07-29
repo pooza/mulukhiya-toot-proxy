@@ -46,6 +46,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/feed/tag/:tag' do
+      if Environment.controller_class.tag_feed?
+        @renderer = TagAtomFeedRenderer.new
+        @renderer.tag = params[:tag]
+        @renderer.status = 404 unless @renderer.exist?
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/about' do
       @renderer.message = {package: @config.raw.dig('application', 'package')}
       return @renderer.to_s
@@ -81,35 +92,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/app/config' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'config'
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/auth' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'auth'
-      @renderer[:oauth_url] = @sns.oauth_uri
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/app/token' do
-      @renderer = SlimRenderer.new
-      @renderer.template = 'token'
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
       return @renderer.to_s
     end
 
-    get '/mulukhiya/app/health' do
+    get '/mulukhiya/app/:page' do
       @renderer = SlimRenderer.new
-      @renderer.template = 'health'
+      @renderer.template = params[:page]
+      @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
+    rescue Ginseng::RenderError
+      @renderer.status = 404
     end
 
     get '/mulukhiya/style/:style' do
@@ -160,6 +155,10 @@ module Mulukhiya
     end
 
     def self.webhook?
+      return false
+    end
+
+    def self.tag_feed?
       return false
     end
 
