@@ -8,8 +8,10 @@ html lang='ja'
     == slim.render 'fragment/breadcrumbs', {current: 'デフォルトタグのAtomフィード'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
+
       h2 デフォルトタグのAtomフィード
-      p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
+      - if controller.tag_feed?
+        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
       ul class='tags'
         - config['/tagging/default_tags'].each do |tag|
           - if controller.tag_feed?
