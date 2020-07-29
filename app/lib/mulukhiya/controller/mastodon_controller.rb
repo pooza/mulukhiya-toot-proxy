@@ -143,6 +143,8 @@ module Mulukhiya
 
     def self.tag_feed?
       return config['/tagging/default_tags'].present?
+    rescue Ginseng::ConfigError
+      return false
     end
 
     def self.clipping?
