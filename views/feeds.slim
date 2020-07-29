@@ -9,11 +9,14 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 デフォルトタグのAtomフィード
+      p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
       ul class='tags'
         - config['/tagging/default_tags'].each do |tag|
           - if controller.tag_feed?
             li
-              a href="/mulukhiya/feed/tag/#{tag}" target='_blank' ##{tag}
+              h3 ##{tag}
+              div class='link'
+                a href="/mulukhiya/feed/tag/#{tag}" target='_blank' = env.sns_class.new.create_uri("/mulukhiya/feed/tag/#{tag}")
           -else
             li
               h3 ##{tag}
