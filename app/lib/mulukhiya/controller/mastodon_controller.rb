@@ -142,7 +142,7 @@ module Mulukhiya
     end
 
     def self.tag_feed?
-      return true
+      return config['/tagging/default_tags'].present?
     end
 
     def self.clipping?
