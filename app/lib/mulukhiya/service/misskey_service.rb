@@ -35,10 +35,7 @@ module Mulukhiya
       unless @info
         r = http.get('/nodeinfo/2.0')
         raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-        @info = r.parsed_response.merge(
-          'title' => r['metadata']['nodeName'],
-          'author' => r['metadata']['maintainer']['name'],
-        )
+        @info = r.parsed_response
       end
       return @info
     end
