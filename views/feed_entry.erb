@@ -2,7 +2,9 @@
 <% if params[:row][:username].present? -%>
 <%= "[@#{params[:row][:username]}@#{params[:row][:domain] || Mulukhiya::Environment.domain_name}]" -%>
 <% end -%>
-<% if params[:row][:text].present? -%>
+<% if params[:row][:spoiler_text].present? -%>
+<%= params[:row][:spoiler_text] %>
+<% elsif params[:row][:text].present? -%>
 <%= params[:row][:text] %>
 <% else -%>
 (空欄)
