@@ -5,7 +5,7 @@ SELECT
   "user".username,
   "user".host AS domain,
   note."text",
-  note.cw
+  note.cw AS spoiler_text
 FROM note
   INNER JOIN "user" ON note."userId"="user".id
 WHERE (note.tags::varchar ~ '[{,]<%= params[:tag].downcase %>[,}]')
