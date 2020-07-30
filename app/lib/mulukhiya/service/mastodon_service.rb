@@ -14,13 +14,27 @@ module Mulukhiya
       return nil
     end
 
-    def instance_info(params = {})
-      r = http.get('/api/v1/instance', {headers: create_headers(params[:headers])})
-      raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-      return r.parsed_response
+    def info(params = {})
+      unless @info
+        r = http.get('/api/v1/instance', {headers: create_headers(params[:headers])})
+        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
+        @info = r.parsed_response
+        r = http.get('/nodeinfo/2.0')
+        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
+        @info.merge!(r.parsed_response)
+        @info['metadata'] = {
+          'nodeName' => @info['title'],
+          'maintainer' => {
+            'name' => @info['contact_account']['display_name'],
+            'email' => @info['email'],
+          },
+        }
+        @info['metadata']['maintainer']['name'] ||= @info['contact_account']['username']
+      end
+      return @info
     end
 
-    alias info instance_info
+    alias nodeinfo info
 
     def search(keyword, params = {})
       params[:limit] ||= @config['/mastodon/search/limit']
@@ -51,6 +65,10 @@ module Mulukhiya
     def redis
       @redis ||= Redis.new
       return @redis
+    end
+
+    def create_tag_uri(tag)
+      return create_uri("/tags/#{tag.sub('^#', '')}")
     end
 
     def notify(account, message, response = nil)

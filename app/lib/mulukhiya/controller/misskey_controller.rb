@@ -86,6 +86,10 @@ module Mulukhiya
       return true
     end
 
+    def self.tag_feed?
+      return TagContainer.default_tags.present?
+    end
+
     def self.clipping?
       return true
     end

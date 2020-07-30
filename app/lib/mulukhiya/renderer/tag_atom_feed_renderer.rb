@@ -9,16 +9,17 @@ module Mulukhiya
     def initialize(channel = {})
       super
       @sns = Environment.sns_class.new
-      channel.merge!(
-        title: "##{tag} | #{@sns.info['title']}",
-        link: @sns.create_uri("/tags/#{tag}").to_s,
-        description: "#{@sns.info['title']} ##{tag}のタイムライン",
-      )
+      @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @limit = @config['/feed/tag/limit']
     end
 
     def tag=(tag)
       @tag = tag
+      @channel.merge!(
+        title: "##{tag} | #{@sns.info['metadata']['nodeName']}",
+        link: @sns.create_tag_uri(tag).to_s,
+        description: "#{@sns.info['metadata']['nodeName']} ##{tag}のタイムライン",
+      )
       @atom = nil
     end
 
@@ -28,7 +29,11 @@ module Mulukhiya
     end
 
     def params
-      return {tag: tag, limit: limit}
+      return {
+        tag: tag,
+        limit: limit,
+        test_usernames: @config['/feed/test_usernames'],
+      }
     end
 
     def cache!
@@ -52,7 +57,7 @@ module Mulukhiya
       all do |renderer|
         renderer.cache!
       rescue => e
-        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: tag))
+        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: renderer.tag))
       end
     end
 
@@ -72,7 +77,7 @@ module Mulukhiya
 
     def self.tags
       return enum_for(__method__) unless block_given?
-      TagContainer.new.default_tags.each do |tag|
+      TagContainer.default_tags.each do |tag|
         yield tag.sub(/^#/, '')
       end
     end
@@ -100,9 +105,13 @@ module Mulukhiya
 
     def create_link(src)
       dest = Ginseng::URI.parse(src)
-      return src unless dest.absolute?
-      return src unless matches = %r{/users/([[:word:]]+)/statuses/([[:digit:]]+)}i.match(dest.path)
-      dest.path = "/@#{matches[1]}/#{matches[2]}"
+      unless dest.absolute?
+        dest = Environment.sns_class.new.uri.clone
+        dest.path = src
+      end
+      if matches = %r{/users/([[:word:]]+)/statuses/([[:digit:]]+)}i.match(dest.path)
+        dest.path = "/@#{matches[1]}/#{matches[2]}"
+      end
       return dest.to_s
     end
   end
