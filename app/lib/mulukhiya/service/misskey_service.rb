@@ -31,7 +31,7 @@ module Mulukhiya
       return nil
     end
 
-    def instance_info(params = {})
+    def info(params = {})
       unless @info
         r = http.get('/nodeinfo/2.0')
         raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
@@ -43,7 +43,7 @@ module Mulukhiya
       return @info
     end
 
-    alias info instance_info
+    alias nodeinfo info
 
     def oauth_client
       unless client = redis.get('oauth_client')

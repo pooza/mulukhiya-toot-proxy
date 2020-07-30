@@ -14,13 +14,16 @@ module Mulukhiya
       return nil
     end
 
-    def instance_info(params = {})
-      r = http.get('/api/v1/instance', {headers: create_headers(params[:headers])})
-      raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-      return r.parsed_response
+    def info(params = {})
+      unless @info
+        r = http.get('/api/v1/instance', {headers: create_headers(params[:headers])})
+        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
+        @info = r.parsed_response.merge('author' => r['contact_account']['display_name'])
+      end
+      return @info
     end
 
-    alias info instance_info
+    alias nodeinfo info
 
     def search(keyword, params = {})
       params[:limit] ||= @config['/mastodon/search/limit']
