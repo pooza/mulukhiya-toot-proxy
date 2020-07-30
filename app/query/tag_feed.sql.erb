@@ -3,18 +3,18 @@ SELECT
   toots.uri,
   toots.created_at,
   accounts.username,
+  accounts.domain,
   toots.text,
   toots.spoiler_text
 FROM statuses_tags
   INNER JOIN tags ON tags.id=statuses_tags.tag_id
   INNER JOIN statuses AS toots ON statuses_tags.status_id=toots.id
   INNER JOIN accounts ON toots.account_id=accounts.id
-WHERE (toots.local='t')
+WHERE (tags.name='<%= params[:tag].downcase %>')
   AND (toots.reblog_of_id IS NULL)
   AND (toots.visibility=0)
   AND (accounts.silenced_at IS NULL)
   AND (accounts.suspended_at IS NULL)
-  AND (tags.name='<%= params[:tag].downcase %>')
 ORDER BY
   toots.created_at DESC
 LIMIT <%= params[:limit] %> OFFSET 0

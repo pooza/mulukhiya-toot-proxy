@@ -1,6 +1,6 @@
 <%# encoding: UTF-8 -%>
 <% if params[:row][:username].present? -%>
-<%= "[@#{params[:row][:username]}]" -%>
+<%= "[@#{params[:row][:username]}@#{params[:row][:domain] || Mulukhiya::Environment.domain_name}]" -%>
 <% end -%>
 <% if params[:row][:text].present? -%>
 <%= params[:row][:text] %>
