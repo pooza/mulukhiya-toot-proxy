@@ -105,9 +105,13 @@ module Mulukhiya
 
     def create_link(src)
       dest = Ginseng::URI.parse(src)
-      return src unless dest.absolute?
-      return src unless matches = %r{/users/([[:word:]]+)/statuses/([[:digit:]]+)}i.match(dest.path)
-      dest.path = "/@#{matches[1]}/#{matches[2]}"
+      unless dest.absolute?
+        dest = Environment.sns_class.new.uri.clone
+        dest.path = src
+      end
+      if matches = %r{/users/([[:word:]]+)/statuses/([[:digit:]]+)}i.match(dest.path)
+        dest.path = "/@#{matches[1]}/#{matches[2]}"
+      end
       return dest.to_s
     end
   end
