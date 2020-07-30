@@ -5,7 +5,7 @@ module Mulukhiya
     private
 
     def dir
-      return 'app/query'
+      return "app/query/#{Environment.controller_name}"
     end
   end
 end
