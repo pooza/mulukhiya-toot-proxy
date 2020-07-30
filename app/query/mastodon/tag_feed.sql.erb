@@ -15,6 +15,7 @@ WHERE (tags.name='<%= params[:tag].downcase %>')
   AND (toots.visibility=0)
   AND (accounts.silenced_at IS NULL)
   AND (accounts.suspended_at IS NULL)
+  AND (accounts.username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
 ORDER BY
   toots.created_at DESC
 LIMIT <%= params[:limit] %> OFFSET 0

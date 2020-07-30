@@ -28,7 +28,11 @@ module Mulukhiya
     end
 
     def params
-      return {tag: tag, limit: limit}
+      return {
+        tag: tag,
+        limit: limit,
+        test_usernames: @config['/feed/test_usernames'],
+      }
     end
 
     def cache!
@@ -52,7 +56,7 @@ module Mulukhiya
       all do |renderer|
         renderer.cache!
       rescue => e
-        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: tag))
+        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: renderer.tag))
       end
     end
 
