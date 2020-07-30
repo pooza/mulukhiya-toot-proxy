@@ -77,7 +77,7 @@ module Mulukhiya
 
     def self.tags
       return enum_for(__method__) unless block_given?
-      TagContainer.new.default_tags.each do |tag|
+      TagContainer.default_tags.each do |tag|
         yield tag.sub(/^#/, '')
       end
     end
