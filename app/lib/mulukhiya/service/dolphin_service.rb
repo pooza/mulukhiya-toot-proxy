@@ -24,6 +24,10 @@ module Mulukhiya
 
     alias nodeinfo info
 
+    def create_tag_uri(tag)
+      return create_uri("/tags/#{tag.sub('^#', '')}")
+    end
+
     def notify(account, message, response = nil)
       note = {
         DolphinController.status_field => message,
