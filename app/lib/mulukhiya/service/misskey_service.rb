@@ -31,6 +31,20 @@ module Mulukhiya
       return nil
     end
 
+    def instance_info(params = {})
+      unless @info
+        r = http.get('/nodeinfo/2.0')
+        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
+        @info = r.parsed_response.merge(
+          'title' => r['metadata']['nodeName'],
+          'author' => r['metadata']['maintainer']['name'],
+        )
+      end
+      return @info
+    end
+
+    alias info instance_info
+
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/app/create', {

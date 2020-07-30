@@ -9,16 +9,17 @@ module Mulukhiya
     def initialize(channel = {})
       super
       @sns = Environment.sns_class.new
-      channel.merge!(
-        title: "##{tag} | #{@sns.info['title']}",
-        link: @sns.create_uri("/tags/#{tag}").to_s,
-        description: "#{@sns.info['title']} ##{tag}のタイムライン",
-      )
+      @channel[:author] = @sns.info['author']
       @limit = @config['/feed/tag/limit']
     end
 
     def tag=(tag)
       @tag = tag
+      @channel.merge!(
+        title: "##{tag} | #{@sns.info['title']}",
+        link: @sns.create_uri("/tags/#{tag}").to_s,
+        description: "#{@sns.info['title']} ##{tag}のタイムライン",
+      )
       @atom = nil
     end
 
