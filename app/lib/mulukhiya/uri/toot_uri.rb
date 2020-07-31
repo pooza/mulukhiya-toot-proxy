@@ -18,6 +18,11 @@ module Mulukhiya
 
     alias id toot_id
 
+    def account_id
+      return nil unless matches = %r{^/users/([[:word:]]+)/statuses/[[:digit:]]+}i.match(path)
+      return matches[1]
+    end
+
     def valid?
       return absolute? && id.present?
     end
@@ -27,6 +32,15 @@ module Mulukhiya
     rescue => e
       @logger.error(e)
       return false
+    end
+
+    def publicize!
+      self.path = "/@#{account_id}/#{toot_id}" if account_id && toot_id
+      return self
+    end
+
+    def publicize
+      return clone.publicize!
     end
 
     def to_md

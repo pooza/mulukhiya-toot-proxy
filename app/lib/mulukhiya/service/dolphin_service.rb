@@ -13,21 +13,6 @@ module Mulukhiya
       return nil
     end
 
-    def info(params = {})
-      unless @info
-        r = http.get('/nodeinfo/2.0')
-        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-        @info = r.parsed_response
-      end
-      return @info
-    end
-
-    alias nodeinfo info
-
-    def create_tag_uri(tag)
-      return create_uri("/tags/#{tag.sub('^#', '')}")
-    end
-
     def notify(account, message, response = nil)
       note = {
         DolphinController.status_field => message,

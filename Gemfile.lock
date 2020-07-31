@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 484ac1597b5badbfdbc98446d494b29ce8e2d583
+  revision: be2c097ae81f641f94ffbf5d7895f5067e6aedc0
   specs:
-    ginseng-fediverse (1.3.3)
+    ginseng-fediverse (1.3.4)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 991d750b118f623b25ca5ffd50ab71965dee374d
+  revision: 3f89fa767ee05fd604fa17ee50136bf07820e552
   specs:
-    ginseng-web (1.2.1)
+    ginseng-web (1.2.2)
       puma
       sass
       sinatra
@@ -175,7 +175,7 @@ GEM
     mimemagic (0.3.5)
     mini_portile2 (2.4.0)
     minitest (5.14.1)
-    mongo (2.12.2)
+    mongo (2.13.0)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.3.3)
     multi_json (1.15.0)
@@ -245,7 +245,7 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rexml (3.2.4)
-    rspotify (2.9.0)
+    rspotify (2.9.1)
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)

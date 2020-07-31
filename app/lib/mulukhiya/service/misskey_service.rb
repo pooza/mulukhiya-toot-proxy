@@ -31,17 +31,6 @@ module Mulukhiya
       return nil
     end
 
-    def info(params = {})
-      unless @info
-        r = http.get('/nodeinfo/2.0')
-        raise Ginseng::GatewayError, "Bad response #{r.code}" unless r.code == 200
-        @info = r.parsed_response
-      end
-      return @info
-    end
-
-    alias nodeinfo info
-
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/app/create', {
@@ -66,10 +55,6 @@ module Mulukhiya
     def redis
       @redis ||= Redis.new
       return @redis
-    end
-
-    def create_tag_uri(tag)
-      return create_uri("/tags/#{tag.sub('^#', '')}")
     end
 
     def notify(account, message, response = nil)
