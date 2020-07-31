@@ -30,7 +30,7 @@ module Mulukhiya
       end
       push(artists.map(&:name).join(', '))
       tags.concat(ArtistParser.new(artists.map(&:name).join('、')).parse)
-      result.push(url: uri.to_s)
+      result.push(url: uri.to_s, artists: artists.map(&:name))
     end
   end
 end
