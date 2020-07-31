@@ -30,7 +30,7 @@ module Mulukhiya
     end
 
     def publicize!
-      self.path = "/note/#{id}" if id
+      self.path = "/notes/#{id}" if id
       return self
     end
 
