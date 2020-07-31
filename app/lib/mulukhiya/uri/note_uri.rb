@@ -29,6 +29,15 @@ module Mulukhiya
       return false
     end
 
+    def publicize!
+      self.path = "/note/#{id}" if id
+      return self
+    end
+
+    def publicize
+      return clone.publicize!
+    end
+
     def to_md
       template = Template.new('status_clipping.md')
       template[:account] = account
