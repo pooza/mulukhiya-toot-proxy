@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 module Mulukhiya
-  class TagAtomFeedRenderer < AtomFeedRenderer
+  class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
 
     attr_reader :logger, :tag, :limit
