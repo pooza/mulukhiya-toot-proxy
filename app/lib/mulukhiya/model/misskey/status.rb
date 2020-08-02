@@ -1,12 +1,8 @@
 module Mulukhiya
   module Misskey
     class Status < Sequel::Model(:note)
+      include StatusMethods
       many_to_one :account, key: :userId
-
-      def logger
-        @logger ||= Logger.new
-        return @logger
-      end
 
       def local?
         return userHost.nil?

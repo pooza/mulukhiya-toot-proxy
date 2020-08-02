@@ -1,6 +1,8 @@
 module Mulukhiya
   module Meisskey
     class Status < CollectionModel
+      include StatusMethods
+
       def account
         return Account.new(values['userId'])
       end
