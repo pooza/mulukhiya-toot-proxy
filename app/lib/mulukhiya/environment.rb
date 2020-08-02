@@ -1,5 +1,7 @@
 module Mulukhiya
   class Environment < Ginseng::Environment
+    include Package
+
     def self.name
       return File.basename(dir)
     end
@@ -10,10 +12,6 @@ module Mulukhiya
 
     def self.dir
       return Mulukhiya.dir
-    end
-
-    def self.config
-      return Config.instance
     end
 
     def self.domain_name
@@ -34,7 +32,7 @@ module Mulukhiya
 
     def self.info_agent_service
       service = service_class.new
-      service.token = Config.instance['/agent/info/token']
+      service.token = config['/agent/info/token']
       return service
     end
 

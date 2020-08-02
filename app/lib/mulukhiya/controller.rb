@@ -150,10 +150,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def self.config
-      return Config.instance
-    end
-
     def self.webhook?
       return false
     end

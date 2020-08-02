@@ -41,7 +41,7 @@ module Mulukhiya
     def self.visibility_names
       return {public: 'public'}.merge(
         [:unlisted, :private, :direct].map do |name|
-          [name, Config.instance["/parser/toot/visibility/#{name}"]]
+          [name, config["/parser/toot/visibility/#{name}"]]
         end.to_h,
       )
     end

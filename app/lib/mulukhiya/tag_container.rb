@@ -1,5 +1,7 @@
 module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
+    include Package
+
     def initialize
       super
       @config = Config.instance
@@ -7,7 +9,7 @@ module Mulukhiya
     end
 
     def self.default_tags
-      return Config.instance['/tagging/default_tags'].map do |tag|
+      return config['/tagging/default_tags'].map do |tag|
         Environment.sns_class.create_tag(tag)
       end
     rescue Ginseng::ConfigError

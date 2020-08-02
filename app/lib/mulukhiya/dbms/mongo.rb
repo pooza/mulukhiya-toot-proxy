@@ -2,11 +2,12 @@ require 'mongo'
 
 module Mulukhiya
   class Mongo
+    include Package
     include Singleton
     attr_reader :db
 
     def self.dsn
-      return MongoDSN.parse(Config.instance['/mongo/dsn'])
+      return MongoDSN.parse(config['/mongo/dsn'])
     rescue Ginseng::ConfigError
       return nil
     end
@@ -20,7 +21,7 @@ module Mulukhiya
     end
 
     def self.health
-      Environment.account_class.get(token: Config.instance['/agent/info/token'])
+      Environment.account_class.get(token: config['/agent/info/token'])
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}

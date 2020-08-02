@@ -50,7 +50,7 @@ module Mulukhiya
     def self.visibility_names
       return {public: 'public'}.merge(
         [:unlisted, :private, :direct].map do |name|
-          [name, Config.instance["/parser/note/visibility/#{name}"]]
+          [name, config["/parser/note/visibility/#{name}"]]
         end.to_h,
       )
     end

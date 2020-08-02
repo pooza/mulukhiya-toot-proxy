@@ -2,6 +2,8 @@ require 'redis'
 
 module Mulukhiya
   class Redis < ::Redis
+    include Package
+
     def initialize
       dsn = Redis.dsn
       dsn.db ||= 1
@@ -31,7 +33,7 @@ module Mulukhiya
     alias del unlink
 
     def self.dsn
-      return Ginseng::RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
+      return Ginseng::RedisDSN.parse(config['/user_config/redis/dsn'])
     end
 
     def self.health

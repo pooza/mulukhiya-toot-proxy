@@ -1,6 +1,8 @@
 module Mulukhiya
   module Dolphin
     class Account < Mulukhiya::Misskey::Account
+      include Package
+
       def recent_status
         note = DolphinService.new.notes(account_id: id)&.first
         return Status[note['id']] if note
@@ -14,7 +16,7 @@ module Mulukhiya
           if host
             @uri = NoteURI.parse("https://#{host}")
           else
-            @uri = NoteURI.parse(Config.instance['/dolphin/url'])
+            @uri = NoteURI.parse(config['/dolphin/url'])
           end
           @uri.path = "/@#{username}"
         end
