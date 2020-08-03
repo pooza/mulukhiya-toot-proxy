@@ -666,7 +666,6 @@ itunes:
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
-      type: track
   hosts:
     - music.apple.com
     - itunes.apple.com

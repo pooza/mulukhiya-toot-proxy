@@ -4,7 +4,6 @@ module Mulukhiya
       super
       @config = Config.instance
       @service = ItunesService.new
-      @http = HTTP.new
     end
 
     def itunes?
@@ -16,7 +15,6 @@ module Mulukhiya
     def shortenable?
       return false unless itunes?
       return false unless album_id.present?
-      return false unless track_id.present?
       @config['/itunes/patterns'].each do |entry|
         next unless path.match(entry['pattern'])
         return entry['shortenable']
@@ -37,7 +35,7 @@ module Mulukhiya
     def album_id
       @config['/itunes/patterns'].each do |entry|
         next unless matches = path.match(entry['pattern'])
-        return matches[1]
+        return matches[1].to_i
       end
       return nil
     end
@@ -47,14 +45,15 @@ module Mulukhiya
     end
 
     def track_id
-      return query_values['i']
+      return nil unless query_values['i']
+      return query_values['i'].to_i
     rescue NoMethodError
       return nil
     end
 
     def track_id=(id)
       values = query_values || {}
-      values['i'] = id
+      values['i'] = id.to_i if id.present?
       self.query_values = values
     end
 
@@ -63,16 +62,23 @@ module Mulukhiya
     def track
       return nil unless itunes?
       return nil unless track_id.present?
-      return @service.lookup(track_id)
+      @track ||= @service.lookup(track_id)
+      return @track
+    end
+
+    def album
+      return nil unless itunes?
+      return nil unless album_id.present?
+      @album ||= @service.lookup(album_id)
+      return @album
     end
 
     def image_uri
       return nil unless itunes?
-      return nil unless track_id.present?
+      return nil if track_id.nil? && album_id.nil?
       unless @image_uri
-        track = @service.lookup(track_id)
-        raise Ginseng::RequestError, "Track '#{track_id}' not found" unless track
-        @image_uri = Ginseng::URI.parse(track['artworkUrl100'].sub('100x100', pixel_size))
+        values = @service.lookup(track_id || album_id)
+        @image_uri = Ginseng::URI.parse(values['artworkUrl100'].sub('100x100', pixel_size))
       end
       return @image_uri
     end
