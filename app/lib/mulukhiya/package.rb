@@ -45,19 +45,19 @@ module Mulukhiya
     end
 
     def self.version
-      return config['/package/version']
+      return Config.instance['/package/version']
     end
 
     def self.url
-      return config['/package/url']
+      return Config.instance['/package/url']
     end
 
     def self.description
-      return config['/package/description']
+      return Config.instance['/package/description']
     end
 
     def self.authors
-      return config['/package/authors']
+      return Config.instance['/package/authors']
     end
 
     def self.full_name
@@ -66,20 +66,6 @@ module Mulukhiya
 
     def self.user_agent
       return "#{name}/#{version} (#{url})"
-    end
-
-    def self.config
-      return Config.instance
-    end
-
-    def self.included(base)
-      base.extend(Methods)
-    end
-
-    module Methods
-      def config
-        return Config.instance
-      end
     end
   end
 end

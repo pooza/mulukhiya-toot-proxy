@@ -2,8 +2,6 @@ require 'vacuum'
 
 module Mulukhiya
   class AmazonService
-    include Package
-
     def initialize
       @config = Config.instance
       @http = HTTP.new
@@ -65,7 +63,7 @@ module Mulukhiya
     end
 
     def self.associate_tag
-      return config['/amazon/associate_tag']
+      return Config.instance['/amazon/associate_tag']
     rescue Ginseng::ConfigError
       return nil
     end

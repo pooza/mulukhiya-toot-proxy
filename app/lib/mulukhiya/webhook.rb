@@ -2,8 +2,6 @@ require 'digest/sha2'
 
 module Mulukhiya
   class Webhook
-    include Package
-
     attr_reader :sns, :reporter
 
     def digest
@@ -60,7 +58,7 @@ module Mulukhiya
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
         token: token,
-        salt: config['/crypt/salt'],
+        salt: Config.instance['/crypt/salt'],
       }.to_json)
     end
 
