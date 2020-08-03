@@ -7,8 +7,7 @@ module Mulukhiya
     def updatable?(uri)
       uri = VideoURI.parse(uri.to_s) unless uri.is_a?(VideoURI)
       return false unless uri.music?
-      return false unless uri.id.present?
-      return false unless uri.image_uri.present?
+      return false unless uri.image_uri
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)

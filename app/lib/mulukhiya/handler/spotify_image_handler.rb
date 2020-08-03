@@ -7,8 +7,7 @@ module Mulukhiya
     def updatable?(uri)
       uri = SpotifyURI.parse(uri.to_s) unless uri.is_a?(SpotifyURI)
       return false unless uri.spotify?
-      return false unless uri.track_id.present?
-      return false unless uri.image_uri.present?
+      return false unless uri.image_uri
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)

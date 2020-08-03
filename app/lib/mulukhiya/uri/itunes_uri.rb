@@ -14,7 +14,7 @@ module Mulukhiya
 
     def shortenable?
       return false unless itunes?
-      return false unless album_id.present?
+      return false unless album_id
       @config['/itunes/patterns'].each do |entry|
         next unless path.match(entry['pattern'])
         return entry['shortenable']
@@ -28,7 +28,6 @@ module Mulukhiya
       dest.host = @config['/itunes/hosts'].first
       dest.album_id = album_id
       dest.track_id = track_id
-      dest.fragment = nil
       return dest
     end
 
@@ -42,6 +41,14 @@ module Mulukhiya
 
     def album_id=(id)
       self.path = "/#{@config['/itunes/country']}/album/#{id}"
+      self.fragment = nil
+    end
+
+    def album
+      return nil unless itunes?
+      return nil unless album_id
+      @album ||= @service.lookup(album_id)
+      return @album
     end
 
     def track_id
@@ -52,34 +59,26 @@ module Mulukhiya
     end
 
     def track_id=(id)
-      if id.present?
-        values = query_values || {}
-        values['i'] = id.to_i
-      else
-        values = nil
-      end
+      values = query_values || {}
+      values['i'] = id.to_i
+      values.delete('i') if id.nil?
+      values = nil unless values.present?
       self.query_values = values
+      self.fragment = nil
     end
 
     alias id track_id
 
     def track
       return nil unless itunes?
-      return nil unless track_id.present?
+      return nil unless track_id
       @track ||= @service.lookup(track_id)
       return @track
     end
 
-    def album
-      return nil unless itunes?
-      return nil unless album_id.present?
-      @album ||= @service.lookup(album_id)
-      return @album
-    end
-
     def image_uri
       return nil unless itunes?
-      return nil if track_id.nil? && album_id.nil?
+      return nil unless album_id
       unless @image_uri
         values = @service.lookup(track_id || album_id)
         @image_uri = Ginseng::URI.parse(values['artworkUrl100'].sub('100x100', pixel_size))

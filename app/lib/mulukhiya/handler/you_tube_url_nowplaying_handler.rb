@@ -1,10 +1,5 @@
 module Mulukhiya
   class YouTubeURLNowplayingHandler < NowplayingHandler
-    def initialize(params = {})
-      super
-      @uris = {}
-    end
-
     def disable?
       return super || !YouTubeService.config?
     end

@@ -26,6 +26,7 @@ module Mulukhiya
 
     def track_id=(id)
       self.path = "/track/#{id}"
+      self.fragment = nil
     end
 
     def album_id
@@ -56,7 +57,7 @@ module Mulukhiya
 
     def image_uri
       return nil unless spotify?
-      return nil unless track_id.present?
+      return nil unless track_id
       @image_uri ||= @spotify.create_image_uri(@spotify.lookup_track(track_id))
       return @image_uri
     end
