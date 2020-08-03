@@ -3,7 +3,6 @@ module Mulukhiya
     def updatable?(uri)
       uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
       return false unless uri.itunes?
-      return false unless uri.track_id.present?
       return false unless uri.image_uri.present?
       return true
     rescue => e

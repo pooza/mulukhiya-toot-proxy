@@ -7,6 +7,7 @@ module Mulukhiya
       def valid?
         return false if to_s.empty?
         return false unless account
+        return true unless application
         return application.name == Package.name
       end
 
@@ -33,7 +34,9 @@ module Mulukhiya
       end
 
       def scopes
-        return application.scopes
+        return application.scopes if application
+        return nil unless matches = permission.match(/{(.*?)}/)[1]
+        return matches.split(',')
       end
     end
   end

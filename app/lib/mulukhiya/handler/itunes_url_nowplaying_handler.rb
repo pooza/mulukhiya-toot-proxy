@@ -2,14 +2,13 @@ module Mulukhiya
   class ItunesURLNowplayingHandler < NowplayingHandler
     def initialize(params = {})
       super
-      @tracks = {}
-      @service = ItunesService.new
+      @uris = {}
     end
 
     def updatable?(keyword)
       return false unless uri = ItunesURI.parse(keyword)
-      return false unless uri.track.present?
-      @tracks[keyword] = uri.track.merge('url' => uri.to_s)
+      return false if uri.track.nil? && uri.album.nil?
+      @uris[keyword] = uri
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
@@ -17,11 +16,17 @@ module Mulukhiya
     end
 
     def update(keyword)
-      return unless track = @tracks[keyword]
-      push(track['trackName'])
-      push(track['artistName'])
-      tags.concat(ArtistParser.new(track['artistName']).parse)
-      result.push(url: track['url'])
+      return unless uri = @uris[keyword]
+      if uri.track
+        push(uri.track['trackName'])
+        artist = uri.track['artistName']
+      elsif uri.album
+        push(uri.album['collectionName'])
+        artist = uri.album['artistName']
+      end
+      push(artist)
+      tags.concat(ArtistParser.new(artist).parse)
+      result.push(url: uri.to_s)
     end
   end
 end
