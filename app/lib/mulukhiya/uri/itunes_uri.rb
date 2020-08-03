@@ -52,8 +52,12 @@ module Mulukhiya
     end
 
     def track_id=(id)
-      values = query_values || {}
-      values['i'] = id.to_i if id.present?
+      if id.present?
+        values = query_values || {}
+        values['i'] = id.to_i
+      else
+        values = nil
+      end
       self.query_values = values
     end
 
