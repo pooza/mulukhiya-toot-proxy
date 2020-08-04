@@ -6,6 +6,7 @@ module Mulukhiya
       @config = Config.instance
       @http = HTTP.new
       @logger = Logger.new
+      @storage = AmazonItemStorage.new
       return unless AmazonService.config?
       @vacuum = Vacuum.new(
         marketplace: @config['/amazon/marketplace'],
@@ -45,9 +46,13 @@ module Mulukhiya
 
     def lookup(asin)
       cnt ||= 0
-      response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
-      raise "Invalid status #{response.status}" unless response.status == 200
-      return JSON.parse(response.to_s)['ItemsResult']['Items'].first
+      unless item = @storage[asin]
+        response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
+        raise "Invalid status #{response.status}" unless response.status == 200
+        item = JSON.parse(response.to_s)['ItemsResult']['Items'].first
+        @storage[asin] = item
+      end
+      return item
     rescue => e
       @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
       cnt += 1

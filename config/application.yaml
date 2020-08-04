@@ -618,6 +618,8 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
   retry_limit: 5
+  cache:
+    ttl: 86400
   resources:
     - Images.Primary.Small
     - Images.Primary.Medium
