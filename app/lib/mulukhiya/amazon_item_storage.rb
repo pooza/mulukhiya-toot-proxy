@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def []=(key, value)
-      return set(key, value)
+      set(key, value)
     end
 
     def get(key)
@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return [@config['/amazon/cache/ttl'], 86400].min
+      return [@config['/amazon/cache/ttl'], 86_400].min
     end
 
     def create_key(key)
