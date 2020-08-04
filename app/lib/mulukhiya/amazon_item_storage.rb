@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return min(@config['/amazon/cache/ttl'], 86400)
+      return [@config['/amazon/cache/ttl'], 86400].min
     end
 
     def create_key(key)
