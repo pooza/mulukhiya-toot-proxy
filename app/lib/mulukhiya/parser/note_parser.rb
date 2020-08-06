@@ -12,6 +12,10 @@ module Mulukhiya
       end
     end
 
+    def to_sanitized
+      return NoteParser.sanitize(text.clone)
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(NoteParser.acct_pattern).map(&:first).each do |acct|
