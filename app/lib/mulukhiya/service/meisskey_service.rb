@@ -32,9 +32,7 @@ module Mulukhiya
     end
 
     def announcements(params = {})
-      return super.map do |announcement|
-        announcement.deep_symbolize_keys
-      end
+      return super.map(&:deep_symbolize_keys)
     end
 
     def oauth_client
