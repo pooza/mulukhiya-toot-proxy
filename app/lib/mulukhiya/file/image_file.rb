@@ -47,6 +47,13 @@ module Mulukhiya
       return /False/i.match?(command.stdout)
     end
 
+    def animated?
+      return false unless image?
+      command = CommandLine.new(['identify', path])
+      command.exec
+      return 1 < command.stdout.each_line.count
+    end
+
     def resize(pixel)
       dest = create_dest_path(f: __method__, p: pixel, type: subtype)
       command = CommandLine.new(['convert', '-resize', "#{pixel}x#{pixel}", path, dest])

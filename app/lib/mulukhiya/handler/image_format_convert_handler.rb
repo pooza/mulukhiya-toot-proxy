@@ -10,6 +10,7 @@ module Mulukhiya
       return false if @source.type == 'image/jpeg'
       return false if @source.type == 'image/gif'
       return false if @source.alpha?
+      return false if @source.animated?
       return true
     end
   end
