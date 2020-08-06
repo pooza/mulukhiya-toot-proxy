@@ -80,6 +80,7 @@ test:
         - status
         - user_config
         - tag_atom_feed_renderer
+        - announcement_worker
     - name: postgres
       cases:
         - clipping_worker
