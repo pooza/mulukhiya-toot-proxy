@@ -38,7 +38,6 @@ module Mulukhiya
       template = Template.new('announcement')
       params.merge!(entry)
       params[:body] = parser.send("to_#{params[:format]}".to_sym)
-      params[:image_url] = params[:imageUrl]
       if entry[:starts_at] && entry[:ends_at]
         params[:start_at] = Time.parse(entry[:starts_at])
         params[:end_at] = Time.parse(entry[:ends_at])
