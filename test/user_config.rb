@@ -11,7 +11,7 @@ module Mulukhiya
     def test_edit
       assert_nil(@userconfig["/#{@key1}"])
       assert_nil(@userconfig["/#{@key1}/#{@key2}"])
-      assert_nil(@userconfig.raw.dig(@key1))
+      assert_nil(@userconfig.raw[@key1])
       assert_nil(@userconfig.raw.dig(@key1, @key2))
 
       @userconfig.update(@key1 => {@key2 => '焼きのり'})
