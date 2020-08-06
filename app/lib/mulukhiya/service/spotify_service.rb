@@ -11,8 +11,7 @@ module Mulukhiya
 
     def search_track(keyword)
       return nil unless SpotifyService.config?
-      tracks = RSpotify::Track.search(keyword)
-      return nil if tracks.nil?
+      return nil unless tracks = RSpotify::Track.search(keyword)
       return tracks.first
     end
 

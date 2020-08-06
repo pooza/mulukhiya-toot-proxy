@@ -1,5 +1,5 @@
 package:
-  version: 3.11.7
+  version: 3.11.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -50,6 +50,10 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
+  announcement:
+    local_clipping:
+      enable: false
+      path: tmp/announcements
 parser:
   toot:
     patterns:
@@ -80,6 +84,7 @@ test:
         - status
         - user_config
         - tag_atom_feed_renderer
+        - announcement_worker
     - name: postgres
       cases:
         - clipping_worker
@@ -618,6 +623,8 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
   retry_limit: 5
+  cache:
+    ttl: 86400
   resources:
     - Images.Primary.Small
     - Images.Primary.Medium

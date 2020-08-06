@@ -1,5 +1,11 @@
 module Mulukhiya
   class NowplayingHandler < Handler
+    def initialize(params = {})
+      super
+      @uris = {}
+      @tracks = {}
+    end
+
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?

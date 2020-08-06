@@ -34,12 +34,14 @@ module Mulukhiya
 
     def asin=(id)
       self.path = "/dp/#{id}"
+      self.fragment = nil
     end
 
     def item
       return nil unless amazon?
       return nil unless asin.present?
-      return @service.lookup(asin)
+      @item ||= @service.lookup(asin)
+      return @item
     end
 
     def associate_tag
@@ -50,17 +52,14 @@ module Mulukhiya
 
     def associate_tag=(tag)
       values = query_values || {}
-      if tag.present?
-        values['tag'] = tag
-      else
-        values.delete('tag')
-      end
+      values['tag'] = tag
+      values = nil unless values.present?
       self.query_values = values
     end
 
     def image_uri
       return nil unless amazon?
-      return nil unless asin.present?
+      return nil unless asin
       @image_uri ||= @service.create_image_uri(asin)
       return @image_uri
     end
@@ -71,9 +70,8 @@ module Mulukhiya
       return self unless shortenable?
       dest = clone
       dest.asin = asin
-      dest.fragment = nil
       dest.query_values = nil
-      dest.query_values = {tag: associate_tag} if associate_tag.present?
+      dest.query_values = {tag: associate_tag} if associate_tag
       return dest
     end
   end

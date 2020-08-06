@@ -1,10 +1,5 @@
 module Mulukhiya
   class SpotifyURLNowplayingHandler < NowplayingHandler
-    def initialize(params = {})
-      super
-      @uris = {}
-    end
-
     def disable?
       return super || !SpotifyService.config?
     end

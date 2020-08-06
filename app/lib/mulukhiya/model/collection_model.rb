@@ -24,7 +24,8 @@ module Mulukhiya
     end
 
     def respond_to_missing?(method, *args)
-      return args.empty?
+      return args.empty? if args.is_a?(Array)
+      return super
     end
 
     def collection_name

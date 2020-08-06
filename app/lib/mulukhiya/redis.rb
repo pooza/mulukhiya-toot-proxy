@@ -5,6 +5,8 @@ module Mulukhiya
     def initialize
       dsn = Redis.dsn
       dsn.db ||= 1
+      @logger = Logger.new
+      @config = Config.instance
       raise Ginseng::RedisError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
       raise Ginseng::RedisError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
       super(url: dsn.to_s)

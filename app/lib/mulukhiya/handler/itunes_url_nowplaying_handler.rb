@@ -1,10 +1,5 @@
 module Mulukhiya
   class ItunesURLNowplayingHandler < NowplayingHandler
-    def initialize(params = {})
-      super
-      @uris = {}
-    end
-
     def updatable?(keyword)
       return false unless uri = ItunesURI.parse(keyword)
       return false if uri.track.nil? && uri.album.nil?
@@ -26,7 +21,7 @@ module Mulukhiya
       end
       push(artist)
       tags.concat(ArtistParser.new(artist).parse)
-      result.push(url: uri.to_s)
+      result.push(url: uri.to_s, artist: artist)
     end
   end
 end
