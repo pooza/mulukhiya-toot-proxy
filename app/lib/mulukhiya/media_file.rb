@@ -34,10 +34,12 @@ module Mulukhiya
     end
 
     def valid_extname
-      return Rack::Mime::MIME_TYPES.invert[type]
+      @types ||= Rack::Mime::MIME_TYPES.invert
+      return @types[type]
     end
 
     def valid_extname?
+      return true if valid_extname.nil?
       return extname == valid_extname
     end
 

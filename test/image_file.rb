@@ -46,6 +46,16 @@ module Mulukhiya
       assert(@animated.animated?)
     end
 
+    def test_valid_extname
+      assert_equal(@png.valid_extname, '.png')
+      assert_nil(@animated.valid_extname)
+    end
+
+    def test_valid_extname?
+      assert(@png.valid_extname?)
+      assert(@animated.valid_extname?)
+    end
+
     def test_resize
       converted = @png.resize(32)
       assert_kind_of(ImageFile, converted)
