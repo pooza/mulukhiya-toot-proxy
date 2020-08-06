@@ -1,13 +1,21 @@
 <%# encoding: UTF-8 -%>
+<% if @params[:header] -%>
+---
+title: <%= @params[:title] || @params[:body].each_line.first.split(/\s+/).first.strip %>
+date: <%= Date.today.strftime %>
+categories: <%= @params[:category] %>
+---
+
+<% end -%>
 <% if @params[:title] -%>
 <%= @params[:title] %>
 
 <% end -%>
-<% if @params[:start_date] && @params[:end_date] -%>
+<% if @params[:start_at] && @params[:end_at] -%>
 <% if @params[:all_day] -%>
-<%= @params[:start_date].strftime('%Y/%m/%d') %> 〜 <%= @params[:end_date].strftime('%Y/%m/%d') %>
+<%= @params[:start_at].strftime('%Y/%m/%d') %> 〜 <%= @params[:end_at].strftime('%Y/%m/%d') %>
 <% else -%>
-<%= @params[:start_date].strftime('%Y/%m/%d %H:%M') %> 〜 <%= @params[:end_date].strftime('%Y/%m/%d %H:%M') %>
+<%= @params[:start_at].strftime('%Y/%m/%d %H:%M') %> 〜 <%= @params[:end_at].strftime('%Y/%m/%d %H:%M') %>
 <% end -%>
 <% end -%>
 <%= @params[:body] %>

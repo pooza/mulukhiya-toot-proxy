@@ -10,6 +10,10 @@ module Mulukhiya
       end
     end
 
+    def to_sanitized
+      return TootParser.sanitize(text.clone)
+    end
+
     def all_tags
       unless @all_tags
         container = TagContainer.new

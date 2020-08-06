@@ -19,6 +19,15 @@ module Mulukhiya
       return super
     end
 
+    def announcements(params = {})
+      return super.map do |announcement|
+        entry = announcement.deep_symbolize_keys
+        entry[:text] = entry[:content].sanitize.strip
+        entry.delete(:read)
+        entry
+      end
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/v1/apps', {
