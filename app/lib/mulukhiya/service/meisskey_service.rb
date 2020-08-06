@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def announcements(params = {})
-      super.map do |announcement|
+      return super.map do |announcement|
         announcement.deep_symbolize_keys
       end
     end

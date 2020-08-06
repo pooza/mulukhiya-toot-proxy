@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def announcements(params = {})
-      super.map do |announcement|
+      return super.map do |announcement|
         entry = announcement.deep_symbolize_keys
         entry[:text] = entry[:content].sanitize.strip
         entry.delete(:read)
