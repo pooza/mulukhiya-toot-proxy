@@ -70,11 +70,9 @@ module Mulukhiya
       File.unlink(path) if exist?
     end
 
-    def remote_dics
+    def remote_dics(&block)
       return enum_for(__method__) unless block_given?
-      RemoteDictionary.all do |dic|
-        yield dic
-      end
+      RemoteDictionary.all(&block)
     end
 
     private

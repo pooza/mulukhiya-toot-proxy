@@ -11,7 +11,7 @@ module Mulukhiya
 
     def perform
       return unless executable?
-      entries.each do |entry|
+      announcements.each do |entry|
         next if cache.member?(entry['id'])
         service.post(
           Environment.controller_class.status_field => create_body(entry, :sanitized),
@@ -21,6 +21,11 @@ module Mulukhiya
         sleep(1)
       end
       save
+    end
+
+    def announcements(&block)
+      return enum_for(__method__) unless block_given?
+      service.announcements.each(&block)
     end
 
     private
@@ -39,18 +44,6 @@ module Mulukhiya
       return template.to_s
     end
 
-    def entries
-      @entries ||= announcements
-      return @entries
-    end
-
-    def announcements
-      return enum_for(__method__) unless block_given?
-      service.announcements.each do |announcement|
-        yield announcement
-      end
-    end
-
     def cache
       return {} unless File.exist?(path)
       return JSON.parse(File.read(path))
@@ -62,7 +55,7 @@ module Mulukhiya
     alias load cache
 
     def save
-      File.write(path, entries.to_h {|v| [v['id'], v]}.to_json)
+      File.write(path, announcements.to_h {|v| [v['id'], v]}.to_json)
     rescue => e
       Slack.broadcast(e)
       @logger.error(e)
