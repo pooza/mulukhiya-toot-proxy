@@ -22,6 +22,15 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/announcements' do
+      if Environment.controller_class.announcement?
+        @renderer.message = Environment.info_agent_service.announcements
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     post '/mulukhiya/webhook/:digest' do
       errors = WebhookContract.new.exec(params)
       if errors.present?
