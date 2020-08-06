@@ -29,7 +29,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ffmpeg
-          sudo apt install imagemagick
           sudo apt install libpq-dev
           sudo apt install libidn11-dev
       - name: bundle install
