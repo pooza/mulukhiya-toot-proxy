@@ -50,6 +50,10 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
+  announcement:
+    local_clipping:
+      enable: false
+      path: tmp/announcements
 parser:
   toot:
     patterns:
