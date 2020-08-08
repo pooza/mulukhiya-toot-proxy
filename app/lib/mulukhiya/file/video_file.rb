@@ -2,8 +2,23 @@ module Mulukhiya
   class VideoFile < MediaFile
     alias video? valid?
 
+    def type
+      return [mediatype, subtype].join('/') if mimemagic_invalid?
+      return super
+    end
+
+    def mediatype
+      return 'video' if mimemagic_invalid?
+      return super
+    end
+
+    def subtype
+      return "x-#{video_stream['codec_name'].downcase}" if mimemagic_invalid?
+      return super
+    end
+
     def width
-      detail_info['streams'].each do |stream|
+      streams.each do |stream|
         next unless stream['codec_type'] == default_mediatype
         next unless stream['width'].present?
         return stream['width'].to_i
@@ -12,7 +27,7 @@ module Mulukhiya
     end
 
     def height
-      detail_info['streams'].each do |stream|
+      streams.each do |stream|
         next unless stream['codec_type'] == default_mediatype
         next unless stream['height'].present?
         return stream['height'].to_i
@@ -21,7 +36,7 @@ module Mulukhiya
     end
 
     def duration
-      detail_info['streams'].each do |stream|
+      streams.each do |stream|
         next unless stream['codec_type'] == default_mediatype
         next unless stream['duration'].present?
         return stream['duration'].to_f
@@ -36,8 +51,8 @@ module Mulukhiya
       return VideoFile.new(dest)
     end
 
-    def detail_info
-      unless @detail_info
+    def streams
+      unless @streams
         command = CommandLine.new([
           'ffprobe', '-v', 'quiet',
           '-print_format', 'json',
@@ -45,9 +60,23 @@ module Mulukhiya
           path
         ])
         command.exec
-        @detail_info = JSON.parse(command.stdout)
+        @streams = JSON.parse(command.stdout)['streams']
       end
-      return @detail_info
+      return @streams
+    end
+
+    alias detail_info streams
+
+    def mimemagic_invalid?
+      return mimemagic&.mediatype != 'video' && video_stream.present?
+    end
+
+    def video_stream
+      return streams.find {|v| v['codec_type'] == 'video'}
+    end
+
+    def audio_stream
+      return streams.find {|v| v['codec_type'] == 'audio'}
     end
   end
 end
