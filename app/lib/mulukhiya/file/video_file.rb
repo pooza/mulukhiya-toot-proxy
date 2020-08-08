@@ -72,11 +72,11 @@ module Mulukhiya
     end
 
     def video_stream
-      return streams.select {|v| v['codec_type'] == 'video'}.first
+      return streams.find {|v| v['codec_type'] == 'video'}
     end
 
     def audio_stream
-      return streams.select {|v| v['codec_type'] == 'audio'}.first
+      return streams.find {|v| v['codec_type'] == 'audio'}
     end
   end
 end
