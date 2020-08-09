@@ -3,44 +3,32 @@ module Mulukhiya
     alias video? valid?
 
     def type
-      return [mediatype, subtype].join('/') if mimemagic_invalid?
+      return [mediatype, subtype].join('/') if invalid_mediatype?
       return super
     end
 
     def mediatype
-      return 'video' if mimemagic_invalid?
+      return default_mediatype if invalid_mediatype?
       return super
     end
 
     def subtype
-      return "x-#{video_stream['codec_name'].downcase}" if mimemagic_invalid?
+      return "x-#{video_stream['codec_name'].downcase}" if invalid_mediatype?
       return super
     end
 
     def width
-      streams.each do |stream|
-        next unless stream['codec_type'] == default_mediatype
-        next unless stream['width'].present?
-        return stream['width'].to_i
-      end
+      return video_stream['width'].to_i if video_stream&.dig('width')
       return nil
     end
 
     def height
-      streams.each do |stream|
-        next unless stream['codec_type'] == default_mediatype
-        next unless stream['height'].present?
-        return stream['height'].to_i
-      end
+      return video_stream['height'].to_i if video_stream&.dig('height')
       return nil
     end
 
     def duration
-      streams.each do |stream|
-        next unless stream['codec_type'] == default_mediatype
-        next unless stream['duration'].present?
-        return stream['duration'].to_f
-      end
+      return video_stream['duration'].to_f if video_stream&.dig('duration')
       return nil
     end
 
@@ -51,32 +39,8 @@ module Mulukhiya
       return VideoFile.new(dest)
     end
 
-    def streams
-      unless @streams
-        command = CommandLine.new([
-          'ffprobe', '-v', 'quiet',
-          '-print_format', 'json',
-          '-show_streams',
-          path
-        ])
-        command.exec
-        @streams = JSON.parse(command.stdout)['streams']
-      end
-      return @streams
-    end
-
-    alias detail_info streams
-
-    def mimemagic_invalid?
-      return mimemagic&.mediatype != 'video' && video_stream.present?
-    end
-
-    def video_stream
-      return streams.find {|v| v['codec_type'] == 'video'}
-    end
-
-    def audio_stream
-      return streams.find {|v| v['codec_type'] == 'audio'}
+    def invalid_mediatype?
+      return mimemagic&.mediatype == 'application' && video_stream.present?
     end
   end
 end

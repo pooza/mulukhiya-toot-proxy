@@ -88,8 +88,26 @@ module Mulukhiya
       return @mimemagic
     end
 
-    def detail_info
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    def streams
+      unless @streams
+        command = CommandLine.new([
+          'ffprobe', '-v', 'quiet',
+          '-print_format', 'json',
+          '-show_streams',
+          path
+        ])
+        command.exec
+        @streams = JSON.parse(command.stdout)['streams']
+      end
+      return @streams
+    end
+
+    def video_stream
+      return streams.find {|v| v['codec_type'] == 'video'}
+    end
+
+    def audio_stream
+      return streams.find {|v| v['codec_type'] == 'audio'}
     end
   end
 end

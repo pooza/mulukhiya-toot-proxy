@@ -30,7 +30,6 @@ module Mulukhiya
     post %r{/api/v[12]/media} do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        filename: params[:file][:filename],
         version: @config['/mastodon/media_api/version'],
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
