@@ -31,10 +31,6 @@ module Mulukhiya
       return nil
     end
 
-    def announcements(params = {})
-      return super.map(&:deep_symbolize_keys)
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/app/create', {

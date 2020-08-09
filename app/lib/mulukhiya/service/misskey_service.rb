@@ -31,14 +31,6 @@ module Mulukhiya
       return nil
     end
 
-    def announcements(params = {})
-      return super.map do |announcement|
-        entry = announcement.deep_symbolize_keys
-        entry[:imate_url] = entry[:imageUrl]
-        entry
-      end
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         r = @http.post('/api/app/create', {
