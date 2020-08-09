@@ -68,7 +68,7 @@ module Mulukhiya
     alias detail_info streams
 
     def mimemagic_invalid?
-      return mimemagic&.mediatype != 'video' && video_stream.present?
+      return mimemagic&.mediatype == 'application' && video_stream.present?
     end
 
     def video_stream
