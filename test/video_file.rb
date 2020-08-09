@@ -4,12 +4,14 @@ module Mulukhiya
       @mp4 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
       @mkv = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mkv'))
       @jpeg = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/logo.jpg'))
+      @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
     end
 
     def test_video?
       assert(@mp4.video?)
       assert(@mkv.video?)
       assert_false(@jpeg.video?)
+      assert_false(@mp3.video?)
     end
 
     def test_mediatype

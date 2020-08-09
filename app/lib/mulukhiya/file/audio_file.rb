@@ -2,6 +2,21 @@ module Mulukhiya
   class AudioFile < MediaFile
     alias audio? valid?
 
+    def type
+      return [mediatype, subtype].join('/') if invalid_mediatype?
+      return super
+    end
+
+    def mediatype
+      return default_mediatype if invalid_mediatype?
+      return super
+    end
+
+    def subtype
+      return "x-#{audio_stream['codec_name'].downcase}" if invalid_mediatype?
+      return super
+    end
+
     def width
       return nil
     end
@@ -11,11 +26,7 @@ module Mulukhiya
     end
 
     def duration
-      detail_info['streams'].each do |stream|
-        next unless stream['codec_type'] == default_mediatype
-        next if stream['duration'].empty?
-        return stream['duration'].to_f
-      end
+      return audio_stream['duration'].to_f if audio_stream['duration'].present?
       return nil
     end
 
@@ -26,18 +37,8 @@ module Mulukhiya
       return AudioFile.new(dest)
     end
 
-    def detail_info
-      unless @detail_info
-        command = CommandLine.new([
-          'ffprobe', '-v', 'quiet',
-          '-print_format', 'json',
-          '-show_streams',
-          path
-        ])
-        command.exec
-        @detail_info = JSON.parse(command.stdout)
-      end
-      return @detail_info
+    def invalid_mediatype?
+      return mimemagic&.mediatype == 'application' && audio_stream.present?
     end
   end
 end

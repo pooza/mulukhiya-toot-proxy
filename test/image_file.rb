@@ -3,10 +3,15 @@ module Mulukhiya
     def setup
       @png = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/ribbon08-009.png'))
       @animated = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'))
+      @mp3 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
+      @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
     end
 
     def test_image?
       assert(@png.image?)
+      assert(@animated.image?)
+      assert_false(@mp3.image?)
+      assert_false(@mp4.image?)
     end
 
     def test_mediatype
