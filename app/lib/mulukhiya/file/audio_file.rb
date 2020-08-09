@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def duration
-      return audio_stream['duration'].to_f if audio_stream['duration'].present?
+      return audio_stream['duration'].to_f if audio_stream&.dig('duration')
       return nil
     end
 

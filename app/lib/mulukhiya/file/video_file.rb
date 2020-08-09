@@ -18,17 +18,17 @@ module Mulukhiya
     end
 
     def width
-      return video_stream['width'].to_i if video_stream['width'].present?
+      return video_stream['width'].to_i if video_stream&.dig('width')
       return nil
     end
 
     def height
-      return video_stream['height'].to_i if video_stream['height'].present?
+      return video_stream['height'].to_i if video_stream&.dig('height')
       return nil
     end
 
     def duration
-      return video_stream['duration'].to_f if video_stream['duration'].present?
+      return video_stream['duration'].to_f if video_stream&.dig('duration')
       return nil
     end
 
