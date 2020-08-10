@@ -31,6 +31,10 @@ handler:
     disable: true
   tweet:
     disable: true
+  canonical_url:
+    ignore:
+      domains:
+        - instagram.com
   shortened_url:
     domains:
       - t.co
