@@ -178,6 +178,10 @@ module Mulukhiya
       return TwitterService.config?
     end
 
+    def self.annict?
+      return AnnictService.config?
+    end
+
     def self.webhook_entries
       return nil
     end

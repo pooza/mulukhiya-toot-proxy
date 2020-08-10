@@ -54,7 +54,7 @@ html lang='ja'
           .field-update-button-container
             a :href='twitterHref'
               img src='/mulukhiya/sign_in_twitter.png'
-      section class='config' v-if='username'
+      section class='config' v-if='username && show_annict'
         h3 v-on:click='toggleAnnictSection' Annict
         .section-contents v-show='show_annict_detail'
           .inline-field-container
@@ -119,6 +119,7 @@ html lang='ja'
           show_growi: #{controller.clipping?},
           show_dropbox: #{controller.clipping?},
           show_twitter: #{controller.twitter?},
+          show_annict: #{controller.annict?},
           show_growi_detail: false,
           show_dropbox_detail: false,
           show_tags_detail: false,

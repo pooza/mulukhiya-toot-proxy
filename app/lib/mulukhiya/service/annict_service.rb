@@ -3,7 +3,7 @@ module Mulukhiya
     def initialize(token = nil)
       @config = Config.instance
       @http = HTTP.new
-      @http.base_uri = 'https://annict.jp'
+      @http.base_uri = @config['/annict/url']
       @token = token
     end
 
@@ -29,6 +29,22 @@ module Mulukhiya
         scope: @config['/annict/oauth/scopes'].join(' '),
       }
       return uri
+    end
+
+    def self.client_id
+      return Config.instance['/annict/oauth/client/id']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
+    def self.client_secret
+      return Config.instance['/annict/oauth/client/secret']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
+    def self.config?
+      return client_id.present? && client_secret.present?
     end
   end
 end
