@@ -28,6 +28,7 @@ module Mulukhiya
         env: Environment,
         crypt: Crypt,
         config: @config,
+        annict: AnnictService.new,
         scripts: @config['/webui/scripts'],
         stylesheets: @config['/webui/stylesheets'],
         metadata: @config.raw.dig('application', 'webui', 'metadata'),

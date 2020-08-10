@@ -671,6 +671,13 @@ spotify:
       type: track
     - pattern: /album/([[:alnum:]]+)
       type: album
+annict:
+  oauth:
+    client:
+      id: nil
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - read
 itunes:
   country: jp
   lang: ja_jp

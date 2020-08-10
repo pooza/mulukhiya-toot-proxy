@@ -115,6 +115,26 @@ module Mulukhiya
       @renderer.status = 404
     end
 
+    post '/mulukhiya/annict/auth' do
+      errors = AnnictAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif @sns.account
+        r = AnnictService.new.auth(params['code'])
+        if r.code == 200
+          @sns.account.config.update(annict: {token: r['access_token']})
+          @renderer.message = user_config_info
+        else
+          @renderer.message = r.parsed_response
+        end
+        @renderer.status = r.code
+      else
+        @renderer.status = 403
+      end
+      return @renderer.to_s
+    end
+
     get '/auth/twitter/callback' do
       errors = TwitterAuthContract.new.exec(params)
       if errors.present?

@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 ruby '2.7.1'
+gem 'annict'
 gem 'bootsnap'
 gem 'dropbox_api'
 gem 'dry-validation'
