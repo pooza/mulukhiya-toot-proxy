@@ -33,6 +33,12 @@ module Mulukhiya
       return nil
     end
 
+    def annict
+      return nil unless config['/annict/token'].present?
+      @annict ||= AnnictService.new(config['/annict/token'])
+      return @annict
+    end
+
     def twitter
       unless @twitter
         return nil unless config['/twitter/token']

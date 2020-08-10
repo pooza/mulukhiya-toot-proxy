@@ -1,9 +1,10 @@
 module Mulukhiya
   class AnnictService
-    def initialize
+    def initialize(token = nil)
       @config = Config.instance
       @http = HTTP.new
       @http.base_uri = 'https://annict.jp'
+      @token = token
     end
 
     def auth(code)
