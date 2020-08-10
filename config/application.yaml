@@ -131,6 +131,7 @@ test:
         - misskey_controller
         - meisskey_controller
         - pleroma_controller
+        - webhook_controller
         - mongo
         - access_token
         - mastodon_auth_contract
