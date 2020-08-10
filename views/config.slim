@@ -54,6 +54,11 @@ html lang='ja'
           .field-update-button-container
             a :href='twitterHref'
               img src='/mulukhiya/sign_in_twitter.png'
+      section class='config' v-if='username && show_annict'
+        h3 v-on:click='toggleAnnictSection' Twitter
+        .section-contents v-show='show_annict_detail'
+          .field-update-button-container
+            a href=annict.oauth_url Annictの利用登録
       section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
@@ -115,6 +120,7 @@ html lang='ja'
           show_webhook_detail: false,
           show_notify_detail: false,
           show_twitter_detail: false,
+          show_annict_detail: false,
         },
         computed: {
           twitterHref: function () {
