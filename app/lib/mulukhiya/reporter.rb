@@ -18,8 +18,11 @@ module Mulukhiya
     def push(entry)
       return unless entry.present?
       super
-      @logger.info(entry)
       @dump = nil
+    end
+
+    def log(entry)
+      @logger.info(entry)
     end
 
     def to_h
