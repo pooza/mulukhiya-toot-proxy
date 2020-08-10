@@ -1,7 +1,7 @@
 module Mulukhiya
   class AnnictServiceTest < TestCase
     def setup
-      @service = Environment.test_account.annict
+      @service = Environment.test_account.annict if AnnictService.config?
     end
 
     def test_config?
