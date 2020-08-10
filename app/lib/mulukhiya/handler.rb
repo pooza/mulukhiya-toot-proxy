@@ -166,8 +166,7 @@ module Mulukhiya
       rescue RestClient::Exception, HTTParty::Error => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure
-        params[:reporter].push(handler.summary) if handler.reportable?
-        params[:reporter].log(handler.summary) if handler.loggable?
+        params[:reporter].push(handler)
       end
       return params[:reporter]
     end
