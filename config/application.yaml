@@ -184,6 +184,7 @@ test:
       cases:
         - webhook
         - webhook_image_handler
+        - webhook_controller
 webui:
   scripts:
     - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
