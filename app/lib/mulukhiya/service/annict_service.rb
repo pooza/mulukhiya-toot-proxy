@@ -13,8 +13,8 @@ module Mulukhiya
         body: {
           'grant_type' => 'authorization_code',
           'redirect_uri' => @config['/mastodon/oauth/redirect_uri'],
-          'client_id' => @config['/annict/oauth/client/id'],
-          'client_secret' => @config['/annict/oauth/client/secret'],
+          'client_id' => AnnictService.client_id,
+          'client_secret' => AnnictService.client_secret,
           'code' => code,
         },
       })
@@ -23,7 +23,7 @@ module Mulukhiya
     def oauth_uri
       uri = @http.create_uri('/oauth/authorize')
       uri.query_values = {
-        client_id: @config['/annict/oauth/client/id'],
+        client_id: AnnictService.client_id,
         response_type: 'code',
         redirect_uri: @config['/annict/oauth/redirect_uri'],
         scope: @config['/annict/oauth/scopes'].join(' '),
