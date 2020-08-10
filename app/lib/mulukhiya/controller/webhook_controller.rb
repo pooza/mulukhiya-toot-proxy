@@ -1,6 +1,6 @@
 module Mulukhiya
   class WebhookController < Controller
-    post '/mulukhiya/webhook/:digest' do
+    post '/:digest' do
       errors = WebhookContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
@@ -15,7 +15,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/webhook/:digest' do
+    get '/:digest' do
       if Webhook.create(params[:digest])
         @renderer.message = {message: 'OK'}
       else
