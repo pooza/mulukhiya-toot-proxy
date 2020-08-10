@@ -697,7 +697,6 @@ itunes:
 youtube:
   url: https://www.googleapis.com/
 twitter:
-  consumer:
   status:
     tags: []
     length:
