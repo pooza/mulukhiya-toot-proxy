@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_oauth_uri
-      return unless TwitterService.config?
+      return unless AnnictService.config?
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
     end
   end
