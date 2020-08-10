@@ -1,5 +1,5 @@
 module Mulukhiya
-  class WebhookController < MisskeyController
+  class WebhookController < Controller
     post '/mulukhiya/webhook/:digest' do
       errors = WebhookContract.new.exec(params)
       if errors.present?
