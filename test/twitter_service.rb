@@ -1,7 +1,7 @@
 module Mulukhiya
   class TwitterServiceTest < TestCase
     def setup
-      @service = Environment.test_account.twitter
+      @service = Environment.test_account.twitter if TwitterService.config?
     end
 
     def test_config?

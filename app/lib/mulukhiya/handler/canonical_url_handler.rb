@@ -25,7 +25,7 @@ module Mulukhiya
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
-      canonical = Ginseng::URI.parse(elements.first.attribute('href'))
+      return false unless canonical = Ginseng::URI.parse(elements.first.attribute('href'))
       return false if ignore?(canonical)
       @canonicals[uri.to_s] = canonical
       return true
@@ -39,9 +39,14 @@ module Mulukhiya
       return true if uri.path == '/'
       return true if uri.path.empty?
       return true if uri.query_values.present?
+      return true if ignore_domains.select {|v| uri.host.end_with?(v)}.present?
       return true if AmazonURI.parse(uri.to_s).valid?
       return true if ItunesURI.parse(uri.to_s).valid?
       return false
+    end
+
+    def ignore_domains
+      return @config['/handler/canonical_url/ignore/domains'] || []
     end
   end
 end

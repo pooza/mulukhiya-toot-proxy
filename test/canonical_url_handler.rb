@@ -42,6 +42,10 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://www.instagram.com/p/CDngan1DcHJ/')
+      assert_nil(@handler.debug_info)
+
+      @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.apple.com/jp/apple-music/')
       assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://www.apple.com/jp/apple-music/')
     end

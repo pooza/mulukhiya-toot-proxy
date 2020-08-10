@@ -16,10 +16,17 @@ module Mulukhiya
     end
 
     def push(entry)
-      return unless entry.present?
-      super
+      if entry.is_a?(Handler)
+        push(entry.summary) if entry.reportable?
+        log(entry.summary) if entry.loggable?
+      elsif entry.present?
+        super
+        @dump = nil
+      end
+    end
+
+    def log(entry)
       @logger.info(entry)
-      @dump = nil
     end
 
     def to_h

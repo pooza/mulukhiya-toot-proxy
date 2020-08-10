@@ -56,9 +56,16 @@ module Mulukhiya
       return Environment.info_agent_service&.notify(sns.account, message, response)
     end
 
+    def reportable?
+      return false if verbose? && !@sns.account.notify_verbose? && @errors.empty?
+      return loggable?
+    end
+
+    def loggable?
+      return @result.present? || @errors.present?
+    end
+
     def summary
-      return nil if verbose? && !@sns.account.notify_verbose? && !@errors.present?
-      return nil if @result.empty? && @errors.empty?
       return {
         event: @event.to_s,
         handler: underscore_name,
@@ -159,7 +166,7 @@ module Mulukhiya
       rescue RestClient::Exception, HTTParty::Error => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure
-        params[:reporter].push(handler.summary)
+        params[:reporter].push(handler)
       end
       return params[:reporter]
     end

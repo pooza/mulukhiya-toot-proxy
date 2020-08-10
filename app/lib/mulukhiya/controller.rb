@@ -22,39 +22,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/announcements' do
-      if Environment.controller_class.announcement?
-        @renderer.message = Environment.info_agent_service.announcements
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/webhook/:digest' do
-      errors = WebhookContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = errors
-      elsif webhook = Webhook.create(params[:digest])
-        reporter = webhook.post(params)
-        @renderer.message = reporter.response.parsed_response
-        @renderer.status = reporter.response.code
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
-    get '/mulukhiya/webhook/:digest' do
-      if Webhook.create(params[:digest])
-        @renderer.message = {message: 'OK'}
-      else
-        @renderer.status = 404
-      end
-      return @renderer.to_s
-    end
-
     get '/mulukhiya/feed/tag/:tag' do
       if Environment.controller_class.tag_feed?
         @renderer = TagAtomFeedRenderer.new
@@ -124,6 +91,26 @@ module Mulukhiya
       @renderer.status = 404
     end
 
+    post '/mulukhiya/annict/auth' do
+      errors = AnnictAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      elsif @sns.account
+        r = AnnictService.new.auth(params['code'])
+        if r.code == 200
+          @sns.account.config.update(annict: {token: r['access_token']})
+          @renderer.message = user_config_info
+        else
+          @renderer.message = r.parsed_response
+        end
+        @renderer.status = r.code
+      else
+        @renderer.status = 403
+      end
+      return @renderer.to_s
+    end
+
     get '/auth/twitter/callback' do
       errors = TwitterAuthContract.new.exec(params)
       if errors.present?
@@ -189,6 +176,10 @@ module Mulukhiya
 
     def self.twitter?
       return TwitterService.config?
+    end
+
+    def self.annict?
+      return AnnictService.config?
     end
 
     def self.webhook_entries
