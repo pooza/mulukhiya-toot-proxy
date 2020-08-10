@@ -44,7 +44,9 @@ module Mulukhiya
     end
 
     def self.config?
-      return client_id.present? && client_secret.present?
+      return false if client_id.nil?
+      return false if client_secret.nil?
+      return true
     end
   end
 end
