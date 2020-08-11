@@ -28,12 +28,12 @@ module Mulukhiya
     end
 
     def post(status)
-      status = {text: status} unless status.is_a?(Hash)
-      status.deep_symbolize_keys!
+      status = {'text' => status} unless status.is_a?(Hash)
+      status.deep_stringify_keys!
       body = {
-        Environment.controller_class.status_field => status[:text],
+        Environment.controller_class.status_field => status['text'],
         'visibility' => visibility,
-        'attachments' => status[:attachments] || [],
+        'attachments' => status['attachments'] || [],
       }
       Handler.dispatch(:pre_webhook, body, {reporter: reporter, sns: @sns})
       reporter.response = @sns.post(body)
