@@ -64,8 +64,8 @@ module Mulukhiya
     end
 
     def updated_at=(time)
-      return if updated_at && Time.parse(time) < updated_at
-      @storage[account['id']] = {time: time}
+      return if updated_at && Time.parse(time.to_s) < updated_at
+      @storage[account['id']] = {time: time.to_s}
       @updated_at = nil
     end
 
