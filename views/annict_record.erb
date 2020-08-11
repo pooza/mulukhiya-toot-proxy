@@ -1,7 +1,7 @@
 <%# encoding: UTF-8 -%>
 <%= @params[:record][:work][:title] %>
 <% if @params[:record][:episode] -%>
-<%= @params[:record][:episode][:number].to_i %>話 「<%= @params[:record][:episode][:title] %>」を視聴。
+<%= @params[:record][:episode][:number_text]%> 「<%= @params[:record][:episode][:title] %>」を視聴。
 <% end -%>
 <% if @params[:record][:record][:comment].present? -%>
 
