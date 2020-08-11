@@ -29,6 +29,7 @@ module Mulukhiya
 
     def post(status)
       status = {text: status} unless status.is_a?(Hash)
+      status.deep_symbolize_keys!
       body = {
         Environment.controller_class.status_field => status[:text],
         'visibility' => visibility,

@@ -696,6 +696,7 @@ annict:
         - created_at
         - work.id
         - work.title
+        - work.images
         - episode.id
         - episode.number_text
         - episode.title

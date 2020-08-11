@@ -17,15 +17,17 @@ module Mulukhiya
 
     def test_records
       assert_kind_of(Enumerator, @service.records)
+      @service.records do |record|
+        assert_kind_of(Hash, record)
+        assert_kind_of(String, record['work']['title'])
+        assert_kind_of([Float, NilClass], record['episode']['number'])
+        uri = Ginseng::URI.parse(record.dig('work', 'images', 'recomended_url'))
+        assert(uri.absolute?) if uri
+      end
     end
 
     def test_recent_records
       assert_kind_of(Enumerator, @service.recent_records)
-      @service.recent_records do |record|
-        assert_kind_of(Hash, record)
-        assert_kind_of(String, record['work']['title'])
-        assert_kind_of(Float, record['episode']['number'])
-      end
     end
 
     def test_updated_at

@@ -19,24 +19,19 @@ module Mulukhiya
 
     def records
       return enum_for(__method__) unless block_given?
-      page = 1
-      loop do
-        uri = api_service.create_uri('/v1/activities')
-        uri.query_values = {
-          filter_user_id: account['id'],
-          fields: @config['/annict/api/records/fields'].join(','),
-          page: page,
-          per_page: @per_page,
-          sort_id: 'desc',
-          access_token: @token,
-        }
-        r = api_service.get(uri)
-        r['activities'].each do |activity|
-          next unless activity['action'] == 'create_record'
-          yield activity
-        end
-        break unless r['next_page']
-        page += 1
+      uri = api_service.create_uri('/v1/activities')
+      uri.query_values = {
+        filter_user_id: account['id'],
+        fields: @config['/annict/api/records/fields'].join(','),
+        page: 1,
+        per_page: @per_page,
+        sort_id: 'desc',
+        access_token: @token,
+      }
+      r = api_service.get(uri)
+      r['activities'].each do |activity|
+        next unless activity['action'] == 'create_record'
+        yield activity
       end
     end
 
