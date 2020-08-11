@@ -181,6 +181,11 @@ test:
         - growi_clipper
         - growi_bookmark_handler
         - growi_clipping_command_handler
+    - name: annict
+      cases:
+        - annict_polling_worker
+        - annict_service
+        - annict_storage
     - name: webhook
       cases:
         - webhook

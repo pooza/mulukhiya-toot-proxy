@@ -9,7 +9,6 @@ module Mulukhiya
     end
 
     def test_account
-      return unless @service
       assert_kind_of(Hash, @service.account)
       assert_kind_of(Integer, @service.account['id'])
       assert_kind_of(String, @service.account['name'])
@@ -17,12 +16,10 @@ module Mulukhiya
     end
 
     def test_records
-      return unless @service
       assert_kind_of(Enumerator, @service.records)
     end
 
     def test_recent_records
-      return unless @service
       assert_kind_of(Enumerator, @service.recent_records)
       @service.recent_records do |record|
         assert_kind_of(Hash, record)
@@ -32,12 +29,10 @@ module Mulukhiya
     end
 
     def test_updated_at
-      return unless @service
-      assert_kind_of([Date, NilClass], @service.updated_at)
+      assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
     def test_oauth_uri
-      return unless @service
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
     end
   end
