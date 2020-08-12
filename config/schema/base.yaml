@@ -115,6 +115,33 @@ properties:
             type: array
             items:
               type: string
+  annict:
+    type: object
+    required:
+      - oauth
+    properties:
+      oauth:
+        type: object
+        required:
+          - client
+        properties:
+          client:
+            type: object
+          required:
+            - key
+            - secret
+          properties:
+            key:
+              type: string
+            secret:
+              type: string
+        status:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
   amazon:
     type: object
     required:

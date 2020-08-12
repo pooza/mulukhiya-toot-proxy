@@ -100,6 +100,7 @@ module Mulukhiya
         r = AnnictService.new.auth(params['code'])
         if r.code == 200
           @sns.account.config.update(annict: {token: r['access_token']})
+          @sns.account.annict.updated_at = Time.now
           @renderer.message = user_config_info
         else
           @renderer.message = r.parsed_response

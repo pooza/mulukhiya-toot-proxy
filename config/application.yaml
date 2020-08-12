@@ -1,5 +1,5 @@
 package:
-  version: 3.11.12
+  version: 3.12.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -181,6 +181,11 @@ test:
         - growi_clipper
         - growi_bookmark_handler
         - growi_clipping_command_handler
+    - name: annict
+      cases:
+        - annict_polling_worker
+        - annict_service
+        - annict_storage
     - name: webhook
       cases:
         - webhook
@@ -674,7 +679,28 @@ spotify:
     - pattern: /album/([[:alnum:]]+)
       type: album
 annict:
-  url: https://annict.jp
+  urls:
+    oauth: https://annict.jp
+    api: https://api.annict.com
+  api:
+    per_page: 50
+    me:
+      fields:
+        - id
+        - name
+        - username
+    records:
+      fields:
+        - id
+        - action
+        - created_at
+        - work.id
+        - work.title
+        - work.images
+        - episode.id
+        - episode.number_text
+        - episode.title
+        - record.comment
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -780,6 +806,9 @@ sidekiq:
     tag_feed_update:
       every: 5m
       class: Mulukhiya::TagFeedUpdateWorker
+    annict_polling:
+      every: 5m
+      class: Mulukhiya::AnnictPollingWorker
 puma:
   port: 3008
   pidfile: tmp/pids/puma.pid

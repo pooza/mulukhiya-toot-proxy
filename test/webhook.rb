@@ -46,6 +46,16 @@ module Mulukhiya
       end
     end
 
+    def test_post
+      r = @test_hook.post(
+        'text' => 'ハミガキと言われてキレたのは面白かったですw',
+        'attachments' => [
+          {'image_url' => 'https://uzakichan.com/_img/sns_img.jpg'},
+        ],
+      )
+      assert_kind_of(Reporter, r)
+    end
+
     def test_command
       command = @test_hook.command
       command.exec
