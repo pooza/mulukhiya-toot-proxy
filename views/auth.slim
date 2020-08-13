@@ -21,8 +21,8 @@ html lang='ja'
             .inline-field-container
               h4 認証コード
               input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
-            - if params.dig(:errors, :code)
-              span class='alert' = params[:errors][:code].join
+              - if params.dig(:errors, :code)
+                p class='alert' = params[:errors][:code].join
             .field-update-button-container
               button 認証
         - if ['Misskey', 'めいすきー'].member?(controller.name)
