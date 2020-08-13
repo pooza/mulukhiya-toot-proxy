@@ -266,10 +266,8 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
     post_webhook:
-      - tweet
       - result_notification
     pre_upload:
       - image_format_convert
@@ -370,10 +368,8 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
     post_webhook:
-      - tweet
       - result_notification
     pre_upload:
       - image_format_convert
@@ -455,10 +451,8 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
     post_webhook:
-      - tweet
       - result_notification
     pre_upload:
       - image_format_convert
@@ -600,10 +594,8 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
     post_webhook:
-      - tweet
       - result_notification
     pre_upload:
       - image_format_convert
