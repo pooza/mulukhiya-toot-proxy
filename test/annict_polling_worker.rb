@@ -27,9 +27,7 @@ module Mulukhiya
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal(@worker.create_body(record), {
-        'attachments' => [
-          {"image_url" => 'https://image.example.com/thumbnail.png'},
-        ],
+        'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.jp/works/111/episodes/112\n",
       })
 
