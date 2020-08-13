@@ -32,13 +32,11 @@ module Mulukhiya
       end
     end
 
-    private
-
     def create_body(record)
       template = Template.new('annict_record')
-      template[:record] = record
+      template[:record] = record.deep_stringify_keys
       body = {'text' => template.to_s, 'attachments' => []}
-      uri = Ginseng::URI.parse(record.dig('work', 'images', 'recommended_url'))
+      uri = Ginseng::URI.parse(template[:record].dig('work', 'images', 'recommended_url'))
       body['attachments'].push({'image_url' => uri.to_s}) if uri&.absolute?
       return body
     end
