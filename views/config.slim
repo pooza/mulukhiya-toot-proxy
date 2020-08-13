@@ -54,16 +54,25 @@ html lang='ja'
           .field-update-button-container
             a :href='twitterHref'
               img src='/mulukhiya/sign_in_twitter.png'
+            button class='alert' v-on:click='unauthTwitter' 認証を解除
       section class='config' v-if='username && show_annict'
         h3 v-on:click='toggleAnnictSection' Annict
         .section-contents v-show='show_annict_detail'
+          ol
+            li
+              | アカウントを持っていない場合は、
+              a href='https://annict.jp/sign_up' ユーザー登録
+              | を行ってください。
+            li
+              a href=annict.oauth_uri target='_blank' 認証コードを取得
+              | して、下の欄に入力してください。
+            li 認証ボタンを押下。
           .inline-field-container
             h4 認証コード
             input placeholder='Annictの認証コード' v-model='annict_auth_code' maxlength='256'
-            .authcode_link_container
-              a href=annict.oauth_uri target='_blank' 認証コードを取得
           .field-update-button-container
             button v-on:click='authAnnict' 認証
+            button class='alert' v-on:click='unauthAnnict' 認証を解除
       section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
         .section-contents v-show='show_webhook_detail'
@@ -97,6 +106,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)
+      Vue.use(window.VuejsDialog.main.default)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
@@ -367,7 +377,23 @@ html lang='ja'
             }
             this.updateConfig(values, command)
           },
-          authAnnict: function (code) {
+          unauthTwitter: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', twitter: null}
+            this.$dialog.confirm({
+              title: '認証の解除',
+              body: 'Twitterのトークンを削除します。',
+            }, {
+              okText: '削除',
+              cancelText: 'キャンセル',
+            }).then(e => {
+              this.updateConfig(values, command)
+            }).catch(e => {
+              this.message = e.message
+	    })
+          },
+          authAnnict: function () {
             'use strict'
             const values = {
               token: localStorage.getItem('mulukhiya_token'),
@@ -384,6 +410,22 @@ html lang='ja'
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
-          }
+          },
+          unauthAnnict: function () {
+            'use strict'
+            const values = {token: localStorage.getItem('mulukhiya_token')}
+            const command = {command: 'user_config', annict: null}
+            this.$dialog.confirm({
+              title: '認証の解除',
+              body: 'Annictのトークンを削除します。',
+            }, {
+              okText: '削除',
+              cancelText: 'キャンセル',
+            }).then(e => {
+              this.updateConfig(values, command)
+            }).catch(e => {
+              this.message = e.message
+	    })
+          },
         },
       })

@@ -189,10 +189,14 @@ pre
   font:
     family: $monospace
 
-section.config h3:hover
-  background:
-    color: aliceblue
-  cursor: pointer
+section.config
+  li
+    font:
+      size: 0.8em
+  h3:hover
+    background:
+      color: aliceblue
+    cursor: pointer
 
 ul.tags
   list:
@@ -307,6 +311,11 @@ a:hover
   h4
     display: inline-block
     width: 100px
+  p.alert
+    margin:
+      left: 140px
+    font:
+      size: 0.8em
   input
     border:
       width: 1px
@@ -325,11 +334,6 @@ a:hover
   label
     font:
       size: 0.8em
-  .authcode_link_container
-    font:
-      size: 0.8em
-    text:
-      align: right
   .v-select
     display: inline-block
     margin: 0
@@ -344,13 +348,22 @@ a:hover
       margin: 6px 0
 
 .field-update-button-container
+  margin: 6px 0
   text:
     align: center
-  margin: 6px 0
+  a
+    margin: 0 1em
+    vertical-align: top
   button
-    display: inline-block
+    display: inline
+    width: 158px
+    height: 28px
+    margin: 0 1em
+    line:
+      height: 1em
     font:
       size: 0.8em
+    vertical-align: top
 
 .alert
   color: red

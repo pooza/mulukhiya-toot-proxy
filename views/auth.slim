@@ -9,24 +9,27 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 トークンの登録
-      - if ['Mastodon', 'Pleroma'].member?(controller.name)
-        form method='POST' action='/mulukhiya/auth'
+      h3 手順
+      section class='config'
+        - if ['Mastodon', 'Pleroma'].member?(controller.name)
           ol
             li
               a href=params[:oauth_url] target='_blank' 認証コードを取得
-            li
-              | 取得した認証コードを↓に貼り付けて…
-              br
+              | して、下の欄に入力してください。
+            li 認証ボタンを押下。
+          form method='POST' action='/mulukhiya/auth'
+            .inline-field-container
+              h4 認証コード
               input type='text' name='code' placeholder='認証コード' maxlength='64' class='code'
-              br
               - if params.dig(:errors, :code)
-                span class='alert' = params[:errors][:code].join
+                p class='alert' = params[:errors][:code].join
+            .field-update-button-container
+              button 認証
+        - if ['Misskey', 'めいすきー'].member?(controller.name)
+          ol
             li
-              button 認証する
-      - if ['Misskey', 'めいすきー'].member?(controller.name)
-        ol
-          li
-            a href=params[:oauth_url] 認証コードを取得
+              a href=params[:oauth_url] 認証コードを取得
+              | してください。
     == slim.render 'fragment/footer'
     javascript:
       Vue.use(VTooltip)

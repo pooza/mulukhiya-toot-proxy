@@ -26,9 +26,9 @@ module Mulukhiya
       keys('*').each do |key|
         type, id = key.split(':')
         next unless type == 'user'
-        next unless id.match?(/^[[:digit:]]+$/)
         next unless userconfig_storage[id]['/annict/token']
-        yield id.to_i
+        id = id.to_i if id.match?(/^[[:digit:]]+$/)
+        yield id
       end
     end
 

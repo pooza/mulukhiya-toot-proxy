@@ -19,7 +19,7 @@ module Mulukhiya
 
     def test_attachments
       @status.attachments.each do |attachment|
-        assert_kind_of(Environment.attachment_class, attachment)
+        assert_kind_of([Environment.attachment_class, Hash], attachment)
       end
     end
 

@@ -6,7 +6,7 @@ module Mulukhiya
 
     def test_account_ids
       @storage.account_ids do |id|
-        assert_kind_of(Integer, id)
+        assert_kind_of([String, Integer], id)
       end
     end
   end
