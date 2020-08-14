@@ -29,8 +29,57 @@ module Mulukhiya
         access_token: @token,
       }
       r = api_service.get(uri)
+      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
       r['activities'].each do |activity|
         next unless activity['action'] == 'create_record'
+        yield activity
+      end
+    end
+
+    def recent_reviews
+      return enum_for(__method__) unless block_given?
+      reviews do |review|
+        break if updated_at && Time.parse(review['created_at']) <= updated_at
+        yield review
+      end
+    end
+
+    def reviews
+      return enum_for(__method__) unless block_given?
+      reviewed_works.each do |work|
+        uri = api_service.create_uri('/v1/reviews')
+        uri.query_values = {
+          filter_work_id: work['work']['id'],
+          fields: @config['/annict/api/reviews/fields'].join(','),
+          page: 1,
+          per_page: @per_page,
+          sort_id: 'desc',
+          access_token: @token,
+        }
+        r = api_service.get(uri)
+        raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
+        r['reviews'].each do |review|
+          next unless review['user']['id'] == account['id']
+          yield review
+        end
+      end
+    end
+
+    def reviewed_works
+      return enum_for(__method__) unless block_given?
+      uri = api_service.create_uri('/v1/activities')
+      uri.query_values = {
+        filter_user_id: account['id'],
+        fields: @config['/annict/api/reviewed_works/fields'].join(','),
+        page: 1,
+        per_page: @per_page,
+        sort_id: 'desc',
+        access_token: @token,
+      }
+      r = api_service.get(uri)
+      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
+      r['activities'].each do |activity|
+        next unless activity['action'] == 'create_review'
         yield activity
       end
     end

@@ -23,9 +23,8 @@ module Mulukhiya
     def account_ids
       return enum_for(__method__) unless block_given?
       userconfig_storage = UserConfigStorage.new
-      keys('*').each do |key|
-        type, id = key.split(':')
-        next unless type == 'user'
+      keys('user:*').each do |key|
+        id = key.split(':').last
         next unless userconfig_storage[id]['/annict/token']
         id = id.to_i if id.match?(/^[[:digit:]]+$/)
         yield id

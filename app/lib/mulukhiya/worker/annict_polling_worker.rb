@@ -1,3 +1,5 @@
+require 'time'
+
 module Mulukhiya
   class AnnictPollingWorker
     include Sidekiq::Worker
@@ -13,16 +15,33 @@ module Mulukhiya
         next unless account.webhook
         next unless account.annict
         if account.annict.updated_at
-          top_record = nil
-          account.annict.recent_records do |record|
-            top_record ||= record
-            account.webhook.post(create_body(record))
-          end
-          account.annict.updated_at = top_record['created_at'] if top_record
+          perform_account(account)
         elsif top_record = account.annict.updated_at = account.annict.records.first
           account.annict.updated_at = top_record['created_at']
         end
       end
+    end
+
+    def perform_account(account)
+      account.annict.recent_records do |record|
+        self.time = record['created_at']
+        account.webhook.post(create_body(record, :record))
+      end
+      account.annict.recent_reviews do |review|
+        self.time = review['created_at']
+        account.webhook.post(create_body(review, :review))
+      end
+      account.annict.updated_at = time if time
+    end
+
+    def time
+      return @time
+    end
+
+    def time=(time)
+      time = Time.parse(time)
+      return if @time && time < @time
+      @time = time
     end
 
     def accounts
@@ -32,11 +51,11 @@ module Mulukhiya
       end
     end
 
-    def create_body(record)
-      template = Template.new('annict_record')
-      template[:record] = record.deep_stringify_keys
+    def create_body(values, type)
+      template = Template.new("annict_#{type}")
+      template[type] = values.deep_stringify_keys
       body = {'text' => template.to_s, 'attachments' => []}
-      uri = Ginseng::URI.parse(template[:record].dig('work', 'images', 'recommended_url'))
+      uri = Ginseng::URI.parse(template[type].dig('work', 'images', 'recommended_url'))
       body['attachments'].push({'image_url' => uri.to_s}) if uri&.absolute?
       return body
     end
