@@ -30,6 +30,28 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.recent_records)
     end
 
+    def test_reviewed_works
+      assert_kind_of(Enumerator, @service.reviewed_works)
+      @service.reviewed_works do |work|
+        assert_kind_of(Hash, work)
+        assert_kind_of(Integer, work['work']['id'])
+      end
+    end
+
+    def test_reviews
+      assert_kind_of(Enumerator, @service.reviews)
+      @service.reviews do |review|
+        assert_kind_of(Hash, review)
+        assert_kind_of(String, review['work']['title'])
+        uri = Ginseng::URI.parse(review.dig('work', 'images', 'recomended_url'))
+        assert(uri.absolute?) if uri
+      end
+    end
+
+    def test_recent_reviews
+      assert_kind_of(Enumerator, @service.recent_reviews)
+    end
+
     def test_updated_at
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
