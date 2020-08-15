@@ -35,7 +35,7 @@ module Mulukhiya
       end
 
       def attachments
-        return data['media_attachments']
+        return nil
       end
 
       def to_md
