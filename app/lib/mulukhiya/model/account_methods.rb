@@ -1,3 +1,5 @@
+require 'time'
+
 module Mulukhiya
   module AccountMethods
     def logger
@@ -37,6 +39,23 @@ module Mulukhiya
       return nil unless config['/annict/token'].present?
       @annict ||= AnnictService.new(config['/annict/token'])
       return @annict
+    end
+
+    def crawl_annict
+      if annict.updated_at
+        times = []
+        annict.recent_records do |record|
+          times.push(Time.parse(record['created_at']))
+          webhook.post(annict.create_body(record, :record))
+        end
+        annict.recent_reviews do |review|
+          times.push(Time.parse(review['created_at']))
+          webhook.post(annict.create_body(review, :review))
+        end
+        annict.updated_at = times.max
+      elsif top_record = annict.records.first
+        annict.updated_at = top_record['created_at']
+      end
     end
 
     def twitter

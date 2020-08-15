@@ -84,6 +84,15 @@ module Mulukhiya
       end
     end
 
+    def create_body(values, type)
+      template = Template.new("annict_#{type}")
+      template[type] = values.deep_stringify_keys
+      body = {'text' => template.to_s, 'attachments' => []}
+      uri = Ginseng::URI.parse(template[type].dig('work', 'images', 'recommended_url'))
+      body['attachments'].push({'image_url' => uri.to_s}) if uri&.absolute?
+      return body
+    end
+
     def account
       unless @account
         uri = api_service.create_uri('/v1/me')

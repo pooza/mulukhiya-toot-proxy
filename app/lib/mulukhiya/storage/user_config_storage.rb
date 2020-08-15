@@ -22,6 +22,10 @@ module Mulukhiya
       set(key, JSON.parse(get(key)).deep_merge(values).select {|k, v| v.present?})
     end
 
+    def all_keys
+      return keys('user:*')
+    end
+
     def create_key(key)
       return "user:#{key}"
     end
