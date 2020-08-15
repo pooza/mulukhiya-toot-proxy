@@ -52,7 +52,7 @@ module Mulukhiya
           times.push(Time.parse(review['created_at']))
           webhook.post(annict.create_body(review, :review))
         end
-        annict.updated_at = times.max
+        annict.updated_at = times.max if times.present?
       elsif top_record = annict.records.first
         annict.updated_at = top_record['created_at']
       end
