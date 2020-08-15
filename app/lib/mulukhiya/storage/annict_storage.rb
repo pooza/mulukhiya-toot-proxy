@@ -20,12 +20,8 @@ module Mulukhiya
       super(create_key(key), values.to_json)
     end
 
-    def all_keys
-      return keys('annict:*')
-    end
-
-    def create_key(key)
-      return "annict:#{key}"
+    def prefix
+      return 'annict'
     end
 
     def self.accounts

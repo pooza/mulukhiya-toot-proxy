@@ -24,12 +24,8 @@ module Mulukhiya
       return [@config['/amazon/cache/ttl'], 86_400].min
     end
 
-    def all_keys
-      return keys('amazon:*')
-    end
-
-    def create_key(key)
-      return "amazon:#{key}"
+    def prefix
+      return 'amazon'
     end
   end
 end
