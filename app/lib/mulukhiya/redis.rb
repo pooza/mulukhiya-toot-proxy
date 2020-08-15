@@ -32,7 +32,6 @@ module Mulukhiya
 
     alias del unlink
 
-
     def all_keys
       return keys('*') unless prefix
       return keys("#{prefix}:*")
