@@ -313,6 +313,8 @@ mastodon:
       - write:filters
   status:
     field: status
+    spoiler:
+      field: spoiler_text
     key: id
     label: トゥート
     max_length: 500

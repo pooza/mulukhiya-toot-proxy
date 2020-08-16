@@ -196,6 +196,10 @@ module Mulukhiya
       return config['/mastodon/poll/options/field']
     end
 
+    def self.spoiler_field
+      return config['/mastodon/status/spoiler/field']
+    end
+
     def self.attachment_key
       return config['/mastodon/attachment/key']
     end
