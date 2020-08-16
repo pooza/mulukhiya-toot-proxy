@@ -138,6 +138,10 @@ module Mulukhiya
       return config['/misskey/poll/options/field']
     end
 
+    def self.spoiler_field
+      return config['/misskey/status/spoiler/field']
+    end
+
     def self.visibility_name(name)
       return parser_class.visibility_name(name)
     end

@@ -52,6 +52,10 @@ module Mulukhiya
       return config['/dolphin/poll/options/field']
     end
 
+    def self.spoiler_field
+      return config['/dolphin/status/spoiler/field']
+    end
+
     def self.visibility_name(name)
       return parser_class.visibility_name(name)
     end

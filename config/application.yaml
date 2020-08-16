@@ -313,11 +313,11 @@ mastodon:
       - write:filters
   status:
     field: status
-    spoiler:
-      field: spoiler_text
     key: id
     label: トゥート
     max_length: 500
+    spoiler:
+      field: spoiler_text
   attachment:
     key: media_ids
   poll:
@@ -403,6 +403,8 @@ misskey:
     key: noteId
     label: ノート
     max_length: 500
+    spoiler:
+      field: cw
   attachment:
     key: fileIds
   poll:
@@ -486,6 +488,8 @@ meisskey:
     key: noteId
     label: ノート
     max_length: 1000
+    spoiler:
+      field: cw
   attachment:
     key: fileIds
   poll:
@@ -542,6 +546,8 @@ dolphin:
     key: noteId
     label: ノート
     max_length: 500
+    spoiler:
+      field: cw
   attachment:
     key: fileIds
   poll:
@@ -629,6 +635,8 @@ pleroma:
     key: id
     label: ステータス
     max_length: 5000
+    spoiler:
+      field: spoiler_text
   attachment:
     key: media_ids
   poll:

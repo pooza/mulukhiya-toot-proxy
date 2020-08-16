@@ -72,6 +72,10 @@ module Mulukhiya
       return config['/pleroma/poll/options/field']
     end
 
+    def self.spoiler_field
+      return config['/pleroma/status/spoiler/field']
+    end
+
     def self.attachment_key
       return config['/pleroma/attachment/key']
     end
