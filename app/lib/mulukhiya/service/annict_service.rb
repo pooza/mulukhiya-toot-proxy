@@ -91,7 +91,7 @@ module Mulukhiya
       title_template[type] = values.deep_stringify_keys
       if body_template.to_s.match?(@config['/annict/spoiler/pattern'])
         body = {
-          'spoiler_text' => title_template.to_s.tr("\n", ' ').strip,
+          'spoiler_text' => "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）",
           'text' => body_template.to_s.lstrip,
         }
       else
