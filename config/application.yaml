@@ -213,7 +213,7 @@ mastodon:
   url: https://mstdn.example.com/
   dbms: postgres
   media_api:
-    version: 2
+    version: null
   parser: toot
   handlers:
     pre_toot:

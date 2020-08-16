@@ -27,10 +27,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post %r{/api/v[12]/media} do
+    post %r{/api/v([12])/media} do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        version: @config['/mastodon/media_api/version'],
+        version: @config['/mastodon/media_api/version'] || params[:captures].first.to_i,
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
