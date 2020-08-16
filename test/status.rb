@@ -18,9 +18,8 @@ module Mulukhiya
     end
 
     def test_attachments
-      return unless @status.attachments
       @status.attachments.each do |attachment|
-        assert_kind_of(Environment.attachment_class, attachment)
+        assert_kind_of([Environment.attachment_class, Hash], attachment)
       end
     end
 
