@@ -1,6 +1,0 @@
-<%# encoding: UTF-8 -%>
-<% if @params[:review][:body].present? -%>
-
-<%= @params[:review][:body].ellipsize(200) %>
-<% end -%>
-https://annict.jp/works/<%= @params[:review][:work][:id] %>/records
