@@ -1,5 +1,4 @@
 <%# encoding: UTF-8 -%>
-「<%= @params[:review][:work][:title] %>」を視聴。
 <% if @params[:review][:body].present? -%>
 
 <%= @params[:review][:body].ellipsize(200) %>
