@@ -30,7 +30,7 @@ module Mulukhiya
     post %r{/api/v([12])/media} do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        version: @config['/mastodon/media_api/version'] || params[:captures].first.to_i,
+        version: media_api_default_version || params[:captures].first.to_i,
       })
       Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
       @renderer.message = JSON.parse(@reporter.response.body)
@@ -130,6 +130,12 @@ module Mulukhiya
       Handler.create('filter_command').handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
+    end
+
+    def media_api_default_version
+      return @config['/mastodon/media_api/version']
+    rescue Ginseng::ConfigError
+      return nil
     end
 
     def self.name

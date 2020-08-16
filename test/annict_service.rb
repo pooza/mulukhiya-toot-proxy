@@ -87,7 +87,7 @@ module Mulukhiya
       }
       assert_equal(@service.create_body(record, :record), {
         'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
-        'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。',
+        'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.jp/works/111/episodes/112\n",
       })
 
@@ -124,7 +124,7 @@ module Mulukhiya
       }
       assert_equal(@service.create_body(review, :review), {
         'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
-        'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。',
+        'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.jp/works/112/records\n",
       })
     end
