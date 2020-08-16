@@ -33,6 +33,7 @@ html lang='ja'
         },
         mounted: function () {
           'use strict'
+          const prev_token = localStorage.getItem('mulukhiya_token')
           localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
           const token = localStorage.getItem('mulukhiya_token')
           const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
@@ -41,6 +42,7 @@ html lang='ja'
               this.username = e.data.account.username
             }).catch(e => {
               this.message = e.message
+              localStorage.setItem('mulukhiya_token', prev_token)
             })
         },
         methods: {
