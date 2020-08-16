@@ -29,7 +29,7 @@ module Mulukhiya
       end
 
       def attachments
-        return nil
+        return query['files']
       end
 
       def to_h
