@@ -692,6 +692,8 @@ annict:
   urls:
     oauth: https://annict.jp
     api: https://api.annict.com
+  spoiler:
+    pattern: (ねた|ネタ)(ばれ|バレ)
   api:
     per_page: 50
     me:
