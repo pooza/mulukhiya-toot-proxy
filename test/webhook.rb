@@ -54,6 +54,12 @@ module Mulukhiya
         ],
       )
       assert_kind_of(Reporter, r)
+
+      r = @test_hook.post(
+        'text' => '犯人はヤス',
+        'spoiler_text' => 'ネタバレあり',
+      )
+      assert_kind_of(Reporter, r)
     end
 
     def test_command

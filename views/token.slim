@@ -50,7 +50,6 @@ html lang='ja'
                 .then(e => {
                   this.users.push({username: e.data.account.username, token: t, scopes: e.data.token.scopes.join(', ')})
                 }).catch(e => {
-                  console.error('%j', e)
                   this.token_error = true
                 })
             }

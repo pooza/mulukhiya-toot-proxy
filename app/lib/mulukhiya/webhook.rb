@@ -35,6 +35,9 @@ module Mulukhiya
         'visibility' => visibility,
         'attachments' => status['attachments'] || [],
       }
+      if spoiler_text = status['spoiler_text']
+        body[Environment.controller_class.spoiler_field] = spoiler_text
+      end
       Handler.dispatch(:pre_webhook, body, {reporter: reporter, sns: @sns})
       reporter.response = @sns.post(body)
       Handler.dispatch(:post_webhook, body, {reporter: reporter, sns: @sns})

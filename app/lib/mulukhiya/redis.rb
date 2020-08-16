@@ -32,6 +32,20 @@ module Mulukhiya
 
     alias del unlink
 
+    def all_keys
+      return keys('*') unless prefix
+      return keys("#{prefix}:*")
+    end
+
+    def create_key(key)
+      return key unless prefix
+      return "#{prefix}:#{key}"
+    end
+
+    def prefix
+      return nil
+    end
+
     def self.dsn
       return Ginseng::RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
     end

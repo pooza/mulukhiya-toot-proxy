@@ -20,19 +20,22 @@ module Mulukhiya
       super(create_key(key), values.to_json)
     end
 
-    def account_ids
-      return enum_for(__method__) unless block_given?
-      userconfig_storage = UserConfigStorage.new
-      keys('user:*').each do |key|
-        id = key.split(':').last
-        next unless userconfig_storage[id]['/annict/token']
-        id = id.to_i if id.match?(/^[[:digit:]]+$/)
-        yield id
-      end
+    def prefix
+      return 'annict'
     end
 
-    def create_key(key)
-      return "annict:#{key}"
+    def self.accounts
+      return enum_for(__method__) unless block_given?
+      storage = UserConfigStorage.new
+      storage.all_keys.each do |key|
+        id = key.split(':').last
+        next unless storage[id]['/annict/token']
+        id = id.to_i if id.match?(/^[[:digit:]]+$/)
+        account = Environment.account_class[id]
+        next unless account.webhook
+        next unless account.annict
+        yield account
+      end
     end
   end
 end

@@ -84,6 +84,24 @@ module Mulukhiya
       end
     end
 
+    def create_body(values, type)
+      body_template = Template.new("annict_#{type}_body")
+      body_template[type] = values.deep_stringify_keys
+      title_template = Template.new("annict_#{type}_title")
+      title_template[type] = values.deep_stringify_keys
+      if body_template.to_s.match?(@config['/annict/spoiler/pattern'])
+        body = {
+          'spoiler_text' => title_template.to_s.tr("\n", ' ').strip,
+          'text' => body_template.to_s.lstrip,
+        }
+      else
+        body = {'text' => [title_template.to_s, body_template.to_s].join}
+      end
+      uri = Ginseng::URI.parse(body_template[type].dig('work', 'images', 'recommended_url'))
+      body['attachments'] = [{'image_url' => uri.to_s}] if uri&.absolute?
+      return body
+    end
+
     def account
       unless @account
         uri = api_service.create_uri('/v1/me')
