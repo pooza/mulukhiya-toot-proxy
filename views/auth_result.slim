@@ -33,16 +33,14 @@ html lang='ja'
         },
         mounted: function () {
           'use strict'
-          const prev_token = localStorage.getItem('mulukhiya_token')
-          localStorage.setItem('mulukhiya_token', '#{crypt.new.encrypt(params[:result][:access_token])}')
-          const token = localStorage.getItem('mulukhiya_token')
+          const token = '#{crypt.new.encrypt(params[:result][:access_token])}'
           const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
           axios.get(href, {responseType: 'json'})
             .then(e => {
               this.username = e.data.account.username
+              localStorage.setItem('mulukhiya_token', token)
             }).catch(e => {
               this.message = e.message
-              localStorage.setItem('mulukhiya_token', prev_token)
             })
         },
         methods: {
