@@ -45,6 +45,11 @@ module Mulukhiya
         template[:url] = uri.to_s
         return template.to_s
       end
+
+      def self.tag_feed(params)
+        return [] unless Postgres.config?
+        return Postgres.instance.execute('tag_feed', params)
+      end
     end
   end
 end

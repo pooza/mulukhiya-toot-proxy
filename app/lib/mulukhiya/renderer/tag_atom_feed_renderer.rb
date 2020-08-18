@@ -85,8 +85,8 @@ module Mulukhiya
     private
 
     def fetch
-      return unless Postgres.config?
-      Postgres.instance.execute('tag_feed', params).each do |row|
+      return nil unless Environment.controller_class.tag_feed?
+      Environment.status_class.tag_feed(params).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),
