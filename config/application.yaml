@@ -695,13 +695,13 @@ annict:
   spoiler:
     pattern: (ねた|ネタ)(ばれ|バレ)
   api:
-    per_page: 25
     me:
       fields:
         - id
         - name
         - username
     records:
+      limit: 5
       fields:
         - id
         - action
@@ -714,11 +714,13 @@ annict:
         - episode.title
         - record.comment
     reviewed_works:
+      limit: 5
       fields:
         - id
         - action
         - work.id
     reviews:
+      limit: 10
       fields:
         - id
         - created_at

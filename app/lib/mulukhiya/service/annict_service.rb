@@ -5,7 +5,6 @@ module Mulukhiya
     def initialize(token = nil)
       @config = Config.instance
       @token = token
-      @per_page = @config['/annict/api/per_page']
       @storage = AnnictStorage.new
     end
 
@@ -24,7 +23,7 @@ module Mulukhiya
         filter_user_id: account['id'],
         fields: @config['/annict/api/records/fields'].join(','),
         page: 1,
-        per_page: @per_page,
+        per_page: @config['/annict/api/records/limit'],
         sort_id: 'desc',
         access_token: @token,
       }
@@ -52,7 +51,7 @@ module Mulukhiya
           filter_work_id: work['work']['id'],
           fields: @config['/annict/api/reviews/fields'].join(','),
           page: 1,
-          per_page: @per_page,
+          per_page: @config['/annict/api/reviews/limit'],
           sort_id: 'desc',
           access_token: @token,
         }
@@ -72,7 +71,7 @@ module Mulukhiya
         filter_user_id: account['id'],
         fields: @config['/annict/api/reviewed_works/fields'].join(','),
         page: 1,
-        per_page: @per_page,
+        per_page: @config['/annict/api/reviewed_works/limit'],
         sort_id: 'desc',
         access_token: @token,
       }
