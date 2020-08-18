@@ -76,6 +76,25 @@ module Mulukhiya
         return get(key)
       end
 
+      def self.tag_feed(params)
+        return [] unless Mongo.config?
+        notes = Mongo.instance.db['notes']
+          .find(tags: params[:tag].downcase)
+          .sort(createdAt: -1)
+          .limit(params[:limit])
+        return notes.map do |row|
+          status = Status.new(row['_id'])
+          {
+            username: status.account.username,
+            domain: status.account.acct.host,
+            spoiler_text: status.cw,
+            text: status.text,
+            uri: status.uri.to_s,
+            created_at: status.createdAt,
+          }
+        end
+      end
+
       private
 
       def collection_name
