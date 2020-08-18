@@ -9,7 +9,6 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 トークンの登録
-      h3 手順
       section class='config'
         - if ['Mastodon', 'Pleroma'].member?(controller.name)
           ol
