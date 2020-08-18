@@ -12,10 +12,6 @@ module Mulukhiya
       return "Mulukhiya::#{dbms_name.camelize}".constantize
     end
 
-    def self.tag_feed?
-      return false
-    end
-
     def self.postgres?
       return dbms_name == 'postgres'
     end
