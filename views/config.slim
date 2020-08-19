@@ -27,6 +27,13 @@ html lang='ja'
       section class='config' v-if='username && show_dropbox'
         h3 v-on:click='toggleDropboxSection' Dropbox
         .section-contents v-show='show_dropbox_detail'
+          ol
+            li
+              | Dropboxの開発者向けページで、
+              a href='https://www.dropbox.com/developers/apps' target='_blank' アプリケーション登録
+              | を行ってください。
+            li アクセストークンを取得して、下の欄に入力してください。
+            li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
             input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
