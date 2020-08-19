@@ -65,7 +65,7 @@ module Mulukhiya
         else
           @service = MastodonService.new(uri)
         end
-        @service.token = nil unless uri.host == Environment.domain_name
+        @service.token = nil
       end
       return @service
     end
