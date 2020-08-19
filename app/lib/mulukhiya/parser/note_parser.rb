@@ -26,7 +26,7 @@ module Mulukhiya
       end
       md.gsub!(HASH, '#')
       md.gsub!(ATMARK, '@')
-      return Parser.sanitize(md)
+      return Ginseng::Fediverse::Parser.sanitize(md)
     end
 
     def to_sanitized
