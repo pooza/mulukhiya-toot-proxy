@@ -41,12 +41,20 @@ module Mulukhiya
     def to_md
       template = Template.new('status_clipping.md')
       template[:account] = account
-      template[:status] = NoteParser.new(note['text']).to_md
+      template[:status] = parser.to_md
       template[:attachments] = note['files']
       template[:url] = self
       return template.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace
+    end
+
+    def parser
+      unless @parser
+        @parser = NoteParser.new(note['text'])
+        @parser.service = service
+      end
+      return @parser
     end
 
     def service
