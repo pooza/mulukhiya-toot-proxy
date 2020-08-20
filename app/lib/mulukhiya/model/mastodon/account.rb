@@ -9,6 +9,7 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.clone
+          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
           @hash.compact!

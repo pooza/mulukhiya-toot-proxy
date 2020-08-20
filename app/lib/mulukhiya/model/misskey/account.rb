@@ -7,6 +7,7 @@ module Mulukhiya
         unless @hash
           @hash = values.clone
           @hash[:url] = uri.to_s
+          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:token)
           @hash.compact!
         end
