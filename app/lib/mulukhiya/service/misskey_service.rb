@@ -9,7 +9,7 @@ module Mulukhiya
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
         FileUtils.mkdir_p(dir)
         file = MediaFile.new(path)
-        filename += file.valid_extname unless file.valid_extname?
+        filename += file.recommended_extname unless file.recommended_extname?
         dest = File.join(dir, filename)
         FileUtils.copy(path, dest)
         path = dest

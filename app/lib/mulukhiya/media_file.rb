@@ -1,6 +1,5 @@
 require 'digest/sha1'
 require 'mimemagic'
-require 'rack/mime'
 
 module Mulukhiya
   class MediaFile < File
@@ -33,15 +32,18 @@ module Mulukhiya
       return File.extname(path)
     end
 
-    def valid_extname
-      @types ||= Rack::Mime::MIME_TYPES.invert
-      return @types[type]
+    def recommended_extname
+      return MIMEType.extname(type)
     end
 
-    def valid_extname?
-      return true if valid_extname.nil?
-      return extname == valid_extname
+    alias valid_extname recommended_extname
+
+    def recommended_extname?
+      return true if recommended_extname.nil?
+      return extname == recommended_extname
     end
+
+    alias valid_exename? recommended_extname?
 
     def width
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
