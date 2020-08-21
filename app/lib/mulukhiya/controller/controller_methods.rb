@@ -41,13 +41,13 @@ module Mulukhiya
         return false
       end
 
-      def self.twitter?
+      def twitter?
         return config["/#{name.underscore}/twitter"] && TwitterService.config?
       rescue Ginseng::ConfigError
         return false
       end
 
-      def self.annict?
+      def annict?
         return config["/#{name.underscore}/annict"] && AnnictService.config?
       rescue Ginseng::ConfigError
         return false

@@ -1,5 +1,9 @@
 module Mulukhiya
   class ControllerMethodsTest < TestCase
+    def test_display_name
+      assert_kind_of(String, controller_class.display_name)
+    end
+
     def test_webhook?
       assert_boolean(controller_class.webhook?)
     end
@@ -18,6 +22,14 @@ module Mulukhiya
 
     def test_filter?
       assert_boolean(controller_class.filter?)
+    end
+
+    def test_twitter?
+      assert_boolean(controller_class.twitter?)
+    end
+
+    def test_annict?
+      assert_boolean(controller_class.annict?)
     end
 
     def test_livecure?
