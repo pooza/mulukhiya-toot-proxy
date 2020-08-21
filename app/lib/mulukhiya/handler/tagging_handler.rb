@@ -23,7 +23,7 @@ module Mulukhiya
 
     def create_attachment_tags(body)
       tags = []
-      (body[attachment_key] || []).each do |id|
+      (body[attachment_field] || []).each do |id|
         type = Environment.attachment_class[id].type
         ['video', 'image', 'audio'].each do |mediatype|
           next unless type.start_with?("#{mediatype}/")

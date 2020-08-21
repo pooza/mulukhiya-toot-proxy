@@ -36,8 +36,8 @@ module Mulukhiya
       return config['/meisskey/status/key']
     end
 
-    def self.attachment_key
-      return config['/meisskey/attachment/key']
+    def self.attachment_field
+      return config['/meisskey/attachment/field']
     end
 
     def self.poll_options_field

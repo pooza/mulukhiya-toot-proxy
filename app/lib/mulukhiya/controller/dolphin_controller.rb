@@ -44,8 +44,8 @@ module Mulukhiya
       return config['/dolphin/status/key']
     end
 
-    def self.attachment_key
-      return config['/dolphin/attachment/key']
+    def self.attachment_field
+      return config['/dolphin/attachment/field']
     end
 
     def self.poll_options_field

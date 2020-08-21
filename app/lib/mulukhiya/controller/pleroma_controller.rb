@@ -76,8 +76,8 @@ module Mulukhiya
       return config['/pleroma/status/spoiler/field']
     end
 
-    def self.attachment_key
-      return config['/pleroma/attachment/key']
+    def self.attachment_field
+      return config['/pleroma/attachment/field']
     end
 
     def self.visibility_name(name)

@@ -308,7 +308,7 @@ mastodon:
     spoiler:
       field: spoiler_text
   attachment:
-    key: media_ids
+    field: media_ids
   poll:
     options:
       field: options
@@ -395,7 +395,7 @@ misskey:
     spoiler:
       field: cw
   attachment:
-    key: fileIds
+    field: fileIds
   poll:
     options:
       field: choices
@@ -480,7 +480,7 @@ meisskey:
     spoiler:
       field: cw
   attachment:
-    key: fileIds
+    field: fileIds
   poll:
     options:
       field: choices
@@ -538,7 +538,7 @@ dolphin:
     spoiler:
       field: cw
   attachment:
-    key: fileIds
+    field: fileIds
   poll:
     options:
       field: choices
@@ -627,7 +627,7 @@ pleroma:
     spoiler:
       field: spoiler_text
   attachment:
-    key: media_ids
+    field: media_ids
   poll:
     options:
       field: options

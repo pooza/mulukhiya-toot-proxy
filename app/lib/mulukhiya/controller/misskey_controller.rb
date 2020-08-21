@@ -130,8 +130,8 @@ module Mulukhiya
       return config['/misskey/status/key']
     end
 
-    def self.attachment_key
-      return config['/misskey/attachment/key']
+    def self.attachment_field
+      return config['/misskey/attachment/field']
     end
 
     def self.poll_options_field

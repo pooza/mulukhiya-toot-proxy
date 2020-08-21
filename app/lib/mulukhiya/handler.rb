@@ -132,8 +132,8 @@ module Mulukhiya
       return Environment.controller_class.status_key
     end
 
-    def attachment_key
-      return Environment.controller_class.attachment_key
+    def attachment_field
+      return Environment.controller_class.attachment_field
     end
 
     def self.create(name, params = {})
