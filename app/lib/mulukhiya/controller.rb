@@ -181,5 +181,9 @@ module Mulukhiya
       message = message.to_yaml unless message.is_a?(String)
       return Environment.info_agent_service&.notify(@sns.account, message)
     end
+
+    def status_field
+      return Environment.controller_class.status_field
+    end
   end
 end
