@@ -69,19 +69,20 @@ module Mulukhiya
       return nil
     end
 
-    def convert_format(type)
+    def convert_type(type)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    alias convert_type convert_format
+    alias convert_format convert_type
 
     def create_dest_path(params = {})
-      params[:type] ||= ".#{default_mediatype}"
+      params[:extname] ||= MIMEType.extname(params[:type])
+      params[:extname] ||= ".#{default_mediatype}"
       params[:content] = Digest::SHA1.hexdigest(File.read(path))
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{Digest::SHA1.hexdigest(params.to_json)}#{params[:type]}",
+        "#{Digest::SHA1.hexdigest(params.to_json)}#{params[:extname]}",
       )
     end
 

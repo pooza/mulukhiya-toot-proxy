@@ -61,7 +61,7 @@ module Mulukhiya
       return ImageFile.new(dest)
     end
 
-    def convert_format(type)
+    def convert_type(type)
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)

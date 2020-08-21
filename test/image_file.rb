@@ -68,8 +68,8 @@ module Mulukhiya
       assert_equal(converted.height, 30)
     end
 
-    def test_convert_format
-      converted = @png.convert_format(:jpeg)
+    def test_convert_type
+      converted = @png.convert_type('image/jpeg')
       assert_kind_of(ImageFile, converted)
       assert_equal(converted.type, 'image/jpeg')
     end

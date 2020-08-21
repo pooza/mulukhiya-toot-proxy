@@ -28,8 +28,8 @@ module Mulukhiya
       assert_equal(@mp3.duration, 5.041625)
     end
 
-    def test_convert_format
-      converted = @mp3.convert_format(:mp3)
+    def test_convert_type
+      converted = @mp3.convert_type('audio/mpeg')
       assert_kind_of(AudioFile, converted)
       assert_equal(converted.type, 'audio/mpeg')
     end

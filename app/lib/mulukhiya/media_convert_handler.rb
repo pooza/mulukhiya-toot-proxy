@@ -24,10 +24,6 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def extname
-      return MIMEType.extname(type)
-    end
-
     def type
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end

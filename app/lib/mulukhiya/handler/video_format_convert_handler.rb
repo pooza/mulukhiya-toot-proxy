@@ -1,7 +1,7 @@
 module Mulukhiya
   class VideoFormatConvertHandler < MediaConvertHandler
     def convert
-      return @source.convert_format(extname)
+      return @source.convert_type(type)
     ensure
       result.push(source: {type: @source.type})
     end
