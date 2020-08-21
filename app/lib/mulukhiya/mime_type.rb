@@ -24,8 +24,10 @@ module Mulukhiya
     private
 
     def initialize
-      @types ||= Rack::Mime::MIME_TYPES
-      @extnames ||= @types.invert
+      @types = Rack::Mime::MIME_TYPES
+      @extnames = @types.invert
+      @extnames['video/mp4'] = '.mp4'
+      @extnames['audio/mpeg'] = '.mp3'
     end
   end
 end

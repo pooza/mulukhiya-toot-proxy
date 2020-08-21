@@ -23,6 +23,8 @@ module Mulukhiya
     def test_extname
       assert_equal(@mime.extname('image/jpeg'), '.jpg')
       assert_equal(@mime.extname('image/png'), '.png')
+      assert_equal(@mime.extname('video/mp4'), '.mp4')
+      assert_equal(@mime.extname('audio/mpeg'), '.mp3')
     end
   end
 end
