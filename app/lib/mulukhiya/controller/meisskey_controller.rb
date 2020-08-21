@@ -3,7 +3,7 @@ module Mulukhiya
     include ControllerMethods
 
     def self.name
-      return 'めいすきー'
+      return 'Meisskey'
     end
 
     def self.webhook_entries
