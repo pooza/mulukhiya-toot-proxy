@@ -215,7 +215,6 @@ webui:
 mastodon:
   name: Mastodon
   url: https://mstdn.example.com/
-  dbms: postgres
   webhook: true
   tag_feed: true
   clipping: true
@@ -223,6 +222,7 @@ mastodon:
   filter: true
   media_api:
     version: null
+  dbms: postgres
   parser: toot
   handlers:
     pre_toot:
@@ -531,7 +531,10 @@ dolphin:
     label: ノート
     max_length: 500
 pleroma:
+  name: Pleroma
   url: https://pleroma.example.com/
+  webhook: true
+  clipping: true
   dbms: postgres
   parser: toot
   handlers:
