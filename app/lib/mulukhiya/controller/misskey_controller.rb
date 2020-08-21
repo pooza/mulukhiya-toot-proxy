@@ -1,5 +1,7 @@
 module Mulukhiya
   class MisskeyController < Controller
+    include ControllerMethods
+
     before do
       if params[:token].present? && home?
         @sns.token = Crypt.new.decrypt(params[:token])
