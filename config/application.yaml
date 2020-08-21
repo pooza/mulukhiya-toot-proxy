@@ -66,17 +66,9 @@ parser:
       - ^/@[[:word:]]+/([[:digit:]]+)
       - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
       - ^/notice/([[:word:]]+)
-    visibility:
-      unlisted: unlisted
-      private: private
-      direct: direct
   note:
     patterns:
       - ^/notes/([[:alnum:]]+)
-    visibility:
-      unlisted: home
-      private: followers
-      direct: specified
 test:
   filters:
     - name: ci
