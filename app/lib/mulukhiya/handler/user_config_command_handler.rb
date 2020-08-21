@@ -19,6 +19,7 @@ module Mulukhiya
       params['dropbox'] ||= {}
       params['notify'] ||= {}
       params['amazon'] ||= {}
+      params['annict'] ||= {}
       return params
     end
 
