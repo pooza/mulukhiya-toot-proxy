@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 トークンの登録
       section class='config'
-        - if ['Mastodon', 'Pleroma'].member?(controller.name)
+        - if ['Mastodon', 'Pleroma'].member?(controller.display_name)
           ol
             li
               a href=params[:oauth_url] target='_blank' 認証コードを取得
@@ -24,7 +24,7 @@ html lang='ja'
                 p class='alert' = params[:errors][:code].join
             .field-update-button-container
               button 認証
-        - if ['Misskey', 'めいすきー'].member?(controller.name)
+        - if ['Misskey', 'めいすきー'].member?(controller.display_name)
           ol
             li
               a href=params[:oauth_url] 認証コードを取得

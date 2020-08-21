@@ -5,6 +5,12 @@ module Mulukhiya
     end
 
     module Methods
+      def display_name
+        return config["/#{name.underscore}/display_name"] ||name
+      rescue Ginseng::ConfigError
+        return name
+      end
+
       def webhook?
         return config["/#{name.underscore}/webhook"] == true
       rescue Ginseng::ConfigError
