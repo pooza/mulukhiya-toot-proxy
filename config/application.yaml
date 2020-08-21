@@ -213,7 +213,6 @@ webui:
     viewport: width=800
   livecure: false
 mastodon:
-  name: Mastodon
   url: https://mstdn.example.com/
   webhook: true
   tag_feed: true
@@ -328,6 +327,11 @@ mastodon:
     limit: 40
 misskey:
   url: https://misskey.example.com/
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
+  filter: true
   dbms: postgres
   parser: note
   handlers:
@@ -531,7 +535,6 @@ dolphin:
     label: ノート
     max_length: 500
 pleroma:
-  name: Pleroma
   url: https://pleroma.example.com/
   webhook: true
   clipping: true
