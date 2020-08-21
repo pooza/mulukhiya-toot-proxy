@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def note_id
-      @config['/parser/note/patterns'].each do |pattern|
+      @config['/parser/note/url/patterns'].each do |pattern|
         next unless matches = path.match(pattern)
         return matches[1]
       end

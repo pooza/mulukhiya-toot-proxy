@@ -61,7 +61,7 @@ module Mulukhiya
     end
 
     def self.status_field
-      return config['/pleroma/status/field']
+      return config['/parser/toot/fields/body']
     end
 
     def self.status_key
@@ -69,15 +69,15 @@ module Mulukhiya
     end
 
     def self.poll_options_field
-      return config['/pleroma/poll/options/field']
+      return config['/parser/toot/fields/poll/options']
     end
 
     def self.spoiler_field
-      return config['/pleroma/status/spoiler/field']
+      return config['/parser/toot/fields/spoiler']
     end
 
     def self.attachment_field
-      return config['/pleroma/attachment/field']
+      return config['/parser/toot/fields/attachment']
     end
 
     def self.visibility_name(name)

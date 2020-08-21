@@ -61,14 +61,28 @@ worker:
       category: お知らせ
 parser:
   toot:
-    patterns:
-      - ^/web/statuses/([[:digit:]]+)
-      - ^/@[[:word:]]+/([[:digit:]]+)
-      - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-      - ^/notice/([[:word:]]+)
+    url:
+      patterns:
+        - ^/web/statuses/([[:digit:]]+)
+        - ^/@[[:word:]]+/([[:digit:]]+)
+        - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+        - ^/notice/([[:word:]]+)
+    fields:
+      body: status
+      spoiler: spoiler_text
+      attachment: media_ids
+      poll:
+        options: options
   note:
-    patterns:
-      - ^/notes/([[:alnum:]]+)
+    url:
+      patterns:
+        - ^/notes/([[:alnum:]]+)
+    fields:
+      body: text
+      spoiler: cw
+      attachment: fileIds
+      poll:
+        options: choices
 test:
   filters:
     - name: ci
@@ -199,8 +213,14 @@ webui:
     viewport: width=800
   livecure: false
 mastodon:
+  name: Mastodon
   url: https://mstdn.example.com/
   dbms: postgres
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
+  filter: true
   media_api:
     version: null
   parser: toot
@@ -301,17 +321,9 @@ mastodon:
       - read:filters
       - write:filters
   status:
-    field: status
     key: id
     label: トゥート
     max_length: 500
-    spoiler:
-      field: spoiler_text
-  attachment:
-    field: media_ids
-  poll:
-    options:
-      field: options
   search:
     limit: 40
 misskey:
@@ -388,17 +400,9 @@ misskey:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 500
-    spoiler:
-      field: cw
-  attachment:
-    field: fileIds
-  poll:
-    options:
-      field: choices
 meisskey:
   url: https://meisskey.example.com/
   dbms: mongo
@@ -473,17 +477,9 @@ meisskey:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 1000
-    spoiler:
-      field: cw
-  attachment:
-    field: fileIds
-  poll:
-    options:
-      field: choices
 dolphin:
   url: https://dolphin.example.com/
   dbms: postgres
@@ -531,17 +527,9 @@ dolphin:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 500
-    spoiler:
-      field: cw
-  attachment:
-    field: fileIds
-  poll:
-    options:
-      field: choices
 pleroma:
   url: https://pleroma.example.com/
   dbms: postgres
@@ -620,17 +608,9 @@ pleroma:
     - post_upload
     - post_bookmark
   status:
-    field: status
     key: id
     label: ステータス
     max_length: 5000
-    spoiler:
-      field: spoiler_text
-  attachment:
-    field: media_ids
-  poll:
-    options:
-      field: options
 amazon:
   marketplace: jp
   urls:

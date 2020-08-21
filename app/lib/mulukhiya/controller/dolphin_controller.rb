@@ -37,7 +37,7 @@ module Mulukhiya
     end
 
     def self.status_field
-      return config['/dolphin/status/field']
+      return config['/parser/note/fields/body']
     end
 
     def self.status_key
@@ -45,15 +45,15 @@ module Mulukhiya
     end
 
     def self.attachment_field
-      return config['/dolphin/attachment/field']
+      return config['/parser/note/fields/attachment']
     end
 
     def self.poll_options_field
-      return config['/dolphin/poll/options/field']
+      return config['/parser/note/fields/poll/options']
     end
 
     def self.spoiler_field
-      return config['/dolphin/status/spoiler/field']
+      return config['/parser/note/fields/spoiler']
     end
 
     def self.visibility_name(name)
