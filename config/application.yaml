@@ -412,6 +412,7 @@ misskey:
     max_length: 500
 meisskey:
   url: https://meisskey.example.com/
+  display_name: めいすきー
   webhook: true
   tag_feed: true
   clipping: true
