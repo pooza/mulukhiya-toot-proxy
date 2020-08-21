@@ -219,6 +219,8 @@ mastodon:
   clipping: true
   announcement: true
   filter: true
+  twitter: true
+  annict: true
   media_api:
     version: null
   dbms: postgres
@@ -331,6 +333,8 @@ misskey:
   tag_feed: true
   clipping: true
   announcement: true
+  twitter: true
+  annict: true
   dbms: postgres
   parser: note
   handlers:
@@ -412,6 +416,8 @@ meisskey:
   tag_feed: true
   clipping: true
   announcement: true
+  twitter: true
+  annict: true
   dbms: mongo
   parser: note
   handlers:
@@ -543,6 +549,8 @@ pleroma:
   url: https://pleroma.example.com/
   webhook: true
   clipping: true
+  twitter: true
+  annict: true
   dbms: postgres
   parser: toot
   handlers:

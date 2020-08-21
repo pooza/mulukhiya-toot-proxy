@@ -35,6 +35,18 @@ module Mulukhiya
         return false
       end
 
+      def self.twitter?
+        return config["/#{name.underscore}/twitter"] && TwitterService.config?
+      rescue Ginseng::ConfigError
+        return false
+      end
+
+      def self.annict?
+        return config["/#{name.underscore}/annict"] && AnnictService.config?
+      rescue Ginseng::ConfigError
+        return false
+      end
+
       def livecure?
         return config['/webui/livecure'] == true
       rescue Ginseng::ConfigError

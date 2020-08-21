@@ -151,38 +151,6 @@ module Mulukhiya
       return Config.instance
     end
 
-    def self.webhook?
-      return false
-    end
-
-    def self.tag_feed?
-      return false
-    end
-
-    def self.clipping?
-      return false
-    end
-
-    def self.announcement?
-      return false
-    end
-
-    def self.filter?
-      return false
-    end
-
-    def self.livecure?
-      return false
-    end
-
-    def self.twitter?
-      return TwitterService.config?
-    end
-
-    def self.annict?
-      return AnnictService.config?
-    end
-
     def self.webhook_entries
       return nil
     end
@@ -212,10 +180,6 @@ module Mulukhiya
     def notify(message)
       message = message.to_yaml unless message.is_a?(String)
       return Environment.info_agent_service&.notify(@sns.account, message)
-    end
-
-    def status_field
-      return Environment.controller_class.status_field
     end
   end
 end
