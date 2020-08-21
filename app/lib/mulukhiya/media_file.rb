@@ -76,12 +76,12 @@ module Mulukhiya
     alias convert_type convert_format
 
     def create_dest_path(params = {})
-      params[:type] ||= default_mediatype
+      params[:type] ||= ".#{default_mediatype}"
       params[:content] = Digest::SHA1.hexdigest(File.read(path))
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{Digest::SHA1.hexdigest(params.to_json)}.#{params[:type]}",
+        "#{Digest::SHA1.hexdigest(params.to_json)}#{params[:type]}",
       )
     end
 
