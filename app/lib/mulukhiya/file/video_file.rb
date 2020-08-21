@@ -32,7 +32,7 @@ module Mulukhiya
       return nil
     end
 
-    def convert_format(type)
+    def convert_type(type)
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['ffmpeg', '-y', '-i', path, dest])
       command.exec unless File.exist?(dest)

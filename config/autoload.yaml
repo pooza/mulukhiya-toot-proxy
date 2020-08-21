@@ -8,6 +8,7 @@ inflections:
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
+  mime_type: MIMEType
   mongo_dsn: MongoDSN
   note_uri: NoteURI
   shortened_url_handler: ShortenedURLHandler

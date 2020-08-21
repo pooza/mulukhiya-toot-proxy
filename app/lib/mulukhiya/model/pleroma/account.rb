@@ -9,6 +9,7 @@ module Mulukhiya
           @hash = values.clone
           @hash[:username] = username
           @hash[:display_name] = display_name
+          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash[:url] = uri.to_s
           @hash.delete(:password_hash)
           @hash.delete(:keys)

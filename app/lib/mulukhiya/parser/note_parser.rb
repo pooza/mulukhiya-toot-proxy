@@ -1,7 +1,7 @@
 module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
-    attr_accessor :account
+    attr_accessor :account, :service
 
     def initialize(text = '')
       super

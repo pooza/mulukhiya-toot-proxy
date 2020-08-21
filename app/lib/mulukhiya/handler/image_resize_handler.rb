@@ -1,8 +1,9 @@
 module Mulukhiya
   class ImageResizeHandler < MediaConvertHandler
     def convert
-      result.push(source: {width: @source.width, height: @source.height})
       return @source.resize(pixel)
+    ensure
+      result.push(source: {width: @source.width, height: @source.height})
     end
 
     def convertable?

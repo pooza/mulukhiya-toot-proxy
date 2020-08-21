@@ -24,6 +24,10 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    def type
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
     def media_class
       return ImageFile
     end

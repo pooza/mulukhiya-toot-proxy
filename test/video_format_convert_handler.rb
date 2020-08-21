@@ -3,7 +3,7 @@ module Mulukhiya
     def setup
       @handler = Handler.create('video_format_convert')
       @handler.handle_pre_upload(file: {
-        tmpfile: File.new(
+        tempfile: File.new(
           File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'),
         ),
       })
@@ -12,6 +12,11 @@ module Mulukhiya
     def test_convertable?
       return unless handler?
       assert_false(@handler.convertable?)
+    end
+
+    def test_convert
+      return unless handler?
+      assert_kind_of(VideoFile, @handler.convert)
     end
   end
 end

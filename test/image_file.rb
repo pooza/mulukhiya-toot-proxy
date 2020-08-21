@@ -1,5 +1,5 @@
 module Mulukhiya
-  class ImageeFileTest < TestCase
+  class ImageFileTest < TestCase
     def setup
       @png = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/ribbon08-009.png'))
       @animated = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'))
@@ -51,14 +51,14 @@ module Mulukhiya
       assert(@animated.animated?) unless Environment.ci?
     end
 
-    def test_valid_extname
-      assert_equal(@png.valid_extname, '.png')
-      assert_nil(@animated.valid_extname)
+    def test_recommended_extname
+      assert_equal(@png.recommended_extname, '.png')
+      assert_nil(@animated.recommended_extname)
     end
 
-    def test_valid_extname?
-      assert(@png.valid_extname?)
-      assert(@animated.valid_extname?)
+    def test_recommended_extname?
+      assert(@png.recommended_extname?)
+      assert(@animated.recommended_extname?)
     end
 
     def test_resize
@@ -68,8 +68,8 @@ module Mulukhiya
       assert_equal(converted.height, 30)
     end
 
-    def test_convert_format
-      converted = @png.convert_format(:jpeg)
+    def test_convert_type
+      converted = @png.convert_type('image/jpeg')
       assert_kind_of(ImageFile, converted)
       assert_equal(converted.type, 'image/jpeg')
     end

@@ -4,7 +4,7 @@ module Mulukhiya
       @handler = Handler.create('image_resize')
       return unless handler?
       @handler.handle_pre_upload(file: {
-        tmpfile: File.new(
+        tempfile: File.new(
           File.join(Environment.dir, 'public/mulukhiya/icon.png'),
         ),
       })
@@ -13,6 +13,11 @@ module Mulukhiya
     def test_convertable?
       return unless handler?
       assert_false(@handler.convertable?)
+    end
+
+    def test_convert
+      return unless handler?
+      assert_kind_of(ImageFile, @handler.convert)
     end
   end
 end
