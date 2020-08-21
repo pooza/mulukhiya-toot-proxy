@@ -35,5 +35,16 @@ module Mulukhiya
         key.failure('URLが正しくありません。') unless Ginseng::URI.parse(value[:url]).absolute?
       end
     end
+
+    def call(values)
+      values[:tags] ||= []
+      values[:webhook] ||= {}
+      values[:growi] ||= {}
+      values[:dropbox] ||= {}
+      values[:notify] ||= {}
+      values[:amazon] ||= {}
+      values[:annict] ||= {}
+      return super
+    end
   end
 end

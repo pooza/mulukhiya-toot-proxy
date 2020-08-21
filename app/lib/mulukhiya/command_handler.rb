@@ -9,12 +9,8 @@ module Mulukhiya
       return @contract
     end
 
-    def command_params
-      return parser.params
-    end
-
     def validate
-      return contract.call(command_params).errors.map do |error|
+      return contract.call(parser.params).errors.map do |error|
         ["/#{error.path.map(&:to_s).join('/')}", error.text]
       end.to_h
     end

@@ -489,6 +489,8 @@ meisskey:
     max_length: 1000
 dolphin:
   url: https://dolphin.example.com/
+  tag_feed: true
+  clipping: true
   dbms: postgres
   parser: note
   handlers:
