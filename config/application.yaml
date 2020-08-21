@@ -331,7 +331,6 @@ misskey:
   tag_feed: true
   clipping: true
   announcement: true
-  filter: true
   dbms: postgres
   parser: note
   handlers:
@@ -409,6 +408,10 @@ misskey:
     max_length: 500
 meisskey:
   url: https://meisskey.example.com/
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
   dbms: mongo
   parser: note
   handlers:
