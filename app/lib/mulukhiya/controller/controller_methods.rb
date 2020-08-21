@@ -6,7 +6,7 @@ module Mulukhiya
 
     module Methods
       def display_name
-        return config["/#{name.underscore}/display_name"] ||name
+        return config["/#{name.underscore}/display_name"] || name
       rescue Ginseng::ConfigError
         return name
       end
