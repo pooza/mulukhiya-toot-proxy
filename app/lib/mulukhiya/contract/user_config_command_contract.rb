@@ -37,6 +37,8 @@ module Mulukhiya
     end
 
     def call(values)
+      values ||= {}
+      values.with_indifferent_access
       values[:tags] ||= []
       values[:webhook] ||= {}
       values[:growi] ||= {}
