@@ -2,12 +2,10 @@
 ## アカウント
 [<%= @params[:account][:display_name] %>](<%= @params[:account][:url] %>)
 <% if @params[:status] -%>
-
 ## 本文
 <%= @params[:status] %>
 <% end -%>
 <% if @params[:attachments].present? -%>
-
 ## メディア
 <% @params[:attachments].each do |attachment| -%>
 <% if attachment[:type].split('/').first == 'image' -%>
@@ -17,6 +15,5 @@
 <% end -%>
 <% end -%>
 <% end -%>
-
 ## URL
 <%= @params[:url] %>
