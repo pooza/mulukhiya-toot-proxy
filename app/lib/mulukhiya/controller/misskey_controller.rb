@@ -1,5 +1,7 @@
 module Mulukhiya
   class MisskeyController < Controller
+    include ControllerMethods
+
     before do
       if params[:token].present? && home?
         @sns.token = Crypt.new.decrypt(params[:token])
@@ -80,78 +82,6 @@ module Mulukhiya
 
     def self.name
       return 'Misskey'
-    end
-
-    def self.webhook?
-      return true
-    end
-
-    def self.tag_feed?
-      return TagContainer.default_tags.present?
-    end
-
-    def self.clipping?
-      return true
-    end
-
-    def self.announcement?
-      return true
-    end
-
-    def self.parser_class
-      return "Mulukhiya::#{parser_name.camelize}Parser".constantize
-    end
-
-    def self.dbms_class
-      return "Mulukhiya::#{dbms_name.camelize}".constantize
-    end
-
-    def self.postgres?
-      return dbms_name == 'postgres'
-    end
-
-    def self.mongo?
-      return dbms_name == 'mongo'
-    end
-
-    def self.dbms_name
-      return config['/misskey/dbms']
-    end
-
-    def self.parser_name
-      return config['/misskey/parser']
-    end
-
-    def self.status_field
-      return config['/misskey/status/field']
-    end
-
-    def self.status_key
-      return config['/misskey/status/key']
-    end
-
-    def self.attachment_key
-      return config['/misskey/attachment/key']
-    end
-
-    def self.poll_options_field
-      return config['/misskey/poll/options/field']
-    end
-
-    def self.spoiler_field
-      return config['/misskey/status/spoiler/field']
-    end
-
-    def self.visibility_name(name)
-      return parser_class.visibility_name(name)
-    end
-
-    def self.status_label
-      return config['/misskey/status/label']
-    end
-
-    def self.events
-      return config['/misskey/events'].map(&:to_sym)
     end
 
     def self.webhook_entries

@@ -1,5 +1,5 @@
 package:
-  version: 3.12.8
+  version: 3.12.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -61,22 +61,28 @@ worker:
       category: お知らせ
 parser:
   toot:
-    patterns:
-      - ^/web/statuses/([[:digit:]]+)
-      - ^/@[[:word:]]+/([[:digit:]]+)
-      - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-      - ^/notice/([[:word:]]+)
-    visibility:
-      unlisted: unlisted
-      private: private
-      direct: direct
+    url:
+      patterns:
+        - ^/web/statuses/([[:digit:]]+)
+        - ^/@[[:word:]]+/([[:digit:]]+)
+        - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
+        - ^/notice/([[:word:]]+)
+    fields:
+      body: status
+      spoiler: spoiler_text
+      attachment: media_ids
+      poll:
+        options: options
   note:
-    patterns:
-      - ^/notes/([[:alnum:]]+)
-    visibility:
-      unlisted: home
-      private: followers
-      direct: specified
+    url:
+      patterns:
+        - ^/notes/([[:alnum:]]+)
+    fields:
+      body: text
+      spoiler: cw
+      attachment: fileIds
+      poll:
+        options: choices
 test:
   filters:
     - name: ci
@@ -208,9 +214,16 @@ webui:
   livecure: false
 mastodon:
   url: https://mstdn.example.com/
-  dbms: postgres
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
+  filter: true
+  twitter: true
+  annict: true
   media_api:
     version: null
+  dbms: postgres
   parser: toot
   handlers:
     pre_toot:
@@ -309,21 +322,19 @@ mastodon:
       - read:filters
       - write:filters
   status:
-    field: status
     key: id
     label: トゥート
     max_length: 500
-    spoiler:
-      field: spoiler_text
-  attachment:
-    key: media_ids
-  poll:
-    options:
-      field: options
   search:
     limit: 40
 misskey:
   url: https://misskey.example.com/
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
+  twitter: true
+  annict: true
   dbms: postgres
   parser: note
   handlers:
@@ -396,19 +407,18 @@ misskey:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 500
-    spoiler:
-      field: cw
-  attachment:
-    key: fileIds
-  poll:
-    options:
-      field: choices
 meisskey:
   url: https://meisskey.example.com/
+  display_name: めいすきー
+  webhook: true
+  tag_feed: true
+  clipping: true
+  announcement: true
+  twitter: true
+  annict: true
   dbms: mongo
   parser: note
   handlers:
@@ -481,19 +491,13 @@ meisskey:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 1000
-    spoiler:
-      field: cw
-  attachment:
-    key: fileIds
-  poll:
-    options:
-      field: choices
 dolphin:
   url: https://dolphin.example.com/
+  tag_feed: true
+  clipping: true
   dbms: postgres
   parser: note
   handlers:
@@ -539,19 +543,15 @@ dolphin:
     - post_upload
     - post_bookmark
   status:
-    field: text
     key: noteId
     label: ノート
     max_length: 500
-    spoiler:
-      field: cw
-  attachment:
-    key: fileIds
-  poll:
-    options:
-      field: choices
 pleroma:
   url: https://pleroma.example.com/
+  webhook: true
+  clipping: true
+  twitter: true
+  annict: true
   dbms: postgres
   parser: toot
   handlers:
@@ -628,17 +628,9 @@ pleroma:
     - post_upload
     - post_bookmark
   status:
-    field: status
     key: id
     label: ステータス
     max_length: 5000
-    spoiler:
-      field: spoiler_text
-  attachment:
-    key: media_ids
-  poll:
-    options:
-      field: options
 amazon:
   marketplace: jp
   urls:

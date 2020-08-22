@@ -24,7 +24,7 @@ html lang='ja'
                 p class='alert' = params[:errors][:code].join
             .field-update-button-container
               button 認証
-        - if ['Misskey', 'めいすきー'].member?(controller.name)
+        - if ['Misskey', 'Meisskey'].member?(controller.name)
           ol
             li
               a href=params[:oauth_url] 認証コードを取得

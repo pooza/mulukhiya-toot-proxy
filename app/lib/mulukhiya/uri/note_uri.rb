@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def note_id
-      @config['/parser/note/patterns'].each do |pattern|
+      @config['/parser/note/url/patterns'].each do |pattern|
         next unless matches = path.match(pattern)
         return matches[1]
       end
@@ -36,6 +36,14 @@ module Mulukhiya
 
     def publicize
       return clone.publicize!
+    end
+
+    def visibility
+      return note['visibility']
+    end
+
+    def public?
+      return visibility == 'public'
     end
 
     def to_md

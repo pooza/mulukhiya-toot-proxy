@@ -3,11 +3,11 @@ module Mulukhiya
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
-      return body if body[attachment_key].present?
+      return body if body[attachment_field].present?
       parser.uris.each do |uri|
         next unless updatable?(uri)
         next unless image = create_image_uri(uri)
-        body[attachment_key] = [sns.upload_remote_resource(image, {response: :id})]
+        body[attachment_field] = [sns.upload_remote_resource(image, {response: :id})]
         result.push(source_url: uri.to_s, image_url: image.to_s)
         break
       rescue Ginseng::GatewayError, RestClient::Exception => e

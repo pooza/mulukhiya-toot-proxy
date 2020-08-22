@@ -14,6 +14,9 @@ module Mulukhiya
       required(:dropbox).maybe(:hash).schema do
         optional(:token).maybe(:string)
       end
+      required(:annict).maybe(:hash).schema do
+        optional(:token).maybe(:string)
+      end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
         optional(:user_config).maybe(:bool)
@@ -31,6 +34,17 @@ module Mulukhiya
       if value[:url]
         key.failure('URLが正しくありません。') unless Ginseng::URI.parse(value[:url]).absolute?
       end
+    end
+
+    def call(values)
+      values[:tags] ||= []
+      values[:webhook] ||= {}
+      values[:growi] ||= {}
+      values[:dropbox] ||= {}
+      values[:notify] ||= {}
+      values[:amazon] ||= {}
+      values[:annict] ||= {}
+      return super
     end
   end
 end

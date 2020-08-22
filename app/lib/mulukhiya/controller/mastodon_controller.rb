@@ -1,5 +1,7 @@
 module Mulukhiya
   class MastodonController < Controller
+    include ControllerMethods
+
     before do
       if params[:token].present? && home?
         @sns.token = Crypt.new.decrypt(params[:token])
@@ -140,86 +142,6 @@ module Mulukhiya
 
     def self.name
       return 'Mastodon'
-    end
-
-    def self.webhook?
-      return true
-    end
-
-    def self.tag_feed?
-      return TagContainer.default_tags.present?
-    end
-
-    def self.clipping?
-      return true
-    end
-
-    def self.announcement?
-      return true
-    end
-
-    def self.filter?
-      return true
-    end
-
-    def self.livecure?
-      return config['/webui/livecure']
-    end
-
-    def self.parser_class
-      return "Mulukhiya::#{parser_name.camelize}Parser".constantize
-    end
-
-    def self.dbms_class
-      return "Mulukhiya::#{dbms_name.camelize}".constantize
-    end
-
-    def self.postgres?
-      return dbms_name == 'postgres'
-    end
-
-    def self.mongo?
-      return dbms_name == 'mongo'
-    end
-
-    def self.dbms_name
-      return config['/mastodon/dbms']
-    end
-
-    def self.parser_name
-      return config['/mastodon/parser']
-    end
-
-    def self.status_field
-      return config['/mastodon/status/field']
-    end
-
-    def self.status_key
-      return config['/mastodon/status/key']
-    end
-
-    def self.poll_options_field
-      return config['/mastodon/poll/options/field']
-    end
-
-    def self.spoiler_field
-      return config['/mastodon/status/spoiler/field']
-    end
-
-    def self.attachment_key
-      return config['/mastodon/attachment/key']
-    end
-
-    def self.visibility_name(name)
-      return parser_class.visibility_name(name)
-    end
-
-    def self.status_label
-      return config['/mastodon/status/label']
-    end
-
-    def self.events
-      return config['/mastodon/events'].map(&:to_sym)
     end
 
     def self.webhook_entries

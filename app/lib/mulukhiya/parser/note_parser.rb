@@ -3,32 +3,6 @@ module Mulukhiya
     include Package
     attr_accessor :account, :service
 
-    def initialize(text = '')
-      super
-      if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
-        @service = Environment.sns_class.new
-      else
-        @service = MisskeyService.new
-      end
-    end
-
-    def to_md
-      md = text.clone
-      tags.sort_by(&:length).reverse_each do |tag|
-        md.gsub!("\##{tag}", "[\\#{HASH}#{tag}](#{@service.create_uri("/tags/#{tag}")})")
-      end
-      accts = self.accts.map(&:to_s).sort_by do |acct|
-        v = acct.to_s
-        v.scan(/@/).count * 100_000_000 + v.length
-      end
-      accts.reverse_each do |acct|
-        md.sub!(acct, "[#{acct.gsub('@', ATMARK)}](#{@service.create_uri("/#{acct}")})")
-      end
-      md.gsub!(HASH, '#')
-      md.gsub!(ATMARK, '@')
-      return Ginseng::Fediverse::Parser.sanitize(md)
-    end
-
     def to_sanitized
       return NoteParser.sanitize(text.clone)
     end
@@ -58,22 +32,6 @@ module Mulukhiya
       end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length
-    end
-
-    def self.visibility_name(name)
-      return visibility_names[name.to_sym] if visibility_names.key?(name.to_sym)
-      return name if visibility_names.values.member?(name)
-      return 'public'
-    rescue
-      return 'public'
-    end
-
-    def self.visibility_names
-      return {public: 'public'}.merge(
-        [:unlisted, :private, :direct].map do |name|
-          [name, Config.instance["/parser/note/visibility/#{name}"]]
-        end.to_h,
-      )
     end
   end
 end

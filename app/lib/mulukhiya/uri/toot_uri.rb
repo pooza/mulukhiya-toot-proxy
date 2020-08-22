@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def toot_id
-      @config['/parser/toot/patterns'].each do |pattern|
+      @config['/parser/toot/url/patterns'].each do |pattern|
         next unless matches = path.match(pattern)
         id = matches[1]
         return id.to_i if id.match?(/^[[:digit:]]+$/)
@@ -41,6 +41,14 @@ module Mulukhiya
 
     def publicize
       return clone.publicize!
+    end
+
+    def visibility
+      return toot['visibility']
+    end
+
+    def public?
+      return visibility == 'public'
     end
 
     def to_md
