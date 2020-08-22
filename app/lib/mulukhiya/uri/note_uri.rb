@@ -38,6 +38,14 @@ module Mulukhiya
       return clone.publicize!
     end
 
+    def visibility
+      return note['visibility']
+    end
+
+    def public?
+      return visibility == 'public'
+    end
+
     def to_md
       template = Template.new('status_clipping.md')
       template[:account] = account
