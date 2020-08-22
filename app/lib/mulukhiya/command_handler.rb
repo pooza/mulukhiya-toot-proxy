@@ -28,7 +28,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return unless parser.command_name == command_name
       exec
-      result.push(parser.params)
+      result.push(parser.params.select {|k, v| v.present?})
     end
 
     def handle_pre_webhook(body, params = {}); end

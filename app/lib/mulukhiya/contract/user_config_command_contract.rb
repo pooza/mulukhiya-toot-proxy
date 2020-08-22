@@ -37,6 +37,8 @@ module Mulukhiya
     end
 
     def call(values)
+      values ||= {}
+      values.deep_symbolize_keys!
       values[:tags] ||= []
       values[:webhook] ||= {}
       values[:growi] ||= {}
