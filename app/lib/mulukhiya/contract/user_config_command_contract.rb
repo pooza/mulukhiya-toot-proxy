@@ -38,14 +38,14 @@ module Mulukhiya
 
     def call(values)
       values ||= {}
-      values.with_indifferent_access
-      values[:tags] ||= []
-      values[:webhook] ||= {}
-      values[:growi] ||= {}
-      values[:dropbox] ||= {}
-      values[:notify] ||= {}
-      values[:amazon] ||= {}
-      values[:annict] ||= {}
+      values.deep_stringify_keys!
+      values['tags'] ||= []
+      values['webhook'] ||= {}
+      values['growi'] ||= {}
+      values['dropbox'] ||= {}
+      values['notify'] ||= {}
+      values['amazon'] ||= {}
+      values['annict'] ||= {}
       return super
     end
   end
