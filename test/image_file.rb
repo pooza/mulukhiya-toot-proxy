@@ -80,5 +80,12 @@ module Mulukhiya
       assert_kind_of(ImageFile, converted)
       assert_equal(converted.type, 'image/jpeg')
     end
+
+    def test_convert_animation_type
+      assert_nil(@png.convert_animation_type)
+      assert_nil(@agif.convert_animation_type)
+      assert_equal(@awebp.convert_animation_type.type, 'image/gif')
+      assert_equal(@apng.convert_animation_type.type, 'image/gif')
+    end
   end
 end
