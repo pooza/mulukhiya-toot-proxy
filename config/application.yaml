@@ -21,6 +21,10 @@ handler:
   audio_format_convert:
     timeout: 10
     type: audio/mpeg
+  animation_image_format_convert:
+    type: image/gif
+    timeout: 10
+    disable: true
   itunes_image:
     pixel: 480
     timeout: 10
@@ -281,6 +285,7 @@ mastodon:
       - result_notification
     pre_upload:
       - image_format_convert
+      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -383,6 +388,7 @@ misskey:
       - result_notification
     pre_upload:
       - image_format_convert
+      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -467,6 +473,7 @@ meisskey:
       - result_notification
     pre_upload:
       - image_format_convert
+      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -527,6 +534,7 @@ dolphin:
       - result_notification
     pre_upload:
       - image_format_convert
+      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -604,6 +612,7 @@ pleroma:
       - result_notification
     pre_upload:
       - image_format_convert
+      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
