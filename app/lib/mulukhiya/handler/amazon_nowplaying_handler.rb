@@ -4,8 +4,6 @@ module Mulukhiya
       super
       @asins = {}
       @service = AmazonService.new
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
     end
 
     def disable?
@@ -13,6 +11,7 @@ module Mulukhiya
     end
 
     def updatable?(keyword)
+      return false if Ginseng::URI.parse(keyword)&.absolute?
       return true if @asins[keyword] = @service.search(keyword, ['DigitalMusic', 'Music'])
       return false
     rescue => e

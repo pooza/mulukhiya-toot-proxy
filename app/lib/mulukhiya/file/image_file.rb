@@ -51,7 +51,11 @@ module Mulukhiya
       return false unless image?
       command = CommandLine.new(['identify', path])
       command.exec
-      return 1 < command.stdout.each_line.count
+      return true if 1 < command.stdout.each_line.count
+      command = CommandLine.new(['ffprobe', path])
+      command.exec
+      return true if command.stderr.match?(/Stream .* Video: .*fps/)
+      return false
     end
 
     def resize(pixel)
@@ -62,6 +66,7 @@ module Mulukhiya
     end
 
     def convert_type(type)
+      return convert_animation_type(type) if animated?
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)
@@ -74,6 +79,25 @@ module Mulukhiya
         dest = Dir.glob(mask).max
       end
       return ImageFile.new(dest)
+    end
+
+    def convert_animation_type(type = 'image/gif')
+      return unless animated?
+      dest = create_dest_path(f: __method__, extname: MIMEType.extname(type))
+      case self.type
+      when 'image/png'
+        command = CommandLine.new(['ffmpeg', '-i', path, dest])
+        command.exec
+      when 'image/webp'
+        command = CommandLine.new(['convert', path, dest])
+        command.exec
+      end
+      file = ImageFile.new(dest)
+      return file if file.type == type
+      return nil
+    rescue => e
+      @logger.error(e)
+      return nil
     end
 
     def detail_info

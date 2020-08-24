@@ -2,16 +2,20 @@ module Mulukhiya
   class ImageFileTest < TestCase
     def setup
       @png = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/ribbon08-009.png'))
-      @animated = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'))
       @mp3 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
       @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
+      @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/11750_thumbnail.gif'))
+      @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'))
+      @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/elephant_apng_zopfli.png'))
     end
 
     def test_image?
       assert(@png.image?)
-      assert(@animated.image?)
       assert_false(@mp3.image?)
       assert_false(@mp4.image?)
+      assert(@agif.image?)
+      assert(@awebp.image?)
+      assert(@apng.image?)
     end
 
     def test_mediatype
@@ -48,17 +52,20 @@ module Mulukhiya
 
     def test_animated?
       assert_false(@png.animated?)
-      assert(@animated.animated?) unless Environment.ci?
+      assert(@agif.animated?)
+      assert(@awebp.animated?) unless Environment.ci?
+      assert(@apng.animated?)
     end
 
     def test_recommended_extname
       assert_equal(@png.recommended_extname, '.png')
-      assert_nil(@animated.recommended_extname)
     end
 
     def test_recommended_extname?
       assert(@png.recommended_extname?)
-      assert(@animated.recommended_extname?)
+      assert(@agif.recommended_extname?)
+      assert(@awebp.recommended_extname?)
+      assert(@apng.recommended_extname?)
     end
 
     def test_resize
@@ -72,6 +79,13 @@ module Mulukhiya
       converted = @png.convert_type('image/jpeg')
       assert_kind_of(ImageFile, converted)
       assert_equal(converted.type, 'image/jpeg')
+    end
+
+    def test_convert_animation_type
+      assert_nil(@png.convert_animation_type)
+      assert_nil(@agif.convert_animation_type)
+      assert_equal(@awebp.convert_animation_type.type, 'image/gif') unless Environment.ci?
+      assert_equal(@apng.convert_animation_type.type, 'image/gif')
     end
   end
 end

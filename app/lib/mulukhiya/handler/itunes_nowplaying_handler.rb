@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def updatable?(keyword)
+      return false if Ginseng::URI.parse(keyword)&.absolute?
       return true if @tracks[keyword] = @service.search(keyword, 'music')
       return false
     rescue => e
