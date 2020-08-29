@@ -740,6 +740,7 @@ itunes:
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
+  retry_limit: 5
   hosts:
     - music.apple.com
     - itunes.apple.com
