@@ -3,6 +3,7 @@ module Mulukhiya
     def initialize
       @config = Config.instance
       @http = HTTP.new
+      @logger = Logger.new
     end
 
     def search(keyword, category)
