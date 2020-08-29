@@ -1,5 +1,5 @@
 package:
-  version: 3.12.12
+  version: 3.12.13
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -681,6 +681,7 @@ spotify:
   language: ja,en-US;q=0.9,en;q=0.8
   urls:
     track: https://open.spotify.com/
+  retry_limit: 5
   patterns:
     - pattern: /track/([[:alnum:]]+)
       type: track
@@ -737,10 +738,10 @@ itunes:
   urls:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
+  retry_limit: 5
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
-  retry_limit: 5
   hosts:
     - music.apple.com
     - itunes.apple.com

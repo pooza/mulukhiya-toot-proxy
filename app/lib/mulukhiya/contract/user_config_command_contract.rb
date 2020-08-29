@@ -1,6 +1,6 @@
 module Mulukhiya
   class UserConfigCommandContract < Contract
-    json do
+    json do # rubocop:disable Metrics/BlockLength
       required(:command).value(:string)
       required(:tags).maybe(:array).each(:string)
       required(:webhook).maybe(:hash).schema do
@@ -16,6 +16,10 @@ module Mulukhiya
       end
       required(:annict).maybe(:hash).schema do
         optional(:token).maybe(:string)
+      end
+      required(:twitter).maybe(:hash).schema do
+        optional(:token).maybe(:string)
+        optional(:secret).maybe(:string)
       end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
@@ -37,7 +41,7 @@ module Mulukhiya
     end
 
     def call(values)
-      values ||= {}
+      values = values.clone || {}
       values.deep_stringify_keys!
       values['tags'] ||= []
       values['webhook'] ||= {}
@@ -46,6 +50,7 @@ module Mulukhiya
       values['notify'] ||= {}
       values['amazon'] ||= {}
       values['annict'] ||= {}
+      values['twitter'] ||= {}
       return super
     end
   end
