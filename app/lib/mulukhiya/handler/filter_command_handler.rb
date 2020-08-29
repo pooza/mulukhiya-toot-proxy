@@ -21,6 +21,7 @@ module Mulukhiya
 
     def remove_filter(phrase)
       sns.filters.each do |filter|
+        next unless filter.is_a?(Hash)
         next unless filter['phrase'] == phrase
         sns.unregister_filter(filter['id'])
       end
