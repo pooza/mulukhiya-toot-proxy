@@ -1,3 +1,9 @@
+- key: /spotify/client/id
+  aliases:
+    - /spotify/client_id
+- key: /spotify/client/secret
+  aliases:
+    - /spotify/client_secret
 - key: /crypt/salt
   aliases:
     - /webhook/salt

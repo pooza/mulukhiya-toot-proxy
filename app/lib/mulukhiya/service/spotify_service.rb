@@ -6,7 +6,7 @@ module Mulukhiya
       @config = Config.instance
       @logger = Logger.new
       ENV['ACCEPT_LANGUAGE'] ||= @config['/spotify/language']
-      RSpotify.authenticate(@config['/spotify/client_id'], @config['/spotify/client_secret'])
+      RSpotify.authenticate(@config['/spotify/client/id'], @config['/spotify/client/secret'])
     end
 
     def search_track(keyword)
@@ -85,8 +85,8 @@ module Mulukhiya
 
     def self.config?
       config = Config.instance
-      config['/spotify/client_id']
-      config['/spotify/client_secret']
+      config['/spotify/client/id']
+      config['/spotify/client/secret']
       return true
     rescue Ginseng::ConfigError
       return false
