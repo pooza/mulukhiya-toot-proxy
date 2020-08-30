@@ -20,6 +20,8 @@ module Mulukhiya
     end
 
     def upload(path, params = {})
+      params[:response] ||= :raw
+      params[:version] = 1
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
         FileUtils.mkdir_p(dir)
@@ -29,7 +31,13 @@ module Mulukhiya
         FileUtils.copy(path, dest)
         path = dest
       end
-      return super
+      response = http.upload(
+        "/api/v#{params[:version]}/media",
+        path,
+        create_headers(params[:headers]),
+      )
+      return response if params[:response] == :raw
+      return JSON.parse(response.body)['id']
     ensure
       FileUtils.rm_rf(dir) if dir
     end
