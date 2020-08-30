@@ -11,7 +11,17 @@ module Mulukhiya
       return nil
     end
 
+    def say(body, params = {})
+      params[:chat_id] ||= body[:chat_id]
+      return http.post("/api/v1/pleroma/chats/#{params[:chat_id]}/messages", {
+        body: body.to_json,
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def upload(path, params = {})
+      params[:response] ||= :raw
+      params[:version] = 1
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
         FileUtils.mkdir_p(dir)
@@ -21,7 +31,13 @@ module Mulukhiya
         FileUtils.copy(path, dest)
         path = dest
       end
-      return super
+      response = http.upload(
+        "/api/v#{params[:version]}/media",
+        path,
+        create_headers(params[:headers]),
+      )
+      return response if params[:response] == :raw
+      return JSON.parse(response.body)['id']
     ensure
       FileUtils.rm_rf(dir) if dir
     end

@@ -19,6 +19,14 @@ module Mulukhiya
       handle_post_toot(body, params)
     end
 
+    def handle_pre_chat(body, params = {})
+      return handle_pre_toot(body, params)
+    end
+
+    def handle_post_chat(body, params = {})
+      handle_post_toot(body, params)
+    end
+
     def handle_pre_upload(body, params = {}); end
 
     def handle_post_upload(body, params = {}); end

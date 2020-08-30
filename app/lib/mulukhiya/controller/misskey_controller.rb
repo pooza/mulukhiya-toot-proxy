@@ -28,6 +28,21 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/api/messaging/messages/create' do
+      Handler.dispatch(:pre_chat, params, {reporter: @reporter, sns: @sns})
+      @reporter.response = @sns.say(params)
+      notify(@reporter.response.parsed_response) if response_error?
+      Handler.dispatch(:post_chat, params, {reporter: @reporter, sns: @sns})
+      @renderer.message = @reporter.response.parsed_response
+      @renderer.status = @reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {'error' => e.message}
+      notify('error' => e.raw_message)
+      @renderer.status = e.status
+      return @renderer.to_s
+    end
+
     post '/api/drive/files/create' do
       Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
