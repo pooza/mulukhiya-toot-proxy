@@ -11,6 +11,14 @@ module Mulukhiya
       return nil
     end
 
+    def say(body, params = {})
+      params[:chat_id] ||= body[:chat_id]
+      return http.post("/api/v1/pleroma/chats/#{params[:chat_id]}/messages", {
+        body: body.to_json,
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))

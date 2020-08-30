@@ -646,6 +646,22 @@ pleroma:
       - tagging
     post_webhook:
       - result_notification
+    pre_chat:
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
+    post_chat:
+      - result_notification
     pre_upload:
       - image_format_convert
       - animation_image_format_convert
@@ -669,6 +685,8 @@ pleroma:
     - post_toot
     - pre_webhook
     - post_webhook
+    - pre_chat
+    - post_chat
     - pre_upload
     - post_upload
     - post_bookmark
@@ -676,6 +694,8 @@ pleroma:
     key: id
     label: ステータス
     max_length: 5000
+  chat:
+    field: content
 amazon:
   marketplace: jp
   urls:
