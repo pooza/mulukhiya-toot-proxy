@@ -102,6 +102,10 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}::AccessToken".constantize
     end
 
+    def self.hash_tag_class
+      return "Mulukhiya::#{controller_name.camelize}::HashTag".constantize
+    end
+
     def self.service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end

@@ -97,6 +97,7 @@ test:
         - account
         - access_token
         - status
+        - hash_tag
         - user_config
         - tag_atom_feed_renderer
         - announcement_worker
@@ -144,6 +145,7 @@ test:
         - webhook_controller
         - mongo
         - access_token
+        - hash_tag
         - mastodon_auth_contract
     - name: mastodon
       cases:
@@ -152,6 +154,7 @@ test:
         - meisskey_controller
         - pleroma_controller
         - mongo
+        - hash_tag
         - misskey_auth_contract
     - name: misskey
       cases:
@@ -160,6 +163,7 @@ test:
         - dolphin_controller
         - pleroma_controller
         - mongo
+        - hash_tag
         - mastodon_auth_contract
     - name: meisskey
       cases:
@@ -176,6 +180,7 @@ test:
         - dolphin_controller
         - meisskey_controller
         - mongo
+        - hash_tag
         - misskey_auth_contract
         - tag_atom_feed_renderer
     - name: dropbox
