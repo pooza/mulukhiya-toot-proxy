@@ -145,7 +145,6 @@ test:
         - webhook_controller
         - mongo
         - access_token
-        - hash_tag
         - mastodon_auth_contract
     - name: mastodon
       cases:
@@ -154,7 +153,6 @@ test:
         - meisskey_controller
         - pleroma_controller
         - mongo
-        - hash_tag
         - misskey_auth_contract
     - name: misskey
       cases:
@@ -163,7 +161,6 @@ test:
         - dolphin_controller
         - pleroma_controller
         - mongo
-        - hash_tag
         - mastodon_auth_contract
     - name: meisskey
       cases:
