@@ -3,6 +3,7 @@ module Mulukhiya
     def setup
       @account = Environment.test_account
       @status = @account.recent_status
+      @config = Config.instance
     end
 
     def test_id
@@ -33,6 +34,18 @@ module Mulukhiya
 
     def test_to_md
       assert_kind_of(String, @status.to_md)
+    end
+
+    def test_tag_feed
+      feed = Environment.status_class.tag_feed(
+        test_usernames: ['test'],
+        tag: TagContainer.default_tags&.first || 'nowplaying',
+        limit: @config['/feed/tag/limit'],
+      )
+      assert_kind_of(Array, feed)
+      feed.each do |entry|
+        assert_kind_of(Hash, entry)
+      end
     end
   end
 end
