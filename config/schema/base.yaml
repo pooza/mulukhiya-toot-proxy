@@ -160,8 +160,13 @@ properties:
   spotify:
     type: object
     required:
-      - client_id
-      - client_secret
+      - client
+    properties:
+      client:
+        type: object
+        required:
+          - client_id
+          - client_secret
     properties:
       client_id:
         type: string
