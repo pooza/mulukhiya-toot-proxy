@@ -15,7 +15,7 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return HashTag.first(name: key[:tag].sub(/^#/, '')) if key.key?(:tag)
+        return HashTag.first(name: key[:tag]) if key.key?(:tag)
         return HashTag.first(key)
       end
     end

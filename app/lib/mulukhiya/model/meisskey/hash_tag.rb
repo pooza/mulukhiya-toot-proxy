@@ -38,7 +38,7 @@ module Mulukhiya
 
       def self.get(key)
         return nil if key[:tag].nil?
-        tag = collection.find(tag: key[:tag].sub(/^#/, '')).first
+        tag = collection.find(tag: key[:tag]).first
         return HashTag.new(tag['_id'])
       end
 
