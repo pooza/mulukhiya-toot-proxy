@@ -201,6 +201,9 @@ test:
         - webhook
         - webhook_image_handler
         - webhook_controller
+    - name: default_hash_tag
+      cases:
+        - tag_atom_feed_renderer
 webui:
   scripts:
     - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
