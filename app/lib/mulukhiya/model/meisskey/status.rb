@@ -76,28 +76,6 @@ module Mulukhiya
         return get(key)
       end
 
-      def self.tag_feed(params)
-        return [] unless Mongo.config?
-        user_ids = (params[:test_usernames] || []).map do |id|
-          BSON::ObjectId.from_string(Account.get(username: id).id)
-        end
-        notes = collection
-          .find(tags: params[:tag].sub(/^#/, '').downcase, userId: {'$nin' => user_ids})
-          .sort(createdAt: -1)
-          .limit(params[:limit])
-        return notes.map do |row|
-          status = Status.new(row['_id'])
-          {
-            username: status.account.username,
-            domain: status.account.acct.host,
-            spoiler_text: status.cw,
-            text: status.text,
-            uri: status.uri.to_s,
-            created_at: status.createdAt,
-          }
-        end
-      end
-
       def self.collection
         return Mongo.instance.db[:notes]
       end

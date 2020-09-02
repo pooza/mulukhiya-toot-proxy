@@ -10,13 +10,35 @@ module Mulukhiya
         return @uri
       end
 
+      def create_feed(params)
+        return [] unless Mongo.config?
+        user_ids = (params[:test_usernames] || []).map do |id|
+          BSON::ObjectId.from_string(Account.get(username: id).id)
+        end
+        notes = collection
+          .find(tags: name, userId: {'$nin' => user_ids})
+          .sort(createdAt: -1)
+          .limit(params[:limit])
+        return notes.map do |row|
+          status = Status.new(row['_id'])
+          {
+            username: status.account.username,
+            domain: status.account.acct.host,
+            spoiler_text: status.cw,
+            text: status.text,
+            uri: status.uri.to_s,
+            created_at: status.createdAt,
+          }
+        end
+      end
+
       def self.[](id)
         return HashTag.new(id)
       end
 
       def self.get(key)
         return nil if key[:tag].nil?
-        tag = collection.find(tag: key[:tag]).first
+        tag = collection.find(tag: key[:tag].sub(/^#/, '')).first
         return HashTag.new(tag['_id'])
       end
 

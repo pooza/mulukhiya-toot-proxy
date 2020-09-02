@@ -34,18 +34,5 @@ module Mulukhiya
     def test_to_md
       assert_kind_of(String, @status.to_md)
     end
-
-    def test_tag_feed
-      feed = Environment.status_class.tag_feed(
-        test_usernames: ['test'],
-        tag: TagContainer.default_tags&.first || 'nowplaying',
-        limit: 3,
-      )
-      assert_kind_of(Array, feed)
-      assert_equal(feed.count, 3)
-      feed.each do |entry|
-        assert_kind_of(Hash, entry)
-      end
-    end
   end
 end

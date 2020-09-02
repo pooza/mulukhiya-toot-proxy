@@ -8,8 +8,14 @@ module Mulukhiya
 
       alias to_h values
 
+      def create_feed(params)
+        return [] unless Postgres.config?
+        params[:tag] = name
+        return Postgres.instance.execute('tag_feed', params)
+      end
+
       def self.get(key)
-        return HashTag.first(name: key[:tag]) if key.key?(:tag)
+        return HashTag.first(name: key[:tag].sub(/^#/, '')) if key.key?(:tag)
         return HashTag.first(key)
       end
     end
