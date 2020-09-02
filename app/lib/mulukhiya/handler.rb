@@ -100,6 +100,7 @@ module Mulukhiya
     end
 
     def timeout
+      return if @config['/test/timeout'] if ENV['TEST']
       return @config["/handler/#{underscore_name}/timeout"]
     rescue Ginseng::ConfigError
       return @config['/handler/default/timeout']

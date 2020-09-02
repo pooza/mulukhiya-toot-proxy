@@ -88,6 +88,7 @@ parser:
       poll:
         options: choices
 test:
+  timeout: 20
   filters:
     - name: ci
       cases:
