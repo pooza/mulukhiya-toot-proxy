@@ -78,13 +78,15 @@ module Mulukhiya
 
       def self.tag_feed(params)
         return [] unless Mongo.config?
-        notes = Mongo.instance.db['notes']
-          .find(tags: params[:tag].sub(/^#/, '').downcase)
+        user_ids = (params[:test_usernames] || []).map do |id|
+          BSON::ObjectId.from_string(Account.get(username: id).id)
+        end
+        notes = collection
+          .find(tags: params[:tag].sub(/^#/, '').downcase, userId: {'$nin' => user_ids})
           .sort(createdAt: -1)
           .limit(params[:limit])
         return notes.map do |row|
           status = Status.new(row['_id'])
-          next if (params[:test_usernames] || []).member?(status.account.username)
           {
             username: status.account.username,
             domain: status.account.acct.host,
@@ -93,7 +95,11 @@ module Mulukhiya
             uri: status.uri.to_s,
             created_at: status.createdAt,
           }
-        end.compact
+        end
+      end
+
+      def self.collection
+        return Mongo.instance.db[:notes]
       end
 
       private

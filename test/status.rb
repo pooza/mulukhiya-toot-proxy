@@ -39,9 +39,10 @@ module Mulukhiya
       feed = Environment.status_class.tag_feed(
         test_usernames: ['test'],
         tag: TagContainer.default_tags&.first || 'nowplaying',
-        limit: 5,
+        limit: 3,
       )
       assert_kind_of(Array, feed)
+      assert_equal(feed.count, 3)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
       end
