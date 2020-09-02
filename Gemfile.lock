@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 3f89fa767ee05fd604fa17ee50136bf07820e552
+  revision: 6f418565e58d1861ac9d1e07a2fc4ea258fa827e
   specs:
-    ginseng-web (1.2.2)
+    ginseng-web (1.2.3)
       puma
       sass
       sinatra
