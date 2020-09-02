@@ -24,6 +24,7 @@ module Mulukhiya
           {
             username: status.account.username,
             domain: status.account.acct.host,
+            display_name: status.account.name,
             spoiler_text: status.cw,
             text: status.text,
             uri: status.uri.to_s,
