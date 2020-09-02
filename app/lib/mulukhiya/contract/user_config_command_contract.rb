@@ -35,9 +35,7 @@ module Mulukhiya
     end
 
     rule(:growi) do
-      if value[:url]
-        key.failure('URLが正しくありません。') unless Ginseng::URI.parse(value[:url]).absolute?
-      end
+      key.failure('URLが正しくありません。') if value[:url] && !Ginseng::URI.parse(value[:url]).absolute?
     end
 
     def call(values)
