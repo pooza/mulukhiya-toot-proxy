@@ -1,5 +1,5 @@
 package:
-  version: 3.13.1
+  version: 3.13.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -201,6 +201,9 @@ test:
         - webhook
         - webhook_image_handler
         - webhook_controller
+    - name: default_hash_tag
+      cases:
+        - tag_atom_feed_renderer
 webui:
   scripts:
     - https://cdn.jsdelivr.net/npm/vue/dist/vue.js

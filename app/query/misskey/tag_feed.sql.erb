@@ -4,6 +4,7 @@ SELECT
   note."createdAt" AS created_at,
   "user".username,
   "user".host AS domain,
+  "user".name AS display_name,
   note."text",
   note.cw AS spoiler_text
 FROM note

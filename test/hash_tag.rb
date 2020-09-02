@@ -2,7 +2,7 @@ module Mulukhiya
   class HashTagTest < TestCase
     def setup
       @nowplaying = Environment.hash_tag_class.get(tag: 'nowplaying')
-      @default = Environment.hash_tag_class.get(tag: TagContainer.default_tags&.first)
+      @default = Environment.hash_tag_class.get(tag: TagContainer.default_tag_bases&.first)
       @config = Config.instance
       @test_usernames = @config['/feed/test_usernames']
     end

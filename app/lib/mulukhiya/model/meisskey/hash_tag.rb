@@ -24,6 +24,7 @@ module Mulukhiya
           {
             username: status.account.username,
             domain: status.account.acct.host,
+            display_name: status.account.name,
             spoiler_text: status.cw,
             text: status.text,
             uri: status.uri.to_s,
@@ -38,7 +39,7 @@ module Mulukhiya
 
       def self.get(key)
         return nil if key[:tag].nil?
-        tag = collection.find(tag: key[:tag].sub(/^#/, '')).first
+        tag = collection.find(tag: key[:tag]).first
         return HashTag.new(tag['_id'])
       end
 
