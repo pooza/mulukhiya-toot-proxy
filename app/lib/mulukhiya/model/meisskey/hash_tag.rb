@@ -15,7 +15,7 @@ module Mulukhiya
         user_ids = (params[:test_usernames] || []).map do |id|
           BSON::ObjectId.from_string(Account.get(username: id).id)
         end
-        notes = collection
+        notes = Status.collection
           .find(tags: name, userId: {'$nin' => user_ids})
           .sort(createdAt: -1)
           .limit(params[:limit])

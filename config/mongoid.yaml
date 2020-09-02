@@ -1,6 +1,0 @@
-development:
-  clients:
-    default:
-      database: misskey
-      hosts:
-        - localhost:27017
