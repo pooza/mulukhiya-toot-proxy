@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7497002e41339ce420126b1f93c41ca3571af11a
+  revision: d59589cb771fca597febf05235a509cc0ea81b44
   specs:
-    ginseng-fediverse (1.3.6)
+    ginseng-fediverse (1.3.7)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
