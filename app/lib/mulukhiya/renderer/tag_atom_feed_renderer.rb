@@ -30,7 +30,6 @@ module Mulukhiya
 
     def params
       return {
-        tag: tag,
         limit: limit,
         test_usernames: @config['/feed/test_usernames'],
       }
@@ -66,6 +65,11 @@ module Mulukhiya
       return File.read(path)
     end
 
+    def record
+      @record ||= Environment.hash_tag_class.get(tag: tag)
+      return @record
+    end
+
     def self.all
       return enum_for(__method__) unless block_given?
       tags do |tag|
@@ -86,7 +90,8 @@ module Mulukhiya
 
     def fetch
       return nil unless Environment.controller_class.tag_feed?
-      Environment.status_class.tag_feed(params).each do |row|
+      return nil unless record
+      record.create_feed(params).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),

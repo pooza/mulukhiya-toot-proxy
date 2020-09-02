@@ -88,6 +88,7 @@ parser:
       poll:
         options: choices
 test:
+  timeout: 20
   filters:
     - name: ci
       cases:
@@ -97,6 +98,7 @@ test:
         - account
         - access_token
         - status
+        - hash_tag
         - user_config
         - tag_atom_feed_renderer
         - announcement_worker
@@ -176,6 +178,7 @@ test:
         - dolphin_controller
         - meisskey_controller
         - mongo
+        - hash_tag
         - misskey_auth_contract
         - tag_atom_feed_renderer
     - name: dropbox
