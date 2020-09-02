@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 2e4ffe074483faaf2716e34a01286f61def78f44
+  revision: e8cb3e906d82d72c3103916dddcf72e392a66b76
   specs:
-    ginseng-core (1.7.6)
+    ginseng-core (1.7.7)
       activesupport
       addressable
       daemon-spawn
@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7497002e41339ce420126b1f93c41ca3571af11a
+  revision: d59589cb771fca597febf05235a509cc0ea81b44
   specs:
-    ginseng-fediverse (1.3.6)
+    ginseng-fediverse (1.3.7)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 3f89fa767ee05fd604fa17ee50136bf07820e552
+  revision: 6f418565e58d1861ac9d1e07a2fc4ea258fa827e
   specs:
-    ginseng-web (1.2.2)
+    ginseng-web (1.2.3)
       puma
       sass
       sinatra
