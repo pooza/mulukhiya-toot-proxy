@@ -135,6 +135,18 @@ Style/SingleArgumentDig:
 Style/StringConcatenation:
   Enabled: true
 
+Style/CombinableLoops: # (new in 0.90)
+  Enabled: true
+
+Style/KeywordParametersOrder: # (new in 0.90)
+  Enabled: true
+
+Style/RedundantSelfAssignment: # (new in 0.90)
+  Enabled: true
+
+Style/SoleNestedConditional: # (new in 0.89)
+  Enabled: true
+
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
@@ -245,6 +257,18 @@ Lint/UnreachableLoop:
   Enabled: true
 
 Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+
+Lint/DuplicateRequire: # (new in 0.90)
+  Enabled: true
+
+Lint/EmptyFile: # (new in 0.90)
+  Enabled: true
+
+Lint/TrailingCommaInAttributeDeclaration: # (new in 0.90)
+  Enabled: true
+
+Lint/UselessMethodDefinition: # (new in 0.90)
   Enabled: true
 
 Performance/AncestorsInclude:
