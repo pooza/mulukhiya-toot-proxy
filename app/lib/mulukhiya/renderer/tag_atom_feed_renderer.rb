@@ -3,7 +3,6 @@ require 'digest/sha1'
 module Mulukhiya
   class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
-
     attr_reader :logger, :tag, :limit
 
     def initialize(channel = {})
@@ -17,7 +16,7 @@ module Mulukhiya
       @tag = tag
       @channel.merge!(
         title: "##{tag} | #{@sns.info['metadata']['nodeName']}",
-        link: @sns.create_tag_uri(tag).to_s,
+        link: record.uri.to_s,
         description: "#{@sns.info['metadata']['nodeName']} ##{tag}のタイムライン",
       )
       @atom = nil
@@ -72,17 +71,10 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      tags do |tag|
+      TagContainer.default_tag_bases.each do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
         yield renderer
-      end
-    end
-
-    def self.tags
-      return enum_for(__method__) unless block_given?
-      TagContainer.default_tags.each do |tag|
-        yield tag.sub(/^#/, '')
       end
     end
 

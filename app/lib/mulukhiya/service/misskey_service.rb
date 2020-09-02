@@ -4,15 +4,6 @@ module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
 
-    def say(body, params = {})
-      body = {text: body.to_s} unless body.is_a?(Hash)
-      body[:i] ||= token
-      return http.post('/api/messaging/messages/create', {
-        body: body.to_json,
-        headers: create_headers(params[:headers]),
-      })
-    end
-
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
