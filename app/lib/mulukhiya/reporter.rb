@@ -11,7 +11,10 @@ module Mulukhiya
     end
 
     def tags
-      @tags ||= TagContainer.new
+      unless @tags
+        @tags = TagContainer.new
+        @tags.concat(TagContainer.default_tag_bases)
+      end
       return @tags
     end
 
