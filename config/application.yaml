@@ -706,7 +706,7 @@ amazon:
   marketplace: jp
   urls:
     jp: https://www.amazon.co.jp/
-  retry_limit: 5
+  retry_limit: 10
   cache:
     ttl: 86400
   resources:
