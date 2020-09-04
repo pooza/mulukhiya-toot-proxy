@@ -22,6 +22,14 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
+    def parser
+      unless @parser
+        @parser = NoteParser.new(note['text'])
+        @parser.service = service
+      end
+      return @parser
+    end
+
     def service
       unless @service
         uri = clone
