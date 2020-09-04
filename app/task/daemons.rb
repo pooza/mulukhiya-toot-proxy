@@ -1,7 +1,7 @@
 namespace :mulukhiya do
   [:puma, :sidekiq].each do |daemon|
     namespace daemon do
-      [:start, :stop].each do |action|
+      [:start, :stop].freeze.each do |action|
         desc "#{action} #{daemon}"
         task action do
           sh "#{File.join(Mulukhiya::Environment.dir, 'bin', "#{daemon}_daemon.rb")} #{action}"
