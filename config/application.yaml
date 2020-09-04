@@ -65,12 +65,6 @@ worker:
       category: お知らせ
 parser:
   toot:
-    url:
-      patterns:
-        - ^/web/statuses/([[:digit:]]+)
-        - ^/@[[:word:]]+/([[:digit:]]+)
-        - ^/users/[[:word:]]+/statuses/([[:digit:]]+)
-        - ^/notice/([[:word:]]+)
     fields:
       body: status
       spoiler: spoiler_text
@@ -78,9 +72,6 @@ parser:
       poll:
         options: options
   note:
-    url:
-      patterns:
-        - ^/notes/([[:alnum:]]+)
     fields:
       body: text
       spoiler: cw
