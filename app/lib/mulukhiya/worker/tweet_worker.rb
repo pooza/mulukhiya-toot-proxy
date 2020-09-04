@@ -34,7 +34,7 @@ module Mulukhiya
       exist_tags = Twitter::TwitterText::Extractor.extract_hashtags(status)
       tags = default_tags
       tags = tags.delete_if {|t| exist_tags.member?(t)}
-      return tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)}
+      return tags.map(&:to_hashtag)
     end
 
     def default_tags
@@ -45,7 +45,7 @@ module Mulukhiya
 
     def max_length
       suffixes = [' ', 'あ' * @config['/twitter/status/length/url']]
-      suffixes.concat(default_tags.map {|t| Ginseng::Fediverse::Service.create_tag(t)})
+      suffixes.concat(default_tags.map(&:to_hashtag))
       suffixes_length = TweetString.new(suffixes.join('  ')).length.ceil
       return @config['/twitter/status/length/max'] - suffixes_length
     end
