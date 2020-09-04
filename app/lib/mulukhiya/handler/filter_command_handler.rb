@@ -6,7 +6,7 @@ module Mulukhiya
 
     def exec
       params = parser.params.clone
-      params['phrase'] ||= Environment.sns_class.create_tag(params['tag'])
+      params['phrase'] ||= params['tag'].to_hashtag
 
       case params['action']
       when 'register', nil

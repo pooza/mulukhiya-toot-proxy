@@ -3,6 +3,7 @@ require: rubocop-performance
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
   DisplayCopNames: true
+  NewCops: enable
   Exclude:
     - '**/._*'
     - '.git/**/*'
@@ -295,3 +296,5 @@ Performance/Squeeze:
 Performance/StringInclude:
   Enabled: true
 
+Performance/Sum: # (new in 1.8)
+  Enabled: true

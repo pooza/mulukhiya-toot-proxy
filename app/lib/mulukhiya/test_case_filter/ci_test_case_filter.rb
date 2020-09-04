@@ -1,5 +1,5 @@
 module Mulukhiya
-  class CiTestCaseFilter < TestCaseFilter
+  class CITestCaseFilter < TestCaseFilter
     def active?
       return Environment.ci?
     end

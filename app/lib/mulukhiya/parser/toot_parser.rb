@@ -18,6 +18,7 @@ module Mulukhiya
       unless @all_tags
         container = TagContainer.new
         container.concat(tags)
+        container.concat(TagContainer.default_tag_bases)
         container.concat(@account.tags) if @account
         return @all_tags = container.create_tags
       end

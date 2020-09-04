@@ -1,53 +1,20 @@
-require 'redis'
-
 module Mulukhiya
-  class Redis < ::Redis
-    def initialize
-      dsn = Redis.dsn
-      dsn.db ||= 1
-      @logger = Logger.new
-      @config = Config.instance
-      raise Ginseng::RedisError, "Invalid DSN '#{dsn}'" unless dsn.absolute?
-      raise Ginseng::RedisError, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
-      super(url: dsn.to_s)
-    end
+  class Redis < Ginseng::Redis::Service
+    include Package
 
-    def get(key)
-      return super
-    rescue => e
-      raise Ginseng::RedisError, e.message, e.backtrace
-    end
-
-    def set(key, value)
-      return super
-    rescue => e
-      raise Ginseng::RedisError, e.message, e.backtrace
-    end
-
-    def unlink(key)
-      return super
-    rescue => e
-      raise Ginseng::RedisError, e.message, e.backtrace
-    end
-
-    alias del unlink
-
-    def all_keys
-      return keys('*') unless prefix
-      return keys("#{prefix}:*")
-    end
-
-    def create_key(key)
-      return key unless prefix
-      return "#{prefix}:#{key}"
-    end
-
-    def prefix
-      return nil
+    def initialize(params = {})
+      unless params[:url]
+        dsn = Redis.dsn
+        dsn.db ||= 1
+        raise Ginseng::Redis::Error, "Invalid DSN '#{dsn}'" unless dsn.absolute?
+        raise Ginseng::Redis::Error, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
+        params[:url] = dsn.to_s
+      end
+      super
     end
 
     def self.dsn
-      return Ginseng::RedisDSN.parse(Config.instance['/user_config/redis/dsn'])
+      return Ginseng::Redis::DSN.parse(Config.instance['/user_config/redis/dsn'])
     end
 
     def self.health

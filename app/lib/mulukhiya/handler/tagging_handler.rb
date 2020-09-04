@@ -25,7 +25,7 @@ module Mulukhiya
       tags = []
       (body[attachment_field] || []).each do |id|
         type = Environment.attachment_class[id].type
-        ['video', 'image', 'audio'].each do |mediatype|
+        ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
           tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
         rescue Ginseng::ConfigError => e

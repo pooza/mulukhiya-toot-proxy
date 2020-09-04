@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e8cb3e906d82d72c3103916dddcf72e392a66b76
+  revision: 0c4442361fd45a336f896a3abb30c212f7a0aeef
   specs:
-    ginseng-core (1.7.7)
+    ginseng-core (1.8.0)
       activesupport
       addressable
       daemon-spawn
@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: d59589cb771fca597febf05235a509cc0ea81b44
+  revision: f03928814cc6329841a0839e180be154336af9a4
   specs:
-    ginseng-fediverse (1.3.7)
+    ginseng-fediverse (1.4.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -29,6 +29,13 @@ GIT
     ginseng-postgres (1.2.5)
       pg
       sequel
+
+GIT
+  remote: https://github.com/pooza/ginseng-redis.git
+  revision: 474ac00b3e3c969c2eb45459073544bbe78bfafb
+  specs:
+    ginseng-redis (1.0.1)
+      redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -104,7 +111,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
-    dry-schema (1.5.3)
+    dry-schema (1.5.4)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
@@ -119,13 +126,13 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.5.4)
+    dry-validation (1.5.6)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
-      dry-schema (~> 1.5)
+      dry-schema (~> 1.5, >= 1.5.2)
     e2mmap (0.1.0)
     equalizer (0.0.11)
     erubi (1.9.0)
@@ -260,8 +267,8 @@ GEM
       unicode-display_width (>= 1.4.0, < 2.0)
     rubocop-ast (0.3.0)
       parser (>= 2.7.1.4)
-    rubocop-performance (1.7.1)
-      rubocop (>= 0.82.0)
+    rubocop-performance (1.8.0)
+      rubocop (>= 0.87.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.6.0)
@@ -347,6 +354,7 @@ DEPENDENCIES
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
+  ginseng-redis!
   ginseng-web!
   ginseng-youtube!
   json-schema
@@ -356,7 +364,6 @@ DEPENDENCIES
   omniauth-twitter
   rack-test
   rails-erb-lint
-  redis
   rspotify
   rubocop
   rubocop-performance

@@ -3,7 +3,7 @@ require 'twitter-text'
 module Mulukhiya
   class TweetString < String
     def length
-      return each_char.map {|c| c.bytesize == 1 ? 0.5 : 1.0}.reduce(:+)
+      return each_char.map {|c| c.bytesize == 1 ? 0.5 : 1.0}.sum
     end
 
     def index(search)

@@ -1,24 +1,6 @@
 module Mulukhiya
-  class NoteURI < Ginseng::URI
-    def initialize(options = {})
-      super
-      @config = Config.instance
-      @logger = Logger.new
-    end
-
-    def note_id
-      @config['/parser/note/url/patterns'].each do |pattern|
-        next unless matches = path.match(pattern)
-        return matches[1]
-      end
-      return nil
-    end
-
-    alias id note_id
-
-    def valid?
-      return absolute? && id.present?
-    end
+  class NoteURI < Ginseng::Fediverse::NoteURI
+    include Package
 
     def local?
       return true if note['user']['host'].empty?
@@ -27,23 +9,6 @@ module Mulukhiya
     rescue => e
       @logger.error(e)
       return false
-    end
-
-    def publicize!
-      self.path = "/notes/#{id}" if id
-      return self
-    end
-
-    def publicize
-      return clone.publicize!
-    end
-
-    def visibility
-      return note['visibility']
-    end
-
-    def public?
-      return visibility == 'public'
     end
 
     def to_md
@@ -80,17 +45,6 @@ module Mulukhiya
       end
       return @service
     end
-
-    def note
-      unless @note
-        @note = service.fetch_status(id)
-        raise "Note '#{self}' not found" unless @note
-        raise "Note '#{self}' is invalid (#{note['error']['message']})" if note['error']
-      end
-      return @note
-    end
-
-    alias status note
 
     def account
       unless @account
