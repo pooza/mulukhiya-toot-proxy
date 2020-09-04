@@ -1,5 +1,7 @@
 module Mulukhiya
   class Redis < Ginseng::Redis::Service
+    include Package
+
     def initialize(params = {})
       unless params[:url]
         dsn = Redis.dsn

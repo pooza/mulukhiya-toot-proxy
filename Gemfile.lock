@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: b61f1c48467447438c1f3662e218becd250bf532
+  revision: 474ac00b3e3c969c2eb45459073544bbe78bfafb
   specs:
-    ginseng-redis (1.0.0)
+    ginseng-redis (1.0.1)
       redis
 
 GIT

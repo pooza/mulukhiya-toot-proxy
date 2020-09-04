@@ -1,7 +1,5 @@
 module Mulukhiya
   class AnnictStorage < Redis
-    include Package
-
     def [](key)
       return get(key) || {}
     end

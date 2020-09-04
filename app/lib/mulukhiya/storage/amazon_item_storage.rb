@@ -1,7 +1,5 @@
 module Mulukhiya
   class AmazonItemStorage < Redis
-    include Package
-
     def [](key)
       return get(key)
     end
