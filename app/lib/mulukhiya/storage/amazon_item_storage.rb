@@ -1,5 +1,7 @@
 module Mulukhiya
   class AmazonItemStorage < Redis
+    include Package
+
     def [](key)
       return get(key)
     end
@@ -12,7 +14,7 @@ module Mulukhiya
       return nil unless entry = super(create_key(key))
       return JSON.parse(entry)
     rescue => e
-      @logger.error(Ginseng::RedisError, e.message)
+      @logger.error(Ginseng::Redis::Error, e.message)
       return nil
     end
 

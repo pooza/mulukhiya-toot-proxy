@@ -31,6 +31,13 @@ GIT
       sequel
 
 GIT
+  remote: https://github.com/pooza/ginseng-redis.git
+  revision: b61f1c48467447438c1f3662e218becd250bf532
+  specs:
+    ginseng-redis (1.0.0)
+      redis
+
+GIT
   remote: https://github.com/pooza/ginseng-web.git
   revision: 6f418565e58d1861ac9d1e07a2fc4ea258fa827e
   specs:
@@ -347,6 +354,7 @@ DEPENDENCIES
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
+  ginseng-redis!
   ginseng-web!
   ginseng-youtube!
   json-schema
@@ -356,7 +364,6 @@ DEPENDENCIES
   omniauth-twitter
   rack-test
   rails-erb-lint
-  redis
   rspotify
   rubocop
   rubocop-performance
