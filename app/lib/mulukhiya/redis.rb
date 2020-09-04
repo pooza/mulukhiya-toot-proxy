@@ -6,8 +6,8 @@ module Mulukhiya
       unless params[:url]
         dsn = Redis.dsn
         dsn.db ||= 1
-        raise Error, "Invalid DSN '#{dsn}'" unless dsn.absolute?
-        raise Error, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
+        raise Ginseng::Redis::Error, "Invalid DSN '#{dsn}'" unless dsn.absolute?
+        raise Ginseng::Redis::Error, "Invalid scheme '#{dsn.scheme}'" unless dsn.scheme == 'redis'
         params[:url] = dsn.to_s
       end
       super

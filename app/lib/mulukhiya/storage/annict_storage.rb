@@ -12,7 +12,7 @@ module Mulukhiya
       return nil unless entry = super(create_key(key))
       return JSON.parse(entry)
     rescue => e
-      @logger.error(Ginseng::Redis::Error, e.message)
+      @logger.error(error: e.message, key: key)
       return nil
     end
 
