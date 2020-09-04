@@ -1,8 +1,7 @@
-require 'test/unit'
 require 'sidekiq/testing'
 
 module Mulukhiya
-  class TestCase < Test::Unit::TestCase
+  class TestCase < Ginseng::TestCase
     def status_field
       return Environment.controller_class.status_field
     end

@@ -3,6 +3,7 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
   canonical_url_handler: CanonicalURLHandler
+  ci_test_case_filter: CITestCaseFilter
   css_renderer: CSSRenderer
   http: HTTP
   itunes_uri: ItunesURI
