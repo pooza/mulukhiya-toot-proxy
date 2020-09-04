@@ -3,6 +3,7 @@ module Mulukhiya
     include ControllerMethods
 
     post '/api/v1/pleroma/chats/:chat_id/messages' do
+      @reporter.tags.clear
       params[status_field] = params[@config['/pleroma/chat/field']]
       Handler.dispatch(:pre_chat, params, {reporter: @reporter, sns: @sns})
       params[@config['/pleroma/chat/field']] = params[status_field]

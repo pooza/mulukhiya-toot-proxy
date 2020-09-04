@@ -29,6 +29,7 @@ module Mulukhiya
     end
 
     post '/api/messaging/messages/create' do
+      @reporter.tags.clear
       Handler.dispatch(:pre_chat, params, {reporter: @reporter, sns: @sns})
       @reporter.response = @sns.say(params)
       notify(@reporter.response.parsed_response) if response_error?

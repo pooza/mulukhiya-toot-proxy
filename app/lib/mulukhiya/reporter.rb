@@ -1,21 +1,14 @@
 module Mulukhiya
   class Reporter < Array
     attr_accessor :response, :parser
-
-    attr_reader :temp
+    attr_reader :temp, :tags
 
     def initialize(size = 0, val = nil)
       super
       @logger = Logger.new
+      @tags = TagContainer.new
+      @tags.concat(TagContainer.default_tag_bases)
       @temp = {}
-    end
-
-    def tags
-      unless @tags
-        @tags = TagContainer.new
-        @tags.concat(TagContainer.default_tag_bases)
-      end
-      return @tags
     end
 
     def push(entry)
