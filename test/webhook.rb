@@ -60,6 +60,15 @@ module Mulukhiya
         'spoiler_text' => 'ネタバレあり',
       )
       assert_kind_of(Reporter, r)
+
+      r = @test_hook.post(
+        'blocks' => [
+          {'type' => 'header', 'text' => {'text' => 'ネタバレ注意2'}},
+          {'type' => 'section', 'text' => {'text' => 'こりは何くる？'}},
+          {'type' => 'image', 'image_url' => 'https://images-na.ssl-images-amazon.com/images/I/71KPGeyC85L._AC_SL1500_.jpg'},
+        ],
+      )
+      assert_kind_of(Reporter, r)
     end
 
     def test_command

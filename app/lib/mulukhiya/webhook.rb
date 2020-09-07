@@ -29,15 +29,8 @@ module Mulukhiya
 
     def post(status)
       status = {'text' => status} unless status.is_a?(Hash)
-      status.deep_stringify_keys!
-      body = {
-        Environment.controller_class.status_field => status['text'],
-        'visibility' => visibility,
-        'attachments' => status['attachments'] || [],
-      }
-      if spoiler_text = status['spoiler_text']
-        body[Environment.controller_class.spoiler_field] = spoiler_text
-      end
+      body = WebhookPayload.new(status).to_h
+      body['visibility'] = visibility
       Handler.dispatch(:pre_webhook, body, {reporter: reporter, sns: @sns})
       reporter.response = @sns.post(body)
       Handler.dispatch(:post_webhook, body, {reporter: reporter, sns: @sns})
