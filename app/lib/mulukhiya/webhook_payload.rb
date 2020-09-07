@@ -5,6 +5,7 @@ module Mulukhiya
     def initialize(values)
       @raw = JSON.parse(values) unless values.is_a?(Hash)
       @raw ||= values.deep_stringify_keys
+      @logger = Logger.new
     end
 
     def blocks?
@@ -18,6 +19,9 @@ module Mulukhiya
     def header
       return @raw['spoiler_text'] unless blocks?
       return blocks.find {|v| v['type'] == 'header'}.dig('text', 'text')
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      return nil
     end
 
     alias spoiler_text header
@@ -25,6 +29,9 @@ module Mulukhiya
     def text
       return @raw['text'] unless blocks?
       return blocks.find {|v| v['type'] == 'section'}.dig('text', 'text')
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      return nil
     end
 
     def images
@@ -34,10 +41,16 @@ module Mulukhiya
         @images ||= []
       end
       return @images
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      return []
     end
 
     def image_uris
       return images.map {|v| Ginseng::URI.parse(v['image_url'])}
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      return []
     end
 
     def values
