@@ -151,7 +151,7 @@ module Mulukhiya
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
-          'redirect_uri' => @config['/mastodon/oauth/redirect_uri'],
+          'redirect_uri' => @config['/annict/oauth/redirect_uri'],
           'client_id' => AnnictService.client_id,
           'client_secret' => AnnictService.client_secret,
           'code' => code,
