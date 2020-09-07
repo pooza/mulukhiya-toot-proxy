@@ -803,6 +803,8 @@ youtube:
 twitter:
   status:
     tags: []
+    hot_words:
+      - 実況
     length:
       max: 140
       url: 12

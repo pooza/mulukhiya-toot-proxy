@@ -1,5 +1,5 @@
 module Mulukhiya
-  class TweetStringTest < TestCase
+  class TweetHandlerTest < TestCase
     def setup
       @handler = Handler.create('tweet')
     end
