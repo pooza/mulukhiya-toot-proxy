@@ -29,7 +29,7 @@ module Mulukhiya
         container = TagContainer.new
         container.text = self
         container.concat(default_tags)
-        container.concat(hot_tags)
+        container.reject! {|v| exist_tags.member?(v)}
         @extra_tags = container.create_tags
       end
       return @extra_tags
@@ -52,26 +52,12 @@ module Mulukhiya
     end
 
     def exist_tags
-      @exist_tags ||= Twitter::TwitterText::Extractor.extract_hashtags(self).map(&:to_tag_base)
+      @exist_tags ||= Twitter::TwitterText::Extractor.extract_hashtags(self).map(&:to_hashtag_base)
       return @exist_tags
     end
 
-    def hot_tags
-      unless @hot_tags
-        temp = clone
-        tags = []
-        @config['/twitter/status/hot_words'].sort_by(&:length).reverse_each do |v|
-          next unless temp.match?(v)
-          tags.push(v)
-          temp.gsub!(v, '')
-        end
-        @hot_tags = tags.compact.uniq
-      end
-      return @hot_tags
-    end
-
     def default_tags
-      return @config['/twitter/status/tags']
+      return @config['/twitter/status/default_tags']
     rescue Ginseng::ConfigError
       return []
     end

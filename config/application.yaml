@@ -802,9 +802,7 @@ youtube:
   url: https://www.googleapis.com/
 twitter:
   status:
-    tags: []
-    hot_words:
-      - 実況
+    default_tags: []
     length:
       max: 140
       url: 12
