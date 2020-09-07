@@ -57,7 +57,7 @@ module Mulukhiya
     end
 
     def default_tags
-      return @config['/twitter/status/default_tags']
+      return @config['/twitter/status/tags']
     rescue Ginseng::ConfigError
       return []
     end

@@ -802,7 +802,7 @@ youtube:
   url: https://www.googleapis.com/
 twitter:
   status:
-    default_tags: []
+    tags: []
     length:
       max: 140
       url: 12

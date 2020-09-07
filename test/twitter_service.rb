@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def test_create_status
-      @config['/twitter/status/default_tags'] = ['キュアスタ']
+      @config['/twitter/status/tags'] = ['キュアスタ']
 
       status = @service.create_status('status' => 'hoge', 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
       assert_equal(status, "hoge\nhttps://precure.ml/hogefuga\n#キュアスタ")
@@ -37,7 +37,7 @@ module Mulukhiya
       assert_equal(status, "#{'あ' * 120}…\nhttps://precure.ml/hogefuga\n#キュアスタ")
       assert(status.valid?)
 
-      @config['/twitter/status/default_tags'] = []
+      @config['/twitter/status/tags'] = []
 
       status = @service.create_status('status' => 'hoge', 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
       assert_equal(status, "hoge\nhttps://precure.ml/hogefuga")
