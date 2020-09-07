@@ -1,5 +1,9 @@
 module Mulukhiya
   class TweetStringTest < TestCase
+    def setup
+      @config = Config.instance
+    end
+
     def test_length
       str = TweetString.new('ああああえええeee')
       assert_equal(str.length, 8.5)
@@ -34,6 +38,34 @@ module Mulukhiya
 
       str = TweetString.new('A' * 281)
       assert_false(str.valid?)
+    end
+
+    def test_extra_tags
+      @config['/twitter/status/tags'] = ['キュアスタ']
+
+      tweet = TweetString.new('ちょうおもしろい。')
+      assert_equal(tweet.extra_tags, ['#キュアスタ'])
+
+      tweet = TweetString.new('ちょうおもしろい。 #キュアスタ')
+      assert_equal(tweet.extra_tags, [])
+
+      @config['/twitter/status/tags'] = []
+
+      tweet = TweetString.new('ちょうおもしろい。')
+      assert_equal(tweet.extra_tags, [])
+
+      tweet = TweetString.new('ちょうおもしろい。 #キュアスタ')
+      assert_equal(tweet.extra_tags, [])
+    end
+
+    def test_body_length_limit
+      @config['/twitter/status/tags'] = ['キュアスタ']
+      tweet = TweetString.new('ちょうおもしろい。')
+      assert_equal(tweet.body_length_limit, 120)
+
+      @config['/twitter/status/tags'] = []
+      tweet = TweetString.new('ちょうおもしろい。')
+      assert_equal(tweet.body_length_limit, 127)
     end
   end
 end
