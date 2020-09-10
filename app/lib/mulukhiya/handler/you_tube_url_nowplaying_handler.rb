@@ -17,15 +17,9 @@ module Mulukhiya
     def update(keyword)
       return unless uri = @uris[keyword]
       push(uri.title)
-      if uri.music?
-        push(uri.artist)
-        tags.push(uri.artist)
-        result.push(url: uri.to_s, artist: uri.artist)
-      else
-        push(uri.channel)
-        tags.push(uri.channel)
-        result.push(url: uri.to_s, channel: uri.channel)
-      end
+      push(uri.artist)
+      tags.concat(ArtistParser.new(uri.artist).parse)
+      result.push(url: uri.to_s, artist: uri.artist)
     end
   end
 end
