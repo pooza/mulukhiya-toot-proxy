@@ -12,12 +12,12 @@ html lang='ja'
       - if controller.tag_feed?
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
       ul class='tags'
-        - Mulukhiya::TagContainer.default_tags.each do |tag|
+        - Mulukhiya::TagContainer.default_tag_bases.each do |tag|
           - if controller.tag_feed?
             li
               h3 #{tag}
               div class='link'
-                a href="/mulukhiya/feed/tag/#{tag.sub(/^#/, '')}" target='_blank' = env.sns_class.new.create_uri("/mulukhiya/feed/tag/#{tag.sub(/^#/, '')}")
+                a href=slim.create_uri("/mulukhiya/feed/tag/#{tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{tag}")
           -else
             li
               h3 #{tag}

@@ -17,6 +17,10 @@ module Mulukhiya
       return nil
     end
 
+    def self.create_uri(path)
+      return Environment.sns_class.new.create_uri(path)
+    end
+
     private
 
     def assign_values
