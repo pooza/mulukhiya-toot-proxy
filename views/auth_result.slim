@@ -23,6 +23,7 @@ html lang='ja'
         p class='alert' = "エラー（#{params[:status]}）"
     == slim.render 'fragment/footer'
     javascript:
+      'use strict'
       Vue.use(VTooltip)
       new Vue({
         el: '#app',
@@ -32,7 +33,6 @@ html lang='ja'
           token_error: false,
         },
         mounted: function () {
-          'use strict'
           const token = '#{crypt.new.encrypt(params[:result][:access_token])}'
           const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
           axios.get(href, {responseType: 'json'})
@@ -45,12 +45,10 @@ html lang='ja'
         },
         methods: {
           copyToken: function () {
-            'use strict'
             document.getElementById('token_text').select()
             document.execCommand('copy')
           },
           copyWehbook: function () {
-            'use strict'
             document.getElementById('webhook_text').select()
             document.execCommand('copy')
           },

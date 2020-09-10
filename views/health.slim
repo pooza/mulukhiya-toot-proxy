@@ -15,6 +15,7 @@ html lang='ja'
           button v-on:click='reloadPage' 再読み込み
     == slim.render 'fragment/footer'
     javascript:
+      'use strict'
       Vue.use(VTooltip)
       new Vue({
         el: '#app',
@@ -25,7 +26,6 @@ html lang='ja'
           result: null,
         },
         mounted: function () {
-          'use strict'
           const href = '/mulukhiya/health'
           axios.get(href, {responseType: 'json'})
             .then(e => {
@@ -37,7 +37,6 @@ html lang='ja'
         },
         methods: {
           reloadPage: function () {
-            'use strict'
             location.reload()
           },
         },
