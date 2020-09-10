@@ -146,6 +146,7 @@ html lang='ja'
           show_notify_detail: false,
           show_twitter_detail: false,
           show_annict_detail: false,
+          token: localStorage.getItem('mulukhiya_token'),
         },
         computed: {
           twitterHref: function () {
@@ -153,9 +154,8 @@ html lang='ja'
           },
         },
         mounted: function () {
-          const token = localStorage.getItem('mulukhiya_token')
-          if (token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          if (this.token) {
+            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)

@@ -31,14 +31,14 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
+          token: '#{crypt.new.encrypt(params[:result][:access_token])}',
         },
         mounted: function () {
-          const token = '#{crypt.new.encrypt(params[:result][:access_token])}'
-          const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
           axios.get(href, {responseType: 'json'})
             .then(e => {
               this.username = e.data.account.username
-              localStorage.setItem('mulukhiya_token', token)
+              localStorage.setItem('mulukhiya_token', this.token)
             }).catch(e => {
               this.message = e.message
             })

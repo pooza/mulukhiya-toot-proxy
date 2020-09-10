@@ -39,11 +39,11 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
+          token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
-          const token = localStorage.getItem('mulukhiya_token')
-          if (token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          if (this.token) {
+            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
