@@ -9,10 +9,10 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 動作状況
-      #result-container v-if='result'
+      #result-container
         pre = '{{result}}'
         .field-update-button-container
-          button v-on:click='reloadPage' 再読み込み
+          button v-on:click='load' 再読み込み
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -26,18 +26,21 @@ html lang='ja'
           result: null,
         },
         mounted: function () {
-          const href = '/mulukhiya/health'
-          axios.get(href, {responseType: 'json'})
-            .then(e => {
-              this.result = e.data
-            }).catch(e => {
-              this.message = e.message
-              document.getElementById('result-container').classList.add('error')
-            })
+          this.load()
         },
         methods: {
-          reloadPage: function () {
-            location.reload()
+          load: function () {
+            const href = '/mulukhiya/health'
+            axios.get(href, {responseType: 'json'})
+              .then(e => {
+                this.result = e.data
+                this.message = null
+                document.getElementById('result-container').classList.remove('error')
+              }).catch(e => {
+                this.result = e.response.data
+                this.message = e.message
+                document.getElementById('result-container').classList.add('error')
+              })
           },
         },
       })
