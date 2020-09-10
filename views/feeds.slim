@@ -24,6 +24,7 @@ html lang='ja'
               .alert #{controller.display_name}はデフォルトタグのAtomフィードに非対応です。
     == slim.render 'fragment/footer'
     javascript:
+      'use strict'
       Vue.use(VTooltip)
       new Vue({
         el: '#app',
@@ -31,17 +32,16 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
+          token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
-          'use strict'
-          const token = localStorage.getItem('mulukhiya_token')
-          if (token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          if (this.token) {
+            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
                 this.token_error = true
               })
           } else {

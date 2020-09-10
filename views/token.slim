@@ -19,6 +19,7 @@ html lang='ja'
           span class='scopes' = '権限: {{user.scopes}}'
     == slim.render 'fragment/footer'
     javascript:
+      'use strict'
       Vue.use(window.VuejsDialog.main.default)
       Vue.use(VTooltip)
       new Vue({
@@ -31,13 +32,12 @@ html lang='ja'
           token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
-          'use strict'
           if (this.token) {
             axios.get('/mulukhiya/config?token=' + encodeURIComponent(this.token), {responseType: 'json'})
               .then(e => {
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
               })
             let tokens = [this.token]
             JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
@@ -59,18 +59,16 @@ html lang='ja'
         },
         methods: {
           switchUser: function (user) {
-            'use strict'
             axios.get('/mulukhiya/config?token=' + encodeURIComponent(user.token), {responseType: 'json'})
               .then(e => {
                 localStorage.setItem('mulukhiya_token', user.token)
                 this.username = e.data.account.username
                 location.href = '/mulukhiya'
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
               })
           },
           deleteUser: function (user) {
-            'use strict'
             this.$dialog.confirm({
               title: 'トークンの削除',
               body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
@@ -89,7 +87,7 @@ html lang='ja'
               localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
               this.users = users
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
         },

@@ -112,6 +112,7 @@ html lang='ja'
             button v-on:click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
+      'use strict'
       Vue.use(VTooltip)
       Vue.use(window.VuejsDialog.main.default)
       Vue.component('v-select', VueSelect.VueSelect)
@@ -145,6 +146,7 @@ html lang='ja'
           show_notify_detail: false,
           show_twitter_detail: false,
           show_annict_detail: false,
+          token: localStorage.getItem('mulukhiya_token'),
         },
         computed: {
           twitterHref: function () {
@@ -152,10 +154,8 @@ html lang='ja'
           },
         },
         mounted: function () {
-          'use strict'
-          const token = localStorage.getItem('mulukhiya_token')
-          if (token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+          if (this.token) {
+            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
             axios.get(href, {responseType: 'json'})
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
@@ -195,14 +195,13 @@ html lang='ja'
                 })
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
                 this.token_error = true
               })
           } else {
             this.token_error = true
           }
-          const href = '/mulukhiya/programs'
-          axios.get(href, {responseType: 'json'})
+          axios.get('/mulukhiya/programs', {responseType: 'json'})
             .then(e => {
               this.programs = e.data
               Object.values(this.programs).map(program => {
@@ -223,12 +222,11 @@ html lang='ja'
                 }
               })
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
         },
         methods: {
           updateConfig: function (values, command) {
-            'use strict'
             values.status = JSON.stringify(command)
             values.text = JSON.stringify(command)
             document.body.style.cursor = 'wait'
@@ -244,17 +242,14 @@ html lang='ja'
               })
           },
           copyWebhookURL: function () {
-            'use strict'
             document.getElementById('webhook-url-text').select()
             document.execCommand('copy')
           },
           copyCurlSample: function () {
-            'use strict'
             document.getElementById('curl-sample-text').select()
             document.execCommand('copy')
           },
           changeTags: function (e) {
-            'use strict'
             const program = this.programs[e.code]
             if (program) {
               const tags = ['実況', program.series]
@@ -275,39 +270,30 @@ html lang='ja'
             }
           },
           toggleGrowiSection: function () {
-            'use strict'
             this.show_growi_detail = !this.show_growi_detail
           },
           toggleDropboxSection: function () {
-            'use strict'
             this.show_dropbox_detail = !this.show_dropbox_detail
           },
           toggleTagsSection: function () {
-            'use strict'
             this.show_tags_detail = !this.show_tags_detail
           },
           toggleLivecureSection: function () {
-            'use strict'
             this.show_livecure_detail = !this.show_livecure_detail
           },
           toggleWebhookSection: function () {
-            'use strict'
             this.show_webhook_detail = !this.show_webhook_detail
           },
           toggleNotifySection: function () {
-            'use strict'
             this.show_notify_detail = !this.show_notify_detail
           },
           toggleTwitterSection: function () {
-            'use strict'
             this.show_twitter_detail = !this.show_twitter_detail
           },
           toggleAnnictSection: function () {
-            'use strict'
             this.show_annict_detail = !this.show_annict_detail
           },
           updateGrowi: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', growi: {url: null, token: null}}
             if (this.growi_url) {
@@ -319,7 +305,6 @@ html lang='ja'
             this.updateConfig(values, command)
           },
           updateDropbox: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', dropbox: {token: null}}
             if (this.dropbox_token) {
@@ -328,7 +313,6 @@ html lang='ja'
             this.updateConfig(values, command)
           },
           updateTags: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', tags: null}
             if (this.tags) {
@@ -337,7 +321,6 @@ html lang='ja'
             this.updateConfig(values, command)
           },
           updateLivecure: function () {
-            'use strict'
             const command = {command: 'filter', tag: '実況'}
             if (this.livecure) {
               command.action = 'register'
@@ -361,7 +344,6 @@ html lang='ja'
               })
           },
           updateWebhook: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', webhook: {token: null, visibility: null}}
             if (this.webhook_token) {
@@ -373,7 +355,6 @@ html lang='ja'
             this.updateConfig(values, command)
           },
           updateNotify: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', notify: {verbose: null, user_config: null}}
             if (this.notify_verbose) {
@@ -385,7 +366,6 @@ html lang='ja'
             this.updateConfig(values, command)
           },
           unauthTwitter: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', twitter: null}
             this.$dialog.confirm({
@@ -397,11 +377,10 @@ html lang='ja'
             }).then(e => {
               this.updateConfig(values, command)
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
           authAnnict: function () {
-            'use strict'
             const values = {
               token: localStorage.getItem('mulukhiya_token'),
               code: this.annict_auth_code,
@@ -419,7 +398,6 @@ html lang='ja'
               })
           },
           unauthAnnict: function () {
-            'use strict'
             const values = {token: localStorage.getItem('mulukhiya_token')}
             const command = {command: 'user_config', annict: null}
             this.$dialog.confirm({
@@ -431,7 +409,7 @@ html lang='ja'
             }).then(e => {
               this.updateConfig(values, command)
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
         },
