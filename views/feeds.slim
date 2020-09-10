@@ -15,7 +15,7 @@ html lang='ja'
         - Mulukhiya::TagContainer.default_tag_bases.each do |tag|
           - if controller.tag_feed?
             li
-              h3 #{tag}
+              h3 #{tag.to_hashtag}
               div class='link'
                 a href=slim.create_uri("/mulukhiya/feed/tag/#{tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{tag}")
           -else
