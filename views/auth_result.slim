@@ -40,7 +40,7 @@ html lang='ja'
               this.username = e.data.account.username
               localStorage.setItem('mulukhiya_token', this.token)
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
         },
         methods: {

@@ -30,15 +30,14 @@ html lang='ja'
         },
         methods: {
           load: function () {
-            const href = '/mulukhiya/health'
-            axios.get(href, {responseType: 'json'})
+            axios.get('/mulukhiya/health', {responseType: 'json'})
               .then(e => {
                 this.result = e.data
                 this.message = null
                 document.getElementById('result-container').classList.remove('error')
               }).catch(e => {
                 this.result = e.response.data
-                this.message = e.message
+                this.message = e.response.data.error || e.message
                 document.getElementById('result-container').classList.add('error')
               })
           },

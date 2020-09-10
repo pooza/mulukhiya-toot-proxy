@@ -41,7 +41,7 @@ html lang='ja'
               .then(e => {
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
                 this.token_error = true
               })
           } else {

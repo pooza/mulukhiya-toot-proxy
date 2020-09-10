@@ -37,7 +37,7 @@ html lang='ja'
               .then(e => {
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
               })
             let tokens = [this.token]
             JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
@@ -65,7 +65,7 @@ html lang='ja'
                 this.username = e.data.account.username
                 location.href = '/mulukhiya'
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
               })
           },
           deleteUser: function (user) {
@@ -87,7 +87,7 @@ html lang='ja'
               localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
               this.users = users
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
         },

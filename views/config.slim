@@ -195,14 +195,13 @@ html lang='ja'
                 })
                 this.username = e.data.account.username
               }).catch(e => {
-                this.message = e.message
+                this.message = e.response.data.error || e.message
                 this.token_error = true
               })
           } else {
             this.token_error = true
           }
-          const href = '/mulukhiya/programs'
-          axios.get(href, {responseType: 'json'})
+          axios.get('/mulukhiya/programs', {responseType: 'json'})
             .then(e => {
               this.programs = e.data
               Object.values(this.programs).map(program => {
@@ -223,7 +222,7 @@ html lang='ja'
                 }
               })
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
         },
         methods: {
@@ -378,7 +377,7 @@ html lang='ja'
             }).then(e => {
               this.updateConfig(values, command)
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
           authAnnict: function () {
@@ -410,7 +409,7 @@ html lang='ja'
             }).then(e => {
               this.updateConfig(values, command)
             }).catch(e => {
-              this.message = e.message
+              this.message = e.response.data.error || e.message
             })
           },
         },
