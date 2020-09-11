@@ -15,8 +15,9 @@ module Mulukhiya
       params = {body: params.to_s} unless params.is_a?(Hash)
       params[:access_token] ||= @token
       params[:grant] ||= GRANT_OWNER
-      r = @http.post('/_api/pages.create', {body: params.delete_if {|k, v| k == :path}.to_json})
-      r = @http.post('/_api/pages.create', {body: params.to_json}) unless r.code == 200
+      #r = @http.post('/_api/pages.create', {body: params.delete_if {|k, v| k == :path}.to_json})
+      #r = @http.post('/_api/pages.create', {body: params.to_json}) unless r.code == 200
+      r = @http.post('/_api/pages.create', {body: params.to_json})
       raise Ginseng::GatewayError, "Invalid status #{r.code}" unless r.code == 200
       return r
     end
