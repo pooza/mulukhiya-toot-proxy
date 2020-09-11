@@ -2,6 +2,8 @@ require 'twitter-text'
 
 module Mulukhiya
   class TweetString < String
+    attr_reader :account
+
     def initialize(string)
       @config = Config.instance
       super
@@ -14,6 +16,11 @@ module Mulukhiya
     def index(search)
       return nil if super.nil?
       return self[0..(super - 1)].length
+    end
+
+    def account=(account)
+      @account = account
+      @extra_tags = nil
     end
 
     def valid?
@@ -29,6 +36,7 @@ module Mulukhiya
         container = TagContainer.new
         container.text = self
         container.concat(default_tags)
+        container.concat(account.tags.select {|v| appendable_tags.member?(v)}) if account
         container.reject! {|v| exist_tags.member?(v)}
         @extra_tags = container.create_tags
       end
@@ -56,8 +64,14 @@ module Mulukhiya
       return @exist_tags
     end
 
+    def appendable_tags
+      return @config['/twitter/status/appendable_tags']
+    rescue Ginseng::ConfigError
+      return []
+    end
+
     def default_tags
-      return @config['/twitter/status/tags']
+      return @config['/twitter/status/default_tags']
     rescue Ginseng::ConfigError
       return []
     end

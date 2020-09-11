@@ -41,7 +41,7 @@ module Mulukhiya
     end
 
     def test_extra_tags
-      @config['/twitter/status/tags'] = ['キュアスタ']
+      @config['/twitter/status/default_tags'] = ['キュアスタ']
 
       tweet = TweetString.new('ちょうおもしろい。')
       assert_equal(tweet.extra_tags, ['#キュアスタ'])
@@ -49,7 +49,7 @@ module Mulukhiya
       tweet = TweetString.new('ちょうおもしろい。 #キュアスタ')
       assert_equal(tweet.extra_tags, [])
 
-      @config['/twitter/status/tags'] = []
+      @config['/twitter/status/default_tags'] = []
 
       tweet = TweetString.new('ちょうおもしろい。')
       assert_equal(tweet.extra_tags, [])
@@ -59,11 +59,11 @@ module Mulukhiya
     end
 
     def test_body_length_limit
-      @config['/twitter/status/tags'] = ['キュアスタ']
+      @config['/twitter/status/default_tags'] = ['キュアスタ']
       tweet = TweetString.new('ちょうおもしろい。')
       assert_equal(tweet.body_length_limit, 120)
 
-      @config['/twitter/status/tags'] = []
+      @config['/twitter/status/default_tags'] = []
       tweet = TweetString.new('ちょうおもしろい。')
       assert_equal(tweet.body_length_limit, 127)
     end

@@ -9,7 +9,7 @@ SELECT
   note.cw AS spoiler_text
 FROM note
   INNER JOIN "user" ON note."userId"="user".id
-WHERE (note.tags::varchar ~ '[{,]<%= params[:tag] %>[,}]')
+WHERE ('<%= params[:tag] %>'=any(note.tags))
   AND (note.visibility='public')
   AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
 ORDER BY created_at DESC
