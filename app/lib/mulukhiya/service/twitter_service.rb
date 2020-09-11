@@ -5,10 +5,11 @@ module Mulukhiya
     alias tweet update
 
     def create_status(params)
-      text = TweetString.new(params['spoiler_text']) if params['spoiler_text'].present?
-      text ||= TweetString.new(params['status'])
-      status = [text.tweetablize, params['url']]
-      status.push(text.extra_tags.join(' ')) if text.extra_tags.present?
+      tweet = TweetString.new(params['spoiler_text']) if params['spoiler_text'].present?
+      tweet ||= TweetString.new(params['status'])
+      tweet.account = Environment.account_class[params['account_id']] if params['account_id']
+      status = [tweet.tweetablize, params['url']]
+      status.push(tweet.extra_tags.join(' ')) if tweet.extra_tags.present?
       return TweetString.new(status.join("\n"))
     end
 
