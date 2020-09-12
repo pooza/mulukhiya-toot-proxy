@@ -9,11 +9,19 @@ module Mulukhiya
     end
 
     def blocks?
-      return @raw['blocks'].is_a?(Array)
+      return blocks.is_a?(Array)
     end
 
     def blocks
       return @raw['blocks']
+    end
+
+    def attachments?
+      return attachments.is_a?(Array)
+    end
+
+    def attachments
+      return @raw['attachments']
     end
 
     def header
@@ -27,17 +35,29 @@ module Mulukhiya
     alias spoiler_text header
 
     def text
-      return @raw['text'] unless blocks?
+      return parse_legacy_text(@raw['text']) unless blocks?
       return blocks.find {|v| v['type'] == 'section'}.dig('text', 'text')
     rescue => e
       @logger.error(class: self.class.to_s, error: e.message, payload: raw)
       return nil
     end
 
+    def parse_legacy_text(text)
+      temp = text.to_s
+      text.to_s.scan(/\<.*?|.*?\>/).each do |matches|
+        link, label = matches.gsub(/(^.*\<|\>.*$)/, '').split('|')
+        temp.gsub!(matches, "[#{label}](#{link})")
+      end
+      return temp
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, text: text)
+      return text
+    end
+
     def images
       unless @images
-        @images = @raw['attachments'] unless blocks?
-        @images ||= blocks.select {|v| v['type'] == 'image'} if blocks
+        @images ||= blocks.select {|v| v['type'] == 'image'} if blocks?
+        @images ||= attachments.select {|v| v['image_url'].present?} if attachments?
         @images ||= []
       end
       return @images
