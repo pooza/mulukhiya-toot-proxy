@@ -42,11 +42,36 @@ module Mulukhiya
           }
         ]
       }))
+
+      @growi = WebhookPayload.new(%({
+        "response_type": "ephemeral",
+        "channel": "#test",
+        "text": ":bell: <https://mulukhiya.growi.cloud/user/pooza|pooza> created <https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825|/mulukhiya/user/pooza/2020/09/12/135825>",
+        "username": "GROWI",
+        "attachments": [
+          {
+            "color": "#263a3c",
+            "text": "",
+            "mrkdwn_in": [
+              "text"
+            ]
+          }
+        ],
+        "link_names": 0,
+        "icon_emoji": ""
+      }))
     end
 
     def test_blocks?
       assert_false(@normal.blocks?)
       assert(@blocks.blocks?)
+      assert_false(@growi.blocks?)
+    end
+
+    def test_attachments?
+      assert(@normal.attachments?)
+      assert_false(@blocks.attachments?)
+      assert(@growi.attachments?)
     end
 
     def test_header
@@ -59,11 +84,13 @@ module Mulukhiya
     def test_text
       assert_equal(@normal.text, '1: つかみ男につかまれると、体力ゲージが減少していく。')
       assert_equal(@blocks.text, '2: つかみ男につかまれると、体力ゲージが減少していく。')
+      assert_equal(@growi.text, '[ pooza ](https://mulukhiya.growi.cloud/user/pooza)[ /mulukhiya/user/pooza/2020/09/12/135825 ](https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825)')
     end
 
     def test_images
       assert_kind_of(Array, @normal.images)
       assert_kind_of(Array, @blocks.images)
+      assert_kind_of(Array, @growi.images)
     end
 
     def test_image_uris
