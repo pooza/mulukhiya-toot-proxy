@@ -49,7 +49,7 @@ module Mulukhiya
     def account
       unless @account
         @account = note['user'].clone
-        @account['display_name'] = @account['name']
+        @account['display_name'] = @account['name'] || "@#{@account['username']}"
         @account['url'] = service.create_uri("/@#{@account['username']}")
       end
       return @account

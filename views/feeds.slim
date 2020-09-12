@@ -13,14 +13,12 @@ html lang='ja'
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
       ul class='tags'
         - Mulukhiya::TagContainer.default_tag_bases.each do |tag|
-          - if controller.tag_feed?
-            li
-              h3 #{tag.to_hashtag}
-              div class='link'
+          li
+            h3 = tag.to_hashtag
+            - if controller.tag_feed?
+              .link
                 a href=slim.create_uri("/mulukhiya/feed/tag/#{tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{tag}")
-          -else
-            li
-              h3 #{tag}
+            - else
               .alert #{controller.display_name}はデフォルトタグのAtomフィードに非対応です。
     == slim.render 'fragment/footer'
     javascript:
