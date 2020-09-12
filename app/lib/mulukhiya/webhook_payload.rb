@@ -44,9 +44,9 @@ module Mulukhiya
 
     def parse_legacy_text(text)
       temp = text.to_s
-      text.to_s.scan(/\<.*?|.*?\>/).each do |matches|
-        link, label = matches.gsub(/(^.*\<|\>.*$)/, '').split('|')
-        temp.gsub!(matches, "[#{label}](#{link}) ")
+      text.to_s.scan(/<.*?|.*?>/).each do |matches|
+        link, label = matches.gsub(/(^.*<|>.*$)/, '').split('|')
+        temp.gsub!(matches, "[ #{label} ](#{link})")
       end
       return temp
     rescue => e
