@@ -5,17 +5,7 @@ module Mulukhiya
       return unless account.growi
       account.growi.clip(
         body: create_body(params),
-        path: create_path(account.username),
-      )
-    end
-
-    def create_path(username)
-      return File.join(
-        '/',
-        Package.short_name,
-        'user',
-        username,
-        Time.now.strftime('%Y/%m/%d/%H%M%S'),
+        path: GrowiClipper.create_path(account.username),
       )
     end
   end

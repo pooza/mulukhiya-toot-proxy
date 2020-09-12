@@ -16,9 +16,21 @@ html lang='ja'
       section class='config' v-if='username && show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
+          ol
+            li
+              | GROWIのアカウントをお持ちでなければ、
+              a href='https://growi.cloud/' target='_blank' GROWI.cloud
+              | で新しいGROWIサーバを登録してください。
+              br
+              | フリープランもあります。サーバを登録する手順の中で、新しいユーザーが作成できます。
+            li
+              | GROWIサーバのURLと、APIトークンを下の欄に入力してください。
+              br
+              | APIトークンは、ユーザー設定画面（画面右上のユーザーアイコンをクリック）から作成できます。
+            li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのアクセストークン' v-model='growi_token' maxlength='256'
+            input placeholder='GROWIのAPIトークン' v-model='growi_token' maxlength='256'
           .inline-field-container
             h4 URL
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
