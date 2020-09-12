@@ -84,7 +84,7 @@ module Mulukhiya
     def test_text
       assert_equal(@normal.text, '1: つかみ男につかまれると、体力ゲージが減少していく。')
       assert_equal(@blocks.text, '2: つかみ男につかまれると、体力ゲージが減少していく。')
-      assert_equal(@growi.text, '[ pooza ](https://mulukhiya.growi.cloud/user/pooza)[ /mulukhiya/user/pooza/2020/09/12/135825 ](https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825)')
+      assert_equal(@growi.text, '🔔 [ pooza ](https://mulukhiya.growi.cloud/user/pooza) created [ /mulukhiya/user/pooza/2020/09/12/135825 ](https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825)')
     end
 
     def test_images

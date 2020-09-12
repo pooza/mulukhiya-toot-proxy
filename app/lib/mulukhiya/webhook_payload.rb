@@ -42,18 +42,6 @@ module Mulukhiya
       return nil
     end
 
-    def parse_legacy_text(text)
-      temp = text.to_s
-      text.to_s.scan(/<.*?|.*?>/).each do |matches|
-        link, label = matches.gsub(/(^.*<|>.*$)/, '').split('|')
-        temp.gsub!(matches, "[ #{label} ](#{link})")
-      end
-      return temp
-    rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, text: text)
-      return text
-    end
-
     def images
       unless @images
         @images ||= blocks.select {|v| v['type'] == 'image'} if blocks?
@@ -81,5 +69,20 @@ module Mulukhiya
     end
 
     alias to_h values
+
+    private
+
+    def parse_legacy_text(text)
+      temp = text.to_s
+      temp.gsub!(':bell:', '🔔')
+      text.to_s.scan(/(<(.*?)\|(.*?)>)/).each do |matches|
+        pair, link, label = matches
+        temp.gsub!(pair, "[ #{label} ](#{link})")
+      end
+      return temp
+    rescue => e
+      @logger.error(class: self.class.to_s, error: e.message, text: text)
+      return text
+    end
   end
 end
