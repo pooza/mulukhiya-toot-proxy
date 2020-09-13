@@ -8,8 +8,9 @@ module Mulukhiya
       tweet = TweetString.new(params['spoiler_text']) if params['spoiler_text'].present?
       tweet ||= TweetString.new(params['status'])
       tweet.account = Environment.account_class[params['account_id']] if params['account_id']
-      status = [tweet.tweetablize, params['url']]
+      status = [tweet.tweetablize]
       status.push(tweet.extra_tags.join(' ')) if tweet.extra_tags.present?
+      status.push(params['url'])
       return TweetString.new(status.join("\n"))
     end
 

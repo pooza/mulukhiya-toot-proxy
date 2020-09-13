@@ -9,6 +9,8 @@ module Mulukhiya
         result.push(acct: acct.to_s)
       end
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
   end
 end

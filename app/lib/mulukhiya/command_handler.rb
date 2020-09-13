@@ -22,6 +22,8 @@ module Mulukhiya
       body['visibility'] = Environment.controller_class.visibility_name('direct')
       @prepared = true
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
     def handle_post_toot(body, params = {})
@@ -29,6 +31,8 @@ module Mulukhiya
       return unless parser.command_name == command_name
       exec
       result.push(parser.params.select {|k, v| v.present?})
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
     def handle_pre_webhook(body, params = {}); end

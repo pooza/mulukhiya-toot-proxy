@@ -10,6 +10,8 @@ module Mulukhiya
       body[status_field] = update_status
       result.push(tags: tags.create_tags)
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
     private

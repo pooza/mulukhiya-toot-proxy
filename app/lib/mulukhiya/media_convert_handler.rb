@@ -6,6 +6,8 @@ module Mulukhiya
       return unless @dest = convert
       body[:file][:org_tempfile] ||= body[:file][:tempfile]
       body[:file][:tempfile] = @dest
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
     end
 
     def handle_pre_thumbnail(body, params = {})
@@ -14,6 +16,8 @@ module Mulukhiya
       return unless @dest = convert
       body[:thumbnail][:org_tempfile] ||= body[:thumbnail][:tempfile]
       body[:thumbnail][:tempfile] = @dest
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
     end
 
     def convert
