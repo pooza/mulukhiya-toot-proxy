@@ -23,6 +23,8 @@ module Mulukhiya
       end
       parser.text = body[status_field] = @lines.join("\n")
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
     end
 
     def updatable?(keyword)
