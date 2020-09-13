@@ -4,6 +4,7 @@ module Mulukhiya
 
     def initialize
       @config = Config.instance
+      @logger = Logger.new
     end
 
     def underscore_name
@@ -28,6 +29,10 @@ module Mulukhiya
       return uri.to_md if uri.public?
       return uri.to_md if uri.local?
       return uri.to_md if federate?
+      return uri.to_s
+    rescue => e
+      raise Ginseng::GatewayError, e.message, e.backtrace unless uri
+      @logger.error(worker: self.class.to_s, error: e.message, uri: uri.to_s)
       return uri.to_s
     end
   end
