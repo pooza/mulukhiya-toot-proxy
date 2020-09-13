@@ -18,11 +18,11 @@ module Mulukhiya
       @config['/twitter/status/default_tags'] = ['キュアスタ']
 
       status = @service.create_status('status' => 'hoge', 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
-      assert_equal(status, "hoge\nhttps://precure.ml/hogefuga\n#キュアスタ")
+      assert_equal(status, "hoge\n#キュアスタ\nhttps://precure.ml/hogefuga")
       assert(status.valid?)
 
       status = @service.create_status('status' => 'hoge', 'spoiler_text' => 'ふがふが', 'url' => 'https://precure.ml/hogefuga')
-      assert_equal(status, "ふがふが\nhttps://precure.ml/hogefuga\n#キュアスタ")
+      assert_equal(status, "ふがふが\n#キュアスタ\nhttps://precure.ml/hogefuga")
       assert(status.valid?)
 
       status = @service.create_status('status' => '#キュアスタ！ hoge', 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
@@ -30,11 +30,11 @@ module Mulukhiya
       assert(status.valid?)
 
       status = @service.create_status('status' => 'あ' * 120, 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
-      assert_equal(status, "#{'あ' * 120}\nhttps://precure.ml/hogefuga\n#キュアスタ")
+      assert_equal(status, "#{'あ' * 120}\n#キュアスタ\nhttps://precure.ml/hogefuga")
       assert(status.valid?)
 
       status = @service.create_status('status' => 'あ' * 121, 'spoiler_text' => '', 'url' => 'https://precure.ml/hogefuga')
-      assert_equal(status, "#{'あ' * 120}…\nhttps://precure.ml/hogefuga\n#キュアスタ")
+      assert_equal(status, "#{'あ' * 120}…\n#キュアスタ\nhttps://precure.ml/hogefuga")
       assert(status.valid?)
 
       @config['/twitter/status/default_tags'] = []
