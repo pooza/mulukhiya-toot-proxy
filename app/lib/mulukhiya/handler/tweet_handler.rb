@@ -8,6 +8,8 @@ module Mulukhiya
       reporter.temp[:tweet] = body[status_field]
       result.push(message: 'saved')
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: body[status_field])
     end
 
     def handle_post_toot(body, params = {})
@@ -22,6 +24,8 @@ module Mulukhiya
       )
       result.push(url: uri.to_s)
       return body
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
     private
