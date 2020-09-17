@@ -40,21 +40,22 @@ html lang='ja'
               }).catch(e => {
                 this.message = e.response.data.error || e.message
               })
-            this.updateUsers()
+            this.repairTokens()
           } else {
             this.token_error = true
           }
         },
         methods: {
-          getTokens: function () {
-            let tokens = [this.token]
+          repairTokens: function () {
+            this.tokens = [this.token]
             JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
-              tokens.push(t)
+              this.tokens.push(t)
             })
-            return Array.from(new Set(tokens))
+            this.tokens = Array.from(new Set(this.tokens))
+            this.updateTokens()
           },
-          updateUsers: function () {
-            this.tokens = this.getTokens()
+          updateTokens: function () {
+            this.users = []
             localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(this.tokens))
             for (let t of this.tokens) {
               axios.get('/mulukhiya/config?token=' + encodeURIComponent(t), {responseType: 'json'})
@@ -83,16 +84,8 @@ html lang='ja'
               okText: '削除',
               cancelText: 'キャンセル',
             }).then(e => {
-              const tokens = []
-              const users = []
-              this.users.map(u => {
-                if (user.token != u.token) {
-                  tokens.push(u.token)
-                  users.push(u)
-                }
-              })
-              localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
-              this.users = users
+              this.tokens = this.tokens.filter(v => v != user.token)
+              this.updateTokens()
             }).catch(e => {
               this.message = e.message
             })
