@@ -1,6 +1,3 @@
-require 'time'
-require 'digest/sha1'
-
 module Mulukhiya
   class AnnouncementWorker
     include Sidekiq::Worker

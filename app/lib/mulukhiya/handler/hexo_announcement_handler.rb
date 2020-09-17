@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 module Mulukhiya
   class HexoAnnouncementHandler < Handler
     def handle_announce(announcement, params = {})
