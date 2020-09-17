@@ -28,8 +28,9 @@ html lang='ja'
           message: null,
           username: null,
           token_error: false,
-          users: [],
           token: localStorage.getItem('mulukhiya_token'),
+          users: [],
+          tokens: [],
         },
         mounted: function () {
           if (this.token) {
@@ -39,25 +40,31 @@ html lang='ja'
               }).catch(e => {
                 this.message = e.response.data.error || e.message
               })
-            let tokens = [this.token]
-            JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
-              tokens.push(t)
-            })
-            tokens = Array.from(new Set(tokens))
-            localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
-            for (let t of tokens) {
-              axios.get('/mulukhiya/config?token=' + encodeURIComponent(t), {responseType: 'json'})
-                .then(e => {
-                  this.users.push({username: e.data.account.username, token: t, scopes: e.data.token.scopes.join(', ')})
-                }).catch(e => {
-                  this.token_error = true
-                })
-            }
+            this.updateUsers()
           } else {
             this.token_error = true
           }
         },
         methods: {
+          getTokens: function () {
+            let tokens = [this.token]
+            JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
+              tokens.push(t)
+            })
+            return Array.from(new Set(tokens))
+          },
+          updateUsers: function () {
+            this.tokens = this.getTokens()
+            localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(this.tokens))
+            for (let t of this.tokens) {
+              axios.get('/mulukhiya/config?token=' + encodeURIComponent(t), {responseType: 'json'})
+                .then(e => {
+                  this.users.push({username: e.data.account.username, token: t, scopes: e.data.token.scopes.join(', ')})
+                }).catch(e => {
+                  console.log(e)
+                })
+            }
+          },
           switchUser: function (user) {
             axios.get('/mulukhiya/config?token=' + encodeURIComponent(user.token), {responseType: 'json'})
               .then(e => {
@@ -87,7 +94,7 @@ html lang='ja'
               localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
               this.users = users
             }).catch(e => {
-              this.message = e.response.data.error || e.message
+              this.message = e.message
             })
           },
         },

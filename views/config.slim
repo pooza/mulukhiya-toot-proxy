@@ -220,7 +220,7 @@ html lang='ja'
                 if (program.enable) {
                   const label = [program.series]
                   if (program.episode) {
-                    label.push(program.episode + '話')
+                    label.push(`${program.episode}話`)
                   }
                   if (program.air) {
                     label.push('エア番組')
@@ -266,7 +266,7 @@ html lang='ja'
             if (program) {
               const tags = ['実況', program.series]
               if (program.episode) {
-                tags.push(program.episode + '話')
+                tags.push(`${program.episode}話`)
               }
               if (program.air) {
                 tags.push('エア番組')
