@@ -1,8 +1,11 @@
 module Mulukhiya
   class PostAnnouncementHandler < AnnouncementHandler
     def announce(announcement, params = {})
-      sns.post({status_field => create_body(announcement, params), 'visibility' => visibility})
-      result.push(visibility: visibility)
+      r = sns.post(
+        status_field => create_body(announcement, params),
+        'visibility' => visibility,
+      )
+      result.push(url: r['url'])
       return announcement
     end
 

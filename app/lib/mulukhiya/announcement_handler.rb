@@ -7,7 +7,7 @@ module Mulukhiya
       @status = announcement[:content] || announcement[:text]
       return announce(announcement, params)
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, accouncement: accouncement)
+      errors.push(class: e.class.to_s, message: e.message, announcement: announcement)
       return false
     end
 

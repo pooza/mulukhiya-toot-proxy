@@ -13,6 +13,9 @@ module Mulukhiya
       @sns.announcements.each do |entry|
         next if cache.member?(entry[:id])
         Handler.dispatch(:announce, entry, {sns: @sns})
+      rescue => e
+        Slack.broadcast(e)
+      ensure
         sleep(1)
       end
       save
