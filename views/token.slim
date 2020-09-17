@@ -47,10 +47,9 @@ html lang='ja'
         },
         methods: {
           repairTokens: function () {
-            this.tokens = [this.token]
-            JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]').map(t => {
-              this.tokens.push(t)
-            })
+            this.tokens = [this.token].concat(
+              JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
+            )
             this.tokens = Array.from(new Set(this.tokens))
             this.updateTokens()
           },
