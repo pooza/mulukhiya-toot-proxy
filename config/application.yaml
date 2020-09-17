@@ -303,6 +303,10 @@ mastodon:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - hexo_announcement
   events:
     - pre_toot
     - post_toot
@@ -316,6 +320,7 @@ mastodon:
     - post_boost
     - post_search
     - post_bookmark
+    - announce
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
