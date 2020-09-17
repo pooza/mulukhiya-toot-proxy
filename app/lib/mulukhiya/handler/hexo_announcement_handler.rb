@@ -3,17 +3,19 @@ require 'date'
 
 module Mulukhiya
   class HexoAnnouncementHandler < AnnouncementHandler
+    def disable?
+      return super || category.nil? || dir.nil?
+    end
+
     def announce(announcement, params = {})
       params = params.clone
-      params[:category] ||= @config['/worker/announcement/local_clipping/category']
+      params[:category] ||= category
       params[:header] = true
       params[:format] = :md
       path = create_path(announcement)
       File.write(path, create_body(announcement, params))
       result.push(path: path)
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, accouncement: accouncement)
-      return false
+      return announcement
     end
 
     def create_path(announcement)
@@ -21,10 +23,20 @@ module Mulukhiya
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
     end
 
+    private
+
+    def category
+      return @config['/handler/hexo_announcement/category']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
     def dir
-      path = @config['/worker/announcement/local_clipping/path']
+      path = @config['/handler/hexo_announcement/path']
       path = File.join(Environment.dir, path) unless path.start_with?('/')
       return path
+    rescue Ginseng::ConfigError
+      return nil
     end
   end
 end

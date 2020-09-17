@@ -39,6 +39,8 @@ handler:
     ignore:
       domains:
         - instagram.com
+  hexo_announcement:
+    category: お知らせ
   shortened_url:
     domains:
       - t.co
@@ -58,11 +60,6 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
-  announcement:
-    local_clipping:
-      enable: false
-      path: tmp/announcements
-      category: お知らせ
 parser:
   toot:
     fields:
@@ -92,7 +89,6 @@ test:
         - hash_tag
         - user_config
         - tag_atom_feed_renderer
-        - announcement_worker
     - name: postgres
       cases:
         - clipping_worker
@@ -416,6 +412,10 @@ misskey:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - hexo_announcement
   oauth:
     permission:
       - write:notes
@@ -432,6 +432,7 @@ misskey:
     - pre_upload
     - post_upload
     - post_bookmark
+    - announce
   status:
     key: noteId
     label: ノート
@@ -519,6 +520,10 @@ meisskey:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - hexo_announcement
   oauth:
     permission:
       - write:notes
@@ -535,6 +540,7 @@ meisskey:
     - pre_upload
     - post_upload
     - post_bookmark
+    - announce
   status:
     key: noteId
     label: ノート

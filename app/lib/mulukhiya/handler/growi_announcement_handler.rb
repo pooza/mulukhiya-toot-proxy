@@ -1,15 +1,24 @@
 module Mulukhiya
   class GrowiAnnouncementHandler < AnnouncementHandler
     def announce(announcement, params = {})
-      return body unless growi = params[:sns].account.growi
+      return announcement unless growi
       params = params.clone
       params[:format] = :md
-      body = {
-        path: GrowiClipper.create_path(params[:sns].account.username),
-        body: create_body(announcement, params),
-      }
-      growi.clip(body)
-      result.push(body)
+      growi.clip(path: path, body: create_body(announcement, params))
+      result.push(path: path)
+      return announcement
+    end
+
+    private
+
+    def path
+      return GrowiClipper.create_path(sns.account.username)
+    end
+
+    def growi
+      return sns.account.growi
+    rescue
+      return nil
     end
   end
 end

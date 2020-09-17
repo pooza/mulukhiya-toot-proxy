@@ -1,9 +1,11 @@
 module Mulukhiya
   class AnnouncementHandler < Handler
+    attr_reader :sns
+
     def handle_announce(announcement, params = {})
-      return announcement unless params[:sns]
+      return announcement unless @sns = params[:sns]
       @status = announcement[:content] || announcement[:text]
-      announce(announcement, params)
+      return announce(announcement, params)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, accouncement: accouncement)
       return false
