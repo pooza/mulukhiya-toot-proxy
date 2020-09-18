@@ -173,6 +173,7 @@ test:
         - dropbox_clipper
         - dropbox_bookmark_handler
         - dropbox_clipping_command_handler
+        - dropbox_announcement_handler
     - name: growi
       cases:
         - growi_clipper
@@ -303,6 +304,7 @@ mastodon:
     announce:
       - post_announcement
       - growi_announcement
+      - dropbox_announcement
       - hexo_announcement
   events:
     - pre_toot
@@ -416,6 +418,7 @@ misskey:
     announce:
       - post_announcement
       - growi_announcement
+      - dropbox_announcement
       - hexo_announcement
   oauth:
     permission:
@@ -524,6 +527,7 @@ meisskey:
     announce:
       - post_announcement
       - growi_announcement
+      - dropbox_announcement
       - hexo_announcement
   oauth:
     permission:
