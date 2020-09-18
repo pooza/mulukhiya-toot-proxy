@@ -17,6 +17,7 @@ gem 'rspotify'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler'
+gem 'sinatra-contrib', require: false
 gem 'twitter'
 gem 'twitter-text'
 gem 'vacuum'

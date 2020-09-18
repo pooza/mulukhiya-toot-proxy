@@ -43,6 +43,8 @@ module Mulukhiya
 
     def handle_post_search(body, params = {}); end
 
+    def handle_announce(announcement, params = {}); end
+
     def handle_toot(body, params = {})
       params[:reporter] ||= Reporter.new
       params[:sns] ||= Environment.sns_class.new

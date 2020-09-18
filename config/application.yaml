@@ -1,5 +1,5 @@
 package:
-  version: 3.13.9
+  version: 3.13.10
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -39,6 +39,8 @@ handler:
     ignore:
       domains:
         - instagram.com
+  hexo_announcement:
+    category: お知らせ
   shortened_url:
     domains:
       - t.co
@@ -58,11 +60,6 @@ worker:
     federate: false
   dropbox_clipping:
     federate: true
-  announcement:
-    local_clipping:
-      enable: false
-      path: tmp/announcements
-      category: お知らせ
 parser:
   toot:
     fields:
@@ -92,7 +89,6 @@ test:
         - hash_tag
         - user_config
         - tag_atom_feed_renderer
-        - announcement_worker
     - name: postgres
       cases:
         - clipping_worker
@@ -177,11 +173,13 @@ test:
         - dropbox_clipper
         - dropbox_bookmark_handler
         - dropbox_clipping_command_handler
+        - dropbox_announcement_handler
     - name: growi
       cases:
         - growi_clipper
         - growi_bookmark_handler
         - growi_clipping_command_handler
+        - growi_announcement_handler
     - name: annict
       cases:
         - annict_polling_worker
@@ -303,6 +301,11 @@ mastodon:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - dropbox_announcement
+      - hexo_announcement
   events:
     - pre_toot
     - post_toot
@@ -316,6 +319,7 @@ mastodon:
     - post_boost
     - post_search
     - post_bookmark
+    - announce
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -411,6 +415,11 @@ misskey:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - dropbox_announcement
+      - hexo_announcement
   oauth:
     permission:
       - write:notes
@@ -427,6 +436,7 @@ misskey:
     - pre_upload
     - post_upload
     - post_bookmark
+    - announce
   status:
     key: noteId
     label: ノート
@@ -514,6 +524,11 @@ meisskey:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    announce:
+      - post_announcement
+      - growi_announcement
+      - dropbox_announcement
+      - hexo_announcement
   oauth:
     permission:
       - write:notes
@@ -530,6 +545,7 @@ meisskey:
     - pre_upload
     - post_upload
     - post_bookmark
+    - announce
   status:
     key: noteId
     label: ノート
