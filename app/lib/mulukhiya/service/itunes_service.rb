@@ -15,9 +15,9 @@ module Mulukhiya
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
     rescue => e
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
-      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
       cnt += 1
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
     end
@@ -31,9 +31,9 @@ module Mulukhiya
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "Item '#{id}' not found", e.backtrace
     rescue => e
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
-      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt <= retry_limit
       cnt += 1
+      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
     end
