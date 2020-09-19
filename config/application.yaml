@@ -306,20 +306,6 @@ mastodon:
       - growi_announcement
       - dropbox_announcement
       - hexo_announcement
-  events:
-    - pre_toot
-    - post_toot
-    - pre_webhook
-    - post_webhook
-    - pre_upload
-    - post_upload
-    - pre_thumbnail
-    - post_thumbnail
-    - post_fav
-    - post_boost
-    - post_search
-    - post_bookmark
-    - announce
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -426,17 +412,6 @@ misskey:
       - write:drive
       - read:drive
     callback_url: /mulukhiya/auth
-  events:
-    - pre_toot
-    - post_toot
-    - pre_webhook
-    - post_webhook
-    - pre_chat
-    - post_chat
-    - pre_upload
-    - post_upload
-    - post_bookmark
-    - announce
   status:
     key: noteId
     label: ノート
@@ -535,17 +510,6 @@ meisskey:
       - write:drive
       - read:drive
     callback_url: /mulukhiya/auth
-  events:
-    - pre_toot
-    - post_toot
-    - pre_webhook
-    - post_webhook
-    - pre_chat
-    - post_chat
-    - pre_upload
-    - post_upload
-    - post_bookmark
-    - announce
   status:
     key: noteId
     label: ノート
@@ -593,12 +557,6 @@ dolphin:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
-  events:
-    - pre_toot
-    - post_toot
-    - pre_upload
-    - post_upload
-    - post_bookmark
   status:
     key: noteId
     label: ノート
@@ -693,16 +651,6 @@ pleroma:
       - write:statuses
       - write:media
       - read:statuses
-  events:
-    - pre_toot
-    - post_toot
-    - pre_webhook
-    - post_webhook
-    - pre_chat
-    - post_chat
-    - pre_upload
-    - post_upload
-    - post_bookmark
   status:
     key: id
     label: ステータス

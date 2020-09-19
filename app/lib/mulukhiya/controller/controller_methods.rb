@@ -114,7 +114,7 @@ module Mulukhiya
       end
 
       def event_syms
-        return config["/#{name.underscore}/events"].map(&:to_sym)
+        return config.keys("/#{name.underscore}/handlers").map(&:to_sym)
       end
     end
   end
