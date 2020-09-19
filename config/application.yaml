@@ -81,7 +81,7 @@ test:
     - name: ci
       cases:
         - mastodon_controller
-        - handler
+        - event
         - slack
         - account
         - access_token
