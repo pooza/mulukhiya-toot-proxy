@@ -113,7 +113,7 @@ module Mulukhiya
         return config["/#{name.underscore}/status/label"]
       end
 
-      def events
+      def event_syms
         return config["/#{name.underscore}/events"].map(&:to_sym)
       end
     end

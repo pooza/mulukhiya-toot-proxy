@@ -35,15 +35,9 @@ module Mulukhiya
 
     def handlers
       handlers = {}
-      Environment.controller_class.events.each do |event|
-        Handler.all(event) do |handler|
-          handlers[handler.underscore_name] ||= {
-            'type' => 'object',
-            'properties' => {
-              'disabled' => {'type' => 'boolean'},
-              'timeout' => {'type' => 'string'},
-            },
-          }
+      Event.all do |event|
+        event.handlers do |handler|
+          handlers[handler.underscore_name] ||= handler.schema
         end
       end
       return handlers

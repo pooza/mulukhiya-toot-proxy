@@ -31,9 +31,9 @@ module Mulukhiya
       status = {'text' => status} unless status.is_a?(Hash)
       body = WebhookPayload.new(status).to_h
       body['visibility'] = visibility
-      Handler.dispatch(:pre_webhook, body, {reporter: reporter, sns: @sns})
+      Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
-      Handler.dispatch(:post_webhook, body, {reporter: reporter, sns: @sns})
+      Event.new(:post_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       return reporter
     end
 

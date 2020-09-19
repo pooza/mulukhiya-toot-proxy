@@ -12,7 +12,7 @@ module Mulukhiya
       return unless executable?
       @sns.announcements.each do |announcement|
         next if cache.member?(announcement[:id])
-        Handler.dispatch(:announce, announcement, {sns: @sns})
+        Event.new(:announce, {sns: @sns}).dispatch(announcement)
       rescue => e
         @logger.error(error: e.message, announcement: announcement)
         Slack.broadcast(e)
