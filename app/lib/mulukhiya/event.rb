@@ -17,9 +17,14 @@ module Mulukhiya
 
     def handlers
       return enum_for(__method__) unless block_given?
-      @config["/#{Environment.controller_name}/handlers/#{label}"].each do |v|
+      handler_names do |v|
         yield Handler.create(v, params)
       end
+    end
+
+    def handler_names(&block)
+      return enum_for(__method__) unless block_given?
+      @config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 
     def reporter

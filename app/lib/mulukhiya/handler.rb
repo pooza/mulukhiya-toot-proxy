@@ -163,6 +163,14 @@ module Mulukhiya
       return nil
     end
 
+    def self.names
+      names = []
+      Event.all do |event|
+        names.concat(event.handler_names.to_a)
+      end
+      return names.sort.uniq
+    end
+
     private
 
     def initialize(params = {})
