@@ -215,7 +215,6 @@ mastodon:
   url: https://mstdn.example.com/
   webhook: true
   tag_feed: true
-  clipping: true
   announcement: true
   filter: true
   twitter: true
@@ -323,7 +322,6 @@ misskey:
   url: https://misskey.example.com/
   webhook: true
   tag_feed: true
-  clipping: true
   announcement: true
   twitter: true
   annict: true
@@ -421,7 +419,6 @@ meisskey:
   display_name: めいすきー
   webhook: true
   tag_feed: true
-  clipping: true
   announcement: true
   twitter: true
   annict: true
@@ -517,7 +514,6 @@ meisskey:
 dolphin:
   url: https://dolphin.example.com/
   tag_feed: true
-  clipping: true
   dbms: postgres
   parser: note
   handlers:
@@ -564,7 +560,6 @@ dolphin:
 pleroma:
   url: https://pleroma.example.com/
   webhook: true
-  clipping: true
   twitter: true
   annict: true
   dbms: postgres

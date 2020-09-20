@@ -12,10 +12,6 @@ module Mulukhiya
       assert_boolean(controller_class.tag_feed?)
     end
 
-    def test_clipping?
-      assert_boolean(controller_class.clipping?)
-    end
-
     def test_announcement?
       assert_boolean(controller_class.announcement?)
     end

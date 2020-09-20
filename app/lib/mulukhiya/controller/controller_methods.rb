@@ -23,12 +23,6 @@ module Mulukhiya
         return false
       end
 
-      def clipping?
-        return config["/#{name.underscore}/clipping"] == true
-      rescue Ginseng::ConfigError
-        return false
-      end
-
       def growi?
         return Handler.search(/growi/).present?
       end
