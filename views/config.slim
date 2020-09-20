@@ -13,6 +13,22 @@ html lang='ja'
         h3 現在の設定
         #result-container
           pre = '{{result}}'
+      section class='config' v-if='username'
+        h3 v-on:click='toggleTagsSection' 固定タグ
+        .section-contents v-show='show_tags_detail'
+          .field-container
+            textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
+            v-select :options='program_options' v-on:input='changeTags' v-model='program'
+          .field-update-button-container
+            button v-on:click='updateTags' 更新
+      section class='config' v-if='username && show_livecure'
+        h3 v-on:click='toggleLivecureSection' = "実況#{controller.status_label}"
+        .section-contents v-show='show_livecure_detail'
+          .inline-field-container
+            label
+              input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
+          .field-update-button-container
+            button v-on:click='updateLivecure' 更新
       section class='config' v-if='username && show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
         .section-contents v-show='show_growi_detail'
@@ -27,6 +43,14 @@ html lang='ja'
               | GROWIサーバのURLと、APIトークンを下の欄に入力してください。
               br
               | APIトークンは、ユーザー設定画面（画面右上のユーザーアイコンをクリック）から作成できます。
+            li
+              | 必要ならば
+              code = "/user/{{username}}/draft"
+              | 等、記事作成先を入力してください。
+              br
+              | 空欄の場合は
+              code = "/mulukhiya/user/{{username}}"
+              | に記事が作成されます。
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
@@ -34,6 +58,9 @@ html lang='ja'
           .inline-field-container
             h4 URL
             input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
+          .inline-field-container
+            h4 記事作成先
+            input placeholder='記事作成先のパス' v-model='growi_prefix' maxlength='256'
           .field-update-button-container
             button v-on:click='updateGrowi' 更新
       section class='config' v-if='username && show_dropbox'
@@ -51,22 +78,6 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
           .field-update-button-container
             button v-on:click='updateDropbox' 更新
-      section class='config' v-if='username'
-        h3 v-on:click='toggleTagsSection' 固定タグ
-        .section-contents v-show='show_tags_detail'
-          .field-container
-            textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
-            v-select :options='program_options' v-on:input='changeTags' v-model='program'
-          .field-update-button-container
-            button v-on:click='updateTags' 更新
-      section class='config' v-if='username && show_livecure'
-        h3 v-on:click='toggleLivecureSection' = "実況#{controller.status_label}"
-        .section-contents v-show='show_livecure_detail'
-          .inline-field-container
-            label
-              input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
-          .field-update-button-container
-            button v-on:click='updateLivecure' 更新
       section class='config' v-if='username && show_twitter'
         h3 v-on:click='toggleTwitterSection' Twitter
         .section-contents v-show='show_twitter_detail'
@@ -146,8 +157,8 @@ html lang='ja'
           visibility: 'public',
           curl_sample: null,
           show_livecure: #{controller.livecure?},
-          show_growi: #{controller.clipping?},
-          show_dropbox: #{controller.clipping?},
+          show_growi: #{controller.growi?},
+          show_dropbox: #{controller.dropbox?},
           show_twitter: #{controller.twitter?},
           show_annict: #{controller.annict?},
           show_growi_detail: false,
@@ -183,6 +194,7 @@ html lang='ja'
                 if (e.data.config.growi) {
                   this.growi_token = e.data.config.growi.token
                   this.growi_url = e.data.config.growi.url
+                  this.growi_prefix = e.data.config.growi.prefix
                 }
                 if (e.data.config.dropbox) {
                   this.dropbox_token = e.data.config.dropbox.token
@@ -307,12 +319,15 @@ html lang='ja'
           },
           updateGrowi: function () {
             const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', growi: {url: null, token: null}}
+            const command = {command: 'user_config', growi: {url: null, token: null, prefix: null}}
+            if (this.growi_token) {
+              command.growi.token = this.growi_token
+            }
             if (this.growi_url) {
               command.growi.url = this.growi_url
             }
-            if (this.growi_token) {
-              command.growi.token = this.growi_token
+            if (this.growi_prefix) {
+              command.growi.prefix = this.growi_prefix
             }
             this.updateConfig(values, command)
           },

@@ -12,10 +12,6 @@ module Mulukhiya
       assert_boolean(controller_class.tag_feed?)
     end
 
-    def test_clipping?
-      assert_boolean(controller_class.clipping?)
-    end
-
     def test_announcement?
       assert_boolean(controller_class.announcement?)
     end
@@ -84,8 +80,8 @@ module Mulukhiya
       assert_kind_of(String, controller_class.status_label)
     end
 
-    def test_events
-      assert_kind_of(Array, controller_class.events)
+    def test_event_syms
+      assert_kind_of(Array, controller_class.event_syms)
     end
 
     def controller_class

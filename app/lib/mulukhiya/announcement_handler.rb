@@ -4,7 +4,7 @@ module Mulukhiya
 
     def handle_announce(announcement, params = {})
       return announcement unless @sns = params[:sns]
-      @status = announcement[:content] || announcement[:text]
+      return announcement unless @status = announcement[:content] || announcement[:text]
       return announce(announcement, params)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, announcement: announcement)

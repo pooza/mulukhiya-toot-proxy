@@ -10,6 +10,13 @@ module Mulukhiya
       return false
     end
 
+    def keys(prefix)
+      return map do |key, value|
+        next unless key.start_with?(prefix)
+        key.sub(Regexp.new("^#{prefix}"), '').split('/')[1]
+      end.compact.sort.uniq
+    end
+
     def errors
       return JSON::Validator.fully_validate(schema, raw['local'])
     end
@@ -35,15 +42,9 @@ module Mulukhiya
 
     def handlers
       handlers = {}
-      Environment.controller_class.events.each do |event|
-        Handler.all(event) do |handler|
-          handlers[handler.underscore_name] ||= {
-            'type' => 'object',
-            'properties' => {
-              'disabled' => {'type' => 'boolean'},
-              'timeout' => {'type' => 'string'},
-            },
-          }
+      Event.all do |event|
+        event.handlers do |handler|
+          handlers[handler.underscore_name] ||= handler.schema
         end
       end
       return handlers

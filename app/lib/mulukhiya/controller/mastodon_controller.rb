@@ -14,10 +14,10 @@ module Mulukhiya
 
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
-      Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns})
+      Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.toot(params)
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
       @renderer.status = @reporter.response.code
@@ -30,11 +30,11 @@ module Mulukhiya
     end
 
     post %r{/api/v([12])/media} do
-      Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         version: media_api_default_version || params[:captures].first.to_i,
       })
-      Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -47,9 +47,9 @@ module Mulukhiya
 
     put '/api/v1/media/:id' do
       if params[:thumbnail]
-        Handler.dispatch(:pre_thumbnail, params, {reporter: @reporter, sns: @sns})
+        Event.new(:pre_thumbnail, {reporter: @reporter, sns: @sns}).dispatch(params)
         @reporter.response = @sns.update_media(params[:id], params)
-        Handler.dispatch(:post_thumbnail, params, {reporter: @reporter, sns: @sns})
+        Event.new(:post_thumbnail, {reporter: @reporter, sns: @sns}).dispatch(params)
       else
         @reporter.response = @sns.update_media(params[:id], params)
       end
@@ -65,7 +65,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/favourite' do
       @reporter.response = @sns.fav(params[:id])
-      Handler.dispatch(:post_fav, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_fav, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -73,7 +73,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/reblog' do
       @reporter.response = @sns.boost(params[:id])
-      Handler.dispatch(:post_boost, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_boost, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -81,7 +81,7 @@ module Mulukhiya
 
     post '/api/v1/statuses/:id/bookmark' do
       @reporter.response = @sns.bookmark(params[:id])
-      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_bookmark, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -93,7 +93,7 @@ module Mulukhiya
       message = @reporter.response.parsed_response
       if message.is_a?(Hash)
         message.deep_stringify_keys!
-        Handler.dispatch(:post_search, params, {reporter: @reporter, message: message})
+        Event.new(:post_search, {reporter: @reporter, sns: @sns, message: message}).dispatch(params)
         @renderer.message = message
       else
         body = Nokogiri::HTML.parse(message, nil, 'utf-8')

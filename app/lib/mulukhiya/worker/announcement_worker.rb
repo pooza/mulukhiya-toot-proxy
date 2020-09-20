@@ -10,10 +10,11 @@ module Mulukhiya
 
     def perform
       return unless executable?
-      @sns.announcements.each do |entry|
-        next if cache.member?(entry[:id])
-        Handler.dispatch(:announce, entry, {sns: @sns})
+      @sns.announcements.each do |announcement|
+        next if cache.member?(announcement[:id])
+        Event.new(:announce, {sns: @sns}).dispatch(announcement)
       rescue => e
+        @logger.error(error: e.message, announcement: announcement)
         Slack.broadcast(e)
       ensure
         sleep(1)
@@ -26,8 +27,6 @@ module Mulukhiya
     def cache
       return {} unless File.exist?(path)
       return JSON.parse(File.read(path))
-    rescue => e
-      @logger.error(e)
     end
 
     def save

@@ -20,10 +20,18 @@ module Mulukhiya
     end
 
     def growi
-      @growi ||= GrowiClipper.create(account_id: id)
+      unless @growi
+        raise Ginseng::ConfigError, '/growi/url undefined' unless config['/growi/url']
+        raise Ginseng::ConfigError, '/growi/token undefined' unless config['/growi/token']
+        @growi = GrowiClipper.new(
+          uri: config['/growi/url'],
+          token: config['/growi/token'],
+          prefix: config['/growi/prefix'] || File.join('/', Package.short_name, 'user', username),
+        )
+      end
       return @growi
     rescue => e
-      logger.error(e)
+      logger.error(clipper: self.class.to_s, error: e.message, acct: acct.to_s)
       return nil
     end
 

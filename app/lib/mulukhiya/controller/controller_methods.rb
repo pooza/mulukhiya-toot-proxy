@@ -23,10 +23,12 @@ module Mulukhiya
         return false
       end
 
-      def clipping?
-        return config["/#{name.underscore}/clipping"] == true
-      rescue Ginseng::ConfigError
-        return false
+      def growi?
+        return Handler.search(/growi/).present?
+      end
+
+      def dropbox?
+        return Handler.search(/dropbox/).present?
       end
 
       def announcement?
@@ -42,13 +44,18 @@ module Mulukhiya
       end
 
       def twitter?
-        return config["/#{name.underscore}/twitter"] && TwitterService.config?
+        return false unless config["/#{name.underscore}/twitter"] == true
+        return false unless TwitterService.config?
+        return false unless Handler.search(/(twitter|tweet)/).present?
+        return true
       rescue Ginseng::ConfigError
         return false
       end
 
       def annict?
-        return config["/#{name.underscore}/annict"] && AnnictService.config?
+        return false unless config["/#{name.underscore}/annict"] == true
+        return false unless AnnictService.config?
+        return true
       rescue Ginseng::ConfigError
         return false
       end
@@ -113,8 +120,8 @@ module Mulukhiya
         return config["/#{name.underscore}/status/label"]
       end
 
-      def events
-        return config["/#{name.underscore}/events"].map(&:to_sym)
+      def event_syms
+        return config.keys("/#{name.underscore}/handlers").map(&:to_sym)
       end
     end
   end

@@ -90,6 +90,16 @@ module Mulukhiya
       return nil
     end
 
+    def schema
+      return {
+        'type' => 'object',
+        'properties' => {
+          'disabled' => {'type' => 'boolean'},
+          'timeout' => {'type' => 'string'},
+        },
+      }
+    end
+
     def clear
       @result.clear
       @errors.clear
@@ -153,33 +163,16 @@ module Mulukhiya
       return nil
     end
 
-    def self.all(event, params = {})
-      config = Config.instance
-      unless config["/#{Environment.controller_name}/events"].member?(event.to_s)
-        raise "Invalid event '#{event}'"
+    def self.names
+      names = []
+      Event.all do |event|
+        names.concat(event.handler_names.to_a)
       end
-      config["/#{Environment.controller_name}/handlers/#{event}"].each do |v|
-        yield create(v, params)
-      end
+      return names.sort.uniq
     end
 
-    def self.dispatch(event, body, params = {})
-      params[:event] = event
-      params[:reporter] ||= Reporter.new
-      all(event, params) do |handler|
-        raise Ginseng::AuthError, 'Invalid token' unless handler.sns.account
-        next if handler.disable?
-        thread = Thread.new {handler.send("handle_#{event}".to_sym, body, params)}
-        unless thread.join(handler.timeout)
-          handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")
-        end
-        break if handler.prepared?
-      rescue RestClient::Exception, HTTParty::Error => e
-        handler.errors.push(class: e.class.to_s, message: e.message)
-      ensure
-        params[:reporter].push(handler)
-      end
-      return params[:reporter]
+    def self.search(pattern)
+      return names.select {|v| v.match?(pattern) && !Handler.create(v).disable?}
     end
 
     private

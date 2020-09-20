@@ -13,11 +13,11 @@ module Mulukhiya
     end
 
     post '/api/notes/create' do
-      Handler.dispatch(:pre_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       params.delete(status_field) if params[status_field].empty?
       @reporter.response = @sns.note(params)
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.dispatch(:post_toot, params, {reporter: @reporter, sns: @sns}) unless renote?
+      Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -30,10 +30,10 @@ module Mulukhiya
 
     post '/api/messaging/messages/create' do
       @reporter.tags.clear
-      Handler.dispatch(:pre_chat, params, {reporter: @reporter, sns: @sns})
+      Event.new(:pre_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.say(params)
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.dispatch(:post_chat, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -45,12 +45,12 @@ module Mulukhiya
     end
 
     post '/api/drive/files/create' do
-      Handler.dispatch(:pre_upload, params, {reporter: @reporter, sns: @sns})
+      Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         filename: params[:file][:filename],
       })
       notify(@reporter.response.parsed_response) if response_error?
-      Handler.dispatch(:post_upload, params, {reporter: @reporter, sns: @sns})
+      Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
       return @renderer.to_s
@@ -63,7 +63,7 @@ module Mulukhiya
 
     post '/api/notes/favorites/create' do
       @reporter.response = @sns.fav(params[:noteId])
-      Handler.dispatch(:post_bookmark, params, {reporter: @reporter, sns: @sns})
+      Event.new(:pre_bookmark, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response || {}
       @renderer.status = @reporter.response.code
       return @renderer.to_s

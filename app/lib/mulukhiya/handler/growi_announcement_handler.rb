@@ -4,16 +4,15 @@ module Mulukhiya
       return announcement unless growi
       params = params.clone
       params[:format] = :md
-      growi.clip(path: path, body: create_body(announcement, params))
-      result.push(path: path)
+      r = growi.clip(body: create_body(announcement, params))
+      result.push(path: r['page']['path'])
+      return announcement
+    rescue => e
+      errors.push(message: e.message)
       return announcement
     end
 
     private
-
-    def path
-      return GrowiClipper.create_path(sns.account.username)
-    end
 
     def growi
       return sns.account.growi
