@@ -53,7 +53,7 @@ module Mulukhiya
         return false unless config["/#{name.underscore}/twitter"] == true
         return false unless TwitterService.config?
         return false unless Handler.search(/(twitter|tweet)/).present?
-        true
+        return true
       rescue Ginseng::ConfigError
         return false
       end
