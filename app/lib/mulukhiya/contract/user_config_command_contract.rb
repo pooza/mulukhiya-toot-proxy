@@ -10,6 +10,7 @@ module Mulukhiya
       required(:growi).maybe(:hash).schema do
         optional(:url).maybe(:string)
         optional(:token).maybe(:string)
+        optional(:prefix).maybe(:string)
       end
       required(:dropbox).maybe(:hash).schema do
         optional(:token).maybe(:string)
