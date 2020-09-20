@@ -171,6 +171,10 @@ module Mulukhiya
       return names.sort.uniq
     end
 
+    def self.search(pattern)
+      return names.select {|v| v.match?(pattern)}
+    end
+
     private
 
     def initialize(params = {})

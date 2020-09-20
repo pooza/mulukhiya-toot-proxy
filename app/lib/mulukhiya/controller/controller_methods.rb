@@ -29,6 +29,14 @@ module Mulukhiya
         return false
       end
 
+      def growi?
+        return Handler.search(/growi/).present?
+      end
+
+      def dropbox?
+        return Handler.search(/dropbox/).present?
+      end
+
       def announcement?
         return config["/#{name.underscore}/announcement"] == true
       rescue Ginseng::ConfigError
@@ -42,15 +50,16 @@ module Mulukhiya
       end
 
       def twitter?
-        return config["/#{name.underscore}/twitter"] && TwitterService.config?
-      rescue Ginseng::ConfigError
-        return false
+        return false unless config["/#{name.underscore}/twitter"] == true
+        return false unless TwitterService.config?
+        return false unless Handler.search(/(twitter|tweet)/).present?
+        true
       end
 
       def annict?
-        return config["/#{name.underscore}/annict"] && AnnictService.config?
-      rescue Ginseng::ConfigError
-        return false
+        return false unless config["/#{name.underscore}/annict"] == true
+        return false unless AnnictService.config?
+        return true
       end
 
       def livecure?
