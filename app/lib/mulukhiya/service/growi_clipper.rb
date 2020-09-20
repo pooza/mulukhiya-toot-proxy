@@ -26,7 +26,7 @@ module Mulukhiya
         Package.short_name,
         'user',
         username,
-        Time.now.strftime('%Y/%m/%d/%H%M%S'),
+        Time.now.strftime('%Y/%m/%d/%H%M%S%L'),
       )
     end
 
