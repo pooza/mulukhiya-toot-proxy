@@ -172,7 +172,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern)}
+      return names.select {|v| v.match?(pattern) && !Handler.create(v).disable?}
     end
 
     private
