@@ -199,6 +199,7 @@ webui:
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.min.js
     - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.js
     - https://cdn.jsdelivr.net/npm/v-tooltip/dist/v-tooltip.min.js
+    - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
   stylesheets:

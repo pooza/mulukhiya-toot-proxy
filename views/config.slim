@@ -15,7 +15,7 @@ html lang='ja'
           pre = '{{result}}'
       section class='config' v-if='username'
         h3 v-on:click='toggleTagsSection' 固定タグ
-        .section-contents v-show='show_tags_detail'
+        vue-slide-up-down :active='show_tags_detail'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
             v-select :options='program_options' v-on:input='changeTags' v-model='program'
@@ -23,7 +23,7 @@ html lang='ja'
             button v-on:click='updateTags' 更新
       section class='config' v-if='username && show_livecure'
         h3 v-on:click='toggleLivecureSection' = "実況#{controller.status_label}"
-        .section-contents v-show='show_livecure_detail'
+        vue-slide-up-down :active='show_livecure_detail'
           .inline-field-container
             label
               input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
@@ -31,7 +31,7 @@ html lang='ja'
             button v-on:click='updateLivecure' 更新
       section class='config' v-if='username && show_growi'
         h3 v-on:click='toggleGrowiSection' GROWI
-        .section-contents v-show='show_growi_detail'
+        vue-slide-up-down :active='show_growi_detail'
           ol
             li
               | GROWIのアカウントをお持ちでなければ、
@@ -65,7 +65,7 @@ html lang='ja'
             button v-on:click='updateGrowi' 更新
       section class='config' v-if='username && show_dropbox'
         h3 v-on:click='toggleDropboxSection' Dropbox
-        .section-contents v-show='show_dropbox_detail'
+        vue-slide-up-down :active='show_dropbox_detail'
           ol
             li
               | Dropboxの開発者向けページで、
@@ -80,14 +80,14 @@ html lang='ja'
             button v-on:click='updateDropbox' 更新
       section class='config' v-if='username && show_twitter'
         h3 v-on:click='toggleTwitterSection' Twitter
-        .section-contents v-show='show_twitter_detail'
+        vue-slide-up-down :active='show_twitter_detail'
           .field-update-button-container
             a :href='twitterHref'
               img src='/mulukhiya/sign_in_twitter.png'
             button class='alert' v-on:click='unauthTwitter' 認証を解除
       section class='config' v-if='username && show_annict'
         h3 v-on:click='toggleAnnictSection' Annict
-        .section-contents v-show='show_annict_detail'
+        vue-slide-up-down :active='show_annict_detail'
           ol
             li
               | アカウントを持っていない場合は、
@@ -105,7 +105,7 @@ html lang='ja'
             button class='alert' v-on:click='unauthAnnict' 認証を解除
       section class='config' v-if='username'
         h3 v-on:click='toggleWebhookSection' Slack互換webhook
-        .section-contents v-show='show_webhook_detail'
+        vue-slide-up-down :active='show_webhook_detail'
           .inline-field-container
             h4 トークン
             input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
@@ -125,7 +125,7 @@ html lang='ja'
             i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
         h3 v-on:click='toggleNotifySection' 通知
-        .section-contents v-show='show_notify_detail'
+        vue-slide-up-down :active='show_notify_detail'
           .inline-field-container
             label
               input type='checkbox' value='1' v-model='notify_user_config' 設定変更を通知
@@ -138,6 +138,7 @@ html lang='ja'
       'use strict'
       Vue.use(VTooltip)
       Vue.use(window.VuejsDialog.main.default)
+      Vue.component('vue-slide-up-down', VueSlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
