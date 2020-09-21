@@ -116,12 +116,12 @@ html lang='ja'
             button v-on:click='updateWebhook' 更新
           .field-container v-if='webhook_url'
             h4 URL
-            textarea id='webhook-url-text' = '{{webhook_url}}'
+            textarea ref='webhook_url_text' = '{{webhook_url}}'
             i class='fas fa-clipboard' v-on:click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='webhook_url'
             h4 curlサンプル
-            textarea id='curl-sample-text' v-html='curl_sample'
+            textarea ref='curl_sample_text' v-html='curl_sample'
             i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
         h3 v-on:click='toggleNotifySection' 通知
@@ -267,11 +267,11 @@ html lang='ja'
               })
           },
           copyWebhookURL: function () {
-            document.getElementById('webhook-url-text').select()
+            this.$refs.webhook_url_text.select()
             document.execCommand('copy')
           },
           copyCurlSample: function () {
-            document.getElementById('curl-sample-text').select()
+            this.$refs.curl_sample_text.select()
             document.execCommand('copy')
           },
           changeTags: function (e) {
