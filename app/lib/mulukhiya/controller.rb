@@ -1,15 +1,11 @@
 require 'omniauth'
 require 'omniauth-twitter'
-require 'sinatra/reloader'
 
 module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
     set :root, Environment.dir
     enable :sessions, :method_override
-    configure :development do
-      register Sinatra::Reloader
-    end
 
     use OmniAuth::Builder do
       provider :twitter, TwitterService.consumer_key, TwitterService.consumer_secret
