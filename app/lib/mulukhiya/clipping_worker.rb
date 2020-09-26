@@ -1,6 +1,7 @@
 module Mulukhiya
   class ClippingWorker
     include Sidekiq::Worker
+    sidekiq_options retry: 3
 
     def initialize
       @config = Config.instance

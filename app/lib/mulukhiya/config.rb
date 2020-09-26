@@ -1,5 +1,3 @@
-require 'json-schema'
-
 module Mulukhiya
   class Config < Ginseng::Config
     include Package
@@ -8,22 +6,6 @@ module Mulukhiya
       return self["/handler/#{handler_name}/disable"] == true
     rescue Ginseng::ConfigError
       return false
-    end
-
-    def keys(prefix)
-      return map do |key, value|
-        next unless key.start_with?(prefix)
-        key.sub(Regexp.new("^#{prefix}"), '').split('/')[1]
-      end.compact.sort.uniq
-    end
-
-    def errors
-      return JSON::Validator.fully_validate(schema, raw['local'])
-    end
-
-    def self.load_file(name)
-      name += '.yaml' if File.extname(name).empty?
-      return YAML.load_file(File.join(Environment.dir, 'config', name))
     end
 
     def schema
@@ -36,6 +18,11 @@ module Mulukhiya
         @schema['properties']['handler'] = handlers
       end
       return @schema
+    end
+
+    def self.load_file(name)
+      name += '.yaml' if File.extname(name).empty?
+      return YAML.load_file(File.join(Environment.dir, 'config', name))
     end
 
     private

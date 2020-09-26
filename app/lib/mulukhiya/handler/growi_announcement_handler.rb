@@ -7,9 +7,6 @@ module Mulukhiya
       r = growi.clip(body: create_body(announcement, params))
       result.push(path: r['page']['path'])
       return announcement
-    rescue => e
-      errors.push(message: e.message)
-      return announcement
     end
 
     private

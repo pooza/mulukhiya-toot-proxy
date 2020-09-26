@@ -35,8 +35,6 @@ module Mulukhiya
       path = @config['/handler/hexo_announcement/path']
       path = File.join(Environment.dir, path) unless path.start_with?('/')
       return path
-    rescue Ginseng::ConfigError
-      return nil
     end
   end
 end

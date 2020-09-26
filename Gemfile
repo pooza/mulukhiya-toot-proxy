@@ -9,7 +9,6 @@ gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fe
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
-gem 'json-schema'
 gem 'mimemagic'
 gem 'nokogiri'
 gem 'omniauth-twitter'
@@ -17,7 +16,6 @@ gem 'rspotify'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler'
-gem 'sinatra-contrib', require: false
 gem 'twitter'
 gem 'twitter-text'
 gem 'vacuum'
@@ -35,6 +33,7 @@ group :development do
   gem 'rails-erb-lint'
   gem 'rubocop'
   gem 'rubocop-performance'
+  gem 'sinatra-contrib', require: false
   gem 'slim_lint'
   gem 'test-unit'
 end
