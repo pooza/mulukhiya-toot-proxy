@@ -33,6 +33,7 @@ module Mulukhiya
     end
     Sidekiq.configure_server do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
+      config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
     end
   end
 
@@ -60,6 +61,8 @@ module Mulukhiya
     end
   end
 end
+
+Redis.exists_returns_integer = true
 
 Mulukhiya.bootsnap
 Mulukhiya.loader.setup
