@@ -4,5 +4,3 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'bundler/setup'
 require 'mulukhiya'
-
-Redis.exists_returns_integer = false

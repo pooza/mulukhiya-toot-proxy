@@ -1,5 +1,5 @@
 package:
-  version: 3.13.13
+  version: 3.13.14
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -859,10 +859,12 @@ puma:
 tagging:
   word:
     minimum_length: 3
-  attachment_tags:
-    image: image
-    video: video
-    audio: audio
+  media:
+    enable: true
+    tags:
+      image: image
+      video: video
+      audio: audio
   dictionaries:
     - url: https://precure.ml/api/dic/v1/precure.json
       type: relative
