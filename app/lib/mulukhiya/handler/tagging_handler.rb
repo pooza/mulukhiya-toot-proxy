@@ -5,7 +5,7 @@ module Mulukhiya
       return body unless executable?(body)
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(body))
-      tags.concat(create_attachment_tags(body))
+      tags.concat(create_media_tags(body)) if media_tag?
       tags.concat(@sns.account.tags)
       body[status_field] = update_status
       result.push(tags: tags.create_tags)
@@ -23,13 +23,17 @@ module Mulukhiya
       return false
     end
 
-    def create_attachment_tags(body)
+    def media_tag?
+      return @config['/tagging/media/enable']
+    end
+
+    def create_media_tags(body)
       tags = []
       (body[attachment_field] || []).each do |id|
         type = Environment.attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
-          tags.push(@config["/tagging/attachment_tags/#{mediatype}"])
+          tags.push(@config["/tagging/media/tags/#{mediatype}"])
         rescue Ginseng::ConfigError => e
           result.push(info: e.message)
         end
