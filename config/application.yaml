@@ -706,6 +706,8 @@ annict:
     api: https://api.annict.com
   spoiler:
     pattern: (ねた|ネタ)(ばれ|バレ)
+  sleep:
+    seconds: 0.5
   api:
     me:
       fields:
