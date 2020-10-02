@@ -284,7 +284,7 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sequel (5.36.0)
+    sequel (5.37.0)
     sidekiq (6.1.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
