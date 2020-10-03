@@ -17,14 +17,11 @@ html lang='ja'
             h3 メディアファイル
             .link
               a href='/mulukhiya/feed/media' = slim.create_uri('/mulukhiya/feed/media')
-        - Mulukhiya::TagContainer.default_tag_bases.each do |tag|
+        - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
           li
-            h3 = tag.to_hashtag
-            - if controller.tag_feed?
-              .link
-                a href=slim.create_uri("/mulukhiya/feed/tag/#{tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{tag}")
-            - else
-              .alert #{controller.display_name}はデフォルトタグのAtomフィードに非対応です。
+            h3 = "タグ #{renderer.tag.to_hashtag}"
+            .link
+              a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

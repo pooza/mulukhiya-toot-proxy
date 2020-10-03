@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h1 = package.name
       nav class='menu'
-        - if controller.tag_feed? || controller.media_catalog?
+        - if controller.tag_feed? || controller.media_catalog? || config['/tagging/media/enable']
           a href='/mulukhiya/app/feeds' Atomフィード
         - else
           a href='#'

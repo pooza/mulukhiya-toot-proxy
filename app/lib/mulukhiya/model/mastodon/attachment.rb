@@ -14,7 +14,7 @@ module Mulukhiya
         Postgres.instance.execute('media_catalog', params).each do |row|
           yield ({
             link: create_link(row).to_s,
-            title: row[:description] || row[:name],
+            title: "#{row[:name]} (#{row[:file_size].commaize}b) #{row[:description]}",
             author: row[:display_name] || "@#{row[:username]}@#{Environment.domain_name}",
             date: Time.parse("#{row[:created_at]} UTC").getlocal,
           })
