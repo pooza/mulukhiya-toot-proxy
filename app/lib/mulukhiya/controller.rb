@@ -77,6 +77,27 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/medias' do
+      if Environment.controller_class.media_catalog?
+        params[:limit] = @config['/feed/media/limit']
+        params[:test_usernames] = @config['/feed/test_usernames']
+        @renderer.message = Postgres.instance.execute('media_catalog', params).each do |row|
+          row[:acct] = "@#{row[:username]}@#{Environment.domain_name}"
+          row.delete(:username)
+          row[:meta] = row[:meta] ? JSON.parse(row[:meta]) : {original: {}, small: {}}
+          [:original, :small].freeze.each do |key|
+            values = row.clone
+            values[:size] = key.to_s
+            row[:meta][key][:url] = Environment.attachment_class.create_uri(values).to_s
+          end
+          row.compact
+        end
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/health' do
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200

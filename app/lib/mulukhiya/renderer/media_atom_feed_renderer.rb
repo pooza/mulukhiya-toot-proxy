@@ -27,7 +27,7 @@ module Mulukhiya
 
     def fetch!
       return nil unless Environment.controller_class.media_catalog?
-      Environment.attachment_class.catalog(params) do |row|
+      Environment.attachment_class.catalog do |row|
         push(row)
       end
       @atom = nil
