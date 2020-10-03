@@ -323,7 +323,6 @@ mastodon:
 misskey:
   url: https://misskey.example.com/
   webhook: true
-  media_catalog: true
   tag_feed: true
   announcement: true
   twitter: true
@@ -421,7 +420,6 @@ meisskey:
   url: https://meisskey.example.com/
   display_name: めいすきー
   webhook: true
-  media_catalog: true
   tag_feed: true
   announcement: true
   twitter: true
@@ -880,6 +878,8 @@ tagging:
     - url: https://precure.ml/api/dic/v2/fairy.json
 feed:
   tag:
+    limit: 100
+  media:
     limit: 100
   test_usernames:
     - test

@@ -9,7 +9,8 @@ SELECT
   attachments.created_at,
   toots.id AS status_id,
   toots.visibility,
-  accounts.username
+  accounts.username,
+  accounts.display_name
 FROM media_attachments AS attachments
   INNER JOIN statuses AS toots ON attachments.status_id=toots.id
   INNER JOIN accounts ON toots.account_id=accounts.id
