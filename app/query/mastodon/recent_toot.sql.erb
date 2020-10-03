@@ -10,5 +10,5 @@ WHERE (toots.visibility=0)
   AND (accounts.suspended_at IS NULL)
   AND (accounts.id='<%= params[:id] %>')
 GROUP BY toots.id
-ORDER BY toots.created_at DESC
+ORDER BY toots.id DESC
 LIMIT 1

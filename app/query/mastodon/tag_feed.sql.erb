@@ -18,5 +18,5 @@ WHERE (tags.name='<%= params[:tag] %>')
   AND (accounts.suspended_at IS NULL)
   AND (accounts.username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
 ORDER BY
-  toots.created_at DESC
+  toots.id DESC
 LIMIT <%= params[:limit] %> OFFSET 0
