@@ -36,7 +36,6 @@ module Mulukhiya
     get '/mulukhiya/feed/media' do
       if Environment.controller_class.media_catalog?
         @renderer = MediaAtomFeedRenderer.new
-
       else
         @renderer.status = 404
       end
