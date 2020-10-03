@@ -1,0 +1,24 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  attachments.id,
+  attachments.file_file_name AS name,
+  attachments.file_content_type AS type,
+  attachments.file_file_size AS size,
+  attachments.file_meta AS meta,
+  attachments.description,
+  attachments.created_at,
+  toots.id AS status_id,
+  toots.visibility,
+  accounts.username
+FROM media_attachments AS attachments
+  INNER JOIN statuses AS toots ON attachments.status_id=toots.id
+  INNER JOIN accounts ON toots.account_id=accounts.id
+WHERE (toots.local=TRUE)
+  AND (toots.reblog_of_id IS NULL)
+  AND (toots.visibility<2)
+  AND (accounts.silenced_at IS NULL)
+  AND (accounts.suspended_at IS NULL)
+  AND (accounts.username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
+ORDER BY
+  attachments.id DESC
+LIMIT <%= params[:limit] %> OFFSET 0

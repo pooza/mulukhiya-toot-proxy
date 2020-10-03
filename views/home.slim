@@ -16,6 +16,15 @@ html lang='ja'
           a href='#'
             = 'デフォルトタグのAtomフィード '
             span class='alert' 非対応
+        - if controller.media_catalog?
+          a href='/mulukhiya/app/media' v-if='username' メディアカタログ
+          a href='#' v-else=''
+            | メディアカタログ
+            span class='alert' 未認証
+        - else
+          a href='#'
+            = 'メディアカタログ '
+            span class='alert' 非対応
         - if controller.webhook?
           a href='/mulukhiya/app/config' v-if='username' 環境設定
           a href='#' v-else=''
