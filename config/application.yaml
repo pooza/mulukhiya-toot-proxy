@@ -89,6 +89,7 @@ test:
         - hash_tag
         - user_config
         - tag_atom_feed_renderer
+        - media_atom_feed_renderer
     - name: postgres
       cases:
         - clipping_worker
