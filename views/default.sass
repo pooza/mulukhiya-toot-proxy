@@ -218,6 +218,42 @@ ul.feeds
       font:
         size: 0.8em
 
+ul.medias
+  display: grid
+  list:
+    style: none
+  padding:
+    inline-start: 0
+  margin: 0 1em
+  grid:
+    template:
+      columns: 1fr 1fr
+    gap: 0.5em
+  li.media
+    border: solid 1px dimgray
+    border-radius: 6px
+    padding: 0.5em
+    .image_container
+      width: 300px
+      height: 240px
+      overflow-y: auto
+      margin: auto
+      img
+        width: 280px
+        max-height: auto
+        border: solid 1px transparent
+        border-radius: 6px
+  ul.params
+    padding: 0
+    list:
+      style: none
+    font:
+      size: 0.8em
+      family: $sans-serif
+    li.param
+      display: inline-block
+      margin: 0 0.5em
+
 textarea
   border:
     width: 1px

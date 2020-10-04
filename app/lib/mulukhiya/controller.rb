@@ -83,7 +83,9 @@ module Mulukhiya
         params[:test_usernames] = @config['/feed/test_usernames']
         @renderer.message = Postgres.instance.execute('media_catalog', params).each do |row|
           row[:acct] = "@#{row[:username]}@#{Environment.domain_name}"
+          row[:status_url] = @sns.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s
           row.delete(:username)
+          row[:created_at] = row[:created_at].strftime('%Y-%m-%d %H:%M')
           row[:meta] = row[:meta] ? JSON.parse(row[:meta]) : {original: {}, small: {}}
           [:original, :small].freeze.each do |key|
             values = row.clone
