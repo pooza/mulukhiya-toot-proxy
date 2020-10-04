@@ -98,6 +98,8 @@ module Mulukhiya
           author: row[:display_name] || "@#{row[:username]}@#{row[:domain]}",
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
+      rescue => e
+        @logger.error(class: self.class.to_s, error: e.message, row: row)
       end
       @atom = nil
       return atom
