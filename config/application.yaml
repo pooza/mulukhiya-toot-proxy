@@ -185,6 +185,9 @@ test:
         - growi_bookmark_handler
         - growi_clipping_command_handler
         - growi_announcement_handler
+    - name: hexo
+      cases:
+        - hexo_announcement_handler
     - name: annict
       cases:
         - annict_polling_worker
