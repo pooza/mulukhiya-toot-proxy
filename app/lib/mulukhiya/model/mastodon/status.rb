@@ -30,6 +30,18 @@ module Mulukhiya
         return @uri
       end
 
+      def public_uri
+        unless @public_uri
+          if ['mastodon', 'pleroma'].member?(Environment.controller_name)
+            service = Environment.sns_class.new
+          else
+            service = MastodonService.new
+          end
+          @public_uri = service.create_uri("/@#{account.username}/#{id}")
+        end
+        return @public_uri
+      end
+
       def to_h
         @hash ||= values.clone.compact
         return @hash

@@ -24,6 +24,13 @@ module Mulukhiya
 
       alias type file_content_type
 
+      def meta
+        @meta ||= JSON.parse(self[:file_meta])
+        return @meta
+      rescue
+        return {}
+      end
+
       def path(size = 'original')
         return File.join(
           '/media/media_attachments/files',
@@ -37,21 +44,48 @@ module Mulukhiya
         return MastodonService.new.create_uri(path(size))
       end
 
-      def self.feed_entries
-        return enum_for(__method__) unless block_given?
+      def feed_entry
+        return {
+          link: uri.to_s,
+          title: "#{name} (#{size_str}) #{description}",
+          author: status.account.display_name || status.account.acct.to_s,
+          date: date,
+        }
+      end
+
+      def catalog_entry
+        return values.merge(
+          acct: status.account.acct.to_s,
+          status_url: status.public_uri.to_s,
+          file_size_str: size_str,
+          subtype: type.split('/').first,
+          created_at: created_at,
+          meta: meta,
+          pixel_size: meta.dig('original', 'size'),
+          url: uri('original').to_s,
+          thumbnail_url: uri('small').to_s,
+        )
+      end
+
+      def self.query_params
         config = Config.instance
-        params = {
+        return {
           limit: config['/feed/media/limit'],
           test_usernames: config['/feed/test_usernames'],
         }
-        Postgres.instance.execute('media_catalog', params).each do |row|
-          attachment = Attachment[row[:id]]
-          yield ({
-            link: attachment.uri.to_s,
-            title: "#{attachment.name} (#{attachment.size_str}) #{attachment.description}",
-            author: row[:display_name] || "@#{row[:username]}@#{Environment.domain_name}",
-            date: attachment.date,
-          })
+      end
+
+      def self.catalog
+        return enum_for(__method__) unless block_given?
+        return Postgres.instance.execute('media_catalog', query_params).each do |row|
+          yield Attachment[row[:id]].catalog_entry
+        end
+      end
+
+      def self.feed
+        return enum_for(__method__) unless block_given?
+        Postgres.instance.execute('media_catalog', query_params).each do |row|
+          yield Attachment[row[:id]].feed_entry
         end
       end
     end

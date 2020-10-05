@@ -79,22 +79,7 @@ module Mulukhiya
 
     get '/mulukhiya/medias' do
       if Environment.controller_class.media_catalog?
-        params[:limit] = @config['/feed/media/limit']
-        params[:test_usernames] = @config['/feed/test_usernames']
-        @renderer.message = Postgres.instance.execute('media_catalog', params).each do |row|
-          row[:acct] = "@#{row[:username]}@#{Environment.domain_name}"
-          row[:status_url] = @sns.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s
-          row[:subtype] = row[:type].split('/').first
-          row.delete(:username)
-          row[:created_at] = row[:created_at].strftime('%Y-%m-%d %H:%M')
-          row[:meta] = row[:meta] ? JSON.parse(row[:meta]) : {original: {}, small: {}}
-          [:original, :small].freeze.each do |key|
-            values = row.clone
-            values[:size] = key.to_s
-            row[:meta][key][:url] = Environment.attachment_class.create_uri(values).to_s
-          end
-          row.compact
-        end
+        @renderer.message = Environment.attachment_class.catalog
       else
         @renderer.status = 404
       end

@@ -31,6 +31,10 @@ module Mulukhiya
       assert_kind_of(Ginseng::URI, @status.uri)
     end
 
+    def test_public_uri
+      assert_kind_of(Ginseng::URI, @status.public_uri)
+    end
+
     def test_to_md
       assert_kind_of(String, @status.to_md)
     end
