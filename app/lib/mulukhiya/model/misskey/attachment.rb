@@ -10,6 +10,10 @@ module Mulukhiya
         @uri ||= Ginseng::URI.parse(url)
         return @uri
       end
+
+      def self.create_uri(row)
+        return MisskeyService.new.create_uri('/')
+      end
     end
   end
 end

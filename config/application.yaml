@@ -331,6 +331,7 @@ mastodon:
 misskey:
   url: https://misskey.example.com/
   webhook: true
+  media_catalog: true
   tag_feed: true
   announcement: true
   twitter: true
