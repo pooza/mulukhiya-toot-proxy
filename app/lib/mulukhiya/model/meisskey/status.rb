@@ -28,6 +28,8 @@ module Mulukhiya
         return @uri
       end
 
+      alias public_uri uri
+
       def attachments
         return query['files']
       end
