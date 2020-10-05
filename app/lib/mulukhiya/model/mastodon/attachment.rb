@@ -4,7 +4,24 @@ module Mulukhiya
       many_to_one :status
 
       def to_h
-        @hash ||= values.clone.compact
+        unless @hasn
+          @hash = values.clone
+          @hash.merge!(
+            acct: status.account.acct.to_s,
+            status_url: status.public_uri.to_s,
+            file_name: file_file_name,
+            file_size_str: size_str,
+            type: type,
+            subtype: type.split('/').first,
+            created_at: created_at,
+            created_at_str: created_at.strftime('%Y/%m/%d %H:%M:%S'),
+            meta: meta,
+            pixel_size: meta.dig('original', 'size'),
+            url: uri('original').to_s,
+            thumbnail_url: uri('small').to_s,
+          )
+          @hash.compact!
+        end
         return @hash
       end
 
@@ -19,7 +36,11 @@ module Mulukhiya
       alias size file_file_size
 
       def size_str
-        return "#{size.to_i.commaize}b"
+        ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
+          unitsize = 1024.pow(i)
+          return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
+        end
+        raise 'Too large'
       end
 
       alias type file_content_type
@@ -53,22 +74,6 @@ module Mulukhiya
         }
       end
 
-      def catalog_entry
-        return values.merge(
-          acct: status.account.acct.to_s,
-          status_url: status.public_uri.to_s,
-          file_size_str: size_str,
-          type: type,
-          subtype: type.split('/').first,
-          created_at: created_at,
-          created_at_str: created_at.strftime('%Y/%m/%d %H:%M:%S'),
-          meta: meta,
-          pixel_size: meta.dig('original', 'size'),
-          url: uri('original').to_s,
-          thumbnail_url: uri('small').to_s,
-        )
-      end
-
       def self.query_params
         config = Config.instance
         return {
@@ -80,7 +85,7 @@ module Mulukhiya
       def self.catalog
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
-          yield Attachment[row[:id]].catalog_entry
+          yield Attachment[row[:id]].to_h
         end
       end
 
