@@ -10,25 +10,18 @@ html lang='ja'
       == slim.render 'fragment/message'
       h1 = package.name
       nav class='menu'
-        a href='/mulukhiya/app/feeds' Atomフィード
+        - if controller.tag_feed?
+          a href='/mulukhiya/app/feeds' Atomフィード
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' v-if='username' メディアカタログ
           a href='#' v-else=''
             | メディアカタログ
             span class='alert' 未認証
-        - else
-          a href='#'
-            = 'メディアカタログ '
-            span class='alert' 非対応
         - if controller.webhook?
           a href='/mulukhiya/app/config' v-if='username' 環境設定
           a href='#' v-else=''
             | 環境設定
             span class='alert' 未認証
-        - else
-          a href='#'
-            = '環境設定 '
-            span class='alert' 非対応
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:

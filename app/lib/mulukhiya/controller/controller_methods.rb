@@ -24,7 +24,7 @@ module Mulukhiya
       end
 
       def tag_feed?
-        return config["/#{name.underscore}/tag_feed"] && TagContainer.default_tags.present?
+        return config["/#{name.underscore}/tag_feed"]
       rescue Ginseng::ConfigError
         return false
       end
