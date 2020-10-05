@@ -34,6 +34,8 @@ module Mulukhiya
         return @uri
       end
 
+      alias public_uri uri
+
       def attachments
         return data['media_attachments']
       end
