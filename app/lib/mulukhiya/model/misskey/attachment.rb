@@ -78,6 +78,8 @@ module Mulukhiya
           attachment = Attachment[row[:id]]
           note = Status[row[:note_id]]
           yield attachment.to_h.merge(status_url: note.uri.to_s)
+        rescue => e
+          Logger.error(error: e.message, row: row)
         end
       end
 
@@ -85,6 +87,8 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].feed_entry
+        rescue => e
+          Logger.error(error: e.message, row: row)
         end
       end
     end

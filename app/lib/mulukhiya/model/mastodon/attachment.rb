@@ -86,6 +86,8 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].to_h
+        rescue => e
+          Logger.error(error: e.message, row: row)
         end
       end
 
@@ -93,6 +95,8 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].feed_entry
+        rescue => e
+          Logger.error(error: e.message, row: row)
         end
       end
     end
