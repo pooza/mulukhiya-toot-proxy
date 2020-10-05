@@ -79,7 +79,7 @@ module Mulukhiya
           note = Status[row[:note_id]]
           yield attachment.to_h.merge(status_url: note.uri.to_s)
         rescue => e
-          Logger.error(error: e.message, row: row)
+          Logger.new.error(error: e.message, row: row)
         end
       end
 
@@ -88,7 +88,7 @@ module Mulukhiya
         Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].feed_entry
         rescue => e
-          Logger.error(error: e.message, row: row)
+          Logger.new.error(error: e.message, row: row)
         end
       end
     end
