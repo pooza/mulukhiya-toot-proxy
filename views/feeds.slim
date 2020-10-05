@@ -23,7 +23,7 @@ html lang='ja'
               .link
                 a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
       - else
-      	p class='alert' #{controller.display_name}はAtomフィードに対応していません。
+        p class='alert' #{controller.display_name}はAtomフィードに対応していません。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
