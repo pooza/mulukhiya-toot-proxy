@@ -9,7 +9,7 @@ namespace :mulukhiya do
             puts "updated: ##{renderer.tag} #{renderer.path}"
           end
         else
-          warn "#{Mulukhiya::Environment.controller_class.name} doesn't support tag feeds."
+          warn "#{Mulukhiya::Environment.controller_class.name} doesn't support feeds."
           exit 1
         end
       end

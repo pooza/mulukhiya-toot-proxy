@@ -27,6 +27,8 @@ module Mulukhiya
         return @uri
       end
 
+      alias public_uri uri
+
       def attachments
         @attachments ||= fileIds.match(/\{(.*)\}/)[1].split(',').map do |id|
           Attachment[id]

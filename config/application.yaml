@@ -81,6 +81,7 @@ test:
     - name: ci
       cases:
         - mastodon_controller
+        - attachment
         - event
         - slack
         - account
@@ -136,6 +137,7 @@ test:
         - access_token
         - mastodon_auth_contract
         - media_atom_feed_renderer
+        - attachment
     - name: mastodon
       cases:
         - dolphin_controller
@@ -152,7 +154,6 @@ test:
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
-        - media_atom_feed_renderer
     - name: meisskey
       cases:
         - mastodon_controller
@@ -162,6 +163,7 @@ test:
         - postgres
         - mastodon_auth_contract
         - media_atom_feed_renderer
+        - attachment
     - name: pleroma
       cases:
         - mastodon_controller
@@ -173,6 +175,7 @@ test:
         - misskey_auth_contract
         - tag_atom_feed_renderer
         - media_atom_feed_renderer
+        - attachment
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -331,6 +334,7 @@ mastodon:
 misskey:
   url: https://misskey.example.com/
   webhook: true
+  media_catalog: true
   tag_feed: true
   announcement: true
   twitter: true
