@@ -12,7 +12,7 @@ html lang='ja'
       ul class='medias'
         li class='media' v-for='media in medias'
           .image_container
-            a :href='media.url' target='_blank' v-if='media.subtype=="image"'
+            a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.subtype=="image"'
               img :src='media.thumbnail_url'
             a :href='media.url' target='_blank' v-else='' = '{{media.file_name}}'
           ul class='params'

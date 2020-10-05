@@ -81,6 +81,7 @@ test:
     - name: ci
       cases:
         - mastodon_controller
+        - attachment
         - event
         - slack
         - account
@@ -152,7 +153,6 @@ test:
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
-        - media_atom_feed_renderer
     - name: meisskey
       cases:
         - mastodon_controller

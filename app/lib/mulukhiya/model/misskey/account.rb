@@ -3,6 +3,8 @@ module Mulukhiya
     class Account < Sequel::Model(:user)
       include AccountMethods
 
+      alias display_name name
+
       def to_h
         unless @hash
           @hash = values.clone

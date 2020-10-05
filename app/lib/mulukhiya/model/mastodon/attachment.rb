@@ -9,12 +9,12 @@ module Mulukhiya
           @hash.merge!(
             acct: status.account.acct.to_s,
             status_url: status.public_uri.to_s,
-            file_name: file_file_name,
+            file_name: name,
             file_size_str: size_str,
             type: type,
             subtype: type.split('/').first,
-            created_at: created_at,
-            created_at_str: created_at.strftime('%Y/%m/%d %H:%M:%S'),
+            created_at: date,
+            created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
             pixel_size: meta.dig('original', 'size'),
             url: uri('original').to_s,
@@ -85,7 +85,9 @@ module Mulukhiya
       def self.catalog
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
-          yield Attachment[row[:id]].to_h
+          attachment = Attachment[row[:id]]
+          note = Status[row[:note_id]]
+          yield attachment.to_h.merge(status_url: note.uri.to_s)
         end
       end
 

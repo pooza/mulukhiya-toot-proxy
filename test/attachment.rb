@@ -30,10 +30,6 @@ module Mulukhiya
       assert_kind_of(Hash, @attachment.meta)
     end
 
-    def test_path
-      assert_kind_of(String, @attachment.path)
-    end
-
     def test_uri
       assert_kind_of(Ginseng::URI, @attachment.uri)
     end
