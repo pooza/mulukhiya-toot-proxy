@@ -1,5 +1,5 @@
 package:
-  version: 3.13.15
+  version: 3.14.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -81,6 +81,7 @@ test:
     - name: ci
       cases:
         - mastodon_controller
+        - attachment
         - event
         - slack
         - account
@@ -89,6 +90,7 @@ test:
         - hash_tag
         - user_config
         - tag_atom_feed_renderer
+        - media_atom_feed_renderer
     - name: postgres
       cases:
         - clipping_worker
@@ -134,6 +136,8 @@ test:
         - mongo
         - access_token
         - mastodon_auth_contract
+        - media_atom_feed_renderer
+        - attachment
     - name: mastodon
       cases:
         - dolphin_controller
@@ -158,6 +162,8 @@ test:
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
+        - media_atom_feed_renderer
+        - attachment
     - name: pleroma
       cases:
         - mastodon_controller
@@ -168,6 +174,8 @@ test:
         - hash_tag
         - misskey_auth_contract
         - tag_atom_feed_renderer
+        - media_atom_feed_renderer
+        - attachment
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -180,6 +188,9 @@ test:
         - growi_bookmark_handler
         - growi_clipping_command_handler
         - growi_announcement_handler
+    - name: hexo
+      cases:
+        - hexo_announcement_handler
     - name: annict
       cases:
         - annict_polling_worker
@@ -215,6 +226,7 @@ webui:
 mastodon:
   url: https://mstdn.example.com/
   webhook: true
+  media_catalog: true
   tag_feed: true
   announcement: true
   filter: true
@@ -322,6 +334,7 @@ mastodon:
 misskey:
   url: https://misskey.example.com/
   webhook: true
+  media_catalog: true
   tag_feed: true
   announcement: true
   twitter: true
@@ -849,7 +862,7 @@ sidekiq:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
     tag_feed_update:
-      every: 5m
+      every: 2m
       class: Mulukhiya::TagFeedUpdateWorker
     annict_polling:
       every: 5m
@@ -877,6 +890,8 @@ tagging:
     - url: https://precure.ml/api/dic/v2/fairy.json
 feed:
   tag:
+    limit: 100
+  media:
     limit: 100
   test_usernames:
     - test

@@ -5,21 +5,25 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'デフォルトタグのAtomフィード'}
+    == slim.render 'fragment/breadcrumbs', {current: 'Atomフィード'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 デフォルトタグのAtomフィード
+      h2 Atomフィード
       - if controller.tag_feed?
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
-      ul class='tags'
-        - Mulukhiya::TagContainer.default_tag_bases.each do |tag|
-          li
-            h3 = tag.to_hashtag
-            - if controller.tag_feed?
+        ul class='feeds'
+          - if controller.media_catalog?
+            li
+              h3 メディアファイル
               .link
-                a href=slim.create_uri("/mulukhiya/feed/tag/#{tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{tag}")
-            - else
-              .alert #{controller.display_name}はデフォルトタグのAtomフィードに非対応です。
+                a href='/mulukhiya/feed/media' = slim.create_uri('/mulukhiya/feed/media')
+          - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
+            li
+              h3 = "タグ #{renderer.tag.to_hashtag}"
+              .link
+                a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
+      - else
+        p class='alert' #{controller.display_name}はAtomフィードに対応していません。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

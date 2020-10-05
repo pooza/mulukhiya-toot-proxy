@@ -17,6 +17,12 @@ module Mulukhiya
         return false
       end
 
+      def media_catalog?
+        return config["/#{name.underscore}/media_catalog"] == true
+      rescue Ginseng::ConfigError
+        return false
+      end
+
       def tag_feed?
         return config["/#{name.underscore}/tag_feed"] && TagContainer.default_tags.present?
       rescue Ginseng::ConfigError

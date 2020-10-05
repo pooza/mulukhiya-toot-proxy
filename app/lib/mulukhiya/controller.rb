@@ -33,6 +33,15 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/mulukhiya/feed/media' do
+      if Environment.controller_class.media_catalog?
+        @renderer = MediaAtomFeedRenderer.new
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     get '/mulukhiya/about' do
       @renderer.message = {package: @config.raw.dig('application', 'package')}
       return @renderer.to_s
@@ -64,6 +73,15 @@ module Mulukhiya
         @renderer.message = JSON.parse(File.read(path))
       else
         @renderer.message = []
+      end
+      return @renderer.to_s
+    end
+
+    get '/mulukhiya/medias' do
+      if Environment.controller_class.media_catalog?
+        @renderer.message = Environment.attachment_class.catalog
+      else
+        @renderer.status = 404
       end
       return @renderer.to_s
     end

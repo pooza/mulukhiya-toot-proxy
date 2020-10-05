@@ -1,0 +1,33 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  drive_file.id,
+  drive_file.name,
+  drive_file.type,
+  drive_file.size AS file_size,
+  drive_file.properties AS meta,
+  NULL as description,
+  drive_file."createdAt" as created_at,
+  note_file.note_id,
+  note_file.visibility,
+  note_file.username,
+  note_file.display_name
+FROM drive_file
+  INNER JOIN (
+    SELECT
+      note.id as note_id,
+      unnest(note."fileIds") as file_id,
+      note.visibility,
+      note."createdAt",
+      "user".username,
+      "user".name AS display_name
+    FROM note
+      INNER JOIN "user" ON note."userId"="user".id
+    WHERE (0 < array_length(note."fileIds", 1))
+      AND (note."userHost" IS NULL)
+      AND (note."visibility" IN ('public', 'home'))
+      AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
+    GROUP BY note_id, file_id, "user".id
+    ORDER BY note."createdAt" DESC
+    LIMIT <%= params[:limit] %> OFFSET 0
+  ) AS note_file ON drive_file.id=note_file.file_id
+ORDER BY note_file."createdAt" DESC
