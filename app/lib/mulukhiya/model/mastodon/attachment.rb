@@ -8,9 +8,36 @@ module Mulukhiya
         return @hash
       end
 
+      alias name file_file_name
+
+      alias filename file_file_name
+
+      def date
+        return created_at.getlocal
+      end
+
+      alias size file_file_size
+
+      def size_str
+        return "#{size.to_i.commaize}b"
+      end
+
       alias type file_content_type
 
-      def self.catalog
+      def path(size = 'original')
+        return File.join(
+          '/media/media_attachments/files',
+          id.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1/'),
+          size,
+          filename,
+        )
+      end
+
+      def uri(size = 'original')
+        return MastodonService.new.create_uri(path(size))
+      end
+
+      def self.feed_entries
         return enum_for(__method__) unless block_given?
         config = Config.instance
         params = {
@@ -18,23 +45,14 @@ module Mulukhiya
           test_usernames: config['/feed/test_usernames'],
         }
         Postgres.instance.execute('media_catalog', params).each do |row|
+          attachment = Attachment[row[:id]]
           yield ({
-            link: create_uri(row).to_s,
-            title: "#{row[:name]} (#{row[:file_size].commaize}b) #{row[:description]}",
+            link: attachment.uri.to_s,
+            title: "#{attachment.name} (#{attachment.size_str}) #{attachment.description}",
             author: row[:display_name] || "@#{row[:username]}@#{Environment.domain_name}",
-            date: Time.parse("#{row[:created_at]} UTC").getlocal,
+            date: attachment.date,
           })
         end
-      end
-
-      def self.create_uri(row)
-        path = File.join(
-          '/media/media_attachments/files',
-          row[:id].to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1/'),
-          row[:size] || 'original',
-          row[:name],
-        )
-        return Environment.sns_class.new.create_uri(path)
       end
     end
   end
