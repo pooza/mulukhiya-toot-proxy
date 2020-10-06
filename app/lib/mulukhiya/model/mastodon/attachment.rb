@@ -18,6 +18,7 @@ module Mulukhiya
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
             pixel_size: pixel_size,
+            duration: duration,
             url: uri('original').to_s,
             thumbnail_url: uri('small').to_s,
           )
@@ -42,6 +43,10 @@ module Mulukhiya
         size = meta.dig('original', 'size')
         size ||= "#{meta.dig('original', 'width')}x#{meta.dig('original', 'height')}"
         return size
+      end
+
+      def duration
+        return meta.dig('original', 'duration')&.round(3)
       end
 
       def subtype
