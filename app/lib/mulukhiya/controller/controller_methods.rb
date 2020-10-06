@@ -23,8 +23,8 @@ module Mulukhiya
         return false
       end
 
-      def tag_feed?
-        return config["/#{name.underscore}/tag_feed"]
+      def feed?
+        return config["/#{name.underscore}/feed"]
       rescue Ginseng::ConfigError
         return false
       end

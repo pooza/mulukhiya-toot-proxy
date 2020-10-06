@@ -4,7 +4,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def perform
-      return unless Environment.controller_class.tag_feed?
+      return unless Environment.controller_class.feed?
       TagAtomFeedRenderer.cache_all
     end
   end

@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 Atomフィード
-      - if controller.tag_feed?
+      - if controller.feed?
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
         ul class='feeds'
           - if controller.media_catalog?

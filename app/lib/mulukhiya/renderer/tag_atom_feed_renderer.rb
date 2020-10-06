@@ -89,7 +89,7 @@ module Mulukhiya
     private
 
     def fetch
-      return nil unless Environment.controller_class.tag_feed?
+      return nil unless Environment.controller_class.feed?
       return nil unless record
       record.create_feed(params).each do |row|
         push(
