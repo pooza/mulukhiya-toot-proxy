@@ -16,7 +16,7 @@ html lang='ja'
             li
               h3 メディアファイル
               .link
-                a href='/mulukhiya/feed/media' = slim.create_uri('/mulukhiya/feed/media')
+                a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
           - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
             li
               h3 = "タグ #{renderer.tag.to_hashtag}"

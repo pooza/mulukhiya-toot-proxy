@@ -33,9 +33,9 @@ module Mulukhiya
       def uri(size = 'original')
         case size
         when 'small', 'thumbnail'
-          return MastodonService.new.create_uri(thumbnailUrl)
+          return MisskeyService.new.create_uri(thumbnailUrl || webpublicUrl || url)
         else
-          return MastodonService.new.create_uri(webpublicUrl)
+          return MisskeyService.new.create_uri(webpublicUrl || url)
         end
       end
 

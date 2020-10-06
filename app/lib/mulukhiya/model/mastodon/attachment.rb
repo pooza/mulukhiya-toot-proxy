@@ -1,3 +1,5 @@
+require 'time'
+
 module Mulukhiya
   module Mastodon
     class Attachment < Sequel::Model(:media_attachments)
@@ -12,15 +14,16 @@ module Mulukhiya
             file_name: name,
             file_size_str: size_str,
             type: type,
-            subtype: type.split('/').first,
-            created_at: date,
+            subtype: subtype,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
-            pixel_size: meta.dig('original', 'size'),
+            pixel_size: pixel_size,
+            duration: duration,
             url: uri('original').to_s,
             thumbnail_url: uri('small').to_s,
           )
-          @hash.compact!
+          @hash.reject! {|k, v| k.end_with?('_at')}
+          @hash[:created_at] = date
         end
         return @hash
       end
@@ -29,11 +32,26 @@ module Mulukhiya
 
       alias filename file_file_name
 
+      alias size file_file_size
+
       def date
-        return created_at.getlocal
+        return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
 
-      alias size file_file_size
+      def pixel_size
+        return nil if subtype == 'audio'
+        size = meta.dig('original', 'size')
+        size ||= "#{meta.dig('original', 'width')}x#{meta.dig('original', 'height')}"
+        return size
+      end
+
+      def duration
+        return meta.dig('original', 'duration')&.round(3)
+      end
+
+      def subtype
+        return type.split('/').first
+      end
 
       def size_str
         ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
