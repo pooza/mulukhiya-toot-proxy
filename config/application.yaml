@@ -1,5 +1,5 @@
 package:
-  version: 3.14.1
+  version: 3.14.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -227,7 +227,7 @@ mastodon:
   url: https://mstdn.example.com/
   webhook: true
   media_catalog: true
-  tag_feed: true
+  feed: true
   announcement: true
   filter: true
   twitter: true
@@ -335,7 +335,7 @@ misskey:
   url: https://misskey.example.com/
   webhook: true
   media_catalog: true
-  tag_feed: true
+  feed: true
   announcement: true
   twitter: true
   annict: true
@@ -432,7 +432,7 @@ meisskey:
   url: https://meisskey.example.com/
   display_name: めいすきー
   webhook: true
-  tag_feed: true
+  feed: true
   announcement: true
   twitter: true
   annict: true
@@ -527,7 +527,7 @@ meisskey:
     max_length: 1000
 dolphin:
   url: https://dolphin.example.com/
-  tag_feed: true
+  feed: true
   dbms: postgres
   parser: note
   handlers:

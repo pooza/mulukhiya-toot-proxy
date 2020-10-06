@@ -3,7 +3,7 @@ namespace :mulukhiya do
     namespace :feeds do
       desc 'update feeds'
       task :update do
-        if Mulukhiya::Environment.controller_class.tag_feed?
+        if Mulukhiya::Environment.controller_class.feed?
           Mulukhiya::TagAtomFeedRenderer.cache_all
           Mulukhiya::TagAtomFeedRenderer.all do |renderer|
             puts "updated: ##{renderer.tag} #{renderer.path}"

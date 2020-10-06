@@ -8,8 +8,8 @@ module Mulukhiya
       assert_boolean(controller_class.webhook?)
     end
 
-    def test_tag_feed?
-      assert_boolean(controller_class.tag_feed?)
+    def test_feed?
+      assert_boolean(controller_class.feed?)
     end
 
     def test_announcement?
