@@ -35,7 +35,7 @@ module Mulukhiya
       alias size file_file_size
 
       def date
-        return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S ') + 'GMT').getlocal
+        return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
 
       def pixel_size
