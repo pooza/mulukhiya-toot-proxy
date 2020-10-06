@@ -9,11 +9,13 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
-      ul class='medias'
+      ul class='medias' v-if='medias'
         li class='media' v-for='media in medias'
           .image_container
             a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.subtype=="image"'
               img :src='media.thumbnail_url'
+            video :src='media.url' style='width:100%' controls='' v-else-if='media.subtype=="video"'
+            audio :src='media.url' style='width:100%' controls='' v-else-if='media.subtype=="audio"'
             a :href='media.url' target='_blank' v-else='' = '{{media.file_name}}'
           ul class='params'
             li class='param' = '{{media.created_at_str}}'
@@ -23,6 +25,7 @@ html lang='ja'
             li class='param' = '{{media.acct}}'
             li class='param'
               a :href='media.status_url' target='_blank' = controller.status_label
+      p v-else='' 読み込み中…
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
