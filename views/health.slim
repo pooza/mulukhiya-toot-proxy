@@ -9,10 +9,10 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 動作状況
-      #result-container
+      div ref='result_container'
         pre = '{{result}}'
         .field-update-button-container
-          button v-on:click='load' 再読み込み
+          button @click='load' 再読み込み
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -47,11 +47,11 @@ html lang='ja'
               .then(e => {
                 this.result = e.data
                 this.message = null
-                document.getElementById('result-container').classList.remove('error')
+                this.$refs.result_container.classList.remove('error')
               }).catch(e => {
                 this.result = e.response.data
                 this.message = e.response.data.error || e.message
-                document.getElementById('result-container').classList.add('error')
+                this.$refs.result_container.classList.add('error')
               })
           },
         },

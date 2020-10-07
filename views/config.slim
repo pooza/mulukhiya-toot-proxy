@@ -14,23 +14,23 @@ html lang='ja'
         #result-container
           pre = '{{result}}'
       section class='config' v-if='username'
-        h3 v-on:click='toggleTagsSection' 固定タグ
+        h3 @click='toggleTagsSection' 固定タグ
         vue-slide-up-down :active='show_tags_detail'
           .field-container
-            textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
-            v-select :options='program_options' v-on:input='changeTags' v-model='program'
+            textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='tags'
+            v-select :options='program_options' @input='changeTags' v-model='program'
           .field-update-button-container
-            button v-on:click='updateTags' 更新
+            button @click='updateTags' 更新
       section class='config' v-if='username && show_livecure'
-        h3 v-on:click='toggleLivecureSection' = "実況#{controller.status_label}"
+        h3 @click='toggleLivecureSection' = "実況#{controller.status_label}"
         vue-slide-up-down :active='show_livecure_detail'
           .inline-field-container
             label
               input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
-            button v-on:click='updateLivecure' 更新
+            button @click='updateLivecure' 更新
       section class='config' v-if='username && show_growi'
-        h3 v-on:click='toggleGrowiSection' GROWI
+        h3 @click='toggleGrowiSection' GROWI
         vue-slide-up-down :active='show_growi_detail'
           ol
             li
@@ -54,17 +54,17 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのAPIトークン' v-model='growi_token' maxlength='256'
+            input placeholder='GROWIのAPIトークン' v-model.trim='growi_token'
           .inline-field-container
             h4 URL
-            input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
+            input placeholder='GROWIのルートURL' v-model.trim='growi_url'
           .inline-field-container
             h4 記事作成先
-            input placeholder='記事作成先のパス' v-model='growi_prefix' maxlength='256'
+            input placeholder='記事作成先のパス' v-model.trim='growi_prefix'
           .field-update-button-container
-            button v-on:click='updateGrowi' 更新
+            button @click='updateGrowi' 更新
       section class='config' v-if='username && show_dropbox'
-        h3 v-on:click='toggleDropboxSection' Dropbox
+        h3 @click='toggleDropboxSection' Dropbox
         vue-slide-up-down :active='show_dropbox_detail'
           ol
             li
@@ -75,18 +75,18 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
+            input placeholder='Dropboxのアクセストークン' v-model.trim='dropbox_token'
           .field-update-button-container
-            button v-on:click='updateDropbox' 更新
+            button @click='updateDropbox' 更新
       section class='config' v-if='username && show_twitter'
-        h3 v-on:click='toggleTwitterSection' Twitter
+        h3 @click='toggleTwitterSection' Twitter
         vue-slide-up-down :active='show_twitter_detail'
           .field-update-button-container
             a :href='twitterHref'
               img src='/mulukhiya/sign_in_twitter.png'
-            button class='alert' v-on:click='unauthTwitter' 認証を解除
+            button class='alert' @click='unauthTwitter' 認証を解除
       section class='config' v-if='username && show_annict'
-        h3 v-on:click='toggleAnnictSection' Annict
+        h3 @click='toggleAnnictSection' Annict
         vue-slide-up-down :active='show_annict_detail'
           ol
             li
@@ -99,32 +99,32 @@ html lang='ja'
             li 認証ボタンを押下。
           .inline-field-container
             h4 認証コード
-            input placeholder='Annictの認証コード' v-model='annict_auth_code' maxlength='256'
+            input placeholder='Annictの認証コード' v-model.trim='annict_auth_code'
           .field-update-button-container
-            button v-on:click='authAnnict' 認証
-            button class='alert' v-on:click='unauthAnnict' 認証を解除
+            button @click='authAnnict' 認証
+            button class='alert' @click='unauthAnnict' 認証を解除
       section class='config' v-if='username'
-        h3 v-on:click='toggleWebhookSection' Slack互換webhook
+        h3 @click='toggleWebhookSection' Slack互換webhook
         vue-slide-up-down :active='show_webhook_detail'
           .inline-field-container
             h4 トークン
-            input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+            input placeholder='webhookのアクセストークン' v-model.trim='webhook_token'
           .inline-field-container
             h4 公開範囲
             v-select :options='visibility_options' v-model='visibility'
           .field-update-button-container
-            button v-on:click='updateWebhook' 更新
+            button @click='updateWebhook' 更新
           .field-container v-if='webhook_url'
             h4 URL
             textarea ref='webhook_url_text' = '{{webhook_url}}'
-            i class='fas fa-clipboard' v-on:click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='webhook_url'
             h4 curlサンプル
             textarea ref='curl_sample_text' v-html='curl_sample'
-            i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
-        h3 v-on:click='toggleNotifySection' 通知
+        h3 @click='toggleNotifySection' 通知
         vue-slide-up-down :active='show_notify_detail'
           .inline-field-container
             label
@@ -132,7 +132,7 @@ html lang='ja'
             label class='alert'
               input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
-            button v-on:click='updateNotify' 更新
+            button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
