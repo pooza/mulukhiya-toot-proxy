@@ -26,7 +26,7 @@ html lang='ja'
         vue-slide-up-down :active='show_livecure_detail'
           .inline-field-container
             label
-              input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
+              input type='checkbox' v-model='livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
       section class='config' v-if='username && show_growi'
@@ -128,9 +128,9 @@ html lang='ja'
         vue-slide-up-down :active='show_notify_detail'
           .inline-field-container
             label
-              input type='checkbox' value='1' v-model='notify_user_config' 設定変更を通知
+              input type='checkbox' v-model='notify_user_config' 設定変更を通知
             label class='alert'
-              input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
+              input type='checkbox' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
             button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
