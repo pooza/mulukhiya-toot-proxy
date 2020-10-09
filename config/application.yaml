@@ -195,7 +195,8 @@ test:
       cases:
         - annict_polling_worker
         - annict_service
-        - annict_storage
+        - annict_timestamp_storage
+        - annict_account_storage
     - name: webhook
       cases:
         - webhook
@@ -723,10 +724,14 @@ annict:
     seconds: 0.5
   api:
     me:
+      cache:
+        ttl: 3600
       fields:
         - id
         - name
         - username
+        - url
+        - avatar_url
     records:
       limit: 5
       fields:

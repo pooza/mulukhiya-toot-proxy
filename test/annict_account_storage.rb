@@ -1,7 +1,7 @@
 module Mulukhiya
-  class AnnictStorageTest < TestCase
+  class AnnictAccountStorageTest < TestCase
     def test_accounts
-      AnnictStorage.accounts do |account|
+      AnnictAccountStorage.accounts do |account|
         assert_kind_of(Environment.account_class, account)
       end
     end
