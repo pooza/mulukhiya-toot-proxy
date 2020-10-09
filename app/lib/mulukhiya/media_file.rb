@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def type
-      return mimemagic&.to_s
+      return mimemagic.to_s
     end
 
     def extname

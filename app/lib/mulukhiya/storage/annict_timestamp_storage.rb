@@ -1,7 +1,7 @@
 module Mulukhiya
-  class AmazonItemStorage < Redis
+  class AnnictTimestampStorage < Redis
     def [](key)
-      return get(key)
+      return get(key) || {}
     end
 
     def []=(key, value)
@@ -17,15 +17,11 @@ module Mulukhiya
     end
 
     def set(key, values)
-      setex(create_key(key), ttl, values.to_json)
-    end
-
-    def ttl
-      return [@config['/amazon/cache/ttl'], 86_400].min
+      super(create_key(key), values.to_json)
     end
 
     def prefix
-      return 'amazon_item'
+      return 'annict'
     end
   end
 end

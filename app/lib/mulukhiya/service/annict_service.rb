@@ -2,10 +2,13 @@ require 'time'
 
 module Mulukhiya
   class AnnictService
+    attr_reader :timestamps, :accounts
+
     def initialize(token = nil)
       @config = Config.instance
       @token = token
-      @storage = AnnictStorage.new
+      @timestamps = AnnictTimestampStorage.new
+      @accounts = AnnictAccountStorage.new
     end
 
     def recent_records
@@ -105,7 +108,7 @@ module Mulukhiya
     end
 
     def account
-      unless @account
+      unless accounts[@token]
         uri = api_service.create_uri('/v1/me')
         uri.query_values = {
           fields: @config['/annict/api/me/fields'].join(','),
@@ -114,15 +117,15 @@ module Mulukhiya
         sleep(@config['/annict/sleep/seconds'])
         r = api_service.get(uri)
         raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
-        @account = r.parsed_response
+        accounts[@token] = r.parsed_response
       end
-      return @account
+      return accounts[@token]
     end
 
     alias me account
 
     def updated_at
-      @updated_at ||= Time.parse(@storage[account['id']]['time'])
+      @updated_at ||= Time.parse(timestamps[account['id']]['time'])
       return @updated_at
     rescue
       return nil
@@ -130,7 +133,7 @@ module Mulukhiya
 
     def updated_at=(time)
       return if updated_at && Time.parse(time.to_s) < updated_at
-      @storage[account['id']] = {time: time.to_s}
+      timestamps[account['id']] = {time: time.to_s}
       @updated_at = nil
     end
 

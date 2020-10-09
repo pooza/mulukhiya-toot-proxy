@@ -57,20 +57,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (6.0.3.3)
-      actionview (= 6.0.3.3)
-      activesupport (= 6.0.3.3)
+    actionpack (6.0.3.4)
+      actionview (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (6.0.3.3)
-      activesupport (= 6.0.3.3)
+    actionview (6.0.3.4)
+      activesupport (= 6.0.3.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (6.0.3.3)
+    activesupport (6.0.3.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -112,7 +112,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
-    dry-schema (1.5.4)
+    dry-schema (1.5.5)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
@@ -257,13 +257,13 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (~> 1.5.0)
       rest-client (~> 2.0.2)
-    rubocop (0.92.0)
+    rubocop (0.93.0)
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.7)
+      regexp_parser (>= 1.8)
       rexml
-      rubocop-ast (>= 0.5.0)
+      rubocop-ast (>= 0.6.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
     rubocop-ast (0.7.1)
@@ -345,7 +345,7 @@ GEM
     unf_ext (0.0.7.7)
     unicode (0.4.4.4)
     unicode-display_width (1.7.0)
-    vacuum (3.4.0)
+    vacuum (3.4.1)
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
@@ -385,7 +385,7 @@ DEPENDENCIES
   vacuum
 
 RUBY VERSION
-   ruby 2.7.1p83
+   ruby 2.7.2p137
 
 BUNDLED WITH
    2.1.4

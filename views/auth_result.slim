@@ -13,12 +13,12 @@ html lang='ja'
         p アプリケーションの認証とトークンの登録が完了しました。
         div
           h3 アクセストークン
-          textarea id='token_text' class='short' = params[:result][:access_token]
-          i class='fas fa-clipboard' v-on:click='copyToken' v-tooltip.bottom="'クリップボードにコピー'"
+          textarea ref='token_text' class='short' = params[:result][:access_token]
+          i class='fas fa-clipboard' @click='copyToken' v-tooltip.bottom="'クリップボードにコピー'"
         div
           h3 Slack互換webhook URL
-          textarea id='webhook_text' = params[:hook_url]
-          i class='fas fa-clipboard' v-on:click='copyWehbook' v-tooltip.bottom="'クリップボードにコピー'"
+          textarea ref='webhook_text' = params[:hook_url]
+          i class='fas fa-clipboard' @click='copyWehbook' v-tooltip.bottom="'クリップボードにコピー'"
       - else
         p class='alert' = "エラー（#{params[:status]}）"
     == slim.render 'fragment/footer'
@@ -45,11 +45,11 @@ html lang='ja'
         },
         methods: {
           copyToken: function () {
-            document.getElementById('token_text').select()
+            this.$refs.token_text.select()
             document.execCommand('copy')
           },
           copyWehbook: function () {
-            document.getElementById('webhook_text').select()
+            this.$refs.webhook_text.select()
             document.execCommand('copy')
           },
         },

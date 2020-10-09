@@ -1,7 +1,7 @@
 module Mulukhiya
-  class AnnictStorage < Redis
+  class AnnictAccountStorage < Redis
     def [](key)
-      return get(key) || {}
+      return get(key)
     end
 
     def []=(key, value)
@@ -17,11 +17,15 @@ module Mulukhiya
     end
 
     def set(key, values)
-      super(create_key(key), values.to_json)
+      setex(create_key(key), ttl, values.to_json)
+    end
+
+    def ttl
+      return @config['/annict/api/me/cache/ttl']
     end
 
     def prefix
-      return 'annict'
+      return 'annict_account'
     end
 
     def self.accounts

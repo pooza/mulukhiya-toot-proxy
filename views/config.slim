@@ -11,27 +11,27 @@ html lang='ja'
       h2 環境設定
       section v-if='username'
         h3 現在の設定
-        #result-container
+        .result-container
           pre = '{{result}}'
       section class='config' v-if='username'
-        h3 v-on:click='toggleTagsSection' 固定タグ
-        vue-slide-up-down :active='show_tags_detail'
+        h3 @click='toggleVisibility("tags")' 固定タグ
+        vue-slide-up-down :active='layout.details.tags'
           .field-container
-            textarea placeholder='タグ化する文字列を改行区切りで' v-model='tags'
-            v-select :options='program_options' v-on:input='changeTags' v-model='program'
+            textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='tags'
+            v-select :options='options.program' @input='changeTags' v-model='program'
           .field-update-button-container
-            button v-on:click='updateTags' 更新
-      section class='config' v-if='username && show_livecure'
-        h3 v-on:click='toggleLivecureSection' = "実況#{controller.status_label}"
-        vue-slide-up-down :active='show_livecure_detail'
+            button @click='updateTags' 更新
+      section class='config' v-if='username && layout.sections.livecure'
+        h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
+        vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
             label
-              input type='checkbox' value='1' v-model='livecure' = "実況#{controller.status_label}を隠す"
+              input type='checkbox' v-model='livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
-            button v-on:click='updateLivecure' 更新
-      section class='config' v-if='username && show_growi'
-        h3 v-on:click='toggleGrowiSection' GROWI
-        vue-slide-up-down :active='show_growi_detail'
+            button @click='updateLivecure' 更新
+      section class='config' v-if='username && layout.sections.growi'
+        h3 @click='toggleVisibility("growi")' GROWI
+        vue-slide-up-down :active='layout.details.growi'
           ol
             li
               | GROWIのアカウントをお持ちでなければ、
@@ -54,18 +54,18 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのAPIトークン' v-model='growi_token' maxlength='256'
+            input placeholder='GROWIのAPIトークン' v-model.trim='growi_token'
           .inline-field-container
             h4 URL
-            input placeholder='GROWIのルートURL' v-model='growi_url' maxlength='256'
+            input placeholder='GROWIのルートURL' v-model.trim='growi_url'
           .inline-field-container
             h4 記事作成先
-            input placeholder='記事作成先のパス' v-model='growi_prefix' maxlength='256'
+            input placeholder='記事作成先のパス' v-model.trim='growi_prefix'
           .field-update-button-container
-            button v-on:click='updateGrowi' 更新
-      section class='config' v-if='username && show_dropbox'
-        h3 v-on:click='toggleDropboxSection' Dropbox
-        vue-slide-up-down :active='show_dropbox_detail'
+            button @click='updateGrowi' 更新
+      section class='config' v-if='username && layout.sections.dropbox'
+        h3 @click='toggleVisibility("dropbox")' Dropbox
+        vue-slide-up-down :active='layout.details.dropbox'
           ol
             li
               | Dropboxの開発者向けページで、
@@ -75,19 +75,19 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='Dropboxのアクセストークン' v-model='dropbox_token' maxlength='256'
+            input placeholder='Dropboxのアクセストークン' v-model.trim='dropbox_token'
           .field-update-button-container
-            button v-on:click='updateDropbox' 更新
-      section class='config' v-if='username && show_twitter'
-        h3 v-on:click='toggleTwitterSection' Twitter
-        vue-slide-up-down :active='show_twitter_detail'
+            button @click='updateDropbox' 更新
+      section class='config' v-if='username && layout.sections.twitter'
+        h3 @click='toggleVisibility("twitter")' Twitter
+        vue-slide-up-down :active='layout.details.twitter'
           .field-update-button-container
-            a :href='twitterHref'
+            a :href='hrefs.twitter'
               img src='/mulukhiya/sign_in_twitter.png'
-            button class='alert' v-on:click='unauthTwitter' 認証を解除
-      section class='config' v-if='username && show_annict'
-        h3 v-on:click='toggleAnnictSection' Annict
-        vue-slide-up-down :active='show_annict_detail'
+            button class='alert' @click='unauthTwitter' 認証を解除
+      section class='config' v-if='username && layout.sections.annict'
+        h3 @click='toggleVisibility("annict")' Annict
+        vue-slide-up-down :active='layout.details.annict'
           ol
             li
               | アカウントを持っていない場合は、
@@ -99,40 +99,40 @@ html lang='ja'
             li 認証ボタンを押下。
           .inline-field-container
             h4 認証コード
-            input placeholder='Annictの認証コード' v-model='annict_auth_code' maxlength='256'
+            input placeholder='Annictの認証コード' v-model.trim='annict_auth_code'
           .field-update-button-container
-            button v-on:click='authAnnict' 認証
-            button class='alert' v-on:click='unauthAnnict' 認証を解除
+            button @click='authAnnict' 認証
+            button class='alert' @click='unauthAnnict' 認証を解除
       section class='config' v-if='username'
-        h3 v-on:click='toggleWebhookSection' Slack互換webhook
-        vue-slide-up-down :active='show_webhook_detail'
+        h3 @click='toggleVisibility("webhook")' Slack互換webhook
+        vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
             h4 トークン
-            input placeholder='webhookのアクセストークン' v-model='webhook_token' maxlength='256'
+            input placeholder='webhookのアクセストークン' v-model.trim='webhook_token'
           .inline-field-container
             h4 公開範囲
-            v-select :options='visibility_options' v-model='visibility'
+            v-select :options='options.visibility' v-model='visibility'
           .field-update-button-container
-            button v-on:click='updateWebhook' 更新
+            button @click='updateWebhook' 更新
           .field-container v-if='webhook_url'
             h4 URL
             textarea ref='webhook_url_text' = '{{webhook_url}}'
-            i class='fas fa-clipboard' v-on:click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='webhook_url'
             h4 curlサンプル
             textarea ref='curl_sample_text' v-html='curl_sample'
-            i class='fas fa-clipboard' v-on:click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
-        h3 v-on:click='toggleNotifySection' 通知
-        vue-slide-up-down :active='show_notify_detail'
+        h3 @click='toggleVisibility("notify")' 通知
+        vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
             label
-              input type='checkbox' value='1' v-model='notify_user_config' 設定変更を通知
+              input type='checkbox' v-model='notify_user_config' 設定変更を通知
             label class='alert'
-              input type='checkbox' value='1' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
+              input type='checkbox' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
-            button v-on:click='updateNotify' 更新
+            button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -152,30 +152,37 @@ html lang='ja'
           livecure: false,
           annict_auth_code: null,
           programs: [],
-          program_options: [{label: '全てのタグを削除', code: 'clear'}],
           program: null,
-          visibility_options: [],
           visibility: 'public',
           curl_sample: null,
-          show_livecure: #{controller.livecure?},
-          show_growi: #{controller.growi?},
-          show_dropbox: #{controller.dropbox?},
-          show_twitter: #{controller.twitter?},
-          show_annict: #{controller.annict?},
-          show_growi_detail: false,
-          show_dropbox_detail: false,
-          show_tags_detail: false,
-          show_livecure_detail: false,
-          show_webhook_detail: false,
-          show_notify_detail: false,
-          show_twitter_detail: false,
-          show_annict_detail: false,
-          token: localStorage.getItem('mulukhiya_token'),
-        },
-        computed: {
-          twitterHref: function () {
-            return '/auth/twitter?token=' + encodeURIComponent(localStorage.getItem('mulukhiya_token'))
+          tags: [],
+          options: {
+            program: [{label: '全てのタグを削除', code: 'clear'}],
+            visibility: [],
           },
+          layout: {
+            sections: {
+              livecure: #{controller.livecure?},
+              growi: #{controller.growi?},
+              dropbox: #{controller.dropbox?},
+              twitter: #{controller.twitter?},
+              annict: #{controller.annict?},
+            },
+            details: {
+              growi: false,
+              dropbox: false,
+              tags: false,
+              livecure: false,
+              webhook: false,
+              notify: false,
+              twitter: false,
+              annict: false,
+            },
+          },
+          hrefs: {
+            twitter: '/auth/twitter?token=' + encodeURIComponent(localStorage.getItem('mulukhiya_token')),
+          },
+          token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
           if (this.token) {
@@ -213,7 +220,7 @@ html lang='ja'
                 }
                 Object.keys(e.data.visibility_names).map(k => {
                   const v = e.data.visibility_names[k]
-                  this.visibility_options.push({
+                  this.options.visibility.push({
                     label: k == v ? k : `${v} (${k})`,
                     code: v,
                   })
@@ -243,7 +250,7 @@ html lang='ja'
                       label.push(tag)
                     })
                   }
-                  this.program_options.push({label: label.join(' '), code: program.key})
+                  this.options.program.push({label: label.join(' '), code: program.key})
                 }
               })
             }).catch(e => {
@@ -294,29 +301,8 @@ html lang='ja'
               this.tags = ''
             }
           },
-          toggleGrowiSection: function () {
-            this.show_growi_detail = !this.show_growi_detail
-          },
-          toggleDropboxSection: function () {
-            this.show_dropbox_detail = !this.show_dropbox_detail
-          },
-          toggleTagsSection: function () {
-            this.show_tags_detail = !this.show_tags_detail
-          },
-          toggleLivecureSection: function () {
-            this.show_livecure_detail = !this.show_livecure_detail
-          },
-          toggleWebhookSection: function () {
-            this.show_webhook_detail = !this.show_webhook_detail
-          },
-          toggleNotifySection: function () {
-            this.show_notify_detail = !this.show_notify_detail
-          },
-          toggleTwitterSection: function () {
-            this.show_twitter_detail = !this.show_twitter_detail
-          },
-          toggleAnnictSection: function () {
-            this.show_annict_detail = !this.show_annict_detail
+          toggleVisibility: function (name) {
+            this.layout.details[name] = !this.layout.details[name]
           },
           updateGrowi: function () {
             const values = {token: localStorage.getItem('mulukhiya_token')}
@@ -365,7 +351,7 @@ html lang='ja'
               .then(e => {
                 document.body.style.cursor = 'auto'
                 this.message = null
-                this.show_livecure_detail = false
+                this.layout.details.livecure = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message

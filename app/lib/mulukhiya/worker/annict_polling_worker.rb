@@ -4,7 +4,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def perform
-      AnnictStorage.accounts(&:crawl_annict)
+      AnnictAccountStorage.accounts(&:crawl_annict)
     end
   end
 end
