@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 動作状況
-      div ref='result_container'
+      .result-container ref='result_container'
         pre = '{{result}}'
         .field-update-button-container
           button @click='load' 再読み込み
