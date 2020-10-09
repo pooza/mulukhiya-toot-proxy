@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 動作状況
-      .result-container ref='result_container'
+      .result-container :class='{"error": 200 < result.status}'
         pre = '{{result}}'
         .field-update-button-container
           button @click='load' 再読み込み
@@ -47,11 +47,9 @@ html lang='ja'
               .then(e => {
                 this.result = e.data
                 this.message = null
-                this.$refs.result_container.classList.remove('error')
               }).catch(e => {
                 this.result = e.response.data
                 this.message = e.response.data.error || e.message
-                this.$refs.result_container.classList.add('error')
               })
           },
         },
