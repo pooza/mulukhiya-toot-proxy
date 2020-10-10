@@ -236,11 +236,10 @@ html lang='ja'
               this.programs = e.data
               Object.values(this.programs).map(program => {
                 if (program.enable) {
-                  const label = [program.series]
-                  if (program.episode) {label.push(`${program.episode}話`)}
-                  if (program.air) {label.push('エア番組')}
-                  if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
-                  this.options.program.push({label: label.join(' '), code: program.key})
+                  this.options.program.push({
+                    code: program.key,
+                    label: this.createTags(program).join(' '),
+                  })
                 }
               })
             }).catch(e => {
@@ -250,6 +249,13 @@ html lang='ja'
         methods: {
           createPath: function (path) {
             return `${path}?token=${encodeURIComponent(this.token)}`
+          },
+          createTags: function (program) {
+            const label = [program.series]
+            if (program.episode) {label.push(`${program.episode}話`)}
+            if (program.air) {label.push('エア番組')}
+            if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
+            return label
           },
           updateConfig: function (command) {
             command.command = 'user_config'
@@ -281,10 +287,8 @@ html lang='ja'
           onChangeTags: function (e) {
             const program = this.programs[e.code]
             if (program) {
-              const tags = ['実況', program.series]
-              if (program.episode) {tags.push(`${program.episode}話`)}
-              if (program.air) {tags.push('エア番組')}
-              if (program.extra_tags) {program.extra_tags.map(tag => {tags.push(tag)})}
+              const tags = this.createTags(program)
+              tags.unshift('実況')
               this.form.tags = tags.join("\n")
             } else {
               this.form.tags = ''
@@ -343,12 +347,8 @@ html lang='ja'
           },
           updateNotify: function () {
             const command = {notify: {verbose: null, user_config: null}}
-            if (this.form.notify.verbose) {
-              command.notify.verbose = true
-            }
-            if (this.form.notify.user_config) {
-              command.notify.user_config = true
-            }
+            if (this.form.notify.verbose) {command.notify.verbose = true}
+            if (this.form.notify.user_config) {command.notify.user_config = true}
             this.updateConfig(command)
           },
           unauthTwitter: function () {
