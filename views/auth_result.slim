@@ -25,6 +25,7 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
         data: {
@@ -34,13 +35,11 @@ html lang='ja'
           token: '#{crypt.new.encrypt(params[:result][:access_token])}',
         },
         mounted: function () {
-          const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
-          axios.get(href, {responseType: 'json'})
-            .then(e => {
-              this.username = e.data.account.username
-              localStorage.setItem('mulukhiya_token', this.token)
-            }).catch(e => {
+          Vue.registerToken(this.token)
+            .then(e => {this.username = e.username})
+            .catch(e => {
               this.message = e.response.data.error || e.message
+              this.token_error = true
             })
         },
         methods: {
