@@ -9,6 +9,22 @@ const MulukhiyaLib = {
         .then(e => {return e.data.account})
     }
 
+    Vue.getConfig = async () => {
+      return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
+        .then(e => {return e.data})
+    }
+
+    Vue.updateConfig = async command => {
+      command.command = 'user_config'
+      const values = {
+        token: Vue.getToken(),
+        status: JSON.stringify(command),
+        text: JSON.stringify(command),
+      }
+      return axios.post('/mulukhiya/config', values)
+        .then(e => {return e.data})
+    }
+
     Vue.getToken = () => {
       return localStorage.getItem('mulukhiya_token')
     }
@@ -59,6 +75,19 @@ const MulukhiyaLib = {
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data.account
       })
+    }
+
+    Vue.getPrograms = async () => {
+      return axios.get('/mulukhiya/programs', {responseType: 'json'})
+        .then(e => {return e.data})
+    }
+
+    Vue.createProgramTags = program => {
+      const label = [program.series]
+      if (program.episode) {label.push(`${program.episode}話`)}
+      if (program.air) {label.push('エア番組')}
+      if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
+      return label
     }
 
     Vue.getMedias = async () => {

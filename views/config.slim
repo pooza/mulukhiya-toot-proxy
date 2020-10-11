@@ -137,6 +137,7 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default)
       Vue.component('vue-slide-up-down', VueSlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
@@ -159,7 +160,7 @@ html lang='ja'
             dropbox: {token: null},
           },
           options: {
-            program: [{label: '全てのタグを削除', code: 'clear'}],
+            program: [],
             visibility: [],
           },
           layout: {
@@ -185,92 +186,69 @@ html lang='ja'
           token: localStorage.getItem('mulukhiya_token'),
         },
         mounted: function () {
-          if (this.token) {
-            this.hrefs.twitter = this.createPath('/auth/twitter')
-            axios.get(this.createPath('/mulukhiya/config'), {responseType: 'json'})
-              .then(e => {
-                this.result = jsyaml.safeDump(e.data.config)
-                if (e.data.config.webhook) {
-                  this.form.webhook.token = e.data.config.webhook.token
-                  this.form.webhook.url = e.data.config.webhook.url
-                  this.form.webhook.visibility = e.data.config.webhook.visibility || 'public'
-                  this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${e.data.config.webhook.url}`
-                }
-                if (e.data.config.tags) {
-                  this.form.tags = e.data.config.tags.join("\n")
-                }
-                if (e.data.config.growi) {
-                  this.form.growi.token = e.data.config.growi.token
-                  this.form.growi.url = e.data.config.growi.url
-                  this.form.growi.prefix = e.data.config.growi.prefix
-                }
-                if (e.data.config.dropbox) {
-                  this.form.dropbox.token = e.data.config.dropbox.token
-                }
-                if (e.data.config.notify) {
-                  this.form.notify.user_config = e.data.config.notify.user_config ? 1 : 0
-                  this.form.notify.verbose = e.data.config.notify.verbose ? 1 : 0
-                }
-                if (Array.isArray(e.data.filters)) {
-                  e.data.filters.map(f => {
-                    if (f.phrase == '#実況') {this.form.livecure = true}
-                  })
-                }
-                Object.keys(e.data.visibility_names).map(k => {
-                  const v = e.data.visibility_names[k]
-                  this.options.visibility.push({
-                    label: k == v ? k : `${v} (${k})`,
-                    code: v,
-                  })
-                })
-                this.username = e.data.account.username
-              }).catch(e => {
-                this.message = e.response.data.error || e.message
-                this.token_error = true
-              })
-          } else {
-            this.token_error = true
-          }
-          axios.get('/mulukhiya/programs', {responseType: 'json'})
+          Vue.getConfig()
             .then(e => {
-              this.programs = e.data
-              Object.values(this.programs).map(program => {
-                if (program.enable) {
-                  this.options.program.push({
-                    code: program.key,
-                    label: this.createTags(program).join(' '),
-                  })
-                }
-              })
+              this.hrefs.twitter = Vue.createPath('/auth/twitter')
+              this.username = e.account.username
+              this.updateForm(e)
             }).catch(e => {
               this.message = e.response.data.error || e.message
+              this.token_error = true
+            })
+          Vue.getPrograms()
+            .then(e => {
+              this.programs = e
+              this.options.program = Object.values(e)
+                .filter(program => {return program.enable})
+                .map(p => {
+                  return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
+                })
             })
         },
         methods: {
-          createPath: function (path) {
-            return `${path}?token=${encodeURIComponent(this.token)}`
-          },
-          createTags: function (program) {
-            const label = [program.series]
-            if (program.episode) {label.push(`${program.episode}話`)}
-            if (program.air) {label.push('エア番組')}
-            if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
-            return label
+          updateForm: function (data) {
+            this.result = jsyaml.safeDump(data.config)
+            if (data.config.webhook) {
+              this.form.webhook.token = data.config.webhook.token
+              this.form.webhook.url = data.config.webhook.url
+              this.form.webhook.visibility = data.config.webhook.visibility || 'public'
+              this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${data.config.webhook.url}`
+            }
+            if (data.config.tags) {
+              this.form.tags = data.config.tags.join("\n")
+            }
+            if (data.config.growi) {
+              this.form.growi.token = data.config.growi.token
+              this.form.growi.url = data.config.growi.url
+              this.form.growi.prefix = data.config.growi.prefix
+            }
+            if (data.config.dropbox) {
+              this.form.dropbox.token = data.config.dropbox.token
+            }
+            if (data.config.notify) {
+              this.form.notify.user_config = data.config.notify.user_config ? 1 : 0
+              this.form.notify.verbose = data.config.notify.verbose ? 1 : 0
+            }
+            if (Array.isArray(data.filters)) {
+              data.filters.map(f => {
+                if (f.phrase == '#実況') {this.form.livecure = true}
+              })
+            }
+            Object.keys(data.visibility_names).map(k => {
+              const v = data.visibility_names[k]
+              this.options.visibility.push({
+                label: k == v ? k : `${v} (${k})`,
+                code: v,
+              })
+            })
           },
           updateConfig: function (command) {
-            command.command = 'user_config'
-            const values = {
-              token: this.token,
-              status: JSON.stringify(command),
-              text: JSON.stringify(command),
-            }
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
+            Vue.updateConfig(command)
               .then(e => {
                 document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
-                this.form.webhook.url = e.data.config.webhook.url
+                this.updateForm(e)
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
@@ -287,7 +265,7 @@ html lang='ja'
           onChangeTags: function (e) {
             const program = this.programs[e.code]
             if (program) {
-              const tags = this.createTags(program)
+              const tags = Vue.createProgramTags(program)
               tags.unshift('実況')
               this.form.tags = tags.join("\n")
             } else {
