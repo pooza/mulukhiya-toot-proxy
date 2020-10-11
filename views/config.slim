@@ -293,11 +293,12 @@ html lang='ja'
           },
           updateLivecure: function () {
             const command = {
+              command: 'filter',
               tag: '実況',
               action: this.form.livecure ? 'register' : 'unregister',
             }
             const values = {
-              token: this.token,
+              token: Vue.getToken(),
               status: JSON.stringify(command),
               text: JSON.stringify(command),
             }
