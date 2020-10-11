@@ -1,7 +1,12 @@
 const MulukhiyaLib = {
   install (Vue, options) {
-    Vue.createPath = (href) => {
+    Vue.createPath = href => {
       return `${href}?token=${encodeURIComponent(Vue.getToken())}`
+    }
+
+    Vue.login = async () => {
+      return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
+        .then(e => {return e.data.account})
     }
 
     Vue.getToken = () => {
@@ -17,11 +22,6 @@ const MulukhiyaLib = {
       return tokens
     }
 
-    Vue.login = async () => {
-      return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
-        .then(e => {return e.data.account})
-    }
-
     Vue.registerToken = async token => {
       const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
       return axios.get(href, {responseType: 'json'})
@@ -29,6 +29,12 @@ const MulukhiyaLib = {
           localStorage.setItem('mulukhiya_token', token)
           return e.data.account
         })
+    }
+
+    Vue.deleteToken = async token => {
+      const tokens = Vue.getTokens().filter(v => v != token)
+      localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+      return tokens
     }
 
     Vue.getUsers = async () => {
@@ -53,12 +59,6 @@ const MulukhiyaLib = {
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data.account
       })
-    }
-
-    Vue.deleteUser = async user => {
-      const tokens = Vue.getTokens().filter(v => v != user.token)
-      localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
-      return tokens
     }
 
     Vue.getMedias = async () => {

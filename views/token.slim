@@ -60,7 +60,7 @@ html lang='ja'
               },
               {okText: '削除', cancelText: 'キャンセル'}
             ).then(e => {
-              Vue.deleteUser(user)
+              Vue.deleteToken(user.token)
             }).then(e => {
               this.tokens = e
               return Vue.getUsers()
