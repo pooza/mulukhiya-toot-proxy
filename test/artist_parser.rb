@@ -42,6 +42,9 @@ module Mulukhiya
 
       tags = ArtistParser.new('キュアミラクル(CV:高橋李依)・キュアマジカル(CV:堀江由衣)').parse
       assert_equal(tags, [])
+
+      tags = ArtistParser.new('宮本佳那子／山野さと子／内田順子／他').parse
+      assert_equal(tags, ['宮本佳那子', '山野さと子', '内田順子', '他'])
     end
   end
 end

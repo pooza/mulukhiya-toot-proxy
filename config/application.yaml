@@ -792,11 +792,9 @@ twitter:
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
-  delimiters:
-    - /
-    - 、
+  delimiter_pattern: '[/、]'
   patterns:
-    - pattern: ^[^():]+、
+    - pattern: ^[^():]+[/、]
       delimited: true
     - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
       delimited: true
