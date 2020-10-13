@@ -249,6 +249,7 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -276,6 +277,7 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -588,6 +590,7 @@ pleroma:
       - mention_visibility
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -612,6 +615,7 @@ pleroma:
     pre_webhook:
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -789,6 +793,11 @@ twitter:
     length:
       max: 140
       url: 12
+bandai_channel:
+  hosts:
+    - www.b-ch.com
+  patterns:
+    - pattern: ^/titles/([[:digit:]]+)/([[:digit:]]+)$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:

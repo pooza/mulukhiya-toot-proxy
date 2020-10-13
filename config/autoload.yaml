@@ -2,6 +2,7 @@ inflections:
   amazon_uri: AmazonURI
   amazon_url_handler: AmazonURLHandler
   amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
+  bandai_channel_uri: BandaiChannelURI
   canonical_url_handler: CanonicalURLHandler
   ci_test_case_filter: CITestCaseFilter
   css_renderer: CSSRenderer
