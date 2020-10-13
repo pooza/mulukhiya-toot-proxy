@@ -1,5 +1,5 @@
 package:
-  version: 3.14.3
+  version: 3.14.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -214,6 +214,7 @@ webui:
     - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
+    - /mulukhiya/script/mulukhiya_lib.js
   stylesheets:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
@@ -248,6 +249,7 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -275,6 +277,7 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -587,6 +590,7 @@ pleroma:
       - mention_visibility
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -611,6 +615,7 @@ pleroma:
     pre_webhook:
       - amazon_image
       - you_tube_image
+      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -788,14 +793,17 @@ twitter:
     length:
       max: 140
       url: 12
+bandai_channel:
+  hosts:
+    - www.b-ch.com
+  patterns:
+    - pattern: ^/titles/([[:digit:]]+)/([[:digit:]]+)$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
-  delimiters:
-    - /
-    - 、
+  delimiter_pattern: '[/、]'
   patterns:
-    - pattern: ^[^():]+、
+    - pattern: ^[^():]+[/、]
       delimited: true
     - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
       delimited: true

@@ -27,5 +27,12 @@ module Mulukhiya
     def verbose?
       return false
     end
+
+    private
+
+    def initialize(params = {})
+      super
+      @image_uris = {}
+    end
   end
 end

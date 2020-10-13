@@ -32,34 +32,27 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
         data: {
           message: null,
           username: null,
           token_error: false,
-          token: localStorage.getItem('mulukhiya_token'),
           medias: null,
         },
         mounted: function () {
-          if (this.token) {
-            let href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
-            axios.get(href, {responseType: 'json'})
-              .then(e => {
-                this.username = e.data.account.username
-              }).catch(e => {
-                this.message = e.response.data.error || e.message
-                this.token_error = true
-              })
-            href = '/mulukhiya/medias?token=' + encodeURIComponent(this.token)
-            axios.get(href, {responseType: 'json'})
-              .then(e => {
-                this.medias = e.data
-              }).catch(e => {
-                this.message = e.response.data.error || e.message
-              })
-          } else {
-            this.token_error = true
-          }
+          Vue.login()
+            .then(e => {this.username = e.username})
+            .catch(e => {
+              this.message = e.response.data.error || e.message
+              this.token_error = true
+            })
+          this.load()
+            .then(e => {this.medias = e})
+            .catch(e => {this.message = e.response.data.error || e.message})
+        },
+        methods: {
+          load: Vue.getMedias,
         },
       })

@@ -1,12 +1,8 @@
 module Mulukhiya
-  class AmazonImageHandler < ImageHandler
-    def disable?
-      return super || !AmazonService.config?
-    end
-
+  class BandaiChannelImageHandler < ImageHandler
     def updatable?(uri)
-      uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
-      return false unless uri.amazon?
+      uri = BandaiChannelURI.parse(uri.to_s) unless uri.is_a?(BandaiChannelURI)
+      return false unless uri.bandai_channel?
       return false unless @image_uris[uri.to_s] = uri.image_uri
       return true
     rescue => e

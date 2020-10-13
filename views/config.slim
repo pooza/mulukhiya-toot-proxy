@@ -17,8 +17,8 @@ html lang='ja'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
-            textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='tags'
-            v-select :options='options.program' @input='changeTags' v-model='program'
+            textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
+            v-select :options='options.program' @input='onChangeTags' v-model='form.program'
           .field-update-button-container
             button @click='updateTags' 更新
       section class='config' v-if='username && layout.sections.livecure'
@@ -26,7 +26,7 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
             label
-              input type='checkbox' v-model='livecure' = "実況#{controller.status_label}を隠す"
+              input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
       section class='config' v-if='username && layout.sections.growi'
@@ -54,13 +54,13 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのAPIトークン' v-model.trim='growi_token'
+            input placeholder='GROWIのAPIトークン' v-model.trim='form.growi.token'
           .inline-field-container
             h4 URL
-            input placeholder='GROWIのルートURL' v-model.trim='growi_url'
+            input placeholder='GROWIのルートURL' v-model.trim='form.growi.url'
           .inline-field-container
             h4 記事作成先
-            input placeholder='記事作成先のパス' v-model.trim='growi_prefix'
+            input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
       section class='config' v-if='username && layout.sections.dropbox'
@@ -75,7 +75,7 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='Dropboxのアクセストークン' v-model.trim='dropbox_token'
+            input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
       section class='config' v-if='username && layout.sections.twitter'
@@ -99,7 +99,7 @@ html lang='ja'
             li 認証ボタンを押下。
           .inline-field-container
             h4 認証コード
-            input placeholder='Annictの認証コード' v-model.trim='annict_auth_code'
+            input placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
           .field-update-button-container
             button @click='authAnnict' 認証
             button class='alert' @click='unauthAnnict' 認証を解除
@@ -108,35 +108,36 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
             h4 トークン
-            input placeholder='webhookのアクセストークン' v-model.trim='webhook_token'
+            input placeholder='webhookのアクセストークン' v-model.trim='form.webhook.token'
           .inline-field-container
             h4 公開範囲
-            v-select :options='options.visibility' v-model='visibility'
+            v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
             button @click='updateWebhook' 更新
-          .field-container v-if='webhook_url'
+          .field-container v-if='form.webhook.url'
             h4 URL
-            textarea ref='webhook_url_text' = '{{webhook_url}}'
+            textarea ref='webhook_url_text' = '{{form.webhook.url}}'
             i class='fas fa-clipboard' @click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
-          .field-container v-if='webhook_url'
+          .field-container v-if='form.webhook.url'
             h4 curlサンプル
-            textarea ref='curl_sample_text' v-html='curl_sample'
+            textarea ref='curl_sample_text' v-html='form.webhook.curl_sample'
             i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
       section class='config' v-if='username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
             label
-              input type='checkbox' v-model='notify_user_config' 設定変更を通知
+              input type='checkbox' v-model='form.notify.user_config' 設定変更を通知
             label class='alert'
-              input type='checkbox' v-model='notify_verbose' 冗長な通知（管理者・開発者向け）
+              input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
             button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
       Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default)
       Vue.component('vue-slide-up-down', VueSlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
@@ -147,17 +148,19 @@ html lang='ja'
           username: null,
           token_error: false,
           result: null,
-          notify_user_config: null,
-          notify_verbose: null,
-          livecure: false,
-          annict_auth_code: null,
           programs: [],
-          program: null,
-          visibility: 'public',
-          curl_sample: null,
-          tags: [],
+          form: {
+            notify: {user_config: null, verbose: null},
+            livecure: false,
+            annict: {auth_code: null},
+            program: null,
+            tags: [],
+            webhook: {token: null, visibility: null, url: null, curl_sample: null},
+            growi: {token: null, url: null, prefix: null},
+            dropbox: {token: null},
+          },
           options: {
-            program: [{label: '全てのタグを削除', code: 'clear'}],
+            program: [],
             visibility: [],
           },
           layout: {
@@ -179,95 +182,72 @@ html lang='ja'
               annict: false,
             },
           },
-          hrefs: {
-            twitter: '/auth/twitter?token=' + encodeURIComponent(localStorage.getItem('mulukhiya_token')),
-          },
-          token: localStorage.getItem('mulukhiya_token'),
+          hrefs: {twitter: null},
         },
         mounted: function () {
-          if (this.token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
-            axios.get(href, {responseType: 'json'})
-              .then(e => {
-                this.result = jsyaml.safeDump(e.data.config)
-                if (e.data.config.webhook) {
-                  this.webhook_token = e.data.config.webhook.token
-                  this.webhook_url = e.data.config.webhook.url
-                  this.visibility = e.data.config.webhook.visibility || 'public'
-                  this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${e.data.config.webhook.url}`
-                }
-                if (e.data.config.tags) {
-                  this.tags = e.data.config.tags.join("\n")
-                }
-                if (e.data.config.growi) {
-                  this.growi_token = e.data.config.growi.token
-                  this.growi_url = e.data.config.growi.url
-                  this.growi_prefix = e.data.config.growi.prefix
-                }
-                if (e.data.config.dropbox) {
-                  this.dropbox_token = e.data.config.dropbox.token
-                }
-                if (e.data.config.notify) {
-                  this.notify_user_config = e.data.config.notify.user_config ? 1 : 0
-                  this.notify_verbose = e.data.config.notify.verbose ? 1 : 0
-                }
-                if (Array.isArray(e.data.filters)) {
-                  e.data.filters.map(f => {
-                    if (f.phrase == '#実況') {
-                      this.livecure = true
-                    }
-                  })
-                }
-                Object.keys(e.data.visibility_names).map(k => {
-                  const v = e.data.visibility_names[k]
-                  this.options.visibility.push({
-                    label: k == v ? k : `${v} (${k})`,
-                    code: v,
-                  })
-                })
-                this.username = e.data.account.username
-              }).catch(e => {
-                this.message = e.response.data.error || e.message
-                this.token_error = true
-              })
-          } else {
-            this.token_error = true
-          }
-          axios.get('/mulukhiya/programs', {responseType: 'json'})
+          Vue.getConfig()
             .then(e => {
-              this.programs = e.data
-              Object.values(this.programs).map(program => {
-                if (program.enable) {
-                  const label = [program.series]
-                  if (program.episode) {
-                    label.push(`${program.episode}話`)
-                  }
-                  if (program.air) {
-                    label.push('エア番組')
-                  }
-                  if (program.extra_tags) {
-                    program.extra_tags.map(tag => {
-                      label.push(tag)
-                    })
-                  }
-                  this.options.program.push({label: label.join(' '), code: program.key})
-                }
-              })
+              this.hrefs.twitter = Vue.createPath('/auth/twitter')
+              this.username = e.account.username
+              this.updateForm(e)
             }).catch(e => {
               this.message = e.response.data.error || e.message
+              this.token_error = true
+            })
+          Vue.getPrograms()
+            .then(e => {
+              this.programs = e
+              this.options.program = Object.values(e)
+                .filter(program => {return program.enable})
+                .map(p => {
+                  return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
+                })
             })
         },
         methods: {
-          updateConfig: function (values, command) {
-            values.status = JSON.stringify(command)
-            values.text = JSON.stringify(command)
+          updateForm: function (data) {
+            this.result = jsyaml.safeDump(data.config)
+            if (data.config.webhook) {
+              this.form.webhook.token = data.config.webhook.token
+              this.form.webhook.url = data.config.webhook.url
+              this.form.webhook.visibility = data.config.webhook.visibility || 'public'
+              this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${data.config.webhook.url}`
+            }
+            if (data.config.tags) {
+              this.form.tags = data.config.tags.join("\n")
+            }
+            if (data.config.growi) {
+              this.form.growi.token = data.config.growi.token
+              this.form.growi.url = data.config.growi.url
+              this.form.growi.prefix = data.config.growi.prefix
+            }
+            if (data.config.dropbox) {
+              this.form.dropbox.token = data.config.dropbox.token
+            }
+            if (data.config.notify) {
+              this.form.notify.user_config = data.config.notify.user_config ? 1 : 0
+              this.form.notify.verbose = data.config.notify.verbose ? 1 : 0
+            }
+            if (Array.isArray(data.filters)) {
+              data.filters.map(f => {
+                if (f.phrase == '#実況') {this.form.livecure = true}
+              })
+            }
+            Object.keys(data.visibility_names).map(k => {
+              const v = data.visibility_names[k]
+              this.options.visibility.push({
+                label: k == v ? k : `${v} (${k})`,
+                code: v,
+              })
+            })
+          },
+          updateConfig: function (command) {
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/config', values)
+            Vue.updateConfig(command)
               .then(e => {
                 document.body.style.cursor = 'auto'
-                this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
-                this.webhook_url = e.data.config.webhook.url
+                this.updateForm(e)
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
@@ -281,68 +261,44 @@ html lang='ja'
             this.$refs.curl_sample_text.select()
             document.execCommand('copy')
           },
-          changeTags: function (e) {
+          onChangeTags: function (e) {
             const program = this.programs[e.code]
             if (program) {
-              const tags = ['実況', program.series]
-              if (program.episode) {
-                tags.push(`${program.episode}話`)
-              }
-              if (program.air) {
-                tags.push('エア番組')
-              }
-              if (program.extra_tags) {
-                program.extra_tags.map(tag => {
-                  tags.push(tag)
-                })
-              }
-              this.tags = tags.join("\n")
+              const tags = Vue.createProgramTags(program)
+              tags.unshift('実況')
+              this.form.tags = tags.join("\n")
             } else {
-              this.tags = ''
+              this.form.tags = ''
             }
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
           },
           updateGrowi: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', growi: {url: null, token: null, prefix: null}}
-            if (this.growi_token) {
-              command.growi.token = this.growi_token
-            }
-            if (this.growi_url) {
-              command.growi.url = this.growi_url
-            }
-            if (this.growi_prefix) {
-              command.growi.prefix = this.growi_prefix
-            }
-            this.updateConfig(values, command)
+            const command = {growi: {url: null, token: null, prefix: null}}
+            if (this.form.growi.token) {command.growi.token = this.form.growi.token}
+            if (this.form.growi.url) {command.growi.url = this.form.growi.url}
+            if (this.form.growi.prefix) {command.growi.prefix = this.form.growi.prefix}
+            this.updateConfig(command)
           },
           updateDropbox: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', dropbox: {token: null}}
-            if (this.dropbox_token) {
-              command.dropbox.token = this.dropbox_token
-            }
-            this.updateConfig(values, command)
+            const command = {dropbox: {token: null}}
+            if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
+            this.updateConfig(command)
           },
           updateTags: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', tags: null}
-            if (this.tags) {
-              command.tags = this.tags.split("\n")
-            }
-            this.updateConfig(values, command)
+            const command = {tags: null}
+            if (this.form.tags) {command.tags = this.form.tags.split("\n")}
+            this.updateConfig(command)
           },
           updateLivecure: function () {
-            const command = {command: 'filter', tag: '実況'}
-            if (this.livecure) {
-              command.action = 'register'
-            } else {
-              command.action = 'unregister'
+            const command = {
+              command: 'filter',
+              tag: '実況',
+              action: this.form.livecure ? 'register' : 'unregister',
             }
             const values = {
-              token: localStorage.getItem('mulukhiya_token'),
+              token: Vue.getToken(),
               status: JSON.stringify(command),
               text: JSON.stringify(command),
             }
@@ -358,70 +314,54 @@ html lang='ja'
               })
           },
           updateWebhook: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', webhook: {token: null, visibility: null}}
-            if (this.webhook_token) {
-              command.webhook.token = this.webhook_token
-              if (this.visibility.code != 'public') {
-                command.webhook.visibility = this.visibility.code
+            const command = {webhook: {token: null, visibility: null}}
+            if (this.form.webhook.token) {
+              command.webhook.token = this.form.webhook.token
+              if (this.form.webhook.visibility.code != 'public') {
+                command.webhook.visibility = this.form.webhook.visibility.code
               }
             }
-            this.updateConfig(values, command)
+            this.updateConfig(command)
           },
           updateNotify: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', notify: {verbose: null, user_config: null}}
-            if (this.notify_verbose) {
-              command.notify.verbose = true
-            }
-            if (this.notify_user_config) {
-              command.notify.user_config = true
-            }
-            this.updateConfig(values, command)
+            const command = {notify: {verbose: null, user_config: null}}
+            if (this.form.notify.verbose) {command.notify.verbose = true}
+            if (this.form.notify.user_config) {command.notify.user_config = true}
+            this.updateConfig(command)
           },
           unauthTwitter: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', twitter: null}
-            this.$dialog.confirm({
-              title: '認証の解除',
-              body: 'Twitterのトークンを削除します。',
-            }, {
-              okText: '削除',
-              cancelText: 'キャンセル',
-            }).then(e => {
-              this.updateConfig(values, command)
+            this.$dialog.confirm(
+              {title: '認証の解除', body: 'Twitterのトークンを削除します。'},
+              {okText: '削除', cancelText: 'キャンセル'}
+            ).then(e => {
+              this.updateConfig({twitter: null})
+              this.layout.details.twitter = false
             }).catch(e => {
               this.message = e.response.data.error || e.message
             })
           },
           authAnnict: function () {
-            const values = {
-              token: localStorage.getItem('mulukhiya_token'),
-              code: this.annict_auth_code,
-            }
+            const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/annict/auth', values)
               .then(e => {
                 document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
-                this.annict_auth_code = null
+                this.form.annict.auth_code = null
+                this.layout.details.annict = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
                 this.message = e.response.data.error || e.message
               })
           },
           unauthAnnict: function () {
-            const values = {token: localStorage.getItem('mulukhiya_token')}
-            const command = {command: 'user_config', annict: null}
-            this.$dialog.confirm({
-              title: '認証の解除',
-              body: 'Annictのトークンを削除します。',
-            }, {
-              okText: '削除',
-              cancelText: 'キャンセル',
-            }).then(e => {
-              this.updateConfig(values, command)
+            this.$dialog.confirm(
+              {title: '認証の解除', body: 'Annictのトークンを削除します。'},
+              {okText: '削除', cancelText: 'キャンセル'}
+            ).then(e => {
+              this.updateConfig({annict: null})
+              this.layout.details.livecure = false
             }).catch(e => {
               this.message = e.response.data.error || e.message
             })

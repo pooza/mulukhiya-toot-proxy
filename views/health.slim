@@ -17,40 +17,27 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
         data: {
           message: null,
           username: null,
           token_error: false,
-          token: localStorage.getItem('mulukhiya_token'),
-          result: null,
+          result: {status: 500},
         },
         mounted: function () {
-          if (this.token) {
-            const href = '/mulukhiya/config?token=' + encodeURIComponent(this.token)
-            axios.get(href, {responseType: 'json'})
-              .then(e => {
-                this.username = e.data.account.username
-              }).catch(e => {
-                this.message = e.response.data.error || e.message
-                this.token_error = true
-              })
-          } else {
-            this.token_error = true
-          }
+          Vue.login()
+            .then(e => {this.username = e.username})
+            .catch(e => {
+              this.message = e.response.data.error || e.message
+              this.token_error = true
+            })
           this.load()
+            .then(e => {this.result = e})
+            .catch(e => {this.message = e.response.data.error || e.message})
         },
         methods: {
-          load: function () {
-            axios.get('/mulukhiya/health', {responseType: 'json'})
-              .then(e => {
-                this.result = e.data
-                this.message = null
-              }).catch(e => {
-                this.result = e.response.data
-                this.message = e.response.data.error || e.message
-              })
-          },
+          load: Vue.getHealth,
         },
       })
