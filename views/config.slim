@@ -146,7 +146,6 @@ html lang='ja'
         data: {
           message: null,
           username: null,
-          token_error: false,
           result: null,
           programs: [],
           form: {
@@ -190,10 +189,7 @@ html lang='ja'
               this.hrefs.twitter = Vue.createPath('/auth/twitter')
               this.username = e.account.username
               this.updateForm(e)
-            }).catch(e => {
-              this.message = e.response.data.error || e.message
-              this.token_error = true
-            })
+            }).catch(e => {this.message = e.response.data.error || e.message})
           Vue.getPrograms()
             .then(e => {
               this.programs = e

@@ -31,16 +31,12 @@ html lang='ja'
         data: {
           message: null,
           username: null,
-          token_error: false,
           token: '#{crypt.new.encrypt(params[:result][:access_token])}',
         },
         mounted: function () {
           Vue.registerToken(this.token)
             .then(e => {this.username = e.username})
-            .catch(e => {
-              this.message = e.response.data.error || e.message
-              this.token_error = true
-            })
+            .catch(e => {this.message = e.response.data.error || e.message})
         },
         methods: {
           copyToken: function () {
