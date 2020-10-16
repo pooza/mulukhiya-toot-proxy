@@ -3,17 +3,15 @@
     p
       = "environment: #{env.type}"
 
-.message-container v-if='username'
-  p
+.message-container
+  p v-if='username'
     | login: @{{username}}
     a href='/mulukhiya/app/token'
       i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
-
-.message-container class='alert' v-if='message'
-  p = '{{message}}'
-
-.message-container v-if='token_error'
-  p
+  p v-else=''
     - if controller.webhook?
       a href='/mulukhiya/app/auth' トークンの登録
       | （アプリケーションの認証）を行ってください。
+
+.message-container class='alert' v-if='message'
+  p = '{{message}}'

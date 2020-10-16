@@ -33,14 +33,10 @@ html lang='ja'
         data: {
           message: null,
           username: null,
-          token_error: false,
         },
         mounted: function () {
           Vue.login()
             .then(e => {this.username = e.username})
-            .catch(e => {
-              this.message = e.response.data.error || e.message
-              this.token_error = true
-            })
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

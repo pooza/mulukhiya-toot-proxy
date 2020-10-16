@@ -1,5 +1,5 @@
 package:
-  version: 3.14.4
+  version: 3.14.5
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -351,6 +351,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -374,6 +375,7 @@ misskey:
       - result_notification
     pre_webhook:
       - webhook_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -448,6 +450,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -471,6 +474,7 @@ meisskey:
       - result_notification
     pre_webhook:
       - webhook_image
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -540,6 +544,7 @@ dolphin:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url

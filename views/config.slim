@@ -146,7 +146,6 @@ html lang='ja'
         data: {
           message: null,
           username: null,
-          token_error: false,
           result: null,
           programs: [],
           form: {
@@ -190,10 +189,7 @@ html lang='ja'
               this.hrefs.twitter = Vue.createPath('/auth/twitter')
               this.username = e.account.username
               this.updateForm(e)
-            }).catch(e => {
-              this.message = e.response.data.error || e.message
-              this.token_error = true
-            })
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -242,16 +238,11 @@ html lang='ja'
             })
           },
           updateConfig: function (command) {
-            document.body.style.cursor = 'wait'
             Vue.updateConfig(command)
               .then(e => {
-                document.body.style.cursor = 'auto'
                 this.message = null
                 this.updateForm(e)
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -267,9 +258,7 @@ html lang='ja'
               const tags = Vue.createProgramTags(program)
               tags.unshift('実況')
               this.form.tags = tags.join("\n")
-            } else {
-              this.form.tags = ''
-            }
+            } else {this.form.tags = ''}
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -310,7 +299,7 @@ html lang='ja'
                 this.layout.details.livecure = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
+                this.message = Vue.createErrorMessage(e)
               })
           },
           updateWebhook: function () {
@@ -337,7 +326,7 @@ html lang='ja'
               this.updateConfig({twitter: null})
               this.layout.details.twitter = false
             }).catch(e => {
-              this.message = e.response.data.error || e.message
+              this.message = Vue.createErrorMessage(e)
             })
           },
           authAnnict: function () {
@@ -352,7 +341,7 @@ html lang='ja'
                 this.layout.details.annict = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
+                this.message = Vue.createErrorMessage(e)
               })
           },
           unauthAnnict: function () {
@@ -362,9 +351,7 @@ html lang='ja'
             ).then(e => {
               this.updateConfig({annict: null})
               this.layout.details.livecure = false
-            }).catch(e => {
-              this.message = e.response.data.error || e.message
-            })
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })
