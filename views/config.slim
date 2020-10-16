@@ -238,16 +238,11 @@ html lang='ja'
             })
           },
           updateConfig: function (command) {
-            document.body.style.cursor = 'wait'
             Vue.updateConfig(command)
               .then(e => {
-                document.body.style.cursor = 'auto'
                 this.message = null
                 this.updateForm(e)
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
