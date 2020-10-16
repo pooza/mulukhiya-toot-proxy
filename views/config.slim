@@ -258,9 +258,7 @@ html lang='ja'
               const tags = Vue.createProgramTags(program)
               tags.unshift('実況')
               this.form.tags = tags.join("\n")
-            } else {
-              this.form.tags = ''
-            }
+            } else {this.form.tags = ''}
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -353,9 +351,7 @@ html lang='ja'
             ).then(e => {
               this.updateConfig({annict: null})
               this.layout.details.livecure = false
-            }).catch(e => {
-              this.message = Vue.createErrorMessage(e)
-            })
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })
