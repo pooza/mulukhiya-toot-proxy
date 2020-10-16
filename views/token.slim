@@ -35,10 +35,10 @@ html lang='ja'
         mounted: function () {
           Vue.login()
             .then(e => {this.username = e.username})
-            .catch(e => {this.message = e.response.data.error || e.message})
+            .catch(e => {this.message = ('response' in e) ? e.response.data.error : e.message})
           Vue.getUsers()
             .then(e => {this.users = e})
-            .catch(e => {this.message = e.response.data.error || e.message})
+            .catch(e => {this.message = ('response' in e) ? e.response.data.error : e.message})
         },
         methods: {
           switchUser: function (user) {

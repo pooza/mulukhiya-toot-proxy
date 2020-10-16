@@ -189,7 +189,7 @@ html lang='ja'
               this.hrefs.twitter = Vue.createPath('/auth/twitter')
               this.username = e.account.username
               this.updateForm(e)
-            }).catch(e => {this.message = e.response.data.error || e.message})
+            }).catch(e => {this.message = ('response' in e) ? e.response.data.error : e.message})
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -246,7 +246,7 @@ html lang='ja'
                 this.updateForm(e)
               }).catch(e => {
                 document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
+                this.message = ('response' in e) ? e.response.data.error : e.message
               })
           },
           copyWebhookURL: function () {
@@ -306,7 +306,7 @@ html lang='ja'
                 this.layout.details.livecure = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
+                this.message = ('response' in e) ? e.response.data.error : e.message
               })
           },
           updateWebhook: function () {
@@ -333,7 +333,7 @@ html lang='ja'
               this.updateConfig({twitter: null})
               this.layout.details.twitter = false
             }).catch(e => {
-              this.message = e.response.data.error || e.message
+              this.message = ('response' in e) ? e.response.data.error : e.message
             })
           },
           authAnnict: function () {
@@ -348,7 +348,7 @@ html lang='ja'
                 this.layout.details.annict = false
               }).catch(e => {
                 document.body.style.cursor = 'auto'
-                this.message = e.response.data.error || e.message
+                this.message = ('response' in e) ? e.response.data.error : e.message
               })
           },
           unauthAnnict: function () {
@@ -359,7 +359,7 @@ html lang='ja'
               this.updateConfig({annict: null})
               this.layout.details.livecure = false
             }).catch(e => {
-              this.message = e.response.data.error || e.message
+              this.message = ('response' in e) ? e.response.data.error : e.message
             })
           },
         },
