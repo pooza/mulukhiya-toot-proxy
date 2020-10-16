@@ -36,7 +36,7 @@ html lang='ja'
         mounted: function () {
           Vue.registerToken(this.token)
             .then(e => {this.username = e.username})
-            .catch(e => {this.message = ('response' in e) ? e.response.data.error : e.message})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           copyToken: function () {

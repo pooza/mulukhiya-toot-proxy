@@ -4,6 +4,10 @@ const MulukhiyaLib = {
       return `${href}?token=${encodeURIComponent(Vue.getToken())}`
     }
 
+    Vue.createErrorMessage = e => {
+      return ('response' in e) ? e.response.data.error : e.message
+    }
+
     Vue.login = async () => {
       return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
         .then(e => {return e.data.account})
