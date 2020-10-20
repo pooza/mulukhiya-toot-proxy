@@ -16,20 +16,22 @@ module Mulukhiya
       unless @title_id
         @config['/bandai_channel/patterns'].each do |entry|
           next unless matches = Regexp.new(entry['pattern']).match(path)
-          return @title_id = matches[1].to_i
+          next unless id = matches[1]
+          return @title_id = id.to_i
         end
       end
       return @title_id
     end
 
     def episode_id
-      unless @title_id
+      unless @episode_id
         @config['/bandai_channel/patterns'].each do |entry|
           next unless matches = Regexp.new(entry['pattern']).match(path)
-          return @title_id = matches[2].to_i
+          next unless id = matches[2]
+          return @episode_id = id.to_i
         end
       end
-      return @title_id
+      return @episode_id
     end
 
     def image_uri

@@ -802,7 +802,7 @@ bandai_channel:
   hosts:
     - www.b-ch.com
   patterns:
-    - pattern: ^/titles/([[:digit:]]+)/([[:digit:]]+)$
+    - pattern: ^/titles/([[:digit:]]+)/?([[:digit:]]+)?$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:
