@@ -21,6 +21,9 @@ module Mulukhiya
     def test_image_uri
       uri = BandaiChannelURI.parse('https://www.b-ch.com/titles/6357/039')
       assert_equal(uri.image_uri.to_s, 'https://image2.b-ch.com/ttl2/6357/6357039a.jpg')
+
+      uri = BandaiChannelURI.parse('https://www.b-ch.com/titles/6256/')
+      assert_equal(uri.image_uri.to_s, 'https://image2.b-ch.com/ttl2/6256/6256001a.jpg')
     end
   end
 end
