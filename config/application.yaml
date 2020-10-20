@@ -1,5 +1,5 @@
 package:
-  version: 3.14.5
+  version: 3.14.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -28,8 +28,6 @@ handler:
   itunes_image:
     pixel: 480
     timeout: 10
-  amazon_image:
-    timeout: 10
   spotify_image:
     timeout: 10
     disable: true
@@ -53,6 +51,13 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
+  amazon_image:
+    timeout: 10
+    disable: true
+  amazon_nowplaying:
+    disable: true
+  amazon_url_nowplaying:
+    disable: true
 worker:
   media_cleaning:
     days: 1
@@ -802,7 +807,7 @@ bandai_channel:
   hosts:
     - www.b-ch.com
   patterns:
-    - pattern: ^/titles/([[:digit:]]+)/([[:digit:]]+)$
+    - pattern: ^/titles/([[:digit:]]+)/?([[:digit:]]+)?$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 artist_parser:

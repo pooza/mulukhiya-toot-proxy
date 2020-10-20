@@ -2,6 +2,11 @@ module Mulukhiya
   class DolphinService < Ginseng::Fediverse::DolphinService
     include Package
 
+    def upload(path, params = {})
+      params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
+      return super
+    end
+
     def account
       @account ||= Environment.account_class.get(token: token)
       return @account

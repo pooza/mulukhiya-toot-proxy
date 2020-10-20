@@ -4,6 +4,11 @@ module Mulukhiya
       return super || !YouTubeService.config?
     end
 
+    def handle_pre_toot(body, params = {})
+      params[:trim_times] = 2
+      return super
+    end
+
     def updatable?(uri)
       uri = VideoURI.parse(uri.to_s) unless uri.is_a?(VideoURI)
       return false unless uri.music?

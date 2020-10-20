@@ -12,6 +12,10 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://www.b-ch.com/titles/6256/')
+      assert(@handler.debug_info[:result].present?) if @handler.debug_info
+
+      @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.b-ch.com/titles/6357/039')
       assert(@handler.debug_info[:result].present?) if @handler.debug_info
     end

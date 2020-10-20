@@ -11,11 +11,11 @@ html lang='ja'
       h2 メディアカタログ
       ul class='medias' v-if='medias'
         li class='media' v-for='media in medias'
-          .image_container
+          .media-container
             a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.subtype=="image"'
               img :src='media.thumbnail_url'
-            video :src='media.url' style='width:100%' controls='' v-else-if='media.subtype=="video"'
-            audio :src='media.url' style='width:100%' controls='' v-else-if='media.subtype=="audio"'
+            video :src='media.url' controls='' v-else-if='media.subtype=="video"'
+            audio :src='media.url' controls='' v-else-if='media.subtype=="audio"'
             a :href='media.url' target='_blank' v-else='' = '{{media.file_name}}'
           ul class='params'
             li class='param' = '{{media.created_at_str}}'
