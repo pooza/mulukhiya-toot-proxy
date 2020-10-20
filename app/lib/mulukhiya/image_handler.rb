@@ -8,7 +8,7 @@ module Mulukhiya
         next unless updatable?(uri)
         next unless image = create_image_uri(uri)
         body[attachment_field] = [
-          sns.upload_remote_resource(image, {response: :id, trim_times: params[:trim_times]})
+          sns.upload_remote_resource(image, {response: :id, trim_times: params[:trim_times]}),
         ]
         result.push(source_url: uri.to_s, image_url: image.to_s)
         break
