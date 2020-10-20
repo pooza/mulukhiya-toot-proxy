@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def upload(path, params = {})
-      params[:trim_times].times {ImageFile.new(path).trim!} if params[:trim_times]
+      params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
     end
 
