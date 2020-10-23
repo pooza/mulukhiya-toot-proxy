@@ -19,11 +19,24 @@ module Mulukhiya
     end
 
     def update(key, values)
+      values.deep_stringify_keys!
       set(key, JSON.parse(get(key)).deep_merge(values).select {|k, v| v.present?})
     end
 
     def prefix
       return 'user'
+    end
+
+    def self.accounts
+      return enum_for(__method__) unless block_given?
+      storage = UserConfigStorage.new
+      storage.all_keys.each do |key|
+        id = key.split(':').last
+        next unless storage[id]['/tags']
+        id = id.to_i if id.match?(/^[[:digit:]]+$/)
+        next unless account = Environment.account_class[id]
+        yield account
+      end
     end
   end
 end
