@@ -35,7 +35,7 @@ module Mulukhiya
         id = key.split(':').last
         next unless storage[id]['/annict/token']
         id = id.to_i if id.match?(/^[[:digit:]]+$/)
-        account = Environment.account_class[id]
+        next unless account = Environment.account_class[id]
         next unless account.webhook
         next unless account.annict
         yield account

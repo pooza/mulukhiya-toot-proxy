@@ -37,8 +37,8 @@
 - 投稿をTwitterにマルチポストする。
 - アニメ視聴記録サービス[Annict](https://annict.jp/)から視聴記録を取得し、投稿する。
 - ローカル投稿を[Dropbox](https://dropbox.com/)等、各種外部サービスに保存。
-- 平易なPOSTで投稿を行えるwebhook。（Slack互換）
-- デフォルトハッシュタグのAtomフィード。（5分ごとにキャッシュされ、IFTTT等との連携に適したもの）
+- 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
+- デフォルトハッシュタグのAtomフィード。（2分ごとにキャッシュされ、IFTTT等との連携に適したもの）
 
 等々。
 

@@ -10,6 +10,7 @@ module Mulukhiya
       @account ||= Environment.account_class[account]
       @storage = UserConfigStorage.new
       @values = @storage[@account.id]
+      @logger = Logger.new
     end
 
     def raw
@@ -23,6 +24,7 @@ module Mulukhiya
     def update(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
+      @logger.info(class: self.class.to_s, account: @account.acct.to_s, message: 'updated')
     end
 
     def webhook_token
