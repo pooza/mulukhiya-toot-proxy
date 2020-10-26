@@ -11,23 +11,19 @@ module Mulukhiya
     def test_handle_toot?
       @handler.clear
       @handler.handle_toot({status_field => 'hoge', 'visibility' => 'private'})
-      assert_equal(@handler.result.count, 1)
+      assert(@handler.result.count.zero?)
 
       @handler.clear
-      @handler.handle_toot({status_field => '@pooza hello'})
-      assert_equal(@handler.result.count, 1)
+      @handler.handle_toot({status_field => '@pooza hello', 'visibility' => 'public'})
+      assert(@handler.result.count.positive?)
 
       @handler.clear
-      @handler.handle_toot({status_field => "command: user_config\n"})
-      assert_equal(@handler.result.count, 1)
+      @handler.handle_toot({status_field => "command: user_config\n", 'visibility' => 'public'})
+      assert(@handler.result.count.positive?)
 
       @handler.clear
       @handler.handle_toot({status_field => 'hoge', 'visibility' => 'public'})
-      assert_equal(@handler.result.count, 2)
-
-      @handler.clear
-      @handler.handle_toot({status_field => 'fuga'})
-      assert_equal(@handler.result.count, 2)
+      assert(@handler.result.count.positive?)
     end
   end
 end
