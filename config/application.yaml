@@ -1,5 +1,5 @@
 package:
-  version: 3.14.7
+  version: 3.14.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -58,6 +58,9 @@ handler:
     disable: true
   amazon_url_nowplaying:
     disable: true
+  good_morning:
+    disable: true
+    pattern: おはようございます。
 worker:
   media_cleaning:
     days: 1
@@ -224,7 +227,7 @@ webui:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
     - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.css
-    - https://use.fontawesome.com/releases/v5.6.1/css/all.css
+    - https://use.fontawesome.com/releases/v5.15.1/css/all.css
     - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
   metadata:
     robots: noindex,nofollow
@@ -276,6 +279,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - itunes_image
@@ -377,6 +381,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - webhook_image
@@ -476,6 +481,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - webhook_image
@@ -568,6 +574,7 @@ dolphin:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - good_morning
       - result_notification
     pre_upload:
       - image_format_convert
@@ -621,6 +628,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - amazon_image

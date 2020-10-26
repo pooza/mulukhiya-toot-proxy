@@ -5,6 +5,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
+      return body unless tweetable?(body)
       reporter.temp[:tweet] = body[status_field]
       result.push(message: 'saved')
       return body

@@ -13,5 +13,5 @@
       a href='/mulukhiya/app/auth' トークンの登録
       | （アプリケーションの認証）を行ってください。
 
-.message-container class='alert' v-if='message'
+.message-container class='alert' v-if='message && message != "Invalid token"'
   p = '{{message}}'
