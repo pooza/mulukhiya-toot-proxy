@@ -226,7 +226,7 @@ webui:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
     - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.css
-    - https://use.fontawesome.com/releases/v5.6.1/css/all.css
+    - https://use.fontawesome.com/releases/v5.15.1/css/all.css
     - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
   metadata:
     robots: noindex,nofollow
