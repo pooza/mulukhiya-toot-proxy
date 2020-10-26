@@ -60,6 +60,7 @@ handler:
     disable: true
   good_morning:
     disable: true
+    pattern: おはようございます。
 worker:
   media_cleaning:
     days: 1
@@ -921,8 +922,6 @@ tagging:
     - url: https://precure.ml/api/dic/v1/series.json
       type: relative
     - url: https://precure.ml/api/dic/v2/fairy.json
-good_morning:
-  pattern: おはようございます。
 feed:
   tag:
     limit: 100
