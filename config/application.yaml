@@ -58,6 +58,8 @@ handler:
     disable: true
   amazon_url_nowplaying:
     disable: true
+  good_morning:
+    disable: true
 worker:
   media_cleaning:
     days: 1
@@ -276,6 +278,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - itunes_image
@@ -377,6 +380,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - webhook_image
@@ -476,6 +480,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - webhook_image
@@ -568,6 +573,7 @@ dolphin:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
+      - good_morning
       - result_notification
     pre_upload:
       - image_format_convert
@@ -621,6 +627,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - tweet
+      - good_morning
       - result_notification
     pre_webhook:
       - amazon_image
@@ -914,6 +921,8 @@ tagging:
     - url: https://precure.ml/api/dic/v1/series.json
       type: relative
     - url: https://precure.ml/api/dic/v2/fairy.json
+good_morning:
+  pattern: おはようございます。
 feed:
   tag:
     limit: 100
