@@ -19,6 +19,7 @@ html lang='ja'
           a href='#' v-else=''
             | 環境設定
             span class='alert' 未認証
+        a href='/mulukhiya/sidekiq' target='_blank' v-if='account.is_admin' Sidekiq
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:
@@ -30,10 +31,13 @@ html lang='ja'
         data: {
           message: null,
           username: null,
+          account: {is_admin: false},
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+          Vue.getConfig()
+            .then(e => {
+              this.username = e.account.username
+              this.account = e.account
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

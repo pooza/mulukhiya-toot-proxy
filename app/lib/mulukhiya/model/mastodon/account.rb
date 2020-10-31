@@ -10,6 +10,8 @@ module Mulukhiya
         unless @hash
           @hash = values.clone
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
+          @hash[:is_admin] = admin?
+          @hash[:is_moderator] = moderator?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
           @hash.compact!

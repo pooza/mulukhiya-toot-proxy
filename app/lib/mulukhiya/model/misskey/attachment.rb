@@ -4,7 +4,7 @@ module Mulukhiya
       many_to_one :account, key: :userId
 
       def to_h
-        unless @hasn
+        unless @hash
           @hash = values.clone
           @hash.merge!(
             acct: account.acct.to_s,
