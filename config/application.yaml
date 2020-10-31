@@ -171,7 +171,6 @@ test:
         - postgres
         - mastodon_auth_contract
         - media_atom_feed_renderer
-        - attachment
     - name: pleroma
       cases:
         - mastodon_controller
@@ -448,6 +447,7 @@ meisskey:
   url: https://meisskey.example.com/
   display_name: めいすきー
   webhook: true
+  media_catalog: true
   feed: true
   announcement: true
   twitter: true
