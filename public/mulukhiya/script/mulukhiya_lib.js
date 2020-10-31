@@ -11,19 +11,15 @@ const MulukhiyaLib = {
     Vue.login = async () => {
       document.body.style.cursor = 'wait'
       return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data.account
-        })
+        .then(e => {return e.data.account})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.getConfig = async () => {
       document.body.style.cursor = 'wait'
       return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.updateConfig = async command => {
@@ -35,10 +31,8 @@ const MulukhiyaLib = {
       }
       document.body.style.cursor = 'wait'
       return axios.post('/mulukhiya/config', values)
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.getToken = () => {
@@ -60,9 +54,8 @@ const MulukhiyaLib = {
       return axios.get(href, {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', token)
-          document.body.style.cursor = 'auto'
           return e.data.account
-        })
+        }).finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.deleteToken = async token => {
@@ -94,18 +87,15 @@ const MulukhiyaLib = {
       return axios.get(href, {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', user.token)
-          document.body.style.cursor = 'auto'
           return e.data.account
-      })
+        }).finally(e=> {document.body.style.cursor = 'auto'})
     }
 
     Vue.getPrograms = async () => {
       document.body.style.cursor = 'wait'
       return axios.get('/mulukhiya/programs', {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.createProgramTags = program => {
@@ -119,19 +109,15 @@ const MulukhiyaLib = {
     Vue.getMedias = async () => {
       document.body.style.cursor = 'wait'
       return axios.get(Vue.createPath('/mulukhiya/medias'), {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.getHealth = async () => {
       document.body.style.cursor = 'wait'
       return axios.get('/mulukhiya/health', {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {document.body.style.cursor = 'auto'})
     }
   }
 }
