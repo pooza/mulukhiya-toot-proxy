@@ -6,7 +6,7 @@ module Mulukhiya
       many_to_one :status
 
       def to_h
-        unless @hasn
+        unless @hash
           @hash = values.clone
           @hash.merge!(
             acct: status.account.acct.to_s,
