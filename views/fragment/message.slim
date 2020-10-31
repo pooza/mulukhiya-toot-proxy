@@ -13,9 +13,5 @@
       a href='/mulukhiya/app/auth' トークンの登録
       | （アプリケーションの認証）を行ってください。
 
-- if controller.webhook?
-  .message-container class='alert' v-if='message && message != "Invalid token"'
-    p = '{{message}}'
-- else
-  .message-container class='alert' v-if='message'
-    p = '{{message}}'
+.message-container class='alert' v-if='message && message != "Invalid token"'
+  p = '{{message}}'
