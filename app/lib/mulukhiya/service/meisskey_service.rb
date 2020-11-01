@@ -38,8 +38,8 @@ module Mulukhiya
           body: {
             name: package_class.name,
             description: @config['/package/description'],
-            permission: @config['/meisskeh/oauth/permission'],
-            callbackUrl: http.create_uri(@config['/meisskeh/oauth/callback_url']).to_s,
+            permission: @config['/meisskey/oauth/permission'],
+            callbackUrl: http.create_uri(@config['/meisskey/oauth/callback_url']).to_s,
           }.to_json,
         })
         raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
