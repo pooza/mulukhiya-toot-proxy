@@ -85,7 +85,7 @@ module Mulukhiya
     def test_app_auth
       get '/mulukhiya/auth', {token: 'hoge'}
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 400)
+      assert_equal(last_response.status, 403)
     end
 
     def test_style

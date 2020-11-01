@@ -234,3 +234,8 @@ properties:
         type: string
       password:
         type: string
+      encoder:
+        type: string
+        enum:
+          - base64
+          - hex

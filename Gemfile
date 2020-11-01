@@ -33,7 +33,6 @@ group :development do
   gem 'rails-erb-lint'
   gem 'rubocop'
   gem 'rubocop-performance'
-  gem 'sinatra-contrib', require: false
   gem 'slim_lint'
   gem 'test-unit'
 end

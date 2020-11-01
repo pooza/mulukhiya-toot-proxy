@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: ae58ca7da8b8a333180df1988f04b45f5f746f29
+  revision: 20a0a3387af039561817444f0d6d30a3ddb99454
   specs:
-    ginseng-core (1.8.2)
+    ginseng-core (1.8.3)
       activesupport
       addressable
       daemon-spawn
@@ -40,9 +40,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: b848898f65c88b915eccee1dbf8ea18b4e6ea264
+  revision: 4b4bd65ada6f4394aee0e41d9175afff49ddb979
   specs:
-    ginseng-web (1.3.0)
+    ginseng-web (1.3.1)
       puma
       sass
       sinatra
@@ -284,7 +284,7 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sequel (5.37.0)
+    sequel (5.38.0)
     sidekiq (6.1.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -303,12 +303,6 @@ GEM
       mustermann (~> 1.0)
       rack (~> 2.2)
       rack-protection (= 2.1.0)
-      tilt (~> 2.0)
-    sinatra-contrib (2.1.0)
-      multi_json
-      mustermann (~> 1.0)
-      rack-protection (= 2.1.0)
-      sinatra (= 2.1.0)
       tilt (~> 2.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
@@ -377,7 +371,6 @@ DEPENDENCIES
   sidekiq
   sidekiq-failures
   sidekiq-scheduler
-  sinatra-contrib
   slim_lint
   test-unit
   twitter
