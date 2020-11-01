@@ -9,5 +9,7 @@ namespace :mulukhiya do
         puts "#{path} #{e.class}: #{e.messagee}"
       end
     end
+
+    task clear: [:clean]
   end
 end

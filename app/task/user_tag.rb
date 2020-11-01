@@ -10,12 +10,14 @@ namespace :mulukhiya do
       end
 
       desc 'clear tags'
-      task :clear do
+      task :clean do
         Mulukhiya::UserConfigStorage.accounts do |account|
           next unless account.config['/tags'].present?
           account.config.update(tags: nil)
         end
       end
+
+      task clear: [:clean]
     end
   end
 end
