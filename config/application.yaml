@@ -940,3 +940,4 @@ agent:
 crypt:
   password: mulukhiya
   salt: mulukhiya
+  encoder: base64
