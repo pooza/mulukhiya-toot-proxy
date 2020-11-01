@@ -10,6 +10,10 @@ module Mulukhiya
       else
         @sns.token = nil
       end
+    rescue => e
+      @logger.error(controller: self.class.to_s, error: e.message)
+      @renderer.status = 403
+      @sns.token = nil
     end
 
     post '/api/v1/statuses' do

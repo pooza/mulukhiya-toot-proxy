@@ -11,8 +11,9 @@ module Mulukhiya
         @sns.token = nil
       end
     rescue => e
-      @logger.error(e)
+      @logger.error(controller: self.class.to_s, error: e.message)
       @renderer.status = 403
+      @sns.token = nil
     end
 
     post '/api/notes/create' do
@@ -92,6 +93,11 @@ module Mulukhiya
         @renderer[:result] = {access_token: @sns.token}
         @renderer.status = r.code
       end
+      return @renderer.to_s
+    rescue => e
+      @renderer = Ginseng::Web::JSONRenderer.new
+      @renderer.status = 403
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
