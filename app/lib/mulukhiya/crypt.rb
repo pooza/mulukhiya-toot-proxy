@@ -19,7 +19,7 @@ module Mulukhiya
         raise "Invalid encoder '#{encoder}'"
       end
     rescue => e
-      raise Ginseng::RequestError, e.message, e.backtrace
+      raise Ginseng::AuthError, e.message, e.backtrace
     end
 
     def decrypt(joined, bit = 256)
@@ -38,7 +38,7 @@ module Mulukhiya
         raise "Invalid encoder '#{encoder}'"
       end
     rescue => e
-      raise Ginseng::RequestError, e.message, e.backtrace
+      raise Ginseng::AuthError, e.message, e.backtrace
     end
 
     def encoder
