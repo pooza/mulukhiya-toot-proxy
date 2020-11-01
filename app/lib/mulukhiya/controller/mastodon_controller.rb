@@ -10,9 +10,6 @@ module Mulukhiya
       else
         @sns.token = nil
       end
-    rescue => e
-      @logger.error(e)
-      @renderer.status = 403
     end
 
     post '/api/v1/statuses' do
@@ -128,6 +125,11 @@ module Mulukhiya
         @renderer[:result] = r.parsed_response
         @renderer.status = r.code
       end
+      return @renderer.to_s
+    rescue => e
+      @renderer = Ginseng::Web::JSONRenderer.new
+      @renderer.status = 403
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
