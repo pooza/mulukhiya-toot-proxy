@@ -10,6 +10,9 @@ module Mulukhiya
       else
         @sns.token = nil
       end
+    rescue => e
+      @logger.error(e)
+      @renderer.status = 403
     end
 
     post '/api/notes/create' do

@@ -16,8 +16,10 @@ module Mulukhiya
         encrypted = enc.update(plaintext) + enc.final
         return [encrypted.bin2hex, salt.bin2hex].join(GLUE)
       else
-        raise "Invalid encoder 'base64'"
+        raise "Invalid encoder '#{encoder}'"
       end
+    rescue => e
+      raise Ginseng::RequestError, e.message, e.backtrace
     end
 
     def decrypt(joined, bit = 256)
@@ -33,8 +35,10 @@ module Mulukhiya
         dec.iv = keyiv[:iv]
         return dec.update(encrypted) + dec.final
       else
-        raise "Invalid encoder 'base64'"
+        raise "Invalid encoder '#{encoder}'"
       end
+    rescue => e
+      raise Ginseng::RequestError, e.message, e.backtrace
     end
 
     def encoder
