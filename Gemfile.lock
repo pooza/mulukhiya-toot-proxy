@@ -40,9 +40,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: b848898f65c88b915eccee1dbf8ea18b4e6ea264
+  revision: 4b4bd65ada6f4394aee0e41d9175afff49ddb979
   specs:
-    ginseng-web (1.3.0)
+    ginseng-web (1.3.1)
       puma
       sass
       sinatra
@@ -304,12 +304,6 @@ GEM
       rack (~> 2.2)
       rack-protection (= 2.1.0)
       tilt (~> 2.0)
-    sinatra-contrib (2.1.0)
-      multi_json
-      mustermann (~> 1.0)
-      rack-protection (= 2.1.0)
-      sinatra (= 2.1.0)
-      tilt (~> 2.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
@@ -377,7 +371,6 @@ DEPENDENCIES
   sidekiq
   sidekiq-failures
   sidekiq-scheduler
-  sinatra-contrib
   slim_lint
   test-unit
   twitter
