@@ -10,7 +10,6 @@ module Mulukhiya
         'id' => id,
       }
       r = @http.get(uri)
-      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
       return nil unless r['items'].present?
       return r['items'].first
     rescue => e

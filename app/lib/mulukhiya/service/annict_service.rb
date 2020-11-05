@@ -32,7 +32,6 @@ module Mulukhiya
       }
       sleep(@config['/annict/sleep/seconds'])
       r = api_service.get(uri)
-      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
       r['activities'].each do |activity|
         next unless activity['action'] == 'create_record'
         yield activity
@@ -61,7 +60,6 @@ module Mulukhiya
         }
         sleep(@config['/annict/sleep/seconds'])
         r = api_service.get(uri)
-        raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
         r['reviews'].each do |review|
           next unless review['user']['id'] == account['id']
           yield review
@@ -82,7 +80,6 @@ module Mulukhiya
       }
       sleep(@config['/annict/sleep/seconds'])
       r = api_service.get(uri)
-      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
       r['activities'].each do |activity|
         next unless activity['action'] == 'create_review'
         yield activity
@@ -116,7 +113,6 @@ module Mulukhiya
         }
         sleep(@config['/annict/sleep/seconds'])
         r = api_service.get(uri)
-        raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
         accounts[@token] = r.parsed_response
       end
       return accounts[@token]

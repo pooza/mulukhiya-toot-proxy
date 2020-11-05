@@ -13,10 +13,10 @@ module Mulukhiya
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
-    rescue Ginseng::ValidateError => e
+    rescue Ginseng::GatewayError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
-      @renderer.status = e.status
+      @renderer.status = e.message.match(/ ([[:digit:]]{3})$/)[1]&.to_i || e.code
       return @renderer.to_s
     end
 

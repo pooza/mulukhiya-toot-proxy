@@ -34,16 +34,14 @@ module Mulukhiya
 
     def oauth_client
       unless client = redis.get('oauth_client')
-        r = http.post('/api/app/create', {
+        client = http.post('/api/app/create', {
           body: {
             name: package_class.name,
             description: @config['/package/description'],
             permission: @config['/misskey/oauth/permission'],
             callbackUrl: http.create_uri(@config['/misskey/oauth/callback_url']).to_s,
           }.to_json,
-        })
-        raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
-        client = r.body
+        }).body
         redis.set('oauth_client', client)
       end
       return JSON.parse(client)
