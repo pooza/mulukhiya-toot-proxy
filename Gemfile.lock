@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: f03928814cc6329841a0839e180be154336af9a4
+  revision: 1670a26676c11f7d9538a32822cda7f7effbf431
   specs:
-    ginseng-fediverse (1.4.0)
+    ginseng-fediverse (1.4.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -84,7 +84,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     bootsnap (1.5.0)
       msgpack (~> 1.0)
-    bson (4.11.0)
+    bson (4.11.1)
     buftok (0.2.0)
     builder (3.2.4)
     concurrent-ruby (1.1.7)
@@ -266,7 +266,7 @@ GEM
       rubocop-ast (>= 1.0.1)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (1.1.0)
+    rubocop-ast (1.1.1)
       parser (>= 2.7.1.5)
     rubocop-performance (1.8.1)
       rubocop (>= 0.87.0)
