@@ -38,7 +38,7 @@ module Mulukhiya
           body: {
             client_name: package_class.name,
             website: @config['/package/url'],
-            redirect_uri: @config['/pleroma/oauth/redirect_uri'],
+            redirect_uris: @config['/pleroma/oauth/redirect_uri'],
             scopes: @config['/pleroma/oauth/scopes'].join(' '),
           }.to_json,
         }).body
