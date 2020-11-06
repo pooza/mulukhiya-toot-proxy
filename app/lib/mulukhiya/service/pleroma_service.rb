@@ -27,6 +27,10 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def filters(params = {})
+      return nil
+    end
+
     def access_token
       return Environment.access_token_class.first(token: token) if token
       return nil
