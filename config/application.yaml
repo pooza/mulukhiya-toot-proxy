@@ -873,6 +873,8 @@ mongo:
 slack:
   hooks: []
 sidekiq:
+  dashboard:
+    url: /mulukhiya/sidekiq
   redis:
     dsn: redis://localhost:6379/2
   auth:
