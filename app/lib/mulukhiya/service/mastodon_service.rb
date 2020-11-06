@@ -30,7 +30,7 @@ module Mulukhiya
           body: {
             client_name: package_class.name,
             website: @config['/package/url'],
-            redirect_uris: @config['/mastodon/oauth/redirect_uri'],
+            redirect_uri: @config['/mastodon/oauth/redirect_uri'],
             scopes: @config['/mastodon/oauth/scopes'].join(' '),
           }.to_json,
         }).body
