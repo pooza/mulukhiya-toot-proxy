@@ -4,8 +4,8 @@ module Mulukhiya
       return announcement unless dropbox
       params = params.clone
       params[:format] = :md
-      r = dropbox.clip(body: create_body(announcement, params))
-      result.push(path: r.path_display)
+      response = dropbox.clip(body: create_body(announcement, params))
+      result.push(path: response.path_display)
       return announcement
     end
 

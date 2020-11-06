@@ -25,10 +25,10 @@ module Mulukhiya
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
-    rescue Ginseng::ValidateError => e
+    rescue Ginseng::GatewayError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
-      @renderer.status = e.status
+      @renderer.status = e.message.match(/ ([[:digit:]]{3})$/)[1]&.to_i || e.code
       return @renderer.to_s
     end
 
@@ -41,10 +41,10 @@ module Mulukhiya
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
       return @renderer.to_s
-    rescue Ginseng::ValidateError => e
+    rescue Ginseng::GatewayError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
-      @renderer.status = e.status
+      @renderer.status = e.message.match(/ ([[:digit:]]{3})$/)[1]&.to_i || e.code
       return @renderer.to_s
     end
 
@@ -83,15 +83,15 @@ module Mulukhiya
         @renderer.status = 422
       else
         @renderer.template = 'auth_result'
-        r = @sns.auth(params[:token])
-        if r.code == 200
+        response = @sns.auth(params[:token])
+        if response.code == 200
           @sns.token = @sns.create_access_token(r.parsed_response['accessToken'])
           @sns.account.config.webhook_token = @sns.token
           @renderer[:hook_url] = @sns.account.webhook&.uri
         end
-        @renderer[:status] = r.code
+        @renderer[:status] = response.code
         @renderer[:result] = {access_token: @sns.token}
-        @renderer.status = r.code
+        @renderer.status = response.code
       end
       return @renderer.to_s
     rescue => e

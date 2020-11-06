@@ -4,8 +4,8 @@ module Mulukhiya
       return announcement unless growi
       params = params.clone
       params[:format] = :md
-      r = growi.clip(body: create_body(announcement, params))
-      result.push(path: r['page']['path'])
+      response = growi.clip(body: create_body(announcement, params))
+      result.push(path: response['page']['path'])
       return announcement
     end
 

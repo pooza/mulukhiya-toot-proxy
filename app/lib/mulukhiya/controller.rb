@@ -115,15 +115,15 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = errors
       elsif @sns.account
-        r = AnnictService.new.auth(params['code'])
-        if r.code == 200
-          @sns.account.config.update(annict: {token: r['access_token']})
+        response = AnnictService.new.auth(params['code'])
+        if response.code == 200
+          @sns.account.config.update(annict: {token: response['access_token']})
           @sns.account.annict.updated_at = Time.now
           @renderer.message = user_config_info
         else
-          @renderer.message = r.parsed_response
+          @renderer.message = response.parsed_response
         end
-        @renderer.status = r.code
+        @renderer.status = response.code
       else
         @renderer.status = 403
       end

@@ -9,10 +9,9 @@ module Mulukhiya
         'key' => api_key,
         'id' => id,
       }
-      r = @http.get(uri)
-      raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
-      return nil unless r['items'].present?
-      return r['items'].first
+      response = @http.get(uri)
+      return nil unless response['items'].present?
+      return response['items'].first
     rescue => e
       raise Ginseng::GatewayError, "invalid video '#{id}' (#{e.message})"
     end

@@ -27,6 +27,10 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def filters(params = {})
+      return nil
+    end
+
     def access_token
       return Environment.access_token_class.first(token: token) if token
       return nil
@@ -34,16 +38,14 @@ module Mulukhiya
 
     def oauth_client
       unless client = redis.get('oauth_client')
-        r = http.post('/api/v1/apps', {
+        client = http.post('/api/v1/apps', {
           body: {
             client_name: package_class.name,
             website: @config['/package/url'],
             redirect_uris: @config['/pleroma/oauth/redirect_uri'],
             scopes: @config['/pleroma/oauth/scopes'].join(' '),
           }.to_json,
-        })
-        raise Ginseng::GatewayError, "Invalid response (#{r.code})" unless r.code == 200
-        client = r.body
+        }).body
         redis.set('oauth_client', client)
       end
       return JSON.parse(client)

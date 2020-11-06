@@ -38,7 +38,6 @@ module Mulukhiya
       return nil unless bandai_channel?
       unless @image_uri
         response = service.get(to_s)
-        return nil unless response.code == 200
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
         uri = Ginseng::URI.parse(body.css('.bch-p-hero img').first.attribute('src').to_s)
         return nil unless uri&.absolute?
