@@ -27,7 +27,7 @@ jobs:
           ruby-version: 2.7.2
       - name: apt install
         run: |
-          #sudo apt update
+          sudo apt update
           sudo apt install ffmpeg
           sudo apt install libpq-dev
           sudo apt install libidn11-dev
