@@ -895,13 +895,13 @@ sidekiq:
       cron: '1 4 * * *'
       class: Mulukhiya::UserTagInitializeWorker
     announcement:
-      every: 2m
+      cron: '0-59/2 * * * *'
       class: Mulukhiya::AnnouncementWorker
     tag_feed_update:
-      every: 2m
+      cron: '0-59/2 * * * *'
       class: Mulukhiya::TagFeedUpdateWorker
     annict_polling:
-      every: 5m
+      cron: '0-59/5 * * * *'
       class: Mulukhiya::AnnictPollingWorker
 puma:
   port: 3008
