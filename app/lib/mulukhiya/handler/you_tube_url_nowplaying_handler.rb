@@ -16,8 +16,8 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push(uri.title)
-      push(uri.artist)
+      push(uri.title.escape_toot)
+      push(uri.artist.escape_toot)
       tags.concat(ArtistParser.new(uri.artist).parse)
       result.push(url: uri.to_s, artist: uri.artist)
     end
