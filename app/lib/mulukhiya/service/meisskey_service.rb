@@ -66,6 +66,10 @@ module Mulukhiya
       return post(note)
     end
 
+    def reset_token
+      @token ||= default_token
+    end
+
     private
 
     def default_token

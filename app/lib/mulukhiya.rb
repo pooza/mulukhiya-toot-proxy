@@ -51,6 +51,10 @@ module Mulukhiya
     end
     return Rack::URLMap.new(
       '/' => Environment.controller_class,
+      '/mulukhiya' => UIController,
+      '/mulukhiya/oauth' => Environment.controller_class,
+      '/mulukhiya/api' => APIController,
+      '/mulukhiya/feed' => FeedController,
       '/mulukhiya/webhook' => WebhookController,
       '/mulukhiya/sidekiq' => Sidekiq::Web,
     )

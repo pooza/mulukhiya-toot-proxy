@@ -2,20 +2,6 @@ module Mulukhiya
   class MisskeyController < Controller
     include ControllerMethods
 
-    before do
-      if params[:token].present? && home?
-        @sns.token = Crypt.new.decrypt(params[:token])
-      elsif params[:i]
-        @sns.token = params[:i]
-      else
-        @sns.token = nil
-      end
-    rescue => e
-      @logger.error(controller: self.class.to_s, error: e.message)
-      @renderer.status = 403
-      @sns.token = nil
-    end
-
     post '/api/notes/create' do
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       params.delete(status_field) if params[status_field].empty?
@@ -73,7 +59,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/mulukhiya/auth' do
+    get '/auth' do
       @renderer = SlimRenderer.new
       errors = MisskeyAuthContract.new.exec(params)
       if errors.present?

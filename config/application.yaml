@@ -214,7 +214,7 @@ webui:
     - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
-    - /mulukhiya/script/mulukhiya_lib.js
+    - /mulukhiya/script/mulukhiya_lib
   stylesheets:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
@@ -425,7 +425,7 @@ misskey:
       - write:notes
       - write:drive
       - read:drive
-    callback_url: /mulukhiya/auth
+    callback_url: /mulukhiya/oauth/auth
   status:
     key: noteId
     label: ノート
@@ -868,13 +868,13 @@ sidekiq:
       cron: '1 4 * * *'
       class: Mulukhiya::UserTagInitializeWorker
     announcement:
-      cron: '0-59/2 * * * *'
+      every: 2m
       class: Mulukhiya::AnnouncementWorker
     tag_feed_update:
-      cron: '0-59/2 * * * *'
+      every: 2m
       class: Mulukhiya::TagFeedUpdateWorker
     annict_polling:
-      cron: '0-59/5 * * * *'
+      every: 5m
       class: Mulukhiya::AnnictPollingWorker
 puma:
   port: 3008

@@ -2,20 +2,6 @@ module Mulukhiya
   class MastodonController < Controller
     include ControllerMethods
 
-    before do
-      if params[:token].present? && home?
-        @sns.token = Crypt.new.decrypt(params[:token])
-      elsif @headers['Authorization']
-        @sns.token = @headers['Authorization'].split(/\s+/).last
-      else
-        @sns.token = nil
-      end
-    rescue => e
-      @logger.error(controller: self.class.to_s, error: e.message)
-      @renderer.status = 403
-      @sns.token = nil
-    end
-
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
@@ -109,7 +95,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/mulukhiya/auth' do
+    post '/auth' do
       @renderer = SlimRenderer.new
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?

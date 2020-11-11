@@ -307,7 +307,7 @@ html lang='ja'
           authAnnict: function () {
             const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/annict/auth', values)
+            axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null

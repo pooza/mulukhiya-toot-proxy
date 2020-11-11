@@ -16,7 +16,7 @@ html lang='ja'
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して、下の欄に入力してください。
             li 認証ボタンを押下。
-          form method='POST' action='/mulukhiya/auth'
+          form method='POST' action='/mulukhiya/oauth/auth'
             .inline-field-container
               h4 認証コード
               input type='text' name='code' placeholder='#{controller.name}の認証コード' class='code'

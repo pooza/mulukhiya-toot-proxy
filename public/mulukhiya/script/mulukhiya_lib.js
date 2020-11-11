@@ -10,14 +10,14 @@ const MulukhiyaLib = {
 
     Vue.login = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
         .then(e => {return e.data.account})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.getConfig = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get(Vue.createPath('/mulukhiya/config'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
@@ -30,7 +30,7 @@ const MulukhiyaLib = {
         text: JSON.stringify(command),
       }
       document.body.style.cursor = 'wait'
-      return axios.post('/mulukhiya/config', values)
+      return axios.post('/mulukhiya/api/config', values)
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
@@ -50,7 +50,7 @@ const MulukhiyaLib = {
 
     Vue.registerToken = async token => {
       document.body.style.cursor = 'wait'
-      const href = '/mulukhiya/config?token=' + encodeURIComponent(token)
+      const href = '/mulukhiya/api/config?token=' + encodeURIComponent(token)
       return axios.get(href, {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', token)
@@ -68,7 +68,7 @@ const MulukhiyaLib = {
       const users = []
       document.body.style.cursor = 'wait'
       Vue.getTokens().forEach(t => {
-        const href = '/mulukhiya/config?token=' + encodeURIComponent(t)
+        const href = '/mulukhiya/api/config?token=' + encodeURIComponent(t)
         axios.get(href, {responseType: 'json'}).then(e => {
           users.push({
             username: e.data.account.username,
@@ -83,7 +83,7 @@ const MulukhiyaLib = {
 
     Vue.switchUser = async user => {
       document.body.style.cursor = 'wait'
-      const href = '/mulukhiya/config?token=' + encodeURIComponent(user.token)
+      const href = '/mulukhiya/api/config?token=' + encodeURIComponent(user.token)
       return axios.get(href, {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', user.token)
@@ -93,7 +93,7 @@ const MulukhiyaLib = {
 
     Vue.getPrograms = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get('/mulukhiya/programs', {responseType: 'json'})
+      return axios.get('/mulukhiya/api/programs', {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
@@ -108,14 +108,14 @@ const MulukhiyaLib = {
 
     Vue.getMedias = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get(Vue.createPath('/mulukhiya/medias'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/medias'), {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
 
     Vue.getHealth = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get('/mulukhiya/health', {responseType: 'json'})
+      return axios.get('/mulukhiya/api/health', {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
