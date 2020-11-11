@@ -93,28 +93,6 @@ properties:
       dsn:
         type: string
         format: uri
-  twitter:
-    type: object
-    required:
-      - consumer
-    properties:
-      consumer:
-        type: object
-        required:
-          - key
-          - secret
-        properties:
-          key:
-            type: string
-          secret:
-            type: string
-      status:
-        type: object
-        properties:
-          tags:
-            type: array
-            items:
-              type: string
   annict:
     type: object
     required:

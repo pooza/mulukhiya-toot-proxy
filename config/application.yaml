@@ -31,8 +31,6 @@ handler:
   spotify_image:
     timeout: 10
     disable: true
-  tweet:
-    disable: true
   canonical_url:
     ignore:
       domains:
@@ -129,11 +127,6 @@ test:
         - video_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
-    - name: twitter
-      cases:
-        - twitter_service
-        - tweet_handler
-        - twitter_auth_contract
     - name: dolphin
       cases:
         - mastodon_controller
@@ -239,7 +232,6 @@ mastodon:
   feed: true
   announcement: true
   filter: true
-  twitter: true
   annict: true
   media_api:
     version: null
@@ -269,7 +261,6 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
@@ -277,7 +268,6 @@ mastodon:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -349,7 +339,6 @@ misskey:
   media_catalog: true
   feed: true
   announcement: true
-  twitter: true
   annict: true
   dbms: postgres
   parser: note
@@ -372,14 +361,12 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -450,7 +437,6 @@ meisskey:
   media_catalog: true
   feed: true
   announcement: true
-  twitter: true
   annict: true
   dbms: mongo
   parser: note
@@ -473,14 +459,12 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -595,7 +579,6 @@ dolphin:
 pleroma:
   url: https://pleroma.example.com/
   webhook: true
-  twitter: true
   annict: true
   dbms: postgres
   parser: toot
@@ -620,14 +603,12 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -803,14 +784,6 @@ itunes:
     - itunes.apple.com
 youtube:
   url: https://www.googleapis.com/
-twitter:
-  status:
-    default_tags: []
-    appendable_tags:
-      - 実況
-    length:
-      max: 140
-      url: 12
 bandai_channel:
   hosts:
     - www.b-ch.com

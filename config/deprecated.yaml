@@ -1,9 +1,3 @@
-- key: /twitter/status/default_tags
-  aliases:
-    - /twitter/status/tags
-- key: /spotify/client/id
-  aliases:
-    - /spotify/client_id
 - key: /spotify/client/secret
   aliases:
     - /spotify/client_secret

@@ -78,13 +78,6 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
-      section class='config' v-if='username && layout.sections.twitter'
-        h3 @click='toggleVisibility("twitter")' Twitter
-        vue-slide-up-down :active='layout.details.twitter'
-          .field-update-button-container
-            a :href='hrefs.twitter'
-              img src='/mulukhiya/sign_in_twitter.png'
-            button class='alert' @click='unauthTwitter' 認証を解除
       section class='config' v-if='username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
@@ -167,7 +160,6 @@ html lang='ja'
               livecure: #{controller.livecure?},
               growi: #{controller.growi?},
               dropbox: #{controller.dropbox?},
-              twitter: #{controller.twitter?},
               annict: #{controller.annict?},
             },
             details: {
@@ -177,16 +169,13 @@ html lang='ja'
               livecure: false,
               webhook: false,
               notify: false,
-              twitter: false,
               annict: false,
             },
           },
-          hrefs: {twitter: null},
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {
-              this.hrefs.twitter = Vue.createPath('/auth/twitter')
               this.username = e.account.username
               this.updateForm(e)
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
@@ -314,17 +303,6 @@ html lang='ja'
             if (this.form.notify.verbose) {command.notify.verbose = true}
             if (this.form.notify.user_config) {command.notify.user_config = true}
             this.updateConfig(command)
-          },
-          unauthTwitter: function () {
-            this.$dialog.confirm(
-              {title: '認証の解除', body: 'Twitterのトークンを削除します。'},
-              {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              this.updateConfig({twitter: null})
-              this.layout.details.twitter = false
-            }).catch(e => {
-              this.message = Vue.createErrorMessage(e)
-            })
           },
           authAnnict: function () {
             const values = {token: Vue.getToken(), code: this.form.annict.auth_code}

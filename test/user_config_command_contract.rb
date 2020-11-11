@@ -32,15 +32,6 @@ module Mulukhiya
       errors = @contract.call(command: 'user_config', annict: {token: 222}).errors
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', twitter: {token: 'aaa', secret: 'bbb'}).errors
-      assert(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', twitter: {token: 222}).errors
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', twitter: {secret: 222}).errors
-      assert_false(errors.empty?)
-
       errors = @contract.call(command: 'user_config', notify: {verbose: true, user_config: true}).errors
       assert(errors.empty?)
 

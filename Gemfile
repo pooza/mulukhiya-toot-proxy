@@ -11,13 +11,10 @@ gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'mimemagic'
 gem 'nokogiri'
-gem 'omniauth-twitter'
 gem 'rspotify'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler'
-gem 'twitter'
-gem 'twitter-text'
 gem 'vacuum'
 
 group :postgres do

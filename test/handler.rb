@@ -5,7 +5,6 @@ module Mulukhiya
     end
 
     def test_search
-      assert_kind_of(Array, Handler.search(/twitter/))
       assert_kind_of(Array, Handler.search(/amazon/))
     end
   end

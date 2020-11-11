@@ -20,10 +20,6 @@ module Mulukhiya
       assert_boolean(controller_class.filter?)
     end
 
-    def test_twitter?
-      assert_boolean(controller_class.twitter?)
-    end
-
     def test_annict?
       assert_boolean(controller_class.annict?)
     end
