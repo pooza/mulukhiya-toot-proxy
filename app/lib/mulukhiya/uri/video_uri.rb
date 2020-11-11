@@ -3,10 +3,15 @@ module Mulukhiya
     include Package
 
     def artist
-      artist = data.dig('snippet', 'tags')&.first if auto_generated_description?
-      artist ||= channel.sub(/ - Topic$/, '') if music?
-      artist ||= channel
-      return artist
+      if auto_generated_description?
+        tags = data.dig('snippet', 'tags')
+        tags.each do |tag|
+          return tag unless tag.match?('^[ _a-zA-Z0-9]+$')
+        end
+        return tags.first if tags.first
+      end
+      return channel.sub(/ - Topic$/, '') if music?
+      return channel
     end
 
     def auto_generated_description?

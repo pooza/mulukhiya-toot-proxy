@@ -73,6 +73,13 @@ module Mulukhiya
         artist: '池田彩',
         url: 'https://music.youtube.com/watch?v=xhV_q_kj2hU&feature=share',
       }])
+
+      @handler.clear
+      @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=aYSFvJ43-to&feature=share\n"})
+      assert_equal(@handler.debug_info[:result], [{
+        artist: '牧野由依',
+        url: 'https://music.youtube.com/watch?v=aYSFvJ43-to&feature=share',
+      }])
     end
   end
 end
