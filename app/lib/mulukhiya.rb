@@ -2,6 +2,7 @@ require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'
+require 'mulukhiya/refines'
 
 module Mulukhiya
   def self.dir

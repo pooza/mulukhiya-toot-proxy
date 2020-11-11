@@ -16,10 +16,10 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push(uri.item.dig('ItemInfo', 'Title', 'DisplayValue'))
+      push(uri.item.dig('ItemInfo', 'Title', 'DisplayValue').escape_toot)
       return unless contributors = uri.item.dig('ItemInfo', 'ByLineInfo', 'Contributors')
       push(contributors.map {|v| v['Name']}.join(', '))
-      tags.concat(ArtistParser.new(contributors.map {|v| v['Name']}.join('、')).parse)
+      tags.concat(ArtistParser.new(contributors.map {|v| v['Name'].escape_toot}.join('、')).parse)
       result.push(url: uri.to_s)
     end
   end

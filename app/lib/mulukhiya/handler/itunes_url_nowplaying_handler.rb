@@ -13,13 +13,13 @@ module Mulukhiya
     def update(keyword)
       return unless uri = @uris[keyword]
       if uri.track
-        push(uri.track['trackName'])
+        push(uri.track['trackName'].escape_toot)
         artist = uri.track['artistName']
       elsif uri.album
-        push(uri.album['collectionName'])
+        push(uri.album['collectionName'].escape_toot)
         artist = uri.album['artistName']
       end
-      push(artist)
+      push(artist.escape_toot)
       tags.concat(ArtistParser.new(artist).parse)
       result.push(url: uri.to_s, artist: artist)
     end
