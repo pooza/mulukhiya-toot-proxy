@@ -1,4 +1,4 @@
-require 'bootsnap'
+require 'bootsnap/setup'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'
