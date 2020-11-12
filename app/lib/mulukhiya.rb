@@ -1,4 +1,4 @@
-require 'bootsnap/setup'
+require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'ginseng'
@@ -68,12 +68,12 @@ module Mulukhiya
   end
 end
 
-Redis.exists_returns_integer = true
-
-Mulukhiya.bootsnap
-Mulukhiya.loader.setup
 Bundler.require
+Mulukhiya.loader.setup
+Mulukhiya.bootsnap
 Mulukhiya.sidekiq
+
+Redis.exists_returns_integer = true
 
 if Mulukhiya::Environment.postgres?
   require 'ginseng/postgres'
