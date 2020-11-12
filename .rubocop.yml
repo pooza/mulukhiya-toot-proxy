@@ -188,6 +188,9 @@ Layout/LineLength:
 Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: true
 
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
 Metrics/AbcSize:
   Max: 30
   Exclude:
