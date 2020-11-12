@@ -5,7 +5,7 @@ module Mulukhiya
       return unless handler?
       @handler.handle_pre_upload(file: {
         tempfile: File.new(
-          File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'),
+          File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'),
         ),
       })
     end

@@ -1,15 +1,15 @@
 module Mulukhiya
   class ScriptRenderer < Ginseng::Web::Renderer
     include Package
-    attr_reader :file
+    attr_reader :name
 
-    def file=(name)
-      @file = name.sub(/\.js$/, '')
+    def name=(name)
+      @name = name.sub(/\.js$/, '')
       raise Ginseng::RenderError, "Script '#{name}' not found." unless File.exist?(path)
     end
 
     def path
-      return File.join(Environment.dir, 'public/mulukhiya/script', "#{file}.js")
+      return File.join(Environment.dir, 'public/mulukhiya/script', "#{name}.js")
     end
 
     def type

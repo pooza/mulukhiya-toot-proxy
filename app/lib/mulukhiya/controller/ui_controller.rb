@@ -11,7 +11,7 @@ module Mulukhiya
       @renderer.template = params[:page]
       @renderer[:oauth_url] = @sns.oauth_uri
       return @renderer.to_s
-    rescue Ginseng::RenderError
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
     end
 
@@ -43,23 +43,29 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/media/:media' do
+      @renderer = StaticMediaRenderer.new
+      @renderer.name = params[:media]
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    end
+
     get '/style/:style' do
       @renderer = CSSRenderer.new
       @renderer.template = params[:style]
       return @renderer.to_s
-    rescue Ginseng::RenderError
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
     end
 
     get '/script/:script' do
       @renderer = ScriptRenderer.new
-      @renderer.file = params[:script]
+      @renderer.name = params[:script]
       return @renderer.to_s
-    rescue Ginseng::RenderError
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
     end
-
-    private
 
     def token
       return Crypt.new.decrypt(params[:token]) if params[:token]

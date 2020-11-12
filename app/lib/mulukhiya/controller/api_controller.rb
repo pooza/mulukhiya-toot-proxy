@@ -81,8 +81,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    private
-
     def token
       return Crypt.new.decrypt(params[:token]) if params[:token]
     end

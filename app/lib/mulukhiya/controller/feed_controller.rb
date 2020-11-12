@@ -20,8 +20,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    private
-
     def token
       return nil
     end
