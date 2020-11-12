@@ -281,7 +281,7 @@ html lang='ja'
               text: JSON.stringify(command),
             }
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/filter', values)
+            axios.post('/mulukhiya/api/filter', values)
               .then(e => {
                 this.message = null
                 this.layout.details.livecure = false

@@ -5,11 +5,7 @@ module Mulukhiya
 
     def file=(name)
       @file = name.sub(/\.js$/, '')
-      if File.exist?(path)
-        @status = 200
-      else
-        @status = 404
-      end
+      raise Ginseng::RenderError, "Script '#{name}' not found." unless File.exist?(path)
     end
 
     def path

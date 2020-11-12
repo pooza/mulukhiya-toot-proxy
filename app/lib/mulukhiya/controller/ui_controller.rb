@@ -27,6 +27,8 @@ module Mulukhiya
       @renderer = ScriptRenderer.new
       @renderer.file = params[:script]
       return @renderer.to_s
+    rescue Ginseng::RenderError
+      @renderer.status = 404
     end
 
     private

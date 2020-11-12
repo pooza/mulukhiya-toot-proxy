@@ -26,6 +26,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/filter' do
+      Handler.create('filter_command').handle_toot(params, {sns: @sns})
+      @renderer.message = {filters: @sns.filters}
+      return @renderer.to_s
+    end
+
     get '/programs' do
       @sns.reset_token
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
