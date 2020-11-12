@@ -343,7 +343,6 @@ DEPENDENCIES
   ginseng-youtube!
   mimemagic
   mongo
-  nokogiri
   rack-test
   rails-erb-lint
   rspotify
