@@ -180,6 +180,7 @@ GEM
     mongo (2.13.1)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.3.3)
+    msgpack (1.3.3-x64-mingw32)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -188,6 +189,8 @@ GEM
     netrc (0.11.0)
     nio4r (2.5.4)
     nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
+    nokogiri (1.10.10-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -318,6 +321,7 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   bootsnap

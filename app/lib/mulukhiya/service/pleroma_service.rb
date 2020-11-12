@@ -69,7 +69,7 @@ module Mulukhiya
       return post(toot)
     end
 
-    def reset_token
+    def init_token!
       @token ||= default_token
     end
 

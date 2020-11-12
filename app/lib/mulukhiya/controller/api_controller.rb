@@ -1,7 +1,7 @@
 module Mulukhiya
   class APIController < Controller
     get '/about' do
-      @sns.reset_token
+      @sns.init_token!
       @renderer.message = {package: @config.raw.dig('application', 'package')}
       return @renderer.to_s
     end
@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     get '/programs' do
-      @sns.reset_token
+      @sns.init_token!
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)
         @renderer.message = JSON.parse(File.read(path))
@@ -44,7 +44,7 @@ module Mulukhiya
     end
 
     get '/medias' do
-      @sns.reset_token
+      @sns.init_token!
       if Environment.controller_class.media_catalog?
         @renderer.message = Environment.attachment_class.catalog
       else
@@ -54,7 +54,7 @@ module Mulukhiya
     end
 
     get '/health' do
-      @sns.reset_token
+      @sns.init_token!
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
       return @renderer.to_s
