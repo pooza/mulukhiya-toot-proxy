@@ -12,42 +12,6 @@ module Mulukhiya
       return PleromaController
     end
 
-    def test_root
-      get '/mulukhiya'
-      assert(last_response.ok?)
-    end
-
-    def test_about
-      get '/mulukhiya/about'
-      assert(last_response.ok?)
-    end
-
-    def test_health
-      get '/mulukhiya/health'
-      assert(last_response.ok?)
-    end
-
-    def test_config
-      get '/mulukhiya/config'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-
-      header 'Authorization', 'Bearer invalid'
-      get '/mulukhiya/config'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-
-      header 'Authorization', "Bearer #{@parser.account.token}"
-      get '/mulukhiya/config'
-      assert(last_response.ok?)
-    end
-
-    def test_not_found
-      get '/not_found'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
-    end
-
     def test_status_length
       header 'Authorization', "Bearer #{@parser.account.token}"
       post '/api/v1/statuses', {status_field => 'A' * @parser.max_length}
@@ -86,26 +50,6 @@ module Mulukhiya
       tags = JSON.parse(last_response.body)['tags'].map {|v| v['name']}
       assert(tags.member?('日本語のタグ'))
       assert(tags.member?('nowplaying'))
-    end
-
-    def test_app_auth
-      post '/mulukhiya/auth', {code: 'hoge'}
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-    end
-
-    def test_style
-      get '/mulukhiya/style/default'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/style/undefined'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
-    end
-
-    def test_static_resource
-      get '/mulukhiya/icon.png'
-      assert(last_response.ok?)
     end
 
     def test_webhook_entries

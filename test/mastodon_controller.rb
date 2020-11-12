@@ -12,42 +12,6 @@ module Mulukhiya
       return MastodonController
     end
 
-    def test_root
-      get '/mulukhiya'
-      assert(last_response.ok?)
-    end
-
-    def test_about
-      get '/mulukhiya/about'
-      assert(last_response.ok?)
-    end
-
-    def test_health
-      get '/mulukhiya/health'
-      assert(last_response.ok?)
-    end
-
-    def test_config
-      get '/mulukhiya/config'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-
-      header 'Authorization', 'Bearer invalid'
-      get '/mulukhiya/config'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-
-      header 'Authorization', "Bearer #{@parser.account.token}"
-      get '/mulukhiya/config'
-      assert(last_response.ok?)
-    end
-
-    def test_not_found
-      get '/not_found'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
-    end
-
     def test_search
       header 'Authorization', "Bearer #{@parser.account.token}"
       get '/api/v2/search?q=hoge'
@@ -88,14 +52,6 @@ module Mulukhiya
       assert(JSON.parse(last_response.body)['content'].include?('<p>！!！!！<'))
     end
 
-    def test_programs
-      get '/mulukhiya/programs'
-      assert(last_response.ok?)
-    rescue Ginseng::ConfigError
-      @config['/programs/url'] = 'https://script.google.com/macros/s/AKfycbxlqRJxUq1dIsshRF6luZvL-_T08OTZD7YKOmAhLHfZeoZy3Ox-/exec'
-      retry
-    end
-
     def test_toot_response
       return if Handler.create('itunes_url_nowplaying').disable?
       header 'Authorization', "Bearer #{@parser.account.token}"
@@ -105,26 +61,6 @@ module Mulukhiya
       tags = JSON.parse(last_response.body)['tags'].map {|v| v['name']}
       assert(tags.member?('日本語のタグ'))
       assert(tags.member?('nowplaying'))
-    end
-
-    def test_app_auth
-      post '/mulukhiya/auth', {code: 'hoge'}
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-    end
-
-    def test_style
-      get '/mulukhiya/style/default'
-      assert(last_response.ok?)
-
-      get '/mulukhiya/style/undefined'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
-    end
-
-    def test_static_resource
-      get '/mulukhiya/icon.png'
-      assert(last_response.ok?)
     end
 
     def test_webhook_entries
