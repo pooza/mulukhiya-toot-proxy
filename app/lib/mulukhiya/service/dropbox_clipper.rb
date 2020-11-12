@@ -1,4 +1,3 @@
-require 'dropbox_api'
 require 'digest/sha1'
 
 module Mulukhiya

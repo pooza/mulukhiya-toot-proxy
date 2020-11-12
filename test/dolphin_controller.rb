@@ -1,5 +1,3 @@
-require 'rack/test'
-
 module Mulukhiya
   class DolphinControllerTest < TestCase
     include ::Rack::Test::Methods

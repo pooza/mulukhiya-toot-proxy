@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Mulukhiya
   class CanonicalURLHandler < URLHandler
     def initialize(params = {})

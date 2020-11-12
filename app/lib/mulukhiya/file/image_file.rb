@@ -1,5 +1,3 @@
-require 'fastimage'
-
 module Mulukhiya
   class ImageFile < MediaFile
     alias image? valid?

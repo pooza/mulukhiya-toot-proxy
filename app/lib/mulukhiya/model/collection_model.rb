@@ -1,5 +1,3 @@
-require 'mongo'
-
 module Mulukhiya
   class CollectionModel
     attr_reader :id

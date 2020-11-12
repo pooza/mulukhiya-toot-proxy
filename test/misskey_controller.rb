@@ -1,5 +1,3 @@
-require 'rack/test'
-
 module Mulukhiya
   class MisskeyControllerTest < TestCase
     include ::Rack::Test::Methods

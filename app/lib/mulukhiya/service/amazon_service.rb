@@ -1,5 +1,3 @@
-require 'vacuum'
-
 module Mulukhiya
   class AmazonService
     def initialize

@@ -1,4 +1,5 @@
 require 'sidekiq/testing'
+require 'rack/test'
 
 module Mulukhiya
   class TestCase < Ginseng::TestCase

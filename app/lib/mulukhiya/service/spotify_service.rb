@@ -1,5 +1,3 @@
-require 'rspotify'
-
 module Mulukhiya
   class SpotifyService
     def initialize
