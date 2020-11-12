@@ -95,34 +95,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/auth' do
-      @renderer = SlimRenderer.new
-      errors = MastodonAuthContract.new.exec(params)
-      if errors.present?
-        @renderer.template = 'auth'
-        @renderer[:errors] = errors
-        @renderer[:oauth_url] = @sns.oauth_uri
-        @renderer.status = 422
-      else
-        @renderer.template = 'auth_result'
-        response = @sns.auth(params[:code])
-        if response.code == 200
-          @sns.token = response.parsed_response['access_token']
-          @sns.account.config.webhook_token = @sns.token
-          @renderer[:hook_url] = @sns.account.webhook&.uri
-        end
-        @renderer[:status] = response.code
-        @renderer[:result] = response.parsed_response
-        @renderer.status = response.code
-      end
-      return @renderer.to_s
-    rescue => e
-      @renderer = Ginseng::Web::JSONRenderer.new
-      @renderer.status = 403
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     def media_api_default_version
       return @config['/mastodon/media_api/version']
     rescue Ginseng::ConfigError

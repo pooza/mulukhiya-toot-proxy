@@ -425,7 +425,7 @@ misskey:
       - write:notes
       - write:drive
       - read:drive
-    callback_url: /mulukhiya/oauth/auth
+    callback_url: /mulukhiya/api/mastodon/auth
   status:
     key: noteId
     label: ノート
