@@ -9,7 +9,6 @@ properties:
     enum:
       - mastodon
       - misskey
-      - dolphin
       - pleroma
       - meisskey
   environment:

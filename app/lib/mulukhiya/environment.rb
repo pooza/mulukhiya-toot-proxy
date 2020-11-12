@@ -54,10 +54,6 @@ module Mulukhiya
       return controller_name == 'mastodon'
     end
 
-    def self.dolphin?
-      return controller_name == 'dolphin'
-    end
-
     def self.misskey?
       return controller_name == 'misskey'
     end

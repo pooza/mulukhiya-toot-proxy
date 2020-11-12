@@ -127,21 +127,8 @@ test:
         - video_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
-    - name: dolphin
-      cases:
-        - mastodon_controller
-        - misskey_controller
-        - meisskey_controller
-        - pleroma_controller
-        - webhook_controller
-        - mongo
-        - access_token
-        - mastodon_auth_contract
-        - media_atom_feed_renderer
-        - attachment
     - name: mastodon
       cases:
-        - dolphin_controller
         - misskey_controller
         - meisskey_controller
         - pleroma_controller
@@ -151,7 +138,6 @@ test:
       cases:
         - mastodon_controller
         - meisskey_controller
-        - dolphin_controller
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
@@ -159,7 +145,6 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
-        - dolphin_controller
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
@@ -168,7 +153,6 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
-        - dolphin_controller
         - meisskey_controller
         - mongo
         - hash_tag
@@ -528,54 +512,6 @@ meisskey:
     key: noteId
     label: ノート
     max_length: 1000
-dolphin:
-  url: https://dolphin.example.com/
-  feed: true
-  dbms: postgres
-  parser: note
-  handlers:
-    pre_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - mention_visibility
-      - bandai_channel_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - tagging
-      - invalid_command
-    post_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - good_morning
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - result_notification
-  status:
-    key: noteId
-    label: ノート
-    max_length: 500
 pleroma:
   url: https://pleroma.example.com/
   webhook: true
