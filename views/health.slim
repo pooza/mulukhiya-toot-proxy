@@ -26,8 +26,8 @@ html lang='ja'
           result: {status: 500},
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
+          Vue.getConfig()
+            .then(e => {this.username = e.account.username})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           this.load()
             .then(e => {this.result = e})

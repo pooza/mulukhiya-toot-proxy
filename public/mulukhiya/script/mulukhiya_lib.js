@@ -8,13 +8,6 @@ const MulukhiyaLib = {
       return ('response' in e) ? e.response.data.error : e.message
     }
 
-    Vue.login = async () => {
-      document.body.style.cursor = 'wait'
-      return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
-        .then(e => {return e.data.account})
-        .finally(e => {document.body.style.cursor = 'auto'})
-    }
-
     Vue.getConfig = async () => {
       document.body.style.cursor = 'wait'
       return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
