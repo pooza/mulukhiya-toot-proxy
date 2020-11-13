@@ -66,6 +66,10 @@ module Mulukhiya
       return controller_name == 'pleroma'
     end
 
+    def self.sns_type
+      return config["/#{config['/controller']}/sns_type"]
+    end
+
     def self.postgres?
       return controller_class.postgres?
     end

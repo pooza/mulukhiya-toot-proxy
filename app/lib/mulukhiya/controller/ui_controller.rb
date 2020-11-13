@@ -55,7 +55,7 @@ module Mulukhiya
         @renderer.template = 'auth_result'
         response = @sns.auth(params[:token])
         if response.code == 200
-          @sns.token = @sns.create_access_token(r.parsed_response['accessToken'])
+          @sns.token = @sns.create_access_token(response.parsed_response['accessToken'])
           @sns.account.config.webhook_token = @sns.token
           @renderer[:hook_url] = @sns.account.webhook&.uri
         end

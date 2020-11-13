@@ -32,7 +32,7 @@ module Mulukhiya
 
       def public_uri
         unless @public_uri
-          if ['mastodon', 'pleroma'].member?(Environment.controller_name)
+          if Environment.sns_type == 'mastodon'
             service = Environment.sns_class.new
           else
             service = MastodonService.new

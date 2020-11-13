@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def max_length
-      if ['misskey', 'meisskey'].member?(Environment.controller_name)
+      if Environment.sns_type == 'misskey'
         length = @config["/#{Environment.controller_name}/status/max_length"]
       else
         length = @config['/misskey/status/max_length']
