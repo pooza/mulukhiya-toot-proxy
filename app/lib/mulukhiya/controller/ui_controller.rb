@@ -43,6 +43,34 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/app/misskey/auth' do
+      @renderer = SlimRenderer.new
+      errors = MisskeyAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.template = 'auth'
+        @renderer[:errors] = errors
+        @renderer[:oauth_url] = @sns.oauth_uri
+        @renderer.status = 422
+      else
+        @renderer.template = 'auth_result'
+        response = @sns.auth(params[:token])
+        if response.code == 200
+          @sns.token = @sns.create_access_token(r.parsed_response['accessToken'])
+          @sns.account.config.webhook_token = @sns.token
+          @renderer[:hook_url] = @sns.account.webhook&.uri
+        end
+        @renderer[:status] = response.code
+        @renderer[:result] = {access_token: @sns.token}
+        @renderer.status = response.code
+      end
+      return @renderer.to_s
+    rescue => e
+      @renderer = Ginseng::Web::JSONRenderer.new
+      @renderer.status = 403
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/media/:media' do
       @renderer = StaticMediaRenderer.new
       @renderer.name = params[:media]
