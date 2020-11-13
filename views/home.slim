@@ -19,7 +19,7 @@ html lang='ja'
           a href='#' v-else=''
             | 環境設定
             span class='alert' 未認証
-        a :href='sidekiq.dashboard' target='_blank' v-if='account.is_admin' Sidekiq
+        a href='#{config['/sidekiq/dashboard/url']}' target='_blank' v-if='account.is_admin' Sidekiq
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:
@@ -32,9 +32,6 @@ html lang='ja'
           message: null,
           username: null,
           account: {is_admin: false},
-          sidekiq: {
-            dashboard: '#{config['/sidekiq/dashboard/url']}',
-          },
         },
         mounted: function () {
           Vue.getConfig()
