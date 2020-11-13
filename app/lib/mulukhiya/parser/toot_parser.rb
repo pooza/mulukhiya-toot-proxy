@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def max_length
-      if Environment.sns_type == 'mastodon'
+      if Environment.mastodon_type?
         length = @config["/#{Environment.controller_name}/status/max_length"]
       else
         length = @config['/mastodon/status/max_length']

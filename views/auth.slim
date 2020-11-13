@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 トークンの登録
       section class='config'
-        - if env.sns_type == 'mastodon'
+        - if env.mastodon_type?
           ol
             li
               a href=params[:oauth_url] target='_blank' 認証コードを取得
@@ -24,7 +24,7 @@ html lang='ja'
                 p class='alert' = params[:errors][:code].join
             .field-update-button-container
               button 認証
-        - if env.sns_type == 'misskey'
+        - if env.misskey_type?
           ol
             li
               a href=params[:oauth_url] 認証コードを取得

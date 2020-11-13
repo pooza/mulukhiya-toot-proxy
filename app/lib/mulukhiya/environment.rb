@@ -28,6 +28,10 @@ module Mulukhiya
       return config['/controller']
     end
 
+    def self.sns_type_name
+      return config["/#{config['/controller']}/sns_type"]
+    end
+
     def self.test_account
       return sns_class.new.account
     end
@@ -66,8 +70,12 @@ module Mulukhiya
       return controller_name == 'pleroma'
     end
 
-    def self.sns_type
-      return config["/#{config['/controller']}/sns_type"]
+    def self.mastodon_type?
+      return sns_type_name == 'mastodon'
+    end
+
+    def self.misskey_type?
+      return sns_type_name == 'misskey'
     end
 
     def self.postgres?

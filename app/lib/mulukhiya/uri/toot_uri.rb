@@ -26,7 +26,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if Environment.sns_type == 'mastodon'
+        if Environment.mastodon_type?
           @service = Environment.sns_class.new(uri)
         else
           @service = MastodonService.new(uri)
