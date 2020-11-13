@@ -28,7 +28,6 @@ module Mulukhiya
       cnt ||= 0
       categories.each do |category|
         response = @vacuum.search_items(keywords: keyword, search_index: category)
-        raise "Invalid status #{response.status}" unless response.status == 200
         items = JSON.parse(response.to_s)['SearchResult']['Items']
         next unless items.present?
         return items.first['ASIN']
@@ -46,7 +45,6 @@ module Mulukhiya
       cnt ||= 0
       unless item = @storage[asin]
         response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
-        raise "Invalid status #{response.status}" unless response.status == 200
         item = JSON.parse(response.to_s)['ItemsResult']['Items'].first
         @storage[asin] = item
       end
