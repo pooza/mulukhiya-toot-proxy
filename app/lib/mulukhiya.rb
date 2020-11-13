@@ -37,6 +37,7 @@ module Mulukhiya
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
       config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
     end
+    Redis.exists_returns_integer = true
   end
 
   def self.rack
@@ -61,6 +62,15 @@ module Mulukhiya
     )
   end
 
+  def self.dbms
+    if Environment.postgres?
+      require 'ginseng/postgres'
+      Postgres.connect if Postgres.config?
+    elsif Environment.mongo?
+      require 'mongo'
+    end
+  end
+
   def self.load_tasks
     Dir.glob(File.join(dir, 'app/task/*.rb')).sort.each do |f|
       require f
@@ -72,10 +82,4 @@ Bundler.require
 Mulukhiya.loader.setup
 Mulukhiya.bootsnap
 Mulukhiya.sidekiq
-
-Redis.exists_returns_integer = true
-
-if Mulukhiya::Environment.postgres?
-  require 'ginseng/postgres'
-  Mulukhiya::Postgres.connect if Mulukhiya::Postgres.config?
-end
+Mulukhiya.dbms
