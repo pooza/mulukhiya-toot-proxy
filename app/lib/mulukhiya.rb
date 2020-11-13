@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
