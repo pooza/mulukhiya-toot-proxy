@@ -59,7 +59,9 @@ module Mulukhiya
 
       alias bot? service?
 
-      alias locked? locked
+      def locked?
+        return false
+      end
 
       def self.get(key)
         if acct = key[:acct]
