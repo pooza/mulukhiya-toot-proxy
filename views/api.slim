@@ -11,7 +11,7 @@ html lang='ja'
       h2 公開API
       ul class='links'
         li
-          h3 番組表
+          h3 実況番組表
           .link
             a href='/mulukhiya/api/programs' target='_blank' GET /mulukhiya/api/programs
         li
@@ -22,10 +22,6 @@ html lang='ja'
           h3 動作状況
           .link
             a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
-        li
-          h3 設定
-          .link
-            a :href='links.config' target='_blank' GET {{links.config}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -36,9 +32,6 @@ html lang='ja'
         data: {
           message: null,
           username: null,
-          links: {
-            config: `/mulukhiya/api/config?token=${encodeURIComponent(Vue.getToken())}`
-          },
         },
         mounted: function () {
           Vue.getConfig()
