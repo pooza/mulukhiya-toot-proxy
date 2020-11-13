@@ -49,10 +49,6 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Invalid token'
     end
 
-    def response_error?
-      return 400 <= @reporter.response&.code
-    end
-
     def notify(message)
       message = message.to_yaml unless message.is_a?(String)
       return Environment.info_agent_service&.notify(@sns.account, message)

@@ -79,6 +79,7 @@ module Mulukhiya
 
     def token
       return Crypt.new.decrypt(params[:token]) if params[:token]
+      return nil
     end
 
     def user_config_info

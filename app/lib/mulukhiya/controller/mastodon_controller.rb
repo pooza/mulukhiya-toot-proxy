@@ -6,7 +6,6 @@ module Mulukhiya
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.toot(params)
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
