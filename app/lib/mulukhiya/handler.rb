@@ -124,8 +124,8 @@ module Mulukhiya
 
     def disable?
       return true unless Environment.dbms_class.config?
-      return true if sns.account.disable?(underscore_name)
-      return true if @config.disable?(underscore_name)
+      return true if sns.account.disable?(self)
+      return true if @config.disable?(self)
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
@@ -172,8 +172,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      config = Config.instance
-      return names.select {|v| v.match?(pattern) && !config.disable?(v)}
+      return names.select {|v| v.match?(pattern) && !Config.instance.disable?(v)}
     end
 
     private

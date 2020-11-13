@@ -56,12 +56,6 @@ module Mulukhiya
       assert_kind_of(DropboxClipper, @account.dropbox)
     end
 
-    def test_disable?
-      Event.new(:pre_toot).handlers do |handler|
-        assert_boolean(@account.disable?(handler.underscore_name))
-      end
-    end
-
     def test_tags
       assert_kind_of(Array, @account.tags)
     end
