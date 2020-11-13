@@ -6,7 +6,6 @@ module Mulukhiya
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       params.delete(status_field) if params[status_field].empty?
       @reporter.response = @sns.note(params)
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
@@ -22,7 +21,6 @@ module Mulukhiya
       @reporter.tags.clear
       Event.new(:pre_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.say(params)
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
@@ -39,7 +37,6 @@ module Mulukhiya
       @reporter.response = @sns.upload(params[:file][:tempfile].path, {
         filename: params[:file][:filename],
       })
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code

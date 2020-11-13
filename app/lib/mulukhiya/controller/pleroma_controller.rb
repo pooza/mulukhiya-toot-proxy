@@ -8,7 +8,6 @@ module Mulukhiya
       Event.new(:pre_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       params[@config['/pleroma/chat/field']] = params[status_field]
       @reporter.response = @sns.say(params)
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.status = @reporter.response.code
