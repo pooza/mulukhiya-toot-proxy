@@ -1,0 +1,48 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: '公開API'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 公開API
+      ul class='links'
+        li
+          h3 番組表
+          .link
+            a href='/mulukhiya/api/programs' target='_blank' GET /mulukhiya/api/programs
+        li
+          h3 メディアファイル
+          .link
+            a href='/mulukhiya/api/medias' target='_blank' GET /mulukhiya/api/medias
+        li
+          h3 動作状況
+          .link
+            a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
+        li
+          h3 設定
+          .link
+            a :href='links.config' target='_blank' GET {{links.config}}
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          username: null,
+          links: {
+            config: `/mulukhiya/api/config?token=${encodeURIComponent(Vue.getToken())}`
+          },
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {this.username = e.account.username})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+      })
