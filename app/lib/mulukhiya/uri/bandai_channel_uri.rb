@@ -50,8 +50,6 @@ module Mulukhiya
       return nil
     end
 
-    alias image_url image_uri
-
     private
 
     def service
