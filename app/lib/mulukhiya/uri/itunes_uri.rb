@@ -86,8 +86,6 @@ module Mulukhiya
       return @image_uri
     end
 
-    alias image_url image_uri
-
     private
 
     def pixel_size
