@@ -67,6 +67,11 @@ module Mulukhiya
       return config['/notify/verbose'] == true
     end
 
+    def disable?(handler)
+      handler = Handler.create(handler) unless handler.is_a?(Handler)
+      return config["/handler/#{handler.underscore_name}/disable"] == true
+    end
+
     def tags
       return config['/tags'] || []
     end
