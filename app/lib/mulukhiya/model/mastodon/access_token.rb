@@ -28,7 +28,7 @@ module Mulukhiya
           @hash.merge!(
             digest: webhook_digest,
             token: to_s,
-            account: user.account.to_h,
+            account: user.account,
             scopes: scopes,
           )
           @hash.compact!

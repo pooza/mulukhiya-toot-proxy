@@ -87,7 +87,7 @@ module Mulukhiya
         account: @sns.account.to_h,
         config: @sns.account.config.to_h,
         filters: @sns.filters&.parsed_response,
-        token: @sns.access_token.to_h,
+        token: @sns.access_token.to_h.reject {|k, v| k == :account},
         visibility_names: Environment.parser_class.visibility_names,
       }
     end
