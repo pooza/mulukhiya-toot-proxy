@@ -5,7 +5,11 @@ const MulukhiyaLib = {
     }
 
     Vue.createErrorMessage = e => {
-      return ('response' in e) ? e.response.data.error : e.message
+      if ('response' in e) {
+        return e.response.data.error || e.response.data.message || e.message
+      } else {
+        return e.message
+      }
     }
 
     Vue.getConfig = async () => {
