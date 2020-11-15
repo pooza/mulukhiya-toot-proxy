@@ -155,9 +155,7 @@ test:
         - misskey_controller
         - meisskey_controller
         - mongo
-        - hash_tag
         - misskey_auth_contract
-        - tag_atom_feed_renderer
         - media_atom_feed_renderer
         - attachment
     - name: dropbox
@@ -519,6 +517,7 @@ pleroma:
   sns_type: mastodon
   url: https://pleroma.example.com/
   webhook: true
+  feed: true
   annict: true
   dbms: postgres
   parser: toot
