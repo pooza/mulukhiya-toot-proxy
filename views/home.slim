@@ -20,7 +20,7 @@ html lang='ja'
             | 環境設定
             span class='alert' 未認証
         a href='/mulukhiya/app/api' 公開API
-        a href='#{config['/sidekiq/dashboard/url']}' target='_blank' v-if='account.is_admin' Sidekiq
+        a href='/mulukhiya/app/admin' v-if='account.is_admin' 管理
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
     javascript:

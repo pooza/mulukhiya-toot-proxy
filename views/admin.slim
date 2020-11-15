@@ -1,0 +1,139 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: '管理'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 管理
+      ul class='links' v-if='account.is_admin'
+        li
+          h3 @click='toggleVisibility("announcement")' お知らせ
+          vue-slide-up-down :active='layout.details.announcement'
+            .field-update-button-container
+              button @click='updateAnnouncement' 更新
+        li
+          h3 @click='toggleVisibility("media_file")' メディアファイル
+          vue-slide-up-down :active='layout.details.media_file'
+            .field-update-button-container
+              button @click='clearMediaFiles' クリア
+        li
+          h3 @click='toggleVisibility("oauth")' OAuthクライアント情報
+          vue-slide-up-down :active='layout.details.oauth'
+            .field-update-button-container
+              button @click='clearOAuthClient' クリア
+        li
+          h3 @click='toggleVisibility("program")' 実況番組表
+          vue-slide-up-down :active='layout.details.program'
+            .field-update-button-container
+              button @click='updatePrograms' 更新
+        li
+          h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
+          vue-slide-up-down :active='layout.details.tagging_dic'
+            .field-update-button-container
+              button @click='updateTaggingDictionary' 更新
+        li
+          h3 @click='toggleVisibility("user_tag")' 全ユーザーの固定タグ設定
+          vue-slide-up-down :active='layout.details.user_tag'
+            .field-update-button-container
+              button @click='clearUserTags' クリア
+        li
+          h3 @click='toggleVisibility("feed")' フィード
+          vue-slide-up-down :active='layout.details.feed'
+            .field-update-button-container
+              button @click='updateFeeds' 更新
+        li
+          h3 @click='toggleVisibility("sidekiq")' Sidekiqダッシュボード
+          vue-slide-up-down :active='layout.details.sidekiq'
+            .link
+              a href='#{config['/sidekiq/dashboard/url']}' target='_blank' GET /mulukhiya/sidekiq
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          username: null,
+          account: {is_admin: false},
+          layout: {
+            details: {
+              announcement: false,
+              media_file: false,
+              oauth: false,
+              program: false,
+              tagging_dic: false,
+              user_tag: false,
+              feed: false,
+              sidekiq: false,
+            },
+          },
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {
+              this.username = e.account.username
+              this.account = e.account
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+          toggleVisibility: function (name) {
+            this.layout.details[name] = !this.layout.details[name]
+          },
+          updateAnnouncement: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          clearMediaFiles: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          clearOAuthClient: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          updatePrograms: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          updateTaggingDictionary: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          clearUserTags: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+          updateFeeds: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
+              .then(e => {this.message = null})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {document.body.style.cursor = 'auto'})
+          },
+        },
+      })
