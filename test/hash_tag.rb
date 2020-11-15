@@ -13,7 +13,7 @@ module Mulukhiya
 
     def test_uri
       assert_kind_of(Ginseng::URI, @nowplaying.uri)
-      assert_equal(@nowplaying.uri.path, '/tags/nowplaying')
+      assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
     end
 
     def test_to_h
