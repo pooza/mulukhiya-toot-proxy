@@ -88,7 +88,7 @@ module Mulukhiya
       assert_nil(uri.artists)
 
       uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4')
-      assert_equal(uri.artists,  ['宮本佳那子'])
+      assert_equal(uri.artists, ['宮本佳那子'])
 
       uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?uo=4')
       assert_equal(uri.artists, ['宮本佳那子', '駒形友梨'])

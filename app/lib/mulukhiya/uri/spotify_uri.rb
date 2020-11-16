@@ -68,7 +68,7 @@ module Mulukhiya
     end
 
     def artists
-      return (album || track)&.artists
+      return (track || album)&.artists&.map(&:name)
     end
 
     def image_uri
