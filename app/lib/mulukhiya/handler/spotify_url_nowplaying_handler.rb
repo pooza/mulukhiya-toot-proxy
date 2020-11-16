@@ -16,16 +16,10 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      if uri.track
-        push(uri.track.name.escape_toot)
-        artists = uri.track.artists
-      elsif uri.album
-        push(uri.album.name.escape_toot)
-        artists = uri.album.artists
-      end
-      push(artists.map(&:name).join(', '))
-      tags.concat(ArtistParser.new(artists.map(&:name).map(&:escape_toot).join('、')).parse)
-      result.push(url: uri.to_s, artists: artists.map(&:name))
+      push(uri.titie.escape_toot)
+      push(uri.artists.map(:escape_root).join(','))
+      tags.concat(ArtistParser.new(uri.artists.join(',')).parse)
+      result.push(url: uri.to_s, artist: uri.artists)
     end
   end
 end

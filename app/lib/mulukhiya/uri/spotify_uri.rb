@@ -55,6 +55,22 @@ module Mulukhiya
       return track&.album
     end
 
+    def title
+      return album_name || track_name
+    end
+
+    def album_name
+      return album&.name
+    end
+
+    def track_name
+      return track&.name
+    end
+
+    def artists
+      return (album || track)&.artists
+    end
+
     def image_uri
       return nil unless spotify?
       return nil unless track_id
