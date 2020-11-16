@@ -753,6 +753,9 @@ artist_parser:
         - strip: true
           split: true
           prefix: 'コーラス:'
+    - pattern: '^歌:(.+)$'
+      items:
+        - split: true
     - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
       items:
         - split: true

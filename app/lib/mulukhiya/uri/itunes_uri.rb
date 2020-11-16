@@ -89,8 +89,8 @@ module Mulukhiya
     end
 
     def artists
-      return [album['artistName']] if album
-      return [track['artistName']] if track
+      return ArtistParser.new(track['artistName']).parse if track
+      return ArtistParser.new(album['artistName']).parse if album
       return nil
     end
 
