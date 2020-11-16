@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def updatable?(keyword)
-      return false unless uri = VideoURI.parse(keyword)
+      return false unless uri = YouTubeURI.parse(keyword)
       return false unless uri.id
       @uris[keyword] = uri
       return true

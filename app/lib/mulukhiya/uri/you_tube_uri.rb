@@ -1,5 +1,5 @@
 module Mulukhiya
-  class VideoURI < Ginseng::YouTube::URI
+  class YouTubeURI < Ginseng::YouTube::URI
     include Package
 
     def artist

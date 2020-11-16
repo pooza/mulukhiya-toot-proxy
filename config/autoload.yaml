@@ -22,5 +22,5 @@ inflections:
   uri: URI
   url_handler: URLHandler
   url_normalize_handler: URLNormalizeHandler
-  video_uri: VideoURI
+  you_tube_uri: YouTubeURI
   you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler

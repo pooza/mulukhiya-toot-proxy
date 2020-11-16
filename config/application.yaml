@@ -124,7 +124,7 @@ test:
     - name: you_tube
       cases:
         - youtube_service
-        - video_uri
+        - you_tube_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
     - name: mastodon
