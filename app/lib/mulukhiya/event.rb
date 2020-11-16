@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def handler_names(&block)
-      return enum_for(__method__) unless block_given?
+      return enum_for(__method__) unless block
       @config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 

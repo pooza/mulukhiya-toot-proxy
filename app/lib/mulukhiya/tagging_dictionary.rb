@@ -71,7 +71,7 @@ module Mulukhiya
     end
 
     def remote_dics(&block)
-      return enum_for(__method__) unless block_given?
+      return enum_for(__method__) unless block
       RemoteDictionary.all(&block)
     end
 
