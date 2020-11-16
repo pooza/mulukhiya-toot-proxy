@@ -76,6 +76,24 @@ module Mulukhiya
       return @track
     end
 
+    def title
+      return album_name || track_name
+    end
+
+    def album_name
+      return album&.dig('collectionName')
+    end
+
+    def track_name
+      return track&.dig('trackName')
+    end
+
+    def artists
+      return [album['artistName']] if album
+      return [track['artistName']] if track
+      return nil
+    end
+
     def image_uri
       return nil unless itunes?
       return nil unless album_id
