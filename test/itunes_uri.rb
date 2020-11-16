@@ -61,6 +61,39 @@ module Mulukhiya
       assert_equal(uri.shorten.to_s, 'https://music.apple.com/jp/album/1299587212')
     end
 
+    def test_album_name
+      uri = ItunesURI.parse('https://music.apple.com/')
+      assert_nil(uri.album_name)
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4')
+      assert_equal(uri.album_name, '「キラキラ☆プリキュアアラモード」後期主題歌シングルED:シュビドゥビ☆スイーツタイム/挿入歌:勇気が君を待ってる - EP')
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?uo=4')
+      assert_equal(uri.album_name, '「キラキラ☆プリキュアアラモード」後期主題歌シングルED:シュビドゥビ☆スイーツタイム/挿入歌:勇気が君を待ってる - EP')
+    end
+
+    def test_track_name
+      uri = ItunesURI.parse('https://music.apple.com/')
+      assert_nil(uri.track_name)
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4')
+      assert_equal(uri.track_name, 'シュビドゥビ☆スイーツタイム')
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?uo=4')
+      assert_nil(uri.track_name)
+    end
+
+    def test_artists
+      uri = ItunesURI.parse('https://music.apple.com/')
+      assert_nil(uri.artists)
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4')
+      assert_equal(uri.artists,  ['宮本佳那子'])
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?uo=4')
+      assert_equal(uri.artists, ['宮本佳那子', '駒形友梨'])
+    end
+
     def test_image_uri
       uri = ItunesURI.parse('https://music.apple.com')
       assert_nil(uri.image_uri)
