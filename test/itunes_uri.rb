@@ -61,6 +61,17 @@ module Mulukhiya
       assert_equal(uri.shorten.to_s, 'https://music.apple.com/jp/album/1299587212')
     end
 
+    def test_title
+      uri = ItunesURI.parse('https://music.apple.com/')
+      assert_nil(uri.title)
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?i=1299587213&uo=4')
+      assert_equal(uri.title, 'シュビドゥビ☆スイーツタイム')
+
+      uri = ItunesURI.parse('https://music.apple.com/jp/album/1299587212?uo=4')
+      assert_equal(uri.title, '「キラキラ☆プリキュアアラモード」後期主題歌シングルED:シュビドゥビ☆スイーツタイム/挿入歌:勇気が君を待ってる - EP')
+    end
+
     def test_album_name
       uri = ItunesURI.parse('https://music.apple.com/')
       assert_nil(uri.album_name)
