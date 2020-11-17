@@ -5,5 +5,11 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
 ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
+
+unless password = ARGV.first
+  warn "文字列を指定してください。"
+  exit 1
+end
+
 puts "source: #{ARGV.first}"
-puts "source: #{Mulukhiya::Crypt.new.encrypt(ARGV.first)}"
+puts "dest:   #{Mulukhiya::Crypt.new.encrypt(password)}"
