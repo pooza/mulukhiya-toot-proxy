@@ -27,12 +27,28 @@ module Mulukhiya
       errors.push(class: e.class.to_s, message: e.message, body: body)
     end
 
-    def updatable?(keyword)
+    def create_uri(keyword)
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    def updatable?(keyword)
+      return false unless uri = create_uri(keyword)
+      return false if uri.track.nil? && uri.album.nil?
+      @uris[keyword] = uri
+      return true
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      return false
+    end
+
     def update(keyword)
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return unless uri = @uris[keyword]
+      push(uri.title.escape_toot)
+      push(uri.artists.map(&:escape_toot).join(','))
+      tags.concat(uri.artists)
+      result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
     end
 
     def verbose?
