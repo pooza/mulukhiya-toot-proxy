@@ -56,7 +56,7 @@ module Mulukhiya
     end
 
     def title
-      return album_name || track_name
+      return track_name || album_name
     end
 
     def album_name
