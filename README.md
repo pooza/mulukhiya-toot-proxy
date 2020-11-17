@@ -7,6 +7,7 @@
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## 対応インスタンス
+
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
 - [Pleroma](https://git.pleroma.social/pleroma/pleroma)
