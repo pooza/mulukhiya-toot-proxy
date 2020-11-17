@@ -5,5 +5,5 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
 ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
-
-puts ARGB.first
+puts "source: #{ARGV.first}"
+puts "source: #{Mulukhiya::Crypt.new.encrypt(ARGV.first)}"
