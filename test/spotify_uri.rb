@@ -43,6 +43,17 @@ module Mulukhiya
       assert_kind_of(RSpotify::Album, uri.album)
     end
 
+    def test_title
+      uri = SpotifyURI.parse('https://open.spotify.com')
+      assert_nil(uri.title)
+
+      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
+      assert_equal(uri.title, 'ガンバランスdeダンス ~夢みる奇跡たち~')
+
+      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
+      assert_equal(uri.title, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+    end
+
     def test_album_name
       uri = SpotifyURI.parse('https://open.spotify.com')
       assert_nil(uri.album_name)
