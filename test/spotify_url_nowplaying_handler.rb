@@ -13,15 +13,27 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ\n")
-      assert_equal(@handler.debug_info[:result], [{url: 'https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ', artists: ['宮本佳那子']}])
+      assert_equal(@handler.debug_info[:result], [{
+        url: 'https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ',
+        title: 'Special day',
+        artists: ['宮本佳那子'],
+      }])
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS\n")
-      assert_equal(@handler.debug_info[:result], [{url: 'https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS', artists: ['牧野由依']}])
+      assert_equal(@handler.debug_info[:result], [{
+        url: 'https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS',
+        title: 'お願いジュンブライト',
+        artists: ['牧野由依'],
+      }])
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn\n")
-      assert_equal(@handler.debug_info[:result], [{url: 'https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn', artists: ['アイネス(CV:水橋かおり)']}])
+      assert_equal(@handler.debug_info[:result], [{
+        url: 'https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn',
+        title: 'ボクは走るんだ!',
+        artists: ['アイネス(CV:水橋かおり)'],
+      }])
     end
   end
 end
