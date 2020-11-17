@@ -141,12 +141,5 @@ module Mulukhiya
       values[:status] ||= 200
       return values
     end
-
-    def self.auth(username, password)
-      return false unless username == config['/sidekiq/auth/user']
-      return true if password.crypt(Environment.hostname) == config['/sidekiq/auth/password']
-      return true if password == config['/sidekiq/auth/password']
-      return false
-    end
   end
 end

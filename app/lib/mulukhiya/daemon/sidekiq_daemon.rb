@@ -19,6 +19,34 @@ module Mulukhiya
       ].join("\n")
     end
 
+    def self.config
+      return config.instance
+    end
+
+    def self.username
+      return config['/sidekiq/auth/user']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
+    def self.password
+      return config['/sidekiq/auth/password']
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
+    def self.basic_auth?
+      return username && password
+    end
+
+    def self.auth(username, password)
+      return true unless basic_auth?
+      return false unless username == self.username
+      return true if Crypt.new.encrypt(password) == self.password
+      return true if password == self.password
+      return false
+    end
+
     def self.health
       stats = Sidekiq::Stats.new
       pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}
