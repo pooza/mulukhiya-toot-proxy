@@ -7,7 +7,7 @@ require 'mulukhiya'
 ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
 
 unless password = ARGV.first
-  warn "文字列を指定してください。"
+  warn '文字列を指定してください。'
   exit 1
 end
 
