@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def self.config
-      return config.instance
+      return Config.instance
     end
 
     def self.username
