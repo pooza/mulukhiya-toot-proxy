@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def type
-      return 'text/javascript'
+      return 'text/javascript;charset=UTF-8'
     end
 
     def to_s
