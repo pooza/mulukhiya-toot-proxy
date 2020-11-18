@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def type
-      return ImageFile.new(path).type if File.exist?(path)
+      return MediaFile.new(path).type if File.exist?(path)
     end
 
     def to_s
