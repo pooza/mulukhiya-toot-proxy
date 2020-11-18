@@ -4,6 +4,7 @@ module Mulukhiya
 
     def setup
       @config = Config.instance
+      @config['/crypt/encoder'] = 'base64'
     end
 
     def app
