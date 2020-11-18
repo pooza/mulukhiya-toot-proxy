@@ -86,6 +86,7 @@ test:
   filters:
     - name: ci
       cases:
+        - ui_controller
         - mastodon_controller
         - attachment
         - event
