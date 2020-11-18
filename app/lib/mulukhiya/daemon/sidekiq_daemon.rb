@@ -42,7 +42,7 @@ module Mulukhiya
     def self.auth(username, password)
       return true unless basic_auth?
       return false unless username == self.username
-      return true if Crypt.new.encrypt(password) == self.password
+      return true if password == Crypt.new.decrypt(self.password)
       return true if password == self.password
       return false
     end
