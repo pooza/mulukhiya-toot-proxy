@@ -36,7 +36,7 @@ module Mulukhiya
     end
 
     def self.basic_auth?
-      return username && password
+      return username.present? && password.present?
     end
 
     def self.auth(username, password)
