@@ -24,7 +24,6 @@ handler:
   animation_image_format_convert:
     type: image/gif
     timeout: 10
-    disable: true
   itunes_image:
     pixel: 480
     timeout: 10
