@@ -77,6 +77,34 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/announcement/update' do
+      return @renderer.to_s
+    end
+
+    post '/media/clear' do
+      return @renderer.to_s
+    end
+
+    post '/oauth/client/clear' do
+      return @renderer.to_s
+    end
+
+    post '/program/update' do
+      return @renderer.to_s
+    end
+
+    post '/tagging/dic/update' do
+      return @renderer.to_s
+    end
+
+    post '/tagging/usertag/clear' do
+      return @renderer.to_s
+    end
+
+    post '/feed/update' do
+      return @renderer.to_s
+    end
+
     def token
       return Crypt.new.decrypt(params[:token]) if params[:token]
       return nil
