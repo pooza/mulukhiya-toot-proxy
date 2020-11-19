@@ -9,12 +9,16 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 API
-      ul class='links' v-if='account.is_admin'
-        li
+      ul class='links'
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("announcement")' お知らせ
           vue-slide-up-down :active='layout.details.announcement'
             .endpoint_container
               .link POST /mulukhiya/api/announcement/update
+              - if config['/sidekiq/schedule/announcement/every']
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/announcement/every']}
               .link_description お知らせの更新を行います。
               .field-update-button-container
                 button @click='updateAnnouncement' 実行
@@ -25,12 +29,16 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/media' target='_blank' GET /mulukhiya/api/media
               .link_description 最近投稿されたメディアファイルを表示します。
-            .endpoint_container
+            .endpoint_container v-if='account.is_admin'
               .link POST /mulukhiya/api/media/clear
+              - if config['/sidekiq/schedule/media_cleaning/cron']
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/media_cleaning/cron']}
               .link_description メディアファイル変換結果をクリアします。
               .field-update-button-container
                 button @click='clearMediaFiles' 実行
-        li
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("oauth")' OAuth
           vue-slide-up-down :active='layout.details.oauth'
             .endpoint_container
@@ -38,39 +46,58 @@ html lang='ja'
               .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
                 button @click='clearOAuthClient' 実行
-        li
-          h3 @click='toggleVisibility("program")' 実況番組表
-          vue-slide-up-down :active='layout.details.program'
-            .endpoint_container
-              .link
-                a href='/mulukhiya/api/program' target='_blank' GET /mulukhiya/api/program
-              .link_description キャッシュ済みの実況番組表を表示します。
-            .endpoint_container
-              .link POST /mulukhiya/api/program/update
-              .link_description 実況番組表を取得し、キャッシュします。
-              .field-update-button-container
-                button @click='updatePrograms' 実行
-        li
+        - if config['/programs/url']
+          li
+            h3 @click='toggleVisibility("program")' 実況番組表
+            vue-slide-up-down :active='layout.details.program'
+              .endpoint_container
+                .link
+                  a href='/mulukhiya/api/program' target='_blank' GET /mulukhiya/api/program
+                .link_description キャッシュ済みの実況番組表を表示します。
+              .endpoint_container v-if='account.is_admin'
+                .link POST /mulukhiya/api/program/update
+                - if config['/sidekiq/schedule/program_update/cron']
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/program_update/cron']}
+                .link_description
+                  a href='#{config['/programs/url']}' target='_blank' 実況番組表
+                  | を取得し、キャッシュします。
+                .field-update-button-container
+                  button @click='updatePrograms' 実行
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint_container
               .link POST /mulukhiya/api/tagging/dic/update
-              .link_description リモートの全てのハッシュタグ辞書を取得し、キャッシュを保存します。
+              - if config['/sidekiq/schedule/tagging_dictionary_update/cron']
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/tagging_dictionary_update/cron']}
+              .link_description リモートの全てのハッシュタグ辞書を取得し、キャッシュを更新します。
               .field-update-button-container
                 button @click='updateTaggingDictionary' 実行
-        li
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint_container
               .link POST /mulukhiya/api/tagging/usertag/clear
+              - if config['/sidekiq/schedule/user_tag_initialize/cron']
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/user_tag_initialize/cron']}
               .link_description インスタンス内全ユーザーの固定タグ設定をクリアします。
               .field-update-button-container
                 button @click='clearUserTags' 実行
-        li
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("feed")' Atomフィード
           vue-slide-up-down :active='layout.details.feed'
             .endpoint_container
               .link POST /mulukhiya/api/feed/update
+              - if config['/sidekiq/schedule/tag_feed_update/every']
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/tag_feed_update/every']}
               .link_description
                 a href='/mulukhiya/app/feeds' ハッシュタグ等のAtomフィード
                 | を更新します。
@@ -83,7 +110,7 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
               .link_description モロヘイヤの動作状況を表示します。
-        li
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("sidekiq")' Sidekiq
           vue-slide-up-down :active='layout.details.sidekiq'
             .endpoint_container
