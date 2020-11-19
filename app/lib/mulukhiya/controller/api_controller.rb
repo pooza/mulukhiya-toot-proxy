@@ -32,7 +32,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/programs' do
+    get '/program' do
       @sns.token ||= @sns.default_token
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)
@@ -43,7 +43,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/medias' do
+    get '/media' do
       @sns.token ||= @sns.default_token
       if Environment.controller_class.media_catalog?
         @renderer.message = Environment.attachment_class.catalog
@@ -78,30 +78,65 @@ module Mulukhiya
     end
 
     post '/announcement/update' do
+      if @sns.account.admin? || @sns.account.moderator?
+        AnnouncementWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/media/clear' do
+      if @sns.account.admin? || @sns.account.moderator?
+        MediaCleaningWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/oauth/client/clear' do
+      if @sns.account.admin? || @sns.account.moderator?
+        Environment.sns_class.new.clear_oauth_client
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/program/update' do
+      if @sns.account.admin? || @sns.account.moderator?
+        ProgramUpdateWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/tagging/dic/update' do
+      if @sns.account.admin? || @sns.account.moderator?
+        TaggingDictionaryUpdateWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/tagging/usertag/clear' do
+      if @sns.account.admin? || @sns.account.moderator?
+        UserTagInitializeWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
     post '/feed/update' do
+      if @sns.account.admin? || @sns.account.moderator?
+        TagFeedUpdateWorker.new.perform
+      else
+        @renderer.status = 403
+      end
       return @renderer.to_s
     end
 
