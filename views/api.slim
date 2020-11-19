@@ -15,7 +15,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.announcement'
             .endpoint_container
               .link POST /mulukhiya/api/announcement/update
-              - if config['/sidekiq/schedule/announcement/every']
+              - if config.keys('/sidekiq/schedule/announcement').member?('every')
                 .link_description
                   | スケジュール
                   code #{config['/sidekiq/schedule/announcement/every']}
@@ -31,7 +31,7 @@ html lang='ja'
               .link_description 最近投稿されたメディアファイルを表示します。
             .endpoint_container v-if='account.is_admin'
               .link POST /mulukhiya/api/media/clear
-              - if config['/sidekiq/schedule/media_cleaning/cron']
+              - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link_description
                   | スケジュール
                   code #{config['/sidekiq/schedule/media_cleaning/cron']}
@@ -46,7 +46,7 @@ html lang='ja'
               .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
                 button @click='clearOAuthClient' 実行
-        - if config['/programs/url']
+        - if config.keys('/program').member?('url')
           li
             h3 @click='toggleVisibility("program")' 実況番組表
             vue-slide-up-down :active='layout.details.program'
@@ -56,7 +56,7 @@ html lang='ja'
                 .link_description キャッシュ済みの実況番組表を表示します。
               .endpoint_container v-if='account.is_admin'
                 .link POST /mulukhiya/api/program/update
-                - if config['/sidekiq/schedule/program_update/cron']
+                - if config.keys('/sidekiq/schedule/program_update').member?('cron')
                   .link_description
                     | スケジュール
                     code #{config['/sidekiq/schedule/program_update/cron']}
@@ -70,11 +70,14 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint_container
               .link POST /mulukhiya/api/tagging/dic/update
-              - if config['/sidekiq/schedule/tagging_dictionary_update/cron']
+              - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
                 .link_description
                   | スケジュール
                   code #{config['/sidekiq/schedule/tagging_dictionary_update/cron']}
-              .link_description リモートの全てのハッシュタグ辞書を取得し、キャッシュを更新します。
+              .link_description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
+              - config['/tagging/dictionaries'].each do |dic|
+                .link
+                  a href=dic['url'] target='_blank' = dic['url'].ellipsize(64)
               .field-update-button-container
                 button @click='updateTaggingDictionary' 実行
         li v-if='account.is_admin'
@@ -82,7 +85,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint_container
               .link POST /mulukhiya/api/tagging/usertag/clear
-              - if config['/sidekiq/schedule/user_tag_initialize/cron']
+              - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
                 .link_description
                   | スケジュール
                   code #{config['/sidekiq/schedule/user_tag_initialize/cron']}
@@ -94,7 +97,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.feed'
             .endpoint_container
               .link POST /mulukhiya/api/feed/update
-              - if config['/sidekiq/schedule/tag_feed_update/every']
+              - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
                 .link_description
                   | スケジュール
                   code #{config['/sidekiq/schedule/tag_feed_update/every']}
