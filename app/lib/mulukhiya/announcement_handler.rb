@@ -11,6 +11,10 @@ module Mulukhiya
       return false
     end
 
+    def announce(announcement, params = {})
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
     def create_body(announcement, params = {})
       params[:format] ||= :sanitized
       params.merge!(announcement)
