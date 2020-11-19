@@ -90,7 +90,7 @@ const MulukhiyaLib = {
 
     Vue.getPrograms = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get('/mulukhiya/api/programs', {responseType: 'json'})
+      return axios.get('/mulukhiya/api/program', {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
@@ -105,7 +105,7 @@ const MulukhiyaLib = {
 
     Vue.getMedias = async () => {
       document.body.style.cursor = 'wait'
-      return axios.get(Vue.createPath('/mulukhiya/api/medias'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/media'), {responseType: 'json'})
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
