@@ -166,7 +166,7 @@ html lang='ja'
               .finally(e => {document.body.style.cursor = 'auto'})
           },
           openSidekiqDashboard: function () {
-            window.open('/mulukhiya/sidekiq')
+            window.open(Vue.createPath('#{config['/sidekiq/dashboard/url']}'))
           },
         },
       })
