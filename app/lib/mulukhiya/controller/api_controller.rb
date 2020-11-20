@@ -16,7 +16,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/config' do
+    post '/config/update' do
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
       @renderer.message = user_config_info
       return @renderer.to_s
@@ -26,7 +26,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/filter' do
+    post '/filter/add' do
       Handler.create('filter_command').handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
@@ -39,6 +39,15 @@ module Mulukhiya
         @renderer.message = JSON.parse(File.read(path))
       else
         @renderer.message = []
+      end
+      return @renderer.to_s
+    end
+
+    post '/program/update' do
+      if @sns.account.admin? || @sns.account.moderator?
+        ProgramUpdateWorker.new.perform
+      else
+        @renderer.status = 403
       end
       return @renderer.to_s
     end
@@ -98,15 +107,6 @@ module Mulukhiya
     post '/oauth/client/clear' do
       if @sns.account.admin? || @sns.account.moderator?
         Environment.sns_class.new.clear_oauth_client
-      else
-        @renderer.status = 403
-      end
-      return @renderer.to_s
-    end
-
-    post '/program/update' do
-      if @sns.account.admin? || @sns.account.moderator?
-        ProgramUpdateWorker.new.perform
       else
         @renderer.status = 403
       end

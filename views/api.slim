@@ -10,18 +10,19 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 API
       ul class='links'
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("announcement")' お知らせ
-          vue-slide-up-down :active='layout.details.announcement'
-            .endpoint_container
-              .link POST /mulukhiya/api/announcement/update
-              - if config.keys('/sidekiq/schedule/announcement').member?('every')
-                .link_description
-                  | スケジュール
-                  code #{config['/sidekiq/schedule/announcement/every']}
-              .link_description お知らせの更新を行います。
-              .field-update-button-container
-                button @click='updateAnnouncement' 実行
+        - if controller.announcement?
+          li v-if='account.is_admin'
+            h3 @click='toggleVisibility("announcement")' お知らせ
+            vue-slide-up-down :active='layout.details.announcement'
+              .endpoint_container
+                .link POST /mulukhiya/api/announcement/update
+                - if config.keys('/sidekiq/schedule/announcement').member?('every')
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/announcement/every']}
+                .link_description お知らせの更新を行います。
+                .field-update-button-container
+                  button @click='updateAnnouncement' 実行
         li
           h3 @click='toggleVisibility("media")' メディアファイル
           vue-slide-up-down :active='layout.details.media'
@@ -46,7 +47,7 @@ html lang='ja'
               .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
                 button @click='clearOAuthClient' 実行
-        - if config.keys('/program').member?('url')
+        - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表
             vue-slide-up-down :active='layout.details.program'
@@ -92,20 +93,21 @@ html lang='ja'
               .link_description インスタンス内全ユーザーの固定タグ設定をクリアします。
               .field-update-button-container
                 button @click='clearUserTags' 実行
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("feed")' Atomフィード
-          vue-slide-up-down :active='layout.details.feed'
-            .endpoint_container
-              .link POST /mulukhiya/api/feed/update
-              - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
+        - if controller.feed?
+          li v-if='account.is_admin'
+            h3 @click='toggleVisibility("feed")' Atomフィード
+            vue-slide-up-down :active='layout.details.feed'
+              .endpoint_container
+                .link POST /mulukhiya/api/feed/update
+                - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/tag_feed_update/every']}
                 .link_description
-                  | スケジュール
-                  code #{config['/sidekiq/schedule/tag_feed_update/every']}
-              .link_description
-                a href='/mulukhiya/app/feeds' ハッシュタグ等のAtomフィード
-                | を更新します。
-              .field-update-button-container
-                button @click='updateFeeds' 実行
+                  a href='/mulukhiya/app/feed' ハッシュタグ等のAtomフィード
+                  | を更新します。
+                .field-update-button-container
+                  button @click='updateFeeds' 実行
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'

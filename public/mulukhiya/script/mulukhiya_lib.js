@@ -27,7 +27,7 @@ const MulukhiyaLib = {
         text: JSON.stringify(command),
       }
       document.body.style.cursor = 'wait'
-      return axios.post('/mulukhiya/api/config', values)
+      return axios.post('/mulukhiya/api/config/update', values)
         .then(e => {return e.data})
         .finally(e => {document.body.style.cursor = 'auto'})
     }
