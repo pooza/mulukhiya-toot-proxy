@@ -127,6 +127,7 @@ html lang='ja'
       'use strict'
       Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default)
       Vue.component('vue-slide-up-down', VueSlideUpDown)
       new Vue({
         el: '#app',
@@ -178,13 +179,17 @@ html lang='ja'
               .finally(e => {document.body.style.cursor = 'auto'})
           },
           clearOAuthClient: function () {
-            document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['oauth'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+            this.$dialog.confirm(
+              {title: 'クライアント情報の削除', body: 'OAuthクライアント情報を削除します。'},
+              {okText: '削除', cancelText: 'キャンセル'}
+            ).then(e => {
+              document.body.style.cursor = 'wait'
+              return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
+            }).then(e => {
+              this.message = null
+              this.layout.details['oauth'] = false
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .finally(e => {document.body.style.cursor = 'auto'})
           },
           updatePrograms: function () {
             document.body.style.cursor = 'wait'
