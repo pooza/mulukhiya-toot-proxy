@@ -12,7 +12,7 @@ module Mulukhiya
     end
 
     def exec
-      raise Ginseng::AuthError, 'Invalid token' unless sns.account
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       sns.account.config.update(parser.params)
     end
   end
