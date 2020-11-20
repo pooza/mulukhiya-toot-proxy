@@ -67,25 +67,25 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/media/:media' do
+    get '/media/:name' do
       @renderer = StaticMediaRenderer.new
-      @renderer.name = params[:media]
+      @renderer.name = params[:name]
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
     end
 
-    get '/style/:style' do
+    get '/style/:name' do
       @renderer = CSSRenderer.new
-      @renderer.template = params[:style]
+      @renderer.template = params[:name]
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
     end
 
-    get '/script/:script' do
+    get '/script/:name' do
       @renderer = ScriptRenderer.new
-      @renderer.name = params[:script]
+      @renderer.name = params[:name]
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
