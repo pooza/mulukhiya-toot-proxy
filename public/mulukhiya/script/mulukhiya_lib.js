@@ -1,7 +1,9 @@
 const MulukhiyaLib = {
   install (Vue, options) {
-    Vue.createPath = href => {
-      return `${href}?token=${encodeURIComponent(Vue.getToken())}`
+    Vue.createPath = (href, token) => {
+      const url = new URL(href, location.href)
+      url.searchParams.set('token', token || Vue.getToken())
+      return url.href
     }
 
     Vue.createErrorMessage = e => {
@@ -47,8 +49,7 @@ const MulukhiyaLib = {
 
     Vue.registerToken = async token => {
       document.body.style.cursor = 'wait'
-      const href = '/mulukhiya/api/config?token=' + encodeURIComponent(token)
-      return axios.get(href, {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', token)
           return e.data.account
@@ -65,8 +66,7 @@ const MulukhiyaLib = {
       const users = []
       document.body.style.cursor = 'wait'
       Vue.getTokens().forEach(t => {
-        const href = '/mulukhiya/api/config?token=' + encodeURIComponent(t)
-        axios.get(href, {responseType: 'json'}).then(e => {
+        axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'}).then(e => {
           users.push({
             username: e.data.account.username,
             token: t,
@@ -80,8 +80,7 @@ const MulukhiyaLib = {
 
     Vue.switchUser = async user => {
       document.body.style.cursor = 'wait'
-      const href = '/mulukhiya/api/config?token=' + encodeURIComponent(user.token)
-      return axios.get(href, {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config', user.token), {responseType: 'json'})
         .then(e => {
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data.account
