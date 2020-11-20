@@ -46,7 +46,7 @@ module Mulukhiya
     def token
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return params[:i] if params[:i]
-      raise Ginseng::AuthError, 'Invalid token'
+      raise Ginseng::AuthError, 'Unauthorized'
     end
 
     def notify(message)

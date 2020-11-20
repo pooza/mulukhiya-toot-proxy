@@ -10,7 +10,7 @@ module Mulukhiya
       if @sns.account
         @renderer.message = user_config_info
       else
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
@@ -45,7 +45,7 @@ module Mulukhiya
 
     post '/program/update' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         ProgramUpdateWorker.new.perform
@@ -92,7 +92,7 @@ module Mulukhiya
 
     post '/announcement/update' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         AnnouncementWorker.new.perform
@@ -105,7 +105,7 @@ module Mulukhiya
 
     post '/media/clear' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         MediaCleaningWorker.new.perform
@@ -118,7 +118,7 @@ module Mulukhiya
 
     post '/oauth/client/clear' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         Environment.sns_class.new.clear_oauth_client
@@ -131,7 +131,7 @@ module Mulukhiya
 
     post '/tagging/dic/update' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         TaggingDictionaryUpdateWorker.new.perform
@@ -144,7 +144,7 @@ module Mulukhiya
 
     post '/tagging/usertag/clear' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         UserTagInitializeWorker.new.perform
@@ -157,7 +157,7 @@ module Mulukhiya
 
     post '/feed/update' do
       if @sns.account.nil?
-        @renderer.message = {error: 'Invalid token'}
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       elsif @sns.account.admin? || @sns.account.moderator?
         TagFeedUpdateWorker.new.perform
