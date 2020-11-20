@@ -44,9 +44,13 @@ module Mulukhiya
     end
 
     post '/program/update' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         ProgramUpdateWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
@@ -87,54 +91,78 @@ module Mulukhiya
     end
 
     post '/announcement/update' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         AnnouncementWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
     end
 
     post '/media/clear' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         MediaCleaningWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
     end
 
     post '/oauth/client/clear' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         Environment.sns_class.new.clear_oauth_client
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
     end
 
     post '/tagging/dic/update' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         TaggingDictionaryUpdateWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
     end
 
     post '/tagging/usertag/clear' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         UserTagInitializeWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
     end
 
     post '/feed/update' do
-      if @sns.account.admin? || @sns.account.moderator?
+      if @sns.account.nil?
+        @renderer.message = {error: 'Invalid token'}
+        @renderer.status = 403
+      elsif @sns.account.admin? || @sns.account.moderator?
         TagFeedUpdateWorker.new.perform
       else
+        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
       end
       return @renderer.to_s
