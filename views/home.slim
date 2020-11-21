@@ -15,10 +15,7 @@ html lang='ja'
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' メディアカタログ
         - if controller.webhook?
-          a href='/mulukhiya/app/config' v-if='username' 環境設定
-          a href='#' v-else=''
-            | 環境設定
-            span class='alert' 未認証
+          a href='/mulukhiya/app/config' v-if='account' 環境設定
         a href='/mulukhiya/app/api' API
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
@@ -30,14 +27,11 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
           account: {is_admin: false},
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {
-              this.username = e.account.username
-              this.account = e.account
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

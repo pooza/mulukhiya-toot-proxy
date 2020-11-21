@@ -30,12 +30,12 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
           token: '#{crypt.new.encrypt(params[:result][:access_token])}',
         },
         mounted: function () {
           Vue.registerToken(this.token)
-            .then(e => {this.username = e.username})
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
