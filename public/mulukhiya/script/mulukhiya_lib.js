@@ -89,7 +89,7 @@ const MulukhiyaLib = {
         .then(e => {
           document.body.style.cursor = 'auto'
           localStorage.setItem('mulukhiya_token', user.token)
-          return e.data.account
+          return e.data
         })
     }
 

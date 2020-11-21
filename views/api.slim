@@ -133,7 +133,6 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
           account: {is_admin: false},
           layout: {
             details: {
@@ -151,10 +150,8 @@ html lang='ja'
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {
-              this.username = e.account.username
-              this.account = e.account
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           toggleVisibility: function (name) {

@@ -27,7 +27,7 @@ html lang='ja'
             li class='param' = '{{media.acct}}'
             li class='param'
               a :href='media.status_url' target='_blank' = controller.status_label
-      p v-else-if='username' 読み込み中…
+      p v-else-if='account' 読み込み中…
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -37,12 +37,12 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
           medias: null,
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {this.username = e.account.username})
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           this.load()
             .then(e => {this.medias = e})

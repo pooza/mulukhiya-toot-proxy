@@ -4,8 +4,8 @@
       = "environment: #{env.type}"
 
 .message-container
-  p v-if='username'
-    | login: @{{username}}
+  p v-if='account'
+    | login: @{{account.username}}
     a href='/mulukhiya/app/token'
       i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
   p v-else=''
