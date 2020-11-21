@@ -47,9 +47,9 @@ html lang='ja'
           this.load()
             .then(e => {this.medias = e})
             .catch(e => {
-	      this.message = Vue.createErrorMessage(e)
-	      this.medias = []
-	    })
+              this.message = Vue.createErrorMessage(e)
+              this.medias = []
+	          })
         },
         methods: {
           load: Vue.getMedias,
