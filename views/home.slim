@@ -14,8 +14,7 @@ html lang='ja'
           a href='/mulukhiya/app/feed' Atomフィード
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' メディアカタログ
-        - if controller.webhook?
-          a href='/mulukhiya/app/config' v-if='account' 環境設定
+        a href='/mulukhiya/app/config' v-if='account' 環境設定
         a href='/mulukhiya/app/api' API
         a href='/mulukhiya/app/health' 動作状況
     == slim.render 'fragment/footer'
