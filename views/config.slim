@@ -283,10 +283,13 @@ html lang='ja'
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/filter/add', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details.livecure = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -309,12 +312,15 @@ html lang='ja'
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           unauthAnnict: function () {
             this.$dialog.confirm(
