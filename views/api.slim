@@ -164,19 +164,25 @@ html lang='ja'
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['announcement'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           clearMediaFiles: function () {
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['media'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           clearOAuthClient: function () {
             this.$dialog.confirm(
@@ -188,44 +194,59 @@ html lang='ja'
             }).then(e => {
               this.message = null
               this.layout.details['oauth'] = false
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
-            .finally(e => {document.body.style.cursor = 'auto'})
+              document.body.style.cursor = 'auto'
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              document.body.style.cursor = 'auto'
+            })
           },
           updatePrograms: function () {
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['program'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           updateTaggingDictionary: function () {
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['tagging_dic'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           clearUserTags: function () {
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['tagging_usertag'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           updateFeeds: function () {
             document.body.style.cursor = 'wait'
             axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details['feed'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
         },
       })
