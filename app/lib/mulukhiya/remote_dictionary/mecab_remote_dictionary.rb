@@ -8,6 +8,8 @@ module Mulukhiya
         next if classes.member?('姓')
         next if classes.member?('名')
         result[create_key(v.first)] = {pattern: create_pattern(v.first)}
+      rescue => e
+        @logger.error(error: e.message, dic: uri.to_s, entry: v)
       end
       return result
     rescue => e
