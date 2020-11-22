@@ -56,6 +56,11 @@ module Mulukhiya
       update(load_cache)
     end
 
+    def load_cache
+      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
+      return @cache
+    end
+
     def refresh
       save_cache
       @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
@@ -82,8 +87,10 @@ module Mulukhiya
       remote_dics do |dic|
         dic.parse.each do |k, v|
           result[k] ||= v
+          result[k][:regexp] = result[k][:pattern].source
           result[k][:words] ||= []
           result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
+          result[k][:words].uniq!
         rescue => e
           @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
         end
@@ -105,11 +112,6 @@ module Mulukhiya
     def save_cache
       File.write(path, Marshal.dump(fetch))
       @cache = nil
-    end
-
-    def load_cache
-      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
-      return @cache
     end
   end
 end

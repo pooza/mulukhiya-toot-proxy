@@ -1,0 +1,48 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 ハッシュタグ
+      - Mulukhiya::TaggingDictionary.new.load_cache.each do |word|
+        - if config['/tagging/word/minimum_length'] <= word.first.length
+          h3 #{word.first}
+          .tags
+            ul
+              li
+                | パターン
+                code = "/#{word[1][:regexp]}/"
+              li
+                | 基本のタグ
+                code = word.first.to_hashtag
+              - if word[1][:words].present?
+                li
+                  | 追加のタグ
+                  - word[1][:words].each do |subword|
+                    - if config['/tagging/word/minimum_length'] <= subword.length
+                      code = subword.to_hashtag
+                      | &nbsp;
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          account: {is_admin: false},
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+        },
+      })
