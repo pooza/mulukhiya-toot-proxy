@@ -127,6 +127,26 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/tagging/tag/search' do
+      dic = {}
+      errors = TagSearchContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = errors
+      else
+        TaggingDictionary.new.load_cache.each do |entry|
+          word = entry.shift
+          next unless word.include?(params[:keyword])
+          dic[word] = entry.first
+          dic[word][:word] = word
+          dic[word][:words].unshift(word)
+          dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
+        end
+        @renderer.message = dic
+      end
+      return @renderer.to_s
+    end
+
     post '/tagging/usertag/clear' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
         UserTagInitializeWorker.new.perform

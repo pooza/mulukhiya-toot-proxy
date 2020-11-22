@@ -89,13 +89,10 @@ module Mulukhiya
           result[k] ||= v
           result[k][:regexp] = result[k][:pattern].source
           result[k][:words] ||= []
-          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
+          next unless v[:words].is_a?(Array)
+          result[k][:words].concat(v[:words])
           result[k][:words].uniq!
-        rescue => e
-          @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
         end
-      rescue => e
-        @logger.error(error: e.message, dic: dic.uri.to_s)
       end
       return result.sort_by {|k, v| k.length}.to_h
     end

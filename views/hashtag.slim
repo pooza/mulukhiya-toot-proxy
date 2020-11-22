@@ -5,32 +5,23 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ'}
+    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ辞書'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 ハッシュタグ
-      - Mulukhiya::TaggingDictionary.new.load_cache.each do |word|
+      h2 ハッシュタグ辞書
+      section
+        input type='search' placeholder='検索キーワード' @input='search' v-model='keyword'
+      section class='tag_detail' v-for='entry in result'
         h3
-          | #{word.first}
-          - if config['/tagging/word/minimum_length'] <= word.first.length
-            span class='alert' 未使用
-        .tags
-          ul
-            li
-              | パターン
-              code = "/#{word[1][:regexp]}/"
-            li
-              | 基本のタグ
-              code = word.first.to_hashtag
-            - if word[1][:words].present?
-              li
-                | 追加のタグ
-                - word[1][:words].each do |subword|
-                  code
-                    | #{subword.to_hashtag}
-                    - if config['/tagging/word/minimum_length'] <= subword.length
-                      span class='alert' 未使用
-                  | &nbsp;
+          | {{entry.word}}
+          span class='alert' v-if='entry.word.length < #{config['/tagging/word/minimum_length']}' 未使用
+        ul
+          li
+            strong パターン
+            code = "/{{entry.regexp}}/"
+          li
+            strong タグ
+            code v-for='tag in entry.tags' = "{{tag}} "
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -41,6 +32,8 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false},
+          keyword: null,
+          result: {},
         },
         mounted: function () {
           Vue.getConfig()
@@ -48,5 +41,23 @@ html lang='ja'
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
+          search: function () {
+            if (this.keyword == '') {
+              this.result = {}
+            } else {
+              document.body.style.cursor = 'wait'
+              const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
+              url.searchParams.set('keyword', this.keyword)
+              axios.get(url.href, {responseType: 'json'})
+                .then(e => {
+                  document.body.style.cursor = 'auto'
+                  this.message = null
+                  this.result = e.data
+                }).catch(e => {
+                  document.body.style.cursor = 'auto'
+                  this.message = Vue.createErrorMessage(e)
+                })
+            }
+          },
         },
       })
