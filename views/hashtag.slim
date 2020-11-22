@@ -10,23 +10,27 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 ハッシュタグ
       - Mulukhiya::TaggingDictionary.new.load_cache.each do |word|
-        - if config['/tagging/word/minimum_length'] <= word.first.length
-          h3 #{word.first}
-          .tags
-            ul
+        h3
+          | #{word.first}
+          - if config['/tagging/word/minimum_length'] <= word.first.length
+            span class='alert' 未使用
+        .tags
+          ul
+            li
+              | パターン
+              code = "/#{word[1][:regexp]}/"
+            li
+              | 基本のタグ
+              code = word.first.to_hashtag
+            - if word[1][:words].present?
               li
-                | パターン
-                code = "/#{word[1][:regexp]}/"
-              li
-                | 基本のタグ
-                code = word.first.to_hashtag
-              - if word[1][:words].present?
-                li
-                  | 追加のタグ
-                  - word[1][:words].each do |subword|
+                | 追加のタグ
+                - word[1][:words].each do |subword|
+                  code
+                    | #{subword.to_hashtag}
                     - if config['/tagging/word/minimum_length'] <= subword.length
-                      code = subword.to_hashtag
-                      | &nbsp;
+                      span class='alert' 未使用
+                  | &nbsp;
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
