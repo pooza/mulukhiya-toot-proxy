@@ -54,7 +54,10 @@ html lang='ja'
               .endpoint_container
                 .link
                   a href='/mulukhiya/api/program' target='_blank' GET /mulukhiya/api/program
-                .link_description キャッシュ済みの実況番組表を表示します。
+                .link_description
+                  | キャッシュ済みの
+                  a href='#{config['/programs/url']}' target='_blank' 実況番組表
+                  | を表示します。
               .endpoint_container v-if='account.is_admin'
                 .link POST /mulukhiya/api/program/update
                 - if config.keys('/sidekiq/schedule/program_update').member?('cron')
@@ -69,6 +72,10 @@ html lang='ja'
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/tagging/tag/search?q=プリキュア' target='_blank' GET /mulukhiya/api/tagging/tag/search?q=your_keyword
+              .link_description ハッシュタグ辞書から、該当するパターンを検索します。
             .endpoint_container
               .link POST /mulukhiya/api/tagging/dic/update
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
