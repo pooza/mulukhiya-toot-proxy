@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 7138104c683993e366efdcd5f9a02fc726da0f9e
+  revision: 429530d1483e66d221c6dc16d22f222ca7f73e77
   specs:
-    ginseng-core (1.8.4)
+    ginseng-core (1.8.5)
       activesupport
       addressable
       daemon-spawn
@@ -196,7 +196,7 @@ GEM
     nio4r (2.5.4)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
-    nokogumbo (2.0.2)
+    nokogumbo (2.0.3)
       nokogiri (~> 1.8, >= 1.8.4)
     oauth (0.5.4)
     oauth2 (1.4.4)
