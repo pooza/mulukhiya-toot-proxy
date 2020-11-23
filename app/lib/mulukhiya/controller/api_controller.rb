@@ -136,11 +136,13 @@ module Mulukhiya
       else
         TaggingDictionary.new.load_cache.each do |entry|
           word = entry.shift
-          next unless word.include?(params[:keyword])
+          next unless params[:q].match?(entry.first[:regexp])
           dic[word] = entry.first
           dic[word][:word] = word
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
+        rescue => e
+          @logger.error(class: self.class.to_s, error: e.message, entry: entry)
         end
         @renderer.message = dic
       end

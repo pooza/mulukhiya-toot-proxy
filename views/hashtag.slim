@@ -47,7 +47,7 @@ html lang='ja'
             } else {
               document.body.style.cursor = 'wait'
               const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
-              url.searchParams.set('keyword', this.keyword)
+              url.searchParams.set('q', this.keyword)
               axios.get(url.href, {responseType: 'json'})
                 .then(e => {
                   document.body.style.cursor = 'auto'
