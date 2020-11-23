@@ -15,9 +15,9 @@ html lang='ja'
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' メディアカタログ
         a href='/mulukhiya/app/hashtag' ハッシュタグ辞書
-        a href='/mulukhiya/app/config' v-if='account' 環境設定
         a href='/mulukhiya/app/api' API
         a href='/mulukhiya/app/health' 動作状況
+        a href='/mulukhiya/app/config' v-if='account' 環境設定
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
