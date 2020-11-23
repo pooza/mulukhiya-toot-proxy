@@ -13,6 +13,31 @@ module Mulukhiya
 
       uri = SpotifyURI.parse('https://open.spotify.com')
       assert(uri.spotify?)
+
+      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
+      assert_false(uri.spotify?)
+    end
+
+    def test_shortenable?
+      uri = SpotifyURI.parse('https://google.com')
+      assert_false(uri.shortenable?)
+
+      uri = SpotifyURI.parse('https://spotify.com')
+      assert_false(uri.shortenable?)
+
+      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
+      assert(uri.shortenable?)
+    end
+
+    def test_shorten
+      uri = SpotifyURI.parse('https://google.com')
+      assert_nil(uri.shorten)
+
+      uri = SpotifyURI.parse('https://spotify.com')
+      assert_nil(uri.shorten)
+
+      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
+      assert_equal(uri.shorten.to_s, 'https://open.spotify.com/track/3L6K6hTLVjVhiTdsMEaWii')
     end
 
     def test_track
