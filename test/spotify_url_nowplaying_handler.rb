@@ -34,6 +34,14 @@ module Mulukhiya
         title: 'ボクは走るんだ!',
         artists: ['アイネス(CV:水橋かおり)'],
       }])
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => "#nowplaying https://link.tospotify.com/ZArOrV7KAbb\n")
+      assert_equal(@handler.debug_info[:result], [{
+        url: 'https://open.spotify.com/track/3L6K6hTLVjVhiTdsMEaWii',
+        title: 'ミルキィローズ・メタルブリザード!',
+        artists: ['佐藤直紀'],
+      }])
     end
   end
 end
