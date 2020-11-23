@@ -16,6 +16,7 @@ inflections:
   note_uri: NoteURI
   shortened_url_handler: ShortenedURLHandler
   spotify_uri: SpotifyURI
+  spotify_url_handler: SpotifyURLHandler
   spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler
   toot_uri: TootURI
   ui_controller: UIController
