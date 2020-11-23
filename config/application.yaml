@@ -95,6 +95,7 @@ test:
         - status
         - hash_tag
         - user_config
+        - spotify_url_handler
         - tag_atom_feed_renderer
         - media_atom_feed_renderer
     - name: postgres
