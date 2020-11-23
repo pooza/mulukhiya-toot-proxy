@@ -236,6 +236,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -264,6 +265,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -337,6 +339,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -360,6 +363,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -376,6 +380,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -436,6 +441,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -459,6 +465,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -475,6 +482,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -534,6 +542,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -559,6 +568,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -575,6 +585,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
