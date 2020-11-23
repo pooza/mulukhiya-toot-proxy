@@ -1,7 +1,7 @@
 module Mulukhiya
   class TagSearchContract < Contract
     params do
-      required(:keyword).value(:string)
+      required(:q).value(:string)
     end
   end
 end
