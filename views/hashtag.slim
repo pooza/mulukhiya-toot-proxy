@@ -10,7 +10,8 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 ハッシュタグ辞書
       section
-        input type='search' placeholder='検索キーワード' @input='search' v-model='keyword'
+        input type='search' placeholder='検索キーワード' v-model='keyword'
+        button class='search' @click='search' 検索
       section class='tag_detail' v-for='entry in result'
         h3
           | {{entry.word}}
