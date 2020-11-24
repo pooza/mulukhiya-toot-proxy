@@ -4,5 +4,10 @@ module Mulukhiya
       assert_equal('#キボウレインボウ#'.escape_toot, '# キボウレインボウ#')
       assert_equal('IDOLM@STER'.escape_toot, 'IDOLM@ STER')
     end
+
+    def test_crypt
+      src = 'hoge'
+      assert_equal(src, src.encrypt.decrypt)
+    end
   end
 end
