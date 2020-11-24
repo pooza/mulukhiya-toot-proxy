@@ -92,7 +92,7 @@ module Mulukhiya
     end
 
     def token
-      return Crypt.new.decrypt(params[:token]) if params[:token]
+      return params[:token].decrypt if params[:token]
       return nil
     end
   end
