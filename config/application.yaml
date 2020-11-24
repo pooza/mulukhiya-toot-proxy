@@ -112,7 +112,6 @@ test:
     - name: amazon
       cases:
         - amazon_service
-        - amazon_image_handler
         - amazon_nowplaying_handler
         - amazon_url_nowplaying_handler
     - name: spotify
