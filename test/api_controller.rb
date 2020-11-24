@@ -25,12 +25,16 @@ module Mulukhiya
     end
 
     def test_program
+      return unless Environment.controller_class.livecure?
+
       get '/program'
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
 
     def test_media
+      return unless Environment.controller_class.media_catalog?
+
       get '/media'
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
