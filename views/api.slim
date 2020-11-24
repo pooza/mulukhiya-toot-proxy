@@ -122,13 +122,6 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
               .link_description モロヘイヤの動作状況を表示します。
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("sidekiq")' Sidekiq
-          vue-slide-up-down :active='layout.details.sidekiq'
-            .endpoint_container
-              .link
-                a href='#{config['/sidekiq/dashboard/url']}' target='_blank' GET /mulukhiya/sidekiq
-              .link_description Sidekiqのダッシュボードを開きます。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
