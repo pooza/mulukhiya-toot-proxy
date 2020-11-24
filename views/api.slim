@@ -122,6 +122,13 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
               .link_description モロヘイヤの動作状況を表示します。
+        li
+          h3 @click='toggleVisibility("about")' パッケージ情報
+          vue-slide-up-down :active='layout.details.about'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/about' target='_blank' GET /mulukhiya/api/about
+              .link_description モロヘイヤのバージョン等、パッケージ情報を表示します。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -145,6 +152,7 @@ html lang='ja'
               feed: false,
               health: false,
               sidekiq: false,
+              about: false,
             },
           },
         },
