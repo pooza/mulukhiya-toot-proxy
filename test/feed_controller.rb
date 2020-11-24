@@ -20,6 +20,7 @@ module Mulukhiya
       return unless Environment.controller_class.media_catalog?
 
       get '/media'
+      pp last_response
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
     end

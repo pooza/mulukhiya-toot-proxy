@@ -86,6 +86,8 @@ test:
     - name: ci
       cases:
         - ui_controller
+        - feed_controller
+        - api_controller
         - mastodon_controller
         - attachment
         - event
