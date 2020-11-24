@@ -43,6 +43,7 @@ module Mulukhiya
       return true unless basic_auth?
       return false unless username == self.username
       return true if password == Crypt.new.decrypt(self.password)
+      return true if password.crypt(Environment.hostname) == self.password
       return true if password == self.password
       return false
     end
