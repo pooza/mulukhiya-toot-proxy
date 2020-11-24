@@ -26,7 +26,7 @@ module Mulukhiya
       else
         response = @http.get(create_item_uri(asin))
         body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
-        return nil unless element = body.xpath(%{//img[@data-old-hires!='']}).first
+        return nil unless element = body.xpath(%(//img[@data-old-hires!=''])).first
         return Ginseng::URI.parse(element['data-old-hires'])
       end
       return nil
