@@ -54,5 +54,11 @@ module Mulukhiya
       uri.associate_tag = 'bshockfortrbl-22'
       assert_equal(uri.shorten.to_s, 'https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22')
     end
+
+    def test_image_uri
+      uri = AmazonURI.parse('https://www.amazon.co.jp/dp/B08JH42SHR')
+      assert_kind_of(Ginseng::URI, uri.image_uri)
+      assert(uri.image_uri.absolute?)
+    end
   end
 end
