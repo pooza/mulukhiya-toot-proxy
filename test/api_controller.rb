@@ -2,11 +2,6 @@ module Mulukhiya
   class APIControllerTest < TestCase
     include ::Rack::Test::Methods
 
-    def setup
-      @config = Config.instance
-      @account = Environment.test_account
-    end
-
     def app
       return APIController
     end
@@ -26,10 +21,6 @@ module Mulukhiya
       get '/config'
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 403)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
-
-      get "/config?token=#{Crypt.new.encrypt(@account.token)}"
-      assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
 
