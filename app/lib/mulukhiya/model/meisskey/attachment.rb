@@ -23,6 +23,15 @@ module Mulukhiya
         return @hash
       end
 
+      def feed_entry
+        return {
+          link: uri.to_s,
+          title: "#{name} (#{size_str}) #{description}",
+          author: account.display_name || account.acct.to_s,
+          date: date,
+        }
+      end
+
       def account
         return Account[values.dig('metadata', 'userId')]
       end
@@ -90,8 +99,7 @@ module Mulukhiya
           note = Status[row[:_id]]
           note.attachments.each do |attachment|
             break unless cnt < config['/feed/media/limit']
-            attachment = Attachment[attachment['id']]
-            yield attachment.to_h
+            yield Attachment[attachment['id']].feed_entry
           end
         rescue => e
           Logger.new.error(error: e.message, row: row.to_h)
