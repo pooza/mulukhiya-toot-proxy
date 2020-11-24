@@ -148,7 +148,6 @@ test:
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
-        - media_atom_feed_renderer
     - name: pleroma
       cases:
         - mastodon_controller
