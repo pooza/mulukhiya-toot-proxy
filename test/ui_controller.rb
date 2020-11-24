@@ -36,11 +36,11 @@ module Mulukhiya
 
       get '/script/mulukhiya_lib'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'text/javascript;charset=UTF-8')
+      assert_equal(last_response.content_type, 'text/javascript;charset=UTF-8')
 
       get '/script/mulukhiya_lib.js'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'text/javascript;charset=UTF-8')
+      assert_equal(last_response.content_type, 'text/javascript;charset=UTF-8')
     end
 
     def test_style
@@ -54,7 +54,7 @@ module Mulukhiya
 
       get '/style/default'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'text/css; charset=UTF-8')
+      assert_equal(last_response.content_type, 'text/css; charset=UTF-8')
     end
 
     def test_media
@@ -68,15 +68,15 @@ module Mulukhiya
 
       get '/media/icon.png'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'image/png')
+      assert_equal(last_response.content_type, 'image/png')
 
       get '/media/poyke.mp4'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'video/mp4')
+      assert_equal(last_response.content_type, 'video/mp4')
 
       get '/media/hugttocatch.mp3'
       assert(last_response.ok?)
-      assert_equal(last_response.headers['Content-Type'], 'audio/mpeg')
+      assert_equal(last_response.content_type, 'audio/mpeg')
     end
   end
 end
