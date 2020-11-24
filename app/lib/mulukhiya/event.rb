@@ -9,6 +9,7 @@ module Mulukhiya
       @label = label.to_sym
       @params = params
       @config = Config.instance
+      @logger = Logger.new
     end
 
     def name
@@ -19,6 +20,8 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       handler_names do |v|
         yield Handler.create(v, params)
+      rescue => e
+        @logger.error(class: self.class.to_s, error: e.message, handler: v)
       end
     end
 
