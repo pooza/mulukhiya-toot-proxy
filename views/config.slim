@@ -9,11 +9,11 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 環境設定
-      section v-if='account'
+      section v-if='account.username'
         h3 現在の設定
         .result-container
           pre = '{{result}}'
-      section class='config' v-if='account'
+      section class='config' v-if='account.account'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
@@ -96,7 +96,7 @@ html lang='ja'
           .field-update-button-container
             button @click='authAnnict' 認証
             button class='alert' @click='unauthAnnict' 認証を解除
-      section class='config' v-if='account'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
@@ -116,7 +116,7 @@ html lang='ja'
             h4 curlサンプル
             textarea ref='curl_sample_text' v-html='form.webhook.curl_sample'
             i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
-      section class='config' v-if='account'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
