@@ -73,6 +73,10 @@ module Mulukhiya
         return Attachment.new(id)
       end
 
+      def self.logger
+        return Logger.new
+      end
+
       def self.catalog
         return enum_for(__method__) unless block_given?
         cnt = 0
@@ -88,7 +92,7 @@ module Mulukhiya
             cnt += 1
           end
         rescue => e
-          Logger.new.error(error: e.message, row: row.to_h)
+          logger.error(error: e.message, row: row.to_h)
         end
       end
 
@@ -102,7 +106,7 @@ module Mulukhiya
             yield Attachment[attachment['id']].feed_entry
           end
         rescue => e
-          Logger.new.error(error: e.message, row: row.to_h)
+          logger.error(error: e.message, row: row.to_h)
         end
       end
 
