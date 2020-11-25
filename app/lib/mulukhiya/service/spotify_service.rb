@@ -14,7 +14,7 @@ module Mulukhiya
       return tracks.first
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -26,7 +26,7 @@ module Mulukhiya
       return RSpotify::Album.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -38,7 +38,7 @@ module Mulukhiya
       return RSpotify::Track.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -50,7 +50,7 @@ module Mulukhiya
       return RSpotify::Artist.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry

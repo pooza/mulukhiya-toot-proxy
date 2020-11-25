@@ -28,7 +28,7 @@ module Mulukhiya
       return @raw['spoiler_text'] unless blocks?
       return blocks.find {|v| v['type'] == 'header'}.dig('text', 'text')
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      @logger.error(error: e, payload: raw)
       return nil
     end
 
@@ -38,7 +38,7 @@ module Mulukhiya
       return parse_legacy_text(@raw['text']) unless blocks?
       return blocks.find {|v| v['type'] == 'section'}.dig('text', 'text')
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      @logger.error(error: e, payload: raw)
       return nil
     end
 
@@ -50,14 +50,14 @@ module Mulukhiya
       end
       return @images
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      @logger.error(error: e, payload: raw)
       return []
     end
 
     def image_uris
       return images.map {|v| Ginseng::URI.parse(v['image_url'])}
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, payload: raw)
+      @logger.error(error: e, payload: raw)
       return []
     end
 
