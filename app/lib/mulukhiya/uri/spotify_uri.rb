@@ -4,6 +4,7 @@ module Mulukhiya
       super
       @config = Config.instance
       @spotify = SpotifyService.new
+      @logger = Logger.new
     end
 
     def spotify?
@@ -31,7 +32,7 @@ module Mulukhiya
       uri.query_values = nil
       return uri
     rescue => e
-      Logger.new.error(class: self.class.to_s, error: e.message, url: to_s)
+      logger.error(class: self.class.to_s, error: e.message, url: to_s)
       return nil
     end
 
