@@ -57,8 +57,8 @@ module Mulukhiya
 
     def test_image_uri
       uri = AmazonURI.parse('https://www.amazon.co.jp/dp/B08JH42SHR')
-      assert_kind_of(Ginseng::URI, uri.image_uri)
-      assert(uri.image_uri.absolute?)
+      assert_kind_of(Ginseng::URI, uri.image_uri) if uri.image_uri
+      assert(uri.image_uri.absolute?) if uri.image_uri
     end
   end
 end
