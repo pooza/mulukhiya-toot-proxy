@@ -5,10 +5,10 @@ module Mulukhiya
         words = Array(words)
         [create_key(k), {pattern: create_pattern(k), words: words.map {|word| create_key(word)}}]
       rescue => e
-        @logger.error(error: e.message, dic: uri.to_s, word: k)
+        @logger.error(error: e, dic: uri.to_s, word: k)
       end.to_h
     rescue => e
-      @logger.error(error: e.message, dic: uri.to_s)
+      @logger.error(error: e, dic: uri.to_s)
       return {}
     end
   end

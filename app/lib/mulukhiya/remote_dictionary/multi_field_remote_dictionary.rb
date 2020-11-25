@@ -8,7 +8,7 @@ module Mulukhiya
           result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
         end
       rescue => e
-        @logger.error(error: e.message, dic: uri.to_s, entry: entry)
+        @logger.error(error: e, dic: uri.to_s, entry: entry)
       end
       return result
     end

@@ -19,7 +19,7 @@ module Mulukhiya
         return matches.split(',') if matches
         return Ginseng::GatewayError, "Invalid scopes '#{values[:scopes]}'"
       rescue => e
-        Logger.new.error(e)
+        Logger.new.error(error: e)
         return []
       end
 

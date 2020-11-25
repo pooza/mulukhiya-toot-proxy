@@ -92,7 +92,7 @@ module Mulukhiya
             cnt += 1
           end
         rescue => e
-          logger.error(error: e.message, row: row.to_h)
+          logger.error(error: e, row: row.to_h)
         end
       end
 
@@ -106,7 +106,7 @@ module Mulukhiya
             yield Attachment[attachment['id']].feed_entry
           end
         rescue => e
-          logger.error(error: e.message, row: row.to_h)
+          logger.error(error: e, row: row.to_h)
         end
       end
 

@@ -33,7 +33,7 @@ module Mulukhiya
       return uri.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace unless uri
-      @logger.error(worker: self.class.to_s, error: e.message, uri: uri.to_s)
+      @logger.error(error: e, uri: uri.to_s)
       return uri.to_s
     end
   end

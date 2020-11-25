@@ -23,7 +23,7 @@ module Mulukhiya
       Config.instance['/tagging/dictionaries'].each do |dic|
         yield RemoteDictionary.create(dic)
       rescue => e
-        logger.error(error: e.message, dic: dic)
+        logger.error(error: e, dic: dic)
       end
     end
 
