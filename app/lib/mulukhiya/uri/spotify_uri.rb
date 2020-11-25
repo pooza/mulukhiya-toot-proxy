@@ -32,7 +32,7 @@ module Mulukhiya
       uri.query_values = nil
       return uri
     rescue => e
-      logger.error(class: self.class.to_s, error: e.message, url: to_s)
+      logger.error(error: e, url: to_s)
       return nil
     end
 

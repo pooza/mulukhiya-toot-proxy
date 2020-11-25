@@ -21,7 +21,7 @@ module Mulukhiya
       handler_names do |v|
         yield Handler.create(v, params)
       rescue => e
-        @logger.error(class: self.class.to_s, error: e.message, handler: v)
+        @logger.error(error: e, handler: v)
       end
     end
 

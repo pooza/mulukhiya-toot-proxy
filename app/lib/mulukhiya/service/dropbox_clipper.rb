@@ -22,10 +22,10 @@ module Mulukhiya
       end
       return DropboxClipper.new(account.config['/dropbox/token'])
     rescue Ginseng::ConfigError => e
-      logger.error(clipper: self.class.to_s, error: e.message)
+      logger.error(error: e)
       return nil
     rescue => e
-      logger.error(Ginseng::Error.create(e).to_h.merge(params: params))
+      logger.error(error: e, params: params)
       return nil
     end
   end

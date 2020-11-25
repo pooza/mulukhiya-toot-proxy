@@ -15,7 +15,7 @@ module Mulukhiya
     def webhook
       return Webhook.new(config)
     rescue => e
-      logger.error(e)
+      logger.error(error: e)
       return nil
     end
 
@@ -31,7 +31,7 @@ module Mulukhiya
       end
       return @growi
     rescue => e
-      logger.error(clipper: self.class.to_s, error: e.message, acct: acct.to_s)
+      logger.error(error: e, acct: acct.to_s)
       return nil
     end
 
@@ -39,7 +39,7 @@ module Mulukhiya
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
     rescue => e
-      logger.error(e)
+      logger.error(error: e)
       return nil
     end
 

@@ -92,7 +92,7 @@ module Mulukhiya
         }
       end
 
-      def self.Logger
+      def self.logger
         return Logger.new
       end
 
@@ -109,7 +109,7 @@ module Mulukhiya
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].to_h
         rescue => e
-          logger.error(error: e.message, row: row)
+          logger.error(error: e, row: row)
         end
       end
 
@@ -118,7 +118,7 @@ module Mulukhiya
         Postgres.instance.execute('media_catalog', query_params).each do |row|
           yield Attachment[row[:id]].feed_entry
         rescue => e
-          logger.error(error: e.message, row: row)
+          logger.error(error: e, row: row)
         end
       end
     end

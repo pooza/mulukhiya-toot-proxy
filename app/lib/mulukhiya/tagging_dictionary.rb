@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(k: k, v: v))
+        @logger.error(error: e, k: k, v: v)
       end
       update(sort_by {|k, v| k.length}.to_h)
     end
@@ -42,7 +42,7 @@ module Mulukhiya
       return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(class: self.class.to_s, path: path, error: e.message)
+      @logger.error(error: e, path: path)
       return true
     end
 
@@ -66,7 +66,7 @@ module Mulukhiya
       @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
     end
 
     alias create refresh

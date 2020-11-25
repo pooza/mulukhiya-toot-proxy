@@ -101,7 +101,7 @@ module Mulukhiya
       return file if file.type == type
       return nil
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
       return nil
     end
 
@@ -128,7 +128,7 @@ module Mulukhiya
       end
       return @size_info
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
       return nil
     end
   end

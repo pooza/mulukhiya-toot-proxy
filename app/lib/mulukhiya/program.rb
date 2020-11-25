@@ -6,7 +6,7 @@ module Mulukhiya
       File.write(path, @http.get(@config['/programs/url']))
       @logger.info(class: self.class.to_s, count: count)
     rescue Ginseng::ConfigError => e
-      @logger.error(class: self.class.to_s, error: e.message)
+      @logger.error(error: e)
     end
 
     def path

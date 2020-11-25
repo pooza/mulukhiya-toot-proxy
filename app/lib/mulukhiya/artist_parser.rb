@@ -24,7 +24,7 @@ module Mulukhiya
       tags.push(@source)
       return tags
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
       return []
     end
 
