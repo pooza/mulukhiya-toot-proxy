@@ -85,8 +85,9 @@ module Mulukhiya
       config = Config.instance
       config['/spotify/client/id']
       config['/spotify/client/secret']
+      SpotifyService.new
       return true
-    rescue Ginseng::ConfigError
+    rescue
       return false
     end
 
