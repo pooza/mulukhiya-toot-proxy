@@ -44,7 +44,7 @@ module Mulukhiya
       return nil
     rescue => e
       cnt += 1
-      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -60,7 +60,7 @@ module Mulukhiya
       return item
     rescue => e
       cnt += 1
-      @logger.info(class: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry

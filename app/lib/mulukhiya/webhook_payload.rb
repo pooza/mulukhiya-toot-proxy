@@ -81,7 +81,7 @@ module Mulukhiya
       end
       return temp
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, text: text)
+      @logger.error(error: e, text: text)
       return text
     end
   end
