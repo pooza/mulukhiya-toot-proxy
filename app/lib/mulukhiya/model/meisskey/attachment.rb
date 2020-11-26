@@ -23,6 +23,15 @@ module Mulukhiya
         return @hash
       end
 
+      def feed_entry
+        return {
+          link: uri.to_s,
+          title: "#{name} (#{size_str}) #{description}",
+          author: account.display_name || account.acct.to_s,
+          date: date,
+        }
+      end
+
       def account
         return Account[values.dig('metadata', 'userId')]
       end
@@ -64,6 +73,10 @@ module Mulukhiya
         return Attachment.new(id)
       end
 
+      def self.logger
+        return Logger.new
+      end
+
       def self.catalog
         return enum_for(__method__) unless block_given?
         cnt = 0
@@ -79,7 +92,7 @@ module Mulukhiya
             cnt += 1
           end
         rescue => e
-          Logger.new.error(error: e.message, row: row.to_h)
+          logger.error(error: e, row: row.to_h)
         end
       end
 
@@ -90,11 +103,10 @@ module Mulukhiya
           note = Status[row[:_id]]
           note.attachments.each do |attachment|
             break unless cnt < config['/feed/media/limit']
-            attachment = Attachment[attachment['id']]
-            yield attachment.to_h
+            yield Attachment[attachment['id']].feed_entry
           end
         rescue => e
-          Logger.new.error(error: e.message, row: row.to_h)
+          logger.error(error: e, row: row.to_h)
         end
       end
 

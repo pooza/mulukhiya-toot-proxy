@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'mimemagic'
 
 module Mulukhiya
   class MediaFile < File

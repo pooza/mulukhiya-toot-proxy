@@ -46,11 +46,9 @@ module Mulukhiya
       end
       return @image_uri
     rescue => e
-      @logger.error(class: self.class.to_s, error: e.message, uri: to_s)
+      @logger.error(error: e, uri: to_s)
       return nil
     end
-
-    alias image_url image_uri
 
     private
 

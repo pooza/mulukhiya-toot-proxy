@@ -32,7 +32,7 @@ module Mulukhiya
 
       def public_uri
         unless @public_uri
-          if ['mastodon', 'pleroma'].member?(Environment.controller_name)
+          if Environment.mastodon_type?
             service = Environment.sns_class.new
           else
             service = MastodonService.new
@@ -50,7 +50,7 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        logger.error(e)
+        logger.error(error: e)
         template = Template.new('status_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md

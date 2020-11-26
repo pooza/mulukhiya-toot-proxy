@@ -49,15 +49,6 @@ module Mulukhiya
         return false
       end
 
-      def twitter?
-        return false unless config["/#{name.underscore}/twitter"] == true
-        return false unless TwitterService.config?
-        return false unless Handler.search(/(twitter|tweet)/).present?
-        return true
-      rescue Ginseng::ConfigError
-        return false
-      end
-
       def annict?
         return false unless config["/#{name.underscore}/annict"] == true
         return false unless AnnictService.config?
@@ -67,7 +58,9 @@ module Mulukhiya
       end
 
       def livecure?
-        return config['/webui/livecure'] == true
+        return false unless config['/programs/url'].present?
+        return false unless config['/webui/livecure'] == true
+        return true
       rescue Ginseng::ConfigError
         return false
       end

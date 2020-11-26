@@ -16,14 +16,15 @@ module Mulukhiya
         'unknown' => {
           'itunes_url_nowplaying' => [{
             'url' => 'https://music.apple.com/jp/album//1352845788?i=1352845804',
-            'artist' => '宮本佳那子',
+            'title' => 'シュビドゥビ☆スイーツタイム',
+            'artists' => ['宮本佳那子'],
           }],
         },
       })
     end
 
     def test_to_s
-      assert_equal(@reporter.to_s, "---\nunknown:\n  itunes_url_nowplaying:\n  - url: https://music.apple.com/jp/album//1352845788?i=1352845804\n    artist: 宮本佳那子\n")
+      assert_equal(@reporter.to_s, "---\nunknown:\n  itunes_url_nowplaying:\n  - url: https://music.apple.com/jp/album//1352845788?i=1352845804\n    title: シュビドゥビ☆スイーツタイム\n    artists:\n    - 宮本佳那子\n")
     end
   end
 end

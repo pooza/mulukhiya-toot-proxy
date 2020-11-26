@@ -1,5 +1,5 @@
 package:
-  version: 3.14.13
+  version: 4.0.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -24,14 +24,11 @@ handler:
   animation_image_format_convert:
     type: image/gif
     timeout: 10
-    disable: true
   itunes_image:
     pixel: 480
     timeout: 10
   spotify_image:
     timeout: 10
-    disable: true
-  tweet:
     disable: true
   canonical_url:
     ignore:
@@ -88,6 +85,9 @@ test:
   filters:
     - name: ci
       cases:
+        - ui_controller
+        - feed_controller
+        - api_controller
         - mastodon_controller
         - attachment
         - event
@@ -97,6 +97,7 @@ test:
         - status
         - hash_tag
         - user_config
+        - spotify_url_handler
         - tag_atom_feed_renderer
         - media_atom_feed_renderer
     - name: postgres
@@ -113,7 +114,6 @@ test:
     - name: amazon
       cases:
         - amazon_service
-        - amazon_image_handler
         - amazon_nowplaying_handler
         - amazon_url_nowplaying_handler
     - name: spotify
@@ -126,29 +126,11 @@ test:
     - name: you_tube
       cases:
         - youtube_service
-        - video_uri
+        - you_tube_uri
         - youtube_image_handler
         - youtube_url_nowplaying_handler
-    - name: twitter
-      cases:
-        - twitter_service
-        - tweet_handler
-        - twitter_auth_contract
-    - name: dolphin
-      cases:
-        - mastodon_controller
-        - misskey_controller
-        - meisskey_controller
-        - pleroma_controller
-        - webhook_controller
-        - mongo
-        - access_token
-        - mastodon_auth_contract
-        - media_atom_feed_renderer
-        - attachment
     - name: mastodon
       cases:
-        - dolphin_controller
         - misskey_controller
         - meisskey_controller
         - pleroma_controller
@@ -158,7 +140,6 @@ test:
       cases:
         - mastodon_controller
         - meisskey_controller
-        - dolphin_controller
         - pleroma_controller
         - mongo
         - mastodon_auth_contract
@@ -166,21 +147,16 @@ test:
       cases:
         - mastodon_controller
         - misskey_controller
-        - dolphin_controller
         - pleroma_controller
         - postgres
         - mastodon_auth_contract
-        - media_atom_feed_renderer
     - name: pleroma
       cases:
         - mastodon_controller
         - misskey_controller
-        - dolphin_controller
         - meisskey_controller
         - mongo
-        - hash_tag
         - misskey_auth_contract
-        - tag_atom_feed_renderer
         - media_atom_feed_renderer
         - attachment
     - name: dropbox
@@ -221,7 +197,7 @@ webui:
     - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
-    - /mulukhiya/script/mulukhiya_lib.js
+    - /mulukhiya/script/mulukhiya_lib
   stylesheets:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
@@ -233,13 +209,13 @@ webui:
     viewport: width=800
   livecure: false
 mastodon:
+  sns_type: mastodon
   url: https://mstdn.example.com/
   webhook: true
   media_catalog: true
   feed: true
   announcement: true
   filter: true
-  twitter: true
   annict: true
   media_api:
     version: null
@@ -261,6 +237,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -269,7 +246,6 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
@@ -277,7 +253,6 @@ mastodon:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -291,6 +266,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -344,12 +320,12 @@ mastodon:
   search:
     limit: 40
 misskey:
+  sns_type: misskey
   url: https://misskey.example.com/
   webhook: true
   media_catalog: true
   feed: true
   announcement: true
-  twitter: true
   annict: true
   dbms: postgres
   parser: note
@@ -364,6 +340,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -372,14 +349,12 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -389,6 +364,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -405,6 +381,7 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -438,19 +415,19 @@ misskey:
       - write:notes
       - write:drive
       - read:drive
-    callback_url: /mulukhiya/auth
+    callback_url: /mulukhiya/app/misskey/auth
   status:
     key: noteId
     label: ノート
     max_length: 500
 meisskey:
+  sns_type: misskey
   url: https://meisskey.example.com/
   display_name: めいすきー
   webhook: true
   media_catalog: true
   feed: true
   announcement: true
-  twitter: true
   annict: true
   dbms: mongo
   parser: note
@@ -465,6 +442,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -473,14 +451,12 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -490,6 +466,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -506,6 +483,7 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -539,63 +517,16 @@ meisskey:
       - write:notes
       - write:drive
       - read:drive
-    callback_url: /mulukhiya/auth
+    callback_url: /mulukhiya/app/misskey/auth
   status:
     key: noteId
     label: ノート
     max_length: 1000
-dolphin:
-  url: https://dolphin.example.com/
-  feed: true
-  dbms: postgres
-  parser: note
-  handlers:
-    pre_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - mention_visibility
-      - bandai_channel_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - tagging
-      - invalid_command
-    post_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - good_morning
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - result_notification
-  status:
-    key: noteId
-    label: ノート
-    max_length: 500
 pleroma:
+  sns_type: mastodon
   url: https://pleroma.example.com/
   webhook: true
-  twitter: true
+  feed: true
   annict: true
   dbms: postgres
   parser: toot
@@ -612,6 +543,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -620,14 +552,12 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
-      - tweet
       - tagging
       - invalid_command
     post_toot:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - tweet
       - good_morning
       - result_notification
     pre_webhook:
@@ -639,6 +569,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -655,6 +586,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - spotify_url
       - amazon_url
       - itunes_nowplaying
       - amazon_nowplaying
@@ -803,14 +735,6 @@ itunes:
     - itunes.apple.com
 youtube:
   url: https://www.googleapis.com/
-twitter:
-  status:
-    default_tags: []
-    appendable_tags:
-      - 実況
-    length:
-      max: 140
-      url: 12
 bandai_channel:
   hosts:
     - www.b-ch.com
@@ -841,6 +765,9 @@ artist_parser:
         - strip: true
           split: true
           prefix: 'コーラス:'
+    - pattern: '^歌:(.+)$'
+      items:
+        - split: true
     - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
       items:
         - split: true

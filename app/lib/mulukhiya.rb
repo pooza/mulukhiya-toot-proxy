@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'bootsnap'
 require 'sidekiq'
 require 'sidekiq-scheduler'
@@ -9,9 +10,10 @@ module Mulukhiya
     return File.expand_path('../..', __dir__)
   end
 
-  def self.bootsnap
+  def self.setup_bootsnap
     Bootsnap.setup(
       cache_dir: File.join(dir, 'tmp/cache'),
+      development_mode: Environment.development?,
       load_path_cache: true,
       autoload_paths_cache: true,
       compile_cache_iseq: true,
@@ -28,7 +30,7 @@ module Mulukhiya
     return loader
   end
 
-  def self.sidekiq
+  def self.setup_sidekiq
     Sidekiq.configure_client do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
     end
@@ -36,24 +38,35 @@ module Mulukhiya
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
       config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
     end
+    Redis.exists_returns_integer = true
   end
 
   def self.rack
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
     require 'sidekiq-failures'
-
-    config = Config.instance
-    if config['/sidekiq/auth/user'].present? && config['/sidekiq/auth/password'].present?
+    if SidekiqDaemon.basic_auth?
       Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|
-        Environment.auth(username, password)
+        SidekiqDaemon.auth(username, password)
       end
     end
     return Rack::URLMap.new(
       '/' => Environment.controller_class,
+      '/mulukhiya' => UIController,
+      '/mulukhiya/api' => APIController,
+      '/mulukhiya/feed' => FeedController,
       '/mulukhiya/webhook' => WebhookController,
       '/mulukhiya/sidekiq' => Sidekiq::Web,
     )
+  end
+
+  def self.setup_dbms
+    if Environment.postgres?
+      require 'ginseng/postgres'
+      Postgres.connect if Postgres.config?
+    elsif Environment.mongo?
+      require 'mongo'
+    end
   end
 
   def self.load_tasks
@@ -63,14 +76,8 @@ module Mulukhiya
   end
 end
 
-Redis.exists_returns_integer = true
-
-Mulukhiya.bootsnap
-Mulukhiya.loader.setup
 Bundler.require
-Mulukhiya.sidekiq
-
-if Mulukhiya::Environment.postgres?
-  require 'ginseng/postgres'
-  Mulukhiya::Postgres.connect if Mulukhiya::Postgres.config?
-end
+Mulukhiya.loader.setup
+Mulukhiya.setup_bootsnap
+Mulukhiya.setup_sidekiq
+Mulukhiya.setup_dbms

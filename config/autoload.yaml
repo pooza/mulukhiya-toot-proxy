@@ -2,6 +2,7 @@ inflections:
   amazon_uri: AmazonURI
   amazon_url_handler: AmazonURLHandler
   amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
+  api_controller: APIController
   bandai_channel_uri: BandaiChannelURI
   canonical_url_handler: CanonicalURLHandler
   ci_test_case_filter: CITestCaseFilter
@@ -15,10 +16,12 @@ inflections:
   note_uri: NoteURI
   shortened_url_handler: ShortenedURLHandler
   spotify_uri: SpotifyURI
+  spotify_url_handler: SpotifyURLHandler
   spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler
   toot_uri: TootURI
+  ui_controller: UIController
   uri: URI
   url_handler: URLHandler
   url_normalize_handler: URLNormalizeHandler
-  video_uri: VideoURI
+  you_tube_uri: YouTubeURI
   you_tube_url_nowplaying_handler: YouTubeURLNowplayingHandler

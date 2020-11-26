@@ -4,6 +4,7 @@ module Mulukhiya
       super
       @config = Config.instance
       @spotify = SpotifyService.new
+      @logger = Logger.new
     end
 
     def spotify?
@@ -11,6 +12,29 @@ module Mulukhiya
     end
 
     alias valid? spotify?
+
+    def shortenable?
+      return shorten.present?
+    end
+
+    def shorten
+      return nil unless host == 'link.tospotify.com'
+      http = HTTP.new
+      href = to_s
+      response = nil
+      loop do
+        response = http.get(href, {follow_redirects: false})
+        break unless href = response.headers['location']
+      end
+      return nil unless uri = Ginseng::URI.scan(response.body)&.first
+      return nil unless uri = SpotifyURI.parse(uri.to_s)
+      return nil unless uri.spotify?
+      uri.query_values = nil
+      return uri
+    rescue => e
+      logger.error(error: e, url: to_s)
+      return nil
+    end
 
     def track_id
       return nil unless SpotifyService.config?
@@ -55,13 +79,27 @@ module Mulukhiya
       return track&.album
     end
 
+    def title
+      return track_name || album_name
+    end
+
+    def album_name
+      return album&.name
+    end
+
+    def track_name
+      return track&.name
+    end
+
+    def artists
+      return (track || album)&.artists&.map(&:name)
+    end
+
     def image_uri
       return nil unless spotify?
       return nil unless track_id
       @image_uri ||= @spotify.create_image_uri(@spotify.lookup_track(track_id))
       return @image_uri
     end
-
-    alias image_url image_uri
   end
 end

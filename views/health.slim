@@ -22,12 +22,12 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
           result: {status: 500},
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           this.load()
             .then(e => {this.result = e})

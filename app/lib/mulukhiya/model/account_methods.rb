@@ -15,7 +15,7 @@ module Mulukhiya
     def webhook
       return Webhook.new(config)
     rescue => e
-      logger.error(e)
+      logger.error(error: e)
       return nil
     end
 
@@ -31,7 +31,7 @@ module Mulukhiya
       end
       return @growi
     rescue => e
-      logger.error(clipper: self.class.to_s, error: e.message, acct: acct.to_s)
+      logger.error(error: e, acct: acct.to_s)
       return nil
     end
 
@@ -39,7 +39,7 @@ module Mulukhiya
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
     rescue => e
-      logger.error(e)
+      logger.error(error: e)
       return nil
     end
 
@@ -63,29 +63,14 @@ module Mulukhiya
       annict.updated_at = times.max if times.present?
     end
 
-    def twitter
-      unless @twitter
-        return nil unless config['/twitter/token']
-        return nil unless config['/twitter/secret']
-        @twitter = TwitterService.new do |twitter|
-          twitter.consumer_key = TwitterService.consumer_key
-          twitter.consumer_secret = TwitterService.consumer_secret
-          twitter.access_token = config['/twitter/token']
-          twitter.access_token_secret = config['/twitter/secret']
-        end
-      end
-      return @twitter
-    rescue => e
-      logger.error(e)
-      return nil
-    end
-
     def notify_verbose?
       return config['/notify/verbose'] == true
     end
 
-    def disable?(handler_name)
-      return true if config["/handler/#{handler_name}/disable"]
+    def disable?(handler)
+      handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
+      return config["/handler/#{handler.underscore_name}/disable"] == true
+    rescue Ginseng::ConfigError, NameError
       return false
     end
 

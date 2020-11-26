@@ -2,25 +2,10 @@ module Mulukhiya
   class MastodonController < Controller
     include ControllerMethods
 
-    before do
-      if params[:token].present? && home?
-        @sns.token = Crypt.new.decrypt(params[:token])
-      elsif @headers['Authorization']
-        @sns.token = @headers['Authorization'].split(/\s+/).last
-      else
-        @sns.token = nil
-      end
-    rescue => e
-      @logger.error(controller: self.class.to_s, error: e.message)
-      @renderer.status = 403
-      @sns.token = nil
-    end
-
     post '/api/v1/statuses' do
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @reporter.response = @sns.toot(params)
-      notify(@reporter.response.parsed_response) if response_error?
       Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
@@ -29,7 +14,7 @@ module Mulukhiya
     rescue Ginseng::GatewayError => e
       @renderer.message = {'error' => e.message}
       notify('error' => e.raw_message)
-      @renderer.status = e.message.match(/ ([[:digit:]]{3})$/)[1]&.to_i || e.code
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
@@ -106,40 +91,6 @@ module Mulukhiya
         message.each_line {|line| @logger.error(line.chomp)}
       end
       @renderer.status = @reporter.response.code
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/auth' do
-      @renderer = SlimRenderer.new
-      errors = MastodonAuthContract.new.exec(params)
-      if errors.present?
-        @renderer.template = 'auth'
-        @renderer[:errors] = errors
-        @renderer[:oauth_url] = @sns.oauth_uri
-        @renderer.status = 422
-      else
-        @renderer.template = 'auth_result'
-        response = @sns.auth(params[:code])
-        if response.code == 200
-          @sns.token = response.parsed_response['access_token']
-          @sns.account.config.webhook_token = @sns.token
-          @renderer[:hook_url] = @sns.account.webhook&.uri
-        end
-        @renderer[:status] = response.code
-        @renderer[:result] = response.parsed_response
-        @renderer.status = response.code
-      end
-      return @renderer.to_s
-    rescue => e
-      @renderer = Ginseng::Web::JSONRenderer.new
-      @renderer.status = 403
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
-    post '/mulukhiya/filter' do
-      Handler.create('filter_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
     end
 

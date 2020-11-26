@@ -7,7 +7,7 @@ body
     size: 1.2em
     family: $serif
   background:
-    image: url(/mulukhiya/logo.jpg)
+    image: url(/mulukhiya/media/logo.jpg)
     repeat: no-repeat
     position: top right
   -webkit-text-size-adjust: 100%
@@ -20,7 +20,7 @@ h1,h2,h3,h4,h5,h6
 
 h1
   background:
-    image: url(/mulukhiya/icon.png)
+    image: url(/mulukhiya/media/icon.png)
     repeat: no-repeat
     position: center
   text:
@@ -50,7 +50,7 @@ p
 
 header
   background:
-    image: url(/mulukhiya/icon-24x24.png)
+    image: url(/mulukhiya/media/icon-24x24.png)
     repeat: no-repeat
     color: green
   font:
@@ -205,7 +205,7 @@ section.config
     opacity: 0.8
     cursor: pointer
 
-ul.feeds
+ul.links
   list:
     style: none
   li
@@ -214,9 +214,26 @@ ul.feeds
         left: 0.5em
     .link
       margin:
-        left: 0.5em
+        left: 1em
       font:
         size: 0.8em
+        family: $monospace
+    .link_description
+      margin:
+        left: 1em
+      font:
+        size: 0.7em
+  h3:hover
+    background:
+      color: aliceblue
+    opacity: 0.8
+    cursor: pointer
+
+  .endpoint_container
+    margin: 0.5em
+    padding: 0.5em
+    border: solid 1px dimgray
+    border-radius: 6px
 
 ul.medias
   display: grid
@@ -258,6 +275,18 @@ ul.medias
       display: inline-block
       margin: 0 0.1em
 
+section
+  margin: 0 1em
+  .tag_detail
+    margin:
+      block:
+        start: 0
+        end: 0
+      left: 1em
+    li
+      font:
+        size: 0.8em
+
 textarea
   border:
     width: 1px
@@ -295,6 +324,12 @@ button
     color: honeydew
   padding: 6px 30px
   cursor: pointer
+
+button.search
+  font:
+    size: 1em
+  padding: 0 1em
+  margin: 0 1em
 
 button:hover
   background:

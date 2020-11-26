@@ -27,14 +27,14 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
           users: [],
           tokens: [],
           token: Vue.getToken(),
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           Vue.getUsers()
             .then(e => {this.users = e})
@@ -44,7 +44,7 @@ html lang='ja'
           switchUser: function (user) {
             Vue.switchUser(user)
               .then(e => {
-                this.username = e.username
+                this.account = e.account
                 location.href = '/mulukhiya'
               })
           },

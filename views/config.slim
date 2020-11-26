@@ -9,11 +9,11 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 環境設定
-      section v-if='username'
+      section v-if='account.username'
         h3 現在の設定
         .result-container
           pre = '{{result}}'
-      section class='config' v-if='username'
+      section class='config' v-if='account.account'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
@@ -21,7 +21,7 @@ html lang='ja'
             v-select :options='options.program' @input='onChangeTags' v-model='form.program'
           .field-update-button-container
             button @click='updateTags' 更新
-      section class='config' v-if='username && layout.sections.livecure'
+      section class='config' v-if='account && layout.sections.livecure'
         h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
         vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
@@ -29,7 +29,7 @@ html lang='ja'
               input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
-      section class='config' v-if='username && layout.sections.growi'
+      section class='config' v-if='account && layout.sections.growi'
         h3 @click='toggleVisibility("growi")' GROWI
         vue-slide-up-down :active='layout.details.growi'
           ol
@@ -45,11 +45,11 @@ html lang='ja'
               | APIトークンは、ユーザー設定画面（画面右上のユーザーアイコンをクリック）から作成できます。
             li
               | 必要ならば
-              code = "/user/{{username}}/draft"
+              code = "/user/{{account.username}}/draft"
               | 等、記事作成先を入力してください。
               br
               | 空欄の場合は
-              code = "/mulukhiya/user/{{username}}"
+              code = "/mulukhiya/user/{{account.username}}"
               | に記事が作成されます。
             li 更新ボタンを押下。
           .inline-field-container
@@ -63,7 +63,7 @@ html lang='ja'
             input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
-      section class='config' v-if='username && layout.sections.dropbox'
+      section class='config' v-if='account && layout.sections.dropbox'
         h3 @click='toggleVisibility("dropbox")' Dropbox
         vue-slide-up-down :active='layout.details.dropbox'
           ol
@@ -78,14 +78,7 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
-      section class='config' v-if='username && layout.sections.twitter'
-        h3 @click='toggleVisibility("twitter")' Twitter
-        vue-slide-up-down :active='layout.details.twitter'
-          .field-update-button-container
-            a :href='hrefs.twitter'
-              img src='/mulukhiya/sign_in_twitter.png'
-            button class='alert' @click='unauthTwitter' 認証を解除
-      section class='config' v-if='username && layout.sections.annict'
+      section class='config' v-if='account && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
           ol
@@ -103,7 +96,7 @@ html lang='ja'
           .field-update-button-container
             button @click='authAnnict' 認証
             button class='alert' @click='unauthAnnict' 認証を解除
-      section class='config' v-if='username'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
@@ -123,7 +116,7 @@ html lang='ja'
             h4 curlサンプル
             textarea ref='curl_sample_text' v-html='form.webhook.curl_sample'
             i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
-      section class='config' v-if='username'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
@@ -145,7 +138,7 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
           result: null,
           programs: [],
           form: {
@@ -167,7 +160,6 @@ html lang='ja'
               livecure: #{controller.livecure?},
               growi: #{controller.growi?},
               dropbox: #{controller.dropbox?},
-              twitter: #{controller.twitter?},
               annict: #{controller.annict?},
             },
             details: {
@@ -177,17 +169,14 @@ html lang='ja'
               livecure: false,
               webhook: false,
               notify: false,
-              twitter: false,
               annict: false,
             },
           },
-          hrefs: {twitter: null},
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {
-              this.hrefs.twitter = Vue.createPath('/auth/twitter')
-              this.username = e.account.username
+              this.account = e.account
               this.updateForm(e)
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
           Vue.getPrograms()
@@ -292,12 +281,15 @@ html lang='ja'
               text: JSON.stringify(command),
             }
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/filter', values)
+            axios.post('/mulukhiya/api/filter/add', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details.livecure = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -315,28 +307,20 @@ html lang='ja'
             if (this.form.notify.user_config) {command.notify.user_config = true}
             this.updateConfig(command)
           },
-          unauthTwitter: function () {
-            this.$dialog.confirm(
-              {title: '認証の解除', body: 'Twitterのトークンを削除します。'},
-              {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              this.updateConfig({twitter: null})
-              this.layout.details.twitter = false
-            }).catch(e => {
-              this.message = Vue.createErrorMessage(e)
-            })
-          },
           authAnnict: function () {
             const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
             document.body.style.cursor = 'wait'
-            axios.post('/mulukhiya/annict/auth', values)
+            axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
+                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {document.body.style.cursor = 'auto'})
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
           },
           unauthAnnict: function () {
             this.$dialog.confirm(

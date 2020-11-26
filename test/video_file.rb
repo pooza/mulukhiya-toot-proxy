@@ -1,10 +1,10 @@
 module Mulukhiya
   class VideoFileTest < TestCase
     def setup
-      @mp4 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
-      @mkv = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mkv'))
-      @jpeg = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/logo.jpg'))
-      @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
+      @mp4 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
+      @mkv = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mkv'))
+      @jpeg = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/logo.jpg'))
+      @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
     end
 
     def test_video?

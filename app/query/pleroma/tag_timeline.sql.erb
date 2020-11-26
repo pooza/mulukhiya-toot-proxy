@@ -1,0 +1,37 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  statuses.uri,
+  statuses.created_at,
+  statuses.actor[5] AS username,
+  statuses.actor[3] AS domain,
+  accts.name as display_name,
+  statuses.text,
+  statuses.spoiler_text
+FROM
+  (
+    SELECT
+      objects.id,
+      objects.data->>'id' AS uri,
+      objects.data->>'published' AS created_at,
+      objects.data->>'actor' AS account_uri,
+      regexp_split_to_array(objects.data->>'actor', '/') AS actor,
+      jsonb_array_elements_text(objects.data->'tag') AS tag,
+      objects.data->>'source' AS text,
+      objects.data->>'summary' AS spoiler_text
+    FROM objects
+    WHERE (objects.data->>'type' = 'Note')
+    ORDER BY objects.id DESC
+  ) AS statuses
+  INNER JOIN (
+    SELECT
+      ap_id AS uri,
+      CASE (email IS NULL)
+        WHEN true THEN '@' || nickname
+        WHEN false THEN '@' || nickname || '@dev.ple.b-shock.org'
+      END AS acct,
+      name
+    FROM users
+  ) AS accts ON statuses.account_uri=accts.uri
+WHERE (statuses.tag='<%= params[:tag] %>')
+  AND (statuses.actor[5] NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
+LIMIT <%= params[:limit] %> OFFSET 0

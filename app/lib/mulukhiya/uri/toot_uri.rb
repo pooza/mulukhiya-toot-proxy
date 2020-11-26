@@ -5,7 +5,7 @@ module Mulukhiya
     def local?
       return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
       return false
     end
 
@@ -26,7 +26,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['mastodon', 'pleroma'].member?(Environment.controller_name)
+        if Environment.mastodon_type?
           @service = Environment.sns_class.new(uri)
         else
           @service = MastodonService.new(uri)

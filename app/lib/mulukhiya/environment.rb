@@ -28,6 +28,10 @@ module Mulukhiya
       return config['/controller']
     end
 
+    def self.sns_type_name
+      return config["/#{config['/controller']}/sns_type"]
+    end
+
     def self.test_account
       return sns_class.new.account
     end
@@ -54,10 +58,6 @@ module Mulukhiya
       return controller_name == 'mastodon'
     end
 
-    def self.dolphin?
-      return controller_name == 'dolphin'
-    end
-
     def self.misskey?
       return controller_name == 'misskey'
     end
@@ -68,6 +68,14 @@ module Mulukhiya
 
     def self.pleroma?
       return controller_name == 'pleroma'
+    end
+
+    def self.mastodon_type?
+      return sns_type_name == 'mastodon'
+    end
+
+    def self.misskey_type?
+      return sns_type_name == 'misskey'
     end
 
     def self.postgres?
@@ -132,13 +140,6 @@ module Mulukhiya
       end
       values[:status] ||= 200
       return values
-    end
-
-    def self.auth(username, password)
-      return false unless username == config['/sidekiq/auth/user']
-      return true if password.crypt(Environment.hostname) == config['/sidekiq/auth/password']
-      return true if password == config['/sidekiq/auth/password']
-      return false
     end
   end
 end

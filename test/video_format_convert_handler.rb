@@ -4,7 +4,7 @@ module Mulukhiya
       @handler = Handler.create('video_format_convert')
       @handler.handle_pre_upload(file: {
         tempfile: File.new(
-          File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'),
+          File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'),
         ),
       })
     end

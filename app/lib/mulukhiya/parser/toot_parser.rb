@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def max_length
-      if ['mastodon', 'pleroma'].member?(Environment.controller_name)
+      if Environment.mastodon_type?
         length = @config["/#{Environment.controller_name}/status/max_length"]
       else
         length = @config['/mastodon/status/max_length']

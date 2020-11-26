@@ -1,5 +1,3 @@
-require 'dry-validation'
-
 module Mulukhiya
   class Contract < Dry::Validation::Contract
     config.messages.default_locale = :ja

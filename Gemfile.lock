@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 7138104c683993e366efdcd5f9a02fc726da0f9e
+  revision: 429530d1483e66d221c6dc16d22f222ca7f73e77
   specs:
-    ginseng-core (1.8.4)
+    ginseng-core (1.8.5)
       activesupport
       addressable
       daemon-spawn
@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: a8ed2786afec2248c94e2a02d668444a28ec297c
+  revision: 4425028803002d63984240ce1af7715926a6f6e6
   specs:
-    ginseng-fediverse (1.4.2)
+    ginseng-fediverse (1.4.3)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -40,9 +40,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 4b4bd65ada6f4394aee0e41d9175afff49ddb979
+  revision: e654386d94ba2e7015622848bab13565fd63c938
   specs:
-    ginseng-web (1.3.1)
+    ginseng-web (1.3.2)
       puma
       sass
       sinatra
@@ -50,9 +50,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: e9b23dd934c5b828e546ea5b68ca4016f09521f9
+  revision: f70fdb94ecee51ea6bf145258baad91a48ac8e66
   specs:
-    ginseng-youtube (1.0.1)
+    ginseng-youtube (1.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -85,7 +85,6 @@ GEM
     bootsnap (1.5.1)
       msgpack (~> 1.0)
     bson (4.11.1)
-    buftok (0.2.0)
     builder (3.2.4)
     concurrent-ruby (1.1.7)
     connection_pool (2.2.3)
@@ -103,7 +102,7 @@ GEM
     dry-container (0.7.2)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.1, >= 0.1.3)
-    dry-core (0.4.9)
+    dry-core (0.4.10)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
     dry-inflector (0.2.0)
@@ -135,8 +134,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (~> 1.5, >= 1.5.2)
     e2mmap (0.1.0)
-    equalizer (0.0.11)
-    erubi (1.9.0)
+    erubi (1.10.0)
     et-orbi (1.2.4)
       tzinfo
     faraday (1.0.0)
@@ -146,7 +144,7 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    fugit (1.4.0)
+    fugit (1.4.1)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.19.2)
@@ -159,24 +157,20 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
-    http-parser (1.2.1)
-      ffi-compiler (>= 1.0, < 2.0)
-    http_parser.rb (0.6.0)
+    http-parser (1.2.2)
+      ffi-compiler
     httparty (0.18.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    idn-ruby (0.1.0)
     json (2.3.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
-    loofah (2.7.0)
+    loofah (2.8.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    memoizable (0.4.2)
-      thread_safe (~> 0.3, >= 0.3.1)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2020.1104)
@@ -191,14 +185,12 @@ GEM
     multipart-post (2.1.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    naught (1.1.0)
     netrc (0.11.0)
     nio4r (2.5.4)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
-    nokogumbo (2.0.2)
+    nokogumbo (2.0.3)
       nokogiri (~> 1.8, >= 1.8.4)
-    oauth (0.5.4)
     oauth2 (1.4.4)
       faraday (>= 0.8, < 2.0)
       jwt (>= 1.0, < 3.0)
@@ -208,16 +200,10 @@ GEM
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
-    omniauth-oauth (1.1.0)
-      oauth
-      omniauth (~> 1.0)
-    omniauth-oauth2 (1.5.0)
-      oauth2 (~> 1.1)
-      omniauth (~> 1.2)
-    omniauth-twitter (1.4.0)
-      omniauth-oauth (~> 1.1)
-      rack
-    parallel (1.20.0)
+    omniauth-oauth2 (1.7.0)
+      oauth2 (~> 1.4)
+      omniauth (~> 1.9)
+    parallel (1.20.1)
     parser (2.7.2.0)
       ast (~> 2.4.1)
     pg (1.2.3)
@@ -246,18 +232,18 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.2.2)
-    regexp_parser (1.8.2)
+    redis (4.2.5)
+    regexp_parser (2.0.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rexml (3.2.4)
-    rspotify (2.9.2)
+    rspotify (2.10.0)
       addressable (~> 2.5.2)
-      omniauth-oauth2 (~> 1.5.0)
+      omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
-    rubocop (1.3.0)
+    rubocop (1.4.2)
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)
@@ -266,10 +252,10 @@ GEM
       rubocop-ast (>= 1.1.1)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (1.1.1)
+    rubocop-ast (1.2.0)
       parser (>= 2.7.1.5)
-    rubocop-performance (1.8.1)
-      rubocop (>= 0.87.0)
+    rubocop-performance (1.9.0)
+      rubocop (>= 0.90.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
@@ -298,7 +284,6 @@ GEM
       sidekiq (>= 3)
       thwait
       tilt (>= 1.4.0)
-    simple_oauth (0.3.1)
     sinatra (2.1.0)
       mustermann (~> 1.0)
       rack (~> 2.2)
@@ -312,26 +297,12 @@ GEM
       slim (>= 3.0, < 5.0)
     syslog-logger (1.6.8)
     temple (0.8.2)
-    test-unit (3.3.6)
+    test-unit (3.3.7)
       power_assert
     thread_safe (0.3.6)
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
-    twitter (7.0.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.11)
-      http (~> 4.0)
-      http-form_data (~> 2.0)
-      http_parser.rb (~> 0.6.0)
-      memoizable (~> 0.4.0)
-      multipart-post (~> 2.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
-    twitter-text (3.1.0)
-      idn-ruby
-      unf (~> 0.1.0)
     tzinfo (1.2.8)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -361,8 +332,6 @@ DEPENDENCIES
   ginseng-youtube!
   mimemagic
   mongo
-  nokogiri
-  omniauth-twitter
   rack-test
   rails-erb-lint
   rspotify
@@ -373,8 +342,6 @@ DEPENDENCIES
   sidekiq-scheduler
   slim_lint
   test-unit
-  twitter
-  twitter-text
   vacuum
 
 RUBY VERSION

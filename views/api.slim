@@ -1,0 +1,257 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'API'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 API
+      ul class='links'
+        - if controller.announcement?
+          li v-if='account.is_admin'
+            h3 @click='toggleVisibility("announcement")' お知らせ
+            vue-slide-up-down :active='layout.details.announcement'
+              .endpoint_container
+                .link POST /mulukhiya/api/announcement/update
+                - if config.keys('/sidekiq/schedule/announcement').member?('every')
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/announcement/every']}
+                .link_description お知らせの更新を行います。
+                .field-update-button-container
+                  button @click='updateAnnouncement' 実行
+        li
+          h3 @click='toggleVisibility("media")' メディアファイル
+          vue-slide-up-down :active='layout.details.media'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/media' target='_blank' GET /mulukhiya/api/media
+              .link_description 最近投稿されたメディアファイルを表示します。
+            .endpoint_container v-if='account.is_admin'
+              .link POST /mulukhiya/api/media/clear
+              - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/media_cleaning/cron']}
+              .link_description メディアファイル変換結果をクリアします。
+              .field-update-button-container
+                button @click='clearMediaFiles' 実行
+        li v-if='account.is_admin'
+          h3 @click='toggleVisibility("oauth")' OAuth
+          vue-slide-up-down :active='layout.details.oauth'
+            .endpoint_container
+              .link POST /mulukhiya/api/oauth/client/clear
+              .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
+              .field-update-button-container
+                button @click='clearOAuthClient' 実行
+        - if controller.livecure?
+          li
+            h3 @click='toggleVisibility("program")' 実況番組表
+            vue-slide-up-down :active='layout.details.program'
+              .endpoint_container
+                .link
+                  a href='/mulukhiya/api/program' target='_blank' GET /mulukhiya/api/program
+                .link_description
+                  | キャッシュ済みの
+                  a href='#{config['/programs/url']}' target='_blank' 実況番組表
+                  | を表示します。
+              .endpoint_container v-if='account.is_admin'
+                .link POST /mulukhiya/api/program/update
+                - if config.keys('/sidekiq/schedule/program_update').member?('cron')
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/program_update/cron']}
+                .link_description
+                  a href='#{config['/programs/url']}' target='_blank' 実況番組表
+                  | を取得し、キャッシュします。
+                .field-update-button-container
+                  button @click='updatePrograms' 実行
+        li v-if='account.is_admin'
+          h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
+          vue-slide-up-down :active='layout.details.tagging_dic'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/tagging/tag/search?q=プリキュア' target='_blank' GET /mulukhiya/api/tagging/tag/search?q=your_keyword
+              .link_description ハッシュタグ辞書から、該当するパターンを検索します。
+            .endpoint_container
+              .link POST /mulukhiya/api/tagging/dic/update
+              - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/tagging_dictionary_update/cron']}
+              .link_description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
+              - config['/tagging/dictionaries'].each do |dic|
+                .link
+                  a href=dic['url'] target='_blank' = dic['url'].ellipsize(64)
+              .field-update-button-container
+                button @click='updateTaggingDictionary' 実行
+        li v-if='account.is_admin'
+          h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
+          vue-slide-up-down :active='layout.details.tagging_usertag'
+            .endpoint_container
+              .link POST /mulukhiya/api/tagging/usertag/clear
+              - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
+                .link_description
+                  | スケジュール
+                  code #{config['/sidekiq/schedule/user_tag_initialize/cron']}
+              .link_description インスタンス内全ユーザーの固定タグ設定をクリアします。
+              .field-update-button-container
+                button @click='clearUserTags' 実行
+        - if controller.feed?
+          li v-if='account.is_admin'
+            h3 @click='toggleVisibility("feed")' Atomフィード
+            vue-slide-up-down :active='layout.details.feed'
+              .endpoint_container
+                .link POST /mulukhiya/api/feed/update
+                - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
+                  .link_description
+                    | スケジュール
+                    code #{config['/sidekiq/schedule/tag_feed_update/every']}
+                .link_description
+                  a href='/mulukhiya/app/feed' ハッシュタグ等のAtomフィード
+                  | を更新します。
+                .field-update-button-container
+                  button @click='updateFeeds' 実行
+        li
+          h3 @click='toggleVisibility("health")' 動作状況
+          vue-slide-up-down :active='layout.details.health'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
+              .link_description モロヘイヤの動作状況を表示します。
+        li
+          h3 @click='toggleVisibility("about")' パッケージ情報
+          vue-slide-up-down :active='layout.details.about'
+            .endpoint_container
+              .link
+                a href='/mulukhiya/api/about' target='_blank' GET /mulukhiya/api/about
+              .link_description モロヘイヤのバージョン等、パッケージ情報を表示します。
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default)
+      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          account: {is_admin: false},
+          layout: {
+            details: {
+              announcement: false,
+              media: false,
+              oauth: false,
+              program: false,
+              tagging_dic: false,
+              tagging_usertag: false,
+              feed: false,
+              health: false,
+              sidekiq: false,
+              about: false,
+            },
+          },
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+          toggleVisibility: function (name) {
+            this.layout.details[name] = !this.layout.details[name]
+          },
+          updateAnnouncement: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['announcement'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+          clearMediaFiles: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['media'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+          clearOAuthClient: function () {
+            this.$dialog.confirm(
+              {title: 'クライアント情報の削除', body: 'OAuthクライアント情報を削除します。'},
+              {okText: '削除', cancelText: 'キャンセル'}
+            ).then(e => {
+              document.body.style.cursor = 'wait'
+              return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
+            }).then(e => {
+              this.message = null
+              this.layout.details['oauth'] = false
+              document.body.style.cursor = 'auto'
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              document.body.style.cursor = 'auto'
+            })
+          },
+          updatePrograms: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['program'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+          updateTaggingDictionary: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['tagging_dic'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+          clearUserTags: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['tagging_usertag'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+          updateFeeds: function () {
+            document.body.style.cursor = 'wait'
+            axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
+              .then(e => {
+                document.body.style.cursor = 'auto'
+                this.message = null
+                this.layout.details['feed'] = false
+              }).catch(e => {
+                document.body.style.cursor = 'auto'
+                this.message = Vue.createErrorMessage(e)
+              })
+          },
+        },
+      })

@@ -7,7 +7,7 @@ module Mulukhiya
       return true if acct.host == Environment.domain_name
       return false
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
       return false
     end
 
@@ -36,7 +36,7 @@ module Mulukhiya
         uri.path = '/'
         uri.query = nil
         uri.fragment = nil
-        if ['misskey', 'meisskey', 'dolphin'].member?(Environment.controller_name)
+        if Environment.misskey_type?
           @service = Environment.sns_class.new(uri)
         else
           @service = MisskeyService.new(uri)

@@ -46,7 +46,7 @@ module Mulukhiya
 
     def associate_tag
       return query_values['tag']
-    rescue NoMethodError
+    rescue
       return nil
     end
 
@@ -57,14 +57,38 @@ module Mulukhiya
       self.query_values = values
     end
 
+    alias track item
+
+    def album
+      return nil
+    end
+
+    def title
+      return track_name || album_name
+    end
+
+    def album_name
+      return nil
+    end
+
+    def track_name
+      return item.dig('ItemInfo', 'Title', 'DisplayValue') if track
+    end
+
+    def artists
+      contributors = item.dig('ItemInfo', 'ByLineInfo', 'Contributors').map {|v| v['Name']}
+      return nil unless contributors
+      return ArtistParser.new(contributors.join('、')).parse if track
+      return ArtistParser.new(contributors.join('、')).parse if album
+      return nil
+    end
+
     def image_uri
       return nil unless amazon?
       return nil unless asin
       @image_uri ||= @service.create_image_uri(asin)
       return @image_uri
     end
-
-    alias image_url image_uri
 
     def shorten
       return self unless shortenable?

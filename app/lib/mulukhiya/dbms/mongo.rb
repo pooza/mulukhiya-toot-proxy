@@ -1,5 +1,3 @@
-require 'mongo'
-
 module Mulukhiya
   class Mongo
     include Singleton

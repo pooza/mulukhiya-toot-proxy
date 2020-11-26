@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        @logger.error(Ginseng::Error.create(e).to_h.merge(k: k, v: v))
+        @logger.error(error: e, k: k, v: v)
       end
       update(sort_by {|k, v| k.length}.to_h)
     end
@@ -42,7 +42,7 @@ module Mulukhiya
       return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(class: self.class.to_s, path: path, error: e.message)
+      @logger.error(error: e, path: path)
       return true
     end
 
@@ -56,12 +56,17 @@ module Mulukhiya
       update(load_cache)
     end
 
+    def load_cache
+      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
+      return @cache
+    end
+
     def refresh
       save_cache
       @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
-      @logger.error(e)
+      @logger.error(error: e)
     end
 
     alias create refresh
@@ -71,7 +76,7 @@ module Mulukhiya
     end
 
     def remote_dics(&block)
-      return enum_for(__method__) unless block_given?
+      return enum_for(__method__) unless block
       RemoteDictionary.all(&block)
     end
 
@@ -82,13 +87,12 @@ module Mulukhiya
       remote_dics do |dic|
         dic.parse.each do |k, v|
           result[k] ||= v
+          result[k][:regexp] = result[k][:pattern].source
           result[k][:words] ||= []
-          result[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
-        rescue => e
-          @logger.error(error: e.message, dic: dic.uri.to_s, word: k)
+          next unless v[:words].is_a?(Array)
+          result[k][:words].concat(v[:words])
+          result[k][:words].uniq!
         end
-      rescue => e
-        @logger.error(error: e.message, dic: dic.uri.to_s)
       end
       return result.sort_by {|k, v| k.length}.to_h
     end
@@ -105,11 +109,6 @@ module Mulukhiya
     def save_cache
       File.write(path, Marshal.dump(fetch))
       @cache = nil
-    end
-
-    def load_cache
-      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
-      return @cache
     end
   end
 end

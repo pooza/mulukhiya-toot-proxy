@@ -11,7 +11,7 @@ html lang='ja'
       h2 Atomフィード
       - if controller.feed?
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
-        ul class='feeds'
+        ul class='links'
           - if controller.media_catalog?
             li
               h3 メディアファイル
@@ -33,11 +33,11 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

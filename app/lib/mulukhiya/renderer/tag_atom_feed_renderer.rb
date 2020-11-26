@@ -37,7 +37,7 @@ module Mulukhiya
 
     def cache!
       File.write(path, fetch)
-      @logger.info(action: 'cached', params: params)
+      @logger.info(class: self.class.to_s, message: 'cached', params: params)
     end
 
     def path
@@ -66,7 +66,7 @@ module Mulukhiya
       all do |renderer|
         renderer.cache!
       rescue => e
-        renderer.logger.error(Ginseng::Error.create(e).to_h.merge(tag: renderer.tag))
+        renderer.logger.error(error: e, tag: renderer.tag)
       end
     end
 
@@ -99,7 +99,7 @@ module Mulukhiya
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       rescue => e
-        @logger.error(class: self.class.to_s, error: e.message, row: row)
+        @logger.error(error: e, row: row)
       end
       @atom = nil
       return atom

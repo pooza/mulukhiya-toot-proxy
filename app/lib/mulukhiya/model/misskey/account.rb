@@ -43,9 +43,7 @@ module Mulukhiya
 
       alias admin? isAdmin
 
-      def moderator?
-        return false
-      end
+      alias moderator? isModerator
 
       alias service? isBot
 

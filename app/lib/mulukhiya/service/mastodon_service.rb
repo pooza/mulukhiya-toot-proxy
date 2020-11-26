@@ -57,8 +57,6 @@ module Mulukhiya
       return post(toot)
     end
 
-    private
-
     def default_token
       return @config['/agent/test/token']
     end

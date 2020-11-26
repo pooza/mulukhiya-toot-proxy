@@ -5,4 +5,3 @@ Thumbs.db
 .fuse*
 config/local.*
 .sass-cache
-*.code-workspace

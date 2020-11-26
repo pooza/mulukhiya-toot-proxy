@@ -1,12 +1,12 @@
 module Mulukhiya
   class ImageFileTest < TestCase
     def setup
-      @png = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/ribbon08-009.png'))
-      @mp3 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/hugttocatch.mp3'))
-      @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/poyke.mp4'))
-      @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/11750_thumbnail.gif'))
-      @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/animated-webp-supported.webp'))
-      @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/elephant_apng_zopfli.png'))
+      @png = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/ribbon08-009.png'))
+      @mp3 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
+      @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
+      @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/11750_thumbnail.gif'))
+      @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'))
+      @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
     end
 
     def test_image?

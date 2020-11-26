@@ -1,5 +1,3 @@
-require 'rspotify'
-
 module Mulukhiya
   class SpotifyService
     def initialize
@@ -16,7 +14,7 @@ module Mulukhiya
       return tracks.first
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -28,7 +26,7 @@ module Mulukhiya
       return RSpotify::Album.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -40,7 +38,7 @@ module Mulukhiya
       return RSpotify::Track.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -52,7 +50,7 @@ module Mulukhiya
       return RSpotify::Artist.find(id)
     rescue => e
       cnt += 1
-      @logger.info(service: self.class.to_s, method: __method__, message: e.message, count: cnt)
+      @logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -87,8 +85,9 @@ module Mulukhiya
       config = Config.instance
       config['/spotify/client/id']
       config['/spotify/client/secret']
+      SpotifyService.new
       return true
-    rescue Ginseng::ConfigError
+    rescue
       return false
     end
 

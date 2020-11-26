@@ -11,16 +11,14 @@ html lang='ja'
       h1 = package.name
       nav class='menu'
         - if controller.feed?
-          a href='/mulukhiya/app/feeds' Atomフィード
+          a href='/mulukhiya/app/feed' Atomフィード
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' メディアカタログ
-        - if controller.webhook?
-          a href='/mulukhiya/app/config' v-if='username' 環境設定
-          a href='#' v-else=''
-            | 環境設定
-            span class='alert' 未認証
-        a :href='sidekiq.dashboard' target='_blank' v-if='account.is_admin' Sidekiq
+        a href='/mulukhiya/app/hashtag' ハッシュタグ辞書
+        a href='/mulukhiya/app/api' API
         a href='/mulukhiya/app/health' 動作状況
+        a href='/mulukhiya/app/config' v-if='account.username' 環境設定
+        a href='#{config['/sidekiq/dashboard/url']}' target='_blank' v-if='account.is_admin' Sidekiq
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -30,17 +28,11 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
           account: {is_admin: false},
-          sidekiq: {
-            dashboard: '#{config['/sidekiq/dashboard/url']}',
-          },
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {
-              this.username = e.account.username
-              this.account = e.account
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def updatable?(uri)
-      uri = VideoURI.parse(uri.to_s) unless uri.is_a?(VideoURI)
+      uri = YouTubeURI.parse(uri.to_s) unless uri.is_a?(YouTubeURI)
       return false unless uri.music?
       return false unless @image_uris[uri.to_s] = uri.image_uri
       return true

@@ -43,8 +43,11 @@ module Mulukhiya
       return @hash
     end
 
-    def disable?(handler_name)
-      return @values["/handler/#{handler_name}/disable"] == true
+    def disable?(handler)
+      handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
+      return @values["/handler/#{handler.underscore_name}/disable"] == true
+    rescue Ginseng::ConfigError, NameError
+      return false
     end
   end
 end

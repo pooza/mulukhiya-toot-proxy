@@ -9,6 +9,7 @@ module Mulukhiya
       @label = label.to_sym
       @params = params
       @config = Config.instance
+      @logger = Logger.new
     end
 
     def name
@@ -19,11 +20,13 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       handler_names do |v|
         yield Handler.create(v, params)
+      rescue => e
+        @logger.error(error: e, handler: v)
       end
     end
 
     def handler_names(&block)
-      return enum_for(__method__) unless block_given?
+      return enum_for(__method__) unless block
       @config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 
@@ -33,7 +36,7 @@ module Mulukhiya
 
     def dispatch(body)
       handlers do |handler|
-        raise Ginseng::AuthError, 'Invalid token' unless handler.sns.account
+        raise Ginseng::AuthError, 'Unauthorized' unless handler.sns.account
         next if handler.disable?
         thread = Thread.new {handler.send("handle_#{label}".to_sym, body, params)}
         unless thread.join(handler.timeout)

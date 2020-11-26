@@ -10,13 +10,13 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 トークンの登録
       section class='config'
-        - if ['Mastodon', 'Pleroma'].member?(controller.name)
+        - if env.mastodon_type?
           ol
             li
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して、下の欄に入力してください。
             li 認証ボタンを押下。
-          form method='POST' action='/mulukhiya/auth'
+          form method='POST' action='/mulukhiya/app/mastodon/auth'
             .inline-field-container
               h4 認証コード
               input type='text' name='code' placeholder='#{controller.name}の認証コード' class='code'
@@ -24,7 +24,7 @@ html lang='ja'
                 p class='alert' = params[:errors][:code].join
             .field-update-button-container
               button 認証
-        - if ['Misskey', 'Meisskey'].member?(controller.name)
+        - if env.misskey_type?
           ol
             li
               a href=params[:oauth_url] 認証コードを取得
@@ -38,11 +38,11 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          username: null,
+          account: {is_admin: false},
         },
         mounted: function () {
-          Vue.login()
-            .then(e => {this.username = e.username})
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
       })

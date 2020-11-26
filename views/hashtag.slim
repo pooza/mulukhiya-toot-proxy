@@ -1,0 +1,67 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ辞書'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 ハッシュタグ辞書
+      section
+        input type='search' placeholder='検索キーワード' v-model='keyword' @keydown.enter='onKeyDown'
+        button class='search' @click='search' 検索
+      section class='tag_detail' v-for='entry in result'
+        h3
+          | {{entry.word}}
+          span class='alert' v-if='entry.word.length < #{config['/tagging/word/minimum_length']}' 未使用
+        ul
+          li
+            strong パターン
+            code = "/{{entry.regexp}}/"
+          li
+            strong タグ
+            code v-for='tag in entry.tags' = "{{tag}} "
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          account: {is_admin: false},
+          keyword: null,
+          result: {},
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+          onKeyDown: function () {
+            if (event.keyCode == 13) {this.search()}
+          },
+          search: function () {
+            if (this.keyword == '') {
+              this.result = {}
+            } else {
+              document.body.style.cursor = 'wait'
+              const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
+              url.searchParams.set('q', this.keyword)
+              axios.get(url.href, {responseType: 'json'})
+                .then(e => {
+                  document.body.style.cursor = 'auto'
+                  this.message = null
+                  this.result = e.data
+                }).catch(e => {
+                  document.body.style.cursor = 'auto'
+                  this.message = Vue.createErrorMessage(e)
+                })
+            }
+          },
+        },
+      })

@@ -7,17 +7,17 @@
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## 対応インスタンス
+
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
-- [Dolphin](https://github.com/syuilo/dolphin)
 - [Pleroma](https://git.pleroma.social/pleroma/pleroma)
 - [めいすきー](https://github.com/mei23/misskey)
 
 ## モロヘイヤに出来ること
 
-本文に対して、
+ツイート/ノート/チャットの本文に対して、
 
-- 各種短縮URLを戻し、リンク先を明らかにする。
+- 各種短縮URLを戻し、本来のリンク先を明らかにする。
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
 - 貼られたURLのページにcanonical指定があったら、そのURLに置き換える。
 - Amazonの商品URLからノイズを除去する。
@@ -34,11 +34,10 @@
 
 また、
 
-- 投稿をTwitterにマルチポストする。
 - アニメ視聴記録サービス[Annict](https://annict.jp/)から視聴記録を取得し、投稿する。
 - ローカル投稿を[Dropbox](https://dropbox.com/)等、各種外部サービスに保存。
 - 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
-- デフォルトハッシュタグのAtomフィード。（2分ごとにキャッシュされ、IFTTT等との連携に適したもの）
+- デフォルトハッシュタグ等、各種Atomフィード。（2分ごとにキャッシュされ、IFTTT等との連携に適したもの）
 
 等々。
 

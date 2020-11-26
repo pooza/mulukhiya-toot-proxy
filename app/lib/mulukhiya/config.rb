@@ -2,9 +2,10 @@ module Mulukhiya
   class Config < Ginseng::Config
     include Package
 
-    def disable?(handler_name)
-      return self["/handler/#{handler_name}/disable"] == true
-    rescue Ginseng::ConfigError
+    def disable?(handler)
+      handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
+      return self["/handler/#{handler.underscore_name}/disable"] == true
+    rescue Ginseng::ConfigError, NameError
       return false
     end
 
