@@ -32,10 +32,8 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/config/update', values)
-        .then(e => {
-          indicator.hide()
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {indicator.hide()})
     }
 
     Vue.getToken = () => {
@@ -56,10 +54,9 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
         .then(e => {
-          indicator.hide()
           localStorage.setItem('mulukhiya_token', token)
           return e.data
-        })
+        }).finally(e => {indicator.hide()})
     }
 
     Vue.deleteToken = async token => {
@@ -90,20 +87,17 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', user.token), {responseType: 'json'})
         .then(e => {
-          indicator.hide()
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data
-        })
+        }).finally(e => {indicator.hide()})
     }
 
     Vue.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/program', {responseType: 'json'})
-        .then(e => {
-          indicator.hide()
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {indicator.hide()})
     }
 
     Vue.createProgramTags = program => {
@@ -118,20 +112,16 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/media'), {responseType: 'json'})
-        .then(e => {
-          indicator.hide()
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {indicator.hide()})
     }
 
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/health', {responseType: 'json'})
-        .then(e => {
-          indicator.hide()
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {indicator.hide()})
     }
   }
 }
