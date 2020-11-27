@@ -4,12 +4,14 @@ $LOAD_PATH.unshift(File.join(dir, 'app/lib'))
 ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
-ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
+
+puts "#{Mulukhiya::Package.full_name}"
+puts "パスワード暗号化ユーティリティ"
 
 unless password = ARGV.first
   warn '文字列を指定してください。'
   exit 1
 end
 
-puts "source: #{ARGV.first}"
-puts "dest:   #{Mulukhiya::Crypt.new.encrypt(password)}"
+puts "source:  #{ARGV.first}"
+puts "crypted: #{Mulukhiya::Crypt.new.encrypt(password)}"
