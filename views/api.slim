@@ -166,90 +166,97 @@ html lang='ja'
             this.layout.details[name] = !this.layout.details[name]
           },
           updateAnnouncement: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['announcement'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
           clearMediaFiles: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['media'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
           clearOAuthClient: function () {
+            const indicator = new ActivityIndicator()
             this.$dialog.confirm(
               {title: 'クライアント情報の削除', body: 'OAuthクライアント情報を削除します。'},
               {okText: '削除', cancelText: 'キャンセル'}
             ).then(e => {
-              document.body.style.cursor = 'wait'
+              indicator.show()
               return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
             }).then(e => {
               this.message = null
               this.layout.details['oauth'] = false
-              document.body.style.cursor = 'auto'
+              indicator.hide()
             }).catch(e => {
               this.message = Vue.createErrorMessage(e)
-              document.body.style.cursor = 'auto'
+              indicator.hide()
             })
           },
           updatePrograms: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['program'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
           updateTaggingDictionary: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['tagging_dic'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
           clearUserTags: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['tagging_usertag'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
           updateFeeds: function () {
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details['feed'] = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
