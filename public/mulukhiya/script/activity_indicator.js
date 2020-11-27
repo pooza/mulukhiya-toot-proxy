@@ -41,4 +41,8 @@ function ActivityIndicator () {
   this.setValue = value => {
     progress.value = value
   }
+
+  this.increment = () => {
+    progress.value ++
+  }
 }

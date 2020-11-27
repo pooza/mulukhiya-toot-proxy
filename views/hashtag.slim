@@ -58,7 +58,7 @@ html lang='ja'
                   this.message = null
                   this.result = e.data
                 }).catch(e => {this.message = Vue.createErrorMessage(e)})
-                .finally(e => {indicator.hide()})
+                .finally(e => indicator.hide())
             }
           },
         },
