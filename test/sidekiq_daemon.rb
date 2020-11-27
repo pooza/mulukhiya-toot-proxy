@@ -3,6 +3,7 @@ module Mulukhiya
     def setup
       @daemon = SidekiqDaemon.new
       @config = Config.instance
+      @config['/crypt/password'] = 'mulukhiya'
       @config['/crypt/encoder'] = 'base64'
       @config['/sidekiq/auth/user'] = 'admin'
       @config['/sidekiq/auth/password'] = 'o/ubs+gIuqRoJD9rCAM8XA==::::YtaCwlriV4w=' # 'aaa'
