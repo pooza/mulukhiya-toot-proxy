@@ -50,7 +50,7 @@ module Mulukhiya
 
     post '/api/notes/favorites/create' do
       @reporter.response = @sns.fav(params[:noteId])
-      Event.new(:pre_bookmark, {reporter: @reporter, sns: @sns}).dispatch(params)
+      Event.new(:post_bookmark, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response || {}
       @renderer.status = @reporter.response.code
       return @renderer.to_s
