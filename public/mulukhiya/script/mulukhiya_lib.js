@@ -18,10 +18,8 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
-        .then(e => {
-          indicator.hide()
-          return e.data
-        })
+        .then(e => {return e.data})
+        .finally(e => {indicator.hide()})
     }
 
     Vue.updateConfig = async command => {
