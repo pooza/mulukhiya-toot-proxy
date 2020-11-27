@@ -55,13 +55,10 @@ html lang='ja'
               url.searchParams.set('q', this.keyword)
               axios.get(url.href, {responseType: 'json'})
                 .then(e => {
-                  indicator.hide()
                   this.message = null
                   this.result = e.data
-                }).catch(e => {
-                  indicator.hide()
-                  this.message = Vue.createErrorMessage(e)
-                })
+                }).catch(e => {this.message = Vue.createErrorMessage(e)})
+                .finally(e => {indicator.hide()})
             }
           },
         },
