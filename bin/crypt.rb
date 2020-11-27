@@ -5,8 +5,9 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
 
-puts "#{Mulukhiya::Package.full_name}"
-puts "パスワード暗号化ユーティリティ"
+puts Mulukhiya::Package.full_name
+puts 'パスワード暗号化ユーティリティ'
+puts ''
 
 unless password = ARGV.first
   warn '文字列を指定してください。'
