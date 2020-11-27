@@ -198,6 +198,7 @@ webui:
     - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
     - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
     - /mulukhiya/script/mulukhiya_lib
+    - /mulukhiya/script/activity_indicator
   stylesheets:
     - /mulukhiya/style/default
     - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
