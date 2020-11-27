@@ -280,14 +280,15 @@ html lang='ja'
               status: JSON.stringify(command),
               text: JSON.stringify(command),
             }
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/filter/add', values)
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = null
                 this.layout.details.livecure = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
@@ -309,16 +310,17 @@ html lang='ja'
           },
           authAnnict: function () {
             const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
               }).catch(e => {
-                document.body.style.cursor = 'auto'
+                indicator.hide()
                 this.message = Vue.createErrorMessage(e)
               })
           },
