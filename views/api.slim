@@ -170,26 +170,20 @@ html lang='ja'
             indicator.show()
             axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['announcement'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
           clearMediaFiles: function () {
             const indicator = new ActivityIndicator()
             indicator.show()
             axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['media'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
           clearOAuthClient: function () {
             const indicator = new ActivityIndicator()
@@ -202,63 +196,48 @@ html lang='ja'
             }).then(e => {
               this.message = null
               this.layout.details['oauth'] = false
-              indicator.hide()
-            }).catch(e => {
-              this.message = Vue.createErrorMessage(e)
-              indicator.hide()
-            })
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .finally(e => {indicator.hide()})
           },
           updatePrograms: function () {
             const indicator = new ActivityIndicator()
             indicator.show()
             axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['program'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
           updateTaggingDictionary: function () {
             const indicator = new ActivityIndicator()
             indicator.show()
             axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['tagging_dic'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
           clearUserTags: function () {
             const indicator = new ActivityIndicator()
             indicator.show()
             axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['tagging_usertag'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
           updateFeeds: function () {
             const indicator = new ActivityIndicator()
             indicator.show()
             axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
               .then(e => {
-                indicator.hide()
                 this.message = null
                 this.layout.details['feed'] = false
-              }).catch(e => {
-                indicator.hide()
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => {indicator.hide()})
           },
         },
       })
