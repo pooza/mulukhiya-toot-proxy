@@ -69,7 +69,7 @@ html lang='ja'
                   | を取得し、キャッシュします。
                 .field-update-button-container
                   button @click='updatePrograms' 実行
-        li v-if='account.is_admin'
+        li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint_container
