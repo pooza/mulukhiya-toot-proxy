@@ -13,7 +13,7 @@ html lang='ja'
         h3 現在の設定
         .result-container
           pre = '{{result}}'
-      section class='config' v-if='account.account'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
@@ -21,7 +21,7 @@ html lang='ja'
             v-select :options='options.program' @input='onChangeTags' v-model='form.program'
           .field-update-button-container
             button @click='updateTags' 更新
-      section class='config' v-if='account && layout.sections.livecure'
+      section class='config' v-if='account.username && layout.sections.livecure'
         h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
         vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
@@ -29,7 +29,7 @@ html lang='ja'
               input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
-      section class='config' v-if='account && layout.sections.growi'
+      section class='config' .username && layout.sections.growi'
         h3 @click='toggleVisibility("growi")' GROWI
         vue-slide-up-down :active='layout.details.growi'
           ol
@@ -63,7 +63,7 @@ html lang='ja'
             input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
-      section class='config' v-if='account && layout.sections.dropbox'
+      section class='config' v-if='account.username && layout.sections.dropbox'
         h3 @click='toggleVisibility("dropbox")' Dropbox
         vue-slide-up-down :active='layout.details.dropbox'
           ol
@@ -78,7 +78,7 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
-      section class='config' v-if='account && layout.sections.annict'
+      section class='config' v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
           ol
