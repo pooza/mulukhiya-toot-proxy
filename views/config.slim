@@ -183,7 +183,7 @@ html lang='ja'
             .then(e => {
               this.programs = e
               this.options.program = Object.values(e)
-                .filter(program => {return program.enable})
+                .filter(program => program.enable)
                 .map(p => {
                   return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
                 })
@@ -287,7 +287,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details.livecure = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -316,7 +316,7 @@ html lang='ja'
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           unauthAnnict: function () {
             this.$dialog.confirm(
