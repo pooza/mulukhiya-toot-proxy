@@ -173,7 +173,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['announcement'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           clearMediaFiles: function () {
             const indicator = new ActivityIndicator()
@@ -183,7 +183,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['media'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           clearOAuthClient: function () {
             const indicator = new ActivityIndicator()
@@ -197,7 +197,7 @@ html lang='ja'
               this.message = null
               this.layout.details['oauth'] = false
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
-            .finally(e => {indicator.hide()})
+            .finally(e => indicator.hide())
           },
           updatePrograms: function () {
             const indicator = new ActivityIndicator()
@@ -207,7 +207,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['program'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           updateTaggingDictionary: function () {
             const indicator = new ActivityIndicator()
@@ -217,7 +217,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['tagging_dic'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           clearUserTags: function () {
             const indicator = new ActivityIndicator()
@@ -227,7 +227,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['tagging_usertag'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
           updateFeeds: function () {
             const indicator = new ActivityIndicator()
@@ -237,7 +237,7 @@ html lang='ja'
                 this.message = null
                 this.layout.details['feed'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => {indicator.hide()})
+              .finally(e => indicator.hide())
           },
         },
       })

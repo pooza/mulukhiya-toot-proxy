@@ -18,8 +18,8 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
-        .then(e => {return e.data})
-        .finally(e => {indicator.hide()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.updateConfig = async command => {
@@ -32,8 +32,8 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/config/update', values)
-        .then(e => {return e.data})
-        .finally(e => {indicator.hide()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.getToken = () => {
@@ -43,7 +43,7 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
-      tokens = tokens.filter(v => {return v != null})
+      tokens = tokens.filter(v => (v != null))
       tokens = Array.from(new Set(tokens))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
@@ -56,7 +56,7 @@ const MulukhiyaLib = {
         .then(e => {
           localStorage.setItem('mulukhiya_token', token)
           return e.data
-        }).finally(e => {indicator.hide()})
+        }).finally(e => indicator.hide())
     }
 
     Vue.deleteToken = async token => {
@@ -68,6 +68,7 @@ const MulukhiyaLib = {
     Vue.getUsers = async () => {
       const users = []
       const indicator = new ActivityIndicator()
+      indicator.setMax(Vue.getTokens().length)
       indicator.show()
       Vue.getTokens().forEach(t => {
         axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'}).then(e => {
@@ -76,6 +77,7 @@ const MulukhiyaLib = {
             token: t,
             scopes: e.data.token.scopes.join(', '),
           })
+          indicator.increment()
         })
       })
       indicator.hide()
@@ -89,15 +91,15 @@ const MulukhiyaLib = {
         .then(e => {
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data
-        }).finally(e => {indicator.hide()})
+        }).finally(e => indicator.hide())
     }
 
     Vue.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/program', {responseType: 'json'})
-        .then(e => {return e.data})
-        .finally(e => {indicator.hide()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.createProgramTags = program => {
@@ -112,16 +114,16 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/media'), {responseType: 'json'})
-        .then(e => {return e.data})
-        .finally(e => {indicator.hide()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/health', {responseType: 'json'})
-        .then(e => {return e.data})
-        .finally(e => {indicator.hide()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
   }
 }
