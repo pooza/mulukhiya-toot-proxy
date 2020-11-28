@@ -76,7 +76,7 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/tagging/tag/search?q=プリキュア' target='_blank' GET /mulukhiya/api/tagging/tag/search?q=your_keyword
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。
-            .endpoint_container
+            .endpoint_container v-if='account.is_admin'
               .link POST /mulukhiya/api/tagging/dic/update
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
                 .link_description
