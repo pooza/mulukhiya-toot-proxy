@@ -1,4 +1,4 @@
-class ActivityIndicator () {
+class ActivityIndicator {
   constructor () {
     this.progress = document.createElement('progress')
     this.container = document.createElement('div')
@@ -13,7 +13,7 @@ class ActivityIndicator () {
     this.container.style.borderStyle = 'solid'
     this.container.style.borderColor = '#000'
     this.container.style.opacity = 0.9
-    this.container.appendChild(this.pregress)
+    this.container.appendChild(this.progress)
     document.getElementsByTagName('body')[0].appendChild(this.container)
   }
 
