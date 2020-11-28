@@ -15,12 +15,11 @@ const MulukhiyaLib = {
     }
 
     Vue.getConfig = async () => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.updateConfig = async command => {
@@ -30,12 +29,11 @@ const MulukhiyaLib = {
         status: JSON.stringify(command),
         text: JSON.stringify(command),
       }
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.post('/mulukhiya/api/config/update', values)
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.getToken = () => {
@@ -45,20 +43,20 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
-      tokens = tokens.filter(v => {return v != null})
+      tokens = tokens.filter(v => (v != null))
       tokens = Array.from(new Set(tokens))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
     }
 
     Vue.registerToken = async token => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
         .then(e => {
-          document.body.style.cursor = 'auto'
           localStorage.setItem('mulukhiya_token', token)
           return e.data
-        })
+        }).finally(e => indicator.hide())
     }
 
     Vue.deleteToken = async token => {
@@ -69,7 +67,9 @@ const MulukhiyaLib = {
 
     Vue.getUsers = async () => {
       const users = []
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.setMax(Vue.getTokens().length)
+      indicator.show()
       Vue.getTokens().forEach(t => {
         axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'}).then(e => {
           users.push({
@@ -77,29 +77,29 @@ const MulukhiyaLib = {
             token: t,
             scopes: e.data.token.scopes.join(', '),
           })
+          indicator.increment()
         })
       })
-      document.body.style.cursor = 'auto'
+      indicator.hide()
       return users
     }
 
     Vue.switchUser = async user => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', user.token), {responseType: 'json'})
         .then(e => {
-          document.body.style.cursor = 'auto'
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data
-        })
+        }).finally(e => indicator.hide())
     }
 
     Vue.getPrograms = async () => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get('/mulukhiya/api/program', {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.createProgramTags = program => {
@@ -111,21 +111,19 @@ const MulukhiyaLib = {
     }
 
     Vue.getMedias = async () => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/media'), {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.getHealth = async () => {
-      document.body.style.cursor = 'wait'
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.get('/mulukhiya/api/health', {responseType: 'json'})
-        .then(e => {
-          document.body.style.cursor = 'auto'
-          return e.data
-        })
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
   }
 }

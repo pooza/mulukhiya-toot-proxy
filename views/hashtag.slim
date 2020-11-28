@@ -49,18 +49,16 @@ html lang='ja'
             if (this.keyword == '') {
               this.result = {}
             } else {
-              document.body.style.cursor = 'wait'
+              const indicator = new ActivityIndicator()
+              indicator.show()
               const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
               url.searchParams.set('q', this.keyword)
               axios.get(url.href, {responseType: 'json'})
                 .then(e => {
-                  document.body.style.cursor = 'auto'
                   this.message = null
                   this.result = e.data
-                }).catch(e => {
-                  document.body.style.cursor = 'auto'
-                  this.message = Vue.createErrorMessage(e)
-                })
+                }).catch(e => {this.message = Vue.createErrorMessage(e)})
+                .finally(e => indicator.hide())
             }
           },
         },

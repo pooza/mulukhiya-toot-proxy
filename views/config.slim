@@ -13,7 +13,7 @@ html lang='ja'
         h3 現在の設定
         .result-container
           pre = '{{result}}'
-      section class='config' v-if='account.account'
+      section class='config' v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
@@ -21,7 +21,7 @@ html lang='ja'
             v-select :options='options.program' @input='onChangeTags' v-model='form.program'
           .field-update-button-container
             button @click='updateTags' 更新
-      section class='config' v-if='account && layout.sections.livecure'
+      section class='config' v-if='account.username && layout.sections.livecure'
         h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
         vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
@@ -29,7 +29,7 @@ html lang='ja'
               input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
-      section class='config' v-if='account && layout.sections.growi'
+      section class='config' v-if='account.username && layout.sections.growi'
         h3 @click='toggleVisibility("growi")' GROWI
         vue-slide-up-down :active='layout.details.growi'
           ol
@@ -63,7 +63,7 @@ html lang='ja'
             input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
-      section class='config' v-if='account && layout.sections.dropbox'
+      section class='config' v-if='account.username && layout.sections.dropbox'
         h3 @click='toggleVisibility("dropbox")' Dropbox
         vue-slide-up-down :active='layout.details.dropbox'
           ol
@@ -78,7 +78,7 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
-      section class='config' v-if='account && layout.sections.annict'
+      section class='config' v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
           ol
@@ -183,7 +183,7 @@ html lang='ja'
             .then(e => {
               this.programs = e
               this.options.program = Object.values(e)
-                .filter(program => {return program.enable})
+                .filter(program => program.enable)
                 .map(p => {
                   return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
                 })
@@ -280,16 +280,14 @@ html lang='ja'
               status: JSON.stringify(command),
               text: JSON.stringify(command),
             }
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/filter/add', values)
               .then(e => {
-                document.body.style.cursor = 'auto'
                 this.message = null
                 this.layout.details.livecure = false
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -309,18 +307,16 @@ html lang='ja'
           },
           authAnnict: function () {
             const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
-            document.body.style.cursor = 'wait'
+            const indicator = new ActivityIndicator()
+            indicator.show()
             axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
-                document.body.style.cursor = 'auto'
                 this.result = jsyaml.safeDump(e.data.config)
                 this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => {
-                document.body.style.cursor = 'auto'
-                this.message = Vue.createErrorMessage(e)
-              })
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
           },
           unauthAnnict: function () {
             this.$dialog.confirm(
