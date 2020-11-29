@@ -208,7 +208,6 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=800
-  livecure: false
 mastodon:
   sns_type: mastodon
   url: https://mstdn.example.com/
