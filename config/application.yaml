@@ -207,7 +207,7 @@ webui:
     - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
   metadata:
     robots: noindex,nofollow
-    viewport: width=800
+    viewport: width=device-width,initial-scale=1
 mastodon:
   sns_type: mastodon
   url: https://mstdn.example.com/
