@@ -59,7 +59,6 @@ module Mulukhiya
 
       def livecure?
         return false unless config['/programs/url'].present?
-        return false unless config['/webui/livecure'] == true
         return true
       rescue Ginseng::ConfigError
         return false

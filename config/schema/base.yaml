@@ -169,11 +169,6 @@ properties:
       url:
         type: string
         format: uri
-  webui:
-    type: object
-    properties:
-      livecure:
-        type: boolean
   sidekiq:
     type: object
     properties:
