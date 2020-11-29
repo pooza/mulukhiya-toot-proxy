@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h1 = package.name
-      nav class='menu'
+      nav class='menu clearfix'
         - if controller.feed?
           a href='/mulukhiya/app/feed' Atomフィード
         - if controller.media_catalog?
