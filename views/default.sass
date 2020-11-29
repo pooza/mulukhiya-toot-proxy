@@ -103,7 +103,10 @@ nav.breadcrumbs
 nav.menu
   a
     display: block
-    margin: 0.5em 8em
+    float: left
+    width: 12em
+    height: calc(1em + 18px)
+    margin: 0.5em 1em
     padding: 0.5em 1em
     border:
       width: 1px
@@ -249,21 +252,21 @@ ul.medias
     border-radius: 6px
     padding: 0.5em
     float: left
-    width: 380px
-    height: 280px
+    width: 12em
+    height: 14em
     display: block
     margin: 0.5em
     .media-container
       overflow-y: auto
       width: 100%
-      height: 240px
+      height: 10em
       margin: auto
       video
         width: 100%
       audio
         width: 100%
       img
-        width: 360px
+        width: 11em
         max-height: auto
         border: solid 1px transparent
         border-radius: 6px
@@ -300,7 +303,7 @@ textarea
     size: 0.8em
     family: $monospace
   margin: 0 0.5em
-  width: 680px
+  width: calc(100% - 4em)
   height: 6em
 
 textarea.short
@@ -311,7 +314,7 @@ input
     size: 1em
 
 input.code
-  width: 680px
+  width: calc(100% - 2em)
 
 button
   font:
@@ -380,7 +383,7 @@ a:hover
 
 .v-select
   margin: 0 0.5em
-  width: 500px
+  width: 30em
   font:
     size: 0.8em
   .vs__clear
@@ -395,10 +398,10 @@ a:hover
 .inline-field-container
   h4
     display: inline-block
-    width: 100px
+    width: 10em
   p.alert
     margin:
-      left: 140px
+      left: 15em
     font:
       size: 0.8em
   input
@@ -408,7 +411,7 @@ a:hover
       color: black
       radius: 6px
     display: inline-block
-    width: 600px
+    width: calc(100% - 13em)
     font:
       size: 1em
       family: $monospace
