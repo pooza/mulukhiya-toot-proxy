@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
-      ul class='medias' v-if='medias'
+      ul class='medias clearfix' v-if='medias'
         li class='media' v-for='media in medias'
           .media-container
             a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.subtype=="image"'
