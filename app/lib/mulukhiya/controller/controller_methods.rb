@@ -94,6 +94,18 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/body"]
       end
 
+      def oauth_webui_uri
+        return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"])
+      rescue Ginseng::ConfigError
+        return nil
+      end
+
+      def oauth_default_scopes
+        return config["/#{name.underscore}/oauth/scopes"] || []
+      rescue Ginseng::ConfigError
+        return nil
+      end
+
       def poll_options_field
         return config["/parser/#{parser_name}/fields/poll/options"]
       end
