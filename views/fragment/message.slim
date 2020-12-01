@@ -11,6 +11,8 @@
   p v-else=''
     a href='/mulukhiya/app/auth' トークンの登録
     | （アプリケーションの認証）を行ってください。
+    a href='/mulukhiya/app/token'
+      i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
 
 .message-container class='alert' v-if='message'
   p = '{{message}}'
