@@ -153,12 +153,33 @@ nav.tokens
         radius: 2px
       background:
         color: lightgreen
-    span.scopes
+    input
+      border:
+        width: 1px
+        style: solid
+        color: black
+        radius: 6px
+      display: inline-block
+      width: 20em
+      font:
+        size: 1em
+        family: $monospace
+    button
+      font:
+        size: 1em
+      padding: 0 1em
+      margin: 0 1em
+    .scopes
       display: block
       color: dimgray
       font:
         size: 0.7em
-    span.loggedin
+    .description
+      display: block
+      color: dimgray
+      font:
+        size: 0.7em
+    .loggedin
       float: right
       font:
         size: 0.8em
@@ -229,6 +250,11 @@ ul.links
         left: 1em
       font:
         size: 0.7em
+    .alert
+      margin:
+        left: 1em
+      font:
+        size: 0.8em
   h3:hover
     background:
       color: aliceblue

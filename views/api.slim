@@ -115,6 +115,17 @@ html lang='ja'
                   | を更新します。
                 .field-update-button-container
                   button @click='updateFeeds' 実行
+        li v-if='webhook.href'
+          h3 @click='toggleVisibility("webhook")' Slack互換webhook
+          vue-slide-up-down :active='layout.details.webhook'
+            .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
+            .endpoint_container
+              .link
+                a :href='webhook.href' target='_blank' GET {{webhook.href}}
+              .link_description webhookが正常であるかを確認します。
+            .endpoint_container
+              .link POST {{webhook.href}}
+              .link_description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
@@ -141,6 +152,7 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false},
+          webhook: {href: null},
           layout: {
             details: {
               announcement: false,
@@ -151,6 +163,7 @@ html lang='ja'
               tagging_usertag: false,
               feed: false,
               health: false,
+              webhook: false,
               sidekiq: false,
               about: false,
             },
@@ -158,8 +171,12 @@ html lang='ja'
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {
+              this.account = e.account
+              if (e.config.webhook) {
+                this.webhook.href = (new URL(e.config.webhook.url)).pathname
+              }
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           toggleVisibility: function (name) {

@@ -19,7 +19,12 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
         .then(e => e.data)
-        .finally(e => indicator.hide())
+        .catch(e => {
+          return {
+            account: {},
+            error: Vue.createErrorMessage(e),
+          }
+        }).finally(e => indicator.hide())
     }
 
     Vue.updateConfig = async command => {
@@ -50,6 +55,9 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
+      if (token == null) {
+        return Promise.reject('empty token')
+      }
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
@@ -68,18 +76,22 @@ const MulukhiyaLib = {
     Vue.getUsers = async () => {
       const users = []
       const indicator = new ActivityIndicator()
-      indicator.setMax(Vue.getTokens().length)
       indicator.show()
       Vue.getTokens().forEach(t => {
-        axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'}).then(e => {
-          users.push({
-            username: e.data.account.username,
-            token: t,
-            scopes: e.data.token.scopes.join(', '),
+        axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'})
+          .then(e => {
+            users.push({
+              username: e.data.account.username,
+              token: t,
+              scopes: e.data.token.scopes.join(', '),
+            })
+          }).catch(e => {
+            users.push({
+              token: t,
+              error: Vue.createErrorMessage(e),
+            })
           })
-          indicator.increment()
         })
-      })
       indicator.hide()
       return users
     }

@@ -38,7 +38,7 @@ module Mulukhiya
           body: {
             name: package_class.name,
             description: @config['/package/description'],
-            permission: @config['/misskey/oauth/permission'],
+            permission: @config['/misskey/oauth/scopes'],
             callbackUrl: http.create_uri(@config['/misskey/oauth/callback_url']).to_s,
           }.to_json,
         }).body
