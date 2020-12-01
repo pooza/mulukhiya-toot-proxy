@@ -11,12 +11,23 @@ html lang='ja'
       h2 トークンの管理
       nav class='tokens'
         .token
-          a href='/mulukhiya/app/auth' 新しいトークンを登録
+          a href='/mulukhiya/app/auth' 新しいトークンを作成して登録
+          .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
+        - if controller.oauth_webui_uri
+          .token
+            input placeholder='#{controller.display_name}で生成した既存のトークン' v-model='input.token'
+            button @click='registerToken' 登録
+            .description
+              a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
+              | で生成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
+            .description 以下の権限を含むものにしてください。
+            .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
         .token v-for='user in users'
-          a href='#' @click='switchUser(user)' = '@{{user.username}}'
-          span class='loggedin' v-if='user.token==token' ログイン中
+          a href='#' @click='switchUser(user)'  v-if='user.username' = '@{{user.username}}'
+          span class='alert' v-else='' 認証できないトークン
+          .loggedin v-if='user.token==token' ログイン中
           i class='fas fa-trash' @click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
-          span class='scopes' = '権限: {{user.scopes}}'
+          .scopes 権限: {{user.scopes}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -31,6 +42,9 @@ html lang='ja'
           users: [],
           tokens: [],
           token: Vue.getToken(),
+          input: {
+            token: null,
+          },
         },
         mounted: function () {
           Vue.getConfig()
@@ -47,6 +61,12 @@ html lang='ja'
                 this.account = e.account
                 location.href = '/mulukhiya'
               })
+          },
+          registerToken: function () {
+            console.log(this.input.token)
+            Vue.registerToken(this.input.token)
+              .then(e => location.reload())
+              .catch(e => {this.message = 'Invalid token'})
           },
           deleteUser: function (user) {
             this.$dialog.confirm(
