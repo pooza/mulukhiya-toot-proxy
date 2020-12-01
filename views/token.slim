@@ -15,12 +15,12 @@ html lang='ja'
           .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
         - if controller.oauth_webui_uri
           .token
-            input placeholder='#{controller.display_name}で生成した既存のトークン' v-model='input.token'
+            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model='input.token'
             button @click='registerToken' 登録
             .description
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
-              | で生成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
-            .description 以下の権限を含むものにしてください。
+              | で作成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
+              | また、以下の権限を含むものにしてください。
             .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
         .token v-for='user in users'
           a href='#' @click='switchUser(user)'  v-if='user.username' = '@{{user.username}}'
@@ -63,7 +63,6 @@ html lang='ja'
               })
           },
           registerToken: function () {
-            console.log(this.input.token)
             Vue.registerToken(this.input.token)
               .then(e => location.reload())
               .catch(e => {this.message = 'Invalid token'})

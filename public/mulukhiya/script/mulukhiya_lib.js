@@ -55,6 +55,9 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
+      if (token == null) {
+        return Promise.reject('empty token')
+      }
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
