@@ -206,6 +206,11 @@ Metrics/ClassLength:
   Exclude:
     - test/*
 
+Metrics/ModuleLength:
+  Max: 200
+  Exclude:
+    - test/*
+
 Metrics/CyclomaticComplexity:
   Max: 10
 
