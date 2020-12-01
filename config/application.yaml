@@ -415,7 +415,7 @@ misskey:
   oauth:
     webui:
       url: /settings/api
-    permission:
+    scopes:
       - write:notes
       - write:drive
       - read:drive
@@ -517,7 +517,7 @@ meisskey:
       - dropbox_announcement
       - hexo_announcement
   oauth:
-    permission:
+    scopes:
       - write:notes
       - write:drive
       - read:drive
