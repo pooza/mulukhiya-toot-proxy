@@ -308,6 +308,8 @@ mastodon:
       - hexo_announcement
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    webui:
+      url: /settings/applications
     scopes:
       - write:statuses
       - write:media
@@ -411,6 +413,8 @@ misskey:
       - dropbox_announcement
       - hexo_announcement
   oauth:
+    webui:
+      url: /settings/api
     permission:
       - write:notes
       - write:drive
