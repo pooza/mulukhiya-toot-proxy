@@ -239,7 +239,7 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rexml (3.2.4)
-    rspotify (2.10.0)
+    rspotify (2.10.1)
       addressable (~> 2.5.2)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
