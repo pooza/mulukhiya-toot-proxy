@@ -173,7 +173,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              if (e.config.webhook) {
+              if (e.config && e.config.webhook) {
                 this.webhook.href = (new URL(e.config.webhook.url)).pathname
               }
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
