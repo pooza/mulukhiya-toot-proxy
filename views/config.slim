@@ -177,7 +177,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              this.updateForm(e)
+              if (!e.error) {this.updateForm(e)}
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
           Vue.getPrograms()
             .then(e => {
