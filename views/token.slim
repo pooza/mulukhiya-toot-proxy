@@ -14,8 +14,8 @@ html lang='ja'
           a href='/mulukhiya/app/auth' 新しいトークンを作成して登録
           .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
         - if controller.oauth_webui_uri
-          .token
-            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model='input.token'
+          .token v-if='account.is_admin'
+            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
             button @click='registerToken' 登録
             .description
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
