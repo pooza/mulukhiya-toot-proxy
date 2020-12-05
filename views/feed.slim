@@ -10,16 +10,19 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 Atomフィード
       - if controller.feed?
-        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
+        h3 一般
         ul class='links'
           - if controller.media_catalog?
             li
-              h3 メディアファイル
+              h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
+        h3 ハッシュタグ
+        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
+        ul class='links'
           - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
             li
-              h3 = "タグ #{renderer.tag.to_hashtag}"
+              h4 = renderer.tag.to_hashtag
               .link
                 a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
       - else

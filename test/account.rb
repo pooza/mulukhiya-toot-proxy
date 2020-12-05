@@ -65,5 +65,9 @@ module Mulukhiya
     def test_tags
       assert_kind_of(Array, @account.tags)
     end
+
+    def test_featured_tags
+      assert_kind_of(Array, @account.featured_tags)
+    end
   end
 end
