@@ -315,6 +315,7 @@ mastodon:
       - write:media
       - read:filters
       - write:filters
+      - read:search
   status:
     key: id
     label: トゥート
