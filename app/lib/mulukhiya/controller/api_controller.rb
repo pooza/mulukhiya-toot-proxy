@@ -159,6 +159,18 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/feed/list' do
+      if @sns.account
+        tags = TagContainer.default_tag_bases.clone
+        tags.concat(TagContainer.media_tag_bases)
+        tags.concat(@sns.account.featured_tag_bases)
+        @renderer.message = tags.uniq.map {|v| Environment.hash_tag_class.get(tag: v).to_h.compact}
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     post '/feed/update' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
         TagFeedUpdateWorker.new.perform

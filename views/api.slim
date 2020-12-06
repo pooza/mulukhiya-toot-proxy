@@ -101,10 +101,14 @@ html lang='ja'
               .field-update-button-container
                 button @click='clearUserTags' 実行
         - if controller.feed?
-          li v-if='account.is_admin'
+          li v-if='account.username'
             h3 @click='toggleVisibility("feed")' Atomフィード
             vue-slide-up-down :active='layout.details.feed'
-              .endpoint_container
+              .endpoint_container v-if='account.is_admin'
+                .link
+                  a :href='feed.list.href' target='_blank' GET /mulukhiya/api/feed/list
+                .link_description フィードの一覧を返します。
+              .endpoint_container v-if='account.is_admin'
                 .link POST /mulukhiya/api/feed/update
                 - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
                   .link_description
@@ -153,6 +157,7 @@ html lang='ja'
           message: null,
           account: {is_admin: false},
           webhook: {href: null},
+          feed: {list: {href: null}},
           layout: {
             details: {
               announcement: false,
@@ -176,6 +181,9 @@ html lang='ja'
               if (e.config && e.config.webhook) {
                 this.webhook.href = (new URL(e.config.webhook.url)).pathname
               }
+              const feed_list_url = new URL('/mulukhiya/api/feed/list', location.href)
+              feed_list_url.searchParams.set('token', Vue.getToken())
+              this.feed.list.href = feed_list_url.href
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {

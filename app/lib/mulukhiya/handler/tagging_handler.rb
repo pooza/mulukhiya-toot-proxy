@@ -5,7 +5,7 @@ module Mulukhiya
       return body unless executable?(body)
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(body))
-      tags.concat(create_media_tags(body)) if media_tag?
+      tags.concat(create_media_tags(body)) if TagContainer.media_tag?
       tags.concat(@sns.account.tags)
       body[status_field] = update_status
       result.push(tags: tags.create_tags)
@@ -21,10 +21,6 @@ module Mulukhiya
       return true if body['visibility'].empty?
       return true if body['visibility'] == 'public'
       return false
-    end
-
-    def media_tag?
-      return @config['/tagging/media/enable']
     end
 
     def create_media_tags(body)

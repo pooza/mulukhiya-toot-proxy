@@ -63,6 +63,10 @@ module Mulukhiya
       annict.updated_at = times.max if times.present?
     end
 
+    def featured_tags
+      return []
+    end
+
     def notify_verbose?
       return config['/notify/verbose'] == true
     end

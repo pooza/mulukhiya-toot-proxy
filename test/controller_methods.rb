@@ -20,6 +20,10 @@ module Mulukhiya
       assert_boolean(controller_class.filter?)
     end
 
+    def test_futured_tag?
+      assert_boolean(controller_class.futured_tag?)
+    end
+
     def test_annict?
       assert_boolean(controller_class.annict?)
     end

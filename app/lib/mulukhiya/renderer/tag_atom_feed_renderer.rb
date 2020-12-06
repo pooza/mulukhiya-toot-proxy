@@ -72,16 +72,12 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      config = Config.instance
-      TagContainer.default_tag_bases.each do |tag|
+      tags = TagContainer.default_tag_bases.clone
+      tags.concat(TagContainer.media_tag_bases)
+      tags.concat(TagContainer.futured_tag_bases)
+      tags.uniq.each do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
-        yield renderer
-      end
-      return unless config['/tagging/media/enable']
-      ['image', 'video', 'audio'].freeze.each do |key|
-        renderer = TagAtomFeedRenderer.new
-        renderer.tag = config["/tagging/media/tags/#{key}"]
         yield renderer
       end
     end

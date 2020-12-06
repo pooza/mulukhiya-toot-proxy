@@ -10,20 +10,20 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 Atomフィード
       - if controller.feed?
-        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
-        ul class='links'
-          - if controller.media_catalog?
+      	- if controller.media_catalog?
+          h3 一般
+          ul class='links'
             li
-              h3 メディアファイル
+              h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
-          - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
-            li
-              h3 = "タグ #{renderer.tag.to_hashtag}"
-              .link
-                a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
-      - else
-        p class='alert' #{controller.display_name}はAtomフィードに対応していません。
+        h3 ハッシュタグ
+        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
+        ul class='links'
+          li v-for='feed in feeds'
+            h4 = '{{feed.tag}}'
+            .link
+              a :href='feed.feed_url' target='_blank' = '{{feed.feed_url}}'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -34,10 +34,24 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false},
+          feeds: []
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
+          this.getFeeds()
+            .then(e => {this.feeds = e})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+          getFeeds: async function () {
+            const indicator = new ActivityIndicator()
+            indicator.show()
+            return axios.get(Vue.createPath('/mulukhiya/api/feed/list'))
+              .then(e => e.data)
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
+          },
         },
       })

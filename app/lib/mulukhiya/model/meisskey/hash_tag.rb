@@ -10,6 +10,29 @@ module Mulukhiya
         return @uri
       end
 
+      def feed_uri
+        @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
+        return @feed_uri
+      end
+
+      def to_h
+        unless @hash
+          @hash = super.merge(
+            name: name.to_hashtag_base,
+            tag: name.to_hashtag,
+            url: uri.to_s,
+            feed_url: feed_uri.to_s,
+          )
+          @hash.delete('attachedUserIds')
+          @hash.delete('attachedLocalUserIds')
+          @hash.delete('attachedRemoteUserIds')
+          @hash.delete('mentionedUserIds')
+          @hash.delete('mentionedLocalUserIds')
+          @hash.delete('mentionedRemoteUserIds')
+        end
+        return @hash
+      end
+
       def create_feed(params)
         return [] unless Mongo.config?
         user_ids = (params[:test_usernames] || []).map do |id|
