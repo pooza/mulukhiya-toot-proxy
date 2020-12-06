@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def test_all_futured_tag_bases
-      TagContainer.futured_tag_bases do |tag|
+      TagContainer.futured_tag_bases.each do |tag|
         assert_kind_of(String, tag)
       end
     end
