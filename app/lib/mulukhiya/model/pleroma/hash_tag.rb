@@ -22,7 +22,7 @@ module Mulukhiya
           name: name.to_hashtag_base,
           tag: name.to_hashtag,
           url: uri.to_s,
-          feed_url: feed_uri.to_s
+          feed_url: feed_uri.to_s,
         }
       end
 
