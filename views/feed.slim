@@ -10,9 +10,9 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 Atomフィード
       - if controller.feed?
-        h3 一般
-        ul class='links'
-          - if controller.media_catalog?
+      	- if controller.media_catalog?
+          h3 一般
+          ul class='links'
             li
               h4 メディアファイル
               .link
@@ -24,8 +24,6 @@ html lang='ja'
             h4 = '{{feed.tag}}'
             .link
               a :href='feed.feed_url' target='_blank' = '{{feed.feed_url}}'
-      - else
-        p class='alert' #{controller.display_name}はAtomフィードに対応していません。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

@@ -12,10 +12,17 @@ module Mulukhiya
         return @uri
       end
 
+      def feed_uri
+        @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
+        return @feed_uri
+      end
+
       def to_h
         return {
-          name: name,
+          name: name.to_hashtag_base,
+          tag: name.to_hashtag,
           url: uri.to_s,
+          feed_url: feed_uri.to_s
         }
       end
 
