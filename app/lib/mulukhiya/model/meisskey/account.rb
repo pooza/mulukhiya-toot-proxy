@@ -52,6 +52,10 @@ module Mulukhiya
         return isLocked
       end
 
+      def featured_tag_bases
+        return []
+      end
+
       def self.[](id)
         return Account.new(id)
       end
