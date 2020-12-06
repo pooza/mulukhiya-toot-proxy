@@ -49,6 +49,12 @@ module Mulukhiya
         return false
       end
 
+      def futured_tag?
+        return config["/#{name.underscore}/futured_tag"] == true
+      rescue Ginseng::ConfigError
+        return false
+      end
+
       def annict?
         return false unless config["/#{name.underscore}/annict"] == true
         return false unless AnnictService.config?

@@ -1,0 +1,7 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  tags.name AS tag
+FROM featured_tags
+  INNER JOIN tags ON featured_tags.tag_id=tags.id
+GROUP BY
+  tags.id

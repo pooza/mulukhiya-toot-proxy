@@ -38,7 +38,7 @@ module Mulukhiya
 
     def test_media_tag
       return unless Environment.controller_class.feed?
-      return unless @config['/tagging/media/enable']
+      return unless TagContainer.media_tag?
 
       get '/tag/image'
       assert(last_response.ok?)
