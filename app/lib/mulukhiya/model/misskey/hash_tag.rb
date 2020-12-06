@@ -6,7 +6,24 @@ module Mulukhiya
         return @uri
       end
 
-      alias to_h values
+      def feed_uri
+        @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
+        return @feed_uri
+      end
+
+      def to_h
+        unless @hash
+          @hash = values.clone.merge(
+            tag: name.to_hashtag,
+            url: uri.to_s,
+            feed_url: feed_uri.to_s,
+          )
+          @hash.delete(:mentionedUserIds)
+          @hash.delete(:mentionedLocalUserIds)
+          @hash.delete(:mentionedRemoteUserIds)
+        end
+        return @hash
+      end
 
       def create_feed(params)
         return [] unless Postgres.config?

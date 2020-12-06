@@ -30,6 +30,14 @@ module Mulukhiya
         return nil
       end
 
+      def featured_tag_bases
+        service = Environment.sns_class.new
+        response = service.fetch_featured_tags(id)
+        return response.parsed_response.map {|v| v['name'].sub(/^#/, '').to_hashtag_base}
+      rescue
+        return []
+      end
+
       alias recent_toot recent_status
 
       def admin?

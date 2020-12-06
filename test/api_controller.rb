@@ -2,6 +2,11 @@ module Mulukhiya
   class APIControllerTest < TestCase
     include ::Rack::Test::Methods
 
+    def setup
+      @config = Config.instance
+      @token = @config['/agent/test/token']
+    end
+
     def app
       return APIController
     end
@@ -53,6 +58,19 @@ module Mulukhiya
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
 
       get '/tagging/tag/search?q=API'
+      assert(last_response.ok?)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+    end
+
+    def test_feed_list
+      get '/feed/list'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+
+      uri = Environment.sns_class.new.create_uri('/feed/list')
+      uri.query_values = {token: Crypt.new.encrypt(@token)}
+      get uri.to_s
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end

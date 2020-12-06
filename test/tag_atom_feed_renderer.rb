@@ -24,6 +24,12 @@ module Mulukhiya
       assert(r.include?('<entry>')) unless Environment.ci?
     end
 
+    def test_all
+      TagAtomFeedRenderer.all do |renderer|
+        assert_kind_of(TagAtomFeedRenderer, renderer)
+      end
+    end
+
     def test_exist?
       assert(@renderer.exist?)
     end
