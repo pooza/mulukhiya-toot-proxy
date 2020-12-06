@@ -13,8 +13,9 @@ module Mulukhiya
 
       def to_h
         @hash ||= values.clone.merge(
+          tag: name.to_hashtag,
           url: uri.to_s,
-          feed_uri: feed_uri.to_s,
+          feed_url: feed_uri.to_s,
         )
         return @hash
       end

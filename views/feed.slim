@@ -20,11 +20,10 @@ html lang='ja'
         h3 ハッシュタグ
         p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
         ul class='links'
-          - Mulukhiya::TagAtomFeedRenderer.all do |renderer|
-            li
-              h4 = renderer.tag.to_hashtag
-              .link
-                a href=slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}") target='_blank' = slim.create_uri("/mulukhiya/feed/tag/#{renderer.tag}")
+          li v-for='feed in feeds'
+            h4 = '{{feed.tag}}'
+            .link
+              a :href='feed.feed_url' target='_blank' = '{{feed.feed_url}}'
       - else
         p class='alert' #{controller.display_name}はAtomフィードに対応していません。
     == slim.render 'fragment/footer'
@@ -37,10 +36,24 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false},
+          feeds: []
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
+          this.getFeeds()
+            .then(e => {this.feeds = e})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+        methods: {
+          getFeeds: async function () {
+            const indicator = new ActivityIndicator()
+            indicator.show()
+            return axios.get(Vue.createPath('/mulukhiya/api/feed/list'))
+              .then(e => e.data)
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
+          },
         },
       })
