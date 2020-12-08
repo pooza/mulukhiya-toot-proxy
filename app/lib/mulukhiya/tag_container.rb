@@ -17,8 +17,8 @@ module Mulukhiya
     end
 
     def self.futured_tag_bases
-      return Postgres.instance.execute('featured_tags').map {|v| v['tag'].to_hashtag_base}
-    rescue Ginseng::DatabaseError, NameError # TODO: HashTagモデルへの委譲
+      return Environment.hashtag_class.featured_tag_base
+    rescue
       return []
     end
 

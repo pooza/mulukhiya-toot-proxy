@@ -32,6 +32,10 @@ module Mulukhiya
         return Postgres.instance.execute('tag_timeline', params)
       end
 
+      def self.featured_tag_base
+        return []
+      end
+
       def self.get(key)
         return HashTag.new(key[:tag])
       end

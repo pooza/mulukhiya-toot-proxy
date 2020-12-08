@@ -26,6 +26,10 @@ module Mulukhiya
         return Postgres.instance.execute('tag_timeline', params)
       end
 
+      def self.featured_tag_base
+        return Postgres.instance.execute('featured_tags').map {|v| v['tag'].to_hashtag_base}
+      end
+
       def self.get(key)
         return HashTag.first(name: key[:tag]) if key.key?(:tag)
         return HashTag.first(key)

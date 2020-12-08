@@ -74,6 +74,10 @@ module Mulukhiya
         return Mongo.instance.db[:hashtags]
       end
 
+      def self.featured_tag_base
+        return []
+      end
+
       private
 
       def collection_name
