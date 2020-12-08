@@ -1,3 +1,5 @@
+require 'mongo'
+
 module Mulukhiya
   class Mongo
     include Singleton
@@ -10,7 +12,7 @@ module Mulukhiya
     end
 
     def self.connect
-      return instance
+      return instance if config?
     end
 
     def self.config?

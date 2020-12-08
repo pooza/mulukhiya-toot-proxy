@@ -60,13 +60,8 @@ module Mulukhiya
     )
   end
 
-  def self.setup_dbms
-    if Environment.postgres?
-      require 'ginseng/postgres'
-      Postgres.connect if Postgres.config?
-    elsif Environment.mongo?
-      require 'mongo'
-    end
+  def self.connect_dbms
+    Environment.dbms_class.connect
   end
 
   def self.load_tasks
@@ -80,4 +75,4 @@ Bundler.require
 Mulukhiya.loader.setup
 Mulukhiya.setup_bootsnap
 Mulukhiya.setup_sidekiq
-Mulukhiya.setup_dbms
+Mulukhiya.connect_dbms
