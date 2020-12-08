@@ -1,3 +1,5 @@
+require 'ginseng/postgres'
+
 module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
@@ -5,7 +7,7 @@ module Mulukhiya
     alias exec execute
 
     def self.connect
-      return instance
+      return instance if config?
     end
 
     def self.config?

@@ -46,6 +46,27 @@ module Mulukhiya
 
       errors = @contract.call(command: 'user_config', amazon: {affiliate: 333}).errors
       assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: nil).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {user_tags: nil}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {user_tags: [1, 3]}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {user_tags: ['tag1', 'tag2']}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {disabled_tags: nil}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {disabled_tags: [1, 3]}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', tagging: {disabled_tags: ['tag1', 'tag2']}).errors
+      assert(errors.empty?)
     end
   end
 end

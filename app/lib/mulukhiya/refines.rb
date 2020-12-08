@@ -19,5 +19,43 @@ module Mulukhiya
         return nil
       end
     end
+
+    class ::Array
+      def deep_compact
+        return clone.deep_compact!
+      end
+
+      def deep_compact!
+        each do |value|
+          if ['Array', 'Hash'].freeze.member?(value.class.to_s)
+            value.deep_compact!
+            delete(value) if value.empty?
+          elsif value.nil?
+            delete(value)
+          end
+        end
+        compact!
+        return self
+      end
+    end
+
+    class ::Hash
+      def deep_compact
+        return clone.deep_compact!
+      end
+
+      def deep_compact!
+        each do |key, value|
+          if ['Array', 'Hash'].freeze.member?(value.class.to_s)
+            value.deep_compact!
+            delete(key) if value.empty?
+          elsif value.nil?
+            delete(key)
+          end
+        end
+        compact!
+        return self
+      end
+    end
   end
 end

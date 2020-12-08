@@ -1,0 +1,39 @@
+environment: production
+controller: pleroma
+pleroma:
+  url: https://pleroma.example.com/
+agent:
+  test:
+    token: your_token
+  info:
+    token: your_token
+postgres:
+  dsn: postgres://pleroma@localhost:5432/pleroma
+user_config:
+  redis:
+    dsn: redis://localhost:6379/1
+sidekiq:
+  redis:
+    dsn: redis://localhost:6379/2
+  auth:
+    password: your_password
+slack:
+  hooks:
+    - https://hooks.slack.com/services/xxxxx
+    - https://discordapp.com/api/webhooks/xxxxx/slack
+tagging:
+  default_tags:
+    - デフォルトタグ1
+    - デフォルトタグ2
+  dictionaries:
+    - url: https://mstdn.example.com/dictionaries/dic1
+      fields:
+        - field1
+        - field2
+    - url: https://mstdn.example.com/dictionaries/dic2
+      type: relative
+    - url: https://mstdn.example.com/dictionaries/dic3
+      type: mecab
+crypt:
+  salt: your_salt
+  password: your_password

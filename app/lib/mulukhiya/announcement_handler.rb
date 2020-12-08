@@ -16,10 +16,11 @@ module Mulukhiya
     end
 
     def create_body(announcement, params = {})
+      @status ||= announcement[:content] || announcement[:text]
       params[:format] ||= :sanitized
       params.merge!(announcement)
-      template = Template.new('announcement')
       params[:body] = parser.send("to_#{params[:format]}".to_sym)
+      template = Template.new('announcement')
       template.params = params
       return template.to_s
     end

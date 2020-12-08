@@ -198,8 +198,8 @@ html lang='ja'
               this.form.webhook.visibility = data.config.webhook.visibility || 'public'
               this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${data.config.webhook.url}`
             }
-            if (data.config.tags) {
-              this.form.tags = data.config.tags.join("\n")
+            if (data.config.tagging && data.config.tagging.user_tags) {
+              this.form.tags = data.config.tagging.user_tags.join("\n")
             }
             if (data.config.growi) {
               this.form.growi.token = data.config.growi.token
@@ -265,8 +265,8 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateTags: function () {
-            const command = {tags: null}
-            if (this.form.tags) {command.tags = this.form.tags.split("\n")}
+            const command = {tagging: {user_tags: null}}
+            if (this.form.tags) {command.tagging.user_tags = this.form.tags.split("\n")}
             this.updateConfig(command)
           },
           updateLivecure: function () {
