@@ -30,6 +30,8 @@ module Mulukhiya
         return nil
       end
 
+      alias recent_toot recent_status
+
       def featured_tag_bases
         service = Environment.sns_class.new
         response = service.fetch_featured_tags(id)
@@ -37,8 +39,6 @@ module Mulukhiya
       rescue
         return []
       end
-
-      alias recent_toot recent_status
 
       def admin?
         return user.admin
