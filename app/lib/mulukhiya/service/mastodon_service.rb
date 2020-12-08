@@ -24,14 +24,6 @@ module Mulukhiya
       return super
     end
 
-    def fetch_featured_tags(id, params = {})
-      response = http.get("/api/v1/accounts/#{id}/featured_tags", {
-        headers: create_headers(params[:headers]),
-      })
-      raise Ginseng::GatewayError, "Invalid response #{response.code}" unless response.code == 200
-      return response
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/v1/apps', {
