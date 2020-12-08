@@ -79,7 +79,7 @@ module Mulukhiya
     end
 
     def tags
-      return config['/tags'] || []
+      return config['/tagging/user_tags'] || []
     end
   end
 end

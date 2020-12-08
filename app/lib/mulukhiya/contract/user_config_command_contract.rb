@@ -25,6 +25,10 @@ module Mulukhiya
       required(:amazon).maybe(:hash).schema do
         optional(:affiliate).maybe(:bool)
       end
+      required(:tagging).maybe(:hash).schema do
+        required(:user_tags).maybe(:array).each(:string)
+        required(:disabled_tags).maybe(:array).each(:string)
+      end
     end
 
     rule(:command) do
@@ -45,6 +49,9 @@ module Mulukhiya
       values['notify'] ||= {}
       values['amazon'] ||= {}
       values['annict'] ||= {}
+      values['tagging'] ||= {}
+      values['tagging']['user_tags'] ||= []
+      values['tagging']['disabled_tags'] ||= []
       return super
     end
   end

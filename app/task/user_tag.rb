@@ -4,15 +4,15 @@ namespace :mulukhiya do
       desc 'show tags'
       task :list do
         Mulukhiya::UserConfigStorage.accounts do |account|
-          next unless account.config['/tags'].present?
-          puts YAML.dump(account: account.acct.to_s, tags: account.config['/tags'])
+          next unless account.config['/tagging/user_tags'].present?
+          puts YAML.dump(account: account.acct.to_s, tags: account.config['/tagging/user_tags'])
         end
       end
 
       desc 'clear tags'
       task :clean do
         Mulukhiya::UserConfigStorage.accounts do |account|
-          next unless account.config['/tags'].present?
+          next unless account.config['/tagging/user_tags'].present?
           account.config.update(tags: nil)
         end
       end

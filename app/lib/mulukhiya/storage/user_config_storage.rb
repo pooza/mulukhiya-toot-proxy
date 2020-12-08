@@ -20,6 +20,13 @@ module Mulukhiya
 
     def update(key, values)
       values.deep_stringify_keys!
+      if values['tags']
+        values['tagging'] ||= {}
+        values['tagging']['user_tags'] ||= values['tags']
+        values.delete('tags')
+      end
+      values['tagging']['user_tags'] = nil unless values['tagging']['user_tags'].present?
+      values['tagging']['disabled_tags'] = nil unless values['tagging']['disabled_tags'].present?
       set(key, JSON.parse(get(key)).deep_merge(values).select {|k, v| v.present?})
     end
 
@@ -32,7 +39,7 @@ module Mulukhiya
       storage = UserConfigStorage.new
       storage.all_keys.each do |key|
         id = key.split(':').last
-        next unless storage[id]['/tags']
+        next unless storage[id]['/tagging/user_tags']
         id = id.to_i if id.match?(/^[[:digit:]]+$/)
         next unless account = Environment.account_class[id]
         yield account
