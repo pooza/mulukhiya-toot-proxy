@@ -49,11 +49,11 @@ Style/WordArray:
 
 Style/IdenticalConditionalBranches:
   Exclude:
-    - test/*
+    - 'test/*'
 
 Style/IfUnlessModifier:
   Exclude:
-    - test/*
+    - 'test/*'
 
 Style/AsciiComments:
   Enabled: false
@@ -183,7 +183,7 @@ Layout/SpaceAroundMethodCallOperator:
 Layout/LineLength:
   Max: 100
   Exclude:
-    - test/*
+    - 'test/*'
 
 Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: true
@@ -194,28 +194,43 @@ Layout/EndOfLine:
 Metrics/AbcSize:
   Max: 30
   Exclude:
-    - test/*
+    - 'test/*'
+    - '**/contract/*'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'test/*'
+    - '**/contract/*'
 
 Metrics/MethodLength:
   Max: 20
   Exclude:
-    - test/*
+    - 'test/*'
+    - '**/contract/*'
 
 Metrics/ClassLength:
   Max: 200
   Exclude:
-    - test/*
+    - 'test/*'
+    - '**/contract/*'
 
 Metrics/ModuleLength:
   Max: 200
   Exclude:
-    - test/*
+    - 'test/*'
+    - '**/contract/*'
 
 Metrics/CyclomaticComplexity:
   Max: 10
+  Exclude:
+    - 'test/*'
+    - '**/contract/*'
 
 Metrics/PerceivedComplexity:
   Max: 10
+  Exclude:
+    - 'test/*'
+    - '**/contract/*'
 
 Lint/AssignmentInCondition:
   Enabled: false
