@@ -266,9 +266,7 @@ html lang='ja'
           },
           updateTags: function () {
             const command = {tagging: {user_tags: null}}
-            if (this.form.tags) {
-              command.tagging.user_tags = this.form.tags.split("\n")
-            }
+            if (this.form.tags) {command.tagging.user_tags = this.form.tags.split("\n")}
             this.updateConfig(command)
           },
           updateLivecure: function () {
