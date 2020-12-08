@@ -19,5 +19,25 @@ module Mulukhiya
         return nil
       end
     end
+
+    class ::Hash
+      def deep_compact
+        return clone.deep_compact!
+      end
+
+      def deep_compact!
+        each do |key, value|
+          case value.class.to_s
+          when 'Array', 'Hash'
+            self[key] = value.deep_compact!
+            delete(key) unless self[key].present?
+          when 'NilClass'
+            delete(key)
+          end
+        end
+        compact!
+        return self
+      end
+    end
   end
 end

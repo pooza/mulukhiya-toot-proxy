@@ -25,11 +25,7 @@ module Mulukhiya
         values['tagging']['user_tags'] ||= values['tags']
         values.delete('tags')
       end
-      if values['tagging']
-        values['tagging']['user_tags'] = nil unless values['tagging']['user_tags'].present?
-        values['tagging']['disabled_tags'] = nil unless values['tagging']['disabled_tags'].present?
-      end
-      set(key, JSON.parse(get(key)).deep_merge(values).select {|k, v| v.present?})
+      set(key, JSON.parse(get(key)).deep_merge(values).deep_compact)
     end
 
     def prefix
