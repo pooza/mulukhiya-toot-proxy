@@ -18,7 +18,7 @@ module Mulukhiya
             url: webpublicUrl || values[:url],
             thumbnail_url: thumbnailUrl,
           )
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

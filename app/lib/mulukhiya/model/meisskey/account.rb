@@ -11,7 +11,7 @@ module Mulukhiya
           @hash[:is_moderator] = moderator?
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete('password')
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

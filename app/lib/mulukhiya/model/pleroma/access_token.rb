@@ -27,7 +27,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone.compact
+          @hash = values.deep_compact
           @hash.merge!(
             digest: webhook_digest,
             token: to_s,

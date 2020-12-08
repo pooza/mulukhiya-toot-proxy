@@ -164,7 +164,7 @@ module Mulukhiya
         tags = TagContainer.default_tag_bases.clone
         tags.concat(TagContainer.media_tag_bases)
         tags.concat(@sns.account.featured_tag_bases)
-        @renderer.message = tags.uniq.map {|v| Environment.hash_tag_class.get(tag: v).to_h.compact}
+        @renderer.message = tags.uniq.map {|v| Environment.hash_tag_class.get(tag: v).to_h.deep_compact}
       else
         @renderer.status = 404
       end

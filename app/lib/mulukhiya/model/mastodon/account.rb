@@ -14,7 +14,7 @@ module Mulukhiya
           @hash[:is_moderator] = moderator?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

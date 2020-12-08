@@ -17,7 +17,7 @@ module Mulukhiya
             account: account,
             scopes: scopes,
           )
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

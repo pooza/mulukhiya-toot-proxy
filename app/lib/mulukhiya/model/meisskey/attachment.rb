@@ -18,7 +18,7 @@ module Mulukhiya
           )
           @hash.delete('_id')
           @hash.delete('metadata')
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

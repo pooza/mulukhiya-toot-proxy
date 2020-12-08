@@ -16,7 +16,7 @@ module Mulukhiya
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

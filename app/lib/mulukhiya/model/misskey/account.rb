@@ -13,7 +13,7 @@ module Mulukhiya
           @hash[:is_admin] = admin?
           @hash[:is_moderator] = moderator?
           @hash.delete(:token)
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end
