@@ -13,7 +13,7 @@ namespace :mulukhiya do
       task :clean do
         Mulukhiya::UserConfigStorage.accounts do |account|
           next unless account.config['/tagging/user_tags'].present?
-          account.config.update(tags: nil)
+          account.config.update(tagging: {user_tags: nil})
         end
       end
 
