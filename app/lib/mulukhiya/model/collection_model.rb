@@ -20,7 +20,7 @@ module Mulukhiya
     private
 
     def method_missing(method, *args)
-      return values[method.to_s] if args.empty?
+      return values[method.to_sym] if args.empty?
       return super
     end
 
