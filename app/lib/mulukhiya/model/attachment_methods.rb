@@ -15,9 +15,5 @@ module Mulukhiya
     def pixel_size
       return nil
     end
-
-    def size
-      return nil
-    end
   end
 end
