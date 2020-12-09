@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class AccessToken < Sequel::Model(:access_token)
+      include AccessTokenMethods
       many_to_one :account, key: :userId
       many_to_one :application, key: :appId
 
@@ -9,10 +10,6 @@ module Mulukhiya
         return false unless account
         return true unless application
         return application.name == Package.name
-      end
-
-      def webhook_digest
-        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def to_s

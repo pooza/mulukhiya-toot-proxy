@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class AccessToken < Sequel::Model(:oauth_tokens)
+      include AccessTokenMethods
       many_to_one :account, key: :user_id
       many_to_one :application, key: :app_id
 
@@ -8,10 +9,6 @@ module Mulukhiya
         return false if to_s.empty?
         return false unless account
         return application.name == Package.name
-      end
-
-      def webhook_digest
-        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def scopes

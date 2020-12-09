@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
+      include AccessTokenMethods
       def valid?
         return false if to_s.empty?
         return false unless account
@@ -37,10 +38,6 @@ module Mulukhiya
 
       def scopes
         return application.scopes
-      end
-
-      def webhook_digest
-        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def self.[](id)

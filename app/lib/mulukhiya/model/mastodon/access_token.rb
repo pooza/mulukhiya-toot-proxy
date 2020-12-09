@@ -1,6 +1,7 @@
 module Mulukhiya
   module Mastodon
     class AccessToken < Sequel::Model(:oauth_access_tokens)
+      include AccessTokenMethods
       many_to_one :user, key: :resource_owner_id
       many_to_one :application
 
@@ -10,10 +11,6 @@ module Mulukhiya
         return false if expires_in.present?
         return false if revoked_at.present?
         return application.name == Package.name
-      end
-
-      def webhook_digest
-        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       alias to_s token
