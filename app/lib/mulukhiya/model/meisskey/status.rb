@@ -1,6 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class Status < CollectionModel
+    class Status < MongoCollection
       def account
         return Account.new(values['userId'])
       end
@@ -36,7 +36,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.merge(
+          @hash = values.deep_symbolize_keys.merge(
             uri: uri.to_s,
             url: uri.to_s,
             attachments: attachments.map(&:to_h),

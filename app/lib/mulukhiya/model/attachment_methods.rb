@@ -11,9 +11,5 @@ module Mulukhiya
       end
       raise 'Too large'
     end
-
-    def pixel_size
-      return nil
-    end
   end
 end

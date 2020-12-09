@@ -1,6 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class HashTag < CollectionModel
+    class HashTag < MongoCollection
       include HashTagMethods
 
       def name
@@ -9,7 +9,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.merge(
+          @hash = values.deep_symbolize_keys.merge(
             name: name.to_hashtag_base,
             tag: name.to_hashtag,
             url: uri.to_s,

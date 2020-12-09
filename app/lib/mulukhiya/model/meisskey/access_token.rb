@@ -1,6 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class AccessToken < CollectionModel
+    class AccessToken < MongoCollection
       include AccessTokenMethods
 
       def valid?
@@ -11,7 +11,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.merge(
+          @hash = values.deep_symbolize_keys.merge(
             digest: webhook_digest,
             token: to_s,
             account: account,

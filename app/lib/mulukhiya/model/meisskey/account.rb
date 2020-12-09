@@ -1,11 +1,11 @@
 module Mulukhiya
   module Meisskey
-    class Account < CollectionModel
+    class Account < MongoCollection
       include AccountMethods
 
       def to_h
         unless @hash
-          @hash = values.merge(
+          @hash = values.deep_symbolize_keys.merge(
             url: uri.to_s,
             id_admin: admin?,
             id_moderator: moderator?,

@@ -1,5 +1,5 @@
 module Mulukhiya
-  class CollectionModel
+  class MongoCollection
     attr_reader :id
 
     def initialize(id)
@@ -8,10 +8,7 @@ module Mulukhiya
     end
 
     def values
-      unless @values
-        @values = collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
-        @values.deep_symbolize_keys!
-      end
+      @values ||= collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
       return @values
     end
 
@@ -20,7 +17,7 @@ module Mulukhiya
     private
 
     def method_missing(method, *args)
-      return values[method.to_sym] if args.empty?
+      return values[method.to_s] if args.empty?
       return super
     end
 

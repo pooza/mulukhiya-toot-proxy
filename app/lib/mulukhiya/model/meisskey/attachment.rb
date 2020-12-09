@@ -1,11 +1,11 @@
 module Mulukhiya
   module Meisskey
-    class Attachment < CollectionModel
+    class Attachment < MongoCollection
       include AttachmentMethods
 
       def to_h
         unless @hash
-          @hash = values.merge(
+          @hash = values.deep_symbolize_keys.merge(
             id: id,
             acct: account.acct.to_s,
             file_name: name,
