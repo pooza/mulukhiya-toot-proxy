@@ -1,5 +1,5 @@
 module Mulukhiya
-  class CollectionModel
+  class MongoCollection
     attr_reader :id
 
     def initialize(id)

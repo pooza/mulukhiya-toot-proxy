@@ -1,6 +1,8 @@
 module Mulukhiya
   module Meisskey
-    class AccessToken < CollectionModel
+    class AccessToken < MongoCollection
+      include AccessTokenMethods
+
       def valid?
         return false if to_s.empty?
         return false unless account
@@ -9,15 +11,14 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone.deep_symbolize_keys
-          @hash.delete(:hash)
-          @hash.merge!(
+          @hash = values.deep_symbolize_keys.merge(
             digest: webhook_digest,
             token: to_s,
             account: account,
             scopes: scopes,
           )
-          @hash.compact!
+          @hash.delete(:hash)
+          @hash.deep_compact!
         end
         return @hash
       end
@@ -38,10 +39,6 @@ module Mulukhiya
 
       def scopes
         return application.scopes
-      end
-
-      def webhook_digest
-        return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
       end
 
       def self.[](id)

@@ -20,7 +20,7 @@ module Mulukhiya
 
     def update(key, values)
       values.deep_stringify_keys!
-      if values['tags']
+      if values.key?('tags')
         values['tagging'] ||= {}
         values['tagging']['user_tags'] ||= values['tags']
         values.delete('tags')

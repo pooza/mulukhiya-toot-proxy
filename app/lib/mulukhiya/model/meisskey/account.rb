@@ -1,17 +1,18 @@
 module Mulukhiya
   module Meisskey
-    class Account < CollectionModel
+    class Account < MongoCollection
       include AccountMethods
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash[:url] = uri.to_s
-          @hash[:is_admin] = admin?
-          @hash[:is_moderator] = moderator?
+          @hash = values.deep_symbolize_keys.merge(
+            url: uri.to_s,
+            id_admin: admin?,
+            id_moderator: moderator?,
+          )
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
-          @hash.delete('password')
-          @hash.compact!
+          @hash.delete(:password)
+          @hash.deep_compact!
         end
         return @hash
       end

@@ -58,7 +58,7 @@ module Mulukhiya
 
     def test_disable?
       Event.new(:pre_toot).handlers do |handler|
-        assert_boolean(@account.disable?(handler.underscore_name))
+        assert_boolean(@account.disable?(handler))
       end
     end
 

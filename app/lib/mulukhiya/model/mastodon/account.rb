@@ -2,19 +2,19 @@ module Mulukhiya
   module Mastodon
     class Account < Sequel::Model(:accounts)
       include AccountMethods
-      attr_accessor :token
-
       one_to_one :user
+      attr_accessor :token
 
       def to_h
         unless @hash
-          @hash = values.clone
+          @hash = values.deep_symbolize_keys.merge(
+            is_admin: admin?,
+            is_moderator: moderator?,
+          )
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
-          @hash[:is_admin] = admin?
-          @hash[:is_moderator] = moderator?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end
@@ -30,6 +30,8 @@ module Mulukhiya
         return nil
       end
 
+      alias recent_toot recent_status
+
       def featured_tag_bases
         service = Environment.sns_class.new
         response = service.fetch_featured_tags(id)
@@ -37,8 +39,6 @@ module Mulukhiya
       rescue
         return []
       end
-
-      alias recent_toot recent_status
 
       def admin?
         return user.admin

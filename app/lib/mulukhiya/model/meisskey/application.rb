@@ -1,6 +1,6 @@
 module Mulukhiya
   module Meisskey
-    class Application < CollectionModel
+    class Application < MongoCollection
       def self.[](id)
         return Application.new(id)
       end

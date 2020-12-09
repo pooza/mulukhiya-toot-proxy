@@ -6,17 +6,18 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash[:username] = username
-          @hash[:display_name] = display_name
+          @hash = values.deep_symbolize_keys.merge(
+            username: username,
+            display_name: display_name,
+            id_admin: admin?,
+            is_moderator: moderator?,
+            url: uri.to_s,
+          )
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
-          @hash[:is_admin] = admin?
-          @hash[:is_moderator] = moderator?
-          @hash[:url] = uri.to_s
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
-          @hash.compact!
+          @hash.deep_compact!
         end
         return @hash
       end

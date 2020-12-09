@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 429530d1483e66d221c6dc16d22f222ca7f73e77
+  revision: b541c5870feea710585d5e211ca18de6635a7a74
   specs:
-    ginseng-core (1.8.5)
+    ginseng-core (1.8.6)
       activesupport
       addressable
       daemon-spawn
@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 32743129d6431a1c9bcbbf0141a60a1d33030061
+  revision: 54333634ee72f5d82247091439120e384de8da0f
   specs:
-    ginseng-fediverse (1.4.5)
+    ginseng-fediverse (1.4.6)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -243,7 +243,7 @@ GEM
       addressable (~> 2.5.2)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
-    rubocop (1.5.2)
+    rubocop (1.6.0)
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)

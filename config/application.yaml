@@ -1,5 +1,5 @@
 package:
-  version: 4.0.7
+  version: 4.0.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -526,7 +526,7 @@ meisskey:
     callback_url: /mulukhiya/app/misskey/auth
   status:
     key: noteId
-    label: ノート
+    label: ポスト
     max_length: 1000
 pleroma:
   sns_type: mastodon
