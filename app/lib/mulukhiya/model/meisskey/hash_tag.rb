@@ -1,18 +1,10 @@
 module Mulukhiya
   module Meisskey
     class HashTag < CollectionModel
+      include HashTagMethods
+
       def name
         return values['tag']
-      end
-
-      def uri
-        @uri ||= Environment.sns_class.new.create_uri("/tags/#{name}")
-        return @uri
-      end
-
-      def feed_uri
-        @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
-        return @feed_uri
       end
 
       def to_h
