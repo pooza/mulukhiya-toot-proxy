@@ -2,6 +2,7 @@ module Mulukhiya
   module Meisskey
     class AccessToken < CollectionModel
       include AccessTokenMethods
+
       def valid?
         return false if to_s.empty?
         return false unless account
