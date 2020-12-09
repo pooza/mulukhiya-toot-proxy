@@ -3,6 +3,7 @@ require 'time'
 module Mulukhiya
   module Mastodon
     class Attachment < Sequel::Model(:media_attachments)
+      include AttachmentMethods
       many_to_one :status
 
       def to_h
@@ -14,6 +15,7 @@ module Mulukhiya
             file_size_str: size_str,
             type: type,
             subtype: subtype,
+            created_at: date,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
             pixel_size: pixel_size,
@@ -21,8 +23,6 @@ module Mulukhiya
             url: uri('original').to_s,
             thumbnail_url: uri('small').to_s,
           )
-          @hash.reject! {|k, v| k.end_with?('_at')}
-          @hash[:created_at] = date
           @hash.deep_compact!
         end
         return @hash
@@ -47,18 +47,6 @@ module Mulukhiya
 
       def duration
         return meta.dig('original', 'duration')&.round(3)
-      end
-
-      def subtype
-        return type.split('/').first
-      end
-
-      def size_str
-        ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
-          unitsize = 1024.pow(i)
-          return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
-        end
-        raise 'Too large'
       end
 
       alias type file_content_type

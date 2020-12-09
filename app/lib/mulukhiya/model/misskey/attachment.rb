@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class Attachment < Sequel::Model(:drive_file)
+      include AttachmentMethods
       many_to_one :account, key: :userId
 
       def to_h
@@ -10,7 +11,7 @@ module Mulukhiya
             file_name: name,
             file_size_str: size_str,
             type: type,
-            subtype: type.split('/').first,
+            subtype: subtype,
             created_at: date,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
@@ -40,14 +41,6 @@ module Mulukhiya
 
       def date
         return createdAt.getlocal
-      end
-
-      def size_str
-        ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
-          unitsize = 1024.pow(i)
-          return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
-        end
-        raise 'Too large'
       end
 
       def description

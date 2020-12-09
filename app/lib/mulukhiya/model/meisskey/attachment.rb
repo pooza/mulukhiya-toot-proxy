@@ -1,6 +1,8 @@
 module Mulukhiya
   module Meisskey
     class Attachment < CollectionModel
+      include AttachmentMethods
+
       def to_h
         unless @hash
           @hash = values.merge(
@@ -9,14 +11,13 @@ module Mulukhiya
             file_name: name,
             file_size_str: size_str,
             type: type,
-            subtype: type.split('/').first,
+            subtype: subtype,
             created_at: date,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
             url: uri.to_s,
             thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
           )
-          @hash.delete(:metadata)
           @hash.deep_compact!
         end
         return @hash
@@ -58,14 +59,6 @@ module Mulukhiya
 
       def size
         return values['length']
-      end
-
-      def size_str
-        ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
-          unitsize = 1024.pow(i)
-          return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
-        end
-        raise 'Too large'
       end
 
       def self.[](id)

@@ -1,6 +1,8 @@
 module Mulukhiya
   module Pleroma
     class Attachment < Sequel::Model(:objects)
+      include AttachmentMethos
+
       def type
         return data['url'].first['mediaType']
       end
@@ -16,7 +18,14 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= data.deep_symbolize_keys.deep_compact
+        unless @hash
+          @hash = values.deep_symbolize_keys.merge(
+            type: type,
+            subtype: subtype,
+            url: uri.to_s,
+          )
+          @hash.deep_compact!
+        end
         return @hash
       end
     end
