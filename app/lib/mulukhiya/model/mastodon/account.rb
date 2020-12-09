@@ -2,9 +2,8 @@ module Mulukhiya
   module Mastodon
     class Account < Sequel::Model(:accounts)
       include AccountMethods
-      attr_accessor :token
-
       one_to_one :user
+      attr_accessor :token
 
       def to_h
         unless @hash
