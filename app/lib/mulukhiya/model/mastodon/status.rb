@@ -43,7 +43,7 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= values.deep_compact
+        @hash ||= values.deep_symbolize_keys.deep_compact
         return @hash
       end
 

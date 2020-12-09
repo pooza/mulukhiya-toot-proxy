@@ -4,20 +4,19 @@ module Mulukhiya
       def to_h
         unless @hash
           @hash = values.merge(
-            'id' => id,
-            'acct' => account.acct.to_s,
-            'file_name' => name,
-            'file_size_str' => size_str,
-            'type' => type,
-            'subtype' => type.split('/').first,
-            'created_at' => date,
-            'created_at_str' => date.strftime('%Y/%m/%d %H:%M:%S'),
-            'meta' => meta,
-            'url' => uri.to_s,
-            'thumbnail_url' => values.dig('metadata', 'thumbnailUrl'),
+            id: id,
+            acct: account.acct.to_s,
+            file_name: name,
+            file_size_str: size_str,
+            type: type,
+            subtype: type.split('/').first,
+            created_at: date,
+            created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+            meta: meta,
+            url: uri.to_s,
+            thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
           )
-          @hash.delete('_id')
-          @hash.delete('metadata')
+          @hash.delete(:metadata)
           @hash.deep_compact!
         end
         return @hash

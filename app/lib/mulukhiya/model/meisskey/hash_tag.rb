@@ -17,18 +17,19 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = super.merge(
+          @hash = values.merge(
             name: name.to_hashtag_base,
             tag: name.to_hashtag,
             url: uri.to_s,
             feed_url: feed_uri.to_s,
           )
-          @hash.delete('attachedUserIds')
-          @hash.delete('attachedLocalUserIds')
-          @hash.delete('attachedRemoteUserIds')
-          @hash.delete('mentionedUserIds')
-          @hash.delete('mentionedLocalUserIds')
-          @hash.delete('mentionedRemoteUserIds')
+          @hash.delete(:attachedUserIds)
+          @hash.delete(:attachedLocalUserIds)
+          @hash.delete(:attachedRemoteUserIds)
+          @hash.delete(:mentionedUserIds)
+          @hash.delete(:mentionedLocalUserIds)
+          @hash.delete(:mentionedRemoteUserIds)
+          @hash.deep_compact!
         end
         return @hash
       end

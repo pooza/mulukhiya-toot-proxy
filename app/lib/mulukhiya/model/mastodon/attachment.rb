@@ -7,8 +7,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash.merge!(
+          @hash = values.deep_symbolize_keys.merge(
             acct: status.account.acct.to_s,
             status_url: status.public_uri.to_s,
             file_name: name,
@@ -24,6 +23,7 @@ module Mulukhiya
           )
           @hash.reject! {|k, v| k.end_with?('_at')}
           @hash[:created_at] = date
+          @hash.deep_compact!
         end
         return @hash
       end

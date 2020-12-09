@@ -12,11 +12,12 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= values.clone.merge(
+        @hash ||= values.deep_symbolize_keys.merge(
           tag: name.to_hashtag,
           url: uri.to_s,
           feed_url: feed_uri.to_s,
         )
+        @hash.deep_compact!
         return @hash
       end
 

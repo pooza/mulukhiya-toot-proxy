@@ -9,14 +9,13 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone.deep_symbolize_keys
-          @hash.delete(:hash)
-          @hash.merge!(
+          @hash = values.merge(
             digest: webhook_digest,
             token: to_s,
             account: account,
             scopes: scopes,
           )
+          @hash.delete(:hash)
           @hash.deep_compact!
         end
         return @hash

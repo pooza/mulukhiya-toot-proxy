@@ -5,8 +5,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash.merge!(
+          @hash = values.deep_symbolize_keys.merge(
             acct: account.acct.to_s,
             file_name: name,
             file_size_str: size_str,

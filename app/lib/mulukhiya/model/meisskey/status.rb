@@ -36,9 +36,11 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash[:uri] = uri.to_s
-          @hash[:attachments] = attachments.map(&:to_h)
+          @hash = values.merge(
+            uri: uri.to_s,
+            url: uri.to_s,
+            attachments: attachments.map(&:to_h),
+          )
           @hash.deep_compact!
         end
         return @hash

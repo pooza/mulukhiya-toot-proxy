@@ -8,7 +8,10 @@ module Mulukhiya
     end
 
     def values
-      @values ||= collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
+      unless @values
+        @values = collection.find(_id: BSON::ObjectId.from_string(id)).first.to_h
+        @values.deep_symbolize_keys!
+      end
       return @values
     end
 

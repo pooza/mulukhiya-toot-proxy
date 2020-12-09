@@ -8,10 +8,11 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
+          @hash = values.deep_symbolize_keys.merge(
+            is_admin: admin?,
+            is_moderator: moderator?,
+          )
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
-          @hash[:is_admin] = admin?
-          @hash[:is_moderator] = moderator?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
           @hash.deep_compact!

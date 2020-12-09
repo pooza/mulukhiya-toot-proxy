@@ -13,7 +13,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone.merge(
+          @hash = values.deep_symbolize_keys.merge(
             tag: name.to_hashtag,
             url: uri.to_s,
             feed_url: feed_uri.to_s,
@@ -21,6 +21,7 @@ module Mulukhiya
           @hash.delete(:mentionedUserIds)
           @hash.delete(:mentionedLocalUserIds)
           @hash.delete(:mentionedRemoteUserIds)
+          @hash.deep_compact!
         end
         return @hash
       end

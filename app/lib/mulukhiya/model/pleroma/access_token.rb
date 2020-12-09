@@ -27,13 +27,13 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.deep_compact
-          @hash.merge!(
+          @hash = values.deep_symbolize_keys.merge(
             digest: webhook_digest,
             token: to_s,
             account: account,
             scopes: scopes,
           )
+          @hash.deep_compact!
         end
         return @hash
       end

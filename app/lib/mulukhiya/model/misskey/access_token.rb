@@ -21,8 +21,7 @@ module Mulukhiya
 
       def to_h
         unless @hash
-          @hash = values.clone
-          @hash.merge!(
+          @hash = values.deep_symbolize_keys.merge(
             digest: webhook_digest,
             token: to_s,
             account: account,
