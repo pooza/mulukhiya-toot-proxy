@@ -4,7 +4,7 @@ module Mulukhiya
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
-      return self["/handler/#{handler.underscore_name}/disable"] == true
+      return self["/handler/#{handler.underscore}/disable"] == true
     rescue Ginseng::ConfigError, NameError
       return false
     end
@@ -32,7 +32,7 @@ module Mulukhiya
       handlers = {}
       Event.all do |event|
         event.handlers do |handler|
-          handlers[handler.underscore_name] ||= handler.schema
+          handlers[handler.underscore] ||= handler.schema
         end
       end
       return handlers

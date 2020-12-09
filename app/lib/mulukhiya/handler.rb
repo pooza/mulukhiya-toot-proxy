@@ -53,7 +53,7 @@ module Mulukhiya
       return handle_post_toot(body, params)
     end
 
-    def underscore_name
+    def underscore
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
@@ -78,7 +78,7 @@ module Mulukhiya
     def summary
       return {
         event: @event.to_s,
-        handler: underscore_name,
+        handler: underscore,
         entries: @result.concat(@errors).map do |entry|
           entry.is_a?(Hash) ? entry.deep_stringify_keys : entry
         end,
@@ -113,7 +113,7 @@ module Mulukhiya
 
     def timeout
       return @config['/test/timeout'] if ENV['TEST']
-      return @config["/handler/#{underscore_name}/timeout"]
+      return @config["/handler/#{underscore}/timeout"]
     rescue Ginseng::ConfigError
       return @config['/handler/default/timeout']
     end

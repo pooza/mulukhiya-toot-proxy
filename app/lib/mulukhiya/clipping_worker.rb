@@ -8,13 +8,13 @@ module Mulukhiya
       @logger = Logger.new
     end
 
-    def underscore_name
+    def underscore
       return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
     end
 
     def federate?
       return true if Environment.test?
-      return @config["/worker/#{underscore_name}/federate"] == true
+      return @config["/worker/#{underscore}/federate"] == true
     rescue Ginseng::ConfigError
       return false
     end
