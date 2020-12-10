@@ -42,7 +42,7 @@ module Mulukhiya
       end
 
       def moderator?
-        return false
+        return isModerator
       end
 
       def bot?
