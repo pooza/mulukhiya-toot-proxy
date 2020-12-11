@@ -1,5 +1,5 @@
 package:
-  version: 4.0.8
+  version: 4.0.9
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -22,8 +22,8 @@ handler:
     timeout: 10
     type: audio/mpeg
   animation_image_format_convert:
-    type: image/gif
     timeout: 10
+    type: image/gif
   itunes_image:
     pixel: 480
     timeout: 10
@@ -229,6 +229,9 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -240,9 +243,6 @@ mastodon:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -257,6 +257,9 @@ mastodon:
       - good_morning
       - result_notification
     pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -269,9 +272,6 @@ mastodon:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -339,6 +339,9 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - bandai_channel_image
       - shortened_url
       - url_normalize
@@ -346,9 +349,6 @@ misskey:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -362,6 +362,9 @@ misskey:
       - good_morning
       - result_notification
     pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - webhook_image
       - bandai_channel_image
       - shortened_url
@@ -370,9 +373,6 @@ misskey:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -443,6 +443,9 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - bandai_channel_image
       - shortened_url
       - url_normalize
@@ -450,9 +453,6 @@ meisskey:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -466,6 +466,9 @@ meisskey:
       - good_morning
       - result_notification
     pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - webhook_image
       - bandai_channel_image
       - shortened_url
@@ -474,9 +477,6 @@ meisskey:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -542,6 +542,9 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - amazon_image
       - you_tube_image
       - bandai_channel_image
@@ -551,9 +554,6 @@ pleroma:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -567,6 +567,9 @@ pleroma:
       - good_morning
       - result_notification
     pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - amazon_image
       - you_tube_image
       - bandai_channel_image
@@ -577,9 +580,6 @@ pleroma:
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying

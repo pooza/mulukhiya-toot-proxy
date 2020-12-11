@@ -9,7 +9,7 @@ module Mulukhiya
           @hash = values.deep_symbolize_keys.merge(
             username: username,
             display_name: display_name,
-            id_admin: admin?,
+            is_admin: admin?,
             is_moderator: moderator?,
             url: uri.to_s,
           )
