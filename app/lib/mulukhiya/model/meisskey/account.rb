@@ -40,11 +40,11 @@ module Mulukhiya
       end
 
       def admin?
-        return isAdmin
+        return isAdmin == true
       end
 
       def moderator?
-        return isModerator
+        return isModerator == true
       end
 
       def bot?
