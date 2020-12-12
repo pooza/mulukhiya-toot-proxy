@@ -1,9 +1,6 @@
 require 'bundler/setup'
-require 'bootsnap'
-require 'sidekiq'
-require 'sidekiq-scheduler'
-require 'ginseng'
 require 'mulukhiya/refines'
+require 'ginseng'
 
 module Mulukhiya
   def self.dir
@@ -42,6 +39,8 @@ module Mulukhiya
   end
 
   def self.rack
+    require 'sidekiq'
+    require 'sidekiq-scheduler'
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
     require 'sidekiq-failures'
