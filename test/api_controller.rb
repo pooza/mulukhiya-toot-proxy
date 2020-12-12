@@ -60,6 +60,17 @@ module Mulukhiya
       get '/tagging/tag/search?q=API'
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+
+      post '/tagging/tag/search'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 422)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+
+      header 'Content-Type', 'application/json'
+      post '/tagging/tag/search', {q: 'まこぴー'}.to_json
+      assert(last_response.ok?)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_kind_of(Hash, JSON.parse(last_response.body))
     end
 
     def test_feed_list
