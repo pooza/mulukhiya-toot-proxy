@@ -15,6 +15,7 @@ html lang='ja'
             h3 @click='toggleVisibility("announcement")' お知らせ
             vue-slide-up-down :active='layout.details.announcement'
               .endpoint_container
+                .role admin
                 .link POST /mulukhiya/api/announcement/update
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
                   .link_description
@@ -31,6 +32,7 @@ html lang='ja'
                 a href='/mulukhiya/api/media' target='_blank' GET /mulukhiya/api/media
               .link_description 最近投稿されたメディアファイルを表示します。
             .endpoint_container v-if='account.is_admin'
+              .role admin
               .link POST /mulukhiya/api/media/clear
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link_description
@@ -43,6 +45,7 @@ html lang='ja'
           h3 @click='toggleVisibility("oauth")' OAuth
           vue-slide-up-down :active='layout.details.oauth'
             .endpoint_container
+              .role admin
               .link POST /mulukhiya/api/oauth/client/clear
               .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
@@ -59,6 +62,7 @@ html lang='ja'
                   a href='#{config['/programs/url']}' target='_blank' 実況番組表
                   | を表示します。
               .endpoint_container v-if='account.is_admin'
+                .role admin
                 .link POST /mulukhiya/api/program/update
                 - if config.keys('/sidekiq/schedule/program_update').member?('cron')
                   .link_description
@@ -76,7 +80,15 @@ html lang='ja'
               .link
                 a href='/mulukhiya/api/tagging/tag/search?q=プリキュア' target='_blank' GET /mulukhiya/api/tagging/tag/search?q=your_keyword
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。
+            .endpoint_container
+              .link POST /mulukhiya/api/tagging/tag/search
+              input type='search' placeholder='q: 検索フレーズ' v-model='input.search_tag.q'
+              .link_description ハッシュタグ辞書から、該当するパターンを検索します。GETで結果が得られない時に。
+              .field-update-button-container
+                button @click='searchTags' 実行
+                pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint_container v-if='account.is_admin'
+              .role admin
               .link POST /mulukhiya/api/tagging/dic/update
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
                 .link_description
@@ -92,6 +104,7 @@ html lang='ja'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint_container
+              .role admin
               .link POST /mulukhiya/api/tagging/usertag/clear
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
                 .link_description
@@ -109,6 +122,7 @@ html lang='ja'
                   a :href='feed.list.href' target='_blank' GET /mulukhiya/api/feed/list
                 .link_description フィードの一覧を返します。
               .endpoint_container v-if='account.is_admin'
+                .role admin
                 .link POST /mulukhiya/api/feed/update
                 - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
                   .link_description
@@ -158,6 +172,12 @@ html lang='ja'
           account: {is_admin: false},
           webhook: {href: null},
           feed: {list: {href: null}},
+          input: {
+            search_tag: {q: null},
+          },
+          result: {
+            search_tag: null,
+          },
           layout: {
             details: {
               announcement: false,
@@ -261,6 +281,16 @@ html lang='ja'
               .then(e => {
                 this.message = null
                 this.layout.details['feed'] = false
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
+          },
+          searchTags: function () {
+            const indicator = new ActivityIndicator()
+            indicator.show()
+            axios.post('/mulukhiya/api/tagging/tag/search', {q: this.input.search_tag.q})
+              .then(e => {
+                this.message = null
+                this.result.search_tag = e.data
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
               .finally(e => indicator.hide())
           },
