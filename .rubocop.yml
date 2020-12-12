@@ -1,13 +1,20 @@
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-sequel
 
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
   DisplayCopNames: true
   NewCops: enable
+  Include:
+    - '**/*.rb'
+    - '**/Rakefile'
+    - '**/config.ru'
   Exclude:
     - '**/._*'
-    - '.git/**/*'
+    - '**/.git/**/*'
     - 'public/**/*'
+    - 'config/**/*'
     - 'tmp/**/*'
   TargetRubyVersion: 2.7
 
@@ -321,3 +328,12 @@ Performance/StringInclude:
 
 Performance/Sum: # (new in 1.8)
   Enabled: true
+
+Sequel/ConcurrentIndex:
+  Enabled: false
+
+Sequel/SaveChanges:
+  Exclude:
+    - '*'
+  Include:
+    - '**/model/*'
