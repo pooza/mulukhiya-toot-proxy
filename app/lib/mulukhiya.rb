@@ -3,6 +3,8 @@ require 'mulukhiya/refines'
 require 'ginseng'
 
 module Mulukhiya
+  using Refines
+
   def self.dir
     return File.expand_path('../..', __dir__)
   end
