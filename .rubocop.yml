@@ -208,6 +208,7 @@ Metrics/BlockLength:
   Exclude:
     - 'test/*'
     - '**/contract/*'
+    - '*.gemspec'
 
 Metrics/MethodLength:
   Max: 20
