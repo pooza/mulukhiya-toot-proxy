@@ -12,6 +12,11 @@ module Mulukhiya
       return @config
     end
 
+    def acct
+      @acct ||= Acct.new("@#{username}@#{host}")
+      return @acct
+    end
+
     def webhook
       return Webhook.new(config)
     rescue => e

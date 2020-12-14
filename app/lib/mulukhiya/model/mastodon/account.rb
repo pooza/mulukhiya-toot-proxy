@@ -19,9 +19,8 @@ module Mulukhiya
         return @hash
       end
 
-      def acct
-        @acct ||= Acct.new("@#{username}@#{domain || Environment.domain_name}")
-        return @acct
+      def host
+        return domain || Environment.domain_name
       end
 
       def recent_status

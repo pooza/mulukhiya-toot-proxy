@@ -19,10 +19,11 @@ module Mulukhiya
         return @hash
       end
 
-      def acct
-        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
-        return @acct
+      def host
+        return values[:host] || Environment.domain_name
       end
+
+      alias domain host
 
       def uri
         unless @uri

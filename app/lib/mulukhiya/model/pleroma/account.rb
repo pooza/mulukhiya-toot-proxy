@@ -36,6 +36,12 @@ module Mulukhiya
 
       alias display_name name
 
+      def host
+        return acct.host
+      end
+
+      alias domain host
+
       def uri
         @uri ||= Ginseng::URI.parse(ap_id)
         return @uri
