@@ -70,10 +70,6 @@ module Mulukhiya
         return false
       end
 
-      def featured_tag_bases
-        return []
-      end
-
       def self.get(key)
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
