@@ -33,7 +33,6 @@ module Mulukhiya
     end
 
     def self.accounts(params = {})
-      return enum_for(__method__, params) unless block_given?
       storage = UserConfigStorage.new
       bar = ProgressBar.create(total: storage.all_keys.count) if params[:console]
       storage.all_keys.each do |key|
