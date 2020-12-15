@@ -32,16 +32,19 @@ module Mulukhiya
       return 'user'
     end
 
-    def self.accounts
-      return enum_for(__method__) unless block_given?
+    def self.accounts(params = {})
+      return enum_for(__method__, params) unless block_given?
       storage = UserConfigStorage.new
+      bar = ProgressBar.create(total: storage.all_keys.count) if params[:console]
       storage.all_keys.each do |key|
+        bar.increment if params[:console]
         id = key.split(':').last
         next unless storage[id]['/tagging/user_tags']
         id = id.to_i if id.match?(/^[[:digit:]]+$/)
         next unless account = Environment.account_class[id]
         yield account
       end
+      bar.finish if params[:console]
     end
   end
 end

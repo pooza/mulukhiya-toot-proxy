@@ -339,6 +339,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-sequel
+  ruby-progressbar
   sidekiq
   sidekiq-failures
   sidekiq-scheduler

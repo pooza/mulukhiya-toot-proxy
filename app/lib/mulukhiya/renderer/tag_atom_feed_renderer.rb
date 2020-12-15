@@ -62,24 +62,31 @@ module Mulukhiya
       return @record
     end
 
-    def self.cache_all
-      all do |renderer|
+    def self.cache_all(params = {})
+      all(params) do |renderer|
         renderer.cache!
       rescue => e
         renderer.logger.error(error: e, tag: renderer.tag)
       end
+      all do |renderer|
+        puts "updated: ##{renderer.tag} #{renderer.path}" if params[:console]
+      end
     end
 
-    def self.all
-      return enum_for(__method__) unless block_given?
+    def self.all(params = {})
+      return enum_for(__method__, params) unless block_given?
       tags = TagContainer.default_tag_bases.clone
       tags.concat(TagContainer.media_tag_bases)
       tags.concat(TagContainer.futured_tag_bases)
-      tags.uniq.each do |tag|
+      tags.uniq!
+      bar = ProgressBar.create(total: tags.count) if params[:console]
+      tags.each do |tag|
+        bar.increment if params[:console]
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
         yield renderer
       end
+      bar.finish if params[:console]
     end
 
     private
