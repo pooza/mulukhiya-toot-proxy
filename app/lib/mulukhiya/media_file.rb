@@ -116,7 +116,7 @@ module Mulukhiya
       logger = Logger.new
       config = Config.instance
       files = []
-      all(params) do |path|
+      all do |path|
         next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
         File.unlink(path)
         files.push(path)
@@ -124,17 +124,18 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, path: path)
       end
-      puts ({'deleted' => files}.to_yaml) if files.present?
+      puts({'deleted' => files}.to_yaml) if Environment.rake? && files.present?
     end
 
-    def self.all(params = {})
+    def self.all
+      return enum_for(__method__) unless block_given?
       paths = Dir.glob(File.join(Environment.dir, 'tmp/media/*'))
-      bar = ProgressBar.create(total: paths.count) if params[:console]
+      bar = ProgressBar.create(total: paths.count) if Environment.rake?
       paths.each do |path|
-        bar.increment if params[:console]
+        bar.increment if Environment.rake?
         yield path
       end
-      bar.finish if params[:console]
+      bar.finish if Environment.rake?
     end
   end
 end

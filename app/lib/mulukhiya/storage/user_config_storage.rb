@@ -32,18 +32,19 @@ module Mulukhiya
       return 'user'
     end
 
-    def self.accounts(params = {})
+    def self.accounts
+      return enum_for(__method__) unless block_given?
       storage = UserConfigStorage.new
-      bar = ProgressBar.create(total: storage.all_keys.count) if params[:console]
+      bar = ProgressBar.create(total: storage.all_keys.count) if Environment.rake?
       storage.all_keys.each do |key|
-        bar.increment if params[:console]
+        bar.increment if Environment.rake?
         id = key.split(':').last
         next unless storage[id]['/tagging/user_tags']
         id = id.to_i if id.match?(/^[[:digit:]]+$/)
         next unless account = Environment.account_class[id]
         yield account
       end
-      bar.finish if params[:console]
+      bar.finish if Environment.rake?
     end
   end
 end
