@@ -7,7 +7,7 @@ namespace :mulukhiya do
         dic.delete if dic.exist?
         dic.create
         puts "path: #{dic.path}"
-        puts "#{dic.remote_dics.count} remote_dics"
+        puts "#{dic.remote_dics.count} remote dics"
         puts "#{dic.count} tags"
       end
     end
