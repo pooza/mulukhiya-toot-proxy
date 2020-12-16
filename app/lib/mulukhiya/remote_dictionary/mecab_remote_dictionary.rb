@@ -7,7 +7,7 @@ module Mulukhiya
         next unless classes.member?('固有名詞')
         next if classes.member?('姓')
         next if classes.member?('名')
-        result[create_key(v.first)] = {pattern: create_pattern(v.first)}
+        result[create_key(v.first)] = create_entry(v.first)
       rescue => e
         @logger.error(error: e, dic: uri.to_s, entry: v)
       end

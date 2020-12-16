@@ -34,6 +34,11 @@ module Mulukhiya
 
     private
 
+    def create_entry(word)
+      pattern = create_pattern(v.first)
+      return {pattern: pattern, regexp: pattern.source, words: []}
+    end
+
     def create_key(word)
       return word.nfkc
     end

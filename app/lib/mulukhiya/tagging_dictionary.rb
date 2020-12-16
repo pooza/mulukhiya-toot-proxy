@@ -89,11 +89,8 @@ module Mulukhiya
         bar&.increment
         dic.parse.each do |k, v|
           result[k] ||= v
-          result[k][:regexp] = result[k][:pattern].source
-          result[k][:words] ||= []
           next unless v[:words].is_a?(Array)
-          result[k][:words].concat(v[:words])
-          result[k][:words].uniq!
+          result[k][:words].concat(v[:words]).uniq!
         end
       end
       bar&.finish
