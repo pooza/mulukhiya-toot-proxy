@@ -14,7 +14,11 @@ module Mulukhiya
     def test_parse
       result = @dic.parse
       assert_kind_of(Hash, result)
-      assert_equal(result['ginseng-core'], {pattern: /ginseng.? ?core/})
+      assert_equal(result['ginseng-core'], {
+        pattern: /ginseng.? ?core/,
+        regexp: 'ginseng.? ?core',
+        words : [],
+      })
     end
   end
 end
