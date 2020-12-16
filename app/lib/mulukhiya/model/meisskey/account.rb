@@ -34,6 +34,10 @@ module Mulukhiya
         return @uri
       end
 
+      def display_name
+        return name
+      end
+
       def recent_status
         note = MeisskeyService.new.notes(account_id: id)&.first
         return Status[note['id']] if note
