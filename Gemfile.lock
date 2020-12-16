@@ -304,7 +304,7 @@ GEM
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
-    tzinfo (2.0.3)
+    tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
