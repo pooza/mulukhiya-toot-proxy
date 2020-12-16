@@ -5,9 +5,6 @@ namespace :mulukhiya do
       task :update do
         if Mulukhiya::Environment.controller_class.feed?
           Mulukhiya::TagAtomFeedRenderer.cache_all
-          Mulukhiya::TagAtomFeedRenderer.all do |renderer|
-            puts "updated: ##{renderer.tag} #{renderer.path}"
-          end
         else
           warn "#{Mulukhiya::Environment.controller_class.name} doesn't support feeds."
           exit 1

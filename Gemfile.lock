@@ -164,7 +164,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    json (2.3.1)
+    json (2.4.0)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
@@ -339,6 +339,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-sequel
+  ruby-progressbar
   sidekiq
   sidekiq-failures
   sidekiq-scheduler

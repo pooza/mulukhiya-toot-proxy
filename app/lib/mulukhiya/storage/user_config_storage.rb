@@ -32,6 +32,16 @@ module Mulukhiya
       return 'user'
     end
 
+    def self.clear_tags
+      bar = ProgressBar.create(total: accounts.count) if Environment.rake?
+      accounts do |account|
+        bar&.increment
+        next unless account.config['/tagging/user_tags'].present?
+        account.config.clear_tags
+      end
+      bar&.finish
+    end
+
     def self.accounts
       return enum_for(__method__) unless block_given?
       storage = UserConfigStorage.new

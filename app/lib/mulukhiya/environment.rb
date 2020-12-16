@@ -4,6 +4,12 @@ module Mulukhiya
       return File.basename(dir)
     end
 
+    def self.rake?
+      return ENV['RAKE'].present?
+    rescue
+      return false
+    end
+
     def self.type
       return config['/environment'] || 'development'
     end
