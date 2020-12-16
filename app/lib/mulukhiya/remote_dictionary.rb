@@ -35,7 +35,7 @@ module Mulukhiya
     private
 
     def create_entry(word)
-      pattern = create_pattern(v.first)
+      pattern = create_pattern(word)
       return {pattern: pattern, regexp: pattern.source, words: []}
     end
 
