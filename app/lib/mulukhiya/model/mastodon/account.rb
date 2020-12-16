@@ -19,9 +19,11 @@ module Mulukhiya
         return @hash
       end
 
-      def host
-        return domain || Environment.domain_name
+      def domain
+        return values[:domain] || Environment.domain_name
       end
+
+      alias host domain
 
       def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})
