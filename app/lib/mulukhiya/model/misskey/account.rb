@@ -34,8 +34,6 @@ module Mulukhiya
         return @uri
       end
 
-      alias display_name name
-
       def recent_status
         notes = MisskeyService.new.notes(account_id: id)
         note = notes&.first
