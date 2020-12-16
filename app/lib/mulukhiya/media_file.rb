@@ -112,7 +112,7 @@ module Mulukhiya
       return streams.find {|v| v['codec_type'] == 'audio'}
     end
 
-    def self.purge(params = {})
+    def self.purge
       logger = Logger.new
       config = Config.instance
       bar = ProgressBar.create(total: all.count) if Environment.rake?
