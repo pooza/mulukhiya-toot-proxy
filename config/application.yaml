@@ -332,6 +332,7 @@ misskey:
   feed: true
   announcement: true
   annict: true
+  futured_tag: true
   dbms: postgres
   parser: note
   handlers:
