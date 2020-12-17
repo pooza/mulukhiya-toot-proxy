@@ -41,11 +41,8 @@ module Mulukhiya
   end
 
   def self.rack
-    require 'sidekiq'
-    require 'sidekiq-scheduler'
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
-    require 'sidekiq-failures'
     if SidekiqDaemon.basic_auth?
       Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|
         SidekiqDaemon.auth(username, password)
