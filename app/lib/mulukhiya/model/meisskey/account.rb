@@ -13,7 +13,6 @@ module Mulukhiya
           @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:password)
           @hash.delete(:keypair)
-          @hash.delete(:clientSettings)
           @hash.deep_compact!
         end
         return @hash
@@ -39,12 +38,25 @@ module Mulukhiya
       end
 
       def recent_status
-        note = MeisskeyService.new.notes(account_id: id)&.first
+        note = service.notes(account_id: id)&.first
         return Status[note['id']] if note
         return nil
       end
 
       alias recent_post recent_status
+
+      def featured_tag_bases
+        tags = []
+        return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
+        timelines.each do |timeline|
+          timeline['query'].each do |entry|
+            tags.concat(entry)
+          end
+        end
+        return tags.compact.uniq
+      rescue
+        return []
+      end
 
       def admin?
         return isAdmin == true
@@ -55,11 +67,11 @@ module Mulukhiya
       end
 
       def bot?
-        return isBot
+        return isBot == true
       end
 
       def locked?
-        return isLocked
+        return isLocked == true
       end
 
       def self.[](id)
