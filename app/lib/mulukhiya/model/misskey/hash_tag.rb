@@ -18,7 +18,7 @@ module Mulukhiya
         return @hash
       end
 
-      def self.featured_tag_base
+      def self.featured_tag_bases
         return Postgres.instance.execute('featured_tags').map {|v| v['tag'].to_hashtag_base}
       end
 

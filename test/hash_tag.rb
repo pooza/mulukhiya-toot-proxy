@@ -30,5 +30,9 @@ module Mulukhiya
         assert_false(@test_usernames.member?(entry['username']))
       end
     end
+
+    def test_featured_tag_bases
+      assert_kind_of(Array, Environment.hash_tag_class.featured_tag_bases)
+    end
   end
 end

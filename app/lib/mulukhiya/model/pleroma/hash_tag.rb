@@ -17,7 +17,7 @@ module Mulukhiya
         }
       end
 
-      def self.featured_tag_base
+      def self.featured_tag_bases
         return []
       end
 
