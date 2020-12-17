@@ -34,11 +34,18 @@ module Mulukhiya
       alias recent_toot recent_status
 
       def featured_tag_bases
-        service = Environment.sns_class.new
         response = service.fetch_featured_tags(id)
         return response.parsed_response.map {|v| v['name'].to_hashtag_base}
       rescue
         return []
+      end
+
+      def service
+        unless @service
+          @service = MastodonService.new
+          @service.token = token
+        end
+        return @service
       end
 
       def admin?
