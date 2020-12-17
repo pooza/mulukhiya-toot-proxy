@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def self.futured_tag_bases
-      return Environment.hash_tag_class.featured_tag_base
+      return Environment.hash_tag_class.featured_tag_bases
     rescue
       return []
     end
