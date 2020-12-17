@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: a9e0086f8d1fd2679eb304917932ac752ab4446b
+  revision: 73bdb1ba3baa06e1923683a296bcf5724523428d
   specs:
-    ginseng-fediverse (1.4.7)
+    ginseng-fediverse (1.4.8)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -102,7 +102,7 @@ GEM
     dry-container (0.7.2)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.1, >= 0.1.3)
-    dry-core (0.4.10)
+    dry-core (0.5.0)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
     dry-inflector (0.2.0)
@@ -164,7 +164,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    json (2.3.1)
+    json (2.4.0)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
@@ -304,7 +304,7 @@ GEM
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
-    tzinfo (2.0.3)
+    tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
@@ -339,6 +339,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-sequel
+  ruby-progressbar
   sidekiq
   sidekiq-failures
   sidekiq-scheduler

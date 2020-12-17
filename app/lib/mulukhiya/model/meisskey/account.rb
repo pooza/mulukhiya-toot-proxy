@@ -19,10 +19,11 @@ module Mulukhiya
         return @hash
       end
 
-      def acct
-        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
-        return @acct
+      def host
+        return values[:host] || Environment.domain_name
       end
+
+      alias domain host
 
       def uri
         unless @uri
@@ -31,6 +32,10 @@ module Mulukhiya
           @uri.path = "/@#{username}"
         end
         return @uri
+      end
+
+      def display_name
+        return name
       end
 
       def recent_status
@@ -53,10 +58,6 @@ module Mulukhiya
 
       def locked?
         return isLocked
-      end
-
-      def featured_tag_bases
-        return []
       end
 
       def self.[](id)

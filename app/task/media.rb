@@ -2,7 +2,7 @@ namespace :mulukhiya do
   namespace :media do
     desc 'clean media cache'
     task :clean do
-      MediaCleaningWorker.new.perform
+      Mulukhiya::MediaFile.purge
     end
 
     task clear: [:clean]

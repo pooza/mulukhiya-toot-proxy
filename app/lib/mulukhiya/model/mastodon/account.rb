@@ -19,10 +19,11 @@ module Mulukhiya
         return @hash
       end
 
-      def acct
-        @acct ||= Acct.new("@#{username}@#{domain || Environment.domain_name}")
-        return @acct
+      def domain
+        return values[:domain] || Environment.domain_name
       end
+
+      alias host domain
 
       def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})

@@ -5,7 +5,7 @@ module Mulukhiya
       fetch.each do |entry|
         fields.each do |field|
           next unless entry[field]
-          result[create_key(entry[field])] ||= {pattern: create_pattern(entry[field])}
+          result[create_key(entry[field])] ||= create_entry(entry[field])
         end
       rescue => e
         @logger.error(error: e, dic: uri.to_s, entry: entry)

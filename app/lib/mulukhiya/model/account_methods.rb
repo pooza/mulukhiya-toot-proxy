@@ -12,6 +12,11 @@ module Mulukhiya
       return @config
     end
 
+    def acct
+      @acct ||= Acct.new("@#{username}@#{host}")
+      return @acct
+    end
+
     def webhook
       return Webhook.new(config)
     rescue => e
@@ -63,7 +68,7 @@ module Mulukhiya
       annict.updated_at = times.max if times.present?
     end
 
-    def featured_tags
+    def featured_tag_bases
       return []
     end
 

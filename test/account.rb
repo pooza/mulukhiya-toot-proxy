@@ -21,6 +21,22 @@ module Mulukhiya
       assert_kind_of(Hash, @account.to_h)
     end
 
+    def test_username
+      assert_kind_of(String, @account.username)
+    end
+
+    def test_host
+      assert_kind_of(String, @account.host)
+    end
+
+    def test_domain
+      assert_kind_of(String, @account.domain)
+    end
+
+    def test_display_name
+      assert_kind_of([String, NilClass], @account.display_name)
+    end
+
     def test_admin?
       assert_boolean(@account.admin?)
     end

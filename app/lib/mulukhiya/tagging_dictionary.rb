@@ -84,16 +84,16 @@ module Mulukhiya
 
     def fetch
       result = {}
+      bar = ProgressBar.create(total: remote_dics.count) if Environment.rake?
       remote_dics do |dic|
+        bar&.increment
         dic.parse.each do |k, v|
           result[k] ||= v
-          result[k][:regexp] = result[k][:pattern].source
-          result[k][:words] ||= []
           next unless v[:words].is_a?(Array)
-          result[k][:words].concat(v[:words])
-          result[k][:words].uniq!
+          result[k][:words].concat(v[:words]).uniq!
         end
       end
+      bar&.finish
       return result.sort_by {|k, v| k.length}.to_h
     end
 

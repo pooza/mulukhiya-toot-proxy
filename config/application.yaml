@@ -1,11 +1,12 @@
 package:
-  version: 4.0.10
+  version: 4.0.11
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
     - Tatsuya Koishi
   email:
     - tkoishi@b-shock.co.jp
+  license: MIT
 controller: mastodon
 environment: development
 handler:
@@ -331,6 +332,7 @@ misskey:
   feed: true
   announcement: true
   annict: true
+  futured_tag: true
   dbms: postgres
   parser: note
   handlers:
@@ -421,6 +423,7 @@ misskey:
       - write:notes
       - write:drive
       - read:drive
+      - read:account
     callback_url: /mulukhiya/app/misskey/auth
   status:
     key: noteId

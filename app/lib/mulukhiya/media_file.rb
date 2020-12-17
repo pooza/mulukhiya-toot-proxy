@@ -111,5 +111,28 @@ module Mulukhiya
     def audio_stream
       return streams.find {|v| v['codec_type'] == 'audio'}
     end
+
+    def self.purge
+      logger = Logger.new
+      config = Config.instance
+      bar = ProgressBar.create(total: all.count) if Environment.rake?
+      files = []
+      all do |path|
+        bar&.increment
+        next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
+        File.unlink(path)
+        files.push(path)
+        logger.info(class: 'MediaFile', message: 'delete', path: path)
+      rescue => e
+        logger.error(error: e, path: path)
+      end
+      bar&.finish
+      puts({'deleted' => files}.to_yaml) if Environment.rake? && files.present?
+    end
+
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      Dir.glob(File.join(Environment.dir, 'tmp/media/*')).sort.each(&block)
+    end
   end
 end

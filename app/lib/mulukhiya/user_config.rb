@@ -35,6 +35,14 @@ module Mulukhiya
       update(webhook: {token: token})
     end
 
+    def tags
+      return self['/tagging/user_tags']
+    end
+
+    def clear_tags
+      update(tagging: {user_tags: nil})
+    end
+
     def to_h
       unless @hash
         @hash = raw.clone

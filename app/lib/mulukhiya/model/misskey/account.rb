@@ -19,10 +19,11 @@ module Mulukhiya
         return @hash
       end
 
-      def acct
-        @acct ||= Acct.new("@#{username}@#{host || Environment.domain_name}")
-        return @acct
+      def host
+        return values[:host] || Environment.domain_name
       end
+
+      alias domain host
 
       def uri
         unless @uri
@@ -42,6 +43,17 @@ module Mulukhiya
 
       alias recent_note recent_status
 
+      def featured_tag_bases
+        tag_bases = []
+        MisskeyService.new.antennas.map {|v| v['keywords'].first}.each do |keywords|
+          tag_bases.concat(keywords.map(&:to_hashtag_base))
+        end
+        return tag_bases.uniq
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
+        return []
+      end
+
       alias admin? isAdmin
 
       alias moderator? isModerator
@@ -51,10 +63,6 @@ module Mulukhiya
       alias bot? isBot
 
       alias locked? isLocked
-
-      def featured_tag_bases
-        return []
-      end
 
       def self.get(key)
         if acct = key[:acct]

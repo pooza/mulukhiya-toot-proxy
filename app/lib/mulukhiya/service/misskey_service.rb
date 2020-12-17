@@ -20,6 +20,16 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def antennas(params = {})
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      response = http.post('/api/antennas/list', {
+        body: {i: token}.to_json,
+        headers: headers,
+      })
+      return response.parsed_response
+    end
+
     def account
       @account ||= Environment.account_class.get(token: token)
       return @account

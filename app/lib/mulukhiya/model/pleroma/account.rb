@@ -36,6 +36,12 @@ module Mulukhiya
 
       alias display_name name
 
+      def host
+        return acct.host
+      end
+
+      alias domain host
+
       def uri
         @uri ||= Ginseng::URI.parse(ap_id)
         return @uri
@@ -62,10 +68,6 @@ module Mulukhiya
 
       def locked?
         return false
-      end
-
-      def featured_tag_bases
-        return []
       end
 
       def self.get(key)
