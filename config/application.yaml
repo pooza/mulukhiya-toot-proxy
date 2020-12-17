@@ -423,6 +423,7 @@ misskey:
       - write:notes
       - write:drive
       - read:drive
+      - read:account
     callback_url: /mulukhiya/app/misskey/auth
   status:
     key: noteId
