@@ -40,14 +40,6 @@ module Mulukhiya
         return []
       end
 
-      def service
-        unless @service
-          @service = MastodonService.new
-          @service.token = token
-        end
-        return @service
-      end
-
       def admin?
         return user.admin
       end

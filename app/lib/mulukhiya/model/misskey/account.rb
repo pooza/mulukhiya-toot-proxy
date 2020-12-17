@@ -54,14 +54,6 @@ module Mulukhiya
         return []
       end
 
-      def service
-        unless @service
-          @service = MisskeyService.new
-          @service.token = token
-        end
-        return @service
-      end
-
       alias admin? isAdmin
 
       alias moderator? isModerator
