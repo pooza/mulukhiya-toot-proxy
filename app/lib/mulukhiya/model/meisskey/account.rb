@@ -44,6 +44,8 @@ module Mulukhiya
         return nil
       end
 
+      alias recent_post recent_status
+
       def admin?
         return isAdmin == true
       end
