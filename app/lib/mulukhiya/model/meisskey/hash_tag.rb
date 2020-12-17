@@ -67,8 +67,14 @@ module Mulukhiya
         return Mongo.instance.db[:hashtags]
       end
 
-      def self.featured_tag_base
-        return []
+      def self.featured_tag_bases
+        tag_bases = []
+        accounts = Account.collection.find(clientSettings: {'$ne' => nil})
+        accounts.each do |account|
+          account = Account[account['_id'].to_s]
+          tag_bases.concat(account.featured_tag_bases)
+        end
+        return tag_bases.uniq.compact
       end
 
       private

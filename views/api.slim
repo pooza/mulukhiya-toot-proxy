@@ -117,7 +117,7 @@ html lang='ja'
           li v-if='account.username'
             h3 @click='toggleVisibility("feed")' Atomフィード
             vue-slide-up-down :active='layout.details.feed'
-              .endpoint_container v-if='account.is_admin'
+              .endpoint_container
                 .link
                   a :href='feed.list.href' target='_blank' GET /mulukhiya/api/feed/list
                 .link_description フィードの一覧を返します。

@@ -35,7 +35,7 @@ module Mulukhiya
       end
 
       def recent_status
-        notes = MisskeyService.new.notes(account_id: id)
+        notes = service.notes(account_id: id)
         note = notes&.first
         return Status[note['id']] if note
         return nil
@@ -45,7 +45,7 @@ module Mulukhiya
 
       def featured_tag_bases
         tag_bases = []
-        MisskeyService.new.antennas.map {|v| v['keywords'].first}.each do |keywords|
+        service.antennas.map {|v| v['keywords'].first}.each do |keywords|
           tag_bases.concat(keywords.map(&:to_hashtag_base))
         end
         return tag_bases.uniq

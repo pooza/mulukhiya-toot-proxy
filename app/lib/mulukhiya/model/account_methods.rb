@@ -17,6 +17,14 @@ module Mulukhiya
       return @acct
     end
 
+    def service
+      unless @service
+        @service = Environment.sns_class.new
+        @service.token = token
+      end
+      return @service
+    end
+
     def webhook
       return Webhook.new(config)
     rescue => e
