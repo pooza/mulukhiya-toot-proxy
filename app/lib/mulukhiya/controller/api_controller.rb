@@ -182,16 +182,12 @@ module Mulukhiya
     end
 
     get '/feed/list' do
-      if @sns.account
-        tags = TagContainer.default_tag_bases.clone
-        tags.concat(TagContainer.media_tag_bases)
-        tags.concat(@sns.account.featured_tag_bases)
-        @renderer.message = tags.uniq.map do |tag|
-          Environment.hash_tag_class.get(tag: tag).to_h
-        end.deep_compact
-      else
-        @renderer.status = 404
-      end
+      tags = TagContainer.default_tag_bases.clone
+      tags.concat(TagContainer.media_tag_bases)
+      tags.concat(@sns.account.featured_tag_bases) if @sns.account
+      @renderer.message = tags.uniq.map do |tag|
+        Environment.hash_tag_class.get(tag: tag).to_h
+      end.deep_compact
       return @renderer.to_s
     end
 
