@@ -1,7 +1,7 @@
 module Mulukhiya
   module Pleroma
     class Attachment < Sequel::Model(:objects)
-      include AttachmentMethos
+      include AttachmentMethods
 
       def type
         return data[:url].first[:mediaType]
