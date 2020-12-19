@@ -17,6 +17,8 @@ module Mulukhiya
             meta: meta,
             url: webpublicUrl || values[:url],
             thumbnail_url: thumbnailUrl,
+            pixel_size: pixel_size,
+            duration: duration,
           )
           @hash.deep_compact!
         end
@@ -24,7 +26,10 @@ module Mulukhiya
       end
 
       def meta
-        @meta ||= JSON.parse(self[:properties])
+        unless @meta
+          @meta = JSON.parse(values[:properties]).deep_symbolize_keys
+          @meta.merge!(super) unless mediatype == 'image'
+        end
         return @meta
       rescue
         return {}
@@ -72,7 +77,7 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
           attachment = Attachment[row[:id]]
-          note = Status[row[:note_id]]
+          note = Status[row[:status_id]]
           yield attachment.to_h.merge(status_url: note.uri.to_s)
         rescue => e
           logger.error(error: e, row: row)
