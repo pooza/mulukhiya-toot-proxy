@@ -14,7 +14,7 @@ module Mulukhiya
             file_name: name,
             file_size_str: size_str,
             type: type,
-            subtype: subtype,
+            mediatype: mediatype,
             created_at: date,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,
@@ -39,20 +39,20 @@ module Mulukhiya
       end
 
       def pixel_size
-        return nil if subtype == 'audio'
-        size = meta.dig('original', 'size')
-        size ||= "#{meta.dig('original', 'width')}x#{meta.dig('original', 'height')}"
+        return nil if mediatype == 'audio'
+        size = meta.dig(:original, :size)
+        size ||= "#{meta.dig(:original, :width)}x#{meta.dig(:original, :height)}"
         return size
       end
 
       def duration
-        return meta.dig('original', 'duration')&.round(3)
+        return meta.dig(:original, :duration)&.round(3)
       end
 
       alias type file_content_type
 
       def meta
-        @meta ||= JSON.parse(self[:file_meta])
+        @meta ||= JSON.parse(self[:file_meta]).deep_symbolize_keys
         return @meta
       rescue
         return {}

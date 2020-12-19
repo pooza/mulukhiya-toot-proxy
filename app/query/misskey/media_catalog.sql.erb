@@ -5,9 +5,8 @@ SELECT
   drive_file.type,
   drive_file.size AS file_size,
   drive_file.properties AS meta,
-  NULL as description,
   drive_file."createdAt" as created_at,
-  note_file.note_id,
+  note_file.note_id AS status_id,
   note_file.visibility,
   note_file.username,
   note_file.display_name

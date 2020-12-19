@@ -4,11 +4,15 @@ module Mulukhiya
     attr_accessor :host
 
     def domain_name
-      return nil if host == Environment.domain_name
+      return nil if local?
       return host
     end
 
     alias domain domain_name
+
+    def local?
+      return host == Environment.domain_name
+    end
 
     def agent?
       @config['/agent/accts'].member?(contents)

@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def test_date
-      assert_kind_of(Time, @attachment.date)
+      assert_kind_of([Time, NilClass], @attachment.date)
     end
 
     def test_size
@@ -32,6 +32,14 @@ module Mulukhiya
 
     def test_uri
       assert_kind_of(Ginseng::URI, @attachment.uri)
+    end
+
+    def test_feed
+      assert_kind_of(Hash, @class.feed.first)
+    end
+
+    def test_catalog
+      assert_kind_of(Hash, @class.catalog.first)
     end
   end
 end

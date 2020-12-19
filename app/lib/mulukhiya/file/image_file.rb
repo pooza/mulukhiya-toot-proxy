@@ -1,6 +1,17 @@
 module Mulukhiya
   class ImageFile < MediaFile
-    alias image? valid?
+    def values
+      return {
+        type: type,
+        mediatype: mediatype,
+        subtype: subtype,
+        width: width,
+        height: height,
+        size: size,
+      }
+    end
+
+    alias to_h values
 
     def width
       return size_info[:width]
@@ -8,10 +19,6 @@ module Mulukhiya
 
     def height
       return size_info[:height]
-    end
-
-    def duration
-      return nil
     end
 
     def type

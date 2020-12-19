@@ -6,6 +6,10 @@ module Mulukhiya
       @mp4 = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
     end
 
+    def test_values
+      assert_kind_of(Hash, @mp3.values)
+    end
+
     def test_audio?
       assert(@mp3.audio?)
       assert_false(@png.audio?)
