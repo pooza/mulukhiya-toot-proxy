@@ -17,6 +17,8 @@ module Mulukhiya
             meta: meta,
             url: uri.to_s,
             thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
+            pixel_size: pixel_size,
+            duration: duration,
           )
           @hash.deep_compact!
         end
@@ -46,7 +48,13 @@ module Mulukhiya
       end
 
       def meta
-        return values.dig('metadata', 'properties')
+        unless @meta
+          @meta = values.dig('metadata', 'properties')
+          @meta.merge!(super) unless mediatype == 'image'
+        end
+        return @meta
+      rescue
+        return {}
       end
 
       def date
