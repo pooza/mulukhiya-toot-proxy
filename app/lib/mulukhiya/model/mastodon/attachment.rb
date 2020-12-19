@@ -40,19 +40,19 @@ module Mulukhiya
 
       def pixel_size
         return nil if mediatype == 'audio'
-        size = meta.dig('original', 'size')
-        size ||= "#{meta.dig('original', 'width')}x#{meta.dig('original', 'height')}"
+        size = meta.dig(:original, :size)
+        size ||= "#{meta.dig(:original, :width)}x#{meta.dig(:original, :height)}"
         return size
       end
 
       def duration
-        return meta.dig('original', 'duration')&.round(3)
+        return meta.dig(:original, :duration)&.round(3)
       end
 
       alias type file_content_type
 
       def meta
-        @meta ||= JSON.parse(self[:file_meta])
+        @meta ||= JSON.parse(self[:file_meta]).deep_symbolize_keys
         return @meta
       rescue
         return {}
