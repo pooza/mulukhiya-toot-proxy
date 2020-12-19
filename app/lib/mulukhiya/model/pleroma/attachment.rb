@@ -10,17 +10,45 @@ module Mulukhiya
         return uri.path.split('/').last
       end
 
-      def size
-        unless @size
-          File.write(path, HTTP.new.get(uri)) unless File.exist?(path)
-          storage = MediaMetadataStorage.new
-          storage.push(path) unless storage.get(path)
-          @size = storage.get(path)['size']
+      def to_h
+        unless @hash
+          @hash = data.deep_symbolize_keys.merge(
+            id: id,
+            file_name: name,
+            file_size_str: size_str,
+            pixel_size: pixel_size,
+            duration: duration,
+            type: type,
+            mediatype: mediatype,
+            url: uri.to_s,
+            thumbnail_url: uri.to_s,
+            meta: meta,
+            created_at: date,
+            created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
+            acct: account&.acct&.to_s,
+          )
+          @hash.deep_compact!
         end
+        return @hash
+      end
+
+      def size
+        @size ||= meta[:size]
         return @size
       rescue => e
         logger.error(error: e, path: path)
         return 0
+      end
+
+      def pixel_size
+        return nil unless meta[:width]
+        return nil unless meta[:height]
+        return "#{meta[:width]}x#{meta[:height]}"
+      end
+
+      def duration
+        return nil unless meta[:duration]
+        return meta[:duration].to_f.round(3)
       end
 
       def description
@@ -36,6 +64,16 @@ module Mulukhiya
         return @uri
       end
 
+      def meta
+        File.write(path, HTTP.new.get(uri)) unless File.exist?(path)
+        storage = MediaMetadataStorage.new
+        storage.push(path) unless storage.get(path)
+        return storage.get(path)
+      rescue => e
+        logger.error(error: e, path: path)
+        return nil
+      end
+
       def data
         @data ||= JSON.parse(values[:data]).deep_symbolize_keys
         return @data
@@ -45,18 +83,6 @@ module Mulukhiya
         return File.join(Environment.dir, 'tmp/media/', Digest::SHA1.hexdigest(
           [id, config['/crypt/salt']].to_json,
         ))
-      end
-
-      def to_h
-        unless @hash
-          @hash = data.merge(
-            type: type,
-            subtype: subtype,
-            url: uri.to_s,
-          )
-          @hash.deep_compact!
-        end
-        return @hash
       end
 
       def feed_entry
@@ -90,6 +116,17 @@ module Mulukhiya
           attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
           attachment.date = Time.parse(time).getlocal
           yield attachment.feed_entry
+        end
+      end
+
+      def self.catalog
+        return enum_for(__method__) unless block_given?
+        return Postgres.instance.execute('media_catalog', query_params).each do |row|
+          time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
+          attachment = Attachment.get(uri: row['uri'])
+          attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
+          attachment.date = Time.parse(time).getlocal
+          yield attachment.to_h.merge(status_url: row['status_uri'])
         end
       end
     end

@@ -11,7 +11,7 @@ module Mulukhiya
             file_name: name,
             file_size_str: size_str,
             type: type,
-            subtype: subtype,
+            mediatype: mediatype,
             created_at: date,
             created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
             meta: meta,

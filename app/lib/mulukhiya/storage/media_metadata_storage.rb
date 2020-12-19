@@ -9,7 +9,7 @@ module Mulukhiya
     def get(path)
       key = Digest::SHA1.hexdigest(File.read(path))
       return nil unless entry = super(create_key(key))
-      return JSON.parse(entry)
+      return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       @logger.error(error: e, key: key)
       return nil

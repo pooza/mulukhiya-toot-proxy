@@ -1,6 +1,6 @@
 module Mulukhiya
   module AttachmentMethods
-    def subtype
+    def mediatype
       return type.split('/').first
     end
 

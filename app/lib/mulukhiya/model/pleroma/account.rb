@@ -25,7 +25,7 @@ module Mulukhiya
       def acct
         unless @acct
           @acct = Acct.new("@#{nickname}")
-          @acct.host ||= Environment.domain_name
+          @acct = Acct.new("@#{nickname}@#{Environment.domain_name}") unless @acct.host
         end
         return @acct
       end
