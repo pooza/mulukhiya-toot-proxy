@@ -9,6 +9,10 @@ module Mulukhiya
       @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
     end
 
+    def test_values
+      assert_kind_of(Hash, @png.values)
+    end
+
     def test_image?
       assert(@png.image?)
       assert_false(@mp3.image?)

@@ -76,15 +76,15 @@ module Mulukhiya
     alias valid_exename? recommended_extname?
 
     def width
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return nil
     end
 
     def height
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return nil
     end
 
     def duration
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return nil
     end
 
     def aspect

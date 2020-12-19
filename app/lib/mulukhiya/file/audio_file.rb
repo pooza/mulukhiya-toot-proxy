@@ -1,7 +1,5 @@
 module Mulukhiya
   class AudioFile < MediaFile
-    alias audio? valid?
-
     def values
       return {
         type: type,
@@ -27,14 +25,6 @@ module Mulukhiya
     def subtype
       return "x-#{audio_stream['codec_name'].downcase}" if invalid_mediatype?
       return super
-    end
-
-    def width
-      return nil
-    end
-
-    def height
-      return nil
     end
 
     def duration

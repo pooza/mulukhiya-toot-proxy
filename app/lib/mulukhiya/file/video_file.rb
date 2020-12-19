@@ -1,7 +1,5 @@
 module Mulukhiya
   class VideoFile < MediaFile
-    alias video? valid?
-
     def values
       return {
         type: type,

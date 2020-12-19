@@ -7,6 +7,11 @@ module Mulukhiya
       @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
     end
 
+    def test_values
+      assert_kind_of(Hash, @mp4.values)
+      assert_kind_of(Hash, @mkv.values)
+    end
+
     def test_video?
       assert(@mp4.video?)
       assert(@mkv.video?)
