@@ -23,6 +23,37 @@ module Mulukhiya
       return mimemagic&.subtype
     end
 
+    def image?
+      return mediatype == 'image'
+    end
+
+    def image_file
+      return ImageFile.new(path)
+    end
+
+    def video?
+      return mediatype == 'video'
+    end
+
+    def video_file
+      return VideoFile.new(path)
+    end
+
+    def audio?
+      return mediatype == 'audio'
+    end
+
+    def audio_file
+      return AudioFile.new(path)
+    end
+
+    def file
+      return image_file if image?
+      return video_file if video?
+      return audio_file if audio?
+      return
+    end
+
     def type
       return mimemagic.to_s
     end

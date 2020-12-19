@@ -4,6 +4,15 @@ module Mulukhiya
       return type.split('/').first
     end
 
+    def logger
+      @logger ||= Logger.new
+      return @logger
+    end
+
+    def config
+      return Config.instance
+    end
+
     def size_str
       ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
         unitsize = 1024.pow(i)

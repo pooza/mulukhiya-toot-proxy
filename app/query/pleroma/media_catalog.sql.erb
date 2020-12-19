@@ -1,0 +1,26 @@
+<%# encoding: UTF-8 -%>
+SELECT *
+FROM
+  (
+    SELECT
+      jsonb_array_elements(data->'attachment')->'url'->0->'mediaType'->>0 AS type,
+      inserted_at AS created_at,
+      jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS uri,
+      objects_actor.actor[5] AS username,
+      objects_actor.actor[3] AS host,
+      objects_base.id AS status_id,
+      data->>'id' AS status_uri
+    FROM
+      objects AS objects_base
+      INNER JOIN (
+        SELECT
+          id,
+          regexp_split_to_array(data->>'actor', '/') AS actor
+        FROM objects
+      ) AS objects_actor ON objects_base.id=objects_actor.id
+    WHERE (data->'attachment' IS NOT NULL)
+    ORDER BY
+      objects_base.id DESC
+  ) AS t
+WHERE status_uri LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%'
+LIMIT <%= params[:limit] %> OFFSET 0

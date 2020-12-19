@@ -2,6 +2,20 @@ module Mulukhiya
   class VideoFile < MediaFile
     alias video? valid?
 
+    def values
+      return {
+        type: type,
+        mediatype: mediatype,
+        subtype: subtype,
+        duration: duration,
+        width: width,
+        height: height,
+        size: size,
+      }
+    end
+
+    alias to_h values
+
     def type
       return [mediatype, subtype].join('/') if invalid_mediatype?
       return super

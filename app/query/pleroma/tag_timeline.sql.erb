@@ -27,7 +27,7 @@ FROM
       ap_id AS uri,
       CASE (email IS NULL)
         WHEN true THEN '@' || nickname
-        WHEN false THEN '@' || nickname || '@#{env.domain_name}'
+        WHEN false THEN '@' || nickname || '<%= Mulukhiya::Environment.domain_name %>'
       END AS acct,
       name
     FROM users

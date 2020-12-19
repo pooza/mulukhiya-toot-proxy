@@ -158,8 +158,6 @@ test:
         - meisskey_controller
         - mongo
         - misskey_auth_contract
-        - media_atom_feed_renderer
-        - attachment
     - name: dropbox
       cases:
         - dropbox_clipper
@@ -536,6 +534,7 @@ pleroma:
   sns_type: mastodon
   url: https://pleroma.example.com/
   webhook: true
+  media_catalog: true
   feed: true
   annict: true
   dbms: postgres
@@ -803,6 +802,10 @@ artist_parser:
 user_config:
   redis:
     dsn: redis://localhost:6379/1
+media:
+  metadata:
+    cache:
+      ttl: 86400
 postgres:
   dsn: null
 mongo:

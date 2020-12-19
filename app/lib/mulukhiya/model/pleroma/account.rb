@@ -73,7 +73,9 @@ module Mulukhiya
       def self.get(key)
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          return first(nickname: acct.to_s.sub(/^@/, ''))
+          nickname = acct.username if acct.local?
+          nickname ||= acct.to_s.sub(/^@/, '')
+          return first(nickname: nickname)
         elsif key.key?(:token)
           return nil if key[:token].nil?
           account = AccessToken.first(token: key[:token]).account
