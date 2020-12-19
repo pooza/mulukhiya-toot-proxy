@@ -75,8 +75,7 @@ module Mulukhiya
 
     def test_feed_list
       get '/feed/list'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
+      assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
 
       uri = Environment.sns_class.new.create_uri('/feed/list')
