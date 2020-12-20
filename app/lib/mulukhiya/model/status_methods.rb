@@ -1,5 +1,5 @@
 module Mulukhiya
-  module AccessTokenMethods
+  module StatusMethods
     def logger
       @logger ||= Logger.new
       return @logger
@@ -9,8 +9,8 @@ module Mulukhiya
       return Config.instance
     end
 
-    def webhook_digest
-      return Webhook.create_digest(Environment.sns_class.new.uri, to_s)
+    def visible?
+      return visibility == 'public'
     end
 
     def self.included(base)

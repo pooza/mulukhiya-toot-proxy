@@ -61,10 +61,6 @@ module Mulukhiya
         }
       end
 
-      def self.logger
-        return Logger.new
-      end
-
       def self.query_params
         config = Config.instance
         return {

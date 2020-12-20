@@ -1,5 +1,7 @@
 module Mulukhiya
   module Pleroma
+    include StatusMethods
+
     class Status
       attr_reader :id
 

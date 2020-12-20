@@ -80,12 +80,7 @@ module Mulukhiya
         }
       end
 
-      def self.logger
-        return Logger.new
-      end
-
       def self.query_params
-        config = Config.instance
         return {
           limit: config['/feed/media/limit'],
           test_usernames: config['/feed/test_usernames'],

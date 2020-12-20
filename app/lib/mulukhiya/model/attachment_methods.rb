@@ -2,10 +2,6 @@ require 'digest/sha1'
 
 module Mulukhiya
   module AttachmentMethods
-    def mediatype
-      return type.split('/').first
-    end
-
     def logger
       @logger ||= Logger.new
       return @logger
@@ -13,6 +9,10 @@ module Mulukhiya
 
     def config
       return Config.instance
+    end
+
+    def mediatype
+      return type.split('/').first
     end
 
     def pixel_size
@@ -48,6 +48,20 @@ module Mulukhiya
         return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
       end
       raise 'Too large'
+    end
+
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def logger
+        return Logger.new
+      end
+
+      def config
+        return Config.instance
+      end
     end
   end
 end

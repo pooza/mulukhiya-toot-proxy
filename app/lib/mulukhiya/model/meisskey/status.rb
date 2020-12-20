@@ -1,6 +1,8 @@
 module Mulukhiya
   module Meisskey
     class Status < MongoCollection
+      include StatusMethods
+
       def account
         return Account.new(values['userId'])
       end
@@ -11,10 +13,6 @@ module Mulukhiya
 
       def local?
         return acct.host == Environment.domain_name
-      end
-
-      def visible?
-        return visibility == 'public'
       end
 
       def uri
@@ -53,7 +51,7 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        @logger.error(error: e)
+        logger.error(error: e)
         template = Template.new('status_clipping.md')
         template[:account] = account
         template[:status] = NoteParser.new(text).to_md

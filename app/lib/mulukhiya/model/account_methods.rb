@@ -94,5 +94,19 @@ module Mulukhiya
     def tags
       return config['/tagging/user_tags'] || []
     end
+
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def logger
+        return Logger.new
+      end
+
+      def config
+        return Config.instance
+      end
+    end
   end
 end
