@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class HashTag < Sequel::Model(:hashtag)
+      include Package
       include HashTagMethods
 
       def to_h

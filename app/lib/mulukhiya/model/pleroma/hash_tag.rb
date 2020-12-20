@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class HashTag
+      include Package
       include HashTagMethods
       attr_reader :name
 

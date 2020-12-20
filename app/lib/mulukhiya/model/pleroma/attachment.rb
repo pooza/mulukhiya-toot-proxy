@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class Attachment < Sequel::Model(:objects)
+      include Package
       include AttachmentMethods
       attr_accessor :account, :date
 

@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class Account < MongoCollection
+      include Package
       include AccountMethods
 
       def to_h

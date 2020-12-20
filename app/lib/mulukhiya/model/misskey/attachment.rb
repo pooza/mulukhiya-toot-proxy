@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class Attachment < Sequel::Model(:drive_file)
+      include Package
       include AttachmentMethods
       many_to_one :account, key: :userId
 

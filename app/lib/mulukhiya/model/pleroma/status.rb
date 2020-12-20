@@ -1,8 +1,8 @@
 module Mulukhiya
   module Pleroma
-    include StatusMethods
-
     class Status
+      include Package
+      include StatusMethods
       attr_reader :id
 
       def initialize(id)

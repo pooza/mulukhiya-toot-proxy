@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class Attachment < MongoCollection
+      include Package
       include AttachmentMethods
 
       def to_h

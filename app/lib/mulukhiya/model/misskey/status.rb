@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class Status < Sequel::Model(:note)
+      include Package
       include StatusMethods
       many_to_one :account, key: :userId
 

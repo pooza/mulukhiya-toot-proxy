@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class AccessToken < Sequel::Model(:oauth_tokens)
+      include Package
       include AccessTokenMethods
       many_to_one :account, key: :user_id
       many_to_one :application, key: :app_id
