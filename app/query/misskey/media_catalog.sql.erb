@@ -25,8 +25,12 @@ FROM drive_file
       AND (note."userHost" IS NULL)
       AND (note."visibility" IN ('public', 'home'))
       AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
-    GROUP BY note_id, file_id, "user".id
-    ORDER BY note."createdAt" DESC
+    GROUP BY
+      note_id,
+      file_id,
+      "user".id
+    ORDER BY
+      note."createdAt" DESC
     LIMIT <%= params[:limit] %> OFFSET 0
   ) AS note_file ON drive_file.id=note_file.file_id
 ORDER BY note_file."createdAt" DESC

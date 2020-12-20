@@ -8,7 +8,7 @@ FROM oauth_access_tokens AS tokens
 WHERE (accounts.domain IS NULL)
   AND (accounts.silenced_at IS NULL)
   AND (accounts.suspended_at IS NULL)
-  AND (users.disabled='f')
+  AND (users.disabled = 'FALSE')
   AND (apps.name='mulukhiya-toot-proxy')
   AND (tokens.expires_in IS NULL)
   AND (tokens.revoked_at IS NULL)

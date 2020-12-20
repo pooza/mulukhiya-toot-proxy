@@ -8,46 +8,45 @@ SELECT
   statuses.username,
   statuses.host,
   statuses.created_at
-FROM
-  (
+FROM (
+  SELECT
+    objects_base.id,
+    data->>'id' AS uri,
+    jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
+    objects_actor.actor[5] AS username,
+    objects_actor.actor[3] AS host,
+    inserted_at AS created_at
+  FROM objects AS objects_base
+    INNER JOIN (
+      SELECT
+        id,
+        regexp_split_to_array(data->>'actor', '/') AS actor
+      FROM objects
+    ) AS objects_actor ON objects_base.id=objects_actor.id
+  WHERE (data->'attachment' IS NOT NULL)
+    AND (data->>'id' LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%')
+  ORDER BY
+    objects_base.id DESC
+  LIMIT <%= params[:limit] %> OFFSET 0
+) AS statuses
+INNER JOIN (
+  SELECT
+    max(id) AS id,
+    uri,
+    max(type) AS type,
+    max(created_at) AS created_at
+  FROM (
     SELECT
-      objects_base.id,
-      data->>'id' AS uri,
-      jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
-      objects_actor.actor[5] AS username,
-      objects_actor.actor[3] AS host,
+      id,
+      data->'url'->0->>'href' AS uri,
+      data->'url'->0->>'mediaType' AS type,
       inserted_at AS created_at
-    FROM
-      objects AS objects_base
-      INNER JOIN (
-        SELECT
-          id,
-          regexp_split_to_array(data->>'actor', '/') AS actor
-        FROM objects
-      ) AS objects_actor ON objects_base.id=objects_actor.id
-    WHERE (data->'attachment' IS NOT NULL)
-      AND (data->>'id' LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%')
-    ORDER BY
-      objects_base.id DESC
-    LIMIT <%= params[:limit] %> OFFSET 0
-  ) AS statuses
-  INNER JOIN (
-    SELECT
-      max(id) AS id,
-      uri,
-      max(type) AS type,
-      max(created_at) AS created_at
-    FROM
-      (
-        SELECT
-          id,
-          data->'url'->0->>'href' AS uri,
-          data->'url'->0->>'mediaType' AS type,
-          inserted_at AS created_at
-        FROM objects
-        WHERE (data->>'mediaType' IS NOT NULL)
-      ) AS t
-    GROUP BY uri
-    ORDER BY created_at DESC
-  ) AS attachments ON statuses.attachment_uri=attachments.uri
+    FROM objects
+    WHERE (data->>'mediaType' IS NOT NULL)
+  ) AS t
+  GROUP BY
+    uri
+  ORDER BY
+    created_at DESC
+) AS attachments ON statuses.attachment_uri=attachments.uri
 ORDER BY created_at DESC
