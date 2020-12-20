@@ -49,10 +49,10 @@ FROM
           objects
         WHERE (data->>'mediaType' IS NOT null)
       ) AS t
-  GROUP BY
-    uri
-  ORDER BY
-    created_at DESC
+    GROUP BY
+      uri
+    ORDER BY
+      created_at DESC
   ) AS attachments ON statuses.attachment_uri = attachments.uri
 ORDER BY
   created_at DESC
