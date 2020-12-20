@@ -1,10 +1,11 @@
 <%# encoding: UTF-8 -%>
 SELECT
   tokens.id
-FROM oauth_access_tokens AS tokens
-  INNER JOIN oauth_applications AS apps ON tokens.application_id=apps.id
-  INNER JOIN users ON tokens.resource_owner_id=users.id
-  INNER JOIN accounts ON accounts.id=users.account_id
+FROM
+  oauth_access_tokens AS tokens
+  INNER JOIN oauth_applications AS apps ON tokens.application_id = apps.id
+  INNER JOIN users ON tokens.resource_owner_id = users.id
+  INNER JOIN accounts ON accounts.id = users.account_id
 WHERE (accounts.domain IS NULL)
   AND (accounts.silenced_at IS NULL)
   AND (accounts.suspended_at IS NULL)

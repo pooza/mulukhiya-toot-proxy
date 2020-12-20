@@ -10,7 +10,8 @@ SELECT
   note_file.visibility,
   note_file.username,
   note_file.display_name
-FROM drive_file
+FROM
+  drive_file
   INNER JOIN (
     SELECT
       note.id as note_id,
@@ -19,11 +20,13 @@ FROM drive_file
       note."createdAt",
       "user".username,
       "user".name AS display_name
-    FROM note
-      INNER JOIN "user" ON note."userId"="user".id
+    FROM
+      note
+      INNER JOIN "user" ON note."userId" = "user".id
     WHERE (0 < array_length(note."fileIds", 1))
       AND (note."userHost" IS NULL)
       AND (note."visibility" IN ('public', 'home'))
+      AND ("user".isBot = false)
       AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
     GROUP BY
       note_id,
@@ -32,5 +35,6 @@ FROM drive_file
     ORDER BY
       note."createdAt" DESC
     LIMIT <%= params[:limit] %> OFFSET 0
-  ) AS note_file ON drive_file.id=note_file.file_id
-ORDER BY note_file."createdAt" DESC
+  ) AS note_file ON drive_file.id = note_file.file_id
+ORDER BY
+  note_file."createdAt" DESC
