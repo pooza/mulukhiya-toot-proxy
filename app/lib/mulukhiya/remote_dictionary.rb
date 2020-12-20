@@ -1,5 +1,7 @@
 module Mulukhiya
   class RemoteDictionary
+    include Package
+
     def parse
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -19,7 +21,6 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      logger = Logger.new
       Config.instance['/tagging/dictionaries'].each do |dic|
         yield RemoteDictionary.create(dic)
       rescue => e
@@ -56,7 +57,6 @@ module Mulukhiya
 
     def initialize(params)
       @params = params.key_flatten
-      @logger = Logger.new
       @http = HTTP.new
     end
   end

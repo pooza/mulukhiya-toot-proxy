@@ -8,7 +8,7 @@ module Mulukhiya
           result[create_key(entry[field])] ||= create_entry(entry[field])
         end
       rescue => e
-        @logger.error(error: e, dic: uri.to_s, entry: entry)
+        logger.error(error: e, dic: uri.to_s, entry: entry)
       end
       return result
     end

@@ -27,9 +27,9 @@ module Mulukhiya
 
     def max_length
       if Environment.mastodon_type?
-        length = @config["/#{Environment.controller_name}/status/max_length"]
+        length = config["/#{Environment.controller_name}/status/max_length"]
       else
-        length = @config['/mastodon/status/max_length']
+        length = config['/mastodon/status/max_length']
       end
       length = length - all_tags.join(' ').length - 1 if all_tags.present?
       return length

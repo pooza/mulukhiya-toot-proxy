@@ -1,9 +1,9 @@
 module Mulukhiya
   class ArtistParser
+    include Package
+
     def initialize(source, depth = 0)
       @source = source.nfkc
-      @config = Config.instance
-      @logger = Logger.new
       @depth = depth + 1
       @max_depth = 3
     end
@@ -24,7 +24,7 @@ module Mulukhiya
       tags.push(@source)
       return tags
     rescue => e
-      @logger.error(error: e)
+      logger.error(error: e)
       return []
     end
 
@@ -47,7 +47,7 @@ module Mulukhiya
 
     def patterns
       return enum_for(__method__) unless block_given?
-      @config['/artist_parser/patterns'].each do |entry|
+      config['/artist_parser/patterns'].each do |entry|
         output = {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def delimiters
-      return Regexp.new(@config['/artist_parser/delimiter_pattern'])
+      return Regexp.new(config['/artist_parser/delimiter_pattern'])
     end
   end
 end
