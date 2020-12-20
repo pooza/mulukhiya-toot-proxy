@@ -37,9 +37,9 @@ module Mulukhiya
         client = http.post('/api/app/create', {
           body: {
             name: package_class.name,
-            description: @config['/package/description'],
-            permission: @config['/meisskey/oauth/scopes'],
-            callbackUrl: http.create_uri(@config['/meisskey/oauth/callback_url']).to_s,
+            description: config['/package/description'],
+            permission: config['/meisskey/oauth/scopes'],
+            callbackUrl: http.create_uri(config['/meisskey/oauth/callback_url']).to_s,
           }.to_json,
         }).body
         redis.set('oauth_client', client)
@@ -67,7 +67,7 @@ module Mulukhiya
     end
 
     def default_token
-      return @config['/agent/test/token']
+      return config['/agent/test/token']
     end
   end
 end

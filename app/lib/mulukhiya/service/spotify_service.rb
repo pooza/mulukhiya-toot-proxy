@@ -1,10 +1,10 @@
 module Mulukhiya
   class SpotifyService
+    include Package
+
     def initialize
-      @config = Config.instance
-      @logger = Logger.new
-      ENV['ACCEPT_LANGUAGE'] ||= @config['/spotify/language']
-      RSpotify.authenticate(@config['/spotify/client/id'], @config['/spotify/client/secret'])
+      ENV['ACCEPT_LANGUAGE'] ||= config['/spotify/language']
+      RSpotify.authenticate(config['/spotify/client/id'], config['/spotify/client/secret'])
     end
 
     def search_track(keyword)
@@ -14,7 +14,7 @@ module Mulukhiya
       return tracks.first
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -26,7 +26,7 @@ module Mulukhiya
       return RSpotify::Album.find(id)
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -38,7 +38,7 @@ module Mulukhiya
       return RSpotify::Track.find(id)
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -50,14 +50,14 @@ module Mulukhiya
       return RSpotify::Artist.find(id)
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
     end
 
     def create_track_uri(track)
-      uri = SpotifyURI.parse(@config['/spotify/urls/track'])
+      uri = SpotifyURI.parse(config['/spotify/urls/track'])
       uri.track_id = track.id
       return nil unless uri&.absolute?
       return uri
@@ -82,7 +82,6 @@ module Mulukhiya
     end
 
     def self.config?
-      config = Config.instance
       config['/spotify/client/id']
       config['/spotify/client/secret']
       SpotifyService.new
@@ -98,7 +97,7 @@ module Mulukhiya
     end
 
     def retry_limit
-      return @config['/spotify/retry_limit']
+      return config['/spotify/retry_limit']
     end
   end
 end

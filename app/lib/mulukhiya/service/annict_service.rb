@@ -2,10 +2,10 @@ require 'time'
 
 module Mulukhiya
   class AnnictService
+    include Package
     attr_reader :timestamps, :accounts
 
     def initialize(token = nil)
-      @config = Config.instance
       @token = token
       @timestamps = AnnictTimestampStorage.new
       @accounts = AnnictAccountStorage.new
@@ -24,13 +24,13 @@ module Mulukhiya
       uri = api_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
-        fields: @config['/annict/api/records/fields'].join(','),
+        fields: config['/annict/api/records/fields'].join(','),
         page: 1,
-        per_page: @config['/annict/api/records/limit'],
+        per_page: config['/annict/api/records/limit'],
         sort_id: 'desc',
         access_token: @token,
       }
-      sleep(@config['/annict/sleep/seconds'])
+      sleep(config['/annict/sleep/seconds'])
       api_service.get(uri)['activities'].each do |activity|
         next unless activity['action'] == 'create_record'
         yield activity
@@ -51,13 +51,13 @@ module Mulukhiya
         uri = api_service.create_uri('/v1/reviews')
         uri.query_values = {
           filter_work_id: work['work']['id'],
-          fields: @config['/annict/api/reviews/fields'].join(','),
+          fields: config['/annict/api/reviews/fields'].join(','),
           page: 1,
-          per_page: @config['/annict/api/reviews/limit'],
+          per_page: config['/annict/api/reviews/limit'],
           sort_id: 'desc',
           access_token: @token,
         }
-        sleep(@config['/annict/sleep/seconds'])
+        sleep(config['/annict/sleep/seconds'])
         api_service.get(uri)['reviews'].each do |review|
           next unless review['user']['id'] == account['id']
           yield review
@@ -70,13 +70,13 @@ module Mulukhiya
       uri = api_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
-        fields: @config['/annict/api/reviewed_works/fields'].join(','),
+        fields: config['/annict/api/reviewed_works/fields'].join(','),
         page: 1,
-        per_page: @config['/annict/api/reviewed_works/limit'],
+        per_page: config['/annict/api/reviewed_works/limit'],
         sort_id: 'desc',
         access_token: @token,
       }
-      sleep(@config['/annict/sleep/seconds'])
+      sleep(config['/annict/sleep/seconds'])
       api_service.get(uri)['activities'].each do |activity|
         next unless activity['action'] == 'create_review'
         yield activity
@@ -88,7 +88,7 @@ module Mulukhiya
       body_template[type] = values.deep_stringify_keys
       title_template = Template.new("annict/#{type}_title")
       title_template[type] = values.deep_stringify_keys
-      if body_template.to_s.match?(@config['/annict/spoiler/pattern'])
+      if body_template.to_s.match?(config['/annict/spoiler/pattern'])
         body = {
           'spoiler_text' => "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）",
           'text' => body_template.to_s.lstrip,
@@ -105,10 +105,10 @@ module Mulukhiya
       unless accounts[@token]
         uri = api_service.create_uri('/v1/me')
         uri.query_values = {
-          fields: @config['/annict/api/me/fields'].join(','),
+          fields: config['/annict/api/me/fields'].join(','),
           access_token: @token,
         }
-        sleep(@config['/annict/sleep/seconds'])
+        sleep(config['/annict/sleep/seconds'])
         accounts[@token] = api_service.get(uri).parsed_response
       end
       return accounts[@token]
@@ -132,7 +132,7 @@ module Mulukhiya
     def api_service
       unless @api_service
         @api_service = HTTP.new
-        @api_service.base_uri = @config['/annict/urls/api']
+        @api_service.base_uri = config['/annict/urls/api']
       end
       return @api_service
     end
@@ -140,7 +140,7 @@ module Mulukhiya
     def oauth_service
       unless @oauth_service
         @oauth_service = HTTP.new
-        @oauth_service.base_uri = @config['/annict/urls/oauth']
+        @oauth_service.base_uri = config['/annict/urls/oauth']
       end
       return @oauth_service
     end
@@ -150,7 +150,7 @@ module Mulukhiya
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
-          'redirect_uri' => @config['/annict/oauth/redirect_uri'],
+          'redirect_uri' => config['/annict/oauth/redirect_uri'],
           'client_id' => AnnictService.client_id,
           'client_secret' => AnnictService.client_secret,
           'code' => code,
@@ -163,20 +163,20 @@ module Mulukhiya
       uri.query_values = {
         client_id: AnnictService.client_id,
         response_type: 'code',
-        redirect_uri: @config['/annict/oauth/redirect_uri'],
-        scope: @config['/annict/oauth/scopes'].join(' '),
+        redirect_uri: config['/annict/oauth/redirect_uri'],
+        scope: config['/annict/oauth/scopes'].join(' '),
       }
       return uri
     end
 
     def self.client_id
-      return Config.instance['/annict/oauth/client/id']
+      return config['/annict/oauth/client/id']
     rescue Ginseng::ConfigError
       return nil
     end
 
     def self.client_secret
-      return Config.instance['/annict/oauth/client/secret']
+      return config['/annict/oauth/client/secret']
     rescue Ginseng::ConfigError
       return nil
     end
