@@ -5,8 +5,8 @@ module Mulukhiya
 
     def perform
       UserConfigStorage.accounts do |account|
-        next unless account.config['/tagging/user_tags'].present?
-        account.config.update(tagging: {user_tags: nil})
+        next unless account.user_config['/tagging/user_tags'].present?
+        account.user_config.update(tagging: {user_tags: nil})
       end
     end
   end

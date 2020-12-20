@@ -5,8 +5,8 @@ namespace :mulukhiya do
       task :list do
         list = []
         Mulukhiya::UserConfigStorage.accounts do |account|
-          next unless account.config['/tagging/user_tags'].present?
-          list.push('account' => account.acct.to_s, 'tags' => account.config.tags)
+          next unless account.user_config['/tagging/user_tags'].present?
+          list.push('account' => account.acct.to_s, 'tags' => account.user_config.tags)
         end
         puts list.to_yaml if list.present?
       end

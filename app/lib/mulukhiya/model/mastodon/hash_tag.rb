@@ -1,6 +1,7 @@
 module Mulukhiya
   module Mastodon
     class HashTag < Sequel::Model(:tags)
+      include Package
       include HashTagMethods
 
       def to_h

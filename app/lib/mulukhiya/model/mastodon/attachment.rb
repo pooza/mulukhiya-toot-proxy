@@ -3,6 +3,7 @@ require 'time'
 module Mulukhiya
   module Mastodon
     class Attachment < Sequel::Model(:media_attachments)
+      include Package
       include AttachmentMethods
       many_to_one :status
 

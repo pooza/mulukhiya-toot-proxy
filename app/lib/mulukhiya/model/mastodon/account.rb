@@ -1,6 +1,7 @@
 module Mulukhiya
   module Mastodon
     class Account < Sequel::Model(:accounts)
+      include Package
       include AccountMethods
       one_to_one :user
       attr_accessor :token

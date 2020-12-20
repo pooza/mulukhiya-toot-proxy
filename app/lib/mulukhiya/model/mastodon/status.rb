@@ -1,6 +1,7 @@
 module Mulukhiya
   module Mastodon
     class Status < Sequel::Model(:statuses)
+      include Package
       include StatusMethods
       one_to_many :attachment
       many_to_one :account
