@@ -2,8 +2,7 @@ module Mulukhiya
   class DropboxAnnouncementHandlerTest < TestCase
     def setup
       @handler = Handler.create('dropbox_announcement')
-      @config = Config.instance
-      @config['/agent/info/token'] = @config['/agent/test/token']
+      config['/agent/info/token'] = config['/agent/test/token']
     end
 
     def test_handle_announce

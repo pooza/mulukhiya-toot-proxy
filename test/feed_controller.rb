@@ -2,10 +2,6 @@ module Mulukhiya
   class FeedControllerTest < TestCase
     include ::Rack::Test::Methods
 
-    def setup
-      @config = Config.instance
-    end
-
     def app
       return FeedController
     end

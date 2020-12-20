@@ -1,9 +1,5 @@
 module Mulukhiya
   class SpotifyURITest < TestCase
-    def setup
-      @config = Config.instance
-    end
-
     def test_spotify?
       uri = SpotifyURI.parse('https://google.com')
       assert_false(uri.spotify?)

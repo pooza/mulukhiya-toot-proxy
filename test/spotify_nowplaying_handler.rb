@@ -1,7 +1,6 @@
 module Mulukhiya
   class SpotifyNowplayingHandlerTest < TestCase
     def setup
-      @config = Config.instance
       @handler = Handler.create('spotify_nowplaying')
     end
 

@@ -1,8 +1,7 @@
 module Mulukhiya
   class StringTest < TestCase
     def setup
-      @config = Config.instance
-      @config['/crypt/encoder'] = 'base64'
+      config['/crypt/encoder'] = 'base64'
     end
 
     def test_escape_toot
