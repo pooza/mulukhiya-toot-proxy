@@ -6,13 +6,13 @@ FROM
   INNER JOIN oauth_applications AS apps ON tokens.application_id = apps.id
   INNER JOIN users ON tokens.resource_owner_id = users.id
   INNER JOIN accounts ON accounts.id = users.account_id
-WHERE (accounts.domain IS NULL)
-  AND (accounts.silenced_at IS NULL)
-  AND (accounts.suspended_at IS NULL)
-  AND (users.disabled = 'FALSE')
+WHERE (accounts.domain IS null)
+  AND (accounts.silenced_at IS null)
+  AND (accounts.suspended_at IS null)
+  AND (users.disabled = false)
   AND (apps.name='mulukhiya-toot-proxy')
-  AND (tokens.expires_in IS NULL)
-  AND (tokens.revoked_at IS NULL)
+  AND (tokens.expires_in IS null)
+  AND (tokens.revoked_at IS null)
 GROUP BY
   tokens.id,
   accounts.id

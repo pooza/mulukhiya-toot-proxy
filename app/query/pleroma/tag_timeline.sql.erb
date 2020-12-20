@@ -27,7 +27,7 @@ FROM
   INNER JOIN (
     SELECT
       ap_id AS uri,
-      CASE (email IS NULL)
+      CASE (email IS null)
         WHEN true THEN '@' || nickname
         WHEN false THEN '@' || nickname || '<%= Mulukhiya::Environment.domain_name %>'
       END AS acct,

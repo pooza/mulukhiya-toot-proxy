@@ -24,7 +24,7 @@ FROM
       note
       INNER JOIN "user" ON note."userId" = "user".id
     WHERE (0 < array_length(note."fileIds", 1))
-      AND (note."userHost" IS NULL)
+      AND (note."userHost" IS null)
       AND (note."visibility" IN ('public', 'home'))
       AND ("user"."isBot" = false)
       AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))

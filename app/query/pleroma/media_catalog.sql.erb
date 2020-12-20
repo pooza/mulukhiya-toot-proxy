@@ -26,7 +26,7 @@ FROM
         FROM
           objects
       ) AS objects_actor ON objects_base.id = objects_actor.id
-    WHERE (data->'attachment' IS NOT NULL)
+    WHERE (data->'attachment' IS NOT null)
       AND (data->>'id' LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%')
     ORDER BY
       objects_base.id DESC
@@ -47,7 +47,7 @@ FROM
           inserted_at AS created_at
         FROM
           objects
-        WHERE (data->>'mediaType' IS NOT NULL)
+        WHERE (data->>'mediaType' IS NOT null)
       ) AS t
   GROUP BY
     uri
