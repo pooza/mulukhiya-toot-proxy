@@ -31,11 +31,11 @@ module Mulukhiya
       unless @growi
         raise Ginseng::ConfigError, '/growi/url undefined' unless user_config['/growi/url']
         raise Ginseng::ConfigError, '/growi/token undefined' unless user_config['/growi/token']
+        default_prefix = File.join('/', Package.short_name, 'user', username)
         @growi = GrowiClipper.new(
           uri: user_config['/growi/url'],
           token: user_config['/growi/token'],
-          prefix: user_config['/growi/prefix'] || File.join('/', Package.short_name, 'user',
-                                                            username),
+          prefix: user_config['/growi/prefix'] || default_prefix,
         )
       end
       return @growi

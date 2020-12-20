@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return [loggerconfig['/amazon/cache/ttl'], 86_400].min
+      return [config['/amazon/cache/ttl'], 86_400].min
     end
 
     def prefix

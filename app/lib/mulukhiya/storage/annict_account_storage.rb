@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return loggerconfig['/annict/api/me/cache/ttl']
+      return config['/annict/api/me/cache/ttl']
     end
 
     def prefix
