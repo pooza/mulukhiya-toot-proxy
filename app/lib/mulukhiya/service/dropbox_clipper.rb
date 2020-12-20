@@ -17,7 +17,6 @@ module Mulukhiya
     end
 
     def self.create(params)
-      logger = Logger.new
       account = Environment.account_class[params[:account_id]]
       unless account.user_config['/dropbox/token']
         raise Ginseng::ConfigError, "Account #{account.acct} /dropbox/token undefined"

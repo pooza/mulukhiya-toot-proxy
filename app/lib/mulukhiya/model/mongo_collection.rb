@@ -1,10 +1,10 @@
 module Mulukhiya
   class MongoCollection
+    include Package
     attr_reader :id
 
     def initialize(id)
       @id = id.to_s
-      @logger = Logger.new
     end
 
     def values

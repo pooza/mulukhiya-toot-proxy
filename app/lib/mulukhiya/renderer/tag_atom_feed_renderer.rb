@@ -68,7 +68,7 @@ module Mulukhiya
         bar&.increment
         renderer.cache!
       rescue => e
-        renderer.logger.error(error: e, tag: renderer.tag)
+        logger.error(error: e, tag: renderer.tag)
       end
       bar&.finish
       all do |renderer|

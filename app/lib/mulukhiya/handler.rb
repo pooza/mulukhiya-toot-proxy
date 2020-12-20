@@ -173,7 +173,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern) && !Config.instance.disable?(v)}
+      return names.select {|v| v.match?(pattern) && !config.disable?(v)}
     end
 
     private

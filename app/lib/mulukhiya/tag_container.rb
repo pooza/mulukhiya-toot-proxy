@@ -1,8 +1,6 @@
 module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
-    def self.config
-      return Config.instance
-    end
+    include Package
 
     def self.default_tags
       return config['/tagging/default_tags'].map(&:to_hashtag)

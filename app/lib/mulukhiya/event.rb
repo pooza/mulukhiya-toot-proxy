@@ -1,5 +1,6 @@
 module Mulukhiya
   class Event
+    include Package
     attr_reader :label, :params
 
     def initialize(label, params = {})
@@ -8,8 +9,6 @@ module Mulukhiya
       params[:reporter] ||= Reporter.new
       @label = label.to_sym
       @params = params
-      @config = Config.instance
-      @logger = Logger.new
     end
 
     def name
@@ -21,13 +20,13 @@ module Mulukhiya
       handler_names do |v|
         yield Handler.create(v, params)
       rescue => e
-        @logger.error(error: e, handler: v)
+        logger.error(error: e, handler: v)
       end
     end
 
     def handler_names(&block)
       return enum_for(__method__) unless block
-      @config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
+      config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 
     def reporter

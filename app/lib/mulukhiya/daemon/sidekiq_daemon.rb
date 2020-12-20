@@ -19,10 +19,6 @@ module Mulukhiya
       ].join("\n")
     end
 
-    def self.config
-      return Config.instance
-    end
-
     def self.username
       return config['/sidekiq/auth/user']
     rescue Ginseng::ConfigError
