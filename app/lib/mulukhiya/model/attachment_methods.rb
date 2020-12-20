@@ -14,7 +14,7 @@ module Mulukhiya
 
     def duration
       return nil unless meta[:duration]
-      return meta[:duration].to_f.round(3)
+      return meta[:duration].to_f.round(2)
     end
 
     def meta
