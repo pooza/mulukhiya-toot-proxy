@@ -53,6 +53,6 @@ FROM
     uri
   ORDER BY
     created_at DESC
-) AS attachments ON statuses.attachment_uri = attachments.uri
+  ) AS attachments ON statuses.attachment_uri = attachments.uri
 ORDER BY
   created_at DESC
