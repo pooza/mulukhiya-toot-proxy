@@ -9,7 +9,7 @@ module Mulukhiya
       super
       @sns = Environment.sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
-      @limit = @config['/feed/tag/limit']
+      @limit = config['/feed/tag/limit']
     end
 
     def tag=(tag)
@@ -31,13 +31,13 @@ module Mulukhiya
       return {
         limit: limit,
         tag: tag,
-        test_usernames: @config['/feed/test_usernames'],
+        test_usernames: config['/feed/test_usernames'],
       }
     end
 
     def cache!
       File.write(path, fetch)
-      @logger.info(class: self.class.to_s, message: 'cached', params: params)
+      logger.info(class: self.class.to_s, message: 'cached', params: params)
     end
 
     def path
@@ -101,7 +101,7 @@ module Mulukhiya
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       rescue => e
-        @logger.error(error: e, row: row)
+        logger.error(error: e, row: row)
       end
       @atom = nil
       return atom
