@@ -1,15 +1,22 @@
 <%# encoding: UTF-8 -%>
-SELECT *
+SELECT
+  attachments.id,
+  attachments.uri,
+  attachments.type,
+  statuses.id AS status_id,
+  statuses.uri AS status_uri,
+  statuses.username,
+  statuses.host,
+  statuses.created_at
 FROM
   (
     SELECT
-      jsonb_array_elements(data->'attachment')->'url'->0->'mediaType'->>0 AS type,
-      inserted_at AS created_at,
-      jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS uri,
+      objects_base.id,
+      data->>'id' AS uri,
+      jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
       objects_actor.actor[5] AS username,
       objects_actor.actor[3] AS host,
-      objects_base.id AS status_id,
-      data->>'id' AS status_uri
+      inserted_at AS created_at
     FROM
       objects AS objects_base
       INNER JOIN (
@@ -19,8 +26,28 @@ FROM
         FROM objects
       ) AS objects_actor ON objects_base.id=objects_actor.id
     WHERE (data->'attachment' IS NOT NULL)
+      AND (data->>'id' LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%')
     ORDER BY
       objects_base.id DESC
-  ) AS t
-WHERE status_uri LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%'
-LIMIT <%= params[:limit] %> OFFSET 0
+    LIMIT <%= params[:limit] %> OFFSET 0
+  ) AS statuses
+  INNER JOIN (
+    SELECT
+      max(id) AS id,
+      uri,
+      max(type) AS type,
+      max(created_at) AS created_at
+    FROM
+      (
+        SELECT
+          id,
+          data->'url'->0->>'href' AS uri,
+          data->'url'->0->>'mediaType' AS type,
+          inserted_at AS created_at
+        FROM objects
+        WHERE (data->>'mediaType' IS NOT NULL)
+      ) AS t
+    GROUP BY uri
+    ORDER BY created_at DESC
+  ) AS attachments ON statuses.attachment_uri=attachments.uri
+ORDER BY created_at DESC
