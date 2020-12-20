@@ -9,7 +9,7 @@ module Mulukhiya
       @sns.token = token
       @reporter = Reporter.new
     rescue => e
-      @logger.error(error: e)
+      logger.error(error: e)
       @sns.token = nil
     end
 
@@ -29,12 +29,8 @@ module Mulukhiya
       @renderer.message.delete(:backtrace)
       @renderer.message[:error] = e.message
       Slack.broadcast(e)
-      @logger.error(error: e)
+      logger.error(error: e)
       return @renderer.to_s
-    end
-
-    def self.config
-      return Config.instance
     end
 
     def self.webhook_entries

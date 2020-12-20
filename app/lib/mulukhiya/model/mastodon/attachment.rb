@@ -3,6 +3,7 @@ require 'time'
 module Mulukhiya
   module Mastodon
     class Attachment < Sequel::Model(:media_attachments)
+      include Package
       include AttachmentMethods
       many_to_one :status
 
@@ -80,12 +81,7 @@ module Mulukhiya
         }
       end
 
-      def self.logger
-        return Logger.new
-      end
-
       def self.query_params
-        config = Config.instance
         return {
           limit: config['/feed/media/limit'],
           test_usernames: config['/feed/test_usernames'],

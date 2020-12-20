@@ -2,14 +2,9 @@ require 'time'
 
 module Mulukhiya
   module AccountMethods
-    def logger
-      @logger ||= Logger.new
-      return @logger
-    end
-
-    def config
-      @config ||= UserConfig.new(id)
-      return @config
+    def user_config
+      @user_config ||= UserConfig.new(id)
+      return @user_config
     end
 
     def acct
@@ -26,7 +21,7 @@ module Mulukhiya
     end
 
     def webhook
-      return Webhook.new(config)
+      return Webhook.new(user_config)
     rescue => e
       logger.error(error: e)
       return nil
@@ -34,12 +29,13 @@ module Mulukhiya
 
     def growi
       unless @growi
-        raise Ginseng::ConfigError, '/growi/url undefined' unless config['/growi/url']
-        raise Ginseng::ConfigError, '/growi/token undefined' unless config['/growi/token']
+        raise Ginseng::ConfigError, '/growi/url undefined' unless user_config['/growi/url']
+        raise Ginseng::ConfigError, '/growi/token undefined' unless user_config['/growi/token']
+        default_prefix = File.join('/', Package.short_name, 'user', username)
         @growi = GrowiClipper.new(
-          uri: config['/growi/url'],
-          token: config['/growi/token'],
-          prefix: config['/growi/prefix'] || File.join('/', Package.short_name, 'user', username),
+          uri: user_config['/growi/url'],
+          token: user_config['/growi/token'],
+          prefix: user_config['/growi/prefix'] || default_prefix,
         )
       end
       return @growi
@@ -57,8 +53,8 @@ module Mulukhiya
     end
 
     def annict
-      return nil unless config['/annict/token'].present?
-      @annict ||= AnnictService.new(config['/annict/token'])
+      return nil unless user_config['/annict/token'].present?
+      @annict ||= AnnictService.new(user_config['/annict/token'])
       return @annict
     end
 
@@ -81,18 +77,18 @@ module Mulukhiya
     end
 
     def notify_verbose?
-      return config['/notify/verbose'] == true
+      return user_config['/notify/verbose'] == true
     end
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
-      return config["/handler/#{handler.underscore}/disable"] == true
+      return user_config["/handler/#{handler.underscore}/disable"] == true
     rescue Ginseng::ConfigError, NameError
       return false
     end
 
     def tags
-      return config['/tagging/user_tags'] || []
+      return user_config['/tagging/user_tags'] || []
     end
   end
 end

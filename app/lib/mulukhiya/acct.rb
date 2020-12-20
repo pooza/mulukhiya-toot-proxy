@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def agent?
-      @config['/agent/accts'].member?(contents)
+      config['/agent/accts'].member?(contents)
     end
   end
 end

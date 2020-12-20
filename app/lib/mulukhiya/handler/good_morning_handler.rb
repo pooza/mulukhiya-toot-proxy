@@ -13,7 +13,7 @@ module Mulukhiya
     def executable?(body)
       return false unless @sns.account.admin? || Environment.test?
       return false if parser.accts.count.positive?
-      return @status.match?(@config['/handler/good_morning/pattern'])
+      return @status.match?(config['/handler/good_morning/pattern'])
     end
   end
 end

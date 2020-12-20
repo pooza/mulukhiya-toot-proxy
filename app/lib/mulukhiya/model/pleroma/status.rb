@@ -1,6 +1,8 @@
 module Mulukhiya
   module Pleroma
     class Status
+      include Package
+      include StatusMethods
       attr_reader :id
 
       def initialize(id)
@@ -25,6 +27,10 @@ module Mulukhiya
 
       def local?
         return acct.host == Environment.domain_name
+      end
+
+      def visibility
+        return data[:visibility]
       end
 
       def account

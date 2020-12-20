@@ -23,6 +23,14 @@ module Mulukhiya
       end
     end
 
+    def test_local?
+      assert_boolean(@status.local?)
+    end
+
+    def test_visible?
+      assert_boolean(@status.visible?)
+    end
+
     def test_text
       assert_kind_of(String, @status.text)
     end

@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class Attachment < Sequel::Model(:objects)
+      include Package
       include AttachmentMethods
       attr_accessor :account, :date
 
@@ -66,13 +67,16 @@ module Mulukhiya
       end
 
       def self.get(key)
-        rows = Postgres.instance.execute('attachment', key)
-        return nil unless row = rows.first
-        return Attachment[row['id']]
+        if key.key?(:acct)
+          rows = Postgres.instance.execute('attachment', key)
+          return nil unless row = rows.first
+          return Attachment[row['id']]
+        elsif key.key?(:id)
+          return Attachment[key[:id]]
+        end
       end
 
       def self.query_params
-        config = Config.instance
         return {
           limit: config['/feed/media/limit'],
           test_usernames: config['/feed/test_usernames'],
@@ -83,7 +87,7 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|
           time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment = Attachment.get(uri: row['uri'])
+          attachment = Attachment.get(id: row['id'])
           attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
           attachment.date = Time.parse(time).getlocal
           yield attachment.feed_entry
@@ -94,7 +98,7 @@ module Mulukhiya
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
           time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment = Attachment.get(uri: row['uri'])
+          attachment = Attachment.get(id: row['id'])
           attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
           attachment.date = Time.parse(time).getlocal
           yield attachment.to_h.merge(status_url: row['status_uri'])

@@ -1,13 +1,10 @@
 module Mulukhiya
   module Mastodon
     class Status < Sequel::Model(:statuses)
+      include Package
+      include StatusMethods
       one_to_many :attachment
       many_to_one :account
-
-      def logger
-        @logger ||= Logger.new
-        return @logger
-      end
 
       def acct
         return account.acct
@@ -16,7 +13,7 @@ module Mulukhiya
       alias local? local
 
       def visible?
-        return visibility == 'public'
+        return visibility.zero?
       end
 
       alias attachments attachment

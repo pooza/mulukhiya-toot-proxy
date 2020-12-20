@@ -2,6 +2,7 @@ require 'digest/sha2'
 
 module Mulukhiya
   class Webhook
+    include Package
     attr_reader :sns, :reporter
 
     def digest
@@ -9,7 +10,7 @@ module Mulukhiya
     end
 
     def visibility
-      return Environment.parser_class.visibility_name(@userconfig['/webhook/visibility'])
+      return Environment.parser_class.visibility_name(@user_config['/webhook/visibility'])
     end
 
     def uri
@@ -46,7 +47,7 @@ module Mulukhiya
         'curl',
         '-H', 'Content-Type: application/json',
         '-X', 'POST',
-        '-d', {text: text || @config['/webhook/sample']}.to_json,
+        '-d', {text: text || config['/webhook/sample']}.to_json,
         uri.to_s
       ])
     end
@@ -55,7 +56,7 @@ module Mulukhiya
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
         token: token,
-        salt: Config.instance['/crypt/salt'],
+        salt: config['/crypt/salt'],
       }.to_json)
     end
 
@@ -76,12 +77,11 @@ module Mulukhiya
 
     private
 
-    def initialize(userconfig)
-      @config = Config.instance
-      @userconfig = userconfig
+    def initialize(user_config)
+      @user_config = user_config
       @reporter = Reporter.new
       @sns = Environment.sns_class.new
-      @sns.token = @userconfig.webhook_token
+      @sns.token = @user_config.webhook_token
     end
   end
 end

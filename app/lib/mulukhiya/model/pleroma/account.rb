@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class Account < Sequel::Model(:users)
+      include Package
       include AccountMethods
       attr_accessor :token
 

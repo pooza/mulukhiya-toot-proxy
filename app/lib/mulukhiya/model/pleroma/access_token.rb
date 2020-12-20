@@ -1,6 +1,7 @@
 module Mulukhiya
   module Pleroma
     class AccessToken < Sequel::Model(:oauth_tokens)
+      include Package
       include AccessTokenMethods
       many_to_one :account, key: :user_id
       many_to_one :application, key: :app_id
@@ -16,7 +17,7 @@ module Mulukhiya
         return matches.split(',') if matches
         return Ginseng::GatewayError, "Invalid scopes '#{values[:scopes]}'"
       rescue => e
-        Logger.new.error(error: e)
+        logger.error(error: e)
         return []
       end
 

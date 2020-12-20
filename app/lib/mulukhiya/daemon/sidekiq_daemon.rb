@@ -15,12 +15,8 @@ module Mulukhiya
     def motd
       return [
         `sidekiq -V`.chomp,
-        "Redis DSN: #{@config['/sidekiq/redis/dsn']}",
+        "Redis DSN: #{config['/sidekiq/redis/dsn']}",
       ].join("\n")
-    end
-
-    def self.config
-      return Config.instance
     end
 
     def self.username

@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class AccessToken < MongoCollection
+      include Package
       include AccessTokenMethods
 
       def valid?

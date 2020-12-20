@@ -37,9 +37,9 @@ module Mulukhiya
         client = http.post('/api/v1/apps', {
           body: {
             client_name: package_class.name,
-            website: @config['/package/url'],
-            redirect_uris: @config['/pleroma/oauth/redirect_uri'],
-            scopes: @config['/pleroma/oauth/scopes'].join(' '),
+            website: config['/package/url'],
+            redirect_uris: config['/pleroma/oauth/redirect_uri'],
+            scopes: config['/pleroma/oauth/scopes'].join(' '),
           }.to_json,
         }).body
         redis.set('oauth_client', client)
@@ -66,7 +66,7 @@ module Mulukhiya
     end
 
     def default_token
-      return @config['/agent/test/token']
+      return config['/agent/test/token']
     end
   end
 end

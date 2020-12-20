@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def self.dsn
-      return Ginseng::Redis::DSN.parse(Config.instance['/user_config/redis/dsn'])
+      return Ginseng::Redis::DSN.parse(config['/user_config/redis/dsn'])
     end
 
     def self.health

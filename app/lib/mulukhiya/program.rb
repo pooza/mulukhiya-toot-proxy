@@ -1,12 +1,13 @@
 module Mulukhiya
   class Program
     include Singleton
+    include Package
 
     def update
-      File.write(path, @http.get(@config['/programs/url']))
-      @logger.info(class: self.class.to_s, count: count)
+      File.write(path, @http.get(config['/programs/url']))
+      logger.info(class: self.class.to_s, count: count)
     rescue Ginseng::ConfigError => e
-      @logger.error(error: e)
+      logger.error(error: e)
     end
 
     def path
@@ -30,9 +31,7 @@ module Mulukhiya
     private
 
     def initialize
-      @config = Config.instance
       @http = HTTP.new
-      @logger = Logger.new
     end
   end
 end

@@ -16,12 +16,12 @@ module Mulukhiya
     def params
       return {
         limit: limit,
-        test_usernames: @config['/feed/test_usernames'],
+        test_usernames: config['/feed/test_usernames'],
       }
     end
 
     def limit
-      return @config['/feed/media/limit']
+      return config['/feed/media/limit']
     end
 
     def fetch

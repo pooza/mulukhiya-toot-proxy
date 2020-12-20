@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class HashTag < MongoCollection
+      include Package
       include HashTagMethods
 
       def name

@@ -1,13 +1,14 @@
 module Mulukhiya
   class ItunesURI < Ginseng::URI
+    include Package
+
     def initialize(options = {})
       super
-      @config = Config.instance
       @service = ItunesService.new
     end
 
     def itunes?
-      return absolute? && @config['/itunes/hosts'].member?(host)
+      return absolute? && config['/itunes/hosts'].member?(host)
     end
 
     alias valid? itunes?
@@ -15,7 +16,7 @@ module Mulukhiya
     def shortenable?
       return false unless itunes?
       return false unless album_id
-      @config['/itunes/patterns'].each do |entry|
+      config['/itunes/patterns'].each do |entry|
         next unless path.match(entry['pattern'])
         return entry['shortenable']
       end
@@ -25,14 +26,14 @@ module Mulukhiya
     def shorten
       return self unless shortenable?
       dest = clone
-      dest.host = @config['/itunes/hosts'].first
+      dest.host = config['/itunes/hosts'].first
       dest.album_id = album_id
       dest.track_id = track_id
       return dest
     end
 
     def album_id
-      @config['/itunes/patterns'].each do |entry|
+      config['/itunes/patterns'].each do |entry|
         next unless matches = path.match(entry['pattern'])
         return matches[1].to_i
       end
@@ -40,7 +41,7 @@ module Mulukhiya
     end
 
     def album_id=(id)
-      self.path = "/#{@config['/itunes/country']}/album/#{id}"
+      self.path = "/#{config['/itunes/country']}/album/#{id}"
       self.fragment = nil
     end
 
@@ -107,7 +108,7 @@ module Mulukhiya
     private
 
     def pixel_size
-      pixel = @config['/handler/itunes_image/pixel']
+      pixel = config['/handler/itunes_image/pixel']
       return "#{pixel}x#{pixel}"
     end
   end

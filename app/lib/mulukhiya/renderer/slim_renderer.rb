@@ -24,11 +24,11 @@ module Mulukhiya
         controller: Environment.controller_class,
         env: Environment,
         crypt: Crypt,
-        config: @config,
+        config: config,
         annict: AnnictService.new,
-        scripts: @config['/webui/scripts'],
-        stylesheets: @config['/webui/stylesheets'],
-        metadata: @config.raw.dig('application', 'webui', 'metadata'),
+        scripts: config['/webui/scripts'],
+        stylesheets: config['/webui/stylesheets'],
+        metadata: config.raw.dig('application', 'webui', 'metadata'),
       }
     end
   end

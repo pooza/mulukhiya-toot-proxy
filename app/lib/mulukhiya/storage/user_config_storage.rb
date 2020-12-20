@@ -36,8 +36,8 @@ module Mulukhiya
       bar = ProgressBar.create(total: accounts.count) if Environment.rake?
       accounts do |account|
         bar&.increment
-        next unless account.config['/tagging/user_tags'].present?
-        account.config.clear_tags
+        next unless account.user_config['/tagging/user_tags'].present?
+        account.user_config.clear_tags
       end
       bar&.finish
     end

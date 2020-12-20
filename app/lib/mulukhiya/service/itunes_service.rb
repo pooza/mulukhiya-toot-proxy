@@ -1,9 +1,9 @@
 module Mulukhiya
   class ItunesService
+    include Package
+
     def initialize
-      @config = Config.instance
       @http = HTTP.new
-      @logger = Logger.new
     end
 
     def search(keyword, category)
@@ -16,7 +16,7 @@ module Mulukhiya
       raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -32,7 +32,7 @@ module Mulukhiya
       raise Ginseng::RequestError, "Item '#{id}' not found", e.backtrace
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -63,28 +63,28 @@ module Mulukhiya
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesURI.parse(@config['/itunes/urls/search'])
+      uri = ItunesURI.parse(config['/itunes/urls/search'])
       uri.query_values = {
         term: keyword,
         media: category,
-        country: @config['/itunes/country'],
-        lang: @config['/itunes/lang'],
+        country: config['/itunes/country'],
+        lang: config['/itunes/lang'],
       }
       return uri
     end
 
     def create_lookup_uri(id)
-      uri = ItunesURI.parse(@config['/itunes/urls/lookup'])
+      uri = ItunesURI.parse(config['/itunes/urls/lookup'])
       uri.query_values = {
         id: id,
-        country: @config['/itunes/country'],
-        lang: @config['/itunes/lang'],
+        country: config['/itunes/country'],
+        lang: config['/itunes/lang'],
       }
       return uri
     end
 
     def retry_limit
-      return @config['/itunes/retry_limit']
+      return config['/itunes/retry_limit']
     end
   end
 end

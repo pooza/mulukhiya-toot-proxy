@@ -3,8 +3,7 @@ module Mulukhiya
     def setup
       @handler = Handler.create('tagging')
       @parser = Environment.parser_class.new
-      @config = Config.instance
-      @config['/agent/accts'] = ['@pooza']
+      config['/agent/accts'] = ['@pooza']
     end
 
     def test_handle_pre_toot
@@ -69,7 +68,7 @@ module Mulukhiya
 
     def test_handle_pre_toot_with_twittodon
       return unless handler?
-      @config['/tagging/default_tags'] = []
+      config['/tagging/default_tags'] = []
 
       @handler.clear
       body = {status_field => "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア#おほしSUMMERバケーション#スタプリ#池袋プリキュア #フワ#トゥインクルブック#スタンプラリー\n\nvia. https://www.instagram.com/precure_event/p/"}

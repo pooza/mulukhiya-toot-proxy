@@ -1,6 +1,7 @@
 module Mulukhiya
   module Mastodon
     class AccessToken < Sequel::Model(:oauth_access_tokens)
+      include Package
       include AccessTokenMethods
       many_to_one :user, key: :resource_owner_id
       many_to_one :application

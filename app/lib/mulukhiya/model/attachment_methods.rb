@@ -6,15 +6,6 @@ module Mulukhiya
       return type.split('/').first
     end
 
-    def logger
-      @logger ||= Logger.new
-      return @logger
-    end
-
-    def config
-      return Config.instance
-    end
-
     def pixel_size
       return nil unless meta[:width]
       return nil unless meta[:height]

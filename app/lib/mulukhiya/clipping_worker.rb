@@ -1,12 +1,8 @@
 module Mulukhiya
   class ClippingWorker
     include Sidekiq::Worker
+    include Package
     sidekiq_options retry: 3
-
-    def initialize
-      @config = Config.instance
-      @logger = Logger.new
-    end
 
     def underscore
       return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
@@ -14,7 +10,7 @@ module Mulukhiya
 
     def federate?
       return true if Environment.test?
-      return @config["/worker/#{underscore}/federate"] == true
+      return config["/worker/#{underscore}/federate"] == true
     rescue Ginseng::ConfigError
       return false
     end
@@ -33,7 +29,7 @@ module Mulukhiya
       return uri.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace unless uri
-      @logger.error(error: e, uri: uri.to_s)
+      logger.error(error: e, uri: uri.to_s)
       return uri.to_s
     end
   end

@@ -5,7 +5,6 @@ module Mulukhiya
 
     def initialize(size = 0, val = nil)
       super
-      @logger = Logger.new
       @tags = TagContainer.new
       @tags.concat(TagContainer.default_tag_bases)
       @temp = {}
@@ -14,15 +13,11 @@ module Mulukhiya
     def push(entry)
       if entry.is_a?(Handler)
         push(entry.summary) if entry.reportable?
-        log(entry.summary) if entry.loggable?
+        logger.info(entry.summary) if entry.loggable?
       elsif entry.present?
         super
         @dump = nil
       end
-    end
-
-    def log(entry)
-      @logger.info(entry)
     end
 
     def to_h

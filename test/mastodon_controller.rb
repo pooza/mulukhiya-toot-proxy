@@ -3,7 +3,6 @@ module Mulukhiya
     include ::Rack::Test::Methods
 
     def setup
-      @config = Config.instance
       @parser = TootParser.new
       @parser.account = Environment.test_account
     end

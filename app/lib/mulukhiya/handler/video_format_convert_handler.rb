@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def type
-      return @config['/handler/video_format_convert/type']
+      return config['/handler/video_format_convert/type']
     end
 
     def media_class

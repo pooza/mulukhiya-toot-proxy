@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class Account < Sequel::Model(:user)
+      include Package
       include AccountMethods
 
       alias display_name name

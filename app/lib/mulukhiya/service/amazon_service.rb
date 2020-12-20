@@ -2,16 +2,16 @@ require 'nokogiri'
 
 module Mulukhiya
   class AmazonService
+    include Package
+
     def initialize
-      @config = Config.instance
       @http = HTTP.new
-      @logger = Logger.new
       @storage = AmazonItemStorage.new
       return unless AmazonService.config?
       @vacuum = Vacuum.new(
-        marketplace: @config['/amazon/marketplace'],
-        access_key: @config['/amazon/access_key'],
-        secret_key: @config['/amazon/secret_key'],
+        marketplace: config['/amazon/marketplace'],
+        access_key: config['/amazon/access_key'],
+        secret_key: config['/amazon/secret_key'],
         partner_tag: AmazonService.associate_tag,
       )
     end
@@ -44,7 +44,7 @@ module Mulukhiya
       return nil
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
@@ -53,33 +53,32 @@ module Mulukhiya
     def lookup(asin)
       cnt ||= 0
       unless item = @storage[asin]
-        response = @vacuum.get_items(item_ids: [asin], resources: @config['/amazon/resources'])
+        response = @vacuum.get_items(item_ids: [asin], resources: config['/amazon/resources'])
         item = JSON.parse(response.to_s)['ItemsResult']['Items'].first
         @storage[asin] = item
       end
       return item
     rescue => e
       cnt += 1
-      @logger.error(error: e, count: cnt)
+      logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(1)
       retry
     end
 
     def create_item_uri(asin)
-      uri = AmazonURI.parse(@config["/amazon/urls/#{@config['/amazon/marketplace']}"])
+      uri = AmazonURI.parse(config["/amazon/urls/#{config['/amazon/marketplace']}"])
       uri.asin = asin
       return uri
     end
 
     def self.associate_tag
-      return Config.instance['/amazon/associate_tag']
+      return config['/amazon/associate_tag']
     rescue Ginseng::ConfigError
       return nil
     end
 
     def self.config?
-      config = Config.instance
       config['/amazon/marketplace']
       config['/amazon/access_key']
       config['/amazon/secret_key']
@@ -92,7 +91,7 @@ module Mulukhiya
     private
 
     def retry_limit
-      return @config['/amazon/retry_limit']
+      return config['/amazon/retry_limit']
     end
   end
 end

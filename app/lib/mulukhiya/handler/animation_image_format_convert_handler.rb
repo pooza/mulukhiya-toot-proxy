@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def type
-      return @config['/handler/animation_image_format_convert/type']
+      return config['/handler/animation_image_format_convert/type']
     end
   end
 end

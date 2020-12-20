@@ -2,10 +2,7 @@ require 'digest/sha1'
 
 module Mulukhiya
   class MediaFile < File
-    def initialize(path, mode = 'r', perm = 0o600)
-      @logger = Logger.new
-      super
-    end
+    include Package
 
     def valid?
       return mediatype == default_mediatype
@@ -144,8 +141,6 @@ module Mulukhiya
     end
 
     def self.purge
-      logger = Logger.new
-      config = Config.instance
       bar = ProgressBar.create(total: all.count) if Environment.rake?
       files = []
       all do |path|

@@ -1,6 +1,7 @@
 module Mulukhiya
   module Misskey
     class AccessToken < Sequel::Model(:access_token)
+      include Package
       include AccessTokenMethods
       many_to_one :account, key: :userId
       many_to_one :application, key: :appId

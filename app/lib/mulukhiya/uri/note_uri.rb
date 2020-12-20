@@ -7,7 +7,7 @@ module Mulukhiya
       return true if acct.host == Environment.domain_name
       return false
     rescue => e
-      @logger.error(error: e)
+      logger.error(error: e)
       return false
     end
 

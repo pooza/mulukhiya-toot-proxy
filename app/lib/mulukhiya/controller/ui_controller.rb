@@ -28,7 +28,7 @@ module Mulukhiya
         @renderer.template = 'auth_result'
         response = @sns.auth(params[:code])
         @sns.token = response.parsed_response['access_token']
-        @sns.account.config.webhook_token = @sns.token
+        @sns.account.user_config.webhook_token = @sns.token
         @renderer[:hook_url] = @sns.account.webhook&.uri
         @renderer[:status] = response.code
         @renderer[:result] = response.parsed_response
@@ -54,7 +54,7 @@ module Mulukhiya
         @renderer.template = 'auth_result'
         response = @sns.auth(params[:token])
         @sns.token = @sns.create_access_token(response.parsed_response['accessToken'])
-        @sns.account.config.webhook_token = @sns.token
+        @sns.account.user_config.webhook_token = @sns.token
         @renderer[:hook_url] = @sns.account.webhook&.uri
         @renderer[:status] = response.code
         @renderer[:result] = {access_token: @sns.token}

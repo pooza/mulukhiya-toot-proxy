@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class Attachment < MongoCollection
+      include Package
       include AttachmentMethods
 
       def to_h
@@ -73,10 +74,6 @@ module Mulukhiya
         return Attachment.new(id)
       end
 
-      def self.logger
-        return Logger.new
-      end
-
       def self.catalog
         return enum_for(__method__) unless block_given?
         cnt = 0
@@ -108,10 +105,6 @@ module Mulukhiya
         rescue => e
           logger.error(error: e, row: row.to_h)
         end
-      end
-
-      def self.config
-        return Config.instance
       end
 
       def self.statuses

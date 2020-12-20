@@ -77,7 +77,7 @@ module Mulukhiya
     end
 
     get '/api/v2/search' do
-      params[:limit] = @config['/mastodon/search/limit']
+      params[:limit] = config['/mastodon/search/limit']
       @reporter.response = @sns.search(params[:q], params)
       message = @reporter.response.parsed_response
       if message.is_a?(Hash)
@@ -88,14 +88,14 @@ module Mulukhiya
         body = Nokogiri::HTML.parse(message, nil, 'utf-8')
         @renderer.message = {path: request.path, error: body.xpath('//h1').first.inner_text.chomp}
         Slack.broadcast(@renderer.message)
-        message.each_line {|line| @logger.error(line.chomp)}
+        message.each_line {|line| logger.error(line.chomp)}
       end
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     end
 
     def media_api_default_version
-      return @config['/mastodon/media_api/version']
+      return config['/mastodon/media_api/version']
     rescue Ginseng::ConfigError
       return nil
     end

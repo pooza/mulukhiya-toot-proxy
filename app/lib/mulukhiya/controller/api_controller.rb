@@ -2,7 +2,7 @@ module Mulukhiya
   class APIController < Controller
     get '/about' do
       @sns.token ||= @sns.default_token
-      @renderer.message = {package: @config.raw.dig('application', 'package')}
+      @renderer.message = {package: config.raw.dig('application', 'package')}
       return @renderer.to_s
     end
 
@@ -77,7 +77,7 @@ module Mulukhiya
         @renderer.message = errors
       elsif @sns.account
         response = AnnictService.new.auth(params['code'])
-        @sns.account.config.update(annict: {token: response['access_token']})
+        @sns.account.user_config.update(annict: {token: response['access_token']})
         @sns.account.annict.updated_at = Time.now
         @renderer.message = user_config_info
         @renderer.status = response.code
@@ -142,7 +142,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
         rescue => e
-          @logger.error(error: e, entry: entry)
+          logger.error(error: e, entry: entry)
         end
         @renderer.message = dic
       end
@@ -164,7 +164,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
         rescue => e
-          @logger.error(error: e, entry: entry)
+          logger.error(error: e, entry: entry)
         end
         @renderer.message = dic
       end
@@ -209,7 +209,7 @@ module Mulukhiya
     def user_config_info
       return {
         account: @sns.account.to_h,
-        config: @sns.account.config.to_h,
+        config: @sns.account.user_config.to_h,
         filters: @sns.filters&.parsed_response,
         token: @sns.access_token.to_h.reject {|k, v| k == :account},
         visibility_names: Environment.parser_class.visibility_names,
