@@ -2,7 +2,7 @@ module Mulukhiya
   class APIController < Controller
     get '/about' do
       @sns.token ||= @sns.default_token
-      @renderer.message = {package: @config.raw.dig('application', 'package')}
+      @renderer.message = {package: config.raw.dig('application', 'package')}
       return @renderer.to_s
     end
 
@@ -142,7 +142,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
         rescue => e
-          @logger.error(error: e, entry: entry)
+          logger.error(error: e, entry: entry)
         end
         @renderer.message = dic
       end
@@ -164,7 +164,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
         rescue => e
-          @logger.error(error: e, entry: entry)
+          logger.error(error: e, entry: entry)
         end
         @renderer.message = dic
       end
