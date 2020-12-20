@@ -71,7 +71,7 @@ module Mulukhiya
           rows = Postgres.instance.execute('attachment', key)
           return nil unless row = rows.first
           return Attachment[row['id']]
-        else key.key?(:id)
+        elsif key.key?(:id)
           return Attachment[key[:id]]
         end
       end
