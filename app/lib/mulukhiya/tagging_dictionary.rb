@@ -1,9 +1,9 @@
 module Mulukhiya
   class TaggingDictionary < Hash
+    include Package
+
     def initialize
       super
-      @config = Config.instance
-      @logger = Logger.new
       @http = HTTP.new
       refresh unless exist?
       refresh if corrupted?
@@ -14,7 +14,7 @@ module Mulukhiya
       r = []
       text = create_temp_text(body)
       reverse_each do |k, v|
-        next if k.length < @config['/tagging/word/minimum_length']
+        next if k.length < config['/tagging/word/minimum_length']
         next unless text.match?(v[:pattern])
         r.push(k)
         r.concat(v[:words])
@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        @logger.error(error: e, k: k, v: v)
+        logger.error(error: e, k: k, v: v)
       end
       update(sort_by {|k, v| k.length}.to_h)
     end
@@ -42,7 +42,7 @@ module Mulukhiya
       return false unless load_cache.is_a?(Array)
       return true
     rescue TypeError, Errno::ENOENT => e
-      @logger.error(error: e, path: path)
+      logger.error(error: e, path: path)
       return true
     end
 
@@ -63,10 +63,10 @@ module Mulukhiya
 
     def refresh
       save_cache
-      @logger.info(class: self.class.to_s, path: path, message: 'refreshed')
+      logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
-      @logger.error(error: e)
+      logger.error(error: e)
     end
 
     alias create refresh

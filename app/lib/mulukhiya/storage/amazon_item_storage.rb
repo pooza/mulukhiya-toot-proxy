@@ -12,7 +12,7 @@ module Mulukhiya
       return nil unless entry = super(create_key(key))
       return JSON.parse(entry)
     rescue => e
-      @logger.error(error: e, key: key)
+      logger.error(error: e, key: key)
       return nil
     end
 
@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return [@config['/amazon/cache/ttl'], 86_400].min
+      return [loggerconfig['/amazon/cache/ttl'], 86_400].min
     end
 
     def prefix

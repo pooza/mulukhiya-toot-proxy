@@ -21,7 +21,7 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Config.instance['/tagging/dictionaries'].each do |dic|
+      config['/tagging/dictionaries'].each do |dic|
         yield RemoteDictionary.create(dic)
       rescue => e
         logger.error(error: e, dic: dic)
