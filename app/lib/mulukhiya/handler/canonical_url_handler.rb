@@ -44,7 +44,7 @@ module Mulukhiya
     end
 
     def ignore_domains
-      return @config['/handler/canonical_url/ignore/domains'] || []
+      return config['/handler/canonical_url/ignore/domains'] || []
     end
   end
 end

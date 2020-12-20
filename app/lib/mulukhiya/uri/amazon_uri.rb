@@ -1,15 +1,16 @@
 module Mulukhiya
   class AmazonURI < Ginseng::URI
+    include Package
+
     def initialize(options = {})
       super
-      @config = Config.instance
       @service = AmazonService.new
     end
 
     def shortenable?
       return false unless amazon?
       return false unless asin.present?
-      @config['/amazon/patterns'].each do |entry|
+      config['/amazon/patterns'].each do |entry|
         next unless path.match(entry['pattern'])
         return entry['shortenable']
       end
@@ -23,7 +24,7 @@ module Mulukhiya
     alias valid? amazon?
 
     def asin
-      @config['/amazon/patterns'].each do |entry|
+      config['/amazon/patterns'].each do |entry|
         next unless matches = path.match(entry['pattern'])
         return matches[1]
       end

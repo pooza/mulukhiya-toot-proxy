@@ -3,6 +3,7 @@ require 'rest-client'
 
 module Mulukhiya
   class Handler
+    include Package
     attr_reader :reporter, :event, :sns, :errors, :result
 
     def handle_pre_toot(body, params = {})
@@ -112,10 +113,10 @@ module Mulukhiya
     end
 
     def timeout
-      return @config['/test/timeout'] if Environment.test?
-      return @config["/handler/#{underscore}/timeout"]
+      return config['/test/timeout'] if Environment.test?
+      return config["/handler/#{underscore}/timeout"]
     rescue Ginseng::ConfigError
-      return @config['/handler/default/timeout']
+      return config['/handler/default/timeout']
     end
 
     def prepared?
@@ -125,7 +126,7 @@ module Mulukhiya
     def disable?
       return true unless Environment.dbms_class.config?
       return true if sns.account.disable?(self)
-      return true if @config.disable?(self)
+      return true if config.disable?(self)
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
@@ -178,7 +179,6 @@ module Mulukhiya
     private
 
     def initialize(params = {})
-      @config = Config.instance
       @result = []
       @errors = []
       @sns = params[:sns] || Environment.sns_class.new

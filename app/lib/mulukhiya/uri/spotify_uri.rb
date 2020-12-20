@@ -1,10 +1,10 @@
 module Mulukhiya
   class SpotifyURI < Ginseng::URI
+    include Package
+
     def initialize(options = {})
       super
-      @config = Config.instance
       @spotify = SpotifyService.new
-      @logger = Logger.new
     end
 
     def spotify?
@@ -38,7 +38,7 @@ module Mulukhiya
 
     def track_id
       return nil unless SpotifyService.config?
-      @config['/spotify/patterns'].each do |entry|
+      config['/spotify/patterns'].each do |entry|
         next unless entry['type'] == 'track'
         next unless matches = path.match(entry['pattern'])
         return matches[1]
@@ -55,7 +55,7 @@ module Mulukhiya
 
     def album_id
       return nil unless SpotifyService.config?
-      @config['/spotify/patterns'].each do |entry|
+      config['/spotify/patterns'].each do |entry|
         next unless entry['type'] == 'album'
         next unless matches = path.match(entry['pattern'])
         return matches[1]

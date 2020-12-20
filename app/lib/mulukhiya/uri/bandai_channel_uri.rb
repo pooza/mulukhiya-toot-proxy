@@ -1,20 +1,16 @@
 module Mulukhiya
   class BandaiChannelURI < Ginseng::URI
-    def initialize(options = {})
-      super
-      @config = Config.instance
-      @logger = Logger.new
-    end
+    include Package
 
     def bandai_channel?
-      return absolute? && @config['/bandai_channel/hosts'].member?(host)
+      return absolute? && config['/bandai_channel/hosts'].member?(host)
     end
 
     alias valid? bandai_channel?
 
     def title_id
       unless @title_id
-        @config['/bandai_channel/patterns'].each do |entry|
+        config['/bandai_channel/patterns'].each do |entry|
           next unless matches = Regexp.new(entry['pattern']).match(path)
           next unless id = matches[1]
           return @title_id = id.to_i
@@ -25,7 +21,7 @@ module Mulukhiya
 
     def episode_id
       unless @episode_id
-        @config['/bandai_channel/patterns'].each do |entry|
+        config['/bandai_channel/patterns'].each do |entry|
           next unless matches = Regexp.new(entry['pattern']).match(path)
           next unless id = matches[2]
           return @episode_id = id.to_i
@@ -46,7 +42,7 @@ module Mulukhiya
       end
       return @image_uri
     rescue => e
-      @logger.error(error: e, uri: to_s)
+      logger.error(error: e, uri: to_s)
       return nil
     end
 
@@ -55,7 +51,7 @@ module Mulukhiya
     def service
       unless @service
         @service = HTTP.new
-        @service.base_uri = "https://#{@config['/bandai_channel/hosts'].first}"
+        @service.base_uri = "https://#{config['/bandai_channel/hosts'].first}"
       end
       return @service
     end

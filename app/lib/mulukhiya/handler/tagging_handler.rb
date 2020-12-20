@@ -29,7 +29,7 @@ module Mulukhiya
         type = Environment.attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
-          tags.push(@config["/tagging/media/tags/#{mediatype}"])
+          tags.push(config["/tagging/media/tags/#{mediatype}"])
         rescue Ginseng::ConfigError => e
           result.push(info: e.message)
         end
@@ -41,7 +41,7 @@ module Mulukhiya
 
     def update_status
       return @status if tags.empty?
-      via = @status.match(@config['/twittodon/pattern'])
+      via = @status.match(config['/twittodon/pattern'])
       @status.sub!(via[0], '') if via.present?
       lines = @status.each_line(chomp: true).to_a
       lines.clone.reverse_each do |line|

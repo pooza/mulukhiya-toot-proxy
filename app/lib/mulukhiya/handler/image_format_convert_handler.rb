@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     def type
-      return @config['/handler/image_format_convert/type']
+      return config['/handler/image_format_convert/type']
     end
   end
 end

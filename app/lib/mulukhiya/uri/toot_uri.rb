@@ -5,7 +5,7 @@ module Mulukhiya
     def local?
       return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
     rescue => e
-      @logger.error(error: e)
+      logger.error(error: e)
       return false
     end
 

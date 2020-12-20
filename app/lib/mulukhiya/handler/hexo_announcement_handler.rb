@@ -26,13 +26,13 @@ module Mulukhiya
     private
 
     def category
-      return @config['/handler/hexo_announcement/category']
+      return config['/handler/hexo_announcement/category']
     rescue Ginseng::ConfigError
       return nil
     end
 
     def dir
-      path = @config['/handler/hexo_announcement/path']
+      path = config['/handler/hexo_announcement/path']
       path = File.join(Environment.dir, path) unless path.start_with?('/')
       return path
     end
