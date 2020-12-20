@@ -29,6 +29,10 @@ module Mulukhiya
         return acct.host == Environment.domain_name
       end
 
+      def visibility
+        return data[:visibility]
+      end
+
       def account
         @account ||= Account.get(acct: acct)
         return @account
