@@ -16,7 +16,7 @@ module Mulukhiya
     def params
       return {
         limit: limit,
-        test_usernames: config['/feed/test_usernames'],
+        test_usernames: [Environmment.test_account.uesrname],
       }
     end
 

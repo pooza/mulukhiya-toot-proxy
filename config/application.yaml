@@ -869,8 +869,6 @@ feed:
     limit: 100
   media:
     limit: 100
-  test_usernames:
-    - test
 webhook:
   sample: |
     わたしが斬るのは、あなたじゃない！
