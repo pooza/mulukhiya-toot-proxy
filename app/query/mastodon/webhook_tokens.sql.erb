@@ -10,7 +10,7 @@ WHERE (accounts.domain IS null)
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
   AND (users.disabled = false)
-  AND (apps.name='mulukhiya-toot-proxy')
+  AND (apps.name = 'mulukhiya-toot-proxy')
   AND (tokens.expires_in IS null)
   AND (tokens.revoked_at IS null)
 GROUP BY
