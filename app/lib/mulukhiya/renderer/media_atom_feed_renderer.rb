@@ -14,10 +14,7 @@ module Mulukhiya
     private
 
     def params
-      return {
-        limit: limit,
-        test_usernames: [Environmment.test_account.uesrname],
-      }
+      return {limit: limit}
     end
 
     def limit

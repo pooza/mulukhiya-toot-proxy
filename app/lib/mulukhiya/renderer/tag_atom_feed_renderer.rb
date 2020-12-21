@@ -31,7 +31,6 @@ module Mulukhiya
       return {
         limit: limit,
         tag: tag,
-        test_usernames: [Environment.test_account.acct.username],
       }
     end
 
