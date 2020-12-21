@@ -2,7 +2,7 @@ require 'digest/sha1'
 
 module Mulukhiya
   class MediaMetadataStorage < Redis
-    def [](file)
+    def [](key)
       return get(key)
     end
 

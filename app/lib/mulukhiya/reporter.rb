@@ -1,5 +1,6 @@
 module Mulukhiya
   class Reporter < Array
+    include Package
     attr_accessor :response, :parser
     attr_reader :temp, :tags
 

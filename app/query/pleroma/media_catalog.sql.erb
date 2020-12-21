@@ -30,6 +30,8 @@ FROM
       INNER JOIN users ON objects_actor.actor[5] = users.nickname
     WHERE (objects_base.data->'attachment'->0->'url' IS NOT null)
       AND (users.actor_type = 'Person')
+      AND (users.local = true)
+      AND (users.invisible = false)
     ORDER BY
       objects_base.id DESC
   ) AS statuses

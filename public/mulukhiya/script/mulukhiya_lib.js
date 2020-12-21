@@ -84,6 +84,8 @@ const MulukhiyaLib = {
               username: e.data.account.username,
               token: t,
               scopes: e.data.token.scopes.join(', '),
+              is_admin: e.data.account.is_admin,
+              is_moderator: e.data.account.is_moderator,
             })
           }).catch(e => {
             users.push({

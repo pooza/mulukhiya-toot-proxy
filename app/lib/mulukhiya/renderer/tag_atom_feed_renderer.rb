@@ -28,11 +28,7 @@ module Mulukhiya
     end
 
     def params
-      return {
-        limit: limit,
-        tag: tag,
-        test_usernames: config['/feed/test_usernames'],
-      }
+      return {limit: limit, tag: tag}
     end
 
     def cache!

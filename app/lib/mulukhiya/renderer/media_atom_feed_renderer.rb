@@ -14,10 +14,7 @@ module Mulukhiya
     private
 
     def params
-      return {
-        limit: limit,
-        test_usernames: config['/feed/test_usernames'],
-      }
+      return {limit: limit}
     end
 
     def limit

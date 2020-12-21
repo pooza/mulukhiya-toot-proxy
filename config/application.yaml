@@ -1,5 +1,5 @@
 package:
-  version: 4.0.15
+  version: 4.0.16
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -869,8 +869,6 @@ feed:
     limit: 100
   media:
     limit: 100
-  test_usernames:
-    - test
 webhook:
   sample: |
     わたしが斬るのは、あなたじゃない！
