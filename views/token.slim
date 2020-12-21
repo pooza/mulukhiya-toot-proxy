@@ -25,8 +25,8 @@ html lang='ja'
         .token v-for='user in users'
           a href='#' @click='switchUser(user)' v-if='user.username' = '@{{user.username}}'
           span class='alert' v-else='' 認証できないトークン
-          span class='role' v-if='user.is_admin' admin
           span class='role' v-if='user.is_moderator' mod
+          span class='role' v-elsif='user.is_admin' admin
           .loggedin v-if='user.token==token' ログイン中
           i class='fas fa-trash' @click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
           .scopes 権限: {{user.scopes}}
