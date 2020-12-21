@@ -7,12 +7,14 @@ module Mulukhiya
     end
 
     def pixel_size
+      return nil unless meta
       return nil unless meta[:width]
       return nil unless meta[:height]
       return "#{meta[:width]}x#{meta[:height]}"
     end
 
     def duration
+      return nil unless meta
       return nil unless meta[:duration]
       return meta[:duration].to_f.round(2)
     end

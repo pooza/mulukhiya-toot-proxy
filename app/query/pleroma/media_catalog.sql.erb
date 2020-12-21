@@ -12,11 +12,11 @@ FROM
   (
     SELECT
       objects_base.id,
-      data->>'id' AS uri,
-      jsonb_array_elements(data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
+      objects_base.data->>'id' AS uri,
+      jsonb_array_elements(objects_base.data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
       objects_actor.actor[5] AS username,
       objects_actor.actor[3] AS host,
-      inserted_at AS created_at
+      objects_base.inserted_at AS created_at
     FROM
       objects AS objects_base
       INNER JOIN (
@@ -25,12 +25,13 @@ FROM
           regexp_split_to_array(data->>'actor', '/') AS actor
         FROM
           objects
+        WHERE (data->>'actor' IS NOT NULL)
       ) AS objects_actor ON objects_base.id = objects_actor.id
-    WHERE (data->'attachment' IS NOT null)
-      AND (data->>'id' LIKE 'https://<%= Mulukhiya::Environment.domain_name %>/%')
+      INNER JOIN users ON objects_actor.actor[5] = users.nickname
+    WHERE (objects_base.data->'attachment'->0->'url' IS NOT null)
+      AND (users.actor_type = 'Person')
     ORDER BY
       objects_base.id DESC
-    LIMIT <%= params[:limit] %> OFFSET 0
   ) AS statuses
   INNER JOIN (
     SELECT
@@ -56,3 +57,4 @@ FROM
   ) AS attachments ON statuses.attachment_uri = attachments.uri
 ORDER BY
   created_at DESC
+LIMIT <%= params[:limit] %> OFFSET 0
