@@ -42,5 +42,11 @@ module Mulukhiya
       end
       raise 'Too large'
     end
+
+    def query_params
+      return {
+        limit: config['/feed/media/limit'],
+      }
+    end
   end
 end

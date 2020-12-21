@@ -27,7 +27,6 @@ FROM
       AND (note."userHost" IS null)
       AND (note."visibility" IN ('public', 'home'))
       AND ("user"."isBot" = false)
-      AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
     GROUP BY
       note_id,
       file_id,

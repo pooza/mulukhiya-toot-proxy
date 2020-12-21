@@ -76,13 +76,6 @@ module Mulukhiya
         end
       end
 
-      def self.query_params
-        return {
-          limit: config['/feed/media/limit'],
-          test_usernames: config['/feed/test_usernames'],
-        }
-      end
-
       def self.feed
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|

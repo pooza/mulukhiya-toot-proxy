@@ -21,7 +21,6 @@ WHERE (toots.local = true)
   AND (accounts.actor_type = 'Person')
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
-  AND (accounts.username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
 ORDER BY
   attachments.id DESC
 LIMIT <%= params[:limit] %> OFFSET 0
