@@ -28,10 +28,7 @@ module Mulukhiya
     end
 
     def params
-      return {
-        limit: limit,
-        tag: tag,
-      }
+      return {limit: limit, tag: tag}
     end
 
     def cache!
