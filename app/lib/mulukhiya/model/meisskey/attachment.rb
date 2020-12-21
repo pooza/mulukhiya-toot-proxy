@@ -108,13 +108,10 @@ module Mulukhiya
       end
 
       def self.statuses
-        user_ids = (config['/feed/test_usernames'] || []).map do |id|
-          BSON::ObjectId.from_string(Account.get(username: id).id)
-        end
         rows = Status.collection
           .find(
             fileIds: {'$ne' => []},
-            userId: {'$nin' => user_ids},
+            userId: {'$nin' => Account.collection.find(host: nil, isBot: true).map {|v| v['_id']}},
             _user: {'host': nil, 'inbox': nil}, # local
             visibility: {'$in' => ['public', 'home']},
           )
