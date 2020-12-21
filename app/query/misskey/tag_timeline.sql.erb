@@ -12,7 +12,7 @@ FROM
   INNER JOIN "user" ON note."userId" = "user".id
 WHERE ('<%= params[:tag] %>'=any(note.tags))
   AND (note.visibility = 'public')
-  AND ("user".username <> <%= Mulukhiya::Environment.test_account.acct.username %>)
+  AND ("user".username <> '<%= Mulukhiya::Environment.test_account.acct.username %>')
 ORDER BY
   created_at DESC
 LIMIT <%= params[:limit] %> OFFSET 0
