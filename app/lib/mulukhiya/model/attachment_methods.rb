@@ -43,10 +43,16 @@ module Mulukhiya
       raise 'Too large'
     end
 
-    def query_params
-      return {
-        limit: config['/feed/media/limit'],
-      }
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def query_params
+        return {
+          limit: config['/feed/media/limit'],
+        }
+      end
     end
   end
 end
