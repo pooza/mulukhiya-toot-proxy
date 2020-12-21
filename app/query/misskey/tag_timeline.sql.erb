@@ -7,10 +7,12 @@ SELECT
   "user".name AS display_name,
   note."text",
   note.cw AS spoiler_text
-FROM note
-  INNER JOIN "user" ON note."userId"="user".id
+FROM
+  note
+  INNER JOIN "user" ON note."userId" = "user".id
 WHERE ('<%= params[:tag] %>'=any(note.tags))
-  AND (note.visibility='public')
+  AND (note.visibility = 'public')
   AND ("user".username NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
-ORDER BY created_at DESC
+ORDER BY
+  created_at DESC
 LIMIT <%= params[:limit] %> OFFSET 0

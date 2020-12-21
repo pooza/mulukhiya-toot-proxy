@@ -76,13 +76,6 @@ module Mulukhiya
         end
       end
 
-      def self.query_params
-        return {
-          limit: config['/feed/media/limit'],
-          test_usernames: config['/feed/test_usernames'],
-        }
-      end
-
       def self.feed
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|
@@ -97,8 +90,8 @@ module Mulukhiya
       def self.catalog
         return enum_for(__method__) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params).each do |row|
+          next unless attachment = Attachment.get(id: row['id'])
           time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment = Attachment.get(id: row['id'])
           attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
           attachment.date = Time.parse(time).getlocal
           yield attachment.to_h.merge(status_url: row['status_uri'])
