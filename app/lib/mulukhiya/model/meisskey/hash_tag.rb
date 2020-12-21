@@ -29,11 +29,8 @@ module Mulukhiya
 
       def create_feed(params)
         return [] unless Mongo.config?
-        user_ids = [Environment.test_account.acct.username].map do |username|
-          BSON::ObjectId.from_string(Account.get(username: username).id)
-        end
         notes = Status.collection
-          .find(tags: name, userId: {'$nin' => user_ids})
+          .find(tags: name, userId: {'$ne' => Environment.test_account.id})
           .sort(createdAt: -1)
           .limit(params[:limit])
         return notes.map do |row|

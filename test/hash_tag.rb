@@ -3,7 +3,6 @@ module Mulukhiya
     def setup
       @nowplaying = Environment.hash_tag_class.get(tag: 'nowplaying')
       @default = Environment.hash_tag_class.get(tag: TagContainer.default_tag_bases&.first)
-      @test_usernames = config['/feed/test_usernames']
     end
 
     def test_name
@@ -21,12 +20,11 @@ module Mulukhiya
 
     def test_create_feed
       return unless @default
-      feed = @default.create_feed(test_usernames: ['test'], limit: 5)
+      feed = @default.create_feed(limit: 5)
       assert_kind_of(Array, feed)
       assert_equal(feed.count, 5)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
-        assert_false(@test_usernames.member?(entry['username']))
       end
     end
 

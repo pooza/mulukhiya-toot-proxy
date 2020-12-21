@@ -36,5 +36,5 @@ FROM
       users
   ) AS accts ON statuses.account_uri = accts.uri
 WHERE (statuses.tag = '<%= params[:tag] %>')
-  AND (statuses.actor[5] NOT IN (<%= params[:test_usernames].map {|v| %{'#{Mulukhiya::QueryTemplate.escape(v)}'}}.join(',') %>))
+  AND (statuses.actor[5] <> <%= Mulukhiya::Environment.test_account.acct.username %>)
 LIMIT <%= params[:limit] %> OFFSET 0
