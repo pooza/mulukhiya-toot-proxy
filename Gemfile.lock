@@ -140,7 +140,7 @@ GEM
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
     fastimage (2.2.0)
-    ffi (1.14.1)
+    ffi (1.14.2)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -164,7 +164,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    json (2.4.1)
+    json (2.5.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
