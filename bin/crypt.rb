@@ -14,5 +14,5 @@ unless password = ARGV.first
   exit 1
 end
 
-puts "source:  #{ARGV.first}"
+puts "source:  #{password}"
 puts "crypted: #{Mulukhiya::Crypt.new.encrypt(password)}"
