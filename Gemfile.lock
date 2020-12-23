@@ -82,6 +82,8 @@ GEM
     aws-eventstream (1.1.0)
     aws-sigv4 (1.2.2)
       aws-eventstream (~> 1, >= 1.0.2)
+    backport (1.1.2)
+    benchmark (0.1.1)
     bootsnap (1.5.1)
       msgpack (~> 1.0)
     bson (4.11.1)
@@ -164,10 +166,15 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
+    jaro_winkler (1.5.4)
     json (2.5.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
+    kramdown (2.3.0)
+      rexml
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     loofah (2.8.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -238,6 +245,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    reverse_markdown (2.0.0)
+      nokogiri
     rexml (3.2.4)
     rspotify (2.10.1)
       addressable (~> 2.5.2)
@@ -297,10 +306,25 @@ GEM
     slim_lint (0.20.2)
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
+    solargraph (0.40.0)
+      backport (~> 1.1)
+      benchmark
+      bundler (>= 1.17.2)
+      e2mmap
+      jaro_winkler (~> 1.5)
+      kramdown (~> 2.3)
+      kramdown-parser-gfm (~> 1.1)
+      parser (~> 2.3)
+      reverse_markdown (>= 1.0.5, < 3)
+      rubocop (>= 0.52)
+      thor (~> 1.0)
+      tilt (~> 2.0)
+      yard (~> 0.9, >= 0.9.24)
     syslog-logger (1.6.8)
     temple (0.8.2)
     test-unit (3.3.7)
       power_assert
+    thor (1.0.1)
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
@@ -315,6 +339,7 @@ GEM
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
+    yard (0.9.25)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -344,6 +369,7 @@ DEPENDENCIES
   sidekiq-failures
   sidekiq-scheduler
   slim_lint
+  solargraph
   test-unit
   vacuum
 
