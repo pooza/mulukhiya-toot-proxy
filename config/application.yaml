@@ -59,6 +59,8 @@ handler:
   good_morning:
     disable: true
     pattern: おはようございます。
+  attachment_reusing:
+    disable: true
 worker:
   media_cleaning:
     days: 1
@@ -343,6 +345,7 @@ misskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - bandai_channel_image
+      - attachment_reusing
       - shortened_url
       - url_normalize
       - canonical_url

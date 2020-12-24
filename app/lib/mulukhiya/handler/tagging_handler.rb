@@ -34,7 +34,7 @@ module Mulukhiya
           result.push(info: e.message)
         end
       rescue => e
-        errors.push(class: e.class.to_s, message: e.message, media_id: id)
+        errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
       end
       return tags.uniq
     end

@@ -32,5 +32,6 @@ group :development do
   gem 'rubocop-performance'
   gem 'rubocop-sequel'
   gem 'slim_lint'
+  gem 'solargraph'
   gem 'test-unit'
 end

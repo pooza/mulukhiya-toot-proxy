@@ -42,6 +42,27 @@ module Mulukhiya
       return nil
     end
 
+    def uploaded_attachment(attachment, params = {})
+      attachment = Environment.attachment_class[attachment] if attachment.is_a?(String)
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      response = http.post('/api/drive/files/find-by-hash', {
+        body: {i: token, md5: attachment.to_h[:md5]}.to_json,
+        headers: headers,
+      })
+      return Environment.attachment_class[response.parsed_response.first['id']]
+    end
+
+    def delete_attachment(attachment, params = {})
+      attachment = Environment.attachment_class[attachment] if attachment.is_a?(String)
+      headers = params[:headers] || {}
+      headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
+      return http.post('/api/drive/files/delete', {
+        body: {i: token, fileId: attachment.id}.to_json,
+        headers: headers,
+      })
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/app/create', {
