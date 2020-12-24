@@ -4,13 +4,13 @@ module Mulukhiya
       super
       @uris = {}
       @tracks = {}
+      @lines = []
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
-      @lines = []
       updated = false
       @status.each_line do |line|
         @lines.push(line.chomp)
@@ -44,7 +44,7 @@ module Mulukhiya
     def update(keyword)
       return unless uri = @uris[keyword]
       push(uri.title.escape_toot)
-      push(uri.artists.map(&:escape_toot).join(','))
+      push(uri.artists.map(&:escape_toot).join(', '))
       tags.concat(uri.artists)
       result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e
