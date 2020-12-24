@@ -1,6 +1,7 @@
 module Mulukhiya
   class AttachmentReusingHandler < Handler
     def handle_pre_toot(body, params = {})
+      return body unless body[attachment_field]
       ids = []
       body[attachment_field].clone.each do |id|
         next unless attachment = sns.uploaded_attachment(Environment.attachment_class[id])
