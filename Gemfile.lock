@@ -322,7 +322,7 @@ GEM
       yard (~> 0.9, >= 0.9.24)
     syslog-logger (1.6.8)
     temple (0.8.2)
-    test-unit (3.3.7)
+    test-unit (3.3.8)
       power_assert
     thor (1.0.1)
     thwait (0.2.0)
