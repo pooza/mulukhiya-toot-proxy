@@ -42,7 +42,7 @@ module Mulukhiya
       return nil
     end
 
-    def uploaded_attachment(attachment, params = {})
+    def search_dupllicated_attachment(attachment, params = {})
       attachment = Environment.attachment_class[attachment] if attachment.is_a?(String)
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
