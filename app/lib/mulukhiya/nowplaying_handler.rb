@@ -1,27 +1,25 @@
+require 'digest/sha1'
+
 module Mulukhiya
   class NowplayingHandler < Handler
     def initialize(params = {})
       super
       @uris = {}
       @tracks = {}
-      @lines = []
+      @lines = {}
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
-      updated = false
       @status.each_line do |line|
-        @lines.push(line.chomp)
-        next if updated
+        push(line)
         next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
-        keyword = matches[1]
-        next unless updatable?(keyword)
-        update(keyword)
-        updated = true
+        @recent_keyword = matches[1]
+        update(@recent_keyword) if updatable?(@recent_keyword)
       end
-      parser.text = body[status_field] = @lines.join("\n")
+      parser.text = body[status_field] = @lines.values.join("\n")
       return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, body: body)
@@ -58,8 +56,8 @@ module Mulukhiya
     private
 
     def push(line)
-      lines = @status.each_line.to_a.map(&:chomp)
-      @lines.push(line) unless lines.member?(line)
+      key = Digest::SHA1.hexdigest([line.chomp, @recent_keyword].to_json)
+      @lines[key] = line.chomp
     end
   end
 end
