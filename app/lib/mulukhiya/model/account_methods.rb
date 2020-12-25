@@ -76,5 +76,9 @@ module Mulukhiya
     def tags
       return user_config['/tagging/user_tags'] || []
     end
+
+    def disabled_tags
+      return user_config['/tagging/tags/disabled'] || []
+    end
   end
 end
