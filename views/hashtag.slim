@@ -11,11 +11,14 @@ html lang='ja'
       h2 ハッシュタグ辞書
       section
         input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
-        button class='search' @click='search' 検索
+        button class='small' @click='search' 検索
       section class='tag_detail' v-for='entry in result'
         h3
           | {{entry.word}}
           span class='alert' v-if='entry.word.length < #{config['/tagging/word/minimum_length']}' 未使用
+        nav
+          button class='small' @click='setTagStatus(entry.word, true)' 有効
+          button class='small' @click='setTagStatus(entry.word, false)' 無効
         ul
           li
             strong パターン
@@ -33,13 +36,16 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false},
+          tags: [],
           keyword: null,
           result: {},
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {
+              this.account = e.account
+              this.tags = this.dig(e, 'config', 'tagging', 'tags', 'disabled')
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           onKeyDown: function () {
@@ -61,5 +67,32 @@ html lang='ja'
                 .finally(e => indicator.hide())
             }
           },
+          setTagStatus: function (tag, flag) {
+            const command = {tagging: {tags: {disabled: []}}}
+            this.tags = this.tags || []
+            if (flag) {
+              this.tags = this.tags.filter(v => (v != tag))
+              if (this.tags.length == 0) {this.tags = null}
+            } else {
+              this.tags.push(tag)
+              this.tags = Array.from(new Set(this.tags))
+            }
+            command.tagging.tags.disabled = this.tags
+            Vue.updateConfig(command)
+          },
+          dig: function (target, ...keys) {
+            let digged = target
+            for (const key of keys) {
+              if (typeof digged === 'undefined' || digged === null) {
+                return undefined
+              }
+              if (typeof key === 'function') {
+                digged = key(digged)
+              } else {
+                digged = digged[key]
+              }
+            }
+            return digged
+          }
         },
       })
