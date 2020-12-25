@@ -78,7 +78,15 @@ module Mulukhiya
     end
 
     def disabled_tags
-      return user_config['/tagging/tags/disabled'] || []
+      tags = TagContainer.new
+      dic_cache = TaggingDictionary.new.load_cache
+      (user_config['/tagging/tags/disabled'] || []).each do |tag|
+        tags.push(tag)
+        tags.concat(dic_cache[tag][:words])
+      end
+      return tags.to_a
+    rescue => e
+      Skack.broadcast(e)
     end
   end
 end
