@@ -1,6 +1,13 @@
 module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
     include Package
+    attr_reader :account
+
+    def account=(account)
+      @account = account
+      reject! {|v| @account.disabled_tags.member?(v)}
+      concat(@account.tags)
+    end
 
     def self.default_tags
       return config['/tagging/default_tags'].map(&:to_hashtag)

@@ -4,7 +4,9 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def perform
-      AnnictAccountStorage.accounts(&:crawl_annict)
+      AnnictAccountStorage.accounts do |account|
+        account.annict.crawl(account.webhook)
+      end
     end
   end
 end

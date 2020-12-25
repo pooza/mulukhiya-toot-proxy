@@ -6,7 +6,7 @@ module Mulukhiya
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(body))
       tags.concat(create_media_tags(body)) if TagContainer.media_tag?
-      tags.concat(@sns.account.tags)
+      tags.account = @sns.account
       body[status_field] = update_status
       result.push(tags: tags.create_tags)
       return body

@@ -27,7 +27,9 @@ module Mulukhiya
       end
       required(:tagging).maybe(:hash).schema do
         required(:user_tags).maybe(:array).each(:string)
-        required(:disabled_tags).maybe(:array).each(:string)
+        required(:tags).maybe(:hash).schema do
+          required(:disabled).maybe(:array).each(:string)
+        end
       end
     end
 
@@ -51,7 +53,8 @@ module Mulukhiya
       values['annict'] ||= {}
       values['tagging'] ||= {}
       values['tagging']['user_tags'] ||= []
-      values['tagging']['disabled_tags'] ||= []
+      values['tagging']['tags'] ||= {}
+      values['tagging']['tags']['disabled'] ||= []
       return super
     end
   end
