@@ -114,6 +114,20 @@ module Mulukhiya
       return accounts[@token]
     end
 
+    def crawl(webhook)
+      self.updated_at ||= Time.now
+      times = []
+      recent_records do |record|
+        times.push(Time.parse(record['created_at']))
+        webhook.post(create_body(record, :record))
+      end
+      recent_reviews do |review|
+        times.push(Time.parse(review['created_at']))
+        webhook.post(create_body(review, :review))
+      end
+      self.updated_at = times.max if times.present?
+    end
+
     alias me account
 
     def updated_at

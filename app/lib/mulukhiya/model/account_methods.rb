@@ -58,20 +58,6 @@ module Mulukhiya
       return @annict
     end
 
-    def crawl_annict
-      annict.updated_at ||= Time.now
-      times = []
-      annict.recent_records do |record|
-        times.push(Time.parse(record['created_at']))
-        webhook.post(annict.create_body(record, :record))
-      end
-      annict.recent_reviews do |review|
-        times.push(Time.parse(review['created_at']))
-        webhook.post(annict.create_body(review, :review))
-      end
-      annict.updated_at = times.max if times.present?
-    end
-
     def featured_tag_bases
       return []
     end
