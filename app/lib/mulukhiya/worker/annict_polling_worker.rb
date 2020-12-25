@@ -5,7 +5,7 @@ module Mulukhiya
 
     def perform
       AnnictAccountStorage.accounts do |account|
-        account.annict.crawl(account.webhook)
+        account.annict.crawl(webhook: account.webhook)
       end
     end
   end
