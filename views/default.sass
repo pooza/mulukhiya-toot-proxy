@@ -346,7 +346,7 @@ ul.medias
 
 section
   margin: 0 1em
-  .tag_detail
+  .tag_entry
     margin:
       block:
         start: 0
@@ -355,6 +355,33 @@ section
     li
       font:
         size: 0.8em
+
+section.disabled
+  background:
+    color: lightgray
+  border:
+    color: transparent
+    radius: 6px
+  opacity: 0.8
+
+section.disabled h3::after
+  display: inline-block
+  content: '無効'
+  margin: 2px 0.5em
+  padding: 2px 0.5em
+  background:
+    color: bisque
+  opacity: 0.8
+  font:
+    size: 0.5em
+  color: firebrick
+  border:
+    width: 1px
+    style: solid
+    color: firebrick
+    radius: 3px
+
+
 
 textarea
   border:
