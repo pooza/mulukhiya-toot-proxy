@@ -73,11 +73,13 @@ module Mulukhiya
       return false
     end
 
-    def tags
+    def user_tag_bases
       return user_config['/tagging/user_tags'] || []
     end
 
-    def disabled_tags
+    alias tags user_tag_bases
+
+    def disabled_tag_bases
       tags = TagContainer.new
       dic_cache = TaggingDictionary.new.load_cache
       (user_config['/tagging/tags/disabled'] || []).each do |tag|

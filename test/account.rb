@@ -78,12 +78,12 @@ module Mulukhiya
       end
     end
 
-    def test_tags
-      assert_kind_of(Array, @account.tags)
+    def test_user_tag_bases
+      assert_kind_of(Array, @account.user_tag_bases)
     end
 
-    def test_disabled_tags
-      assert_kind_of(Array, @account.disabled_tags)
+    def test_disabled_tag_bases
+      assert_kind_of(Array, @account.disabled_tag_bases)
     end
 
     def test_featured_tag_bases
