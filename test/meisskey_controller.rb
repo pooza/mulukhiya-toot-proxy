@@ -47,8 +47,8 @@ module Mulukhiya
       header 'Content-Type', 'application/json'
       post '/api/notes/create', {status_field => "ああああ\n\nいいい\n\n#nowplaying https://music.apple.com/jp/album/1447931442?i=1447931444&uo=4\n\n#nowplaying https://music.apple.com/jp/album/405905341?i=405905342&uo=4", 'i' => config['/agent/test/token']}.to_json
       assert(last_response.ok?)
-      contents = JSON.parse(last_response.body)['createdNote']['text']
-      assert(contents.start_with?('ああああ<br/><br/>いいい<br/><br/>'))
+      content = JSON.parse(last_response.body)['createdNote']['text']
+      assert(content.start_with?("ああああ\n\nいいい\n\n"))
       assert(content.include?('唯一無二'))
       assert(content.include?('夢みる奇跡たち'))
     end
