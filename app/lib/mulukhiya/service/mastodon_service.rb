@@ -58,10 +58,10 @@ module Mulukhiya
 
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.clone].join("\n")
-      message.ellipsize!(Environment.parser_class.new.max_length)
+      message.ellipsize!(TootParser.new.max_length)
       status = {
-        Environment.controller_class.status_field => message,
-        'visibility' => Environment.controller_class.visibility_name('direct'),
+        MastodonController.status_field => message,
+        'visibility' => MastodonController.visibility_name('direct'),
       }
       status['in_reply_to_id'] = response['id'] if response
       return post(status)

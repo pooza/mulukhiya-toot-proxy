@@ -96,13 +96,15 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      note = {
+      message = [account.acct.to_s, message.clone].join("\n")
+      message.ellipsize!(NoteParser.new.max_length)
+      status = {
         MisskeyController.status_field => message,
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
       }
-      note['replyId'] = response['createdNote']['id'] if response
-      return post(note)
+      status['replyId'] = response['createdNote']['id'] if response
+      return post(status)
     end
 
     def default_token
