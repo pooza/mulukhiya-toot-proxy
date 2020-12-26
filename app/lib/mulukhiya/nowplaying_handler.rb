@@ -60,7 +60,6 @@ module Mulukhiya
       line.chomp!
       key = rand.to_s if line.empty?
       key ||= Digest::SHA1.hexdigest([line, @recent_keyword].to_json)
-      logger.info(key: key, l: line)
       @lines[key] = line
     end
   end
