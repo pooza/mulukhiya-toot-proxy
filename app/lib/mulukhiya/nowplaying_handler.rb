@@ -11,6 +11,7 @@ module Mulukhiya
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
+      return body unless @status.match?(/#nowplaying\s+(.*)$/i)
       return body if parser.command?
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
       @status.each_line do |line|
@@ -56,8 +57,11 @@ module Mulukhiya
     private
 
     def push(line)
-      key = Digest::SHA1.hexdigest([line.chomp, @recent_keyword].to_json)
-      @lines[key] = line.chomp
+      line.chomp!
+      key = rand.to_s if line.empty?
+      key ||= Digest::SHA1.hexdigest([line, @recent_keyword].to_json)
+      logger.info(key: key, l: line)
+      @lines[key] = line
     end
   end
 end
