@@ -45,7 +45,7 @@ module Mulukhiya
       assert(tags.member?('nowplaying'))
 
       header 'Content-Type', 'application/json'
-      post '/api/v1/statuses', {status_field => "ああああ\n\nいいい\n\n#nowplaying https://music.apple.com/jp/album/1447931442?i=1447931444&uo=4\n\n#nowplaying https://music.apple.com/jp/album/405905341?i=405905342&uo=4", 'i' => config['/agent/test/token'], 'visibility' => 'private'}.to_json
+      post '/api/v1/statuses', {status_field => "ああああ\n\nいいい\n\n#nowplaying https://music.apple.com/jp/album/1447931442?i=1447931444&uo=4\n\n#nowplaying https://music.apple.com/jp/album/405905341?i=405905342&uo=4", 'i' => config['/agent/test/token']}.to_json
       assert(last_response.ok?)
       assert(JSON.parse(last_response.body)['createdNote']['text'].start_with?('ああああ<br/><br/>いいい<br/><br/>'))
     end
