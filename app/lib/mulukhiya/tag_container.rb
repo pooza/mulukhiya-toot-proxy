@@ -5,8 +5,8 @@ module Mulukhiya
 
     def account=(account)
       @account = account
-      reject! {|v| @account.disabled_tags.member?(v)}
-      concat(@account.tags)
+      reject! {|v| @account.disabled_tag_bases.member?(v)}
+      concat(@account.user_tag_bases)
     end
 
     def self.default_tags

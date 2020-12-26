@@ -114,18 +114,23 @@ module Mulukhiya
       return accounts[@token]
     end
 
-    def crawl(webhook)
+    def crawl(params = {})
       self.updated_at ||= Time.now
       times = []
-      recent_records do |record|
-        times.push(Time.parse(record['created_at']))
-        webhook.post(create_body(record, :record))
+      crawl_set(params).each do |key, result|
+        result.each do |record|
+          times.push(Time.parse(record['created_at']))
+          params[:webhook]&.post(create_body(record, key))
+          puts record.to_yaml if Environment.rake?
+        end
       end
-      recent_reviews do |review|
-        times.push(Time.parse(review['created_at']))
-        webhook.post(create_body(review, :review))
-      end
-      self.updated_at = times.max if times.present?
+      self.updated_at = times.max if times.present? && !params[:dryrun]
+      puts({updated: self.updated_at}.to_yaml) if Environment.rake?
+    end
+
+    def crawl_set(params = {})
+      return {record: records, review: reviews} if params[:all]
+      return {record: recent_records, review: recent_reviews}
     end
 
     alias me account

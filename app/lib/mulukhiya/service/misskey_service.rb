@@ -3,6 +3,9 @@ require 'fileutils'
 module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
+    include ServiceMethods
+
+    alias info nodeinfo
 
     def upload(path, params = {})
       if filename = params[:filename]
@@ -28,18 +31,6 @@ module Mulukhiya
         headers: headers,
       })
       return response.parsed_response
-    end
-
-    def account
-      @account ||= Environment.account_class.get(token: token)
-      return @account
-    rescue
-      return nil
-    end
-
-    def access_token
-      return Environment.access_token_class.first(hash: token) if token
-      return nil
     end
 
     def search_dupllicated_attachment(attachment, params = {})
@@ -78,23 +69,16 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def clear_oauth_client
-      redis.unlink('oauth_client')
-    end
-
-    def redis
-      @redis ||= Redis.new
-      return @redis
-    end
-
     def notify(account, message, response = nil)
-      note = {
+      message = [account.acct.to_s, message.clone].join("\n")
+      message.ellipsize!(NoteParser.new.max_length)
+      status = {
         MisskeyController.status_field => message,
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
       }
-      note['replyId'] = response['createdNote']['id'] if response
-      return post(note)
+      status['replyId'] = response['createdNote']['id'] if response
+      return post(status)
     end
 
     def default_token

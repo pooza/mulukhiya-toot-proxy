@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def self.load
-      ENV['TEST'] = Package.name
+      ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
       names.each do |name|
         puts "case: #{name}"

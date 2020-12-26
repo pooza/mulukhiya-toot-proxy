@@ -3,6 +3,9 @@ require 'fileutils'
 module Mulukhiya
   class MeisskeyService < Ginseng::Fediverse::MeisskeyService
     include Package
+    include ServiceMethods
+
+    alias info nodeinfo
 
     def upload(path, params = {})
       if filename = params[:filename]
@@ -20,18 +23,6 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
-    def account
-      @account ||= Environment.account_class.get(token: token)
-      return @account
-    rescue
-      return nil
-    end
-
-    def access_token
-      return Environment.access_token_class.first(hash: token) if token
-      return nil
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/app/create', {
@@ -47,23 +38,16 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def clear_oauth_client
-      redis.unlink('oauth_client')
-    end
-
-    def redis
-      @redis ||= Redis.new
-      return @redis
-    end
-
     def notify(account, message, response = nil)
-      note = {
-        MeisskeyController.status_field => message,
+      message = [account.acct.to_s, message.clone].join("\n")
+      message.ellipsize!(NoteParser.new.max_length)
+      status = {
+        MisskeyController.status_field => message,
         'visibleUserIds' => [account.id],
-        'visibility' => MeisskeyController.visibility_name('direct'),
+        'visibility' => MisskeyController.visibility_name('direct'),
       }
-      note['replyId'] = response['createdNote']['id'] if response
-      return post(note)
+      status['replyId'] = response['createdNote']['id'] if response
+      return post(status)
     end
 
     def default_token

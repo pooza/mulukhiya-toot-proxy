@@ -3,13 +3,9 @@ require 'fileutils'
 module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
+    include ServiceMethods
 
-    def account
-      @account ||= Environment.account_class.get(token: token)
-      return @account
-    rescue
-      return nil
-    end
+    alias info nodeinfo
 
     def upload(path, params = {})
       if filename = params[:filename]
@@ -27,11 +23,6 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
-    def access_token
-      return Environment.access_token_class.first(token: token) if token
-      return nil
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/v1/apps', {
@@ -47,22 +38,15 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def clear_oauth_client
-      redis.unlink('oauth_client')
-    end
-
-    def redis
-      @redis ||= Redis.new
-      return @redis
-    end
-
     def notify(account, message, response = nil)
-      toot = {
-        PleromaController.status_field => [account.acct.to_s, message].join("\n"),
+      message = [account.acct.to_s, message.clone].join("\n")
+      message.ellipsize!(TootParser.new.max_length)
+      status = {
+        PleromaController.status_field => message,
         'visibility' => PleromaController.visibility_name('direct'),
       }
-      toot['in_reply_to_id'] = response['id'] if response
-      return post(toot)
+      status['in_reply_to_id'] = response['id'] if response
+      return post(status)
     end
 
     def default_token

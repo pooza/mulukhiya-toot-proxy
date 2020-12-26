@@ -35,6 +35,10 @@ module Mulukhiya
         end
         return @hash
       end
+
+      def self.get(key)
+        return AccessToken.first(key)
+      end
     end
   end
 end
