@@ -4,6 +4,14 @@ module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
 
+    def nodeinfo
+      ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
+      redis.setex('nodeinfo', ttl, super.to_json)
+      return JSON.parse(redis.get('nodeinfo'))
+    end
+
+    alias info nodeinfo
+
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))

@@ -4,6 +4,14 @@ module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
 
+    def nodeinfo
+      ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
+      redis.setex('nodeinfo', ttl, super.to_json)
+      return JSON.parse(redis.get('nodeinfo'))
+    end
+
+    alias info nodeinfo
+
     def account
       @account ||= Environment.account_class.get(token: token)
       return @account

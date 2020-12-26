@@ -872,6 +872,9 @@ feed:
     limit: 100
   media:
     limit: 100
+nodeinfo:
+  cache:
+    ttl: 3600
 webhook:
   sample: |
     わたしが斬るのは、あなたじゃない！

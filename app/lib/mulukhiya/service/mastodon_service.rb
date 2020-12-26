@@ -2,6 +2,14 @@ module Mulukhiya
   class MastodonService < Ginseng::Fediverse::MastodonService
     include Package
 
+    def nodeinfo
+      ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
+      redis.setex('nodeinfo', ttl, super.to_json)
+      return JSON.parse(redis.get('nodeinfo'))
+    end
+
+    alias info nodeinfo
+
     def upload(path, params = {})
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
