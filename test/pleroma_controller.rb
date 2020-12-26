@@ -54,7 +54,10 @@ module Mulukhiya
       header 'Content-Type', 'application/json'
       post '/api/v1/statuses', {status_field => "ああああ\n\nいいい\n\n#nowplaying https://music.apple.com/jp/album/1447931442?i=1447931444&uo=4\n\n#nowplaying https://music.apple.com/jp/album/405905341?i=405905342&uo=4", 'visibility' => 'private'}.to_json
       assert(last_response.ok?)
-      assert(JSON.parse(last_response.body)['content'].start_with?('ああああ<br/><br/>いいい<br/><br/>'))
+      content = JSON.parse(last_response.body)['content']
+      assert(content.start_with?('ああああ<br/><br/>いいい<br/><br/>'))
+      assert(content.include?('唯一無二'))
+      assert(content.include?('夢みる奇跡たち'))
     end
 
     def test_webhook_entries
