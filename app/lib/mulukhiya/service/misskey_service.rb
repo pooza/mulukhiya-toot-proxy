@@ -3,12 +3,7 @@ require 'fileutils'
 module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
-
-    def nodeinfo
-      ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
-      redis.setex('nodeinfo', ttl, super.to_json)
-      return JSON.parse(redis.get('nodeinfo'))
-    end
+    include ServiceMethods
 
     alias info nodeinfo
 
@@ -36,18 +31,6 @@ module Mulukhiya
         headers: headers,
       })
       return response.parsed_response
-    end
-
-    def account
-      @account ||= Environment.account_class.get(token: token)
-      return @account
-    rescue
-      return nil
-    end
-
-    def access_token
-      return Environment.access_token_class.first(hash: token) if token
-      return nil
     end
 
     def search_dupllicated_attachment(attachment, params = {})
@@ -84,15 +67,6 @@ module Mulukhiya
         redis.set('oauth_client', client)
       end
       return JSON.parse(client)
-    end
-
-    def clear_oauth_client
-      redis.unlink('oauth_client')
-    end
-
-    def redis
-      @redis ||= Redis.new
-      return @redis
     end
 
     def notify(account, message, response = nil)
