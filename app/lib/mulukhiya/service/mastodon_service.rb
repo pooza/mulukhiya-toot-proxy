@@ -57,12 +57,14 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      toot = {
-        MastodonController.status_field => [account.acct.to_s, message].join("\n"),
-        'visibility' => MastodonController.visibility_name('direct'),
+      message = [account.acct.to_s, message.clone].join("\n")
+      message.ellipsize!(Environment.parser_class.new.max_length)
+      status = {
+        Environment.controller_class.status_field => message,
+        'visibility' => Environment.controller_class.visibility_name('direct'),
       }
-      toot['in_reply_to_id'] = response['id'] if response
-      return post(toot)
+      status['in_reply_to_id'] = response['id'] if response
+      return post(status)
     end
 
     def default_token

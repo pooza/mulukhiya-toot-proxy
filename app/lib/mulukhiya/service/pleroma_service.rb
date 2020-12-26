@@ -64,15 +64,6 @@ module Mulukhiya
       return @redis
     end
 
-    def notify(account, message, response = nil)
-      toot = {
-        PleromaController.status_field => [account.acct.to_s, message].join("\n"),
-        'visibility' => PleromaController.visibility_name('direct'),
-      }
-      toot['in_reply_to_id'] = response['id'] if response
-      return post(toot)
-    end
-
     def default_token
       return config['/agent/test/token']
     end

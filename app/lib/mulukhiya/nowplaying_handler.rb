@@ -45,7 +45,7 @@ module Mulukhiya
       push(uri.title.escape_toot)
       push(uri.artists.map(&:escape_toot).join(', '))
       tags.concat(uri.artists)
-      result.push(url: uri.to_s)
+      result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
     end
