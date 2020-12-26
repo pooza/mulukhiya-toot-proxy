@@ -103,6 +103,7 @@ test:
         - spotify_url_handler
         - tag_atom_feed_renderer
         - media_atom_feed_renderer
+        - sns_service
     - name: postgres
       cases:
         - clipping_worker
