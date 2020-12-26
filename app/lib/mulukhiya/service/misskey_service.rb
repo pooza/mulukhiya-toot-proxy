@@ -54,11 +54,6 @@ module Mulukhiya
       })
     end
 
-    def access_token
-      return Environment.access_token_class.first(hash: token) if token
-      return nil
-    end
-
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/app/create', {

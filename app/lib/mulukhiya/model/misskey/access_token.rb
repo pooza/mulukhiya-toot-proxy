@@ -35,6 +35,10 @@ module Mulukhiya
         return nil unless matches = permission.match(/{(.*?)}/)[1]
         return matches.split(',')
       end
+
+      def self.get(key)
+        return AccessToken.first(hash: key[:token]) if key.key?(:token)
+      end
     end
   end
 end
