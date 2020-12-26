@@ -6,8 +6,8 @@ module Mulukhiya
       super
       @sns = Environment.sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
-      @channel[:title] = "#{@sns.info['title']} 直近のメディアファイル"
-      @channel[:description] = "#{@sns.info['title']} 直近のメディアファイル #{limit}件"
+      @channel[:title] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル"
+      @channel[:description] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル #{limit}件"
       fetch
     end
 
