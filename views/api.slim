@@ -249,8 +249,12 @@ html lang='ja'
             }).then(e => {
               this.message = null
               this.layout.details['oauth'] = false
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
-            .finally(e => indicator.hide())
+              indicator.hide()
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              this.layout.details['oauth'] = false
+              indicator.hide()
+            })
           },
           updatePrograms: function () {
             const indicator = new ActivityIndicator()
@@ -294,13 +298,21 @@ html lang='ja'
           },
           crawlAnnict: function () {
             const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['annict'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.$dialog.confirm(
+              {title: 'Annictへの問い合わせ', body: 'Annictへの問い合わせを実行します。'},
+              {okText: '実行', cancelText: 'キャンセル'}
+            ).then(e => {
+              indicator.show()
+              return axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
+            }).then(e => {
+              this.message = null
+              this.layout.details['annict'] = false
+              indicator.hide()
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              this.layout.details['annict'] = false
+              indicator.hide()
+            })
           },
           searchTags: function () {
             const indicator = new ActivityIndicator()
