@@ -191,6 +191,16 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/annict/crawl' do
+      if @sns.account
+        @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
+      else
+        @renderer.message = {error: 'Unauthorized'}
+        @renderer.status = 403
+      end
+      return @renderer.to_s
+    end
+
     post '/feed/update' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
         TagFeedUpdateWorker.new.perform

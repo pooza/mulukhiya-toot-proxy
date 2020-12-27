@@ -67,9 +67,7 @@ module Mulukhiya
         logger.error(error: e, tag: renderer.tag)
       end
       bar&.finish
-      all do |renderer|
-        puts "updated: ##{renderer.tag} #{renderer.path}" if Environment.rake?
-      end
+      puts all.map {|v| "updated: ##{v.tag} #{v.path}"}.join("\n") if Environment.rake?
     end
 
     def self.all

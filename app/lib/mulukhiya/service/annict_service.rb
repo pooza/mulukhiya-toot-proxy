@@ -117,15 +117,16 @@ module Mulukhiya
     def crawl(params = {})
       self.updated_at ||= Time.now
       times = []
+      records = []
       crawl_set(params).each do |key, result|
         result.each do |record|
           times.push(Time.parse(record['created_at']))
           params[:webhook]&.post(create_body(record, key))
-          puts record.to_yaml if Environment.rake?
+          records.push(record)
         end
       end
       self.updated_at = times.max if times.present? && !params[:dryrun]
-      puts({updated: self.updated_at}.to_yaml) if Environment.rake?
+      return records
     end
 
     def crawl_set(params = {})

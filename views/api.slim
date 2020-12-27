@@ -133,16 +133,24 @@ html lang='ja'
                   | を更新します。
                 .field-update-button-container
                   button @click='updateFeeds' 実行
-        li v-if='webhook.href'
+        li  v-if='config.annict'
+          h3 @click='toggleVisibility("annict")' Annict
+          vue-slide-up-down :active='layout.details.annict'
+            .endpoint_container
+              .link POST /mulukhiya/api/annict/crawl
+              .link_description Annictへの問い合わせを行います。
+              .field-update-button-container
+                button @click='crawlAnnict' 実行
+        li v-if='config.webhook'
           h3 @click='toggleVisibility("webhook")' Slack互換webhook
           vue-slide-up-down :active='layout.details.webhook'
             .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
             .endpoint_container
               .link
-                a :href='webhook.href' target='_blank' GET {{webhook.href}}
+                a :href='config.webhook.url' target='_blank' GET {{config.webhook.url}}
               .link_description webhookが正常であるかを確認します。
             .endpoint_container
-              .link POST {{webhook.href}}
+              .link POST {{config.webhook.url}}
               .link_description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
@@ -169,8 +177,8 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          account: {is_admin: false},
-          webhook: {href: null},
+          account: {is_admin: false, annict: null},
+          config: {annict: null, webhook: {url: null}},
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
@@ -190,6 +198,7 @@ html lang='ja'
               health: false,
               webhook: false,
               sidekiq: false,
+              annict: false,
               about: false,
             },
           },
@@ -198,9 +207,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              if (e.config && e.config.webhook) {
-                this.webhook.href = (new URL(e.config.webhook.url)).pathname
-              }
+              this.config = e.config
               const feed_list_url = new URL('/mulukhiya/api/feed/list', location.href)
               feed_list_url.searchParams.set('token', Vue.getToken())
               this.feed.list.href = feed_list_url.href
@@ -281,6 +288,16 @@ html lang='ja'
               .then(e => {
                 this.message = null
                 this.layout.details['feed'] = false
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .finally(e => indicator.hide())
+          },
+          crawlAnnict: function () {
+            const indicator = new ActivityIndicator()
+            indicator.show()
+            axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
+              .then(e => {
+                this.message = null
+                this.layout.details['annict'] = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
               .finally(e => indicator.hide())
           },

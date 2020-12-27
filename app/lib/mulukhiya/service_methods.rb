@@ -1,9 +1,12 @@
 module Mulukhiya
   module ServiceMethods
     def nodeinfo
-      ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
-      redis.setex('nodeinfo', ttl, super.to_json)
-      return JSON.parse(redis.get('nodeinfo'))
+      unless info = redis.get('nodeinfo')
+        ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
+        info = super.to_json
+        redis.setex('nodeinfo', ttl, info)
+      end
+      return JSON.parse(info)
     end
 
     def account
