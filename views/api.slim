@@ -136,6 +136,7 @@ html lang='ja'
         li  v-if='config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
+            .alert 与えられた実行回数（有限）を消費します。やむを得ない場合にだけ、慎重に実行してください。
             .endpoint_container
               .link POST /mulukhiya/api/annict/crawl
               .link_description Annictへの問い合わせを行います。
@@ -177,8 +178,8 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          account: {is_admin: false, annict: null},
-          config: {annict: null, webhook: {url: null}},
+          account: {is_admin: false},
+          config: {annict: null, webhook: null},
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
