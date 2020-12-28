@@ -34,7 +34,7 @@ module Mulukhiya
     end
 
     def test_display_name
-      assert_kind_of([String, NilClass], @account.display_name)
+      assert_kind_of(String, @account.display_name)
     end
 
     def test_admin?

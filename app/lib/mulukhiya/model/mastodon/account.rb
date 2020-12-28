@@ -12,12 +12,15 @@ module Mulukhiya
             is_admin: admin?,
             is_moderator: moderator?,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
           @hash.deep_compact!
         end
         return @hash
+      end
+
+      def display_name
+        return values[:display_name] || acct.to_s
       end
 
       def domain

@@ -35,6 +35,10 @@ module Mulukhiya
 
       alias size file_file_size
 
+      def account
+        return status.account
+      end
+
       def date
         return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
@@ -76,7 +80,7 @@ module Mulukhiya
         return {
           link: uri.to_s,
           title: "#{name} (#{size_str}) #{description}",
-          author: status.account.display_name || status.account.acct.to_s,
+          author: account.display_name,
           date: date,
         }
       end

@@ -14,7 +14,6 @@ module Mulukhiya
             is_moderator: moderator?,
             url: uri.to_s,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
@@ -35,7 +34,9 @@ module Mulukhiya
         return acct.username
       end
 
-      alias display_name name
+      def display_name
+        return name || acct.to_s
+      end
 
       def host
         return acct.host
