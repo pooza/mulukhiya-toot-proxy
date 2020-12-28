@@ -9,9 +9,9 @@ module Mulukhiya
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
             username: username,
-            display_name: display_name,
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
             url: uri.to_s,
           )
           @hash.delete(:password_hash)

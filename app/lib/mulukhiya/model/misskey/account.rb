@@ -10,6 +10,7 @@ module Mulukhiya
             url: uri.to_s,
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
           )
           @hash.delete(:token)
           @hash.deep_compact!

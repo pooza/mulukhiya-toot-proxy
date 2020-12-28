@@ -11,6 +11,7 @@ module Mulukhiya
           @hash = values.deep_symbolize_keys.merge(
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
           )
           @hash.delete(:private_key)
           @hash.delete(:public_key)
