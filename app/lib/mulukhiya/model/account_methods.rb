@@ -62,6 +62,10 @@ module Mulukhiya
       return []
     end
 
+    def field_tag_bases
+      return fields.map {|v| v['value']}.filter {|v| v.match?(/^#/)}.map(&:to_hashtag_base)
+    end
+
     def notify_verbose?
       return user_config['/notify/verbose'] == true
     end
@@ -88,7 +92,7 @@ module Mulukhiya
       end
       return tags.to_a
     rescue => e
-      Skack.broadcast(e)
+      logger.error(error: e, account: acct.to_s)
     end
   end
 end

@@ -45,6 +45,12 @@ module Mulukhiya
         return []
       end
 
+      def fields
+        return JSON.parse(values[:fields])
+      rescue
+        return []
+      end
+
       def admin?
         return user.admin
       end
