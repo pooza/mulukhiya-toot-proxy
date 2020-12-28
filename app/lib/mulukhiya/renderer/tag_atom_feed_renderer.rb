@@ -75,10 +75,13 @@ module Mulukhiya
       tags = TagContainer.default_tag_bases.clone
       tags.concat(TagContainer.media_tag_bases)
       tags.concat(TagContainer.futured_tag_bases)
+      tags.concat(TagContainer.field_tag_bases)
       tags.uniq.each do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
         yield renderer
+      rescue => e
+        logger.error(error: e, tag: tag)
       end
     end
 
