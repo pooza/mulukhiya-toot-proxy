@@ -37,6 +37,10 @@ module Mulukhiya
       assert_kind_of(String, @account.display_name)
     end
 
+    def test_fields
+      assert_kind_of(Array, @account.fields)
+    end
+
     def test_admin?
       assert_boolean(@account.admin?)
     end
@@ -88,6 +92,10 @@ module Mulukhiya
 
     def test_featured_tag_bases
       assert_kind_of(Array, @account.featured_tag_bases)
+    end
+
+    def test_field_tag_bases
+      assert_kind_of(Array, @account.field_tag_bases)
     end
   end
 end
