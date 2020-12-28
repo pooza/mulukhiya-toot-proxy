@@ -148,10 +148,10 @@ html lang='ja'
             .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
             .endpoint_container
               .link
-                a :href='config.webhook.url' target='_blank' GET {{config.webhook.url}}
+                a :href='webhook.href' target='_blank' GET {{webhook.href}}
               .link_description webhookが正常であるかを確認します。
             .endpoint_container
-              .link POST {{config.webhook.url}}
+              .link POST {{webhook.href}}
               .link_description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
@@ -180,6 +180,7 @@ html lang='ja'
           message: null,
           account: {is_admin: false},
           config: {annict: null, webhook: null},
+          webhook: {href: null},
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
@@ -209,6 +210,9 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
+              if (e.config && e.config.webhook) {
+                this.webhook.href = (new URL(e.config.webhook.url)).pathname
+              }
               const feed_list_url = new URL('/mulukhiya/api/feed/list', location.href)
               feed_list_url.searchParams.set('token', Vue.getToken())
               this.feed.list.href = feed_list_url.href
