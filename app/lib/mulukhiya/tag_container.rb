@@ -27,6 +27,12 @@ module Mulukhiya
       return []
     end
 
+    def self.field_tag_bases
+      return Environment.hash_tag_class.field_tag_bases
+    rescue
+      return []
+    end
+
     def self.media_tag?
       return config['/tagging/media/enable']
     end
