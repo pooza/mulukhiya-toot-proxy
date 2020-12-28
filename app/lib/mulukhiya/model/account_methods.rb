@@ -63,7 +63,7 @@ module Mulukhiya
     end
 
     def field_tag_bases
-      return fields.map {|v| v['value']}.filter {|v| v.match?(/^#/)}.map(&:to_hashtag_base)
+      return fields.map {|v| v['value']}.filter {|v| v.start_with?('#')}.map(&:to_hashtag_base)
     end
 
     def notify_verbose?

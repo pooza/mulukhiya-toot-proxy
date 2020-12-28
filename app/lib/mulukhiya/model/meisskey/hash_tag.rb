@@ -73,7 +73,7 @@ module Mulukhiya
           tag_bases.concat(
             account.fields
               .map {|v| v['value']}
-              .select {|v| v.match?(/^#/)}
+              .select {|v| v.start_with?('#')}
               .map(&:to_hashtag_base),
           )
         end
