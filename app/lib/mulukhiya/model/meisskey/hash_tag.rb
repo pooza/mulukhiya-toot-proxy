@@ -75,6 +75,10 @@ module Mulukhiya
         return tag_bases.uniq.compact
       end
 
+      def self.field_tag_bases
+        return []
+      end
+
       private
 
       def collection_name
