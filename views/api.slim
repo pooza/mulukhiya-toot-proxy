@@ -133,7 +133,7 @@ html lang='ja'
                   | を更新します。
                 .field-update-button-container
                   button @click='updateFeeds' 実行
-        li  v-if='config.annict'
+        li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
             .alert 与えられた実行回数（有限）を消費します。やむを得ない場合にだけ、慎重に実行してください。
@@ -142,7 +142,7 @@ html lang='ja'
               .link_description Annictへの問い合わせを行います。
               .field-update-button-container
                 button @click='crawlAnnict' 実行
-        li v-if='config.webhook'
+        li v-if='account.username && config.webhook'
           h3 @click='toggleVisibility("webhook")' Slack互換webhook
           vue-slide-up-down :active='layout.details.webhook'
             .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
