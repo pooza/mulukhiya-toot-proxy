@@ -64,6 +64,9 @@ module Mulukhiya
 
     def field_tag_bases
       return fields.map {|v| v['value']}.filter {|v| v.start_with?('#')}.map(&:to_hashtag_base)
+    rescue => e
+      logger.error(error: e, acct: acct.to_s)
+      return []
     end
 
     def notify_verbose?
@@ -92,7 +95,7 @@ module Mulukhiya
       end
       return tags.to_a
     rescue => e
-      logger.error(error: e, account: acct.to_s)
+      logger.error(error: e, acct: acct.to_s)
     end
   end
 end
