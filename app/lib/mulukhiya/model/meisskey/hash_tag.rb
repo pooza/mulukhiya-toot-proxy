@@ -53,7 +53,7 @@ module Mulukhiya
 
       def self.get(key)
         return nil if key[:tag].nil?
-        tag = collection.find(tag: key[:tag]).first
+        return nil unless tag = collection.find(tag: key[:tag]).first
         return HashTag.new(tag['_id'])
       end
 
@@ -65,9 +65,19 @@ module Mulukhiya
         return Mongo.instance.db[:hashtags]
       end
 
+      def self.field_tag_bases
+        tag_bases = []
+        accounts = Account.collection.find(host: nil, fields: {'$ne' => nil})
+        accounts.each do |account|
+          account = Account[account['_id'].to_s]
+          tag_bases.concat(account.field_tag_bases)
+        end
+        return tag_bases.uniq.compact
+      end
+
       def self.featured_tag_bases
         tag_bases = []
-        accounts = Account.collection.find(clientSettings: {'$ne' => nil})
+        accounts = Account.collection.find(host: nil, clientSettings: {'$ne' => nil})
         accounts.each do |account|
           account = Account[account['_id'].to_s]
           tag_bases.concat(account.featured_tag_bases)

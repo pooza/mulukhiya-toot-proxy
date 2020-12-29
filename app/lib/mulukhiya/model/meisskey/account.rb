@@ -10,8 +10,8 @@ module Mulukhiya
             url: uri.to_s,
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:password)
           @hash.delete(:keypair)
           @hash.deep_compact!
@@ -35,7 +35,7 @@ module Mulukhiya
       end
 
       def display_name
-        return name
+        return name || acct.to_s
       end
 
       def recent_status
@@ -55,7 +55,8 @@ module Mulukhiya
           end
         end
         return tags.compact.uniq
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 

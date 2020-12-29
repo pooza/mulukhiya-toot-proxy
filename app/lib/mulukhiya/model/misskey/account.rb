@@ -4,20 +4,22 @@ module Mulukhiya
       include Package
       include AccountMethods
 
-      alias display_name name
-
       def to_h
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
             url: uri.to_s,
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:token)
           @hash.deep_compact!
         end
         return @hash
+      end
+
+      def display_name
+        return name || acct.to_s
       end
 
       def host
@@ -33,6 +35,13 @@ module Mulukhiya
           @uri.path = "/@#{username}"
         end
         return @uri
+      end
+
+      def fields
+        return JSON.parse(values[:fields])
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
+        return []
       end
 
       def recent_status

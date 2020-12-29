@@ -133,24 +133,25 @@ html lang='ja'
                   | を更新します。
                 .field-update-button-container
                   button @click='updateFeeds' 実行
-        li  v-if='config.annict'
+        li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
+            .alert 与えられた実行回数（有限）を消費します。やむを得ない場合にだけ、慎重に実行してください。
             .endpoint_container
               .link POST /mulukhiya/api/annict/crawl
               .link_description Annictへの問い合わせを行います。
               .field-update-button-container
                 button @click='crawlAnnict' 実行
-        li v-if='config.webhook'
+        li v-if='account.username && config.webhook'
           h3 @click='toggleVisibility("webhook")' Slack互換webhook
           vue-slide-up-down :active='layout.details.webhook'
             .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
             .endpoint_container
               .link
-                a :href='config.webhook.url' target='_blank' GET {{config.webhook.url}}
+                a :href='webhook.href' target='_blank' GET {{webhook.href}}
               .link_description webhookが正常であるかを確認します。
             .endpoint_container
-              .link POST {{config.webhook.url}}
+              .link POST {{webhook.href}}
               .link_description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
@@ -177,8 +178,9 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          account: {is_admin: false, annict: null},
-          config: {annict: null, webhook: {url: null}},
+          account: {is_admin: false},
+          config: {annict: null, webhook: null},
+          webhook: {href: null},
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
@@ -208,6 +210,9 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
+              if (e.config && e.config.webhook) {
+                this.webhook.href = (new URL(e.config.webhook.url)).pathname
+              }
               const feed_list_url = new URL('/mulukhiya/api/feed/list', location.href)
               feed_list_url.searchParams.set('token', Vue.getToken())
               this.feed.list.href = feed_list_url.href
@@ -248,8 +253,12 @@ html lang='ja'
             }).then(e => {
               this.message = null
               this.layout.details['oauth'] = false
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
-            .finally(e => indicator.hide())
+              indicator.hide()
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              this.layout.details['oauth'] = false
+              indicator.hide()
+            })
           },
           updatePrograms: function () {
             const indicator = new ActivityIndicator()
@@ -293,13 +302,21 @@ html lang='ja'
           },
           crawlAnnict: function () {
             const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['annict'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.$dialog.confirm(
+              {title: 'Annictへの問い合わせ', body: 'Annictへの問い合わせを実行します。'},
+              {okText: '実行', cancelText: 'キャンセル'}
+            ).then(e => {
+              indicator.show()
+              return axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
+            }).then(e => {
+              this.message = null
+              this.layout.details['annict'] = false
+              indicator.hide()
+            }).catch(e => {
+              this.message = Vue.createErrorMessage(e)
+              this.layout.details['annict'] = false
+              indicator.hide()
+            })
           },
           searchTags: function () {
             const indicator = new ActivityIndicator()

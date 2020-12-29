@@ -9,12 +9,11 @@ module Mulukhiya
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
             username: username,
-            display_name: display_name,
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
             url: uri.to_s,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:password_hash)
           @hash.delete(:keys)
           @hash.delete(:magic_key)
@@ -35,7 +34,9 @@ module Mulukhiya
         return acct.username
       end
 
-      alias display_name name
+      def display_name
+        return name || acct.to_s
+      end
 
       def host
         return acct.host
@@ -46,6 +47,16 @@ module Mulukhiya
       def uri
         @uri ||= Ginseng::URI.parse(ap_id)
         return @uri
+      end
+
+      def fields
+        return JSON.parse(values[:fields]).map do |entry|
+          entry['value'].sanitize!
+          entry
+        end
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
+        return []
       end
 
       def recent_status

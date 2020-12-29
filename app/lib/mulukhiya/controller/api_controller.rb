@@ -184,7 +184,10 @@ module Mulukhiya
     get '/feed/list' do
       tags = TagContainer.default_tag_bases.clone
       tags.concat(TagContainer.media_tag_bases)
-      tags.concat(@sns.account.featured_tag_bases) if @sns.account
+      if @sns.account
+        tags.concat(@sns.account.featured_tag_bases)
+        tags.concat(@sns.account.field_tag_bases)
+      end
       @renderer.message = tags.uniq.map do |tag|
         Environment.hash_tag_class.get(tag: tag).to_h
       end.deep_compact

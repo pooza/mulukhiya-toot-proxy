@@ -11,13 +11,17 @@ module Mulukhiya
           @hash = values.deep_symbolize_keys.merge(
             is_admin: admin?,
             is_moderator: moderator?,
+            display_name: display_name,
           )
-          @hash[:display_name] = acct.to_s if @hash[:display_name].empty?
           @hash.delete(:private_key)
           @hash.delete(:public_key)
           @hash.deep_compact!
         end
         return @hash
+      end
+
+      def display_name
+        return values[:display_name] || acct.to_s
       end
 
       def domain
@@ -37,7 +41,15 @@ module Mulukhiya
       def featured_tag_bases
         response = service.fetch_featured_tags(id)
         return response.parsed_response.map {|v| v['name'].to_hashtag_base}
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
+        return []
+      end
+
+      def fields
+        return JSON.parse(values[:fields])
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 

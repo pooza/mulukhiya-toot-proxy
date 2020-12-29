@@ -8,6 +8,6 @@ FROM
     FROM
       (SELECT jsonb_array_elements(keywords) AS keywords FROM antenna) AS t
   ) AS t
-WHERE keyword LIKE '#%'
+WHERE (keyword LIKE '#%')
 GROUP BY
   keyword

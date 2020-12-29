@@ -30,7 +30,7 @@ module Mulukhiya
         return {
           link: uri.to_s,
           title: "#{name} (#{size_str}) #{description}",
-          author: account.display_name || account.acct.to_s,
+          author: account.display_name,
           date: date,
         }
       end

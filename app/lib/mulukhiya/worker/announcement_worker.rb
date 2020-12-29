@@ -14,7 +14,6 @@ module Mulukhiya
         Event.new(:announce, {sns: @sns}).dispatch(announcement)
       rescue => e
         logger.error(error: e, announcement: announcement)
-        Slack.broadcast(e)
       ensure
         sleep(1)
       end

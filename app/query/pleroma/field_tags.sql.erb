@@ -1,0 +1,13 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  value AS tag
+FROM
+  (
+    SELECT
+      jsonb_array_elements(fields)->>'value' AS value
+    FROM users
+    WHERE (local = true)
+  ) AS t
+WHERE (value LIKE '#%')
+GROUP BY
+  value
