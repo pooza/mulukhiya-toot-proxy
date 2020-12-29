@@ -55,7 +55,8 @@ module Mulukhiya
           end
         end
         return tags.compact.uniq
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 

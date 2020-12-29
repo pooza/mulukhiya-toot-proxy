@@ -5,8 +5,8 @@ FROM
   (
     SELECT
       jsonb_array_elements(fields)->>'value' AS value
-    FROM accounts
-    WHERE (domain IS null)
+    FROM users
+    WHERE (local = true)
   ) AS t
 WHERE (value LIKE '#%')
 GROUP BY

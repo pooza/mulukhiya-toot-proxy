@@ -41,13 +41,15 @@ module Mulukhiya
       def featured_tag_bases
         response = service.fetch_featured_tags(id)
         return response.parsed_response.map {|v| v['name'].to_hashtag_base}
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 
       def fields
         return JSON.parse(values[:fields])
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 

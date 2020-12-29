@@ -39,7 +39,8 @@ module Mulukhiya
 
       def fields
         return JSON.parse(values[:fields])
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 

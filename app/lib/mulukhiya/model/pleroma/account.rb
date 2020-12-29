@@ -54,7 +54,8 @@ module Mulukhiya
           entry['value'].sanitize!
           entry
         end
-      rescue
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
         return []
       end
 
