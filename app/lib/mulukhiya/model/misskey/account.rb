@@ -37,6 +37,12 @@ module Mulukhiya
         return @uri
       end
 
+      def fields
+        return JSON.parse(values[:fields])
+      rescue
+        return []
+      end
+
       def recent_status
         notes = service.notes(account_id: id)
         note = notes&.first
