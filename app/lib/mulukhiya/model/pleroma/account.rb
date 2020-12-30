@@ -35,7 +35,8 @@ module Mulukhiya
       end
 
       def display_name
-        return name || acct.to_s
+        return name if name.present?
+        return acct.to_s
       end
 
       def host
