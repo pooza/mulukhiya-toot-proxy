@@ -21,7 +21,8 @@ module Mulukhiya
       end
 
       def display_name
-        return values[:display_name] || acct.to_s
+        return values[:display_name] if values[:display_name].present?
+        return acct.to_s
       end
 
       def domain
