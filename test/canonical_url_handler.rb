@@ -47,11 +47,15 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.instagram.com/p/CDngan1DcHJ/')
-      assert_nil(@handler.debug_info)
+      assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://www.instagram.com/p/CDngan1DcHJ/')
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.apple.com/jp/apple-music/')
       assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://www.apple.com/jp/apple-music/')
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://twitter.com/rna/status/997883017312878592')
+      assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://twitter.com/rna/status/997883017312878592')
     end
   end
 end
