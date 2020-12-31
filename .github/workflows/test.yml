@@ -33,7 +33,6 @@ jobs:
           sudo apt install libidn11-dev
       - name: bundle install
         run: |
-          gem install bundler
           bundle install --jobs 4 --retry 3
           bundle exec rake bundle:update
           bundle exec rake bundle:check
