@@ -19,7 +19,9 @@ module Mulukhiya
     def rewritable?(uri)
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       return false if ignore?(uri)
-      response = @http.get(uri)
+      response = @http.get(uri, {
+        headers: {'User-Agent' => config['/handler/canonical_url/useragent']},
+      })
       body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
       elements = body.xpath('//link[@rel="canonical"]')
       return false unless elements.present?
