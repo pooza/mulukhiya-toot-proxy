@@ -31,7 +31,7 @@ group :development do
   gem 'rails-erb-lint'
   gem 'rubocop'
   gem 'rubocop-performance'
-  gem 'rubocop-sequel'
+  gem 'rubocop-sequel', github: 'pooza/rubocop-sequel', branch: 'master.pooza'
   gem 'slim_lint'
   gem 'solargraph'
   gem 'test-unit'
