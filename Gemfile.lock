@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9afcde6688f0a2a3ee312bf797e5422f773048a6
+  revision: 2cbb58353f82830527384695613c26879e871335
   specs:
-    ginseng-core (1.8.8)
+    ginseng-core (1.8.9)
       activesupport
       addressable
       daemon-spawn
