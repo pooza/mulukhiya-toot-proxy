@@ -1,9 +1,8 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
-      Slack.broadcast(params)
       if webhook = Webhook.create(params[:digest])
-        webhook.payload = GitHubWebhookPayload.new(params) if @headers['X-GitHub-Hook-ID']
+        webhook.payload = GitHubWebhookPayload.new(params) if @headers['X-Github-Hook-Id']
         webhook.payload ||= SlackWebhookPayload.new(params)
         if webhook.payload.errors.present?
           @renderer.status = 422

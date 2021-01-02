@@ -13,8 +13,46 @@ module Mulukhiya
       return @errors
     end
 
+    def action
+      return @raw['action']
+    end
+
+    def zen
+      return @raw['zen']
+    end
+
+    def check_suite
+      return {
+        conclusion: @raw.dig('check_suite', 'conclusion'),
+        url: @raw.dig('check_suite', 'url'),
+      }
+    end
+
+    def check_run
+      return {
+        conclusion: @raw.dig('check_run', 'conclusion'),
+        url: @raw.dig('check_run', 'url'),
+      }
+    end
+
+    def repository
+      return {
+        full_name: @raw.dig('repository', 'full_name'),
+        html_url: @raw.dig('repository', 'html_url'),
+        url: @raw.dig('repository', 'url'),
+      }
+    end
+
     def values
-      return {Environment.controller_class.status_field => @raw.to_json}
+      return {
+        Environment.controller_class.status_field => {
+          zen: zen,
+          action: action,
+          check_suite: check_suite,
+          check_run: check_run,
+          repository: repository,
+        }.deep_stringify_keys.deep_compact.to_yaml
+      }
     end
 
     alias to_h values
