@@ -51,7 +51,7 @@ module Mulukhiya
           check_suite: check_suite,
           check_run: check_run,
           repository: repository,
-        }.deep_stringify_keys.deep_compact.to_yaml
+        }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end
 
