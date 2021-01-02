@@ -4,6 +4,7 @@ module Mulukhiya
   class Webhook
     include Package
     attr_reader :sns, :reporter
+    attr_accessor :payload
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)
@@ -28,9 +29,9 @@ module Mulukhiya
       return @json
     end
 
-    def post(status)
-      status = {'text' => status} unless status.is_a?(Hash)
-      body = SlackWebhookPayload.new(status).to_h
+    def post
+      raise 'Empty payload' unless @payload
+      body = @payload.to_h
       body['visibility'] = visibility
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
