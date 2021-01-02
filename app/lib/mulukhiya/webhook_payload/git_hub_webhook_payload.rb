@@ -21,6 +21,14 @@ module Mulukhiya
       return @raw['zen']
     end
 
+    def ref
+      return @raw['ref']
+    end
+
+    def after
+      return @raw['after']
+    end
+
     def check_suite
       return {
         conclusion: @raw.dig('check_suite', 'conclusion'),
@@ -48,6 +56,8 @@ module Mulukhiya
         Environment.controller_class.status_field => {
           zen: zen,
           action: action,
+          ref: ref,
+          after: after,
           check_suite: check_suite,
           check_run: check_run,
           repository: repository,
