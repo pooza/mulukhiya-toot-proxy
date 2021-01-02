@@ -31,7 +31,7 @@ module Mulukhiya
 
     def post
       raise 'Empty payload' unless @payload
-      body = @payload.to_h
+      body = @payload.values
       body['visibility'] = visibility
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)

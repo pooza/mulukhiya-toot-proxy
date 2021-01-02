@@ -1,5 +1,5 @@
 module Mulukhiya
-  class WebhookContract < Contract
+  class GitHubWebhookContract < Contract
     params do
       required(:digest).value(:string)
     end

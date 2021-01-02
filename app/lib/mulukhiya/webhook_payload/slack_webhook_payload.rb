@@ -8,6 +8,11 @@ module Mulukhiya
       @raw ||= values.deep_stringify_keys
     end
 
+    def errors
+      @errors ||= SlackWebhookContract.new.exec(@raw)
+      return @errors
+    end
+
     def blocks?
       return blocks.is_a?(Array)
     end
