@@ -30,7 +30,7 @@ module Mulukhiya
 
     def post(status)
       status = {'text' => status} unless status.is_a?(Hash)
-      body = WebhookPayload.new(status).to_h
+      body = SlackWebhookPayload.new(status).to_h
       body['visibility'] = visibility
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)

@@ -1,5 +1,5 @@
 module Mulukhiya
-  class WebhookPayload
+  class SlackWebhookPayload
     include Package
     attr_reader :raw
 
