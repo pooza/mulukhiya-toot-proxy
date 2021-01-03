@@ -32,22 +32,29 @@ module Mulukhiya
     def check_suite
       return {
         conclusion: @raw.dig('check_suite', 'conclusion'),
-        url: @raw.dig('check_suite', 'url'),
+        url: @raw.dig('check_suite', 'html_url'),
       }
     end
 
     def check_run
       return {
         conclusion: @raw.dig('check_run', 'conclusion'),
-        url: @raw.dig('check_run', 'url'),
+        url: @raw.dig('check_run', 'html_url'),
       }
     end
 
     def repository
       return {
-        full_name: @raw.dig('repository', 'full_name'),
-        html_url: @raw.dig('repository', 'html_url'),
-        url: @raw.dig('repository', 'url'),
+        name: @raw.dig('repository', 'full_name'),
+        url: @raw.dig('repository', 'html_url'),
+      }
+    end
+
+    def issue
+      return {
+        title: @raw.dig('issue', 'title'),
+        url: @raw.dig('issue', 'html_url'),
+        milestone: @raw.dig('issue', 'milestone', 'title'),
       }
     end
 
@@ -61,6 +68,7 @@ module Mulukhiya
           check_suite: check_suite,
           check_run: check_run,
           repository: repository,
+          issue: issue,
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end
