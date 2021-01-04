@@ -1,9 +1,7 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
-      if webhook = Webhook.create(params[:digest])
-        webhook.payload = GitHubWebhookPayload.new(params) if @headers['X-Github-Hook-Id']
-        webhook.payload ||= SlackWebhookPayload.new(params)
+      if webhook
         if webhook.payload.errors.present?
           @renderer.status = 422
           @renderer.message = webhook.payload.errors
@@ -19,12 +17,29 @@ module Mulukhiya
     end
 
     get '/:digest' do
-      if Webhook.create(params[:digest])
+      if webhook
         @renderer.message = {message: 'OK'}
       else
         @renderer.status = 404
       end
       return @renderer.to_s
+    end
+
+    def webhook
+      unless @webhook
+        @webhook ||= Webhook.create(params[:digest])
+        @webhook.payload = payload
+      end
+      return @webhook
+    rescue => e
+      logger.error(error: e, params: params)
+      return nil
+    end
+
+    def payload
+      @payload ||= GitHubWebhookPayload.new(params) if @headers['X-Github-Hook-Id']
+      @payload ||= SlackWebhookPayload.new(params)
+      return @payload
     end
   end
 end

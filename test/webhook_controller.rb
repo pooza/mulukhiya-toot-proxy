@@ -44,6 +44,15 @@ module Mulukhiya
       assert(last_response.ok?)
     end
 
+    def test_post_git_hub_payload
+      return unless hook = @parser.account.webhook
+      header 'Content-Type', 'application/json'
+      header 'X-Github-Hook-Id', '武田信玄'
+      post hook.uri.path.sub(@path_prefix_pattern, ''), {zen: '武田信玄'}.to_json
+      assert(last_response.ok?)
+      assert_equal(JSON.parse(last_response.body)['content'], '<p>---<br />zen: 武田信玄</p>')
+    end
+
     def test_invalid_request
       return unless hook = @parser.account.webhook
       header 'Content-Type', 'application/json'
