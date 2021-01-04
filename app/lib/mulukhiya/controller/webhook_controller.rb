@@ -16,7 +16,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       @renderer.message = {'error' => e.message}
-      @renderer.status = e.source_status
+      @renderer.status = e.status
       return @renderer.to_s
     end
 
