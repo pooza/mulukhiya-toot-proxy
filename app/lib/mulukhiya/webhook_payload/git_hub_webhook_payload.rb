@@ -48,5 +48,7 @@ module Mulukhiya
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end
+
+    alias to_h values
   end
 end
