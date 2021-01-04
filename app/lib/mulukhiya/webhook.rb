@@ -4,7 +4,6 @@ module Mulukhiya
   class Webhook
     include Package
     attr_reader :sns, :reporter
-    attr_accessor :payload
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)
@@ -29,10 +28,8 @@ module Mulukhiya
       return @json
     end
 
-    def post(body = nil)
-      @payload = SlackWebhookPayload.new(body) if body
-      raise 'Invalid payload' unless @payload
-      body = @payload.values.merge('visibility' => visibility)
+    def post(payload)
+      body = payload.values.merge('visibility' => visibility)
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
       Event.new(:post_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
