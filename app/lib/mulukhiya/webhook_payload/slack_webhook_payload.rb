@@ -1,36 +1,20 @@
 module Mulukhiya
-  class SlackWebhookPayload
-    include Package
-    attr_reader :raw
-
-    def initialize(values)
-      @raw = JSON.parse(values) unless values.is_a?(Hash)
-      @raw ||= values.deep_stringify_keys
-    end
-
-    def errors
-      @errors ||= SlackWebhookContract.new.exec(@raw)
-      return @errors
+  class SlackWebhookPayload < WebhookPayload
+    def contract
+      @contract ||= SlackWebhookContract.new.exec(raw) if raw
+      return @contract
     end
 
     def blocks?
       return blocks.is_a?(Array)
     end
 
-    def blocks
-      return @raw['blocks']
-    end
-
     def attachments?
       return attachments.is_a?(Array)
     end
 
-    def attachments
-      return @raw['attachments']
-    end
-
     def header
-      return @raw['spoiler_text'] unless blocks?
+      return raw['spoiler_text'] unless blocks?
       return blocks.find {|v| v['type'] == 'header'}.dig('text', 'text')
     rescue => e
       logger.error(error: e, payload: raw)
@@ -40,7 +24,7 @@ module Mulukhiya
     alias spoiler_text header
 
     def text
-      return parse_legacy_text(@raw['text']) unless blocks?
+      return parse_legacy_text(raw['text']) unless blocks?
       return blocks.find {|v| v['type'] == 'section'}.dig('text', 'text')
     rescue => e
       logger.error(error: e, payload: raw)
@@ -72,8 +56,6 @@ module Mulukhiya
       values['attachments'] = images
       return values
     end
-
-    alias to_h values
 
     private
 
