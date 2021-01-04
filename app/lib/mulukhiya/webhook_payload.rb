@@ -25,7 +25,5 @@ module Mulukhiya
     def values
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
-
-    alias to_h values
   end
 end

@@ -57,6 +57,8 @@ module Mulukhiya
       return values
     end
 
+    alias to_h values
+
     private
 
     def parse_legacy_text(text)

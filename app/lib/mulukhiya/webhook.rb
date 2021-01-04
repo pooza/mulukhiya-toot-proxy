@@ -30,7 +30,7 @@ module Mulukhiya
     end
 
     def post(body = nil)
-      body = SlackWebhookPayload.new(body).values if body
+      body = SlackWebhookPayload.new(body).to_h if body
       body ||= @payload.values
       body['visibility'] = visibility
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
