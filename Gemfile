@@ -15,7 +15,7 @@ gem 'rss'
 gem 'ruby-progressbar'
 gem 'sidekiq'
 gem 'sidekiq-failures'
-gem 'sidekiq-scheduler'
+gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
 gem 'vacuum'
 
 group :postgres do
@@ -33,6 +33,5 @@ group :development do
   gem 'rubocop-performance'
   gem 'rubocop-sequel', github: 'pooza/rubocop-sequel', branch: 'master.pooza'
   gem 'slim_lint'
-  gem 'solargraph'
   gem 'test-unit'
 end
