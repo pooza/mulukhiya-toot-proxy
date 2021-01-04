@@ -30,9 +30,9 @@ module Mulukhiya
     end
 
     def post(body = nil)
-      body = SlackWebhookPayload.new(body).to_h if body
-      body ||= @payload.values
-      body['visibility'] = visibility
+      @payload = SlackWebhookPayload.new(body) if body
+      raise 'Invalid payload' unless @payload
+      body = @payload.values.merge('visibility' => visibility)
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
       Event.new(:post_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
