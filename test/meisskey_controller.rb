@@ -35,24 +35,6 @@ module Mulukhiya
       assert(JSON.parse(last_response.body)['createdNote']['text'].include?('！!！!！'))
     end
 
-    def test_note_response
-      return if Handler.create('itunes_url_nowplaying').disable?
-      header 'Content-Type', 'application/json'
-      post '/api/notes/create', {status_field => '#nowplaying https://music.apple.com/jp/album//1447931442?i=1447931444&uo=4 #日本語のタグ', 'i' => config['/agent/test/token']}.to_json
-      assert(last_response.ok?)
-      tags = JSON.parse(last_response.body)['createdNote']['tags']
-      assert(tags.member?('日本語のタグ'))
-      assert(tags.member?('nowplaying'))
-
-      header 'Content-Type', 'application/json'
-      post '/api/notes/create', {status_field => "ああああ\n\nいいい\n\n#nowplaying https://music.apple.com/jp/album/1447931442?i=1447931444&uo=4\n\n#nowplaying https://music.apple.com/jp/album/405905341?i=405905342&uo=4", 'i' => config['/agent/test/token']}.to_json
-      assert(last_response.ok?)
-      content = JSON.parse(last_response.body)['createdNote']['text']
-      assert(content.start_with?("ああああ\n\nいいい\n\n"))
-      assert(content.include?('唯一無二'))
-      assert(content.include?('夢みる奇跡たち'))
-    end
-
     def test_webhook_entries
       return unless webhook = app.webhook_entries&.first
       assert_kind_of(String, webhook[:digest])
