@@ -1,7 +1,7 @@
 module Mulukhiya
-  class WebhookPayloadTest < TestCase
+  class SlackWebhookPayloadTest < TestCase
     def setup
-      @normal = WebhookPayload.new(%({
+      @normal = SlackWebhookPayload.new(%({
         "spoiler_text": "ネタバレ注意1",
         "text": "1: つかみ男につかまれると、体力ゲージが減少していく。",
         "attachments": [
@@ -14,7 +14,7 @@ module Mulukhiya
         ]
       }))
 
-      @blocks = WebhookPayload.new(%({
+      @blocks = SlackWebhookPayload.new(%({
         "blocks": [
           {
             "type": "header",
@@ -43,7 +43,7 @@ module Mulukhiya
         ]
       }))
 
-      @growi = WebhookPayload.new(%({
+      @growi = SlackWebhookPayload.new(%({
         "response_type": "ephemeral",
         "channel": "#test",
         "text": ":bell: <https://mulukhiya.growi.cloud/user/pooza|pooza> created <https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825|/mulukhiya/user/pooza/2020/09/12/135825>",

@@ -20,6 +20,10 @@ module Mulukhiya
         description: "#{@sns.info['metadata']['nodeName']} ##{tag}のタイムライン",
       )
       @atom = nil
+    rescue => e
+      logger.error(error: e, tag: tag)
+      @tag = nil
+      @atom = nil
     end
 
     def limit=(limit)

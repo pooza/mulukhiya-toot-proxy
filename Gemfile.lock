@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9afcde6688f0a2a3ee312bf797e5422f773048a6
+  revision: 2cbb58353f82830527384695613c26879e871335
   specs:
-    ginseng-core (1.8.8)
+    ginseng-core (1.8.9)
       activesupport
       addressable
       daemon-spawn
@@ -54,6 +54,27 @@ GIT
   specs:
     ginseng-youtube (1.0.2)
 
+GIT
+  remote: https://github.com/pooza/rubocop-sequel.git
+  revision: e0aef826a94777c0316825fdd9c44678b23db828
+  branch: master.pooza
+  specs:
+    rubocop-sequel (0.1.0.1)
+      rubocop (~> 1.0)
+
+GIT
+  remote: https://github.com/pooza/sidekiq-scheduler.git
+  revision: 14c089124ebe99c59c0c66523e42f16560a7440a
+  branch: master.pooza
+  specs:
+    sidekiq-scheduler (3.0.1)
+      e2mmap
+      redis (>= 3, < 5)
+      rufus-scheduler (~> 3.2)
+      sidekiq (>= 3)
+      thwait
+      tilt (>= 1.4.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -82,8 +103,6 @@ GEM
     aws-eventstream (1.1.0)
     aws-sigv4 (1.2.2)
       aws-eventstream (~> 1, >= 1.0.2)
-    backport (1.1.2)
-    benchmark (0.1.1)
     bootsnap (1.5.1)
       msgpack (~> 1.0)
     bson (4.11.1)
@@ -162,17 +181,12 @@ GEM
     httparty (0.18.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.5)
+    i18n (1.8.6)
       concurrent-ruby (~> 1.0)
-    jaro_winkler (1.5.4)
     json (2.5.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
-    kramdown (2.3.0)
-      rexml
-    kramdown-parser-gfm (1.1.0)
-      kramdown (~> 2.0)
     loofah (2.8.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -192,8 +206,10 @@ GEM
       ruby2_keywords (~> 0.0.1)
     netrc (0.11.0)
     nio4r (2.5.4)
-    nokogiri (1.11.0.rc4)
+    nokogiri (1.11.0)
       mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
+    nokogiri (1.11.0-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.4)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -210,7 +226,7 @@ GEM
       oauth2 (~> 1.4)
       omniauth (~> 1.9)
     parallel (1.20.1)
-    parser (2.7.2.0)
+    parser (3.0.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     power_assert (1.2.0)
@@ -245,8 +261,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    reverse_markdown (2.0.0)
-      nokogiri
     rexml (3.2.4)
     rspotify (2.10.1)
       addressable (~> 2.5.2)
@@ -254,22 +268,20 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (0.93.1)
+    rubocop (1.7.0)
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.8)
+      regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 0.6.0)
+      rubocop-ast (>= 1.2.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (1.3.0)
+    rubocop-ast (1.4.0)
       parser (>= 2.7.1.5)
-    rubocop-performance (1.9.1)
+    rubocop-performance (1.9.2)
       rubocop (>= 0.90.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-sequel (0.0.6)
-      rubocop (~> 0.55, >= 0.55)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.7.0)
@@ -283,20 +295,13 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sequel (5.39.0)
+    sequel (5.40.0)
     sidekiq (6.1.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
-    sidekiq-scheduler (3.0.1)
-      e2mmap
-      redis (>= 3, < 5)
-      rufus-scheduler (~> 3.2)
-      sidekiq (>= 3)
-      thwait
-      tilt (>= 1.4.0)
     sinatra (2.1.0)
       mustermann (~> 1.0)
       rack (~> 2.2)
@@ -308,25 +313,10 @@ GEM
     slim_lint (0.20.2)
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
-    solargraph (0.40.1)
-      backport (~> 1.1)
-      benchmark
-      bundler (>= 1.17.2)
-      e2mmap
-      jaro_winkler (~> 1.5)
-      kramdown (~> 2.3)
-      kramdown-parser-gfm (~> 1.1)
-      parser (~> 2.3)
-      reverse_markdown (>= 1.0.5, < 3)
-      rubocop (>= 0.52)
-      thor (~> 1.0)
-      tilt (~> 2.0)
-      yard (~> 0.9, >= 0.9.24)
     syslog-logger (1.6.8)
     temple (0.8.2)
     test-unit (3.3.9)
       power_assert
-    thor (1.0.1)
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
@@ -341,11 +331,11 @@ GEM
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
     yajl-ruby (1.4.1)
-    yard (0.9.26)
     zeitwerk (2.4.2)
 
 PLATFORMS
-  ruby
+  x86_64-freebsd-12
+  x86_64-linux
 
 DEPENDENCIES
   bootsnap
@@ -366,13 +356,12 @@ DEPENDENCIES
   rss
   rubocop
   rubocop-performance
-  rubocop-sequel
+  rubocop-sequel!
   ruby-progressbar
   sidekiq
   sidekiq-failures
-  sidekiq-scheduler
+  sidekiq-scheduler!
   slim_lint
-  solargraph
   test-unit
   vacuum
 
@@ -380,4 +369,4 @@ RUBY VERSION
    ruby 3.0.0p0
 
 BUNDLED WITH
-   2.2.3
+   2.2.4

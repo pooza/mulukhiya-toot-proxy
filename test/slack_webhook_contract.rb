@@ -1,7 +1,7 @@
 module Mulukhiya
-  class WebhookContractTest < TestCase
+  class SlackWebhookContractTest < TestCase
     def setup
-      @contract = WebhookContract.new
+      @contract = SlackWebhookContract.new
     end
 
     def test_call
