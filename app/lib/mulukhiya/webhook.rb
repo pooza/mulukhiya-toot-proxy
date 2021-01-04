@@ -29,9 +29,9 @@ module Mulukhiya
       return @json
     end
 
-    def post
-      raise 'Empty payload' unless @payload
-      body = @payload.values
+    def post(body = nil)
+      body = SlackWebhookPayload.new(body).values if body
+      body ||= @payload.values
       body['visibility'] = visibility
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
