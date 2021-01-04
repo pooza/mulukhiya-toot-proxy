@@ -14,7 +14,7 @@ module Mulukhiya
           "before": "0b6a249f4679ec599d86d8280607dc36c1201e9f",
           "after": "8d18e3dc3230c4b674c05064d3f41dd9b5cbcb67",
           "pull_requests": [
-            
+
           ],
           "app": {
             "id": 15368,
@@ -242,6 +242,6 @@ module Mulukhiya
 
     def test_check_suite
       assert_equal(@payload.check_suite, {conclusion: 'success', url: nil})
-   end
- end
+    end
+  end
 end
