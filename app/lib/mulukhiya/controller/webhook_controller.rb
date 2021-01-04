@@ -14,6 +14,10 @@ module Mulukhiya
         @renderer.status = 404
       end
       return @renderer.to_s
+    rescue => e
+      @renderer.message = {'error' => e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
     get '/:digest' do
@@ -28,7 +32,7 @@ module Mulukhiya
     def webhook
       unless @webhook
         @webhook ||= Webhook.create(params[:digest])
-        @webhook.payload = payload
+        @webhook&.payload = payload
       end
       return @webhook
     rescue => e

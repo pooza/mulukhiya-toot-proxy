@@ -60,7 +60,8 @@ module Mulukhiya
     private
 
     def parse_legacy_text(text)
-      temp = text.to_s
+      return text if text.nil?
+      temp = text.dup
       temp.gsub!(':bell:', '🔔')
       text.to_s.scan(/(<(.*?)\|(.*?)>)/).each do |matches|
         pair, link, label = matches

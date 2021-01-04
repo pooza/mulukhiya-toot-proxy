@@ -67,6 +67,9 @@ module Mulukhiya
         return hook[:account].webhook if hook[:digest] == key
       end
       return nil
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def self.all
