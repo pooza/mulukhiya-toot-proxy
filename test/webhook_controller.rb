@@ -50,7 +50,7 @@ module Mulukhiya
       header 'X-Github-Hook-Id', '武田信玄'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {zen: '武田信玄'}.to_json
       assert(last_response.ok?)
-      assert(JSON.parse(last_response.body)['content'].include?('zen: 武田信玄'))
+      assert(last_response.body.include?('zen: 武田信玄'))
     end
 
     def test_invalid_request
@@ -58,7 +58,7 @@ module Mulukhiya
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {}.to_json
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 422)
+      assert([400, 422].include?(last_response.status))
     end
   end
 end
