@@ -3,6 +3,7 @@ module Mulukhiya
     class Status < Sequel::Model(:note)
       include Package
       include StatusMethods
+      include SNSMethods
       many_to_one :account, key: :userId
 
       def local?

@@ -3,6 +3,7 @@ module Mulukhiya
     class HashTag < Sequel::Model(:tags)
       include Package
       include HashTagMethods
+      include SNSMethods
 
       def to_h
         @hash ||= values.deep_symbolize_keys.merge(

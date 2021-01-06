@@ -3,6 +3,7 @@ module Mulukhiya
     class Account < Sequel::Model(:user)
       include Package
       include AccountMethods
+      include SNSMethods
 
       def to_h
         unless @hash
