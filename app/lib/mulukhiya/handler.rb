@@ -154,6 +154,9 @@ module Mulukhiya
         names.concat(event.handler_names.to_a)
       end
       return names.sort.uniq
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def self.search(pattern)
