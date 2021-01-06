@@ -34,7 +34,9 @@ module Mulukhiya
       names = ARGV.first.split(/[^[:word:],]+/)[1]&.split(',')
       names ||= Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
       TestCaseFilter.all do |filter|
-        filter.exec(names) if filter.active?
+        next unless filter.active?
+        puts "filter: #{filter.class}" if Environment.test?
+        filter.exec(names)
       end
       return names.sort.uniq
     end
