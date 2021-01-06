@@ -30,6 +30,7 @@ module Mulukhiya
     end
 
     def test_accounts
+      return unless account_class
       UserConfigStorage.accounts do |account|
         assert_kind_of(account_class, account)
       end

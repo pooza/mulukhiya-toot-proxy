@@ -9,10 +9,14 @@ module Mulukhiya
     def account
       @account ||= account_class.test_account
       return @account
+    rescue
+      return nil
     end
 
     def test_token
       return account_class.test_token
+    rescue
+      return nil
     end
 
     def handler?
