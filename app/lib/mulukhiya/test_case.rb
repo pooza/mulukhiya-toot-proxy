@@ -9,13 +9,15 @@ module Mulukhiya
     def account
       @account ||= account_class.test_account
       return @account
-    rescue
+    rescue => e
+      logger.error(error: e)
       return nil
     end
 
     def test_token
       return account_class.test_token
-    rescue
+    rescue => e
+      logger.error(error: e)
       return nil
     end
 
