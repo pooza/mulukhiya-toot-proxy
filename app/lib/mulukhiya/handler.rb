@@ -4,6 +4,7 @@ require 'rest-client'
 module Mulukhiya
   class Handler
     include Package
+    include SNSMethods
     attr_reader :reporter, :event, :sns, :errors, :result
 
     def handle_pre_toot(body, params = {})
@@ -60,11 +61,6 @@ module Mulukhiya
 
     def verbose?
       return true
-    end
-
-    def notify(message, response = nil)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(sns.account, message, response)
     end
 
     def reportable?

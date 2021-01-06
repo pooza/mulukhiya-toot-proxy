@@ -1,6 +1,7 @@
 module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
+    include SNSMethods
     set :root, Environment.dir
     enable :method_override
 
@@ -43,15 +44,6 @@ module Mulukhiya
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return params[:i] if params[:i]
       raise Ginseng::AuthError, 'Unauthorized'
-    end
-
-    def notify(message)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(@sns.account, message)
-    end
-
-    def status_field
-      return Environment.controller_class.status_field
     end
   end
 end
