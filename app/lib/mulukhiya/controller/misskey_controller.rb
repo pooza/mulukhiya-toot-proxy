@@ -60,6 +60,11 @@ module Mulukhiya
       return params[:renoteId].present?
     end
 
+    def token
+      return params[:i] if params[:i]
+      raise Ginseng::AuthError, 'Unauthorized'
+    end
+
     def self.name
       return 'Misskey'
     end

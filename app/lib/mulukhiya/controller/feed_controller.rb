@@ -19,9 +19,5 @@ module Mulukhiya
       end
       return @renderer.to_s
     end
-
-    def token
-      return nil
-    end
   end
 end

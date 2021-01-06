@@ -34,16 +34,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def self.webhook_entries
+    def token
       return nil
     end
 
-    private
-
-    def token
-      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
-      return params[:i] if params[:i]
-      raise Ginseng::AuthError, 'Unauthorized'
+    def self.webhook_entries
+      return nil
     end
   end
 end
