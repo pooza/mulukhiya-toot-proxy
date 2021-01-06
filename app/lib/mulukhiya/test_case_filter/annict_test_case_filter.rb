@@ -1,8 +1,8 @@
 module Mulukhiya
   class AnnictTestCaseFilter < TestCaseFilter
     def active?
-      return Environment.test_account.annict.nil?
-    rescue Ginseng::ConfigError
+      return account.annict.nil?
+    rescue
       return true
     end
   end

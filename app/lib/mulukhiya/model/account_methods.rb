@@ -97,5 +97,27 @@ module Mulukhiya
     rescue => e
       logger.error(error: e, acct: acct.to_s)
     end
+
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def test_token
+        return config['/agent/test/token']
+      end
+
+      def test_account
+        return Environment.account_class.get(token: test_token)
+      end
+
+      def info_token
+        return config['/agent/info/token']
+      end
+
+      def info_account
+        return Environment.account_class.get(token: info_token)
+      end
+    end
   end
 end

@@ -51,8 +51,8 @@ module Mulukhiya
     end
 
     def values
-      values = {Environment.controller_class.status_field => text}
-      values[Environment.controller_class.spoiler_field] = header if header
+      values = {status_field => text}
+      values[controller_class.spoiler_field] = header if header
       values['attachments'] = images
       return values
     end

@@ -4,13 +4,21 @@ require 'rack/test'
 module Mulukhiya
   class TestCase < Ginseng::TestCase
     include Package
+    include SNSMethods
 
-    def status_field
-      return Environment.controller_class.status_field
+    def account
+      @account ||= account_class.test_account
+      return @account
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
-    def status_key
-      return Environment.controller_class.status_key
+    def test_token
+      return account_class.test_token
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def handler?
@@ -32,7 +40,9 @@ module Mulukhiya
       names = ARGV.first.split(/[^[:word:],]+/)[1]&.split(',')
       names ||= Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
       TestCaseFilter.all do |filter|
-        filter.exec(names) if filter.active?
+        next unless filter.active?
+        puts "filter: #{filter.class}" if Environment.test?
+        filter.exec(names)
       end
       return names.sort.uniq
     end

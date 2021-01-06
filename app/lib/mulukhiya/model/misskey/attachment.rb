@@ -3,6 +3,7 @@ module Mulukhiya
     class Attachment < Sequel::Model(:drive_file)
       include Package
       include AttachmentMethods
+      include SNSMethods
       many_to_one :account, key: :userId
 
       def to_h

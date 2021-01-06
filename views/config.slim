@@ -191,7 +191,7 @@ html lang='ja'
         },
         methods: {
           updateForm: function (data) {
-            this.result = jsyaml.safeDump(data.config)
+            this.result = jsyaml.dump(data.config)
             if (data.config.webhook) {
               this.form.webhook.token = data.config.webhook.token
               this.form.webhook.url = data.config.webhook.url
@@ -311,7 +311,7 @@ html lang='ja'
             indicator.show()
             axios.post('/mulukhiya/api/annict/auth', values)
               .then(e => {
-                this.result = jsyaml.safeDump(e.data.config)
+                this.result = jsyaml.dump(e.data.config)
                 this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false

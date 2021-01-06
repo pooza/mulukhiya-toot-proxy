@@ -1,7 +1,6 @@
 module Mulukhiya
   module Meisskey
     class HashTag < MongoCollection
-      include Package
       include HashTagMethods
 
       def name
@@ -30,7 +29,7 @@ module Mulukhiya
       def create_feed(params)
         return [] unless Mongo.config?
         notes = Status.collection
-          .find(tags: name, userId: {'$ne' => Environment.test_account.id})
+          .find(tags: name, userId: {'$ne' => test_account.id})
           .sort(createdAt: -1)
           .limit(params[:limit])
         return notes.map do |row|

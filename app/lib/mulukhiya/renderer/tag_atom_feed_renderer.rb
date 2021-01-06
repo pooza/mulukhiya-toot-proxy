@@ -3,11 +3,12 @@ require 'digest/sha1'
 module Mulukhiya
   class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
+    include SNSMethods
     attr_reader :logger, :tag, :limit
 
     def initialize(channel = {})
       super
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @limit = config['/feed/tag/limit']
     end
@@ -58,7 +59,7 @@ module Mulukhiya
     end
 
     def record
-      @record ||= Environment.hash_tag_class.get(tag: tag)
+      @record ||= hash_tag_class.get(tag: tag)
       return @record
     end
 
@@ -92,7 +93,7 @@ module Mulukhiya
     private
 
     def fetch
-      return nil unless Environment.controller_class.feed?
+      return nil unless controller_class.feed?
       return nil unless record
       record.create_feed(params).each do |row|
         push(
@@ -116,7 +117,7 @@ module Mulukhiya
 
     def create_link(src)
       dest = Ginseng::URI.parse(src)
-      dest = Environment.sns_class.new.create_uri(src) unless dest.absolute?
+      dest = sns_class.new.create_uri(src) unless dest.absolute?
       generic = dest.clone
       dest = TootURI.parse(generic.to_s)
       dest = NoteURI.parse(generic.to_s) unless dest.valid?

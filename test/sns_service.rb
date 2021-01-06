@@ -1,7 +1,7 @@
 module Mulukhiya
   class SNSServiceTest < TestCase
     def setup
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
     end
 
     def test_info
@@ -11,11 +11,11 @@ module Mulukhiya
     end
 
     def test_account
-      assert_kind_of(Environment.account_class, @sns.account)
+      assert_kind_of(account_class, @sns.account)
     end
 
     def test_access_token
-      assert_kind_of(Environment.access_token_class, @sns.access_token)
+      assert_kind_of(access_token_class, @sns.access_token)
     end
   end
 end

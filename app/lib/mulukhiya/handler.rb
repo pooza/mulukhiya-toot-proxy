@@ -4,6 +4,7 @@ require 'rest-client'
 module Mulukhiya
   class Handler
     include Package
+    include SNSMethods
     attr_reader :reporter, :event, :sns, :errors, :result
 
     def handle_pre_toot(body, params = {})
@@ -48,7 +49,7 @@ module Mulukhiya
 
     def handle_toot(body, params = {})
       params[:reporter] ||= Reporter.new
-      params[:sns] ||= Environment.sns_class.new
+      params[:sns] ||= sns_class.new
       @sns = params[:sns]
       handle_pre_toot(body, params)
       return handle_post_toot(body, params)
@@ -60,11 +61,6 @@ module Mulukhiya
 
     def verbose?
       return true
-    end
-
-    def notify(message, response = nil)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(sns.account, message, response)
     end
 
     def reportable?
@@ -146,18 +142,6 @@ module Mulukhiya
       return @reporter.tags
     end
 
-    def status_field
-      return Environment.controller_class.status_field
-    end
-
-    def status_key
-      return Environment.controller_class.status_key
-    end
-
-    def attachment_field
-      return Environment.controller_class.attachment_field
-    end
-
     def self.create(name, params = {})
       return "Mulukhiya::#{name.camelize}Handler".constantize.new(params)
     rescue Ginseng::ConfigError
@@ -170,6 +154,9 @@ module Mulukhiya
         names.concat(event.handler_names.to_a)
       end
       return names.sort.uniq
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def self.search(pattern)
@@ -181,7 +168,7 @@ module Mulukhiya
     def initialize(params = {})
       @result = []
       @errors = []
-      @sns = params[:sns] || Environment.sns_class.new
+      @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @prepared = false
       @event = params[:event] || 'unknown'

@@ -1,11 +1,12 @@
 module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
+    include SNSMethods
     set :root, Environment.dir
     enable :method_override
 
     before do
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @sns.token = token
       @reporter = Reporter.new
     rescue => e
@@ -33,25 +34,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def self.webhook_entries
+    def token
       return nil
     end
 
-    private
-
-    def token
-      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
-      return params[:i] if params[:i]
-      raise Ginseng::AuthError, 'Unauthorized'
-    end
-
-    def notify(message)
-      message = message.to_yaml unless message.is_a?(String)
-      return Environment.info_agent_service&.notify(@sns.account, message)
-    end
-
-    def status_field
-      return Environment.controller_class.status_field
+    def self.webhook_entries
+      return nil
     end
   end
 end

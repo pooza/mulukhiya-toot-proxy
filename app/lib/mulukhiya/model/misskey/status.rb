@@ -3,6 +3,7 @@ module Mulukhiya
     class Status < Sequel::Model(:note)
       include Package
       include StatusMethods
+      include SNSMethods
       many_to_one :account, key: :userId
 
       def local?
@@ -12,7 +13,7 @@ module Mulukhiya
       def uri
         unless @uri
           @uri = Ginseng::URI.parse(self[:uri]) if self[:uri].present?
-          @uri ||= Environment.sns_class.new.create_uri("/notes/#{id}")
+          @uri ||= sns_class.new.create_uri("/notes/#{id}")
           @uri = TootURI.parse(@uri)
           @uri = NoteURI.parse(@uri) unless @uri&.valid?
           @uri = nil unless @uri&.valid?
@@ -45,7 +46,7 @@ module Mulukhiya
       end
 
       def query
-        return Environment.sns_class.new.fetch_status(id)
+        return sns_class.new.fetch_status(id)
       end
 
       def to_md

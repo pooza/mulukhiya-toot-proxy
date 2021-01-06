@@ -19,7 +19,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return body unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
-      body['visibility'] = Environment.controller_class.visibility_name('direct')
+      body['visibility'] = controller_class.visibility_name('direct')
       @prepared = true
       return body
     rescue => e

@@ -3,6 +3,7 @@ module Mulukhiya
     class Account < Sequel::Model(:users)
       include Package
       include AccountMethods
+      include SNSMethods
       attr_accessor :token
 
       def to_h

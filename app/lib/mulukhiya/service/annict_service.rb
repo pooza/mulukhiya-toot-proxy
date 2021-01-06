@@ -121,7 +121,7 @@ module Mulukhiya
       crawl_set(params).each do |key, result|
         result.each do |record|
           times.push(Time.parse(record['created_at']))
-          params[:webhook]&.post(create_body(record, key))
+          params[:webhook]&.post(SlackWebhookPayload.new(create_body(record, key)))
           records.push(record)
         end
       end

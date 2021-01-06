@@ -3,6 +3,7 @@ module Mulukhiya
     class AccessToken < Sequel::Model(:oauth_access_tokens)
       include Package
       include AccessTokenMethods
+      include SNSMethods
       many_to_one :user, key: :resource_owner_id
       many_to_one :application
 

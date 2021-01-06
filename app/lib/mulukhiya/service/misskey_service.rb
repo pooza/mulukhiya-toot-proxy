@@ -4,6 +4,7 @@ module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
     include ServiceMethods
+    include SNSMethods
 
     alias info nodeinfo
 
@@ -34,18 +35,18 @@ module Mulukhiya
     end
 
     def search_dupllicated_attachment(attachment, params = {})
-      attachment = Environment.attachment_class[attachment] if attachment.is_a?(String)
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       response = http.post('/api/drive/files/find-by-hash', {
         body: {i: token, md5: attachment.to_h[:md5]}.to_json,
         headers: headers,
       })
-      return Environment.attachment_class[response.parsed_response.first['id']]
+      return attachment_class[response.parsed_response.first['id']]
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = Environment.attachment_class[attachment] if attachment.is_a?(String)
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
       headers = params[:headers] || {}
       headers['X-Mulukhiya'] = package_class.full_name unless mulukhiya_enable?
       return http.post('/api/drive/files/delete', {
@@ -82,7 +83,7 @@ module Mulukhiya
     end
 
     def default_token
-      return config['/agent/test/token']
+      return account_class.test_token
     end
   end
 end

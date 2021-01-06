@@ -1,8 +1,8 @@
 module Mulukhiya
   class GrowiTestCaseFilter < TestCaseFilter
     def active?
-      return Environment.test_account.growi.nil?
-    rescue Ginseng::ConfigError
+      return account.growi.nil?
+    rescue
       return true
     end
   end

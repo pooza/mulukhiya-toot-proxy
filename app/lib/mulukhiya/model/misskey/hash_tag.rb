@@ -3,6 +3,7 @@ module Mulukhiya
     class HashTag < Sequel::Model(:hashtag)
       include Package
       include HashTagMethods
+      include SNSMethods
 
       def to_h
         unless @hash

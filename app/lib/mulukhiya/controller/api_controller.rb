@@ -55,7 +55,7 @@ module Mulukhiya
 
     get '/media' do
       @sns.token ||= @sns.default_token
-      if Environment.controller_class.media_catalog?
+      if controller_class.media_catalog?
         @renderer.message = Environment.attachment_class.catalog
       else
         @renderer.status = 404
@@ -109,7 +109,7 @@ module Mulukhiya
 
     post '/oauth/client/clear' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
-        Environment.sns_class.new.clear_oauth_client
+        sns_class.new.clear_oauth_client
       else
         @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
@@ -189,7 +189,7 @@ module Mulukhiya
         tags.concat(@sns.account.field_tag_bases)
       end
       @renderer.message = tags.uniq.map do |tag|
-        Environment.hash_tag_class.get(tag: tag).to_h
+        hash_tag_class.get(tag: tag).to_h
       end.deep_compact
       return @renderer.to_s
     end

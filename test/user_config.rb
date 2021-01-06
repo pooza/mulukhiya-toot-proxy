@@ -3,7 +3,7 @@ require 'securerandom'
 module Mulukhiya
   class UserConfigTest < TestCase
     def setup
-      @user_config = UserConfig.new(Environment.test_account.id)
+      @user_config = UserConfig.new(account.id)
       @key1 = SecureRandom.hex(16)
       @key2 = SecureRandom.hex(16)
     end

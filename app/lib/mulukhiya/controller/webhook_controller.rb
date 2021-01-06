@@ -2,11 +2,11 @@ module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
       if webhook
-        if webhook.payload.errors.present?
+        if payload.errors.present?
           @renderer.status = 422
-          @renderer.message = webhook.payload.errors
+          @renderer.message = payload.errors
         else
-          reporter = webhook.post
+          reporter = webhook.post(payload)
           @renderer.message = reporter.response.parsed_response
           @renderer.status = reporter.response.code
         end
@@ -30,10 +30,7 @@ module Mulukhiya
     end
 
     def webhook
-      unless @webhook
-        @webhook ||= Webhook.create(params[:digest])
-        @webhook&.payload = payload
-      end
+      @webhook ||= Webhook.create(params[:digest])
       return @webhook
     rescue => e
       logger.error(error: e, params: params)

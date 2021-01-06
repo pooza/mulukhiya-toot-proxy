@@ -1,13 +1,14 @@
 module Mulukhiya
   class UserConfig
     include Package
+    include SNSMethods
 
     def initialize(account)
-      @account = account if account.is_a?(Environment.account_class)
+      @account = account if account.is_a?(account_class)
       if account.is_a?(Hash) && (token = account['/webhook/token'])
-        @account ||= Environment.account_class.get(token: token)
+        @account ||= account_class.get(token: token)
       end
-      @account ||= Environment.account_class[account]
+      @account ||= account_class[account]
       @storage = UserConfigStorage.new
       @values = @storage[@account.id]
     end

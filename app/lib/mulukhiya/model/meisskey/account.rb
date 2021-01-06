@@ -1,7 +1,6 @@
 module Mulukhiya
   module Meisskey
     class Account < MongoCollection
-      include Package
       include AccountMethods
 
       def to_h
@@ -28,7 +27,7 @@ module Mulukhiya
       def uri
         unless @uri
           @uri = Ginseng::URI.parse("https://#{host}") if host
-          @uri ||= Environment.sns_class.new.uri.clone
+          @uri ||= sns_class.new.uri.clone
           @uri.path = "/@#{username}"
         end
         return @uri

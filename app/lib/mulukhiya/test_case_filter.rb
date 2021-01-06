@@ -1,6 +1,23 @@
 module Mulukhiya
   class TestCaseFilter < Ginseng::TestCaseFilter
     include Package
+    include SNSMethods
+
+    def account
+      @account ||= account_class.test_account
+      return @account
+    rescue => e
+      logger.error(error: e)
+      return nil
+    end
+
+    def exec(cases)
+      @params['/cases'].each do |pattern|
+        cases.delete_if do |v|
+          File.fnmatch(pattern, v)
+        end
+      end
+    end
 
     def self.create(name)
       config['/test/filters'].each do |entry|

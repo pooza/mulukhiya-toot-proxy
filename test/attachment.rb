@@ -1,8 +1,7 @@
 module Mulukhiya
   class AttachmentTest < TestCase
     def setup
-      @class = Environment.attachment_class
-      @attachment = @class[@class.catalog.first[:id]]
+      @attachment = attachment_class[attachment_class.catalog.first[:id]]
     end
 
     def test_to_h
@@ -35,11 +34,11 @@ module Mulukhiya
     end
 
     def test_feed
-      assert_kind_of(Hash, @class.feed.first)
+      assert_kind_of(Hash, attachment_class.feed.first)
     end
 
     def test_catalog
-      assert_kind_of(Hash, @class.catalog.first)
+      assert_kind_of(Hash, attachment_class.catalog.first)
     end
   end
 end

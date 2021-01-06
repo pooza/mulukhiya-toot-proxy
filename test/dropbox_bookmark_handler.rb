@@ -3,7 +3,7 @@ module Mulukhiya
     def setup
       @handler = Handler.create('dropbox_bookmark')
       return unless handler?
-      @status = Environment.test_account.recent_status
+      @status = account.recent_status
     end
 
     def test_handle_post_bookmark

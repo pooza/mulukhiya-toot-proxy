@@ -3,8 +3,8 @@ require 'digest/sha2'
 module Mulukhiya
   class Webhook
     include Package
+    include SNSMethods
     attr_reader :sns, :reporter
-    attr_accessor :payload
 
     def digest
       return Webhook.create_digest(@sns.uri, @sns.token)
@@ -29,10 +29,8 @@ module Mulukhiya
       return @json
     end
 
-    def post(body = nil)
-      body = SlackWebhookPayload.new(body).to_h if body
-      body ||= @payload.values
-      body['visibility'] = visibility
+    def post(payload)
+      body = payload.values.merge('visibility' => visibility)
       Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
       Event.new(:post_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
@@ -63,7 +61,7 @@ module Mulukhiya
 
     def self.create(key)
       return Webhook.new(key) if key.is_a?(UserConfig)
-      Environment.controller_class.webhook_entries do |hook|
+      controller_class.webhook_entries do |hook|
         return hook[:account].webhook if hook[:digest] == key
       end
       return nil
@@ -74,7 +72,7 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      Environment.controller_class.webhook_entries do |hook|
+      controller_class.webhook_entries do |hook|
         yield Webhook.create(hook[:digest])
       end
     end
@@ -84,7 +82,7 @@ module Mulukhiya
     def initialize(user_config)
       @user_config = user_config
       @reporter = Reporter.new
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @sns.token = @user_config.webhook_token
     end
   end

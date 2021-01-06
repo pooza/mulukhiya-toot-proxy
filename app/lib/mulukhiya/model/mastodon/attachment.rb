@@ -5,6 +5,7 @@ module Mulukhiya
     class Attachment < Sequel::Model(:media_attachments)
       include Package
       include AttachmentMethods
+      include SNSMethods
       many_to_one :status
 
       def to_h

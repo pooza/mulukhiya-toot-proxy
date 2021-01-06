@@ -1,6 +1,7 @@
 module Mulukhiya
   class WebhookPayload
     include Package
+    include SNSMethods
     attr_reader :raw
 
     def initialize(values)

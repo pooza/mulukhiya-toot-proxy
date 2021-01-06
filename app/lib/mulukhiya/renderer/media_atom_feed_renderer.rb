@@ -1,10 +1,11 @@
 module Mulukhiya
   class MediaAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
+    include SNSMethods
 
     def initialize(channel = {})
       super
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @channel[:title] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル"
       @channel[:description] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル #{limit}件"
@@ -23,8 +24,8 @@ module Mulukhiya
 
     def fetch
       entries.clear
-      return nil unless Environment.controller_class.media_catalog?
-      Environment.attachment_class.feed do |row|
+      return nil unless controller_class.media_catalog?
+      attachment_class.feed do |row|
         push(row)
       end
       @atom = nil

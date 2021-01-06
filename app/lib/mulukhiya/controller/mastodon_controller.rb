@@ -98,6 +98,11 @@ module Mulukhiya
       return nil
     end
 
+    def token
+      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
+      raise Ginseng::AuthError, 'Unauthorized'
+    end
+
     def self.name
       return 'Mastodon'
     end

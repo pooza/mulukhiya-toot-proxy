@@ -2,10 +2,6 @@ module Mulukhiya
   class APIControllerTest < TestCase
     include ::Rack::Test::Methods
 
-    def setup
-      @token = config['/agent/test/token']
-    end
-
     def app
       return APIController
     end
@@ -79,7 +75,7 @@ module Mulukhiya
       assert_equal(last_response.status, 403)
 
       header 'Content-Type', 'application/json'
-      post '/annict/crawl', {token: Crypt.new.encrypt(@token)}.to_json
+      post '/annict/crawl', {token: Crypt.new.encrypt(test_token)}.to_json
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
@@ -89,8 +85,8 @@ module Mulukhiya
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
 
-      uri = Environment.sns_class.new.create_uri('/feed/list')
-      uri.query_values = {token: Crypt.new.encrypt(@token)}
+      uri = sns_class.new.create_uri('/feed/list')
+      uri.query_values = {token: Crypt.new.encrypt(test_token)}
       get uri.to_s
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')

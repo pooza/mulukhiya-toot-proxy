@@ -1,7 +1,7 @@
 module Mulukhiya
   class AccessTokenTest < TestCase
     def setup
-      @token = Environment.sns_class.new.access_token
+      @token = sns_class.new.access_token
     end
 
     def test_valid?

@@ -1,7 +1,7 @@
 module Mulukhiya
   class NoteURITest < TestCase
     def setup
-      @uri = NoteURI.parse(Environment.test_account.recent_status.uri)
+      @uri = NoteURI.parse(account.recent_status.uri)
     end
 
     def test_id
@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_service
-      assert_kind_of(Environment.sns_class, @uri.service)
+      assert_kind_of(sns_class, @uri.service)
     end
 
     def test_to_md

@@ -1,6 +1,7 @@
 module Mulukhiya
   class SlimRenderer < Ginseng::Web::SlimRenderer
     include Package
+    include SNSMethods
 
     def self.render(name, values = {})
       slim = SlimRenderer.new(name)
@@ -11,7 +12,7 @@ module Mulukhiya
     end
 
     def self.create_uri(path)
-      return Environment.sns_class.new.create_uri(path)
+      return sns_class.new.create_uri(path)
     end
 
     private
@@ -21,7 +22,7 @@ module Mulukhiya
         params: params,
         slim: SlimRenderer,
         package: Package,
-        controller: Environment.controller_class,
+        controller: controller_class,
         env: Environment,
         crypt: Crypt,
         config: config,

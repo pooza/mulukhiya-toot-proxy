@@ -1,6 +1,7 @@
 module Mulukhiya
   class QueryTemplate < Ginseng::Postgres::QueryTemplate
     include Package
+    include SNSMethods
 
     def self.escape(value)
       return Postgres.instance.escape_string(value)

@@ -4,7 +4,7 @@ module Mulukhiya
 
     def setup
       @parser = TootParser.new
-      @parser.account = Environment.test_account
+      @parser.account = account
     end
 
     def app
@@ -55,7 +55,7 @@ module Mulukhiya
       return unless webhook = app.webhook_entries&.first
       assert_kind_of(String, webhook[:digest])
       assert_kind_of(String, webhook[:token])
-      assert_kind_of(Environment.account_class, webhook[:account])
+      assert_kind_of(account_class, webhook[:account])
     end
   end
 end

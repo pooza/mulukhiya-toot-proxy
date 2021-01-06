@@ -70,34 +70,20 @@ module Mulukhiya
         return false
       end
 
-      def parser_name
-        return config["/#{name.underscore}/parser"]
-      rescue Ginseng::ConfigError
-        return false
-      end
-
       def dbms_name
         return config["/#{name.underscore}/dbms"]
-      end
-
-      def parser_class
-        return "Mulukhiya::#{parser_name.camelize}Parser".constantize
       end
 
       def dbms_class
         return "Mulukhiya::#{dbms_name.camelize}".constantize
       end
 
-      def postgres?
-        return dbms_name == 'postgres'
+      def parser_name
+        return config["/#{name.underscore}/parser"]
       end
 
-      def mongo?
-        return dbms_name == 'mongo'
-      end
-
-      def status_field
-        return config["/parser/#{parser_name}/fields/body"]
+      def parser_class
+        return "Mulukhiya::#{parser_name.camelize}Parser".constantize
       end
 
       def oauth_webui_uri
@@ -110,6 +96,10 @@ module Mulukhiya
         return config["/#{name.underscore}/oauth/scopes"] || []
       rescue Ginseng::ConfigError
         return nil
+      end
+
+      def status_field
+        return config["/parser/#{parser_name}/fields/body"]
       end
 
       def poll_options_field
@@ -128,16 +118,12 @@ module Mulukhiya
         return config["/#{name.underscore}/status/key"]
       end
 
-      def visibility_name(name)
-        return parser_class.visibility_name(name)
-      end
-
       def status_label
         return config["/#{name.underscore}/status/label"]
       end
 
-      def event_syms
-        return config.keys("/#{name.underscore}/handlers").map(&:to_sym)
+      def visibility_name(name)
+        return parser_class.visibility_name(name)
       end
     end
   end

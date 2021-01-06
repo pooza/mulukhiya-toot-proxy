@@ -3,6 +3,7 @@ module Mulukhiya
     class HashTag
       include Package
       include HashTagMethods
+      include SNSMethods
       attr_reader :name
 
       def initialize(name)
