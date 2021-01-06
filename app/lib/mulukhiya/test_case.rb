@@ -7,7 +7,7 @@ module Mulukhiya
     include SNSMethods
 
     def account
-      @account ||= Environment.account_class.test_account
+      @account ||= account_class.test_account
       return @account
     end
 

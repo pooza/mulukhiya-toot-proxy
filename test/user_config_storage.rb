@@ -31,7 +31,7 @@ module Mulukhiya
 
     def test_accounts
       UserConfigStorage.accounts do |account|
-        assert_kind_of(Environment.account_class, account)
+        assert_kind_of(account_class, account)
       end
     end
   end

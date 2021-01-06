@@ -4,7 +4,7 @@ module Mulukhiya
       return body unless body[attachment_field]
       ids = []
       body[attachment_field].each do |id|
-        next unless src = Environment.attachment_class[id]
+        next unless src = attachment_class[id]
         next unless dest = sns.search_dupllicated_attachment(src)
         ids.push(dest.id)
         next if dest.id == src.id

@@ -13,12 +13,12 @@ module Mulukhiya
     end
 
     def test_account
-      assert_kind_of(Environment.account_class, @status.account)
+      assert_kind_of(account_class, @status.account)
     end
 
     def test_attachments
       @status.attachments.each do |attachment|
-        assert_kind_of([Environment.attachment_class, Hash], attachment)
+        assert_kind_of([attachment_class, Hash], attachment)
       end
     end
 

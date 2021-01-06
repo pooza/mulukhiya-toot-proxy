@@ -189,7 +189,7 @@ module Mulukhiya
         tags.concat(@sns.account.field_tag_bases)
       end
       @renderer.message = tags.uniq.map do |tag|
-        Environment.hash_tag_class.get(tag: tag).to_h
+        hash_tag_class.get(tag: tag).to_h
       end.deep_compact
       return @renderer.to_s
     end

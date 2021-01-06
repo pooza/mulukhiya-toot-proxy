@@ -1,8 +1,8 @@
 module Mulukhiya
   class HashTagTest < TestCase
     def setup
-      @nowplaying = Environment.hash_tag_class.get(tag: 'nowplaying')
-      @default = Environment.hash_tag_class.get(tag: TagContainer.default_tag_bases&.first)
+      @nowplaying = hash_tag_class.get(tag: 'nowplaying')
+      @default = hash_tag_class.get(tag: TagContainer.default_tag_bases&.first)
     end
 
     def test_name
@@ -29,11 +29,11 @@ module Mulukhiya
     end
 
     def test_featured_tag_bases
-      assert_kind_of(Array, Environment.hash_tag_class.featured_tag_bases)
+      assert_kind_of(Array, hash_tag_class.featured_tag_bases)
     end
 
     def test_field_tag_bases
-      assert_kind_of(Array, Environment.hash_tag_class.field_tag_bases)
+      assert_kind_of(Array, hash_tag_class.field_tag_bases)
     end
   end
 end

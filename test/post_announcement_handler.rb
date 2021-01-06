@@ -2,7 +2,7 @@ module Mulukhiya
   class PostAnnouncementHandlerTest < TestCase
     def setup
       @handler = Handler.create('post_announcement')
-      config['/agent/info/token'] = Environment.account_class.test_token
+      config['/agent/info/token'] = account_class.test_token
     end
 
     def test_handle_announce

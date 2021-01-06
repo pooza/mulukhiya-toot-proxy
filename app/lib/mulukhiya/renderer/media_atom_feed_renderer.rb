@@ -25,7 +25,7 @@ module Mulukhiya
     def fetch
       entries.clear
       return nil unless controller_class.media_catalog?
-      Environment.attachment_class.feed do |row|
+      attachment_class.feed do |row|
         push(row)
       end
       @atom = nil

@@ -1,10 +1,10 @@
 module Mulukhiya
   class AccountTest < TestCase
     def test_get
-      assert_equal(Environment.account_class.get(token: account.token).id, account.id)
-      assert_equal(Environment.account_class.get(acct: account.acct.to_s).id, account.id)
-      assert_equal(Environment.account_class.get(id: account.id).id, account.id)
-      assert_nil(Environment.account_class.get(token: nil))
+      assert_equal(account_class.get(token: account.token).id, account.id)
+      assert_equal(account_class.get(acct: account.acct.to_s).id, account.id)
+      assert_equal(account_class.get(id: account.id).id, account.id)
+      assert_nil(account_class.get(token: nil))
     end
 
     def test_acct

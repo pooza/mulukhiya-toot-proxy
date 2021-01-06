@@ -26,7 +26,7 @@ module Mulukhiya
     def create_media_tags(body)
       tags = []
       (body[attachment_field] || []).each do |id|
-        type = Environment.attachment_class[id].type
+        type = attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
           tags.push(config["/tagging/media/tags/#{mediatype}"])

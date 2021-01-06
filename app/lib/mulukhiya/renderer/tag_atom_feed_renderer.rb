@@ -59,7 +59,7 @@ module Mulukhiya
     end
 
     def record
-      @record ||= Environment.hash_tag_class.get(tag: tag)
+      @record ||= hash_tag_class.get(tag: tag)
       return @record
     end
 
