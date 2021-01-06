@@ -50,7 +50,7 @@ module Mulukhiya
     end
 
     def default_token
-      return config['/agent/test/token']
+      return Environment.account_class.test_token
     end
   end
 end

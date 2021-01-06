@@ -13,7 +13,7 @@ module Mulukhiya
 
     def info_agent_service
       service = Environment.sns_service_class.new
-      service.token = config['/agent/info/token']
+      service.token = Environment.account_class.info_token
       return service
     end
 

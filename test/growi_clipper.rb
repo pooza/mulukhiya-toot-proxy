@@ -1,15 +1,11 @@
 module Mulukhiya
   class GrowiClipperTest < TestCase
-    def setup
-      @clipper = account.growi
-    end
-
     def test_create
-      assert_kind_of(GrowiClipper, @clipper)
+      assert_kind_of(GrowiClipper, account.growi)
     end
 
     def test_clip
-      r = @clipper.clip(body: "#{Time.now} #{__method__}")
+      r = account.growi.clip(body: "#{Time.now} #{__method__}")
       assert_kind_of(HTTParty::Response, r)
       assert_equal(200, r.code)
     end

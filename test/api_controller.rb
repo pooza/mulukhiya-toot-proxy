@@ -3,7 +3,7 @@ module Mulukhiya
     include ::Rack::Test::Methods
 
     def setup
-      @token = config['/agent/test/token']
+      @token = Environment.account_class.test_token
     end
 
     def app
