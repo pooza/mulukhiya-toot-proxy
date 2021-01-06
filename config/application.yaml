@@ -96,21 +96,23 @@ test:
         - event
         - slack
         - user_config
-        - spotify_url_handler
-        - tag_atom_feed_renderer
-        - media_atom_feed_renderer
     - name: postgres
       cases:
         - clipping_worker
         - note_uri
         - toot_uri
-        - query_template
         - sns_methods
         - account
         - attachment
         - access_token
         - status
         - hash_tag
+        - dropbox_bookmark_handler
+        - growi_bookmark_handler
+        - media_atom_feed_renderer
+        - spotify_url_handler
+        - tag_atom_feed_renderer
+        - query_template
     - name: mongo
       cases:
         - clipping_worker
@@ -122,6 +124,11 @@ test:
         - access_token
         - status
         - hash_tag
+        - dropbox_bookmark_handler
+        - growi_bookmark_handler
+        - media_atom_feed_renderer
+        - spotify_url_handler
+        - tag_atom_feed_renderer
     - name: amazon
       cases:
         - amazon_service

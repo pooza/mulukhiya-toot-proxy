@@ -51,6 +51,8 @@ module Mulukhiya
 
     def test_account
       return account_class.test_account
+    rescue => e
+      logger.error(error: e)
     end
 
     def self.included(base)
