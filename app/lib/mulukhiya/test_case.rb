@@ -11,6 +11,10 @@ module Mulukhiya
       return @account
     end
 
+    def test_token
+      return account_class.test_token
+    end
+
     def handler?
       return false if @handler.nil?
       return false if @handler.disable?
