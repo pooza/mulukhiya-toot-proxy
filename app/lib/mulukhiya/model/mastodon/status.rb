@@ -3,6 +3,7 @@ module Mulukhiya
     class Status < Sequel::Model(:statuses)
       include Package
       include StatusMethods
+      include SNSMethods
       one_to_many :attachment
       many_to_one :account
 
@@ -30,7 +31,7 @@ module Mulukhiya
       def public_uri
         unless @public_uri
           if Environment.mastodon_type?
-            service = Environment.sns_class.new
+            service = sns_class.new
           else
             service = MastodonService.new
           end

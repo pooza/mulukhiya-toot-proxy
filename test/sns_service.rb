@@ -1,7 +1,7 @@
 module Mulukhiya
   class SNSServiceTest < TestCase
     def setup
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
     end
 
     def test_info

@@ -8,7 +8,7 @@ module Mulukhiya
 
     def initialize(channel = {})
       super
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @limit = config['/feed/tag/limit']
     end
@@ -117,7 +117,7 @@ module Mulukhiya
 
     def create_link(src)
       dest = Ginseng::URI.parse(src)
-      dest = Environment.sns_class.new.create_uri(src) unless dest.absolute?
+      dest = sns_class.new.create_uri(src) unless dest.absolute?
       generic = dest.clone
       dest = TootURI.parse(generic.to_s)
       dest = NoteURI.parse(generic.to_s) unless dest.valid?

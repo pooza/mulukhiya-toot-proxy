@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_service
-      assert_kind_of(Environment.sns_class, @uri.service)
+      assert_kind_of(sns_class, @uri.service)
     end
 
     def test_to_md

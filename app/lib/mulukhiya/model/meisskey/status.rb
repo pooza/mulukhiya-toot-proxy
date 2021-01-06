@@ -18,7 +18,7 @@ module Mulukhiya
       def uri
         unless @uri
           @uri = Ginseng::URI.parse(values['uri']) if values['uri'].present?
-          @uri ||= Environment.sns_class.new.create_uri("/notes/#{id}")
+          @uri ||= sns_class.new.create_uri("/notes/#{id}")
           @uri = TootURI.parse(@uri)
           @uri = NoteURI.parse(@uri) unless @uri&.valid?
           @uri = nil unless @uri&.valid?
@@ -45,7 +45,7 @@ module Mulukhiya
       end
 
       def query
-        return Environment.sns_class.new.fetch_status(id)
+        return sns_class.new.fetch_status(id)
       end
 
       def to_md

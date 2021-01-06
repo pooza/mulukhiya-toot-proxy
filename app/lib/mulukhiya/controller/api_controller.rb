@@ -109,7 +109,7 @@ module Mulukhiya
 
     post '/oauth/client/clear' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
-        Environment.sns_class.new.clear_oauth_client
+        sns_class.new.clear_oauth_client
       else
         @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403

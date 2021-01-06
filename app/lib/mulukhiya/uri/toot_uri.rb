@@ -1,6 +1,7 @@
 module Mulukhiya
   class TootURI < Ginseng::Fediverse::TootURI
     include Package
+    include SNSMethods
 
     def local?
       return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
@@ -27,7 +28,7 @@ module Mulukhiya
         uri.query = nil
         uri.fragment = nil
         if Environment.mastodon_type?
-          @service = Environment.sns_class.new(uri)
+          @service = sns_class.new(uri)
         else
           @service = MastodonService.new(uri)
         end

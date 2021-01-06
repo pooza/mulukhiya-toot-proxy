@@ -49,7 +49,7 @@ module Mulukhiya
 
     def handle_toot(body, params = {})
       params[:reporter] ||= Reporter.new
-      params[:sns] ||= Environment.sns_class.new
+      params[:sns] ||= sns_class.new
       @sns = params[:sns]
       handle_pre_toot(body, params)
       return handle_post_toot(body, params)
@@ -168,7 +168,7 @@ module Mulukhiya
     def initialize(params = {})
       @result = []
       @errors = []
-      @sns = params[:sns] || Environment.sns_class.new
+      @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @prepared = false
       @event = params[:event] || 'unknown'

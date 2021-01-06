@@ -6,7 +6,7 @@ module Mulukhiya
     enable :method_override
 
     before do
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @sns.token = token
       @reporter = Reporter.new
     rescue => e

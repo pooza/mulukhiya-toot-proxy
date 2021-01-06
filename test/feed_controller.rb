@@ -24,7 +24,7 @@ module Mulukhiya
       return unless controller_class.feed?
       return unless TagContainer.default_tag_bases.present?
 
-      service = Environment.sns_class.new
+      service = sns_class.new
       TagContainer.default_tag_bases.each do |tag|
         get service.create_uri("/tag/#{tag}").normalize.path
         assert(last_response.ok?)

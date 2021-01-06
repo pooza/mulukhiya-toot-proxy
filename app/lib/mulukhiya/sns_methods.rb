@@ -4,6 +4,10 @@ module Mulukhiya
       return Environment.controller_class
     end
 
+    def sns_class
+      return Environment.sns_class
+    end
+
     def status_field
       return controller_class.status_field
     end

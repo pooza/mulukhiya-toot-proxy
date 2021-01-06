@@ -5,7 +5,7 @@ module Mulukhiya
 
     def initialize(channel = {})
       super
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @channel[:title] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル"
       @channel[:description] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル #{limit}件"

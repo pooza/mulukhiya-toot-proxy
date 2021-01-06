@@ -82,7 +82,7 @@ module Mulukhiya
     def initialize(user_config)
       @user_config = user_config
       @reporter = Reporter.new
-      @sns = Environment.sns_class.new
+      @sns = sns_class.new
       @sns.token = @user_config.webhook_token
     end
   end

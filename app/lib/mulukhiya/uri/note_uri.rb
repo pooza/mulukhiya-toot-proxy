@@ -1,6 +1,7 @@
 module Mulukhiya
   class NoteURI < Ginseng::Fediverse::NoteURI
     include Package
+    include SNSMethods
 
     def local?
       return true if note['user']['host'].empty?
@@ -37,7 +38,7 @@ module Mulukhiya
         uri.query = nil
         uri.fragment = nil
         if Environment.misskey_type?
-          @service = Environment.sns_class.new(uri)
+          @service = sns_class.new(uri)
         else
           @service = MisskeyService.new(uri)
         end
