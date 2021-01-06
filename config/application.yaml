@@ -95,12 +95,16 @@ test:
         - note_uri
         - toot_uri
         - sns_methods
+        - sns_service
         - account
         - attachment
         - access_token
         - status
         - hash_tag
         - user_config
+        - user_config_storage
+        - media_atom_feed_renderer
+        - reporter
         - '*_controller'
         - '*_handler'
     - name: postgres
