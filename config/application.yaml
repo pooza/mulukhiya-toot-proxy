@@ -105,6 +105,7 @@ test:
         - user_config_storage
         - media_atom_feed_renderer
         - reporter
+        - handler
         - '*_controller'
         - '*_handler'
     - name: postgres
