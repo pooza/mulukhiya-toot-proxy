@@ -93,13 +93,8 @@ test:
         - feed_controller
         - api_controller
         - mastodon_controller
-        - attachment
         - event
         - slack
-        - account
-        - access_token
-        - status
-        - hash_tag
         - user_config
         - spotify_url_handler
         - tag_atom_feed_renderer
@@ -111,11 +106,21 @@ test:
         - note_uri
         - query_template
         - toot_uri
+        - account
+        - attachment
+        - access_token
+        - status
+        - hash_tag
     - name: mongo
       cases:
         - clipping_worker
         - note_uri
         - toot_uri
+        - account
+        - attachment
+        - access_token
+        - status
+        - hash_tag
     - name: amazon
       cases:
         - amazon_service
