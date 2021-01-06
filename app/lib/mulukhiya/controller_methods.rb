@@ -86,10 +86,6 @@ module Mulukhiya
         return "Mulukhiya::#{parser_name.camelize}Parser".constantize
       end
 
-      def status_field
-        return config["/parser/#{parser_name}/fields/body"]
-      end
-
       def oauth_webui_uri
         return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"])
       rescue Ginseng::ConfigError
@@ -100,6 +96,10 @@ module Mulukhiya
         return config["/#{name.underscore}/oauth/scopes"] || []
       rescue Ginseng::ConfigError
         return nil
+      end
+
+      def status_field
+        return config["/parser/#{parser_name}/fields/body"]
       end
 
       def poll_options_field
@@ -118,16 +118,12 @@ module Mulukhiya
         return config["/#{name.underscore}/status/key"]
       end
 
-      def visibility_name(name)
-        return parser_class.visibility_name(name)
-      end
-
       def status_label
         return config["/#{name.underscore}/status/label"]
       end
 
-      def event_syms
-        return config.keys("/#{name.underscore}/handlers").map(&:to_sym)
+      def visibility_name(name)
+        return parser_class.visibility_name(name)
       end
     end
   end

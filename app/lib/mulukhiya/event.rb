@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def self.syms
-      return Environment.controller_class.event_syms
+      return config.keys("/#{Environment.controller_name}/handlers").map(&:to_sym)
     end
   end
 end
