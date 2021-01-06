@@ -9,7 +9,7 @@ module Mulukhiya
       return unless handler?
 
       @handler.clear
-      @handler.handle_announce({text: 'お知らせです。GROWI'}, {sns: Environment.info_agent_service})
+      @handler.handle_announce({text: 'お知らせです。GROWI'}, {sns: info_agent_service})
       assert_kind_of(String, @handler.debug_info[:result].first[:path])
     end
   end

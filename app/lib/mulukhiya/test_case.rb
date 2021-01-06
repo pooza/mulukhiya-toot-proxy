@@ -4,6 +4,7 @@ require 'rack/test'
 module Mulukhiya
   class TestCase < Ginseng::TestCase
     include Package
+    include SNSMethods
 
     def status_field
       return Environment.controller_class.status_field

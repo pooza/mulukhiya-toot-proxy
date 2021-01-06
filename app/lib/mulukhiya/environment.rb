@@ -46,12 +46,6 @@ module Mulukhiya
       return sns_class.new.account
     end
 
-    def self.info_agent_service
-      service = service_class.new
-      service.token = config['/agent/info/token']
-      return service
-    end
-
     def self.controller_class
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
@@ -124,7 +118,7 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}::HashTag".constantize
     end
 
-    def self.service_class
+    def self.sns_service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     end
 
