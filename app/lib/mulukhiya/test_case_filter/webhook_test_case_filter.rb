@@ -3,7 +3,7 @@ module Mulukhiya
     def active?
       return true unless controller_class.webhook?
       return account.webhook.nil?
-    rescue Ginseng::ConfigError
+    rescue
       return true
     end
   end

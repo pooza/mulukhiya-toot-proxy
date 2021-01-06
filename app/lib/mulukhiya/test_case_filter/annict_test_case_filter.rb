@@ -2,7 +2,7 @@ module Mulukhiya
   class AnnictTestCaseFilter < TestCaseFilter
     def active?
       return account.annict.nil?
-    rescue Ginseng::ConfigError
+    rescue
       return true
     end
   end

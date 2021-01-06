@@ -4,7 +4,7 @@ module Mulukhiya
       config['/handler/hexo_announcement/category']
       config['/handler/hexo_announcement/path']
       return false
-    rescue Ginseng::ConfigError
+    rescue
       return true
     end
   end
