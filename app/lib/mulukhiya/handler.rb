@@ -142,18 +142,6 @@ module Mulukhiya
       return @reporter.tags
     end
 
-    def status_field
-      return Environment.controller_class.status_field
-    end
-
-    def status_key
-      return Environment.controller_class.status_key
-    end
-
-    def attachment_field
-      return Environment.controller_class.attachment_field
-    end
-
     def self.create(name, params = {})
       return "Mulukhiya::#{name.camelize}Handler".constantize.new(params)
     rescue Ginseng::ConfigError

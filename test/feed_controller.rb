@@ -12,8 +12,8 @@ module Mulukhiya
     end
 
     def test_media
-      return unless Environment.controller_class.feed?
-      return unless Environment.controller_class.media_catalog?
+      return unless controller_class.feed?
+      return unless controller_class.media_catalog?
 
       get '/media'
       assert(last_response.ok?)
@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def test_default_tag
-      return unless Environment.controller_class.feed?
+      return unless controller_class.feed?
       return unless TagContainer.default_tag_bases.present?
 
       service = Environment.sns_class.new
@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def test_media_tag
-      return unless Environment.controller_class.feed?
+      return unless controller_class.feed?
       return unless TagContainer.media_tag?
 
       get '/tag/image'

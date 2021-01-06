@@ -1,6 +1,7 @@
 module Mulukhiya
   class TaggingDictionary < Hash
     include Package
+    include SNSMethods
 
     def initialize
       super
@@ -98,10 +99,10 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      status = body[Environment.controller_class.status_field].clone
+      status = body[status_field].clone
       status.gsub!(Acct.pattern, '')
       parts = [status]
-      options = body.dig('poll', Environment.controller_class.poll_options_field)
+      options = body.dig('poll', controller_class.poll_options_field)
       parts.concat(options) if options.present?
       return parts.join('::::')
     end

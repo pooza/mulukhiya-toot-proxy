@@ -1,6 +1,7 @@
 module Mulukhiya
   class TestCaseFilter < Ginseng::TestCaseFilter
     include Package
+    include SNSMethods
 
     def account
       @account ||= Environment.account_class.test_account

@@ -12,7 +12,7 @@ module Mulukhiya
     private
 
     def visibility
-      return Environment.controller_class.visibility_name('unlisted')
+      return controller_class.visibility_name('unlisted')
     end
   end
 end

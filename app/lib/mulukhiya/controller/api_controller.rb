@@ -55,7 +55,7 @@ module Mulukhiya
 
     get '/media' do
       @sns.token ||= @sns.default_token
-      if Environment.controller_class.media_catalog?
+      if controller_class.media_catalog?
         @renderer.message = Environment.attachment_class.catalog
       else
         @renderer.status = 404

@@ -36,7 +36,7 @@ module Mulukhiya
 
     def values
       return {
-        Environment.controller_class.status_field => {
+        status_field => {
           zen: zen,
           action: action,
           ref: ref,

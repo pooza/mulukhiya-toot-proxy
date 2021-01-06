@@ -71,13 +71,5 @@ module Mulukhiya
     def test_status_label
       assert_kind_of(String, controller_class.status_label)
     end
-
-    def test_event_syms
-      assert_kind_of(Array, controller_class.event_syms)
-    end
-
-    def controller_class
-      return Environment.controller_class
-    end
   end
 end

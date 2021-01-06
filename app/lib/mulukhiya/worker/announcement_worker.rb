@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def executable?
-      return Environment.controller_class.announcement?
+      return controller_class.announcement?
     end
   end
 end

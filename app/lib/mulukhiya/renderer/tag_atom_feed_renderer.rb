@@ -3,6 +3,7 @@ require 'digest/sha1'
 module Mulukhiya
   class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
+    include SNSMethods
     attr_reader :logger, :tag, :limit
 
     def initialize(channel = {})
@@ -92,7 +93,7 @@ module Mulukhiya
     private
 
     def fetch
-      return nil unless Environment.controller_class.feed?
+      return nil unless controller_class.feed?
       return nil unless record
       record.create_feed(params).each do |row|
         push(
