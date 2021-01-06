@@ -1,7 +1,6 @@
 module Mulukhiya
   module Meisskey
     class Status < MongoCollection
-      include Package
       include StatusMethods
 
       def account

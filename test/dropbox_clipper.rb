@@ -1,7 +1,7 @@
 module Mulukhiya
   class DropboxClipperTest < TestCase
     def setup
-      @clipper = Environment.test_account.dropbox
+      @clipper = account.dropbox
     end
 
     def test_create

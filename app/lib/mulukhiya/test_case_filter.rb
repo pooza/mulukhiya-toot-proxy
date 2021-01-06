@@ -2,6 +2,11 @@ module Mulukhiya
   class TestCaseFilter < Ginseng::TestCaseFilter
     include Package
 
+    def account
+      @account ||= Environment.account_class.test_account
+      return @account
+    end
+
     def self.create(name)
       config['/test/filters'].each do |entry|
         next unless entry['name'] == name

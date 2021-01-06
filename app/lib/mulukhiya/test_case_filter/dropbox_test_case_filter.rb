@@ -1,7 +1,7 @@
 module Mulukhiya
   class DropboxTestCaseFilter < TestCaseFilter
     def active?
-      return Environment.test_account.dropbox.nil?
+      return account.dropbox.nil?
     rescue Ginseng::ConfigError
       return true
     end

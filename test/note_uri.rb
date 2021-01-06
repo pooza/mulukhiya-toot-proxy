@@ -1,7 +1,7 @@
 module Mulukhiya
   class NoteURITest < TestCase
     def setup
-      @uri = NoteURI.parse(Environment.test_account.recent_status.uri)
+      @uri = NoteURI.parse(account.recent_status.uri)
     end
 
     def test_id

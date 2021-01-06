@@ -48,14 +48,6 @@ module Mulukhiya
       assert_kind_of(Class, controller_class.dbms_class)
     end
 
-    def test_postgres?
-      assert_boolean(controller_class.postgres?)
-    end
-
-    def test_mongo?
-      assert_boolean(controller_class.mongo?)
-    end
-
     def test_status_field
       assert_kind_of(String, controller_class.status_field)
     end

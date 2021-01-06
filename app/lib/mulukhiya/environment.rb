@@ -22,6 +22,14 @@ module Mulukhiya
       return config['/environment'] || 'development'
     end
 
+    def self.development?
+      return type == 'development'
+    end
+
+    def self.production?
+      return type == 'production'
+    end
+
     def self.dir
       return Mulukhiya.dir
     end
@@ -38,24 +46,8 @@ module Mulukhiya
       return config['/controller']
     end
 
-    def self.sns_type_name
-      return config["/#{config['/controller']}/sns_type"]
-    end
-
-    def self.test_account
-      return sns_class.new.account
-    end
-
     def self.controller_class
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
-    end
-
-    def self.dbms_name
-      return controller_class.dbms_name
-    end
-
-    def self.parser_name
-      return controller_class.parser_name
     end
 
     def self.mastodon?
@@ -74,28 +66,40 @@ module Mulukhiya
       return controller_name == 'pleroma'
     end
 
+    def self.controller_type
+      return config["/#{controller_name}/sns_type"]
+    end
+
     def self.mastodon_type?
-      return sns_type_name == 'mastodon'
+      return controller_type == 'mastodon'
     end
 
     def self.misskey_type?
-      return sns_type_name == 'misskey'
+      return controller_type == 'misskey'
+    end
+
+    def self.dbms_name
+      return controller_class.dbms_name
     end
 
     def self.postgres?
-      return controller_class.postgres?
+      return dbms_name == 'postgres'
     end
 
     def self.mongo?
-      return controller_class.mongo?
+      return dbms_name == 'mongo'
     end
 
-    def self.development?
-      return type == 'development'
+    def self.parser_name
+      return controller_class.parser_name
     end
 
-    def self.production?
-      return type == 'production'
+    def self.toot?
+      return parser_name == 'toot'
+    end
+
+    def self.note?
+      return parser_name == 'note'
     end
 
     def self.account_class

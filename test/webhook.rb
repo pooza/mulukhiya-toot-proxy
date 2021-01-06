@@ -1,7 +1,7 @@
 module Mulukhiya
   class WebhookTest < TestCase
     def setup
-      @test_hook = Environment.test_account.webhook
+      @test_hook = account.webhook
       @payloads = {
         image: SlackWebhookPayload.new(
           'text' => 'ハミガキと言われてキレたのは面白かったですw',

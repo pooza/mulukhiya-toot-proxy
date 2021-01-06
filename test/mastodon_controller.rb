@@ -4,7 +4,7 @@ module Mulukhiya
 
     def setup
       @parser = TootParser.new
-      @parser.account = Environment.test_account
+      @parser.account = account
     end
 
     def app

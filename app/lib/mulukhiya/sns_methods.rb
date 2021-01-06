@@ -16,5 +16,9 @@ module Mulukhiya
       service.token = config['/agent/info/token']
       return service
     end
+
+    def test_account
+      return Environment.account_class.test_account
+    end
   end
 end

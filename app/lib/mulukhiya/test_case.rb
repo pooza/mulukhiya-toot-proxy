@@ -6,6 +6,11 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def account
+      @account ||= Environment.account_class.test_account
+      return @account
+    end
+
     def status_field
       return Environment.controller_class.status_field
     end

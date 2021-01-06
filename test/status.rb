@@ -1,8 +1,7 @@
 module Mulukhiya
   class StatusTest < TestCase
     def setup
-      @account = Environment.test_account
-      @status = @account.recent_status
+      @status = account.recent_status
     end
 
     def test_id

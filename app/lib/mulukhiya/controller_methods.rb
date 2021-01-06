@@ -70,30 +70,20 @@ module Mulukhiya
         return false
       end
 
-      def parser_name
-        return config["/#{name.underscore}/parser"]
-      rescue Ginseng::ConfigError
-        return false
-      end
-
       def dbms_name
         return config["/#{name.underscore}/dbms"]
-      end
-
-      def parser_class
-        return "Mulukhiya::#{parser_name.camelize}Parser".constantize
       end
 
       def dbms_class
         return "Mulukhiya::#{dbms_name.camelize}".constantize
       end
 
-      def postgres?
-        return dbms_name == 'postgres'
+      def parser_name
+        return config["/#{name.underscore}/parser"]
       end
 
-      def mongo?
-        return dbms_name == 'mongo'
+      def parser_class
+        return "Mulukhiya::#{parser_name.camelize}Parser".constantize
       end
 
       def status_field

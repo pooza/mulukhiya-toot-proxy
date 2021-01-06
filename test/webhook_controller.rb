@@ -4,7 +4,7 @@ module Mulukhiya
 
     def setup
       @parser = Environment.parser_class.new
-      @parser.account = Environment.test_account
+      @parser.account = account
       @path_prefix_pattern = %r{^/mulukhiya/webhook}
     end
 
