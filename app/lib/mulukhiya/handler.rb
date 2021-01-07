@@ -150,9 +150,7 @@ module Mulukhiya
 
     def self.names
       names = []
-      Event.all do |event|
-        names.concat(event.handler_names.to_a)
-      end
+      Event.all {|v| names.concat(v.handler_names.to_a)}
       return names.uniq.sort
     rescue => e
       logger.error(error: e)
