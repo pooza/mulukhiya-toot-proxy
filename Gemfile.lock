@@ -56,10 +56,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/rubocop-sequel.git
-  revision: e0aef826a94777c0316825fdd9c44678b23db828
+  revision: 5f0c8c5a115b9a3a9daba3dd58da0bb80415d16a
   branch: master.pooza
   specs:
-    rubocop-sequel (0.1.0.1)
+    rubocop-sequel (0.1.0.2)
       rubocop (~> 1.0)
 
 GIT
@@ -334,6 +334,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  ruby
   x86_64-freebsd-12
   x86_64-linux
 
