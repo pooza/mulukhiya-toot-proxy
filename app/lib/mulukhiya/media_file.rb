@@ -158,7 +158,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      Dir.glob(File.join(Environment.dir, 'tmp/media/*')).sort.each(&block)
+      Dir.glob(File.join(Environment.dir, 'tmp/media/*')).each(&block)
     end
   end
 end
