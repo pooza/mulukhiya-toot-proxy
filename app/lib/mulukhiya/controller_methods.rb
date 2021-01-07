@@ -6,31 +6,29 @@ module Mulukhiya
 
     module Methods
       def name
-        return config["/#{Environment.controller_name}/name"] || Environment.controller_name
-      rescue Ginseng::ConfigError
-        return Environment.controller_name
+        return to_s.split('::').last.sub(/Controller$/, '').underscore
       end
 
       def display_name
-        return config["/#{Environment.controller_name}/display_name"] || name
+        return config["/#{name}/display_name"] || name
       rescue Ginseng::ConfigError
         return name
       end
 
       def webhook?
-        return config["/#{Environment.controller_name}/webhook"] == true
+        return config["/#{name}/webhook"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def media_catalog?
-        return config["/#{Environment.controller_name}/media_catalog"] == true
+        return config["/#{name}/media_catalog"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def feed?
-        return config["/#{Environment.controller_name}/feed"]
+        return config["/#{name}/feed"]
       rescue Ginseng::ConfigError
         return false
       end
@@ -44,19 +42,19 @@ module Mulukhiya
       end
 
       def announcement?
-        return config["/#{Environment.controller_name}/announcement"] == true
+        return config["/#{name}/announcement"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def filter?
-        return config["/#{Environment.controller_name}/filter"] == true
+        return config["/#{name}/filter"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def futured_tag?
-        return config["/#{Environment.controller_name}/futured_tag"] == true
+        return config["/#{name}/futured_tag"] == true
       rescue Ginseng::ConfigError
         return false
       end
@@ -77,7 +75,7 @@ module Mulukhiya
       end
 
       def dbms_name
-        return config["/#{Environment.controller_name}/dbms"]
+        return config["/#{name}/dbms"]
       end
 
       def dbms_class
@@ -85,7 +83,7 @@ module Mulukhiya
       end
 
       def parser_name
-        return config["/#{Environment.controller_name}/parser"]
+        return config["/#{name}/parser"]
       end
 
       def parser_class
@@ -99,7 +97,7 @@ module Mulukhiya
       end
 
       def oauth_default_scopes
-        return config["/#{Environment.controller_name}/oauth/scopes"] || []
+        return config["/#{name}/oauth/scopes"] || []
       rescue Ginseng::ConfigError
         return nil
       end
@@ -121,11 +119,11 @@ module Mulukhiya
       end
 
       def status_key
-        return config["/#{Environment.controller_name}/status/key"]
+        return config["/#{name}/status/key"]
       end
 
       def status_label
-        return config["/#{Environment.controller_name}/status/label"]
+        return config["/#{name}/status/label"]
       end
 
       def visibility_name(name)
