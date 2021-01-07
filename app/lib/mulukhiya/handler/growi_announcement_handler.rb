@@ -9,12 +9,8 @@ module Mulukhiya
       return announcement
     end
 
-    private
-
     def growi
-      return sns.account.growi
-    rescue
-      return nil
+      return sns.account.growi rescue nil
     end
   end
 end

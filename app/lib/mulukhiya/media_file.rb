@@ -85,15 +85,11 @@ module Mulukhiya
     end
 
     def aspect
-      return width.to_f / height
-    rescue
-      return nil
+      return width.to_f / height rescue nil
     end
 
     def long_side
-      return [width, height].max
-    rescue
-      return nil
+      return [width, height].max rescue nil
     end
 
     def convert_type(type)

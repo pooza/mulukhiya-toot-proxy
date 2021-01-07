@@ -67,9 +67,7 @@ module Mulukhiya
     end
 
     def create_log_entry(line)
-      return {daemon: app_name}.merge(JSON.parse(line))
-    rescue
-      return super
+      return {daemon: app_name}.merge(JSON.parse(line)) rescue super
     end
   end
 end
