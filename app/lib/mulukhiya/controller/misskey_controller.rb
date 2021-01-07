@@ -65,10 +65,6 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized'
     end
 
-    def self.name
-      return 'Misskey'
-    end
-
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Misskey::AccessToken.order(Sequel.desc(:createdAt)).all do |token|

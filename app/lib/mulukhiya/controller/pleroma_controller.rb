@@ -1,7 +1,5 @@
 module Mulukhiya
   class PleromaController < MastodonController
-    include ControllerMethods
-
     post '/api/v1/pleroma/chats/:chat_id/messages' do
       @reporter.tags.clear
       params[status_field] = params[config['/pleroma/chat/field']]
@@ -33,10 +31,6 @@ module Mulukhiya
       notify(@renderer.message)
       @renderer.status = e.response&.code || 400
       return @renderer.to_s
-    end
-
-    def self.name
-      return 'Pleroma'
     end
 
     def self.webhook_entries

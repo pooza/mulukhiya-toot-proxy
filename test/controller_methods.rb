@@ -1,5 +1,9 @@
 module Mulukhiya
   class ControllerMethodsTest < TestCase
+    def test_name
+      assert_kind_of(String, controller_class.name)
+    end
+
     def test_display_name
       assert_kind_of(String, controller_class.display_name)
     end
