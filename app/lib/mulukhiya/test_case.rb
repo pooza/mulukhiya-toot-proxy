@@ -44,7 +44,7 @@ module Mulukhiya
         puts "filter: #{filter.class}" if Environment.test?
         filter.exec(names)
       end
-      return names.sort.uniq
+      return names.uniq.sort
     end
 
     def self.dir

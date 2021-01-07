@@ -153,7 +153,7 @@ module Mulukhiya
       Event.all do |event|
         names.concat(event.handler_names.to_a)
       end
-      return names.sort.uniq
+      return names.uniq.sort
     rescue => e
       logger.error(error: e)
       return nil
