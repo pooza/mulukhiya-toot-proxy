@@ -28,13 +28,12 @@ html lang='ja'
           span class='role' v-if='user.is_moderator' mod
           span class='role' v-if='user.is_admin' admin
           .loggedin v-if='user.token==token' ログイン中
-          i class='fas fa-trash' @click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
+          i class='fas fa-trash' @click='deleteUser(user)' v-else=''
           .scopes 権限: {{user.scopes}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
       Vue.use(window.VuejsDialog.main.default)
-      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',

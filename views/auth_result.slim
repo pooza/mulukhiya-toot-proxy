@@ -14,17 +14,16 @@ html lang='ja'
         div
           h3 アクセストークン
           textarea ref='token_text' class='short' = params[:result][:access_token]
-          i class='fas fa-clipboard' @click='copyToken' v-tooltip.bottom="'クリップボードにコピー'"
+          i class='fas fa-clipboard' @click='copyToken'
         div
           h3 Slack互換webhook URL
           textarea ref='webhook_text' = params[:hook_url]
-          i class='fas fa-clipboard' @click='copyWehbook' v-tooltip.bottom="'クリップボードにコピー'"
+          i class='fas fa-clipboard' @click='copyWehbook'
       - else
         p class='alert' = "エラー（#{params[:status]}）"
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
