@@ -66,8 +66,9 @@ html lang='ja'
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
-              .then(e => location.reload())
-              .catch(e => {this.message = 'Invalid token'})
+              .then(e => Vue.getUsers())
+              .then(e => {this.users = e})
+              .catch(e => {this.message = e.message})
           },
           deleteUser: function (user) {
             this.$dialog.confirm(
@@ -76,9 +77,8 @@ html lang='ja'
                 body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
               },
               {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              Vue.deleteToken(user.token)
-            }).then(e => {
+            ).then(e => Vue.deleteToken(user.token))
+            .then(e => {
               this.tokens = e
               return Vue.getUsers()
             }).then(e => {
