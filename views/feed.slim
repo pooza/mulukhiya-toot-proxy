@@ -40,18 +40,8 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
-          this.getFeeds()
+          Vue.getFeeds()
             .then(e => {this.feeds = e})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
-        },
-        methods: {
-          getFeeds: async function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            return axios.get(Vue.createPath('/mulukhiya/api/feed/list'))
-              .then(e => e.data)
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
-          },
         },
       })

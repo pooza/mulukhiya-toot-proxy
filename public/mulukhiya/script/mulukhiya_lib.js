@@ -14,6 +14,19 @@ const MulukhiyaLib = {
       }
     }
 
+    Vue.dig = (target, ...keys) => {
+      let digged = target
+      for (const key of keys) {
+        if (typeof digged === 'undefined' || digged === null) {return undefined}
+        if (typeof key === 'function') {
+          digged = key(digged)
+        } else {
+          digged = digged[key]
+        }
+      }
+      return digged
+    }
+
     Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -108,6 +121,14 @@ const MulukhiyaLib = {
         }).finally(e => indicator.hide())
     }
 
+    Vue.getFeeds = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createPath('/mulukhiya/api/feed/list'), {responseType: 'json'})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -122,6 +143,16 @@ const MulukhiyaLib = {
       if (program.air) {label.push('エア番組')}
       if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
       return label
+    }
+
+    Vue.searchTags = async keyword => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
+      url.searchParams.set('q', keyword)
+      return axios.get(url.href, {responseType: 'json'})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
     }
 
     Vue.getMedias = async () => {
