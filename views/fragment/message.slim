@@ -7,14 +7,14 @@
   p v-if='account.username'
     | login: @{{account.username}}
     a href='/mulukhiya/app/token'
-      i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
+      i class='fas fa-user'
     span class='role' v-if='account.is_moderator' = 'mod'
     span class='role' v-if='account.is_admin' = 'admin'
   p v-else=''
     a href='/mulukhiya/app/auth' トークンの登録
     | （アプリケーションの認証）を行ってください。
     a href='/mulukhiya/app/token'
-      i class='fas fa-user' v-tooltip.bottom="'トークンの管理'"
+      i class='fas fa-user'
 
 .message-container class='alert' v-if='message'
   p = '{{message}}'

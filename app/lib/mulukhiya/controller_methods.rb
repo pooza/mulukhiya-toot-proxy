@@ -5,26 +5,30 @@ module Mulukhiya
     end
 
     module Methods
+      def name
+        return to_s.split('::').last.sub(/Controller$/, '').underscore
+      end
+
       def display_name
-        return config["/#{name.underscore}/display_name"] || name
+        return config["/#{name}/display_name"] || name
       rescue Ginseng::ConfigError
         return name
       end
 
       def webhook?
-        return config["/#{name.underscore}/webhook"] == true
+        return config["/#{name}/webhook"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def media_catalog?
-        return config["/#{name.underscore}/media_catalog"] == true
+        return config["/#{name}/media_catalog"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def feed?
-        return config["/#{name.underscore}/feed"]
+        return config["/#{name}/feed"]
       rescue Ginseng::ConfigError
         return false
       end
@@ -38,19 +42,19 @@ module Mulukhiya
       end
 
       def announcement?
-        return config["/#{name.underscore}/announcement"] == true
+        return config["/#{name}/announcement"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def filter?
-        return config["/#{name.underscore}/filter"] == true
+        return config["/#{name}/filter"] == true
       rescue Ginseng::ConfigError
         return false
       end
 
       def futured_tag?
-        return config["/#{name.underscore}/futured_tag"] == true
+        return config["/#{name}/futured_tag"] == true
       rescue Ginseng::ConfigError
         return false
       end
@@ -71,7 +75,7 @@ module Mulukhiya
       end
 
       def dbms_name
-        return config["/#{name.underscore}/dbms"]
+        return config["/#{name}/dbms"]
       end
 
       def dbms_class
@@ -79,7 +83,7 @@ module Mulukhiya
       end
 
       def parser_name
-        return config["/#{name.underscore}/parser"]
+        return config["/#{name}/parser"]
       end
 
       def parser_class
@@ -93,7 +97,7 @@ module Mulukhiya
       end
 
       def oauth_default_scopes
-        return config["/#{name.underscore}/oauth/scopes"] || []
+        return config["/#{name}/oauth/scopes"] || []
       rescue Ginseng::ConfigError
         return nil
       end
@@ -115,11 +119,11 @@ module Mulukhiya
       end
 
       def status_key
-        return config["/#{name.underscore}/status/key"]
+        return config["/#{name}/status/key"]
       end
 
       def status_label
-        return config["/#{name.underscore}/status/label"]
+        return config["/#{name}/status/label"]
       end
 
       def visibility_name(name)

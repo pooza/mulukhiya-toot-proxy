@@ -103,10 +103,6 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized'
     end
 
-    def self.name
-      return 'Mastodon'
-    end
-
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Postgres.instance.exec('webhook_tokens').each do |row|

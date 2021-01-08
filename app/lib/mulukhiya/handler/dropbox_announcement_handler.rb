@@ -9,12 +9,8 @@ module Mulukhiya
       return announcement
     end
 
-    private
-
     def dropbox
-      return sns.account.dropbox
-    rescue
-      return nil
+      return sns.account.dropbox rescue nil
     end
   end
 end

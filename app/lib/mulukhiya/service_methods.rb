@@ -31,12 +31,5 @@ module Mulukhiya
       @redis ||= Redis.new
       return @redis
     end
-
-    def self.included(base)
-      base.extend(Methods)
-    end
-
-    module Methods
-    end
   end
 end

@@ -110,12 +110,12 @@ html lang='ja'
           .field-container v-if='form.webhook.url'
             h4 URL
             textarea ref='webhook_url_text' = '{{form.webhook.url}}'
-            i class='fas fa-clipboard' @click='copyWebhookURL' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyWebhookURL'
             .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
           .field-container v-if='form.webhook.url'
             h4 curlサンプル
             textarea ref='curl_sample_text' v-html='form.webhook.curl_sample'
-            i class='fas fa-clipboard' @click='copyCurlSample' v-tooltip.bottom="'クリップボードにコピー'"
+            i class='fas fa-clipboard' @click='copyCurlSample'
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
@@ -129,7 +129,6 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default)
       Vue.component('vue-slide-up-down', VueSlideUpDown)

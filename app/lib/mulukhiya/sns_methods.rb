@@ -67,6 +67,10 @@ module Mulukhiya
       def controller_class
         return Environment.controller_class
       end
+
+      def sns_class
+        return Environment.sns_class
+      end
     end
   end
 end

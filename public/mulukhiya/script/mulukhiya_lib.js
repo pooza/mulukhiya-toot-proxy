@@ -1,8 +1,13 @@
 const MulukhiyaLib = {
   install (Vue, options) {
-    Vue.createPath = (href, token) => {
+    Vue.createPath = (href, params) => {
       const url = new URL(href, location.href)
-      url.searchParams.set('token', token || Vue.getToken())
+      params = params || {}
+      params.query = params.query || {}
+      params.query.token = params.token || Vue.getToken()
+      for (let k in params.query) {
+        url.searchParams.set(k, params.query[k])
+      }
       return url.href
     }
 
@@ -14,10 +19,23 @@ const MulukhiyaLib = {
       }
     }
 
+    Vue.dig = (target, ...keys) => {
+      let digged = target
+      for (const key of keys) {
+        if (typeof digged === 'undefined' || digged === null) {return undefined}
+        if (typeof key === 'function') {
+          digged = key(digged)
+        } else {
+          digged = digged[key]
+        }
+      }
+      return digged
+    }
+
     Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config'))
         .then(e => e.data)
         .catch(e => {
           return {
@@ -60,7 +78,7 @@ const MulukhiyaLib = {
       }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config', token), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
         .then(e => {
           localStorage.setItem('mulukhiya_token', token)
           return e.data
@@ -78,7 +96,7 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       Vue.getTokens().forEach(t => {
-        axios.get(Vue.createPath('/mulukhiya/api/config', t), {responseType: 'json'})
+        axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
           .then(e => {
             users.push({
               username: e.data.account.username,
@@ -101,17 +119,25 @@ const MulukhiyaLib = {
     Vue.switchUser = async user => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config', user.token), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/config', {token: user.token}))
         .then(e => {
           localStorage.setItem('mulukhiya_token', user.token)
           return e.data
         }).finally(e => indicator.hide())
     }
 
+    Vue.getFeeds = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createPath('/mulukhiya/api/feed/list'))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get('/mulukhiya/api/program', {responseType: 'json'})
+      return axios.get('/mulukhiya/api/program')
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -124,10 +150,18 @@ const MulukhiyaLib = {
       return label
     }
 
+    Vue.searchTags = async keyword => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createPath('/mulukhiya/api/tagging/tag/search', {query: {q: keyword}}))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getMedias = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/media'), {responseType: 'json'})
+      return axios.get(Vue.createPath('/mulukhiya/api/media'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -135,7 +169,7 @@ const MulukhiyaLib = {
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get('/mulukhiya/api/health', {responseType: 'json'})
+      return axios.get('/mulukhiya/api/health')
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

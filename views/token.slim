@@ -28,13 +28,12 @@ html lang='ja'
           span class='role' v-if='user.is_moderator' mod
           span class='role' v-if='user.is_admin' admin
           .loggedin v-if='user.token==token' ログイン中
-          i class='fas fa-trash' @click='deleteUser(user)' v-tooltip.bottom="'トークンの削除'" v-else=''
+          i class='fas fa-trash' @click='deleteUser(user)' v-else=''
           .scopes 権限: {{user.scopes}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
       Vue.use(window.VuejsDialog.main.default)
-      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
@@ -66,8 +65,9 @@ html lang='ja'
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
-              .then(e => location.reload())
-              .catch(e => {this.message = 'Invalid token'})
+              .then(e => Vue.getUsers())
+              .then(e => {this.users = e})
+              .catch(e => {this.message = e.message})
           },
           deleteUser: function (user) {
             this.$dialog.confirm(
@@ -76,9 +76,8 @@ html lang='ja'
                 body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
               },
               {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              Vue.deleteToken(user.token)
-            }).then(e => {
+            ).then(e => Vue.deleteToken(user.token))
+            .then(e => {
               this.tokens = e
               return Vue.getUsers()
             }).then(e => {

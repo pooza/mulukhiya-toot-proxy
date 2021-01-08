@@ -37,9 +37,7 @@ module Mulukhiya
     end
 
     def source_file(body, key = :file)
-      return media_class.new(body[key][:tempfile].path)
-    rescue
-      return nil
+      return media_class.new(body[key][:tempfile].path) rescue nil
     end
   end
 end

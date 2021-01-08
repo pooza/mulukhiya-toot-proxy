@@ -46,9 +46,7 @@ module Mulukhiya
     end
 
     def associate_tag
-      return query_values['tag']
-    rescue
-      return nil
+      return query_values['tag'] rescue nil
     end
 
     def associate_tag=(tag)

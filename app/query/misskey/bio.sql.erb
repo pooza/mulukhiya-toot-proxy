@@ -1,0 +1,8 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  "user".id,
+  user_profile.description AS bio
+FROM "user"
+  INNER JOIN user_profile ON "user".id = user_profile."userId"
+WHERE (user_profile.description IS NOT null)
+  AND ("user".host IS null)

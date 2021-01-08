@@ -29,7 +29,6 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
@@ -44,7 +43,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              this.tags = this.dig(e, 'config', 'tagging', 'tags', 'disabled')
+              this.tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
@@ -52,20 +51,12 @@ html lang='ja'
             if (event.keyCode == 13) {this.search()}
           },
           search: function () {
-            if (this.keyword == '') {
-              this.result = {}
-            } else {
-              const indicator = new ActivityIndicator()
-              indicator.show()
-              const url = new URL('/mulukhiya/api/tagging/tag/search', location.href)
-              url.searchParams.set('q', this.keyword)
-              axios.get(url.href, {responseType: 'json'})
-                .then(e => {
-                  this.message = null
-                  this.result = e.data
-                }).catch(e => {this.message = Vue.createErrorMessage(e)})
-                .finally(e => indicator.hide())
-            }
+            this.message = null
+            this.result = {}
+            if (this.keyword == '') {return}
+            Vue.searchTags(this.keyword)
+              .then(e => {this.result = e})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           isDisabledTag: function (tag) {
             this.tags = this.tags || []
@@ -84,19 +75,5 @@ html lang='ja'
             command.tagging.tags.disabled = this.tags
             Vue.updateConfig(command)
           },
-          dig: function (target, ...keys) {
-            let digged = target
-            for (const key of keys) {
-              if (typeof digged === 'undefined' || digged === null) {
-                return undefined
-              }
-              if (typeof key === 'function') {
-                digged = key(digged)
-              } else {
-                digged = digged[key]
-              }
-            }
-            return digged
-          }
         },
       })
