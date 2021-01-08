@@ -52,15 +52,12 @@ html lang='ja'
             if (event.keyCode == 13) {this.search()}
           },
           search: function () {
-            if (this.keyword == '') {
-              this.result = {}
-            } else {
-              Vue.searchTags(this.keyword)
-                .then(e => {
-                  this.message = null
-                  this.result = e
-                }).catch(e => {this.message = Vue.createErrorMessage(e)})
-            }
+            this.message = null
+            this.result = {}
+            if (this.keyword == '') {return}
+            Vue.searchTags(this.keyword)
+              .then(e => {this.result = e})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           isDisabledTag: function (tag) {
             this.tags = this.tags || []
