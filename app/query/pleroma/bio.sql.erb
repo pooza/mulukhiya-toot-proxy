@@ -1,0 +1,8 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  id,
+  bio
+FROM users
+WHERE (local = true)
+  AND (bio <> '')
+  AND (bio IS NOT null)
