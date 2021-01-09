@@ -824,7 +824,7 @@ sidekiq:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
     tag_feed_update:
-      every: 2m
+      every: 5m
       class: Mulukhiya::TagFeedUpdateWorker
     annict_polling:
       every: 5m
