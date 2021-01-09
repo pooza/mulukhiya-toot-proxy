@@ -9,6 +9,14 @@ const MulukhiyaLib = {
       return url.href
     }
 
+    Vue.createPayload = values => {
+      return {
+        token: Vue.getToken(),
+        status: JSON.stringify(values),
+        text: JSON.stringify(values),
+      }
+    }
+
     Vue.createErrorMessage = e => {
       if ('response' in e) {
         return e.response.data.error || e.response.data.message || e.message
@@ -37,14 +45,9 @@ const MulukhiyaLib = {
 
     Vue.updateConfig = async command => {
       command.command = 'user_config'
-      const values = {
-        token: Vue.getToken(),
-        status: JSON.stringify(command),
-        text: JSON.stringify(command),
-      }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/config/update', values)
+      return axios.post('/mulukhiya/api/config/update', Vue.createPayload(command))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -55,14 +58,9 @@ const MulukhiyaLib = {
         tag: '実況',
         action: flag ? 'register' : 'unregister',
       }
-      const values = {
-        token: Vue.getToken(),
-        status: JSON.stringify(command),
-        text: JSON.stringify(command),
-      }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/filter/add', values)
+      return axios.post('/mulukhiya/api/filter/add', Vue.createPayload(command))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
