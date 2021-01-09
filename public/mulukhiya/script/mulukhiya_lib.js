@@ -5,7 +5,7 @@ const MulukhiyaLib = {
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || Vue.getToken()
-      Object.keys(params.query).map(k => {url.searchParams.set(k, params.query[k])})
+      url.searchParams = new URLSearchParams(params)
       return url.href
     }
 
