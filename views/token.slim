@@ -80,9 +80,8 @@ html lang='ja'
             .then(e => {
               this.tokens = e
               return Vue.getUsers()
-            }).then(e => {
-              this.users = e
-            }).catch(e => {this.message = e.message})
+            }).then(e => this.users = e)
+            .catch(e => {this.message = e.message})
           },
         },
       })

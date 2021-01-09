@@ -49,6 +49,24 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.updateLivecureFlag = async flag => {
+      const command = {
+        command: 'filter',
+        tag: '実況',
+        action: flag ? 'register' : 'unregister',
+      }
+      const values = {
+        token: Vue.getToken(),
+        status: JSON.stringify(command),
+        text: JSON.stringify(command),
+      }
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/filter/add', values)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getToken = () => {
       return localStorage.getItem('mulukhiya_token')
     }
@@ -126,11 +144,14 @@ const MulukhiyaLib = {
     }
 
     Vue.createProgramTags = program => {
-      const label = [program.series]
-      if (program.episode) {label.push(`${program.episode}話`)}
-      if (program.air) {label.push('エア番組')}
-      if (program.extra_tags) {program.extra_tags.map(tag => label.push(tag))}
-      return label
+      const tags = []
+      if (program) {
+        tags.push('実況')
+        if (program.episode) {tags.push(`${program.episode}話`)}
+        if (program.air) {tags.push('エア番組')}
+        if (program.extra_tags) {tags.concat(program.extra_tags)}
+      }
+      return tags
     }
 
     Vue.searchTags = async keyword => {
@@ -153,6 +174,14 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/health')
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.authAnnict = async code => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/annict/auth', {token: Vue.getToken(), code: code})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

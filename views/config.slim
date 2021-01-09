@@ -183,9 +183,7 @@ html lang='ja'
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => {
-                  return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
-                })
+                .map(p => ({code: p.key, label: Vue.createProgramTags(p).join(' ')}))
             })
         },
         methods: {
@@ -226,11 +224,10 @@ html lang='ja'
             })
           },
           updateConfig: function (command) {
+            this.message = null
             Vue.updateConfig(command)
-              .then(e => {
-                this.message = null
-                this.updateForm(e)
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .then(e => this.updateForm(e))
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -241,12 +238,7 @@ html lang='ja'
             document.execCommand('copy')
           },
           onChangeTags: function (e) {
-            const program = this.programs[e.code]
-            if (program) {
-              const tags = Vue.createProgramTags(program)
-              tags.unshift('実況')
-              this.form.tags = tags.join("\n")
-            } else {this.form.tags = ''}
+            this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -269,24 +261,10 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateLivecure: function () {
-            const command = {
-              command: 'filter',
-              tag: '実況',
-              action: this.form.livecure ? 'register' : 'unregister',
-            }
-            const values = {
-              token: Vue.getToken(),
-              status: JSON.stringify(command),
-              text: JSON.stringify(command),
-            }
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/filter/add', values)
-              .then(e => {
-                this.message = null
-                this.layout.details.livecure = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.updateLivecureFlag(this.form.livecure)
+              .then(e => {this.layout.details.livecure = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -305,26 +283,22 @@ html lang='ja'
             this.updateConfig(command)
           },
           authAnnict: function () {
-            const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/annict/auth', values)
+            this.message = null
+            Vue.authAnnict(this.form.annict.auth_code)
               .then(e => {
                 this.result = jsyaml.dump(e.data.config)
-                this.message = null
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
           },
           unauthAnnict: function () {
+            this.message = null
             this.$dialog.confirm(
               {title: '認証の解除', body: 'Annictのトークンを削除します。'},
               {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              this.updateConfig({annict: null})
-              this.layout.details.livecure = false
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            ).then(e => this.updateConfig({annict: null}))
+            .then(e => {this.layout.details.livecure = false})
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })
