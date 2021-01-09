@@ -5,7 +5,7 @@ const MulukhiyaLib = {
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || Vue.getToken()
-      url.searchParams = new URLSearchParams(params)
+      Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
     }
 
@@ -18,7 +18,7 @@ const MulukhiyaLib = {
     }
 
     Vue.createErrorMessage = e => {
-      if ('response' in e) {
+      if (Vue.dig(e, 'response', 'data')) {
         return e.response.data.error || e.response.data.message || e.message
       } else {
         return e.message
@@ -145,6 +145,7 @@ const MulukhiyaLib = {
       const tags = []
       if (program) {
         tags.push('実況')
+        tags.push(program.series)
         if (program.episode) {tags.push(`${program.episode}話`)}
         if (program.air) {tags.push('エア番組')}
         if (program.extra_tags) {tags.concat(program.extra_tags)}
