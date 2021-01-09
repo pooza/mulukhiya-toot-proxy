@@ -5,9 +5,7 @@ const MulukhiyaLib = {
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || Vue.getToken()
-      for (let k in params.query) {
-        url.searchParams.set(k, params.query[k])
-      }
+      Object.keys(params.query).map(k => {url.searchParams.set(k, params.query[k])})
       return url.href
     }
 
@@ -23,11 +21,7 @@ const MulukhiyaLib = {
       let digged = target
       for (const key of keys) {
         if (typeof digged === 'undefined' || digged === null) {return undefined}
-        if (typeof key === 'function') {
-          digged = key(digged)
-        } else {
-          digged = digged[key]
-        }
+        digged = (typeof key === 'function') ? key(digged) : digged[key]
       }
       return digged
     }
@@ -37,12 +31,8 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'))
         .then(e => e.data)
-        .catch(e => {
-          return {
-            account: {},
-            error: Vue.createErrorMessage(e),
-          }
-        }).finally(e => indicator.hide())
+        .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
+        .finally(e => indicator.hide())
     }
 
     Vue.updateConfig = async command => {
@@ -73,9 +63,7 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
-      if (token == null) {
-        return Promise.reject('empty token')
-      }
+      if (token == null) {return Promise.reject('empty token')}
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
@@ -105,12 +93,7 @@ const MulukhiyaLib = {
               is_admin: e.data.account.is_admin,
               is_moderator: e.data.account.is_moderator,
             })
-          }).catch(e => {
-            users.push({
-              token: t,
-              error: Vue.createErrorMessage(e),
-            })
-          })
+          }).catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
         })
       indicator.hide()
       return users
@@ -146,7 +129,7 @@ const MulukhiyaLib = {
       const label = [program.series]
       if (program.episode) {label.push(`${program.episode}話`)}
       if (program.air) {label.push('エア番組')}
-      if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
+      if (program.extra_tags) {program.extra_tags.map(tag => label.push(tag))}
       return label
     }
 
