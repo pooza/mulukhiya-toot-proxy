@@ -217,10 +217,7 @@ html lang='ja'
             }
             Object.keys(data.visibility_names).map(k => {
               const v = data.visibility_names[k]
-              this.options.visibility.push({
-                label: k == v ? k : `${v} (${k})`,
-                code: v,
-              })
+              this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
             })
           },
           updateConfig: function (command) {
