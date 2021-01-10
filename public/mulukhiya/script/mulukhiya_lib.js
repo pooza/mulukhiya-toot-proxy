@@ -5,14 +5,20 @@ const MulukhiyaLib = {
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || Vue.getToken()
-      for (let k in params.query) {
-        url.searchParams.set(k, params.query[k])
-      }
+      Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
     }
 
+    Vue.createPayload = values => {
+      return {
+        token: Vue.getToken(),
+        status: JSON.stringify(values),
+        text: JSON.stringify(values),
+      }
+    }
+
     Vue.createErrorMessage = e => {
-      if ('response' in e) {
+      if (Vue.dig(e, 'response', 'data')) {
         return e.response.data.error || e.response.data.message || e.message
       } else {
         return e.message
@@ -23,11 +29,7 @@ const MulukhiyaLib = {
       let digged = target
       for (const key of keys) {
         if (typeof digged === 'undefined' || digged === null) {return undefined}
-        if (typeof key === 'function') {
-          digged = key(digged)
-        } else {
-          digged = digged[key]
-        }
+        digged = (typeof key === 'function') ? key(digged) : digged[key]
       }
       return digged
     }
@@ -37,24 +39,28 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config'))
         .then(e => e.data)
-        .catch(e => {
-          return {
-            account: {},
-            error: Vue.createErrorMessage(e),
-          }
-        }).finally(e => indicator.hide())
+        .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
+        .finally(e => indicator.hide())
     }
 
     Vue.updateConfig = async command => {
       command.command = 'user_config'
-      const values = {
-        token: Vue.getToken(),
-        status: JSON.stringify(command),
-        text: JSON.stringify(command),
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/config/update', Vue.createPayload(command))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.updateLivecureFlag = async flag => {
+      const command = {
+        command: 'filter',
+        tag: '実況',
+        action: flag ? 'register' : 'unregister',
       }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/config/update', values)
+      return axios.post('/mulukhiya/api/filter/add', Vue.createPayload(command))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -66,22 +72,21 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
-      tokens = tokens.filter(v => (v != null))
-      tokens = Array.from(new Set(tokens))
+      tokens = Array.from(new Set(tokens.filter(v => (v != null))))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
     }
 
     Vue.registerToken = async token => {
-      if (token == null) {
-        return Promise.reject('empty token')
-      }
+      if (token == null) {return Promise.reject('empty token')}
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
         .then(e => {
-          localStorage.setItem('mulukhiya_token', token)
-          return e.data
+          tokens = Vue.getTokens()
+          tokens.push(token)
+          tokens = Array.from(new Set(tokens.filter(v => (v != null))))
+          localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
         }).finally(e => indicator.hide())
     }
 
@@ -93,27 +98,27 @@ const MulukhiyaLib = {
 
     Vue.getUsers = async () => {
       const users = []
+      const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
-      Vue.getTokens().forEach(t => {
-        axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
-          .then(e => {
-            users.push({
-              username: e.data.account.username,
-              token: t,
-              scopes: e.data.token.scopes.join(', '),
-              is_admin: e.data.account.is_admin,
-              is_moderator: e.data.account.is_moderator,
-            })
-          }).catch(e => {
-            users.push({
-              token: t,
-              error: Vue.createErrorMessage(e),
-            })
-          })
-        })
-      indicator.hide()
-      return users
+      indicator.max = tokens.length
+      return Promise.all(tokens.map(t => {
+        indicator.increment
+        return axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
+          .then(e => users.push(Vue.createUserInfo(e.data, t)))
+          .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
+      })).then(e => users)
+      .finally(indicator.hide())
+    }
+
+    Vue.createUserInfo = (data, token_crypted) => {
+      return {
+        username: data.account.username,
+        token: token_crypted,
+        scopes: data.token.scopes.join(', '),
+        is_admin: data.account.is_admin,
+        is_moderator: data.account.is_moderator,
+      }
     }
 
     Vue.switchUser = async user => {
@@ -143,11 +148,15 @@ const MulukhiyaLib = {
     }
 
     Vue.createProgramTags = program => {
-      const label = [program.series]
-      if (program.episode) {label.push(`${program.episode}話`)}
-      if (program.air) {label.push('エア番組')}
-      if (program.extra_tags) {program.extra_tags.map(tag => {label.push(tag)})}
-      return label
+      const tags = []
+      if (program) {
+        tags.push('実況')
+        tags.push(program.series)
+        if (program.episode) {tags.push(`${program.episode}話`)}
+        if (program.air) {tags.push('エア番組')}
+        if (program.extra_tags) {tags.concat(program.extra_tags)}
+      }
+      return tags
     }
 
     Vue.searchTags = async keyword => {
@@ -170,6 +179,14 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/health')
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.authAnnict = async code => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/annict/auth', {token: Vue.getToken(), code: code})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

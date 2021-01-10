@@ -10,7 +10,7 @@ SELECT
 FROM
   note
   INNER JOIN "user" ON note."userId" = "user".id
-WHERE ('<%= params[:tag] %>'=any(note.tags))
+WHERE ('<%= params[:tag] %>' = any(note.tags))
   AND (note.visibility = 'public')
   AND ("user".username <> '<%= test_account.acct.username %>')
 ORDER BY

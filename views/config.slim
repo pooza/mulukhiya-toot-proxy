@@ -174,63 +174,49 @@ html lang='ja'
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => {
-              this.account = e.account
-              if (!e.error) {this.updateForm(e)}
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => this.updateForm(e))
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
           Vue.getPrograms()
             .then(e => {
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => {
-                  return {code: p.key, label: Vue.createProgramTags(p).join(' ')}
-                })
+                .map(p => ({code: p.key, label: Vue.createProgramTags(p).join(' ')}))
+              this.options.program.unshift({label: '(固定タグのクリア)'})
             })
         },
         methods: {
           updateForm: function (data) {
+            if (data.error) {return Promise.reject(data.error)}
+            this.account = data.account
             this.result = jsyaml.dump(data.config)
-            if (data.config.webhook) {
-              this.form.webhook.token = data.config.webhook.token
-              this.form.webhook.url = data.config.webhook.url
-              this.form.webhook.visibility = data.config.webhook.visibility || 'public'
-              this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${data.config.webhook.url}`
-            }
-            if (data.config.tagging && data.config.tagging.user_tags) {
-              this.form.tags = data.config.tagging.user_tags.join("\n")
-            }
-            if (data.config.growi) {
-              this.form.growi.token = data.config.growi.token
-              this.form.growi.url = data.config.growi.url
-              this.form.growi.prefix = data.config.growi.prefix
-            }
-            if (data.config.dropbox) {
-              this.form.dropbox.token = data.config.dropbox.token
-            }
-            if (data.config.notify) {
-              this.form.notify.user_config = data.config.notify.user_config ? 1 : 0
-              this.form.notify.verbose = data.config.notify.verbose ? 1 : 0
+            this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
+            this.form.webhook.url = Vue.dig(data, 'config', 'webhook', 'url')
+            this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
+            this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${Vue.dig(data, 'config', 'webhook', 'url')}`
+            this.form.growi.token = Vue.dig(data, 'config', 'growi', 'token')
+            this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
+            this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
+            this.form.dropbox.token = Vue.dig(data, 'config', 'dropbox', 'token')
+            this.form.notify.user_config = Vue.dig(data, 'config', 'notify', 'user_config') == true
+            this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
+            if (Vue.dig(data, 'config', 'tagging', 'user_tag')) {
+              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tag').join("\n")
             }
             if (Array.isArray(data.filters)) {
-              data.filters.map(f => {
-                if (f.phrase == '#実況') {this.form.livecure = true}
-              })
+              data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
             }
+            this.options.visibility = []
             Object.keys(data.visibility_names).map(k => {
               const v = data.visibility_names[k]
-              this.options.visibility.push({
-                label: k == v ? k : `${v} (${k})`,
-                code: v,
-              })
+              this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
             })
           },
           updateConfig: function (command) {
+            this.message = null
             Vue.updateConfig(command)
-              .then(e => {
-                this.message = null
-                this.updateForm(e)
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              .then(e => this.updateForm(e))
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -241,12 +227,7 @@ html lang='ja'
             document.execCommand('copy')
           },
           onChangeTags: function (e) {
-            const program = this.programs[e.code]
-            if (program) {
-              const tags = Vue.createProgramTags(program)
-              tags.unshift('実況')
-              this.form.tags = tags.join("\n")
-            } else {this.form.tags = ''}
+            this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -269,24 +250,10 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateLivecure: function () {
-            const command = {
-              command: 'filter',
-              tag: '実況',
-              action: this.form.livecure ? 'register' : 'unregister',
-            }
-            const values = {
-              token: Vue.getToken(),
-              status: JSON.stringify(command),
-              text: JSON.stringify(command),
-            }
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/filter/add', values)
-              .then(e => {
-                this.message = null
-                this.layout.details.livecure = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.updateLivecureFlag(this.form.livecure)
+              .then(e => {this.layout.details.livecure = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -305,25 +272,23 @@ html lang='ja'
             this.updateConfig(command)
           },
           authAnnict: function () {
-            const values = {token: Vue.getToken(), code: this.form.annict.auth_code}
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/annict/auth', values)
+            this.message = null
+            Vue.authAnnict(this.form.annict.auth_code)
               .then(e => {
-                this.result = jsyaml.dump(e.data.config)
-                this.message = null
+                this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
           },
           unauthAnnict: function () {
+            this.message = null
             this.$dialog.confirm(
               {title: '認証の解除', body: 'Annictのトークンを削除します。'},
               {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => {
-              this.updateConfig({annict: null})
-              this.layout.details.livecure = false
+            ).then(e => this.updateConfig({annict: null}))
+            .then(e => {
+              this.result = jsyaml.dump(e.config)
+              this.layout.details.annict = false
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },

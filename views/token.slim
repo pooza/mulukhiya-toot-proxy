@@ -24,7 +24,7 @@ html lang='ja'
             .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
         .token v-for='user in users'
           a href='#' @click='switchUser(user)' v-if='user.username' = '@{{user.username}}'
-          span class='alert' v-else='' 認証できないトークン
+          span class='alert' v-else='' 壊れたトークン
           span class='role' v-if='user.is_moderator' mod
           span class='role' v-if='user.is_admin' admin
           .loggedin v-if='user.token==token' ログイン中
@@ -50,8 +50,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
-          Vue.getUsers()
+            .then(e => Vue.getUsers())
             .then(e => {this.users = e})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
@@ -59,15 +58,17 @@ html lang='ja'
           switchUser: function (user) {
             Vue.switchUser(user)
               .then(e => {
-                this.account = e.account
-                location.href = '/mulukhiya'
-              })
+                this.account = user
+                this.token = user.token
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
               .then(e => Vue.getUsers())
-              .then(e => {this.users = e})
-              .catch(e => {this.message = e.message})
+              .then(e => {
+                this.users = e
+                this.input.token = null
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           deleteUser: function (user) {
             this.$dialog.confirm(
@@ -80,9 +81,8 @@ html lang='ja'
             .then(e => {
               this.tokens = e
               return Vue.getUsers()
-            }).then(e => {
-              this.users = e
-            }).catch(e => {this.message = e.message})
+            }).then(e => this.users = e)
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })
