@@ -72,8 +72,7 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
-      tokens = tokens.filter(v => (v != null))
-      tokens = Array.from(new Set(tokens))
+      tokens = Array.from(new Set(tokens.filter(v => (v != null))))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
     }
@@ -84,8 +83,10 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
         .then(e => {
-          localStorage.setItem('mulukhiya_token', token)
-          return e.data
+          tokens = Vue.getTokens()
+          tokens.push(token)
+          tokens = Array.from(new Set(tokens.filter(v => (v != null))))
+          localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
         }).finally(e => indicator.hide())
     }
 
@@ -97,22 +98,27 @@ const MulukhiyaLib = {
 
     Vue.getUsers = async () => {
       const users = []
+      const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
-      Vue.getTokens().forEach(t => {
-        axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
-          .then(e => {
-            users.push({
-              username: e.data.account.username,
-              token: t,
-              scopes: e.data.token.scopes.join(', '),
-              is_admin: e.data.account.is_admin,
-              is_moderator: e.data.account.is_moderator,
-            })
-          }).catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
-        })
-      indicator.hide()
-      return users
+      indicator.max = tokens.length
+      return Promise.all(tokens.map(t => {
+        indicator.increment
+        return axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
+          .then(e => users.push(Vue.createUserInfo(e.data, t)))
+          .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
+      })).then(e => users)
+      .finally(indicator.hide())
+    }
+
+    Vue.createUserInfo = (data, token_crypted) => {
+      return {
+        username: data.account.username,
+        token: token_crypted,
+        scopes: data.token.scopes.join(', '),
+        is_admin: data.account.is_admin,
+        is_moderator: data.account.is_moderator,
+      }
     }
 
     Vue.switchUser = async user => {
