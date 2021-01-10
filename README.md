@@ -10,12 +10,13 @@
 
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
+  - [Groundpolis](https://github.com/Groundpolis/Groundpolis)での動作報告あり。
 - [Pleroma](https://git.pleroma.social/pleroma/pleroma)
 - [めいすきー](https://github.com/mei23/misskey)
 
 ## モロヘイヤに出来ること
 
-ツイート/ノート/チャットの本文に対して、
+トゥート/ノート/チャットの本文に対して、
 
 - 各種短縮URLを戻し、本来のリンク先を明らかにする。
 - 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
@@ -37,7 +38,7 @@
 - アニメ視聴記録サービス[Annict](https://annict.jp/)から視聴記録を取得し、投稿する。
 - ローカル投稿を[Dropbox](https://dropbox.com/)等、各種外部サービスに保存。
 - 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
-- デフォルトハッシュタグ等、各種Atomフィード。（2分ごとにキャッシュされ、IFTTT等との連携に適したもの）
+- デフォルトハッシュタグ等、各種Atomフィード。（5分ごとにキャッシュされ、IFTTT等との連携に適したもの）
 
 等々。
 
