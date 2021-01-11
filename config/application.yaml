@@ -193,6 +193,7 @@ webui:
     robots: noindex,nofollow
     viewport: width=1000
 mastodon:
+  display_name: Mastodon
   sns_type: mastodon
   url: https://mstdn.example.com/
   webhook: true
@@ -308,6 +309,7 @@ mastodon:
   search:
     limit: 40
 misskey:
+  display_name: Misskey
   sns_type: misskey
   url: https://misskey.example.com/
   webhook: true
@@ -414,9 +416,9 @@ misskey:
     label: ノート
     max_length: 500
 meisskey:
+  display_name: めいすきー
   sns_type: misskey
   url: https://meisskey.example.com/
-  display_name: めいすきー
   webhook: true
   media_catalog: true
   feed: true
@@ -517,6 +519,7 @@ meisskey:
     label: ポスト
     max_length: 1000
 pleroma:
+  display_name: Pleroma
   sns_type: mastodon
   url: https://pleroma.example.com/
   webhook: true
