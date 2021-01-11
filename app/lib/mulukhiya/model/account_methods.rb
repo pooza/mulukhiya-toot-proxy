@@ -69,6 +69,13 @@ module Mulukhiya
       return []
     end
 
+    def bio_tag_bases
+      return TagContainer.scan(bio)
+    rescue => e
+      logger.error(error: e, acct: acct.to_s)
+      return []
+    end
+
     def notify_verbose?
       return user_config['/notify/verbose'] == true
     end

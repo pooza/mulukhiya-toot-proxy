@@ -32,6 +32,8 @@ module Mulukhiya
 
       alias host domain
 
+      alias bio note
+
       def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})
         return Status[rows.first['id']] if rows.present?

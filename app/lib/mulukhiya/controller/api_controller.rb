@@ -187,6 +187,7 @@ module Mulukhiya
       if @sns.account
         tags.concat(@sns.account.featured_tag_bases)
         tags.concat(@sns.account.field_tag_bases)
+        tags.concat(@sns.account.bio_tag_bases)
       end
       @renderer.message = tags.uniq.map do |tag|
         hash_tag_class.get(tag: tag).to_h
