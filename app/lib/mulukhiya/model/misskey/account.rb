@@ -4,7 +4,7 @@ module Mulukhiya
       include Package
       include AccountMethods
       include SNSMethods
-      one_to_one :account_profile
+      one_to_one :account_profile, key: :userId
 
       def to_h
         unless @hash
@@ -48,7 +48,7 @@ module Mulukhiya
       end
 
       def bio
-        return account_profile.description
+        return account_profile.description || ''
       end
 
       def recent_status
