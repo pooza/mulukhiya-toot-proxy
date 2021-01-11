@@ -32,8 +32,6 @@ module Mulukhiya
 
       alias host domain
 
-      alias bio note
-
       def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})
         return Status[rows.first['id']] if rows.present?
@@ -55,6 +53,10 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, acct: acct.to_s)
         return []
+      end
+
+      def bio
+        return note || ''
       end
 
       def admin?
