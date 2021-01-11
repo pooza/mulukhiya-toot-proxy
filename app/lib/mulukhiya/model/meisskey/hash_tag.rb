@@ -73,6 +73,16 @@ module Mulukhiya
         return tag_bases.uniq.compact
       end
 
+      def self.bio_tag_bases
+        tag_bases = []
+        accounts = Account.collection.find(host: nil, description: {'$ne' => nil})
+        accounts.each do |account|
+          account = Account[account['_id'].to_s]
+          tag_bases.concat(account.bio_tag_bases)
+        end
+        return tag_bases.uniq.compact
+      end
+
       def self.featured_tag_bases
         tag_bases = []
         accounts = Account.collection.find(host: nil, clientSettings: {'$ne' => nil})
