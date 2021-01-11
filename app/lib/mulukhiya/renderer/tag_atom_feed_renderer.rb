@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def tag=(tag)
-      @tag = tag
+      @tag = tag.to_hashtag_base
       @channel.merge!(
         title: "##{tag} | #{@sns.info['metadata']['nodeName']}",
         link: record.uri.to_s,
@@ -27,13 +27,21 @@ module Mulukhiya
       @atom = nil
     end
 
+    def default_tag?
+      return TagContainer.default_tag_bases.member?(tag)
+    end
+
     def limit=(limit)
       @limit = limit
       @atom = nil
     end
 
     def params
-      return {limit: limit, tag: tag}
+      return {
+        limit: limit,
+        tag: tag,
+        local: !default_tag?,
+      }
     end
 
     def cache!
