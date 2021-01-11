@@ -28,10 +28,9 @@ module Mulukhiya
 
       def create_feed(params)
         return [] unless Mongo.config?
-        notes = Status.collection
-          .find(tags: name, userId: {'$ne' => test_account.id})
-          .sort(createdAt: -1)
-          .limit(params[:limit])
+        criteria = {'$and' => [{tags: name}], userId: {'$ne' => test_account.id}}
+        criteria['$and'].push(tags: {'$in' => TagContainer.default_tag_bases}) if params[:local]
+        notes = Status.collection.find(criteria).sort(createdAt: -1).limit(params[:limit])
         return notes.map do |row|
           status = Status.new(row['_id'])
           {
