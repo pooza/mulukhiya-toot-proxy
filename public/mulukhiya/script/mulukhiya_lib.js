@@ -69,6 +69,10 @@ const MulukhiyaLib = {
       return localStorage.getItem('mulukhiya_token')
     }
 
+    Vue.setToken = token => {
+      localStorage.setItem('mulukhiya_token', token)
+    }
+
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
@@ -78,7 +82,6 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
-      if (token == null) {return Promise.reject('empty token')}
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
@@ -87,6 +90,7 @@ const MulukhiyaLib = {
           tokens.push(token)
           tokens = Array.from(new Set(tokens.filter(v => (v != null))))
           localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+          return e.data.account
         }).finally(e => indicator.hide())
     }
 
@@ -126,7 +130,7 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createPath('/mulukhiya/api/config', {token: user.token}))
         .then(e => {
-          localStorage.setItem('mulukhiya_token', user.token)
+          Vue.setToken(user.token)
           return e.data
         }).finally(e => indicator.hide())
     }

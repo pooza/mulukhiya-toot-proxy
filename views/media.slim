@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
-      ul class='medias clearfix' v-if='medias'
+      ul class='medias clearfix'
         li class='media' v-for='media in medias'
           .media-container
             a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.mediatype=="image"'
@@ -45,8 +45,8 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          account: {is_admin: false},
-          medias: null,
+          account: {is_admin: false, username: null},
+          medias: [],
         },
         mounted: function () {
           Vue.getConfig()
@@ -54,10 +54,7 @@ html lang='ja'
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           this.load()
             .then(e => {this.medias = e})
-            .catch(e => {
-              this.message = Vue.createErrorMessage(e)
-              this.medias = []
-            })
+            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           load: Vue.getMedias,
