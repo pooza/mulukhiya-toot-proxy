@@ -38,6 +38,10 @@ module Mulukhiya
         return acct.to_s
       end
 
+      def bio
+        return description || ''
+      end
+
       def recent_status
         note = service.notes(account_id: id)&.first
         return Status[note['id']] if note
