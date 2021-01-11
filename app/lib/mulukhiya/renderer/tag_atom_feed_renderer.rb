@@ -87,6 +87,7 @@ module Mulukhiya
       tags.concat(TagContainer.media_tag_bases)
       tags.concat(TagContainer.futured_tag_bases)
       tags.concat(TagContainer.field_tag_bases)
+      tags.concat(TagContainer.bio_tag_bases)
       tags.uniq.each do |tag|
         renderer = TagAtomFeedRenderer.new
         renderer.tag = tag
