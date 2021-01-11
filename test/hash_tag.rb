@@ -35,5 +35,9 @@ module Mulukhiya
     def test_field_tag_bases
       assert_kind_of(Array, hash_tag_class.field_tag_bases)
     end
+
+    def test_bio_tag_bases
+      assert_kind_of(Array, hash_tag_class.bio_tag_bases)
+    end
   end
 end
