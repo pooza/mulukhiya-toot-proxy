@@ -19,5 +19,11 @@ module Mulukhiya
         assert_kind_of(String, tag)
       end
     end
+
+    def test_bio_tag_bases
+      TagContainer.bio_tag_bases.each do |tag|
+        assert_kind_of(String, tag)
+      end
+    end
   end
 end

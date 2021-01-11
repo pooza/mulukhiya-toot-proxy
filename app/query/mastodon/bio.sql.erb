@@ -3,9 +3,10 @@ SELECT
   accounts.id,
   accounts.note AS bio
 FROM accounts
-  INNER JOIN accounts ON accounts.id = users.account_id
+  INNER JOIN users ON accounts.id = users.account_id
 WHERE (accounts.domain IS null)
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
   AND (accounts.note IS NOT null)
+  AND (accounts.note <> '')
   AND (users.disabled = false)

@@ -55,6 +55,10 @@ module Mulukhiya
         return []
       end
 
+      def bio
+        return note || ''
+      end
+
       def admin?
         return user.admin
       end

@@ -29,13 +29,15 @@ html lang='ja'
         el: '#app',
         data: {
           message: null,
-          account: {is_admin: false},
+          account: {is_admin: false, username: null},
           token: '#{crypt.new.encrypt(params[:result][:access_token])}',
         },
         mounted: function () {
           Vue.registerToken(this.token)
-            .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {
+              Vue.setToken(this.token)
+              this.account = e
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
           copyToken: function () {

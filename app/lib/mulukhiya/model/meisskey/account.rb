@@ -19,7 +19,7 @@ module Mulukhiya
       end
 
       def host
-        return values[:host] || Environment.domain_name
+        return values['host'] || Environment.domain_name
       end
 
       alias domain host
@@ -36,6 +36,10 @@ module Mulukhiya
       def display_name
         return name if name.present?
         return acct.to_s
+      end
+
+      def bio
+        return description || ''
       end
 
       def recent_status

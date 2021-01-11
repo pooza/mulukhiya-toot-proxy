@@ -28,6 +28,14 @@ module Mulukhiya
       def field_tag_bases
         return Postgres.instance.execute('field_tags').map {|v| v['tag'].to_hashtag_base}
       end
+
+      def bio_tag_bases
+        tags = []
+        Postgres.instance.execute('bio').each do |row|
+          tags.concat(TagContainer.scan(row[:bio]))
+        end
+        return tags.compact.uniq
+      end
     end
   end
 end

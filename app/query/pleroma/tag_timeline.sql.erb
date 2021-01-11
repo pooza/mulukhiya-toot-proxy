@@ -37,4 +37,7 @@ FROM
   ) AS accts ON statuses.account_uri = accts.uri
 WHERE (statuses.tag = '<%= params[:tag] %>')
   AND (statuses.actor[5] <> '<%= test_account.acct.username %>')
+  <% if params[:local] %>
+    AND (statuses.actor[3] = '<%= Mulukhiya::Environment.domain_name %>')
+  <% end %>
 LIMIT <%= params[:limit] %> OFFSET 0
