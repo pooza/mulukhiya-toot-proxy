@@ -52,11 +52,8 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
-          this.load()
+          Vue.getMedias()
             .then(e => {this.medias = e})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
-        },
-        methods: {
-          load: Vue.getMedias,
         },
       })
