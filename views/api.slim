@@ -220,24 +220,16 @@ html lang='ja'
             this.layout.details[name] = !this.layout.details[name]
           },
           updateAnnouncement: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['announcement'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.updateAnnouncement()
+              .then(e => {this.layout.details['announcement'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           clearMediaFiles: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['media'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.clearMediaFiles()
+              .then(e => {this.layout.details['media'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           clearOAuthClient: function () {
             const indicator = new ActivityIndicator()
@@ -258,44 +250,28 @@ html lang='ja'
             })
           },
           updatePrograms: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['program'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.updatePrograms()
+              .then(e => {this.layout.details['program'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           updateTaggingDictionary: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['tagging_dic'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            VUe.updateTaggingDictionary()
+              .then(e => {this.layout.details['tagging_dic'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           clearUserTags: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['tagging_usertag'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.clearUserTags()
+              .then(e => {this.layout.details['tagging_usertag'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           updateFeeds: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
-              .then(e => {
-                this.message = null
-                this.layout.details['feed'] = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            VUe.updateFeeds()
+              .then(e => {this.layout.details['feed'] = false})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           crawlAnnict: function () {
             const indicator = new ActivityIndicator()
@@ -316,14 +292,10 @@ html lang='ja'
             })
           },
           searchTags: function () {
-            const indicator = new ActivityIndicator()
-            indicator.show()
-            axios.post('/mulukhiya/api/tagging/tag/search', {q: this.input.search_tag.q})
-              .then(e => {
-                this.message = null
-                this.result.search_tag = e.data
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
-              .finally(e => indicator.hide())
+            this.message = null
+            Vue.searchTags()
+              .then(e => {this.result.search_tag = e.data})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })
