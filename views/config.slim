@@ -130,7 +130,7 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.component('vue-slide-up-down', VueSlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
@@ -282,14 +282,12 @@ html lang='ja'
           },
           unauthAnnict: function () {
             this.message = null
-            this.$dialog.confirm(
-              {title: '認証の解除', body: 'Annictのトークンを削除します。'},
-              {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => this.updateConfig({annict: null}))
-            .then(e => {
-              this.result = jsyaml.dump(e.config)
-              this.layout.details.annict = false
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
+              .then(e => this.updateConfig({annict: null}))
+              .then(e => {
+                this.result = jsyaml.dump(e.config)
+                this.layout.details.annict = false
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
       })

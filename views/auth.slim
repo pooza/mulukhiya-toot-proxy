@@ -19,7 +19,7 @@ html lang='ja'
           form method='POST' action='/mulukhiya/app/mastodon/auth'
             .inline-field-container
               h4 認証コード
-              input type='text' name='code' placeholder='#{controller.name}の認証コード' class='code'
+              input type='text' name='code' placeholder='#{controller.display_name}の認証コード' class='code'
               - if params.dig(:errors, :code)
                 p class='alert' = params[:errors][:code].join
             .field-update-button-container
