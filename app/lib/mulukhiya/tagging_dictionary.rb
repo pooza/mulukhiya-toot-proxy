@@ -99,9 +99,7 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      status = body[status_field].clone
-      status.gsub!(Acct.pattern, '')
-      parts = [status]
+      parts = [(body[status_field] || '').gsub(Acct.pattern, '')]
       options = body.dig('poll', controller_class.poll_options_field)
       parts.concat(options) if options.present?
       return parts.join('::::')
