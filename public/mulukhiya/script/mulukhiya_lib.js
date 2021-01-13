@@ -143,10 +143,26 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.updateFeeds = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/program')
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.updatePrograms = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -166,7 +182,23 @@ const MulukhiyaLib = {
     Vue.searchTags = async keyword => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/tagging/tag/search', {query: {q: keyword}}))
+      return axios.post('/mulukhiya/api/tagging/tag/search', {q: keyword})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.updateTaggingDictionary = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.clearUserTags = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -179,6 +211,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.clearMediaFiles = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -187,10 +227,33 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.updateAnnouncement = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.authAnnict = async code => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/annict/auth', {token: Vue.getToken(), code: code})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.crawlAnnict = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.clearOAuthClient = async () => {
+      const indicator = new ActivityIndicator()
+      return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

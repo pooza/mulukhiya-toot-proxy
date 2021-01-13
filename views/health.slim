@@ -29,10 +29,12 @@ html lang='ja'
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
           this.load()
-            .then(e => {this.result = e})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
-          load: Vue.getHealth,
+          load: function () {
+            Vue.getHealth,
+              .then(e => {this.result = e})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+          },
         },
       })

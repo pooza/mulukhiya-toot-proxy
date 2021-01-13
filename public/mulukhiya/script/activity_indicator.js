@@ -3,6 +3,7 @@ class ActivityIndicator {
     this.progress = document.createElement('progress')
     this.container = document.createElement('div')
     this.container.style.display = 'none'
+    this.container.style.padding = '0.5em 1em'
     this.container.style.position = 'fixed'
     this.container.style.left = '50%'
     this.container.style.top = '50%'
@@ -12,6 +13,7 @@ class ActivityIndicator {
     this.container.style.borderWidth = '1px'
     this.container.style.borderStyle = 'solid'
     this.container.style.borderColor = '#000'
+    this.container.style.borderRadius = '6px'
     this.container.style.opacity = 0.9
     this.container.appendChild(this.progress)
     document.getElementsByTagName('body')[0].appendChild(this.container)

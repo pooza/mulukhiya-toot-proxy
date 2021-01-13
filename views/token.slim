@@ -33,7 +33,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(window.VuejsDialog.main.default)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
@@ -71,18 +71,13 @@ html lang='ja'
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           deleteUser: function (user) {
-            this.$dialog.confirm(
-              {
-                title: 'トークンの削除',
-                body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`,
-              },
-              {okText: '削除', cancelText: 'キャンセル'}
-            ).then(e => Vue.deleteToken(user.token))
-            .then(e => {
-              this.tokens = e
-              return Vue.getUsers()
-            }).then(e => this.users = e)
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            this.$dialog.confirm({body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
+              .then(e => Vue.deleteToken(user.token))
+              .then(e => {
+                this.tokens = e
+                return Vue.getUsers()
+              }).then(e => this.users = e)
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           isLoggedIn: function (user) {
             return user.token == this.token

@@ -4,7 +4,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return body unless executable?(body)
       tags.text = @status
-      tags.concat(TaggingDictionary.new.matches(body))
+      tags.concat(TaggingDictionary.new.matches(body)) if @status
       tags.concat(create_media_tags(body)) if TagContainer.media_tag?
       tags.account = @sns.account
       body[status_field] = update_status
