@@ -209,12 +209,10 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
-              if (e.config && e.config.webhook) {
+              if (Vue.dig(e, 'config', 'webhook', 'url')) {
                 this.webhook.href = (new URL(e.config.webhook.url)).pathname
               }
-              const feed_list_url = new URL('/mulukhiya/api/feed/list', location.href)
-              feed_list_url.searchParams.set('token', Vue.getToken())
-              this.feed.list.href = feed_list_url.href
+              this.feed.list.href = Vue.createPath('/mulukhiya/api/feed/list')
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
