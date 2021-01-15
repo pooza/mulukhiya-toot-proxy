@@ -37,6 +37,8 @@ html lang='ja'
             li class='param'
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' = controller.status_label
+      nav
+        a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -47,13 +49,20 @@ html lang='ja'
           message: null,
           account: {is_admin: false, username: null},
           medias: [],
+          page: 0,
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
-          Vue.getMedias()
-            .then(e => {this.medias = e})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+          this.appendMedias()
+        },
+        methods: {
+          appendMedias: function () {
+            this.page ++
+            Vue.getMedias(this.page)
+              .then(e => {this.medias = this.medias.concat(e)})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+          },
         },
       })
