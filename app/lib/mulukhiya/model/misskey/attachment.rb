@@ -63,9 +63,9 @@ module Mulukhiya
         }
       end
 
-      def self.catalog
-        return enum_for(__method__) unless block_given?
-        return Postgres.instance.execute('media_catalog', query_params).each do |row|
+      def self.catalog(params = {})
+        return enum_for(__method__, params) unless block_given?
+        return Postgres.instance.execute('media_catalog', query_params.merge(params)).each do |row|
           attachment = Attachment[row[:id]]
           note = Status[row[:status_id]]
           yield attachment.to_h.merge(status_url: note.uri.to_s)

@@ -38,6 +38,18 @@ module Mulukhiya
       get '/media'
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+
+      get '/media?page=0'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 422)
+
+      get '/media?page=1'
+      assert(last_response.ok?)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+
+      get '/media?page=2'
+      assert(last_response.ok?)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
 
     def test_health
