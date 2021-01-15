@@ -37,7 +37,7 @@ html lang='ja'
             li class='param'
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' = controller.status_label
-      nav
+      nav class='media' v-if='medias.length'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:
