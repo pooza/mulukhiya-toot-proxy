@@ -75,6 +75,7 @@ module Mulukhiya
 
       def self.catalog(params = {})
         return enum_for(__method__, params) unless block_given?
+        return if 1 < params[:page].to_i
         cnt = 0
         statuses.each do |row|
           note = Status[row[:_id]]
