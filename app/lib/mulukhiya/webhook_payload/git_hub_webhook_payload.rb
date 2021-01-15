@@ -34,6 +34,13 @@ module Mulukhiya
       }
     end
 
+    def milestone
+      return {
+        title: raw.dig('milestone', 'title'),
+        url: raw.dig('milestone', 'html_url'),
+      }
+    end
+
     def values
       return {
         status_field => {
@@ -45,6 +52,7 @@ module Mulukhiya
           check_run: check_run,
           repository: repository,
           issue: issue,
+          milestone: milestone,
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end
