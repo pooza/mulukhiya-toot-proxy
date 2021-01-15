@@ -20,7 +20,7 @@ module Mulukhiya
       @renderer = SlimRenderer.new
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
-        @renderer.template = 'auth'
+        @renderer.template = 'token'
         @renderer[:errors] = errors
         @renderer[:oauth_url] = @sns.oauth_uri
         @renderer.status = 422
@@ -46,7 +46,7 @@ module Mulukhiya
       @renderer = SlimRenderer.new
       errors = MisskeyAuthContract.new.exec(params)
       if errors.present?
-        @renderer.template = 'auth'
+        @renderer.template = 'token'
         @renderer[:errors] = errors
         @renderer[:oauth_url] = @sns.oauth_uri
         @renderer.status = 422

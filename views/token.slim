@@ -10,18 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 トークンの管理
       nav class='tokens'
-        .token
-          a href='/mulukhiya/app/auth' 新しいトークンを作成して登録
-          .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
-        - if controller.oauth_webui_uri
-          .token v-if='account.is_admin'
-            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
-            button @click='registerToken' 登録
-            .description
-              a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
-              | で作成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
-              | また、以下の権限を含むものにしてください。
-            .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
+        h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(user)}' v-for='user in users'
           a href='#' @click='switchUser(user)' v-if='user.username' = '@{{user.username}}'
           span class='alert' v-else='' 壊れたトークン
@@ -30,6 +19,36 @@ html lang='ja'
           span class='role' v-if='isLoggedIn(user)' loggedin
           i class='fas fa-trash' @click='deleteUser(user)' v-else=''
           .scopes 権限: {{user.scopes}}
+      nav class='tokens'
+        h3 未登録のトークン
+        .token
+          | 新しいトークンを作成して登録
+          .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
+          - if env.mastodon_type?
+            .description
+              a href=params[:oauth_url] target='_blank' 認証コードを取得
+              | して下の欄に入力、認証ボタンを押下してください。
+            form method='POST' action='/mulukhiya/app/mastodon/auth'
+              input type='text' name='code' placeholder='#{controller.display_name}の認証コード' class='code'
+              button 認証
+              - if params.dig(:errors, :code)
+                p class='alert' = params[:errors][:code].join
+          - if env.misskey_type?
+            .description
+              ol
+                li
+                  a href=params[:oauth_url] 認証コードを取得
+                  | してください。
+        - if controller.oauth_webui_uri
+          .token v-if='account.is_admin'
+            | 既存のトークンを登録
+            .description
+              a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
+              | で作成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
+              | また、以下の権限を含むものにしてください。
+            .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
+            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
+            button @click='registerToken' 登録
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
