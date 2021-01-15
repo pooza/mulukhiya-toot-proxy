@@ -22,7 +22,7 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false, username: null},
-          result: {status: 500},
+          result: {status: 200},
         },
         mounted: function () {
           Vue.getConfig()
@@ -32,7 +32,7 @@ html lang='ja'
         },
         methods: {
           load: function () {
-            Vue.getHealth,
+            Vue.getHealth()
               .then(e => {this.result = e})
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },

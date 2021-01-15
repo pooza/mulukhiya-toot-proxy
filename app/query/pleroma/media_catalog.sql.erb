@@ -59,4 +59,4 @@ FROM
   ) AS attachments ON statuses.attachment_uri = attachments.uri
 ORDER BY
   created_at DESC
-LIMIT <%= params[:limit] %> OFFSET 0
+LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>

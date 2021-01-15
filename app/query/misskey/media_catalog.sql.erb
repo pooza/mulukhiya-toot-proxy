@@ -33,7 +33,7 @@ FROM
       "user".id
     ORDER BY
       note."createdAt" DESC
-    LIMIT <%= params[:limit] %> OFFSET 0
+    LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
   ) AS note_file ON drive_file.id = note_file.file_id
 ORDER BY
   note_file."createdAt" DESC

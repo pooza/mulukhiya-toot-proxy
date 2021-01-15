@@ -23,4 +23,4 @@ WHERE (toots.local = true)
   AND (accounts.suspended_at IS null)
 ORDER BY
   attachments.id DESC
-LIMIT <%= params[:limit] %> OFFSET 0
+LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
