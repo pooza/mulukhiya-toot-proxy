@@ -55,13 +55,13 @@ module Mulukhiya
 
     get '/media' do
       @sns.token ||= @sns.default_token
-      params[:page]&.to_i
+      params[:page] = params[:page]&.to_i || 1
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = errors
       elsif controller_class.media_catalog?
-        @renderer.message = Environment.attachment_class.catalog(page: params[:page])
+        @renderer.message = Environment.attachment_class.catalog(params)
       else
         @renderer.status = 404
       end
