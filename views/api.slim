@@ -272,7 +272,7 @@ html lang='ja'
           searchTags: function () {
             this.message = null
             Vue.searchTags(this.input.search_tag.q)
-              .then(e => {this.result.search_tag = e.data})
+              .then(e => {this.result.search_tag = e})
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },
