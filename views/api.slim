@@ -210,9 +210,9 @@ html lang='ja'
               this.account = e.account
               this.config = e.config
               if (Vue.dig(e, 'config', 'webhook', 'url')) {
-                this.webhook.href = (new URL(e.config.webhook.url)).pathname
+                this.webhook.href = Vue.createPath(e.config.webhook.url)
               }
-              this.feed.list.href = Vue.createPath('/mulukhiya/api/feed/list')
+              this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
