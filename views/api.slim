@@ -210,9 +210,9 @@ html lang='ja'
               this.account = e.account
               this.config = e.config
               if (Vue.dig(e, 'config', 'webhook', 'url')) {
-                this.webhook.href = (new URL(e.config.webhook.url)).pathname
+                this.webhook.href = Vue.createPath(e.config.webhook.url)
               }
-              this.feed.list.href = Vue.createPath('/mulukhiya/api/feed/list')
+              this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
@@ -246,7 +246,7 @@ html lang='ja'
           },
           updateTaggingDictionary: function () {
             this.message = null
-            VUe.updateTaggingDictionary()
+            Vue.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
@@ -258,7 +258,7 @@ html lang='ja'
           },
           updateFeeds: function () {
             this.message = null
-            VUe.updateFeeds()
+            Vue.updateFeeds()
               .then(e => {this.layout.details['feed'] = false})
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
@@ -271,8 +271,8 @@ html lang='ja'
           },
           searchTags: function () {
             this.message = null
-            Vue.searchTags()
-              .then(e => {this.result.search_tag = e.data})
+            Vue.searchTags(this.input.search_tag.q)
+              .then(e => {this.result.search_tag = e})
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
         },

@@ -1,12 +1,16 @@
 const MulukhiyaLib = {
   install (Vue, options) {
-    Vue.createPath = (href, params) => {
+    Vue.createURL = (href, params) => {
       const url = new URL(href, location.href)
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || Vue.getToken()
       Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
+    }
+
+    Vue.createPath = href => {
+      return (new URL(href)).pathname
     }
 
     Vue.createPayload = values => {
@@ -37,7 +41,7 @@ const MulukhiyaLib = {
     Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config'))
+      return axios.get(Vue.createURL('/mulukhiya/api/config'))
         .then(e => e.data)
         .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
         .finally(e => indicator.hide())
@@ -84,7 +88,7 @@ const MulukhiyaLib = {
     Vue.registerToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config', {token: token}))
+      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
@@ -108,7 +112,7 @@ const MulukhiyaLib = {
       indicator.max = tokens.length
       return Promise.all(tokens.map(t => {
         indicator.increment
-        return axios.get(Vue.createPath('/mulukhiya/api/config', {token: t}))
+        return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
           .then(e => users.push(Vue.createUserInfo(e.data, t)))
           .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
       })).then(e => users)
@@ -128,7 +132,7 @@ const MulukhiyaLib = {
     Vue.switchUser = async user => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/config', {token: user.token}))
+      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: user.token}))
         .then(e => {
           Vue.setToken(user.token)
           return e.data
@@ -138,7 +142,7 @@ const MulukhiyaLib = {
     Vue.getFeeds = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath('/mulukhiya/api/feed/list'))
+      return axios.get(Vue.createURL('/mulukhiya/api/feed/list'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -206,7 +210,7 @@ const MulukhiyaLib = {
     Vue.getMedias = async page => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createPath(Vue.createPath('/mulukhiya/api/media', {query: {page: page || 1}})))
+      return axios.get(Vue.createURL(Vue.createURL('/mulukhiya/api/media', {query: {page: page || 1}})))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
