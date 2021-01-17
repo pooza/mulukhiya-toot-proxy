@@ -48,7 +48,7 @@ module Mulukhiya
     end
 
     def path
-      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary')
+      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary.marshal')
     end
 
     def load
@@ -87,12 +87,15 @@ module Mulukhiya
       result = {}
       bar = ProgressBar.create(total: remote_dics.count) if Environment.rake?
       remote_dics do |dic|
-        bar&.increment
         dic.parse.each do |k, v|
           result[k] ||= v
           next unless v[:words].is_a?(Array)
           result[k][:words].concat(v[:words]).uniq!
         end
+      rescue => e
+        logger.error(error: e)
+      ensure
+        bar&.increment
       end
       bar&.finish
       return result.sort_by {|k, v| k.length}.to_h

@@ -846,6 +846,8 @@ tagging:
       image: image
       video: video
       audio: audio
+  fetch:
+    retry_limit: 5
   dictionaries:
     - url: https://precure.ml/api/dic/v1/precure.json
       type: relative
