@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Mulukhiya
   class AmazonURI < Ginseng::URI
     include Package
