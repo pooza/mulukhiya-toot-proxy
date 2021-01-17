@@ -9,7 +9,7 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 トークンの管理
-      nav class='tokens'
+      nav class='tokens' v-if='users.length'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(user)}' v-for='user in users'
           a href='#' @click='switchUser(user)' v-if='user.username' = '@{{user.username}}'
@@ -20,10 +20,10 @@ html lang='ja'
           i class='fas fa-trash' @click='deleteUser(user)' v-else=''
           .scopes 権限: {{user.scopes}}
       nav class='tokens'
-        h3 未登録のトークン
+        h3 トークンの登録
         .token
-          | 新しいトークンを作成して登録
-          .description #{controller.display_name}でOAuth認証を行って、新しいトークンを登録します。
+          | 新しいトークンを登録
+          .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
           - if env.mastodon_type?
             .description
               a href=params[:oauth_url] target='_blank' 認証コードを取得
@@ -35,10 +35,7 @@ html lang='ja'
                 p class='alert' = params[:errors][:code].join
           - if env.misskey_type?
             .description
-              ol
-                li
-                  a href=params[:oauth_url] 認証コードを取得
-                  | してください。
+              a href=params[:oauth_url] target='_blank' #{controller.display_name}の認証ページ
         - if controller.oauth_webui_uri
           .token v-if='account.is_admin'
             | 既存のトークンを登録
