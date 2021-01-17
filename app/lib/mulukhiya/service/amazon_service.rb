@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Mulukhiya
   class AmazonService
     include Package
