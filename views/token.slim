@@ -9,16 +9,16 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 トークンの管理
-      nav class='tokens' v-if='users.length'
+      nav class='tokens' v-if='accounts.length'
         h3 登録済みのトークン
-        .token :class='{loggedin:isLoggedIn(user)}' v-for='user in users'
-          a href='#' @click='switchUser(user)' v-if='user.username' = '@{{user.username}}'
+        .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
+          a href='#' @click='switchAccount(current_account)' v-if='current_account.username' = '@{{current_account.username}}'
           span class='alert' v-else='' 壊れたトークン
-          span class='role' v-if='user.is_moderator' mod
-          span class='role' v-if='user.is_admin' admin
-          span class='role' v-if='isLoggedIn(user)' loggedin
-          i class='fas fa-trash' @click='deleteUser(user)' v-else=''
-          .scopes 権限: {{user.scopes}}
+          span class='role' v-if='current_account.is_moderator' mod
+          span class='role' v-if='current_account.is_admin' admin
+          span class='role' v-if='isLoggedIn(current_account)' loggedin
+          i class='fas fa-trash' @click='deleteAccount(current_account)' v-else=''
+          .scopes 権限: {{current_account.scopes}}
       nav class='tokens'
         h3 トークンの登録
         .token
@@ -54,7 +54,7 @@ html lang='ja'
         data: {
           message: null,
           account: {is_admin: false, username: null},
-          users: [],
+          accounts: [],
           tokens: [],
           token: Vue.getToken(),
           input: {
@@ -65,13 +65,13 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .then(e => Vue.getUsers())
-            .then(e => {this.users = e})
+            .then(e => Vue.getAccounts())
+            .then(e => {this.accounts = e})
             .catch(e => {this.message = Vue.createErrorMessage(e)})
         },
         methods: {
-          switchUser: function (user) {
-            Vue.switchUser(user)
+          switchAccount: function (user) {
+            Vue.switchAccount(user)
               .then(e => {
                 this.account = user
                 this.token = user.token
@@ -79,19 +79,19 @@ html lang='ja'
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
-              .then(e => Vue.getUsers())
+              .then(e => Vue.getAccounts())
               .then(e => {
-                this.users = e
+                this.accounts = e
                 this.input.token = null
               }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
-          deleteUser: function (user) {
+          deleteAccount: function (user) {
             this.$dialog.confirm({body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
               .then(e => Vue.deleteToken(user.token))
               .then(e => {
                 this.tokens = e
-                return Vue.getUsers()
-              }).then(e => this.users = e)
+                return Vue.getAccounts()
+              }).then(e => this.accounts = e)
               .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           authMastodon: function () {
@@ -102,11 +102,14 @@ html lang='ja'
                 this.token = e.access_token_crypt
                 return Vue.registerToken(this.token)
               }).then(e => {
-                Vue.setToken(this.token)
-                this.account = e
-                return Vue.getUsers()
-              }).then(e => this.users = e)
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+                return Vue.getAccounts()
+              }).then(e => {
+                this.accounts = e
+                if (this.accounts.length == 1) {
+                  Vue.setToken(this.token)
+                  this.account = this.accounts[0]
+                }
+              }).catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           isLoggedIn: function (user) {
             return user.token == this.token

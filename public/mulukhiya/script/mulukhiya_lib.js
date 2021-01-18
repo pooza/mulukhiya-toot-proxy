@@ -112,7 +112,7 @@ const MulukhiyaLib = {
       return tokens
     }
 
-    Vue.getUsers = async () => {
+    Vue.getAccounts = async () => {
       const users = []
       const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
@@ -121,13 +121,13 @@ const MulukhiyaLib = {
       return Promise.all(tokens.map(t => {
         indicator.increment
         return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
-          .then(e => users.push(Vue.createUserInfo(e.data, t)))
+          .then(e => users.push(Vue.createAccountInfo(e.data, t)))
           .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
       })).then(e => users)
       .finally(indicator.hide())
     }
 
-    Vue.createUserInfo = (data, token_crypted) => {
+    Vue.createAccountInfo = (data, token_crypted) => {
       return {
         username: data.account.username,
         token: token_crypted,
@@ -137,12 +137,12 @@ const MulukhiyaLib = {
       }
     }
 
-    Vue.switchUser = async user => {
+    Vue.switchAccount = async account => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: user.token}))
+      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: account.token}))
         .then(e => {
-          Vue.setToken(user.token)
+          Vue.setToken(account.token)
           return e.data
         }).finally(e => indicator.hide())
     }
