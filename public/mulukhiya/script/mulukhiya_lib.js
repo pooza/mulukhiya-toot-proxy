@@ -46,10 +46,10 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getConfig = async () => {
+    Vue.getConfig = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config'))
+      return axios.get(Vue.createURL('/mulukhiya/api/config'), {toke: token || Vue.getToken()})
         .then(e => e.data)
         .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
         .finally(e => indicator.hide())
@@ -96,14 +96,14 @@ const MulukhiyaLib = {
     Vue.registerToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
+      return Vue.getConfig(token)
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
           tokens = Array.from(new Set(tokens.filter(v => (v != null))))
           localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
           return e.data.account
-        }).finally(e => indicator.hide())
+        })
     }
 
     Vue.deleteToken = async token => {
@@ -120,9 +120,7 @@ const MulukhiyaLib = {
       indicator.max = tokens.length
       return Promise.all(tokens.map(t => {
         indicator.increment
-        return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
-          .then(e => users.push(Vue.createAccountInfo(e.data, t)))
-          .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
+        return Vue.getConfig(t).then(e => users.push(Vue.createAccountInfo(e, t)))
       })).then(e => users)
       .finally(indicator.hide())
     }
@@ -140,11 +138,11 @@ const MulukhiyaLib = {
     Vue.switchAccount = async account => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: account.token}))
+      return Vue.getConfig(account.token)
         .then(e => {
           Vue.setToken(account.token)
           return e.data
-        }).finally(e => indicator.hide())
+        })
     }
 
     Vue.getFeeds = async () => {
