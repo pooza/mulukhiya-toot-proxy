@@ -98,14 +98,12 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
       return Vue.getConfig(token)
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
           Vue.setTokens(tokens)
-          return e.data.account
+          return e.account
         })
     }
 
@@ -137,12 +135,10 @@ const MulukhiyaLib = {
     }
 
     Vue.switchAccount = async account => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
       return Vue.getConfig(account.token)
         .then(e => {
           Vue.setToken(account.token)
-          return e.data
+          return e
         })
     }
 
