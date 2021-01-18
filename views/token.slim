@@ -103,14 +103,11 @@ html lang='ja'
                 this.token = e.access_token_crypt
                 return Vue.registerToken(this.token)
               }).then(e => {
+                Vue.setToken(this.token)
+                this.account = e
                 return Vue.getAccounts()
-              }).then(e => {
-                this.accounts = e
-                if (this.accounts.length == 1) {
-                  Vue.setToken(this.token)
-                  this.account = this.accounts[0]
-                }
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).then(e => {this.accounts = e})
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
           },
           isLoggedIn: function (user) {
             return user.token == this.token
