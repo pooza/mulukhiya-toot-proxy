@@ -104,7 +104,7 @@ const MulukhiyaLib = {
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
-          Vue.setToekns(tokens)
+          Vue.setTokens(tokens)
           return e.data.account
         })
     }
