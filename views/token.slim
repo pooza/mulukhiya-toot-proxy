@@ -29,7 +29,7 @@ html lang='ja'
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
             .auth-form
-              input type='text' v-model='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
+              input type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
               button @click='authMastodon' 認証
           - if env.misskey_type?
             .description

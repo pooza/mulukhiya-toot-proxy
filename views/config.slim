@@ -18,7 +18,7 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
-            v-select :options='options.program' @input='onChangeTags' v-model='form.program'
+            v-select :options='options.program' @input='onChangeTags' v-model.trim='form.program'
           .field-update-button-container
             button @click='updateTags' 更新
       section class='config' v-if='account.username && layout.sections.livecure'

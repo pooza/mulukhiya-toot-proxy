@@ -82,7 +82,7 @@ html lang='ja'
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。
             .endpoint_container
               .link POST /mulukhiya/api/tagging/tag/search
-              input type='search' placeholder='q: 検索フレーズ' v-model='input.search_tag.q'
+              input type='search' placeholder='q: 検索フレーズ' v-model.trim='input.search_tag.q'
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。GETで結果が得られない時に。
               .field-update-button-container
                 button @click='searchTags' 実行
