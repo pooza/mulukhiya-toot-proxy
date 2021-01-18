@@ -1,0 +1,30 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'トークンの管理'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      Vue.use(MulukhiyaLib)
+      new Vue({
+        el: '#app',
+        data: {
+          message: null,
+          account: {is_admin: false, username: null},
+          token: '#{params[:access_token_crypt]}',
+        },
+        mounted: function () {
+          Vue.registerToken(this.token)
+            .then(e => {
+              Vue.setToken(this.token)
+              location.href = '/mulukhiya/app/token'
+            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+        },
+      })
