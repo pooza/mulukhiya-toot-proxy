@@ -72,10 +72,11 @@ module Mulukhiya
     def self.cache_all
       bar = ProgressBar.create(total: all.count) if Environment.rake?
       all do |renderer|
-        bar&.increment
         renderer.cache!
       rescue => e
         logger.error(error: e, tag: renderer.tag)
+      ensure
+        bar&.increment
       end
       bar&.finish
       puts all.map {|v| "updated: ##{v.tag} #{v.path}"}.join("\n") if Environment.rake?

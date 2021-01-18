@@ -32,6 +32,24 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/mastodon/auth' do
+      raise "Invalid controller '#{Environment.controller_name}'" unless Environment.mastodon_type?
+      errors = MastodonAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.message = {error: errors[:code].join}
+        @renderer.status = 422
+      else
+        response = @sns.auth(params[:code])
+        @renderer.message = response.parsed_response
+        @renderer.message['access_token_crypt'] = @renderer.message['access_token'].encrypt
+      end
+      return @renderer.to_s
+    rescue => e
+      @renderer.status = 403
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/program' do
       @sns.token ||= @sns.default_token
       path = File.join(Environment.dir, 'tmp/cache/programs.json')

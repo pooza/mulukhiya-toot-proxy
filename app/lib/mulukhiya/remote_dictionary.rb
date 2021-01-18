@@ -7,11 +7,16 @@ module Mulukhiya
     end
 
     def fetch
+      cnt ||= 0
       response = @http.get(uri).parsed_response
       raise 'empty' unless response.present?
       return response
     rescue => e
-      raise Ginseng::GatewayError, "Invalid URL '#{uri}'", e.backtrace
+      cnt += 1
+      logger.error(error: e, count: cnt)
+      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
+      sleep(1)
+      retry
     end
 
     def uri
@@ -58,6 +63,10 @@ module Mulukhiya
     def initialize(params)
       @params = params.key_flatten
       @http = HTTP.new
+    end
+
+    def retry_limit
+      return config['/tagging/fetch/retry_limit']
     end
   end
 end

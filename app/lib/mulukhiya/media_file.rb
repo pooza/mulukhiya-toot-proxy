@@ -140,13 +140,14 @@ module Mulukhiya
       bar = ProgressBar.create(total: all.count) if Environment.rake?
       files = []
       all do |path|
-        bar&.increment
         next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
         File.unlink(path)
         files.push(path)
         logger.info(class: 'MediaFile', message: 'delete', path: path)
       rescue => e
         logger.error(error: e, path: path)
+      ensure
+        bar&.increment
       end
       bar&.finish
       puts({'deleted' => files}.to_yaml) if Environment.rake? && files.present?

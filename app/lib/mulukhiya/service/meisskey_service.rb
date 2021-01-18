@@ -1,5 +1,3 @@
-require 'fileutils'
-
 module Mulukhiya
   class MeisskeyService < Ginseng::Fediverse::MeisskeyService
     include Package

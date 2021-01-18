@@ -1,6 +1,5 @@
 require 'bundler/setup'
 require 'mulukhiya/refines'
-require 'ginseng'
 
 module Mulukhiya
   using Refines

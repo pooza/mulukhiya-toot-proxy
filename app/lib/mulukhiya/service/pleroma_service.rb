@@ -1,5 +1,3 @@
-require 'fileutils'
-
 module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
