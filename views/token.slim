@@ -28,11 +28,9 @@ html lang='ja'
             .description
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
-            form method='POST' action='/mulukhiya/app/mastodon/auth'
-              input type='text' name='code' placeholder='#{controller.display_name}の認証コード' class='code'
-              button 認証
-              - if params.dig(:errors, :code)
-                p class='alert' = params[:errors][:code].join
+            .auth-form
+              input type='text' v-model='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
+              button @click='authMastodon' 認証
           - if env.misskey_type?
             .description
               a href=params[:oauth_url] target='_blank' #{controller.display_name}の認証ページ
@@ -60,6 +58,7 @@ html lang='ja'
           tokens: [],
           token: Vue.getToken(),
           input: {
+            authcode: null,
             token: null,
           },
         },
@@ -91,6 +90,20 @@ html lang='ja'
               .then(e => Vue.deleteToken(user.token))
               .then(e => {
                 this.tokens = e
+                return Vue.getUsers()
+              }).then(e => this.users = e)
+              .catch(e => {this.message = Vue.createErrorMessage(e)})
+          },
+          authMastodon: function () {
+            this.message = null
+            Vue.authMastodon(this.input.authcode)
+              .then(e => {
+                this.input.authcode = null
+                this.token = e.access_token_crypt
+                return Vue.registerToken(this.token)
+              }).then(e => {
+                Vue.setToken(this.token)
+                this.account = e
                 return Vue.getUsers()
               }).then(e => this.users = e)
               .catch(e => {this.message = Vue.createErrorMessage(e)})

@@ -38,6 +38,14 @@ const MulukhiyaLib = {
       return digged
     }
 
+    Vue.authMastodon = async code => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/mastodon/auth', {token: Vue.getToken(), code: code})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
