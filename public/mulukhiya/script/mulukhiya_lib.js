@@ -88,6 +88,10 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
+      return Vue.setTokens(tokens)
+    }
+
+    Vue.setTokens = tokens => {
       tokens = Array.from(new Set(tokens.filter(v => (v != null))))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
@@ -100,16 +104,13 @@ const MulukhiyaLib = {
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
-          tokens = Array.from(new Set(tokens.filter(v => (v != null))))
-          localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+          Vue.setToekns(tokens)
           return e.data.account
         })
     }
 
     Vue.deleteToken = async token => {
-      const tokens = Vue.getTokens().filter(v => v != token)
-      localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
-      return tokens
+      return Vue.setTokens(Vue.getTokens().filter(v => v != token))
     }
 
     Vue.getAccounts = async () => {
