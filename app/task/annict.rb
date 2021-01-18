@@ -25,12 +25,13 @@ namespace :mulukhiya do
       bar = ProgressBar.create(total: accounts.count)
       results = {}
       accounts.each do |account|
-        bar&.increment
         results[account.acct.to_s] = account.annict.crawl(
           dryrun: params[:dryrun],
           all: params[:all],
           webhook: params[:dryrun] ? nil : account.webhook,
         )
+      ensure
+        bar.increment
       end
       bar&.finish
       results.each do |key, result|

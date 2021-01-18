@@ -93,7 +93,7 @@ module Mulukhiya
           result[k][:words].concat(v[:words]).uniq!
         end
       rescue => e
-        logger.error(error: e)
+        logger.error(error: e, dic: {uri: dic.uri.to_s})
       ensure
         bar&.increment
       end
