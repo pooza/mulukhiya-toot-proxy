@@ -17,7 +17,6 @@ class ActivityIndicator {
     this.container.style.opacity = 0.9
     this.container.appendChild(this.progress)
     document.getElementsByTagName('body')[0].appendChild(this.container)
-    this.setMax(max)
   }
 
   show () {

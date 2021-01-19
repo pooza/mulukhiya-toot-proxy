@@ -9,9 +9,7 @@ const MulukhiyaLib = {
       return url.href
     }
 
-    Vue.createPath = href => {
-      return (new URL(href)).pathname
-    }
+    Vue.createPath = href => (new URL(href)).pathname
 
     Vue.createPayload = values => {
       return {
@@ -114,8 +112,9 @@ const MulukhiyaLib = {
     Vue.getAccounts = async () => {
       const accounts = []
       const tokens = Vue.getTokens()
-      const indicator = new ActivityIndicator(tokens.length)
+      const indicator = new ActivityIndicator()
       indicator.show()
+      indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
         return Vue.getConfig(t).then(e => {
           indicator.increment
@@ -261,6 +260,7 @@ const MulukhiyaLib = {
 
     Vue.clearOAuthClient = async () => {
       const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
