@@ -1,5 +1,5 @@
 class ActivityIndicator {
-  constructor (max) {
+  constructor () {
     this.progress = document.createElement('progress')
     this.container = document.createElement('div')
     this.container.style.display = 'none'
