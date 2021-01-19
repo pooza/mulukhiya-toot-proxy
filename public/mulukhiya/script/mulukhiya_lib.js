@@ -114,9 +114,8 @@ const MulukhiyaLib = {
     Vue.getAccounts = async () => {
       const accounts = []
       const tokens = Vue.getTokens()
-      const indicator = new ActivityIndicator()
+      const indicator = new ActivityIndicator(tokens.length)
       indicator.show()
-      indicator.max = tokens.length
       return Promise.all(tokens.map(t => {
         return Vue.getConfig(t).then(e => {
           indicator.increment
