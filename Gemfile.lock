@@ -288,7 +288,7 @@ GEM
     rubocop-rake (0.5.1)
       rubocop
     ruby-progressbar (1.11.0)
-    ruby2_keywords (0.0.2)
+    ruby2_keywords (0.0.4)
     rufus-scheduler (3.7.0)
       fugit (~> 1.1, >= 1.1.6)
     sanitize (5.2.3)
