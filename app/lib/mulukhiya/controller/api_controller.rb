@@ -77,7 +77,7 @@ module Mulukhiya
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = errors
+        @renderer.message = {errors: errors}
       elsif controller_class.media_catalog?
         @renderer.message = Environment.attachment_class.catalog(params)
       else
@@ -97,7 +97,7 @@ module Mulukhiya
       errors = AnnictAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = errors
+        @renderer.message = {errors: errors}
       elsif @sns.account
         response = AnnictService.new.auth(params['code'])
         @sns.account.user_config.update(annict: {token: response['access_token']})
