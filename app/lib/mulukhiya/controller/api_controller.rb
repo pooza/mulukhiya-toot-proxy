@@ -36,7 +36,7 @@ module Mulukhiya
       raise "Invalid controller '#{Environment.controller_name}'" unless Environment.mastodon_type?
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
-        @renderer.message = {error: errors[:code].join}
+        @renderer.message = {errors: errors}
         @renderer.status = 422
       else
         response = @sns.auth(params[:code])
@@ -155,7 +155,7 @@ module Mulukhiya
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = errors
+        @renderer.message = {errors: errors}
       else
         TaggingDictionary.new.load_cache.each do |entry|
           word = entry.shift
@@ -177,7 +177,7 @@ module Mulukhiya
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = errors
+        @renderer.message = {errors: errors}
       else
         TaggingDictionary.new.load_cache.each do |entry|
           word = entry.shift

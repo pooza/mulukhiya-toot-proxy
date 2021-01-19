@@ -21,7 +21,17 @@ const MulukhiyaLib = {
 
     Vue.createErrorMessage = e => {
       if (Vue.dig(e, 'response', 'data')) {
-        return e.response.data.error || e.response.data.message || e.message
+        if (Vue.dig(e, 'response', 'data', 'errors')) {
+          const messages = []
+          Object.keys(e.response.data.errors).map(k => {
+            messages.push(`${k}: ${e.response.data.errors[k].join()}`)
+          })
+          return messages.join("\n")
+        } else {
+          return Vue.dig(e, 'response', 'data', 'error'
+            || Vue.dig(e, 'response', 'data', 'message'
+            || Vue.dig(e, 'message')
+        }
       } else {
         return e.message
       }

@@ -43,10 +43,10 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           medias: [],
           page: 0,
@@ -54,7 +54,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           this.appendMedias()
         },
         methods: {
@@ -62,7 +62,7 @@ html lang='ja'
             this.page ++
             Vue.getMedias(this.page)
               .then(e => {this.medias = this.medias.concat(e)})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },
       })

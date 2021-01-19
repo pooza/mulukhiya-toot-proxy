@@ -136,7 +136,6 @@ html lang='ja'
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           result: null,
           programs: [],
@@ -175,7 +174,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => this.updateForm(e))
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -213,10 +212,9 @@ html lang='ja'
             })
           },
           updateConfig: function (command) {
-            this.message = null
             Vue.updateConfig(command)
               .then(e => this.updateForm(e))
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -250,10 +248,9 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateLivecure: function () {
-            this.message = null
             Vue.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -272,22 +269,20 @@ html lang='ja'
             this.updateConfig(command)
           },
           authAnnict: function () {
-            this.message = null
             Vue.authAnnict(this.form.annict.auth_code)
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           unauthAnnict: function () {
-            this.message = null
             this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },
       })
