@@ -46,10 +46,10 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getConfig = async token => {
+    Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config'), {token: token || Vue.getConfig()})
+      return axios.get(Vue.createURL('/mulukhiya/api/config'))
         .then(e => e.data)
         .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
         .finally(e => indicator.hide())
@@ -100,13 +100,13 @@ const MulukhiyaLib = {
     Vue.registerToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return Vue.getConfig(token)
+      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
           Vue.setTokens(tokens)
           return e.data.account
-        })
+        }).finally(e => indicator.hide())
     }
 
     Vue.deleteToken = async token => {
@@ -114,16 +114,18 @@ const MulukhiyaLib = {
     }
 
     Vue.getAccounts = async () => {
-      const users = []
+      const accounts = []
       const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
       indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
-        indicator.increment
-        return Vue.getConfig(t).then(e => users.push(Vue.createAccountInfo(e, t)))
-      })).then(e => users)
-      .finally(indicator.hide())
+        return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
+          .then(e => accounts.push(Vue.createAccountInfo(e.data, t)))
+          .catch(e => accounts.push({token: t, error: Vue.createErrorMessage(e)}))
+          .finally(e => indicator.increment)
+      })).then(e => accounts)
+      .finally(e => indicator.hide())
     }
 
     Vue.createAccountInfo = (data, token_crypted) => {
@@ -139,11 +141,11 @@ const MulukhiyaLib = {
     Vue.switchAccount = async account => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return Vue.getConfig(account.token)
+      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: account.token}))
         .then(e => {
           Vue.setToken(account.token)
           return e.data
-        })
+        }).finally(e => indicator.hide())
     }
 
     Vue.getFeeds = async () => {
