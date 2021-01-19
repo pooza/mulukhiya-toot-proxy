@@ -202,14 +202,18 @@ html lang='ja'
             if (Vue.dig(data, 'config', 'tagging', 'user_tag')) {
               this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tag').join("\n")
             }
-            if (Array.isArray(data.filters)) {
-              data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
+            if (data.filters) {
+              if (Array.isArray(data.filters)) {
+                data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
+              }
             }
-            this.options.visibility = []
-            Object.keys(data.visibility_names).map(k => {
-              const v = data.visibility_names[k]
-              this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
-            })
+            if (data.visibility_names) {
+              this.options.visibility = []
+              Object.keys(data.visibility_names).map(k => {
+                const v = data.visibility_names[k]
+                this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
+              })
+            }
           },
           updateConfig: function (command) {
             Vue.updateConfig(command)

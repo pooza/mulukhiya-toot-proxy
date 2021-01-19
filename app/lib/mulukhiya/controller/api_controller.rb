@@ -24,7 +24,11 @@ module Mulukhiya
 
     post '/config/update' do
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {config: @sns.account.user_config.to_h}
+      @renderer.message = {
+        account: @sns.account.to_h,
+        config: @sns.account.user_config.to_h,
+        token: @sns.access_token.to_h.except(:account),
+      }
       return @renderer.to_s
     rescue Ginseng::AuthError, Ginseng::ValidateError => e
       @renderer.status = e.status
@@ -94,8 +98,8 @@ module Mulukhiya
 
     get '/health' do
       @sns.token ||= @sns.default_token
-      @renderer.status = @renderer.message[:status] || 200
       @renderer.message = Environment.health
+      @renderer.status = @renderer.message[:status] || 200
       return @renderer.to_s
     end
 
