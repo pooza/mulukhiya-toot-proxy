@@ -10,8 +10,8 @@ module Mulukhiya
       if @sns.account
         @renderer.message = user_config_info
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -21,8 +21,8 @@ module Mulukhiya
       @renderer.message = user_config_info
       return @renderer.to_s
     rescue Ginseng::AuthError, Ginseng::ValidateError => e
-      @renderer.message = {'error' => e.message}
       @renderer.status = e.status
+      @renderer.message = {'error' => e.message}
       return @renderer.to_s
     end
 
@@ -36,8 +36,8 @@ module Mulukhiya
       raise "Invalid controller '#{Environment.controller_name}'" unless Environment.mastodon_type?
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
-        @renderer.message = {errors: errors}
         @renderer.status = 422
+        @renderer.message = {errors: errors}
       else
         response = @sns.auth(params[:code])
         @renderer.message = response.parsed_response
@@ -65,8 +65,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         ProgramUpdateWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -88,8 +88,8 @@ module Mulukhiya
 
     get '/health' do
       @sns.token ||= @sns.default_token
-      @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
+      @renderer.message = Environment.health
       return @renderer.to_s
     end
 
@@ -102,8 +102,8 @@ module Mulukhiya
         response = AnnictService.new.auth(params['code'])
         @sns.account.user_config.update(annict: {token: response['access_token']})
         @sns.account.annict.updated_at = Time.now
-        @renderer.message = user_config_info
         @renderer.status = response.code
+        @renderer.message = user_config_info
       else
         @renderer.status = 403
       end
@@ -114,8 +114,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         AnnouncementWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -124,8 +124,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         MediaCleaningWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -134,8 +134,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         sns_class.new.clear_oauth_client
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -144,8 +144,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         TaggingDictionaryUpdateWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -198,8 +198,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         UserTagInitializeWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -222,8 +222,8 @@ module Mulukhiya
       if @sns.account
         @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
@@ -232,8 +232,8 @@ module Mulukhiya
       if @sns&.account&.admin? || @sns&.account&.moderator?
         TagFeedUpdateWorker.new.perform
       else
-        @renderer.message = {error: 'Unauthorized'}
         @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
       end
       return @renderer.to_s
     end
