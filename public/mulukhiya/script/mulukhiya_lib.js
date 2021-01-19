@@ -20,21 +20,13 @@ const MulukhiyaLib = {
     }
 
     Vue.createErrorMessage = e => {
-      if (Vue.dig(e, 'response', 'data')) {
-        if (Vue.dig(e, 'response', 'data', 'errors')) {
-          const messages = []
-          Object.keys(e.response.data.errors).map(k => {
-            messages.push(`${k}: ${e.response.data.errors[k].join()}`)
-          })
-          return messages.join("\n")
-        } else {
-          return Vue.dig(e, 'response', 'data', 'error'
-            || Vue.dig(e, 'response', 'data', 'message'
-            || Vue.dig(e, 'message')
-        }
-      } else {
-        return e.message
+      let errors
+      if (errors = Vue.dig(e, 'response', 'data', 'errors')) {
+        return Object.keys(errors).map(k => `${k}: ${errors[k].join()}`).join("\n")
       }
+      return Vue.dig(e, 'response', 'data', 'error')
+        || Vue.dig(e, 'response', 'data', 'message')
+        || Vue.dig(e, 'message')
     }
 
     Vue.dig = (target, ...keys) => {
@@ -57,7 +49,7 @@ const MulukhiyaLib = {
     Vue.getConfig = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config'), {toke: token || Vue.getToken()})
+      return axios.get(Vue.createURL('/mulukhiya/api/config'), {token: token || Vue.getConfig()})
         .then(e => e.data)
         .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
         .finally(e => indicator.hide())
