@@ -24,11 +24,7 @@ module Mulukhiya
 
     post '/config/update' do
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {
-        account: @sns.account.to_h,
-        config: @sns.account.user_config.to_h,
-        token: @sns.access_token.to_h.except(:account),
-      }
+      @renderer.message = {config: @sns.account.user_config.to_h}
       return @renderer.to_s
     rescue Ginseng::AuthError, Ginseng::ValidateError => e
       @renderer.status = e.status
@@ -113,7 +109,7 @@ module Mulukhiya
         @sns.account.user_config.update(annict: {token: response['access_token']})
         @sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
-        @renderer.message = response.parsed_response
+        @renderer.message = {config: @sns.account.user_config.to_h}
       else
         @renderer.status = 403
       end

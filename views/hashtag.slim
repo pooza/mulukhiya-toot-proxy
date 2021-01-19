@@ -11,7 +11,7 @@ html lang='ja'
       h2 ハッシュタグ辞書
       section
         input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
-        button class='small' @click='search' 検索
+        button class='small' :disabled='!keyword' @click='search' 検索
       section :class='{"tag_entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in result'
         h3
           | {{entry.word}}

@@ -94,7 +94,7 @@ html lang='ja'
             h4 認証コード
             input placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
           .field-update-button-container
-            button @click='authAnnict' 認証
+            button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
             button class='alert' @click='unauthAnnict' 認証を解除
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
@@ -144,7 +144,7 @@ html lang='ja'
             livecure: false,
             annict: {auth_code: null},
             program: null,
-            tags: [],
+            tags: '',
             webhook: {token: null, visibility: null, url: null, curl_sample: null},
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
@@ -173,8 +173,10 @@ html lang='ja'
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => this.updateForm(e))
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .then(e => {
+              this.updateForm(e)
+              this.account = e.account
+            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -186,8 +188,6 @@ html lang='ja'
         },
         methods: {
           updateForm: function (data) {
-            if (data.error) {return Promise.reject(data.error)}
-            this.account = data.account
             this.result = jsyaml.dump(data.config)
             this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
             this.form.webhook.url = Vue.dig(data, 'config', 'webhook', 'url')
