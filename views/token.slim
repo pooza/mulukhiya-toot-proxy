@@ -70,24 +70,26 @@ html lang='ja'
             .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
         },
         methods: {
-          switchAccount: function (user) {
-            Vue.switchAccount(user)
+          switchAccount: function (account) {
+            Vue.switchAccount(account)
               .then(e => {
-                this.account = user
-                this.token = user.token
+                this.account = account
+                this.token = account.token
               }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
-              .then(e => Vue.getAccounts())
               .then(e => {
+                this.account =e
+                return Vue.getAccounts()
+              }).then(e => {
                 this.accounts = e
                 this.input.token = null
               }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
-          deleteAccount: function (user) {
-            this.$dialog.confirm({body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
-              .then(e => Vue.deleteToken(user.token))
+          deleteAccount: function (account) {
+            this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
+              .then(e => Vue.deleteToken(account.token))
               .then(e => {
                 this.tokens = e
                 return Vue.getAccounts()
@@ -107,8 +109,8 @@ html lang='ja'
               }).then(e => {this.accounts = e})
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
-          isLoggedIn: function (user) {
-            return user.token == this.token
+          isLoggedIn: function (account) {
+            return account.token == this.token
           }
         },
       })
