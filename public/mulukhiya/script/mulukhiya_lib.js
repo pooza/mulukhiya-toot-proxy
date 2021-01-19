@@ -98,12 +98,14 @@ const MulukhiyaLib = {
     }
 
     Vue.registerToken = async token => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return Vue.getConfig(token)
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
           Vue.setTokens(tokens)
-          return e.account
+          return e.data.account
         })
     }
 
@@ -112,17 +114,15 @@ const MulukhiyaLib = {
     }
 
     Vue.getAccounts = async () => {
-      const accounts = []
+      const users = []
       const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
       indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
-        return Vue.getConfig(t).then(e => {
-          indicator.increment
-          accounts.push(Vue.createAccountInfo(e, t))
-        })
-      })).then(e => accounts)
+        indicator.increment
+        return Vue.getConfig(t).then(e => users.push(Vue.createAccountInfo(e, t)))
+      })).then(e => users)
       .finally(indicator.hide())
     }
 
@@ -137,10 +137,12 @@ const MulukhiyaLib = {
     }
 
     Vue.switchAccount = async account => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
       return Vue.getConfig(account.token)
         .then(e => {
           Vue.setToken(account.token)
-          return e
+          return e.data
         })
     }
 
