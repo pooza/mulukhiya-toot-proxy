@@ -8,7 +8,13 @@ module Mulukhiya
 
     get '/config' do
       if @sns.account
-        @renderer.message = user_config_info
+        @renderer.message = {
+          account: @sns.account.to_h,
+          config: @sns.account.user_config.to_h,
+          filters: @sns.filters&.parsed_response,
+          token: @sns.access_token.to_h.except(:account),
+          visibility_names: Environment.parser_class.visibility_names,
+        }
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}
@@ -18,7 +24,7 @@ module Mulukhiya
 
     post '/config/update' do
       Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = user_config_info
+      @renderer.message = {config: @sns.account.user_config.to_h}
       return @renderer.to_s
     rescue Ginseng::AuthError, Ginseng::ValidateError => e
       @renderer.status = e.status
@@ -103,7 +109,7 @@ module Mulukhiya
         @sns.account.user_config.update(annict: {token: response['access_token']})
         @sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
-        @renderer.message = user_config_info
+        @renderer.message = response.parsed_response
       else
         @renderer.status = 403
       end
@@ -241,16 +247,6 @@ module Mulukhiya
     def token
       return params[:token].decrypt if params[:token]
       return nil
-    end
-
-    def user_config_info
-      return {
-        account: @sns.account.to_h,
-        config: @sns.account.user_config.to_h,
-        filters: @sns.filters&.parsed_response,
-        token: @sns.access_token.to_h.except(:account),
-        visibility_names: Environment.parser_class.visibility_names,
-      }
     end
   end
 end
