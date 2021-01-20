@@ -91,7 +91,7 @@ module Mulukhiya
     private
 
     def retry_limit
-      return config['/amazon/retry_limit']
+      return config['/http/retry/limit']
     end
   end
 end

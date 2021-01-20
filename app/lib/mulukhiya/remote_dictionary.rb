@@ -7,16 +7,9 @@ module Mulukhiya
     end
 
     def fetch
-      cnt ||= 0
       response = @http.get(uri).parsed_response
       raise 'empty' unless response.present?
       return response
-    rescue => e
-      cnt += 1
-      logger.error(error: e, count: cnt)
-      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(1)
-      retry
     end
 
     def uri
@@ -66,7 +59,7 @@ module Mulukhiya
     end
 
     def retry_limit
-      return config['/tagging/fetch/retry_limit']
+      return config['/http/retry/limit']
     end
   end
 end

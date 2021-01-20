@@ -625,7 +625,6 @@ amazon:
   marketplace: jp
   urls:
     jp: https://www.amazon.co.jp/
-  retry_limit: 10
   cache:
     ttl: 86400
   resources:
@@ -662,7 +661,6 @@ spotify:
   language: ja,en-US;q=0.9,en;q=0.8
   urls:
     track: https://open.spotify.com/
-  retry_limit: 5
   patterns:
     - pattern: /track/([[:alnum:]]+)
       type: track
@@ -725,7 +723,6 @@ itunes:
   urls:
     search: https://itunes.apple.com/search
     lookup: https://itunes.apple.com/lookup
-  retry_limit: 5
   patterns:
     - pattern: /album/.*?/?([[:digit:]]+)$
       shortenable: true
@@ -846,8 +843,6 @@ tagging:
       image: image
       video: video
       audio: audio
-  fetch:
-    retry_limit: 5
   dictionaries:
     - url: https://precure.ml/api/dic/v1/precure.json
       type: relative
@@ -861,6 +856,10 @@ feed:
     limit: 100
   media:
     limit: 100
+http:
+  retry:
+    limit: 3
+    second: 1
 nodeinfo:
   cache:
     ttl: 3600
