@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 74d940e99fc04c82d644aff960b174fdac7ea4ae
+  revision: b7963da3b245c185f4fc6d326efb9c98aa6ece9a
   specs:
-    ginseng-core (1.9.1)
+    ginseng-core (1.9.2)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -108,7 +108,7 @@ GEM
       msgpack (~> 1.0)
     bson (4.11.1)
     builder (3.2.4)
-    concurrent-ruby (1.1.7)
+    concurrent-ruby (1.1.8)
     connection_pool (2.2.3)
     crass (1.0.6)
     daemon-spawn (0.4.2)
