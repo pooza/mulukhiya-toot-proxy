@@ -37,7 +37,7 @@ html lang='ja'
             li class='param'
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' = controller.status_label
-      nav class='media' v-if='medias.length'
+      nav class='media' v-if='medias.length && !last'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:
@@ -50,6 +50,7 @@ html lang='ja'
           account: {is_admin: false, username: null},
           medias: [],
           page: 0,
+          last: false,
         },
         mounted: function () {
           Vue.getConfig()
@@ -61,8 +62,14 @@ html lang='ja'
           appendMedias: function () {
             this.page ++
             Vue.getMedias(this.page)
-              .then(e => {this.medias = this.medias.concat(e)})
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              .then(e => {
+                if (0 < e.length) {
+                  this.medias = this.medias.concat(e)
+                } else {
+                  this.$dialog.alert('最後のページです。')
+                  this.last = true
+                }
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },
       })
