@@ -30,7 +30,7 @@ html lang='ja'
               | して下の欄に入力、認証ボタンを押下してください。
             .auth-form
               input type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
-              button @click='authMastodon' 認証
+              button :disabled='!input.authcode' @click='authMastodon' 認証
           - if env.misskey_type?
             .description
               a href=params[:oauth_url] #{controller.display_name}の認証ページ
@@ -44,7 +44,7 @@ html lang='ja'
               | また、以下の権限を含むものにしてください。
             .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
             input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
-            button @click='registerToken' 登録
+            button :disabled='!input.token' @click='registerToken' 登録
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

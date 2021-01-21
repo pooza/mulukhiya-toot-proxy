@@ -106,7 +106,7 @@ html lang='ja'
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
-            button @click='updateWebhook' 更新
+            button :disabled='!form.webhook.token' @click='updateWebhook' 更新
           .field-container v-if='form.webhook.url'
             h4 URL
             textarea ref='webhook_url_text' = '{{form.webhook.url}}'
