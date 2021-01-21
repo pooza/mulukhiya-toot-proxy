@@ -11,7 +11,7 @@ html lang='ja'
       h2 ハッシュタグ辞書
       section
         input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
-        button class='small' @click='search' 検索
+        button class='small' :disabled='!keyword' @click='search' 検索
       section :class='{"tag_entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in result'
         h3
           | {{entry.word}}
@@ -30,10 +30,10 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           tags: [],
           keyword: null,
@@ -44,19 +44,18 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
         },
         methods: {
           onKeyDown: function () {
             if (event.keyCode == 13) {this.search()}
           },
           search: function () {
-            this.message = null
             this.result = {}
             if (this.keyword == '') {return}
             Vue.searchTags(this.keyword)
               .then(e => {this.result = e})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           isDisabledTag: function (tag) {
             this.tags = this.tags || []

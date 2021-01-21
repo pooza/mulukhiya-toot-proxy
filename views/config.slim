@@ -94,7 +94,7 @@ html lang='ja'
             h4 認証コード
             input placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
           .field-update-button-container
-            button @click='authAnnict' 認証
+            button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
             button class='alert' @click='unauthAnnict' 認証を解除
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
@@ -106,7 +106,7 @@ html lang='ja'
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
-            button @click='updateWebhook' 更新
+            button :disabled='!form.webhook.token' @click='updateWebhook' 更新
           .field-container v-if='form.webhook.url'
             h4 URL
             textarea ref='webhook_url_text' = '{{form.webhook.url}}'
@@ -136,7 +136,6 @@ html lang='ja'
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           result: null,
           programs: [],
@@ -145,7 +144,7 @@ html lang='ja'
             livecure: false,
             annict: {auth_code: null},
             program: null,
-            tags: [],
+            tags: '',
             webhook: {token: null, visibility: null, url: null, curl_sample: null},
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
@@ -174,8 +173,10 @@ html lang='ja'
         },
         mounted: function () {
           Vue.getConfig()
-            .then(e => this.updateForm(e))
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .then(e => {
+              this.updateForm(e)
+              this.account = e.account
+            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -187,8 +188,6 @@ html lang='ja'
         },
         methods: {
           updateForm: function (data) {
-            if (data.error) {return Promise.reject(data.error)}
-            this.account = data.account
             this.result = jsyaml.dump(data.config)
             this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
             this.form.webhook.url = Vue.dig(data, 'config', 'webhook', 'url')
@@ -200,23 +199,26 @@ html lang='ja'
             this.form.dropbox.token = Vue.dig(data, 'config', 'dropbox', 'token')
             this.form.notify.user_config = Vue.dig(data, 'config', 'notify', 'user_config') == true
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
-            if (Vue.dig(data, 'config', 'tagging', 'user_tag')) {
-              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tag').join("\n")
+            if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
+              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
             }
-            if (Array.isArray(data.filters)) {
-              data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
+            if (data.filters) {
+              if (Array.isArray(data.filters)) {
+                data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
+              }
             }
-            this.options.visibility = []
-            Object.keys(data.visibility_names).map(k => {
-              const v = data.visibility_names[k]
-              this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
-            })
+            if (data.visibility_names) {
+              this.options.visibility = []
+              Object.keys(data.visibility_names).map(k => {
+                const v = data.visibility_names[k]
+                this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
+              })
+            }
           },
           updateConfig: function (command) {
-            this.message = null
             Vue.updateConfig(command)
               .then(e => this.updateForm(e))
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -250,10 +252,9 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateLivecure: function () {
-            this.message = null
             Vue.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -272,22 +273,20 @@ html lang='ja'
             this.updateConfig(command)
           },
           authAnnict: function () {
-            this.message = null
             Vue.authAnnict(this.form.annict.auth_code)
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           unauthAnnict: function () {
-            this.message = null
             this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.annict = false
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },
       })

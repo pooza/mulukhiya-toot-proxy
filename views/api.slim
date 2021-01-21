@@ -82,10 +82,10 @@ html lang='ja'
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。
             .endpoint_container
               .link POST /mulukhiya/api/tagging/tag/search
-              input type='search' placeholder='q: 検索フレーズ' v-model='input.search_tag.q'
+              input type='search' placeholder='q: 検索フレーズ' v-model.trim='input.search_tag.q'
               .link_description ハッシュタグ辞書から、該当するパターンを検索します。GETで結果が得られない時に。
               .field-update-button-container
-                button @click='searchTags' 実行
+                button :disabled='!input.search_tag.q' @click='searchTags' 実行
                 pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint_container v-if='account.is_admin'
               .role admin
@@ -176,7 +176,6 @@ html lang='ja'
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           config: {annict: null, webhook: null},
           webhook: {href: null},
@@ -213,67 +212,58 @@ html lang='ja'
                 this.webhook.href = Vue.createPath(e.config.webhook.url)
               }
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
-            }).catch(e => {this.message = Vue.createErrorMessage(e)})
+            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
         },
         methods: {
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
           },
           updateAnnouncement: function () {
-            this.message = null
             Vue.updateAnnouncement()
               .then(e => {this.layout.details['announcement'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           clearMediaFiles: function () {
-            this.message = null
             Vue.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           clearOAuthClient: function () {
-            this.message = null
             this.$dialog.confirm({body: 'OAuthクライアント情報を削除します。'}, {okText: '実行'})
               .then(e => Vue.clearOAuthClient())
               .then(e => {this.layout.details['oauth'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updatePrograms: function () {
-            this.message = null
             Vue.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updateTaggingDictionary: function () {
-            this.message = null
             Vue.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           clearUserTags: function () {
-            this.message = null
             Vue.clearUserTags()
               .then(e => {this.layout.details['tagging_usertag'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updateFeeds: function () {
-            this.message = null
             Vue.updateFeeds()
               .then(e => {this.layout.details['feed'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           crawlAnnict: function () {
-            this.message = null
             this.$dialog.confirm({body: 'Annictへの問い合わせを実行します。'}, {okText: '実行'})
               .then(e => Vue.crawlAnnict())
               .then(e => {this.layout.details['annict'] = false})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           searchTags: function () {
-            this.message = null
             Vue.searchTags(this.input.search_tag.q)
               .then(e => {this.result.search_tag = e})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },
       })

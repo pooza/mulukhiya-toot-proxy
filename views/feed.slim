@@ -28,19 +28,19 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           feeds: [],
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           Vue.getFeeds()
             .then(e => {this.feeds = e})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
         },
       })

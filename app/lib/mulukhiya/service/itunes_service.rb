@@ -7,35 +7,21 @@ module Mulukhiya
     end
 
     def search(keyword, category)
-      cnt ||= 0
       response = JSON.parse(@http.get(create_search_uri(keyword, category)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
-    rescue => e
-      cnt += 1
-      logger.error(error: e, count: cnt)
-      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(1)
-      retry
     end
 
     def lookup(id)
-      cnt ||= 0
       response = JSON.parse(@http.get(create_lookup_uri(id)).strip)
       raise Ginseng::RequestError, response['errorMessage'] if response['errorMessage']
       return nil unless response['results'].present?
       return response['results'].first
     rescue Ginseng::RequestError => e
       raise Ginseng::RequestError, "Item '#{id}' not found", e.backtrace
-    rescue => e
-      cnt += 1
-      logger.error(error: e, count: cnt)
-      raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(1)
-      retry
     end
 
     def create_track_uri(track)
@@ -84,7 +70,7 @@ module Mulukhiya
     end
 
     def retry_limit
-      return config['/itunes/retry_limit']
+      return config['/http/retry/limit']
     end
   end
 end

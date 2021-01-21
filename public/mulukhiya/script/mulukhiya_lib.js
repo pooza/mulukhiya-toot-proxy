@@ -9,9 +9,7 @@ const MulukhiyaLib = {
       return url.href
     }
 
-    Vue.createPath = href => {
-      return (new URL(href)).pathname
-    }
+    Vue.createPath = href => (new URL(href)).pathname
 
     Vue.createPayload = values => {
       return {
@@ -22,11 +20,13 @@ const MulukhiyaLib = {
     }
 
     Vue.createErrorMessage = e => {
-      if (Vue.dig(e, 'response', 'data')) {
-        return e.response.data.error || e.response.data.message || e.message
-      } else {
-        return e.message
+      let errors
+      if (errors = Vue.dig(e, 'response', 'data', 'errors')) {
+        return Object.keys(errors).map(k => `${k}: ${errors[k].join()}`).join("\n")
       }
+      return Vue.dig(e, 'response', 'data', 'error')
+        || Vue.dig(e, 'response', 'data', 'message')
+        || Vue.dig(e, 'message')
     }
 
     Vue.dig = (target, ...keys) => {
@@ -88,6 +88,10 @@ const MulukhiyaLib = {
     Vue.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
       tokens.unshift(Vue.getToken())
+      return Vue.setTokens(tokens)
+    }
+
+    Vue.setTokens = tokens => {
       tokens = Array.from(new Set(tokens.filter(v => (v != null))))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
@@ -100,31 +104,28 @@ const MulukhiyaLib = {
         .then(e => {
           tokens = Vue.getTokens()
           tokens.push(token)
-          tokens = Array.from(new Set(tokens.filter(v => (v != null))))
-          localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
+          Vue.setTokens(tokens)
           return e.data.account
         }).finally(e => indicator.hide())
     }
 
     Vue.deleteToken = async token => {
-      const tokens = Vue.getTokens().filter(v => v != token)
-      localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
-      return tokens
+      return Vue.setTokens(Vue.getTokens().filter(v => v != token))
     }
 
     Vue.getAccounts = async () => {
-      const users = []
+      const accounts = []
       const tokens = Vue.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
-      indicator.max = tokens.length
+      indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
-        indicator.increment
         return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
-          .then(e => users.push(Vue.createAccountInfo(e.data, t)))
-          .catch(e => users.push({token: t, error: Vue.createErrorMessage(e)}))
-      })).then(e => users)
-      .finally(indicator.hide())
+          .then(e => accounts.push(Vue.createAccountInfo(e.data, t)))
+          .catch(e => accounts.push({token: t, error: Vue.createErrorMessage(e)}))
+          .finally(e => indicator.increment)
+      })).then(e => accounts)
+      .finally(e => indicator.hide())
     }
 
     Vue.createAccountInfo = (data, token_crypted) => {
@@ -265,6 +266,7 @@ const MulukhiyaLib = {
 
     Vue.clearOAuthClient = async () => {
       const indicator = new ActivityIndicator()
+      indicator.show()
       return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())

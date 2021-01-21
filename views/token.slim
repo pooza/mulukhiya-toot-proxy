@@ -29,8 +29,8 @@ html lang='ja'
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
             .auth-form
-              input type='text' v-model='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
-              button @click='authMastodon' 認証
+              input type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
+              button :disabled='!input.authcode' @click='authMastodon' 認証
           - if env.misskey_type?
             .description
               a href=params[:oauth_url] #{controller.display_name}の認証ページ
@@ -44,16 +44,15 @@ html lang='ja'
               | また、以下の権限を含むものにしてください。
             .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
             input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
-            button @click='registerToken' 登録
+            button :disabled='!input.token' @click='registerToken' 登録
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
         data: {
-          message: null,
           account: {is_admin: false, username: null},
           accounts: [],
           tokens: [],
@@ -68,35 +67,36 @@ html lang='ja'
             .then(e => {this.account = e.account})
             .then(e => Vue.getAccounts())
             .then(e => {this.accounts = e})
-            .catch(e => {this.message = Vue.createErrorMessage(e)})
+            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
         },
         methods: {
-          switchAccount: function (user) {
-            Vue.switchAccount(user)
+          switchAccount: function (account) {
+            Vue.switchAccount(account)
               .then(e => {
-                this.account = user
-                this.token = user.token
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+                this.account = account
+                this.token = account.token
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
-              .then(e => Vue.getAccounts())
               .then(e => {
+                this.account =e
+                return Vue.getAccounts()
+              }).then(e => {
                 this.accounts = e
                 this.input.token = null
-              }).catch(e => {this.message = Vue.createErrorMessage(e)})
+              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
-          deleteAccount: function (user) {
-            this.$dialog.confirm({body: `@${user.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
-              .then(e => Vue.deleteToken(user.token))
+          deleteAccount: function (account) {
+            this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
+              .then(e => Vue.deleteToken(account.token))
               .then(e => {
                 this.tokens = e
                 return Vue.getAccounts()
               }).then(e => this.accounts = e)
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           authMastodon: function () {
-            this.message = null
             Vue.authMastodon(this.input.authcode)
               .then(e => {
                 this.input.authcode = null
@@ -107,10 +107,10 @@ html lang='ja'
                 this.account = e
                 return Vue.getAccounts()
               }).then(e => {this.accounts = e})
-              .catch(e => {this.message = Vue.createErrorMessage(e)})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
-          isLoggedIn: function (user) {
-            return user.token == this.token
+          isLoggedIn: function (account) {
+            return account.token == this.token
           }
         },
       })

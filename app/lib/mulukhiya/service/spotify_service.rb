@@ -97,7 +97,7 @@ module Mulukhiya
     end
 
     def retry_limit
-      return config['/spotify/retry_limit']
+      return config['/http/retry/limit']
     end
   end
 end

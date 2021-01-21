@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 74d940e99fc04c82d644aff960b174fdac7ea4ae
+  revision: b7963da3b245c185f4fc6d326efb9c98aa6ece9a
   specs:
-    ginseng-core (1.9.1)
+    ginseng-core (1.9.2)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -108,7 +108,7 @@ GEM
       msgpack (~> 1.0)
     bson (4.11.1)
     builder (3.2.4)
-    concurrent-ruby (1.1.7)
+    concurrent-ruby (1.1.8)
     connection_pool (2.2.3)
     crass (1.0.6)
     daemon-spawn (0.4.2)
@@ -131,19 +131,17 @@ GEM
     dry-logic (1.1.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
-    dry-schema (1.5.6)
+    dry-schema (1.6.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
-      dry-core (~> 0.4)
-      dry-equalizer (~> 0.2)
+      dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
-      dry-types (~> 1.4)
-    dry-types (1.4.0)
+      dry-types (~> 1.5)
+    dry-types (1.5.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
-      dry-core (~> 0.4, >= 0.4.4)
-      dry-equalizer (~> 0.3)
+      dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
     dry-validation (1.6.0)
@@ -288,7 +286,7 @@ GEM
     rubocop-rake (0.5.1)
       rubocop
     ruby-progressbar (1.11.0)
-    ruby2_keywords (0.0.2)
+    ruby2_keywords (0.0.4)
     rufus-scheduler (3.7.0)
       fugit (~> 1.1, >= 1.1.6)
     sanitize (5.2.3)
@@ -301,7 +299,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.40.0)
-    sidekiq (6.1.2)
+    sidekiq (6.1.3)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
