@@ -199,8 +199,8 @@ html lang='ja'
             this.form.dropbox.token = Vue.dig(data, 'config', 'dropbox', 'token')
             this.form.notify.user_config = Vue.dig(data, 'config', 'notify', 'user_config') == true
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
-            if (Vue.dig(data, 'config', 'tagging', 'user_tag')) {
-              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tag').join("\n")
+            if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
+              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
             }
             if (data.filters) {
               if (Array.isArray(data.filters)) {
