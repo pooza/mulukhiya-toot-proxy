@@ -237,6 +237,7 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get('/mulukhiya/api/health')
         .then(e => e.data)
+        .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 
