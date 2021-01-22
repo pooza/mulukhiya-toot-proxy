@@ -22,6 +22,24 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def search_dupllicated_attachment(attachment, params = {})
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
+      response = http.post('/api/drive/files/find-by-hash', {
+        body: {i: token, md5: attachment.to_h[:md5]},
+        headers: create_headers(params[:headers]),
+      })
+      return response if params[:response] == :raw
+      return attachment_class[response.parsed_response.first['id']]
+    end
+
+    def delete_attachment(attachment, params = {})
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
+      return http.post('/api/drive/files/delete', {
+        body: {i: token, fileId: attachment.id},
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/app/create', {
