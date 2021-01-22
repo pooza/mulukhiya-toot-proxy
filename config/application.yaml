@@ -859,7 +859,11 @@ feed:
 http:
   retry:
     limit: 3
-    second: 1
+    seconds: 1
+redis:
+  retry:
+    limit: 3
+    seconds: 1
 nodeinfo:
   cache:
     ttl: 3600
