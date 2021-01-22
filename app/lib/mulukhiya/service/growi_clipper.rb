@@ -16,7 +16,7 @@ module Mulukhiya
       params[:access_token] ||= @token
       params[:grant] ||= GRANT_OWNER
       params[:path] ||= File.join(@prefix, Time.now.strftime('%Y/%m/%d/%H%M%S%L'))
-      response = @http.post('/_api/pages.create', {body: params.to_json})
+      response = @http.post('/_api/pages.create', {body: params})
       raise Ginseng::GatewayError, response['error'] unless response&.dig('ok')
       return response
     end

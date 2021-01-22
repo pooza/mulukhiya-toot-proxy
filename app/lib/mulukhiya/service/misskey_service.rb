@@ -25,7 +25,7 @@ module Mulukhiya
     def search_dupllicated_attachment(attachment, params = {})
       attachment = attachment_class[attachment] if attachment.is_a?(String)
       response = http.post('/api/drive/files/find-by-hash', {
-        body: {i: token, md5: attachment.to_h[:md5]}.to_json,
+        body: {i: token, md5: attachment.to_h[:md5]},
         headers: create_headers(params[:headers]),
       })
       return response if params[:response] == :raw
@@ -35,7 +35,7 @@ module Mulukhiya
     def delete_attachment(attachment, params = {})
       attachment = attachment_class[attachment] if attachment.is_a?(String)
       return http.post('/api/drive/files/delete', {
-        body: {i: token, fileId: attachment.id}.to_json,
+        body: {i: token, fileId: attachment.id},
         headers: create_headers(params[:headers]),
       })
     end
@@ -48,7 +48,7 @@ module Mulukhiya
             description: config['/package/description'],
             permission: config['/misskey/oauth/scopes'],
             callbackUrl: http.create_uri(config['/misskey/oauth/callback_url']).to_s,
-          }.to_json,
+          },
         }).body
         redis.set('oauth_client', client)
       end
