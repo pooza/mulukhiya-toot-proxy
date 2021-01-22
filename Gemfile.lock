@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b7963da3b245c185f4fc6d326efb9c98aa6ece9a
+  revision: 2dd82f8aa28102e9d7b42eebad648e5d0c854160
   specs:
-    ginseng-core (1.9.2)
+    ginseng-core (1.9.3)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -20,9 +20,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 380b692553c9d8332efcdabc8491a58e754f2578
+  revision: 155a1223cc9cd05386bde4ed3277ea1bc664f795
   specs:
-    ginseng-fediverse (1.5.0)
+    ginseng-fediverse (1.5.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
