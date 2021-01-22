@@ -32,9 +32,7 @@ html lang='ja'
         },
         methods: {
           load: function () {
-            Vue.getHealth()
-              .then(e => {this.result = e})
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            Vue.getHealth().then(e => {this.result = e})
           },
         },
       })

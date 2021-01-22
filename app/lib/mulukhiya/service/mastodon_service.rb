@@ -23,7 +23,7 @@ module Mulukhiya
             website: config['/package/url'],
             redirect_uris: config['/mastodon/oauth/redirect_uri'],
             scopes: config['/mastodon/oauth/scopes'].join(' '),
-          }.to_json,
+          },
         }).body
         redis.set('oauth_client', client)
       end

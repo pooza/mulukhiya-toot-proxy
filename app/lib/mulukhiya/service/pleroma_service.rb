@@ -29,7 +29,7 @@ module Mulukhiya
             website: config['/package/url'],
             redirect_uris: config['/pleroma/oauth/redirect_uri'],
             scopes: config['/pleroma/oauth/scopes'].join(' '),
-          }.to_json,
+          },
         }).body
         redis.set('oauth_client', client)
       end
