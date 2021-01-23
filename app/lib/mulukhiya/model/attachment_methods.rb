@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def meta
-      File.write(path, HTTP.new.get(uri)) unless File.exist?(path)
+      File.write(path, HTTP.new.get(uri, {retry: 0})) unless File.exist?(path)
       storage = MediaMetadataStorage.new
       storage.push(path) unless storage.get(path)
       return storage.get(path)
