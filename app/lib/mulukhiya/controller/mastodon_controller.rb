@@ -100,7 +100,7 @@ module Mulukhiya
 
     def token
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
-      raise Ginseng::AuthError, 'Unauthorized'
+      return nil
     end
 
     def self.webhook_entries

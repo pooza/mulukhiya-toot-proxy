@@ -61,8 +61,7 @@ module Mulukhiya
     end
 
     def token
-      return params[:i] if params[:i]
-      raise Ginseng::AuthError, 'Unauthorized'
+      return params[:i]
     end
 
     def self.webhook_entries
