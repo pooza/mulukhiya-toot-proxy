@@ -28,9 +28,12 @@ html lang='ja'
           h3 @click='toggleVisibility("media")' メディアファイル
           vue-slide-up-down :active='layout.details.media'
             .endpoint_container
-              .link
-                a href='/mulukhiya/api/media' target='_blank' GET /mulukhiya/api/media
+              .link GET /mulukhiya/api/media
+              input type='number' placeholder='page: ページ' v-model.trim='input.media_list.page'
               .link_description 最近投稿されたメディアファイルを表示します。
+              .field-update-button-container
+                button @click='getMedias' 実行
+                pre class='result' v-if='result.media_list' = '{{result.media_list}}'
             .endpoint_container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/clear
@@ -55,12 +58,14 @@ html lang='ja'
             h3 @click='toggleVisibility("program")' 実況番組表
             vue-slide-up-down :active='layout.details.program'
               .endpoint_container
-                .link
-                  a href='/mulukhiya/api/program' target='_blank' GET /mulukhiya/api/program
+                .link GET /mulukhiya/api/program
                 .link_description
                   | キャッシュ済みの
                   a href='#{config['/programs/url']}' target='_blank' 実況番組表
                   | を表示します。
+                .field-update-button-container
+                  button @click='getPrograms' 実行
+                  pre class='result' v-if='result.program_list' = '{{result.program_list}}'
               .endpoint_container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
@@ -77,13 +82,9 @@ html lang='ja'
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint_container
-              .link
-                a href='/mulukhiya/api/tagging/tag/search?q=プリキュア' target='_blank' GET /mulukhiya/api/tagging/tag/search?q=your_keyword
-              .link_description ハッシュタグ辞書から、該当するパターンを検索します。
-            .endpoint_container
               .link POST /mulukhiya/api/tagging/tag/search
               input type='search' placeholder='q: 検索フレーズ' v-model.trim='input.search_tag.q'
-              .link_description ハッシュタグ辞書から、該当するパターンを検索します。GETで結果が得られない時に。
+              .link_description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!input.search_tag.q' @click='searchTags' 実行
                 pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
@@ -118,9 +119,11 @@ html lang='ja'
             h3 @click='toggleVisibility("feed")' Atomフィード
             vue-slide-up-down :active='layout.details.feed'
               .endpoint_container
-                .link
-                  a :href='feed.list.href' target='_blank' GET /mulukhiya/api/feed/list
+                .link GET /mulukhiya/api/feed/list
                 .link_description フィードの一覧を返します。
+                .field-update-button-container
+                  button @click='getFeeds' 実行
+                  pre class='result' v-if='result.feed_list' = '{{result.feed_list}}'
               .endpoint_container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/feed/update
@@ -136,7 +139,6 @@ html lang='ja'
         li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
-            .alert 与えられた実行回数（有限）を消費します。やむを得ない場合にだけ、慎重に実行してください。
             .endpoint_container
               .link POST /mulukhiya/api/annict/crawl
               .link_description Annictへの問い合わせを行います。
@@ -157,16 +159,20 @@ html lang='ja'
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
             .endpoint_container
-              .link
-                a href='/mulukhiya/api/health' target='_blank' GET /mulukhiya/api/health
+              .link GET /mulukhiya/api/health
               .link_description モロヘイヤの動作状況を表示します。
+              .field-update-button-container
+                button @click='getHealth' 実行
+                pre class='result' v-if='result.health' = '{{result.health}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
             .endpoint_container
-              .link
-                a href='/mulukhiya/api/about' target='_blank' GET /mulukhiya/api/about
+              .link GET /mulukhiya/api/about
               .link_description モロヘイヤのバージョン等、パッケージ情報を表示します。
+              .field-update-button-container
+                button @click='getAbout' 実行
+                pre class='result' v-if='result.about' = '{{result.about}}'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -182,9 +188,15 @@ html lang='ja'
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
+            media_list: {page: 1},
           },
           result: {
             search_tag: null,
+            media_list: null,
+            program_list: null,
+            feed_list: null,
+            health: null,
+            about: null,
           },
           layout: {
             details: {
@@ -223,6 +235,12 @@ html lang='ja'
               .then(e => {this.layout.details['announcement'] = false})
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
+          getMedias: function () {
+            this.result.media_list = null
+            Vue.getMedias(this.input.media_list.page)
+              .then(e => {this.result.media_list = e})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+          },
           clearMediaFiles: function () {
             Vue.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
@@ -237,6 +255,12 @@ html lang='ja'
           updatePrograms: function () {
             Vue.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+          },
+          getPrograms: function () {
+            this.result.program_list = null
+            Vue.getPrograms()
+              .then(e => {this.result.program_list = e})
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           updateTaggingDictionary: function () {
@@ -254,6 +278,12 @@ html lang='ja'
               .then(e => {this.layout.details['feed'] = false})
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
+          getFeeds: function () {
+            this.result.feed_list = null
+            Vue.getFeeds()
+              .then(e => {this.result.feed_list = e})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+          },
           crawlAnnict: function () {
             this.$dialog.confirm({body: 'Annictへの問い合わせを実行します。'}, {okText: '実行'})
               .then(e => Vue.crawlAnnict())
@@ -261,8 +291,21 @@ html lang='ja'
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
           searchTags: function () {
+            this.result.search_tag = null
             Vue.searchTags(this.input.search_tag.q)
               .then(e => {this.result.search_tag = e})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+          },
+          getHealth: function () {
+            this.result.health = null
+            Vue.getHealth()
+              .then(e => {this.result.health = e})
+              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+          },
+          getAbout: function () {
+            this.result.about = null
+            Vue.getAbout()
+              .then(e => {this.result.about = e})
               .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
         },

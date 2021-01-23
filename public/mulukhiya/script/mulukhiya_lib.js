@@ -241,6 +241,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getAbout = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get('/mulukhiya/api/about')
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.updateAnnouncement = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
