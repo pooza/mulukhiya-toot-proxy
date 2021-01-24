@@ -6,7 +6,7 @@ module Mulukhiya
 
     def perform
       return unless executable?
-      info_agent_service.announcements.each do |announcement|
+      announcements.each do |announcement|
         next if cache.member?(announcement[:id])
         Event.new(:announce, {sns: info_agent_service}).dispatch(announcement)
       rescue => e
@@ -24,8 +24,13 @@ module Mulukhiya
       return JSON.parse(File.read(path))
     end
 
+    def announcements
+      @announcements ||= info_agent_service.announcements
+      return @announcements
+    end
+
     def save
-      File.write(path, info_agent_service.announcements.to_h {|v| [v[:id], v]}.to_json)
+      File.write(path, announcements.to_h {|v| [v[:id], v]}.to_json)
     rescue => e
       logger.error(error: e)
     end
