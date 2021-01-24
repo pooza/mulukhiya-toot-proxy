@@ -63,7 +63,8 @@ module Mulukhiya
     end
 
     def refresh
-      save_cache
+      File.write(path, Marshal.dump(merge(fetch)))
+      @cache = nil
       logger.info(class: self.class.to_s, path: path, message: 'refreshed')
       load
     rescue => e
@@ -83,24 +84,6 @@ module Mulukhiya
 
     private
 
-    def fetch
-      result = {}
-      bar = ProgressBar.create(total: remote_dics.count) if Environment.rake?
-      remote_dics do |dic|
-        dic.parse.each do |k, v|
-          result[k] ||= v
-          next unless v[:words].is_a?(Array)
-          result[k][:words].concat(v[:words]).uniq!
-        end
-      rescue => e
-        logger.error(error: e, dic: {uri: dic.uri.to_s})
-      ensure
-        bar&.increment
-      end
-      bar&.finish
-      return result.sort_by {|k, v| k.length}.to_h
-    end
-
     def create_temp_text(body)
       parts = [(body[status_field] || '').gsub(Acct.pattern, '')]
       options = body.dig('poll', controller_class.poll_options_field)
@@ -108,9 +91,35 @@ module Mulukhiya
       return parts.join('::::')
     end
 
-    def save_cache
-      File.write(path, Marshal.dump(fetch))
-      @cache = nil
+    def fetch
+      bar = ProgressBar.create(total: remote_dics.count) if Environment.rake?
+      threads = []
+      result = []
+      remote_dics do |dic|
+        thread = Thread.new do
+          result.push(dic.parse)
+        rescue => e
+          logger.error(error: e, dic: {uri: dic.uri.to_s})
+        ensure
+          bar&.increment
+        end
+        threads.push(thread)
+      end
+      threads.each(&:join)
+      bar&.finish
+      return result
+    end
+
+    def merge(wordsets)
+      result = {}
+      wordsets.each do |words|
+        words.each do |k, v|
+          result[k] ||= v
+          next unless v[:words].is_a?(Array)
+          result[k][:words].concat(v[:words]).uniq!
+        end
+      end
+      return result.sort_by {|k, v| k.length}.to_h
     end
   end
 end
