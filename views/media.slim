@@ -66,8 +66,8 @@ html lang='ja'
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
                 } else {
-                  this.$dialog.alert('最後のページです。')
                   this.last = true
+                  this.$dialog.alert('最後のページです。')
                 }
               }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
           },
