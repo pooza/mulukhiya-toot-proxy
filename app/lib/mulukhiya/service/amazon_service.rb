@@ -19,7 +19,7 @@ module Mulukhiya
     def create_image_uri(asin)
       if AmazonService.config?
         item = lookup(asin)
-        ['Large', 'Medium', 'Small'].each do |size|
+        ['Large', 'Medium', 'Small'].freeze.each do |size|
           uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
           return uri if uri
         end
