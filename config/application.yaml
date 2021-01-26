@@ -795,6 +795,7 @@ media:
       ttl: 86400
 postgres:
   dsn: null
+  query_log: false
 mongo:
   dsn: null
 slack:

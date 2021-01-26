@@ -4,7 +4,9 @@ module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
 
-    alias exec execute
+    def loggable?
+      return Environment.test? || Environment.deveopment? || config['/postgres/query_log']
+    end
 
     def self.connect
       return instance if config?
