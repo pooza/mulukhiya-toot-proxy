@@ -59,7 +59,7 @@ module Mulukhiya
     end
 
     def retry_limit
-      return config['/http/retry/limit']
+      return config['/http/retry/limit'] rescue 5
     end
   end
 end

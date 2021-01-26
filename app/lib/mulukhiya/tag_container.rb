@@ -30,7 +30,7 @@ module Mulukhiya
     end
 
     def self.media_tag?
-      return config['/tagging/media/enable']
+      return config['/tagging/media/enable'] == true rescue true
     end
 
     def self.media_tag_bases

@@ -17,10 +17,14 @@ module Mulukhiya
 
     def rewritable?(uri)
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
-      return config['/handler/shortened_url/domains'].member?(uri.host)
+      return domains.member?(uri.host)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       return false
+    end
+
+    def domains
+      return config['/handler/shortened_url/domains'] rescue []
     end
   end
 end
