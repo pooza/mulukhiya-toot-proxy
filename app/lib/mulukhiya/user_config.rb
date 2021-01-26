@@ -53,9 +53,7 @@ module Mulukhiya
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
-      return @values["/handler/#{handler.underscore}/disable"] == true
-    rescue Ginseng::ConfigError, NameError
-      return false
+      return @values["/handler/#{handler.underscore}/disable"] == true rescue false
     end
   end
 end

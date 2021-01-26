@@ -73,9 +73,7 @@ module Mulukhiya
     end
 
     def self.associate_tag
-      return config['/amazon/associate_tag']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/amazon/associate_tag'] rescue nil
     end
 
     def self.config?

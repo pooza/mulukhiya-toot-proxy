@@ -93,9 +93,7 @@ module Mulukhiya
     end
 
     def media_api_default_version
-      return config['/mastodon/media_api/version']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/mastodon/media_api/version'] rescue nil
     end
 
     def token

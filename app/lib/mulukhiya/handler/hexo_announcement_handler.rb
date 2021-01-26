@@ -26,9 +26,7 @@ module Mulukhiya
     private
 
     def category
-      return config['/handler/hexo_announcement/category']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/handler/hexo_announcement/category'] rescue nil
     end
 
     def dir

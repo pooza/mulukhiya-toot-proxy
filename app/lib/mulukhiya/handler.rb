@@ -143,9 +143,7 @@ module Mulukhiya
     end
 
     def self.create(name, params = {})
-      return "Mulukhiya::#{name.camelize}Handler".constantize.new(params)
-    rescue Ginseng::ConfigError
-      return nil
+      return "Mulukhiya::#{name.camelize}Handler".constantize.new(params) rescue nil
     end
 
     def self.names

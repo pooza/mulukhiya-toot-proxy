@@ -15,9 +15,7 @@ module Mulukhiya
     end
 
     def self.dsn
-      return Ginseng::Postgres::DSN.parse(config['/postgres/dsn'])
-    rescue Ginseng::ConfigError
-      return nil
+      return Ginseng::Postgres::DSN.parse(config['/postgres/dsn']) rescue nil
     end
 
     def self.health

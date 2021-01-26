@@ -20,15 +20,11 @@ module Mulukhiya
     end
 
     def self.username
-      return config['/sidekiq/auth/user']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/sidekiq/auth/user'] rescue nil
     end
 
     def self.password
-      return config['/sidekiq/auth/password']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/sidekiq/auth/password'] rescue nil
     end
 
     def self.basic_auth?
