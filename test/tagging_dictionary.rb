@@ -16,5 +16,10 @@ module Mulukhiya
         assert_kind_of(RemoteDictionary, d)
       end
     end
+
+    def test_short?
+      assert(TaggingDictionary.short?('ココ'))
+      assert_false(TaggingDictionary.short?('館長'))
+    end
   end
 end

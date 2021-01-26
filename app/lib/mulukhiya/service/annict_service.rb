@@ -190,15 +190,11 @@ module Mulukhiya
     end
 
     def self.client_id
-      return config['/annict/oauth/client/id']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/annict/oauth/client/id'] rescue nil
     end
 
     def self.client_secret
-      return config['/annict/oauth/client/secret']
-    rescue Ginseng::ConfigError
-      return nil
+      return config['/annict/oauth/client/secret'] rescue nil
     end
 
     def self.config?

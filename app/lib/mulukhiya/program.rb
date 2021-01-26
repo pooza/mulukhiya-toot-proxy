@@ -4,10 +4,7 @@ module Mulukhiya
     include Package
 
     def update
-      File.write(path, @http.get(config['/programs/url']))
-      logger.info(class: self.class.to_s, count: count)
-    rescue Ginseng::ConfigError => e
-      logger.error(error: e)
+      File.write(path, @http.get(config['/programs/url'])) rescue nil
     end
 
     def path

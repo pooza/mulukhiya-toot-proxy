@@ -10,9 +10,7 @@ module Mulukhiya
 
     def federate?
       return true if Environment.test?
-      return config["/worker/#{underscore}/federate"] == true
-    rescue Ginseng::ConfigError
-      return false
+      return config["/worker/#{underscore}/federate"] == true rescue false
     end
 
     def perform(params)

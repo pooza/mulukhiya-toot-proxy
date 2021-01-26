@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def self.type
-      return config['/environment'] || 'development'
+      return config['/environment'] rescue 'development'
     end
 
     def self.development?

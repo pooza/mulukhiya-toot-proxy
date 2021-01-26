@@ -29,7 +29,7 @@ FROM
       ap_id AS uri,
       CASE (email IS null)
         WHEN true THEN '@' || nickname
-        WHEN false THEN '@' || nickname || '<%= Mulukhiya::Environment.domain_name %>'
+        WHEN false THEN '@' || nickname || '<%= environment.domain_name %>'
       END AS acct,
       name
     FROM
@@ -38,6 +38,6 @@ FROM
 WHERE (statuses.tag = '<%= params[:tag] %>')
   AND (statuses.actor[5] <> '<%= test_account.acct.username %>')
   <% if params[:local] %>
-    AND (statuses.actor[3] = '<%= Mulukhiya::Environment.domain_name %>')
+    AND (statuses.actor[3] = '<%= environment.domain_name %>')
   <% end %>
 LIMIT <%= params[:limit] %> OFFSET 0

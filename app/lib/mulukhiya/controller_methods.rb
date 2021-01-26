@@ -10,27 +10,19 @@ module Mulukhiya
       end
 
       def display_name
-        return config["/#{name}/display_name"] || name
-      rescue Ginseng::ConfigError
-        return name
+        return config["/#{name}/display_name"] rescue name
       end
 
       def webhook?
-        return config["/#{name}/webhook"] == true
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/webhook"] == true rescue false
       end
 
       def media_catalog?
-        return config["/#{name}/media_catalog"] == true
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/media_catalog"] == true rescue false
       end
 
       def feed?
-        return config["/#{name}/feed"]
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/feed"] rescue false
       end
 
       def growi?
@@ -42,21 +34,15 @@ module Mulukhiya
       end
 
       def announcement?
-        return config["/#{name}/announcement"] == true
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/announcement"] == true rescue false
       end
 
       def filter?
-        return config["/#{name}/filter"] == true
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/filter"] == true rescue false
       end
 
       def futured_tag?
-        return config["/#{name}/futured_tag"] == true
-      rescue Ginseng::ConfigError
-        return false
+        return config["/#{name}/futured_tag"] == true rescue false
       end
 
       def annict?
@@ -91,15 +77,11 @@ module Mulukhiya
       end
 
       def oauth_webui_uri
-        return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"])
-      rescue Ginseng::ConfigError
-        return nil
+        return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"]) rescue nil
       end
 
       def oauth_default_scopes
-        return config["/#{name}/oauth/scopes"] || []
-      rescue Ginseng::ConfigError
-        return nil
+        return config["/#{name}/oauth/scopes"] || [] rescue nil
       end
 
       def status_field

@@ -4,9 +4,7 @@ module Mulukhiya
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
-      return self["/handler/#{handler.underscore}/disable"] == true
-    rescue Ginseng::ConfigError, NameError
-      return false
+      return self["/handler/#{handler.underscore}/disable"] == true rescue false
     end
 
     def schema

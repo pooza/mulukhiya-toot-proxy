@@ -10,15 +10,11 @@ module Mulukhiya
     end
 
     def self.default_tags
-      return config['/tagging/default_tags'].map(&:to_hashtag)
-    rescue Ginseng::ConfigError
-      return []
+      return config['/tagging/default_tags'].map(&:to_hashtag) rescue []
     end
 
     def self.default_tag_bases
-      return config['/tagging/default_tags'].map(&:to_hashtag_base)
-    rescue Ginseng::ConfigError
-      return []
+      return config['/tagging/default_tags'].map(&:to_hashtag_base) rescue []
     end
 
     def self.futured_tag_bases
@@ -34,7 +30,7 @@ module Mulukhiya
     end
 
     def self.media_tag?
-      return config['/tagging/media/enable']
+      return config['/tagging/media/enable'] == true rescue true
     end
 
     def self.media_tag_bases

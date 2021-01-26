@@ -190,6 +190,7 @@ module Mulukhiya
           next unless params[:q].match?(entry.first[:regexp])
           dic[word] = entry.first
           dic[word][:word] = word
+          dic[word][:short] = TaggingDictionary.short?(word)
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
         rescue => e

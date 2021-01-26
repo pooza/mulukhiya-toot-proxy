@@ -7,9 +7,7 @@ module Mulukhiya
     attr_reader :db
 
     def self.dsn
-      return MongoDSN.parse(config['/mongo/dsn'])
-    rescue Ginseng::ConfigError
-      return nil
+      return MongoDSN.parse(config['/mongo/dsn']) rescue nil
     end
 
     def self.connect

@@ -4,7 +4,9 @@ module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
 
-    alias exec execute
+    def loggable?
+      return Environment.test? || Environment.development? || config['/postgres/query_log']
+    end
 
     def self.connect
       return instance if config?
@@ -15,9 +17,7 @@ module Mulukhiya
     end
 
     def self.dsn
-      return Ginseng::Postgres::DSN.parse(config['/postgres/dsn'])
-    rescue Ginseng::ConfigError
-      return nil
+      return Ginseng::Postgres::DSN.parse(config['/postgres/dsn']) rescue nil
     end
 
     def self.health

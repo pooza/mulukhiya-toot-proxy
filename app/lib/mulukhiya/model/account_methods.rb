@@ -82,9 +82,7 @@ module Mulukhiya
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
-      return user_config["/handler/#{handler.underscore}/disable"] == true
-    rescue Ginseng::ConfigError, NameError
-      return false
+      return user_config["/handler/#{handler.underscore}/disable"] == true rescue false
     end
 
     def user_tag_bases
