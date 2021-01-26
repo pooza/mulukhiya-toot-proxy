@@ -18,7 +18,7 @@ FROM
 WHERE (toots.local = true)
   AND (toots.reblog_of_id IS null)
   AND (toots.visibility < 2)
-  AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS NULL))
+  AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
 ORDER BY

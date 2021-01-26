@@ -7,7 +7,7 @@ FROM
       jsonb_array_elements(prof.fields)->>'value' AS value
     FROM "user"
       INNER JOIN user_profile AS prof ON "user".id = prof."userId"
-    WHERE ("user".host IS NULL)
+    WHERE ("user".host IS null)
   ) AS t
 WHERE (value LIKE '#%')
 GROUP BY

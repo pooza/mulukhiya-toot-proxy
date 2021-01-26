@@ -25,7 +25,7 @@ FROM
           regexp_split_to_array(data->>'actor', '/') AS actor
         FROM
           objects
-        WHERE (data->>'actor' IS NOT NULL)
+        WHERE (data->>'actor' IS NOT null)
       ) AS objects_actor ON objects_base.id = objects_actor.id
       INNER JOIN users ON objects_actor.actor[5] = users.nickname
     WHERE (objects_base.data->'attachment'->0->'url' IS NOT null)
