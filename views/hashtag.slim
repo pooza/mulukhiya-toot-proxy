@@ -12,7 +12,7 @@ html lang='ja'
       section
         input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
         button class='small' :disabled='!keyword' @click='search' 検索
-      section :class='{"tag_entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in result'
+      section :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in result'
         h3
           | {{entry.word}}
           span class='alert' v-if='entry.short' 未使用

@@ -14,66 +14,66 @@ html lang='ja'
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
             vue-slide-up-down :active='layout.details.announcement'
-              .endpoint_container
+              .endpoint-container
                 .role admin
                 .link POST /mulukhiya/api/announcement/update
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
-                  .link_description
+                  .link-description
                     | スケジュール
                     code #{config['/sidekiq/schedule/announcement/every']}
-                .link_description お知らせの更新を行います。
+                .link-description お知らせの更新を行います。
                 .field-update-button-container
                   button @click='updateAnnouncement' 実行
         li
           h3 @click='toggleVisibility("media")' メディアファイル
           vue-slide-up-down :active='layout.details.media'
-            .endpoint_container
+            .endpoint-container
               .link GET /mulukhiya/api/media
               input type='number' placeholder='page: ページ' v-model.trim='input.media_list.page'
-              .link_description 最近投稿されたメディアファイルを表示します。
+              .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
                 pre class='result' v-if='result.media_list' = '{{result.media_list}}'
-            .endpoint_container v-if='account.is_admin'
+            .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/clear
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
-                .link_description
+                .link-description
                   | スケジュール
                   code #{config['/sidekiq/schedule/media_cleaning/cron']}
-              .link_description メディアファイル変換結果をクリアします。
+              .link-description メディアファイル変換結果をクリアします。
               .field-update-button-container
                 button @click='clearMediaFiles' 実行
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("oauth")' OAuth
           vue-slide-up-down :active='layout.details.oauth'
-            .endpoint_container
+            .endpoint-container
               .role admin
               .link POST /mulukhiya/api/oauth/client/clear
-              .link_description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
+              .link-description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
                 button @click='clearOAuthClient' 実行
         - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表
             vue-slide-up-down :active='layout.details.program'
-              .endpoint_container
+              .endpoint-container
                 .link GET /mulukhiya/api/program
-                .link_description
+                .link-description
                   | キャッシュ済みの
                   a href='#{config['/programs/url']}' target='_blank' 実況番組表
                   | を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
                   pre class='result' v-if='result.program_list' = '{{result.program_list}}'
-              .endpoint_container v-if='account.is_admin'
+              .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
                 - if config.keys('/sidekiq/schedule/program_update').member?('cron')
-                  .link_description
+                  .link-description
                     | スケジュール
                     code #{config['/sidekiq/schedule/program_update/cron']}
-                .link_description
+                .link-description
                   a href='#{config['/programs/url']}' target='_blank' 実況番組表
                   | を取得し、キャッシュします。
                 .field-update-button-container
@@ -81,21 +81,21 @@ html lang='ja'
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
-            .endpoint_container
+            .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
               input type='search' placeholder='q: 検索フレーズ' v-model.trim='input.search_tag.q'
-              .link_description ハッシュタグ辞書から、該当するパターンを検索します。
+              .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!input.search_tag.q' @click='searchTags' 実行
                 pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
-            .endpoint_container v-if='account.is_admin'
+            .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
-                .link_description
+                .link-description
                   | スケジュール
                   code #{config['/sidekiq/schedule/tagging_dictionary_update/cron']}
-              .link_description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
+              .link-description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
               - config['/tagging/dictionaries'].each do |dic|
                 .link
                   a href=dic['url'] target='_blank' = dic['url'].ellipsize(64)
@@ -104,34 +104,34 @@ html lang='ja'
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           vue-slide-up-down :active='layout.details.tagging_usertag'
-            .endpoint_container
+            .endpoint-container
               .role admin
               .link POST /mulukhiya/api/tagging/usertag/clear
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
-                .link_description
+                .link-description
                   | スケジュール
                   code #{config['/sidekiq/schedule/user_tag_initialize/cron']}
-              .link_description インスタンス内全ユーザーの固定タグ設定をクリアします。
+              .link-description インスタンス内全ユーザーの固定タグ設定をクリアします。
               .field-update-button-container
                 button @click='clearUserTags' 実行
         - if controller.feed?
           li v-if='account.username'
             h3 @click='toggleVisibility("feed")' Atomフィード
             vue-slide-up-down :active='layout.details.feed'
-              .endpoint_container
+              .endpoint-container
                 .link GET /mulukhiya/api/feed/list
-                .link_description フィードの一覧を返します。
+                .link-description フィードの一覧を返します。
                 .field-update-button-container
                   button @click='getFeeds' 実行
                   pre class='result' v-if='result.feed_list' = '{{result.feed_list}}'
-              .endpoint_container v-if='account.is_admin'
+              .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/feed/update
                 - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
-                  .link_description
+                  .link-description
                     | スケジュール
                     code #{config['/sidekiq/schedule/tag_feed_update/every']}
-                .link_description
+                .link-description
                   a href='/mulukhiya/app/feed' ハッシュタグ等のAtomフィード
                   | を更新します。
                 .field-update-button-container
@@ -139,37 +139,37 @@ html lang='ja'
         li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
-            .endpoint_container
+            .endpoint-container
               .link POST /mulukhiya/api/annict/crawl
-              .link_description Annictへの問い合わせを行います。
+              .link-description Annictへの問い合わせを行います。
               .field-update-button-container
                 button @click='crawlAnnict' 実行
         li v-if='account.username && config.webhook'
           h3 @click='toggleVisibility("webhook")' Slack互換webhook
           vue-slide-up-down :active='layout.details.webhook'
             .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
-            .endpoint_container
+            .endpoint-container
               .link
                 a :href='webhook.href' target='_blank' GET {{webhook.href}}
-              .link_description webhookが正常であるかを確認します。
-            .endpoint_container
+              .link-description webhookが正常であるかを確認します。
+            .endpoint-container
               .link POST {{webhook.href}}
-              .link_description 投稿を行います。
+              .link-description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
-            .endpoint_container
+            .endpoint-container
               .link GET /mulukhiya/api/health
-              .link_description モロヘイヤの動作状況を表示します。
+              .link-description モロヘイヤの動作状況を表示します。
               .field-update-button-container
                 button @click='getHealth' 実行
                 pre class='result' v-if='result.health' = '{{result.health}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
-            .endpoint_container
+            .endpoint-container
               .link GET /mulukhiya/api/about
-              .link_description モロヘイヤのバージョン等、パッケージ情報を表示します。
+              .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
               .field-update-button-container
                 button @click='getAbout' 実行
                 pre class='result' v-if='result.about' = '{{result.about}}'
