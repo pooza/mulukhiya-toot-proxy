@@ -15,7 +15,7 @@ module Mulukhiya
       r = []
       text = create_temp_text(body)
       reverse_each do |k, v|
-        next if k.length < config['/tagging/word/minimum_length']
+        next if TaggingDictionary.short?(k)
         next unless text.match?(v[:pattern])
         r.push(k)
         r.concat(v[:words])
@@ -80,6 +80,10 @@ module Mulukhiya
     def remote_dics(&block)
       return enum_for(__method__) unless block
       RemoteDictionary.all(&block)
+    end
+
+    def self.short?(word)
+      return word.match?("^[0-9a-zA-Zあ-んア-ン]{,#{config['/tagging/word/minimum_length']}}$")
     end
 
     private
