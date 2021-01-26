@@ -5,7 +5,7 @@ module Mulukhiya
     include Package
 
     def loggable?
-      return Environment.test? || Environment.deveopment? || config['/postgres/query_log']
+      return Environment.test? || Environment.development? || config['/postgres/query_log']
     end
 
     def self.connect
