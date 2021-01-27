@@ -16,9 +16,11 @@ html lang='ja'
           i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
           .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
         .field-container
-          h3 curlサンプル
-          textarea ref='curl_sample_text' v-html='curl_sample'
-          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyCurlSample'
+          h3 詳細
+          p
+            | wikiの
+            a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/webhook' target='_blank' 該当ページ
+            | を参照。
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -30,23 +32,17 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           url: null,
-          curl_sample: null,
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {
               this.account = e.account
               this.url = Vue.dig(e, 'config', 'webhook', 'url')
-              this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${Vue.dig(e, 'config', 'webhook', 'url')}`
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
-            document.execCommand('copy')
-          },
-          copyCurlSample: function () {
-            this.$refs.curl_sample_text.select()
             document.execCommand('copy')
           },
         },
