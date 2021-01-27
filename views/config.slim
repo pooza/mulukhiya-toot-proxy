@@ -177,7 +177,7 @@ html lang='ja'
             .then(e => {
               this.updateForm(e)
               this.account = e.account
-            }).catch(e => Vue.alert(e))
+            }).catch(e => Vue.alert(this.$dialog, e))
           Vue.getPrograms()
             .then(e => {
               this.programs = e
@@ -219,7 +219,7 @@ html lang='ja'
           updateConfig: function (command) {
             Vue.updateConfig(command)
               .then(e => this.updateForm(e))
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
@@ -255,7 +255,7 @@ html lang='ja'
           updateLivecure: function () {
             Vue.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -279,7 +279,7 @@ html lang='ja'
                 this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => Vue.alert(e))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           unauthAnnict: function () {
             this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
@@ -287,7 +287,7 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.annict = false
-              }).catch(e => Vue.alert(e))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

@@ -19,7 +19,7 @@ const MulukhiyaLib = {
       }
     }
 
-    Vue.alert = e => {
+    Vue.alert = (dialog, e) => {
       let errors
       if (!e) {return}
       if (errors = Vue.dig(e, 'response', 'data', 'errors')) {
@@ -28,7 +28,7 @@ const MulukhiyaLib = {
       const message = Vue.dig(e, 'response', 'data', 'error')
         || Vue.dig(e, 'response', 'data', 'message')
         || Vue.dig(e, 'message')
-      this.$dialog.alert(message)
+      dialog.alert(message)
     }
 
     Vue.dig = (target, ...keys) => {

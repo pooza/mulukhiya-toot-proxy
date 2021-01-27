@@ -56,7 +56,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => Vue.alert(e))
+            .catch(e => Vue.alert(this.$dialog, e))
           this.appendMedias()
         },
         methods: {
@@ -70,7 +70,7 @@ html lang='ja'
                   this.last = true
                   this.$dialog.alert('最後のページです。')
                 }
-              }).catch(e => Vue.alert(e))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

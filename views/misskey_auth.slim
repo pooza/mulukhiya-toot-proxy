@@ -24,6 +24,6 @@ html lang='ja'
             .then(e => {
               Vue.setToken(this.token)
               location.href = '/mulukhiya/app/token'
-            }).catch(e => Vue.alert(e))
+            }).catch(e => Vue.alert(this.$dialog, e))
         },
       })

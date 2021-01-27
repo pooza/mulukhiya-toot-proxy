@@ -224,7 +224,7 @@ html lang='ja'
                 this.webhook.href = Vue.createPath(e.config.webhook.url)
               }
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
-            }).catch(e => Vue.alert(e))
+            }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           toggleVisibility: function (name) {
@@ -233,80 +233,82 @@ html lang='ja'
           updateAnnouncement: function () {
             Vue.updateAnnouncement()
               .then(e => {this.layout.details['announcement'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getMedias: function () {
             this.result.media_list = null
             Vue.getMedias(this.input.media_list.page)
               .then(e => {this.result.media_list = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           clearMediaFiles: function () {
             Vue.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           clearOAuthClient: function () {
             this.$dialog.confirm({body: 'OAuthクライアント情報を削除します。'}, {okText: '実行'})
               .then(e => Vue.clearOAuthClient())
               .then(e => {this.layout.details['oauth'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => {
+                Vue.alert(this.$dialog, e)
+              })
           },
           updatePrograms: function () {
             Vue.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getPrograms: function () {
             this.result.program_list = null
             Vue.getPrograms()
               .then(e => {this.result.program_list = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           updateTaggingDictionary: function () {
             Vue.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           clearUserTags: function () {
             Vue.clearUserTags()
               .then(e => {this.layout.details['tagging_usertag'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           updateFeeds: function () {
             Vue.updateFeeds()
               .then(e => {this.layout.details['feed'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getFeeds: function () {
             this.result.feed_list = null
             Vue.getFeeds()
               .then(e => {this.result.feed_list = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           crawlAnnict: function () {
             this.$dialog.confirm({body: 'Annictへの問い合わせを実行します。'}, {okText: '実行'})
               .then(e => Vue.crawlAnnict())
               .then(e => {this.layout.details['annict'] = false})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           searchTags: function () {
             this.result.search_tag = null
             Vue.searchTags(this.input.search_tag.q)
               .then(e => {this.result.search_tag = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getHealth: function () {
             this.result.health = null
             Vue.getHealth()
               .then(e => {this.result.health = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getAbout: function () {
             this.result.about = null
             Vue.getAbout()
               .then(e => {this.result.about = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

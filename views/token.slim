@@ -68,7 +68,7 @@ html lang='ja'
             .then(e => {this.account = e.account})
             .then(e => Vue.getAccounts())
             .then(e => {this.accounts = e})
-            .catch(e => Vue.alert(e))
+            .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           switchAccount: function (account) {
@@ -76,7 +76,7 @@ html lang='ja'
               .then(e => {
                 this.account = account
                 this.token = account.token
-              }).catch(e => Vue.alert(e))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
@@ -86,7 +86,7 @@ html lang='ja'
               }).then(e => {
                 this.accounts = e
                 this.input.token = null
-              }).catch(e => Vue.alert(e))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteAccount: function (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
@@ -95,7 +95,7 @@ html lang='ja'
                 this.tokens = e
                 return Vue.getAccounts()
               }).then(e => this.accounts = e)
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           authMastodon: function () {
             Vue.authMastodon(this.input.authcode)
@@ -108,7 +108,7 @@ html lang='ja'
                 this.account = e
                 return Vue.getAccounts()
               }).then(e => {this.accounts = e})
-              .catch(e => Vue.alert(e))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           isLoggedIn: function (account) {
             return account.token == this.token

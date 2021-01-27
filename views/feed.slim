@@ -39,9 +39,9 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => Vue.alert(e))
+            .catch(e => Vue.alert(this.$dialog, e))
           Vue.getFeeds()
             .then(e => {this.feeds = e})
-            .catch(e => Vue.alert(e))
+            .catch(e => Vue.alert(this.$dialog, e))
         },
       })
