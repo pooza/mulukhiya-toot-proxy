@@ -243,7 +243,7 @@ ul.links
       font:
         size: 0.8em
         family: $monospace
-    .link_description
+    .link-description
       margin:
         left: 1em
       font:
@@ -258,7 +258,7 @@ ul.links
       color: aliceblue
     opacity: 0.8
     cursor: pointer
-  .endpoint_container
+  .endpoint-container
     margin: 0.5em
     padding: 0.5em
     border:
@@ -283,7 +283,12 @@ ul.links
     pre.result
       margin: 1em
       opacity: 0.9
-      text-align: left
+      max:
+        height: 10em
+      overflow:
+        y: scroll
+      text:
+        align: left
       border:
         color: transparent
         radius: 6px
@@ -356,7 +361,7 @@ nav.media
 
 section
   margin: 0 1em
-  .tag_entry
+  .tag-entry
     margin:
       block:
         start: 0
@@ -578,6 +583,8 @@ code
   color: red
 
 .tooltip
+  display: block !important
+  z-index: 10000
   font:
     family: $sans-serif
     size: 0.5em

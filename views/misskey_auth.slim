@@ -11,6 +11,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       new Vue({
         el: '#app',
@@ -23,6 +24,6 @@ html lang='ja'
             .then(e => {
               Vue.setToken(this.token)
               location.href = '/mulukhiya/app/token'
-            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            }).catch(e => Vue.alert(this.$dialog, e))
         },
       })

@@ -1,0 +1,49 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'webhook'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 webhook
+      section class='config' v-if='account.username'
+        .field-container
+          h3 URL
+          textarea ref='webhook_url_text' = '{{url}}'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
+          .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
+        .field-container
+          h3 詳細
+          p
+            | wikiの
+            a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/webhook' target='_blank' 該当ページ
+            | を参照。
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+          url: null,
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {
+              this.account = e.account
+              this.url = Vue.dig(e, 'config', 'webhook', 'url')
+            }).catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          copyWebhookURL: function () {
+            this.$refs.webhook_url_text.select()
+            document.execCommand('copy')
+          },
+        },
+      })

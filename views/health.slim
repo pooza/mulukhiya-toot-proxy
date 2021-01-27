@@ -16,18 +16,19 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          result: {status: 500},
+          result: {status: 503},
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(this.$dialog, e))
           this.load()
         },
         methods: {

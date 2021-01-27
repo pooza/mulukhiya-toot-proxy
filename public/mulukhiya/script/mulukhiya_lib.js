@@ -19,6 +19,10 @@ const MulukhiyaLib = {
       }
     }
 
+    Vue.alert = (dialog, e) => {
+      if (e) {dialog.alert(Vue.createErrorMessage(e))}
+    }
+
     Vue.createErrorMessage = e => {
       let errors
       if (errors = Vue.dig(e, 'response', 'data', 'errors')) {

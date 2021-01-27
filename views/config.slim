@@ -107,15 +107,6 @@ html lang='ja'
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
             button :disabled='!form.webhook.token' @click='updateWebhook' 更新
-          .field-container v-if='form.webhook.url'
-            h4 URL
-            textarea ref='webhook_url_text' = '{{form.webhook.url}}'
-            i class='fas fa-clipboard' @click='copyWebhookURL'
-            .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
-          .field-container v-if='form.webhook.url'
-            h4 curlサンプル
-            textarea ref='curl_sample_text' v-html='form.webhook.curl_sample'
-            i class='fas fa-clipboard' @click='copyCurlSample'
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
@@ -129,6 +120,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.component('vue-slide-up-down', VueSlideUpDown)
@@ -145,7 +137,7 @@ html lang='ja'
             annict: {auth_code: null},
             program: null,
             tags: '',
-            webhook: {token: null, visibility: null, url: null, curl_sample: null},
+            webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
           },
@@ -176,13 +168,13 @@ html lang='ja'
             .then(e => {
               this.updateForm(e)
               this.account = e.account
-            }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            }).catch(e => Vue.alert(this.$dialog, e))
           Vue.getPrograms()
             .then(e => {
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => ({code: p.key, label: Vue.createProgramTags(p).join(' ')}))
+                .map(p => ({code: p.key, label: Vue.createProgramTags(p).map(v => `#${v}`).join(' ')}))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
         },
@@ -190,9 +182,7 @@ html lang='ja'
           updateForm: function (data) {
             this.result = jsyaml.dump(data.config)
             this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
-            this.form.webhook.url = Vue.dig(data, 'config', 'webhook', 'url')
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
-            this.form.webhook.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${Vue.dig(data, 'config', 'webhook', 'url')}`
             this.form.growi.token = Vue.dig(data, 'config', 'growi', 'token')
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
             this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
@@ -218,15 +208,7 @@ html lang='ja'
           updateConfig: function (command) {
             Vue.updateConfig(command)
               .then(e => this.updateForm(e))
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
-          },
-          copyWebhookURL: function () {
-            this.$refs.webhook_url_text.select()
-            document.execCommand('copy')
-          },
-          copyCurlSample: function () {
-            this.$refs.curl_sample_text.select()
-            document.execCommand('copy')
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           onChangeTags: function (e) {
             this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
@@ -254,7 +236,7 @@ html lang='ja'
           updateLivecure: function () {
             Vue.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           updateWebhook: function () {
             const command = {webhook: {token: null, visibility: null}}
@@ -278,7 +260,7 @@ html lang='ja'
                 this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           unauthAnnict: function () {
             this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
@@ -286,7 +268,7 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.annict = false
-              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

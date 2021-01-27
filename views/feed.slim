@@ -27,6 +27,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
@@ -38,9 +39,9 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(this.$dialog, e))
           Vue.getFeeds()
             .then(e => {this.feeds = e})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(this.$dialog, e))
         },
       })

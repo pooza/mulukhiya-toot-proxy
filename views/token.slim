@@ -17,7 +17,7 @@ html lang='ja'
           span class='role' v-if='current_account.is_moderator' mod
           span class='role' v-if='current_account.is_admin' admin
           span class='role' v-if='isLoggedIn(current_account)' loggedin
-          i class='fas fa-trash' @click='deleteAccount(current_account)' v-else=''
+          i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip="'トークンの削除'" v-else=''
           .scopes 権限: {{current_account.scopes}}
       nav class='tokens'
         h3 トークンの登録
@@ -48,6 +48,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
@@ -67,7 +68,7 @@ html lang='ja'
             .then(e => {this.account = e.account})
             .then(e => Vue.getAccounts())
             .then(e => {this.accounts = e})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           switchAccount: function (account) {
@@ -75,7 +76,7 @@ html lang='ja'
               .then(e => {
                 this.account = account
                 this.token = account.token
-              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           registerToken: function () {
             Vue.registerToken(this.input.token)
@@ -85,7 +86,7 @@ html lang='ja'
               }).then(e => {
                 this.accounts = e
                 this.input.token = null
-              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteAccount: function (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
@@ -94,7 +95,7 @@ html lang='ja'
                 this.tokens = e
                 return Vue.getAccounts()
               }).then(e => this.accounts = e)
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           authMastodon: function () {
             Vue.authMastodon(this.input.authcode)
@@ -107,7 +108,7 @@ html lang='ja'
                 this.account = e
                 return Vue.getAccounts()
               }).then(e => {this.accounts = e})
-              .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           isLoggedIn: function (account) {
             return account.token == this.token

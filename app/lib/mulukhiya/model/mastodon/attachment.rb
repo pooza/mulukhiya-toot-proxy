@@ -25,6 +25,7 @@ module Mulukhiya
             url: uri('original').to_s,
             thumbnail_url: uri('small').to_s,
           )
+          @hash.delete(:file_meta)
           @hash.deep_compact!
         end
         return @hash

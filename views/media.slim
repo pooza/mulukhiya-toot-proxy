@@ -42,6 +42,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
@@ -55,7 +56,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(this.$dialog, e))
           this.appendMedias()
         },
         methods: {
@@ -69,7 +70,7 @@ html lang='ja'
                   this.last = true
                   this.$dialog.alert('最後のページです。')
                 }
-              }).catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

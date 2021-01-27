@@ -22,6 +22,7 @@ module Mulukhiya
             pixel_size: pixel_size,
             duration: duration,
           )
+          @hash.delete(:properties)
           @hash.deep_compact!
         end
         return @hash
