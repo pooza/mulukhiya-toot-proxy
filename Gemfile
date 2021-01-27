@@ -33,7 +33,7 @@ group :development do
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
-  gem 'rubocop-sequel', github: 'pooza/rubocop-sequel', branch: 'master.pooza'
+  gem 'rubocop-sequel'
   gem 'slim_lint'
   gem 'test-unit'
 end
