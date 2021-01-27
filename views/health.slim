@@ -28,7 +28,7 @@ html lang='ja'
         mounted: function () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
-            .catch(e => this.$dialog.alert(Vue.createErrorMessage(e)))
+            .catch(e => Vue.alert(e))
           this.load()
         },
         methods: {

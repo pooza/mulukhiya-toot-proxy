@@ -19,14 +19,16 @@ const MulukhiyaLib = {
       }
     }
 
-    Vue.createErrorMessage = e => {
+    Vue.alert = e => {
       let errors
+      if (!e) {return}
       if (errors = Vue.dig(e, 'response', 'data', 'errors')) {
         return Object.keys(errors).map(k => `${k}: ${errors[k].join()}`).join("\n")
       }
-      return Vue.dig(e, 'response', 'data', 'error')
+      const message = Vue.dig(e, 'response', 'data', 'error')
         || Vue.dig(e, 'response', 'data', 'message')
         || Vue.dig(e, 'message')
+      this.$dialog.alert(message)
     }
 
     Vue.dig = (target, ...keys) => {
