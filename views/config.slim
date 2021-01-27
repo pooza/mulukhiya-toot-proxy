@@ -174,7 +174,7 @@ html lang='ja'
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => ({code: p.key, label: Vue.createProgramTags(p).join(' ')}))
+                .map(p => ({code: p.key, label: Vue.createProgramTags(p).map(v => `#${v}`).join(' ')}))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
         },
