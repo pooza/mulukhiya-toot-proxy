@@ -144,17 +144,6 @@ html lang='ja'
               .link-description Annictへの問い合わせを行います。
               .field-update-button-container
                 button @click='crawlAnnict' 実行
-        li v-if='account.username && config.webhook'
-          h3 @click='toggleVisibility("webhook")' Slack互換webhook
-          vue-slide-up-down :active='layout.details.webhook'
-            .alert webhookのURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
-            .endpoint-container
-              .link
-                a :href='webhook.href' target='_blank' GET {{webhook.href}}
-              .link-description webhookが正常であるかを確認します。
-            .endpoint-container
-              .link POST {{webhook.href}}
-              .link-description 投稿を行います。
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
@@ -183,8 +172,7 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          config: {annict: null, webhook: null},
-          webhook: {href: null},
+          config: {annict: null},
           feed: {list: {href: null}},
           input: {
             search_tag: {q: null},
@@ -208,7 +196,6 @@ html lang='ja'
               tagging_usertag: false,
               feed: false,
               health: false,
-              webhook: false,
               sidekiq: false,
               annict: false,
               about: false,
@@ -220,9 +207,6 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
-              if (Vue.dig(e, 'config', 'webhook', 'url')) {
-                this.webhook.href = Vue.createPath(e.config.webhook.url)
-              }
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => Vue.alert(this.$dialog, e))
         },

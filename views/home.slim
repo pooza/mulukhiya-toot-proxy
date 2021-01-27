@@ -16,6 +16,7 @@ html lang='ja'
           a href='/mulukhiya/app/media' メディアカタログ
         a href='/mulukhiya/app/hashtag' ハッシュタグ辞書
         a href='/mulukhiya/app/api' API
+        a href='/mulukhiya/app/webhook' v-if='account.username' webhook
         a href='/mulukhiya/app/health' 動作状況
         a href='/mulukhiya/app/config' v-if='account.username' 環境設定
         a href='#{config['/sidekiq/dashboard/url']}' target='_blank' v-if='account.is_admin' Sidekiq

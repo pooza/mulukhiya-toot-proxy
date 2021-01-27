@@ -1,0 +1,53 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: 'webhook'}
+    main id='app' class=env.type
+      == slim.render 'fragment/message'
+      h2 webhook
+      section class='config' v-if='account.username'
+        .field-container
+          h3 URL
+          textarea ref='webhook_url_text' = '{{url}}'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
+          .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
+        .field-container
+          h3 curlサンプル
+          textarea ref='curl_sample_text' v-html='curl_sample'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyCurlSample'
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+          url: null,
+          curl_sample: null,
+        },
+        mounted: function () {
+          Vue.getConfig()
+            .then(e => {
+              this.account = e.account
+              this.url = Vue.dig(e, 'config', 'webhook', 'url')
+              this.curl_sample = String.raw`curl -H 'Content-Type: application/json' -X POST -d '{"text":"#{config['/webhook/sample'].strip.gsub(/\n/,'\n')}"}' ${Vue.dig(e, 'config', 'webhook', 'url')}`
+            }).catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          copyWebhookURL: function () {
+            this.$refs.webhook_url_text.select()
+            document.execCommand('copy')
+          },
+          copyCurlSample: function () {
+            this.$refs.curl_sample_text.select()
+            document.execCommand('copy')
+          },
+        },
+      })
