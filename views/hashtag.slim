@@ -29,6 +29,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
+      Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
