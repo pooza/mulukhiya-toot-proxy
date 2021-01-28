@@ -3,6 +3,10 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def name
+      return params['name']
+    end
+
     def account
       @account ||= account_class.test_account
       return @account
@@ -12,7 +16,7 @@ module Mulukhiya
     end
 
     def exec(cases)
-      @params['/cases'].each do |pattern|
+      @params['cases'].each do |pattern|
         cases.delete_if do |v|
           File.fnmatch(pattern, v)
         end
@@ -20,16 +24,15 @@ module Mulukhiya
     end
 
     def self.create(name)
-      config['/test/filters'].each do |entry|
-        next unless entry['name'] == name
-        return "Mulukhiya::#{name.camelize}TestCaseFilter".constantize.new(entry)
+      all do |filter|
+        return filter if filter.name == name
       end
     end
 
     def self.all
       return enum_for(__method__) unless block_given?
-      config['/test/filters'].each do |entry|
-        yield TestCaseFilter.create(entry['name'])
+      config.raw.dig('test', 'filters').each do |entry|
+        yield "Mulukhiya::#{name.camelize}TestCaseFilter".constantize.new(entry)
       end
     end
   end
