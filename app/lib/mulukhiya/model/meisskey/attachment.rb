@@ -112,7 +112,7 @@ module Mulukhiya
           .find(
             fileIds: {'$ne' => []},
             userId: {'$nin' => Account.collection.find(host: nil, isBot: true).map {|v| v['_id']}},
-            _user: {'host': nil, 'inbox': nil}, # local
+            _user: {host: nil, inbox: nil}, # local
             visibility: {'$in' => ['public', 'home']},
           )
           .sort(createdAt: -1)
