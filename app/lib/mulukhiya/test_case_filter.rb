@@ -15,14 +15,6 @@ module Mulukhiya
       return nil
     end
 
-    def exec(cases)
-      @params['cases'].each do |pattern|
-        cases.delete_if do |v|
-          File.fnmatch(pattern, v)
-        end
-      end
-    end
-
     def self.create(name)
       all do |filter|
         return filter if filter.name == name
