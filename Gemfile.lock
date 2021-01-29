@@ -1,13 +1,14 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 2dd82f8aa28102e9d7b42eebad648e5d0c854160
+  revision: 64fe9ff85bd9c34cffd36e794753f5f6cde84970
   specs:
-    ginseng-core (1.9.3)
+    ginseng-core (1.10.0)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
       httparty
       json-schema
+      mail
       multi_json
       nokogiri (>= 1.11.0.rc4)
       rake
@@ -182,10 +183,13 @@ GEM
     loofah (2.9.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
+    mail (2.7.1)
+      mini_mime (>= 0.1.1)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2020.1104)
     mimemagic (0.3.5)
+    mini_mime (1.0.2)
     mini_portile2 (2.5.0)
     minitest (5.14.3)
     mongo (2.14.0)
@@ -224,7 +228,7 @@ GEM
     pg (1.2.3)
     power_assert (2.0.0)
     public_suffix (3.1.1)
-    puma (5.1.1)
+    puma (5.2.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.5.2)
@@ -261,7 +265,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.8.1)
+    rubocop (1.9.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
