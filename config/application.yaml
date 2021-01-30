@@ -88,22 +88,40 @@ parser:
 test:
   timeout: 20
 webui:
-  scripts:
-    - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
-    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.min.js
-    - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.js
-    - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
-    - https://cdn.jsdelivr.net/npm/v-tooltip/dist/v-tooltip.min.js
-    - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
-    - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
-    - /mulukhiya/script/mulukhiya_lib
-    - /mulukhiya/script/activity_indicator
-  stylesheets:
-    - /mulukhiya/style/default
-    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
-    - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.css
-    - https://use.fontawesome.com/releases/v5.15.1/css/all.css
-    - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+  production:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.min.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
+  development:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
   metadata:
     robots: noindex,nofollow
     viewport: width=1000
