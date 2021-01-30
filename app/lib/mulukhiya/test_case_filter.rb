@@ -3,10 +3,6 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def name
-      return params['name']
-    end
-
     def account
       @account ||= account_class.test_account
       return @account
