@@ -3,7 +3,6 @@ require 'mulukhiya/refines'
 
 module Mulukhiya
   using Ricecream
-  using Ricecream::p
   using Refines
 
   def self.dir
@@ -42,16 +41,14 @@ module Mulukhiya
   end
 
   def self.setup_debug
-    if Environment.develpment?
-      Ricecream.enable
-      Ricecream.include_context = true
-      Ricecream.colorize = true
-      Ricecream.prefix = Package.name
-      def Ricecream.arg_to_s(arg)
-        PP.pp(arg)
-      end
-    else
-      Ricecream.disable
+    Ricecream.disable
+    return unless Environment.develpment?
+    Ricecream.enable
+    Ricecream.include_context = true
+    Ricecream.colorize = true
+    Ricecream.prefix = Package.name
+    def Ricecream.arg_to_s(arg)
+      PP.pp(arg)
     end
   end
 
