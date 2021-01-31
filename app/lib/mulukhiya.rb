@@ -2,6 +2,8 @@ require 'bundler/setup'
 require 'mulukhiya/refines'
 
 module Mulukhiya
+  using Ricecream
+  using Ricecream::p
   using Refines
 
   def self.dir
@@ -39,6 +41,20 @@ module Mulukhiya
     Redis.exists_returns_integer = true
   end
 
+  def self.setup_debug
+    if Environment.develpment?
+      Ricecream.enable
+      Ricecream.include_context = true
+      Ricecream.colorize = true
+      Ricecream.prefix = Package.name
+      def Ricecream.arg_to_s(arg)
+        PP.pp(arg)
+      end
+    else
+      Ricecream.disable
+    end
+  end
+
   def self.rack
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
@@ -73,3 +89,4 @@ Mulukhiya.loader.setup
 Mulukhiya.setup_bootsnap
 Mulukhiya.setup_sidekiq
 Mulukhiya.connect_dbms
+Mulukhiya.setup_debug
