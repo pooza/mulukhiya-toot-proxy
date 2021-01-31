@@ -8,6 +8,9 @@ FROM
     FROM "user"
       INNER JOIN user_profile AS prof ON "user".id = prof."userId"
     WHERE ("user".host IS null)
+      AND (prof.fields IS NOT null)
+      AND (prof.fields <> '[]'::jsonb)
+      AND (prof.fields <> '{}'::jsonb)
   ) AS t
 WHERE (value LIKE '#%')
 GROUP BY

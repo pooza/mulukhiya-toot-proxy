@@ -7,6 +7,9 @@ FROM
       jsonb_array_elements(fields)->>'value' AS value
     FROM users
     WHERE (local = true)
+      AND (fields IS NOT null)
+      AND (fields <> '[]'::jsonb)
+      AND (fields <> '{}'::jsonb)
   ) AS t
 WHERE (value LIKE '#%')
 GROUP BY

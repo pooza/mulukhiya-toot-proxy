@@ -7,6 +7,9 @@ FROM
       jsonb_array_elements(fields)->>'value' AS value
     FROM accounts
     WHERE (domain IS null)
+      AND (fields IS NOT null)
+      AND (fields <> '[]'::jsonb)
+      AND (fields <> '{}'::jsonb)
   ) AS t
 WHERE (value LIKE '#%')
 GROUP BY
