@@ -13,7 +13,7 @@ module Mulukhiya
     Bootsnap.setup(
       cache_dir: File.join(dir, 'tmp/cache'),
       development_mode: Environment.development?,
-      load_path_cache: false,
+      load_path_cache: true,
       compile_cache_iseq: true,
       compile_cache_yaml: true,
     )
