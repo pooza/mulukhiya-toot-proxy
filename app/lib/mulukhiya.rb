@@ -77,11 +77,11 @@ module Mulukhiya
       require f
     end
   end
-end
 
-Bundler.require
-Mulukhiya.loader.setup
-Mulukhiya.setup_bootsnap
-Mulukhiya.setup_sidekiq
-Mulukhiya.setup_debug
-Mulukhiya.connect_dbms
+  Bundler.require
+  loader.setup
+  setup_bootsnap
+  setup_sidekiq
+  setup_debug
+  connect_dbms
+end
