@@ -1,8 +1,8 @@
 require 'bundler/setup'
+require 'ricecream'
 require 'mulukhiya/refines'
 
 module Mulukhiya
-  using Ricecream
   using Refines
 
   def self.dir
@@ -42,14 +42,12 @@ module Mulukhiya
 
   def self.setup_debug
     Ricecream.disable
-    return unless Environment.develpment?
+    return unless Environment.development?
     Ricecream.enable
     Ricecream.include_context = true
     Ricecream.colorize = true
-    Ricecream.prefix = Package.name
-    def Ricecream.arg_to_s(arg)
-      PP.pp(arg)
-    end
+    Ricecream.prefix = "#{Package.name} | "
+    Ricecream.define_singleton_method(:arg_to_s, proc {|v| PP.pp(v)})
   end
 
   def self.rack
@@ -85,5 +83,5 @@ Bundler.require
 Mulukhiya.loader.setup
 Mulukhiya.setup_bootsnap
 Mulukhiya.setup_sidekiq
-Mulukhiya.connect_dbms
 Mulukhiya.setup_debug
+Mulukhiya.connect_dbms

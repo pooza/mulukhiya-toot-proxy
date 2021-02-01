@@ -30,7 +30,7 @@ end
 group :development do
   gem 'rack-test'
   gem 'rails-erb-lint'
-  gem 'ricecream', require: 'ricecream/refine'
+  gem 'ricecream'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
