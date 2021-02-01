@@ -341,7 +341,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bootsnap
+  bootsnap (>= 1.7.0)
   dropbox_api
   dry-validation
   fastimage

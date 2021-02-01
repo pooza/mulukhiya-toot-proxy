@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 ruby '~>3.0.0'
-gem 'bootsnap'
+gem 'bootsnap', '>=1.7.0'
 gem 'dropbox_api'
 gem 'dry-validation'
 gem 'fastimage'
