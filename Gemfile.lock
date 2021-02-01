@@ -149,7 +149,7 @@ GEM
       tzinfo
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
-    fastimage (2.2.1)
+    fastimage (2.2.2)
     ffi (1.14.2)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -190,7 +190,7 @@ GEM
     minitest (5.14.3)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
-    msgpack (1.4.1)
+    msgpack (1.4.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -331,6 +331,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  ruby
   x86_64-freebsd-12
   x86_64-linux
 
