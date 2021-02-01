@@ -83,7 +83,7 @@ module Mulukhiya
       end
     end
 
-    def create_body(values, type)
+    def create_payload(values, type)
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values.deep_stringify_keys
       title_template = Template.new("annict/#{type}_title")
@@ -98,7 +98,7 @@ module Mulukhiya
       end
       uri = Ginseng::URI.parse(body_template[type].dig('work', 'images', 'recommended_url'))
       body['attachments'] = [{'image_url' => uri.to_s}] if uri&.absolute?
-      return body
+      return SlackWebhookPayload.new(body)
     end
 
     def account
@@ -121,8 +121,10 @@ module Mulukhiya
       crawl_set(params).each do |key, result|
         result.each do |record|
           times.push(Time.parse(record['created_at']))
-          params[:webhook]&.post(SlackWebhookPayload.new(create_body(record, key)))
           records.push(record)
+          params[:webhook]&.post(create_payload(record, key)) unless params[:dryrun]
+        rescue => e
+          logger.error(error: e, token: @token)
         end
       end
       self.updated_at = times.max if times.present? && !params[:dryrun]
@@ -201,6 +203,22 @@ module Mulukhiya
       return false if client_id.nil?
       return false if client_secret.nil?
       return true
+    end
+
+    def self.crawl_all(params = {})
+      accounts = AnnictAccountStorage.accounts
+      bar = ProgressBar.create(total: accounts.count) if Environment.rake?
+      results = {}
+      accounts.each do |account|
+        results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
+      ensure
+        bar&.increment
+      end
+      bar&.finish
+      return unless Environment.rake?
+      results.each do |key, result|
+        puts({acct: key, result: result}.deep_stringify_keys.to_yaml)
+      end
     end
   end
 end
