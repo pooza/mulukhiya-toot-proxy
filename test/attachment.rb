@@ -1,7 +1,7 @@
 module Mulukhiya
   class AttachmentTest < TestCase
     def setup
-      @attachment = attachment_class[attachment_class.catalog.first[:id]]
+      @attachment = attachment_class[attachment_class.catalog.first[:_id]]
     end
 
     def test_to_h
