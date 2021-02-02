@@ -15,10 +15,12 @@ module Mulukhiya
       return @db
     end
 
+    def loggable?
+      return Environment.test? || Environment.development? || config['/mongo/query_log']
+    end
+
     def logger
-      @logger ||= Logger.new if Environment.test?
-      @logger ||= Logger.new if Environment.development?
-      @logger ||= Logger.new if config['/mongo/query_log']
+      @logger ||= Logger.new if loggable?
       @logger ||= ::Logger.new('/dev/null')
       return @logger
     end
