@@ -4,7 +4,24 @@ module Mulukhiya
   class Mongo
     include Singleton
     include Package
-    attr_reader :db
+
+    def db
+      @db ||= ::Mongo::Client.new(["#{@dsn.host}:#{@dsn.port}"], {
+        database: @dsn.dbname,
+        user: @dsn.user,
+        password: @dsn.password,
+        logger: logger,
+      })
+      return @db
+    end
+
+    def logger
+      @logger ||= Logger.new if Environment.test?
+      @logger ||= Logger.new if Environment.development?
+      @logger ||= Logger.new if config['/mongo/query_log']
+      @logger ||= ::Logger.new('/dev/null')
+      return @logger
+    end
 
     def self.dsn
       return MongoDSN.parse(config['/mongo/dsn']) rescue nil
@@ -25,24 +42,11 @@ module Mulukhiya
       return {error: e.message, status: 'NG'}
     end
 
-    def self.create_logger
-      return Logger.new if Environment.test?
-      return Logger.new if Environment.development?
-      return Logger.new if config['/mongo/query_log']
-      return ::Logger.new('/dev/null')
-    end
-
     private
 
     def initialize
-      dsn = Mongo.dsn
-      raise Ginseng::DatabaseError, 'Invalid DSN' unless dsn.valid?
-      @db = ::Mongo::Client.new(["#{dsn.host}:#{dsn.port}"], {
-        database: dsn.dbname,
-        user: dsn.user,
-        password: dsn.password,
-        logger: Mongo.create_logger,
-      })
+      @dsn = Mongo.dsn
+      raise Ginseng::DatabaseError, 'Invalid DSN' unless @dsn.valid?
     end
   end
 end
