@@ -730,6 +730,7 @@ postgres:
   query_log: false
 mongo:
   dsn: null
+  query_log: false
 slack:
   hooks: []
 sidekiq:

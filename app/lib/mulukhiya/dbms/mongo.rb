@@ -25,6 +25,14 @@ module Mulukhiya
       return {error: e.message, status: 'NG'}
     end
 
+    def self.create_logger
+      if Environment.development? || Evnironment.test? || config['/mongo/query_log']
+        return Logger.new
+      else
+        return ::Logger.new('/dev/null')
+      end
+    end
+
     private
 
     def initialize
@@ -34,7 +42,7 @@ module Mulukhiya
         database: dsn.dbname,
         user: dsn.user,
         password: dsn.password,
-        logger: Logger.new,
+        logger: Mongo.create_logger,
       })
     end
   end
