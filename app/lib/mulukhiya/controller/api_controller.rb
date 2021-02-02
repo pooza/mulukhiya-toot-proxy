@@ -156,28 +156,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/tagging/tag/search' do
-      dic = {}
-      errors = TagSearchContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors: errors}
-      else
-        TaggingDictionary.new.load_cache.each do |entry|
-          word = entry.shift
-          next unless params[:q].match?(entry.first[:regexp])
-          dic[word] = entry.first
-          dic[word][:word] = word
-          dic[word][:words].unshift(word)
-          dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
-        rescue => e
-          logger.error(error: e, entry: entry)
-        end
-        @renderer.message = dic
-      end
-      return @renderer.to_s
-    end
-
     post '/tagging/tag/search' do
       dic = {}
       errors = TagSearchContract.new.exec(params)

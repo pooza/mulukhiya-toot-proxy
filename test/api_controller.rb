@@ -59,15 +59,6 @@ module Mulukhiya
     end
 
     def test_tag_search
-      get '/tagging/tag/search'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 422)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
-
-      get '/tagging/tag/search?q=API'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
-
       post '/tagging/tag/search'
       assert_false(last_response.ok?)
       assert_equal(last_response.status, 422)
