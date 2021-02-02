@@ -724,12 +724,13 @@ user_config:
 media:
   metadata:
     cache:
-      ttl: 86400
+      ttl: 8640000 #100日
 postgres:
   dsn: null
   query_log: false
 mongo:
   dsn: null
+  query_log: false
 slack:
   hooks: []
 sidekiq:

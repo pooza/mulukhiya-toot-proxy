@@ -25,7 +25,7 @@ html lang='ja'
                 .field-update-button-container
                   button @click='updateAnnouncement' 実行
         li
-          h3 @click='toggleVisibility("media")' メディアファイル
+          h3 @click='toggleVisibility("media")' メディア
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET /mulukhiya/api/media
@@ -36,7 +36,7 @@ html lang='ja'
                 pre class='result' v-if='result.media_list' = '{{result.media_list}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
-              .link POST /mulukhiya/api/media/clear
+              .link POST /mulukhiya/api/media/file/clear
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link-description
                   | スケジュール
@@ -44,6 +44,12 @@ html lang='ja'
               .link-description メディアファイル変換結果をクリアします。
               .field-update-button-container
                 button @click='clearMediaFiles' 実行
+            .endpoint-container v-if='account.is_admin'
+              .role admin
+              .link POST /mulukhiya/api/media/metadata/clear
+              .link-description メディアファイルのメタデータをクリアします。
+              .field-update-button-container
+                button @click='clearMediaMetadata' 実行
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("oauth")' OAuth
           vue-slide-up-down :active='layout.details.oauth'
@@ -227,6 +233,11 @@ html lang='ja'
           },
           clearMediaFiles: function () {
             Vue.clearMediaFiles()
+              .then(e => {this.layout.details['media'] = false})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          clearMediaMetadata: function () {
+            Vue.clearMediaMetadata()
               .then(e => {this.layout.details['media'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },

@@ -231,7 +231,15 @@ const MulukhiyaLib = {
     Vue.clearMediaFiles = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/media/file/clear', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.clearMediaMetadata = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/media/metadata/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

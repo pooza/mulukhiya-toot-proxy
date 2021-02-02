@@ -126,9 +126,29 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/media/clear' do
+    post '/media/clear' do # deprecated
       if @sns&.account&.admin? || @sns&.account&.moderator?
         MediaCleaningWorker.new.perform
+      else
+        @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
+      end
+      return @renderer.to_s
+    end
+
+    post '/media/file/clear' do
+      if @sns&.account&.admin? || @sns&.account&.moderator?
+        MediaCleaningWorker.new.perform
+      else
+        @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
+      end
+      return @renderer.to_s
+    end
+
+    post '/media/metadata/clear' do
+      if @sns&.account&.admin? || @sns&.account&.moderator?
+        MediaMetadataStorage.new.clear
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}
@@ -152,28 +172,6 @@ module Mulukhiya
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}
-      end
-      return @renderer.to_s
-    end
-
-    get '/tagging/tag/search' do
-      dic = {}
-      errors = TagSearchContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors: errors}
-      else
-        TaggingDictionary.new.load_cache.each do |entry|
-          word = entry.shift
-          next unless params[:q].match?(entry.first[:regexp])
-          dic[word] = entry.first
-          dic[word][:word] = word
-          dic[word][:words].unshift(word)
-          dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
-        rescue => e
-          logger.error(error: e, entry: entry)
-        end
-        @renderer.message = dic
       end
       return @renderer.to_s
     end
