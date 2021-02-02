@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def self.create_logger
-      if Environment.development? || Evnironment.test? || config['/mongo/query_log']
+      if Environment.test? || Environment.development? || config['/mongo/query_log']
         return Logger.new
       else
         return ::Logger.new('/dev/null')
