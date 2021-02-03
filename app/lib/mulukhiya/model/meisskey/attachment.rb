@@ -77,10 +77,11 @@ module Mulukhiya
         return enum_for(__method__, params) unless block_given?
         statuses(params[:page]).each do |status|
           status[:_files].each do |row|
-            note = Attachment[row[:_id]]
-            yield note.to_h.deep_symbolize_keys.merge(
-              date: note.createdAt,
-              status_url: note.uri.to_s,
+            attachment = Attachment[row[:_id]]
+            yield attachment.to_h.deep_symbolize_keys.merge(
+              id: attachment.id,
+              date: attachment.createdAt,
+              status_url: attachment.uri.to_s,
             )
           rescue => e
             logger.error(error: e, row: row)
