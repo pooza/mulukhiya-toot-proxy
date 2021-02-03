@@ -75,10 +75,10 @@ html lang='ja'
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
-                - if config.keys('/sidekiq/schedule/program_update').member?('cron')
+                - if config.keys('/sidekiq/schedule/program_update').member?('every')
                   .link-description
                     | スケジュール
-                    code #{config['/sidekiq/schedule/program_update/cron']}
+                    code #{config['/sidekiq/schedule/program_update/every']}
                 .link-description
                   a href='#{config['/programs/url']}' target='_blank' 実況番組表
                   | を取得し、キャッシュします。
@@ -97,10 +97,10 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
-              - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('cron')
+              - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
                 .link-description
                   | スケジュール
-                  code #{config['/sidekiq/schedule/tagging_dictionary_update/cron']}
+                  code #{config['/sidekiq/schedule/tagging_dictionary_update/every']}
               .link-description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
               - config['/tagging/dictionaries'].each do |dic|
                 .link
