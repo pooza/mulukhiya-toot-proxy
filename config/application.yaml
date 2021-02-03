@@ -225,6 +225,8 @@ mastodon:
       - growi_announcement
       - dropbox_announcement
       - hexo_announcement
+    alert:
+      - slack_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     webui:
@@ -335,6 +337,8 @@ misskey:
       - growi_announcement
       - dropbox_announcement
       - hexo_announcement
+    alert:
+      - slack_alert
   oauth:
     webui:
       url: /settings/api
@@ -441,6 +445,8 @@ meisskey:
       - growi_announcement
       - dropbox_announcement
       - hexo_announcement
+    alert:
+      - slack_alert
   oauth:
     scopes:
       - write:notes
@@ -541,6 +547,8 @@ pleroma:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    alert:
+      - slack_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:

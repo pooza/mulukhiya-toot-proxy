@@ -47,6 +47,8 @@ module Mulukhiya
 
     def handle_announce(announcement, params = {}); end
 
+    def handle_error(error, params = {}); end
+
     def handle_toot(body, params = {})
       params[:reporter] ||= Reporter.new
       params[:sns] ||= sns_class.new
