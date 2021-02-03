@@ -743,27 +743,27 @@ sidekiq:
     password: ''
   concurrency: 5
   schedule:
-    program_update:
-      cron: '1 1 * * *'
-      class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
       cron: '2 1 * * *'
       class: Mulukhiya::MediaCleaningWorker
-    tagging_dictionary_update:
-      cron: '3 1 * * *'
-      class: Mulukhiya::TaggingDictionaryUpdateWorker
     user_tag_initialize:
-      cron: '1 4 * * *'
+      cron: '3 4 * * *'
       class: Mulukhiya::UserTagInitializeWorker
+    tagging_dictionary_update:
+      every: 10m
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
+    program_update:
+      every: 10m
+      class: Mulukhiya::ProgramUpdateWorker
+    annict_polling:
+      every: 5m
+      class: Mulukhiya::AnnictPollingWorker
     announcement:
       every: 2m
       class: Mulukhiya::AnnouncementWorker
     tag_feed_update:
-      every: 5m
+      every: 2m
       class: Mulukhiya::TagFeedUpdateWorker
-    annict_polling:
-      every: 5m
-      class: Mulukhiya::AnnictPollingWorker
 puma:
   port: 3008
   pidfile: tmp/pids/puma.pid
