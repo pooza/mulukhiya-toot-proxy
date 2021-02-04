@@ -15,6 +15,5 @@ module Mulukhiya
       params[:tag] = name
       return Postgres.instance.execute('tag_timeline', params)
     end
-    end
   end
 end
