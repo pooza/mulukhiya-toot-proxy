@@ -1,5 +1,5 @@
 module Mulukhiya
-  class MediaFeedRenderer < Ginseng::Web::FeedRenderer
+  class MediaFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
     include SNSMethods
 
