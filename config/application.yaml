@@ -739,8 +739,9 @@ postgres:
 mongo:
   dsn: null
   query_log: false
-slack:
-  hooks: []
+alert:
+  slack:
+    hooks: []
 sidekiq:
   dashboard:
     url: /mulukhiya/sidekiq

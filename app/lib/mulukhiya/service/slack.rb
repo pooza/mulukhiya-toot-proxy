@@ -4,7 +4,7 @@ module Mulukhiya
 
     def self.all
       return enum_for(__method__) unless block_given?
-      config['/slack/hooks'].each do |url|
+      config['/alert/slack/hooks'].each do |url|
         yield Slack.new(url)
       end
     end
