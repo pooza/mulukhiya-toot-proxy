@@ -1,7 +1,7 @@
 module Mulukhiya
-  class TagAtomFeedRendererTest < TestCase
+  class TagFeedRendererTest < TestCase
     def setup
-      @renderer = TagAtomFeedRenderer.new
+      @renderer = TagFeedRenderer.new
       @renderer.tag = TagContainer.default_tag_bases.first
     end
 

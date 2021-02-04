@@ -15,7 +15,7 @@ filters:
       - hash_tag
       - user_config
       - user_config_storage
-      - media_atom_feed_renderer
+      - media_feed_renderer
       - reporter
       - handler
       - '*_controller'
@@ -84,4 +84,4 @@ filters:
       - 'webhook*'
   - name: default_hash_tag
     cases:
-      - tag_atom_feed_renderer
+      - tag_feed_renderer

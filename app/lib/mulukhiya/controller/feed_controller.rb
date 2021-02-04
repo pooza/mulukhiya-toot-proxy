@@ -2,7 +2,7 @@ module Mulukhiya
   class FeedController < Controller
     get '/tag/:tag' do
       if controller_class.feed?
-        @renderer = TagAtomFeedRenderer.new
+        @renderer = TagFeedRenderer.new
         @renderer.tag = params[:tag]
         @renderer.status = 404 unless @renderer.exist?
       else
@@ -13,7 +13,7 @@ module Mulukhiya
 
     get '/media' do
       if controller_class.media_catalog?
-        @renderer = MediaAtomFeedRenderer.new
+        @renderer = MediaFeedRenderer.new
       else
         @renderer.status = 404
       end

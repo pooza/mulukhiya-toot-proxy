@@ -1,5 +1,5 @@
 module Mulukhiya
-  class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
+  class TagFeedRenderer < Ginseng::Web::FeedRenderer
     include Package
     include SNSMethods
     attr_reader :tag, :limit
