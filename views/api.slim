@@ -130,18 +130,6 @@ html lang='ja'
                 .field-update-button-container
                   button @click='getFeeds' 実行
                   pre class='result' v-if='result.feed_list' = '{{result.feed_list}}'
-              .endpoint-container v-if='account.is_admin'
-                .role admin
-                .link POST /mulukhiya/api/feed/update
-                - if config.keys('/sidekiq/schedule/tag_feed_update').member?('every')
-                  .link-description
-                    | スケジュール
-                    code #{config['/sidekiq/schedule/tag_feed_update/every']}
-                .link-description
-                  a href='/mulukhiya/app/feed' ハッシュタグ等のAtomフィード
-                  | を更新します。
-                .field-update-button-container
-                  button @click='updateFeeds' 実行
         li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'

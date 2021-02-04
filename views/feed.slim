@@ -18,7 +18,6 @@ html lang='ja'
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
         h3 ハッシュタグ
-        p 更新周期: #{config['/sidekiq/schedule/tag_feed_update/every']}
         ul class='links'
           li v-for='feed in feeds'
             h4 = '{{feed.tag}}'
