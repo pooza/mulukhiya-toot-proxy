@@ -41,10 +41,16 @@ module Mulukhiya
       return @record
     end
 
+    def to_s
+      fetch
+      return super
+    end
+
     def fetch
+      @atom = nil
       return nil unless controller_class.feed?
       return nil unless record
-      record.create_feed(params).each do |row|
+      record.create_feed({limit: limit, tag: tag, local: !default_tag?}).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),
@@ -54,18 +60,9 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, row: row)
       end
-      @atom = nil
     end
 
     private
-
-    def params
-      return {
-        limit: limit,
-        tag: tag,
-        local: !default_tag?,
-      }
-    end
 
     def create_title(row)
       template = Template.new('feed_entry')

@@ -9,7 +9,11 @@ module Mulukhiya
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @channel[:title] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
       @channel[:description] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
+    end
+
+    def to_s
       fetch
+      return super
     end
 
     def fetch
