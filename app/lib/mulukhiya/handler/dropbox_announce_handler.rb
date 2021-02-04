@@ -1,5 +1,5 @@
 module Mulukhiya
-  class DropboxAnnouncementHandler < AnnouncementHandler
+  class DropboxAnnounceHandler < AnnounceHandler
     def announce(announcement, params = {})
       return announcement unless dropbox
       params = params.clone

@@ -1,5 +1,5 @@
 module Mulukhiya
-  class GrowiAnnouncementHandler < AnnouncementHandler
+  class GrowiAnnounceHandler < AnnounceHandler
     def announce(announcement, params = {})
       return announcement unless growi
       params = params.clone

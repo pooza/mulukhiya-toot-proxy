@@ -37,7 +37,7 @@ handler:
         - instagram.com
         - toei-anim.co.jp
     useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100'
-  hexo_announcement:
+  hexo_announce:
     category: お知らせ
   shortened_url:
     domains:
@@ -221,10 +221,10 @@ mastodon:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
     alert:
       - slack_alert
   oauth:
@@ -333,10 +333,10 @@ misskey:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
     alert:
       - slack_alert
   oauth:
@@ -441,10 +441,10 @@ meisskey:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
     alert:
       - slack_alert
   oauth:

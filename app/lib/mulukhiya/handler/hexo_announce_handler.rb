@@ -2,7 +2,7 @@ require 'digest/sha1'
 require 'date'
 
 module Mulukhiya
-  class HexoAnnouncementHandler < AnnouncementHandler
+  class HexoAnnounceHandler < AnnounceHandler
     def disable?
       return super || category.nil? || dir.nil?
     end
@@ -26,11 +26,11 @@ module Mulukhiya
     private
 
     def category
-      return config['/handler/hexo_announcement/category'] rescue nil
+      return config['/handler/hexo_announce/category'] rescue nil
     end
 
     def dir
-      path = config['/handler/hexo_announcement/path']
+      path = config['/handler/hexo_announce/path']
       path = File.join(Environment.dir, path) unless path.start_with?('/')
       return path
     end

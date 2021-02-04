@@ -1,7 +1,7 @@
 module Mulukhiya
-  class GrowiAnnouncementHandlerTest < TestCase
+  class DropboxAnnounceHandlerTest < TestCase
     def setup
-      @handler = Handler.create('growi_announcement')
+      @handler = Handler.create('dropbox_announce')
       config['/agent/info/token'] = test_token
     end
 
@@ -9,7 +9,7 @@ module Mulukhiya
       return unless handler?
 
       @handler.clear
-      @handler.handle_announce({text: 'お知らせです。GROWI'}, {sns: info_agent_service})
+      @handler.handle_announce({text: 'お知らせです。Dropbox'}, {sns: info_agent_service})
       assert_kind_of(String, @handler.debug_info[:result].first[:path])
     end
   end
