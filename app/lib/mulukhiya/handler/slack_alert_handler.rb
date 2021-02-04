@@ -4,5 +4,10 @@ module Mulukhiya
       SlackService.broadcast(error)
       return error
     end
+
+    def disable?
+      return false unless config['/alert/slack/hooks'].present? rescue false
+      return super
+    end
   end
 end
