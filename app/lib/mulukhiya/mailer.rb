@@ -3,8 +3,7 @@ module Mulukhiya
     include Package
 
     def initialize
-      @config = Config.instance
-      @config['/mail/to'] = config['/alert/mail/to']
+      config['/mail/to'] = config['/alert/mail/to']
       super
       @prefix = nil
       @mail['X-Mailer'] = Package.full_name
