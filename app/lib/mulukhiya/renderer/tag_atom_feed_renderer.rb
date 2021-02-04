@@ -1,10 +1,8 @@
-require 'digest/sha1'
-
 module Mulukhiya
   class TagAtomFeedRenderer < Ginseng::Web::AtomFeedRenderer
     include Package
     include SNSMethods
-    attr_reader :logger, :tag, :limit
+    attr_reader :tag, :limit
 
     def initialize(channel = {})
       super
@@ -34,74 +32,14 @@ module Mulukhiya
       @atom = nil
     end
 
-    def params
-      return {
-        limit: limit,
-        tag: tag,
-        local: !default_tag?,
-      }
-    end
-
-    def cache!
-      File.write(path, fetch)
-      logger.info(class: self.class.to_s, message: 'cached', params: params)
-    end
-
-    def path
-      return File.join(
-        Environment.dir,
-        'tmp/cache/',
-        "#{Digest::SHA1.hexdigest(params.to_json)}.atom",
-      )
-    end
-
     def exist?
-      return File.exist?(path)
-    end
-
-    def to_s
-      return nil unless exist?
-      return File.read(path)
+      return @record.present?
     end
 
     def record
       @record ||= hash_tag_class.get(tag: tag)
       return @record
     end
-
-    def self.cache_all
-      bar = ProgressBar.create(total: all.count) if Environment.rake?
-      threads = []
-      all do |renderer|
-        thread = Thread.new do
-          renderer.cache!
-        rescue => e
-          logger.error(error: e, tag: renderer.tag)
-        ensure
-          bar&.increment
-        end
-        threads.push(thread)
-      end
-      threads.each(&:join)
-      bar&.finish
-      puts all.map {|v| "updated: ##{v.tag} #{v.path}"}.join("\n") if Environment.rake?
-    end
-
-    def self.all
-      return enum_for(__method__) unless block_given?
-      tags = TagContainer.default_tag_bases.clone
-      tags.concat(TagContainer.media_tag_bases)
-      tags.uniq.each do |tag|
-        renderer = TagAtomFeedRenderer.new
-        renderer.tag = tag
-        next unless renderer.record
-        yield renderer
-      rescue => e
-        logger.error(error: e, tag: tag)
-      end
-    end
-
-    private
 
     def fetch
       return nil unless controller_class.feed?
@@ -117,7 +55,16 @@ module Mulukhiya
         logger.error(error: e, row: row)
       end
       @atom = nil
-      return atom
+    end
+
+    private
+
+    def params
+      return {
+        limit: limit,
+        tag: tag,
+        local: !default_tag?,
+      }
     end
 
     def create_title(row)

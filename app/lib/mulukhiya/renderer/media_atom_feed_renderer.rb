@@ -7,19 +7,9 @@ module Mulukhiya
       super
       @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
-      @channel[:title] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル"
-      @channel[:description] = "#{@sns.info['metadata']['nodeName']} 直近のメディアファイル #{limit}件"
+      @channel[:title] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
+      @channel[:description] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
       fetch
-    end
-
-    private
-
-    def params
-      return {limit: limit}
-    end
-
-    def limit
-      return config['/feed/media/limit']
     end
 
     def fetch
@@ -28,7 +18,6 @@ module Mulukhiya
       attachment_class.feed do |row|
         push(row)
       end
-      @atom = nil
     end
   end
 end
