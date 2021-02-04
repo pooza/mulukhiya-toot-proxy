@@ -4,11 +4,10 @@ module Mulukhiya
 
     def initialize
       @config = Config.instance
-      @mail = ::Mail.new(charset: 'UTF-8')
-      @mail['X-Mailer'] = Package.name
-      @mail.from = "root@#{Environment.hostname}"
-      @mail.to = config['/alert/mail/to']
-      @mail.delivery_method(:sendmail)
+      @config['/mail/to'] = config['/alert/mail/to']
+      super
+      @prefix = nil
+      @mail['X-Mailer'] = Package.full_name
     end
 
     def subject=(value)
