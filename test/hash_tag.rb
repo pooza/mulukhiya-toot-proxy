@@ -27,17 +27,5 @@ module Mulukhiya
         assert_kind_of(Hash, entry)
       end
     end
-
-    def test_featured_tag_bases
-      assert_kind_of(Array, hash_tag_class.featured_tag_bases)
-    end
-
-    def test_field_tag_bases
-      assert_kind_of(Array, hash_tag_class.field_tag_bases)
-    end
-
-    def test_bio_tag_bases
-      assert_kind_of(Array, hash_tag_class.bio_tag_bases)
-    end
   end
 end

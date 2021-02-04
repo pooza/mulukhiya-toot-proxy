@@ -15,27 +15,6 @@ module Mulukhiya
       params[:tag] = name
       return Postgres.instance.execute('tag_timeline', params)
     end
-
-    def self.included(base)
-      base.extend(Methods)
-    end
-
-    module Methods
-      def featured_tag_bases
-        return Postgres.instance.execute('featured_tags').map {|v| v['tag'].to_hashtag_base}
-      end
-
-      def field_tag_bases
-        return Postgres.instance.execute('field_tags').map {|v| v['tag'].to_hashtag_base}
-      end
-
-      def bio_tag_bases
-        tags = []
-        Postgres.instance.execute('bio').each do |row|
-          tags.concat(TagContainer.scan(row[:bio]))
-        end
-        return tags.compact.uniq
-      end
     end
   end
 end

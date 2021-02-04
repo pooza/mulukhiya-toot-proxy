@@ -63,36 +63,6 @@ module Mulukhiya
         return Mongo.instance.db[:hashtags]
       end
 
-      def self.field_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, fields: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.field_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
-      def self.bio_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, description: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.bio_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
-      def self.featured_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, clientSettings: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.featured_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
       private
 
       def collection_name

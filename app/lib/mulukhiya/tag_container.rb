@@ -17,18 +17,6 @@ module Mulukhiya
       return config['/tagging/default_tags'].map(&:to_hashtag_base) rescue []
     end
 
-    def self.futured_tag_bases
-      return Environment.hash_tag_class.featured_tag_bases rescue []
-    end
-
-    def self.field_tag_bases
-      return Environment.hash_tag_class.field_tag_bases rescue []
-    end
-
-    def self.bio_tag_bases
-      return Environment.hash_tag_class.bio_tag_bases rescue []
-    end
-
     def self.media_tag?
       return config['/tagging/media/enable'] == true rescue true
     end
