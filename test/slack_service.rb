@@ -1,13 +1,13 @@
 module Mulukhiya
-  class SlackTest < TestCase
+  class SlackServiceTest < TestCase
     def test_all
-      Slack.all do |slack|
-        assert_kind_of(Slack, slack)
+      SlackService.all do |slack|
+        assert_kind_of(SlackService, slack)
       end
     end
 
     def test_create_message
-      slack = Slack.all.first
+      slack = SlackService.all.first
       assert_equal(slack.create_body('hoge', :text), %({"text":"hoge"}))
       assert_equal(slack.create_body({a: 'fuga'}, :json), %({"text":"{\\n  \\"a\\": \\"fuga\\"\\n}"}))
       assert_equal(slack.create_body({b: 'fugafugafuga'}, :yaml), %({"text":"---\\n:b: fugafugafuga\\n"}))
@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def test_say
-      Slack.all do |slack|
+      SlackService.all do |slack|
         assert_equal(slack.say(text: 'say YAML').code, 200)
         sleep(1)
         assert_equal(slack.say({text: 'say JSON'}, :json).code, 200)
@@ -27,8 +27,8 @@ module Mulukhiya
     end
 
     def test_broadcast
-      assert(Slack.broadcast(message: 'OK'))
-      assert_false(Slack.broadcast(Ginseng::NotFoundError.new('404')))
+      assert(SlackService.broadcast(message: 'OK'))
+      assert_false(SlackService.broadcast(Ginseng::NotFoundError.new('404')))
     end
   end
 end
