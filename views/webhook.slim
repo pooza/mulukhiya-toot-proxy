@@ -37,7 +37,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              this.url = Vue.dig(e, 'config', 'webhook', 'url')
+              this.url = Vue.dig(e, 'webhook', 'url')
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {

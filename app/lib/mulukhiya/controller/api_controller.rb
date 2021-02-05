@@ -11,6 +11,7 @@ module Mulukhiya
         @renderer.message = {
           account: @sns.account.to_h,
           config: @sns.account.user_config.to_h,
+          webhook: {url: @sns.account.webhook.uri.to_s},
           filters: @sns.filters&.parsed_response,
           token: @sns.access_token.to_h.except(:account),
           visibility_names: Environment.parser_class.visibility_names,

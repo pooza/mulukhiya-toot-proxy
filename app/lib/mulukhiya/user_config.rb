@@ -46,13 +46,7 @@ module Mulukhiya
       update(tagging: {user_tags: nil})
     end
 
-    def to_h
-      unless @hash
-        @hash = raw.clone
-        @hash['webhook']['url'] = @account.webhook.uri.to_s if raw.dig('webhook', 'token')
-      end
-      return @hash
-    end
+    alias to_h raw
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
