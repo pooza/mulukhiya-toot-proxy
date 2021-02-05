@@ -3,7 +3,9 @@ module Mulukhiya
     def handle_alert(error, params = {})
       mailer = Mailer.new
       mailer.prefix = @sns.info['metadata']['nodeName']
-      mailer.deliver("#{error.source_class} #{error.message}", error.backtrace)
+      mailer.subject = "#{error.source_class} #{error.message}"
+      mailer.body = error.backtrace
+      mailer.deliver
       return error
     end
 
