@@ -6,8 +6,10 @@ module Mulukhiya
     end
 
     def disable?
-      return false unless config['/alert/slack/hooks'].present? rescue false
+      return true unless config['/alert/slack/hooks'].present?
       return super
+    rescue Ginseng::ConfigError
+      return true
     end
   end
 end

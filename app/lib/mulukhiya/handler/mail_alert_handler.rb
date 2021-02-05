@@ -10,8 +10,10 @@ module Mulukhiya
     end
 
     def disable?
-      return false unless config['/alert/mail/to'] rescue false
+      return true unless config['/alert/mail/to'].present?
       return super
+    rescue Ginseng::ConfigError
+      return true
     end
   end
 end
