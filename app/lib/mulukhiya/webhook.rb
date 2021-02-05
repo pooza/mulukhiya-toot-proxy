@@ -83,7 +83,7 @@ module Mulukhiya
       @user_config = user_config
       @reporter = Reporter.new
       @sns = sns_class.new
-      @sns.token = @user_config.webhook_token
+      @sns.token = @user_config.token
     end
   end
 end

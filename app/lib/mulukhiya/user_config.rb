@@ -5,7 +5,7 @@ module Mulukhiya
 
     def initialize(account)
       @account = account if account.is_a?(account_class)
-      if account.is_a?(Hash) && (token = account['/webhook/token'])
+      if account.is_a?(Hash) && (token = account['/mulukhiya/token'])
         @account ||= account_class.get(token: token)
       end
       @account ||= account_class[account]
@@ -27,12 +27,15 @@ module Mulukhiya
       logger.info(class: self.class.to_s, account: @account.acct.to_s, message: 'updated')
     end
 
-    def webhook_token
-      return self['/webhook/token']
+    def token
+      return self['/mulukhiya/token'] || self['/webhook/token']
     end
 
-    def webhook_token=(token)
-      update(webhook: {token: token})
+    def token=(token)
+      update(
+        webhook: {token: nil},
+        mulukhiya: {token: token},
+      )
     end
 
     def tags

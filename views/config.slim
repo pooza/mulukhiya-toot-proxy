@@ -100,13 +100,10 @@ html lang='ja'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
-            h4 トークン
-            input placeholder='webhookのアクセストークン' v-model.trim='form.webhook.token'
-          .inline-field-container
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
-            button :disabled='!form.webhook.token' @click='updateWebhook' 更新
+            button @click='updateWebhook' 更新
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
@@ -181,7 +178,6 @@ html lang='ja'
         methods: {
           updateForm: function (data) {
             this.result = jsyaml.dump(data.config)
-            this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
             this.form.growi.token = Vue.dig(data, 'config', 'growi', 'token')
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
@@ -239,12 +235,9 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateWebhook: function () {
-            const command = {webhook: {token: null, visibility: null}}
-            if (this.form.webhook.token) {
-              command.webhook.token = this.form.webhook.token
-              if (this.form.webhook.visibility.code != 'public') {
-                command.webhook.visibility = this.form.webhook.visibility.code
-              }
+            const command = {webhook: {visibility: null}}
+            if (this.form.webhook.visibility.code != 'public') {
+              command.webhook.visibility = this.form.webhook.visibility.code
             }
             this.updateConfig(command)
           },
