@@ -14,10 +14,10 @@ module Mulukhiya
           body[attachment_field] ||= []
           body[attachment_field].push(sns.upload_remote_resource(uri, {response: :id}))
           result.push(source_url: uri.to_s)
+        rescue => e
+          errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
         end
         threads.push(thread)
-      rescue => e
-        errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
       end
       threads.each(&:join)
       return body
