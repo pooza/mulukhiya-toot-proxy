@@ -233,16 +233,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/feed/update' do
-      if @sns&.account&.admin? || @sns&.account&.moderator?
-        TagFeedUpdateWorker.new.perform
-      else
-        @renderer.status = 403
-        @renderer.message = {error: 'Unauthorized'}
-      end
-      return @renderer.to_s
-    end
-
     def token
       return params[:token].decrypt if params[:token]
       return nil
