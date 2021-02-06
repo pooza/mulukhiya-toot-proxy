@@ -2,16 +2,16 @@ module Mulukhiya
   class Mailer < Ginseng::Mailer
     include Package
 
-    def initialize
-      config['/mail/to'] = config['/alert/mail/to']
-      super
-      @prefix = nil
-      @mail['X-Mailer'] = Package.full_name
+    def name
+      return Package.full_name
     end
 
-    def subject=(value)
-      @mail.subject = "[#{prefix}] #{value}" if prefix
-      @mail.subject ||= value
+    def default_prefix
+      return nil
+    end
+
+    def default_receipt
+      return config['/alert/mail/to'] rescue nil
     end
   end
 end
