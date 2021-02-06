@@ -18,7 +18,10 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
-            v-select :options='options.program' @input='onChangeTags' v-model='form.program'
+          .inline-field-container
+            input class='short' placeholder='期限(分)' v-model.number='form.program.minutes'
+          .field-container
+            v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
       section class='config' v-if='account.username && layout.sections.livecure'
@@ -132,7 +135,7 @@ html lang='ja'
             notify: {user_config: null, verbose: null},
             livecure: false,
             annict: {auth_code: null},
-            program: null,
+            program: {minutes: null, tags: null},
             tags: '',
             webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
@@ -171,7 +174,10 @@ html lang='ja'
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => ({code: p.key, label: Vue.createProgramTags(p).join(', ')}))
+                .map(program => ({
+                  code: program.key,
+                  label: `${Vue.createProgramTags(program).join(', ')} (${program.minutes}分)`,
+                }))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
         },
@@ -207,7 +213,13 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           onChangeTags: function (e) {
-            this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
+            if (e.code) {
+              this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
+              this.form.program.minutes = this.programs[e.code].minutes
+            } else {
+              this.form.tags = null
+              this.form.program.minutes = null
+            }
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -225,8 +237,15 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateTags: function () {
-            const command = {tagging: {user_tags: null}}
-            if (this.form.tags) {command.tagging.user_tags = this.form.tags.split("\n")}
+            const command = {tagging: {user_tags: null, minutes: null}}
+            if (this.form.tags) {
+              command.tagging.user_tags = this.form.tags.split("\n")
+              if (this.form.program.minutes) {
+                command.tagging.minutes = this.form.program.minutes
+              }
+            } else {
+              command.tagging.minutes = null
+            }
             this.updateConfig(command)
           },
           updateLivecure: function () {

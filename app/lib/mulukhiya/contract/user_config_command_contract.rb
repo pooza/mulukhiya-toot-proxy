@@ -30,6 +30,7 @@ module Mulukhiya
         required(:tags).maybe(:hash).schema do
           required(:disabled).maybe(:array).each(:string)
         end
+        optional(:minutes).maybe(:integer)
       end
     end
 
