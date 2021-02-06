@@ -754,6 +754,7 @@ sidekiq:
   auth:
     user: admin
     password: ''
+  dynamic: true
   concurrency: 5
   schedule:
     user_tag_initialize:
@@ -779,6 +780,8 @@ puma:
   pidfile: tmp/pids/puma.pid
   rackup: app/initializer/config.ru
 tagging:
+  user_tags:
+    extra_minutes: 2
   word:
     minimum_length: 3
   media:

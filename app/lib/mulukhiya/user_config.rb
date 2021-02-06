@@ -24,7 +24,6 @@ module Mulukhiya
     def update(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
-      logger.info(class: self.class.to_s, account: @account.acct.to_s, message: 'updated')
     end
 
     def token
