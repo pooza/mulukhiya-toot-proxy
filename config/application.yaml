@@ -757,9 +757,6 @@ sidekiq:
   dynamic: true
   concurrency: 5
   schedule:
-    user_tag_initialize:
-      cron: '1 4 * * *'
-      class: Mulukhiya::UserTagInitializeWorker
     media_cleaning:
       every: 60m
       class: Mulukhiya::MediaCleaningWorker
