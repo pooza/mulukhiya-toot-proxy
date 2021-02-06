@@ -100,6 +100,10 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/attachment"]
       end
 
+      def attachment_limit
+        return config["/#{name}/attachment/limit"]
+      end
+
       def status_key
         return config["/#{name}/status/key"]
       end
