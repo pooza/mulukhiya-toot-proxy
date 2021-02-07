@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def exist?
-      return @record.present? && @record.listable?
+      return @record&.listable? rescue false
     end
 
     def record

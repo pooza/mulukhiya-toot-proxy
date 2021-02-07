@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def listable?
-      return false
+      return true
     end
 
     def feed_uri
