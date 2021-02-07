@@ -5,6 +5,10 @@ module Mulukhiya
       return @uri
     end
 
+    def listable?
+      return false
+    end
+
     def feed_uri
       @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
       return @feed_uri

@@ -14,6 +14,10 @@ module Mulukhiya
       assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
     end
 
+    def test_listable?
+      assert_boolean(@nowplaying.listable?)
+    end
+
     def test_to_h
       assert_kind_of(Hash, @nowplaying.to_h)
     end
