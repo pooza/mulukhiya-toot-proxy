@@ -140,6 +140,7 @@ const MulukhiyaLib = {
         scopes: data.token.scopes.join(', '),
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,
+        webhook: data.webhook.url,
       }
     }
 
