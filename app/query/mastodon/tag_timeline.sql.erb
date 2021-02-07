@@ -10,10 +10,8 @@ SELECT
 FROM
   statuses AS toots
   INNER JOIN statuses_tags ON statuses_tags.status_id = toots.id
-  INNER JOIN tags ON statuses_tags.tag_id = tags.id
   INNER JOIN accounts ON toots.account_id = accounts.id
-WHERE (tags.name = '<%= params[:tag] %>')
-  AND ((tags.listable IS null) OR (tags.listable = true))
+WHERE (statuses_tags.tag_id = '<%= params[:tag_id] %>')
   AND (toots.reblog_of_id IS null)
   AND (toots.visibility = 0)
   <% if params[:local] %>
