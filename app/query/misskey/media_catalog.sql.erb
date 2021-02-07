@@ -27,6 +27,7 @@ FROM
       AND (note."userHost" IS null)
       AND (note."visibility" IN ('public', 'home'))
       AND ("user"."isBot" = false)
+      AND ("user".id <> '<%= test_account.id %>')
     GROUP BY
       note_id,
       file_id,

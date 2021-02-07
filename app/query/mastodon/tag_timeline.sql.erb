@@ -21,7 +21,7 @@ WHERE (tags.id = (SELECT id FROM tags WHERE name = '<%= params[:tag] %>'))
   <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
-  AND (accounts.username <> '<%= test_account.acct.username %>')
+  AND (accounts.id <> '<%= test_account.id %>')
 ORDER BY
   toots.id DESC
 LIMIT <%= params[:limit] %> OFFSET 0
