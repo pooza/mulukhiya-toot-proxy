@@ -9,7 +9,7 @@ module Mulukhiya
 
       begin
         @handler.clear
-        raise Ginseng::RenderError, 'テンプレが腐ってるから書き直せ。'
+        raise Ginseng::RenderError, 'Renderエラーが起きたというテスト。'
       rescue Ginseng::RenderError => e
         assert_kind_of(Ginseng::RenderError, @handler.handle_alert(e))
       end
