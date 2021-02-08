@@ -17,7 +17,7 @@ module Mulukhiya
     def create_feed(params)
       return [] unless Postgres.config?
       params[:tag] = name
-      params[:tag_id] = id
+      params[:tag_id] = id rescue nil
       return Postgres.instance.execute('tag_timeline', params)
     end
   end
