@@ -2,7 +2,7 @@ name: test
 on:
   - push
 env:
-  CI: "true"
+  CI: 'true'
 jobs:
   test:
     runs-on: ubuntu-latest

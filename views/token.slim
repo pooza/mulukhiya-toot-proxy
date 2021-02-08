@@ -17,8 +17,18 @@ html lang='ja'
           span class='role' v-if='current_account.is_moderator' mod
           span class='role' v-if='current_account.is_admin' admin
           span class='role' v-if='isLoggedIn(current_account)' loggedin
-          i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip="'トークンの削除'" v-else=''
-          .scopes 権限: {{current_account.scopes}}
+          i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
+          .field
+            .title 権限:
+            .value = '{{current_account.scopes}}'
+          .field
+            .title トークン:
+            .value
+              code = '{{current_account.token}}'
+          .field
+            .title webhook:
+            .value
+              code = '{{current_account.webhook}}'
       nav class='tokens'
         h3 トークンの登録
         .token
@@ -42,7 +52,9 @@ html lang='ja'
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
               | で作成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
               | また、以下の権限を含むものにしてください。
-            .scopes 権限: #{controller.oauth_default_scopes.join(', ')}
+            .field
+              .title 権限:
+              .value #{controller.oauth_default_scopes.join(', ')}
             input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
             button :disabled='!input.token' @click='registerToken' 登録
     == slim.render 'fragment/footer'

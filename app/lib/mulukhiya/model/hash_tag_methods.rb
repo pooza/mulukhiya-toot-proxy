@@ -5,6 +5,10 @@ module Mulukhiya
       return @uri
     end
 
+    def listable?
+      return true
+    end
+
     def feed_uri
       @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
       return @feed_uri
@@ -13,29 +17,8 @@ module Mulukhiya
     def create_feed(params)
       return [] unless Postgres.config?
       params[:tag] = name
+      params[:tag_id] = id rescue nil
       return Postgres.instance.execute('tag_timeline', params)
-    end
-
-    def self.included(base)
-      base.extend(Methods)
-    end
-
-    module Methods
-      def featured_tag_bases
-        return Postgres.instance.execute('featured_tags').map {|v| v['tag'].to_hashtag_base}
-      end
-
-      def field_tag_bases
-        return Postgres.instance.execute('field_tags').map {|v| v['tag'].to_hashtag_base}
-      end
-
-      def bio_tag_bases
-        tags = []
-        Postgres.instance.execute('bio').each do |row|
-          tags.concat(TagContainer.scan(row[:bio]))
-        end
-        return tags.compact.uniq
-      end
     end
   end
 end

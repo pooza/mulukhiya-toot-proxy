@@ -40,7 +40,13 @@ module Mulukhiya
     def test_post_with_attachment
       return unless hook = @parser.account.webhook
       header 'Content-Type', 'application/json'
-      post hook.uri.path.sub(@path_prefix_pattern, ''), {text: '武田信玄', attachments: [{image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'}]}.to_json
+      post hook.uri.path.sub(@path_prefix_pattern, ''), {
+        text: '武田信玄',
+        attachments: [
+          {image_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'},
+          {image_url: 'https://images-na.ssl-images-amazon.com/images/I/21VK3xpmERL._AC_.jpg'},
+        ],
+      }.to_json
       assert(last_response.ok?)
     end
 

@@ -1,7 +1,7 @@
 module Mulukhiya
-  class MediaAtomFeedRendererTest < TestCase
+  class MediaFeedRendererTest < TestCase
     def setup
-      @renderer = MediaAtomFeedRenderer.new
+      @renderer = MediaFeedRenderer.new
     end
 
     def test_to_s

@@ -18,7 +18,10 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
-            v-select :options='options.program' @input='onChangeTags' v-model='form.program'
+          .inline-field-container
+            input class='short' placeholder='期限(分)' v-model.number='form.program.minutes'
+          .field-container
+            v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
       section class='config' v-if='account.username && layout.sections.livecure'
@@ -100,13 +103,10 @@ html lang='ja'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
-            h4 トークン
-            input placeholder='webhookのアクセストークン' v-model.trim='form.webhook.token'
-          .inline-field-container
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
-            button :disabled='!form.webhook.token' @click='updateWebhook' 更新
+            button @click='updateWebhook' 更新
       section class='config' v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
@@ -135,7 +135,7 @@ html lang='ja'
             notify: {user_config: null, verbose: null},
             livecure: false,
             annict: {auth_code: null},
-            program: null,
+            program: {minutes: null, tags: null},
             tags: '',
             webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
@@ -174,14 +174,16 @@ html lang='ja'
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
-                .map(p => ({code: p.key, label: Vue.createProgramTags(p).map(v => `#${v}`).join(' ')}))
+                .map(program => ({
+                  code: program.key,
+                  label: `${Vue.createProgramTags(program).join(', ')} (${program.minutes}分)`,
+                }))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
         },
         methods: {
           updateForm: function (data) {
             this.result = jsyaml.dump(data.config)
-            this.form.webhook.token = Vue.dig(data, 'config', 'webhook', 'token')
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
             this.form.growi.token = Vue.dig(data, 'config', 'growi', 'token')
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
@@ -211,7 +213,13 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           onChangeTags: function (e) {
-            this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
+            if (e.code) {
+              this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
+              this.form.program.minutes = this.programs[e.code].minutes
+            } else {
+              this.form.tags = null
+              this.form.program.minutes = null
+            }
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -229,8 +237,15 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateTags: function () {
-            const command = {tagging: {user_tags: null}}
-            if (this.form.tags) {command.tagging.user_tags = this.form.tags.split("\n")}
+            const command = {tagging: {user_tags: null, minutes: null}}
+            if (this.form.tags) {
+              command.tagging.user_tags = this.form.tags.split("\n")
+              if (this.form.program.minutes) {
+                command.tagging.minutes = this.form.program.minutes
+              }
+            } else {
+              command.tagging.minutes = null
+            }
             this.updateConfig(command)
           },
           updateLivecure: function () {
@@ -239,12 +254,9 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateWebhook: function () {
-            const command = {webhook: {token: null, visibility: null}}
-            if (this.form.webhook.token) {
-              command.webhook.token = this.form.webhook.token
-              if (this.form.webhook.visibility.code != 'public') {
-                command.webhook.visibility = this.form.webhook.visibility.code
-              }
+            const command = {webhook: {visibility: null}}
+            if (this.form.webhook.visibility.code != 'public') {
+              command.webhook.visibility = this.form.webhook.visibility.code
             }
             this.updateConfig(command)
           },

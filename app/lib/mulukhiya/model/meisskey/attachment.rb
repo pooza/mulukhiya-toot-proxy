@@ -75,48 +75,45 @@ module Mulukhiya
 
       def self.catalog(params = {})
         return enum_for(__method__, params) unless block_given?
-        return if 1 < params[:page].to_i
-        cnt = 0
-        statuses.each do |row|
-          note = Status[row[:_id]]
-          note.attachments.each do |attachment|
-            break unless cnt < config['/feed/media/limit']
-            attachment = Attachment[attachment['id']]
+        statuses(params[:page]).each do |status|
+          status[:_files].each do |row|
+            attachment = Attachment[row[:_id]]
             yield attachment.to_h.deep_symbolize_keys.merge(
-              date: note.createdAt,
-              status_url: note.uri.to_s,
+              id: attachment.id,
+              date: attachment.createdAt,
+              status_url: attachment.uri.to_s,
             )
-            cnt += 1
+          rescue => e
+            logger.error(error: e, row: row)
           end
-        rescue => e
-          logger.error(error: e, row: row.to_h)
         end
       end
 
       def self.feed
         return enum_for(__method__) unless block_given?
-        cnt = 0
-        statuses.each do |row|
-          note = Status[row[:_id]]
-          note.attachments.each do |attachment|
-            break unless cnt < config['/feed/media/limit']
-            yield Attachment[attachment['id']].feed_entry
+        statuses.each do |status|
+          status[:_files].each do |row|
+            yield Attachment[row[:_id]].feed_entry
+          rescue => e
+            logger.error(error: e, row: row)
           end
-        rescue => e
-          logger.error(error: e, row: row.to_h)
         end
       end
 
-      def self.statuses
-        rows = Status.collection
-          .find(
-            fileIds: {'$ne' => []},
-            userId: {'$nin' => Account.collection.find(host: nil, isBot: true).map {|v| v['_id']}},
-            _user: {'host': nil, 'inbox': nil}, # local
-            visibility: {'$in' => ['public', 'home']},
-          )
-          .sort(createdAt: -1)
-          .limit(config['/feed/media/limit'])
+      def self.statuses(page = 1)
+        page ||= 1
+        rows = Status.collection.aggregate([
+          {'$sort' => {'createdAt' => -1}},
+          {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
+          {'$match' => {
+            'fileIds' => {'$ne' => nil},
+            'user.isBot' => false,
+            '_user.host' => nil,
+            'visibility' => {'$in' => ['public', 'home']},
+          }},
+          {'$skip' => config['/feed/media/limit'] * (page - 1)},
+          {'$limit' => config['/feed/media/limit'] * page},
+        ])
         return rows
       end
 

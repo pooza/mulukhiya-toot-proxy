@@ -29,7 +29,7 @@ module Mulukhiya
       @renderer.message = e.to_h
       @renderer.message.delete(:backtrace)
       @renderer.message[:error] = e.message
-      Slack.broadcast(e)
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       return @renderer.to_s
     end

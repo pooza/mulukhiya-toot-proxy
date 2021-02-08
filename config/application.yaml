@@ -1,5 +1,5 @@
 package:
-  version: 4.0.39
+  version: 4.1.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -37,7 +37,7 @@ handler:
         - instagram.com
         - toei-anim.co.jp
     useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100'
-  hexo_announcement:
+  hexo_announce:
     category: お知らせ
   shortened_url:
     domains:
@@ -87,110 +87,41 @@ parser:
         options: choices
 test:
   timeout: 20
-  filters:
-    - name: ci
-      cases:
-        - event
-        - slack
-        - clipping_worker
-        - note_uri
-        - toot_uri
-        - sns_methods
-        - sns_service
-        - account
-        - attachment
-        - access_token
-        - status
-        - hash_tag
-        - user_config
-        - user_config_storage
-        - media_atom_feed_renderer
-        - reporter
-        - handler
-        - '*_controller'
-        - '*_handler'
-    - name: postgres
-      cases:
-        - postgres
-        - query_template
-    - name: mongo
-      cases:
-        - mongo
-    - name: mastodon
-      cases:
-        - mastodon_controller
-        - postgres
-        - toot_uri
-        - mastodon_auth_contract
-    - name: misskey
-      cases:
-        - misskey_controller
-        - postgres
-        - note_uri
-        - misskey_auth_contract
-    - name: meisskey
-      cases:
-        - meisskey_controller
-        - mongo
-        - note_uri
-        - misskey_auth_contract
-    - name: pleroma
-      cases:
-        - pleroma_controller
-        - postgres
-        - toot_uri
-        - mastodon_auth_contract
-    - name: amazon
-      cases:
-        - amazon_service
-        - 'amazon*_handler'
-    - name: spotify
-      cases:
-        - spotify_service
-        - spotify_uri
-        - 'spotify*_handler'
-    - name: you_tube
-      cases:
-        - youtube_service
-        - you_tube_uri
-        - 'youtube*_handler'
-    - name: dropbox
-      cases:
-        - dropbox_clipper
-        - 'dropbox*_handler'
-    - name: growi
-      cases:
-        - growi_clipper
-        - 'growi*_handler'
-    - name: hexo
-      cases:
-        - 'hexo*_handler'
-    - name: annict
-      cases:
-        - 'annict*'
-    - name: webhook
-      cases:
-        - 'webhook*'
-    - name: default_hash_tag
-      cases:
-        - tag_atom_feed_renderer
 webui:
-  scripts:
-    - https://cdn.jsdelivr.net/npm/vue/dist/vue.js
-    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.min.js
-    - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.js
-    - https://cdn.jsdelivr.net/npm/vue-slide-up-down/dist/vue-slide-up-down.umd.js
-    - https://cdn.jsdelivr.net/npm/v-tooltip/dist/v-tooltip.min.js
-    - https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js
-    - https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js
-    - /mulukhiya/script/mulukhiya_lib
-    - /mulukhiya/script/activity_indicator
-  stylesheets:
-    - /mulukhiya/style/default
-    - https://cdn.jsdelivr.net/npm/vue-select/dist/vue-select.css
-    - https://cdn.jsdelivr.net/npm/vuejs-dialog/dist/vuejs-dialog.min.css
-    - https://use.fontawesome.com/releases/v5.15.1/css/all.css
-    - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+  production:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.min.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
+  development:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
   metadata:
     robots: noindex,nofollow
     viewport: width=1000
@@ -290,10 +221,13 @@ mastodon:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
+    alert:
+      - slack_alert
+      - mail_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     webui:
@@ -308,6 +242,8 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
+  attachment:
+    limit: 4
   search:
     limit: 40
 misskey:
@@ -400,10 +336,13 @@ misskey:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
+    alert:
+      - slack_alert
+      - mail_alert
   oauth:
     webui:
       url: /settings/api
@@ -417,6 +356,8 @@ misskey:
     key: noteId
     label: ノート
     max_length: 500
+  attachment:
+    limit: 4
 meisskey:
   display_name: めいすきー
   sns_type: misskey
@@ -506,10 +447,13 @@ meisskey:
       - growi_bookmark
       - result_notification
     announce:
-      - post_announcement
-      - growi_announcement
-      - dropbox_announcement
-      - hexo_announcement
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
+    alert:
+      - slack_alert
+      - mail_alert
   oauth:
     scopes:
       - write:notes
@@ -520,6 +464,8 @@ meisskey:
     key: noteId
     label: ポスト
     max_length: 1000
+  attachment:
+    limit: 4
 pleroma:
   display_name: Pleroma
   sns_type: mastodon
@@ -610,6 +556,9 @@ pleroma:
       - dropbox_bookmark
       - growi_bookmark
       - result_notification
+    alert:
+      - slack_alert
+      - mail_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -622,6 +571,8 @@ pleroma:
     max_length: 5000
   chat:
     field: content
+  attachment:
+    limit: 4
 amazon:
   marketplace: jp
   urls:
@@ -793,14 +744,16 @@ user_config:
 media:
   metadata:
     cache:
-      ttl: 86400
+      ttl: 8640000 #100日
 postgres:
   dsn: null
   query_log: false
 mongo:
   dsn: null
-slack:
-  hooks: []
+  query_log: false
+alert:
+  slack:
+    hooks: []
 sidekiq:
   dashboard:
     url: /mulukhiya/sidekiq
@@ -809,34 +762,31 @@ sidekiq:
   auth:
     user: admin
     password: ''
+  dynamic: true
   concurrency: 5
   schedule:
-    program_update:
-      cron: '1 1 * * *'
-      class: Mulukhiya::ProgramUpdateWorker
     media_cleaning:
-      cron: '2 1 * * *'
+      every: 60m
       class: Mulukhiya::MediaCleaningWorker
     tagging_dictionary_update:
-      cron: '3 1 * * *'
+      every: 10m
       class: Mulukhiya::TaggingDictionaryUpdateWorker
-    user_tag_initialize:
-      cron: '1 4 * * *'
-      class: Mulukhiya::UserTagInitializeWorker
-    announcement:
-      every: 2m
-      class: Mulukhiya::AnnouncementWorker
-    tag_feed_update:
-      every: 5m
-      class: Mulukhiya::TagFeedUpdateWorker
+    program_update:
+      every: 10m
+      class: Mulukhiya::ProgramUpdateWorker
     annict_polling:
       every: 5m
       class: Mulukhiya::AnnictPollingWorker
+    announcement:
+      every: 1m
+      class: Mulukhiya::AnnouncementWorker
 puma:
   port: 3008
   pidfile: tmp/pids/puma.pid
   rackup: app/initializer/config.ru
 tagging:
+  user_tags:
+    extra_minutes: 2
   word:
     minimum_length: 3
   media:
@@ -871,9 +821,8 @@ nodeinfo:
     ttl: 3600
 webhook:
   sample: |
-    わたしが斬るのは、あなたじゃない！
-    絶ち切るのは弱さ。切り拓くは未来。心を貫く勇気の刃。
-    それがわたし。王女様からもらった名前、キュアソードよ！
+    あんなの、戦いのうちに入らないわ。
+    奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'

@@ -11,6 +11,7 @@ module Mulukhiya
         @renderer.message = {
           account: @sns.account.to_h,
           config: @sns.account.user_config.to_h,
+          webhook: {url: @sns.account.webhook.uri.to_s},
           filters: @sns.filters&.parsed_response,
           token: @sns.access_token.to_h.except(:account),
           visibility_names: Environment.parser_class.visibility_names,
@@ -126,9 +127,29 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/media/clear' do
+    post '/media/clear' do # deprecated
       if @sns&.account&.admin? || @sns&.account&.moderator?
         MediaCleaningWorker.new.perform
+      else
+        @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
+      end
+      return @renderer.to_s
+    end
+
+    post '/media/file/clear' do
+      if @sns&.account&.admin? || @sns&.account&.moderator?
+        MediaCleaningWorker.new.perform
+      else
+        @renderer.status = 403
+        @renderer.message = {error: 'Unauthorized'}
+      end
+      return @renderer.to_s
+    end
+
+    post '/media/metadata/clear' do
+      if @sns&.account&.admin? || @sns&.account&.moderator?
+        MediaMetadataStorage.new.clear
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}
@@ -152,28 +173,6 @@ module Mulukhiya
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}
-      end
-      return @renderer.to_s
-    end
-
-    get '/tagging/tag/search' do
-      dic = {}
-      errors = TagSearchContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors: errors}
-      else
-        TaggingDictionary.new.load_cache.each do |entry|
-          word = entry.shift
-          next unless params[:q].match?(entry.first[:regexp])
-          dic[word] = entry.first
-          dic[word][:word] = word
-          dic[word][:words].unshift(word)
-          dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
-        rescue => e
-          logger.error(error: e, entry: entry)
-        end
-        @renderer.message = dic
       end
       return @renderer.to_s
     end
@@ -228,16 +227,6 @@ module Mulukhiya
     post '/annict/crawl' do
       if @sns.account
         @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
-      else
-        @renderer.status = 403
-        @renderer.message = {error: 'Unauthorized'}
-      end
-      return @renderer.to_s
-    end
-
-    post '/feed/update' do
-      if @sns&.account&.admin? || @sns&.account&.moderator?
-        TagFeedUpdateWorker.new.perform
       else
         @renderer.status = 403
         @renderer.message = {error: 'Unauthorized'}

@@ -28,10 +28,7 @@ module Mulukhiya
 
       def create_feed(params)
         return [] unless Mongo.config?
-        criteria = {'$and' => [{tags: name}], userId: {'$ne' => test_account.id}}
-        criteria['$and'].push(tags: {'$in' => TagContainer.default_tag_bases}) if params[:local]
-        notes = Status.collection.find(criteria).sort(createdAt: -1).limit(params[:limit])
-        return notes.map do |row|
+        return notes(params).map do |row|
           status = Status.new(row['_id'])
           {
             username: status.account.username,
@@ -63,37 +60,22 @@ module Mulukhiya
         return Mongo.instance.db[:hashtags]
       end
 
-      def self.field_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, fields: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.field_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
-      def self.bio_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, description: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.bio_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
-      def self.featured_tag_bases
-        tag_bases = []
-        accounts = Account.collection.find(host: nil, clientSettings: {'$ne' => nil})
-        accounts.each do |account|
-          account = Account[account['_id'].to_s]
-          tag_bases.concat(account.featured_tag_bases)
-        end
-        return tag_bases.uniq.compact
-      end
-
       private
+
+      def notes(params = {})
+        criteria = [
+          {'$sort' => {'createdAt' => -1}},
+          {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
+          {'$match' => {
+            'tags' => name,
+            'visibility' => 'public',
+            'user._id' => {'$ne' => test_account._id},
+          }},
+        ]
+        criteria.push('$match' => {'_user.host' => nil}) if params[:local]
+        criteria.push('$limit' => params[:limit])
+        return Status.collection.aggregate(criteria)
+      end
 
       def collection_name
         return :hashtags

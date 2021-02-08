@@ -3,6 +3,7 @@ title: Local config
 type: object
 required:
   - agent
+  - alert
 properties:
   controller:
     type: string
@@ -74,16 +75,19 @@ properties:
         type: array
         items:
           type: string
-  slack:
+  alert:
     type: object
-    required:
-      - hooks
     properties:
-      hooks:
-        type: array
-        items:
-          type: string
-          format: uri
+      slack:
+        type: object
+        required:
+          - hooks
+        properties:
+          hooks:
+            type: array
+            items:
+              type: string
+              format: uri
   postgres:
     type: object
     required:

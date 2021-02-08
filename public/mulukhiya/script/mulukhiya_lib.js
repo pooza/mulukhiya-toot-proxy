@@ -106,6 +106,7 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
         .then(e => {
+          Vue.updateConfig({mulukhiya: {token: token}})
           tokens = Vue.getTokens()
           tokens.push(token)
           Vue.setTokens(tokens)
@@ -139,6 +140,7 @@ const MulukhiyaLib = {
         scopes: data.token.scopes.join(', '),
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,
+        webhook: data.webhook.url,
       }
     }
 
@@ -231,7 +233,15 @@ const MulukhiyaLib = {
     Vue.clearMediaFiles = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/media/clear', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/media/file/clear', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.clearMediaMetadata = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/media/metadata/clear', {token: Vue.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

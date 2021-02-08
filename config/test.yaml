@@ -1,0 +1,87 @@
+filters:
+  - name: ci
+    cases:
+      - event
+      - slack
+      - clipping_worker
+      - note_uri
+      - toot_uri
+      - sns_methods
+      - sns_service
+      - account
+      - attachment
+      - access_token
+      - status
+      - hash_tag
+      - user_config
+      - user_config_storage
+      - media_feed_renderer
+      - reporter
+      - handler
+      - '*_controller'
+      - '*_handler'
+  - name: postgres
+    cases:
+      - postgres
+      - query_template
+  - name: mongo
+    cases:
+      - mongo
+  - name: mastodon
+    cases:
+      - mastodon_controller
+      - postgres
+      - toot_uri
+      - mastodon_auth_contract
+  - name: misskey
+    cases:
+      - misskey_controller
+      - postgres
+      - note_uri
+      - misskey_auth_contract
+  - name: meisskey
+    cases:
+      - meisskey_controller
+      - mongo
+      - note_uri
+      - misskey_auth_contract
+  - name: pleroma
+    cases:
+      - pleroma_controller
+      - postgres
+      - toot_uri
+      - mastodon_auth_contract
+  - name: amazon
+    cases:
+      - amazon_service
+      - 'amazon*_handler'
+  - name: spotify
+    cases:
+      - spotify_service
+      - spotify_uri
+      - 'spotify*_handler'
+  - name: you_tube
+    cases:
+      - youtube_service
+      - you_tube_uri
+      - 'youtube*_handler'
+  - name: dropbox
+    cases:
+      - dropbox_clipper
+      - 'dropbox*_handler'
+  - name: growi
+    cases:
+      - growi_clipper
+      - 'growi*_handler'
+  - name: hexo
+    cases:
+      - 'hexo*_handler'
+  - name: annict
+    cases:
+      - 'annict*'
+  - name: webhook
+    cases:
+      - 'webhook*'
+  - name: default_hash_tag
+    cases:
+      - tag_feed_renderer

@@ -5,7 +5,7 @@ module Mulukhiya
 
     def initialize(account)
       @account = account if account.is_a?(account_class)
-      if account.is_a?(Hash) && (token = account['/webhook/token'])
+      if account.is_a?(Hash) && (token = account['/mulukhiya/token'])
         @account ||= account_class.get(token: token)
       end
       @account ||= account_class[account]
@@ -24,15 +24,17 @@ module Mulukhiya
     def update(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
-      logger.info(class: self.class.to_s, account: @account.acct.to_s, message: 'updated')
     end
 
-    def webhook_token
-      return self['/webhook/token']
+    def token
+      return self['/mulukhiya/token'] || self['/webhook/token']
     end
 
-    def webhook_token=(token)
-      update(webhook: {token: token})
+    def token=(token)
+      update(
+        webhook: {token: nil},
+        mulukhiya: {token: token},
+      )
     end
 
     def tags
@@ -43,13 +45,7 @@ module Mulukhiya
       update(tagging: {user_tags: nil})
     end
 
-    def to_h
-      unless @hash
-        @hash = raw.clone
-        @hash['webhook']['url'] = @account.webhook.uri.to_s if raw.dig('webhook', 'token')
-      end
-      return @hash
-    end
+    alias to_h raw
 
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)

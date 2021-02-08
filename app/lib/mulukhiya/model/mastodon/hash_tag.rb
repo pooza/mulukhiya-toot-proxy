@@ -15,6 +15,10 @@ module Mulukhiya
         return @hash
       end
 
+      def listable?
+        return listable != false
+      end
+
       def self.get(key)
         return HashTag.first(name: key[:tag]) if key.key?(:tag)
         return HashTag.first(key)

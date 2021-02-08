@@ -14,6 +14,10 @@ module Mulukhiya
       assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
     end
 
+    def test_listable?
+      assert_boolean(@nowplaying.listable?)
+    end
+
     def test_to_h
       assert_kind_of(Hash, @nowplaying.to_h)
     end
@@ -26,18 +30,6 @@ module Mulukhiya
       feed.each do |entry|
         assert_kind_of(Hash, entry)
       end
-    end
-
-    def test_featured_tag_bases
-      assert_kind_of(Array, hash_tag_class.featured_tag_bases)
-    end
-
-    def test_field_tag_bases
-      assert_kind_of(Array, hash_tag_class.field_tag_bases)
-    end
-
-    def test_bio_tag_bases
-      assert_kind_of(Array, hash_tag_class.bio_tag_bases)
     end
   end
 end

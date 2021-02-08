@@ -13,6 +13,17 @@ module Mulukhiya
       super
     end
 
+    def clear
+      bar = ProgressBar.create(total: all_keys.count) if Environment.rake?
+      all_keys.each do |key|
+        unlink(key)
+      ensure
+        bar&.increment
+      end
+      bar&.finish
+      @logger.info(class: self.class.to_s, prefix: prefix, message: 'clear')
+    end
+
     def self.dsn
       return Ginseng::Redis::DSN.parse(config['/user_config/redis/dsn'])
     end

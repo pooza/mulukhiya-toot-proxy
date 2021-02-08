@@ -20,6 +20,10 @@ module Mulukhiya
       return controller_class.attachment_field
     end
 
+    def attachment_limit
+      return controller_class.attachment_limit
+    end
+
     def account_class
       return Environment.account_class
     end

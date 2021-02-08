@@ -1,7 +1,7 @@
 module Mulukhiya
-  class AnnouncementHandlerTest < TestCase
+  class AnnounceHandlerTest < TestCase
     def setup
-      @handler = AnnouncementHandler.new
+      @handler = AnnounceHandler.new
       @announcement = {text: "1行目\n\n2行目"}
     end
 

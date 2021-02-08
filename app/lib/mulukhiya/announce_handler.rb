@@ -1,5 +1,5 @@
 module Mulukhiya
-  class AnnouncementHandler < Handler
+  class AnnounceHandler < Handler
     attr_reader :sns
 
     def handle_announce(announcement, params = {})

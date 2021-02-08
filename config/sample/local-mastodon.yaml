@@ -15,10 +15,13 @@ postgres:
 user_config:
   redis:
     dsn: redis://localhost:6379/1
-slack:
-  hooks:
-    - https://hooks.slack.com/services/xxxxx
-    - https://discordapp.com/api/webhooks/xxxxx/slack
+alert:
+  slack:
+    hooks:
+      - https://hooks.slack.com/services/xxxxx
+      - https://discordapp.com/api/webhooks/xxxxx/slack
+  mail:
+    to: admin@example.com
 sidekiq:
   redis:
     dsn: redis://localhost:6379/2

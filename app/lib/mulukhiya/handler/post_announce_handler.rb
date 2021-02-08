@@ -1,5 +1,5 @@
 module Mulukhiya
-  class PostAnnouncementHandler < AnnouncementHandler
+  class PostAnnounceHandler < AnnounceHandler
     def announce(announcement, params = {})
       response = sns.post(
         status_field => create_body(announcement, params),

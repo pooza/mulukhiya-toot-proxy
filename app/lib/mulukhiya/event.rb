@@ -35,7 +35,6 @@ module Mulukhiya
 
     def dispatch(body)
       handlers do |handler|
-        break unless handler.sns.account
         next if handler.disable?
         thread = Thread.new {handler.send("handle_#{label}".to_sym, body, params)}
         unless thread.join(handler.timeout)
