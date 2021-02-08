@@ -1,3 +1,6 @@
+- key: /alert/slack/hooks
+  aliases:
+    - /slack/hooks
 - key: /spotify/client/secret
   aliases:
     - /spotify/client_secret
