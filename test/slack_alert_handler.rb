@@ -9,7 +9,7 @@ module Mulukhiya
 
       begin
         @handler.clear
-        raise Ginseng::AuthError, 'だめです。'
+        raise Ginseng::AuthError, '認証エラーが起きたテイのテスト。'
       rescue Ginseng::AuthError => e
         assert_kind_of(Ginseng::AuthError, @handler.handle_alert(e))
       end
