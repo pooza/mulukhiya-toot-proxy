@@ -10,7 +10,7 @@ SELECT
 FROM
   note
   INNER JOIN "user" ON note."userId" = "user".id
-WHERE ('<%= params[:tag] %>' = any(note.tags))
+WHERE ('<%= params[:tag].downcase %>' = any(note.tags))
   AND (note.visibility = 'public')
   <% if params[:local] %>
     AND ("user".host IS null)
