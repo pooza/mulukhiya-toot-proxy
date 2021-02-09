@@ -37,7 +37,10 @@ module Mulukhiya
     end
 
     def record
-      @record ||= hash_tag_class.get(tag: tag)
+      unless @record
+        @record = hash_tag_class.get(tag: tag.downcase)
+        @record.raw_name = tag
+      end
       return @record
     end
 

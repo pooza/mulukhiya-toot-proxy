@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def feed_uri
-      @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{name}")
+      @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{raw_name}")
       return @feed_uri
     end
 
