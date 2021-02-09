@@ -136,8 +136,6 @@ mastodon:
   filter: true
   annict: true
   futured_tag: true
-  media_api:
-    version: null
   dbms: postgres
   parser: toot
   handlers:
