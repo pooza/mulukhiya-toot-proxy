@@ -20,8 +20,9 @@ html lang='ja'
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
           .inline-field-container
             input class='short' placeholder='期限(分)' v-model.number='form.program.minutes'
-          .field-container
-            v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
+          - if controller.livecure?
+            .field-container
+              v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
       section class='config' v-if='account.username && layout.sections.livecure'
