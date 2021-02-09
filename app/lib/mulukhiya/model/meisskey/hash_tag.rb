@@ -48,7 +48,7 @@ module Mulukhiya
 
       def self.get(key)
         return nil if key[:tag].nil?
-        return nil unless tag = collection.find(tag: key[:tag]).first
+        return nil unless tag = collection.find(tag: key[:tag].downcase).first
         return HashTag.new(tag['_id'])
       end
 
@@ -67,7 +67,7 @@ module Mulukhiya
           {'$sort' => {'createdAt' => -1}},
           {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
           {'$match' => {
-            'tags' => name,
+            'tags' => name.downcase,
             'visibility' => 'public',
             'user._id' => {'$ne' => test_account._id},
           }},

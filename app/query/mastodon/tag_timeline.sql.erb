@@ -14,6 +14,7 @@ FROM
 WHERE (statuses_tags.tag_id = '<%= params[:tag_id] %>')
   AND (toots.reblog_of_id IS null)
   AND (toots.visibility = 0)
+  AND (toots.deleted_at IS null)
   <% if params[:local] %>
     AND (toots.local = true)
   <% end %>

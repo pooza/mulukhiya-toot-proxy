@@ -88,6 +88,13 @@ properties:
             items:
               type: string
               format: uri
+      mail:
+        type: object
+        required:
+          - to
+        properties:
+          to:
+            type: string
   postgres:
     type: object
     required:

@@ -1,5 +1,5 @@
 package:
-  version: 4.1.0
+  version: 4.1.1
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -136,8 +136,6 @@ mastodon:
   filter: true
   annict: true
   futured_tag: true
-  media_api:
-    version: null
   dbms: postgres
   parser: toot
   handlers:

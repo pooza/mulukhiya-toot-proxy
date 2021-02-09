@@ -18,9 +18,11 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v2/media' do
+    post %r{/api/v([12])/media} do
       Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
-      @reporter.response = @sns.upload(params[:file][:tempfile].path, {version: 2})
+      @reporter.response = @sns.upload(params[:file][:tempfile].path, {
+        version: params[:captures].first.to_i,
+      })
       Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
