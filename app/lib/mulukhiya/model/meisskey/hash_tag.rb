@@ -8,10 +8,6 @@ module Mulukhiya
         return values['tag']
       end
 
-      def raw_name
-        return @raw_name || name
-      end
-
       def to_h
         unless @hash
           @hash = values.deep_symbolize_keys.merge(

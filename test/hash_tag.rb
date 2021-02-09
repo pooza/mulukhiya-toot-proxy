@@ -2,11 +2,16 @@ module Mulukhiya
   class HashTagTest < TestCase
     def setup
       @nowplaying = hash_tag_class.get(tag: 'nowplaying')
+      @nowplaying.raw_name = 'NowPlaying'
       @default = hash_tag_class.get(tag: TagContainer.default_tag_bases&.first)
     end
 
     def test_name
       assert_equal(@nowplaying.name, 'nowplaying')
+    end
+
+    def test_raw_name
+      assert_equal(@nowplaying.raw_name, 'NowPlaying')
     end
 
     def test_uri

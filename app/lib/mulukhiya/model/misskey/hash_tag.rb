@@ -6,10 +6,6 @@ module Mulukhiya
       include SNSMethods
       attr_writer :raw_name
 
-      def raw_name
-        return @raw_name || name
-      end
-
       def to_h
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
@@ -27,7 +23,7 @@ module Mulukhiya
 
       def self.get(key)
         if key.key?(:tag)
-          record = HashTag.first(name: key[:tag].downcase)
+          record = first(name: key[:tag].downcase)
           record.raw_name = key[:tag]
           return record
         end

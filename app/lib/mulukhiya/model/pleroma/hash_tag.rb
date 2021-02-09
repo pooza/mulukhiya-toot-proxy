@@ -11,10 +11,6 @@ module Mulukhiya
         @name = name
       end
 
-      def raw_name
-        return @raw_name || name
-      end
-
       def to_h
         return {
           name: name.to_hashtag_base,

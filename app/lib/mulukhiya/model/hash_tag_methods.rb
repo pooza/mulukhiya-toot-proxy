@@ -1,5 +1,9 @@
 module Mulukhiya
   module HashTagMethods
+    def raw_name
+      return @raw_name || name
+    end
+
     def uri
       @uri ||= Environment.sns_class.new.create_uri("/tags/#{name}")
       return @uri
