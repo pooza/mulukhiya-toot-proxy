@@ -18,9 +18,11 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v2/media' do
+    post %r{/api/v([12])/media} do
       Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
-      @reporter.response = @sns.upload(params[:file][:tempfile].path, {version: 2})
+      @reporter.response = @sns.upload(params[:file][:tempfile].path, {
+        version: media_api_default_version || params[:captures].first.to_i,
+      })
       Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)
       @renderer.status = @reporter.response.code
@@ -88,6 +90,10 @@ module Mulukhiya
       end
       @renderer.status = @reporter.response.code
       return @renderer.to_s
+    end
+
+    def media_api_default_version
+      return config['/mastodon/media_api/version'] rescue nil
     end
 
     def token
