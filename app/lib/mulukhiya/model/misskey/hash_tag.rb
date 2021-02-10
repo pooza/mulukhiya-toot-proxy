@@ -4,11 +4,12 @@ module Mulukhiya
       include Package
       include HashTagMethods
       include SNSMethods
+      attr_writer :raw_name
 
       def to_h
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
-            tag: name.to_hashtag,
+            tag: raw_name.to_hashtag,
             url: uri.to_s,
             feed_url: feed_uri.to_s,
           )
@@ -21,8 +22,12 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return HashTag.first(name: key[:tag].downcase) if key.key?(:tag)
-        return HashTag.first(key.downcase)
+        if key.key?(:tag)
+          record = first(name: key[:tag].downcase)
+          record.raw_name = key[:tag]
+          return record
+        end
+        return first(key)
       end
     end
   end

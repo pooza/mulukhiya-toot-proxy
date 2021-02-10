@@ -2,6 +2,7 @@ module Mulukhiya
   module Meisskey
     class HashTag < MongoCollection
       include HashTagMethods
+      attr_writer :raw_name
 
       def name
         return values['tag']
@@ -11,7 +12,7 @@ module Mulukhiya
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
             name: name.to_hashtag_base,
-            tag: name.to_hashtag,
+            tag: raw_name.to_hashtag,
             url: uri.to_s,
             feed_url: feed_uri.to_s,
           )
@@ -49,7 +50,9 @@ module Mulukhiya
       def self.get(key)
         return nil if key[:tag].nil?
         return nil unless tag = collection.find(tag: key[:tag].downcase).first
-        return HashTag.new(tag['_id'])
+        record = HashTag.new(tag['_id'])
+        record.raw_name = key[:tag]
+        return record
       end
 
       def self.first(key)
@@ -67,7 +70,7 @@ module Mulukhiya
           {'$sort' => {'createdAt' => -1}},
           {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
           {'$match' => {
-            'tags' => name.downcase,
+            'tags' => raw_name,
             'visibility' => 'public',
             'user._id' => {'$ne' => test_account._id},
           }},

@@ -1,5 +1,5 @@
 package:
-  version: 4.1.1
+  version: 4.1.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -58,9 +58,6 @@ handler:
     disable: true
   amazon_url_nowplaying:
     disable: true
-  good_morning:
-    disable: true
-    pattern: おはようございます。
   attachment_reusing:
     disable: true
 worker:
@@ -170,7 +167,6 @@ mastodon:
       - filter_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - good_morning
       - result_notification
     pre_webhook:
       - itunes_nowplaying
@@ -283,7 +279,6 @@ misskey:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - good_morning
       - result_notification
     pre_webhook:
       - itunes_nowplaying
@@ -394,7 +389,6 @@ meisskey:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - good_morning
       - result_notification
     pre_webhook:
       - itunes_nowplaying
@@ -502,7 +496,6 @@ pleroma:
       - user_config_command
       - growi_clipping_command
       - dropbox_clipping_command
-      - good_morning
       - result_notification
     pre_webhook:
       - itunes_nowplaying
