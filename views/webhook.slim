@@ -14,7 +14,12 @@ html lang='ja'
           h3 URL
           textarea ref='webhook_url_text' = '{{url}}'
           i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
-          .alert このURLを公開してはいけません。パスワードと同じと思って、厳重に管理してください。
+          .alert このURLを公開してはいけません。
+        .field-container
+          h3 平文トークン
+          textarea ref='token_text' = '{{token}}'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyToken'
+          .alert このトークンを公開してはいけません。
         .field-container
           h3 詳細
           p
@@ -31,6 +36,7 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
+          token: null,
           url: null,
         },
         mounted: function () {
@@ -38,11 +44,16 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.url = Vue.dig(e, 'webhook', 'url')
+              this.token = Vue.dig(e, 'config', 'mulukhiya', 'token') || Vue.dig(e, 'config', 'webhook', 'token')
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           copyWebhookURL: function () {
             this.$refs.webhook_url_text.select()
+            document.execCommand('copy')
+          },
+          copyToken: function () {
+            this.$refs.token_text.select()
             document.execCommand('copy')
           },
         },

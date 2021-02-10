@@ -126,17 +126,17 @@ const MulukhiyaLib = {
       indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
         return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
-          .then(e => accounts.push(Vue.createAccountInfo(e.data)))
+          .then(e => accounts.push(Vue.createAccountInfo(e.data, t)))
           .catch(e => accounts.push({token: t, error: Vue.createErrorMessage(e)}))
           .finally(e => indicator.increment)
       })).then(e => accounts)
       .finally(e => indicator.hide())
     }
 
-    Vue.createAccountInfo = data => {
+    Vue.createAccountInfo = (data, token_crypted) => {
       return {
         username: data.account.username,
-        token: data.config.mulukhiya.token || data.config.webhook.token,
+        token: token_crypted,
         scopes: data.token.scopes.join(', '),
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,
