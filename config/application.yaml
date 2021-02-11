@@ -739,6 +739,8 @@ media:
 postgres:
   dsn: null
   query_log: false
+  slow_query:
+    seconds: 3
 mongo:
   dsn: null
   query_log: false
