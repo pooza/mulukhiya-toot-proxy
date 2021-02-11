@@ -1,11 +1,12 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b895dc8e83145cd03b6399efbacc330dc0d18592
+  revision: ec27f50f73feb430cdf959bb10f7c22b84012333
   specs:
-    ginseng-core (1.10.2)
+    ginseng-core (1.10.3)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
+      facets
       httparty
       json-schema
       mail
@@ -148,6 +149,7 @@ GEM
     erubi (1.10.0)
     et-orbi (1.2.4)
       tzinfo
+    facets (3.1.0)
     faraday (1.3.0)
       faraday-net_http (~> 1.0)
       multipart-post (>= 1.2, < 3)
@@ -340,6 +342,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  ruby
   x86_64-darwin-20
   x86_64-freebsd-12
   x86_64-linux
