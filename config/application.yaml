@@ -780,6 +780,7 @@ puma:
 tagging:
   user_tags:
     extra_minutes: 2
+    clear_message: 固定タグをクリアしました。
   word:
     minimum_length: 3
   media:
