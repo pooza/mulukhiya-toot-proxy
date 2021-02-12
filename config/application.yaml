@@ -739,6 +739,8 @@ media:
 postgres:
   dsn: null
   query_log: false
+  slow_query:
+    seconds: 3
 mongo:
   dsn: null
   query_log: false
@@ -778,6 +780,7 @@ puma:
 tagging:
   user_tags:
     extra_minutes: 2
+    clear_message: 固定タグをクリアしました。
   word:
     minimum_length: 3
   media:
