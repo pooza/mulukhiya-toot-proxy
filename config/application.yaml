@@ -683,11 +683,11 @@ twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 nowplaying:
   album:
-    prefix: 'Album: '
+    prefix: 'Album:'
   track:
-    prefix: 'Title: '
+    prefix: 'Title:'
   artist:
-    prefix: 'Artist: '
+    prefix: 'Artist:'
     parser:
       delimiter:
         pattern: '[/、]'
