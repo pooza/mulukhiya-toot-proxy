@@ -300,15 +300,15 @@ misskey:
     post_webhook:
       - result_notification
     pre_chat:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -410,15 +410,15 @@ meisskey:
     post_webhook:
       - result_notification
     pre_chat:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -519,15 +519,15 @@ pleroma:
     post_webhook:
       - result_notification
     pre_chat:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
       - spotify_url
       - amazon_url
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
@@ -681,54 +681,62 @@ bandai_channel:
     - pattern: ^/titles/([[:digit:]]+)/?([[:digit:]]+)?$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
-artist_parser:
-  delimiter_pattern: '[/、]'
-  patterns:
-    - pattern: ^[^():]+[/、]
-      delimited: true
-    - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
-      delimited: true
-    - pattern: '^(.+\s*\(.+\)、?){2,}$'
-      delimited: true
-    - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
-      items:
-        - drop: true
-        - drop: true
-        - split: true
-        - strip: true
-          split: true
-          prefix: 'CV:'
-    - pattern: '^歌:(.+)\s*コーラス:(.+)$'
-      items:
-        - split: true
-        - strip: true
-          split: true
-          prefix: 'コーラス:'
-    - pattern: '^歌:(.+)$'
-      items:
-        - split: true
-    - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
-      items:
-        - split: true
-        - strip: true
-          split: true
-          prefix: 'コーラス:'
-    - pattern: '^(.+)\s*\(as\s*(.+)\)$'
-      items:
-        - strip: true
-          prefix: 'CV:'
-        - split: true
-    - pattern: '^(.+)\s*\((.+)\)$'
-      items:
-        - split: true
-        - strip: true
-          split: true
-    - pattern: '^(.+)\s*feat\.\s*(.+)$'
-      items:
-        - split: true
-        - strip: true
-          split: true
-          prefix: feat.
+nowplaying:
+  album:
+    prefix: 'Album: '
+  track:
+    prefix: 'Title: '
+  artist:
+    prefix: 'Artist: '
+    parser:
+      delimiter:
+        pattern: '[/、]'
+      patterns:
+        - pattern: ^[^():]+[/、]
+          delimited: true
+        - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
+          delimited: true
+        - pattern: '^(.+\s*\(.+\)、?){2,}$'
+          delimited: true
+        - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
+          items:
+            - drop: true
+            - drop: true
+            - split: true
+            - strip: true
+              split: true
+              prefix: 'CV:'
+        - pattern: '^歌:(.+)\s*コーラス:(.+)$'
+          items:
+            - split: true
+            - strip: true
+              split: true
+              prefix: 'コーラス:'
+        - pattern: '^歌:(.+)$'
+          items:
+            - split: true
+        - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
+          items:
+            - split: true
+            - strip: true
+              split: true
+              prefix: 'コーラス:'
+        - pattern: '^(.+)\s*\(as\s*(.+)\)$'
+          items:
+            - strip: true
+              prefix: 'CV:'
+            - split: true
+        - pattern: '^(.+)\s*\((.+)\)$'
+          items:
+            - split: true
+            - strip: true
+              split: true
+        - pattern: '^(.+)\s*feat\.\s*(.+)$'
+          items:
+            - split: true
+            - strip: true
+              split: true
+              prefix: feat.
 user_config:
   redis:
     dsn: redis://localhost:6379/1

@@ -42,8 +42,9 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push(uri.title.escape_toot)
-      push(uri.artists.map(&:escape_toot).join(', '))
+      push("#{config['/nowplaying/track/prefix']} #{uri.track_name.escape_toot}") if uri.track?
+      push("#{config['/nowplaying/album/prefix']} #{uri.album_name.escape_toot}") if uri.album_name
+      push("#{config['/nowplaying/artist/prefix']} #{uri.artists.map(&:escape_toot).join(', ')}")
       tags.concat(uri.artists)
       result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e

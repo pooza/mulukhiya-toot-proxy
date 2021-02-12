@@ -47,7 +47,7 @@ module Mulukhiya
 
     def patterns
       return enum_for(__method__) unless block_given?
-      config['/artist_parser/patterns'].each do |entry|
+      config['/nowplaying/artist/parser/patterns'].each do |entry|
         output = {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def delimiters
-      return Regexp.new(config['/artist_parser/delimiter_pattern'])
+      return Regexp.new(config['/nowplaying/artist/parser/delimiter/pattern'])
     end
   end
 end

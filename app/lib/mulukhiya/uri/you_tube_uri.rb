@@ -6,10 +6,18 @@ module Mulukhiya
       return nil
     end
 
-    alias track data
+    def album?
+      return false
+    end
 
     def album_name
       return nil
+    end
+
+    alias track data
+
+    def track?
+      return track.present?
     end
 
     alias track_name title

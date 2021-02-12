@@ -52,11 +52,25 @@ module Mulukhiya
       return @album
     end
 
+    def album?
+      return album_id.present? && track_id.nil?
+    end
+
+    def album_name
+      return album&.dig('collectionName')
+    end
+
     def track_id
       return nil unless query_values['i']
       return query_values['i'].to_i
     rescue NoMethodError
       return nil
+    end
+
+    alias id track_id
+
+    def track?
+      return album_id.present? && track_id.present?
     end
 
     def track_id=(id)
@@ -68,8 +82,6 @@ module Mulukhiya
       self.fragment = nil
     end
 
-    alias id track_id
-
     def track
       return nil unless itunes?
       return nil unless track_id
@@ -77,16 +89,12 @@ module Mulukhiya
       return @track
     end
 
-    def title
-      return track_name || album_name
-    end
-
-    def album_name
-      return album&.dig('collectionName')
-    end
-
     def track_name
       return track&.dig('trackName')
+    end
+
+    def title
+      return track_name || album_name
     end
 
     def artists
