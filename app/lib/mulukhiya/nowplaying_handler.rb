@@ -42,9 +42,9 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push("#{config['/nowplaying/track/prefix']} #{uri.track_name.escape_toot}") if uri.track?
-      push("#{config['/nowplaying/album/prefix']} #{uri.album_name.escape_toot}") if uri.album_name
-      push("#{config['/nowplaying/artist/prefix']} #{uri.artists.map(&:escape_toot).join(', ')}")
+      push("#{track_prefix} #{uri.track_name.escape_toot}") if uri.track?
+      push("#{album_prefix} #{uri.album_name.escape_toot}") if uri.album_name
+      push("#{artist_prefix} #{uri.artists.map(&:escape_toot).join(', ')}")
       tags.concat(uri.artists)
       result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e
@@ -56,6 +56,18 @@ module Mulukhiya
     end
 
     private
+
+    def track_prefix
+      return config['/nowplaying/track/prefix']
+    end
+
+    def album_prefix
+      return config['/nowplaying/album/prefix']
+    end
+
+    def artist_prefix
+      return config['/nowplaying/artist/prefix']
+    end
 
     def push(line)
       line.chomp!
