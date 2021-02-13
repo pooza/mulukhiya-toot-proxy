@@ -3,6 +3,7 @@ require 'time'
 module Mulukhiya
   class AnnictService
     include Package
+    include SNSMethods
     attr_reader :timestamps, :accounts
 
     def initialize(token = nil)
@@ -123,8 +124,6 @@ module Mulukhiya
           times.push(Time.parse(record['created_at']))
           records.push(record)
           params[:webhook]&.post(create_payload(record, key)) unless params[:dryrun]
-        rescue => e
-          logger.error(error: e, token: @token)
         end
       end
       self.updated_at = times.max if times.present? && !params[:dryrun]
@@ -211,6 +210,9 @@ module Mulukhiya
       results = {}
       accounts.each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
+      rescue => e
+        logger.error(error: e, acct: account.acct.to_s)
+        info_agent_service.notify(account, "Annict接続中に、エラーが発生しました。 (#{e.message})")
       ensure
         bar&.increment
       end
