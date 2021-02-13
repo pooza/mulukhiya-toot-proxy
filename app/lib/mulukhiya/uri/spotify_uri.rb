@@ -67,28 +67,36 @@ module Mulukhiya
       self.path = "/album/#{id}"
     end
 
-    def track
-      return nil unless spotify?
-      return nil unless track_id.present?
-      return @spotify.lookup_track(track_id)
-    end
-
     def album
       return nil unless spotify?
       return @spotify.lookup_album(album_id) if album_id
       return track&.album
     end
 
-    def title
-      return track_name || album_name
+    def album?
+      return album_id.present?
     end
 
     def album_name
       return album&.name
     end
 
+    def track
+      return nil unless spotify?
+      return nil unless track_id.present?
+      return @spotify.lookup_track(track_id)
+    end
+
+    def track?
+      return track_id.present?
+    end
+
     def track_name
       return track&.name
+    end
+
+    def title
+      return track_name || album_name
     end
 
     def artists

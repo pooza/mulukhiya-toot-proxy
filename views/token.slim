@@ -45,18 +45,19 @@ html lang='ja'
             .description
               a href=params[:oauth_url] #{controller.display_name}の認証ページ
               | で認証を行って、新しいトークンを登録します。
-        - if controller.oauth_webui_uri
-          .token v-if='account.is_admin'
-            | 既存のトークンを登録
-            .description
+        .token
+          | 既存のトークンを登録
+          .description 他のPCに登録されている暗号化トークンを入力して、登録ボタンを押下してください。
+          - if controller.oauth_webui_uri
+            .description v-if='account.is_admin'
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
-              | で作成した既存のトークンを、bin/crypt.rbで暗号化して登録してください。
-              | また、以下の権限を含むものにしてください。
-            .field
+              | で作成したトークンを、bin/crypt.rbで暗号化して登録することもできます。
+              | 以下の権限を含むものにしてください。
+            .field v-if='account.is_admin'
               .title 権限:
               .value #{controller.oauth_default_scopes.join(', ')}
-            input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
-            button :disabled='!input.token' @click='registerToken' 登録
+          input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
+          button :disabled='!input.token' @click='registerToken' 登録
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

@@ -1,119 +1,101 @@
 module Mulukhiya
   class SpotifyURITest < TestCase
+    def setup
+      @google = SpotifyURI.parse('https://google.com')
+      @root = SpotifyURI.parse('https://spotify.com')
+      @track = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
+      @album = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
+      @link = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
+    end
+
     def test_spotify?
-      uri = SpotifyURI.parse('https://google.com')
-      assert_false(uri.spotify?)
-
-      uri = SpotifyURI.parse('https://spotify.com')
-      assert(uri.spotify?)
-
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert(uri.spotify?)
-
-      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
-      assert_false(uri.spotify?)
+      assert_false(@google.spotify?)
+      assert(@root.spotify?)
+      assert(@track.spotify?)
+      assert(@album.spotify?)
+      assert_false(@link.spotify?)
     end
 
     def test_shortenable?
-      uri = SpotifyURI.parse('https://google.com')
-      assert_false(uri.shortenable?)
-
-      uri = SpotifyURI.parse('https://spotify.com')
-      assert_false(uri.shortenable?)
-
-      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
-      assert(uri.shortenable?)
+      assert_false(@google.shortenable?)
+      assert_false(@root.shortenable?)
+      assert_false(@track.shortenable?)
+      assert_false(@album.shortenable?)
+      assert(@link.shortenable?)
     end
 
     def test_shorten
-      uri = SpotifyURI.parse('https://google.com')
-      assert_nil(uri.shorten)
+      assert_nil(@google.shorten)
+      assert_nil(@root.shorten)
+      assert_nil(@track.shorten)
+      assert_nil(@album.shorten)
+      assert_equal(@link.shorten.to_s, 'https://open.spotify.com/track/3L6K6hTLVjVhiTdsMEaWii')
+    end
 
-      uri = SpotifyURI.parse('https://spotify.com')
-      assert_nil(uri.shorten)
-
-      uri = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
-      assert_equal(uri.shorten.to_s, 'https://open.spotify.com/track/3L6K6hTLVjVhiTdsMEaWii')
+    def test_track_id
+      assert_nil(@root.track_id)
+      assert_equal(@track.track_id, '7f47OJZ6x9EZ4G2ZWOOlQZ')
+      assert_nil(@album.track_id)
     end
 
     def test_track
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.track_id)
-      assert_nil(uri.track)
+      assert_nil(@root.track)
+      assert_kind_of(RSpotify::Track, @track.track)
+      assert_nil(@album.track)
+    end
 
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_equal(uri.track_id, '7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_kind_of(RSpotify::Track, uri.track)
+    def test_track?
+      assert_false(@root.track?)
+      assert(@track.track?)
+      assert_false(@album.track?)
+    end
 
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_nil(uri.track_id)
-      assert_nil(uri.track)
+    def test_album_id
+      assert_nil(@root.album_id)
+      assert_nil(@track.album_id)
+      assert_equal(@album.album_id, '7xtiD9nNWrbbAtbbInNllD')
     end
 
     def test_album
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.album_id)
-      assert_nil(uri.album)
+      assert_nil(@root.album)
+      assert_kind_of(RSpotify::Album, @track.album)
+      assert_kind_of(RSpotify::Album, @album.album)
+    end
 
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_nil(uri.album_id)
-      assert_kind_of(RSpotify::Album, uri.album)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_equal(uri.album_id, '7xtiD9nNWrbbAtbbInNllD')
-      assert_kind_of(RSpotify::Album, uri.album)
+    def test_album?
+      assert_false(@root.album?)
+      assert_false(@track.album?)
+      assert(@album.album?)
     end
 
     def test_title
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.title)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_equal(uri.title, 'ガンバランスdeダンス ~夢みる奇跡たち~')
-
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_equal(uri.title, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+      assert_nil(@root.title)
+      assert_equal(@track.title, 'ガンバランスdeダンス ~夢みる奇跡たち~')
+      assert_equal(@album.title, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
     end
 
     def test_album_name
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.album_name)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_equal(uri.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
-
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_equal(uri.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+      assert_nil(@root.album_name)
+      assert_equal(@track.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+      assert_equal(@album.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
     end
 
     def test_track_name
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.track_name)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_equal(uri.track_name, 'ガンバランスdeダンス ~夢みる奇跡たち~')
-
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_nil(uri.track_name)
+      assert_nil(@root.track_name)
+      assert_equal(@track.track_name, 'ガンバランスdeダンス ~夢みる奇跡たち~')
+      assert_nil(@album.track_name)
     end
 
     def test_artists
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.artists)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
-      assert_equal(uri.artists, ['宮本佳那子'])
-
-      uri = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      assert_equal(uri.artists, ['ヴァリアス・アーティスト'])
+      assert_nil(@root.artists)
+      assert_equal(@track.artists, ['宮本佳那子'])
+      assert_equal(@album.artists, ['ヴァリアス・アーティスト'])
     end
 
     def test_image_uri
-      uri = SpotifyURI.parse('https://open.spotify.com')
-      assert_nil(uri.image_uri)
-
-      uri = SpotifyURI.parse('https://open.spotify.com/track/2j7bBkmzkl2Yz6oAsHozX0')
-      assert_kind_of(Ginseng::URI, uri.image_uri)
+      assert_nil(@root.image_uri)
+      assert_kind_of(Ginseng::URI, @track.image_uri)
+      assert_nil(@album.image_uri)
     end
   end
 end

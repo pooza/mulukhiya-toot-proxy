@@ -75,6 +75,12 @@ module Mulukhiya
       def sns_class
         return Environment.sns_class
       end
+
+      def info_agent_service
+        service = Environment.sns_service_class.new
+        service.token = Environment.account_class.info_token
+        return service
+      end
     end
   end
 end
