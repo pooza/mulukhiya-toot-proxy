@@ -26,7 +26,7 @@ module Mulukhiya
 
     def handler_names(&block)
       return enum_for(__method__) unless block
-      config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
+      return config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 
     def reporter

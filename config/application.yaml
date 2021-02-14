@@ -145,6 +145,7 @@ mastodon:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -172,6 +173,7 @@ mastodon:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - amazon_image
@@ -261,6 +263,7 @@ misskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - bandai_channel_image
       - attachment_reusing
       - shortened_url
@@ -284,6 +287,7 @@ misskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - webhook_image
       - bandai_channel_image
       - shortened_url
@@ -303,6 +307,7 @@ misskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -372,6 +377,7 @@ meisskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - bandai_channel_image
       - shortened_url
       - url_normalize
@@ -394,6 +400,7 @@ meisskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - webhook_image
       - bandai_channel_image
       - shortened_url
@@ -413,6 +420,7 @@ meisskey:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -477,6 +485,7 @@ pleroma:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - amazon_image
       - you_tube_image
       - bandai_channel_image
@@ -501,6 +510,7 @@ pleroma:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - amazon_image
       - you_tube_image
       - bandai_channel_image
@@ -522,6 +532,7 @@ pleroma:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
+      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -609,6 +620,9 @@ spotify:
       type: track
     - pattern: /album/([[:alnum:]]+)
       type: album
+songwhip:
+  urls:
+    api: https://songwhip.com/
 annict:
   urls:
     oauth: https://annict.jp
