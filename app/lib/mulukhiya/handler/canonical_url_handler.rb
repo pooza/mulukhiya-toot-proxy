@@ -29,9 +29,10 @@ module Mulukhiya
       return false if ignore?(canonical)
       @canonicals[uri.to_s] = canonical
       return true
+    rescue Ginseng::GatewayError
+      return false
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
-      return false
     end
 
     def ignore?(uri)
