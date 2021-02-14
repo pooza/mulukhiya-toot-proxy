@@ -11,11 +11,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://4sq.com/2NYeZb6')
-      assert_equal(@handler.debug_info[:errors].first, {
-        class: 'Ginseng::GatewayError',
-        message: 'Bad response 403',
-        url: 'https://4sq.com/2NYeZb6',
-      })
+      assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.youtube.com/watch?v=Lvinns9DJs0&feature=youtu.be&t=2252')
