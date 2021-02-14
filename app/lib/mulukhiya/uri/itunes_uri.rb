@@ -98,9 +98,12 @@ module Mulukhiya
     end
 
     def artists
-      return ArtistParser.new(track['artistName']).parse if track
-      return ArtistParser.new(album['artistName']).parse if album
-      return nil
+      name = track['artistName'] if track
+      name ||= album['artistName'] if album
+      return nil if name.nil?
+      names = ArtistParser.new(name).parse
+      names = [name] unless names.present?
+      return names
     end
 
     def image_uri

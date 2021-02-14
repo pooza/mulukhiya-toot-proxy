@@ -21,11 +21,10 @@ module Mulukhiya
         end
         return tags
       end
-      tags.push(@source)
-      return tags
+      return [@source]
     rescue => e
       logger.error(error: e)
-      return []
+      return [@source]
     end
 
     alias exec parse
