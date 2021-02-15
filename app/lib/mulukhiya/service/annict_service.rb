@@ -212,7 +212,6 @@ module Mulukhiya
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
         logger.error(error: e, acct: account.acct.to_s)
-        info_agent_service.notify(account, "Annict接続中に、エラーが発生しました。 (#{e.message})")
       ensure
         bar&.increment
       end
