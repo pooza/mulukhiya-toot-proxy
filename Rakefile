@@ -3,5 +3,5 @@ $LOAD_PATH.unshift(File.join(dir, 'app/lib'))
 ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
-ENV['RAKE'] = Package.full_name
+ENV['RAKE'] = Mulukhiya::Package.full_name
 Mulukhiya.load_tasks
