@@ -17,8 +17,6 @@ handler:
     disable: true
   amazon_nowplaying:
     disable: true
-  amazon_url:
-    timeout: 10
   amazon_url_nowplaying:
     disable: true
   attachment_reusing:
@@ -43,8 +41,6 @@ handler:
     type: image/jpeg
   itunes_image:
     pixel: 480
-    timeout: 10
-  itunes_url:
     timeout: 10
   shortened_url:
     domains:
