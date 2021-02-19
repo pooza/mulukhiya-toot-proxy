@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: ec27f50f73feb430cdf959bb10f7c22b84012333
+  revision: 8c2767d09fbc273756975cf0625beb9d88bb2bb8
   specs:
-    ginseng-core (1.10.3)
+    ginseng-core (1.10.7)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -21,9 +21,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 289e58cea0f2a44a32d3af8e5aa425dc29c244b7
+  revision: a27ea6c2637b332c8eeb1ff87c0efaed7fee9b5d
   specs:
-    ginseng-fediverse (1.5.3)
+    ginseng-fediverse (1.5.4)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -73,20 +73,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (6.1.2.1)
-      actionview (= 6.1.2.1)
-      activesupport (= 6.1.2.1)
+    actionpack (6.1.3)
+      actionview (= 6.1.3)
+      activesupport (= 6.1.3)
       rack (~> 2.0, >= 2.0.9)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (6.1.2.1)
-      activesupport (= 6.1.2.1)
+    actionview (6.1.3)
+      activesupport (= 6.1.3)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (6.1.2.1)
+    activesupport (6.1.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -132,7 +132,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
       dry-types (~> 1.5)
-    dry-types (1.5.0)
+    dry-types (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.5, >= 0.5)
@@ -222,7 +222,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    omniauth (2.0.2)
+    omniauth (2.0.3)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
       rack-protection

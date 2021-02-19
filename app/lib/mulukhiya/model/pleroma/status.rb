@@ -11,10 +11,7 @@ module Mulukhiya
       end
 
       def data
-        unless @data
-          @data = PleromaService.new.fetch_status(id).parsed_response
-          @data.deep_symbolize_keys!
-        end
+        @data ||= PleromaService.new.fetch_status(id).parsed_response.deep_symbolize_keys
         return @data
       end
 
