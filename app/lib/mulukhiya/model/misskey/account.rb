@@ -5,6 +5,7 @@ module Mulukhiya
       include AccountMethods
       include SNSMethods
       one_to_one :account_profile, key: :userId
+      one_to_many :attachment, key: :userId
 
       def to_h
         unless @hash
@@ -69,6 +70,19 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, acct: acct.to_s)
         return []
+      end
+
+      alias attachments attachment
+
+      def clear_attachments
+        bar = ProgressBar.create(total: attachments.count) if Environment.rake?
+        attachments.each do |attachment|
+          service.delete_attachment(attachment)
+        ensure
+          bar&.increment
+        end
+        bar&.finish
+        logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
       end
 
       alias admin? isAdmin

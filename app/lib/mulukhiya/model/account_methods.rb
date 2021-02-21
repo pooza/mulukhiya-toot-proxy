@@ -103,6 +103,10 @@ module Mulukhiya
       logger.error(error: e, acct: acct.to_s)
     end
 
+    def clear_attachments
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
     def self.included(base)
       base.extend(Methods)
     end
