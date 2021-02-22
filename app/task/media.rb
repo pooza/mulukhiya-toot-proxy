@@ -11,6 +11,11 @@ namespace :mulukhiya do
         Mulukhiya::Environment.account_class.test_account.clear_attachments
       end
 
+      desc 'clean attachment records of test user (dryrun)'
+      task :clean_dryrun do
+        Mulukhiya::Environment.account_class.test_account.clear_attachments(dryrun: true)
+      end
+
       task clear: [:clean]
     end
 

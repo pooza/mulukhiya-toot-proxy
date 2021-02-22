@@ -74,17 +74,6 @@ module Mulukhiya
 
       alias attachments attachment
 
-      def clear_attachments
-        bar = ProgressBar.create(total: attachments.count) if Environment.rake?
-        attachments.each do |attachment|
-          service.delete_attachment(attachment)
-        ensure
-          bar&.increment
-        end
-        bar&.finish
-        logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
-      end
-
       alias admin? isAdmin
 
       alias moderator? isModerator

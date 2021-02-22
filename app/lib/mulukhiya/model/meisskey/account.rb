@@ -80,6 +80,19 @@ module Mulukhiya
         return isLocked == true
       end
 
+      def attachments
+        unless @attachments
+          @attachments = []
+          rows = Status.collection.aggregate([
+            {'$match' => {'userId' => _id, 'fileIds' => {'$nin' => [[], nil]}}},
+          ])
+          rows.each do |row|
+            @attachments.concat(row[:_files].map {|f| Attachment[f[:_id]]})
+          end
+        end
+        return @attachments
+      end
+
       def self.[](id)
         return Account.new(id)
       end
