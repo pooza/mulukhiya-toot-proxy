@@ -5,6 +5,7 @@ module Mulukhiya
       include AccountMethods
       include SNSMethods
       one_to_one :account_profile, key: :userId
+      one_to_many :attachment, key: :userId
 
       def to_h
         unless @hash
@@ -70,6 +71,8 @@ module Mulukhiya
         logger.error(error: e, acct: acct.to_s)
         return []
       end
+
+      alias attachments attachment
 
       alias admin? isAdmin
 

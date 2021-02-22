@@ -103,6 +103,29 @@ module Mulukhiya
       logger.error(error: e, acct: acct.to_s)
     end
 
+    def attachments
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def clear_attachments(params = {})
+      raise Ginseng::AuthError, 'Only test users can run it' unless test?
+      puts "delete #{attachments.count.commaize} attachments"
+      bar = ProgressBar.create(total: attachments.count) if Environment.rake?
+      attachments.each do |attachment|
+        service.delete_attachment(attachment) unless params[:dryrun]
+      rescue => e
+        logger.error(error: e, acct: acct.to_s)
+      ensure
+        bar&.increment
+      end
+      bar&.finish
+      logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
+    end
+
+    def test?
+      return Environment.account_class.test_account.id == id
+    end
+
     def self.included(base)
       base.extend(Methods)
     end
