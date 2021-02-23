@@ -4,7 +4,6 @@ module Mulukhiya
 
     post '/api/notes/create' do
       Event.new(:pre_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
-      params.delete(status_field) if params[status_field].empty?
       @reporter.response = @sns.note(params)
       Event.new(:post_toot, {reporter: @reporter, sns: @sns}).dispatch(params) unless renote?
       @renderer.message = @reporter.response.parsed_response
