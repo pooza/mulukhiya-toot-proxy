@@ -11,9 +11,5 @@ namespace :mulukhiya do
         puts "#{dic.count} tags"
       end
     end
-
-    namespace :dictionary do
-      task update: ['mulukhiya:tagging:dic:update']
-    end
   end
 end
