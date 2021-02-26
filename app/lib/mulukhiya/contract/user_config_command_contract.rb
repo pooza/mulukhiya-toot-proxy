@@ -2,7 +2,6 @@ module Mulukhiya
   class UserConfigCommandContract < Contract
     json do
       required(:command).value(:string)
-      required(:tags).maybe(:array).each(:string)
       required(:webhook).maybe(:hash).schema do
         optional(:token).maybe(:string)
         optional(:visibility).maybe(:string)
