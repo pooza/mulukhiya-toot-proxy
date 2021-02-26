@@ -21,9 +21,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7e68cba19107f572911f9a1832907335e34429ed
+  revision: 87cb7b2e97bb7d0329682698420d440e84d74cd0
   specs:
-    ginseng-fediverse (1.5.6)
+    ginseng-fediverse (1.5.7)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -260,7 +260,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.2.5)
-    regexp_parser (2.0.3)
+    regexp_parser (2.1.1)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
