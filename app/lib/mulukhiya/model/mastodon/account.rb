@@ -5,6 +5,7 @@ module Mulukhiya
       include AccountMethods
       include SNSMethods
       one_to_one :user
+      one_to_many :attachment, key: :account_id
       attr_accessor :token
 
       def to_h
@@ -58,6 +59,8 @@ module Mulukhiya
       def bio
         return note || ''
       end
+
+      alias attachments attachment
 
       def admin?
         return user.admin

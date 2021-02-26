@@ -10,6 +10,16 @@ module Mulukhiya
       return super
     end
 
+    def delete_attachment(attachment, params = {})
+      attachment = Environment.attachment_class[attachment] if attachment.is_a?(Integer)
+      return delete_status(attachment.status, params) if attachment.status
+    end
+
+    def delete_status(status, params = {})
+      status = status.id if status.is_a?(Environment.status_class)
+      return super
+    end
+
     def search(keyword, params = {})
       params[:limit] ||= config['/mastodon/search/limit']
       return super
