@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 5f17a73c411a4ca4956a1ee4e59e7e5b76e400c8
+  revision: 04087e2d68324b5a63a5d3ad07b0ba9017b5b208
   specs:
-    ginseng-core (1.10.8)
+    ginseng-core (1.10.9)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -196,7 +196,7 @@ GEM
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
-    minitest (5.14.3)
+    minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
