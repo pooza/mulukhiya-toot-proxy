@@ -324,7 +324,6 @@ misskey:
       - result_notification
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -438,7 +437,6 @@ meisskey:
       - result_notification
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -551,7 +549,6 @@ pleroma:
       - result_notification
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
