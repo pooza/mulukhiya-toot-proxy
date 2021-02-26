@@ -1,8 +1,7 @@
 module Mulukhiya
-  class SlackAlertHandler < Handler
-    def handle_alert(error, params = {})
+  class SlackAlertHandler < AlertHandler
+    def alert(error, params = {})
       SlackService.broadcast(error.to_h)
-      return error
     end
 
     def disable?

@@ -1,9 +1,7 @@
 module Mulukhiya
-  class LineAlertHandler < Handler
-    def handle_alert(error, params = {})
-      error.package = Package.full_name
+  class LineAlertHandler < AlertHandler
+    def alert(error, params = {})
       LineService.new.say(config['/alert/line/to'], error.to_h)
-      return error
     end
 
     def disable?
