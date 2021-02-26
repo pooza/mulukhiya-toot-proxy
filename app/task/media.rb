@@ -1,10 +1,5 @@
 namespace :mulukhiya do
   namespace :media do
-    desc 'clean media file cache (deprecated)'
-    task clean: 'file:clean'
-
-    task clear: 'file:clean'
-
     namespace :record do
       desc 'clean attachment records of test user'
       task :clean do
