@@ -24,6 +24,9 @@ alert:
       - https://discordapp.com/api/webhooks/xxxxx/slack
   mail:
     to: admin@example.com
+handler:
+  image_format_convert:
+    type: image/webp
 tagging:
   default_tags:
     - デフォルトタグ1

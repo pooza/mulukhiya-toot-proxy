@@ -51,6 +51,11 @@ module Mulukhiya
       return
     end
 
+    def recommended_name
+      @recommended_name ||= File.basename(path, File.extname(path)) + recommended_extname
+      return @recommended_name
+    end
+
     def type
       return mimemagic.to_s
     end
@@ -70,7 +75,7 @@ module Mulukhiya
       return extname == recommended_extname
     end
 
-    alias valid_exename? recommended_extname?
+    alias valid_extname? recommended_extname?
 
     def width
       return nil
