@@ -34,13 +34,20 @@ module Mulukhiya
 
     def self.clear_tags
       bar = ProgressBar.create(total: accounts.count) if Environment.rake?
-      accounts do |account|
-        next unless account.user_config['/tagging/user_tags'].present?
+      tag_owners do |account|
         account.user_config.clear_tags
       ensure
         bar&.increment
       end
       bar&.finish
+    end
+
+    def self.tag_owners
+      return enum_for(__method__) unless block_given?
+      accounts do |account|
+        next unless account.user_config['/tagging/user_tags'].present?
+        yield account
+      end
     end
 
     def self.accounts

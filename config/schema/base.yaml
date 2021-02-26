@@ -95,6 +95,16 @@ properties:
         properties:
           to:
             type: string
+      line:
+        type: object
+        required:
+          - token
+          - token
+        properties:
+          token:
+            type: string
+          to:
+            type: string
   postgres:
     type: object
     required:

@@ -22,11 +22,8 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(String)
-      return http.post('/api/drive/files/delete', {
-        body: {i: token, fileId: attachment.id},
-        headers: create_headers(params[:headers]),
-      })
+      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
+      return super
     end
 
     def oauth_client

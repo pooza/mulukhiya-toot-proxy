@@ -23,21 +23,15 @@ module Mulukhiya
     end
 
     def search_dupllicated_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(String)
-      response = http.post('/api/drive/files/find-by-hash', {
-        body: {i: token, md5: attachment.to_h[:md5]},
-        headers: create_headers(params[:headers]),
-      })
+      attachment = attachment.to_h[:md5] if attachment.is_a?(Environment.attachment_class)
+      response = super
       return response if params[:response] == :raw
-      return attachment_class[response.parsed_response.first['id']]
+      return Environment.attachment_class[response.parsed_response.first['id']]
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(String)
-      return http.post('/api/drive/files/delete', {
-        body: {i: token, fileId: attachment.id},
-        headers: create_headers(params[:headers]),
-      })
+      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
+      return super
     end
 
     def oauth_client

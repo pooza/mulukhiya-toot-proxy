@@ -1,5 +1,5 @@
 package:
-  version: 4.1.9
+  version: 4.1.10
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -223,6 +223,7 @@ mastodon:
       - hexo_announce
     alert:
       - slack_alert
+      - line_alert
       - mail_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -340,6 +341,7 @@ misskey:
       - hexo_announce
     alert:
       - slack_alert
+      - line_alert
       - mail_alert
   oauth:
     webui:
@@ -453,6 +455,7 @@ meisskey:
       - hexo_announce
     alert:
       - slack_alert
+      - line_alert
       - mail_alert
   oauth:
     scopes:
@@ -560,6 +563,7 @@ pleroma:
       - result_notification
     alert:
       - slack_alert
+      - line_alert
       - mail_alert
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -622,7 +626,10 @@ spotify:
       type: album
 songwhip:
   urls:
-    api: https://songwhip.com/
+    api: https://songwhip.com
+line:
+  urls:
+    api: https://api.line.me
 annict:
   urls:
     oauth: https://annict.jp

@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 5f17a73c411a4ca4956a1ee4e59e7e5b76e400c8
+  revision: 04087e2d68324b5a63a5d3ad07b0ba9017b5b208
   specs:
-    ginseng-core (1.10.8)
+    ginseng-core (1.10.9)
       activesupport (>= 6.1.1)
       addressable
       daemon-spawn
@@ -21,9 +21,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7e68cba19107f572911f9a1832907335e34429ed
+  revision: 87cb7b2e97bb7d0329682698420d440e84d74cd0
   specs:
-    ginseng-fediverse (1.5.6)
+    ginseng-fediverse (1.5.7)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -192,11 +192,11 @@ GEM
       mini_mime (>= 0.1.1)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0212)
+    mime-types-data (3.2021.0225)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
-    minitest (5.14.3)
+    minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
@@ -260,7 +260,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.2.5)
-    regexp_parser (2.0.3)
+    regexp_parser (2.1.1)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)

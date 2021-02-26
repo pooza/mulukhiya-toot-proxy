@@ -21,6 +21,16 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def delete_attachment(attachment, params = {})
+      attachment = attachment_class[attachment] if attachment.is_a?(Integer)
+      return delete_status(attachment.status, params)
+    end
+
+    def delete_status(status, params = {})
+      status = status.id if status.is_a?(status_class)
+      return super
+    end
+
     def oauth_client
       unless client = redis.get('oauth_client')
         client = http.post('/api/v1/apps', {

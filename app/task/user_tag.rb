@@ -3,12 +3,12 @@ namespace :mulukhiya do
     namespace :user do
       desc 'show tags'
       task :list do
-        list = []
-        Mulukhiya::UserConfigStorage.accounts do |account|
-          next unless account.user_config['/tagging/user_tags'].present?
-          list.push('account' => account.acct.to_s, 'tags' => account.user_config.tags)
+        Mulukhiya::UserConfigStorage.tag_owners do |account|
+          puts({
+            account: account.acct.to_s,
+            tags: account.user_config.tags,
+          }).deep_stringify_keys.to_yaml
         end
-        puts list.to_yaml if list.present?
       end
 
       task show: [:list]
