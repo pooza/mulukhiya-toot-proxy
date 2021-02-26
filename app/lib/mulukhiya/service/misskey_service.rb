@@ -23,14 +23,14 @@ module Mulukhiya
     end
 
     def search_dupllicated_attachment(attachment, params = {})
-      attachment = attachment.to_h[:md5] if attachment.is_a?(attachment_class)
+      attachment = attachment.to_h[:md5] if attachment.is_a?(Environment.attachment_class)
       response = super
       return response if params[:response] == :raw
-      return attachment_class[response.parsed_response.first['id']]
+      return Environment.attachment_class[response.parsed_response.first['id']]
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment.id if attachment.is_a?(attachment_class)
+      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
       return super
     end
 

@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment.id if attachment.is_a?(attachment_class)
+      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
       return super
     end
 
