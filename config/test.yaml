@@ -79,6 +79,9 @@ filters:
   - name: annict
     cases:
       - 'annict*'
+  - name: line
+    cases:
+      - 'line*'
   - name: webhook
     cases:
       - 'webhook*'
