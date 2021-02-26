@@ -12,7 +12,7 @@ namespace :mulukhiya do
       end
     end
 
-    name :dictionary do
+    namespace :dictionary do
       task update: ['mulukhiya:tagging:dic:update']
     end
   end
