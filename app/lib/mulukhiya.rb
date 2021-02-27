@@ -1,5 +1,4 @@
 require 'bundler/setup'
-require 'ricecream'
 require 'mulukhiya/refines'
 
 module Mulukhiya
@@ -40,6 +39,7 @@ module Mulukhiya
   end
 
   def self.setup_debug
+    require 'ricecream'
     Ricecream.disable
     return unless Environment.development?
     Ricecream.enable
@@ -67,10 +67,6 @@ module Mulukhiya
     )
   end
 
-  def self.connect_dbms
-    Environment.dbms_class.connect
-  end
-
   def self.load_tasks
     Dir.glob(File.join(dir, 'app/task/*.rb')).each do |f|
       require f
@@ -82,5 +78,5 @@ module Mulukhiya
   setup_bootsnap
   setup_sidekiq
   setup_debug
-  connect_dbms
+  Environment.dbms_class.connect
 end
