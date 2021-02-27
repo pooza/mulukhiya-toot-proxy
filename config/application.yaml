@@ -121,21 +121,40 @@ mastodon:
   display_name: Mastodon
   sns_type: mastodon
   url: https://mstdn.example.com/
-  webhook: true
-  media_catalog: true
-  feed: true
-  announcement: true
-  filter: true
-  annict: true
-  futured_tag: true
   dbms: postgres
   parser: toot
+  features:
+    webhook: true
+    media_catalog: true
+    feed: true
+    announcement: true
+    filter: true
+    annict: true
+    futured_tag: true
   media:
     default_type:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: image/gif
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    webui:
+      url: /settings/applications
+    scopes:
+      - write:statuses
+      - write:media
+      - read:filters
+      - write:filters
+      - read:search
+  status:
+    key: id
+    label: トゥート
+    max_length: 500
+  attachment:
+    limit: 4
+  search:
+    limit: 40
   handlers:
     pre_toot:
       - user_config_command
@@ -226,42 +245,40 @@ mastodon:
       - slack_alert
       - line_alert
       - mail_alert
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    webui:
-      url: /settings/applications
-    scopes:
-      - write:statuses
-      - write:media
-      - read:filters
-      - write:filters
-      - read:search
-  status:
-    key: id
-    label: トゥート
-    max_length: 500
-  attachment:
-    limit: 4
-  search:
-    limit: 40
 misskey:
   display_name: Misskey
   sns_type: misskey
   url: https://misskey.example.com/
-  webhook: true
-  media_catalog: true
-  feed: true
-  announcement: true
-  annict: true
-  futured_tag: true
   dbms: postgres
   parser: note
+  features:
+    webhook: true
+    media_catalog: true
+    feed: true
+    announcement: true
+    annict: true
+    futured_tag: true
   media:
     default_type:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
+  oauth:
+    webui:
+      url: /settings/api
+    scopes:
+      - write:notes
+      - write:drive
+      - read:drive
+      - read:account
+    callback_url: /mulukhiya/app/misskey/auth
+  status:
+    key: noteId
+    label: ノート
+    max_length: 500
+  attachment:
+    limit: 4
   handlers:
     pre_toot:
       - user_config_command
@@ -350,39 +367,37 @@ misskey:
       - slack_alert
       - line_alert
       - mail_alert
-  oauth:
-    webui:
-      url: /settings/api
-    scopes:
-      - write:notes
-      - write:drive
-      - read:drive
-      - read:account
-    callback_url: /mulukhiya/app/misskey/auth
-  status:
-    key: noteId
-    label: ノート
-    max_length: 500
-  attachment:
-    limit: 4
 meisskey:
   display_name: めいすきー
   sns_type: misskey
   url: https://meisskey.example.com/
-  webhook: true
-  media_catalog: true
-  feed: true
-  announcement: true
-  annict: true
-  futured_tag: true
   dbms: mongo
   parser: note
+  features:
+    webhook: true
+    media_catalog: true
+    feed: true
+    announcement: true
+    annict: true
+    futured_tag: true
   media:
     default_type:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
+  oauth:
+    scopes:
+      - write:notes
+      - write:drive
+      - read:drive
+    callback_url: /mulukhiya/app/misskey/auth
+  status:
+    key: noteId
+    label: ポスト
+    max_length: 1000
+  attachment:
+    limit: 4
   handlers:
     pre_toot:
       - user_config_command
@@ -470,34 +485,37 @@ meisskey:
       - slack_alert
       - line_alert
       - mail_alert
-  oauth:
-    scopes:
-      - write:notes
-      - write:drive
-      - read:drive
-    callback_url: /mulukhiya/app/misskey/auth
-  status:
-    key: noteId
-    label: ポスト
-    max_length: 1000
-  attachment:
-    limit: 4
 pleroma:
   display_name: Pleroma
   sns_type: mastodon
   url: https://pleroma.example.com/
-  webhook: true
-  media_catalog: true
-  feed: true
-  annict: true
   dbms: postgres
   parser: toot
+  features:
+    webhook: true
+    media_catalog: true
+    feed: true
+    annict: true
   media:
     default_type:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      - write:statuses
+      - write:media
+      - read:statuses
+  status:
+    key: id
+    label: ステータス
+    max_length: 5000
+  chat:
+    field: content
+  attachment:
+    limit: 4
   handlers:
     pre_toot:
       - user_config_command
@@ -584,20 +602,6 @@ pleroma:
       - slack_alert
       - line_alert
       - mail_alert
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    scopes:
-      - write:statuses
-      - write:media
-      - read:statuses
-  status:
-    key: id
-    label: ステータス
-    max_length: 5000
-  chat:
-    field: content
-  attachment:
-    limit: 4
 amazon:
   marketplace: jp
   urls:
