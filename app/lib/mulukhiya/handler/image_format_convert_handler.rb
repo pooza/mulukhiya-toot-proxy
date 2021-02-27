@@ -8,6 +8,7 @@ module Mulukhiya
 
     def convertable?
       return false unless @source&.image?
+      return false unless type
       return false if @source.type == type
       return false if @source.type == 'image/gif'
       return false if @source.alpha?

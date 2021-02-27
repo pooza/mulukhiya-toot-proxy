@@ -8,6 +8,7 @@ module Mulukhiya
 
     def convertable?
       return false unless @source&.video?
+      return false unless type
       return false if @source.type == type
       return true
     end
