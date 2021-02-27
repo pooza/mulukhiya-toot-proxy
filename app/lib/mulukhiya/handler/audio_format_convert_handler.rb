@@ -1,7 +1,7 @@
 module Mulukhiya
   class AudioFormatConvertHandler < MediaConvertHandler
     def convert
-      return @source.convert_type(type) 
+      return @source.convert_type(type)
     ensure
       result.push(source: {type: @source.type})
     end
