@@ -112,6 +112,22 @@ module Mulukhiya
         return config["/#{name}/status/label"]
       end
 
+      def default_image_type
+        return config["/#{name}/media/default_type/image"]
+      end
+
+      def default_video_type
+        return config["/#{name}/media/default_type/video"]
+      end
+
+      def default_audio_type
+        return config["/#{name}/media/default_type/audio"]
+      end
+
+      def default_animation_image_type
+        return config["/#{name}/media/default_type/image"]
+      end
+
       def visibility_name(name)
         return parser_class.visibility_name(name)
       end

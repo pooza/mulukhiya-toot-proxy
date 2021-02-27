@@ -23,10 +23,8 @@ handler:
     disable: true
   audio_format_convert:
     timeout: 10
-    type: audio/mpeg
   animation_image_format_convert:
     timeout: 10
-    type: image/gif
   canonical_url:
     ignore:
       domains:
@@ -37,8 +35,6 @@ handler:
     category: お知らせ
   image_resize:
     pixel: 1280
-  image_format_convert:
-    type: image/jpeg
   itunes_image:
     pixel: 480
     timeout: 10
@@ -59,7 +55,6 @@ handler:
     disable: true
   video_format_convert:
     timeout: 30
-    type: video/mp4
 worker:
   dropbox_clipping:
     federate: true
@@ -135,6 +130,12 @@ mastodon:
   futured_tag: true
   dbms: postgres
   parser: toot
+  media:
+    default_type:
+      image: image/jpeg
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: image/gif
   handlers:
     pre_toot:
       - user_config_command
@@ -255,6 +256,12 @@ misskey:
   futured_tag: true
   dbms: postgres
   parser: note
+  media:
+    default_type:
+      image: image/webp
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: image/gif
   handlers:
     pre_toot:
       - user_config_command
@@ -369,6 +376,12 @@ meisskey:
   futured_tag: true
   dbms: mongo
   parser: note
+  media:
+    default_type:
+      image: image/webp
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: image/gif
   handlers:
     pre_toot:
       - user_config_command
@@ -477,6 +490,12 @@ pleroma:
   annict: true
   dbms: postgres
   parser: toot
+  media:
+    default_type:
+      image: image/webp
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: image/gif
   handlers:
     pre_toot:
       - user_config_command
@@ -773,6 +792,11 @@ mongo:
 alert:
   slack:
     hooks: []
+  mail:
+    to: null
+  line:
+    token: null
+    to: null
 sidekiq:
   dashboard:
     url: /mulukhiya/sidekiq
