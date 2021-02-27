@@ -125,7 +125,7 @@ module Mulukhiya
       end
 
       def default_animation_image_type
-        return config["/#{name}/media/default_type/image"]
+        return config["/#{name}/media/default_type/animation_image"]
       end
 
       def visibility_name(name)

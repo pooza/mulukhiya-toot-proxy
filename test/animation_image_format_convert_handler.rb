@@ -17,7 +17,7 @@ module Mulukhiya
 
     def test_convert
       return unless handler?
-      assert_kind_of(ImageFile, @handler.convert)
+      assert_kind_of([ImageFile, NilClass], @handler.convert)
     end
   end
 end

@@ -261,7 +261,7 @@ misskey:
       image: image/webp
       video: video/mp4
       audio: audio/mpeg
-      animation_image: image/gif
+      animation_image: null
   handlers:
     pre_toot:
       - user_config_command
@@ -382,7 +382,7 @@ meisskey:
       image: image/webp
       video: video/mp4
       audio: audio/mpeg
-      animation_image: image/gif
+      animation_image: null
   handlers:
     pre_toot:
       - user_config_command
@@ -497,7 +497,7 @@ pleroma:
       image: image/webp
       video: video/mp4
       audio: audio/mpeg
-      animation_image: image/gif
+      animation_image: null
   handlers:
     pre_toot:
       - user_config_command
