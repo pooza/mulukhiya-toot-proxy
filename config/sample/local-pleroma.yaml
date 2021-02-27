@@ -17,9 +17,6 @@ sidekiq:
     dsn: redis://localhost:6379/2
   auth:
     password: your_password
-handler:
-  image_format_convert:
-    type: image/webp
 alert:
   slack:
     hooks:
