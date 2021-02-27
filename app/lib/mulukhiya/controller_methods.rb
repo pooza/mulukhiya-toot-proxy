@@ -113,19 +113,19 @@ module Mulukhiya
       end
 
       def default_image_type
-        return config["/#{name}/media/default_type/image"]
+        return config["/#{name}/attachment/types/image"]
       end
 
       def default_video_type
-        return config["/#{name}/media/default_type/video"]
+        return config["/#{name}/attachment/types/video"]
       end
 
       def default_audio_type
-        return config["/#{name}/media/default_type/audio"]
+        return config["/#{name}/attachment/types/audio"]
       end
 
       def default_animation_image_type
-        return config["/#{name}/media/default_type/animation_image"]
+        return config["/#{name}/attachment/types/animation_image"]
       end
 
       def visibility_name(name)

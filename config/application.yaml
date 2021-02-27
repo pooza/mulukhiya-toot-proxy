@@ -130,12 +130,6 @@ mastodon:
     filter: true
     annict: true
     futured_tag: true
-  media:
-    default_type:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: image/gif
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     webui:
@@ -153,6 +147,11 @@ mastodon:
     max_length: 500
   attachment:
     limit: 4
+    types:
+      image: image/jpeg
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: image/gif
   search:
     limit: 40
   handlers:
@@ -257,12 +256,6 @@ misskey:
     announcement: true
     annict: true
     futured_tag: true
-  media:
-    default_type:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
   oauth:
     webui:
       url: /settings/api
@@ -279,6 +272,11 @@ misskey:
     max_length: 500
   attachment:
     limit: 4
+    types:
+      image: image/jpeg
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: null
   handlers:
     pre_toot:
       - user_config_command
@@ -379,12 +377,6 @@ meisskey:
     announcement: true
     annict: true
     futured_tag: true
-  media:
-    default_type:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
   oauth:
     scopes:
       - write:notes
@@ -398,6 +390,11 @@ meisskey:
     max_length: 1000
   attachment:
     limit: 4
+    types:
+      image: image/jpeg
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: null
   handlers:
     pre_toot:
       - user_config_command
@@ -495,12 +492,6 @@ pleroma:
     media_catalog: true
     feed: true
     annict: true
-  media:
-    default_type:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -512,10 +503,15 @@ pleroma:
     key: id
     label: ステータス
     max_length: 5000
-  chat:
-    field: content
   attachment:
     limit: 4
+    types:
+      image: image/jpeg
+      video: video/mp4
+      audio: audio/mpeg
+      animation_image: null
+  chat:
+    field: content
   handlers:
     pre_toot:
       - user_config_command
