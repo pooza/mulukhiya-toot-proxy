@@ -258,7 +258,7 @@ misskey:
   parser: note
   media:
     default_type:
-      image: image/webp
+      image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
@@ -379,7 +379,7 @@ meisskey:
   parser: note
   media:
     default_type:
-      image: image/webp
+      image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
@@ -494,7 +494,7 @@ pleroma:
   parser: toot
   media:
     default_type:
-      image: image/webp
+      image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
       animation_image: null

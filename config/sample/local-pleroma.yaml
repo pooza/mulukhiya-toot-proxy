@@ -2,6 +2,9 @@ environment: production
 controller: pleroma
 pleroma:
   url: https://pleroma.example.com/
+  media:
+    default_type:
+      image: image/webp
 agent:
   test:
     token: your_token
