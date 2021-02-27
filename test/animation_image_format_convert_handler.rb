@@ -12,7 +12,7 @@ module Mulukhiya
 
     def test_convertable?
       return unless handler?
-      assert(@handler.convertable?)
+      assert_boolean(@handler.convertable?)
     end
 
     def test_convert
