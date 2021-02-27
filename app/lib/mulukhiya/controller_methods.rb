@@ -69,7 +69,7 @@ module Mulukhiya
       end
 
       def parser_name
-        return config["/#{name}/parser"]
+        return config["/#{name}/status/parser"]
       end
 
       def parser_class

@@ -122,7 +122,6 @@ mastodon:
   sns_type: mastodon
   url: https://mstdn.example.com/
   dbms: postgres
-  parser: toot
   features:
     webhook: true
     media_catalog: true
@@ -148,6 +147,7 @@ mastodon:
       - write:filters
       - read:search
   status:
+    parser: toot
     key: id
     label: トゥート
     max_length: 500
@@ -250,7 +250,6 @@ misskey:
   sns_type: misskey
   url: https://misskey.example.com/
   dbms: postgres
-  parser: note
   features:
     webhook: true
     media_catalog: true
@@ -274,6 +273,7 @@ misskey:
       - read:account
     callback_url: /mulukhiya/app/misskey/auth
   status:
+    parser: note
     key: noteId
     label: ノート
     max_length: 500
@@ -372,7 +372,6 @@ meisskey:
   sns_type: misskey
   url: https://meisskey.example.com/
   dbms: mongo
-  parser: note
   features:
     webhook: true
     media_catalog: true
@@ -393,6 +392,7 @@ meisskey:
       - read:drive
     callback_url: /mulukhiya/app/misskey/auth
   status:
+    parser: note
     key: noteId
     label: ポスト
     max_length: 1000
@@ -490,7 +490,6 @@ pleroma:
   sns_type: mastodon
   url: https://pleroma.example.com/
   dbms: postgres
-  parser: toot
   features:
     webhook: true
     media_catalog: true
@@ -509,6 +508,7 @@ pleroma:
       - write:media
       - read:statuses
   status:
+    parser: toot
     key: id
     label: ステータス
     max_length: 5000
