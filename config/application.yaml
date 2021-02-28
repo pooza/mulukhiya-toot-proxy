@@ -807,7 +807,7 @@ sidekiq:
     dsn: redis://localhost:6379/2
   auth:
     user: admin
-    password: ''
+    password: null
   dynamic: true
   concurrency: 5
   schedule:
