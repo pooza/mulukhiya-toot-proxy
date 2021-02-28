@@ -112,6 +112,10 @@ module Mulukhiya
         return config["/#{name}/status/label"]
       end
 
+      def status_delete_limit
+        return config["/#{name}/status/delete/limit"] rescue nil
+      end
+
       def default_image_type
         return config["/#{name}/attachment/types/image"] rescue nil
       end

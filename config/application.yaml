@@ -145,6 +145,8 @@ mastodon:
     key: id
     label: トゥート
     max_length: 500
+    delete:
+      limit: 30
   attachment:
     limit: 4
     types:
