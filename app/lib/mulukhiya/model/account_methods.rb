@@ -16,6 +16,7 @@ module Mulukhiya
       unless @service
         @service = Environment.sns_class.new
         @service.token = token
+        @service.retry_limit = 1
       end
       return @service
     end
