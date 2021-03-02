@@ -4,6 +4,7 @@ type: object
 required:
   - agent
   - alert
+  - crypt
 properties:
   controller:
     type: string
