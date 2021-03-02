@@ -17,6 +17,8 @@ html lang='ja'
               .endpoint-container
                 .role admin
                 .link POST /mulukhiya/api/announcement/update
+                pre.payload 
+                  | {{query_params.announcement_update}}
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
                   .link-description
                     | スケジュール
@@ -28,8 +30,8 @@ html lang='ja'
           h3 @click='toggleVisibility("media")' メディア
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
-              .link GET /mulukhiya/api/media
-              input type='number' placeholder='page: ページ' v-model.trim='input.media_list.page'
+              .link GET {{endpoints.media_list}}
+              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -37,6 +39,8 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/file/clear
+              pre.payload 
+                | {{query_params.media_file_clear}}
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link-description
                   | スケジュール
@@ -47,6 +51,8 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/metadata/clear
+              pre.payload 
+                | {{query_params.media_metadata_clear}}
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
                 button @click='clearMediaMetadata' 実行
@@ -56,6 +62,8 @@ html lang='ja'
             .endpoint-container
               .role admin
               .link POST /mulukhiya/api/oauth/client/clear
+              pre.payload 
+                | {{query_params.oauth_client_clear}}
               .link-description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
                 button @click='clearOAuthClient' 実行
@@ -75,6 +83,8 @@ html lang='ja'
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
+                pre.payload 
+                  | {{query_params.program_update}}
                 - if config.keys('/sidekiq/schedule/program_update').member?('every')
                   .link-description
                     | スケジュール
@@ -89,14 +99,18 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
-              input type='search' placeholder='q: 検索フレーズ' v-model.trim='input.search_tag.q'
+              pre.payload 
+                | {{query_params.tagging_tag_search}}
+              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
-                button :disabled='!input.search_tag.q' @click='searchTags' 実行
+                button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
                 pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
+              pre.payload 
+                | {{query_params.tagging_dic_update}}
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
                 .link-description
                   | スケジュール
@@ -113,6 +127,8 @@ html lang='ja'
             .endpoint-container
               .role admin
               .link POST /mulukhiya/api/tagging/usertag/clear
+              pre.payload 
+                | {{query_params.tagging_usertag_clear}}
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
                 .link-description
                   | スケジュール
@@ -135,6 +151,8 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.annict'
             .endpoint-container
               .link POST /mulukhiya/api/annict/crawl
+              pre.payload 
+                | {{query_params.annict_crawl}}
               .link-description Annictへの問い合わせを行います。
               .field-update-button-container
                 button @click='crawlAnnict' 実行
@@ -168,9 +186,20 @@ html lang='ja'
           account: {is_admin: false, username: null},
           config: {annict: null},
           feed: {list: {href: null}},
-          input: {
-            search_tag: {q: null},
+          endpoints: {
+            media_list: '/mulukhiya/api/media?page=1'
+          },
+          query_params: {
             media_list: {page: 1},
+            announcement_update: {token: Vue.getToken()},
+            media_file_clear: {token: Vue.getToken()},
+            media_metadata_clear: {token: Vue.getToken()},
+            oauth_client_clear: {token: Vue.getToken()},
+            program_update: {token: Vue.getToken()},
+            tagging_tag_search: {q: null},
+            tagging_dic_update: {token: Vue.getToken()},
+            tagging_usertag_clear: {token: Vue.getToken()},
+            annict_crawl: {token: Vue.getToken()},
           },
           result: {
             search_tag: null,
@@ -205,6 +234,11 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
+          onInputMediaListPage: function () {
+            const url = new URL('/mulukhiya/api/media', location.href)
+            url.searchParams.set('page', this.query_params.media_list.page)
+            this.endpoints.media_list = `${url.pathname}${url.search}`
+          },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
           },
@@ -215,7 +249,7 @@ html lang='ja'
           },
           getMedias: function () {
             this.result.media_list = null
-            Vue.getMedias(this.input.media_list.page)
+            Vue.getMedias(this.query_params.media_list.page)
               .then(e => {this.result.media_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
@@ -277,7 +311,7 @@ html lang='ja'
           },
           searchTags: function () {
             this.result.search_tag = null
-            Vue.searchTags(this.input.search_tag.q)
+            Vue.searchTags(this.query_params.tagging_tag_search.q)
               .then(e => {this.result.search_tag = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },

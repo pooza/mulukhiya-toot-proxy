@@ -127,16 +127,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/media/clear' do # deprecated
-      if @sns&.account&.admin? || @sns&.account&.moderator?
-        MediaCleaningWorker.new.perform
-      else
-        @renderer.status = 403
-        @renderer.message = {error: 'Unauthorized'}
-      end
-      return @renderer.to_s
-    end
-
     post '/media/file/clear' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
         MediaCleaningWorker.new.perform

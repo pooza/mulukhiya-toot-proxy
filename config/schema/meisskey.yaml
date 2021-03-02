@@ -11,3 +11,19 @@ meisskey:
       properties:
         max_length:
           type: integer
+        label:
+          type: string
+    attachment:
+      type: object
+      properties:
+        types:
+          type: object
+          properties:
+            image:
+              type: string
+            video:
+              type: string
+            audio:
+              type: string
+            animation_image:
+              type: string

@@ -8,6 +8,7 @@ module Mulukhiya
 
     def convertable?
       return false unless @source&.image?
+      return false unless type
       return false if @source.type == type
       return false if @source.type == 'image/gif'
       return false if @source.alpha?
@@ -16,7 +17,7 @@ module Mulukhiya
     end
 
     def type
-      return config['/handler/image_format_convert/type']
+      return controller_class.default_image_type
     end
   end
 end

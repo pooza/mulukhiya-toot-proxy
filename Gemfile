@@ -16,6 +16,7 @@ gem 'ruby-progressbar'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
+gem 'sidekiq-unique-jobs'
 gem 'vacuum'
 
 group :postgres do

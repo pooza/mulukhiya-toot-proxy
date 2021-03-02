@@ -2,6 +2,9 @@ environment: production
 controller: meisskey
 meisskey:
   url: https://meisskey.example.com/
+  media:
+    default_type:
+      image: image/webp
 agent:
   test:
     token: your_token

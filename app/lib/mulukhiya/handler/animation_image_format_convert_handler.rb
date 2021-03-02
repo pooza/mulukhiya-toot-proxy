@@ -9,12 +9,13 @@ module Mulukhiya
     def convertable?
       return false unless @source&.image?
       return false unless @source.animated?
+      return false unless type
       return false if @source.type == type
       return true
     end
 
     def type
-      return config['/handler/animation_image_format_convert/type']
+      return controller_class.default_animation_image_type
     end
   end
 end

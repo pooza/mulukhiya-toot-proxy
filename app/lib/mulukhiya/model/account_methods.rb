@@ -16,6 +16,7 @@ module Mulukhiya
       unless @service
         @service = Environment.sns_class.new
         @service.token = token
+        @service.retry_limit = 1
       end
       return @service
     end
@@ -109,9 +110,9 @@ module Mulukhiya
 
     def clear_attachments(params = {})
       raise Ginseng::AuthError, 'Only test users can run it' unless test?
-      puts "delete #{attachments.count.commaize} attachments" if Environment.rake?
-      bar = ProgressBar.create(total: attachments.count) if Environment.rake?
-      attachments.each do |attachment|
+      limit = controller_class.status_delete_limit || attachments.count
+      bar = ProgressBar.create(total: limit) if Environment.rake?
+      attachments.first(limit).each do |attachment|
         next if params[:dryrun]
         service.delete_attachment(attachment)
         sleep(1)

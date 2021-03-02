@@ -1,6 +1,3 @@
-require 'httparty'
-require 'rest-client'
-
 module Mulukhiya
   class Handler
     include Package

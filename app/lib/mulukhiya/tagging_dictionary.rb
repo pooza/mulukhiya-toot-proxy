@@ -83,7 +83,7 @@ module Mulukhiya
     end
 
     def self.short?(word)
-      return word.match?("^[0-9a-zA-Zあ-んア-ン]{,#{config['/tagging/word/minimum_length']}}$")
+      return word.match?("^[0-9a-zA-Zあ-んア-ン]{,#{config['/tagging/word/minimum_length'] - 1}}$")
     end
 
     private

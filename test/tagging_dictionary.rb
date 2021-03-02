@@ -20,6 +20,7 @@ module Mulukhiya
     def test_short?
       assert(TaggingDictionary.short?('ココ'))
       assert_false(TaggingDictionary.short?('館長'))
+      assert_false(TaggingDictionary.short?('DX3'))
     end
   end
 end

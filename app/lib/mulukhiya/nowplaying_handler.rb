@@ -7,13 +7,13 @@ module Mulukhiya
       @uris = {}
       @tracks = {}
       @lines = {}
+      reporter.temp[:track_uris] ||= []
     end
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
-      return body unless @status.match?(/#nowplaying\s/i)
-      return body if parser.command?
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
+      return body if parser.command?
       @status.each_line do |line|
         push(line)
         next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)

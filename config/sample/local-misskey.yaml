@@ -2,6 +2,9 @@ environment: production
 controller: misskey
 misskey:
   url: https://misskey.example.com/
+  media:
+    default_type:
+      image: image/webp
 agent:
   test:
     token: your_token

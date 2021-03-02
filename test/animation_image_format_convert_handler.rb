@@ -12,12 +12,12 @@ module Mulukhiya
 
     def test_convertable?
       return unless handler?
-      assert(@handler.convertable?)
+      assert_boolean(@handler.convertable?)
     end
 
     def test_convert
       return unless handler?
-      assert_kind_of(ImageFile, @handler.convert)
+      assert_kind_of([ImageFile, NilClass], @handler.convert)
     end
   end
 end

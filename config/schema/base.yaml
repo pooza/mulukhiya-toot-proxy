@@ -99,7 +99,7 @@ properties:
         type: object
         required:
           - token
-          - token
+          - to
         properties:
           token:
             type: string

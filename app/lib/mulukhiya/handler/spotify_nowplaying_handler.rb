@@ -21,6 +21,7 @@ module Mulukhiya
     def update(keyword)
       return unless track = @tracks[keyword]
       push(track.external_urls['spotify'])
+      reporter.temp[:track_uris].push(track.external_urls['spotify'])
       result.push(keyword: keyword)
     end
   end

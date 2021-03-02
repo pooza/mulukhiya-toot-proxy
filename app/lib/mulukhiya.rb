@@ -1,5 +1,4 @@
 require 'bundler/setup'
-require 'ricecream'
 require 'mulukhiya/refines'
 
 module Mulukhiya
@@ -29,17 +28,28 @@ module Mulukhiya
   end
 
   def self.setup_sidekiq
+    Redis.exists_returns_integer = true
     Sidekiq.configure_client do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
+      config.client_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Client
+      end
     end
     Sidekiq.configure_server do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
       config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
+      config.client_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Client
+      end
+      config.server_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Server
+      end
+      SidekiqUniqueJobs::Server.configure(config)
     end
-    Redis.exists_returns_integer = true
   end
 
   def self.setup_debug
+    require 'ricecream'
     Ricecream.disable
     return unless Environment.development?
     Ricecream.enable
@@ -67,10 +77,6 @@ module Mulukhiya
     )
   end
 
-  def self.connect_dbms
-    Environment.dbms_class.connect
-  end
-
   def self.load_tasks
     Dir.glob(File.join(dir, 'app/task/*.rb')).each do |f|
       require f
@@ -82,5 +88,5 @@ module Mulukhiya
   setup_bootsnap
   setup_sidekiq
   setup_debug
-  connect_dbms
+  Environment.dbms_class.connect
 end

@@ -8,12 +8,13 @@ module Mulukhiya
 
     def convertable?
       return false unless @source&.video?
+      return false unless type
       return false if @source.type == type
       return true
     end
 
     def type
-      return config['/handler/video_format_convert/type']
+      return controller_class.default_video_type
     end
 
     def media_class

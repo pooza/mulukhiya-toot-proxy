@@ -14,15 +14,15 @@ module Mulukhiya
       end
 
       def webhook?
-        return config["/#{name}/webhook"] == true rescue false
+        return config["/#{name}/features/webhook"] == true rescue false
       end
 
       def media_catalog?
-        return config["/#{name}/media_catalog"] == true rescue false
+        return config["/#{name}/features/media_catalog"] == true rescue false
       end
 
       def feed?
-        return config["/#{name}/feed"] rescue false
+        return config["/#{name}/features/feed"] rescue false
       end
 
       def growi?
@@ -34,19 +34,19 @@ module Mulukhiya
       end
 
       def announcement?
-        return config["/#{name}/announcement"] == true rescue false
+        return config["/#{name}/features/announcement"] == true rescue false
       end
 
       def filter?
-        return config["/#{name}/filter"] == true rescue false
+        return config["/#{name}/features/filter"] == true rescue false
       end
 
       def futured_tag?
-        return config["/#{name}/futured_tag"] == true rescue false
+        return config["/#{name}/features/futured_tag"] == true rescue false
       end
 
       def annict?
-        return false unless config["/#{name.underscore}/annict"] == true
+        return false unless config["/#{name.underscore}/features/annict"] == true
         return false unless AnnictService.config?
         return true
       rescue Ginseng::ConfigError
@@ -69,7 +69,7 @@ module Mulukhiya
       end
 
       def parser_name
-        return config["/#{name}/parser"]
+        return config["/#{name}/status/parser"]
       end
 
       def parser_class
@@ -110,6 +110,26 @@ module Mulukhiya
 
       def status_label
         return config["/#{name}/status/label"]
+      end
+
+      def status_delete_limit
+        return config["/#{name}/status/delete/limit"] rescue nil
+      end
+
+      def default_image_type
+        return config["/#{name}/attachment/types/image"] rescue nil
+      end
+
+      def default_video_type
+        return config["/#{name}/attachment/types/video"] rescue nil
+      end
+
+      def default_audio_type
+        return config["/#{name}/attachment/types/audio"] rescue nil
+      end
+
+      def default_animation_image_type
+        return config["/#{name}/attachment/types/animation_image"] rescue nil
       end
 
       def visibility_name(name)
