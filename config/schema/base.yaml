@@ -4,6 +4,7 @@ type: object
 required:
   - agent
   - alert
+  - crypt
 properties:
   controller:
     type: string
@@ -222,6 +223,9 @@ properties:
         type: integer
   crypt:
     type: object
+    required:
+      - salt
+      - password
     properties:
       salt:
         type: string
