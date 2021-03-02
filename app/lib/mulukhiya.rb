@@ -28,14 +28,24 @@ module Mulukhiya
   end
 
   def self.setup_sidekiq
+    Redis.exists_returns_integer = true
     Sidekiq.configure_client do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
+      config.client_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Client
+      end
     end
     Sidekiq.configure_server do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
       config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
+      config.client_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Client
+      end
+      config.server_middleware do |chain|
+        chain.add SidekiqUniqueJobs::Middleware::Server
+      end
+      SidekiqUniqueJobs::Server.configure(config)
     end
-    Redis.exists_returns_integer = true
   end
 
   def self.setup_debug
