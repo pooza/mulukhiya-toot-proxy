@@ -22,7 +22,7 @@ module Mulukhiya
     def meta
       unless @http
         @http = HTTP.new
-        @http.retry_limit = 0
+        @http.retry_limit = 1
       end
       File.write(path, @http.get(uri)) unless File.exist?(path)
       storage = MediaMetadataStorage.new
