@@ -17,6 +17,7 @@ module Mulukhiya
     def update(keyword)
       return unless track = @tracks[keyword]
       push(track['trackViewUrl'])
+      reporter.temp[:track_uris].push(track['trackViewUrl'])
       result.push(keyword: keyword)
     end
   end
