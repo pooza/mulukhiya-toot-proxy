@@ -110,12 +110,10 @@ module Mulukhiya
 
     def clear_attachments(params = {})
       raise Ginseng::AuthError, 'Only test users can run it' unless test?
-      limit = controller_class.status_delete_limit || attachments.count
-      bar = ProgressBar.create(total: limit) if Environment.rake?
-      attachments.first(limit).each do |attachment|
-        next if params[:dryrun]
-        service.delete_attachment(attachment)
-        sleep(1)
+      puts "delete #{attachments.count.commaize} attachments" if Environment.rake?
+      bar = ProgressBar.create(total: status_delete_limit) if Environment.rake?
+      attachments.first(status_delete_limit).each do |attachment|
+        service.delete_attachment(attachment) unless params[:dryrun]
       rescue => e
         logger.error(error: e, acct: acct.to_s)
       ensure
@@ -123,6 +121,10 @@ module Mulukhiya
       end
       bar&.finish
       logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
+    end
+
+    def status_delete_limit
+      return controller_class.status_delete_limit || attachments.count
     end
 
     def test?
