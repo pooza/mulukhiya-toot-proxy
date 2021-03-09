@@ -72,7 +72,7 @@ module Mulukhiya
     def push(line)
       line.chomp!
       key = rand.to_s if line.empty?
-      key ||= Zlib.adler32([line, @recent_keyword].to_json)
+      key ||= Zlib.adler32([line, @recent_keyword].join("\n"))
       @lines[key] = line
     end
   end

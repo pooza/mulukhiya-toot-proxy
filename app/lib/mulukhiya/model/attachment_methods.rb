@@ -34,9 +34,7 @@ module Mulukhiya
     end
 
     def path
-      return File.join(Environment.dir, 'tmp/media/', Zlib.adler32(
-        [id, config['/crypt/salt']].to_json,
-      ))
+      return File.join(Environment.dir, 'tmp/media/', Zlib.adler32(id.to_s))
     end
 
     def size_str
