@@ -3,8 +3,7 @@ module Mulukhiya
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
-      parser.accts do |acct|
-        next unless acct.agent?
+      parser.accts.reject(&:agent?).each do |acct|
         body['visibility'] = controller_class.visibility_name('direct')
         result.push(acct: acct.to_s)
       end
