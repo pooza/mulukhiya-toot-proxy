@@ -117,6 +117,8 @@ webui:
   metadata:
     robots: noindex,nofollow
     viewport: width=1000
+  cache:
+    ttl: 86400
 mastodon:
   display_name: Mastodon
   sns_type: mastodon

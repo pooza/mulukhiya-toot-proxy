@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def to_s
-      return File.exist?(path) ? File.read(path) : ''
+      return ScriptStorage.new[path]
     end
   end
 end
