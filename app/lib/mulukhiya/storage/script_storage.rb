@@ -5,9 +5,7 @@ module Mulukhiya
     end
 
     def get(key)
-      unless super(create_key(key))
-        setex(create_key(key), ttl, compress(key))
-      end
+      setex(create_key(key), ttl, compress(key)) unless super(create_key(key))
       return super(create_key(key))
     rescue => e
       logger.error(error: e, key: key)
