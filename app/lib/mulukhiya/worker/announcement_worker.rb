@@ -7,8 +7,7 @@ module Mulukhiya
 
     def perform
       return unless executable?
-      announcements.each do |announcement|
-        next if cache.member?(announcement[:id])
+      announcements.reject {|v| cache.member?(v[:id])}.each do |announcement|
         Event.new(:announce, {sns: info_agent_service}).dispatch(announcement)
       rescue => e
         logger.error(error: e, announcement: announcement)

@@ -33,8 +33,7 @@ module Mulukhiya
 
     def parse_part(matches, items)
       tags = []
-      items.each_with_index do |item, i|
-        next if item['drop']
+      items.reject {|v| v['drop']}.each_with_index do |item, i|
         if item['split']
           tags.concat(matches[i + 1].split(delimiters).map(&:strip))
         else
