@@ -45,7 +45,7 @@ module Mulukhiya
         end
       end
       names ||= Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
-      TestCaseFilter.all.select(&:active?) do |filter|
+      TestCaseFilter.all.select(&:active?).each do |filter|
         puts "filter: #{filter.class}" if Environment.test?
         filter.exec(names)
       end
