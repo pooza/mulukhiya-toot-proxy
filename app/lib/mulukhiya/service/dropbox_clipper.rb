@@ -1,5 +1,3 @@
-require 'zlib'
-
 module Mulukhiya
   class DropboxClipper < DropboxApi::Client
     include Package

@@ -1,5 +1,3 @@
-require 'zlib'
-
 module Mulukhiya
   class MediaFile < File
     include Package

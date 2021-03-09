@@ -1,5 +1,3 @@
-require 'zlib'
-
 module Mulukhiya
   class MediaMetadataStorage < Redis
     def [](key)
@@ -7,8 +5,7 @@ module Mulukhiya
     end
 
     def get(path)
-      key = Zlib.adler32(File.read(path))
-      return nil unless entry = super(create_key(key))
+      return nil unless entry = super(create_key(path))
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       logger.error(error: e, key: key)
@@ -17,8 +14,12 @@ module Mulukhiya
 
     def push(path)
       path = path.path if path.is_a?(File)
-      key = Zlib.adler32(File.read(path))
-      setex(create_key(key), ttl, MediaFile.new(path).file.values.to_json)
+      setex(create_key(path), ttl, MediaFile.new(path).file.values.to_json)
+    end
+
+    def create_key(key)
+      key = Zlib.adler32(File.read(key))
+      return super
     end
 
     def ttl

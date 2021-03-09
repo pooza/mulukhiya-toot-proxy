@@ -1,5 +1,3 @@
-require 'zlib'
-
 module Mulukhiya
   module AttachmentMethods
     def mediatype

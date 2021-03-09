@@ -1,5 +1,3 @@
-require 'zlib'
-
 module Mulukhiya
   class NowplayingHandler < Handler
     def initialize(params = {})
