@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 require 'date'
 
 module Mulukhiya
@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def create_path(announcement)
-      basename = announcement[:title] || Digest::SHA1.hexdigest(announcement.to_json)
+      basename = announcement[:title] || Zlib.adler32(announcement.to_json)
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
     end
 

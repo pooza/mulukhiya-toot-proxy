@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 
 module Mulukhiya
   class DropboxClipper < DropboxApi::Client
@@ -6,7 +6,7 @@ module Mulukhiya
 
     def clip(params)
       params = {body: params.to_s} unless params.is_a?(Hash)
-      src = File.join(Environment.dir, 'tmp/media', Digest::SHA1.hexdigest(params.to_s))
+      src = File.join(Environment.dir, 'tmp/media', Zlib.adler32(params.to_s))
       dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])
       return upload(dest, IO.read(src), {mode: :overwrite})

@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 
 module Mulukhiya
   class NowplayingHandler < Handler
@@ -72,7 +72,7 @@ module Mulukhiya
     def push(line)
       line.chomp!
       key = rand.to_s if line.empty?
-      key ||= Digest::SHA1.hexdigest([line, @recent_keyword].to_json)
+      key ||= Zlib.adler32([line, @recent_keyword].to_json)
       @lines[key] = line
     end
   end

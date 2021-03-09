@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 
 module Mulukhiya
   class MediaFile < File
@@ -106,11 +106,11 @@ module Mulukhiya
     def create_dest_path(params = {})
       params[:extname] ||= MIMEType.extname(params[:type])
       params[:extname] ||= ".#{default_mediatype}"
-      params[:content] = Digest::SHA1.hexdigest(File.read(path))
+      params[:content] = Zlib.adler32(File.read(path))
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{Digest::SHA1.hexdigest(params.to_json)}#{params[:extname]}",
+        "#{Zlib.adler32(params.to_json)}#{params[:extname]}",
       )
     end
 

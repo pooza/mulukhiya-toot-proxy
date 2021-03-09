@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 
 module Mulukhiya
   class MediaMetadataStorage < Redis
@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def get(path)
-      key = Digest::SHA1.hexdigest(File.read(path))
+      key = Zlib.adler32(File.read(path))
       return nil unless entry = super(create_key(key))
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
@@ -17,7 +17,7 @@ module Mulukhiya
 
     def push(path)
       path = path.path if path.is_a?(File)
-      key = Digest::SHA1.hexdigest(File.read(path))
+      key = Zlib.adler32(File.read(path))
       setex(create_key(key), ttl, MediaFile.new(path).file.values.to_json)
     end
 

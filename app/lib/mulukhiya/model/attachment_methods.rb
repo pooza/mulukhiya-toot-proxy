@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'zlib'
 
 module Mulukhiya
   module AttachmentMethods
@@ -34,7 +34,7 @@ module Mulukhiya
     end
 
     def path
-      return File.join(Environment.dir, 'tmp/media/', Digest::SHA1.hexdigest(
+      return File.join(Environment.dir, 'tmp/media/', Zlib.adler32(
         [id, config['/crypt/salt']].to_json,
       ))
     end
