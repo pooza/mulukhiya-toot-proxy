@@ -18,7 +18,7 @@ module Mulukhiya
     end
 
     def create_path(announcement)
-      basename = announcement[:title] || Zlib.adler32(announcement.to_json)
+      basename = announcement[:title] || announcement.to_json.adler32
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
     end
 

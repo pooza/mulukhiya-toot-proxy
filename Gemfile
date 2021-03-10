@@ -17,9 +17,7 @@ gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
 gem 'sidekiq-unique-jobs'
-gem 'uglifier'
 gem 'vacuum'
-gem 'zlib'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'

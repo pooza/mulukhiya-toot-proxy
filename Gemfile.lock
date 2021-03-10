@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 850978fabfb8d77d02585d4cfd4091845dbba65e
+  revision: 3a3015134196e12eb0961912201cb3c836fff502
   specs:
     ginseng-core (1.10.10)
       activesupport (>= 6.1.1)
@@ -18,6 +18,7 @@ GIT
       unicode
       yajl-ruby
       zeitwerk (>= 2.4.0)
+      zlib
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
@@ -42,14 +43,15 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 96ea13eb91133fc89e9e7f50e9c8ceaa0879103b
+  revision: ce22f906ce47309e2eb46cd4d9ac4cdd49d01d00
   specs:
-    ginseng-web (1.3.5)
+    ginseng-web (1.3.6)
       puma (< 5.2.1)
       rss
       sass
       sinatra
       slim
+      uglifier
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
@@ -389,9 +391,7 @@ DEPENDENCIES
   sidekiq-unique-jobs
   slim_lint
   test-unit
-  uglifier
   vacuum
-  zlib
 
 RUBY VERSION
    ruby 3.0.0p0

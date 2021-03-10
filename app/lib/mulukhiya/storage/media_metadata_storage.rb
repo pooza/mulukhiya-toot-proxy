@@ -18,7 +18,7 @@ module Mulukhiya
     end
 
     def create_key(key)
-      key = Zlib.adler32(File.read(key))
+      key = File.read(key).adler32
       return super
     end
 

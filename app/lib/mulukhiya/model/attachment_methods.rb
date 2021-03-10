@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def path
-      return File.join(Environment.dir, 'tmp/media/', Zlib.adler32(id.to_s))
+      return File.join(Environment.dir, 'tmp/media/', id.to_s.adler32)
     end
 
     def size_str

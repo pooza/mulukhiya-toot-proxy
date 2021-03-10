@@ -104,11 +104,11 @@ module Mulukhiya
     def create_dest_path(params = {})
       params[:extname] ||= MIMEType.extname(params[:type])
       params[:extname] ||= ".#{default_mediatype}"
-      params[:content] = Zlib.adler32(File.read(path))
+      params[:content] = File.read(path).adler32
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{Zlib.adler32(params.to_json)}#{params[:extname]}",
+        "#{params.to_json.adler32}#{params[:extname]}",
       )
     end
 

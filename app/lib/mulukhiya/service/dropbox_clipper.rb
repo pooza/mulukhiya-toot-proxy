@@ -4,7 +4,7 @@ module Mulukhiya
 
     def clip(params)
       params = {body: params.to_s} unless params.is_a?(Hash)
-      src = File.join(Environment.dir, 'tmp/media', Zlib.adler32(params.to_json).to_s)
+      src = File.join(Environment.dir, 'tmp/media', params.to_json.adler32.to_s)
       dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])
       return upload(dest, IO.read(src), {mode: :overwrite})
