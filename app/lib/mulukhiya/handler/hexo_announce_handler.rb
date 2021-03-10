@@ -1,4 +1,3 @@
-require 'digest/sha1'
 require 'date'
 
 module Mulukhiya
@@ -19,7 +18,7 @@ module Mulukhiya
     end
 
     def create_path(announcement)
-      basename = announcement[:title] || Digest::SHA1.hexdigest(announcement.to_json)
+      basename = announcement[:title] || announcement.to_json.adler32
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
     end
 

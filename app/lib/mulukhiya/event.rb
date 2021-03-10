@@ -34,8 +34,7 @@ module Mulukhiya
     end
 
     def dispatch(body)
-      handlers do |handler|
-        next if handler.disable?
+      handlers.reject(&:disable?).each do |handler|
         thread = Thread.new {handler.send("handle_#{label}".to_sym, body, params)}
         unless thread.join(handler.timeout)
           handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")

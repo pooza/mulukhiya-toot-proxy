@@ -1,5 +1,3 @@
-require 'digest/sha1'
-
 module Mulukhiya
   class MediaFile < File
     include Package
@@ -106,11 +104,11 @@ module Mulukhiya
     def create_dest_path(params = {})
       params[:extname] ||= MIMEType.extname(params[:type])
       params[:extname] ||= ".#{default_mediatype}"
-      params[:content] = Digest::SHA1.hexdigest(File.read(path))
+      params[:content] = File.read(path).adler32
       return File.join(
         Environment.dir,
         'tmp/media',
-        "#{Digest::SHA1.hexdigest(params.to_json)}#{params[:extname]}",
+        "#{params.to_json.adler32}#{params[:extname]}",
       )
     end
 

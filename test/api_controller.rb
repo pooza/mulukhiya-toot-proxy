@@ -78,7 +78,7 @@ module Mulukhiya
       assert_equal(last_response.status, 403)
 
       header 'Content-Type', 'application/json'
-      post '/annict/crawl', {token: Crypt.new.encrypt(test_token)}.to_json
+      post '/annict/crawl', {token: test_token.encrypt}.to_json
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
@@ -89,7 +89,7 @@ module Mulukhiya
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
 
       uri = sns_class.new.create_uri('/feed/list')
-      uri.query_values = {token: Crypt.new.encrypt(test_token)}
+      uri.query_values = {token: test_token.encrypt}
       get uri.to_s
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')

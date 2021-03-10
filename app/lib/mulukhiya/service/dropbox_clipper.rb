@@ -1,12 +1,10 @@
-require 'digest/sha1'
-
 module Mulukhiya
   class DropboxClipper < DropboxApi::Client
     include Package
 
     def clip(params)
       params = {body: params.to_s} unless params.is_a?(Hash)
-      src = File.join(Environment.dir, 'tmp/media', Digest::SHA1.hexdigest(params.to_s))
+      src = File.join(Environment.dir, 'tmp/media', params.to_json.adler32.to_s)
       dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])
       return upload(dest, IO.read(src), {mode: :overwrite})

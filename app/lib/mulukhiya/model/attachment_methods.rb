@@ -1,5 +1,3 @@
-require 'digest/sha1'
-
 module Mulukhiya
   module AttachmentMethods
     def mediatype
@@ -34,9 +32,7 @@ module Mulukhiya
     end
 
     def path
-      return File.join(Environment.dir, 'tmp/media/', Digest::SHA1.hexdigest(
-        [id, config['/crypt/salt']].to_json,
-      ))
+      return File.join(Environment.dir, 'tmp/media/', id.to_s.adler32.to_s)
     end
 
     def size_str
