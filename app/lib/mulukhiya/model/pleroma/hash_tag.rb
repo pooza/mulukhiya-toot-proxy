@@ -25,6 +25,7 @@ module Mulukhiya
       end
 
       def self.get(key)
+        return nil if key[:tag].nil?
         return nil unless record = HashTag.new(key[:tag].downcase)
         record.raw_name = key[:tag]
         return record
