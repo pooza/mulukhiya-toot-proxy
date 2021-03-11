@@ -137,11 +137,7 @@ module Mulukhiya
       }
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?
-      values.keys.clone.each do |k|
-        next if values.dig(k, :status) == 'OK'
-        values[:status] = 503
-        break
-      end
+      values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
       values[:status] ||= 200
       return values
     end
