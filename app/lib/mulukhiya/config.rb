@@ -2,6 +2,12 @@ module Mulukhiya
   class Config < Ginseng::Config
     include Package
 
+    def initialize
+      super
+      @raw = {}
+      load
+    end
+
     def load
       dirs.each do |dir|
         suffixes.each do |suffix|
