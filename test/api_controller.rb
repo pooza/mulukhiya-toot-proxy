@@ -72,8 +72,6 @@ module Mulukhiya
     end
 
     def test_annict_crawl
-      return unless test_account.annict
-
       header 'Content-Type', 'application/json'
       post '/annict/crawl'
       assert_false(last_response.ok?)
