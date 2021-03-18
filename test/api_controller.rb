@@ -79,8 +79,13 @@ module Mulukhiya
 
       header 'Content-Type', 'application/json'
       post '/annict/crawl', {token: test_token.encrypt}.to_json
-      assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      if test_account.annict
+        assert(last_response.ok?)
+      else
+        assert_false(last_response.ok?)
+        assert_equal(last_response.status, 403)
+      end
     end
 
     def test_feed_list
