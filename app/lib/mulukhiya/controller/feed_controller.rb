@@ -6,7 +6,7 @@ module Mulukhiya
         @renderer.tag = params[:tag]
         @renderer.status = 404 unless @renderer.exist?
       else
-        @renderer.status = 404
+        @renderer.status = 403
       end
       return @renderer.to_s
     end
@@ -15,7 +15,7 @@ module Mulukhiya
       if controller_class.media_catalog?
         @renderer = MediaFeedRenderer.new
       else
-        @renderer.status = 404
+        @renderer.status = 403
       end
       return @renderer.to_s
     end

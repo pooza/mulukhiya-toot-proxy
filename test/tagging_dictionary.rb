@@ -1,6 +1,7 @@
 module Mulukhiya
   class TaggingDictionaryTest < TestCase
     def setup
+      config['/tagging/word/minimum_length'] = 3
       @dic = TaggingDictionary.new
     end
 

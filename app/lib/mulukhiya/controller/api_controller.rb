@@ -117,6 +117,13 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/annict/crawl' do
+      @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
+    rescue
+      @renderer.status = 403
+      @renderer.message = {error: 'Unauthorized'}
+    end
+
     post '/announcement/update' do
       if @sns&.account&.admin? || @sns&.account&.moderator?
         AnnouncementWorker.new.perform
@@ -211,16 +218,6 @@ module Mulukhiya
       @renderer.message = tags.uniq.map do |tag|
         hash_tag_class.get(tag: tag).to_h
       end.deep_compact
-      return @renderer.to_s
-    end
-
-    post '/annict/crawl' do
-      if @sns.account
-        @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
-      else
-        @renderer.status = 403
-        @renderer.message = {error: 'Unauthorized'}
-      end
       return @renderer.to_s
     end
 
