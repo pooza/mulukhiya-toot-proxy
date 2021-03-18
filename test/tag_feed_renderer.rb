@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def test_exist?
-      assert(@renderer.exist?)
+      assert_boolean(@renderer.exist?)
     end
   end
 end
