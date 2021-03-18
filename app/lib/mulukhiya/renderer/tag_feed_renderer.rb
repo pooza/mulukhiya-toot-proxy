@@ -33,12 +33,13 @@ module Mulukhiya
     end
 
     def exist?
-      return @record&.listable? rescue false
+      return @record&.listable? || false rescue false
     end
 
     def record
       unless @record
-        @record = hash_tag_class.get(tag: tag.downcase)
+        @record = hash_tag_class.get(tag: tag&.downcase)
+        return nil unless @record
         @record.raw_name = tag
       end
       return @record
