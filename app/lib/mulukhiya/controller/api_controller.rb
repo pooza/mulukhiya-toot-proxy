@@ -119,7 +119,7 @@ module Mulukhiya
 
     post '/annict/crawl' do
       @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
-    rescue => e
+    rescue
       @renderer.status = 403
       @renderer.message = {error: 'Unauthorized'}
     end
