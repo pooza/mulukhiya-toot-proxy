@@ -6,6 +6,10 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def teardown
+      config.reload
+    end
+
     def account
       @account ||= account_class.test_account
       return @account

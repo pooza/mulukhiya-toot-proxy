@@ -1,9 +1,23 @@
 module Mulukhiya
   class TaggingHandlerTest < TestCase
     def setup
+      config['/tagging/word/minimum_length'] = 3
+      config['/agent/accts'] = ['@pooza']
+      config['/tagging/dictionaries'] = [
+        {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
+      ]
+      TaggingDictionary.new.refresh
+
       @handler = Handler.create('tagging')
       @parser = Environment.parser_class.new
-      config['/agent/accts'] = ['@pooza']
+    end
+
+    def teardown
+      super
+      TaggingDictionary.new.refresh
     end
 
     def test_handle_pre_toot

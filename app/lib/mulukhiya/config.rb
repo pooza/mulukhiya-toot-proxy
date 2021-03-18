@@ -2,6 +2,23 @@ module Mulukhiya
   class Config < Ginseng::Config
     include Package
 
+    def load
+      dirs.each do |dir|
+        suffixes.each do |suffix|
+          Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
+            key = File.basename(f, suffix)
+            next if @raw.member?(key)
+            @raw[key] = YAML.load_file(f)
+          end
+        end
+      end
+      basenames.reverse_each do |key|
+        update(@raw[key].key_flatten) if @raw[key]
+      end
+    end
+
+    alias reload load
+
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
       return self["/handler/#{handler.underscore}/disable"] == true rescue false
