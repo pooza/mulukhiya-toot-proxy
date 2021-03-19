@@ -3,9 +3,7 @@ module Mulukhiya
     include Package
 
     def initialize(params = {})
-      @http = http_class.new
-      @config = config_class.instance
-      @http.base_uri = @config['/line/urls/api']
+      super
       @id = params[:id] || @config['/alert/line/to']
       @token = params[:token] || @config['/alert/line/token']
     end
