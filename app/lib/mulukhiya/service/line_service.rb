@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def initialize(params = {})
-      super
+      super rescue nil
       @id = params[:id] || @config['/alert/line/to']
       @token = params[:token] || @config['/alert/line/token']
     end
