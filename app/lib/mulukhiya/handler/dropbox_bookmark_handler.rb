@@ -1,7 +1,8 @@
 module Mulukhiya
   class DropboxBookmarkHandler < BookmarkHandler
     def disable?
-      return super || sns.account.dropbox.nil?
+      return false unless sns.account.dropbox
+      return super
     end
 
     def worker_class

@@ -1,14 +1,12 @@
 module Mulukhiya
   class SlackAlertHandler < AlertHandler
-    def alert(error, params = {})
-      SlackService.broadcast(error.to_h)
+    def disable?
+      return true unless config['/alert/slack/hooks'].present? rescue true
+      return super
     end
 
-    def disable?
-      return true unless config['/alert/slack/hooks'].present?
-      return super
-    rescue Ginseng::ConfigError
-      return true
+    def alert(error, params = {})
+      SlackService.broadcast(error.to_h)
     end
   end
 end

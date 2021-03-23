@@ -6,7 +6,8 @@ module Mulukhiya
     end
 
     def disable?
-      return super || !SpotifyService.config?
+      return false unless SpotifyService.config?
+      return super
     end
 
     def updatable?(keyword)

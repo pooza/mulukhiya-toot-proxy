@@ -1,7 +1,8 @@
 module Mulukhiya
   class AmazonURLNowplayingHandler < NowplayingHandler
     def disable?
-      return super || !AmazonService.config?
+      return false unless AmazonService.config?
+      return super
     end
 
     def create_uri(keyword)

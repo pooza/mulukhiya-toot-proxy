@@ -1,16 +1,16 @@
 module Mulukhiya
   class GrowiAnnounceHandler < AnnounceHandler
-    def announce(announcement, params = {})
-      return announcement unless growi
-      params = params.clone
-      params[:format] = :md
-      response = growi.clip(body: create_body(announcement, params))
-      result.push(path: response['page']['path'])
-      return announcement
+    def disable?
+      return false unless sns.account.growi
+      return super
     end
 
-    def growi
-      return sns.account.growi rescue nil
+    def announce(announcement, params = {})
+      params = params.clone
+      params[:format] = :md
+      response = sns.account.growi.clip(body: create_body(announcement, params))
+      result.push(path: response['page']['path'])
+      return announcement
     end
   end
 end

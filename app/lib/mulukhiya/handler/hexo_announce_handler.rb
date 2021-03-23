@@ -3,7 +3,9 @@ require 'date'
 module Mulukhiya
   class HexoAnnounceHandler < AnnounceHandler
     def disable?
-      return super || category.nil? || dir.nil?
+      return false unless category
+      return false unless dir
+      return super
     end
 
     def announce(announcement, params = {})

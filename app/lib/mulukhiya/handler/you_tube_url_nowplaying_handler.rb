@@ -1,7 +1,8 @@
 module Mulukhiya
   class YouTubeURLNowplayingHandler < NowplayingHandler
     def disable?
-      return super || !YouTubeService.config?
+      return false unless YouTubeService.config?
+      return super
     end
 
     def create_uri(keyword)

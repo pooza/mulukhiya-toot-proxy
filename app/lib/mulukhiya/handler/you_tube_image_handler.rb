@@ -1,7 +1,8 @@
 module Mulukhiya
   class YouTubeImageHandler < ImageHandler
     def disable?
-      return super || !YouTubeService.config?
+      return false unless YouTubeService.config?
+      return super
     end
 
     def handle_pre_toot(body, params = {})

@@ -7,7 +7,8 @@ module Mulukhiya
     end
 
     def disable?
-      return super || !AmazonService.config?
+      return false unless AmazonService.config?
+      return super
     end
 
     def updatable?(keyword)

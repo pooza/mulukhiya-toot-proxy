@@ -1,16 +1,16 @@
 module Mulukhiya
   class DropboxAnnounceHandler < AnnounceHandler
-    def announce(announcement, params = {})
-      return announcement unless dropbox
-      params = params.clone
-      params[:format] = :md
-      response = dropbox.clip(body: create_body(announcement, params))
-      result.push(path: response.path_display)
-      return announcement
+    def disable?
+      return false unless sns.account.dropbox
+      return super
     end
 
-    def dropbox
-      return sns.account.dropbox rescue nil
+    def announce(announcement, params = {})
+      params = params.clone
+      params[:format] = :md
+      response = sns.account.dropbox.clip(body: create_body(announcement, params))
+      result.push(path: response.path_display)
+      return announcement
     end
   end
 end
