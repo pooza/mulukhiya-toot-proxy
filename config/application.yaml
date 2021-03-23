@@ -127,6 +127,7 @@ mastodon:
   features:
     webhook: true
     media_catalog: true
+    favorite_tags: true
     feed: true
     announcement: true
     filter: true

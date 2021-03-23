@@ -20,6 +20,21 @@ module Mulukhiya
         return listable != false
       end
 
+      def self.favorites
+        favorites = {}
+        Postgres.instance.exec('tagged_accounts').each do |row|
+          parser = controller_class.parser_class.new(row['note'])
+          parser.tags.each do |v|
+            favorites[v] ||= 0
+            favorites[v] += 1
+          end
+        end
+        return favorites.sort_by {|k, v| v}.reverse.to_h
+      rescue => e
+        logger.error(error: e)
+        return {}
+      end
+
       def self.get(key)
         if key.key?(:tag)
           return nil if key[:tag].nil?

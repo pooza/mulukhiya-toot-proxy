@@ -207,6 +207,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getFavoriteTags = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createURL('/mulukhiya/api/tagging/favorites'))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.updateTaggingDictionary = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

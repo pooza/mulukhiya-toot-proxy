@@ -28,6 +28,10 @@ module Mulukhiya
       assert_boolean(controller_class.futured_tag?)
     end
 
+    def test_favorite_tags?
+      assert_boolean(controller_class.favorite_tags?)
+    end
+
     def test_annict?
       assert_boolean(controller_class.annict?)
     end

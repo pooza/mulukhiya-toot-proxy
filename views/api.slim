@@ -94,6 +94,16 @@ html lang='ja'
                   | を取得し、キャッシュします。
                 .field-update-button-container
                   button @click='updatePrograms' 実行
+        - if controller.favorite_tags?
+          li
+            h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
+            vue-slide-up-down :active='layout.details.favorite_tags'
+              .endpoint-container
+                .link GET /mulukhiya/api/tagging/favorites
+                .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
+                .field-update-button-container
+                  button @click='getFavoriteTags' 実行
+                  pre class='result' v-if='result.favorite_tags' = '{{result.favorite_tags}}'
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
@@ -203,6 +213,7 @@ html lang='ja'
           },
           result: {
             search_tag: null,
+            favorite_tags: null,
             media_list: null,
             program_list: null,
             feed_list: null,
@@ -215,6 +226,7 @@ html lang='ja'
               media: false,
               oauth: false,
               program: false,
+              favorite_tags: false,
               tagging_dic: false,
               tagging_usertag: false,
               feed: false,
@@ -280,6 +292,12 @@ html lang='ja'
             this.result.program_list = null
             Vue.getPrograms()
               .then(e => {this.result.program_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getFavoriteTags: function () {
+            this.result.favorite_tags = null
+            Vue.getFavoriteTags()
+              .then(e => {this.result.favorite_tags = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateTaggingDictionary: function () {
