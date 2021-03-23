@@ -1,7 +1,7 @@
 module Mulukhiya
   class SlackAlertHandler < AlertHandler
     def disable?
-      return true unless config['/alert/slack/hooks'].present? rescue true
+      return true unless SlackService.config?
       return super
     end
 

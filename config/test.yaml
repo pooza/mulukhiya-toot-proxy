@@ -79,6 +79,9 @@ filters:
   - name: annict
     cases:
       - 'annict*'
+  - name: slack
+    cases:
+      - 'slack*'
   - name: line
     cases:
       - 'line*'
