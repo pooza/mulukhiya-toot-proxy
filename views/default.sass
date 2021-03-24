@@ -393,8 +393,28 @@ section
     li
       font:
         size: 0.8em
+    button.small
+      font:
+        size: 0.8em
 
-section.disabled
+section.fav_entries
+  article
+    display: inline-block
+    border:
+      width: 0
+      style: solid
+      color: transparent
+      radius: 3px
+    background:
+      color: papayawhip
+    span
+      padding: 0 0.5em
+    a
+      font:
+        family: $sans-serif
+
+
+section.tagging_dictionary article.disabled
   background:
     color: lightgray
   border:
@@ -487,6 +507,8 @@ a:hover
   color: navy
   text:
     decoration: underline
+
+
 
 .message-container
   border:
