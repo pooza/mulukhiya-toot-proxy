@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def disable?
-      return false unless AmazonService.config?
+      return true unless AmazonService.config?
       return super
     end
 

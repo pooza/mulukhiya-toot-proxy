@@ -1,7 +1,7 @@
 module Mulukhiya
   class FilterCommandHandler < CommandHandler
     def disable?
-      return false unless controller_class.filter?
+      return true unless controller_class.filter?
       return super
     end
 

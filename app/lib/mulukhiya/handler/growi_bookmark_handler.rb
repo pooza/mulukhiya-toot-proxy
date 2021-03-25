@@ -1,7 +1,7 @@
 module Mulukhiya
   class GrowiBookmarkHandler < BookmarkHandler
     def disable?
-      return false unless sns.account.growi
+      return true unless sns.account.growi
       return super
     end
 

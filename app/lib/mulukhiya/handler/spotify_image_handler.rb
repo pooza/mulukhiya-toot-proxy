@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpotifyImageHandler < ImageHandler
     def disable?
-      return false unless SpotifyService.config?
+      return true unless SpotifyService.config?
       return super
     end
 

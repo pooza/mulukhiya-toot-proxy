@@ -3,8 +3,8 @@ require 'date'
 module Mulukhiya
   class HexoAnnounceHandler < AnnounceHandler
     def disable?
-      return false unless category
-      return false unless dir
+      return true unless category
+      return true unless dir
       return super
     end
 

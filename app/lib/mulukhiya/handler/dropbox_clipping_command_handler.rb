@@ -1,7 +1,7 @@
 module Mulukhiya
   class DropboxClippingCommandHandler < CommandHandler
     def disable?
-      return false unless sns.account.dropbox
+      return true unless sns.account.dropbox
       return super
     end
 
