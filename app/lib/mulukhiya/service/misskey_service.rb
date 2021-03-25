@@ -8,11 +8,10 @@ module Mulukhiya
 
     def upload(path, params = {})
       if filename = params[:filename]
-        dir = File.join(Environment.dir, 'tmp/media', path.adler32.to_s)
+        dir = File.join(Environment.dir, 'tmp/media/upload', File.basename(path))
         FileUtils.mkdir_p(dir)
         file = MediaFile.new(path)
         dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
-        dest = File.join(dir, dest)
         FileUtils.copy(path, dest)
         path = dest
       end
