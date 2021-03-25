@@ -13,10 +13,6 @@ module Mulukhiya
       return true
     end
 
-    def favorites
-      return nil
-    end
-
     def feed_uri
       @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{raw_name}")
       return @feed_uri
@@ -27,6 +23,16 @@ module Mulukhiya
       params[:tag] = name
       params[:tag_id] = id rescue nil
       return Postgres.instance.execute('tag_timeline', params)
+    end
+
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def favorites
+        return nil
+      end
     end
   end
 end
