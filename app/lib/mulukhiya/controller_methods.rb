@@ -21,6 +21,10 @@ module Mulukhiya
         return config["/#{name}/features/media_catalog"] == true rescue false
       end
 
+      def favorite_tags?
+        return config["/#{name}/features/favorite_tags"] == true rescue false
+      end
+
       def feed?
         return config["/#{name}/features/feed"] rescue false
       end

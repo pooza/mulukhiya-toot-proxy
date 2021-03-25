@@ -1,7 +1,8 @@
 module Mulukhiya
   class SpotifyURLNowplayingHandler < NowplayingHandler
     def disable?
-      return super || !SpotifyService.config?
+      return true unless SpotifyService.config?
+      return super
     end
 
     def create_uri(keyword)

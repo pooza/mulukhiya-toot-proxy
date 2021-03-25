@@ -27,6 +27,11 @@ module Mulukhiya
       assert_kind_of(Hash, @nowplaying.to_h)
     end
 
+    def test_favorites
+      return unless controller_class.favorite_tags?
+      assert_kind_of(Hash, hash_tag_class.favorites)
+    end
+
     def test_create_feed
       return unless @default
       feed = @default.create_feed(limit: 5)

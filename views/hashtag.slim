@@ -5,27 +5,36 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ辞書'}
+    == slim.render 'fragment/breadcrumbs', {current: 'ハッシュタグ'}
     main id='app' class=env.type
       == slim.render 'fragment/message'
-      h2 ハッシュタグ辞書
-      section
-        input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
-        button class='small' :disabled='!keyword' @click='search' 検索
-      section :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in result'
-        h3
-          | {{entry.word}}
-          span class='alert' v-if='entry.short' 未使用
-        nav v-if='account.username'
-          button class='small' :disabled='!isDisabledTag(entry.word)' @click='setTagStatus(entry.word, true)' 有効
-          button class='small' :disabled='isDisabledTag(entry.word)' @click='setTagStatus(entry.word, false)' 無効
-        ul
-          li
-            strong パターン
-            code = "/{{entry.regexp}}/"
-          li
-            strong タグ
-            code v-for='tag in entry.tags' = "{{tag}} "
+      h2 ハッシュタグ
+      - if controller.favorite_tags?
+        section class='fav_entries'
+          h3 プロフィールに含まれるタグ
+          article class='tag-entry' v-for='(count, tag) in fav_entries'
+            a :href='"/tags/" + tag' target='_blank'
+              span = '#{{tag}}'
+            span = '{{count}}'
+      section class='tagging_dictionary'
+        h3 ハッシュタグ辞書を検索
+        section
+          input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
+          button class='small' :disabled='!keyword' @click='search' 検索
+        article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
+          h4
+            | {{entry.word}}
+            span class='alert' v-if='entry.short' 未使用
+          nav v-if='account.username'
+            button class='small' :disabled='!isDisabledTag(entry.word)' @click='setTagStatus(entry.word, true)' 有効
+            button class='small' :disabled='isDisabledTag(entry.word)' @click='setTagStatus(entry.word, false)' 無効
+          ul
+            li
+              strong パターン
+              code = "/{{entry.regexp}}/"
+            li
+              strong タグ
+              code v-for='tag in entry.tags' = "{{tag}} "
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -36,41 +45,45 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          tags: [],
+          disabled_tags: [],
           keyword: null,
-          result: {},
+          dic_entries: {},
+          fav_entries: [],
         },
         mounted: function () {
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              this.tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
+              this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => Vue.alert(this.$dialog, e))
+          Vue.getFavoriteTags()
+            .then(e => {this.fav_entries = e})
+            .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           onKeyDown: function () {
             if (event.keyCode == 13) {this.search()}
           },
           search: function () {
-            this.result = {}
+            this.dic_entries = {}
             if (this.keyword == '') {return}
             Vue.searchTags(this.keyword)
-              .then(e => {this.result = e})
+              .then(e => {this.dic_entries = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           isDisabledTag: function (tag) {
-            this.tags = this.tags || []
-            return this.tags.includes(tag)
+            this.disabled_tags = this.disabled_tags || []
+            return this.disabled_tags.includes(tag)
           },
           setTagStatus: function (tag, flag) {
             const command = {tagging: {tags: {disabled: []}}}
-            this.tags = this.tags || []
+            this.disabled_tags = this.disabled_tags || []
             if (flag) {
-              this.tags = this.tags.filter(v => (v != tag))
-              if (this.tags.length == 0) {this.tags = null}
+              this.disabled_tags = this.disabled_tags.filter(v => (v != tag))
+              if (this.disabled_tags.length == 0) {this.disabled_tags = null}
             } else {
-              this.tags.push(tag)
-              this.tags = Array.from(new Set(this.tags))
+              this.disabled_tags.push(tag)
+              this.disabled_tags = Array.from(new Set(this.disabled_tags))
             }
             command.tagging.tags.disabled = this.tags
             Vue.updateConfig(command)

@@ -24,5 +24,15 @@ module Mulukhiya
       params[:tag_id] = id rescue nil
       return Postgres.instance.execute('tag_timeline', params)
     end
+
+    def self.included(base)
+      base.extend(Methods)
+    end
+
+    module Methods
+      def favorites
+        return nil
+      end
+    end
   end
 end

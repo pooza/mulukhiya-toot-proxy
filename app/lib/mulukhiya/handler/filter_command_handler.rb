@@ -1,7 +1,8 @@
 module Mulukhiya
   class FilterCommandHandler < CommandHandler
     def disable?
-      return !Environment.mastodon? || super
+      return true unless controller_class.filter?
+      return super
     end
 
     def exec

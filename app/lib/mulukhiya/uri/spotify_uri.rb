@@ -13,29 +13,6 @@ module Mulukhiya
 
     alias valid? spotify?
 
-    def shortenable?
-      return shorten.present?
-    end
-
-    def shorten
-      return nil unless host == 'link.tospotify.com'
-      http = HTTP.new
-      href = to_s
-      response = nil
-      loop do
-        response = http.get(href, {follow_redirects: false})
-        break unless href = response.headers['location']
-      end
-      return nil unless uri = Ginseng::URI.scan(response.body)&.first
-      return nil unless uri = SpotifyURI.parse(uri.to_s)
-      return nil unless uri.spotify?
-      uri.query_values = nil
-      return uri
-    rescue => e
-      logger.error(error: e, url: to_s)
-      return nil
-    end
-
     def track_id
       return nil unless SpotifyService.config?
       config['/spotify/patterns'].each do |entry|

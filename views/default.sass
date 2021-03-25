@@ -27,7 +27,8 @@ h1
     align: center
   font:
     size: 3em
-  line-height: 2em
+  line:
+    height: 2em
 
 h2:before
   content: '■ '
@@ -83,7 +84,8 @@ nav.breadcrumbs
   opacity: 0.85
   ul
     margin: 0
-    line-height: 0.9em
+    line:
+      height: 0.9em
     padding: 0
     li
       font:
@@ -393,8 +395,30 @@ section
     li
       font:
         size: 0.8em
+    button.small
+      font:
+        size: 0.8em
 
-section.disabled
+section.fav_entries
+  article
+    display: inline-block
+    margin:
+      bottom: 0.5em
+    border:
+      width: 0
+      style: solid
+      color: transparent
+      radius: 3px
+    background:
+      color: papayawhip
+    span
+      padding: 0 0.5em
+    a
+      font:
+        family: $sans-serif
+
+
+section.tagging_dictionary article.disabled
   background:
     color: lightgray
   border:

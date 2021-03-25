@@ -5,7 +5,6 @@ module Mulukhiya
       @root = SpotifyURI.parse('https://spotify.com')
       @track = SpotifyURI.parse('https://open.spotify.com/track/7f47OJZ6x9EZ4G2ZWOOlQZ')
       @album = SpotifyURI.parse('https://open.spotify.com/album/7xtiD9nNWrbbAtbbInNllD')
-      @link = SpotifyURI.parse('https://link.tospotify.com/ZArOrV7KAbb')
     end
 
     def test_spotify?
@@ -13,23 +12,6 @@ module Mulukhiya
       assert(@root.spotify?)
       assert(@track.spotify?)
       assert(@album.spotify?)
-      assert_false(@link.spotify?)
-    end
-
-    def test_shortenable?
-      assert_false(@google.shortenable?)
-      assert_false(@root.shortenable?)
-      assert_false(@track.shortenable?)
-      assert_false(@album.shortenable?)
-      assert(@link.shortenable?)
-    end
-
-    def test_shorten
-      assert_nil(@google.shorten)
-      assert_nil(@root.shorten)
-      assert_nil(@track.shorten)
-      assert_nil(@album.shorten)
-      assert_equal(@link.shorten.to_s, 'https://open.spotify.com/track/3L6K6hTLVjVhiTdsMEaWii')
     end
 
     def test_track_id

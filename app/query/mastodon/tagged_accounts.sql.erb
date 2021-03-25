@@ -1,0 +1,11 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  username,
+  display_name,
+  note
+FROM accounts
+WHERE note LIKE '%#%'
+  AND (domain IS null)
+  AND ((actor_type = 'Person') OR (actor_type IS null))
+  AND (silenced_at IS null)
+  AND (suspended_at IS null)

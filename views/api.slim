@@ -17,7 +17,7 @@ html lang='ja'
               .endpoint-container
                 .role admin
                 .link POST /mulukhiya/api/announcement/update
-                pre.payload 
+                pre.payload
                   | {{query_params.announcement_update}}
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
                   .link-description
@@ -39,7 +39,7 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/file/clear
-              pre.payload 
+              pre.payload
                 | {{query_params.media_file_clear}}
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link-description
@@ -51,7 +51,7 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/metadata/clear
-              pre.payload 
+              pre.payload
                 | {{query_params.media_metadata_clear}}
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
@@ -62,7 +62,7 @@ html lang='ja'
             .endpoint-container
               .role admin
               .link POST /mulukhiya/api/oauth/client/clear
-              pre.payload 
+              pre.payload
                 | {{query_params.oauth_client_clear}}
               .link-description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
               .field-update-button-container
@@ -83,7 +83,7 @@ html lang='ja'
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
-                pre.payload 
+                pre.payload
                   | {{query_params.program_update}}
                 - if config.keys('/sidekiq/schedule/program_update').member?('every')
                   .link-description
@@ -94,12 +94,22 @@ html lang='ja'
                   | を取得し、キャッシュします。
                 .field-update-button-container
                   button @click='updatePrograms' 実行
+        - if controller.favorite_tags?
+          li
+            h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
+            vue-slide-up-down :active='layout.details.favorite_tags'
+              .endpoint-container
+                .link GET /mulukhiya/api/tagging/favorites
+                .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
+                .field-update-button-container
+                  button @click='getFavoriteTags' 実行
+                  pre class='result' v-if='result.favorite_tags' = '{{result.favorite_tags}}'
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
-              pre.payload 
+              pre.payload
                 | {{query_params.tagging_tag_search}}
               input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
@@ -109,7 +119,7 @@ html lang='ja'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
-              pre.payload 
+              pre.payload
                 | {{query_params.tagging_dic_update}}
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
                 .link-description
@@ -127,7 +137,7 @@ html lang='ja'
             .endpoint-container
               .role admin
               .link POST /mulukhiya/api/tagging/usertag/clear
-              pre.payload 
+              pre.payload
                 | {{query_params.tagging_usertag_clear}}
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
                 .link-description
@@ -151,7 +161,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.annict'
             .endpoint-container
               .link POST /mulukhiya/api/annict/crawl
-              pre.payload 
+              pre.payload
                 | {{query_params.annict_crawl}}
               .link-description Annictへの問い合わせを行います。
               .field-update-button-container
@@ -203,6 +213,7 @@ html lang='ja'
           },
           result: {
             search_tag: null,
+            favorite_tags: null,
             media_list: null,
             program_list: null,
             feed_list: null,
@@ -215,6 +226,7 @@ html lang='ja'
               media: false,
               oauth: false,
               program: false,
+              favorite_tags: false,
               tagging_dic: false,
               tagging_usertag: false,
               feed: false,
@@ -280,6 +292,12 @@ html lang='ja'
             this.result.program_list = null
             Vue.getPrograms()
               .then(e => {this.result.program_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getFavoriteTags: function () {
+            this.result.favorite_tags = null
+            Vue.getFavoriteTags()
+              .then(e => {this.result.favorite_tags = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateTaggingDictionary: function () {

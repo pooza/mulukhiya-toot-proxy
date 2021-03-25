@@ -174,6 +174,12 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/tagging/favorites' do
+      @sns.token ||= @sns.default_token
+      @renderer.message = Environment.hash_tag_class.favorites
+      return @renderer.to_s
+    end
+
     post '/tagging/tag/search' do
       dic = {}
       errors = TagSearchContract.new.exec(params)
