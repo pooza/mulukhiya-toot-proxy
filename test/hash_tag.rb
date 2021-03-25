@@ -28,6 +28,7 @@ module Mulukhiya
     end
 
     def test_favorites
+      return unless controller_class.favorite_tags?
       assert_kind_of(Hash, hash_tag_class.favorites)
     end
 
