@@ -50,6 +50,10 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
+  spoiler:
+    emoji: netabare
+    pattern: (ねた|ネタ)(ばれ|バレ)
+    disable: true
   spotify_image:
     timeout: 10
     disable: true
@@ -179,12 +183,12 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -208,12 +212,12 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -298,7 +302,6 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -322,7 +325,6 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -340,7 +342,6 @@ misskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -415,7 +416,6 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -439,7 +439,6 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -457,7 +456,6 @@ meisskey:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -534,7 +532,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -560,7 +557,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
@@ -578,7 +574,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - spotify_url
       - amazon_url
       - itunes_url_nowplaying
       - amazon_url_nowplaying
