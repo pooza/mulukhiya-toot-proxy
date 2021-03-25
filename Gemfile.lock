@@ -168,7 +168,7 @@ GEM
       ffi (>= 1.0.0)
       rake
     fileutils (1.5.0)
-    fugit (1.4.3)
+    fugit (1.4.4)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.20.0)
