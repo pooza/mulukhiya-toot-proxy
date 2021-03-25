@@ -53,7 +53,6 @@ handler:
   spoiler:
     emoji: netabare
     pattern: (ねた|ネタ)(ばれ|バレ)
-    disable: true
   spotify_image:
     timeout: 10
     disable: true
