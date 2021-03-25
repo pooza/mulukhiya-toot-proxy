@@ -9,12 +9,13 @@ html lang='ja'
     main id='app' class=env.type
       == slim.render 'fragment/message'
       h2 ハッシュタグ
-      section class='fav_entries'
-        h3 プロフィールに含まれるハッシュタグ
-        article class='tag-entry' v-for='(count, tag) in fav_entries'
-          a :href='"/tags/" + tag' target='_blank'
-            span = '#{{tag}}'
-          span = '{{count}}'
+      - if controller.favorite_tags?
+        section class='fav_entries'
+          h3 プロフィールに含まれるタグ
+          article class='tag-entry' v-for='(count, tag) in fav_entries'
+            a :href='"/tags/" + tag' target='_blank'
+              span = '#{{tag}}'
+            span = '{{count}}'
       section class='tagging_dictionary'
         h3 ハッシュタグ辞書を検索
         section
