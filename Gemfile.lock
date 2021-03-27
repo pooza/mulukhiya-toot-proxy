@@ -343,6 +343,7 @@ GEM
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
+    timecop (0.9.4)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     uglifier (4.2.0)
@@ -394,6 +395,7 @@ DEPENDENCIES
   sidekiq-unique-jobs
   slim_lint
   test-unit
+  timecop
   vacuum
 
 RUBY VERSION

@@ -37,4 +37,5 @@ group :development do
   gem 'rubocop-sequel'
   gem 'slim_lint'
   gem 'test-unit'
+  gem 'timecop'
 end
