@@ -1,12 +1,14 @@
 require 'timecop'
 
 module Mulukhiya
-  class LontTextImageHandlerTest < TestCase
+  class LongTextImageHandlerTest < TestCase
     def setup
       @handler = Handler.create('long_text_image')
     end
 
     def test_disable?
+      return if Environment.development?
+
       Timecop.travel(Time.parse('2021/04/01'))
       return unless handler?
 
