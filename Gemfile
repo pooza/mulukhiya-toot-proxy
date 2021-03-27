@@ -11,6 +11,7 @@ gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'mimemagic'
+gem 'mini_magick'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq'
@@ -37,4 +38,5 @@ group :development do
   gem 'rubocop-sequel'
   gem 'slim_lint'
   gem 'test-unit'
+  gem 'timecop'
 end

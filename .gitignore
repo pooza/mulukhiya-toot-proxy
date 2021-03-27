@@ -5,4 +5,5 @@ Thumbs.db
 .fuse*
 config/local.*
 .sass-cache
+font/
 dist
