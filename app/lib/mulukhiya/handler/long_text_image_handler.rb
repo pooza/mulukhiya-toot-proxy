@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def executable?(body)
-      return false if attachment_limit <= body[attachment_field].count
+      return false if attachment_limit <= (body[attachment_field] || []).count
 
       # 本来は半角文字は0.5文字として数えるべきなどという苦情は受け付けません。
       # あのサービスの正しい仕様になど、作者は興味がないです。

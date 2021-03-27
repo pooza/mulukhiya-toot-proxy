@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      return if Environment.development?
+      return unless Environment.production?
 
       Timecop.travel(Time.parse('2021/04/01'))
       return unless handler?
@@ -34,6 +34,7 @@ module Mulukhiya
       return unless handler?
 
       @handler.handle_pre_toot(status_field => 'あ' * 500)
+      ic @handler.debug_info
       assert_equal(@handler.debug_info[:result].first, {message: '今日は4月1日です。'})
     ensure
       Timecop.return
