@@ -38,6 +38,14 @@ handler:
   itunes_image:
     pixel: 480
     timeout: 10
+  long_text_image:
+    disable: true
+    text_length: 140
+    image_file: 'public/mulukhiya/media/background.png'
+    font_file: 'font/HackGen-Regular.ttf'
+    font_size: 30
+    columns: 20
+    rows: 30
   shortened_url:
     domains:
       - t.co
@@ -178,6 +186,7 @@ mastodon:
       - amazon_image
       - you_tube_image
       - bandai_channel_image
+      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -296,6 +305,7 @@ misskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - bandai_channel_image
+      - long_text_image
       - attachment_reusing
       - shortened_url
       - url_normalize
@@ -411,6 +421,7 @@ meisskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - bandai_channel_image
+      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -527,6 +538,7 @@ pleroma:
       - amazon_image
       - you_tube_image
       - bandai_channel_image
+      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
