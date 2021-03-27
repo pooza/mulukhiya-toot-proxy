@@ -5,6 +5,7 @@ module Mulukhiya
     def setup
       @parser = NoteParser.new
       @parser.account = account
+      config['/handler/long_text_image/disable'] = true
     end
 
     def app
