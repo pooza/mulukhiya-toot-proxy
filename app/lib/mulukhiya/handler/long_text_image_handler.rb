@@ -1,13 +1,7 @@
-# ■使い方
-# 設置ディレクトリ/font ディレクトリ作成し、その中に適当なフォントを置く。
-# （HackGenなら、設定もいじる必要がなくお勧め）
-# 設定値 /handler/long_text_image/disable をfalseに。
-
 module Mulukhiya
   class LongTextImageHandler < ImageHandler
     def disable?
       if Environment.production?
-        # 本番環境で、4/1以外でも動作させたいアホな^H^H^H人は、下2行をコメントアウトしてください。
         return true unless today.month == 4
         return true unless today.day == 1
       end
@@ -36,9 +30,6 @@ module Mulukhiya
 
     def executable?(body)
       return false if attachment_limit <= (body[attachment_field] || []).count
-
-      # 本来は半角文字は0.5文字として数えるべきなどという苦情は受け付けません。
-      # あのサービスの正しい仕様になど、作者は興味がないです。
       return text_length < body[status_field].length
     end
 
@@ -89,15 +80,3 @@ module Mulukhiya
     end
   end
 end
-
-# おまけの雑談です。
-# 昨年は、エイプリルフールネタの準備が間に合わなかったんです。
-# ちょうど100ワニが流行ってた（…流行ってた？）頃だったから、「ワニ語尾を強制するハンドラ」
-# などという、叱られ発生が必至なネタを考えていた。
-# 「今日は良い天気ですね。」ってトゥートすると「今日は良い天気ですねワニ！」なんて置き換える、
-# 頭の悪すぎるネタだったから、実際にはお蔵入りになったのはよかったかもしれないけど。
-#
-# で、2021年のエイプリルフールネタですが。
-# 140文字を越える投稿を行うとそのテキストを画像に変換し、長文投稿を行える様になる便利機能です。
-# 一発ネタとして楽しんでもらえるとうれしいけど、不謹慎厨やら自治警察やらに叱られたり、
-# 逆に「ちょうべんりですね！」なんてめっちゃ感謝されたら困っちゃいますね。
