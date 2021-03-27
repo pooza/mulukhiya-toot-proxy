@@ -34,7 +34,6 @@ module Mulukhiya
       return unless handler?
 
       @handler.handle_pre_toot(status_field => 'あ' * 500)
-      ic @handler.debug_info
       assert_equal(@handler.debug_info[:result].first, {message: '今日は4月1日です。'})
     ensure
       Timecop.return
