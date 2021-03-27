@@ -1,5 +1,3 @@
-require 'timecop'
-
 module Mulukhiya
   class LongTextImageHandlerTest < TestCase
     def setup
