@@ -316,6 +316,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -339,6 +340,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -431,6 +433,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -454,6 +457,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -548,6 +552,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -573,6 +578,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
