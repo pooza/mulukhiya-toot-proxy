@@ -89,7 +89,7 @@ module Mulukhiya
       body_template[type] = values.deep_stringify_keys
       title_template = Template.new("annict/#{type}_title")
       title_template[type] = values.deep_stringify_keys
-      if body_template.to_s.match?(config['/annict/spoiler/pattern'])
+      if body_template.to_s.match?(config['/spoiler/pattern'])
         body = {
           'spoiler_text' => "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）",
           'text' => body_template.to_s.lstrip,

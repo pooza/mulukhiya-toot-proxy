@@ -58,9 +58,6 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
-  spoiler:
-    emoji: netabare
-    pattern: (ねた|ネタ)(ばれ|バレ)
   spotify_image:
     timeout: 10
     disable: true
@@ -90,6 +87,9 @@ parser:
         options: choices
 test:
   timeout: 20
+spoiler:
+  emoji: netabare
+  pattern: (ねた|ネタ)(ばれ|バレ)
 webui:
   production:
     scripts:
@@ -664,8 +664,6 @@ annict:
   urls:
     oauth: https://annict.jp
     api: https://api.annict.com
-  spoiler:
-    pattern: (ねた|ネタ)(ばれ|バレ)
   sleep:
     seconds: 0.5
   api:
