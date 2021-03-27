@@ -8,6 +8,7 @@ module Mulukhiya
 
     def teardown
       config.reload
+      Timecop.return
     end
 
     def account
