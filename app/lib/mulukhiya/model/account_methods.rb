@@ -12,6 +12,10 @@ module Mulukhiya
       return @acct
     end
 
+    def maintainer?
+      return admin? || moderator?
+    end
+
     def service
       unless @service
         @service = Environment.sns_class.new

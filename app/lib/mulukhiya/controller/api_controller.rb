@@ -89,8 +89,7 @@ module Mulukhiya
 
     post '/program/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless controller_class.livecure?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       ProgramUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -100,7 +99,7 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::NotFoundError, 'Unauthorized' unless controller_class.media_catalog?
+      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.media_catalog?
       @sns.token ||= @sns.default_token
       params[:page] = params[:page]&.to_i || 1
       errors = PagerContract.new.exec(params)
@@ -120,8 +119,7 @@ module Mulukhiya
     end
 
     post '/media/file/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       MediaCleaningWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -131,8 +129,7 @@ module Mulukhiya
     end
 
     post '/media/metadata/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
@@ -174,8 +171,7 @@ module Mulukhiya
 
     post '/announcement/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless controller_class.announcement?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       AnnouncementWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -185,8 +181,7 @@ module Mulukhiya
     end
 
     post '/oauth/client/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       sns_class.new.clear_oauth_client
       return @renderer.to_s
     rescue => e
@@ -207,8 +202,7 @@ module Mulukhiya
     end
 
     post '/tagging/dic/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       TaggingDictionaryUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -241,8 +235,7 @@ module Mulukhiya
     end
 
     post '/tagging/usertag/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' if !@sns.account.admin? || !@sns.account.moderator?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       UserTagInitializeWorker.new.perform
       return @renderer.to_s
     rescue => e
