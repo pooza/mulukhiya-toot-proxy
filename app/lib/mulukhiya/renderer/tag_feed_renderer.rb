@@ -23,10 +23,6 @@ module Mulukhiya
       @atom = nil
     end
 
-    def default_tag?
-      return TagContainer.default_tag_bases.member?(tag)
-    end
-
     def limit=(limit)
       @limit = limit
       @atom = nil
@@ -53,7 +49,7 @@ module Mulukhiya
       @atom = nil
       return nil unless controller_class.feed?
       return nil unless record
-      record.create_feed({limit: limit, tag: tag, local: !default_tag?}).each do |row|
+      record.create_feed({limit: limit, tag: tag, local: record.local?}).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),

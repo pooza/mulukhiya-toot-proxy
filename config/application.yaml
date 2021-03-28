@@ -849,6 +849,9 @@ tagging:
   user_tags:
     extra_minutes: 2
     clear_message: 固定タグをクリアしました。
+  remote_default_tags:
+    - precure_fun
+    - delmulin
   word:
     minimum_length: 3
   media:
