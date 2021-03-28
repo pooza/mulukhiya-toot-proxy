@@ -43,7 +43,7 @@ module Mulukhiya
 
     post '/filter/add' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.filter?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
       Handler.create('filter_command').handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
@@ -54,7 +54,7 @@ module Mulukhiya
     end
 
     post '/mastodon/auth' do
-      raise Ginseng::AuthError, 'Unauthorized' unless Environment.mastodon_type?
+      raise Ginseng::NotFoundError, 'Not Found'  unless Environment.mastodon_type?
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
@@ -72,7 +72,7 @@ module Mulukhiya
     end
 
     get '/program' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.livecure?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.livecure?
       @sns.token ||= @sns.default_token
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)
@@ -88,7 +88,7 @@ module Mulukhiya
     end
 
     post '/program/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.livecure?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.livecure?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       ProgramUpdateWorker.new.perform
       return @renderer.to_s
@@ -99,7 +99,7 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.media_catalog?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.media_catalog?
       @sns.token ||= @sns.default_token
       params[:page] = params[:page]&.to_i || 1
       errors = PagerContract.new.exec(params)
@@ -139,7 +139,7 @@ module Mulukhiya
     end
 
     post '/annict/auth' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.annict?
+      raise Ginseng::NotFoundError, 'Not Found'   unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       errors = AnnictAuthContract.new.exec(params)
       if errors.present?
@@ -160,7 +160,7 @@ module Mulukhiya
     end
 
     post '/annict/crawl' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.annict?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
     rescue => e
@@ -170,7 +170,7 @@ module Mulukhiya
     end
 
     post '/announcement/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.announcement?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
       AnnouncementWorker.new.perform
       return @renderer.to_s
@@ -191,7 +191,7 @@ module Mulukhiya
     end
 
     get '/tagging/favorites' do
-      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.favorite_tags?
+      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.favorite_tags?
       @sns.token ||= @sns.default_token
       @renderer.message = Environment.hash_tag_class.favorites
       return @renderer.to_s
