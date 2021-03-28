@@ -2,17 +2,14 @@ module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
-      if webhook
-        if payload.errors.present?
-          @renderer.status = 422
-          @renderer.message = payload.errors
-        else
-          reporter = webhook.post(payload)
-          @renderer.message = reporter.response.parsed_response
-          @renderer.status = reporter.response.code
-        end
+      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      if payload.errors.present?
+        @renderer.status = 422
+        @renderer.message = payload.errors
       else
-        @renderer.status = 404
+        reporter = webhook.post(payload)
+        @renderer.message = reporter.response.parsed_response
+        @renderer.status = reporter.response.code
       end
       return @renderer.to_s
     rescue => e
@@ -23,11 +20,8 @@ module Mulukhiya
 
     get '/:digest' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
-      if webhook
-        @renderer.message = {message: 'OK'}
-      else
-        @renderer.status = 404
-      end
+      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      @renderer.message = {message: 'OK'}
       return @renderer.to_s
     rescue => e
       @renderer.status = e.status
