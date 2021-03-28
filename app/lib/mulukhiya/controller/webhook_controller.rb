@@ -1,7 +1,7 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.webhook?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
       if webhook
         if payload.errors.present?
           @renderer.status = 422
@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     get '/:digest' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.webhook?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
       if webhook
         @renderer.message = {message: 'OK'}
       else

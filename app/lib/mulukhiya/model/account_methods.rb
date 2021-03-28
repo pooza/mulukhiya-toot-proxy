@@ -12,7 +12,7 @@ module Mulukhiya
       return @acct
     end
 
-    def maintainer?
+    def operator?
       return admin? || moderator?
     end
 

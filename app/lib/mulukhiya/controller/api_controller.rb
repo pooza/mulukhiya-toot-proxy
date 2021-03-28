@@ -54,7 +54,7 @@ module Mulukhiya
     end
 
     post '/mastodon/auth' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless Environment.mastodon_type?
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.mastodon_type?
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
@@ -72,7 +72,7 @@ module Mulukhiya
     end
 
     get '/program' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.livecure?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       @sns.token ||= @sns.default_token
       path = File.join(Environment.dir, 'tmp/cache/programs.json')
       if File.readable?(path)
@@ -88,8 +88,8 @@ module Mulukhiya
     end
 
     post '/program/update' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.livecure?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       ProgramUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -99,7 +99,7 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.media_catalog?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       @sns.token ||= @sns.default_token
       params[:page] = params[:page]&.to_i || 1
       errors = PagerContract.new.exec(params)
@@ -119,7 +119,7 @@ module Mulukhiya
     end
 
     post '/media/file/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       MediaCleaningWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -129,7 +129,7 @@ module Mulukhiya
     end
 
     post '/media/metadata/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
@@ -160,7 +160,7 @@ module Mulukhiya
     end
 
     post '/annict/crawl' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.annict?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
     rescue => e
@@ -170,8 +170,8 @@ module Mulukhiya
     end
 
     post '/announcement/update' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.announcement?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       AnnouncementWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -181,7 +181,7 @@ module Mulukhiya
     end
 
     post '/oauth/client/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       sns_class.new.clear_oauth_client
       return @renderer.to_s
     rescue => e
@@ -191,7 +191,7 @@ module Mulukhiya
     end
 
     get '/tagging/favorites' do
-      raise Ginseng::NotFoundError, 'Not Found'  unless controller_class.favorite_tags?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.favorite_tags?
       @sns.token ||= @sns.default_token
       @renderer.message = Environment.hash_tag_class.favorites
       return @renderer.to_s
@@ -202,7 +202,7 @@ module Mulukhiya
     end
 
     post '/tagging/dic/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       TaggingDictionaryUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
@@ -235,7 +235,7 @@ module Mulukhiya
     end
 
     post '/tagging/usertag/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.maintainer?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
       UserTagInitializeWorker.new.perform
       return @renderer.to_s
     rescue => e
