@@ -139,7 +139,7 @@ module Mulukhiya
     end
 
     post '/annict/auth' do
-      raise Ginseng::NotFoundError, 'Not Found'   unless controller_class.annict?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       errors = AnnictAuthContract.new.exec(params)
       if errors.present?
