@@ -11,7 +11,7 @@ module Mulukhiya
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      @renderer.message = {'error' => e.message}
+      @renderer.message = {error: e.message}
       notify('error' => e.raw_message)
       @renderer.status = e.source_status
       return @renderer.to_s

@@ -1,6 +1,7 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
+      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.webhook?
       if webhook
         if payload.errors.present?
           @renderer.status = 422
@@ -15,26 +16,28 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      @renderer.message = {'error' => e.message}
       @renderer.status = e.status
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
     get '/:digest' do
+      raise Ginseng::AuthError, 'Unauthorized' unless controller_class.webhook?
       if webhook
         @renderer.message = {message: 'OK'}
       else
         @renderer.status = 404
       end
       return @renderer.to_s
+    rescue => e
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
     end
 
     def webhook
       @webhook ||= Webhook.create(params[:digest])
       return @webhook
-    rescue => e
-      logger.error(error: e, params: params)
-      return nil
     end
 
     def payload
