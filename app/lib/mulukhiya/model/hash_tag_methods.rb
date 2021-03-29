@@ -45,7 +45,18 @@ module Mulukhiya
 
     module Methods
       def favorites
-        return nil
+        favorites = {}
+        Postgres.instance.exec('tagged_accounts').each do |row|
+          parser = controller_class.parser_class.new(row['note'].downcase)
+          parser.tags.each do |v|
+            favorites[v] ||= 0
+            favorites[v] += 1
+          end
+        end
+        return favorites.sort_by {|k, v| v}.reverse.to_h
+      rescue => e
+        logger.error(error: e)
+        return {}
       end
     end
   end
