@@ -508,6 +508,7 @@ pleroma:
   features:
     webhook: true
     media_catalog: true
+    favorite_tags: true
     feed: true
     annict: true
   oauth:

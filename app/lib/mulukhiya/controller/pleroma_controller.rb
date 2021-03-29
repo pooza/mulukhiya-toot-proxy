@@ -33,6 +33,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    def self.create_tag_uri(tag)
+      return @sns.create_uri("/tag/#{tag.to_hashtag_base}")
+    end
+
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
       Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|

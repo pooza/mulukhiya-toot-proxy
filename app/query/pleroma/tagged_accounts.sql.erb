@@ -1,0 +1,9 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  nickname AS username,
+  name AS display_name,
+  raw_bio AS note
+FROM users
+WHERE raw_bio LIKE '%#%'
+  AND (local = true)
+  AND (invisible = false)
