@@ -6,9 +6,8 @@ module Mulukhiya
     def initialize
       super
       @http = HTTP.new
-      refresh unless exist?
-      refresh if corrupted?
-      load
+      refresh unless cache.is_a?(Hash)
+      update(cache)
     end
 
     def matches(body)
@@ -35,46 +34,22 @@ module Mulukhiya
       update(sort_by {|k, v| k.length}.to_h)
     end
 
-    def exist?
-      return File.exist?(path)
-    end
-
-    def corrupted?
-      return false unless load_cache.is_a?(Array)
-      return true
-    rescue TypeError, Errno::ENOENT => e
-      logger.error(error: e, path: path)
-      return true
-    end
-
-    def path
-      return File.join(Environment.dir, 'tmp/cache/tagging_dictionary.marshal')
-    end
-
-    def load
-      return unless exist?
-      clear
-      update(load_cache)
-    end
-
-    def load_cache
-      @cache ||= Marshal.load(File.read(path)) # rubocop:disable Security/MarshalLoad
+    def cache
+      @cache ||= Marshal.load(redis.get('tagging_dictionary')) # rubocop:disable Security/MarshalLoad
       return @cache
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def refresh
-      File.write(path, Marshal.dump(merge(fetch)))
+      redis.set('tagging_dictionary', Marshal.dump(merge(fetch)))
       @cache = nil
-      logger.info(class: self.class.to_s, path: path, message: 'refreshed')
-      load
+      logger.info(class: self.class.to_s, message: 'refreshed')
+      clear
+      update(cache)
     rescue => e
       logger.error(error: e)
-    end
-
-    alias create refresh
-
-    def delete
-      File.unlink(path) if exist?
     end
 
     def remote_dics(&block)
@@ -87,6 +62,11 @@ module Mulukhiya
     end
 
     private
+
+    def redis
+      @redis ||= Redis.new
+      return @redis
+    end
 
     def create_temp_text(body)
       parts = [(body[status_field] || '').gsub(Acct.pattern, '')]

@@ -4,9 +4,7 @@ namespace :mulukhiya do
       desc 'update tagging dictionary'
       task :update do
         dic = Mulukhiya::TaggingDictionary.new
-        dic.delete if dic.exist?
-        dic.create
-        puts "path: #{dic.path}"
+        dic.refresh
         puts "#{dic.remote_dics.count} remote dics"
         puts "#{dic.count} tags"
       end
