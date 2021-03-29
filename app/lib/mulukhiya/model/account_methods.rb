@@ -98,7 +98,7 @@ module Mulukhiya
 
     def disabled_tag_bases
       tags = TagContainer.new
-      dic_cache = TaggingDictionary.new.load_cache
+      dic_cache = TaggingDictionary.new.cache
       (user_config['/tagging/tags/disabled'] || []).each do |tag|
         tags.push(tag)
         tags.concat(dic_cache[tag][:words])

@@ -218,7 +218,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors: errors}
       else
-        TaggingDictionary.new.load_cache.each do |entry|
+        TaggingDictionary.new.cache.each do |entry|
           word = entry.shift
           next unless params[:q].match?(entry.first[:regexp])
           dic[word] = entry.first
