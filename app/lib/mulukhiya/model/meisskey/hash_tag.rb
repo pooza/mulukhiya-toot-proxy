@@ -43,6 +43,27 @@ module Mulukhiya
         end
       end
 
+      def self.favorites
+        favorites = {}
+        accounts = Account.collection.aggregate([
+          {'$match' => {
+            'host' => nil,
+            'isBot' => {'$ne' => true},
+            'tags' => {'$nin' => [[], nil]},
+          }},
+        ])
+        accounts.each do |account|
+          account.to_h['tags'].each do |v|
+            favorites[v] ||= 0
+            favorites[v] += 1
+          end
+        end
+        return favorites.sort_by {|k, v| v}.reverse.to_h
+      rescue => e
+        logger.error(error: e)
+        return {}
+      end
+
       def self.[](id)
         return HashTag.new(id)
       end
