@@ -5,10 +5,10 @@ module Mulukhiya
   class MastodonListener
     include Package
     include SNSMethods
-    attr_reader :client, :uri
+    attr_reader :client, :uri, :sns
 
     def open
-      logger.info(class: self.class.to_s, message: 'open', uri: @uri.to_s)
+      logger.info(class: self.class.to_s, message: 'open', uri: uri.to_s)
     end
 
     def close(event)
@@ -73,9 +73,9 @@ module Mulukhiya
     private
 
     def initialize
-      @mastodon = info_agent_service
-      @uri = @mastodon.create_streaming_uri
-      @client = Faye::WebSocket::Client.new(@uri.to_s, nil, {
+      @sns = info_agent_service
+      @uri = @sns.create_streaming_uri
+      @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
         ping: config['/websocket/keepalive'],
       })
     end

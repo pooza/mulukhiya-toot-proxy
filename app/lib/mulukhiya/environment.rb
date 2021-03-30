@@ -138,6 +138,7 @@ module Mulukhiya
       values = {
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
+        listener: ListenerDaemon.health,
       }
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?

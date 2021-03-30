@@ -4,7 +4,7 @@ module Mulukhiya
     include SNSMethods
 
     def command
-      return Ginseng::CommandLine.new([
+      return CommandLine.new([
         File.join(Environment.dir, 'bin/listener_worker.rb'),
       ])
     end
