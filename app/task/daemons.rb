@@ -1,5 +1,5 @@
 namespace :mulukhiya do
-  [:listener, :sidekiq, :puma].each do |daemon|
+  [:listener, :puma, :sidekiq].freeze.each do |daemon|
     namespace daemon do
       [:start, :stop].freeze.each do |action|
         desc "#{action} #{daemon}"
