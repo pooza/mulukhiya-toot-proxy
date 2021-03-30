@@ -1,5 +1,5 @@
 namespace :mulukhiya do
-  [:puma, :sidekiq].freeze.each do |daemon|
+  [:listener, :sidekiq, :puma].each do |daemon|
     namespace daemon do
       [:start, :stop].freeze.each do |action|
         desc "#{action} #{daemon}"
@@ -18,5 +18,9 @@ end
 
 [:start, :stop, :restart].freeze.each do |action|
   desc "#{action} all"
-  multitask action => ["mulukhiya:puma:#{action}", "mulukhiya:sidekiq:#{action}"]
+  multitask action => [
+    "mulukhiya:listener:#{action}",
+    "mulukhiya:puma:#{action}",
+    "mulukhiya:sidekiq:#{action}",
+  ]
 end

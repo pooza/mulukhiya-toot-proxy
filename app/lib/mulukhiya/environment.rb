@@ -46,6 +46,10 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
 
+    def self.listener_class
+      return "Mulukhiya::#{controller_name.camelize}Listener".constantize
+    end
+
     def self.mastodon?
       return controller_name == 'mastodon'
     end
