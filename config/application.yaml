@@ -142,6 +142,7 @@ mastodon:
     feed: true
     announcement: true
     filter: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:

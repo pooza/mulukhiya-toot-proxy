@@ -18,9 +18,5 @@ end
 
 [:start, :stop, :restart].freeze.each do |action|
   desc "#{action} all"
-  multitask action => [
-    "mulukhiya:listener:#{action}",
-    "mulukhiya:puma:#{action}",
-    "mulukhiya:sidekiq:#{action}",
-  ]
+  multitask action => Mulukhiya::Environment.task_prefixes.map {|v| "#{v}:#{action}"}
 end

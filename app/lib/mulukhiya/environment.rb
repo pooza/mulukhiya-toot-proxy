@@ -134,6 +134,12 @@ module Mulukhiya
       return controller_class.dbms_class
     end
 
+    def self.task_prefixes
+      tasks = ['mulukhiya:puma', 'mulukhiya:sidekiq']
+      tasks.push('mulukhiya:listener') if controller_class.streaming?
+      return tasks
+    end
+
     def self.health
       values = {
         redis: Redis.health,
