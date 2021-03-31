@@ -144,8 +144,8 @@ module Mulukhiya
       values = {
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
-        listener: ListenerDaemon.health,
       }
+      values[:streaming] = ListenerDaemon.health if controller_class.streaming?
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
