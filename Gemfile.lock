@@ -319,7 +319,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
     sequel (5.42.0)
-    sidekiq (6.2.0)
+    sidekiq (6.1.3)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -399,7 +399,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq
+  sidekiq (~> 6.1.0)
   sidekiq-failures
   sidekiq-scheduler!
   sidekiq-unique-jobs
