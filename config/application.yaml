@@ -130,6 +130,8 @@ webui:
     viewport: width=1000
   cache:
     ttl: 86400
+  javascript:
+    minimize: false
 mastodon:
   display_name: Mastodon
   sns_type: mastodon
