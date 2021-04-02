@@ -260,6 +260,8 @@ mastodon:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert

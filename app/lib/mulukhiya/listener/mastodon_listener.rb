@@ -7,18 +7,18 @@ module Mulukhiya
     include SNSMethods
     attr_reader :client, :uri, :sns
 
-    def open
-      logger.info(class: self.class.to_s, message: 'open', uri: uri.to_s)
-    end
-
     def close(event)
       @client = nil
-      logger.error(class: self.class.to_s, message: 'close', reason: event.reason)
+      e = Ginseng::GatewayError.new('close')
+      e.message = {reason: event.reason}
+      logger.error(error: e)
     end
 
     def error(event)
       @client = nil
-      logger.error(class: self.class.to_s, message: 'error', reason: event.reason)
+      e = Ginseng::GatewayError.new('close')
+      e.message = {reason: event.reason}
+      logger.error(error: e)
     end
 
     def receive(message)
@@ -33,11 +33,9 @@ module Mulukhiya
       logger.error(error: e, payload: payload)
     end
 
-    def handle_mention_notification(payload)
-      SlackService.broadcast(payload)
+    def handle_follow_notification(payload)
+      Event.new(:follow, {reporter: @reporter, sns: @sns}).dispatch(payload)
     end
-
-    def handle_follow_notification(payload); end
 
     def handle_update(payload); end
 
@@ -46,10 +44,6 @@ module Mulukhiya
     def self.start
       EM.run do
         listener = MastodonListener.new
-
-        listener.client.on :open do |e|
-          listener.open
-        end
 
         listener.client.on :close do |e|
           listener.close(e)
@@ -75,6 +69,7 @@ module Mulukhiya
     def initialize
       @sns = info_agent_service
       @uri = @sns.create_streaming_uri
+      @reporter = Reporter.new
       @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
         ping: config['/websocket/keepalive'],
       })
