@@ -899,6 +899,9 @@ webhook:
     あんなの、戦いのうちに入らないわ。
     奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
 agent:
+  info:
+    follow:
+      template: welcome
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 crypt:
