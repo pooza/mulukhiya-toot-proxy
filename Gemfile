@@ -11,7 +11,7 @@ gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fe
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
-gem 'mimemagic'
+gem 'mimemagic', '>=4.0'
 gem 'mini_magick'
 gem 'rspotify'
 gem 'ruby-progressbar'
