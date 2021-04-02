@@ -9,6 +9,7 @@ module Mulukhiya
       return payload unless sns = params[:sns]
       return payload unless account = Environment.account_class[payload.dig('account', 'id')]
       sns.notify(account, template.to_s)
+      return payload
     end
 
     def template
