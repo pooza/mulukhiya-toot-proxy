@@ -23,6 +23,18 @@ module Mulukhiya
       assert_boolean(@nowplaying.listable?)
     end
 
+    def test_default?
+      assert_boolean(@nowplaying.default?)
+    end
+
+    def test_remote_default?
+      assert_boolean(@nowplaying.remote_default?)
+    end
+
+    def test_local?
+      assert_boolean(@nowplaying.local?)
+    end
+
     def test_to_h
       assert_kind_of(Hash, @nowplaying.to_h)
     end
