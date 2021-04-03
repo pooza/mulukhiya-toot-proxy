@@ -91,3 +91,6 @@ filters:
   - name: default_hash_tag
     cases:
       - tag_feed_renderer
+  - name: listener
+    cases:
+      - listener_daemon
