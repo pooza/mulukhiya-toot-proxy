@@ -900,8 +900,11 @@ webhook:
     奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
 agent:
   info:
+    token: null
     follow:
       template: welcome
+  test:
+    token: null
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 crypt:
