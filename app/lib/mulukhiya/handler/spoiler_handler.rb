@@ -5,17 +5,18 @@ module Mulukhiya
       return body if parser.command?
       subject = body[controller_class.spoiler_field]
       return body unless subject&.match?(pattern)
+      subject.sub!(Regexp.new("^#{shortcode} *"), '')
       body[controller_class.spoiler_field] = "#{shortcode} #{subject}"
       result.push(subject: subject)
       return body
     end
 
     def shortcode
-      return ":#{config['/handler/spoiler/emoji']}:"
+      return ":#{config['/spoiler/emoji']}:"
     end
 
     def pattern
-      return Regexp.new(config['/handler/spoiler/pattern'])
+      return Regexp.new(config['/spoiler/pattern'])
     end
   end
 end

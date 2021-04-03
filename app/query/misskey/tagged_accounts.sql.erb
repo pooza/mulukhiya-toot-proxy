@@ -1,0 +1,12 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  "user".username,
+  "user".name AS display_name,
+  user_profile.description AS note
+FROM "user"
+  INNER JOIN user_profile on "user".id = "user_profile"."userId"
+WHERE user_profile.description LIKE '%#%'
+  AND ("user".host IS null)
+  AND ("user"."isBot" = false)
+  AND ("user"."isSilenced" = false)
+  AND ("user"."isSuspended" = false)

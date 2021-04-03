@@ -17,6 +17,14 @@ module Mulukhiya
       return config['/tagging/default_tags'].map(&:to_hashtag_base) rescue []
     end
 
+    def self.remote_default_tags
+      return config['/tagging/remote_default_tags'].map(&:to_hashtag) rescue []
+    end
+
+    def self.remote_default_tag_bases
+      return config['/tagging/remote_default_tags'].map(&:to_hashtag_base) rescue []
+    end
+
     def self.media_tag?
       return config['/tagging/media/enable'] == true rescue true
     end

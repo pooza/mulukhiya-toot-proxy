@@ -6,7 +6,7 @@ module Mulukhiya
     sidekiq_options retry: false, lock: :until_executed
 
     def perform
-      return unless executable?
+      return unless controller_class.announcement?
       announcements.each do |announcement|
         next if cache.member?(announcement[:id])
         Event.new(:announce, {sns: info_agent_service}).dispatch(announcement)
@@ -18,11 +18,12 @@ module Mulukhiya
       save
     end
 
-    private
-
     def cache
-      return {} unless File.exist?(path)
-      return JSON.parse(File.read(path))
+      if File.exist?(path)
+        redis.set('announcements', JSON.parse(File.read(path)))
+        File.unlink(path)
+      end
+      return JSON.parse(redis.get('announcements') || '{}')
     end
 
     def announcements
@@ -30,8 +31,10 @@ module Mulukhiya
       return @announcements
     end
 
+    private
+
     def save
-      File.write(path, announcements.to_h {|v| [v[:id], v]}.to_json)
+      redis.set('announcements', announcements.to_h {|v| [v[:id], v]}.to_json)
     rescue => e
       logger.error(error: e)
     end
@@ -40,8 +43,9 @@ module Mulukhiya
       return File.join(Environment.dir, 'tmp/cache/announcements.json')
     end
 
-    def executable?
-      return controller_class.announcement?
+    def redis
+      @redis ||= Redis.new
+      return @redis
     end
   end
 end

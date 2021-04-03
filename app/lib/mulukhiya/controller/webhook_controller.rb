@@ -1,40 +1,37 @@
 module Mulukhiya
   class WebhookController < Controller
     post '/:digest' do
-      if webhook
-        if payload.errors.present?
-          @renderer.status = 422
-          @renderer.message = payload.errors
-        else
-          reporter = webhook.post(payload)
-          @renderer.message = reporter.response.parsed_response
-          @renderer.status = reporter.response.code
-        end
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
+      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      if payload.errors.present?
+        @renderer.status = 422
+        @renderer.message = payload.errors
       else
-        @renderer.status = 404
+        reporter = webhook.post(payload)
+        @renderer.message = reporter.response.parsed_response
+        @renderer.status = reporter.response.code
       end
       return @renderer.to_s
     rescue => e
-      @renderer.message = {'error' => e.message}
       @renderer.status = e.status
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
     get '/:digest' do
-      if webhook
-        @renderer.message = {message: 'OK'}
-      else
-        @renderer.status = 404
-      end
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.webhook?
+      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      @renderer.message = {message: 'OK'}
+      return @renderer.to_s
+    rescue => e
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 
     def webhook
       @webhook ||= Webhook.create(params[:digest])
       return @webhook
-    rescue => e
-      logger.error(error: e, params: params)
-      return nil
     end
 
     def payload

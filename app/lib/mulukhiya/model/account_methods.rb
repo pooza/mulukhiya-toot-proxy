@@ -12,6 +12,10 @@ module Mulukhiya
       return @acct
     end
 
+    def operator?
+      return admin? || moderator?
+    end
+
     def service
       unless @service
         @service = Environment.sns_class.new
@@ -94,7 +98,7 @@ module Mulukhiya
 
     def disabled_tag_bases
       tags = TagContainer.new
-      dic_cache = TaggingDictionary.new.load_cache
+      dic_cache = TaggingDictionary.new.cache
       (user_config['/tagging/tags/disabled'] || []).each do |tag|
         tags.push(tag)
         tags.concat(dic_cache[tag][:words])

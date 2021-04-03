@@ -1,5 +1,3 @@
-require 'timecop'
-
 module Mulukhiya
   class LongTextImageHandlerTest < TestCase
     def setup
@@ -20,8 +18,6 @@ module Mulukhiya
 
       Timecop.travel(Time.parse('2021/04/02'))
       assert(@handler.disable?)
-    ensure
-      Timecop.return
     end
 
     def test_executable?
@@ -35,8 +31,6 @@ module Mulukhiya
 
       @handler.handle_pre_toot(status_field => 'あ' * 500)
       assert_equal(@handler.debug_info[:result].first, {message: '今日は4月1日です。'})
-    ensure
-      Timecop.return
     end
   end
 end

@@ -13,8 +13,12 @@ html lang='ja'
         section class='fav_entries'
           h3 プロフィールに含まれるタグ
           article class='tag-entry' v-for='(count, tag) in fav_entries'
-            a :href='"/tags/" + tag' target='_blank'
-              span = '#{{tag}}'
+            - if env.pleroma?
+              a :href='"/tag/" + tag' target='_blank'
+                span = '#{{tag}}'
+            - else
+              a :href='"/tags/" + tag' target='_blank'
+                span = '#{{tag}}'
             span = '{{count}}'
       section class='tagging_dictionary'
         h3 ハッシュタグ辞書を検索

@@ -18,6 +18,8 @@ filters:
       - media_feed_renderer
       - reporter
       - handler
+      - listener_daemon
+      - template
       - '*_controller'
       - '*_handler'
   - name: postgres
@@ -91,3 +93,6 @@ filters:
   - name: default_hash_tag
     cases:
       - tag_feed_renderer
+  - name: listener
+    cases:
+      - listener_daemon

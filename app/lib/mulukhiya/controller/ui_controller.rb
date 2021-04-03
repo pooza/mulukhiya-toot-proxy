@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     get '/app/misskey/auth' do
-      raise "Invalid controller '#{Environment.controller_name}'" unless Environment.misskey_type?
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
       @renderer = SlimRenderer.new
       @renderer.template = 'misskey_auth'
       errors = MisskeyAuthContract.new.exec(params)
@@ -31,7 +31,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       @renderer = Ginseng::Web::JSONRenderer.new
-      @renderer.status = 403
+      @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end

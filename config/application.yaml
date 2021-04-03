@@ -1,5 +1,5 @@
 package:
-  version: 4.2.8
+  version: 4.3.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -58,9 +58,6 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
-  spoiler:
-    emoji: netabare
-    pattern: (ねた|ネタ)(ばれ|バレ)
   spotify_image:
     timeout: 10
     disable: true
@@ -90,6 +87,9 @@ parser:
         options: choices
 test:
   timeout: 20
+spoiler:
+  emoji: netabare
+  pattern: (ねた|ネタ)(ばれ|バレ)
 webui:
   production:
     scripts:
@@ -130,6 +130,8 @@ webui:
     viewport: width=1000
   cache:
     ttl: 86400
+  javascript:
+    minimize: false
 mastodon:
   display_name: Mastodon
   sns_type: mastodon
@@ -142,6 +144,7 @@ mastodon:
     feed: true
     announcement: true
     filter: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:
@@ -257,6 +260,8 @@ mastodon:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert
@@ -269,6 +274,7 @@ misskey:
   features:
     webhook: true
     media_catalog: true
+    favorite_tags: true
     feed: true
     announcement: true
     annict: true
@@ -316,6 +322,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -339,6 +346,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -388,6 +396,7 @@ meisskey:
   features:
     webhook: true
     media_catalog: true
+    favorite_tags: true
     feed: true
     announcement: true
     annict: true
@@ -431,6 +440,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -454,6 +464,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -503,6 +514,7 @@ pleroma:
   features:
     webhook: true
     media_catalog: true
+    favorite_tags: true
     feed: true
     annict: true
   oauth:
@@ -548,6 +560,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
       - invalid_command
     post_toot:
@@ -573,6 +586,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - spoiler
       - tagging
     post_webhook:
       - result_notification
@@ -664,8 +678,6 @@ annict:
   urls:
     oauth: https://annict.jp
     api: https://api.annict.com
-  spoiler:
-    pattern: (ねた|ネタ)(ばれ|バレ)
   sleep:
     seconds: 0.5
   api:
@@ -845,6 +857,9 @@ tagging:
   user_tags:
     extra_minutes: 2
     clear_message: 固定タグをクリアしました。
+  remote_default_tags:
+    - precure_fun
+    - delmulin
   word:
     minimum_length: 3
   media:
@@ -870,6 +885,8 @@ http:
   retry:
     limit: 3
     seconds: 1
+websocket:
+  keepalive: 15
 redis:
   retry:
     limit: 3
@@ -882,6 +899,12 @@ webhook:
     あんなの、戦いのうちに入らないわ。
     奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
 agent:
+  info:
+    token: null
+    follow:
+      template: welcome
+  test:
+    token: null
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
 crypt:

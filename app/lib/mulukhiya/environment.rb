@@ -46,6 +46,10 @@ module Mulukhiya
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
     end
 
+    def self.listener_class
+      return "Mulukhiya::#{controller_name.camelize}Listener".constantize
+    end
+
     def self.mastodon?
       return controller_name == 'mastodon'
     end
@@ -130,11 +134,18 @@ module Mulukhiya
       return controller_class.dbms_class
     end
 
+    def self.task_prefixes
+      tasks = ['mulukhiya:puma', 'mulukhiya:sidekiq']
+      tasks.push('mulukhiya:listener') if controller_class.streaming?
+      return tasks
+    end
+
     def self.health
       values = {
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
       }
+      values[:streaming] = ListenerDaemon.health if controller_class.streaming?
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}

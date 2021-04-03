@@ -8,7 +8,12 @@ module Mulukhiya
     end
 
     def to_s
-      return ScriptStorage.new[path]
+      return ScriptStorage.new[path] if minimize?
+      return File.read(path)
+    end
+
+    def minimize?
+      return config['/webui/javascript/minimize']
     end
   end
 end

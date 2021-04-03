@@ -1,3 +1,7 @@
+- key: /spoiler/pattern
+  aliases:
+    - /annict/spoiler/pattern
+    - /handler/spoiler/pattern
 - key: /alert/slack/hooks
   aliases:
     - /slack/hooks

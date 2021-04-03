@@ -236,3 +236,11 @@ properties:
         enum:
           - base64
           - hex
+  webui:
+    type: object
+    properties:
+      javascript:
+        type: object
+        properties:
+          minimize:
+            type: boolean
