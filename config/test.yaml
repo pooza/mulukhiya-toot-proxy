@@ -18,6 +18,7 @@ filters:
       - media_feed_renderer
       - reporter
       - handler
+      - lister_daemon
       - '*_controller'
       - '*_handler'
   - name: postgres
