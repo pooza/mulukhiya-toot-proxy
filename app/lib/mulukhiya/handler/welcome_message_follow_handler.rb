@@ -2,6 +2,7 @@ module Mulukhiya
   class WelcomeMessageFollowHandler < Handler
     def disable?
       return true unless Environment.dbms_class.config?
+      return true unless Environment.controller_class.listener?
       return false
     end
 
