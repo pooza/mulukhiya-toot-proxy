@@ -17,6 +17,12 @@ module Mulukhiya
       required(:annict).maybe(:hash).schema do
         optional(:token).maybe(:string)
       end
+      required(:lemmy).maybe(:hash).schema do
+        optional(:host).maybe(:string)
+        optional(:user).maybe(:string)
+        optional(:password).maybe(:string)
+        optional(:community).maybe(:integer)
+      end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
         optional(:user_config).maybe(:bool)
@@ -51,6 +57,7 @@ module Mulukhiya
       values['notify'] ||= {}
       values['amazon'] ||= {}
       values['annict'] ||= {}
+      values['lemmy'] ||= {}
       values['tagging'] ||= {}
       values['tagging']['user_tags'] ||= []
       values['tagging']['tags'] ||= {}

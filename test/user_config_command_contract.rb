@@ -41,6 +41,30 @@ module Mulukhiya
       errors = @contract.call(command: 'user_config', amazon: {affiliate: 333}).errors
       assert_false(errors.empty?)
 
+      errors = @contract.call(command: 'user_config', lemmy: {host: 111}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {host: 'lm.korako.me'}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {user: 111}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {user: 'pooza@b-shock.org'}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {password: 111}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {password: 'you_pass_word'}).errors
+      assert(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {community: 'community_name'}).errors
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', lemmy: {community: 111}).errors
+      assert(errors.empty?)
+
       errors = @contract.call(command: 'user_config', tagging: nil).errors
       assert(errors.empty?)
 

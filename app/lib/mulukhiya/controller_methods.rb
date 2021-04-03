@@ -37,6 +37,10 @@ module Mulukhiya
         return Handler.search(/dropbox/).present?
       end
 
+      def lemmy?
+        return Handler.search(/lemmy/).present?
+      end
+
       def announcement?
         return config["/#{name}/features/announcement"] == true rescue false
       end

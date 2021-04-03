@@ -82,6 +82,23 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
+      section class='config' v-if='account.username && layout.sections.lemmy'
+        h3 @click='toggleVisibility("lemmy")' Lemmy
+        vue-slide-up-down :active='layout.details.lemmy'
+          .inline-field-container
+            h4 ホスト名
+            input placeholder='Lemmyのホスト名（lemmy.example.com等）' v-model.trim='form.lemmy.host'
+          .inline-field-container
+            h4 ユーザーID
+            input placeholder='LemmyのユーザーID（メールアドレス）' v-model.trim='form.lemmy.user'
+          .inline-field-container
+            h4 パスワード
+            input placeholder='Lemmyのパスワード' v-model.trim='form.lemmy.password'
+          .inline-field-container
+            h4 コミュニティID
+            input placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
+          .field-update-button-container
+            button @click='updateLemmy' 更新
       section class='config' v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
@@ -141,6 +158,7 @@ html lang='ja'
             webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
+            lemmy: {host: null, user: null, passwrd: null, community: null},
           },
           options: {
             program: [],
@@ -150,12 +168,14 @@ html lang='ja'
             sections: {
               livecure: #{controller.livecure?},
               growi: #{controller.growi?},
+              lemmy: #{controller.lemmy?},
               dropbox: #{controller.dropbox?},
               annict: #{controller.annict?},
             },
             details: {
               growi: false,
               dropbox: false,
+              lemmy: false,
               tags: false,
               livecure: false,
               webhook: false,
@@ -190,6 +210,9 @@ html lang='ja'
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
             this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
             this.form.dropbox.token = Vue.dig(data, 'config', 'dropbox', 'token')
+            this.form.lemmy.host = Vue.dig(data, 'config', 'lemmy', 'host')
+            this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
+            this.form.lemmy.community = Vue.dig(data, 'config', 'lemmy', 'community')
             this.form.notify.user_config = Vue.dig(data, 'config', 'notify', 'user_config') == true
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
             if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
@@ -235,6 +258,14 @@ html lang='ja'
           updateDropbox: function () {
             const command = {dropbox: {token: null}}
             if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
+            this.updateConfig(command)
+          },
+          updateLemmy: function () {
+            const command = {lemmy: {host: null, user: null, community: null}}
+            if (this.form.lemmy.host) {command.lemmy.host = this.form.lemmy.host}
+            if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
+            if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
+            if (this.form.lemmy.community) {command.lemmy.community = this.form.lemmy.community}
             this.updateConfig(command)
           },
           updateTags: function () {
