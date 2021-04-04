@@ -1,8 +1,8 @@
 module Mulukhiya
   class SlackWebhookPayload < WebhookPayload
-    def contract
-      @contract ||= SlackWebhookContract.new.exec(raw) if raw
-      return @contract
+    def errors
+      @errors ||= SlackWebhookContract.new.exec(raw) if raw
+      return @errors
     end
 
     def blocks?
