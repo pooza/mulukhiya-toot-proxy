@@ -74,12 +74,7 @@ module Mulukhiya
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       @sns.token ||= @sns.default_token
-      path = File.join(Environment.dir, 'tmp/cache/programs.json')
-      if File.readable?(path)
-        @renderer.message = JSON.parse(File.read(path))
-      else
-        @renderer.message = []
-      end
+      @renderer.message = Program.instance.data
       return @renderer.to_s
     rescue => e
       @renderer.status = e.status

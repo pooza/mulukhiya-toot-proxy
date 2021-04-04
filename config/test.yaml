@@ -96,3 +96,6 @@ filters:
   - name: listener
     cases:
       - listener_daemon
+  - name: livecure
+    cases:
+      - program
