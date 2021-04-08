@@ -136,7 +136,10 @@ module Mulukhiya
 
     def self.task_prefixes
       tasks = ['mulukhiya:puma', 'mulukhiya:sidekiq']
-      tasks.push('mulukhiya:listener') if controller_class.streaming?
+      return tasks unless controller_class.streaming?
+      return tasks unless event = Event.new(:follow) rescue nil
+      return tasks unless event.count.positive?
+      tasks.push('mulukhiya:listener')
       return tasks
     end
 
