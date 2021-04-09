@@ -38,7 +38,7 @@ module Mulukhiya
             client_name: package_class.name,
             website: config['/package/url'],
             redirect_uris: config['/pleroma/oauth/redirect_uri'],
-            scopes: config['/pleroma/oauth/scopes'].join(' '),
+            scopes: PleromaController.oauth_scopes.join(' '),
           },
         }).body
         redis.set('oauth_client', client)

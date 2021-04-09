@@ -32,7 +32,7 @@ module Mulukhiya
             client_name: package_class.name,
             website: config['/package/url'],
             redirect_uris: config['/mastodon/oauth/redirect_uri'],
-            scopes: config['/mastodon/oauth/scopes'].join(' '),
+            scopes: MastodonController.oauth_scopes.join(' '),
           },
         }).body
         redis.set('oauth_client', client)

@@ -68,6 +68,14 @@ module Mulukhiya
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
     end
 
+    def test_oauth_scopes
+      assert_kind_of(Array, AnnictService.oauth_scopes)
+      assert(AnnictService.oauth_scopes.present?)
+      AnnictService.oauth_scopes.each do |scope|
+        assert_kind_of(String, scope)
+      end
+    end
+
     def test_create_create_payload
       return unless @service
       record = {

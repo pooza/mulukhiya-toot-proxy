@@ -60,6 +60,14 @@ module Mulukhiya
       assert_kind_of(Class, controller_class.dbms_class)
     end
 
+    def test_oauth_scopes
+      assert_kind_of(Array, controller_class.oauth_scopes)
+      assert(controller_class.oauth_scopes.present?)
+      controller_class.oauth_scopes.each do |scope|
+        assert_kind_of(String, scope)
+      end
+    end
+
     def test_status_field
       assert_kind_of(String, controller_class.status_field)
     end
