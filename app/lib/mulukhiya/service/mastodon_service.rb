@@ -40,6 +40,17 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
+    def oauth_uri
+      uri = create_uri('/oauth/authorize')
+      uri.query_values = {
+        client_id: oauth_client['client_id'],
+        response_type: 'code',
+        redirect_uri: @config['/mastodon/redirect_uri'],
+        scope: MastodonController.oauth_scopes.join(' '),
+      }
+      return uri
+    end
+
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.clone].join("\n")
       message.ellipsize!(TootParser.new.max_length)
