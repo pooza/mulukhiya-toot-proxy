@@ -29,9 +29,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 2627e2ad1dc0604c34cf053a52828f100fddfd1e
+  revision: e88d89348becf583d0234be07113726ad90c39bc
   specs:
-    ginseng-postgres (1.3.3)
+    ginseng-postgres (1.3.4)
       pg
       sequel
 
