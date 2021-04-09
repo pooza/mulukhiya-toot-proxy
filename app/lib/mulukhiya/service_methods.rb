@@ -27,6 +27,17 @@ module Mulukhiya
       redis.unlink('oauth_client')
     end
 
+    def oauth_uri
+      uri = create_uri('/oauth/authorize')
+      uri.query_values = {
+        client_id: oauth_client['client_id'],
+        response_type: 'code',
+        redirect_uri: @config["/#{Environment.controller_name}/oauth/redirect_uri"],
+        scope: Environment.controller_class.oauth_scopes.join(' '),
+      }
+      return uri
+    end
+
     def redis
       @redis ||= Redis.new
       return @redis
