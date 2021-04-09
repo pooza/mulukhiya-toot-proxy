@@ -185,9 +185,13 @@ module Mulukhiya
         client_id: AnnictService.client_id,
         response_type: 'code',
         redirect_uri: config['/annict/oauth/redirect_uri'],
-        scope: config['/annict/oauth/scopes'].join(' '),
+        scope: AnnictService.oauth_scopes.join(' '),
       }
       return uri
+    end
+
+    def self.oauth_scopes(key = 'default')
+      return config["/annict/oauth/scopes/#{key}"]
     end
 
     def self.client_id

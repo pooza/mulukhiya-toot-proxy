@@ -32,7 +32,7 @@ module Mulukhiya
           body: {
             name: package_class.name,
             description: config['/package/description'],
-            permission: config['/meisskey/oauth/scopes'],
+            permission: MeisskeyController.oauth_scopes,
             callbackUrl: http.create_uri(config['/meisskey/oauth/callback_url']).to_s,
           },
         }).body

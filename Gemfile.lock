@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: bdc5732747a2617adb116c13f69102a203b1fc1c
+  revision: 1b90713eec32a1e60534834c51559a93c6218af0
   specs:
-    ginseng-core (1.10.11)
+    ginseng-core (1.10.12)
       activesupport (>= 6.1.1)
       addressable
       bundler
@@ -23,30 +23,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 87cb7b2e97bb7d0329682698420d440e84d74cd0
+  revision: 5e7972c1f5482aa1163d301e3fe6d01618b8a92a
   specs:
-    ginseng-fediverse (1.5.7)
+    ginseng-fediverse (1.5.8)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 2627e2ad1dc0604c34cf053a52828f100fddfd1e
+  revision: e88d89348becf583d0234be07113726ad90c39bc
   specs:
-    ginseng-postgres (1.3.3)
+    ginseng-postgres (1.3.4)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: af9549693a7a6332639d170176ddcb44278e5e78
+  revision: 285274062cfb0e4841fb2a0e7a808cb0626f5764
   specs:
-    ginseng-redis (1.1.1)
+    ginseng-redis (1.1.2)
       redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ce22f906ce47309e2eb46cd4d9ac4cdd49d01d00
+  revision: 61603eb51e406a4aed3e20ef0c8515e758f1a533
   specs:
-    ginseng-web (1.3.6)
+    ginseng-web (1.3.7)
       puma (< 5.2.1)
       rss
       sass
@@ -196,7 +196,7 @@ GEM
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.2.2)
-    loofah (2.9.0)
+    loofah (2.9.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -208,7 +208,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_magick (4.11.0)
-    mini_mime (1.0.3)
+    mini_mime (1.1.0)
     mini_portile2 (2.5.0)
     minitest (5.14.4)
     mongo (2.14.0)
@@ -221,12 +221,12 @@ GEM
       ruby2_keywords (~> 0.0.1)
     netrc (0.11.0)
     nio4r (2.5.7)
-    nokogiri (1.11.2)
+    nokogiri (1.11.3)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.2-x86_64-darwin)
+    nokogiri (1.11.3-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.11.2-x86_64-linux)
+    nokogiri (1.11.3-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.5)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -236,7 +236,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    omniauth (2.0.3)
+    omniauth (2.0.4)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
       rack-protection
@@ -244,7 +244,7 @@ GEM
       oauth2 (~> 1.4)
       omniauth (>= 1.9, < 3)
     parallel (1.20.1)
-    parser (3.0.0.0)
+    parser (3.0.1.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     power_assert (2.0.0)
@@ -279,7 +279,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.2.4)
+    rexml (3.2.5)
     ricecream (0.2.0)
     rspotify (2.10.1)
       addressable (~> 2.5.2)
@@ -287,7 +287,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.12.0)
+    rubocop (1.12.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)

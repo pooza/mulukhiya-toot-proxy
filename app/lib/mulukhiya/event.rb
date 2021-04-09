@@ -29,6 +29,10 @@ module Mulukhiya
       return config["/#{Environment.controller_name}/handlers/#{label}"].each(&block)
     end
 
+    def count
+      return handler_names.count
+    end
+
     def reporter
       return params[:reporter]
     end

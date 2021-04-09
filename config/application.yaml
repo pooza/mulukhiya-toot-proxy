@@ -1,5 +1,5 @@
 package:
-  version: 4.3.1
+  version: 4.3.2
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -152,11 +152,21 @@ mastodon:
     webui:
       url: /settings/applications
     scopes:
-      - write:statuses
-      - write:media
-      - read:filters
-      - write:filters
-      - read:search
+      default:
+        - write:statuses
+        - write:media
+        - read:filters
+        - write:filters
+        - read:search
+      info:
+        - write:statuses
+        - write:media
+        - read:filters
+        - write:filters
+        - read:search
+        - read:notifications
+        - read:accounts
+        - write:follows
   status:
     parser: toot
     key: id
@@ -283,10 +293,11 @@ misskey:
     webui:
       url: /settings/api
     scopes:
-      - write:notes
-      - write:drive
-      - read:drive
-      - read:account
+      default:
+        - write:notes
+        - write:drive
+        - read:drive
+        - read:account
     callback_url: /mulukhiya/app/misskey/auth
   status:
     parser: note
@@ -403,9 +414,10 @@ meisskey:
     futured_tag: true
   oauth:
     scopes:
-      - write:notes
-      - write:drive
-      - read:drive
+      default:
+        - write:notes
+        - write:drive
+        - read:drive
     callback_url: /mulukhiya/app/misskey/auth
   status:
     parser: note
@@ -520,9 +532,10 @@ pleroma:
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
-      - write:statuses
-      - write:media
-      - read:statuses
+      default:
+        - write:statuses
+        - write:media
+        - read:statuses
   status:
     parser: toot
     key: id
@@ -722,7 +735,8 @@ annict:
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
-      - read
+      default:
+        - read
 itunes:
   country: jp
   lang: ja_jp

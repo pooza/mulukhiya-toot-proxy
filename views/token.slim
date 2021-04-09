@@ -55,7 +55,7 @@ html lang='ja'
               | 以下の権限を含むものにしてください。
             .field v-if='account.is_admin'
               .title 権限:
-              .value #{controller.oauth_default_scopes.join(', ')}
+              .value #{controller.oauth_scopes.join(', ')}
           input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
           button :disabled='!input.token' @click='registerToken' 登録
     == slim.render 'fragment/footer'
