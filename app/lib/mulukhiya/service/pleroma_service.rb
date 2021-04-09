@@ -51,7 +51,7 @@ module Mulukhiya
       uri.query_values = {
         client_id: oauth_client['client_id'],
         response_type: 'code',
-        redirect_uri: @config['/pleroma/redirect_uri'],
+        redirect_uri: @config['/pleroma/oauth/redirect_uri'],
         scope: PleromaController.oauth_scopes.join(' '),
       }
       return uri
