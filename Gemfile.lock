@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: bdc5732747a2617adb116c13f69102a203b1fc1c
+  revision: 1b90713eec32a1e60534834c51559a93c6218af0
   specs:
-    ginseng-core (1.10.11)
+    ginseng-core (1.10.12)
       activesupport (>= 6.1.1)
       addressable
       bundler
@@ -23,30 +23,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 87cb7b2e97bb7d0329682698420d440e84d74cd0
+  revision: 5e7972c1f5482aa1163d301e3fe6d01618b8a92a
   specs:
-    ginseng-fediverse (1.5.7)
+    ginseng-fediverse (1.5.8)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 2627e2ad1dc0604c34cf053a52828f100fddfd1e
+  revision: e88d89348becf583d0234be07113726ad90c39bc
   specs:
-    ginseng-postgres (1.3.3)
+    ginseng-postgres (1.3.4)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: af9549693a7a6332639d170176ddcb44278e5e78
+  revision: 285274062cfb0e4841fb2a0e7a808cb0626f5764
   specs:
-    ginseng-redis (1.1.1)
+    ginseng-redis (1.1.2)
       redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ce22f906ce47309e2eb46cd4d9ac4cdd49d01d00
+  revision: 61603eb51e406a4aed3e20ef0c8515e758f1a533
   specs:
-    ginseng-web (1.3.6)
+    ginseng-web (1.3.7)
       puma (< 5.2.1)
       rss
       sass
