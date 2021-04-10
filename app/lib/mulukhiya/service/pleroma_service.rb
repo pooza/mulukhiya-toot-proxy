@@ -38,12 +38,23 @@ module Mulukhiya
             client_name: package_class.name,
             website: config['/package/url'],
             redirect_uris: config['/pleroma/oauth/redirect_uri'],
-            scopes: config['/pleroma/oauth/scopes'].join(' '),
+            scopes: PleromaController.oauth_scopes.join(' '),
           },
         }).body
         redis.set('oauth_client', client)
       end
       return JSON.parse(client)
+    end
+
+    def oauth_uri
+      uri = create_uri('/oauth/authorize')
+      uri.query_values = {
+        client_id: oauth_client['client_id'],
+        response_type: 'code',
+        redirect_uri: @config['/pleroma/oauth/redirect_uri'],
+        scope: PleromaController.oauth_scopes.join(' '),
+      }
+      return uri
     end
 
     def notify(account, message, response = nil)

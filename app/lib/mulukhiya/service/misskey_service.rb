@@ -40,7 +40,7 @@ module Mulukhiya
           body: {
             name: package_class.name,
             description: config['/package/description'],
-            permission: config['/misskey/oauth/scopes'],
+            permission: MisskeyController.oauth_scopes,
             callbackUrl: http.create_uri(config['/misskey/oauth/callback_url']).to_s,
           },
         }).body

@@ -92,8 +92,8 @@ module Mulukhiya
         return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"]) rescue nil
       end
 
-      def oauth_default_scopes
-        return config["/#{name}/oauth/scopes"] || [] rescue nil
+      def oauth_scopes(key = 'default')
+        return config["/#{name}/oauth/scopes/#{key}"] || [] rescue nil
       end
 
       def status_field
