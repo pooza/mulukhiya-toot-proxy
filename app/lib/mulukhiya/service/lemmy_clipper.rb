@@ -4,64 +4,77 @@ require 'faye/websocket'
 module Mulukhiya
   class LemmyClipper
     include Package
-    attr_reader :uri, :client
+    attr_accessor :jwt
 
     def initialize(params = {})
       @params = params
-      @uri = Ginseng::URI.parse("wss://#{@params[:host]}/api/v2/ws")
-      @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
+    end
+
+    def uri
+      unless @uri
+        @uri = Ginseng::URI.parse("wss://#{@params[:host]}")
+        @uri.path = config['/lemmy/urls/api']
+      end
+      return @uri
+    end
+
+    def client
+      @client ||= Faye::WebSocket::Client.new(uri.to_s, nil, {
         ping: config['/websocket/keepalive'],
       })
+      return @client
     end
 
     def clip(body)
       EM.run do
-        client.send({op: 'Login', data: login_data}.to_json)
+        jwt ? post(body, jwt) : login
 
         client.on(:close) do |e|
           EM.stop_event_loop
         end
 
         client.on(:error) do |e|
-          @response = e
-          logger.error(error: e.message)
+          raise Ginseng::GatewayError, e.message
         end
 
         client.on(:message) do |message|
           payload = JSON.parse(message.data)
-          @response = send("handle_#{payload['op']}".underscore.to_sym, payload['data'], body)
+          unless send("handle_#{payload['op']}".underscore.to_sym, payload['data'], body)
+            EM.stop_event_loop
+          end
         rescue => e
-          logger.error(error: e.message)
+          logger.error(e)
           EM.stop_event_loop
         end
       end
-      return @response
-    end
-
-    def handle_login(payload, body)
-      @auth = payload['jwt']
-      return client.send({op: 'CreatePost', data: create_post_data(body)}.to_json)
     end
 
     private
 
-    def login_data
-      return {
-        username_or_email: @params['user_id'],
-        password: @params['password'].decrypt,
-      }
+    def login
+      client.send({op: 'Login', data: {
+        username_or_email: @params[:user_id],
+        password: @params[:password],
+      }}.to_json)
     end
 
-    def create_post_data(body)
-      params = body[:template].params.deep_symbolize_keys
-      source = params[:source] || params[:feed]
-      return {
-        name: (params[:entry]&.title || params[:status]),
-        url: params[:entry]&.uri&.to_s,
+    def post(body, jwt)
+      client.send({op: 'CreatePost', data: {
+        name: body[:name].to_s,
+        # url: body[:uri].to_s,
         nsfw: false,
-        community_id: source['/dest/lemmy/community_id'],
-        auth: @auth,
-      }
+        community_id: @params[:community_id],
+        auth: jwt,
+      }}.to_json)
+    end
+
+    def handle_login(payload, body)
+      post(body, payload['jwt'])
+      return true
+    end
+
+    def handle_create_post(payload, body)
+      return nil
     end
   end
 end
