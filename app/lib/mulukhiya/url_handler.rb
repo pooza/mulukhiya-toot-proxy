@@ -3,8 +3,7 @@ module Mulukhiya
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
       return body if parser.command?
-      parser.uris do |uri|
-        next unless rewritable?(uri)
+      parser.uris.select {|v| rewritable?(v)}.each do |uri|
         rewrited = rewrite(uri)
         result.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
       rescue => e
