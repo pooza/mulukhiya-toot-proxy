@@ -18,8 +18,6 @@ module Mulukhiya
     end
 
     def test_clip
-      # @clipper.jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsImlzcyI6ImxtLmtvcmFrby5tZSIsImlhdCI6MTYxODI1NzYwMX0.w__WvKbmMw1BnhzaIod3m8_hDsZkNToIoSn316bW4t0'
-
       @clipper.clip(name: Time.now)
     end
   end

@@ -4,7 +4,6 @@ require 'faye/websocket'
 module Mulukhiya
   class LemmyClipper
     include Package
-    attr_accessor :jwt
 
     def initialize(params = {})
       @params = params
@@ -27,7 +26,7 @@ module Mulukhiya
 
     def clip(body)
       EM.run do
-        jwt ? post(body, jwt) : login
+        login
 
         client.on(:close) do |e|
           EM.stop_event_loop
