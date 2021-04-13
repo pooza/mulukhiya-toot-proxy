@@ -24,7 +24,7 @@ module Mulukhiya
     end
 
     def subject
-      return note['text'].sanitize
+      return note['text'].gsub(/\s+/, ' ').sanitize
     end
 
     def parser

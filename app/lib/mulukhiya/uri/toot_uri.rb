@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def subject
-      return toot['content'].sanitize
+      return toot['content'].gsub(/\s+/, ' ').sanitize
     end
 
     def service
