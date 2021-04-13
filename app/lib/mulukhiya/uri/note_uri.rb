@@ -23,16 +23,6 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
-    def subject
-      unless @subject
-        @subject = note['cw'] if note['cw'].present?
-        @subject ||= note['text']
-        @subject.gsub!(/\s+/, ' ')
-        @subject.sanitize!
-      end
-      return @subject
-    end
-
     def parser
       unless @parser
         @parser = NoteParser.new(note['text'])

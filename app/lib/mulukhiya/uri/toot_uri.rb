@@ -21,16 +21,6 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
-    def subject
-      unless @subject
-        @subject = toot['spoiler_text'] if toot['spoiler_text'].present?
-        @subject ||= toot['content']
-        @subject.gsub!(/\s+/, ' ')
-        @subject.sanitize!
-      end
-      return @subject
-    end
-
     def service
       unless @service
         uri = clone
