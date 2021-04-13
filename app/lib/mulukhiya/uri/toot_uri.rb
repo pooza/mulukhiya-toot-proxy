@@ -22,7 +22,13 @@ module Mulukhiya
     end
 
     def subject
-      return (toot['spoiler_text'] || toot['content']).gsub(/\s+/, ' ').sanitize
+      unless @subject
+        @subject = toot['spoiler_text'] if toot['spoiler_text'].present?
+        @subject ||= toot['content']
+        @subject.gsub!(/\s+/, ' ')
+        @subject.sanitize!
+      end
+      return @subject
     end
 
     def service

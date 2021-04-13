@@ -24,7 +24,13 @@ module Mulukhiya
     end
 
     def subject
-      return (note['cw'] || note['text']).gsub(/\s+/, ' ').sanitize
+      unless @subject
+        @subject = note['cw'] if note['cw'].present?
+        @subject ||= note['text']
+        @subject.gsub!(/\s+/, ' ')
+        @subject.sanitize!
+      end
+      return @subject
     end
 
     def parser
