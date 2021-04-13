@@ -73,9 +73,8 @@ module Mulukhiya
       dest = Ginseng::URI.parse(src)
       dest = sns_class.new.create_uri(src) unless dest.absolute?
       generic = dest.clone
-      dest = TootURI.parse(generic.to_s)
-      dest = NoteURI.parse(generic.to_s) unless dest.valid?
-      return dest.publicize if dest.valid?
+      dest = Controller.create_status_uri(generic.to_s)
+      return dest.publicize if dest&.valid?
       return generic
     end
   end

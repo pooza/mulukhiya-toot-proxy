@@ -20,11 +20,7 @@ module Mulukhiya
       alias attachments attachment
 
       def uri
-        unless @uri
-          @uri = TootURI.parse(self[:url] || self[:uri])
-          @uri = NoteURI.parse(self[:url] || self[:uri]) unless @uri&.valid?
-          @uri = nil unless @uri&.valid?
-        end
+        @uri ||= Controller.create_status_uri(self[:url] || self[:uri])
         return @uri
       end
 
