@@ -51,14 +51,14 @@ module Mulukhiya
 
     def lemmy
       unless @lemmy
-        ['host', 'user_id', 'password', 'community_id'].freeze.each do |key|
+        ['host', 'user', 'password', 'community'].freeze.each do |key|
           raise Ginseng::ConfigError, "/lemmy/#{key} undefined" unless user_config["/lemmy/#{key}"]
         end
         @lemmy = LemmyClipper.new(
           host: user_config['/lemmy/host'],
-          user_id: user_config['/lemmy/user_id'],
+          user: user_config['/lemmy/user'],
           password: user_config['/lemmy/password'].decrypt,
-          community_id: user_config['/lemmy/community_id'],
+          community: user_config['/lemmy/community'],
         )
       end
       return @lemmy

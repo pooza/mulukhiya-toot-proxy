@@ -42,8 +42,8 @@ module Mulukhiya
             EM.stop_event_loop
           end
         rescue => e
-          logger.error(e)
-          EM.stop_event_loop
+          logger.error(error: e.message)
+          raise Ginseng::GatewayError, e.message, e.backtrace
         end
       end
     end
@@ -52,19 +52,20 @@ module Mulukhiya
 
     def login
       client.send({op: 'Login', data: {
-        username_or_email: @params[:user_id],
+        username_or_email: @params[:user],
         password: @params[:password],
       }}.to_json)
     end
 
     def post(body, jwt)
-      client.send({op: 'CreatePost', data: {
+      data = {
         name: body[:name].to_s,
-        # url: body[:uri].to_s,
         nsfw: false,
-        community_id: @params[:community_id],
+        community_id: @params[:community],
         auth: jwt,
-      }}.to_json)
+      }.deep_compact
+      data[:url] = body[:uri].to_s if body[:uri]
+      client.send({op: 'CreatePost', data: data}.to_json)
     end
 
     def handle_login(payload, body)
