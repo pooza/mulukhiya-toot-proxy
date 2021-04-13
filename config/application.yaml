@@ -918,6 +918,8 @@ websocket:
 lemmy:
   urls:
     api: /api/v3/ws
+  subject:
+    max_length: 200
 redis:
   retry:
     limit: 3
