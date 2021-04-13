@@ -23,6 +23,10 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
+    def subject
+      return note['text'].sanitize
+    end
+
     def parser
       unless @parser
         @parser = NoteParser.new(note['text'])
