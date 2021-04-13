@@ -62,11 +62,9 @@ module Mulukhiya
       data = {nsfw: false, community_id: @params[:community], auth: jwt}
       data[:name] = body[:name].to_s if body[:name]
       if uri = Controller.create_status_uri(body[:url])
-        if uri.valid?
-          data[:url] = uri.to_s
-          data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
-          data[:body] ||= uri.to_s
-        end
+        data[:url] = uri.to_s
+        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:body] ||= uri.to_s
       end
       client.send({op: 'CreatePost', data: data}.to_json)
     end
