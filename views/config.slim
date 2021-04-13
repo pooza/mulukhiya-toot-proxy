@@ -85,8 +85,6 @@ html lang='ja'
       section class='config' v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
-          ul
-            li Lemmyのパスワードは、暗号化して保存します。
           .inline-field-container
             h4 ホスト名
             input placeholder='Lemmyのホスト名（lemmy.example.com等）' v-model.trim='form.lemmy.host'
@@ -95,7 +93,7 @@ html lang='ja'
             input placeholder='LemmyのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
           .inline-field-container
             h4 パスワード
-            input type='password' placeholder='Lemmyのパスワード' v-model.trim='form.lemmy.password'
+            input type='password' placeholder='Lemmyのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
           .inline-field-container
             h4 コミュニティID
             input placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
