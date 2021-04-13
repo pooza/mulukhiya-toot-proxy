@@ -41,11 +41,5 @@ module Mulukhiya
     def self.webhook_entries
       return nil
     end
-
-    def self.create_status_uri(src)
-      dest = TootURI.parse(src.to_s)
-      dest = NoteURI.parse(dest) unless dest&.valid?
-      return dest if dest.valid?
-    end
   end
 end
