@@ -44,12 +44,12 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 61603eb51e406a4aed3e20ef0c8515e758f1a533
+  revision: 51ea3070525b1558af67e2bf8bf91c24614af759
   specs:
     ginseng-web (1.3.7)
       puma (< 5.2.1)
       rss
-      sass
+      sassc
       sinatra
       slim
       uglifier
@@ -109,7 +109,7 @@ GEM
     bson (4.12.0)
     builder (3.2.4)
     concurrent-ruby (1.1.8)
-    connection_pool (2.2.3)
+    connection_pool (2.2.4)
     crass (1.0.6)
     daemon-spawn (0.4.2)
     domain_name (0.5.20190701)
@@ -270,9 +270,6 @@ GEM
       loofah (~> 2.3)
     rainbow (3.0.0)
     rake (13.0.3)
-    rb-fsevent (0.10.4)
-    rb-inotify (0.10.1)
-      ffi (~> 1.0)
     redis (4.2.5)
     regexp_parser (2.1.1)
     rest-client (2.0.2)
@@ -313,11 +310,8 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.8.0)
       nokogumbo (~> 2.0)
-    sass (3.7.4)
-      sass-listen (~> 4.0.0)
-    sass-listen (4.0.0)
-      rb-fsevent (~> 0.9, >= 0.9.4)
-      rb-inotify (~> 0.9, >= 0.9.7)
+    sassc (2.4.0)
+      ffi (~> 1.9)
     sequel (5.43.0)
     sidekiq (6.1.3)
       connection_pool (>= 2.2.2)

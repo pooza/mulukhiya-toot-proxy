@@ -75,6 +75,10 @@ filters:
     cases:
       - growi_clipper
       - 'growi*_handler'
+  - name: lemmy
+    cases:
+      - lemmy_clipper
+      - 'lemmy*_handler'
   - name: hexo
     cases:
       - 'hexo*_handler'

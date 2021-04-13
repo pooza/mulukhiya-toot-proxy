@@ -19,10 +19,6 @@ module Mulukhiya
     end
 
     def cache
-      if File.exist?(path)
-        redis.set('announcements', JSON.parse(File.read(path)))
-        File.unlink(path)
-      end
       return JSON.parse(redis.get('announcements') || '{}')
     end
 
@@ -37,10 +33,6 @@ module Mulukhiya
       redis.set('announcements', announcements.to_h {|v| [v[:id], v]}.to_json)
     rescue => e
       logger.error(error: e)
-    end
-
-    def path
-      return File.join(Environment.dir, 'tmp/cache/announcements.json')
     end
 
     def redis

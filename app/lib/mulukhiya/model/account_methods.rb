@@ -49,6 +49,24 @@ module Mulukhiya
       return nil
     end
 
+    def lemmy
+      unless @lemmy
+        ['host', 'user', 'password', 'community'].freeze.each do |key|
+          raise Ginseng::ConfigError, "/lemmy/#{key} undefined" unless user_config["/lemmy/#{key}"]
+        end
+        @lemmy = LemmyClipper.new(
+          host: user_config['/lemmy/host'],
+          user: user_config['/lemmy/user'],
+          password: user_config['/lemmy/password'].decrypt,
+          community: user_config['/lemmy/community'],
+        )
+      end
+      return @lemmy
+    rescue => e
+      logger.error(error: e, acct: acct.to_s)
+      return nil
+    end
+
     def dropbox
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox

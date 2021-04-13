@@ -22,6 +22,9 @@ module Mulukhiya
     end
 
     def update(values)
+      if password = values.dig('lemmy', 'password')
+        values['lemmy']['password'] = password.encrypt
+      end
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
     end
