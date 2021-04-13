@@ -90,7 +90,7 @@ html lang='ja'
             input placeholder='Lemmyのホスト名（lemmy.example.com等）' v-model.trim='form.lemmy.host'
           .inline-field-container
             h4 ユーザーID
-            input placeholder='LemmyのユーザーID（メールアドレス）' v-model.trim='form.lemmy.user'
+            input placeholder='LemmyのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
           .inline-field-container
             h4 パスワード
             input placeholder='Lemmyのパスワード' v-model.trim='form.lemmy.password'
@@ -265,8 +265,9 @@ html lang='ja'
             if (this.form.lemmy.host) {command.lemmy.host = this.form.lemmy.host}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
             if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
-            if (this.form.lemmy.community) {command.lemmy.community = this.form.lemmy.community}
+            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community)}
             this.updateConfig(command)
+            this.form.lemmy.password = null
           },
           updateTags: function () {
             const command = {tagging: {user_tags: null, minutes: null}}
