@@ -1,5 +1,5 @@
 module Mulukhiya
-  class MeisskeyTestCaseFilter < TestCaseFilter
+  class TootTestCaseFilter < TestCaseFilter
     def active?
       return Environment.parser_name != 'toot'
     end
