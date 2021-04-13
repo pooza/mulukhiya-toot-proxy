@@ -68,6 +68,8 @@ worker:
     federate: true
   growi_clipping:
     federate: false
+  lemmy_clipping:
+    federate: false
   media_cleaning:
     days: 1
 parser:

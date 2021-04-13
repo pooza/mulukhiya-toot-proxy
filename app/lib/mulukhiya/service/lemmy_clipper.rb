@@ -38,6 +38,7 @@ module Mulukhiya
 
         client.on(:message) do |message|
           payload = JSON.parse(message.data)
+          raise payload['error'] if payload['error']
           unless send("handle_#{payload['op']}".underscore.to_sym, payload['data'], body)
             EM.stop_event_loop
           end
@@ -58,13 +59,10 @@ module Mulukhiya
     end
 
     def post(body, jwt)
-      data = {
-        name: body[:name].to_s,
-        nsfw: false,
-        community_id: @params[:community],
-        auth: jwt,
-      }.deep_compact
-      data[:url] = body[:uri].to_s if body[:uri]
+      data = {nsfw: false, community_id: @params[:community], auth: jwt}
+      data[:url] = body[:url].to_s if body[:url]
+      data[:name] = body[:name].to_s if body[:name]
+      data[:name] ||= body[:url].to_s
       client.send({op: 'CreatePost', data: data}.to_json)
     end
 
