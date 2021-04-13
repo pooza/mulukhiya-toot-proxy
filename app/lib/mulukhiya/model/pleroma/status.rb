@@ -41,7 +41,7 @@ module Mulukhiya
       end
 
       def uri
-        @uri = Controller.create_status_uri(data[:url])
+        @uri ||= Controller.create_status_uri(data[:url])
         return @uri
       end
 
