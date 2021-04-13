@@ -919,7 +919,7 @@ lemmy:
   urls:
     api: /api/v3/ws
   subject:
-    max_length: 200
+    max_length: 140
 redis:
   retry:
     limit: 3
