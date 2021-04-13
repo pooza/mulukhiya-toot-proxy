@@ -268,6 +268,7 @@ mastodon:
     post_bookmark:
       - dropbox_bookmark
       - growi_bookmark
+      - lemmy_bookmark
       - result_notification
     announce:
       - post_announce
@@ -395,6 +396,7 @@ misskey:
     post_bookmark:
       - dropbox_bookmark
       - growi_bookmark
+      - lemmy_bookmark
       - result_notification
     announce:
       - post_announce
@@ -516,6 +518,7 @@ meisskey:
     post_bookmark:
       - dropbox_bookmark
       - growi_bookmark
+      - lemmy_bookmark
       - result_notification
     announce:
       - post_announce
@@ -641,6 +644,7 @@ pleroma:
     post_bookmark:
       - dropbox_bookmark
       - growi_bookmark
+      - lemmy_bookmark
       - result_notification
     alert:
       - slack_alert
