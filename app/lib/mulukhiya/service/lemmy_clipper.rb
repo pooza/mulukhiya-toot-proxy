@@ -62,9 +62,12 @@ module Mulukhiya
       data = {nsfw: false, community_id: @params[:community], auth: jwt}
       data[:name] = body[:name].to_s if body[:name]
       if body[:url] && (uri = Ginseng::URI.parse(body[:url]))
-        data[:url] = uri.to_s
         uri = Controller.create_status_uri(uri)
-        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length']) if uri.valid?
+        if uri.valid?
+          data[:url] = uri.to_s
+          data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+          data[:body] ||= uri.to_s
+        end
       end
       client.send({op: 'CreatePost', data: data}.to_json)
     end
