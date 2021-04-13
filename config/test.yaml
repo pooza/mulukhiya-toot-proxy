@@ -99,7 +99,7 @@ filters:
     cases:
       - note_uri
       - misskey_auth_contract
-  - name: note
+  - name: toot
     cases:
       - toot_uri
       - mastodon_auth_contract
