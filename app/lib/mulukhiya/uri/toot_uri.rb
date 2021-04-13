@@ -21,6 +21,10 @@ module Mulukhiya
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
+    def subject
+      return toot['content'].sanitize
+    end
+
     def service
       unless @service
         uri = clone
