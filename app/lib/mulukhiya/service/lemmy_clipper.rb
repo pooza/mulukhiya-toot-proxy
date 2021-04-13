@@ -61,8 +61,7 @@ module Mulukhiya
     def post(body, jwt)
       data = {nsfw: false, community_id: @params[:community], auth: jwt}
       data[:name] = body[:name].to_s if body[:name]
-      if body[:url] && (uri = Ginseng::URI.parse(body[:url]))
-        uri = Controller.create_status_uri(uri)
+      if uri = Controller.create_status_uri(body[:url])
         if uri.valid?
           data[:url] = uri.to_s
           data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
