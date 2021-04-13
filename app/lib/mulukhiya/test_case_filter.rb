@@ -11,15 +11,6 @@ module Mulukhiya
       return nil
     end
 
-    def exec(cases)
-      @params['/cases'].each do |pattern|
-        cases.clone.select {|v| File.fnmatch(pattern, v)}.each do |v|
-          puts "- case: #{v} (disabled)"
-          cases.delete(v)
-        end
-      end
-    end
-
     def self.create(name)
       return all.find {|v| v.name == name}
     end
