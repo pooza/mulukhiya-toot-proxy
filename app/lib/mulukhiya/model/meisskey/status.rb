@@ -1,6 +1,7 @@
 module Mulukhiya
   module Meisskey
     class Status < MongoCollection
+      include Package
       include StatusMethods
 
       def account
@@ -19,9 +20,7 @@ module Mulukhiya
         unless @uri
           @uri = Ginseng::URI.parse(values['uri']) if values['uri'].present?
           @uri ||= sns_class.new.create_uri("/notes/#{id}")
-          @uri = TootURI.parse(@uri)
-          @uri = NoteURI.parse(@uri) unless @uri&.valid?
-          @uri = nil unless @uri&.valid?
+          @uri = Controller.create_status_uri(@uri)
         end
         return @uri
       end

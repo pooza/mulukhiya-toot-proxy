@@ -33,26 +33,18 @@ filters:
     cases:
       - mastodon_controller
       - postgres
-      - toot_uri
-      - mastodon_auth_contract
   - name: misskey
     cases:
       - misskey_controller
       - postgres
-      - note_uri
-      - misskey_auth_contract
   - name: meisskey
     cases:
       - meisskey_controller
       - mongo
-      - note_uri
-      - misskey_auth_contract
   - name: pleroma
     cases:
       - pleroma_controller
       - postgres
-      - toot_uri
-      - mastodon_auth_contract
   - name: amazon
     cases:
       - amazon_service
@@ -103,3 +95,11 @@ filters:
   - name: livecure
     cases:
       - program
+  - name: note
+    cases:
+      - note_uri
+      - misskey_auth_contract
+  - name: toot
+    cases:
+      - toot_uri
+      - mastodon_auth_contract

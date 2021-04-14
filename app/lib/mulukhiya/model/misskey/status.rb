@@ -14,9 +14,7 @@ module Mulukhiya
         unless @uri
           @uri = Ginseng::URI.parse(self[:uri]) if self[:uri].present?
           @uri ||= sns_class.new.create_uri("/notes/#{id}")
-          @uri = TootURI.parse(@uri)
-          @uri = NoteURI.parse(@uri) unless @uri&.valid?
-          @uri = nil unless @uri&.valid?
+          @uri = Controller.create_status_uri(@uri)
         end
         return @uri
       end

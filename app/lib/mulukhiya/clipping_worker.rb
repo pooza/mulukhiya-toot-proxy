@@ -18,8 +18,7 @@ module Mulukhiya
     end
 
     def create_body(params)
-      uri = TootURI.parse(params['uri'])
-      uri = NoteURI.parse(params['uri']) unless uri&.valid?
+      uri = Controller.create_status_uri(params['uri'])
       raise Ginseng::RequestError, "Invalid URL '#{params['uri']}'" unless uri&.valid?
       return uri.to_md if uri.public?
       return uri.to_md if uri.local?
