@@ -33,6 +33,7 @@ module Mulukhiya
         end
 
         client.on(:error) do |e|
+          EM.stop_event_loop
           raise Ginseng::GatewayError, e.message
         end
 
@@ -43,7 +44,7 @@ module Mulukhiya
             EM.stop_event_loop
           end
         rescue => e
-          logger.error(error: e.message)
+          logger.error(error: e)
           raise Ginseng::GatewayError, e.message, e.backtrace
         end
       end
