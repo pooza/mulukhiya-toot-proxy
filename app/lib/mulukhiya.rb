@@ -67,6 +67,11 @@ module Mulukhiya
         SidekiqDaemon.auth(username, password)
       end
     end
+    Sidekiq::Web.use(Rack::Session::Cookie, {
+      secret: Config.instance['/crypt/password'],
+      same_site: true,
+      max_age: 86_400,
+    })
     return Rack::URLMap.new(
       '/' => Environment.controller_class,
       '/mulukhiya' => UIController,
