@@ -71,7 +71,7 @@ module Mulukhiya
       assert_false(@png_rgba.animated?)
       assert(@agif.animated?)
       assert_false(@webp.animated?)
-      assert(@awebp.animated?) unless Evnironment.ci?
+      assert(@awebp.animated?) unless Environment.ci?
       assert(@apng.animated?)
     end
 
