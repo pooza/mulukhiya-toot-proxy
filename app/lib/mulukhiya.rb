@@ -70,7 +70,7 @@ module Mulukhiya
     Sidekiq::Web.use(Rack::Session::Cookie, {
       secret: Config.instance['/crypt/password'],
       same_site: true,
-      max_age: 86_400,
+      max_age: Config.instance['/sidekiq/dashboard/session/max_age'],
     })
     return Rack::URLMap.new(
       '/' => Environment.controller_class,
