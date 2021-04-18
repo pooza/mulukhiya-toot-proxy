@@ -11,8 +11,7 @@ module Mulukhiya
 
     def motd
       return [
-        Package.full_name,
-        self.class.to_s,
+        "#{self.class.to_s} #{Package.version}",
         "Streaming API URL: #{service.create_streaming_uri}",
       ].join("\n")
     end
