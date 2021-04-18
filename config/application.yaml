@@ -25,6 +25,8 @@ handler:
     timeout: 10
   animation_image_format_convert:
     disable: true
+    png: true
+    webp: false
     timeout: 10
   canonical_url:
     ignore:
