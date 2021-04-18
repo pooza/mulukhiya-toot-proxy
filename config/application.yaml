@@ -24,6 +24,7 @@ handler:
   audio_format_convert:
     timeout: 10
   animation_image_format_convert:
+    disable: true
     timeout: 10
   canonical_url:
     ignore:
