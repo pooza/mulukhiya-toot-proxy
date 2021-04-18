@@ -858,7 +858,7 @@ sidekiq:
   dashboard:
     url: /mulukhiya/sidekiq
     session:
-      max_age: 86_400
+      max_age: 86400
   redis:
     dsn: redis://localhost:6379/2
   auth:
