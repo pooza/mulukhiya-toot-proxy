@@ -59,7 +59,7 @@ module Mulukhiya
       return true if 1 < command.stdout.each_line.count
       command = CommandLine.new(['ffprobe', path])
       command.exec
-      return true if command.stderr.match?(/Stream .* Video: .*fps/)
+      return true if command.stderr.match?(/Stream .* Video: apng/)
       return false
     end
 
