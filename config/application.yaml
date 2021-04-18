@@ -316,7 +316,7 @@ misskey:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
-      animation_image: null
+      animation_image: image/png
   handlers:
     pre_toot:
       - user_config_command
@@ -439,7 +439,7 @@ meisskey:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
-      animation_image: null
+      animation_image: image/png
   handlers:
     pre_toot:
       - user_config_command
@@ -559,7 +559,7 @@ pleroma:
       image: image/jpeg
       video: video/mp4
       audio: audio/mpeg
-      animation_image: null
+      animation_image: image/png
   chat:
     field: content
   handlers:
