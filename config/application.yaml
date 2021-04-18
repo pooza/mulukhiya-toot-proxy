@@ -1,5 +1,5 @@
 package:
-  version: 4.4.3
+  version: 4.4.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -24,6 +24,9 @@ handler:
   audio_format_convert:
     timeout: 10
   animation_image_format_convert:
+    disable: true
+    png: true
+    webp: false
     timeout: 10
   canonical_url:
     ignore:
@@ -854,6 +857,8 @@ alert:
 sidekiq:
   dashboard:
     url: /mulukhiya/sidekiq
+    session:
+      max_age: 86400
   redis:
     dsn: redis://localhost:6379/2
   auth:
