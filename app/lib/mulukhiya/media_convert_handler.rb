@@ -7,6 +7,7 @@ module Mulukhiya
       body[:file][:org_tempfile] ||= body[:file][:tempfile]
       body[:file][:tempfile] = @dest
     rescue => e
+      logger.error(error: e)
       errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
     end
 
@@ -17,6 +18,7 @@ module Mulukhiya
       body[:thumbnail][:org_tempfile] ||= body[:thumbnail][:tempfile]
       body[:thumbnail][:tempfile] = @dest
     rescue => e
+      logger.error(error: e)
       errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
     end
 

@@ -47,9 +47,9 @@ module Mulukhiya
 
     def alpha?
       return false unless image?
-      command = CommandLine.new(['identify', '-format', '%[opaque]', path])
+      command = CommandLine.new(['identify', '-format', '%[channels]', path])
       command.exec
-      return /False/i.match?(command.stdout)
+      return /rgba/i.match?(command.stdout)
     end
 
     def animated?
