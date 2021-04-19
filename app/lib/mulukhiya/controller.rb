@@ -6,9 +6,9 @@ module Mulukhiya
     enable :method_override
 
     before do
+      @reporter = Reporter.new
       @sns = sns_class.new
       @sns.token = token
-      @reporter = Reporter.new
     rescue => e
       logger.error(error: e)
       @sns.token = nil

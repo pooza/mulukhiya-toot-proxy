@@ -1,11 +1,13 @@
 module Mulukhiya
   module HashTagMethods
+    include SNSMethods
+
     def raw_name
       return @raw_name || name
     end
 
     def uri
-      @uri ||= Environment.sns_class.new.create_uri("/tags/#{name}")
+      @uri ||= sns_class.new.create_uri("/tags/#{name}")
       return @uri
     end
 
@@ -28,7 +30,7 @@ module Mulukhiya
     end
 
     def feed_uri
-      @feed_uri ||= Environment.sns_class.new.create_uri("/mulukhiya/feed/tag/#{raw_name}")
+      @feed_uri ||= sns_class.new.create_uri("/mulukhiya/feed/tag/#{raw_name}")
       return @feed_uri
     end
 

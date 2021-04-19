@@ -1,7 +1,8 @@
 module Mulukhiya
   class MastodonService < Ginseng::Fediverse::MastodonService
     include Package
-    include ServiceMethods
+    include SNSMethods
+    include SNSServiceMethods
 
     alias info nodeinfo
 
@@ -11,12 +12,12 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = Environment.attachment_class[attachment] if attachment.is_a?(Integer)
+      attachment = attachment_class[attachment] if attachment.is_a?(Integer)
       return delete_status(attachment.status, params) if attachment.status
     end
 
     def delete_status(status, params = {})
-      status = status.id if status.is_a?(Environment.status_class)
+      status = status.id if status.is_a?(status_class)
       return super
     end
 
@@ -63,7 +64,7 @@ module Mulukhiya
     end
 
     def default_token
-      return Environment.account_class.test_token
+      return account_class.test_token
     end
   end
 end

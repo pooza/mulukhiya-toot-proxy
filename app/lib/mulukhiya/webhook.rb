@@ -11,7 +11,7 @@ module Mulukhiya
     end
 
     def visibility
-      return Environment.parser_class.visibility_name(@user_config['/webhook/visibility'])
+      return parser_class.visibility_name(@user_config['/webhook/visibility'])
     end
 
     def uri

@@ -1,7 +1,8 @@
 module Mulukhiya
   class PleromaService < Ginseng::Fediverse::PleromaService
     include Package
-    include ServiceMethods
+    include SNSMethods
+    include SNSServiceMethods
 
     alias info nodeinfo
 
@@ -69,7 +70,7 @@ module Mulukhiya
     end
 
     def default_token
-      return Environment.account_class.test_token
+      return account_class.test_token
     end
   end
 end
