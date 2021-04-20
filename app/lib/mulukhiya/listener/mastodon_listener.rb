@@ -16,7 +16,7 @@ module Mulukhiya
 
     def error(event)
       @client = nil
-      e = Ginseng::GatewayError.new('close')
+      e = Ginseng::GatewayError.new('error')
       e.message = {reason: event.reason}
       logger.error(error: e)
     end
