@@ -213,7 +213,6 @@ module Mulukhiya
       bar = ProgressBar.create(total: accounts.count) if Environment.rake?
       results = {}
       accounts.each do |account|
-        account.webhook.reporter.tags.clear
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
         logger.error(error: e, acct: account.acct.to_s)
