@@ -44,7 +44,7 @@ module Mulukhiya
 
     def test_visibility
       Webhook.all do |hook|
-        assert(Environment.parser_class.visibility_names.values.member?(hook.visibility))
+        assert(parser_class.visibility_names.values.member?(hook.visibility))
       end
     end
 

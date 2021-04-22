@@ -11,7 +11,7 @@ module Mulukhiya
     end
 
     def visibility
-      return Environment.parser_class.visibility_name(@user_config['/webhook/visibility'])
+      return parser_class.visibility_name(@user_config['/webhook/visibility'])
     end
 
     def uri
@@ -31,9 +31,10 @@ module Mulukhiya
 
     def post(payload)
       body = payload.values.merge('visibility' => visibility)
-      Event.new(:pre_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
+      reporter = Reporter.new
+      Event.new(:pre_webhook, {reporter: reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
-      Event.new(:post_webhook, {reporter: @reporter, sns: @sns}).dispatch(body)
+      Event.new(:post_webhook, {reporter: reporter, sns: @sns}).dispatch(body)
       return reporter
     end
 
@@ -81,7 +82,6 @@ module Mulukhiya
 
     def initialize(user_config)
       @user_config = user_config
-      @reporter = Reporter.new
       @sns = sns_class.new
       @sns.token = @user_config.token
     end

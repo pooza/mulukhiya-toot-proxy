@@ -16,6 +16,7 @@ inflections:
   note_uri: NoteURI
   shortened_url_handler: ShortenedURLHandler
   sns_methods: SNSMethods
+  sns_service_methods: SNSServiceMethods
   spotify_uri: SpotifyURI
   spotify_url_handler: SpotifyURLHandler
   spotify_url_nowplaying_handler: SpotifyURLNowplayingHandler

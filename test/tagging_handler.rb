@@ -12,7 +12,7 @@ module Mulukhiya
       TaggingDictionary.new.refresh
 
       @handler = Handler.create('tagging')
-      @parser = Environment.parser_class.new
+      @parser = parser_class.new
     end
 
     def teardown

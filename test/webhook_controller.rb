@@ -3,7 +3,7 @@ module Mulukhiya
     include ::Rack::Test::Methods
 
     def setup
-      @parser = Environment.parser_class.new
+      @parser = parser_class.new
       @parser.account = account
       @path_prefix_pattern = %r{^/mulukhiya/webhook}
     end

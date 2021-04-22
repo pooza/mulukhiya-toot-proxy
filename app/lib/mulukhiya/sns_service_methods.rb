@@ -1,5 +1,7 @@
 module Mulukhiya
-  module ServiceMethods
+  module SNSServiceMethods
+    include SNSMethods
+
     def nodeinfo
       unless info = redis.get('nodeinfo')
         ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
@@ -10,17 +12,13 @@ module Mulukhiya
     end
 
     def account
-      @account ||= Environment.account_class.get(token: token)
+      @account ||= account_class.get(token: token) rescue nil
       return @account
-    rescue
-      return nil
     end
 
     def access_token
-      @access_token ||= Environment.access_token_class.get(token: token)
+      @access_token ||= access_token_class.get(token: token) rescue nil
       return @access_token
-    rescue
-      return nil
     end
 
     def clear_oauth_client

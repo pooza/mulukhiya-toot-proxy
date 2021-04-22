@@ -8,6 +8,10 @@ module Mulukhiya
       return Environment.sns_class
     end
 
+    def parser_class
+      return Environment.parser_class
+    end
+
     def status_field
       return controller_class.status_field
     end

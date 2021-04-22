@@ -1,7 +1,8 @@
 module Mulukhiya
   class MeisskeyService < Ginseng::Fediverse::MeisskeyService
     include Package
-    include ServiceMethods
+    include SNSMethods
+    include SNSServiceMethods
 
     alias info nodeinfo
 
@@ -22,7 +23,7 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
+      attachment = attachment.id if attachment.is_a?(attachment_class)
       return super
     end
 
@@ -54,7 +55,7 @@ module Mulukhiya
     end
 
     def default_token
-      return Environment.account_class.test_token
+      return account_class.test_token
     end
   end
 end

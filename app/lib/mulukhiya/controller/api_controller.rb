@@ -21,7 +21,7 @@ module Mulukhiya
         webhook: {url: @sns.account.webhook.uri.to_s},
         filters: @sns.filters&.parsed_response,
         token: @sns.access_token.to_h.except(:account),
-        visibility_names: Environment.parser_class.visibility_names,
+        visibility_names: parser_class.visibility_names,
       }
       return @renderer.to_s
     rescue => e
@@ -102,7 +102,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors: errors}
       elsif controller_class.media_catalog?
-        @renderer.message = Environment.attachment_class.catalog(params)
+        @renderer.message = attachment_class.catalog(params)
       else
         @renderer.status = 404
       end
@@ -188,7 +188,7 @@ module Mulukhiya
     get '/tagging/favorites' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.favorite_tags?
       @sns.token ||= @sns.default_token
-      @renderer.message = Environment.hash_tag_class.favorites
+      @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
       @renderer.status = e.status

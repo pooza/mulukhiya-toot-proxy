@@ -2,6 +2,8 @@ require 'time'
 
 module Mulukhiya
   module AccountMethods
+    include SNSMethods
+
     def user_config
       @user_config ||= UserConfig.new(id)
       return @user_config
@@ -18,7 +20,7 @@ module Mulukhiya
 
     def service
       unless @service
-        @service = Environment.sns_class.new
+        @service = sns_class.new
         @service.token = token
         @service.retry_limit = 1
       end
@@ -150,7 +152,7 @@ module Mulukhiya
     end
 
     def test?
-      return Environment.account_class.test_account.id == id
+      return account_class.test_account.id == id
     end
 
     def self.included(base)

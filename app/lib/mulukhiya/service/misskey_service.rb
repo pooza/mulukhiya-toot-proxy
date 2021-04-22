@@ -1,8 +1,8 @@
 module Mulukhiya
   class MisskeyService < Ginseng::Fediverse::MisskeyService
     include Package
-    include ServiceMethods
     include SNSMethods
+    include SNSServiceMethods
 
     alias info nodeinfo
 
@@ -23,14 +23,14 @@ module Mulukhiya
     end
 
     def search_dupllicated_attachment(attachment, params = {})
-      attachment = attachment.to_h[:md5] if attachment.is_a?(Environment.attachment_class)
+      attachment = attachment.to_h[:md5] if attachment.is_a?(attachment_class)
       response = super
       return response if params[:response] == :raw
-      return Environment.attachment_class[response.parsed_response.first['id']]
+      return attachment_class[response.parsed_response.first['id']]
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment.id if attachment.is_a?(Environment.attachment_class)
+      attachment = attachment.id if attachment.is_a?(attachment_class)
       return super
     end
 
