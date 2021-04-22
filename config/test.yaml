@@ -21,7 +21,6 @@ filters:
       - listener_daemon
       - template
       - '*_controller'
-      - '*_handler'
   - name: postgres
     cases:
       - postgres
