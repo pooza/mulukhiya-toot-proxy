@@ -25,7 +25,7 @@ module Mulukhiya
       if minutes = params['tagging']['minutes']
         Sidekiq.set_schedule(task_name, create_schedule_params(minutes))
         params['tagging']['minutes'] = nil
-      elsif params['tagging'].key?('user_tags') && params['tagging']['user_tags'].nil?
+      elsif params['tagging'].key?('user_tags') && params['tagging']['user_tags'].empty?
         Sidekiq.remove_schedule(task_name)
       end
       Sidekiq::Scheduler.reload_schedule!
