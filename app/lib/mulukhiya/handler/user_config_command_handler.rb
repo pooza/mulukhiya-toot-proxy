@@ -13,27 +13,11 @@ module Mulukhiya
 
     def exec
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      handle_user_tags(parser.params)
       sns.account.user_config.update(parser.params)
       sns.account.user_config.token = sns.token
     end
 
     private
-
-    def handle_user_tags(params)
-      return unless params['tagging'].is_a?(Hash)
-      if minutes = params['tagging']['minutes']
-        Sidekiq.set_schedule(task_name, create_schedule_params(minutes))
-        params['tagging']['minutes'] = nil
-      elsif params['tagging'].key?('user_tags') && params['tagging']['user_tags'].empty?
-        Sidekiq.remove_schedule(task_name)
-      end
-      Sidekiq::Scheduler.reload_schedule!
-    end
-
-    def task_name
-      return "user_tag_initialize_#{sns.account.username}"
-    end
 
     def create_schedule_params(minutes)
       return {
