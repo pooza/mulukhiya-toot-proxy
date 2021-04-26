@@ -176,7 +176,7 @@ GEM
       ffi (>= 1.0.0)
       rake
     fileutils (1.5.0)
-    fugit (1.4.4)
+    fugit (1.4.5)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.20.0)
@@ -282,7 +282,7 @@ GEM
       netrc (~> 0.8)
     rexml (3.2.5)
     ricecream (0.2.0)
-    rspotify (2.10.1)
+    rspotify (2.10.2)
       addressable (~> 2.5.2)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
