@@ -22,11 +22,13 @@ module Mulukhiya
     end
 
     def update(values)
-      if password = values.dig('lemmy', 'password')
-        values['lemmy']['password'] = password.encrypt
-      end
+      values = values.deep_stringify_keys!
+      handle_user_tags(values)
+      handle_lemmy_password(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
+    rescue => e
+      logger.error(error: e)
     end
 
     def token
@@ -53,6 +55,29 @@ module Mulukhiya
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
       return @values["/handler/#{handler.underscore}/disable"] == true rescue false
+    end
+
+    private
+
+    def handle_user_tags(values)
+      return unless values['tagging'].is_a?(Hash)
+      task_name = "user_tag_initialize_#{@account.username}"
+      if minutes = values['tagging']['minutes']
+        Sidekiq.set_schedule(task_name, {
+          at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
+          class: 'Mulukhiya::UserTagInitializeWorker',
+          args: [{account: @account.id}],
+        })
+        values['tagging']['minutes'] = nil
+      elsif values['tagging'].key?('user_tags') && values['tagging']['user_tags'].empty?
+        Sidekiq.remove_schedule(task_name)
+      end
+      Sidekiq::Scheduler.reload_schedule!
+    end
+
+    def handle_lemmy_password(values)
+      return unless password = values.dig('lemmy', 'password')
+      values['lemmy']['password'] = password.encrypt
     end
   end
 end
