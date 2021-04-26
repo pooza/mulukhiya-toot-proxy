@@ -197,7 +197,7 @@ html lang='ja'
                 .filter(program => program.enable)
                 .map(program => ({
                   code: program.key,
-                  label: `${Vue.createProgramTags(program).join(', ')} (${program.minutes}分)`,
+                  label: program.minutes ? `${Vue.createProgramTags(program).join(', ')} (${program.minutes}分)` : Vue.createProgramTags(program).join(', '),
                 }))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
