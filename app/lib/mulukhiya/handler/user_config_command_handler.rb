@@ -16,15 +16,5 @@ module Mulukhiya
       sns.account.user_config.update(parser.params)
       sns.account.user_config.token = sns.token
     end
-
-    private
-
-    def create_schedule_params(minutes)
-      return {
-        at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
-        class: 'Mulukhiya::UserTagInitializeWorker',
-        args: [{account: sns.account.id}],
-      }
-    end
   end
 end

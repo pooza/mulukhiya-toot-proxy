@@ -22,11 +22,13 @@ module Mulukhiya
     end
 
     def update(values)
-      config = values.deep_stringify_keys!
-      handle_user_tags(config)
-      handle_lemmy_password(config)
-      @storage.update(@account.id, config)
+      values = values.deep_stringify_keys!
+      handle_user_tags(values)
+      handle_lemmy_password(values)
+      @storage.update(@account.id, values)
       @values = @storage[@account.id]
+    rescue => e
+      logger.error(error: e)
     end
 
     def token
@@ -57,24 +59,25 @@ module Mulukhiya
 
     private
 
-    def handle_user_tags(config)
-      return unless config['tagging'].is_a?(Hash)
-      if minutes = config['tagging']['minutes']
-        Sidekiq.set_schedule(task_name, create_schedule_params(minutes))
-        config['tagging']['minutes'] = nil
-      elsif config['tagging'].key?('user_tags') && config['tagging']['user_tags'].empty?
+    def handle_user_tags(values)
+      return unless values['tagging'].is_a?(Hash)
+      task_name = "user_tag_initialize_#{@account.username}"
+      if minutes = values['tagging']['minutes']
+        Sidekiq.set_schedule(task_name, {
+          at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
+          class: 'Mulukhiya::UserTagInitializeWorker',
+          args: [{account: @account.id}],
+        })
+        values['tagging']['minutes'] = nil
+      elsif values['tagging'].key?('user_tags') && values['tagging']['user_tags'].empty?
         Sidekiq.remove_schedule(task_name)
       end
       Sidekiq::Scheduler.reload_schedule!
     end
 
-    def handle_lemmy_password(config)
-      return unless password = config.dig('lemmy', 'password')
-      config['lemmy']['password'] = password.encrypt
-    end
-
-    def task_name
-      return "user_tag_initialize_#{@account.username}"
+    def handle_lemmy_password(values)
+      return unless password = values.dig('lemmy', 'password')
+      values['lemmy']['password'] = password.encrypt
     end
   end
 end
