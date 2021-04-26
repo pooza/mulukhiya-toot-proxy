@@ -323,7 +323,7 @@ GEM
       redis (>= 4.2.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
-    sidekiq-unique-jobs (7.0.8)
+    sidekiq-unique-jobs (7.0.9)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 5.0, < 7.0)
