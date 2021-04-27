@@ -30,8 +30,9 @@ module Mulukhiya
       end
 
       def oauth_callback?
-        return false unless url = config["/#{name}/oauth/callback_url"]
-        return url != 'urn:ietf:wg:oauth:2.0:oob'
+        return config["/#{name}/oauth/callback_url"] != 'urn:ietf:wg:oauth:2.0:oob'
+      rescue Ginseng::ConfigError
+        return false
       end
 
       def growi?
