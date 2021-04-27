@@ -41,7 +41,7 @@ module Mulukhiya
             name: package_class.name,
             description: config['/package/description'],
             permission: MisskeyController.oauth_scopes,
-            callbackUrl: http.create_uri(config['/misskey/oauth/callback_url']).to_s,
+            callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
           },
         }).body
         redis.set('oauth_client', client)
