@@ -58,7 +58,7 @@ module Mulukhiya
             favorites[v] += 1
           end
         end
-        return favorites.sort_by {|k, v| v}.reverse.to_h
+        return favorites.sort_by {|_, v| v}.reverse.to_h
       rescue => e
         logger.error(error: e)
         return {}

@@ -34,7 +34,7 @@ module Mulukhiya
     end
 
     def handle_follow_notification(payload)
-      Event.new(:follow, {reporter: @reporter, sns: @sns}).dispatch(payload)
+      Event.new(:follow, {sns: @sns}).dispatch(payload)
     end
 
     def handle_update(payload); end
@@ -69,7 +69,6 @@ module Mulukhiya
     def initialize
       @sns = info_agent_service
       @uri = @sns.create_streaming_uri
-      @reporter = Reporter.new
       @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
         ping: config['/websocket/keepalive'],
       })

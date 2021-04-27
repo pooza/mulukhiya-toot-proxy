@@ -38,6 +38,10 @@ module Mulukhiya
         return acct.to_s
       end
 
+      def fields
+        return values['vields'] || []
+      end
+
       def bio
         return description || ''
       end

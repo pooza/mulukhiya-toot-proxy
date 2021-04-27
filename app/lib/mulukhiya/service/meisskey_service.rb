@@ -34,7 +34,7 @@ module Mulukhiya
             name: package_class.name,
             description: config['/package/description'],
             permission: MeisskeyController.oauth_scopes,
-            callbackUrl: http.create_uri(config['/meisskey/oauth/callback_url']).to_s,
+            callbackUrl: http.create_uri(config['/meisskey/oauth/callback/url']).to_s,
           },
         }).body
         redis.set('oauth_client', client)

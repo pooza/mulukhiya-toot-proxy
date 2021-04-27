@@ -1,5 +1,5 @@
 package:
-  version: 4.4.6
+  version: 4.4.7
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -306,7 +306,9 @@ misskey:
         - write:drive
         - read:drive
         - read:account
-    callback_url: /mulukhiya/app/misskey/auth
+    callback:
+      url: /mulukhiya/app/misskey/auth
+      enable: true
   status:
     parser: note
     key: noteId
@@ -429,7 +431,9 @@ meisskey:
         - write:notes
         - write:drive
         - read:drive
-    callback_url: /mulukhiya/app/misskey/auth
+    callback:
+      url: /mulukhiya/app/misskey/auth
+      enable: true
   status:
     parser: note
     key: noteId

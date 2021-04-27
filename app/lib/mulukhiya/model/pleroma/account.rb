@@ -52,7 +52,7 @@ module Mulukhiya
       end
 
       def fields
-        return JSON.parse(values[:fields]).map do |entry|
+        return JSON.parse(values[:fields] || '[]').map do |entry|
           entry['value'].sanitize!
           entry
         end

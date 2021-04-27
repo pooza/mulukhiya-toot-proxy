@@ -29,6 +29,10 @@ module Mulukhiya
         return config["/#{name}/features/feed"] rescue false
       end
 
+      def oauth_callback?
+        return config["/#{name}/oauth/callback/enable"] == true rescue false
+      end
+
       def growi?
         return Handler.search(/growi/).present?
       end

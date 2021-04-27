@@ -33,18 +33,21 @@ html lang='ja'
         h3 トークンの登録
         .token
           | 新しいトークンを登録
-          - if env.mastodon_type?
+          - if controller.oauth_callback?
+            .description
+              a href=params[:oauth_url] #{controller.display_name}の認証ページ
+              | で認証を行って、新しいトークンを登録します。
+          - else
             .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
             .description
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
             .auth-form
               input type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
-              button :disabled='!input.authcode' @click='authMastodon' 認証
-          - if env.misskey_type?
-            .description
-              a href=params[:oauth_url] #{controller.display_name}の認証ページ
-              | で認証を行って、新しいトークンを登録します。
+              - if env.mastodon_type?
+                button :disabled='!input.authcode' @click='authMastodon' 認証
+              - elsif env.misskey_type?
+                button :disabled='!input.authcode' @click='authMisskey' 認証
         .token
           | 既存のトークンを登録
           .description 他のPCに登録されている暗号化トークンを入力して、登録ボタンを押下してください。
@@ -112,6 +115,19 @@ html lang='ja'
           },
           authMastodon: function () {
             Vue.authMastodon(this.input.authcode)
+              .then(e => {
+                this.input.authcode = null
+                this.token = e.access_token_crypt
+                return Vue.registerToken(this.token)
+              }).then(e => {
+                Vue.setToken(this.token)
+                this.account = e
+                return Vue.getAccounts()
+              }).then(e => {this.accounts = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          authMisskey: function () {
+            Vue.authMisskey(this.input.authcode)
               .then(e => {
                 this.input.authcode = null
                 this.token = e.access_token_crypt

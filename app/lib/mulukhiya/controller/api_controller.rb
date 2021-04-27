@@ -71,6 +71,25 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/misskey/auth' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
+      errors = MisskeyAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors: errors}
+      else
+        response = @sns.auth(params[:token])
+        token = @sns.create_access_token(response.parsed_response['accessToken'])
+        @renderer.message = response.parsed_response
+        @renderer.message['access_token_crypt'] = token.encrypt
+      end
+      return @renderer.to_s
+    rescue => e
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       @sns.token ||= @sns.default_token

@@ -31,7 +31,7 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, k: k, v: v)
       end
-      update(sort_by {|k, v| k.length}.to_h)
+      update(sort_by {|k, _| k.length}.to_h)
     end
 
     def cache
@@ -103,7 +103,7 @@ module Mulukhiya
           result[k][:words].concat(v[:words]).uniq!
         end
       end
-      return result.sort_by {|k, v| k.length}.to_h
+      return result.sort_by {|k, _| k.length}.to_h
     end
   end
 end
