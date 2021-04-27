@@ -29,6 +29,11 @@ module Mulukhiya
         return config["/#{name}/features/feed"] rescue false
       end
 
+      def oauth_callback?
+        sns = sns_class.new
+        return sns.oauth_uri && (sns.oauth_uri != 'urn:ietf:wg:oauth:2.0:oob')
+      end
+
       def growi?
         return Handler.search(/growi/).present?
       end

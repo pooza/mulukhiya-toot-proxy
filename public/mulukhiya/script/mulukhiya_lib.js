@@ -50,6 +50,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.authMisskey = async token => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/misskey/auth', {token: Vue.getToken(), token: token})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
