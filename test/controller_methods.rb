@@ -16,7 +16,7 @@ module Mulukhiya
       assert_boolean(controller_class.feed?)
     end
 
-    def oauth_callback?
+    def test_oauth_callback?
       assert_boolean(controller_class.oauth_callback?)
     end
 

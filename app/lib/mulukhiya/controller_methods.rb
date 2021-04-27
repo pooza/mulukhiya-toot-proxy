@@ -30,8 +30,8 @@ module Mulukhiya
       end
 
       def oauth_callback?
-        sns = sns_class.new
-        return sns.oauth_uri && (sns.oauth_uri != 'urn:ietf:wg:oauth:2.0:oob')
+        return false unless url = config["/#{name}/oauth/callback_url"]
+        return url != 'urn:ietf:wg:oauth:2.0:oob'
       end
 
       def growi?

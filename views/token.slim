@@ -34,6 +34,10 @@ html lang='ja'
         .token
           | 新しいトークンを登録
           - if controller.oauth_callback?
+            .description
+              a href=params[:oauth_url] #{controller.display_name}の認証ページ
+              | で認証を行って、新しいトークンを登録します。
+          - else
             .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
             .description
               a href=params[:oauth_url] target='_blank' 認証コードを取得
@@ -44,10 +48,6 @@ html lang='ja'
                 button :disabled='!input.authcode' @click='authMastodon' 認証
               - elsif env.misskey_type?
                 button :disabled='!input.authcode' @click='authMisskey' 認証
-          - else
-            .description
-              a href=params[:oauth_url] #{controller.display_name}の認証ページ
-              | で認証を行って、新しいトークンを登録します。
         .token
           | 既存のトークンを登録
           .description 他のPCに登録されている暗号化トークンを入力して、登録ボタンを押下してください。
