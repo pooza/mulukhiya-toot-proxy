@@ -30,7 +30,7 @@ module Mulukhiya
       @status = body[status_field] || ''
       return unless parser.command_name == command_name
       exec
-      result.push(parser.params.select {|k, v| v.present?})
+      result.push(parser.params.select {|_, v| v.present?})
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
