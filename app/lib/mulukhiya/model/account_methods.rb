@@ -144,7 +144,6 @@ module Mulukhiya
         bar&.increment
       end
       bar&.finish
-      logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
     end
 
     def status_delete_limit

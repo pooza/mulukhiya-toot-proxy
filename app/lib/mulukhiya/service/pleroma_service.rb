@@ -28,7 +28,13 @@ module Mulukhiya
     end
 
     def delete_status(status, params = {})
-      status = status.id if status.is_a?(status_class)
+      case status.class
+      when status_class
+        status = status.id
+      when Ginseng::URI, TootURI
+        response = @http.get(status, {follow_redirects: false})
+        status = response.headers['location'].match(%r{/notice/(.*)})[1]
+      end
       return super
     end
 
