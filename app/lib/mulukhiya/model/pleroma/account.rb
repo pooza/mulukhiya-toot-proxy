@@ -89,10 +89,10 @@ module Mulukhiya
         attachments = Postgres.instance.exec('attachments_by_account', {acct: test_account.acct})
         puts "delete #{attachments.count.commaize} attachments" if Environment.rake?
         bar = ProgressBar.create(total: attachments.count) if Environment.rake?
-        http = HTTP.new
+        ic @http
         attachments.each do |attachment|
           next unless uri = Ginseng::URI.parse(attachment['uri'])
-          response = http.get(uri, {follow_redirects: false})
+          response = @http.get(uri, {follow_redirects: false})
           next unless matches = response.headers['location'].match(%r{/notice/(.*)})
           service.delete_status(matches[1]) unless params[:dryrun]
         rescue => e
