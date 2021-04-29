@@ -84,6 +84,26 @@ module Mulukhiya
         return false
       end
 
+      def clear_attachments(params = {})
+        raise Ginseng::AuthError, 'Only test users can run it' unless test?
+        attachments = Postgres.instance.exec('attachments_by_account', {acct: test_account.acct})
+        puts "delete #{attachments.count.commaize} attachments" if Environment.rake?
+        bar = ProgressBar.create(total: attachments.count) if Environment.rake?
+        http = HTTP.new
+        attachments.each do |attachment|
+          next unless uri = Ginseng::URI.parse(attachment['uri'])
+          response = http.get(uri, {follow_redirects: false})
+          next unless matches = response.headers['location'].match(%r{/notice/(.*)})
+          service.delete_status(matches[1]) unless params[:dryrun]
+        rescue => e
+          logger.error(error: e, acct: acct.to_s)
+        ensure
+          bar&.increment
+        end
+        bar&.finish
+        logger.info(class: self.class.to_s, acct: acct.to_s, message: 'clear')
+      end
+
       def self.get(key)
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)

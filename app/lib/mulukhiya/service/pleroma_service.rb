@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(Integer)
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
       return delete_status(attachment.status, params)
     end
 
