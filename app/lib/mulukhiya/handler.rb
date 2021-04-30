@@ -8,7 +8,8 @@ module Mulukhiya
       return body
     end
 
-    def handle_post_toot(body, params = {}); end
+    def handle_post_toot(body, params = {})
+    end
 
     def handle_pre_webhook(body, params = {})
       return handle_pre_toot(body, params)
@@ -26,25 +27,35 @@ module Mulukhiya
       handle_post_toot(body, params)
     end
 
-    def handle_pre_upload(body, params = {}); end
+    def handle_pre_upload(body, params = {})
+    end
 
-    def handle_post_upload(body, params = {}); end
+    def handle_post_upload(body, params = {})
+    end
 
-    def handle_pre_thumbnail(body, params = {}); end
+    def handle_pre_thumbnail(body, params = {})
+    end
 
-    def handle_post_thumbnail(body, params = {}); end
+    def handle_post_thumbnail(body, params = {})
+    end
 
-    def handle_post_fav(body, params = {}); end
+    def handle_post_fav(body, params = {})
+    end
 
-    def handle_post_boost(body, params = {}); end
+    def handle_post_boost(body, params = {})
+    end
 
-    def handle_post_bookmark(body, params = {}); end
+    def handle_post_bookmark(body, params = {})
+    end
 
-    def handle_post_search(body, params = {}); end
+    def handle_post_search(body, params = {})
+    end
 
-    def handle_announce(announcement, params = {}); end
+    def handle_announce(announcement, params = {})
+    end
 
-    def handle_error(error, params = {}); end
+    def handle_error(error, params = {})
+    end
 
     def handle_toot(body, params = {})
       params[:reporter] ||= Reporter.new

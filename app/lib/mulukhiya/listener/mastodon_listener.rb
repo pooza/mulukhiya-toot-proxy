@@ -37,9 +37,11 @@ module Mulukhiya
       Event.new(:follow, {sns: @sns}).dispatch(payload)
     end
 
-    def handle_update(payload); end
+    def handle_update(payload)
+    end
 
-    def handle_delete(payload); end
+    def handle_delete(payload)
+    end
 
     def self.start
       EM.run do
