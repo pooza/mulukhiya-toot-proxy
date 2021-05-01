@@ -5,7 +5,19 @@ module Mulukhiya
 
     def initialize(name)
       super
-      self['sns'] = info_agent_service
+      self.params = assign_values
+    end
+
+    def self.assign_values
+      return {
+        package: Package,
+        controller: controller_class,
+        sns: info_agent_service,
+        env: Environment,
+        crypt: Crypt,
+        config: config,
+        annict: AnnictService.new,
+      }
     end
   end
 end

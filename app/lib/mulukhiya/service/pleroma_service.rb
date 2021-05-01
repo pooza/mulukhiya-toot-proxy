@@ -27,7 +27,7 @@ module Mulukhiya
       return delete_status(attachment.status, params)
     end
 
-    def delete_status(status, params = {})
+    def search_status_id(status)
       case status.class.to_s
       when status_class.to_s
         status = status.id

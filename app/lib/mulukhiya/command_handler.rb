@@ -35,9 +35,11 @@ module Mulukhiya
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
-    def handle_pre_webhook(body, params = {}); end
+    def handle_pre_webhook(body, params = {})
+    end
 
-    def handle_post_webhook(body, params = {}); end
+    def handle_post_webhook(body, params = {})
+    end
 
     def verbose?
       return false
