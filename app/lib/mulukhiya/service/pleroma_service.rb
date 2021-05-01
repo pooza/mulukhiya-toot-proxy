@@ -23,12 +23,18 @@ module Mulukhiya
     end
 
     def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(Integer)
+      attachment = attachment_class[attachment] if attachment.is_a?(String)
       return delete_status(attachment.status, params)
     end
 
-    def delete_status(status, params = {})
-      status = status.id if status.is_a?(status_class)
+    def search_status_id(status)
+      case status.class.to_s
+      when status_class.to_s
+        status = status.id
+      when 'Ginseng::URI', 'TootURI'
+        response = @http.get(status, {follow_redirects: false})
+        status = response.headers['location'].match(%r{/notice/(.*)})[1]
+      end
       return super
     end
 

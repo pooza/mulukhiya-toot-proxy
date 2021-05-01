@@ -84,6 +84,20 @@ module Mulukhiya
         return false
       end
 
+      def clear_attachments(params = {})
+        raise Ginseng::AuthError, 'Only test users can run it' unless test?
+        puts "delete #{deletable_statuses.count.commaize} attachments" if Environment.rake?
+        bar = ProgressBar.create(total: deletable_statuses.count) if Environment.rake?
+        deletable_statuses.each do |status|
+          service.delete_status(Ginseng::URI.parse(status['uri'])) unless params[:dryrun]
+        rescue => e
+          logger.error(error: e, acct: acct.to_s)
+        ensure
+          bar&.increment
+        end
+        bar&.finish
+      end
+
       def self.get(key)
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
@@ -97,6 +111,12 @@ module Mulukhiya
           return account
         end
         return first(key)
+      end
+
+      private
+
+      def deletable_statuses
+        return Postgres.instance.exec('deletable_statuses', {acct: test_account.acct})
       end
     end
   end

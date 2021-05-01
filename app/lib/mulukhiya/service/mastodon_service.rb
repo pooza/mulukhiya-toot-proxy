@@ -16,8 +16,13 @@ module Mulukhiya
       return delete_status(attachment.status, params) if attachment.status
     end
 
-    def delete_status(status, params = {})
+    def search_status_id(status)
       status = status.id if status.is_a?(status_class)
+      return super
+    end
+
+    def search_attachment_id(attachment)
+      attachment = attachment.id if attachment.is_a?(attachment_class)
       return super
     end
 

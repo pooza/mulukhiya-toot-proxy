@@ -18,19 +18,13 @@ module Mulukhiya
     private
 
     def assign_values
-      return {
+      return Template.assign_values.merge(
         params: params,
         slim: SlimRenderer,
-        package: Package,
-        controller: controller_class,
-        env: Environment,
-        crypt: Crypt,
-        config: config,
-        annict: AnnictService.new,
         scripts: config["/webui/#{Environment.type}/scripts"],
         stylesheets: config["/webui/#{Environment.type}/stylesheets"],
         metadata: config.raw.dig('application', 'webui', 'metadata'),
-      }
+      )
     end
   end
 end
