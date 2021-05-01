@@ -5,7 +5,7 @@ module Mulukhiya
 
     def initialize(name)
       super
-      self.params = assign_values
+      self.params = Template.assign_values
     end
 
     def self.assign_values
