@@ -4,7 +4,7 @@ module Mulukhiya
     include Package
 
     def update
-      redis.set('program', @http.get(config['/programs/url']))
+      redis.set('program', @http.get(uri)) if uri
     end
 
     def data
@@ -22,6 +22,10 @@ module Mulukhiya
 
     def to_yaml
       return data.to_yaml
+    end
+
+    def uri
+      return Ginseng::URI.parse(config['/programs/url']) rescue nil
     end
 
     alias to_s to_yaml
