@@ -1,8 +1,8 @@
 module Mulukhiya
   class AnnouncementWorker
+    include Sidekiq::Worker
     include Package
     include SNSMethods
-    include Sidekiq::Worker
     sidekiq_options retry: false, lock: :until_executed
 
     def perform

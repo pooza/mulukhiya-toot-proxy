@@ -2,6 +2,7 @@ module Mulukhiya
   class AnnictPollingWorker
     include Sidekiq::Worker
     include Package
+    include SNSMethods
     sidekiq_options retry: false, lock: :until_executed
 
     def perform

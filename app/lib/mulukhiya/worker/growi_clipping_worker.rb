@@ -1,6 +1,5 @@
 module Mulukhiya
   class GrowiClippingWorker < ClippingWorker
-    include Package
     sidekiq_options lock: :until_executed
 
     def perform(params)
