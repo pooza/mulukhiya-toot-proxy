@@ -6,38 +6,38 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'メディアカタログ'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
       ul class='medias clearfix'
-        li class='media' v-for='media in medias'
+        li.media v-for='media in medias'
           .media-container
             a :href='media.url' target='_blank' v-if='media.thumbnail_url && media.mediatype=="image"'
               img :src='media.thumbnail_url'
             video :src='media.url' controls='' v-else-if='media.mediatype=="video"'
             audio :src='media.url' controls='' v-else-if='media.mediatype=="audio"'
             a :href='media.url' target='_blank' v-else='' = '{{media.file_name}}'
-          ul class='params'
-            li class='param'
+          ul.params
+            li.param
               i class='fas fa-calendar'
               | {{media.created_at_str}}
-          ul class='params'
+          ul.params
             i class='fas fa-image' v-if='media.thumbnail_url && media.mediatype=="image"'
             i class='fas fa-video' v-else-if='media.mediatype=="video"'
             i class='fas fa-play-circle' v-else-if='media.mediatype=="audio"'
-            li class='param' v-if='media.pixel_size' = '{{media.pixel_size}}'
-            li class='param' v-if='media.duration' = '{{media.duration}}s'
-            li class='param' = '{{media.type}}'
-            li class='param' v-if='media.file_size_str' = '{{media.file_size_str}}'
-          ul class='params'
-            li class='param'
+            li.param v-if='media.pixel_size' = '{{media.pixel_size}}'
+            li.param v-if='media.duration' = '{{media.duration}}s'
+            li.param = '{{media.type}}'
+            li.param v-if='media.file_size_str' = '{{media.file_size_str}}'
+          ul.params
+            li.param
               i class='fas fa-user'
               | {{media.acct}}
-          ul class='params'
-            li class='param'
+          ul.params
+            li.param
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' = controller.status_label
-      nav class='media' v-if='medias.length && !last'
+      nav.media v-if='medias.length && !last'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:

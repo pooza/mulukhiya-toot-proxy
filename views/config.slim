@@ -6,26 +6,26 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: '環境設定'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 環境設定
       section v-if='account.username'
         h3 現在の設定
         .result-container
           pre = '{{result}}'
-      section class='config' v-if='account.username'
+      section.config v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
           .inline-field-container
-            input class='short' placeholder='期限(分)' v-model.number='form.program.minutes'
+            input.short placeholder='期限(分)' v-model.number='form.program.minutes'
           - if controller.livecure?
             .field-container
               v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
-      section class='config' v-if='account.username && layout.sections.livecure'
+      section.config v-if='account.username && layout.sections.livecure'
         h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
         vue-slide-up-down :active='layout.details.livecure'
           .inline-field-container
@@ -33,7 +33,7 @@ html lang='ja'
               input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
           .field-update-button-container
             button @click='updateLivecure' 更新
-      section class='config' v-if='account.username && layout.sections.growi'
+      section.config v-if='account.username && layout.sections.growi'
         h3 @click='toggleVisibility("growi")' GROWI
         vue-slide-up-down :active='layout.details.growi'
           ol
@@ -67,7 +67,7 @@ html lang='ja'
             input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
-      section class='config' v-if='account.username && layout.sections.dropbox'
+      section.config v-if='account.username && layout.sections.dropbox'
         h3 @click='toggleVisibility("dropbox")' Dropbox
         vue-slide-up-down :active='layout.details.dropbox'
           ol
@@ -82,7 +82,7 @@ html lang='ja'
             input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
-      section class='config' v-if='account.username && layout.sections.lemmy'
+      section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
           .inline-field-container
@@ -99,7 +99,7 @@ html lang='ja'
             input placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
           .field-update-button-container
             button @click='updateLemmy' 更新
-      section class='config' v-if='account.username && layout.sections.annict'
+      section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
           ol
@@ -116,8 +116,8 @@ html lang='ja'
             input placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
           .field-update-button-container
             button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
-            button class='alert' @click='unauthAnnict' 認証を解除
-      section class='config' v-if='account.username'
+            button.alert @click='unauthAnnict' 認証を解除
+      section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
           .inline-field-container
@@ -125,13 +125,13 @@ html lang='ja'
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
             button @click='updateWebhook' 更新
-      section class='config' v-if='account.username'
+      section.config v-if='account.username'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
             label
               input type='checkbox' v-model='form.notify.user_config' 設定変更を通知
-            label class='alert'
+            label.alert
               input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
             button @click='updateNotify' 更新

@@ -6,10 +6,10 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'API'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 API
-      ul class='links'
+      ul.links
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
@@ -35,7 +35,7 @@ html lang='ja'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
-                pre class='result' v-if='result.media_list' = '{{result.media_list}}'
+                pre.result v-if='result.media_list' = '{{result.media_list}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/file/clear
@@ -79,7 +79,7 @@ html lang='ja'
                   | を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
-                  pre class='result' v-if='result.program_list' = '{{result.program_list}}'
+                  pre.result v-if='result.program_list' = '{{result.program_list}}'
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/program/update
@@ -103,7 +103,7 @@ html lang='ja'
                 .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
                 .field-update-button-container
                   button @click='getFavoriteTags' 実行
-                  pre class='result' v-if='result.favorite_tags' = '{{result.favorite_tags}}'
+                  pre.result v-if='result.favorite_tags' = '{{result.favorite_tags}}'
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
@@ -115,7 +115,7 @@ html lang='ja'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
-                pre class='result' v-if='result.search_tag' = '{{result.search_tag}}'
+                pre.result v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
@@ -155,7 +155,7 @@ html lang='ja'
                 .link-description フィードの一覧を返します。
                 .field-update-button-container
                   button @click='getFeeds' 実行
-                  pre class='result' v-if='result.feed_list' = '{{result.feed_list}}'
+                  pre.result v-if='result.feed_list' = '{{result.feed_list}}'
         li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
@@ -174,7 +174,7 @@ html lang='ja'
               .link-description モロヘイヤの動作状況を表示します。
               .field-update-button-container
                 button @click='getHealth' 実行
-                pre class='result' v-if='result.health' = '{{result.health}}'
+                pre.result v-if='result.health' = '{{result.health}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -183,7 +183,7 @@ html lang='ja'
               .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
               .field-update-button-container
                 button @click='getAbout' 実行
-                pre class='result' v-if='result.about' = '{{result.about}}'
+                pre.result v-if='result.about' = '{{result.about}}'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
