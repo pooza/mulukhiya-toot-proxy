@@ -54,7 +54,7 @@ html lang='ja'
                 button :disabled='!input.authcode' @click='authMisskey' 認証
         .token
           | 既存のトークンを登録
-          .description 他のPCに登録されている暗号化トークンを入力し、登録ボタンを押下してください。
+          .description 他のPCに登録されている暗号化トークンを入力して、登録ボタンを押下してください。
           - if controller.oauth_webui_uri
             .description v-if='account.is_admin'
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
