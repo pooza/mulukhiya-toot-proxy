@@ -143,7 +143,7 @@ webui:
   cache:
     ttl: 86400
   javascript:
-    minimize: false
+    minimize: true
 mastodon:
   display_name: Mastodon
   sns_type: mastodon
