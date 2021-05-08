@@ -280,10 +280,11 @@ module Mulukhiya
         raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
         command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
         command.exec
+        raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer.message = JSON.parse(command.stdout)
-        raise command.stderr unless command.status.zero?
         return @renderer.to_s
       rescue => e
+        e = Ginseng::Error.create(e)
         @renderer.status = e.status
         @renderer.message = {error: e.message}
         return @renderer.to_s
