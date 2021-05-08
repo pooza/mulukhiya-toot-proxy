@@ -32,7 +32,7 @@ module Mulukhiya
         command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
-        @renderer = AtomFeedRenderer.new(entry)
+        @renderer = RSS20FeedRenderer.new(entry)
         @renderer.entries = JSON.parse(command.stdout)
         return @renderer.to_s
       rescue => e

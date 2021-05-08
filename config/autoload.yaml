@@ -14,6 +14,7 @@ inflections:
   mime_type: MIMEType
   mongo_dsn: MongoDSN
   note_uri: NoteURI
+  rss20_feed_renderer: RSS20FeedRenderer
   shortened_url_handler: ShortenedURLHandler
   sns_methods: SNSMethods
   sns_service_methods: SNSServiceMethods
