@@ -108,5 +108,17 @@ module Mulukhiya
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
+
+    def test_costom_endpoints
+      get '/custom/noexistant'
+      assert_false(last_response.ok?)
+      assert_equal(last_response.status, 404)
+
+      assert_kind_of(Array, config['/api/custom'])
+      config['/api/custom'].each do |entry|
+        get File.join('custom', entry['name'])
+        assert(last_response.ok?)
+      end
+    end
   end
 end

@@ -272,6 +272,18 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/custom/:name' do
+      if entry = config['/api/custom'].find {|v| v['name'] == params[:name]}
+        command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
+        command.exec
+        @renderer.message = JSON.parse(command.stdout)
+        raise command.stderr unless command.status.zero?
+      else
+        @renderer.status = 404
+      end
+      return @renderer.to_s
+    end
+
     def token
       return params[:token].decrypt if params[:token]
       return nil

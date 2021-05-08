@@ -925,6 +925,14 @@ feed:
     limit: 100
   media:
     limit: 100
+  custom:
+    sample:
+      command:
+        - custom_feed_sample.sh
+api:
+  custom:
+    - name: sample
+      command: custom_api_sample.sh
 http:
   retry:
     limit: 3
