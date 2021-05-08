@@ -932,7 +932,7 @@ feed:
 api:
   custom:
     - name: sample
-      command: custom_api_sample.sh
+      command: sample/custom_api.sh
 http:
   retry:
     limit: 3
