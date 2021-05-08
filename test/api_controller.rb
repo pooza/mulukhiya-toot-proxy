@@ -110,13 +110,9 @@ module Mulukhiya
     end
 
     def test_costom_endpoints
-      get '/custom/noexistant'
-      assert_false(last_response.ok?)
-      assert_equal(last_response.status, 404)
-
       assert_kind_of(Array, config['/api/custom'])
       config['/api/custom'].each do |entry|
-        get File.join('custom', entry['name'])
+        get File.join('/', entry['path'])
         assert(last_response.ok?)
       end
     end

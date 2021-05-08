@@ -272,18 +272,27 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/custom/:name' do
-      entry = config['/api/custom'].find {|v| v['name'] == params[:name]}
-      raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
-      command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
-      command.exec
-      @renderer.message = JSON.parse(command.stdout)
-      raise command.stderr unless command.status.zero?
-      return @renderer.to_s
-    rescue => e
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+    config['/api/custom'].each do |entry|
+      get File.join('/', entry['path']) do
+        entry = config['/api/custom'].find do |v|
+          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
+        command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
+        command.exec
+        @renderer.message = JSON.parse(command.stdout)
+        raise command.stderr unless command.status.zero?
+        return @renderer.to_s
+      rescue => e
+        @renderer.status = e.status
+        @renderer.message = {error: e.message}
+        return @renderer.to_s
+      end
+    end
+
+    def path_prefix
+      return '' if Environment.test?
+      return '/mulukhiya/api'
     end
 
     def token

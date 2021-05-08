@@ -931,8 +931,10 @@ feed:
         - custom_feed_sample.sh
 api:
   custom:
-    - name: sample
-      command: sample/custom_api.sh
+    - path: sample/foo
+      command: sample/custom_api_1.sh
+    - path: sample/bar
+      command: sample/custom_api_2.sh
 http:
   retry:
     limit: 3
