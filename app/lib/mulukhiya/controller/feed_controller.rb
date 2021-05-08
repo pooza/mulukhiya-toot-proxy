@@ -22,5 +22,31 @@ module Mulukhiya
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
+
+    config['/feed/custom'].each do |entry|
+      get File.join('/', entry['path']) do
+        entry = config['/feed/custom'].find do |v|
+          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
+        command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
+        command.exec
+        raise Ginseng::Error, command.stderr unless command.status.zero?
+        @renderer = AtomFeedRenderer.new(entry)
+        @renderer.entries = JSON.parse(command.stdout)
+        return @renderer.to_s
+      rescue => e
+        e = Ginseng::Error.create(e)
+        @renderer = Ginseng::Web::XMLRenderer.new
+        @renderer.status = e.status
+        @renderer.message = {error: e.message}
+        return @renderer.to_s
+      end
+    end
+
+    def path_prefix
+      return '' if Environment.test?
+      return '/mulukhiya/feed'
+    end
   end
 end

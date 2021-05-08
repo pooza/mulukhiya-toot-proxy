@@ -926,9 +926,14 @@ feed:
   media:
     limit: 100
   custom:
-    sample:
-      command:
-        - custom_feed_sample.sh
+    - path: sample/foo
+      command: sample/custom_feed_1.sh
+      title: タイトル1
+      description: 説明1
+    - path: sample/bar
+      command: sample/custom_feed_2.sh
+      title: タイトル2
+      description: 説明2
 api:
   custom:
     - path: sample/foo
