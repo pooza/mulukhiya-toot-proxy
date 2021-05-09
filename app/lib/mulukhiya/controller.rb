@@ -61,11 +61,11 @@ module Mulukhiya
       return dest if dest.valid?
     end
 
-    private
-
     def command_entries
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      return config["/#{self.class.to_s.split('::').last.sub(/Controller$/, '').underscore}/custom"]
     end
+
+    private
 
     def path_prefix
       return ''

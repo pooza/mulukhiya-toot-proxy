@@ -42,10 +42,6 @@ module Mulukhiya
 
     private
 
-    def command_entries
-      return config['/feed/custom']
-    end
-
     def path_prefix
       return '' if Environment.test?
       return '/mulukhiya/feed'

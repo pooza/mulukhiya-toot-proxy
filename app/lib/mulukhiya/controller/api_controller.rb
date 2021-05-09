@@ -294,10 +294,6 @@ module Mulukhiya
 
     private
 
-    def command_entries
-      return config['/api/custom']
-    end
-
     def path_prefix
       return '' if Environment.test?
       return '/mulukhiya/api'
