@@ -5,5 +5,7 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 ENV['RAKE'] = nil
 
 require 'mulukhiya'
-ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
-Mulukhiya::PumaDaemon.spawn!
+module Mulukhiya
+  ENV['RACK_ENV'] ||= Environment.type
+  Mulukhiya::PumaDaemon.spawn!
+end

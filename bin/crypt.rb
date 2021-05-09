@@ -4,7 +4,6 @@ $LOAD_PATH.unshift(File.join(dir, 'app/lib'))
 ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
-
 module Mulukhiya
   puts Package.full_name
   puts 'パスワード暗号化ユーティリティ'
