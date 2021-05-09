@@ -38,6 +38,19 @@ module Mulukhiya
       return nil
     end
 
+    def command
+      unless @command
+        command_entry ||= command_entries.find do |entry|
+          entry['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        return nil unless command_entry
+        @command = CommandLine.new(command_entry['command'])
+        @command.dir = command_entry['dir'] || File.join(Environment.dir, 'bin')
+        @command.env = command_entry['env'] if command_entry['env']
+      end
+      return @command
+    end
+
     def self.webhook_entries
       return nil
     end
@@ -46,6 +59,16 @@ module Mulukhiya
       dest = TootURI.parse(src.to_s)
       dest = NoteURI.parse(dest) unless dest&.valid?
       return dest if dest.valid?
+    end
+
+    private
+
+    def command_entries
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def path_prefix
+      return ''
     end
   end
 end

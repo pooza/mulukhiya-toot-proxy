@@ -274,11 +274,7 @@ module Mulukhiya
 
     config['/api/custom'].each do |entry|
       get File.join('/', entry['path']) do
-        entry = config['/api/custom'].find do |v|
-          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
-        end
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
-        command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
+        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer.message = JSON.parse(command.stdout)
@@ -291,14 +287,20 @@ module Mulukhiya
       end
     end
 
-    def path_prefix
-      return '' if Environment.test?
-      return '/mulukhiya/api'
-    end
-
     def token
       return params[:token].decrypt if params[:token]
       return nil
+    end
+
+    private
+
+    def command_entries
+      return config['/api/custom']
+    end
+
+    def path_prefix
+      return '' if Environment.test?
+      return '/mulukhiya/api'
     end
   end
 end

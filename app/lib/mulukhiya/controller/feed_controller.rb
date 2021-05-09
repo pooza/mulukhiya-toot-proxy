@@ -25,11 +25,7 @@ module Mulukhiya
 
     config['/feed/custom'].each do |entry|
       get File.join('/', entry['path']) do
-        entry = config['/feed/custom'].find do |v|
-          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
-        end
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless entry
-        command = CommandLine.new([File.join(Environment.dir, 'bin', entry['command'])])
+        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer = RSS20FeedRenderer.new(entry)
@@ -42,6 +38,12 @@ module Mulukhiya
         @renderer.message = {error: e.message}
         return @renderer.to_s
       end
+    end
+
+    private
+
+    def command_entries
+      return config['/feed/custom']
     end
 
     def path_prefix
