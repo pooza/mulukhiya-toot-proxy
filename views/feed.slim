@@ -23,6 +23,14 @@ html lang='ja'
             h4 = '{{feed.tag}}'
             .link
               a :href='feed.feed_url' target='_blank' = '{{feed.feed_url}}'
+        - if config['/feed/custom'].present?
+          h3 カスタム
+          ul.links
+            - config['/feed/custom'].each do |entry|
+              li
+                h4 #{entry['title'] || entry['path']}
+                .link
+                  a href='#{File.join('/mulukhiya/feed', entry['path'])}' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
