@@ -36,7 +36,7 @@ handler:
   hexo_announce:
     category: お知らせ
   image_resize:
-    pixel: 1280
+    pixel: 1920
   itunes_image:
     pixel: 480
     timeout: 10
