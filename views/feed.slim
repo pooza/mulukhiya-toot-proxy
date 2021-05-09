@@ -10,18 +10,18 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 Atomフィード
       - if controller.feed?
-      	- if controller.media_catalog?
-          h3 一般
-          ul.links
+        h3 一般
+        ul.links
+      	  - if controller.media_catalog?
             li
               h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
-            - config['/feed/custom'].each do |entry|
-              li
-                h4 #{entry['title'] || entry['path']}
-                .link
-                  a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
+          - config['/feed/custom'].each do |entry|
+            li
+              h4 #{entry['title'] || entry['path']}
+              .link
+                a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
         h3 ハッシュタグ
         ul.links
           li v-for='feed in feeds'
