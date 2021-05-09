@@ -236,6 +236,44 @@ properties:
         enum:
           - base64
           - hex
+  feed:
+    type: object
+    properties:
+      custom:
+        type: array
+        items:
+          type: object
+          required:
+            - path
+            - command
+          properties:
+            path:
+              type: string
+            command:
+              type: array
+              items:
+                type: string
+            title:
+              type: string
+            description:
+              type: string
+  api:
+    type: object
+    properties:
+      custom:
+        type: array
+        items:
+          type: object
+          required:
+            - path
+            - command
+          properties:
+            path:
+              type: string
+            command:
+              type: array
+              items:
+                type: string
   webui:
     type: object
     properties:

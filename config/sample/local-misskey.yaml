@@ -40,6 +40,26 @@ tagging:
       type: relative
     - url: https://mstdn.example.com/dictionaries/dic3
       type: mecab
+feed:
+  custom:
+    - path: sample/foo
+      command:
+        - sample/custom_feed_1.sh
+      title: タイトル1
+      description: 説明1
+    - path: sample/bar
+      command:
+        - sample/custom_feed_2.sh
+      title: タイトル2
+      description: 説明2
+api:
+  custom:
+    - path: sample/foo
+      command:
+        - sample/custom_api_1.sh
+    - path: sample/bar
+      command:
+        - sample/custom_api_2.sh
 crypt:
   salt: your_salt
   password: your_password
