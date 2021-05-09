@@ -4,5 +4,9 @@ Thumbs.db
 ._*
 .fuse*
 config/local.*
+bin
+!bin/crypt.rb
+!bin/*_daemon.rb
+!bin/*_worker.rb
 .sass-cache
 dist
