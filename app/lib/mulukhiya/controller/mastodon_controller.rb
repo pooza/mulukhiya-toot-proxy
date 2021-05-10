@@ -85,7 +85,7 @@ module Mulukhiya
         Event.new(:post_search, {reporter: @reporter, sns: @sns, message: message}).dispatch(params)
         @renderer.message = message
       else
-        body = Nokogiri::HTML.parse(message, nil, 'utf-8')
+        body = message.nokogiri
         @renderer.message = {path: request.path, error: body.xpath('//h1').first.inner_text.chomp}
       end
       @renderer.status = @reporter.response.code

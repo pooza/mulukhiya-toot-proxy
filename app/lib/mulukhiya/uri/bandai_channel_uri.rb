@@ -33,8 +33,7 @@ module Mulukhiya
     def image_uri
       return nil unless bandai_channel?
       unless @image_uri
-        response = service.get(to_s)
-        body = Nokogiri::HTML.parse(response.body, nil, 'utf-8')
+        body = service.get(to_s).body.nokogiri
         uri = Ginseng::URI.parse(body.css('.bch-p-hero img').first.attribute('src').to_s)
         return nil unless uri&.absolute?
         uri.query = nil
