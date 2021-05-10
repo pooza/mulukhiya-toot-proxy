@@ -294,6 +294,19 @@ module Mulukhiya
 
     private
 
+    def command
+      unless @command
+        command_entry ||= command_entries.find do |entry|
+          entry['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        return nil unless command_entry
+        @command = CommandLine.new(command_entry['command'])
+        @command.dir = command_entry['dir'] || Environment.dir
+        @command.env = command_entry['env'] if command_entry['env']
+      end
+      return @command
+    end
+
     def path_prefix
       return '' if Environment.test?
       return '/mulukhiya/api'
