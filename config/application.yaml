@@ -937,6 +937,8 @@ feed:
     limit: 100
   media:
     limit: 100
+  cache:
+    ttl: 300
   custom: []
 api:
   custom: []

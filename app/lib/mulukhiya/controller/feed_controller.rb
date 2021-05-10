@@ -26,10 +26,12 @@ module Mulukhiya
     config['/feed/custom'].each do |entry|
       get File.join('/', entry['path']) do
         raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
+        return storage[command] if storage[command]
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer = RSS20FeedRenderer.new(entry)
         @renderer.entries = JSON.parse(command.stdout)
+        storage.setex(command, config['/feed/cache/ttl'] * 2, @renderer)
         return @renderer.to_s
       rescue => e
         e = Ginseng::Error.create(e)
@@ -38,6 +40,11 @@ module Mulukhiya
         @renderer.message = {error: e.message}
         return @renderer.to_s
       end
+    end
+
+    def storage
+      @storage ||= RenderStorage.new
+      return @storage
     end
 
     private

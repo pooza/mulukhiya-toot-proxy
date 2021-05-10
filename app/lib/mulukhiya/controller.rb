@@ -45,7 +45,7 @@ module Mulukhiya
         end
         return nil unless command_entry
         @command = CommandLine.new(command_entry['command'])
-        @command.dir = command_entry['dir'] || File.join(Environment.dir, 'bin')
+        @command.dir = command_entry['dir'] || File.join(Environment.dir)
         @command.env = command_entry['env'] if command_entry['env']
       end
       return @command

@@ -9,10 +9,9 @@ module Mulukhiya
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
       @channel[:title] = channel['title']
       @channel[:description] = channel['description']
-    end
-
-    def entries=(entries)
-      entries.each {|v| push(v)}
+      return unless channel['link']
+      @http.base_uri = URI.parse(channel['link'])
+      @channel[:link] = @http.base_uri.to_s
     end
   end
 end
