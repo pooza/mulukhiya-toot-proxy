@@ -31,7 +31,7 @@ module Mulukhiya
         raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer = RSS20FeedRenderer.new(entry)
         @renderer.entries = JSON.parse(command.stdout)
-        storage.setex(command, config['/feed/cache/ttl'] * 2, @renderer)
+        storage.setex(command, config['/feed/cache/ttl'], @renderer)
         return @renderer.to_s
       rescue => e
         e = Ginseng::Error.create(e)

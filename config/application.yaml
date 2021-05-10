@@ -890,6 +890,9 @@ sidekiq:
     annict_polling:
       every: 5m
       class: Mulukhiya::AnnictPollingWorker
+    feed_update:
+      every: 5m
+      class: Mulukhiya::FeedUpdateWorker
     announcement:
       every: 1m
       class: Mulukhiya::AnnouncementWorker
@@ -938,7 +941,7 @@ feed:
   media:
     limit: 100
   cache:
-    ttl: 300
+    ttl: 600
   custom: []
 api:
   custom: []

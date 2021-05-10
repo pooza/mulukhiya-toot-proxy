@@ -11,6 +11,7 @@ module Mulukhiya
       @channel[:description] = channel['description']
       return unless channel['link']
       @http.base_uri = URI.parse(channel['link'])
+      @http.retry_limit = 2
       @channel[:link] = @http.base_uri.to_s
     end
   end
