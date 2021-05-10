@@ -2,6 +2,10 @@ module Mulukhiya
   class RemoteDictionary
     include Package
 
+    def name
+      return @params['/name'] || uri.path.split('/').last
+    end
+
     def parse
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
@@ -15,6 +19,11 @@ module Mulukhiya
     def uri
       @uri ||= Ginseng::URI.parse(@params['/url'])
       return @uri
+    end
+
+    def edit_uri
+      @edit_uri ||= Ginseng::URI.parse(@params['/edit/url'])
+      return @edit_uri
     end
 
     def self.all

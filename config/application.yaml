@@ -182,7 +182,7 @@ mastodon:
   status:
     parser: toot
     key: id
-    label: トゥート
+    label: 投稿
     max_length: 500
     delete:
       limit: 30
@@ -914,12 +914,24 @@ tagging:
       audio: audio
   dictionaries:
     - url: https://precure.ml/api/dic/v1/precure.json
+      name: プリキュア
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v1/singer.json
+      name: プリキュア歌手
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v1/series.json
+      name: プリキュア作品
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v2/fairy.json
+      name: プリキュア妖精
+      edit:
+        url: null
 feed:
   tag:
     limit: 100

@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 ハッシュタグ
       - if controller.favorite_tags?
-        section.fav_entries
+        section.fav-entries
           h3 プロフィールに含まれるタグ
           article.tag-entry v-for='(count, tag) in fav_entries'
             - if env.pleroma?
@@ -20,9 +20,9 @@ html lang='ja'
               a :href='"/tags/" + tag' target='_blank'
                 span = '#{{tag}}'
             span = '{{count}}'
-      section.tagging_dictionary
-        h3 ハッシュタグ辞書を検索
-        section
+      section.tagging-dictionary
+        h3 タグを検索
+        .search-form-container
           input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
           button.small :disabled='!keyword' @click='search' 検索
         article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
@@ -39,6 +39,18 @@ html lang='ja'
             li
               strong タグ
               code v-for='tag in entry.tags' = "{{tag}} "
+      section.remote-dics
+        h3 辞書
+        ul
+          - Mulukhiya::RemoteDictionary.all do |dic|
+            li
+              h4 = dic.name
+              .link-container
+                a.url href='#{dic.uri}' target='_blank' = dic.uri.to_s.ellipsize(64)
+                - if dic.edit_uri
+                  |&nbsp;
+                  a.edit href='#{dic.edit_uri}' target='_blank'
+                    i class='fas fa-edit'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
