@@ -879,7 +879,7 @@ sidekiq:
   concurrency: 5
   schedule:
     user_tag_initialize:
-      cron: '2 4 0 0 0'
+      cron: '2 4 * * *'
       class: Mulukhiya::UserTagInitializeWorker
     media_cleaning:
       every: 60m
