@@ -34,6 +34,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    def name
+      return self.class.to_s.split('::').last.sub(/Controller$/, '').underscore
+    end
+
     def token
       return nil
     end
@@ -61,14 +65,15 @@ module Mulukhiya
       return dest if dest.valid?
     end
 
-    def command_entries
-      return config["/#{self.class.to_s.split('::').last.sub(/Controller$/, '').underscore}/custom"]
-    end
-
     private
 
+    def command_entries
+      return config["/#{name}/custom"]
+    end
+
     def path_prefix
-      return ''
+      return '' if Environment.test?
+      return "/mulukhiya/#{name}"
     end
   end
 end

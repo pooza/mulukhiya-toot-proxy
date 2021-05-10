@@ -301,12 +301,5 @@ module Mulukhiya
       return params[:token].decrypt if params[:token]
       return nil
     end
-
-    private
-
-    def path_prefix
-      return '' if Environment.test?
-      return '/mulukhiya/api'
-    end
   end
 end

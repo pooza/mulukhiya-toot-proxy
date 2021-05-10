@@ -37,12 +37,5 @@ module Mulukhiya
         return @renderer.to_s
       end
     end
-
-    private
-
-    def path_prefix
-      return '' if Environment.test?
-      return '/mulukhiya/feed'
-    end
   end
 end
