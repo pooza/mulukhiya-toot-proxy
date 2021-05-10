@@ -32,7 +32,7 @@ html lang='ja'
         .all-tokens v-if='all_tokens'
           | 全ての暗号化トークン
           textarea ref='all_tokens' :value='all_tokens'
-          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyTokens'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyAllTokens'
       nav.tokens
         h3 トークンの登録
         .token
@@ -156,7 +156,7 @@ html lang='ja'
           getAllTokens: function () {
             return this.accounts.map(v => v.token).join("\n")
           },
-          copyTokens: function () {
+          copyAllTokens: function () {
             this.$refs.all_tokens.select()
             document.execCommand('copy')
           },

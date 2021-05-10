@@ -16,6 +16,7 @@ html lang='ja'
             vue-slide-up-down :active='layout.details.announcement'
               .endpoint-container
                 .role admin
+                .role mod
                 .link POST /mulukhiya/api/announcement/update
                 pre.payload
                   | {{query_params.announcement_update}}
@@ -38,6 +39,7 @@ html lang='ja'
                 pre.result v-if='result.media_list' = '{{result.media_list}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
+              .role mod
               .link POST /mulukhiya/api/media/file/clear
               pre.payload
                 | {{query_params.media_file_clear}}
@@ -50,6 +52,7 @@ html lang='ja'
                 button @click='clearMediaFiles' 実行
             .endpoint-container v-if='account.is_admin'
               .role admin
+              .role mod
               .link POST /mulukhiya/api/media/metadata/clear
               pre.payload
                 | {{query_params.media_metadata_clear}}
@@ -61,6 +64,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.oauth'
             .endpoint-container
               .role admin
+              .role mod
               .link POST /mulukhiya/api/oauth/client/clear
               pre.payload
                 | {{query_params.oauth_client_clear}}
@@ -82,6 +86,7 @@ html lang='ja'
                   pre.result v-if='result.program_list' = '{{result.program_list}}'
               .endpoint-container v-if='account.is_admin'
                 .role admin
+                .role mod
                 .link POST /mulukhiya/api/program/update
                 pre.payload
                   | {{query_params.program_update}}
@@ -118,6 +123,7 @@ html lang='ja'
                 pre.result v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
+              .role mod
               .link POST /mulukhiya/api/tagging/dic/update
               pre.payload
                 | {{query_params.tagging_dic_update}}
@@ -136,6 +142,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint-container
               .role admin
+              .role mod
               .link POST /mulukhiya/api/tagging/usertag/clear
               pre.payload
                 | {{query_params.tagging_usertag_clear}}
@@ -158,6 +165,7 @@ html lang='ja'
                   pre.result v-if='result.feed_list' = '{{result.feed_list}}'
               .endpoint-container v-if='account.is_admin'
                 .role admin
+                .role mod
                 .link POST /mulukhiya/api/feed/update
                 pre.payload
                   | {{query_params.feed_update}}
