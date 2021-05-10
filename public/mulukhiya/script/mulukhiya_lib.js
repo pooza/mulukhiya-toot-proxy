@@ -171,7 +171,7 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.updateFeeds = async () => {
+    Vue.updateCustomFeeds = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})

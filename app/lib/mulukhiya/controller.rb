@@ -34,8 +34,25 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    def name
+      return self.class.to_s.split('::').last.sub(/Controller$/, '').underscore
+    end
+
     def token
       return nil
+    end
+
+    def command
+      unless @command
+        command_entry ||= command_entries.find do |entry|
+          entry['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        return nil unless command_entry
+        @command = CommandLine.new(command_entry['command'])
+        @command.dir = command_entry['dir'] || Environment.dir
+        @command.env = command_entry['env'] if command_entry['env']
+      end
+      return @command
     end
 
     def self.webhook_entries
@@ -46,6 +63,17 @@ module Mulukhiya
       dest = TootURI.parse(src.to_s)
       dest = NoteURI.parse(dest) unless dest&.valid?
       return dest if dest.valid?
+    end
+
+    private
+
+    def command_entries
+      return config["/#{name}/custom"]
+    end
+
+    def path_prefix
+      return '' if Environment.test?
+      return "/mulukhiya/#{name}"
     end
   end
 end

@@ -272,6 +272,31 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/feed/update' do
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      Mulukhiya::FeedUpdateWorker.new.perform
+      return @renderer.to_s
+    rescue => e
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    config['/api/custom'].each do |entry|
+      get File.join('/', entry['path']) do
+        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
+        command.exec
+        raise Ginseng::Error, command.stderr unless command.status.zero?
+        @renderer.message = JSON.parse(command.stdout)
+        return @renderer.to_s
+      rescue => e
+        e = Ginseng::Error.create(e)
+        @renderer.status = e.status
+        @renderer.message = {error: e.message}
+        return @renderer.to_s
+      end
+    end
+
     def token
       return params[:token].decrypt if params[:token]
       return nil

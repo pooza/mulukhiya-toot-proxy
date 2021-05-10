@@ -6,10 +6,10 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'webhook'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 webhook
-      section class='config' v-if='account.username'
+      section.config v-if='account.username'
         .field-container
           h3 URL
           textarea ref='webhook_url_text' = '{{url}}'

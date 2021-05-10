@@ -1,5 +1,5 @@
 package:
-  version: 4.4.10
+  version: 4.5.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -36,7 +36,7 @@ handler:
   hexo_announce:
     category: お知らせ
   image_resize:
-    pixel: 1280
+    pixel: 1920
   itunes_image:
     pixel: 480
     timeout: 10
@@ -143,7 +143,7 @@ webui:
   cache:
     ttl: 86400
   javascript:
-    minimize: false
+    minimize: true
 mastodon:
   display_name: Mastodon
   sns_type: mastodon
@@ -182,7 +182,7 @@ mastodon:
   status:
     parser: toot
     key: id
-    label: トゥート
+    label: 投稿
     max_length: 500
     delete:
       limit: 30
@@ -878,6 +878,9 @@ sidekiq:
   dynamic: true
   concurrency: 5
   schedule:
+    user_tag_initialize:
+      cron: '2 4 * * *'
+      class: Mulukhiya::UserTagInitializeWorker
     media_cleaning:
       every: 60m
       class: Mulukhiya::MediaCleaningWorker
@@ -890,6 +893,9 @@ sidekiq:
     annict_polling:
       every: 5m
       class: Mulukhiya::AnnictPollingWorker
+    feed_update:
+      every: 5m
+      class: Mulukhiya::FeedUpdateWorker
     announcement:
       every: 1m
       class: Mulukhiya::AnnouncementWorker
@@ -914,17 +920,34 @@ tagging:
       audio: audio
   dictionaries:
     - url: https://precure.ml/api/dic/v1/precure.json
+      name: プリキュア
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v1/singer.json
+      name: プリキュア歌手
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v1/series.json
+      name: プリキュア作品
       type: relative
+      edit:
+        url: null
     - url: https://precure.ml/api/dic/v2/fairy.json
+      name: プリキュア妖精
+      edit:
+        url: null
 feed:
   tag:
     limit: 100
   media:
     limit: 100
+  cache:
+    ttl: 600
+  custom: []
+api:
+  custom: []
 http:
   retry:
     limit: 3

@@ -6,19 +6,24 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'Atomフィード'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 Atomフィード
       - if controller.feed?
-      	- if controller.media_catalog?
-          h3 一般
-          ul class='links'
+        h3 一般
+        ul.links
+          - if controller.media_catalog?
             li
               h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
+          - config['/feed/custom'].each do |entry|
+            li
+              h4 #{entry['title'] || entry['path']}
+              .link
+                a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
         h3 ハッシュタグ
-        ul class='links'
+        ul.links
           li v-for='feed in feeds'
             h4 = '{{feed.tag}}'
             .link

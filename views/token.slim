@@ -6,17 +6,17 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {current: 'トークンの管理'}
-    main id='app' class=env.type
+    main#app class=env.type
       == slim.render 'fragment/message'
       h2 トークンの管理
-      nav class='tokens' v-if='accounts.length'
+      nav.tokens v-if='accounts.length'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
           a href='#' @click='switchAccount(current_account)' v-if='current_account.username' = '@{{current_account.username}}'
-          span class='alert' v-else='' 壊れたトークン
-          span class='role' v-if='current_account.is_moderator' mod
-          span class='role' v-if='current_account.is_admin' admin
-          span class='role' v-if='isLoggedIn(current_account)' loggedin
+          span.alert v-else='' 壊れたトークン
+          span.role v-if='current_account.is_moderator' mod
+          span.role v-if='current_account.is_admin' admin
+          span.role v-if='isLoggedIn(current_account)' loggedin
           i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
           .field
             .title 権限:
@@ -29,7 +29,11 @@ html lang='ja'
             .title webhook:
             .value
               code = '{{current_account.webhook}}'
-      nav class='tokens'
+        .all-tokens v-if='all_tokens'
+          | 全ての暗号化トークン
+          textarea ref='all_tokens' :value='all_tokens'
+          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyAllTokens'
+      nav.tokens
         h3 トークンの登録
         .token
           | 新しいトークンを登録
@@ -43,7 +47,7 @@ html lang='ja'
               a href=params[:oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
             .auth-form
-              input type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード' class='code'
+              input.code type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
               - if env.mastodon_type?
                 button :disabled='!input.authcode' @click='authMastodon' 認証
               - elsif env.misskey_type?
@@ -59,8 +63,8 @@ html lang='ja'
             .field v-if='account.is_admin'
               .title 権限:
               .value #{controller.oauth_scopes.join(', ')}
-          input placeholder='#{controller.display_name}で作成した既存のトークン' v-model.trim='input.token'
-          button :disabled='!input.token' @click='registerToken' 登録
+          textarea placeholder='暗号化トークンを1件ずつ、改行で区切って' v-model.trim='input.token'
+          button :disabled='!input.token' @click='registerTokens' 登録
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -73,6 +77,7 @@ html lang='ja'
           account: {is_admin: false, username: null},
           accounts: [],
           tokens: [],
+          all_tokens: null,
           token: Vue.getToken(),
           input: {
             authcode: null,
@@ -83,8 +88,10 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .then(e => Vue.getAccounts())
-            .then(e => {this.accounts = e})
-            .catch(e => Vue.alert(this.$dialog, e))
+            .then(e => {
+              this.accounts = e
+              this.all_tokens = this.getAllTokens()
+            }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
           switchAccount: function (account) {
@@ -94,15 +101,16 @@ html lang='ja'
                 this.token = account.token
               }).catch(e => Vue.alert(this.$dialog, e))
           },
-          registerToken: function () {
-            Vue.registerToken(this.input.token)
-              .then(e => {
-                this.account =e
-                return Vue.getAccounts()
-              }).then(e => {
-                this.accounts = e
-                this.input.token = null
-              }).catch(e => Vue.alert(this.$dialog, e))
+          registerTokens: function () {
+            Promise.all(
+              this.input.token.trim().split("\n").map(token => Vue.registerToken(token))
+            ).then(e => {this.account = e[0]})
+            .then(e => Vue.getAccounts())
+            .then(e => {
+              this.accounts = e
+              this.all_tokens = this.getAllTokens()
+              this.input.token = null
+            }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteAccount: function (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
@@ -110,8 +118,10 @@ html lang='ja'
               .then(e => {
                 this.tokens = e
                 return Vue.getAccounts()
-              }).then(e => this.accounts = e)
-              .catch(e => Vue.alert(this.$dialog, e))
+              }).then(e => {
+                this.accounts = e
+                this.all_tokens = this.getAllTokens()
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           authMastodon: function () {
             Vue.authMastodon(this.input.authcode)
@@ -123,8 +133,10 @@ html lang='ja'
                 Vue.setToken(this.token)
                 this.account = e
                 return Vue.getAccounts()
-              }).then(e => {this.accounts = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              }).then(e => {
+                this.accounts = e
+                this.all_tokens = this.getAllTokens()
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           authMisskey: function () {
             Vue.authMisskey(this.input.authcode)
@@ -136,8 +148,17 @@ html lang='ja'
                 Vue.setToken(this.token)
                 this.account = e
                 return Vue.getAccounts()
-              }).then(e => {this.accounts = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              }).then(e => {
+                this.accounts = e
+                this.all_tokens = this.getAllTokens()
+              }).catch(e => Vue.alert(this.$dialog, e))
+          },
+          getAllTokens: function () {
+            return this.accounts.map(v => v.token).join("\n")
+          },
+          copyAllTokens: function () {
+            this.$refs.all_tokens.select()
+            document.execCommand('copy')
           },
           isLoggedIn: function (account) {
             return account.token == this.token

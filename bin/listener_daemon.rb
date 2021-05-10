@@ -4,5 +4,7 @@ $LOAD_PATH.unshift(File.join(dir, 'app/lib'))
 ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
-ENV['RACK_ENV'] ||= Mulukhiya::Environment.type
-Mulukhiya::ListenerDaemon.spawn!
+module Mulukhiya
+  ENV['RACK_ENV'] ||= Environment.type
+  ListenerDaemon.spawn!
+end
