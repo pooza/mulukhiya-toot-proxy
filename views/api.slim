@@ -156,6 +156,14 @@ html lang='ja'
                 .field-update-button-container
                   button @click='getFeeds' 実行
                   pre.result v-if='result.feed_list' = '{{result.feed_list}}'
+              .endpoint-container v-if='account.is_admin'
+                .role admin
+                .link POST /mulukhiya/api/feed/update
+                pre.payload
+                  | {{query_params.feed_update}}
+                .link-description カスタムフィードの更新を行います。
+                .field-update-button-container
+                  button @click='updateCustomFeeds' 実行
         li  v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
@@ -210,6 +218,7 @@ html lang='ja'
             tagging_dic_update: {token: Vue.getToken()},
             tagging_usertag_clear: {token: Vue.getToken()},
             annict_crawl: {token: Vue.getToken()},
+            feed_update: {token: Vue.getToken()},
           },
           result: {
             search_tag: null,
@@ -310,15 +319,15 @@ html lang='ja'
               .then(e => {this.layout.details['tagging_usertag'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          updateFeeds: function () {
-            Vue.updateFeeds()
-              .then(e => {this.layout.details['feed'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
-          },
           getFeeds: function () {
             this.result.feed_list = null
             Vue.getFeeds()
               .then(e => {this.result.feed_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          updateCustomFeeds: function () {
+            Vue.updateCustomFeeds()
+              .then(e => {this.layout.details['feed'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           crawlAnnict: function () {

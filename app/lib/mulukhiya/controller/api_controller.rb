@@ -272,6 +272,16 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/feed/update' do
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      Mulukhiya::FeedUpdateWorker.new.perform
+      return @renderer.to_s
+    rescue => e
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     config['/api/custom'].each do |entry|
       get File.join('/', entry['path']) do
         raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
@@ -293,19 +303,6 @@ module Mulukhiya
     end
 
     private
-
-    def command
-      unless @command
-        command_entry ||= command_entries.find do |entry|
-          entry['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
-        end
-        return nil unless command_entry
-        @command = CommandLine.new(command_entry['command'])
-        @command.dir = command_entry['dir'] || Environment.dir
-        @command.env = command_entry['env'] if command_entry['env']
-      end
-      return @command
-    end
 
     def path_prefix
       return '' if Environment.test?
