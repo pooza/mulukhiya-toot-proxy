@@ -4,9 +4,11 @@ Thumbs.db
 ._*
 .fuse*
 config/local.*
-bin
+bin/*.rb
 !bin/crypt.rb
-!bin/*_daemon.rb
-!bin/*_worker.rb
+!bin/listener_daemon.rb
+!bin/listener_worker.rb
+!bin/puma_daemon.rb
+!bin/sidekiq_daemon.rb
 .sass-cache
 dist
