@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def cache
-      @cache ||= Marshal.load(redis.get('tagging_dictionary')) # rubocop:disable Security/MarshalLoad
+      @cache ||= Marshal.load(redis['tagging_dictionary']) # rubocop:disable Security/MarshalLoad
       return @cache
     rescue => e
       logger.error(error: e)
@@ -43,7 +43,7 @@ module Mulukhiya
     end
 
     def refresh
-      redis.set('tagging_dictionary', Marshal.dump(merge(fetch)))
+      redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
       @cache = nil
       logger.info(class: self.class.to_s, message: 'refreshed')
       clear

@@ -3,7 +3,7 @@ module Mulukhiya
     include SNSMethods
 
     def nodeinfo
-      unless info = redis.get('nodeinfo')
+      unless info = redis['nodeinfo']
         ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
         info = super.to_json
         redis.setex('nodeinfo', ttl, info)
