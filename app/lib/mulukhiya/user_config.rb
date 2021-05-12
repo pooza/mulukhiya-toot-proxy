@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def update(values)
-      values = values.deep_stringify_keys!
+      values.deep_stringify_keys!
       handle_user_tags(values)
       handle_lemmy_password(values)
       @storage.update(@account.id, values)
