@@ -1,15 +1,7 @@
 module Mulukhiya
   class AnnictTimestampStorage < Redis
-    def [](key)
-      return get(key) || {}
-    end
-
-    def []=(key, value)
-      set(key, value)
-    end
-
     def get(key)
-      return nil unless entry = super(create_key(key))
+      return nil unless entry = super
       return JSON.parse(entry)
     rescue => e
       logger.error(error: e, key: key)
@@ -17,7 +9,7 @@ module Mulukhiya
     end
 
     def set(key, values)
-      super(create_key(key), values.to_json)
+      super(key, values.to_json)
     end
 
     def prefix

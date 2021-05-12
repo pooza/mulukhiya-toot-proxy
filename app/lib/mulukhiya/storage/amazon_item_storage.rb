@@ -1,15 +1,8 @@
 module Mulukhiya
   class AmazonItemStorage < Redis
-    def [](key)
-      return get(key)
-    end
-
-    def []=(key, value)
-      set(key, value)
-    end
 
     def get(key)
-      return nil unless entry = super(create_key(key))
+      return nil unless entry = super
       return JSON.parse(entry)
     rescue => e
       logger.error(error: e, key: key)
@@ -17,7 +10,7 @@ module Mulukhiya
     end
 
     def set(key, values)
-      setex(create_key(key), ttl, values.to_json)
+      setex(key, ttl, values.to_json)
     end
 
     def ttl
