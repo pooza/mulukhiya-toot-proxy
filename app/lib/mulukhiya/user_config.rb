@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def raw
-      return JSON.parse(@storage[@account.id])
+      return JSON.parse(@storage.get(@account.id))
     end
 
     def [](key)
