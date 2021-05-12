@@ -4,16 +4,12 @@ module Mulukhiya
       return get(key)
     end
 
-    def get(command)
-      return super(create_key(command))
-    end
-
     def set(command, value)
       setex(command, ttl, value.to_s)
     end
 
     def setex(command, ttl, value)
-      super(create_key(command), ttl, value.to_s)
+      super(command, ttl, value.to_s)
     end
 
     def create_key(key)

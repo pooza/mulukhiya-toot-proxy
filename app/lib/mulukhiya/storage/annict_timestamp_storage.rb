@@ -8,10 +8,6 @@ module Mulukhiya
       return nil
     end
 
-    def set(key, values)
-      super(create_key(key), values.to_json)
-    end
-
     def prefix
       return 'annict'
     end

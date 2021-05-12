@@ -5,17 +5,13 @@ module Mulukhiya
     end
 
     def get(key)
-      return super(create_key(key)) || '{}'
+      return super || '{}'
     end
 
     def set(key, values)
       ['c', 'command'].freeze.each {|k| values.delete(k) if values.member?(k)}
-      super(create_key(key), values.to_json)
+      super(key, values.to_json)
       save
-    end
-
-    def del(key)
-      super(create_key(key))
     end
 
     def update(key, values)
