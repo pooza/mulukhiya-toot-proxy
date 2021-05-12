@@ -8,6 +8,10 @@ module Mulukhiya
       return nil
     end
 
+    def set(key, values)
+      setex(key, ttl, values.to_json)
+    end
+
     def prefix
       return 'annict'
     end
