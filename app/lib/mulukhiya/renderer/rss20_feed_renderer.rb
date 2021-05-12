@@ -8,9 +8,5 @@ module Mulukhiya
       @sns = sns_class.new
       @channel[:author] = @sns.info['metadata']['maintainer']['name']
     end
-
-    def self.fix_uri(root, href)
-      return URI.fix(root, href)
-    end
   end
 end

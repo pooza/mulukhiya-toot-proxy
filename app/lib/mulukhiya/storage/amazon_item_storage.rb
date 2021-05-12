@@ -1,6 +1,5 @@
 module Mulukhiya
   class AmazonItemStorage < Redis
-
     def get(key)
       return nil unless entry = super
       return JSON.parse(entry)
