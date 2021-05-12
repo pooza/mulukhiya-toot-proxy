@@ -1,7 +1,7 @@
 module Mulukhiya
   class MediaMetadataStorage < Redis
     def get(path)
-      return nil unless entry = super(path)
+      return nil unless entry = super
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       logger.error(error: e, key: key)
