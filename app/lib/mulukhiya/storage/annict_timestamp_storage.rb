@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def set(key, values)
-      setex(key, ttl, values.to_json)
+      super(key, values.to_json)
     end
 
     def prefix
