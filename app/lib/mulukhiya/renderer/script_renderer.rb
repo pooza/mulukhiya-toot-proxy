@@ -12,10 +12,7 @@ module Mulukhiya
       return File.read(path)
     end
 
-    def compressor
-      @compressor ||= Uglifier.new(harmony: true)
-      return @compressor
-    end
+    alias compressor uglifier
 
     def minimize?
       return config['/webui/javascript/minimize']
