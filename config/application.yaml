@@ -882,13 +882,13 @@ sidekiq:
       cron: '2 4 * * *'
       class: Mulukhiya::UserTagInitializeWorker
     media_cleaning:
-      every: 60m
+      every: 10m
       class: Mulukhiya::MediaCleaningWorker
     tagging_dictionary_update:
       every: 10m
       class: Mulukhiya::TaggingDictionaryUpdateWorker
     program_update:
-      every: 10m
+      every: 1m
       class: Mulukhiya::ProgramUpdateWorker
     annict_polling:
       every: 5m
