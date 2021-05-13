@@ -3,7 +3,7 @@ module Mulukhiya
     include Sidekiq::Worker
     include Package
     include SNSMethods
-    sidekiq_options retry: 3, lock: :until_executed
+    sidekiq_options retry: 3, unique: :until_executed
 
     def perform(params = {})
       accounts(params) do |account|
