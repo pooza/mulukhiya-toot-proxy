@@ -114,6 +114,7 @@ module Mulukhiya
       config['/api/custom'].each do |entry|
         get File.join('/', entry['path'])
         assert(last_response.ok?)
+        assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
       end
     end
   end
