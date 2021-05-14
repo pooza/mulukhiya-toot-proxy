@@ -1,5 +1,7 @@
 module Mulukhiya
   class GrowiClippingWorker < ClippingWorker
+    sidekiq_options unique: true
+
     def perform(params)
       return unless controller_class.growi?
       return unless account = account_class[params['account_id']]

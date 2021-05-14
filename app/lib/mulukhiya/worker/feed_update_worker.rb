@@ -31,9 +31,10 @@ module Mulukhiya
     end
 
     def create_command(params)
-      command = CommandLine.new(params['command'])
-      command.dir = params['dir'] || Environment.dir
-      command.env = params['env'] if params['env']
+      params.deep_symbolize_keys!
+      command = CommandLine.new(params[:command])
+      command.dir = params[:dir] || Environment.dir
+      command.env = params[:env] if params[:env]
       return command
     end
   end
