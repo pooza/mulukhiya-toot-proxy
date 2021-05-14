@@ -3,7 +3,7 @@ module Mulukhiya
     include Sidekiq::Worker
     include Package
     include SNSMethods
-    sidekiq_options retry: false, lock: :until_executed
+    sidekiq_options retry: false, unique: :until_executed
 
     def perform
       return unless controller_class.announcement?
@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def cache
-      return JSON.parse(redis.get('announcements') || '{}')
+      return JSON.parse(redis['announcements'] || '{}')
     end
 
     def announcements
@@ -30,7 +30,7 @@ module Mulukhiya
     private
 
     def save
-      redis.set('announcements', announcements.to_h {|v| [v[:id], v]}.to_json)
+      redis['announcements'] = announcements.to_h {|v| [v[:id], v]}.to_json
     rescue => e
       logger.error(error: e)
     end

@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def oauth_client
-      unless client = redis.get('oauth_client')
+      unless client = redis['oauth_client']
         client = http.post('/api/v1/apps', {
           body: {
             client_name: package_class.name,
@@ -41,7 +41,7 @@ module Mulukhiya
             scopes: MastodonController.oauth_scopes.join(' '),
           },
         }).body
-        redis.set('oauth_client', client)
+        redis['oauth_client'] = client
       end
       return JSON.parse(client)
     end

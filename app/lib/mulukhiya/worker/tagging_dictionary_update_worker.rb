@@ -1,7 +1,7 @@
 module Mulukhiya
   class TaggingDictionaryUpdateWorker
     include Sidekiq::Worker
-    sidekiq_options retry: false, lock: :until_executed
+    sidekiq_options retry: false, unique: :until_executed
 
     def perform
       TaggingDictionary.new.refresh

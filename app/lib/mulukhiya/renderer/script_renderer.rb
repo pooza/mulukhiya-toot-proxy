@@ -8,13 +8,8 @@ module Mulukhiya
     end
 
     def to_s
-      return compressor.compile(File.read(path)) if minimize?
+      return uglifier.compile(File.read(path)) if minimize?
       return File.read(path)
-    end
-
-    def compressor
-      @compressor ||= Uglifier.new(harmony: true)
-      return @compressor
     end
 
     def minimize?

@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def oauth_client
-      unless client = redis.get('oauth_client')
+      unless client = redis['oauth_client']
         client = http.post('/api/app/create', {
           body: {
             name: package_class.name,
@@ -44,7 +44,7 @@ module Mulukhiya
             callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
           },
         }).body
-        redis.set('oauth_client', client)
+        redis['oauth_client'] = client
       end
       return JSON.parse(client)
     end

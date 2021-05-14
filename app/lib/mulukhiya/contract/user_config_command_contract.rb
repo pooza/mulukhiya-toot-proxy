@@ -48,8 +48,7 @@ module Mulukhiya
     end
 
     def call(values)
-      values = values.clone || {}
-      values.deep_stringify_keys!
+      values = values.deep_stringify_keys || {}
       values['tags'] ||= []
       values['webhook'] ||= {}
       values['growi'] ||= {}

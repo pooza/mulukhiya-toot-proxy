@@ -4,11 +4,11 @@ module Mulukhiya
     include Package
 
     def update
-      redis.set('program', @http.get(uri)) if uri
+      redis['program'] = @http.get(uri) if uri
     end
 
     def data
-      return JSON.parse(redis.get('program') || '{}')
+      return JSON.parse(redis['program'] || '{}')
     end
 
     def redis

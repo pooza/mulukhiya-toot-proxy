@@ -1,6 +1,6 @@
 module Mulukhiya
   class DropboxClippingWorker < ClippingWorker
-    sidekiq_options lock: :until_executed
+    sidekiq_options unique: :until_executed
 
     def perform(params)
       return unless controller_class.dropbox?

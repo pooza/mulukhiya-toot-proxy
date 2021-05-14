@@ -23,9 +23,9 @@ module Mulukhiya
         @http.retry_limit = 1
       end
       File.write(path, @http.get(uri)) unless File.exist?(path)
-      storage = MediaMetadataStorage.new
-      storage.push(path) unless storage.get(path)
-      return storage.get(path)
+      redis = MediaMetadataStorage.new
+      redis.push(path) unless redis[path]
+      return redis[path]
     rescue => e
       logger.error(error: e, path: path)
       return nil
