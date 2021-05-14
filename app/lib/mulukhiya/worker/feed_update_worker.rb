@@ -3,7 +3,7 @@ module Mulukhiya
     include Sidekiq::Worker
     include Package
     include SNSMethods
-    sidekiq_options retry: false, unique: :until_executed
+    sidekiq_options retry: false
 
     def initialize
       @storage = RenderStorage.new
@@ -12,7 +12,6 @@ module Mulukhiya
     def perform
       bar = ProgressBar.create(total: custom_feeds.count) if Environment.rake?
       custom_feeds.each do |entry|
-        Dir.chdir(Environment.dir)
         command = create_command(entry)
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
