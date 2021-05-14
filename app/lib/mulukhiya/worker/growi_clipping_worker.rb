@@ -1,6 +1,6 @@
 module Mulukhiya
   class GrowiClippingWorker < ClippingWorker
-    sidekiq_options unique: true
+    sidekiq_options unique: :until_executed
 
     def perform(params)
       return unless controller_class.growi?

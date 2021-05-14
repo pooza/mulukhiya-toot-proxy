@@ -3,7 +3,7 @@ module Mulukhiya
     include Sidekiq::Worker
     include Package
     include SNSMethods
-    sidekiq_options retry: false
+    sidekiq_options retry: false, unique: :until_executed
 
     def perform
       return unless controller_class.annict?

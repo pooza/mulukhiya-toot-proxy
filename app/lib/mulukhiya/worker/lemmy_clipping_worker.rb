@@ -1,6 +1,6 @@
 module Mulukhiya
   class LemmyClippingWorker < ClippingWorker
-    sidekiq_options unique: true
+    sidekiq_options unique: :until_executed
 
     def perform(params)
       return unless controller_class.lemmy?
