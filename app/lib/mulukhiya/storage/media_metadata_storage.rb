@@ -8,17 +8,37 @@ module Mulukhiya
       return nil
     end
 
-    def push(path)
-      path = path.path if path.is_a?(File)
-      setex(path, ttl, MediaFile.new(path).file.values.to_json)
+    def push(key)
+      if File.exist?(key)
+        setex(key, ttl, MediaFile.new(key).file.values.to_json)
+      elsif key.is_a?(Ginseng::URI)
+        path = File.join(Environment.dir, 'tmp/media', key.to_s.adler32.to_s)
+        File.write(path, http.get(key).body)
+        setex(key.to_s, remote_ttl, MediaFile.new(path).file.values.to_json)
+      end
+    rescue => e
+      logger.error(error: e)
+    end
+
+    def http
+      unless @http
+        @http = HTTP.new
+        @http.retry_limit = 1
+      end
+      return @http
     end
 
     def create_key(key)
-      return super(File.read(key).adler32)
+      return super(File.read(key).adler32) if File.exist?(key)
+      return super(key.to_s.adler32)
     end
 
     def ttl
       return config['/media/metadata/cache/ttl']
+    end
+
+    def remote_ttl
+      return config['/media/metadata/cache/remote_ttl']
     end
 
     def prefix

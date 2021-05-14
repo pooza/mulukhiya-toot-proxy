@@ -849,6 +849,7 @@ media:
   metadata:
     cache:
       ttl: 8640000 #100日
+      remote_ttl: 86400 #1日
 postgres:
   dsn: null
   query_log: false
