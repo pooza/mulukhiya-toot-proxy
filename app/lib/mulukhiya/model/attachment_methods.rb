@@ -22,7 +22,7 @@ module Mulukhiya
       redis.push(uri) unless redis[uri]
       return redis[uri]
     rescue => e
-      logger.error(error: e, path: uri)
+      logger.error(error: e, uri: uri.to_s)
       return nil
     end
 
