@@ -40,7 +40,7 @@ module Mulukhiya
       assert_equal(@storage[@uri], {
         height: 964,
         mediatype: 'image',
-        size: 124728,
+        size: 124_728,
         subtype: 'jpeg',
         type: 'image/jpeg',
         width: 1453,
