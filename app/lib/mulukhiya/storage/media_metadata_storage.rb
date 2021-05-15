@@ -9,12 +9,12 @@ module Mulukhiya
     end
 
     def push(key)
-      if File.exist?(key)
-        setex(key, ttl, MediaFile.new(key).file.values.to_json)
-      elsif key.is_a?(Ginseng::URI)
+      if key.is_a?(Ginseng::URI)
         path = File.join(Environment.dir, 'tmp/media', key.to_s.adler32.to_s)
         File.write(path, http.get(key).body)
         setex(key.to_s, remote_ttl, MediaFile.new(path).file.values.to_json)
+      elsif File.exist?(key)
+        setex(key, ttl, MediaFile.new(key).file.values.to_json)
       end
     rescue => e
       logger.error(error: e)
@@ -29,8 +29,9 @@ module Mulukhiya
     end
 
     def create_key(key)
+      return super(key.to_s.adler32) if key.is_a?(Ginseng::URI)
       return super(File.read(key).adler32) if File.exist?(key)
-      return super(key.to_s.adler32)
+      return super
     end
 
     def ttl
