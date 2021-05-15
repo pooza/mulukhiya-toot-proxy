@@ -28,6 +28,7 @@ module Mulukhiya
         storage = RenderStorage.new
         raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
         raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless storage[command]
+        @renderer = RSS20FeedRenderer.new
         return storage[command]
       rescue => e
         e = Ginseng::Error.create(e)

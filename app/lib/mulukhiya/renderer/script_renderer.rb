@@ -10,6 +10,9 @@ module Mulukhiya
     def to_s
       return uglifier.compile(File.read(path)) if minimize?
       return File.read(path)
+    rescue => e
+      logger.error(error: e)
+      return File.read(path)
     end
 
     def minimize?
