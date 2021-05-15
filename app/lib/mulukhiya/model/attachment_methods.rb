@@ -18,16 +18,11 @@ module Mulukhiya
     end
 
     def meta
-      unless @http
-        @http = HTTP.new
-        @http.retry_limit = 1
-      end
-      File.write(path, @http.get(uri)) unless File.exist?(path)
       redis = MediaMetadataStorage.new
-      redis.push(path) unless redis[path]
-      return redis[path]
+      redis.push(uri) unless redis[uri]
+      return redis[uri]
     rescue => e
-      logger.error(error: e, path: path)
+      logger.error(error: e, path: uri)
       return nil
     end
 
