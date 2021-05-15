@@ -37,7 +37,14 @@ module Mulukhiya
         subtype: 'mpeg',
         type: 'audio/mpeg',
       })
-      assert_kind_of(Hash, @storage[@uri])
+      assert_equal(@storage[@uri], {
+        height: 964,
+        mediatype: 'image',
+        size: 124728,
+        subtype: 'jpeg',
+        type: 'image/jpeg',
+        width: 1453,
+      })
     end
   end
 end
