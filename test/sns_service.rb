@@ -17,5 +17,13 @@ module Mulukhiya
     def test_access_token
       assert_kind_of(access_token_class, @sns.access_token)
     end
+
+    def test_create_status_uri
+      assert_nil(@sns.create_status_uri('https://www.google.co.jp'))
+      assert_nil(@sns.create_status_uri('hoge'))
+      assert_nil(@sns.create_status_uri(nil))
+      assert_kind_of(TootURI, @sns.create_status_uri('https://st.mstdn.b-shock.org/web/statuses/106057223567166956'))
+      assert_kind_of(NoteURI, @sns.create_status_uri('https://dev.mis.b-shock.org/notes/8kjdew1qgd'))
+    end
   end
 end
