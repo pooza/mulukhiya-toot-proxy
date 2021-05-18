@@ -48,6 +48,12 @@ module Mulukhiya
       return Environment.hash_tag_class
     end
 
+    def create_status_uri(src)
+      dest = TootURI.parse(src.to_s)
+      dest = NoteURI.parse(dest) unless dest&.valid?
+      return dest if dest.valid?
+    end
+
     def notify(message, response = nil)
       message = message.to_yaml unless message.is_a?(String)
       return info_agent_service.notify(@sns.account, message, response)

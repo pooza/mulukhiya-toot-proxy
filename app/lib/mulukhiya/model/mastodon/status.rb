@@ -20,7 +20,7 @@ module Mulukhiya
       alias attachments attachment
 
       def uri
-        @uri ||= Controller.create_status_uri(self[:url] || self[:uri])
+        @uri ||= create_status_uri(self[:url] || self[:uri])
         return @uri
       end
 

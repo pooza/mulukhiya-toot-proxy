@@ -4,6 +4,7 @@ require 'faye/websocket'
 module Mulukhiya
   class LemmyClipper
     include Package
+    include SNSMethods
 
     def initialize(params = {})
       @params = params
@@ -62,7 +63,7 @@ module Mulukhiya
     def post(body, jwt)
       data = {nsfw: false, community_id: @params[:community], auth: jwt}
       data[:name] = body[:name].to_s if body[:name]
-      if uri = Controller.create_status_uri(body[:url])
+      if uri = create_status_uri(body[:url])
         data[:url] = uri.to_s
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s

@@ -3,6 +3,7 @@ module Mulukhiya
     class Status < MongoCollection
       include Package
       include StatusMethods
+      include SNSMethods
 
       def account
         return Account.new(values['userId'])
@@ -20,7 +21,7 @@ module Mulukhiya
         unless @uri
           @uri = Ginseng::URI.parse(values['uri']) if values['uri'].present?
           @uri ||= sns_class.new.create_uri("/notes/#{id}")
-          @uri = Controller.create_status_uri(@uri)
+          @uri = create_status_uri(@uri)
         end
         return @uri
       end

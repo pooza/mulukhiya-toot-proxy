@@ -59,12 +59,6 @@ module Mulukhiya
       return nil
     end
 
-    def self.create_status_uri(src)
-      dest = TootURI.parse(src.to_s)
-      dest = NoteURI.parse(dest) unless dest&.valid?
-      return dest if dest.valid?
-    end
-
     private
 
     def command_entries
