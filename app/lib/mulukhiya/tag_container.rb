@@ -9,6 +9,19 @@ module Mulukhiya
       concat(@account.user_tag_bases)
     end
 
+    def create_tags
+      unless @tags
+        @tags = map do |tag|
+          tag = tag.dup
+          tag.gsub(/([a-z0-9]{2,})\s/i, '\\1_').gsub(/\s/, '').to_hashtag
+        end
+        @tags.uniq!
+        @tags.compact!
+        @tags.reject! {|v| @text.match?(create_pattern(v))} if @text
+      end
+      return @tags
+    end
+
     def self.default_tags
       return config['/tagging/default_tags'].map(&:to_hashtag) rescue []
     end
