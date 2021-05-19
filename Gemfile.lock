@@ -288,7 +288,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.14.0)
+    rubocop (1.15.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -323,7 +323,7 @@ GEM
       redis (>= 4.2.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
-    sidekiq-unique-jobs (7.0.10)
+    sidekiq-unique-jobs (7.0.11)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 5.0, < 7.0)
