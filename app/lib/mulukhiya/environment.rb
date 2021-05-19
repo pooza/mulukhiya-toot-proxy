@@ -148,7 +148,7 @@ module Mulukhiya
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
       }
-      values[:streaming] = ListenerDaemon.health if controller_class.streaming?
+      values[:streaming] = ListenerDaemon.health if task_prefixes.include?('mulukhiya:listener')
       values[:postgres] = Postgres.health if postgres?
       values[:mongo] = Mongo.health if mongo?
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
