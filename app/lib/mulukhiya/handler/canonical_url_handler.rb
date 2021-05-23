@@ -22,9 +22,8 @@ module Mulukhiya
       response = @http.get(uri, {
         headers: {'User-Agent' => config['/handler/canonical_url/useragent']},
       })
-      elements = response.body.nokogiri.xpath('//link[@rel="canonical"]')
-      return false unless elements.present?
-      return false unless canonical = Ginseng::URI.parse(elements.first.attribute('href'))
+      return false unless element = response.body.nokogiri.xpath('//link[@rel="canonical"]').first
+      return false unless canonical = Ginseng::URI.parse(element.attribute('href'))
       return false if ignore?(canonical)
       @canonicals[uri.to_s] = canonical
       return true
