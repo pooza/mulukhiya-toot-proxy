@@ -212,7 +212,6 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -242,7 +241,6 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -340,7 +338,6 @@ misskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - bandai_channel_image
       - long_text_image
       - attachment_reusing
       - shortened_url
@@ -367,7 +364,6 @@ misskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -465,7 +461,6 @@ meisskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -491,7 +486,6 @@ meisskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -589,7 +583,6 @@ pleroma:
       - songwhip_nowplaying
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -616,7 +609,6 @@ pleroma:
       - songwhip_nowplaying
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -780,11 +772,6 @@ itunes:
     - itunes.apple.com
 youtube:
   url: https://www.googleapis.com/
-bandai_channel:
-  hosts:
-    - www.b-ch.com
-  patterns:
-    - pattern: ^/titles/([[:digit:]]+)/?([[:digit:]]+)?$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 nowplaying:

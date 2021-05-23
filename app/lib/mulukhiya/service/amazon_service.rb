@@ -15,17 +15,14 @@ module Mulukhiya
     end
 
     def create_image_uri(asin)
-      if AmazonService.config?
-        item = lookup(asin)
-        ['Large', 'Medium', 'Small'].freeze.each do |size|
-          uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
-          return uri if uri
-        end
-      else
-        nokogiri = @http.get(create_item_uri(asin)).body.nokogiri
-        return nil unless element = nokogiri.xpath(%(//img[@data-old-hires!=''])).first
-        return Ginseng::URI.parse(element['data-old-hires'])
+      return nil unless AmazonService.config?
+      item = lookup(asin)
+      ['Large', 'Medium', 'Small'].freeze.each do |size|
+        uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
+        return uri if uri&.absolute?
       end
+    rescue => e
+      logger.error(error: e)
       return nil
     end
 
