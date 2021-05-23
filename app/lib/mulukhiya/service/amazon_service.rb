@@ -1,5 +1,3 @@
-require 'nokogiri'
-
 module Mulukhiya
   class AmazonService
     include Package
@@ -24,8 +22,8 @@ module Mulukhiya
           return uri if uri
         end
       else
-        body = @http.get(create_item_uri(asin)).body.nokogiri
-        return nil unless element = body.xpath(%(//img[@data-old-hires!=''])).first
+        nokogiri = @http.get(create_item_uri(asin)).body.nokogiri
+        return nil unless element = nokogiri.xpath(%(//img[@data-old-hires!=''])).first
         return Ginseng::URI.parse(element['data-old-hires'])
       end
       return nil
