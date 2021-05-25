@@ -49,7 +49,6 @@ module Mulukhiya
         end
         return nil unless command_entry
         @command = CommandLine.new(command_entry['command'])
-        @command.args.push(params.merge(path: request.path).to_json)
         @command.dir = command_entry['dir'] || Environment.dir
         @command.env = command_entry['env'] if command_entry['env']
       end
