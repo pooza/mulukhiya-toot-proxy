@@ -155,7 +155,7 @@ html lang='ja'
                 button @click='clearUserTags' 実行
         - if controller.feed?
           li v-if='account.username'
-            h3 @click='toggleVisibility("feed")' Atomフィード
+            h3 @click='toggleVisibility("feed")' フィード
             vue-slide-up-down :active='layout.details.feed'
               .endpoint-container
                 .link GET /mulukhiya/api/feed/list
