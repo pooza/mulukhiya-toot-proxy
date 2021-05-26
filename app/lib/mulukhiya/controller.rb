@@ -43,10 +43,13 @@ module Mulukhiya
     end
 
     def command
-      entry = command_entries.map(&:deep_stringify_keys).find do |v|
-        v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+      unless @command
+        entry = command_entries.map(&:deep_stringify_keys).find do |v|
+          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        end
+        @command = CommandLine.create(entry) if entry
       end
-      return CommandLine.create(entry) if entry
+      return @command
     end
 
     def self.webhook_entries
