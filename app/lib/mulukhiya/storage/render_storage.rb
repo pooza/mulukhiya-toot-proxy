@@ -1,9 +1,5 @@
 module Mulukhiya
   class RenderStorage < Redis
-    def [](key)
-      return get(key)
-    end
-
     def set(command, value)
       setex(command, ttl, value.to_s)
     end

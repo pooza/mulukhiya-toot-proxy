@@ -3,7 +3,6 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
   api_controller: APIController
-  bandai_channel_uri: BandaiChannelURI
   canonical_url_handler: CanonicalURLHandler
   ci_test_case_filter: CITestCaseFilter
   css_renderer: CSSRenderer

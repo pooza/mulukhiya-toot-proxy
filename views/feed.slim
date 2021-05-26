@@ -17,7 +17,7 @@ html lang='ja'
               h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
-          - config['/feed/custom'].each do |entry|
+          - config['/feed/custom'].map(&:deep_stringify_keys).each do |entry|
             li
               h4 #{entry['title'] || entry['path']}
               .link

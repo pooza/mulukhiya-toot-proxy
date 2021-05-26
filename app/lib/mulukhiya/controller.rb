@@ -44,13 +44,10 @@ module Mulukhiya
 
     def command
       unless @command
-        command_entry ||= command_entries.find do |entry|
-          entry['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
+        entry = command_entries.map(&:deep_stringify_keys).find do |v|
+          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
         end
-        return nil unless command_entry
-        @command = CommandLine.new(command_entry['command'])
-        @command.dir = command_entry['dir'] || Environment.dir
-        @command.env = command_entry['env'] if command_entry['env']
+        @command = CommandLine.create(entry) if entry
       end
       return @command
     end

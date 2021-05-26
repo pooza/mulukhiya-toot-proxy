@@ -1,5 +1,5 @@
 package:
-  version: 4.5.5
+  version: 4.5.6
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -31,6 +31,7 @@ handler:
     ignore:
       domains:
         - instagram.com
+        - facebook.com
         - toei-anim.co.jp
     useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100'
   hexo_announce:
@@ -211,7 +212,6 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -241,7 +241,6 @@ mastodon:
       - spotify_image
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -339,7 +338,6 @@ misskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - bandai_channel_image
       - long_text_image
       - attachment_reusing
       - shortened_url
@@ -366,7 +364,6 @@ misskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -464,7 +461,6 @@ meisskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -490,7 +486,6 @@ meisskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - bandai_channel_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -588,7 +583,6 @@ pleroma:
       - songwhip_nowplaying
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -615,7 +609,6 @@ pleroma:
       - songwhip_nowplaying
       - amazon_image
       - you_tube_image
-      - bandai_channel_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -779,11 +772,6 @@ itunes:
     - itunes.apple.com
 youtube:
   url: https://www.googleapis.com/
-bandai_channel:
-  hosts:
-    - www.b-ch.com
-  patterns:
-    - pattern: ^/titles/([[:digit:]]+)/?([[:digit:]]+)?$
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 nowplaying:
