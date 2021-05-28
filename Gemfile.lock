@@ -241,10 +241,6 @@ GEM
     nokogiri (1.11.6)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.6-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.11.6-x86_64-linux)
-      racc (~> 1.4)
     nokogumbo (2.0.5)
       nokogiri (~> 1.8, >= 1.8.4)
     oauth2 (1.4.7)
@@ -383,10 +379,7 @@ GEM
     zlib (1.1.0)
 
 PLATFORMS
-  ruby
-  x86_64-darwin-20
   x86_64-freebsd-12
-  x86_64-linux
 
 DEPENDENCIES
   bootsnap (>= 1.7.0)
@@ -423,7 +416,7 @@ DEPENDENCIES
   vacuum (~> 3.0)
 
 RUBY VERSION
-   ruby 3.0.0p0
+   ruby 3.0.1p64
 
 BUNDLED WITH
    2.2.18
