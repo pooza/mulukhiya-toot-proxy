@@ -5,10 +5,10 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'Atomフィード'}
+    == slim.render 'fragment/breadcrumbs', {current: 'フィード'}
     main#app class=env.type
       == slim.render 'fragment/message'
-      h2 Atomフィード
+      h2 フィード
       - if controller.feed?
         h3 一般
         ul.links

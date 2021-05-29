@@ -13,13 +13,14 @@ gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'mimemagic', '>=0.4.0'
 gem 'mini_magick'
+gem 'mini_portile2', '<2.5.2' # todo: バージョン指定削除
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.2.0'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
 gem 'sidekiq-unique-jobs'
-gem 'vacuum'
+gem 'vacuum', '~>3.0'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'

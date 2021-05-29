@@ -155,7 +155,7 @@ html lang='ja'
                 button @click='clearUserTags' 実行
         - if controller.feed?
           li v-if='account.username'
-            h3 @click='toggleVisibility("feed")' Atomフィード
+            h3 @click='toggleVisibility("feed")' フィード
             vue-slide-up-down :active='layout.details.feed'
               .endpoint-container
                 .link GET /mulukhiya/api/feed/list
@@ -169,10 +169,10 @@ html lang='ja'
                 .link POST /mulukhiya/api/feed/update
                 pre.payload
                   | {{query_params.feed_update}}
-                - if config.keys('/sidekiq/schedule/feed_update').member?('cron')
+                - if config.keys('/sidekiq/schedule/feed_update').member?('every')
                   .link-description
                     | スケジュール
-                    code #{config['/sidekiq/schedule/feed_update/cron']}
+                    code #{config['/sidekiq/schedule/feed_update/every']}
                 .link-description カスタムフィードの更新を行います。
                 .field-update-button-container
                   button @click='updateCustomFeeds' 実行

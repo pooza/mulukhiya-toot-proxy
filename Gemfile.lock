@@ -106,7 +106,7 @@ GEM
     brpoplpush-redis_script (0.1.2)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       redis (>= 1.0, <= 5.0)
-    bson (4.12.0)
+    bson (4.12.1)
     builder (3.2.4)
     concurrent-ruby (1.1.8)
     connection_pool (2.2.5)
@@ -229,12 +229,10 @@ GEM
       ruby2_keywords (~> 0.0.1)
     netrc (0.11.0)
     nio4r (2.5.7)
-    nokogiri (1.11.5)
+    nokogiri (1.11.6)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.5-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.11.5-x86_64-linux)
+    nokogiri (1.11.6-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.5)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -301,7 +299,7 @@ GEM
       rubocop-ast (>= 1.5.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.5.0)
+    rubocop-ast (1.7.0)
       parser (>= 3.0.1.1)
     rubocop-performance (1.11.3)
       rubocop (>= 1.7.0, < 2.0)
@@ -340,7 +338,7 @@ GEM
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
-    slim_lint (0.21.0)
+    slim_lint (0.21.1)
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
@@ -371,8 +369,6 @@ GEM
     zlib (1.1.0)
 
 PLATFORMS
-  ruby
-  x86_64-darwin-20
   x86_64-freebsd-12
   x86_64-linux
 
@@ -391,6 +387,7 @@ DEPENDENCIES
   ginseng-youtube!
   mimemagic (>= 0.4.0)
   mini_magick
+  mini_portile2 (< 2.5.2)
   mongo
   rack-test
   rails-erb-lint
@@ -408,10 +405,10 @@ DEPENDENCIES
   slim_lint
   test-unit
   timecop
-  vacuum
+  vacuum (~> 3.0)
 
 RUBY VERSION
-   ruby 3.0.0p0
+   ruby 3.0.1p64
 
 BUNDLED WITH
-   2.2.15
+   2.2.18
