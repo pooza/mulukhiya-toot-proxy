@@ -3,14 +3,14 @@ module Mulukhiya
     include Singleton
     include Package
     include SNSMethods
-    attr_reader :storage
+    attr_reader :storage, :sns
 
     def announce
       return unless controller_class.announcement?
       bar = ProgressBar.create(total: fetch.count) if Environment.rake?
       fetch.each do |announcement|
         next if cache.member?(announcement[:id])
-        Event.new(:announce, {sns: info_agent_service}).dispatch(announcement)
+        Event.new(:announce, {sns: sns}).dispatch(announcement)
       rescue => e
         logger.error(error: e, announcement: announcement)
       ensure
@@ -22,12 +22,16 @@ module Mulukhiya
     end
 
     def fetch
-      @announcements ||= info_agent_service.announcements
+      @announcements ||= sns.announcements
       return @announcements
     end
 
     def load
       return JSON.parse(storage['announcements'] || '{}')
+    end
+
+    def count
+      return load.count
     end
 
     alias cache load
@@ -42,6 +46,7 @@ module Mulukhiya
 
     def initialize
       @storage = Redis.new
+      @sns = info_agent_service
     end
   end
 end
