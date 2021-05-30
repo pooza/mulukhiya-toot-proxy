@@ -112,6 +112,7 @@ GEM
     connection_pool (2.2.5)
     crass (1.0.6)
     daemon-spawn (0.4.2)
+    date (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dropbox_api (0.1.19)
@@ -200,6 +201,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    io-wait (0.1.0)
     json (2.5.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
@@ -217,7 +219,8 @@ GEM
       rake
     mini_magick (4.11.0)
     mini_mime (1.1.0)
-    mini_portile2 (2.5.1)
+    mini_portile2 (2.5.2)
+      net-ftp (~> 0.1)
     minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
@@ -227,6 +230,12 @@ GEM
     multipart-post (2.1.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
+    net-ftp (0.1.2)
+      net-protocol
+      time
+    net-protocol (0.1.0)
+      io-wait
+      timeout
     netrc (0.11.0)
     nio4r (2.5.7)
     nokogiri (1.11.6)
@@ -342,13 +351,16 @@ GEM
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
-    test-unit (3.4.1)
+    test-unit (3.4.2)
       power_assert
     thor (1.1.0)
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
+    time (0.1.0)
+      date
     timecop (0.9.4)
+    timeout (0.1.1)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     uglifier (4.2.0)
@@ -387,7 +399,6 @@ DEPENDENCIES
   ginseng-youtube!
   mimemagic (>= 0.4.0)
   mini_magick
-  mini_portile2 (< 2.5.2)
   mongo
   rack-test
   rails-erb-lint
