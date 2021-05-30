@@ -48,7 +48,7 @@ module Mulukhiya
         headers: create_headers(params[:headers]),
       })
       return response['announcements'].map do |entry|
-        {id: entry.to_json.adler32.to_s, title: entry['title'], text: entry['text']}
+        {id: entry.to_json.adler32.to_s, title: entry['title'], content: entry['text']}
       end
     end
 

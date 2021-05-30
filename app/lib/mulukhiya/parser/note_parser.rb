@@ -4,7 +4,7 @@ module Mulukhiya
     attr_accessor :account, :service
 
     def to_sanitized
-      return NoteParser.sanitize(text.clone)
+      return NoteParser.sanitize(text.dup)
     end
 
     def accts

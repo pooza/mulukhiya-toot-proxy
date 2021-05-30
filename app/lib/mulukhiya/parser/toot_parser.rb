@@ -11,7 +11,7 @@ module Mulukhiya
     end
 
     def to_sanitized
-      return TootParser.sanitize(text.clone)
+      return TootParser.sanitize(text.dup)
     end
 
     def all_tags
