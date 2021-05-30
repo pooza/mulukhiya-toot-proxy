@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 ruby '~>3.0.0'
 gem 'bootsnap', '>=1.7.0'
+gem 'date'
 gem 'dropbox_api'
 gem 'dry-validation'
 gem 'fastimage'
@@ -11,15 +12,16 @@ gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fe
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
+gem 'io-wait'
 gem 'mimemagic', '>=0.4.0'
 gem 'mini_magick'
-#gem 'mini_portile2', '<2.5.2' # todo: バージョン指定削除
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.2.0'
 gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
 gem 'sidekiq-unique-jobs'
+gem 'timeout'
 gem 'vacuum', '~>3.0'
 
 group :postgres do
