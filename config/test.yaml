@@ -96,6 +96,9 @@ filters:
   - name: livecure
     cases:
       - program
+  - name: announcement
+    cases:
+      - announcement
   - name: note
     cases:
       - note_uri
