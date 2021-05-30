@@ -1,5 +1,3 @@
-require 'time'
-
 module Mulukhiya
   class AnnictService
     include Package

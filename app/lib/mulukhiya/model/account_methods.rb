@@ -1,5 +1,3 @@
-require 'time'
-
 module Mulukhiya
   module AccountMethods
     include SNSMethods

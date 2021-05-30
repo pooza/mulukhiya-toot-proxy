@@ -1,5 +1,3 @@
-require 'time'
-
 module Mulukhiya
   module Mastodon
     class Attachment < Sequel::Model(:media_attachments)
