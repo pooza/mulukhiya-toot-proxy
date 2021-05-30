@@ -49,18 +49,6 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def announcements(params = {})
-      response = http.post('/api/announcements', {
-        body: {i: token},
-        headers: create_headers(params[:headers]),
-      })
-      return response.parsed_response.map do |announcement|
-        entry = announcement.deep_symbolize_keys
-        entry[:imate_url] = entry[:imageUrl]
-        entry
-      end
-    end
-
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.clone].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
