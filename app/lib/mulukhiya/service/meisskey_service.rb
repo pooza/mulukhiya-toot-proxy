@@ -42,16 +42,6 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def announcements(params = {})
-      response = http.get('/api/meta', {
-        body: {i: token}.to_json,
-        headers: create_headers(params[:headers]),
-      })
-      return response['announcements'].map do |entry|
-        {id: entry.to_json.adler32.to_s, title: entry['title'], content: entry['text']}
-      end
-    end
-
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.clone].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
