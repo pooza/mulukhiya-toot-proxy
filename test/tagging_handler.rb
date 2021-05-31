@@ -2,6 +2,7 @@ module Mulukhiya
   class TaggingHandlerTest < TestCase
     def setup
       config['/tagging/word/minimum_length'] = 3
+      config['/tagging/word/minimum_length_kanji'] = 2
       config['/agent/accts'] = ['@pooza']
       config['/tagging/dictionaries'] = [
         {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'relative'},

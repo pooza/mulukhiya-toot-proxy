@@ -16,6 +16,7 @@ filters:
       - user_config
       - user_config_storage
       - media_feed_renderer
+      - announcement
       - reporter
       - handler
       - listener_daemon
@@ -95,6 +96,9 @@ filters:
   - name: livecure
     cases:
       - program
+  - name: announcement
+    cases:
+      - announcement
   - name: note
     cases:
       - note_uri

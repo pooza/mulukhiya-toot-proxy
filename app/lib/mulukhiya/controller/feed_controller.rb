@@ -23,13 +23,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    config['/feed/custom'].each do |entry|
+    CustomFeed.entries.each do |entry|
       get File.join('/', entry['path']) do
-        storage = RenderStorage.new
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless storage[command]
-        @renderer = RSS20FeedRenderer.new
-        return storage[command]
+        @renderer = CustomFeed.instance.create(entry)
+        return @renderer.to_s
       rescue => e
         e = Ginseng::Error.create(e)
         @renderer = Ginseng::Web::XMLRenderer.new

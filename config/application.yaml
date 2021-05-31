@@ -1,5 +1,5 @@
 package:
-  version: 4.5.7
+  version: 4.5.8
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -900,6 +900,8 @@ tagging:
     - delmulin
   word:
     minimum_length: 3
+    minimum_length_kanji: 2
+    without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   media:
     enable: true
     tags:

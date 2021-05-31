@@ -1,5 +1,3 @@
-require 'date'
-
 module Mulukhiya
   class HexoAnnounceHandler < AnnounceHandler
     def disable?
