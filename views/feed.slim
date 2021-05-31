@@ -17,9 +17,9 @@ html lang='ja'
               h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' = slim.create_uri('/mulukhiya/feed/media')
-          - config['/feed/custom'].map(&:deep_stringify_keys).each do |entry|
+          - Mulukhiya::CustomFeed.entries.each do |entry|
             li
-              h4 #{entry['title'] || entry['path']}
+              h4 #{entry['title']}
               .link
                 a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
         h3 ハッシュタグ

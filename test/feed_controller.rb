@@ -80,8 +80,7 @@ module Mulukhiya
     end
 
     def test_costom_endpoints
-      assert_kind_of(Array, config['/feed/custom'])
-      config['/feed/custom'].each do |entry|
+      CustomFeed.entries.each do |entry|
         get File.join('/', entry['path'])
         assert(last_response.ok?)
         assert_equal(last_response.content_type, 'application/rss+xml; charset=UTF-8')
