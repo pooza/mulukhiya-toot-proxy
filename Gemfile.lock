@@ -236,7 +236,7 @@ GEM
     net-ftp (0.1.2)
       net-protocol
       time
-    net-protocol (0.1.0)
+    net-protocol (0.1.1)
       io-wait
       timeout
     netrc (0.11.0)
