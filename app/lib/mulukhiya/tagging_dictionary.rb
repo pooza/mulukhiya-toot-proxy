@@ -58,7 +58,20 @@ module Mulukhiya
     end
 
     def self.short?(word)
-      return word.match?("^[0-9a-zA-Zあ-んア-ン]{,#{config['/tagging/word/minimum_length'] - 1}}$")
+      return true if word.match?("^#{without_kanji_pattern}{,#{minimum_length - 1}}$")
+      return word.length < minimum_length_kanji
+    end
+
+    def self.without_kanji_pattern
+      return config['/tagging/word/without_kanji_pattern']
+    end
+
+    def self.minimum_length
+      return config['/tagging/word/minimum_length']
+    end
+
+    def self.minimum_length_kanji
+      return config['/tagging/word/minimum_length_kanji']
     end
 
     private
