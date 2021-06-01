@@ -63,19 +63,6 @@ GIT
   specs:
     ginseng-youtube (1.0.2)
 
-GIT
-  remote: https://github.com/pooza/sidekiq-scheduler.git
-  revision: 14c089124ebe99c59c0c66523e42f16560a7440a
-  branch: master.pooza
-  specs:
-    sidekiq-scheduler (3.0.1)
-      e2mmap
-      redis (>= 3, < 5)
-      rufus-scheduler (~> 3.2)
-      sidekiq (>= 3)
-      thwait
-      tilt (>= 1.4.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -222,8 +209,7 @@ GEM
       rake
     mini_magick (4.11.0)
     mini_mime (1.1.0)
-    mini_portile2 (2.5.2)
-      net-ftp (~> 0.1)
+    mini_portile2 (2.5.3)
     minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
@@ -233,9 +219,6 @@ GEM
     multipart-post (2.1.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    net-ftp (0.1.2)
-      net-protocol
-      time
     net-protocol (0.1.1)
       io-wait
       timeout
@@ -302,13 +285,13 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.15.0)
+    rubocop (1.16.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.5.0, < 2.0)
+      rubocop-ast (>= 1.7.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.7.0)
@@ -330,13 +313,20 @@ GEM
       nokogumbo (~> 2.0)
     sassc (2.4.0)
       ffi (~> 1.9)
-    sequel (5.44.0)
+    sequel (5.45.0)
     sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
+    sidekiq-scheduler (3.1.0)
+      e2mmap
+      redis (>= 3, < 5)
+      rufus-scheduler (~> 3.2)
+      sidekiq (>= 3)
+      thwait
+      tilt (>= 1.4.0)
     sidekiq-unique-jobs (7.0.11)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
@@ -415,7 +405,7 @@ DEPENDENCIES
   ruby-progressbar
   sidekiq (~> 6.2.0)
   sidekiq-failures
-  sidekiq-scheduler!
+  sidekiq-scheduler
   sidekiq-unique-jobs
   slim_lint
   test-unit
