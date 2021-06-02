@@ -175,7 +175,7 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
-    fastimage (2.2.3)
+    fastimage (2.2.4)
     faye-websocket (0.11.1)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
@@ -361,7 +361,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
