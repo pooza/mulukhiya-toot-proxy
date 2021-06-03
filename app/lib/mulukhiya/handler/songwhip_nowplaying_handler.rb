@@ -5,25 +5,16 @@ module Mulukhiya
       @service = SongwhipService.new
     end
 
-    def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
-      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
-      return body if parser.command?
-      @status.each_line do |line|
-        push(line)
-        if matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
-          @recent_keyword = matches[1]
-        elsif reporter.temp[:track_uris].member?(line)
-          @recent_keyword = line
-        else
-          next
-        end
-        update(@recent_keyword) if updatable?(@recent_keyword)
+    def handle_line(line)
+      if matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
+        @recent_keyword = matches[1]
+      elsif reporter.temp[:track_uris].member?(line)
+        @recent_keyword = line
+      else
+        return
       end
-      parser.text = body[status_field] = @lines.values.join("\n")
-      return body
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, body: body)
+      return unless updatable?(@recent_keyword)
+      update(@recent_keyword)
     end
 
     def updatable?(keyword)

@@ -3,11 +3,20 @@ module Mulukhiya
     include Package
     attr_accessor :account
 
+    def text=(text)
+      text.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2') if text.present?
+      super
+    end
+
     def accts
       return enum_for(__method__) unless block_given?
       text.scan(TootParser.acct_pattern).map(&:first).each do |acct|
         yield Acct.new(acct)
       end
+    end
+
+    def nowplaying?
+      return /#nowplaying\s/i.match?(text)
     end
 
     def to_sanitized

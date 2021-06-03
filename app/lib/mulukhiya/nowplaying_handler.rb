@@ -10,18 +10,23 @@ module Mulukhiya
 
     def handle_pre_toot(body, params = {})
       @status = body[status_field] || ''
-      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
+      return body unless parser.nowplaying?
       return body if parser.command?
       @status.each_line do |line|
         push(line)
-        next unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
-        @recent_keyword = matches[1]
-        update(@recent_keyword) if updatable?(@recent_keyword)
+        handle_line(line)
       end
       parser.text = body[status_field] = @lines.values.join("\n")
       return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, body: body)
+    end
+
+    def handle_line(line)
+      return unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
+      @recent_keyword = matches[1]
+      return unless updatable?(@recent_keyword)
+      update(@recent_keyword)
     end
 
     def create_uri(keyword)
