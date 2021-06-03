@@ -11,6 +11,7 @@ filters:
       - account
       - attachment
       - access_token
+      - announcer
       - status
       - hash_tag
       - user_config
