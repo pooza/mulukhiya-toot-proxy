@@ -1,9 +1,13 @@
 module Mulukhiya
-  class Announcement
-    include Singleton
+  class Announcer
     include Package
     include SNSMethods
     attr_reader :storage, :sns
+
+    def initialize
+      @storage = Redis.new
+      @sns = info_agent_service
+    end
 
     def announce
       return unless controller_class.announcement?
@@ -40,13 +44,6 @@ module Mulukhiya
       storage['announcements'] = fetch.to_h {|v| [v[:id], v]}.to_json
     rescue => e
       logger.error(error: e)
-    end
-
-    private
-
-    def initialize
-      @storage = Redis.new
-      @sns = info_agent_service
     end
   end
 end
