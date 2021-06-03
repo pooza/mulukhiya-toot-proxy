@@ -17,7 +17,7 @@ gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.2.0'
 gem 'sidekiq-failures'
-gem 'sidekiq-scheduler', github: 'pooza/sidekiq-scheduler', branch: 'master.pooza'
+gem 'sidekiq-scheduler'
 gem 'sidekiq-unique-jobs'
 gem 'vacuum', '~>3.0'
 

@@ -4,7 +4,7 @@ module Mulukhiya
     sidekiq_options retry: false, unique: :until_executed
 
     def perform
-      Announcement.instance.announce
+      Announcer.new.announce
     end
   end
 end

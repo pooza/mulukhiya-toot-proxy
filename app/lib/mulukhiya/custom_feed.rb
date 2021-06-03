@@ -5,7 +5,7 @@ module Mulukhiya
     attr_accessor :storage
 
     def update
-      bar = ProgressBar.create(total: count) if Environment.rake?
+      bar = ProgressBar.create(total: CustomFeed.count) if Environment.rake?
       CustomFeed.entries.each do |entry|
         create(entry).save
       rescue => e
@@ -27,8 +27,8 @@ module Mulukhiya
       return renderer
     end
 
-    def count
-      return CustomFeed.entries.count
+    def self.count
+      return entries.count
     end
 
     def self.entries
