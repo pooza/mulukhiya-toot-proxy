@@ -51,7 +51,7 @@ module Mulukhiya
       uri.query_values = {
         client_id: oauth_client['client_id'],
         response_type: 'code',
-        redirect_uri: @config['/mastodon/oauth/redirect_uri'],
+        redirect_uri: config['/mastodon/oauth/redirect_uri'],
         scope: MastodonController.oauth_scopes.join(' '),
       }
       return uri

@@ -4,8 +4,8 @@ module Mulukhiya
 
     def initialize(params = {})
       super rescue nil
-      @id = params[:id] || @config['/alert/line/to']
-      @token = params[:token] || @config['/alert/line/token']
+      @id = params[:id] || config['/alert/line/to']
+      @token = params[:token] || config['/alert/line/token']
     end
 
     def self.config?
