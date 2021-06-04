@@ -99,7 +99,7 @@ filters:
       - program
   - name: announcement
     cases:
-      - announcement
+      - announcer
   - name: note
     cases:
       - note_uri
