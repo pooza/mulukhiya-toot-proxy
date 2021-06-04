@@ -90,7 +90,7 @@ module Mulukhiya
       body = {text: [title_template.to_s, body_template.to_s].join}
       if body_template.to_s.match?(config['/spoiler/pattern'])
         body[:text] = body_template.to_s.lstrip
-        body[:spoiler_text]= "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
+        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
       end
       uri = Ginseng::URI.parse(body_template[type].dig(:work, :images, :recommended_url))
       body[:attachments] = [{image_url: uri.to_s}] if uri&.absolute?
