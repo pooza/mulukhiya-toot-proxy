@@ -9,7 +9,7 @@ module Mulukhiya
     def rewrite(uri)
       source = Ginseng::URI.parse(uri.to_s)
       dest = @canonicals[source.to_s]
-      raise Ginseng::NotFoundError, "Canonical for '#{source}' not found" unless dest
+      raise Ginseng::NotFoundError, 'Not Found' unless dest
       @status.sub!(source.to_s, dest.to_s)
       return dest
     end

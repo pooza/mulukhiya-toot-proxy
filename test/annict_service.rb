@@ -76,7 +76,7 @@ module Mulukhiya
       end
     end
 
-    def test_create_create_payload
+    def test_create_payload
       return unless @service
       record = {
         work: {id: 111, title: 'すごいあにめ'},

@@ -284,7 +284,7 @@ module Mulukhiya
 
     config['/api/custom'].each do |entry|
       get File.join('/', entry['path']) do
-        raise Ginseng::NotFoundError, "Resource #{request.path} not found." unless command
+        raise Ginseng::NotFoundError, 'Not Found' unless command
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
         @renderer.message = JSON.parse(command.stdout)

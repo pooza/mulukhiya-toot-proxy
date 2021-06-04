@@ -12,7 +12,7 @@ module Mulukhiya
       return nil unless response['results'].present?
       return response['results'].first
     rescue Ginseng::RequestError => e
-      raise Ginseng::RequestError, "#{category} ’#{keyword}' not found", e.backtrace
+      raise Ginseng::RequestError, "#{category} '#{keyword}' not found", e.backtrace
     end
 
     def lookup(id)

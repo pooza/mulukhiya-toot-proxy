@@ -38,7 +38,9 @@ module Mulukhiya
       return [] unless Postgres.config?
       params[:tag] = name
       params[:tag_id] = id rescue nil
-      return Postgres.instance.execute('tag_timeline', params)
+      return Postgres.instance.execute('tag_timeline', params).map do |row|
+        row.to_h.deep_symbolize_keys
+      end
     end
 
     def self.included(base)

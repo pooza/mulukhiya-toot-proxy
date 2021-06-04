@@ -84,19 +84,16 @@ module Mulukhiya
 
     def create_payload(values, type)
       body_template = Template.new("annict/#{type}_body")
-      body_template[type] = values.deep_stringify_keys
+      body_template[type] = values
       title_template = Template.new("annict/#{type}_title")
-      title_template[type] = values.deep_stringify_keys
+      title_template[type] = values
+      body = {text: [title_template.to_s, body_template.to_s].join}
       if body_template.to_s.match?(config['/spoiler/pattern'])
-        body = {
-          'spoiler_text' => "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）",
-          'text' => body_template.to_s.lstrip,
-        }
-      else
-        body = {'text' => [title_template.to_s, body_template.to_s].join}
+        body[:text] = body_template.to_s.lstrip
+        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
       end
-      uri = Ginseng::URI.parse(body_template[type].dig('work', 'images', 'recommended_url'))
-      body['attachments'] = [{'image_url' => uri.to_s}] if uri&.absolute?
+      uri = Ginseng::URI.parse(body_template[type].dig(:work, :images, :recommended_url))
+      body[:attachments] = [{image_url: uri.to_s}] if uri&.absolute?
       return SlackWebhookPayload.new(body)
     end
 
