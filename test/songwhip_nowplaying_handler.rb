@@ -28,7 +28,7 @@ module Mulukhiya
       @handler.clear
       assert_equal(
         @handler.handle_pre_toot(status_field => "色々PC持ってるけど、\nWindows\nWindows\nWindows\nWindows\nUbuntu\nFedora\nChromeOS\nChromeOS\n\nmacOSはない。"),
-        {'status' => "色々PC持ってるけど、\nWindows\nWindows\nWindows\nWindows\nUbuntu\nFedora\nChromeOS\nChromeOS\n\nmacOSはない。"},
+        {status_field => "色々PC持ってるけど、\nWindows\nWindows\nWindows\nWindows\nUbuntu\nFedora\nChromeOS\nChromeOS\n\nmacOSはない。"},
       )
     end
   end
