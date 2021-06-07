@@ -28,9 +28,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 661b2b88e85b7c061bfecde8156d2dfa02cc225a
+  revision: 7e85a3dba9d7594912bdda5f5b75b2a67f49ff00
   specs:
-    ginseng-fediverse (1.5.13)
+    ginseng-fediverse (1.5.14)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -356,7 +356,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
