@@ -776,6 +776,9 @@ youtube:
   url: https://www.googleapis.com/
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
+growi:
+  urls:
+    create_page: /_api/v3/pages/create
 nowplaying:
   album:
     prefix: 'Album:'

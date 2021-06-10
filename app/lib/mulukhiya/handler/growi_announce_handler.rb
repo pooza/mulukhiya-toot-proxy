@@ -9,7 +9,7 @@ module Mulukhiya
       params = params.clone
       params[:format] = :md
       response = sns.account.growi.clip(body: create_body(announcement, params))
-      result.push(path: response['page']['path'])
+      result.push(path: response['data']['page']['path'])
       return announcement
     end
   end
