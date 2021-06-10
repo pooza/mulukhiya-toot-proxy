@@ -1,5 +1,6 @@
 module Mulukhiya
   class GrowiClipper
+    include Package
     GRANT_PUBLIC = 1
     GRANT_RESTRICTED = 2
     GRANT_SPECIFIED = 3
@@ -16,9 +17,9 @@ module Mulukhiya
       params[:access_token] ||= @token
       params[:grant] ||= GRANT_OWNER
       params[:path] ||= File.join(@prefix, Time.now.strftime('%Y/%m/%d/%H%M%S%L'))
-      response = @http.post('/_api/pages.create', {body: params})
-      raise Ginseng::GatewayError, response['error'] unless response&.dig('ok')
-      return response
+      response = @http.post(config['/growi/urls/create_page'], {body: params})
+      return response if response['data']['page']
+      raise Ginseng::GatewayError, 'Invalid response'
     end
   end
 end

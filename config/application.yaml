@@ -1,5 +1,5 @@
 package:
-  version: 4.5.10
+  version: 4.5.11
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -776,6 +776,9 @@ youtube:
   url: https://www.googleapis.com/
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
+growi:
+  urls:
+    create_page: /_api/v3/pages/create
 nowplaying:
   album:
     prefix: 'Album:'
