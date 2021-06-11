@@ -11,14 +11,14 @@ namespace :mulukhiya do
         end
       end
 
-      task show: [:list]
+      task show: [:list] # rubocop:disable Rake/Desc
 
       desc 'clear tags'
       task :clean do
         Mulukhiya::UserConfigStorage.clear_tags
       end
 
-      task clear: [:clean]
+      task clear: [:clean] # rubocop:disable Rake/Desc
     end
   end
 end

@@ -2,17 +2,13 @@ namespace :mulukhiya do
   namespace :program do
     desc 'update programs'
     task :update do
-      program.update
+      Mulukhiya::Program.instance.update
       puts "#{program.count} programs"
     end
 
     desc 'show programs'
     task :show do
-      puts program.to_yaml
-    end
-
-    def program
-      return Mulukhiya::Program.instance
+      puts Mulukhiya::Program.instance.to_yaml
     end
   end
 end

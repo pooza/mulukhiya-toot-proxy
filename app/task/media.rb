@@ -11,7 +11,7 @@ namespace :mulukhiya do
         Mulukhiya::Environment.account_class.test_account.clear_attachments(dryrun: true)
       end
 
-      task clear: [:clean]
+      task clear: [:clean] # rubocop:disable Rake/Desc
     end
 
     namespace :file do
@@ -20,7 +20,7 @@ namespace :mulukhiya do
         Mulukhiya::MediaFile.purge
       end
 
-      task clear: [:clean]
+      task clear: [:clean] # rubocop:disable Rake/Desc
     end
 
     namespace :meta do
@@ -29,7 +29,7 @@ namespace :mulukhiya do
         Mulukhiya::MediaMetadataStorage.new.clear
       end
 
-      task clear: [:clean]
+      task clear: [:clean] # rubocop:disable Rake/Desc
     end
   end
 end
