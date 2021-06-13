@@ -1,7 +1,7 @@
 module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
+      self.status = body[status_field]
       return body unless executable?(body)
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(body)) if @status

@@ -3,8 +3,8 @@ module Mulukhiya
     attr_reader :sns
 
     def handle_announce(announcement, params = {})
+      self.status = announcement[:content] || announcement[:text]
       return announcement unless @sns = params[:sns]
-      return announcement unless @status = announcement[:content] || announcement[:text]
       return announce(announcement, params)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, announcement: announcement)
@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     def create_body(announcement, params = {})
-      @status ||= announcement[:content] || announcement[:text]
+      self.status = announcement[:content] || announcement[:text]
       params[:format] ||= :sanitized
       params.merge!(announcement)
       params[:body] = parser.send("to_#{params[:format]}".to_sym)

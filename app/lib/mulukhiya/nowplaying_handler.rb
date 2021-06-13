@@ -9,11 +9,10 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
-      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
+      self.status = body[status_field]
       return body unless parser.nowplaying?
       return body if parser.command?
-      @status.each_line do |line|
+      status.each_line do |line|
         push(line)
         handle_line(line)
       end
