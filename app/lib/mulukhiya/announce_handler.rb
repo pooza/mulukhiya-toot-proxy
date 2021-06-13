@@ -3,7 +3,7 @@ module Mulukhiya
     attr_reader :sns
 
     def handle_announce(announcement, params = {})
-      self.body = announcement
+      self.envelope = announcement
       return announcement unless @sns = params[:sns]
       return announce(announcement, params)
     rescue => e
@@ -15,12 +15,13 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
-    def body=(announcement)
+    def envelope=(announcement)
+      @envelope = announcement
       @status = (announcement[:content] || announcement[:text] || '').dup
     end
 
     def create_body(announcement, params = {})
-      self.body = announcement
+      self.envelope = announcement
       params[:format] ||= :sanitized
       params.merge!(announcement)
       params[:body] = parser.send("to_#{params[:format]}".to_sym)

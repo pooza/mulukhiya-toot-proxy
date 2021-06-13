@@ -140,7 +140,8 @@ module Mulukhiya
 
     alias disabled? disable?
 
-    def body=(body)
+    def envelope=(body)
+      @envelope = body
       @status = (body[status_field] || '').dup
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
     end

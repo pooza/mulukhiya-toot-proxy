@@ -1,7 +1,7 @@
 module Mulukhiya
   class MentionVisibilityHandler < Handler
     def handle_pre_toot(body, params = {})
-      self.body = body
+      self.envelope = body
       return body if parser.command?
       parser.accts.select(&:agent?).each do |acct|
         body['visibility'] = controller_class.visibility_name('direct')
