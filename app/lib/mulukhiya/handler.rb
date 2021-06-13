@@ -142,8 +142,8 @@ module Mulukhiya
 
     def envelope=(body)
       @envelope = body
-      @status = (body[status_field] || '').dup
-      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
+      @status = body[status_field] || ''
+      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2') if @status.present?
     end
 
     def parser

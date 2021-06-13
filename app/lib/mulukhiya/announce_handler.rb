@@ -17,7 +17,7 @@ module Mulukhiya
 
     def envelope=(announcement)
       @envelope = announcement
-      @status = (announcement[:content] || announcement[:text] || '').dup
+      @status = announcement[:content] || announcement[:text] || ''
     end
 
     def create_body(announcement, params = {})
