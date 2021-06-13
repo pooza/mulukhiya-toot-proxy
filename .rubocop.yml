@@ -17,6 +17,7 @@ AllCops:
     - 'public/**/*'
     - 'config/**/*'
     - 'tmp/**/*'
+    - '**/old/**/*'
   TargetRubyVersion: 3.0
 
 Naming/RescuedExceptionsVariableName:
