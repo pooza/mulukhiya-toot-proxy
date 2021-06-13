@@ -6,7 +6,7 @@ namespace :mulukhiya do
         Mulukhiya::Environment.sns_class.new.clear_oauth_client
       end
 
-      task clear: [:clean]
+      task clear: [:clean] # rubocop:disable Rake/Desc
 
       desc 'show OAuth client'
       task :show do

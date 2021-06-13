@@ -9,14 +9,13 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
+      self.envelope = body
       return body if parser.command?
       return body unless executable?(body)
       return body unless path = create_image(@status)
       body[attachment_field] ||= []
       body[attachment_field].push(sns.upload(path, {response: :id}))
-      body[status_field] = '.'
-      result.push(message: "今日は#{today.month}月#{today.day}日です。")
+      parser.text = body[status_field] = '.'
       return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
@@ -30,7 +29,7 @@ module Mulukhiya
 
     def executable?(body)
       return false if attachment_limit <= (body[attachment_field] || []).count
-      return text_length < body[status_field].length
+      return text_length < body[status_field]&.length
     end
 
     private

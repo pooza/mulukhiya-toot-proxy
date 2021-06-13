@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      @status = body[status_field] || ''
+      self.envelope = body
       return body unless parser.nowplaying?
       return body if parser.command?
       @status.each_line do |line|

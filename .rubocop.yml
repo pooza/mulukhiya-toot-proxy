@@ -17,6 +17,7 @@ AllCops:
     - 'public/**/*'
     - 'config/**/*'
     - 'tmp/**/*'
+    - '**/old/**/*'
   TargetRubyVersion: 3.0
 
 Naming/RescuedExceptionsVariableName:
@@ -341,8 +342,15 @@ Performance/Sum: # (new in 1.8)
 Sequel/ConcurrentIndex:
   Enabled: false
 
-Sequel/SaveChanges:
+Sequel:
   Exclude:
     - '*'
   Include:
     - '**/model/*'
+
+Rake:
+  Exclude:
+    - '*'
+  Include:
+    - 'Rakefile'
+    - 'app/task/*'
