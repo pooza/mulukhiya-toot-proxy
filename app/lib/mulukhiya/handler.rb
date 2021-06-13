@@ -2,7 +2,7 @@ module Mulukhiya
   class Handler
     include Package
     include SNSMethods
-    attr_reader :reporter, :event, :sns, :errors, :result, :status, :envelope
+    attr_reader :reporter, :event, :sns, :errors, :result, :envelope
 
     def handle_pre_toot(body, params = {})
       return body
@@ -148,7 +148,7 @@ module Mulukhiya
 
     def parser
       unless @parser
-        @parser = @reporter.parser || parser_class.new(status)
+        @parser = @reporter.parser || parser_class.new(@status)
         @reporter.parser = @parser
       end
       return @parser

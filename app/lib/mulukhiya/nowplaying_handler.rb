@@ -12,7 +12,7 @@ module Mulukhiya
       self.envelope = body
       return body unless parser.nowplaying?
       return body if parser.command?
-      status.each_line do |line|
+      @status.each_line do |line|
         push(line)
         handle_line(line)
       end
