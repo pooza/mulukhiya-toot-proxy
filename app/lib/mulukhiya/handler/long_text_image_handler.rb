@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      self.status = body[status_field]
+      self.body = body
       return body if parser.command?
       return body unless executable?(body)
       return body unless path = create_image(@status)

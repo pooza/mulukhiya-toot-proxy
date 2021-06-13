@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpoilerHandler < Handler
     def handle_pre_toot(body, params = {})
-      self.status = body[status_field]
+      self.body = body
       return body if parser.command?
       subject = body[controller_class.spoiler_field]
       return body unless subject&.match?(pattern)

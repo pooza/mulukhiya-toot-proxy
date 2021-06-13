@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     def handle_pre_toot(body, params = {})
-      self.status = body[status_field]
+      self.body = body
       return body unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
       body['visibility'] = controller_class.visibility_name('direct')
@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def handle_post_toot(body, params = {})
-      self.status = body[status_field]
+      self.body = body
       return unless parser.command_name == command_name
       exec
       result.push(parser.params.select {|_, v| v.present?})
