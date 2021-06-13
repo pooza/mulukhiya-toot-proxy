@@ -2,7 +2,7 @@ module Mulukhiya
   class Handler
     include Package
     include SNSMethods
-    attr_reader :reporter, :event, :sns, :errors, :result, :status
+    attr_reader :reporter, :event, :sns, :errors, :result, :status, :envelope
 
     def handle_pre_toot(body, params = {})
       return body
