@@ -7,7 +7,7 @@ module Mulukhiya
       tags.concat(TaggingDictionary.new.matches(body)) if @status
       tags.concat(create_media_tags(body)) if TagContainer.media_tag?
       tags.account = @sns.account
-      body[status_field] = update_status
+      parser.text = body[status_field] = update_status
       result.push(tags: tags.create_tags)
       return body
     rescue => e
@@ -52,7 +52,7 @@ module Mulukhiya
       end
       lines.push(tags.to_s)
       lines.push(via[1]) if via.present?
-      return @status = lines.join("\n")
+      return lines.join("\n")
     end
   end
 end
