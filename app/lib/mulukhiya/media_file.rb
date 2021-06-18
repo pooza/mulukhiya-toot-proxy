@@ -140,7 +140,7 @@ module Mulukhiya
     end
 
     def self.purge
-      bar = ProgressBar.create(total: all.count) if Environment.rake?
+      bar = ProgressBar.create(total: all.count)
       files = []
       all do |path|
         next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago

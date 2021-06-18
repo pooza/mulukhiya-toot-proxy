@@ -90,7 +90,7 @@ module Mulukhiya
     end
 
     def fetch
-      bar = ProgressBar.create(total: remote_dics.count) if Environment.rake?
+      bar = ProgressBar.create(total: remote_dics.count)
       threads = []
       result = []
       remote_dics do |dic|

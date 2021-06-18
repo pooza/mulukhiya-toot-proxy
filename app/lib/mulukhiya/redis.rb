@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def clear
-      bar = ProgressBar.create(total: all_keys.count) if Environment.rake?
+      bar = ProgressBar.create(total: all_keys.count)
       all_keys.each do |key|
         unlink(key)
       ensure

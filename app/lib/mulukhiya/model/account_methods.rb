@@ -132,8 +132,7 @@ module Mulukhiya
 
     def clear_attachments(params = {})
       raise Ginseng::AuthError, 'Only test users can run it' unless test?
-      puts "delete #{attachments.count.commaize} attachments" if Environment.rake?
-      bar = ProgressBar.create(total: status_delete_limit) if Environment.rake?
+      bar = ProgressBar.create(total: status_delete_limit)
       attachments.first(status_delete_limit).each do |attachment|
         service.delete_attachment(attachment) unless params[:dryrun]
       rescue => e

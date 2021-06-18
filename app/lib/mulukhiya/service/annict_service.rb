@@ -205,7 +205,7 @@ module Mulukhiya
 
     def self.crawl_all(params = {})
       accounts = AnnictAccountStorage.accounts
-      bar = ProgressBar.create(total: accounts.count) if Environment.rake?
+      bar = ProgressBar.create(total: accounts.count)
       results = {}
       accounts.each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
