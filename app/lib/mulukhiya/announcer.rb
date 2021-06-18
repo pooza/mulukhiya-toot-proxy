@@ -11,7 +11,7 @@ module Mulukhiya
 
     def announce
       return unless controller_class.announcement?
-      bar = ProgressBar.create(total: fetch.count) if Environment.rake?
+      bar = ProgressBar.create(total: fetch.count)
       fetch.each do |announcement|
         next if cache.member?(announcement[:id])
         Event.new(:announce, {sns: sns}).dispatch(announcement)

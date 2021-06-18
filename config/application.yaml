@@ -1,5 +1,5 @@
 package:
-  version: 4.5.12
+  version: 4.5.13
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -965,6 +965,9 @@ webhook:
   sample: |
     あんなの、戦いのうちに入らないわ。
     奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
+cli:
+  progress_bar:
+    format: '%c/%C (%p%%)| %B'
 agent:
   info:
     token: null
