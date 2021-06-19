@@ -54,7 +54,7 @@ module Mulukhiya
           EM.stop_event_loop if send(method, payload['data'], body) == :stop
         rescue => e
           logger.error(error: e)
-          raise Ginseng::GatewayError, e.message, e.backtrace
+          EM.stop_event_loop
         end
       end
     end
