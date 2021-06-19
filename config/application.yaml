@@ -329,6 +329,8 @@ misskey:
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
+  chat:
+    field: text
   handlers:
     pre_toot:
       - user_config_command
@@ -452,6 +454,8 @@ meisskey:
       video: video/mp4
       audio: audio/mpeg
       animation_image: null
+  chat:
+    field: text
   handlers:
     pre_toot:
       - user_config_command
