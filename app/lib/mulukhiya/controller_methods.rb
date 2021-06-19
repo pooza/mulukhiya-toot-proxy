@@ -112,6 +112,10 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/spoiler"]
       end
 
+      def chat_field
+        return config["/#{name}/chat/field"] == true rescue nil
+      end
+
       def attachment_field
         return config["/parser/#{parser_name}/fields/attachment"]
       end

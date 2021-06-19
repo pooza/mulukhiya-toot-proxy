@@ -88,6 +88,10 @@ module Mulukhiya
       assert_kind_of(String, controller_class.attachment_field)
     end
 
+    def test_chat_field
+      assert_kind_of(String, controller_class.chat_field) if controller_class.chat_field
+    end
+
     def test_status_key
       assert_kind_of(String, controller_class.status_key)
     end

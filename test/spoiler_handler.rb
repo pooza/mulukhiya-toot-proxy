@@ -7,25 +7,21 @@ module Mulukhiya
 
     def test_handle_pre_toot
       @handler.clear
-      body = {
-        controller_class.status_field => '普通の文章',
-      }
+      body = {controller_class.status_field => '普通の文章'}
       @handler.handle_pre_toot(body)
       assert_nil(@handler.debug_info)
+      assert_equal(body[controller_class.status_field], '普通の文章')
 
       @handler.clear
-      body = {
-        controller_class.status_field => '普通の文章',
-        controller_class.status_field => '18禁',
-      }
+      body = {controller_class.status_field => '18禁'}
       @handler.handle_pre_toot(body)
       assert_nil(@handler.debug_info)
       assert_equal(body[controller_class.status_field], '18禁')
 
       @handler.clear
       body = {
-        controller_class.status_field => 'command: user_config',
         controller_class.spoiler_field => 'ネタバレ',
+        controller_class.status_field => 'command: user_config',
       }
       @handler.handle_pre_toot(body)
       assert_nil(@handler.debug_info)

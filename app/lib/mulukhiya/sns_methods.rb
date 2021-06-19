@@ -16,12 +16,24 @@ module Mulukhiya
       return controller_class.status_field
     end
 
-    def status_key
-      return controller_class.status_key
-    end
-
     def attachment_field
       return controller_class.attachment_field
+    end
+
+    def poll_options_field
+      return controller_class.poll_options_field
+    end
+
+    def spoiler_field
+      return controller_class.spoiler_field
+    end
+
+    def chat_field
+      return controller_class.chat_field
+    end
+
+    def status_key
+      return controller_class.status_key
     end
 
     def attachment_limit
