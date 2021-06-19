@@ -16,7 +16,7 @@ module Mulukhiya
         push(line)
         handle_line(line)
       end
-      parser.text = body[status_field] = @lines.values.join("\n")
+      parser.text = body[text_field] = @lines.values.join("\n")
       return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, body: body)

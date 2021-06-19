@@ -2,9 +2,7 @@ module Mulukhiya
   class PleromaController < MastodonController
     post '/api/v1/pleroma/chats/:chat_id/messages' do
       @reporter.tags.clear
-      params[status_field] = params[config['/pleroma/chat/field']]
       Event.new(:pre_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
-      params[config['/pleroma/chat/field']] = params[status_field]
       @reporter.response = @sns.say(params)
       Event.new(:post_chat, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = @reporter.response.parsed_response
