@@ -17,6 +17,7 @@ module Mulukhiya
     private
 
     def executable?(body)
+      return false if parser.command?
       return false if parser.accts.any?(&:agent?)
       return true if body['visibility'].empty?
       return true if body['visibility'] == 'public'
