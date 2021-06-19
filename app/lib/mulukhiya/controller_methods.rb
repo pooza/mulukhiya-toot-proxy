@@ -113,7 +113,7 @@ module Mulukhiya
       end
 
       def chat_field
-        return config["/#{name}/chat/field"] == true rescue nil
+        return config["/#{name}/chat/field"] rescue nil
       end
 
       def attachment_field

@@ -82,7 +82,7 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      parts = [(body[status_field] || '').gsub(Acct.pattern, '')]
+      parts = [(body[status_field] || body[chat_field] || '').gsub(Acct.pattern, '')]
       parts.push(body[spoiler_field]) if body[spoiler_field]
       options = body.dig('poll', poll_options_field)
       parts.concat(options) if options.present?
