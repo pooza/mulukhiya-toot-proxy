@@ -13,8 +13,8 @@ module Mulukhiya
           @hash = values.deep_symbolize_keys.merge(
             is_admin: admin?,
             is_moderator: moderator?,
-            is_info_bot: info_bot?,
-            is_test_bot: test_bot?,
+            is_info_bot: info?,
+            is_test_bot: test?,
             display_name: display_name,
           )
           @hash.delete(:private_key)
