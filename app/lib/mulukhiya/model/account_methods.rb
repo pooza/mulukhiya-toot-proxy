@@ -151,6 +151,10 @@ module Mulukhiya
       return account_class.test_account.id == id
     end
 
+    def test?
+      return account_class.info_account.id == id
+    end
+
     def self.included(base)
       base.extend(Methods)
     end

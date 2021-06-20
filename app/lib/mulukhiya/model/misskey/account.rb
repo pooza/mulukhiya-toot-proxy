@@ -13,6 +13,8 @@ module Mulukhiya
             url: uri.to_s,
             is_admin: admin?,
             is_moderator: moderator?,
+            is_info_bot: info_bot?,
+            is_test_bot: test_bot?,
             display_name: display_name,
           )
           @hash.delete(:token)

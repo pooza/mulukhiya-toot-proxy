@@ -17,6 +17,8 @@ html lang='ja'
             span.alert v-else='' 壊れたトークン
             span.role v-if='current_account.is_moderator' mod
             span.role v-if='current_account.is_admin' admin
+            span.role v-if='current_account.is_test_bot' test
+            span.role v-if='current_account.is_info_bot' info
             span.role v-if='isLoggedIn(current_account)' loggedin
             i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
           .field
