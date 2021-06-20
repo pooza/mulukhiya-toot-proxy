@@ -114,7 +114,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
       - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.min.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
@@ -131,7 +131,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
       - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.0/dist/js-yaml.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
