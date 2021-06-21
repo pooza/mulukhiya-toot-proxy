@@ -15,11 +15,11 @@ html lang='ja'
           h4
             a href='#' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
             span.alert v-else='' 壊れたトークン
-            span.role v-if='current_account.is_moderator' mod
+            span.role v-if='current_account.is_moderator' moderator
             span.role v-if='current_account.is_admin' admin
-            span.role v-if='current_account.is_test_bot' test
-            span.role v-if='current_account.is_info_bot' info
-            span.role v-if='isLoggedIn(current_account)' loggedin
+            span.role v-if='current_account.is_test_bot' test bot
+            span.role v-if='current_account.is_info_bot' info bot
+            span.role v-if='isLoggedIn(current_account)' logged in
             i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
           .field
             .title 権限:
