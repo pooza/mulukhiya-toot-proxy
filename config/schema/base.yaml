@@ -79,16 +79,11 @@ properties:
   alert:
     type: object
     properties:
-      slack:
-        type: object
-        required:
-          - hooks
-        properties:
-          hooks:
-            type: array
-            items:
-              type: string
-              format: uri
+      hooks:
+        type: array
+        items:
+          type: string
+          format: uri
       mail:
         type: object
         required:

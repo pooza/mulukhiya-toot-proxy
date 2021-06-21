@@ -11,7 +11,7 @@ module Mulukhiya
 
     def self.uris
       return enum_for(__method__) unless block_given?
-      config['/alert/slack/hooks'].each do |href|
+      config['/alert/hooks'].each do |href|
         yield Ginseng::URI.parse(href)
       end
     rescue Ginseng::ConfigError
