@@ -4,9 +4,7 @@ module Mulukhiya
       @handler = Handler.create('audio_format_convert')
       return unless handler?
       @handler.handle_pre_upload(file: {
-        tempfile: File.new(
-          File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'),
-        ),
+        tempfile: File.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')),
       })
     end
 
