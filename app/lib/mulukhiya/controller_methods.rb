@@ -103,7 +103,7 @@ module Mulukhiya
       def oauth_client_name(type = :default)
         name = [package_class.name]
         name.push("(#{type})") unless type == :default
-        return name.join(" ")
+        return name.join(' ')
       end
 
       def status_field
