@@ -161,8 +161,10 @@ module Mulukhiya
     end
 
     def self.create(name, params = {})
-      name = name.dup.sub(/_handler$/, '')
-      return "Mulukhiya::#{name.camelize}Handler".constantize.new(params) rescue nil
+      return "Mulukhiya::#{name.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def self.names
