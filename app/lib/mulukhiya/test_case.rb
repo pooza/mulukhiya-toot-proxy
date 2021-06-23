@@ -27,12 +27,6 @@ module Mulukhiya
       return nil
     end
 
-    def handler?
-      return false if @handler.nil?
-      return false if @handler.disable?
-      return true
-    end
-
     def self.load
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
