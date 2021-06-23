@@ -160,7 +160,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors: errors}
       else
-        response = AnnictService.new.auth(params['code'])
+        response = AnnictService.new.auth(params[:code])
         @sns.account.user_config.update(annict: {token: response['access_token']})
         @sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
@@ -196,7 +196,7 @@ module Mulukhiya
 
     post '/oauth/client/clear' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      sns_class.new.clear_oauth_client
+      sns_class.new.clear_oauth_client(params[:name] || :default)
       return @renderer.to_s
     rescue => e
       @renderer.status = e.status

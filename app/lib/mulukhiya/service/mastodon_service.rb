@@ -31,17 +31,17 @@ module Mulukhiya
       return super
     end
 
-    def oauth_client
-      unless client = redis['oauth_client']
-        client = http.post('/api/v1/apps', {
-          body: {
-            client_name: package_class.name,
-            website: config['/package/url'],
-            redirect_uris: config['/mastodon/oauth/redirect_uri'],
-            scopes: MastodonController.oauth_scopes.join(' '),
-          },
-        }).body
-        redis['oauth_client'] = client
+    def oauth_client(type = :default)
+      body = {
+        client_name: MastodonController.oauth_client_name(type),
+        website: config['/package/url'],
+        redirect_uris: config['/mastodon/oauth/redirect_uri'],
+        scopes: MastodonController.oauth_scopes(type).join(' '),
+      }
+      unless client = oauth_client_storage[body]
+        client = http.post('/api/v1/apps', {body: body}).body
+        oauth_client_storage[body] = client
+        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end

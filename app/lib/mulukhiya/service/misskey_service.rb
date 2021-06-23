@@ -34,17 +34,17 @@ module Mulukhiya
       return super
     end
 
-    def oauth_client
-      unless client = redis['oauth_client']
-        client = http.post('/api/app/create', {
-          body: {
-            name: package_class.name,
-            description: config['/package/description'],
-            permission: MisskeyController.oauth_scopes,
-            callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
-          },
-        }).body
-        redis['oauth_client'] = client
+    def oauth_client(type = :default)
+      body = {
+        name: MisskeyController.oauth_client_name(type),
+        description: config['/package/description'],
+        permission: MisskeyController.oauth_scopes(type),
+        callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
+      }
+      unless client = oauth_client_storage[body]
+        client = http.post('/api/app/create', {body: body}).body
+        oauth_client_storage[body] = client
+        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end
