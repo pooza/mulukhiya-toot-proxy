@@ -45,7 +45,7 @@ html lang='ja'
             .description
               a href=params[:oauth_url] #{controller.display_name}の認証ページ
               | で認証を行って、新しいトークンを登録します。
-          - else
+          - elsif params[:oauth_url]
             .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
             .description
               a href=params[:oauth_url] target='_blank' 認証コードを取得
@@ -62,8 +62,8 @@ html lang='ja'
             .description
               a href=params[:oauth_url] #{controller.display_name}の認証ページ
               | で認証を行って、新しいトークンを登録します。
-          - else
-            .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
+          - elsif params[:infobot_oauth_url]
+            .description #{controller.display_name}で認証を行って、お知らせボット用の新しいトークンを登録します。
             .description
               a href=params[:infobot_oauth_url] target='_blank' 認証コードを取得
               | して下の欄に入力、認証ボタンを押下してください。
@@ -74,8 +74,8 @@ html lang='ja'
               - elsif env.misskey_type?
                 .alert Misskeyは未対応です。
         .token
-          h4 既存のトークンを登録
-          .description 他のPCに登録されている暗号化トークンを入力して、登録ボタンを押下してください。
+          h4 暗号化トークンをまとめて登録
+          .description 暗号化トークンを改行区切りで入力して、登録ボタンを押下してください。
           - if controller.oauth_webui_uri
             .description v-if='account.is_admin'
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
@@ -102,6 +102,7 @@ html lang='ja'
           token: Vue.getToken(),
           input: {
             authcode: null,
+            infobot_authcode: null,
             token: null,
           },
         },

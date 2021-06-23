@@ -173,7 +173,7 @@ mastodon:
         - read:filters
         - write:filters
         - read:search
-      info:
+      infobot:
         - write:statuses
         - write:media
         - read:filters

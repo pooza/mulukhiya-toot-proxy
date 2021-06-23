@@ -46,13 +46,13 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def oauth_uri
+    def oauth_uri(type = :default)
       uri = create_uri('/oauth/authorize')
       uri.query_values = {
         client_id: oauth_client['client_id'],
         response_type: 'code',
         redirect_uri: config['/mastodon/oauth/redirect_uri'],
-        scope: MastodonController.oauth_scopes.join(' '),
+        scope: MastodonController.oauth_scopes(type).join(' '),
       }
       return uri
     end
