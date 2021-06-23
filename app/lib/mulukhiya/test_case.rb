@@ -37,8 +37,11 @@ module Mulukhiya
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
       names.each do |name|
+        raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
         puts "+ case: #{name}" if Environment.test?
         require File.join(dir, "#{name}.rb")
+      rescue => e
+        puts "- case: #{name} (#{e.message})" if Environment.test?
       end
     end
 
@@ -51,10 +54,7 @@ module Mulukhiya
         end
       end
       names ||= Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
-      TestCaseFilter.all.select(&:active?).each do |filter|
-        puts "filter: #{filter.class}" if Environment.test?
-        filter.exec(names)
-      end
+      TestCaseFilter.all.select(&:active?).each {|v| v.exec(names)}
       return names.uniq.sort
     end
 

@@ -5,14 +5,10 @@ module Mulukhiya
     end
 
     def test_handle_alert
-      return unless handler?
-
-      begin
-        @handler.clear
-        raise Ginseng::RenderError, 'Renderエラーが起きたというテスト。'
-      rescue Ginseng::RenderError => e
-        assert_kind_of(Ginseng::RenderError, @handler.handle_alert(e))
-      end
+      @handler.clear
+      raise Ginseng::RenderError, 'Renderエラーが起きたというテスト。'
+    rescue Ginseng::RenderError => e
+      assert_kind_of(Ginseng::RenderError, @handler.handle_alert(e))
     end
   end
 end

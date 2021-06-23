@@ -22,8 +22,6 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot
-      return unless handler?
-
       @handler.clear
       @parser.text = @handler.handle_pre_toot(status_field => '宮本佳那子')[status_field]
       assert(@parser.all_tags.member?('#宮本佳那子'))
@@ -61,16 +59,12 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot_with_direct
-      return unless handler?
-
       @handler.clear
       r = @handler.handle_pre_toot({status_field => 'キュアソード', 'visibility' => 'direct'})
       assert_equal(r[status_field], 'キュアソード')
     end
 
     def test_handle_pre_toot_with_poll
-      return unless handler?
-
       @handler.clear
       body = {
         status_field => 'アンケート',
@@ -80,7 +74,6 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot_with_twittodon
-      return unless handler?
       config['/tagging/default_tags'] = []
 
       @handler.clear
@@ -95,8 +88,6 @@ module Mulukhiya
     end
 
     def test_ignore_accts
-      return unless handler?
-
       @handler.clear
       assert(@handler.handle_pre_toot({status_field => '@pooza #キュアビューティ'})[status_field].start_with?('@pooza #キュアビューティ'))
     end

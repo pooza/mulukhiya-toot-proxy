@@ -5,8 +5,6 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot
-      return unless handler?
-
       @handler.clear
       @handler.handle_pre_toot({status_field => "#nowplaying https://www.youtube.com\n"})
       assert_nil(@handler.debug_info)
