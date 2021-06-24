@@ -27,10 +27,10 @@ module Mulukhiya
       return nil
     end
 
-    def self.load
+    def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
-      names.each do |name|
+      names(cases).each do |name|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
         puts "+ case: #{name}" if Environment.test?
         require File.join(dir, "#{name}.rb")
@@ -39,10 +39,10 @@ module Mulukhiya
       end
     end
 
-    def self.names
-      if arg = ARGV.first.split(/[^[:word:],]+/)[1]
+    def self.names(cases = nil)
+      if cases
         names = []
-        arg.split(',').each do |name|
+        cases.split(',').each do |name|
           names.push(name) if File.exist?(File.join(dir, "#{name}.rb"))
           names.push("#{name}_test") if File.exist?(File.join(dir, "#{name}_test.rb"))
         end
