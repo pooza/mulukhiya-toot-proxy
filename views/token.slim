@@ -23,18 +23,19 @@ html lang='ja'
             i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
           .field
             .title 権限:
-            .value = '{{current_account.scopes}}'
+            .value
+              .scope v-for='scope in current_account.scopes' = '{{scope}}'
           .field
-            .title 暗号化トークン:
+            .title トークン:
             .value
               code = '{{current_account.token}}'
-          .field v-if='!current_account.scopes.match(/read:notifications/)'
+          .field
             .title webhook:
             .value
               code = '{{current_account.webhook}}'
         .all-tokens v-if='all_tokens'
-          h4 全ての暗号化トークン
-          .description 他のブラウザやPCに、暗号化トークンを持ち出すことができます。
+          h4 全てのトークン
+          .description 他のブラウザやPCに、トークンを持ち出すことができます。
           textarea ref='all_tokens' :value='all_tokens'
           i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyAllTokens'
       nav.tokens
@@ -74,8 +75,8 @@ html lang='ja'
               - elsif env.misskey_type?
                 .alert Misskeyは未対応です。
         .token
-          h4 暗号化トークンをまとめて登録
-          .description 暗号化トークンを改行区切りで入力して、登録ボタンを押下してください。
+          h4 トークンをまとめて登録
+          .description トークンを改行区切りで入力して、登録ボタンを押下してください。
           - if controller.oauth_webui_uri
             .description v-if='account.is_admin'
               a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
@@ -83,8 +84,10 @@ html lang='ja'
               | 以下の権限を含むものにしてください。
             .field v-if='account.is_admin'
               .title 権限:
-              .value #{controller.oauth_scopes.join(', ')}
-          textarea placeholder='暗号化トークンを1件ずつ、改行で区切って' v-model.trim='input.token'
+              .value
+                - controller.oauth_scopes.each do |scope|
+                  .scope = scope
+          textarea placeholder='トークンを1件ずつ、改行で区切って' v-model.trim='input.token'
           button :disabled='!input.token' @click='registerTokens' 登録
     == slim.render 'fragment/footer'
     javascript:
