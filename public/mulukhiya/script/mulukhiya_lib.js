@@ -42,18 +42,18 @@ const MulukhiyaLib = {
       return digged
     }
 
-    Vue.authMastodon = async code => {
+    Vue.authMastodon = async (code, type = 'default') => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/mastodon/auth', {token: Vue.getToken(), code: code})
+      return axios.post('/mulukhiya/api/mastodon/auth', {token: Vue.getToken(), code: code, type: type})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.authMisskey = async token => {
+    Vue.authMisskey = async (token, type = 'default') => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/misskey/auth', {token: Vue.getToken(), token: token})
+      return axios.post('/mulukhiya/api/misskey/auth', {token: Vue.getToken(), token: token, type: type})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -146,6 +146,7 @@ const MulukhiyaLib = {
       return {
         username: data.account.username,
         token: token_crypted,
+        token_raw: data.token.token,
         scopes: data.token.scopes.join(', '),
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,

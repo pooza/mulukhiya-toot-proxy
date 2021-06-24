@@ -34,11 +34,20 @@ module Mulukhiya
       return super
     end
 
+    def auth(token, type = :default)
+      return http.post('/api/auth/session/userkey', {
+        body: {
+          appSecret: oauth_client(type)['secret'],
+          token: token,
+        },
+      })
+    end
+
     def oauth_client(type = :default)
       body = {
-        name: MisskeyController.oauth_client_name(type),
+        name: MisskeyController.oauth_client_name(type.to_sym),
         description: config['/package/description'],
-        permission: MisskeyController.oauth_scopes(type),
+        permission: MisskeyController.oauth_scopes(type.to_sym),
         callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
       }
       unless client = oauth_client_storage[body]

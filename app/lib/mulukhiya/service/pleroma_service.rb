@@ -40,10 +40,10 @@ module Mulukhiya
 
     def oauth_client(type = :default)
       body = {
-        client_name: PleromaController.oauth_client_name(type),
+        client_name: PleromaController.oauth_client_name(type.to_sym),
         website: config['/package/url'],
         redirect_uris: config['/pleroma/oauth/redirect_uri'],
-        scopes: PleromaController.oauth_scopes(type).join(' '),
+        scopes: PleromaController.oauth_scopes(type.to_sym).join(' '),
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/v1/apps', {body: body}).body
@@ -53,10 +53,23 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
+    def auth(code, type = :default)
+      return http.post('/oauth/token', {
+        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body: {
+          'grant_type' => 'authorization_code',
+          'redirect_uri' => @config['/pleroma/oauth/redirect_uri'],
+          'client_id' => oauth_client(type)['client_id'],
+          'client_secret' => oauth_client(type)['client_secret'],
+          'code' => code,
+        },
+      })
+    end
+
     def oauth_uri(type = :default)
       uri = create_uri('/oauth/authorize')
       uri.query_values = {
-        client_id: oauth_client['client_id'],
+        client_id: oauth_client(type)['client_id'],
         response_type: 'code',
         redirect_uri: config['/pleroma/oauth/redirect_uri'],
         scope: PleromaController.oauth_scopes(type).join(' '),
