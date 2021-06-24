@@ -161,7 +161,7 @@ module Mulukhiya
 
     module Methods
       def test_token
-        return config['/agent/test/token'].decrypt 
+        return config['/agent/test/token'].decrypt
       rescue
         return config['/agent/test/token']
       end
@@ -171,7 +171,7 @@ module Mulukhiya
       end
 
       def info_token
-        return config['/agent/info/token'].decrypt 
+        return config['/agent/info/token'].decrypt
       rescue
         return config['/agent/info/token']
       end
