@@ -24,11 +24,7 @@ html lang='ja'
           .field
             .title 権限:
             .value = '{{current_account.scopes}}'
-          .field v-if='current_account.scopes.match(/read:notifications/)'
-            .title 平文トークン:
-            .value
-              code = '{{current_account.token_raw}}'
-          .field v-else=''
+          .field
             .title 暗号化トークン:
             .value
               code = '{{current_account.token}}'
