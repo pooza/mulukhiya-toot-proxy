@@ -44,11 +44,11 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MisskeyController.oauth_scopes(type.to_sym)
+      return nil unless MisskeyController.oauth_scopes(type)
       body = {
-        name: MisskeyController.oauth_client_name(type.to_sym),
+        name: MisskeyController.oauth_client_name(type),
         description: config['/package/description'],
-        permission: MisskeyController.oauth_scopes(type.to_sym),
+        permission: MisskeyController.oauth_scopes(type),
         callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
       }
       unless client = oauth_client_storage[body]

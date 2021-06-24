@@ -101,6 +101,8 @@ module Mulukhiya
       end
 
       def oauth_client_name(type = :default)
+        return nil unless oauth_scopes(type)
+        type = type.to_sym
         name = [Package.name]
         name.push("(#{type})") unless type == :default
         return name.join(' ')

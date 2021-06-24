@@ -37,11 +37,11 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MeisskeyController.oauth_scopes(type.to_sym)
+      return nil unless MeisskeyController.oauth_scopes(type)
       body = {
-        name: MeisskeyController.oauth_client_name(type.to_sym),
+        name: MeisskeyController.oauth_client_name(type),
         description: config['/package/description'],
-        permission: MeisskeyController.oauth_scopes(type.to_sym),
+        permission: MeisskeyController.oauth_scopes(type),
         callbackUrl: http.create_uri(config['/meisskey/oauth/callback/url']).to_s,
       }
       unless client = oauth_client_storage[body]
