@@ -101,7 +101,7 @@ module Mulukhiya
       end
 
       def oauth_client_name(type = :default)
-        name = [package_class.name]
+        name = [Package.name]
         name.push("(#{type})") unless type == :default
         return name.join(' ')
       end
