@@ -76,7 +76,7 @@ module Mulukhiya
 
     def test_info?
       return unless account
-      assert(account.info?)
+      assert_boolean(account.info?)
     end
 
     def test_locked?
