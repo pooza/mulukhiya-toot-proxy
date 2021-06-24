@@ -44,6 +44,7 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
+      return nil unless MisskeyController.oauth_scopes(type.to_sym)
       body = {
         name: MisskeyController.oauth_client_name(type.to_sym),
         description: config['/package/description'],
@@ -56,6 +57,14 @@ module Mulukhiya
         redis.unlink('oauth_client')
       end
       return JSON.parse(client)
+    end
+
+    def oauth_uri(type = :default)
+      return nil unless oauth_client(type)
+      response = http.post('/api/auth/session/generate', {
+        body: {appSecret: oauth_client(type)['secret']},
+      })
+      return Ginseng::URI.parse(response['url'])
     end
 
     def notify(account, message, response = nil)
