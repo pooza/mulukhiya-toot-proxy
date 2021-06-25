@@ -52,7 +52,7 @@ module Mulukhiya
 
     def values
       values = {status_field => text}
-      values[controller_class.spoiler_field] = header if header
+      values[spoiler_field] = header if header
       values['attachments'] = images
       return values
     end

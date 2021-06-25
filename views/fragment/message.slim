@@ -8,8 +8,10 @@
     | login: @{{account.username}}
     a href='/mulukhiya/app/token'
       i class='fas fa-user' v-tooltip.left="'トークンの管理'"
-    span.role v-if='account.is_moderator' = 'mod'
-    span.role v-if='account.is_admin' = 'admin'
+    span.role v-if='account.is_moderator' moderator
+    span.role v-if='account.is_admin' admin
+    span.role v-if='account.is_test_bot' test bot
+    span.role v-if='account.is_info_bot' info bot
   p v-else=''
     a href='/mulukhiya/app/token' トークンの登録
     | を行ってください。

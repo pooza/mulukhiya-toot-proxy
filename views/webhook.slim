@@ -16,11 +16,6 @@ html lang='ja'
           i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
           .alert このURLを公開してはいけません。
         .field-container
-          h3 平文トークン
-          textarea ref='token_text' = '{{token}}'
-          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyToken'
-          .alert このトークンを公開してはいけません。
-        .field-container
           h3 詳細
           p
             | wikiの

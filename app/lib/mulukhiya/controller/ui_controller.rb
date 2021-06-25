@@ -10,6 +10,7 @@ module Mulukhiya
       @renderer = SlimRenderer.new
       @renderer.template = params[:page]
       @renderer[:oauth_url] = @sns.oauth_uri
+      @renderer[:infobot_oauth_url] = @sns.oauth_uri(:infobot)
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404

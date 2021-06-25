@@ -21,8 +21,15 @@ module Mulukhiya
       return @access_token
     end
 
-    def clear_oauth_client
-      redis.unlink('oauth_client')
+    def clear_oauth_client(type = :default)
+      type ||= :default
+      oauth_client_storage.unlink(type)
+      redis.unlink('oauth_client') if type == :default
+    end
+
+    def oauth_client_storage
+      @oauth_client_storage ||= OAuthClientStorage.new
+      return @oauth_client_storage
     end
 
     def redis

@@ -10,6 +10,13 @@ module Mulukhiya
       @params = params
     end
 
+    def client
+      @client ||= Faye::WebSocket::Client.new(uri.to_s, nil, {
+        ping: config['/websocket/keepalive'],
+      })
+      return @client
+    end
+
     def uri
       unless @uri
         @uri = Ginseng::URI.parse("wss://#{@params[:host]}")
@@ -18,11 +25,13 @@ module Mulukhiya
       return @uri
     end
 
-    def client
-      @client ||= Faye::WebSocket::Client.new(uri.to_s, nil, {
-        ping: config['/websocket/keepalive'],
-      })
-      return @client
+    def handle_login(payload, body)
+      @jwt = payload['jwt']
+      post(body)
+    end
+
+    def handle_create_post(payload, body)
+      return :stop
     end
 
     def clip(body)
@@ -34,19 +43,18 @@ module Mulukhiya
         end
 
         client.on(:error) do |e|
+          logger.error(error: e.message)
           EM.stop_event_loop
-          raise Ginseng::GatewayError, e.message
         end
 
         client.on(:message) do |message|
           payload = JSON.parse(message.data)
           raise payload['error'] if payload['error']
-          unless send("handle_#{payload['op']}".underscore.to_sym, payload['data'], body)
-            EM.stop_event_loop
-          end
+          method = "handle_#{payload['op']}".underscore.to_sym
+          EM.stop_event_loop if send(method, payload['data'], body) == :stop
         rescue => e
           logger.error(error: e)
-          raise Ginseng::GatewayError, e.message, e.backtrace
+          EM.stop_event_loop
         end
       end
     end
@@ -60,8 +68,8 @@ module Mulukhiya
       }}.to_json)
     end
 
-    def post(body, jwt)
-      data = {nsfw: false, community_id: @params[:community], auth: jwt}
+    def post(body)
+      data = {nsfw: false, community_id: @params[:community], auth: @jwt}
       data[:name] = body[:name].to_s if body[:name]
       if uri = create_status_uri(body[:url])
         data[:url] = uri.to_s
@@ -69,15 +77,6 @@ module Mulukhiya
         data[:body] ||= uri.to_s
       end
       client.send({op: 'CreatePost', data: data}.to_json)
-    end
-
-    def handle_login(payload, body)
-      post(body, payload['jwt'])
-      return true
-    end
-
-    def handle_create_post(payload, body)
-      return nil
     end
   end
 end

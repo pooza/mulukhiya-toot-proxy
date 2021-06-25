@@ -5,8 +5,6 @@ module Mulukhiya
     end
 
     def test_handle_toot
-      return unless handler?
-
       @handler.clear
       @handler.handle_toot(status_field => '')
       assert_nil(@handler.debug_info)

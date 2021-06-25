@@ -82,11 +82,13 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      parts = [(body[status_field] || '').gsub(Acct.pattern, '')]
-      parts.push(body[controller_class.spoiler_field]) if body[controller_class.spoiler_field]
-      options = body.dig('poll', controller_class.poll_options_field)
+      parts = []
+      parts.push(body[status_field]) if body[status_field]
+      parts.push(body[chat_field]) if chat_field && body[chat_field]
+      parts.push(body[spoiler_field]) if body[spoiler_field]
+      options = body.dig('poll', poll_options_field)
       parts.concat(options) if options.present?
-      return parts.join('::::')
+      return parts.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
 
     def fetch

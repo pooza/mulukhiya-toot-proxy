@@ -8,12 +8,10 @@ module Mulukhiya
     end
 
     def test_convertable?
-      return unless handler?
       assert_false(@handler.convertable?)
     end
 
     def test_convert
-      return unless handler?
       assert_kind_of(VideoFile, @handler.convert)
     end
   end

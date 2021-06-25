@@ -96,8 +96,16 @@ module Mulukhiya
         return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"]) rescue nil
       end
 
-      def oauth_scopes(key = 'default')
-        return config["/#{name}/oauth/scopes/#{key}"] || [] rescue nil
+      def oauth_scopes(type = :default)
+        return config["/#{name}/oauth/scopes/#{type}"] || [] rescue nil
+      end
+
+      def oauth_client_name(type = :default)
+        return nil unless oauth_scopes(type)
+        type = type.to_sym
+        name = [Package.name]
+        name.push("(#{type})") unless type == :default
+        return name.join(' ')
       end
 
       def status_field
@@ -110,6 +118,10 @@ module Mulukhiya
 
       def spoiler_field
         return config["/parser/#{parser_name}/fields/spoiler"]
+      end
+
+      def chat_field
+        return config["/#{name}/chat/field"] rescue nil
       end
 
       def attachment_field

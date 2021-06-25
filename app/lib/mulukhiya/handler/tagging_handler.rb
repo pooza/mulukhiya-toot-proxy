@@ -7,7 +7,7 @@ module Mulukhiya
       tags.concat(TaggingDictionary.new.matches(body)) if @status
       tags.concat(create_media_tags(body)) if TagContainer.media_tag?
       tags.account = @sns.account
-      parser.text = body[status_field] = update_status
+      parser.text = body[text_field] = update_status
       result.push(tags: tags.create_tags)
       return body
     rescue => e
@@ -17,6 +17,7 @@ module Mulukhiya
     private
 
     def executable?(body)
+      return false if parser.command?
       return false if parser.accts.any?(&:agent?)
       return true if body['visibility'].empty?
       return true if body['visibility'] == 'public'

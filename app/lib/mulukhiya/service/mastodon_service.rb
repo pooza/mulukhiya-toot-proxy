@@ -31,28 +31,43 @@ module Mulukhiya
       return super
     end
 
-    def oauth_client
-      unless client = redis['oauth_client']
-        client = http.post('/api/v1/apps', {
-          body: {
-            client_name: package_class.name,
-            website: config['/package/url'],
-            redirect_uris: config['/mastodon/oauth/redirect_uri'],
-            scopes: MastodonController.oauth_scopes.join(' '),
-          },
-        }).body
-        redis['oauth_client'] = client
+    def oauth_client(type = :default)
+      return nil unless MastodonController.oauth_scopes(type)
+      body = {
+        client_name: MastodonController.oauth_client_name(type),
+        website: config['/package/url'],
+        redirect_uris: config['/mastodon/oauth/redirect_uri'],
+        scopes: MastodonController.oauth_scopes(type).join(' '),
+      }
+      unless client = oauth_client_storage[body]
+        client = http.post('/api/v1/apps', {body: body}).body
+        oauth_client_storage[body] = client
+        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end
 
-    def oauth_uri
+    def auth(code, type = :default)
+      return http.post('/oauth/token', {
+        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body: {
+          'grant_type' => 'authorization_code',
+          'redirect_uri' => @config['/mastodon/oauth/redirect_uri'],
+          'client_id' => oauth_client(type)['client_id'],
+          'client_secret' => oauth_client(type)['client_secret'],
+          'code' => code,
+        },
+      })
+    end
+
+    def oauth_uri(type = :default)
+      return nil unless oauth_client(type)
       uri = create_uri('/oauth/authorize')
       uri.query_values = {
-        client_id: oauth_client['client_id'],
+        client_id: oauth_client(type)['client_id'],
         response_type: 'code',
         redirect_uri: config['/mastodon/oauth/redirect_uri'],
-        scope: MastodonController.oauth_scopes.join(' '),
+        scope: MastodonController.oauth_scopes(type).join(' '),
       }
       return uri
     end

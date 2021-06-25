@@ -12,6 +12,8 @@ module Mulukhiya
             username: username,
             is_admin: admin?,
             is_moderator: moderator?,
+            is_info_bot: info?,
+            is_test_bot: test?,
             display_name: display_name,
             url: uri.to_s,
           )

@@ -151,12 +151,18 @@ module Mulukhiya
       return account_class.test_account.id == id
     end
 
+    def info?
+      return account_class.info_account.id == id
+    end
+
     def self.included(base)
       base.extend(Methods)
     end
 
     module Methods
       def test_token
+        return config['/agent/test/token'].decrypt
+      rescue
         return config['/agent/test/token']
       end
 
@@ -165,6 +171,8 @@ module Mulukhiya
       end
 
       def info_token
+        return config['/agent/info/token'].decrypt
+      rescue
         return config['/agent/info/token']
       end
 

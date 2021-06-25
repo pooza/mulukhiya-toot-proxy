@@ -6,8 +6,6 @@ module Mulukhiya
     end
 
     def test_handle_announce
-      return unless handler?
-
       @handler.clear
       @handler.handle_announce({content: 'お知らせです。'}, {sns: info_agent_service})
       assert_kind_of(Array, @handler.debug_info[:result])
