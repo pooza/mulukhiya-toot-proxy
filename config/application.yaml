@@ -850,8 +850,7 @@ mongo:
   dsn: null
   query_log: false
 alert:
-  slack:
-    hooks: []
+  hooks: []
   mail:
     to: null
   line:
