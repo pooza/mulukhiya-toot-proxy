@@ -3,15 +3,6 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def exec(cases)
-      @params['/cases'].each do |pattern|
-        cases.clone.select {|v| File.fnmatch(pattern, v)}.each do |v|
-          puts "- case: #{v} (filter: #{self.class})" if environment_class.test?
-          cases.delete(v)
-        end
-      end
-    end
-
     def account
       @account ||= account_class.test_account
       return @account
