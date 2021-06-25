@@ -174,14 +174,9 @@ mastodon:
         - write:filters
         - read:search
       infobot:
+        - read
         - write:statuses
         - write:media
-        - read:filters
-        - write:filters
-        - read:search
-        - read:notifications
-        - read:accounts
-        - write:follows
   status:
     parser: toot
     key: id
