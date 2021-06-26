@@ -27,15 +27,6 @@ module Mulukhiya
       return super
     end
 
-    def auth(token, type = :default)
-      return http.post('/api/auth/session/userkey', {
-        body: {
-          appSecret: oauth_client(type)['secret'],
-          token: token,
-        },
-      })
-    end
-
     def oauth_client(type = :default)
       return nil unless MeisskeyController.oauth_scopes(type)
       body = {

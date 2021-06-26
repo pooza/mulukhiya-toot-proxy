@@ -54,19 +54,6 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def auth(code, type = :default)
-      return http.post('/oauth/token', {
-        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
-        body: {
-          'grant_type' => 'authorization_code',
-          'redirect_uri' => @config['/pleroma/oauth/redirect_uri'],
-          'client_id' => oauth_client(type)['client_id'],
-          'client_secret' => oauth_client(type)['client_secret'],
-          'code' => code,
-        },
-      })
-    end
-
     def oauth_uri(type = :default)
       return nil unless oauth_client(type)
       uri = create_uri('/oauth/authorize')

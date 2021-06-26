@@ -43,6 +43,15 @@ module Mulukhiya
       raise 'Too large'
     end
 
+    def feed_entry
+      return {
+        link: uri.to_s,
+        title: [name, "(#{size_str})", description].compact.join(' '),
+        author: account.display_name,
+        date: date,
+      }
+    end
+
     def self.included(base)
       base.extend(Methods)
     end

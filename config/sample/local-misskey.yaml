@@ -21,10 +21,9 @@ sidekiq:
   auth:
     password: your_password
 alert:
-  slack:
-    hooks:
-      - https://hooks.slack.com/services/xxxxx
-      - https://discordapp.com/api/webhooks/xxxxx/slack
+  hooks:
+    - https://hooks.slack.com/services/xxxxx
+    - https://discordapp.com/api/webhooks/xxxxx/slack
   mail:
     to: admin@example.com
 tagging:

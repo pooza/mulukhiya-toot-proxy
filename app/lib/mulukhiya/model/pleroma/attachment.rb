@@ -58,15 +58,6 @@ module Mulukhiya
         return @data
       end
 
-      def feed_entry
-        return {
-          link: uri.to_s,
-          title: "#{name} (#{size_str}) #{description}",
-          author: account.display_name,
-          date: date,
-        }
-      end
-
       def self.get(key)
         if key.key?(:acct)
           rows = Postgres.instance.execute('attachment', key)

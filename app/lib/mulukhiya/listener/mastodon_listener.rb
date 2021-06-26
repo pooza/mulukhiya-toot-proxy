@@ -70,7 +70,7 @@ module Mulukhiya
 
     def initialize
       @sns = info_agent_service
-      @uri = @sns.create_streaming_uri
+      @uri = @sns.streaming_uri
       @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
         ping: config['/websocket/keepalive'],
       })
