@@ -82,8 +82,7 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      parts = [body[status_field], body[spoiler_field]]
-      parts.push(body[chat_field]) if chat_field && body[chat_field]
+      parts = [body[status_field], body[spoiler_field], body[chat_field]]
       parts.concat(body.dig('poll', poll_options_field) || [])
       (body[attachment_field] || []).each do |id|
         next unless attachment = attachment_class[id]
@@ -91,7 +90,7 @@ module Mulukhiya
       rescue => e
         logger.error(error: e)
       end
-      return parts.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
+      return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
 
     def fetch
