@@ -82,17 +82,11 @@ module Mulukhiya
     end
 
     def create_temp_text(body)
-      parts = []
-      parts.push(body[status_field]) if body[status_field]
+      parts = [body[status_field], body[spoiler_field]]
       parts.push(body[chat_field]) if chat_field && body[chat_field]
-      parts.push(body[spoiler_field]) if body[spoiler_field]
-      options = body.dig('poll', poll_options_field)
-      parts.concat(options) if options.present?
-      (body[attachment_field] || []).each do |id|
-        next unless attachment = attachment_class[id]
-        parts.push(attachment.description)
-      rescue => e
-        errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
+      parts.concat(body.dig('poll', poll_options_field) || [])
+      if ids = body[attachment_field]
+        parts.concat(ids.map {|id| attachment_class[id]&.description})
       end
       return parts.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
