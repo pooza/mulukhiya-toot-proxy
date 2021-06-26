@@ -85,8 +85,11 @@ module Mulukhiya
       parts = [body[status_field], body[spoiler_field]]
       parts.push(body[chat_field]) if chat_field && body[chat_field]
       parts.concat(body.dig('poll', poll_options_field) || [])
-      if ids = body[attachment_field]
-        parts.concat(ids.map {|id| attachment_class[id]&.description})
+      (body[attachment_field] || []).each do |id|
+        next unless attachment = attachment_class[id]
+        parts.push(attachment.description)
+      rescue => e
+        logger.error(error: e)
       end
       return parts.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end

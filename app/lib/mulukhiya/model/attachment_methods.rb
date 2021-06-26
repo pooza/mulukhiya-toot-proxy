@@ -46,7 +46,7 @@ module Mulukhiya
     def feed_entry
       return {
         link: uri.to_s,
-        title: "#{name} (#{size_str}) #{description}",
+        title: [name, "(#{size_str})", description].compact.join(' '),
         author: account.display_name,
         date: date,
       }
