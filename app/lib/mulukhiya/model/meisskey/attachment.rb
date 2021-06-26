@@ -25,15 +25,6 @@ module Mulukhiya
         return @hash
       end
 
-      def feed_entry
-        return {
-          link: uri.to_s,
-          title: "#{name} (#{size_str}) #{description}",
-          author: account.display_name,
-          date: date,
-        }
-      end
-
       def account
         return Account[values.dig('metadata', 'userId')]
       end

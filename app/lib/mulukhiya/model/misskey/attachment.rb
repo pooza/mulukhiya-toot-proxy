@@ -55,15 +55,6 @@ module Mulukhiya
         return nil
       end
 
-      def feed_entry
-        return {
-          link: uri.to_s,
-          title: "#{name} (#{size_str}) #{description}",
-          author: account.display_name,
-          date: date,
-        }
-      end
-
       def self.catalog(params = {})
         return enum_for(__method__, params) unless block_given?
         return Postgres.instance.execute('media_catalog', query_params.merge(params)).each do |row|

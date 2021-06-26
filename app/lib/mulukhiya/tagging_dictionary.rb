@@ -88,6 +88,12 @@ module Mulukhiya
       parts.push(body[spoiler_field]) if body[spoiler_field]
       options = body.dig('poll', poll_options_field)
       parts.concat(options) if options.present?
+      (body[attachment_field] || []).each do |id|
+        next unless attachment = attachment_class[id]
+        parts.push(attachment.description)
+      rescue => e
+        errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
+      end
       return parts.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
 
