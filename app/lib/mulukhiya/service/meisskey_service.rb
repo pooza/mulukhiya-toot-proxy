@@ -52,7 +52,7 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      message = [account.acct.to_s, message.clone].join("\n")
+      message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
       status = {
         MisskeyController.status_field => message,

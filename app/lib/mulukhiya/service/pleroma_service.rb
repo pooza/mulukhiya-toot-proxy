@@ -67,7 +67,7 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      message = [account.acct.to_s, message.clone].join("\n")
+      message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(TootParser.new.max_length)
       status = {
         PleromaController.status_field => message,
