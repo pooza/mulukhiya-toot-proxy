@@ -27,7 +27,7 @@ module Mulukhiya
     private
 
     def upload(uri)
-      params = {file: {tempfile: download(uri)}}
+      params = {file: {tempfile: MediaFile.download(uri)}}
       Event.new(:pre_upload, {reporter: reporter, sns: sns}).dispatch(params)
       id = sns.upload(params[:file][:tempfile].path, {
         response: :id,
@@ -36,16 +36,6 @@ module Mulukhiya
       })
       Event.new(:post_upload, {reporter: reporter, sns: sns}).dispatch(params)
       return id
-    end
-
-    def download(uri)
-      path = File.join(
-        Environment.dir,
-        'tmp/media',
-        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
-      )
-      File.write(path, HTTP.new.get(uri).body)
-      return File.new(path)
     end
   end
 end

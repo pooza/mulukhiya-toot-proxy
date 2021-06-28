@@ -40,7 +40,7 @@ module Mulukhiya
     def upload(uri, trim_times = 0)
       return unless updatable?(uri)
       return unless image = create_image_uri(uri)
-      params = {file: {tempfile: download(image)}}
+      params = {file: {tempfile: MediaFile.download(image)}}
       Event.new(:pre_upload, {reporter: reporter, sns: sns}).dispatch(params)
       id = sns.upload(params[:file][:tempfile].path, {
         response: :id,
@@ -53,16 +53,6 @@ module Mulukhiya
       return id
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
-    end
-
-    def download(uri)
-      path = File.join(
-        Environment.dir,
-        'tmp/media',
-        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
-      )
-      File.write(path, HTTP.new.get(uri).body)
-      return File.new(path)
     end
   end
 end
