@@ -8,8 +8,8 @@ module Mulukhiya
         thread = Thread.new do
           body[attachment_field] ||= []
           raise 'Too many attachments' if attachment_limit <= body[attachment_field].count
-          if image = upload(uri, params)
-            body[attachment_field].push(image)
+          if id = upload(uri, params[:trim_times])
+            body[attachment_field].push(id)
           end
         end
         threads.push(thread)
@@ -37,17 +37,32 @@ module Mulukhiya
       @image_uris = {}
     end
 
-    def upload(uri, params)
+    def upload(uri, trim_times = 0)
       return unless updatable?(uri)
       return unless image = create_image_uri(uri)
-      id = sns.upload_remote_resource(image, {
+      params = {file: {tempfile: download(image)}}
+      Event.new(:pre_upload, {reporter: reporter, sns: sns}).dispatch(params)
+      id = sns.upload(params[:file][:tempfile].path, {
         response: :id,
-        trim_times: params[:trim_times],
+        version: 1,
+        filename: File.basename(uri.path),
+        trim_times: trim_times,
       })
+      Event.new(:post_upload, {reporter: reporter, sns: sns}).dispatch(params)
       result.push(source_url: uri.to_s, image_url: image.to_s)
       return id
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
+    end
+
+    def download(uri)
+      path = File.join(
+        Environment.dir,
+        'tmp/media',
+        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
+      )
+      File.write(path, HTTP.new.get(uri).body)
+      return File.new(path)
     end
   end
 end
