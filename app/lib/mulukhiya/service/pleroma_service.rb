@@ -22,6 +22,18 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def upload_remote_resource(uri, params = {})
+      file = MediaFile.download(uri)
+      payload = {file: {tempfile: file}}
+      params[:sns] = self
+      params[:reporter] ||= Reporter.new
+      params[:filename] ||= File.basename(uri.path)
+      Event.new(:pre_upload, params).dispatch(payload)
+      response = upload(file.path, params)
+      Event.new(:post_upload, params).dispatch(payload)
+      return response
+    end
+
     def delete_attachment(attachment, params = {})
       attachment = attachment_class[attachment] if attachment.is_a?(String)
       return delete_status(attachment.status, params)
