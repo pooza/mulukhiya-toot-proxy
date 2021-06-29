@@ -28,7 +28,7 @@ module Mulukhiya
       params[:reporter] ||= Reporter.new
       params[:filename] ||= File.basename(uri.path)
       Event.new(:pre_upload, params).dispatch(payload)
-      response = upload(file.path, params)
+      response = upload(payload.dig(:file, :tempfile).path, params)
       Event.new(:post_upload, params).dispatch(payload)
       return response
     end
