@@ -24,20 +24,13 @@ module Mulukhiya
 
     def upload_remote_resource(uri, params = {})
       file = MediaFile.download(uri)
-      envelope = {file: {tempfile: file}}
+      payload = {file: {tempfile: file}}
       params[:reporter] ||= Reporter.new
-      Event.new(:pre_upload, {reporter: params[:reporter], sns: self}).dispatch(envelope)
-      id = upload(file.path, {
-        response: :id,
-        filename: File.basename(uri.path),
-        trim_times: params[:trim_times],
-      })
-      Event.new(:post_upload, {reporter: params[:reporter], sns: self}).dispatch(envelope)
-      return id
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
-    ensure
-      File.unlink(file&.path) if File.exist?(file&.path)
+      params[:filename] ||= File.basename(uri.path)
+      Event.new(:pre_upload, params).dispatch(payload)
+      response = upload(file.path, params)
+      Event.new(:post_upload, params).dispatch(payload)
+      return response
     end
 
     def delete_attachment(attachment, params = {})
@@ -85,7 +78,7 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      message = [account.acct.to_s, message.clone].join("\n")
+      message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(TootParser.new.max_length)
       status = {
         PleromaController.status_field => message,
