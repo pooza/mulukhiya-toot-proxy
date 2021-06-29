@@ -25,7 +25,6 @@ module Mulukhiya
     def upload_remote_resource(uri, params = {})
       file = MediaFile.download(uri)
       payload = {file: {tempfile: file}}
-      params[:sns] = self
       params[:reporter] ||= Reporter.new
       params[:filename] ||= File.basename(uri.path)
       Event.new(:pre_upload, params).dispatch(payload)
