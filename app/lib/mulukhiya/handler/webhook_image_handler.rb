@@ -13,7 +13,7 @@ module Mulukhiya
           uri = Ginseng::URI.parse(attachment['image_url'])
           raise Ginseng::RequestError, "Invalid URL '#{uri}'" unless uri&.absolute?
           body[attachment_field] ||= []
-          body[attachment_field].push(upload(uri))
+          body[attachment_field].push(sns.upload_remote_resource(uri, {response: :id}))
           result.push(source_url: uri.to_s)
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
@@ -22,30 +22,6 @@ module Mulukhiya
       end
       threads.each(&:join)
       return body
-    end
-
-    private
-
-    def upload(uri)
-      params = {file: {tempfile: download(uri)}}
-      Event.new(:pre_upload, {reporter: reporter, sns: sns}).dispatch(params)
-      id = sns.upload(params[:file][:tempfile].path, {
-        response: :id,
-        version: 1,
-        filename: File.basename(uri.path),
-      })
-      Event.new(:post_upload, {reporter: reporter, sns: sns}).dispatch(params)
-      return id
-    end
-
-    def download(uri)
-      path = File.join(
-        Environment.dir,
-        'tmp/media',
-        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
-      )
-      File.write(path, HTTP.new.get(uri).body)
-      return File.new(path)
     end
   end
 end

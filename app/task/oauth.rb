@@ -6,14 +6,14 @@ namespace :mulukhiya do
         Mulukhiya::Environment.sns_class.new.clear_oauth_client
       end
 
-      task clear: [:clean] # rubocop:disable Rake/Desc
+      task clear: [:clean]
 
       desc 'clean OAuth client (infobot)'
       task :clean_infobot do
         Mulukhiya::Environment.sns_class.new.clear_oauth_client(:infobot)
       end
 
-      task clear_infobot: [:clean_infobot] # rubocop:disable Rake/Desc
+      task clear_infobot: [:clean_infobot]
 
       desc 'show OAuth client'
       task :show do

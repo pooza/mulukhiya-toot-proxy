@@ -22,6 +22,16 @@ module Mulukhiya
       FileUtils.rm_rf(dir) if dir
     end
 
+    def upload_remote_resource(uri, params = {})
+      file = MediaFile.download(uri)
+      payload = {file: {tempfile: file}}
+      params[:filename] ||= File.basename(uri.path)
+      Event.new(:pre_upload, params).dispatch(payload)
+      response = upload(payload.dig(:file, :tempfile).path, params)
+      Event.new(:post_upload, params).dispatch(payload)
+      return response
+    end
+
     def search_dupllicated_attachment(attachment, params = {})
       attachment = attachment.to_h[:md5] if attachment.is_a?(attachment_class)
       response = super
@@ -59,7 +69,7 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      message = [account.acct.to_s, message.clone].join("\n")
+      message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
       status = {
         MisskeyController.status_field => message,

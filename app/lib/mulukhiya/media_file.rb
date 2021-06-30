@@ -139,6 +139,16 @@ module Mulukhiya
       return streams.find {|v| v['codec_type'] == 'audio'}
     end
 
+    def self.download(uri)
+      path = File.join(
+        Environment.dir,
+        'tmp/media',
+        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
+      )
+      File.write(path, HTTP.new.get(uri).body)
+      return MediaFile.new(path).file
+    end
+
     def self.purge
       bar = ProgressBar.create(total: all.count)
       files = []

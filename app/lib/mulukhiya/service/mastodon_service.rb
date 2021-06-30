@@ -11,6 +11,16 @@ module Mulukhiya
       return super
     end
 
+    def upload_remote_resource(uri, params = {})
+      file = MediaFile.download(uri)
+      payload = {file: {tempfile: file}}
+      params[:version] ||= 1
+      Event.new(:pre_upload, params).dispatch(payload)
+      response = upload(payload.dig(:file, :tempfile).path, params)
+      Event.new(:post_upload, params).dispatch(payload)
+      return response
+    end
+
     def delete_attachment(attachment, params = {})
       attachment = attachment_class[attachment] if attachment.is_a?(Integer)
       return delete_status(attachment.status, params) if attachment.status
@@ -60,7 +70,7 @@ module Mulukhiya
     end
 
     def notify(account, message, response = nil)
-      message = [account.acct.to_s, message.clone].join("\n")
+      message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(TootParser.new.max_length)
       status = {
         MastodonController.status_field => message,
