@@ -10,7 +10,7 @@ module Mulukhiya
         thread = Thread.new do
           body[attachment_field] ||= []
           raise 'Too many attachments' if attachment_limit <= body[attachment_field].count
-          body[attachment_field].push(sns.upload_remote_resource(image_uri, {response: id}))
+          body[attachment_field].push(sns.upload_remote_resource(image_uri, {response: :id}))
         end
         threads.push(thread)
       end
