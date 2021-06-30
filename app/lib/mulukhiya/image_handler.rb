@@ -4,14 +4,13 @@ module Mulukhiya
       self.envelope = body
       return body if parser.command?
       threads = []
-      params[:response] = :id
       parser.uris.each do |uri|
         next unless updatable?(uri)
         next unless image_uri = create_image_uri(uri)
         thread = Thread.new do
           body[attachment_field] ||= []
           raise 'Too many attachments' if attachment_limit <= body[attachment_field].count
-          body[attachment_field].push(sns.upload_remote_resource(image_uri, params))
+          body[attachment_field].push(sns.upload_remote_resource(image_uri, {response: id}))
         end
         threads.push(thread)
       end
