@@ -40,7 +40,7 @@ module Mulukhiya
     def token=(token)
       update(
         webhook: {token: nil},
-        mulukhiya: {token: (token.decrypt rescue token).encrypt},
+        mulukhiya: {token: token},
       )
     end
 
