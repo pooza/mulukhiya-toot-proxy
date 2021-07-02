@@ -5,9 +5,8 @@ module Mulukhiya
       return super
     end
 
-    def handle_pre_toot(body, params = {})
-      params[:trim_times] = 2
-      return super
+    def trim_times
+      return 2
     end
 
     def updatable?(uri)
