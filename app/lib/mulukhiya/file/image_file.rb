@@ -70,7 +70,7 @@ module Mulukhiya
       return ImageFile.new(dest)
     end
 
-    def trim!(fuzz = '10%')
+    def trim!(fuzz = '20%')
       command = CommandLine.new(['mogrify', '-fuzz', fuzz, '-trim', '+repage', path])
       command.exec
       @size_info = nil
