@@ -7,12 +7,12 @@ module Mulukhiya
       parser.uris.each do |uri|
         next unless updatable?(uri)
         next unless image_uri = create_image_uri(uri)
-        next if body[attachment_field].count < attachment_limit
+        body[attachment_field] ||= []
+        next unless body[attachment_field].count < attachment_limit
         thread = Thread.new do
-          if id = sns.upload_remote_resource(image_uri, {response: :id, trim_times: trim_times})
-            body[attachment_field] ||= []
-            body[attachment_field].push(id)
-          end
+          body[attachment_field].push(
+            sns.upload_remote_resource(image_uri, {response: :id, trim_times: trim_times}),
+          )
         end
         threads.push(thread)
       end
