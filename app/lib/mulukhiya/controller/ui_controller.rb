@@ -62,8 +62,9 @@ module Mulukhiya
     end
 
     def token
-      return params[:token].decrypt if params[:token]
-      return nil
+      return params[:token].decrypt
+    rescue
+      return params[:token]
     end
   end
 end

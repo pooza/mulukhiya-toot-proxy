@@ -32,6 +32,8 @@ module Mulukhiya
     end
 
     def token
+      return (self['/mulukhiya/token'] || self['/webhook/token']).decrypt
+    rescue
       return self['/mulukhiya/token'] || self['/webhook/token']
     end
 
