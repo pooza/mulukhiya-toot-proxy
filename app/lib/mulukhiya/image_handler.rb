@@ -1,7 +1,7 @@
 module Mulukhiya
   class ImageHandler < Handler
     def handle_pre_toot(body, params = {})
-      self.envelope = body
+      self.payload = body
       return body if parser.command?
       threads = []
       parser.uris.each do |uri|
