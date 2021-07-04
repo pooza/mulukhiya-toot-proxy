@@ -4,9 +4,7 @@ module Mulukhiya
 
     def handle_announce(payload, params = {})
       self.payload = payload
-      if @sns = params[:sns]
-        announce(params)
-      end
+      announce(params) if @sns = params[:sns]
       return payload
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, payload: payload)
