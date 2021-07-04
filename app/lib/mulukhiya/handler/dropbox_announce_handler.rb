@@ -5,12 +5,10 @@ module Mulukhiya
       return super
     end
 
-    def announce(announcement, params = {})
-      params = params.clone
+    def announce(params = {})
       params[:format] = :md
-      response = sns.account.dropbox.clip(body: create_body(announcement, params))
+      response = sns.account.dropbox.clip(body: create_body(params))
       result.push(path: response.path_display)
-      return announcement
     end
   end
 end

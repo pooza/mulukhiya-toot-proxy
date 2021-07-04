@@ -4,14 +4,16 @@ module Mulukhiya
 
     def handle_announce(payload, params = {})
       self.payload = payload
-      return payload unless @sns = params[:sns]
-      return announce(payload, params)
+      if @sns = params[:sns]
+        announce(params)
+      end
+      return payload
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, payload: payload)
       return false
     end
 
-    def announce(payload, params = {})
+    def announce(params = {})
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
@@ -20,8 +22,7 @@ module Mulukhiya
       @status = payload[:content] || payload[:text] || ''
     end
 
-    def create_body(payload, params = {})
-      self.payload = payload
+    def create_body(params = {})
       params[:format] ||= :sanitized
       params.merge!(payload)
       params[:body] = parser.send("to_#{params[:format]}".to_sym)
