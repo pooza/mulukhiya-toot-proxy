@@ -24,30 +24,30 @@ module Mulukhiya
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot(status_field => '宮本佳那子')
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#宮本佳那子'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'キュアソードの中の人は宮本佳那子。')
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#宮本佳那子'))
       assert(@parser.all_tags.member?('#キュアソード'))
       assert(@parser.all_tags.member?('#剣崎真琴'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 GoGo!')
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!')
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#Yes_プリキュア5'))
       assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド")
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#キュアフローラ_キュアマーメイド'))
       assert(@parser.all_tags.member?('#キュアフローラ'))
       assert(@parser.all_tags.member?('#春野はるか'))
@@ -58,7 +58,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => '#キュアビューティ')
-      @parser.text = @handler[status_field]
+      @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('#キュアビューティ'))
       assert(@parser.all_tags.member?('#青木れいか'))
       assert(@parser.all_tags.member?('#西村ちなみ'))
@@ -97,7 +97,8 @@ module Mulukhiya
 
     def test_ignore_accts
       @handler.clear
-      assert(@handler.handle_pre_toot({status_field => '@pooza #キュアビューティ'})[status_field].start_with?('@pooza #キュアビューティ'))
+      @handler.handle_pre_toot({status_field => '@pooza #キュアビューティ'})
+      assert(@handler.payload[status_field].start_with?('@pooza #キュアビューティ'))
     end
   end
 end
