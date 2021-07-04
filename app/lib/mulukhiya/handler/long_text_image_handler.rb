@@ -8,15 +8,15 @@ module Mulukhiya
       return super
     end
 
-    def handle_pre_toot(body, params = {})
-      self.payload = body
-      return body if parser.command?
-      return body unless executable?(body)
-      return body unless path = create_image(@status)
-      body[attachment_field] ||= []
-      body[attachment_field].push(sns.upload(path, {response: :id}))
-      parser.text = body[text_field] = '.'
-      return body
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return payload if parser.command?
+      return payload unless executable?(payload)
+      return payload unless path = create_image(@status)
+      payload[attachment_field] ||= []
+      payload[attachment_field].push(sns.upload(path, {response: :id}))
+      parser.text = payload[text_field] = '.'
+      return payload
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
     ensure
@@ -27,9 +27,9 @@ module Mulukhiya
       return true
     end
 
-    def executable?(body)
-      return false if attachment_limit <= (body[attachment_field] || []).count
-      return text_length < body[text_field]&.length
+    def executable?(payload)
+      return false if attachment_limit <= (payload[attachment_field] || []).count
+      return text_length < payload[text_field]&.length
     end
 
     private

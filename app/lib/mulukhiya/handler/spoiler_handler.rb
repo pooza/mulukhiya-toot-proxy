@@ -1,14 +1,14 @@
 module Mulukhiya
   class SpoilerHandler < Handler
-    def handle_pre_toot(body, params = {})
-      self.payload = body
-      return body if parser.command?
-      subject = body[spoiler_field]
-      return body unless subject&.match?(pattern)
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return payload if parser.command?
+      subject = payload[spoiler_field]
+      return payload unless subject&.match?(pattern)
       subject.sub!(Regexp.new("^#{shortcode} *"), '')
-      body[spoiler_field] = "#{shortcode} #{subject}"
+      payload[spoiler_field] = "#{shortcode} #{subject}"
       result.push(subject: subject)
-      return body
+      return payload
     end
 
     def shortcode
