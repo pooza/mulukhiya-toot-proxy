@@ -2,7 +2,7 @@ module Mulukhiya
   class ImageHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      return payload if parser.command?
+      return if parser.command?
       threads = []
       parser.uris.each do |uri|
         next unless updatable?(uri)
@@ -17,7 +17,6 @@ module Mulukhiya
         threads.push(thread)
       end
       threads.each(&:join)
-      return payload
     end
 
     def trim_times

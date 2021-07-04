@@ -10,13 +10,12 @@ module Mulukhiya
 
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      return payload if parser.command?
-      return payload unless executable?
-      return payload unless path = create_image(@status)
+      return if parser.command?
+      return unless executable?
+      return unless path = create_image(@status)
       payload[attachment_field] ||= []
       payload[attachment_field].push(sns.upload(path, {response: :id}))
       parser.text = payload[text_field] = '.'
-      return payload
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
     ensure

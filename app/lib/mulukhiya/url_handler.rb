@@ -2,7 +2,7 @@ module Mulukhiya
   class URLHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      return payload if parser.command?
+      return if parser.command?
       parser.uris.select {|v| rewritable?(v)}.each do |uri|
         rewrited = rewrite(uri)
         result.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
@@ -10,7 +10,6 @@ module Mulukhiya
         errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
       parser.text = payload[text_field]
-      return payload
     end
 
     def rewrite(uri)

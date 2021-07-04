@@ -21,7 +21,6 @@ module Mulukhiya
         threads.push(thread)
       end
       threads.each(&:join)
-      return payload
     end
   end
 end

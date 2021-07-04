@@ -2,14 +2,13 @@ module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      return payload unless executable?
+      return unless executable?
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(payload)) if @status
       tags.concat(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
       parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
-      return payload
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end

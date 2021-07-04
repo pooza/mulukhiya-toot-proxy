@@ -23,26 +23,31 @@ module Mulukhiya
 
     def test_handle_pre_toot
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => '宮本佳那子')[status_field]
+      @handler.handle_pre_toot(status_field => '宮本佳那子')
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#宮本佳那子'))
 
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => 'キュアソードの中の人は宮本佳那子。')[status_field]
+      @handler.handle_pre_toot(status_field => 'キュアソードの中の人は宮本佳那子。')
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#宮本佳那子'))
       assert(@parser.all_tags.member?('#キュアソード'))
       assert(@parser.all_tags.member?('#剣崎真琴'))
 
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 GoGo!')[status_field]
+      @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 GoGo!')
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!')[status_field]
+      @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!')
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#Yes_プリキュア5'))
       assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
 
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド")[status_field]
+      @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド")
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#キュアフローラ_キュアマーメイド'))
       assert(@parser.all_tags.member?('#キュアフローラ'))
       assert(@parser.all_tags.member?('#春野はるか'))
@@ -52,7 +57,8 @@ module Mulukhiya
       assert(@parser.all_tags.member?('#浅野真澄'))
 
       @handler.clear
-      @parser.text = @handler.handle_pre_toot(status_field => '#キュアビューティ')[status_field]
+      @handler.handle_pre_toot(status_field => '#キュアビューティ')
+      @parser.text = @handler[status_field]
       assert(@parser.all_tags.member?('#キュアビューティ'))
       assert(@parser.all_tags.member?('#青木れいか'))
       assert(@parser.all_tags.member?('#西村ちなみ'))
@@ -60,30 +66,32 @@ module Mulukhiya
 
     def test_handle_pre_toot_with_direct
       @handler.clear
-      r = @handler.handle_pre_toot({status_field => 'キュアソード', 'visibility' => 'direct'})
-      assert_equal(r[status_field], 'キュアソード')
+      @handler.handle_pre_toot({status_field => 'キュアソード', 'visibility' => 'direct'})
+      assert_equal(@handler.payload[status_field], 'キュアソード')
     end
 
     def test_handle_pre_toot_with_poll
       @handler.clear
-      body = {
+      @handler.handle_pre_toot(
         status_field => 'アンケート',
         'poll' => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
-      }
-      assert(@handler.handle_pre_toot(body)[status_field].start_with?("アンケート\n#ふたりはプリキュア"))
+      )
+      assert(@handler.payload[status_field].start_with?("アンケート\n#ふたりはプリキュア"))
     end
 
     def test_handle_pre_toot_with_twittodon
       config['/tagging/default_tags'] = []
 
       @handler.clear
-      body = {status_field => "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア#おほしSUMMERバケーション#スタプリ#池袋プリキュア #フワ#トゥインクルブック#スタンプラリー\n\nvia. https://www.instagram.com/precure_event/p/"}
-      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      @handler.handle_pre_toot(status_field => "みんな〜！「スター☆トゥインクルプリキュア  おほしSUMMERバケーション」が今日もオープンしているよ❣️会場内では、スタンプラリーを開催中！！😍🌈今年のスタンプラリーシートは…なんと！トゥインクルブック型！！🌟フワも登場してとーっても可愛いデザインだよ💖スタンプを全て集めると、「夜空でピカッとステッカー」も貰えちゃう！😍みんなは全部見つけられるかな！？会場内で、ぜひチェックしてね！💫 #スタートゥインクルプリキュア#おほしSUMMERバケーション#スタプリ#池袋プリキュア #フワ#トゥインクルブック#スタンプラリー\n\nvia. https://www.instagram.com/precure_event/p/")
+      lines = @handler.payload[status_field].split("\n")
       assert_equal(lines.last, 'via. https://www.instagram.com/precure_event/p/')
 
       @handler.clear
-      body = {status_field => "【新商品】「プリキュアランド第2弾 SPLASH☆WATER」より『アクリルスタンド』『シーズンパスポート』『缶バッジ』が8/25(日)発売だよ！ あっつ～い夏に楽しく元気に水遊びをするみんなを見てたらこちらも涼しくなっちゃう？ それともヒートアップしちゃう？ #プリキュア #プリティストア\n\n(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)"}
-      lines = @handler.handle_pre_toot(body)[status_field].split("\n")
+      @handler.handle_pre_toot(
+        status_field => "【新商品】「プリキュアランド第2弾 SPLASH☆WATER」より『アクリルスタンド』『シーズンパスポート』『缶バッジ』が8/25(日)発売だよ！ あっつ～い夏に楽しく元気に水遊びをするみんなを見てたらこちらも涼しくなっちゃう？ それともヒートアップしちゃう？ #プリキュア #プリティストア\n\n(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)",
+      )
+      lines = @handler.payload[status_field].split("\n")
       assert_equal(lines.last, '(via. Twitter https://twitter.com/pps_as/status/1161472629217218560)')
     end
 

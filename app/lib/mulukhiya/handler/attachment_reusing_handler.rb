@@ -1,7 +1,7 @@
 module Mulukhiya
   class AttachmentReusingHandler < Handler
     def handle_pre_toot(payload, params = {})
-      return payload unless payload[attachment_field]
+      return unless payload[attachment_field]
       ids = []
       payload[attachment_field].each do |id|
         next unless src = attachment_class[id]
@@ -14,7 +14,6 @@ module Mulukhiya
         errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
       end
       payload[attachment_field] = ids
-      return payload
     end
   end
 end
