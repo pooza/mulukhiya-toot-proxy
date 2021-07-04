@@ -11,7 +11,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return payload if parser.command?
-      return payload unless executable?(payload)
+      return payload unless executable?
       return payload unless path = create_image(@status)
       payload[attachment_field] ||= []
       payload[attachment_field].push(sns.upload(path, {response: :id}))
@@ -27,7 +27,7 @@ module Mulukhiya
       return true
     end
 
-    def executable?(payload)
+    def executable?
       return false if attachment_limit <= (payload[attachment_field] || []).count
       return text_length < payload[text_field]&.length
     end

@@ -2,10 +2,10 @@ module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      return payload unless executable?(payload)
+      return payload unless executable?
       tags.text = @status
       tags.concat(TaggingDictionary.new.matches(payload)) if @status
-      tags.concat(create_media_tags(payload)) if TagContainer.media_tag?
+      tags.concat(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
       parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
@@ -16,7 +16,7 @@ module Mulukhiya
 
     private
 
-    def executable?(payload)
+    def executable?
       return false if parser.command?
       return false if parser.accts.any?(&:agent?)
       return true if payload['visibility'].empty?
@@ -24,7 +24,7 @@ module Mulukhiya
       return false
     end
 
-    def create_media_tags(payload)
+    def media_tags
       tags = []
       (payload[attachment_field] || []).each do |id|
         type = attachment_class[id].type
