@@ -1,23 +1,23 @@
 module Mulukhiya
   class ImageHandler < Handler
-    def handle_pre_toot(body, params = {})
-      self.payload = body
-      return body if parser.command?
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return payload if parser.command?
       threads = []
       parser.uris.each do |uri|
         next unless updatable?(uri)
         next unless image_uri = create_image_uri(uri)
-        body[attachment_field] ||= []
-        next unless body[attachment_field].count < attachment_limit
+        payload[attachment_field] ||= []
+        next unless payload[attachment_field].count < attachment_limit
         thread = Thread.new do
-          body[attachment_field].push(
+          payload[attachment_field].push(
             sns.upload_remote_resource(image_uri, {response: :id, trim_times: trim_times}),
           )
         end
         threads.push(thread)
       end
       threads.each(&:join)
-      return body
+      return payload
     end
 
     def trim_times
