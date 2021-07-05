@@ -10,9 +10,12 @@ module Mulukhiya
       return false unless file
       return false unless file.image?
       return false unless file.animated?
-      return false unless type
-      return false if file.type == controller_class.default_animation_image_type
+      return false if file.type == type
       return true
+    end
+
+    def type
+      return controller_class.default_animation_image_type
     end
   end
 end

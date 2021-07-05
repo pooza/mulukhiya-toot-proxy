@@ -9,8 +9,12 @@ module Mulukhiya
     def convertable?
       return false unless file
       return false unless file.audio?
-      return false if file.type == controller_class.default_audio_type
+      return false if file.type == type
       return true
+    end
+
+    def type
+      return controller_class.default_audio_type
     end
 
     def media_class

@@ -10,7 +10,7 @@ module Mulukhiya
       payload[image_field][:tempfile] = @dest
     rescue => e
       logger.error(error: e)
-      errors.push(class: e.class.to_s, message: e.message, file: @source.path)
+      errors.push(class: e.class.to_s, message: e.message, file: file.path)
     end
 
     def handle_pre_thumbnail(payload, params = {})

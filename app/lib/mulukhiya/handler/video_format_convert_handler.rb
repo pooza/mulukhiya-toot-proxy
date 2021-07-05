@@ -9,8 +9,12 @@ module Mulukhiya
     def convertable?
       return false unless file
       return false unless file.video?
-      return false if file.type == controller_class.default_video_type
+      return false if file.type == type
       return true
+    end
+
+    def type
+      return controller_class.default_video_type
     end
 
     def media_class
