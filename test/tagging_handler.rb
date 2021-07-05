@@ -65,13 +65,11 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot_with_direct
-      @handler.clear
       @handler.handle_pre_toot({status_field => 'キュアソード', 'visibility' => 'direct'})
       assert_equal(@handler.payload[status_field], 'キュアソード')
     end
 
     def test_handle_pre_toot_with_poll
-      @handler.clear
       @handler.handle_pre_toot(
         status_field => 'アンケート',
         'poll' => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
@@ -96,7 +94,6 @@ module Mulukhiya
     end
 
     def test_ignore_accts
-      @handler.clear
       @handler.handle_pre_toot({status_field => '@pooza #キュアビューティ'})
       assert(@handler.payload[status_field].start_with?('@pooza #キュアビューティ'))
     end
