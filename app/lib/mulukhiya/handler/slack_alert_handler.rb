@@ -5,7 +5,7 @@ module Mulukhiya
       return super
     end
 
-    def alert(error, params = {})
+    def alert(params = {})
       SlackService.broadcast(error.to_h)
     end
   end
