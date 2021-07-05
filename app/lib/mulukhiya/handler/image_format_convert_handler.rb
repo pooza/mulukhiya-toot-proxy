@@ -1,27 +1,23 @@
 module Mulukhiya
   class ImageFormatConvertHandler < MediaConvertHandler
     def convert
-      return @source.convert_type(type)
+      return file.convert_type(type)
     ensure
-      result.push(source: {type: @source.type})
+      result.push(source: {type: file.type})
     end
 
     def convertable?
-      return false unless @source&.image?
-      return false unless type
-      return false if @source.type == type
-      return false if @source.type == 'image/gif'
-      return false if detect_alpha? && @source.alpha?
-      return false if @source.animated?
+      return false unless file
+      return false unless file.image?
+      return false if file.type == controller_class.default_image_type
+      return false if file.type == 'image/gif'
+      return false if detect_alpha? && file.alpha?
+      return false if file.animated?
       return true
     end
 
     def detect_alpha?
       return config['/handler/image_format_convert/alpha'] == true
-    end
-
-    def type
-      return controller_class.default_image_type
     end
   end
 end

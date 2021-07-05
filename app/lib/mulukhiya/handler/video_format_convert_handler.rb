@@ -1,20 +1,16 @@
 module Mulukhiya
   class VideoFormatConvertHandler < MediaConvertHandler
     def convert
-      return @source.convert_type(type)
+      return file.convert_type(type)
     ensure
-      result.push(source: {type: @source.type})
+      result.push(source: {type: file.type})
     end
 
     def convertable?
-      return false unless @source&.video?
-      return false unless type
-      return false if @source.type == type
+      return false unless file
+      return false unless file.video?
+      return false if file.type == controller_class.default_video_type
       return true
-    end
-
-    def type
-      return controller_class.default_video_type
     end
 
     def media_class
