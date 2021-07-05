@@ -3,7 +3,6 @@ module Mulukhiya
     def initialize(params = {})
       super
       @canonicals = {}
-      @http = HTTP.new
     end
 
     def rewrite(uri)
@@ -19,7 +18,7 @@ module Mulukhiya
     def rewritable?(uri)
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       return false if ignore?(uri)
-      response = @http.get(uri, {
+      response = http.get(uri, {
         headers: {'User-Agent' => config['/handler/canonical_url/useragent']},
       })
       return false unless element = response.body.nokogiri.xpath('//link[@rel="canonical"]').first

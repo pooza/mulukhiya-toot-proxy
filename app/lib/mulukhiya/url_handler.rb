@@ -1,5 +1,12 @@
 module Mulukhiya
   class URLHandler < Handler
+    attr_reader :http
+
+    def initialize(params = {})
+      super
+      @http = HTTP.new
+    end
+
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if parser.command?
