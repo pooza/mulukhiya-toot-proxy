@@ -15,14 +15,11 @@ module Mulukhiya
     end
 
     def all_tags
-      unless @all_tags
-        container = TagContainer.new
-        container.concat(tags)
-        container.concat(TagContainer.default_tag_bases)
-        container.concat(@account.user_tag_bases) if @account
-        return @all_tags = container.create_tags
-      end
-      return @all_tags
+      container = TagContainer.new
+      container.concat(tags)
+      container.concat(TagContainer.default_tag_bases)
+      container.concat(@account.user_tag_bases) if @account
+      return container.create_tags
     end
 
     def max_length
