@@ -3,9 +3,11 @@
 Thumbs.db
 ._*
 .fuse*
+*.log
 config/local.*
 bin/*.rb
 !bin/crypt.rb
+!bin/decrypt.rb
 !bin/listener_daemon.rb
 !bin/listener_worker.rb
 !bin/puma_daemon.rb
