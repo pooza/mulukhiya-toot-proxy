@@ -6,13 +6,13 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 require 'mulukhiya'
 module Mulukhiya
   warn Package.full_name
-  warn '暗号化ユーティリティ'
+  warn '復号化ユーティリティ'
   warn ''
 
   password = ARGV.first
   raise '文字列を指定してください。' unless password.present?
 
-  puts ARGV.first.encrypt
+  puts ARGV.first.decrypt
 rescue => e
   warn e.message
   exit 1
