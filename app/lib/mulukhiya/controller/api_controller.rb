@@ -79,7 +79,7 @@ module Mulukhiya
         @renderer.message = {errors: errors}
       else
         response = @sns.auth(params[:code], params[:type])
-        token = @sns.create_access_token(response.parsed_response['accessToken'])
+        token = @sns.create_access_token(response.parsed_response['accessToken'], params[:type])
         @renderer.message = response.parsed_response
         @renderer.message['access_token_crypt'] = token.encrypt
       end
