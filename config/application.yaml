@@ -300,6 +300,7 @@ misskey:
     favorite_tags: true
     feed: true
     announcement: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:
@@ -311,6 +312,14 @@ misskey:
         - write:drive
         - read:drive
         - read:account
+      infobot:
+        - write:notes
+        - write:drive
+        - write:following
+        - read:drive
+        - read:account
+        - read:following
+        - read:notifications
     callback:
       url: /mulukhiya/app/misskey/auth
       enable: true
@@ -413,6 +422,8 @@ misskey:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert
@@ -428,6 +439,7 @@ meisskey:
     favorite_tags: true
     feed: true
     announcement: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:
@@ -436,6 +448,13 @@ meisskey:
         - write:notes
         - write:drive
         - read:drive
+      infobot:
+        - write:notes
+        - write:drive
+        - write:following
+        - read:drive
+        - read:following
+        - read:notifications
     callback:
       url: /mulukhiya/app/misskey/auth
       enable: true
@@ -537,6 +556,8 @@ meisskey:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert

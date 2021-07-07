@@ -61,6 +61,13 @@ module Mulukhiya
       return Ginseng::URI.parse(response['url'])
     end
 
+    def streaming_uri
+      uri = http.create_uri('/streaming')
+      uri.schema = 'wss'
+      uri.query_values = {'i' => token}
+      return uri
+    end
+
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
