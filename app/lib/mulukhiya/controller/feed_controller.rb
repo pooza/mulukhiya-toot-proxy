@@ -7,7 +7,7 @@ module Mulukhiya
       @renderer.status = 404 unless @renderer.exist?
       return @renderer.to_s
     rescue => e
-      @renderer.status = e.status
+      @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
@@ -18,7 +18,7 @@ module Mulukhiya
       @renderer = MediaFeedRenderer.new
       return @renderer.to_s
     rescue => e
-      @renderer.status = e.status
+      @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
@@ -28,9 +28,8 @@ module Mulukhiya
         @renderer = CustomFeed.instance.create(entry)
         return @renderer.to_s
       rescue => e
-        e = Ginseng::Error.create(e)
         @renderer = Ginseng::Web::XMLRenderer.new
-        @renderer.status = e.status
+        @renderer.status = e.status rescue 502
         @renderer.message = {error: e.message}
         return @renderer.to_s
       end
