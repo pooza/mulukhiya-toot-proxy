@@ -70,7 +70,7 @@ module Mulukhiya
 
     def streaming_uri
       uri = http.create_uri('/streaming')
-      uri.schema = 'wss'
+      uri.scheme = 'wss'
       uri.query_values = {'i' => token}
       return uri
     end

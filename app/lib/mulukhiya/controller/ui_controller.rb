@@ -31,6 +31,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      e = Ginseng::Error.create(e)
       @renderer = Ginseng::Web::JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = {error: e.message}
