@@ -11,8 +11,7 @@ module Mulukhiya
 
   password = ARGV.first
   raise '文字列を指定してください。' unless password.present?
-
-  puts ARGV.first.encrypt
+  puts password.encrypt
 rescue => e
   warn e.message
   exit 1
