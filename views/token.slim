@@ -42,38 +42,28 @@ html lang='ja'
         h3 トークンの登録
         .token
           h4 新しいトークンを登録
-          - if controller.oauth_callback?
-            .description
-              a href=params[:oauth_url] #{controller.display_name}の認証ページ
-              | で認証を行って、新しいトークンを登録します。
-          - else
-            .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
-            .description
-              a href=params[:oauth_url] target='_blank' 認証コードを取得
-              | して下の欄に入力、認証ボタンを押下してください。
-            .auth-form
-              input.code type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
-              - if env.mastodon_type?
-                button :disabled='!input.authcode' @click='authMastodon(input.authcode)' 認証
-              - elsif env.misskey_type?
-                button :disabled='!input.authcode' @click='authMisskey(input.authcode)' 認証
+          .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
+          .description
+            a href=params[:oauth_url] target='_blank' 認証コードを取得
+            | して下の欄に入力、認証ボタンを押下してください。
+          .auth-form
+            input.code type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
+            - if env.mastodon_type?
+              button :disabled='!input.authcode' @click='authMastodon(input.authcode)' 認証
+            - elsif env.misskey_type?
+              button :disabled='!input.authcode' @click='authMisskey(input.authcode)' 認証
         .token v-if='account.is_info_bot'
           h4 お知らせボット用のトークンを登録
-          - if controller.oauth_callback?
-            .description
-              a href=params[:infobot_oauth_url] #{controller.display_name}の認証ページ
-              | で認証を行って、新しいトークンを登録します。
-          - else
-            .description #{controller.display_name}で認証を行って、お知らせボット用の新しいトークンを登録します。
-            .description
-              a href=params[:infobot_oauth_url] target='_blank' 認証コードを取得
-              | して下の欄に入力、認証ボタンを押下してください。
-            .auth-form
-              input.code type='text' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
-              - if env.mastodon_type?
-                button :disabled='!input.infobot_authcode' @click='authMastodon(input.infobot_authcode, "infobot")' 認証
-              - elsif env.misskey_type?
-                button :disabled='!input.infobot_authcode' @click='authMisskey(input.infobot_authcode, "infobot")' 認証
+          .description #{controller.display_name}で認証を行って、お知らせボット用の新しいトークンを登録します。
+          .description
+            a href=params[:infobot_oauth_url] target='_blank' 認証コードを取得
+            | して下の欄に入力、認証ボタンを押下してください。
+          .auth-form
+            input.code type='text' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
+            - if env.mastodon_type?
+              button :disabled='!input.infobot_authcode' @click='authMastodon(input.infobot_authcode, "infobot")' 認証
+            - elsif env.misskey_type?
+              button :disabled='!input.infobot_authcode' @click='authMisskey(input.infobot_authcode, "infobot")' 認証
         .token
           h4 トークンをまとめて登録
           .description トークンを改行区切りで入力して、登録ボタンを押下してください。

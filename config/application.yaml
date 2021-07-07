@@ -320,9 +320,6 @@ misskey:
         - read:account
         - read:following
         - read:notifications
-    callback:
-      url: /mulukhiya/app/misskey/auth
-      enable: true
   status:
     parser: note
     key: noteId
@@ -455,9 +452,6 @@ meisskey:
         - read:drive
         - read:following
         - read:notifications
-    callback:
-      url: /mulukhiya/app/misskey/auth
-      enable: true
   status:
     parser: note
     key: noteId

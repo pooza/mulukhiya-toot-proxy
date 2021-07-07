@@ -50,7 +50,6 @@ module Mulukhiya
         name: MisskeyController.oauth_client_name(type),
         description: config['/package/description'],
         permission: MisskeyController.oauth_scopes(type),
-        callbackUrl: http.create_uri(config['/misskey/oauth/callback/url']).to_s,
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/app/create', {body: body}).body
