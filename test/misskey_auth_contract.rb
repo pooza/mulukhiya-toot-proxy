@@ -5,10 +5,10 @@ module Mulukhiya
     end
 
     def test_call
-      errors = @contract.call(token: 'hoge').errors
+      errors = @contract.call(code: 'hoge').errors
       assert(errors.empty?)
 
-      errors = @contract.call(token: nil).errors
+      errors = @contract.call(code: nil).errors
       assert_false(errors.empty?)
     end
   end
