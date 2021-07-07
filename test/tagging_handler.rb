@@ -25,43 +25,43 @@ module Mulukhiya
       @handler.clear
       @handler.handle_pre_toot(status_field => '宮本佳那子')
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#宮本佳那子'))
+      assert(@parser.all_tags.member?('宮本佳那子'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'キュアソードの中の人は宮本佳那子。')
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#宮本佳那子'))
-      assert(@parser.all_tags.member?('#キュアソード'))
-      assert(@parser.all_tags.member?('#剣崎真琴'))
+      assert(@parser.all_tags.member?('宮本佳那子'))
+      assert(@parser.all_tags.member?('キュアソード'))
+      assert(@parser.all_tags.member?('剣崎真琴'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 GoGo!')
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
+      assert(@parser.all_tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'Yes!プリキュア5 Yes!プリキュア5 GoGo!')
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#Yes_プリキュア5'))
-      assert(@parser.all_tags.member?('#Yes_プリキュア5GoGo'))
+      assert(@parser.all_tags.member?('Yes_プリキュア5'))
+      assert(@parser.all_tags.member?('Yes_プリキュア5GoGo'))
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアフローラ_キュアマーメイド")
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#キュアフローラ_キュアマーメイド'))
-      assert(@parser.all_tags.member?('#キュアフローラ'))
-      assert(@parser.all_tags.member?('#春野はるか'))
-      assert(@parser.all_tags.member?('#嶋村侑'))
-      assert(@parser.all_tags.member?('#キュアマーメイド'))
-      assert(@parser.all_tags.member?('#海藤みなみ'))
-      assert(@parser.all_tags.member?('#浅野真澄'))
+      assert(@parser.all_tags.member?('キュアフローラ_キュアマーメイド'))
+      assert(@parser.all_tags.member?('キュアフローラ'))
+      assert(@parser.all_tags.member?('春野はるか'))
+      assert(@parser.all_tags.member?('嶋村侑'))
+      assert(@parser.all_tags.member?('キュアマーメイド'))
+      assert(@parser.all_tags.member?('海藤みなみ'))
+      assert(@parser.all_tags.member?('浅野真澄'))
 
       @handler.clear
-      @handler.handle_pre_toot(status_field => '#キュアビューティ')
+      @handler.handle_pre_toot(status_field => 'キュアビューティ')
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#キュアビューティ'))
-      assert(@parser.all_tags.member?('#青木れいか'))
-      assert(@parser.all_tags.member?('#西村ちなみ'))
+      assert(@parser.all_tags.member?('キュアビューティ'))
+      assert(@parser.all_tags.member?('青木れいか'))
+      assert(@parser.all_tags.member?('西村ちなみ'))
     end
 
     def test_handle_pre_toot_with_direct
@@ -75,7 +75,7 @@ module Mulukhiya
         'poll' => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
       )
       @parser.text = @handler.payload[status_field]
-      assert(@parser.all_tags.member?('#ふたりはプリキュア'))
+      assert(@parser.all_tags.member?('ふたりはプリキュア'))
     end
 
     def test_handle_pre_toot_with_twittodon

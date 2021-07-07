@@ -14,21 +14,23 @@ module Mulukhiya
       end
     end
 
+    def hashtags
+      return TagContainer.new(TagContainer.scan(text))
+    end
+
+    alias tags hashtags
+
     def all_tags
-      container = TagContainer.new
-      container.concat(tags)
+      container = hashtags.clone
       container.concat(TagContainer.default_tag_bases)
       container.concat(@account.user_tag_bases) if @account
-      return container.create_tags
+      return container
     end
 
     def max_length
-      if Environment.misskey_type?
-        length = config["/#{Environment.controller_name}/status/max_length"]
-      else
-        length = config['/misskey/status/max_length']
-      end
-      length = length - all_tags.join(' ').length - 1 if all_tags.present?
+      length = config['/misskey/status/max_length'] unless Environment.misskey_type?
+      length ||= config["/#{Environment.controller_name}/status/max_length"]
+      length -= (all_tags.create_tags.join(' ').length + 1) if all_tags.present?
       return length
     end
   end
