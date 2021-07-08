@@ -1,32 +1,31 @@
 module Mulukhiya
   class TaggingHandler < Handler
-    def handle_pre_toot(body, params = {})
-      self.envelope = body
-      return body unless executable?(body)
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return unless executable?
       tags.text = @status
-      tags.concat(TaggingDictionary.new.matches(body)) if @status
-      tags.concat(create_media_tags(body)) if TagContainer.media_tag?
+      tags.concat(TaggingDictionary.new.matches(payload)) if @status
+      tags.concat(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
-      parser.text = body[text_field] = update_status
+      parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
-      return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
     private
 
-    def executable?(body)
+    def executable?
       return false if parser.command?
       return false if parser.accts.any?(&:agent?)
-      return true if body['visibility'].empty?
-      return true if body['visibility'] == 'public'
+      return true if payload['visibility'].empty?
+      return true if payload['visibility'] == 'public'
       return false
     end
 
-    def create_media_tags(body)
+    def media_tags
       tags = []
-      (body[attachment_field] || []).each do |id|
+      (payload[attachment_field] || []).each do |id|
         type = attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")

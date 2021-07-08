@@ -9,6 +9,7 @@ module Mulukhiya
 
     def teardown
       config.reload
+      @handler&.clear
       Timecop.return
     end
 

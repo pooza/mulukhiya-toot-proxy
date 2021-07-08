@@ -176,7 +176,7 @@ html lang='ja'
                 .link-description カスタムフィードの更新を行います。
                 .field-update-button-container
                   button @click='updateCustomFeeds' 実行
-        li  v-if='account.username && config.annict'
+        li v-if='account.username && config.annict'
           h3 @click='toggleVisibility("annict")' Annict
           vue-slide-up-down :active='layout.details.annict'
             .endpoint-container

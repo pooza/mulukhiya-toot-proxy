@@ -1,16 +1,22 @@
 module Mulukhiya
   class URLHandler < Handler
-    def handle_pre_toot(body, params = {})
-      self.envelope = body
-      return body if parser.command?
+    attr_reader :http
+
+    def initialize(params = {})
+      super
+      @http = HTTP.new
+    end
+
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return if parser.command?
       parser.uris.select {|v| rewritable?(v)}.each do |uri|
         rewrited = rewrite(uri)
         result.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
-      parser.text = body[text_field]
-      return body
+      parser.text = payload[text_field]
     end
 
     def rewrite(uri)

@@ -7,11 +7,11 @@ module Mulukhiya
     end
 
     def handle_follow(payload, params = {})
-      return payload unless sns = params[:sns]
-      return payload unless account = account_class[payload.dig('account', 'id')]
-      return payload if account.bot?
+      return unless sns = params[:sns]
+      return unless id = payload.dig('account', 'id') || payload.dig('body', 'id')
+      return unless account = account_class[id]
+      return if account.bot?
       sns.notify(account, template.to_s)
-      return payload
     end
 
     def template

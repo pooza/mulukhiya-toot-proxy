@@ -15,19 +15,18 @@ module Mulukhiya
       end.to_h
     end
 
-    def handle_pre_toot(body, params = {})
-      self.envelope = body
-      return body unless parser.command_name == command_name
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
-      body['visibility'] = controller_class.visibility_name('direct')
+      payload['visibility'] = controller_class.visibility_name('direct')
       @prepared = true
-      return body
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
-    def handle_post_toot(body, params = {})
-      self.envelope = body
+    def handle_post_toot(payload, params = {})
+      self.payload = payload
       return unless parser.command_name == command_name
       exec
       result.push(parser.params.select {|_, v| v.present?})
@@ -35,10 +34,10 @@ module Mulukhiya
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
 
-    def handle_pre_webhook(body, params = {})
+    def handle_pre_webhook(payload, params = {})
     end
 
-    def handle_post_webhook(body, params = {})
+    def handle_post_webhook(payload, params = {})
     end
 
     def verbose?

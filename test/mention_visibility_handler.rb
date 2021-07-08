@@ -11,9 +11,9 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.clear
-      r = @handler.handle_pre_toot(status_field => '@relayctl@hashtag-relay.dtp-mstdn.jp subscribe #mulukhiya')
+      @handler.handle_pre_toot(status_field => '@relayctl@hashtag-relay.dtp-mstdn.jp subscribe #mulukhiya')
       assert_equal(@handler.debug_info[:result], [{acct: '@relayctl@hashtag-relay.dtp-mstdn.jp'}])
-      assert_equal(r['visibility'], controller_class.visibility_name('direct'))
+      assert_equal(@handler.payload['visibility'], controller_class.visibility_name('direct'))
     end
   end
 end

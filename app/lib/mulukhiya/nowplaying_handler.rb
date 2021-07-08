@@ -8,18 +8,17 @@ module Mulukhiya
       reporter.temp[:track_uris] ||= []
     end
 
-    def handle_pre_toot(body, params = {})
-      self.envelope = body
-      return body unless parser.nowplaying?
-      return body if parser.command?
+    def handle_pre_toot(payload, params = {})
+      self.payload = payload
+      return unless parser.nowplaying?
+      return if parser.command?
       @status.each_line do |line|
         push(line)
         handle_line(line)
       end
-      parser.text = body[text_field] = @lines.values.join("\n")
-      return body
+      parser.text = payload[text_field] = @lines.values.join("\n")
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, body: body)
+      errors.push(class: e.class.to_s, message: e.message, payload: payload)
     end
 
     def handle_line(line)

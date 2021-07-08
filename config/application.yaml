@@ -1,5 +1,5 @@
 package:
-  version: 4.6.4
+  version: 4.7.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -300,6 +300,7 @@ misskey:
     favorite_tags: true
     feed: true
     announcement: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:
@@ -311,9 +312,24 @@ misskey:
         - write:drive
         - read:drive
         - read:account
-    callback:
-      url: /mulukhiya/app/misskey/auth
-      enable: true
+      infobot:
+        - write:drive
+        - write:following
+        - write:messaging
+        - write:notes
+        - read:account
+        - read:blocks
+        - read:channels
+        - read:drive
+        - read:favorites
+        - read:following
+        - read:messaging
+        - read:mutes
+        - read:notifications
+        - read:page-likes
+        - read:pages
+        - read:reactions
+        - read:user-groups
   status:
     parser: note
     key: noteId
@@ -413,6 +429,8 @@ misskey:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert
@@ -428,6 +446,7 @@ meisskey:
     favorite_tags: true
     feed: true
     announcement: true
+    streaming: true
     annict: true
     futured_tag: true
   oauth:
@@ -436,9 +455,23 @@ meisskey:
         - write:notes
         - write:drive
         - read:drive
-    callback:
-      url: /mulukhiya/app/misskey/auth
-      enable: true
+      infobot:
+        - write:drive
+        - write:following
+        - write:messaging
+        - write:notes
+        - read:account
+        - read:blocks
+        - read:drive
+        - read:favorites
+        - read:following
+        - read:messaging
+        - read:mutes
+        - read:notifications
+        - read:page-likes
+        - read:pages
+        - read:reactions
+        - read:user-groups
   status:
     parser: note
     key: noteId
@@ -537,6 +570,8 @@ meisskey:
       - growi_announce
       - dropbox_announce
       - hexo_announce
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert
@@ -551,6 +586,7 @@ pleroma:
     media_catalog: true
     favorite_tags: true
     feed: true
+    streaming: true
     annict: true
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -559,6 +595,10 @@ pleroma:
         - write:statuses
         - write:media
         - read:statuses
+      infobot:
+        - read
+        - write:statuses
+        - write:media
   status:
     parser: toot
     key: id
@@ -656,6 +696,8 @@ pleroma:
       - growi_bookmark
       - lemmy_bookmark
       - result_notification
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert

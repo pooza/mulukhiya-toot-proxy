@@ -2,55 +2,55 @@ module Mulukhiya
   class Handler
     include Package
     include SNSMethods
-    attr_reader :reporter, :event, :sns, :errors, :result, :envelope, :text_field
+    attr_reader :reporter, :event, :sns, :errors, :result, :payload, :text_field
 
-    def handle_pre_toot(body, params = {})
-      return body
+    def handle_pre_toot(payload, params = {})
+      return payload
     end
 
-    def handle_post_toot(body, params = {})
+    def handle_post_toot(payload, params = {})
     end
 
-    def handle_pre_webhook(body, params = {})
-      return handle_pre_toot(body, params)
+    def handle_pre_webhook(payload, params = {})
+      return handle_pre_toot(payload, params)
     end
 
-    def handle_post_webhook(body, params = {})
-      handle_post_toot(body, params)
+    def handle_post_webhook(payload, params = {})
+      handle_post_toot(payload, params)
     end
 
-    def handle_pre_chat(body, params = {})
+    def handle_pre_chat(payload, params = {})
       @text_field = chat_field
-      return handle_pre_toot(body, params)
+      return handle_pre_toot(payload, params)
     end
 
-    def handle_post_chat(body, params = {})
+    def handle_post_chat(payload, params = {})
       @text_field = chat_field
-      handle_post_toot(body, params)
+      handle_post_toot(payload, params)
     end
 
-    def handle_pre_upload(body, params = {})
+    def handle_pre_upload(payload, params = {})
     end
 
-    def handle_post_upload(body, params = {})
+    def handle_post_upload(payload, params = {})
     end
 
-    def handle_pre_thumbnail(body, params = {})
+    def handle_pre_thumbnail(payload, params = {})
     end
 
-    def handle_post_thumbnail(body, params = {})
+    def handle_post_thumbnail(payload, params = {})
     end
 
-    def handle_post_fav(body, params = {})
+    def handle_post_fav(payload, params = {})
     end
 
-    def handle_post_boost(body, params = {})
+    def handle_post_boost(payload, params = {})
     end
 
-    def handle_post_bookmark(body, params = {})
+    def handle_post_bookmark(payload, params = {})
     end
 
-    def handle_post_search(body, params = {})
+    def handle_post_search(payload, params = {})
     end
 
     def handle_announce(announcement, params = {})
@@ -59,12 +59,12 @@ module Mulukhiya
     def handle_error(error, params = {})
     end
 
-    def handle_toot(body, params = {})
+    def handle_toot(payload, params = {})
       params[:reporter] ||= Reporter.new
       params[:sns] ||= sns_class.new
       @sns = params[:sns]
-      handle_pre_toot(body, params)
-      return handle_post_toot(body, params)
+      handle_pre_toot(payload, params)
+      return handle_post_toot(payload, params)
     end
 
     def underscore
@@ -142,9 +142,9 @@ module Mulukhiya
 
     alias disabled? disable?
 
-    def envelope=(body)
-      @envelope = body
-      @status = body[text_field] || ''
+    def payload=(payload)
+      @payload = payload
+      @status = payload[text_field] || ''
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2') if @status.present?
     end
 

@@ -38,9 +38,10 @@ module Mulukhiya
     end
 
     def token=(token)
+      token = token.decrypt rescue token
       update(
         webhook: {token: nil},
-        mulukhiya: {token: token},
+        mulukhiya: {token: token.encrypt},
       )
     end
 
@@ -63,18 +64,21 @@ module Mulukhiya
 
     def handle_user_tags(values)
       return unless values['tagging'].is_a?(Hash)
-      task_name = "user_tag_initialize_#{@account.username}"
       if minutes = values['tagging']['minutes']
-        Sidekiq.set_schedule(task_name, {
+        Sidekiq.set_schedule(sidekiq_task_name, {
           at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
           class: 'Mulukhiya::UserTagInitializeWorker',
           args: [{account: @account.id}],
         })
         values['tagging']['minutes'] = nil
       elsif values['tagging'].key?('user_tags') && values['tagging']['user_tags'].empty?
-        Sidekiq.remove_schedule(task_name)
+        Sidekiq.remove_schedule(sidekiq_task_name)
       end
       Sidekiq::Scheduler.reload_schedule!
+    end
+
+    def sidekiq_task_name
+      return "user_tag_initialize_#{@account.username}"
     end
 
     def handle_lemmy_password(values)

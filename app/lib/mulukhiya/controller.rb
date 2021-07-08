@@ -22,10 +22,9 @@ module Mulukhiya
     end
 
     error do |e|
-      e = Ginseng::Error.create(e)
       e.package = Package.full_name
       @renderer = default_renderer_class.new
-      @renderer.status = e.status
+      @renderer.status = e.status rescue 500
       @renderer.message = e.to_h
       @renderer.message.delete(:backtrace)
       @renderer.message[:error] = e.message

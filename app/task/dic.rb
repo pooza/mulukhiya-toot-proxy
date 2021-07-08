@@ -5,8 +5,8 @@ namespace :mulukhiya do
       task :update do
         dic = Mulukhiya::TaggingDictionary.new
         dic.refresh
-        puts "#{dic.remote_dics.count} remote dics"
-        puts "#{dic.count} tags"
+        puts "#{dic.remote_dics.count.commaize} remote dics"
+        puts "#{dic.count.commaize} tags"
       end
     end
   end

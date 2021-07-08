@@ -1,16 +1,16 @@
 module Mulukhiya
   class AnimationImageFormatConvertHandler < MediaConvertHandler
     def convert
-      return @source.convert_animation_type(type)
+      return file.convert_animation_type(type)
     ensure
-      result.push(source: {type: @source.type})
+      result.push(source: {type: file.type})
     end
 
     def convertable?
-      return false unless @source&.image?
-      return false unless @source.animated?
-      return false unless type
-      return false if @source.type == type
+      return false unless file
+      return false unless file.image?
+      return false unless file.animated?
+      return false if file.type == type
       return true
     end
 

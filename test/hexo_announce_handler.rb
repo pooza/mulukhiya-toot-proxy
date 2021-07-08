@@ -6,7 +6,6 @@ module Mulukhiya
     end
 
     def test_handle_announce
-      @handler.clear
       @handler.handle_announce({content: 'お知らせです。Hexo'}, {sns: info_agent_service})
       assert(File.exist?(@handler.debug_info[:result].first[:path]))
     end

@@ -1,25 +1,26 @@
 module Mulukhiya
   class MediaConvertHandler < Handler
-    def handle_pre_upload(body, params = {})
-      return unless @source = source_file(body)
+    attr_reader :image_field, :file
+
+    def handle_pre_upload(payload, params = {})
+      @file = media_class.new(payload[image_field][:tempfile].path)
       return unless convertable?
       return unless @dest = convert
-      body[:file][:org_tempfile] ||= body[:file][:tempfile]
-      body[:file][:tempfile] = @dest
+      payload[image_field][:org_tempfile] ||= payload[image_field][:tempfile]
+      payload[image_field][:tempfile] = @dest
     rescue => e
       logger.error(error: e)
-      errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
+      errors.push(class: e.class.to_s, message: e.message, file: file.path)
     end
 
-    def handle_pre_thumbnail(body, params = {})
-      return unless @source = source_file(body, :thumbnail)
-      return unless convertable?
-      return unless @dest = convert
-      body[:thumbnail][:org_tempfile] ||= body[:thumbnail][:tempfile]
-      body[:thumbnail][:tempfile] = @dest
-    rescue => e
-      logger.error(error: e)
-      errors.push(class: e.class.to_s, message: e.message, file: body[:file][:tempfile].path)
+    def handle_pre_thumbnail(payload, params = {})
+      @image_field = :thumbnail
+      handle_pre_upload(payload, params)
+    end
+
+    def handle_post_thumbnail(payload, params = {})
+      @image_field = :thumbnail
+      handle_post_upload(payload, params)
     end
 
     def convert
@@ -38,8 +39,11 @@ module Mulukhiya
       return ImageFile
     end
 
-    def source_file(body, key = :file)
-      return media_class.new(body[key][:tempfile].path) rescue nil
+    private
+
+    def initialize(params = {})
+      super
+      @image_field = :file
     end
   end
 end

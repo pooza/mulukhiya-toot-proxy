@@ -1,7 +1,11 @@
 module Mulukhiya
   class MisskeyAuthContract < Contract
     params do
-      required(:token).value(:string)
+      required(:code).value(:string)
+    end
+
+    rule(:code) do
+      key.failure('空欄です。') if value.length.zero?
     end
   end
 end

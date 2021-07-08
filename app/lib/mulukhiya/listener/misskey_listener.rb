@@ -1,26 +1,21 @@
 module Mulukhiya
-  class MastodonListener < Listener
+  class MisskeyListener < Listener
     def receive(message)
-      data = JSON.parse(message.data)
-      payload = JSON.parse(data['payload'])
-      if data['event'] == 'notification'
-        send("handle_#{payload['type']}_notification".to_sym, payload)
-      else
-        send("handle_#{data['event']}".to_sym, payload)
-      end
+      payload = JSON.parse(message.data)['body']
+      send("handle_#{payload['type'].underscore}".to_sym, payload)
     rescue NoMethodError
       logger.error(error: 'method undefined', payload: payload)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end
 
-    def handle_follow_notification(payload)
+    def handle_followed(payload)
       Event.new(:follow, {sns: sns}).dispatch(payload)
     end
 
     def self.start
       EM.run do
-        listener = MastodonListener.new
+        listener = MisskeyListener.new
 
         listener.client.on :close do |e|
           raise Ginseng::GatewayError, event.reason
@@ -34,11 +29,20 @@ module Mulukhiya
           listener.receive(message)
         end
       end
-    rescue
+    rescue => e
       @client = nil
       logger.error(error: e)
       sleep(5)
       retry
+    end
+
+    private
+
+    def initialize
+      super
+      client.send({type: 'connect', body: {channel: 'main', id: 'main'}}.to_json)
+      client.send({type: 'connect', body: {channel: 'homeTimeline', id: 'home'}}.to_json)
+      client.send({type: 'connect', body: {channel: 'localTimeline', id: 'local'}}.to_json)
     end
   end
 end

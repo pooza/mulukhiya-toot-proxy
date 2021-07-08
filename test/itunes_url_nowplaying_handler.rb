@@ -35,9 +35,8 @@ module Mulukhiya
     end
 
     def test_push
-      @handler.clear
-      body = @handler.handle_pre_toot(status_field => "シュビドゥビ☆スイーツタイム\n#nowplaying https://music.apple.com/jp/album//1352845788?i=1352845804\n")[status_field]
-      lines = body.each_line.to_a.map(&:chomp)
+      @handler.handle_pre_toot(status_field => "シュビドゥビ☆スイーツタイム\n#nowplaying https://music.apple.com/jp/album//1352845788?i=1352845804\n")
+      lines = @handler.payload[status_field].each_line.to_a.map(&:chomp)
       assert(lines.member?('シュビドゥビ☆スイーツタイム'))
       assert(lines.member?('Artist: 宮本佳那子'))
     end
