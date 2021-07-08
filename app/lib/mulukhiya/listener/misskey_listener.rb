@@ -36,6 +36,8 @@ module Mulukhiya
     def initialize
       super
       client.send({type: 'connect', body: {channel: 'main', id: 'main'}}.to_json)
+      client.send({type: 'connect', body: {channel: 'homeTimeline', id: 'home'}}.to_json)
+      client.send({type: 'connect', body: {channel: 'localTimeline', id: 'local'}}.to_json)
     end
   end
 end
