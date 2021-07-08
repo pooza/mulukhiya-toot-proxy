@@ -313,13 +313,23 @@ misskey:
         - read:drive
         - read:account
       infobot:
-        - write:notes
         - write:drive
         - write:following
-        - read:drive
+        - write:messaging
+        - write:notes
         - read:account
+        - read:blocks
+        - read:channels
+        - read:drive
+        - read:favorites
         - read:following
+        - read:messaging
+        - read:mutes
         - read:notifications
+        - read:page-likes
+        - read:pages
+        - read:reactions
+        - read:user-groups
   status:
     parser: note
     key: noteId
@@ -446,12 +456,23 @@ meisskey:
         - write:drive
         - read:drive
       infobot:
-        - write:notes
         - write:drive
         - write:following
+        - write:messaging
+        - write:notes
+        - read:account
+        - read:blocks
+        - read:channels
         - read:drive
+        - read:favorites
         - read:following
+        - read:messaging
+        - read:mutes
         - read:notifications
+        - read:page-likes
+        - read:pages
+        - read:reactions
+        - read:user-groups
   status:
     parser: note
     key: noteId
