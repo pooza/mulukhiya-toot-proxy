@@ -25,6 +25,7 @@ module Mulukhiya
       }
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -36,6 +37,7 @@ module Mulukhiya
       @renderer.message = {config: @sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -48,6 +50,7 @@ module Mulukhiya
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -66,6 +69,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -85,6 +89,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -96,6 +101,7 @@ module Mulukhiya
       @renderer.message = Program.instance.data
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -107,6 +113,7 @@ module Mulukhiya
       ProgramUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -127,6 +134,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -137,6 +145,7 @@ module Mulukhiya
       MediaCleaningWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -147,6 +156,7 @@ module Mulukhiya
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -168,6 +178,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -178,6 +189,7 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -189,6 +201,7 @@ module Mulukhiya
       AnnouncementWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -199,6 +212,7 @@ module Mulukhiya
       sns_class.new.clear_oauth_client(params[:name] || :default)
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -210,6 +224,7 @@ module Mulukhiya
       @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -220,6 +235,7 @@ module Mulukhiya
       TaggingDictionaryUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -253,6 +269,7 @@ module Mulukhiya
       UserTagInitializeWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -277,6 +294,7 @@ module Mulukhiya
       Mulukhiya::FeedUpdateWorker.new.perform
       return @renderer.to_s
     rescue => e
+      logger.error(error: e)
       @renderer.status = e.status rescue 502
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -290,6 +308,7 @@ module Mulukhiya
         @renderer.message = JSON.parse(command.stdout)
         return @renderer.to_s
       rescue => e
+        logger.error(error: e)
         @renderer.status = e.status rescue 502
         @renderer.message = {error: e.message}
         return @renderer.to_s
