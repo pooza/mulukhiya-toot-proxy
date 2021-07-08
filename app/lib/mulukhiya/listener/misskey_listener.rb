@@ -1,57 +1,32 @@
-require 'eventmachine'
-require 'faye/websocket'
-
 module Mulukhiya
-  class MisskeyListener
-    include Package
-    include SNSMethods
-    attr_reader :client, :uri, :sns
-
-    def close(event)
-      @client = nil
-      e = Ginseng::GatewayError.new('close')
-      e.message = {reason: event.reason}
-      logger.error(error: e)
-    end
-
-    def error(event)
-      @client = nil
-      e = Ginseng::GatewayError.new('error')
-      e.message = {reason: event.reason}
-      logger.error(error: e)
-    end
-
+  class MisskeyListener < Listener
     def receive(message)
-      data = JSON.parse(message.data)
-      payload = JSON.parse(data['payload'])
-      if data['event'] == 'notification'
-        send("handle_#{payload['type']}_notification".to_sym, payload)
-      else
-        send("handle_#{data['event']}".to_sym, payload)
-      end
+      payload = JSON.parse(message.data)
+
+      logger.info(websocket: payload)
     rescue => e
-      logger.error(error: e, payload: payload)
+      logger.error(error: e, payload: (payload rescue message.data))
     end
 
     def self.start
       EM.run do
-        listener = MastodonListener.new
+        listener = MisskeyListener.new
 
         listener.client.on :close do |e|
-          listener.close(e)
-          raise 'closed'
+          raise Ginseng::GatewayError, event.reason
         end
 
         listener.client.on :error do |e|
-          listener.error(e)
-          raise 'error'
+          raise Ginseng::GatewayError, event.reason
         end
 
         listener.client.on :message do |message|
           listener.receive(message)
         end
       end
-    rescue
+    rescue => e
+      @client = nil
+      logger.error(error: e)
       sleep(5)
       retry
     end
@@ -59,11 +34,8 @@ module Mulukhiya
     private
 
     def initialize
-      @sns = info_agent_service
-      @uri = @sns.streaming_uri
-      @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
-        ping: config['/websocket/keepalive'],
-      })
+      super
+      client.send({type: 'connect', body: {channel: 'main', id: 'main'}}.to_json)
     end
   end
 end
