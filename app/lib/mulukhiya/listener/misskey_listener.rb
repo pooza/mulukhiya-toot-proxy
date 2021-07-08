@@ -1,11 +1,23 @@
 module Mulukhiya
   class MisskeyListener < Listener
     def receive(message)
-      payload = JSON.parse(message.data)
-
-      logger.info(websocket: payload)
+      payload = JSON.parse(message.data)['body']
+      send("handle_#{payload['type'].underscore}".to_sym, payload)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
+    end
+
+    def handle_followed(payload)
+      Event.new(:follow, {sns: sns}).dispatch(payload)
+    end
+
+    def handle_note(payload)
+    end
+
+    def handle_notification(payload)
+    end
+
+    def handle_unread_notification(payload)
     end
 
     def self.start

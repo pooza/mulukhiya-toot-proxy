@@ -462,7 +462,6 @@ meisskey:
         - write:notes
         - read:account
         - read:blocks
-        - read:channels
         - read:drive
         - read:favorites
         - read:following
