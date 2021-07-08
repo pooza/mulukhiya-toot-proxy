@@ -8,18 +8,14 @@ module Mulukhiya
       else
         send("handle_#{data['event']}".to_sym, payload)
       end
+    rescue NoMethodError
+      logger.error(error: 'method undefined', payload: payload)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end
 
     def handle_follow_notification(payload)
       Event.new(:follow, {sns: sns}).dispatch(payload)
-    end
-
-    def handle_update(payload)
-    end
-
-    def handle_delete(payload)
     end
 
     def self.start

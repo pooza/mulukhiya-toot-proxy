@@ -586,6 +586,7 @@ pleroma:
     media_catalog: true
     favorite_tags: true
     feed: true
+    streaming: true
     annict: true
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -594,6 +595,10 @@ pleroma:
         - write:statuses
         - write:media
         - read:statuses
+      infobot:
+        - read
+        - write:statuses
+        - write:media
   status:
     parser: toot
     key: id
@@ -691,6 +696,8 @@ pleroma:
       - growi_bookmark
       - lemmy_bookmark
       - result_notification
+    follow:
+      - welcome_message_follow
     alert:
       - slack_alert
       - line_alert
