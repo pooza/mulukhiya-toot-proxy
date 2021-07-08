@@ -82,10 +82,10 @@ module Mulukhiya
 
       def self.get(key)
         if key.key?(:token)
-          return nil if key[:token].nil?
-          account = Postgres.instance.exec('token_owner', {token: key[:token]})&.first
+          return nil unless token = (key[:token].decrypt rescue key[:token])
+          account = Postgres.instance.exec('token_owner', {token: token})&.first
           account = Account[account[:id]]
-          account.token = key[:token]
+          account.token = token
           return account
         elsif acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)

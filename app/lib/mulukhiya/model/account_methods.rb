@@ -148,11 +148,11 @@ module Mulukhiya
     end
 
     def test?
-      return account_class.test_account.id == id
+      return account_class.test_account&.id == id
     end
 
     def info?
-      return account_class.info_account.id == id
+      return account_class.info_account&.id == id
     end
 
     def self.included(base)

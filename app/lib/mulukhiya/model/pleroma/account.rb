@@ -106,9 +106,9 @@ module Mulukhiya
           nickname ||= acct.to_s.sub(/^@/, '')
           return first(nickname: nickname)
         elsif key.key?(:token)
-          return nil if key[:token].nil?
-          account = AccessToken.first(token: key[:token]).account
-          account.token = key[:token]
+          return nil unless token = (key[:token].decrypt rescue key[:token])
+          account = AccessToken.first(token: token)&.account
+          account.token = token
           return account
         end
         return first(key)
