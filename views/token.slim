@@ -46,6 +46,12 @@ html lang='ja'
           .description
             a href=params[:oauth_url] target='_blank' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
+            - if env.misskey_type?
+              | （認証後の、URL末尾の
+              code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+              | 形式の文字列が
+              strong 認証コード
+              | です）
           .auth-form
             input.code type='text' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
@@ -58,6 +64,12 @@ html lang='ja'
           .description
             a href=params[:infobot_oauth_url] target='_blank' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
+            - if env.misskey_type?
+              | （認証後の、URL末尾の
+              code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+              | 形式の文字列が
+              strong 認証コード
+              | です）
           .auth-form
             input.code type='text' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
