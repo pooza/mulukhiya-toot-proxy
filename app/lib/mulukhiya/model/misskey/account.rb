@@ -92,7 +92,7 @@ module Mulukhiya
           return first(username: acct.username, host: acct.domain)
         elsif key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          return AccessToken.first(hash: token)&.account
+          return first(key) || AccessToken.first(hash: token)&.account
         end
         return first(key)
       end
