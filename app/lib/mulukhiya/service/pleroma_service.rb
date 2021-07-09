@@ -4,8 +4,6 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
-    alias info nodeinfo
-
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)

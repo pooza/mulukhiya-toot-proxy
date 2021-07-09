@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def hashtags
-      return TagContainer.new(TagContainer.scan(text))
+      return TagContainer.scan(text)
     end
 
     alias tags hashtags
