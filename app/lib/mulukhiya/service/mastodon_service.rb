@@ -4,6 +4,8 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
+    alias info nodeinfo
+
     def upload(path, params = {})
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
@@ -66,6 +68,8 @@ module Mulukhiya
       }
       return uri
     end
+
+    alias streaming_uri create_streaming_uri
 
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.dup].join("\n")

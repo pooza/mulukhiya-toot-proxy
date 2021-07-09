@@ -4,6 +4,8 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
+    alias info nodeinfo
+
     def upload(path, params = {})
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
@@ -64,6 +66,8 @@ module Mulukhiya
       })
       return Ginseng::URI.parse(response['url'])
     end
+
+    alias streaming_uri create_streaming_uri
 
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.dup].join("\n")
