@@ -1,5 +1,5 @@
 module Mulukhiya
-  class PleromaListener < Listener
+  class PleromaListener < MastodonListener
     def self.start
       EM.run do
         listener = PleromaListener.new

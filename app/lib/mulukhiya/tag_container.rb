@@ -9,6 +9,12 @@ module Mulukhiya
       concat(@account.user_tag_bases)
     end
 
+    def self.scan(text)
+      return TagContainer.new(
+        text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first),
+      )
+    end
+
     def self.default_tags
       return config['/tagging/default_tags'].map(&:to_hashtag) rescue []
     end

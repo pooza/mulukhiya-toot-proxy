@@ -59,23 +59,12 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def create_access_token(token, type = :default)
-      return Digest::SHA256.hexdigest(token + oauth_client(type)['secret'])
-    end
-
     def oauth_uri(type = :default)
       return nil unless oauth_client(type)
       response = http.post('/api/auth/session/generate', {
         body: {appSecret: oauth_client(type)['secret']},
       })
       return Ginseng::URI.parse(response['url'])
-    end
-
-    def streaming_uri
-      uri = http.create_uri('/streaming')
-      uri.scheme = 'wss'
-      uri.query_values = {'i' => token}
-      return uri
     end
 
     def notify(account, message, response = nil)
