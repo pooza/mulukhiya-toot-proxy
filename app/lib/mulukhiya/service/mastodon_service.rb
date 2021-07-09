@@ -69,8 +69,6 @@ module Mulukhiya
       return uri
     end
 
-    alias streaming_uri create_streaming_uri
-
     def notify(account, message, response = nil)
       message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(TootParser.new.max_length)
