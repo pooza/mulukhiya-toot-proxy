@@ -35,7 +35,8 @@ module Mulukhiya
 
     def self.webhook_entries
       return enum_for(__method__) unless block_given?
-      Pleroma::AccessToken.order(Sequel.desc(:inserted_at)).all do |token|
+      Postgres.instance.exec('webhook_tokens').each do |row|
+        token = Pleroma::AccessToken[row['id']]
         yield token.to_h if token.valid?
       end
     end

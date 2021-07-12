@@ -1,0 +1,14 @@
+<%# encoding: UTF-8 -%>
+SELECT
+  token.id
+FROM
+  access_token AS token
+  INNER JOIN app ON token."appId" = app.id
+  INNER JOIN "user" ON token."userId" = "user".id
+WHERE ("user".host IS NULL)
+  AND ("user"."isSuspended" = false)
+  AND (app.name LIKE '<%= package.short_name %>%')
+GROUP BY
+  token.id
+ORDER BY
+  token."createdAt" DESC
