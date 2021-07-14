@@ -13,7 +13,7 @@ gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tu
 gem 'mimemagic', '>=0.4.0'
 gem 'mini_magick'
 gem 'optparse'
-gem 'rspotify'
+gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.2.0'
 gem 'sidekiq-failures'
