@@ -3,6 +3,7 @@ module Mulukhiya
     def disable?
       return true unless Environment.dbms_class.config?
       return true unless controller_class.streaming?
+      return true if config.disable?(self)
       return false
     end
 
