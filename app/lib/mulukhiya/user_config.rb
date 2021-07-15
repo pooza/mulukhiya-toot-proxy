@@ -63,22 +63,20 @@ module Mulukhiya
     private
 
     def handle_user_tags(values)
-      return unless values['tagging'].is_a?(Hash)
-      if minutes = values['tagging']['minutes']
-        Sidekiq.set_schedule(sidekiq_task_name, {
+      flatten = values.key_flatten
+      flatten['/tagging/user_tags'] ||= flatten['/tags'] if flatten.key?('/tags')
+      if minutes = flatten['/tagging/minutes']
+        Sidekiq.set_schedule("user_tag_initialize_#{@account.username}", {
           at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
           class: 'Mulukhiya::UserTagInitializeWorker',
           args: [{account: @account.id}],
         })
+        Sidekiq::Scheduler.reload_schedule!
         values['tagging']['minutes'] = nil
-      elsif values['tagging'].key?('user_tags') && values['tagging']['user_tags'].empty?
-        Sidekiq.remove_schedule(sidekiq_task_name)
+      elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
+        Sidekiq.remove_schedule("user_tag_initialize_#{@account.username}")
+        Sidekiq::Scheduler.reload_schedule!
       end
-      Sidekiq::Scheduler.reload_schedule!
-    end
-
-    def sidekiq_task_name
-      return "user_tag_initialize_#{@account.username}"
     end
 
     def handle_lemmy_password(values)
