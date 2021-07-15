@@ -63,22 +63,20 @@ module Mulukhiya
     private
 
     def handle_user_tags(values)
-      return unless values['tagging'].is_a?(Hash)
-
-      logger.info(tags: values.dig('tagging', 'user_tags'))
-
-      if minutes = values['tagging']['minutes']
+      flatten = values.key_flatten
+      flatten['/tagging/user_tags'] ||= flatten['/tags'] if flatten.key?('/tags')
+      if minutes = flatten['/tagging/minutes']
         Sidekiq.set_schedule(sidekiq_task_name, {
           at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
           class: 'Mulukhiya::UserTagInitializeWorker',
           args: [{account: @account.id}],
         })
         values['tagging']['minutes'] = nil
-      elsif values['tagging'].key?('user_tags') && values['tagging']['user_tags'].empty?
-        logger.info(1111111)
+        Sidekiq::Scheduler.reload_schedule!
+      elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
         Sidekiq.remove_schedule(sidekiq_task_name)
+        Sidekiq::Scheduler.reload_schedule!
       end
-      Sidekiq::Scheduler.reload_schedule!
     end
 
     def sidekiq_task_name
