@@ -71,8 +71,8 @@ module Mulukhiya
           class: 'Mulukhiya::UserTagInitializeWorker',
           args: [{account: @account.id}],
         })
-        values['tagging']['minutes'] = nil
         Sidekiq::Scheduler.reload_schedule!
+        values['tagging']['minutes'] = nil
       elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
         Sidekiq.remove_schedule(sidekiq_task_name)
         Sidekiq::Scheduler.reload_schedule!
