@@ -51,10 +51,6 @@ module Mulukhiya
       return @command
     end
 
-    def self.webhook_entries
-      return nil
-    end
-
     private
 
     def command_entries

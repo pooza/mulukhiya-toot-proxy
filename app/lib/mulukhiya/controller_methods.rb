@@ -163,6 +163,10 @@ module Mulukhiya
       def visibility_name(name)
         return parser_class.visibility_name(name)
       end
+
+      def webhook_entries
+        return access_token_class.webhook_entries
+      end
     end
   end
 end

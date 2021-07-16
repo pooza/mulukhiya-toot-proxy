@@ -44,5 +44,13 @@ module Mulukhiya
       return unless @token
       assert_kind_of(Array, @token.scopes)
     end
+
+    def test_webhook_entries
+      access_token_class.webhook_entries.first(5).each do |webhook|
+        assert_kind_of(String, webhook[:digest])
+        assert_kind_of(String, webhook[:token])
+        assert_kind_of(account_class, webhook[:account])
+      end
+    end
   end
 end

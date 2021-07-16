@@ -61,6 +61,13 @@ module Mulukhiya
         end
       end
 
+      def self.webhook_entries
+        return enum_for(__method__) unless block_given?
+        all.select(&:valid?).reverse_each do |token|
+          yield token.to_h
+        end
+      end
+
       def self.collection
         return Mongo.instance.db[:accessTokens]
       end

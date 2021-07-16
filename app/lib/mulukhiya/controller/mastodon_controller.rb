@@ -101,13 +101,5 @@ module Mulukhiya
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return nil
     end
-
-    def self.webhook_entries
-      return enum_for(__method__) unless block_given?
-      Postgres.instance.exec('webhook_tokens').each do |row|
-        token = Mastodon::AccessToken[row['id']]
-        yield token.to_h if token.valid?
-      end
-    end
   end
 end
