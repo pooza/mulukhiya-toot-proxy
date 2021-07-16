@@ -60,7 +60,7 @@ module Mulukhiya
       return @values["/handler/#{handler.underscore}/disable"] == true rescue false
     end
 
-    def to_json
+    def to_json(*_args)
       return @values.to_json
     end
 

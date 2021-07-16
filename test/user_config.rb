@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def test_to_s
-      assert_kind_of(String, @user_config.to_json)
+      assert_kind_of(String, @user_config.to_s)
     end
 
     def test_disable?
