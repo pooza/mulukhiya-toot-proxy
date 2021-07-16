@@ -5,7 +5,7 @@ FROM
   access_token AS token
   INNER JOIN app ON token."appId" = app.id
   INNER JOIN "user" ON token."userId" = "user".id
-WHERE ("user".host IS NULL)
+WHERE ("user".host IS null)
   AND ("user"."isSuspended" = false)
   AND (app.name LIKE '<%= package.short_name %>%')
 GROUP BY
