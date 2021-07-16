@@ -165,7 +165,7 @@ module Mulukhiya
       end
 
       def webhook_entries
-        return access_token_class.webhook_entries
+        return Environment.access_token_class.webhook_entries
       end
     end
   end
