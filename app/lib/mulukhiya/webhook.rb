@@ -62,19 +62,16 @@ module Mulukhiya
 
     def self.create(key)
       return Webhook.new(key) if key.is_a?(UserConfig)
-      controller_class.webhook_entries do |hook|
-        return hook[:account].webhook if hook[:digest] == key
-      end
-      return nil
+      return controller_class.webhook_entries.find {|v| v[:digest] == key}[:account].webhook
     rescue => e
-      logger.error(error: e)
+      logger.error(error: e, key: key.to_s)
       return nil
     end
 
     def self.all
       return enum_for(__method__) unless block_given?
-      controller_class.webhook_entries do |hook|
-        yield Webhook.create(hook[:digest])
+      controller_class.webhook_entries do |entry|
+        yield Webhook.create(entry[:digest])
       end
     end
 

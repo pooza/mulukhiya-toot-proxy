@@ -27,6 +27,14 @@ module Mulukhiya
       assert_kind_of(Hash, @user_config.to_h)
     end
 
+    def test_to_json
+      assert_kind_of(Hash, JSON.parse(@user_config.to_json))
+    end
+
+    def test_to_s
+      assert_kind_of(String, @user_config.to_s)
+    end
+
     def test_disable?
       assert_false(@user_config.disable?('yakinori'))
       assert_boolean(@user_config.disable?('youtube_nowplaying_url'))
