@@ -28,7 +28,6 @@ module Mulukhiya
     end
 
     def test_to_json
-      ic JSON.parse(@user_config.to_json)
       assert_kind_of(Hash, JSON.parse(@user_config.to_json))
     end
 
