@@ -69,7 +69,7 @@ module Mulukhiya
           {'$lookup' => {from: 'apps', localField: 'appId', foreignField: '_id', as: 'app'}},
           {'$match' => {
             'user.host' => nil,
-            'app.name' => {'$regex' => "^#{Package.name}"},
+            'app.name' => {'$regex' => "^#{Package.short_name}"},
           }},
         ]).each do |row|
           yield AccessToken[row['_id']].to_h

@@ -46,11 +46,11 @@ module Mulukhiya
     end
 
     def self.name
-      return 'mulukhiya'
+      return 'mulukhiya-toot-proxy'
     end
 
     def self.short_name
-      return name
+      return 'mulukhiya'
     end
 
     def self.version
