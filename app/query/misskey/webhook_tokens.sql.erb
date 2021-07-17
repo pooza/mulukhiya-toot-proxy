@@ -7,7 +7,7 @@ FROM
   INNER JOIN "user" ON token."userId" = "user".id
 WHERE ("user".host IS null)
   AND ("user"."isSuspended" = false)
-  AND (app.name LIKE '<%= package.short_name %>%')
+  AND (app.name LIKE '<%= package.name %>%')
 GROUP BY
   token.id
 ORDER BY
