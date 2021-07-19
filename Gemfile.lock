@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 8c4371c4512aa0469cda955157dbb5e5e8d792e6
+  revision: c60e3184e55e42b9caa8d8665729930f024b3ec9
   specs:
-    ginseng-core (1.10.25)
+    ginseng-core (1.10.26)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -369,7 +369,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
