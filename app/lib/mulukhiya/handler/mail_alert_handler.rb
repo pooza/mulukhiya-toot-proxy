@@ -1,7 +1,7 @@
 module Mulukhiya
   class MailAlertHandler < AlertHandler
     def disable?
-      return true unless config['/alert/mail/to'].present? rescue true
+      return true unless Mailer.config?
       return super
     end
 
