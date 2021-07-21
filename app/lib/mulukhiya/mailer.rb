@@ -11,7 +11,13 @@ module Mulukhiya
     end
 
     def default_receipt
-      return config['/alert/mail/to'] rescue nil
+      receipt = (config['/alert/mail/to'] rescue nil)
+      receipt ||= sns_class.new.nodeinfo.dig('metadata', 'maintainer', 'email')
+      return receipt
+    end
+
+    def self.config?
+      return Mailer.new.default_receipt.present?
     end
   end
 end
