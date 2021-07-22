@@ -3,6 +3,10 @@ module Mulukhiya
     include Package
 
     def api_key
+      return YouTubeService.api_key
+    end
+
+    def self.api_key
       return config['/google/api/key'].decrypt
     rescue Ginseng::ConfigError
       return nil

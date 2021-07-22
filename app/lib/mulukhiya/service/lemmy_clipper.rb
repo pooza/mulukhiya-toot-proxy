@@ -64,7 +64,7 @@ module Mulukhiya
     def login
       client.send({op: 'Login', data: {
         username_or_email: @params[:user],
-        password: @params[:password],
+        password: (@params[:password].decrypt rescue @params[:password]),
       }}.to_json)
     end
 
