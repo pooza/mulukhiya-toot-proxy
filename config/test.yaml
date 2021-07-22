@@ -22,6 +22,7 @@ filters:
       - handler
       - listener_daemon
       - template
+      - mailer
       - '*_controller'
       - '*_handler'
   - name: postgres
