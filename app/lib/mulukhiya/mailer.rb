@@ -1,6 +1,7 @@
 module Mulukhiya
   class Mailer < Ginseng::Mailer
     include Package
+    include SNSMethods
 
     def name
       return Package.full_name
