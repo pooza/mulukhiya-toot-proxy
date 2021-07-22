@@ -4,8 +4,8 @@ module Mulukhiya
       @uri = TootURI.parse('https://precure.ml/web/statuses/101118840135913675')
     end
 
-    test 'テスト用トゥートURIの有無' do
-      assert(@uri)
+    test 'テスト用投稿の有無' do
+      assert(account.recent_status)
     end
 
     def test_id

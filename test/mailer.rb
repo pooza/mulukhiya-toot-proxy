@@ -4,11 +4,7 @@ module Mulukhiya
       @mailer = Mailer.new
     end
 
-    def test_default_receipt
-      @mailer.default_receipt
-    end
-
-    def test_config?
+    test '管理者向けメールアドレスの有無' do
       assert(Mailer.config?)
     end
   end
