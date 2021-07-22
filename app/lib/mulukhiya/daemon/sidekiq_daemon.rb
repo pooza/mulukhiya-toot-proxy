@@ -34,8 +34,7 @@ module Mulukhiya
     def self.auth(username, password)
       return true unless basic_auth?
       return false unless username == self.username
-      return true if password == self.password.decrypt
-      return true if password == self.password
+      return false unless password == (self.password.decrypt rescue self.password)
       return false
     end
 

@@ -57,7 +57,7 @@ module Mulukhiya
         @lemmy = LemmyClipper.new(
           host: user_config['/lemmy/host'],
           user: user_config['/lemmy/user'],
-          password: user_config['/lemmy/password'].decrypt,
+          password: (user_config['/lemmy/password'].decrypt rescue user_config['/lemmy/password']),
           community: user_config['/lemmy/community'],
         )
       end
@@ -162,6 +162,8 @@ module Mulukhiya
     module Methods
       def test_token
         return config['/agent/test/token'].decrypt
+      rescue Ginseng::ConfigError
+        return nil
       rescue
         return config['/agent/test/token']
       end
@@ -172,6 +174,8 @@ module Mulukhiya
 
       def info_token
         return config['/agent/info/token'].decrypt
+      rescue Ginseng::ConfigError
+        return nil
       rescue
         return config['/agent/info/token']
       end
