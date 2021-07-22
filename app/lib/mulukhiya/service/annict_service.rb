@@ -5,7 +5,7 @@ module Mulukhiya
     attr_reader :timestamps, :accounts
 
     def initialize(token = nil)
-      @token = token
+      @token = (token.decrypt rescue token)
       @timestamps = AnnictTimestampStorage.new
       @accounts = AnnictAccountStorage.new
     end
@@ -194,7 +194,11 @@ module Mulukhiya
     end
 
     def self.client_secret
-      return config['/annict/oauth/client/secret'] rescue nil
+      return config['/annict/oauth/client/secret'].decrypt
+    rescue Ginseng::ConfigError
+      return nil
+    rescue
+      return config['/annict/oauth/client/secret']
     end
 
     def self.config?

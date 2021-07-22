@@ -6,6 +6,7 @@ module Mulukhiya
       super rescue nil
       @id = params[:id] || config['/alert/line/to']
       @token = params[:token] || config['/alert/line/token']
+      @token = (@token.decrypt rescue @token)
     end
 
     def self.config?
