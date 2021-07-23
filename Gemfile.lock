@@ -303,13 +303,13 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.18.3)
+    rubocop (1.18.4)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.7.0, < 2.0)
+      rubocop-ast (>= 1.8.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.8.0)
@@ -369,6 +369,7 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
+      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
