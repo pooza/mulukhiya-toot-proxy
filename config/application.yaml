@@ -947,7 +947,7 @@ sidekiq:
       every: 5m
       class: Mulukhiya::FeedUpdateWorker
     announcement:
-      every: 1m
+      every: 5m
       class: Mulukhiya::AnnouncementWorker
 puma:
   port: 3008

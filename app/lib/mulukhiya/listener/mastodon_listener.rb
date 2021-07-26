@@ -22,6 +22,10 @@ module Mulukhiya
       Event.new(:follow, {sns: sns}).dispatch(payload)
     end
 
+    def handle_announcement(payload)
+      Announcer.new.announce
+    end
+
     def self.sender(payload)
       return Environment.account_class[payload.dig('account', 'id')]
     rescue => e
