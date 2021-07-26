@@ -17,10 +17,11 @@ module Mulukhiya
 
       config['/crypt/encoder'] = 'huga'
       assert_raise Ginseng::CryptError do
-        encrypted = @crypt.encrypt('fugafuga')
+        @crypt.encrypt('fugafuga')
       end
+      assert_equal(decrypted, 'fugafuga')
       assert_raise Ginseng::CryptError do
-        decrypted = @crypt.decrypt(encrypted)
+        @crypt.decrypt('fugafuga')
       end
     end
   end
