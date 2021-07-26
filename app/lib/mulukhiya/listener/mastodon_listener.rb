@@ -2,10 +2,10 @@ module Mulukhiya
   class MastodonListener < Listener
     def receive(message)
       data = JSON.parse(message.data)
-      method_name = "handle_#{data['event']}"
+      method_name = "handle_#{data['event']}".underscore
       if data['event'] == 'notification'
         payload = JSON.parse(data['payload'])
-        method_name = "handle_#{payload['type']}_notification"
+        method_name = "handle_#{payload['type']}_notification".underscore
       end
       send(method_name.to_sym, payload)
     rescue NoMethodError

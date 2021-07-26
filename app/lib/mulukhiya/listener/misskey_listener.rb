@@ -2,7 +2,8 @@ module Mulukhiya
   class MisskeyListener < Listener
     def receive(message)
       payload = JSON.parse(message.data)['body']
-      send("handle_#{payload['type'].underscore}".to_sym, payload)
+      method_name = "handle_#{payload['type']}"
+      send(method_name.to_sym, payload)
     rescue NoMethodError
       logger.error(class: self.class.to_s, message: 'method undefined', method: method_name)
     rescue => e
