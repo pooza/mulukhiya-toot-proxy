@@ -24,7 +24,7 @@ module Mulukhiya
     error do |e|
       e.package = Package.full_name
       @renderer = default_renderer_class.new
-      @renderer.status = e.status rescue 500
+      @renderer.status = e.status
       @renderer.message = e.to_h
       @renderer.message.delete(:backtrace)
       @renderer.message[:error] = e.message

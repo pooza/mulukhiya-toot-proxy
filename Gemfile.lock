@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: c60e3184e55e42b9caa8d8665729930f024b3ec9
+  revision: 68afa62ab3fb83c597c6a5969304ff5acf27344d
   specs:
-    ginseng-core (1.10.26)
+    ginseng-core (1.10.27)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -17,9 +17,11 @@ GIT
       multi_json
       net-protocol
       nokogiri (>= 1.11.4)
+      optparse
       rake
       rest-client
       sanitize
+      securerandom
       time
       unicode
       yajl-ruby
@@ -331,6 +333,7 @@ GEM
       nokogumbo (~> 2.0)
     sassc (2.4.0)
       ffi (~> 1.9)
+    securerandom (0.1.0)
     sequel (5.46.0)
     sidekiq (6.2.1)
       connection_pool (>= 2.2.2)

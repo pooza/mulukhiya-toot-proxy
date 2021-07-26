@@ -14,7 +14,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
-      @renderer.status = e.status rescue 502
+      @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
@@ -26,7 +26,7 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
-      @renderer.status = e.status rescue 502
+      @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
     end
