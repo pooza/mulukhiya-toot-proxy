@@ -287,10 +287,10 @@ mastodon:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message
+      - welcome_mention
     mention:
       - announcement_mention
-      - welcome_message
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -436,10 +436,10 @@ misskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message
+      - welcome_mention
     mention:
       - announcement_mention
-      - welcome_message
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -580,10 +580,10 @@ meisskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message
+      - welcome_mention
     mention:
       - announcement_mention
-      - welcome_message
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -709,10 +709,10 @@ pleroma:
       - lemmy_bookmark
       - result_notification
     follow:
-      - welcome_message
+      - welcome_mention
     mention:
       - announcement_mention
-      - welcome_message
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -1028,8 +1028,10 @@ cli:
 agent:
   info:
     token: null
-    follow:
+    welcome:
       template: welcome
+    announcement:
+      template: announcement
   test:
     token: null
   accts:

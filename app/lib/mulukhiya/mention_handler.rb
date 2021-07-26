@@ -8,14 +8,6 @@ module Mulukhiya
       return false
     end
 
-    def handle_follow(payload, params = {})
-      return unless sns = params[:sns]
-      return unless id = payload.dig('account', 'id') || payload.dig('body', 'id')
-      return unless account = account_class[id]
-      return if account.bot?
-      sns.notify(account, template.to_s)
-    end
-
     def handle_mention(payload, params = {})
       self.payload = payload
       return unless respondable?
@@ -36,8 +28,19 @@ module Mulukhiya
       return true
     end
 
+    def template
+      unless @template
+        prefix = underscore.sub(/_mention$/, '')
+        @template = Template.new(
+          File.join('mention', (config["/agent/info/#{prefix}/template"] || prefix)),
+        )
+      end
+      return @template
+    end
+
     def create_body(params = {})
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      template.params = params
+      return template.to_s
     end
   end
 end
