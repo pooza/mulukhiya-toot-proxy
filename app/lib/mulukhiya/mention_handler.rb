@@ -12,6 +12,7 @@ module Mulukhiya
       self.payload = payload
       return unless respondable?
       return unless sns = params[:sns]
+      return unless sender
       return if sender.bot?
       sns.notify(sender, create_body(params), payload['status'] || payload['body'])
       @prepared = true

@@ -1,7 +1,7 @@
 module Mulukhiya
   class MeisskeyListener < MisskeyListener
     def self.sender(payload)
-      return Environment.account_class[payload.dig('body', 'user', 'id')]
+      return Environment.account_class.get(id: payload.dig('body', 'user', 'id'))
     rescue => e
       logger.error(error: e)
     end
