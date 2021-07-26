@@ -1,7 +1,7 @@
 module Mulukhiya
-  class WelcomeMessageFollowHandlerTest < TestCase
+  class WelcomeMessageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('welcome_message_follow')
+      @handler = Handler.create('welcome_message')
     end
 
     def test_template

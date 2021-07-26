@@ -14,6 +14,10 @@ module Mulukhiya
       logger.error(error: e, payload: (payload rescue message.data))
     end
 
+    def handle_mention_notification(payload)
+      Event.new(:mention, {sns: sns}).dispatch(payload)
+    end
+
     def handle_follow_notification(payload)
       Event.new(:follow, {sns: sns}).dispatch(payload)
     end

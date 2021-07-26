@@ -285,7 +285,9 @@ mastodon:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_message
+    mention:
+      - welcome_message
     alert:
       - slack_alert
       - line_alert
@@ -431,7 +433,9 @@ misskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_message
+    mention:
+      - welcome_message
     alert:
       - slack_alert
       - line_alert
@@ -572,7 +576,9 @@ meisskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_message
+    mention:
+      - welcome_message
     alert:
       - slack_alert
       - line_alert
@@ -698,7 +704,9 @@ pleroma:
       - lemmy_bookmark
       - result_notification
     follow:
-      - welcome_message_follow
+      - welcome_message
+    mention:
+      - welcome_message
     alert:
       - slack_alert
       - line_alert

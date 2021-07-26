@@ -56,6 +56,12 @@ module Mulukhiya
     def handle_announce(announcement, params = {})
     end
 
+    def handle_follow(payload, params = {})
+    end
+
+    def handle_mention(payload, params = {})
+    end
+
     def handle_error(error, params = {})
     end
 

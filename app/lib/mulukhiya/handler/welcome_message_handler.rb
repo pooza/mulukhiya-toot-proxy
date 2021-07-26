@@ -1,9 +1,8 @@
 module Mulukhiya
-  class WelcomeMessageFollowHandler < Handler
+  class WelcomeMessageHandler < Handler
     def disable?
       return true unless Environment.dbms_class.config?
       return true unless controller_class.streaming?
-      return true if config.disable?(self)
       return false
     end
 
@@ -13,6 +12,10 @@ module Mulukhiya
       return unless account = account_class[id]
       return if account.bot?
       sns.notify(account, template.to_s)
+    end
+
+    def handle_mention(payload, params = {})
+      handle_follow(payload, params)
     end
 
     def template
