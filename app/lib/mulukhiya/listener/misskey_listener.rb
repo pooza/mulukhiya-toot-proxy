@@ -4,7 +4,7 @@ module Mulukhiya
       payload = JSON.parse(message.data)['body']
       send("handle_#{payload['type'].underscore}".to_sym, payload)
     rescue NoMethodError
-      logger.error(error: 'method undefined', payload: payload)
+      logger.error(class: self.class.to_s, message: 'method undefined', method: method_name)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end
