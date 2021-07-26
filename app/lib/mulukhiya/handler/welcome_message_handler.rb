@@ -1,30 +1,14 @@
 module Mulukhiya
-  class WelcomeMessageHandler < Handler
-    def disable?
-      return true unless Environment.dbms_class.config?
-      return true unless controller_class.streaming?
-      return false
-    end
-
+  class WelcomeMessageHandler < MentionHandler
     def handle_follow(payload, params = {})
+      self.payload = payload
       return unless sns = params[:sns]
-      return unless id = payload.dig('account', 'id') || payload.dig('body', 'id')
-      return unless account = account_class[id]
-      return if account.bot?
-      sns.notify(account, template.to_s)
+      return if sender.bot?
+      sns.notify(sender, create_body(params))
     end
 
-    def handle_mention(payload, params = {})
-      return unless sns = params[:sns]
-      return unless id = payload.dig('account', 'id') || payload.dig('body', 'id')
-      return unless account = account_class[id]
-      return if account.bot?
-      sns.notify(account, template.to_s, payload['status'])
-      @prepared = true
-    end
-
-    def template
-      return Template.new(config['/agent/info/follow/template'])
+    def create_body(params = {})
+      return Template.new(config['/agent/info/follow/template']).to_s
     end
   end
 end
