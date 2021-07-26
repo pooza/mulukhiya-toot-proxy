@@ -13,14 +13,14 @@ module Mulukhiya
       return unless respondable?
       return unless sns = params[:sns]
       return if sender.bot?
-      sns.notify(sender, create_body(params), payload['status'])
+      sns.notify(sender, create_body(params), payload['status'] || payload['body'])
       @prepared = true
     end
 
     def payload=(payload)
       @payload = payload
-      @status = payload.dig('status', 'content')
-      id = payload.dig('account', 'id') || payload.dig('body', 'id')
+      @status = payload.dig('status', 'content') || payload.dig('body', 'text')
+      id = payload.dig('account', 'id') || payload.dig('body', 'user', 'id')
       @sender = account_class[id]
     end
 
