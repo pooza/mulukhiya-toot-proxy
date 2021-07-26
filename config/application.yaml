@@ -711,7 +711,6 @@ pleroma:
     follow:
       - welcome_mention
     mention:
-      - announcement_mention
       - welcome_mention
     alert:
       - slack_alert
@@ -947,7 +946,7 @@ sidekiq:
       every: 5m
       class: Mulukhiya::FeedUpdateWorker
     announcement:
-      every: 5m
+      every: 1m
       class: Mulukhiya::AnnouncementWorker
 puma:
   port: 3008

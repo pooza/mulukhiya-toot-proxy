@@ -24,6 +24,9 @@ sidekiq:
     dsn: redis://localhost:6379/2
   auth:
     password: your_password
+  schedule:
+    announcement:
+      every: 10m
 tagging:
   default_tags:
     - デフォルトタグ1
