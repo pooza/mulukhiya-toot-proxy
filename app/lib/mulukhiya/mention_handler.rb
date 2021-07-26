@@ -20,7 +20,7 @@ module Mulukhiya
     def payload=(payload)
       @payload = payload
       @status = payload.dig('status', 'content') || payload.dig('body', 'text')
-      @sender = account_class.get(stream: payload)
+      @sender = Environment.listener_class.sender(payload)
     end
 
     def respondable?

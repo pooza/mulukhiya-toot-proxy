@@ -90,8 +90,6 @@ module Mulukhiya
         if acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return first(username: acct.username, host: acct.domain)
-        elsif key.key?(:stream)
-          return get(id: key[:stream].dig('body', 'user', 'id'))
         elsif key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
           return first(key) || AccessToken.first(hash: token)&.account

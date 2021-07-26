@@ -22,6 +22,12 @@ module Mulukhiya
       Event.new(:follow, {sns: sns}).dispatch(payload)
     end
 
+    def self.sender(payload)
+      return Environment.account_class[payload.dig('account', 'id')]
+    rescue => e
+      logger.error(error: e)
+    end
+
     def self.start
       EM.run do
         listener = MastodonListener.new

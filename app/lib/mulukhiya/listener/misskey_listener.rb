@@ -18,6 +18,12 @@ module Mulukhiya
       Event.new(:follow, {sns: sns}).dispatch(payload)
     end
 
+    def self.sender(payload)
+      return Environment.account_class.get[payload.dig('body', 'user', 'id')]
+    rescue => e
+      logger.error(error: e)
+    end
+
     def self.start
       EM.run do
         listener = MisskeyListener.new

@@ -110,8 +110,6 @@ module Mulukhiya
           entry = collection.find(username: acct.username, host: acct.domain).first
           return Account.new(entry['_id']) if entry
           return nil
-        elsif key.key?(:stream)
-          return get(id: key[:stream].dig('body', 'user', 'id'))
         elsif key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
           entry = collection.find(token: token).first
