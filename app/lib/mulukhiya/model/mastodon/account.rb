@@ -87,6 +87,8 @@ module Mulukhiya
           account = Account[account[:id]]
           account.token = token
           return account
+        elsif key.key?(:stream)
+          return get(id: key[:stream].dig('account', 'id'))
         elsif acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return Account.first(username: acct.username, domain: acct.domain)

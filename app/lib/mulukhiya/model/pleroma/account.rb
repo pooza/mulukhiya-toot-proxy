@@ -105,6 +105,8 @@ module Mulukhiya
           nickname = acct.username if acct.local?
           nickname ||= acct.to_s.sub(/^@/, '')
           return first(nickname: nickname)
+        elsif key.key?(:stream)
+          return get(acct: key[:stream].dig('account', 'fqn'))
         elsif key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
           account = AccessToken.first(token: token)&.account
