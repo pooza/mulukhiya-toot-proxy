@@ -18,6 +18,8 @@ handler:
     disable: true
   amazon_url_nowplaying:
     disable: true
+  announcement_mention:
+    pattern: 'お[知し]らせ'
   attachment_reusing:
     disable: true
   audio_format_convert:
@@ -287,6 +289,7 @@ mastodon:
     follow:
       - welcome_message
     mention:
+      - announcement_mention
       - welcome_message
     alert:
       - slack_alert
@@ -435,6 +438,7 @@ misskey:
     follow:
       - welcome_message
     mention:
+      - announcement_mention
       - welcome_message
     alert:
       - slack_alert
@@ -578,6 +582,7 @@ meisskey:
     follow:
       - welcome_message
     mention:
+      - announcement_mention
       - welcome_message
     alert:
       - slack_alert
@@ -706,6 +711,7 @@ pleroma:
     follow:
       - welcome_message
     mention:
+      - announcement_mention
       - welcome_message
     alert:
       - slack_alert
