@@ -1,7 +1,7 @@
 module Mulukhiya
   class AccountTest < TestCase
     test 'テスト用アカウントの有無' do
-      assert(account)
+      assert_not_nil(account)
     end
 
     def test_get

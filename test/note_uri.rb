@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     test 'テスト用投稿の有無' do
-      assert(account.recent_status)
+      assert_not_nil(account.recent_status)
     end
 
     def test_id
