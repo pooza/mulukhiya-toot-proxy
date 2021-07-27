@@ -21,6 +21,10 @@ module Mulukhiya
       return @service
     end
 
+    def self.disable?
+      return [:follow, :mention].sum {|v| Event.new(v).count}.zero?
+    end
+
     def self.health
       pid = File.read(File.join(Environment.dir, 'tmp/pids/ListenerDaemon.pid')).to_i
       raise "PID '#{pid}' was dead" unless Process.alive?(pid)

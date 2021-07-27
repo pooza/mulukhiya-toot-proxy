@@ -134,23 +134,19 @@ module Mulukhiya
       return controller_class.dbms_class
     end
 
+    def self.daemon_classes
+      return [PumaDaemon, SidekiqDaemon, ListenerDaemon].reject(&:disable?)
+    end
+
     def self.task_prefixes
-      tasks = ['mulukhiya:puma', 'mulukhiya:sidekiq']
-      return tasks unless controller_class.streaming?
-      return tasks unless event = Event.new(:follow) rescue nil
-      return tasks unless event.count.positive?
-      tasks.push('mulukhiya:listener')
-      return tasks
+      return daemon_classes.map {|v| v.to_s.split('::').last.sub(/Daemon$/, '').underscore}
     end
 
     def self.health
-      values = {
-        redis: Redis.health,
-        sidekiq: SidekiqDaemon.health,
-      }
-      values[:streaming] = ListenerDaemon.health if task_prefixes.include?('mulukhiya:listener')
-      values[:postgres] = Postgres.health if postgres?
-      values[:mongo] = Mongo.health if mongo?
+      values = daemon_classes.map do |daemon|
+        [daemon.to_s.split('::').last.sub(/Daemon$/, '').undrescore.to_sym, daemon.health]
+      end.to_h
+      values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
       values[:status] ||= 200
       return values

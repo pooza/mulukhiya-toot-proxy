@@ -26,6 +26,10 @@ module Mulukhiya
       return @uri
     end
 
+    def self.disable?
+      return false
+    end
+
     private
 
     def initializer_path

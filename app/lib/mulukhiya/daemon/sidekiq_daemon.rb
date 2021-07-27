@@ -42,6 +42,10 @@ module Mulukhiya
       return true
     end
 
+    def self.disable?
+      return false
+    end
+
     def self.health
       stats = Sidekiq::Stats.new
       pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}
