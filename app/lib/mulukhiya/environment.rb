@@ -146,7 +146,7 @@ module Mulukhiya
 
     def self.health
       values = daemon_classes.map do |daemon|
-        [daemon.to_s.split('::').last.sub(/Daemon$/, '').undrescore.to_sym, daemon.health]
+        [daemon.to_s.split('::').last.sub(/Daemon$/, '').underscore.to_sym, daemon.health]
       end.to_h
       values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
