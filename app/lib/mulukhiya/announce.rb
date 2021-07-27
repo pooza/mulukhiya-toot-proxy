@@ -1,5 +1,5 @@
 module Mulukhiya
-  class Announcer
+  class Announce
     include Package
     include SNSMethods
     attr_reader :storage, :sns

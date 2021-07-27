@@ -1,20 +1,20 @@
 module Mulukhiya
-  class AnnouncerTest < TestCase
+  class AnnounceTest < TestCase
     def setup
-      @annauncer = Announcer.new
+      @announce = Announce.new
     end
 
     def test_load
-      assert_kind_of(Hash, @annauncer.load)
+      assert_kind_of(Hash, @announce.load)
     end
 
     def test_count
-      assert_kind_of(Integer, @annauncer.count)
+      assert_kind_of(Integer, @announce.count)
     end
 
     def test_fetch
-      assert_kind_of(Array, @annauncer.fetch)
-      @annauncer.fetch.first(5).each do |entry|
+      assert_kind_of(Array, @announce.fetch)
+      @announce.fetch.first(5).each do |entry|
         assert_kind_of(Hash, entry)
         assert(entry[:id].present?)
         assert(entry[:content].present?)

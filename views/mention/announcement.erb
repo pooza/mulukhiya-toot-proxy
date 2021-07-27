@@ -1,5 +1,5 @@
-公開されているお知らせは、<%= @params[:announcer].count.commaize %>件です。
+公開されているお知らせは、<%= @params[:announce].count.commaize %>件です。
 
-<% @params[:announcer].load.each do |_id, announcement| -%>
+<% @params[:announce].load.each do |_id, announcement| -%>
 - <%= announcement['text'] %>
 <% end -%>

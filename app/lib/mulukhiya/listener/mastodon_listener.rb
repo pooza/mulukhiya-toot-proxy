@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def handle_announcement(payload)
-      Announcer.new.announce
+      Announce.new.announce
     end
 
     def self.sender(payload)
