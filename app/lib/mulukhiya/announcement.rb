@@ -1,5 +1,5 @@
 module Mulukhiya
-  class Announce
+  class Announcement
     include Package
     include SNSMethods
     attr_reader :storage, :sns
@@ -26,8 +26,7 @@ module Mulukhiya
     end
 
     def fetch
-      @announcements ||= sns.announcements
-      return @announcements
+      return sns.announcements
     end
 
     def load

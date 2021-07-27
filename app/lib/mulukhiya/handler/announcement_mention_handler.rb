@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def handle_mention(payload, params = {})
-      params[:announce] = Announce.new
+      params[:announcement] = Announcement.new
       super(payload, params)
     end
 
