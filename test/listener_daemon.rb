@@ -11,9 +11,5 @@ module Mulukhiya
     def test_motd
       assert_kind_of(String, @daemon.motd)
     end
-
-    def test_service
-      assert_kind_of(sns_class, @daemon.service)
-    end
   end
 end
