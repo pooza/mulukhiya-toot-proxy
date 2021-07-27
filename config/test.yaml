@@ -11,7 +11,6 @@ filters:
       - account
       - attachment
       - access_token
-      - announce
       - status
       - hash_tag
       - user_config
@@ -100,7 +99,7 @@ filters:
       - program
   - name: announcement
     cases:
-      - announce
+      - announcement
   - name: note
     cases:
       - note_uri
