@@ -145,9 +145,11 @@ module Mulukhiya
     end
 
     def self.health
-      values = daemon_classes.map do |daemon|
-        [daemon.to_s.split('::').last.sub(/Daemon$/, '').underscore.to_sym, daemon.health]
-      end.to_h
+      values = {
+        redis: Redis.health,
+        sidekiq: SidekiqDaemon.health,
+      }
+      values[:streaming] = ListenerDaemon.health if daemon_classes.include?(ListenerDaemon)
       values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
       values[:status] ||= 200
