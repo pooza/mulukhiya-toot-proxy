@@ -12,13 +12,8 @@ module Mulukhiya
     def motd
       return [
         "#{self.class} #{Package.version}",
-        "Streaming API URL: #{service.streaming_uri}",
+        "Streaming API URL: #{info_agent_service.streaming_uri}",
       ].join("\n")
-    end
-
-    def service
-      @service ||= info_agent_service
-      return @service
     end
 
     def self.disable?

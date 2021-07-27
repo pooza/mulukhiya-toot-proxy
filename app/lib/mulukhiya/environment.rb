@@ -139,7 +139,9 @@ module Mulukhiya
     end
 
     def self.task_prefixes
-      return daemon_classes.map {|v| v.to_s.split('::').last.sub(/Daemon$/, '').underscore}
+      return daemon_classes.map do |daemon|
+        "mulukhiya:#{daemon.to_s.split('::').last.sub(/Daemon$/, '').underscore}"
+      end
     end
 
     def self.health
