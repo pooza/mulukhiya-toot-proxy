@@ -11,5 +11,9 @@ module Mulukhiya
     def test_motd
       assert_kind_of(String, @daemon.motd)
     end
+
+    def test_disable?
+      assert_boolean(ListenerDaemon.disable?)
+    end
   end
 end
