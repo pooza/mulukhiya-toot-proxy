@@ -49,6 +49,7 @@ module Mulukhiya
     end
 
     def values
+      logger.info(raw['head_commit'])
       return {
         status_field => {
           zen: zen,
