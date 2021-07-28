@@ -41,10 +41,10 @@ module Mulukhiya
       }
     end
 
-    def commits
+    def head_commit
       return {
-        message: raw.dig('commits', 'message'),
-        url: raw.dig('commits', 'url'),
+        message: raw.dig('head_commit', 'message'),
+        url: raw.dig('head_commit', 'url'),
       }
     end
 
@@ -60,7 +60,7 @@ module Mulukhiya
           repository: repository,
           issue: issue,
           milestone: milestone,
-          commits: commits,
+          head_commit: head_commit,
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end
