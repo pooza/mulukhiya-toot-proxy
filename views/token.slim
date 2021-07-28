@@ -24,15 +24,15 @@ html lang='ja'
           .field
             .title 権限:
             .value
-              .scope v-for='scope in current_account.scopes' = '{{scope}}'
+              .scope v-for='scope in current_account.scopes' = ' {{scope}}'
           .field
             .title トークン:
             .value
-              code = '{{current_account.token}}'
+              code = ' {{current_account.token}}'
           .field
             .title webhook:
             .value
-              code = '{{current_account.webhook}}'
+              code = ' {{current_account.webhook}}'
         .all-tokens v-if='all_tokens'
           h4 全てのトークン
           .description 他のブラウザやPCに、トークンを持ち出すことができます。
