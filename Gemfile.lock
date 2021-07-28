@@ -294,7 +294,7 @@ GEM
       loofah (~> 2.3)
     rainbow (3.0.0)
     rake (13.0.6)
-    redis (4.3.1)
+    redis (4.4.0)
     regexp_parser (2.1.1)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -348,7 +348,7 @@ GEM
       sidekiq (>= 3)
       thwait
       tilt (>= 1.4.0)
-    sidekiq-unique-jobs (7.1.4)
+    sidekiq-unique-jobs (7.1.5)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 5.0, < 7.0)
