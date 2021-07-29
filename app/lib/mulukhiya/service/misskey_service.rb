@@ -75,7 +75,7 @@ module Mulukhiya
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
       }
-      status['replyId'] = response['createdNote']['id'] if response
+      status['replyId'] = (response.dig('createdNote', 'id') || response['id']) if response
       return post(status)
     end
 

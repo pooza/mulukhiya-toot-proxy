@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 8c4371c4512aa0469cda955157dbb5e5e8d792e6
+  revision: 1368b1264837c1078c54a8de8146718a6fcb20e1
   specs:
-    ginseng-core (1.10.25)
+    ginseng-core (1.10.28)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -17,9 +17,11 @@ GIT
       multi_json
       net-protocol
       nokogiri (>= 1.11.4)
+      optparse
       rake
       rest-client
       sanitize
+      securerandom
       time
       unicode
       yajl-ruby
@@ -103,7 +105,7 @@ GEM
     aws-eventstream (1.1.1)
     aws-sigv4 (1.2.4)
       aws-eventstream (~> 1, >= 1.0.2)
-    bootsnap (1.7.5)
+    bootsnap (1.7.6)
       msgpack (~> 1.0)
     brpoplpush-redis_script (0.1.2)
       concurrent-ruby (~> 1.0, >= 1.0.5)
@@ -292,7 +294,7 @@ GEM
       loofah (~> 2.3)
     rainbow (3.0.0)
     rake (13.0.6)
-    redis (4.3.1)
+    redis (4.4.0)
     regexp_parser (2.1.1)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -303,13 +305,13 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.18.3)
+    rubocop (1.18.4)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.7.0, < 2.0)
+      rubocop-ast (>= 1.8.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.8.0)
@@ -331,6 +333,7 @@ GEM
       nokogumbo (~> 2.0)
     sassc (2.4.0)
       ffi (~> 1.9)
+    securerandom (0.1.0)
     sequel (5.46.0)
     sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
@@ -345,7 +348,7 @@ GEM
       sidekiq (>= 3)
       thwait
       tilt (>= 1.4.0)
-    sidekiq-unique-jobs (7.1.2)
+    sidekiq-unique-jobs (7.1.5)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 5.0, < 7.0)
@@ -358,7 +361,7 @@ GEM
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
-    slim_lint (0.21.1)
+    slim_lint (0.22.0)
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
@@ -369,7 +372,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)

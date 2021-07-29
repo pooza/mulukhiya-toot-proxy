@@ -64,7 +64,7 @@ module Mulukhiya
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {}.to_json
       assert_false(last_response.ok?)
-      assert([422, 502].include?(last_response.status))
+      assert([422, 502].member?(last_response.status))
     end
   end
 end

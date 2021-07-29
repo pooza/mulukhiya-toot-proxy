@@ -40,8 +40,11 @@
 - ローカル投稿を[Dropbox](https://dropbox.com/)等、各種外部サービスに保存。
 - ブックマークされた公開投稿を、[Lemmy](https://join.lemmy.ml/)に転送。
 - 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
+- GitHub / GROWIのwebhookとして登録。
 - ハッシュタグのAtomフィード。
+- カスタムRSSフィード。
 - 新規登録者へのウェルカムメッセージ。
+- お知らせの念押し投稿。
 
 等々。
 

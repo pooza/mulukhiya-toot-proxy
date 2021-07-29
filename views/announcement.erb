@@ -4,6 +4,7 @@
 title: <%= @params[:title] || @params[:body].each_line.first.split(/\s+/).first.strip %>
 date: <%= Date.today.strftime %>
 categories: <%= @params[:category] %>
+comments: <%= config['/handler/hexo_announce/comments'].to_s %>
 ---
 
 <% end -%>

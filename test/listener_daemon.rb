@@ -12,8 +12,8 @@ module Mulukhiya
       assert_kind_of(String, @daemon.motd)
     end
 
-    def test_service
-      assert_kind_of(sns_class, @daemon.service)
+    def test_disable?
+      assert_boolean(ListenerDaemon.disable?)
     end
   end
 end

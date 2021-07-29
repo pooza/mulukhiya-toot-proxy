@@ -2,15 +2,26 @@ module Mulukhiya
   class MisskeyListener < Listener
     def receive(message)
       payload = JSON.parse(message.data)['body']
-      send("handle_#{payload['type'].underscore}".to_sym, payload)
+      method_name = "handle_#{payload['type']}".underscore
+      send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.error(error: 'method undefined', payload: payload)
+      logger.error(class: self.class.to_s, message: 'method undefined', method: method_name)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end
 
+    def handle_mention(payload)
+      Event.new(:mention, {sns: sns}).dispatch(payload)
+    end
+
     def handle_followed(payload)
       Event.new(:follow, {sns: sns}).dispatch(payload)
+    end
+
+    def self.sender(payload)
+      return Environment.account_class.get(id: payload.dig('body', 'user', 'id'))
+    rescue => e
+      logger.error(error: e)
     end
 
     def self.start

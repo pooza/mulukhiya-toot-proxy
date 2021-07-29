@@ -41,6 +41,13 @@ module Mulukhiya
       }
     end
 
+    def head_commit
+      return {
+        message: raw.dig('head_commit', 'message'),
+        url: raw.dig('head_commit', 'url'),
+      }
+    end
+
     def values
       return {
         status_field => {
@@ -53,6 +60,7 @@ module Mulukhiya
           repository: repository,
           issue: issue,
           milestone: milestone,
+          head_commit: head_commit,
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end

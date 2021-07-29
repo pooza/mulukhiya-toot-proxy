@@ -1,7 +1,7 @@
 package:
-  version: 4.7.5
+  version: 4.8.0
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  description: 投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
+  description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
     - Tatsuya Koishi
   email:
@@ -18,6 +18,8 @@ handler:
     disable: true
   amazon_url_nowplaying:
     disable: true
+  announcement_mention:
+    pattern: 'お[知し]らせ'
   attachment_reusing:
     disable: true
   audio_format_convert:
@@ -36,6 +38,7 @@ handler:
     useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100'
   hexo_announce:
     category: お知らせ
+    comments: false
   image_format_convert:
     alpha: true
   image_resize:
@@ -284,7 +287,10 @@ mastodon:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_mention
+    mention:
+      - announcement_mention
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -430,7 +436,10 @@ misskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_mention
+    mention:
+      - announcement_mention
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -571,7 +580,10 @@ meisskey:
       - dropbox_announce
       - hexo_announce
     follow:
-      - welcome_message_follow
+      - welcome_mention
+    mention:
+      - announcement_mention
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -697,7 +709,9 @@ pleroma:
       - lemmy_bookmark
       - result_notification
     follow:
-      - welcome_message_follow
+      - welcome_mention
+    mention:
+      - welcome_mention
     alert:
       - slack_alert
       - line_alert
@@ -1013,8 +1027,10 @@ cli:
 agent:
   info:
     token: null
-    follow:
+    welcome:
       template: welcome
+    announcement:
+      template: announcement
   test:
     token: null
   accts:

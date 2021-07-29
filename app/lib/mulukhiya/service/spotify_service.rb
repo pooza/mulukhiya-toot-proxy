@@ -4,7 +4,7 @@ module Mulukhiya
 
     def initialize
       ENV['ACCEPT_LANGUAGE'] ||= config['/spotify/language']
-      RSpotify.authenticate(config['/spotify/client/id'], config['/spotify/client/secret'])
+      RSpotify.authenticate(SpotifyService.client_id, SpotifyService.client_secret)
     end
 
     def search_track(keyword)
@@ -81,12 +81,25 @@ module Mulukhiya
       return itunes.create_track_uri(track)
     end
 
+    def self.client_id
+      return config['/spotify/client/id'] rescue nil
+    end
+
+    def self.client_secret
+      return config['/spotify/client/secret'].decrypt
+    rescue Ginseng::ConfigError
+      return nil
+    rescue
+      return config['/spotify/client/secret']
+    end
+
     def self.config?
-      config['/spotify/client/id']
-      config['/spotify/client/secret']
+      return false unless client_id
+      return false unless client_secret
       SpotifyService.new
       return true
-    rescue
+    rescue => e
+      logger.error(error: e)
       return false
     end
 

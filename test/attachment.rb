@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     test 'テスト用メディアファイルの有無' do
-      assert(@attachment)
+      assert_not_nil(@attachment)
     end
 
     def test_to_h

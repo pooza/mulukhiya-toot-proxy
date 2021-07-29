@@ -7,9 +7,9 @@ meisskey:
       image: image/jpeg
 agent:
   test:
-    token: your_token
+    token: 'your_token'
   info:
-    token: your_token
+    token: 'your_token'
 mongo:
   dsn: mongo://localhost:27017/misskey
 user_config:
@@ -24,8 +24,6 @@ alert:
   hooks:
     - https://hooks.slack.com/services/xxxxx
     - https://discordapp.com/api/webhooks/xxxxx/slack
-  mail:
-    to: admin@example.com
 tagging:
   default_tags:
     - デフォルトタグ1

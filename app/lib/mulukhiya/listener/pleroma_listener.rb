@@ -1,5 +1,11 @@
 module Mulukhiya
   class PleromaListener < MastodonListener
+    def self.sender(payload)
+      return Environment.account_class.get(acct: payload.dig('account', 'fqn'))
+    rescue => e
+      logger.error(error: e)
+    end
+
     def self.start
       EM.run do
         listener = PleromaListener.new
@@ -16,7 +22,7 @@ module Mulukhiya
           listener.receive(message)
         end
       end
-    rescue
+    rescue => e
       @client = nil
       logger.error(error: e)
       sleep(5)

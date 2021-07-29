@@ -12,13 +12,12 @@ module Mulukhiya
     def motd
       return [
         "#{self.class} #{Package.version}",
-        "Streaming API URL: #{service.streaming_uri}",
+        "Streaming API URL: #{info_agent_service.streaming_uri}",
       ].join("\n")
     end
 
-    def service
-      @service ||= info_agent_service
-      return @service
+    def self.disable?
+      return [:follow, :mention].sum {|v| Event.new(v).count}.zero?
     end
 
     def self.health

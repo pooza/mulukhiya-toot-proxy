@@ -4,16 +4,26 @@ module Mulukhiya
 
     def initialize(params = {})
       super rescue nil
-      @id = params[:id] || config['/alert/line/to']
-      @token = params[:token] || config['/alert/line/token']
+      @id = params[:id] || LineService.id
+      @token = (params[:token].decrypt rescue params[:token]) || LineService.token
+    end
+
+    def self.id
+      return config['/alert/line/to'] rescue nil
+    end
+
+    def self.token
+      return config['/alert/line/token'].decrypt
+    rescue Ginseng::ConfigError
+      return nil
+    rescue
+      return config['/alert/line/token']
     end
 
     def self.config?
-      return false unless config['/alert/line/token'].present?
-      return false unless config['/alert/line/to'].present?
+      return false unless LineService.id
+      return false unless LineService.token
       return true
-    rescue Ginseng::ConfigError
-      return false
     end
   end
 end

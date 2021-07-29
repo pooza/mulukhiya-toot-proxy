@@ -7,7 +7,7 @@ module Mulukhiya
     GRANT_OWNER = 4
 
     def initialize(params = {})
-      @token = params[:token]
+      @token = (params[:token].decrypt rescue params[:token])
       @prefix = params[:prefix]
       @http = HTTP.new
       @http.base_uri = params[:uri]

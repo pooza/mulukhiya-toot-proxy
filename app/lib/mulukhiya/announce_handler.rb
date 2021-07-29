@@ -2,6 +2,11 @@ module Mulukhiya
   class AnnounceHandler < Handler
     attr_reader :sns
 
+    def disable?
+      return true unless controller_class.announcement?
+      return super
+    end
+
     def handle_announce(payload, params = {})
       self.payload = payload
       announce(params) if @sns = params[:sns]

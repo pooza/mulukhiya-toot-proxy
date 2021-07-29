@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     test 'テスト用トークンの有無' do
-      assert(@token)
+      assert_not_nil(@token)
     end
 
     def test_valid?

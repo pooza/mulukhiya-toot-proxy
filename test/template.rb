@@ -1,7 +1,7 @@
 module Mulukhiya
   class TemplateTest < TestCase
     def setup
-      @template = Template.new('welcome')
+      @template = Template.new('mention/welcome')
     end
 
     def test_to_s

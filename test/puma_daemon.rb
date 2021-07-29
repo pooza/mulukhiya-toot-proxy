@@ -15,5 +15,9 @@ module Mulukhiya
     def test_root_uri
       assert_kind_of(Ginseng::URI, @daemon.root_uri)
     end
+
+    def test_disable?
+      assert_boolean(PumaDaemon.disable?)
+    end
   end
 end

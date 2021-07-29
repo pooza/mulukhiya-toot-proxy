@@ -2,20 +2,34 @@ module Mulukhiya
   class MastodonListener < Listener
     def receive(message)
       data = JSON.parse(message.data)
-      payload = JSON.parse(data['payload'])
+      method_name = "handle_#{data['event']}".underscore
       if data['event'] == 'notification'
-        send("handle_#{payload['type']}_notification".to_sym, payload)
-      else
-        send("handle_#{data['event']}".to_sym, payload)
+        payload = JSON.parse(data['payload'])
+        method_name = "handle_#{payload['type']}_notification".underscore
       end
+      send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.error(error: 'method undefined', payload: payload)
+      logger.error(class: self.class.to_s, message: 'method undefined', method: method_name)
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end
 
+    def handle_mention_notification(payload)
+      Event.new(:mention, {sns: sns}).dispatch(payload)
+    end
+
     def handle_follow_notification(payload)
       Event.new(:follow, {sns: sns}).dispatch(payload)
+    end
+
+    def handle_announcement(payload)
+      Announcement.new.announce
+    end
+
+    def self.sender(payload)
+      return Environment.account_class[payload.dig('account', 'id')]
+    rescue => e
+      logger.error(error: e)
     end
 
     def self.start
@@ -34,7 +48,7 @@ module Mulukhiya
           listener.receive(message)
         end
       end
-    rescue
+    rescue => e
       @client = nil
       logger.error(error: e)
       sleep(5)

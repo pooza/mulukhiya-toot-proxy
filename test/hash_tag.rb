@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     test 'テスト用ハッシュタグの有無' do
-      assert(@nowplaying)
+      assert_not_nil(@nowplaying)
     end
 
     def test_name

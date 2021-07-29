@@ -24,7 +24,11 @@ module Mulukhiya
     end
 
     def self.password
-      return config['/sidekiq/auth/password'] rescue nil
+      return config['/sidekiq/auth/password'].decrypt
+    rescue Ginseng::ConfigError
+      return nil
+    rescue
+      return config['/sidekiq/auth/password']
     end
 
     def self.basic_auth?
@@ -34,8 +38,11 @@ module Mulukhiya
     def self.auth(username, password)
       return true unless basic_auth?
       return false unless username == self.username
-      return true if password == self.password.decrypt
-      return true if password == self.password
+      return false unless password == self.password
+      return true
+    end
+
+    def self.disable?
       return false
     end
 

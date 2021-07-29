@@ -8,8 +8,8 @@ module Mulukhiya
       return unless AmazonService.config?
       @vacuum = Vacuum.new(
         marketplace: config['/amazon/marketplace'],
-        access_key: config['/amazon/access_key'],
-        secret_key: config['/amazon/secret_key'],
+        access_key: AmazonService.access_key,
+        secret_key: AmazonService.secret_key,
         partner_tag: AmazonService.associate_tag,
       )
     end
@@ -70,11 +70,23 @@ module Mulukhiya
       return config['/amazon/associate_tag'] rescue nil
     end
 
+    def self.access_key
+      return config['/amazon/access_key'] rescue nil
+    end
+
+    def self.secret_key
+      return config['/amazon/secret_key'].decrypt
+    rescue Ginseng::ConfigError
+      return nil
+    rescue
+      return config['/amazon/secret_key']
+    end
+
     def self.config?
+      return false unless access_key
+      return false unless secret_key
+      return false unless associate_tag
       config['/amazon/marketplace']
-      config['/amazon/access_key']
-      config['/amazon/secret_key']
-      config['/amazon/associate_tag']
       return true
     rescue Ginseng::ConfigError
       return false
