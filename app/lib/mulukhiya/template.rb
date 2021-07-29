@@ -12,7 +12,6 @@ module Mulukhiya
         crypt: Crypt,
         config: config,
         annict: AnnictService.new,
-        dic: TaggingDictionary.new,
       }
     end
   end
