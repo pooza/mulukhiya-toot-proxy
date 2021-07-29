@@ -1,0 +1,3 @@
+*.erb
+!announcement.rb
+!welcome.rb
