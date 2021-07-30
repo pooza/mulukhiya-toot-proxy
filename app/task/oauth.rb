@@ -17,16 +17,22 @@ namespace :mulukhiya do
         end
       end
 
+      # deprecated
       task show: ['default:show']
 
+      # deprecated
       task clean: ['default:clean']
 
+      # deprecated
       task clear: ['default:clean']
 
+      # deprecated
       task show_infobot: ['infobot:show']
 
+      # deprecated
       task clean_infobot: ['infobot:clean']
 
+      # deprecated
       task clear_infobot: ['infobot:clean']
     end
   end
