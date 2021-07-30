@@ -4,6 +4,5 @@ Thumbs.db
 ._*
 .fuse*
 *.log
-config/local.*
 .sass-cache
 dist

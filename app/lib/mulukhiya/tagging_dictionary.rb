@@ -10,9 +10,9 @@ module Mulukhiya
       update(cache)
     end
 
-    def matches(body)
+    def matches(source)
       r = []
-      text = create_temp_text(body)
+      text = create_temp_text(source)
       reverse_each do |k, v|
         next if TaggingDictionary.short?(k)
         next unless text.match?(v[:pattern])
@@ -81,10 +81,11 @@ module Mulukhiya
       return @redis
     end
 
-    def create_temp_text(body)
-      parts = [body[status_field], body[spoiler_field], body[chat_field]]
-      parts.concat(body.dig('poll', poll_options_field) || [])
-      (body[attachment_field] || []).each do |id|
+    def create_temp_text(payload)
+      return payload if payload.is_a?(String)
+      parts = [payload[status_field], payload[spoiler_field], payload[chat_field]]
+      parts.concat(payload.dig('poll', poll_options_field) || [])
+      (payload[attachment_field] || []).each do |id|
         next unless attachment = attachment_class[id]
         parts.push(attachment.description)
       rescue => e

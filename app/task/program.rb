@@ -3,7 +3,7 @@ namespace :mulukhiya do
     desc 'update programs'
     task :update do
       Mulukhiya::Program.instance.update
-      puts "#{program.count} programs"
+      puts "#{program.count.commaize} programs"
     end
 
     desc 'show programs'
