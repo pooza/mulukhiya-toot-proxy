@@ -5,9 +5,9 @@ title: <%= params[:title] || params[:body].each_line.first.split(/\s+/).first.st
 date: <%= Date.today.strftime %>
 categories: <%= params[:category] %>
 tags:
-<% Mulukhiya::TaggingDictionary.new.matches(params[:title].to_s + params[:body].to_s).each do |word| %>
+<% Mulukhiya::TaggingDictionary.new.matches(params[:title].to_s + params[:body].to_s).each do |word| -%>
   - <%= word.to_hashtag_base %>
-<% end %>
+<% end -%>
 comments: <%= config['/handler/hexo_announce/comments'].to_s %>
 ---
 
