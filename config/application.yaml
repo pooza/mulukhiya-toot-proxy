@@ -769,7 +769,7 @@ line:
     api: https://api.line.me
 annict:
   urls:
-    oauth: https://annict.com
+    default: https://annict.com
     api: https://api.annict.com
   sleep:
     seconds: 0.5
