@@ -16,7 +16,7 @@ html lang='ja'
             vue-slide-up-down :active='layout.details.announcement'
               .endpoint-container
                 .role admin
-                .role mod
+                .role moderator
                 .link POST /mulukhiya/api/announcement/update
                 pre.payload
                   | {{query_params.announcement_update}}
@@ -39,7 +39,7 @@ html lang='ja'
                 pre.result v-if='result.media_list' = '{{result.media_list}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
-              .role mod
+              .role moderator
               .link POST /mulukhiya/api/media/file/clear
               pre.payload
                 | {{query_params.media_file_clear}}
@@ -52,25 +52,13 @@ html lang='ja'
                 button @click='clearMediaFiles' 実行
             .endpoint-container v-if='account.is_admin'
               .role admin
-              .role mod
+              .role moderator
               .link POST /mulukhiya/api/media/metadata/clear
               pre.payload
                 | {{query_params.media_metadata_clear}}
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
                 button @click='clearMediaMetadata' 実行
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("oauth")' OAuth
-          vue-slide-up-down :active='layout.details.oauth'
-            .endpoint-container
-              .role admin
-              .role mod
-              .link POST /mulukhiya/api/oauth/client/clear
-              pre.payload
-                | {{query_params.oauth_client_clear}}
-              .link-description #{controller.display_name}から受け取ったOAuthクライアント情報をクリアします。
-              .field-update-button-container
-                button @click='clearOAuthClient' 実行
         - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表
@@ -86,7 +74,7 @@ html lang='ja'
                   pre.result v-if='result.program_list' = '{{result.program_list}}'
               .endpoint-container v-if='account.is_admin'
                 .role admin
-                .role mod
+                .role moderator
                 .link POST /mulukhiya/api/program/update
                 pre.payload
                   | {{query_params.program_update}}
@@ -123,7 +111,7 @@ html lang='ja'
                 pre.result v-if='result.search_tag' = '{{result.search_tag}}'
             .endpoint-container v-if='account.is_admin'
               .role admin
-              .role mod
+              .role moderator
               .link POST /mulukhiya/api/tagging/dic/update
               pre.payload
                 | {{query_params.tagging_dic_update}}
@@ -142,7 +130,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint-container
               .role admin
-              .role mod
+              .role moderator
               .link POST /mulukhiya/api/tagging/usertag/clear
               pre.payload
                 | {{query_params.tagging_usertag_clear}}
@@ -165,7 +153,7 @@ html lang='ja'
                   pre.result v-if='result.feed_list' = '{{result.feed_list}}'
               .endpoint-container v-if='account.is_admin'
                 .role admin
-                .role mod
+                .role moderator
                 .link POST /mulukhiya/api/feed/update
                 pre.payload
                   | {{query_params.feed_update}}
@@ -224,7 +212,6 @@ html lang='ja'
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
             media_metadata_clear: {token: Vue.getToken()},
-            oauth_client_clear: {token: Vue.getToken()},
             program_update: {token: Vue.getToken()},
             tagging_tag_search: {q: null},
             tagging_dic_update: {token: Vue.getToken()},
@@ -245,7 +232,6 @@ html lang='ja'
             details: {
               announcement: false,
               media: false,
-              oauth: false,
               program: false,
               favorite_tags: false,
               tagging_dic: false,
@@ -295,14 +281,6 @@ html lang='ja'
             Vue.clearMediaMetadata()
               .then(e => {this.layout.details['media'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
-          },
-          clearOAuthClient: function () {
-            this.$dialog.confirm({body: 'OAuthクライアント情報を削除します。'}, {okText: '実行'})
-              .then(e => Vue.clearOAuthClient())
-              .then(e => {this.layout.details['oauth'] = false})
-              .catch(e => {
-                Vue.alert(this.$dialog, e)
-              })
           },
           updatePrograms: function () {
             Vue.updatePrograms()
