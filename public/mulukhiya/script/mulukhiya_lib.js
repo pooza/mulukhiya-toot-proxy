@@ -305,4 +305,5 @@ const MulukhiyaLib = {
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
+  }
 }
