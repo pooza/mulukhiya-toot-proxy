@@ -1,29 +1,39 @@
 namespace :mulukhiya do
   namespace :oauth do
     namespace :client do
-      desc 'clean OAuth client'
-      task :clean do
-        Mulukhiya::Environment.sns_class.new.clear_oauth_client
+      [:default, :infobot].each do |client|
+        namespace client do
+          desc "show OAuth client (#{client})"
+          task :show do
+            puts Mulukhiya::Environment.sns_class.new.oauth_client(client).to_yaml
+          end
+
+          desc "clean OAuth client (#{client})"
+          task :clean do
+            Mulukhiya::Environment.sns_class.new.clear_oauth_client(client)
+          end
+
+          task clear: [:clean]
+        end
       end
 
-      task clear: [:clean]
+      # deprecated
+      task show: ['default:show']
 
-      desc 'clean OAuth client (infobot)'
-      task :clean_infobot do
-        Mulukhiya::Environment.sns_class.new.clear_oauth_client(:infobot)
-      end
+      # deprecated
+      task clean: ['default:clean']
 
-      task clear_infobot: [:clean_infobot]
+      # deprecated
+      task clear: ['default:clean']
 
-      desc 'show OAuth client'
-      task :show do
-        puts Mulukhiya::Environment.sns_class.new.oauth_client.to_yaml
-      end
+      # deprecated
+      task show_infobot: ['infobot:show']
 
-      desc 'show OAuth client (infobot)'
-      task :show_infobot do
-        puts Mulukhiya::Environment.sns_class.new.oauth_client(:infobot).to_yaml
-      end
+      # deprecated
+      task clean_infobot: ['infobot:clean']
+
+      # deprecated
+      task clear_infobot: ['infobot:clean']
     end
   end
 end

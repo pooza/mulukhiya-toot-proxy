@@ -305,13 +305,5 @@ const MulukhiyaLib = {
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
-
-    Vue.clearOAuthClient = async () => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.post('/mulukhiya/api/oauth/client/clear', {token: Vue.getToken()})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
   }
 }

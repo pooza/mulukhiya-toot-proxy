@@ -207,17 +207,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/oauth/client/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      sns_class.new.clear_oauth_client(params[:name] || :default)
-      return @renderer.to_s
-    rescue => e
-      logger.error(error: e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     get '/tagging/favorites' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.favorite_tags?
       @sns.token ||= @sns.default_token
