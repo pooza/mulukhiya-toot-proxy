@@ -4,7 +4,7 @@ module Mulukhiya
     sidekiq_options retry: false, unique: :until_executed
 
     def perform
-      sleep(config['/worker/announcement/sleep/seconds'])
+      sleep(config['/worker/announcement/prior/seconds'])
       Announcement.new.announce
     end
   end

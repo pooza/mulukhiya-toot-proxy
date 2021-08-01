@@ -83,7 +83,7 @@ handler:
     timeout: 10
 worker:
   announcement:
-    sleep:
+    prior:
       seconds: 2
     interval:
       seconds: 1
@@ -780,7 +780,7 @@ annict:
   urls:
     default: https://annict.com
     api: https://api.annict.com
-  sleep:
+  prior:
     seconds: 0.5
   api:
     me:
