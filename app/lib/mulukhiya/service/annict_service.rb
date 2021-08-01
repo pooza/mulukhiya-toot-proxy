@@ -153,13 +153,15 @@ module Mulukhiya
       return @api_service
     end
 
-    def oauth_service
-      unless @oauth_service
-        @oauth_service = HTTP.new
-        @oauth_service.base_uri = config['/annict/urls/oauth']
+    def service
+      unless @service
+        @service = HTTP.new
+        @service.base_uri = config['/annict/urls/default']
       end
-      return @oauth_service
+      return @service
     end
+
+    alias oauth_service service
 
     def auth(code)
       return oauth_service.post('/oauth/token', {
