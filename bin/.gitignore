@@ -5,3 +5,4 @@
 !listener_worker.rb
 !puma_daemon.rb
 !sidekiq_daemon.rb
+!test.rb
