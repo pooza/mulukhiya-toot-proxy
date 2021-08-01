@@ -83,7 +83,8 @@ handler:
     timeout: 10
 worker:
   announcement:
-    sleep: 2
+    sleep:
+      seconds: 2
   dropbox_clipping:
     federate: true
   growi_clipping:
