@@ -85,6 +85,8 @@ worker:
   announcement:
     sleep:
       seconds: 2
+    interval:
+      seconds: 1
   dropbox_clipping:
     federate: true
   growi_clipping:
@@ -755,6 +757,8 @@ amazon:
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
   affiliate: false
+  retry:
+    seconds: 1
 spotify:
   language: ja,en-US;q=0.9,en;q=0.8
   urls:
@@ -764,6 +768,8 @@ spotify:
       type: track
     - pattern: /album/([[:alnum:]]+)
       type: album
+  retry:
+    seconds: 1
 songwhip:
   urls:
     api: https://songwhip.com
@@ -1008,6 +1014,8 @@ http:
     seconds: 1
 websocket:
   keepalive: 15
+  retry:
+    seconds: 5
 lemmy:
   urls:
     api: /api/v3/ws
