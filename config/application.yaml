@@ -82,6 +82,8 @@ handler:
   you_tube_image:
     timeout: 10
 worker:
+  announcement:
+    sleep: 2
   dropbox_clipping:
     federate: true
   growi_clipping:
