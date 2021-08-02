@@ -83,8 +83,6 @@ handler:
     timeout: 10
 worker:
   announcement:
-    prior:
-      seconds: 2
     interval:
       seconds: 1
   dropbox_clipping:
@@ -780,8 +778,8 @@ annict:
   urls:
     default: https://annict.com
     api: https://api.annict.com
-  prior:
-    seconds: 0.5
+  interval:
+    seconds: 1
   api:
     me:
       cache:

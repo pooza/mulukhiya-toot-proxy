@@ -29,7 +29,7 @@ module Mulukhiya
         sort_id: 'desc',
         access_token: @token,
       }
-      sleep(config['/annict/prior/seconds'])
+      sleep(config['/annict/interval/seconds'])
       api_service.get(uri)['activities'].each do |activity|
         next unless activity['action'] == 'create_record'
         yield activity
@@ -56,7 +56,7 @@ module Mulukhiya
           sort_id: 'desc',
           access_token: @token,
         }
-        sleep(config['/annict/prior/seconds'])
+        sleep(config['/annict/interval/seconds'])
         api_service.get(uri)['reviews'].each do |review|
           next unless review['user']['id'] == account['id']
           yield review
@@ -75,7 +75,7 @@ module Mulukhiya
         sort_id: 'desc',
         access_token: @token,
       }
-      sleep(config['/annict/prior/seconds'])
+      sleep(config['/annict/interval/seconds'])
       api_service.get(uri)['activities'].each do |activity|
         next unless activity['action'] == 'create_review'
         yield activity
@@ -104,7 +104,7 @@ module Mulukhiya
           fields: config['/annict/api/me/fields'].join(','),
           access_token: @token,
         }
-        sleep(config['/annict/prior/seconds'])
+        sleep(config['/annict/interval/seconds'])
         accounts[@token] = api_service.get(uri).parsed_response
       end
       return accounts[@token]
