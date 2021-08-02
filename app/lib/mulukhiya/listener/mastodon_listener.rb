@@ -23,6 +23,7 @@ module Mulukhiya
     end
 
     def handle_announcement(payload)
+      sleep(config['/worker/announcement/interval/seconds'])
       Announcement.new.announce
     end
 
@@ -51,7 +52,7 @@ module Mulukhiya
     rescue => e
       @client = nil
       logger.error(error: e)
-      sleep(5)
+      sleep(config['/websocket/retry/seconds'])
       retry
     end
   end

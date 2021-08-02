@@ -19,7 +19,7 @@ module Mulukhiya
         logger.error(error: e, announcement: announcement)
       ensure
         bar&.increment
-        sleep(1)
+        sleep(config['/worker/announcement/interval/seconds'])
       end
       bar&.finish
       save

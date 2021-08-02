@@ -25,7 +25,7 @@ module Mulukhiya
     rescue => e
       @client = nil
       logger.error(error: e)
-      sleep(5)
+      sleep(config['/websocket/retry/seconds'])
       retry
     end
   end

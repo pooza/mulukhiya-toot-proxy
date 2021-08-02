@@ -1,5 +1,5 @@
 package:
-  version: 4.8.3
+  version: 4.8.4
   url: https://github.com/pooza/mulukhiya-toot-proxy
   description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   authors:
@@ -82,6 +82,9 @@ handler:
   you_tube_image:
     timeout: 10
 worker:
+  announcement:
+    interval:
+      seconds: 1
   dropbox_clipping:
     federate: true
   growi_clipping:
@@ -752,6 +755,8 @@ amazon:
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
   affiliate: false
+  retry:
+    seconds: 1
 spotify:
   language: ja,en-US;q=0.9,en;q=0.8
   urls:
@@ -761,6 +766,8 @@ spotify:
       type: track
     - pattern: /album/([[:alnum:]]+)
       type: album
+  retry:
+    seconds: 1
 songwhip:
   urls:
     api: https://songwhip.com
@@ -771,8 +778,8 @@ annict:
   urls:
     default: https://annict.com
     api: https://api.annict.com
-  sleep:
-    seconds: 0.5
+  interval:
+    seconds: 1
   api:
     me:
       cache:
@@ -1005,6 +1012,8 @@ http:
     seconds: 1
 websocket:
   keepalive: 15
+  retry:
+    seconds: 5
 lemmy:
   urls:
     api: /api/v3/ws

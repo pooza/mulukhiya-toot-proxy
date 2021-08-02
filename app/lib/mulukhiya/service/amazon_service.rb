@@ -40,7 +40,7 @@ module Mulukhiya
       cnt += 1
       logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(1)
+      sleep(config['/amazon/retry/seconds'])
       retry
     end
 
@@ -56,7 +56,7 @@ module Mulukhiya
       cnt += 1
       logger.error(error: e, count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(1)
+      sleep(config['/amazon/retry/seconds'])
       retry
     end
 
