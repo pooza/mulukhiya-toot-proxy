@@ -247,7 +247,7 @@ GEM
       io-wait
       timeout
     netrc (0.11.0)
-    nio4r (2.5.7)
+    nio4r (2.5.8)
     nokogiri (1.11.7)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
@@ -374,6 +374,7 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
+      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
