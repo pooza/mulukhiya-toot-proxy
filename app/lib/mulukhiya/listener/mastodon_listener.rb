@@ -2,14 +2,15 @@ module Mulukhiya
   class MastodonListener < Listener
     def receive(message)
       payload = JSON.parse(message.data)
-      method_name = "handle_#{payload['event']}".underscore
+      method_name = create_method_name(payload['event'])
       if payload['event'] == 'notification'
         payload = JSON.parse(payload['payload'])
-        method_name = "handle_#{payload['type']}_notification".underscore
+        method_name = create_method_name("#{payload['type']}_notification")
       end
+      logger.info(class: self.class.to_s, method: method_name)
       send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.error(class: self.class.to_s, message: 'method undefined', method: method_name)
+      logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
     rescue => e
       logger.error(error: e, payload: (payload rescue message.data))
     end

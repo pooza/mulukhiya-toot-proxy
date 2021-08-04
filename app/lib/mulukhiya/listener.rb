@@ -16,5 +16,9 @@ module Mulukhiya
         ping: config['/websocket/keepalive'],
       })
     end
+
+    def create_method_name(name)
+      return "handle_#{name.gsub(/[^[:word:]]+/, '_')}".underscore
+    end
   end
 end
