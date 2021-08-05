@@ -6,9 +6,9 @@ module Mulukhiya
     def initialize(channel = {})
       super
       @sns = sns_class.new
-      @channel[:author] = @sns.info['metadata']['maintainer']['name']
-      @channel[:title] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
-      @channel[:description] = "#{@sns.info['metadata']['nodeName']} メディアファイル"
+      @channel[:author] = @sns.info.dig('metadata', 'maintainer', 'name')
+      @channel[:title] = "#{@sns.info.dig('metadata', 'nodeName')} メディアファイル"
+      @channel[:description] = "#{@sns.info.dig('metadata', 'nodeName')} メディアファイル"
     end
 
     def to_s

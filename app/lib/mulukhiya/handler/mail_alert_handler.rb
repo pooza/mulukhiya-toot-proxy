@@ -7,7 +7,7 @@ module Mulukhiya
 
     def alert(params = {})
       mailer = Mailer.new
-      mailer.prefix = sns.info['metadata']['nodeName']
+      mailer.prefix = sns.info.dig('metadata', 'nodeName')
       mailer.subject = "#{error.source_class} #{error.message}"
       mailer.body = error.backtrace
       mailer.deliver
