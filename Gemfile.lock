@@ -314,7 +314,7 @@ GEM
       rubocop-ast (>= 1.8.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.8.0)
+    rubocop-ast (1.9.0)
       parser (>= 3.0.1.1)
     rubocop-performance (1.11.4)
       rubocop (>= 1.7.0, < 2.0)
@@ -371,6 +371,7 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
+      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
