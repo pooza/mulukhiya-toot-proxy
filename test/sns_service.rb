@@ -6,8 +6,8 @@ module Mulukhiya
 
     def test_info
       assert_kind_of(Hash, @sns.info)
-      assert_kind_of(String, @sns.info.dig('metadata', 'maintainer', 'name'))
-      assert_kind_of(String, @sns.info.dig('metadata', 'nodeName'))
+      assert_kind_of(String, @sns.maintainer_name)
+      assert_kind_of(String, @sns.node_name)
     end
 
     def test_account

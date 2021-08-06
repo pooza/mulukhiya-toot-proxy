@@ -7,7 +7,7 @@ module Mulukhiya
     def initialize(channel = {})
       super
       @sns = sns_class.new
-      @channel[:author] = @sns.info['metadata']['maintainer']['name']
+      @channel[:author] = @sns.maintainer_name
       @storage = RenderStorage.new
     end
 

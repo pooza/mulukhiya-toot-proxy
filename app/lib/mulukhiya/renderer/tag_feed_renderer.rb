@@ -7,15 +7,15 @@ module Mulukhiya
     def initialize(channel = {})
       super
       @sns = sns_class.new
-      @channel[:author] = @sns.info['metadata']['maintainer']['name']
+      @channel[:author] = @sns.maintainer_name
       @limit = config['/feed/tag/limit']
     end
 
     def tag=(tag)
       @tag = tag.to_hashtag_base
       @channel[:link] = record.uri.to_s
-      @channel[:title] = "##{tag} | #{@sns.info['metadata']['nodeName']}"
-      @channel[:description] = "#{@sns.info['metadata']['nodeName']} ##{tag}のタイムライン"
+      @channel[:title] = "##{tag} | #{@sns.node_name}"
+      @channel[:description] = "#{@sns.node_name} ##{tag}のタイムライン"
       @atom = nil
     rescue => e
       logger.error(error: e, tag: tag)

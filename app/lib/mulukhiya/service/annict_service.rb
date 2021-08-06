@@ -210,6 +210,7 @@ module Mulukhiya
     end
 
     def self.crawl_all(params = {})
+      return unless controller_class.annict?
       accounts = AnnictAccountStorage.accounts
       bar = ProgressBar.create(total: accounts.count)
       results = {}

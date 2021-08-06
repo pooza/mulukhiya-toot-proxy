@@ -1,33 +1,148 @@
-package:
-  version: 4.8.4
-  url: https://github.com/pooza/mulukhiya-toot-proxy
-  description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
-  authors:
-    - Tatsuya Koishi
-  email:
-    - tkoishi@b-shock.co.jp
-  license: MIT
+agent:
+  accts:
+    - '@relayctl@hashtag-relay.dtp-mstdn.jp'
+  info:
+    announcement:
+      template: announcement
+    token: null
+    welcome:
+      template: welcome
+  test:
+    token: null
+alert:
+  hooks: []
+  line:
+    to: null
+    token: null
+  mail:
+    to: null
+amazon:
+  affiliate: false
+  cache:
+    ttl: 86400
+  marketplace: jp
+  patterns:
+    - pattern: /dp/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /gp/product/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /o/ASIN/([[:alnum:]]+)
+      shortenable: true
+    - pattern: /gp/video/detail/([[:alnum:]]+)
+      shortenable: true
+  resources:
+    - Images.Primary.Small
+    - Images.Primary.Medium
+    - Images.Primary.Large
+    - Images.Variants.Small
+    - Images.Variants.Medium
+    - Images.Variants.Large
+    - ItemInfo.ByLineInfo
+    - ItemInfo.ContentInfo
+    - ItemInfo.ContentRating
+    - ItemInfo.Classifications
+    - ItemInfo.ExternalIds
+    - ItemInfo.Features
+    - ItemInfo.ManufactureInfo
+    - ItemInfo.ProductInfo
+    - ItemInfo.TechnicalInfo
+    - ItemInfo.Title
+    - ItemInfo.TradeInInfo
+  retry:
+    seconds: 1
+  urls:
+    jp: https://www.amazon.co.jp/
+annict:
+  api:
+    me:
+      cache:
+        ttl: 3600
+      fields:
+        - id
+        - name
+        - username
+        - url
+        - avatar_url
+    records:
+      fields:
+        - id
+        - action
+        - created_at
+        - work.id
+        - work.title
+        - work.images
+        - episode.id
+        - episode.number_text
+        - episode.title
+        - record.comment
+      limit: 5
+    reviewed_works:
+      fields:
+        - id
+        - action
+        - work.id
+      limit: 5
+    reviews:
+      fields:
+        - id
+        - created_at
+        - body
+        - user.id
+        - work.id
+        - work.title
+        - work.images
+      limit: 10
+  interval:
+    seconds: 1
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      default:
+        - read
+  urls:
+    api: https://api.annict.com
+    default: https://annict.com
+api:
+  custom: []
+cli:
+  progress_bar:
+    format: '%c/%C (%p%%)| %B'
 controller: mastodon
+crypt:
+  encoder: base64
+  password: mulukhiya
+  salt: mulukhiya
 environment: development
+feed:
+  cache:
+    ttl: 600
+  custom: []
+  media:
+    limit: 100
+  tag:
+    limit: 100
+growi:
+  urls:
+    create_page: /_api/v3/pages/create
 handler:
-  default:
-    timeout: 5
   amazon_image:
     disable: true
   amazon_nowplaying:
     disable: true
   amazon_url_nowplaying:
     disable: true
-  announcement_mention:
-    pattern: 'お[知し]らせ'
-  attachment_reusing:
-    disable: true
-  audio_format_convert:
-    timeout: 10
   animation_image_format_convert:
     disable: true
     png: true
+    timeout: 10
     webp: false
+  announcement_mention:
+    pattern: お[知し]らせ
+  attachment_reusing:
+    disable: true
+  audio_format_convert:
     timeout: 10
   canonical_url:
     ignore:
@@ -35,7 +150,9 @@ handler:
         - instagram.com
         - facebook.com
         - toei-anim.co.jp
-    useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100'
+    useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
+  default:
+    timeout: 5
   hexo_announce:
     category: お知らせ
     comments: false
@@ -51,13 +168,13 @@ handler:
   itunes_url_nowplaying:
     timeout: 10
   long_text_image:
-    disable: true
-    text_length: 140
-    image_file: 'public/mulukhiya/media/background.png'
-    font_file: 'font/HackGen-Regular.ttf'
-    font_size: 30
     columns: 20
+    disable: true
+    font_file: font/HackGen-Regular.ttf
+    font_size: 30
+    image_file: public/mulukhiya/media/background.png
     rows: 30
+    text_length: 140
   shortened_url:
     domains:
       - t.co
@@ -71,8 +188,8 @@ handler:
       - spoti.fi
       - apple.co
   spotify_image:
-    timeout: 10
     disable: true
+    timeout: 10
   spotify_nowplaying:
     timeout: 10
   spotify_url_nowplaying:
@@ -81,127 +198,92 @@ handler:
     timeout: 30
   you_tube_image:
     timeout: 10
-worker:
-  announcement:
-    interval:
-      seconds: 1
-  dropbox_clipping:
-    federate: true
-  growi_clipping:
-    federate: false
-  lemmy_clipping:
-    federate: false
-  media_cleaning:
-    days: 1
-parser:
-  toot:
-    fields:
-      body: status
-      spoiler: spoiler_text
-      attachment: media_ids
-      poll:
-        options: options
-  note:
-    fields:
-      body: text
-      spoiler: cw
-      attachment: fileIds
-      poll:
-        options: choices
-test:
-  timeout: 20
-spoiler:
-  emoji: netabare
-  pattern: (ねた|ネタ)(ばれ|バレ)
-webui:
-  production:
-    scripts:
-      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
-      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
-      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
-      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
-      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
-      - /mulukhiya/script/mulukhiya_lib
-      - /mulukhiya/script/activity_indicator
-    stylesheets:
-      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
-      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
-      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
-      - /mulukhiya/style/default
-  development:
-    scripts:
-      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
-      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
-      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
-      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
-      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
-      - /mulukhiya/script/mulukhiya_lib
-      - /mulukhiya/script/activity_indicator
-    stylesheets:
-      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
-      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
-      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
-      - /mulukhiya/style/default
-  metadata:
-    robots: noindex,nofollow
-    viewport: width=1000
-  cache:
-    ttl: 86400
-  javascript:
-    minimize: true
+http:
+  retry:
+    limit: 3
+    seconds: 1
+itunes:
+  country: jp
+  hosts:
+    - music.apple.com
+    - itunes.apple.com
+  lang: ja_jp
+  patterns:
+    - pattern: /album/.*?/?([[:digit:]]+)$
+      shortenable: true
+  urls:
+    lookup: https://itunes.apple.com/lookup
+    search: https://itunes.apple.com/search
+lemmy:
+  subject:
+    max_length: 50
+  urls:
+    api: /api/v3/ws
+line:
+  urls:
+    api: https://api.line.me
 mastodon:
-  display_name: Mastodon
-  sns_type: mastodon
-  url: https://mstdn.example.com/
-  dbms: postgres
-  features:
-    webhook: true
-    media_catalog: true
-    favorite_tags: true
-    feed: true
-    announcement: true
-    filter: true
-    streaming: true
-    annict: true
-    futured_tag: true
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    webui:
-      url: /settings/applications
-    scopes:
-      default:
-        - write:statuses
-        - write:media
-        - read:filters
-        - write:filters
-        - read:search
-      infobot:
-        - read
-        - write:statuses
-        - write:media
-  status:
-    parser: toot
-    key: id
-    label: 投稿
-    max_length: 500
-    delete:
-      limit: 30
   attachment:
     limit: 4
     types:
+      animation_image: image/gif
+      audio: audio/mpeg
       image: image/jpeg
       video: video/mp4
-      audio: audio/mpeg
-      animation_image: image/gif
-  search:
-    limit: 40
+  dbms: postgres
+  display_name: Mastodon
+  features:
+    annict: true
+    announcement: true
+    favorite_tags: true
+    feed: true
+    filter: true
+    futured_tag: true
+    media_catalog: true
+    streaming: true
+    webhook: true
   handlers:
+    alert:
+      - slack_alert
+      - line_alert
+      - mail_alert
+    announce:
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
+    follow:
+      - welcome_mention
+    mention:
+      - announcement_mention
+      - welcome_mention
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - lemmy_bookmark
+      - result_notification
+    post_boost:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_search:
+      - result_notification
+    post_thumbnail:
+      - result_notification
+    post_toot:
+      - user_config_command
+      - filter_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - lemmy_clipping_command
+      - result_notification
+    post_upload:
+      - result_notification
+    post_webhook:
+      - result_notification
+    pre_thumbnail:
+      - image_format_convert
+      - image_resize
     pre_toot:
       - user_config_command
       - filter_command
@@ -230,13 +312,12 @@ mastodon:
       - spoiler
       - tagging
       - invalid_command
-    post_toot:
-      - user_config_command
-      - filter_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - lemmy_clipping_command
-      - result_notification
+    pre_upload:
+      - image_format_convert
+      - animation_image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - amazon_nowplaying
@@ -258,32 +339,62 @@ mastodon:
       - you_tube_url_nowplaying
       - spoiler
       - tagging
-    post_webhook:
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    pre_thumbnail:
-      - image_format_convert
-      - image_resize
-    post_thumbnail:
-      - result_notification
-    post_fav:
-      - result_notification
-    post_boost:
-      - result_notification
-    post_search:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - lemmy_bookmark
-      - result_notification
+  oauth:
+    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    scopes:
+      default:
+        - write:statuses
+        - write:media
+        - read:filters
+        - write:filters
+        - read:search
+      infobot:
+        - read
+        - write:statuses
+        - write:media
+    webui:
+      url: /settings/applications
+  search:
+    limit: 40
+  sns_type: mastodon
+  status:
+    delete:
+      limit: 30
+    key: id
+    label: 投稿
+    max_length: 500
+    parser: toot
+  url: https://mstdn.example.com/
+media:
+  metadata:
+    cache:
+      ttl: 8640000
+meisskey:
+  attachment:
+    limit: 4
+    types:
+      animation_image: null
+      audio: audio/mpeg
+      image: image/jpeg
+      video: video/mp4
+  chat:
+    field: text
+  dbms: mongo
+  display_name: めいすきー
+  features:
+    annict: true
+    announcement: true
+    favorite_tags: true
+    feed: true
+    futured_tag: true
+    media_catalog: true
+    streaming: true
+    webhook: true
+  handlers:
+    alert:
+      - slack_alert
+      - line_alert
+      - mail_alert
     announce:
       - post_announce
       - growi_announce
@@ -294,33 +405,90 @@ mastodon:
     mention:
       - announcement_mention
       - welcome_mention
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-misskey:
-  display_name: Misskey
-  sns_type: misskey
-  url: https://misskey.example.com/
-  dbms: postgres
-  features:
-    webhook: true
-    media_catalog: true
-    favorite_tags: true
-    feed: true
-    announcement: true
-    streaming: true
-    annict: true
-    futured_tag: true
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - lemmy_bookmark
+      - result_notification
+    post_chat:
+      - result_notification
+    post_toot:
+      - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - lemmy_clipping_command
+      - result_notification
+    post_upload:
+      - result_notification
+    post_webhook:
+      - result_notification
+    pre_chat:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - songwhip_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
+    pre_toot:
+      - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - lemmy_clipping_command
+      - mention_visibility
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - songwhip_nowplaying
+      - long_text_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - spoiler
+      - tagging
+      - invalid_command
+    pre_upload:
+      - image_format_convert
+      - animation_image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
+    pre_webhook:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - songwhip_nowplaying
+      - webhook_image
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - spoiler
+      - tagging
   oauth:
-    webui:
-      url: /settings/api
     scopes:
       default:
         - write:notes
         - write:drive
         - read:drive
-        - read:account
       infobot:
         - write:drive
         - write:following
@@ -328,7 +496,6 @@ misskey:
         - write:notes
         - read:account
         - read:blocks
-        - read:channels
         - read:drive
         - read:favorites
         - read:following
@@ -339,21 +506,81 @@ misskey:
         - read:pages
         - read:reactions
         - read:user-groups
+  sns_type: misskey
   status:
-    parser: note
     key: noteId
-    label: ノート
-    max_length: 500
+    label: ポスト
+    max_length: 1000
+    parser: note
+  url: https://meisskey.example.com/
+misskey:
   attachment:
     limit: 4
     types:
+      animation_image: null
+      audio: audio/mpeg
       image: image/jpeg
       video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
   chat:
     field: text
+  dbms: postgres
+  display_name: Misskey
+  features:
+    annict: true
+    announcement: true
+    favorite_tags: true
+    feed: true
+    futured_tag: true
+    media_catalog: true
+    streaming: true
+    webhook: true
   handlers:
+    alert:
+      - slack_alert
+      - line_alert
+      - mail_alert
+    announce:
+      - post_announce
+      - growi_announce
+      - dropbox_announce
+      - hexo_announce
+    follow:
+      - welcome_mention
+    mention:
+      - announcement_mention
+      - welcome_mention
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - lemmy_bookmark
+      - result_notification
+    post_chat:
+      - result_notification
+    post_toot:
+      - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - lemmy_clipping_command
+      - result_notification
+    post_upload:
+      - result_notification
+    post_webhook:
+      - result_notification
+    pre_chat:
+      - itunes_nowplaying
+      - amazon_nowplaying
+      - spotify_nowplaying
+      - songwhip_nowplaying
+      - shortened_url
+      - url_normalize
+      - canonical_url
+      - itunes_url
+      - amazon_url
+      - itunes_url_nowplaying
+      - amazon_url_nowplaying
+      - spotify_url_nowplaying
+      - you_tube_url_nowplaying
+      - tagging
     pre_toot:
       - user_config_command
       - growi_clipping_command
@@ -378,12 +605,12 @@ misskey:
       - spoiler
       - tagging
       - invalid_command
-    post_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - lemmy_clipping_command
-      - result_notification
+    pre_upload:
+      - image_format_convert
+      - animation_image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - amazon_nowplaying
@@ -401,6 +628,169 @@ misskey:
       - you_tube_url_nowplaying
       - spoiler
       - tagging
+  oauth:
+    scopes:
+      default:
+        - write:notes
+        - write:drive
+        - read:drive
+        - read:account
+      infobot:
+        - write:drive
+        - write:following
+        - write:messaging
+        - write:notes
+        - read:account
+        - read:blocks
+        - read:channels
+        - read:drive
+        - read:favorites
+        - read:following
+        - read:messaging
+        - read:mutes
+        - read:notifications
+        - read:page-likes
+        - read:pages
+        - read:reactions
+        - read:user-groups
+    webui:
+      url: /settings/api
+  sns_type: misskey
+  status:
+    key: noteId
+    label: ノート
+    max_length: 500
+    parser: note
+  url: https://misskey.example.com/
+mongo:
+  dsn: null
+  query_log: false
+nodeinfo:
+  cache:
+    ttl: 3600
+nowplaying:
+  album:
+    prefix: 'Album:'
+  artist:
+    parser:
+      delimiter:
+        pattern: '[/、]'
+      patterns:
+        - delimited: true
+          pattern: ^[^():]+[/、]
+        - delimited: true
+          pattern: ^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$
+        - delimited: true
+          pattern: ^(.+\s*\(.+\)、?){2,}$
+        - items:
+            - drop: true
+            - drop: true
+            - split: true
+            - prefix: 'CV:'
+              split: true
+              strip: true
+          pattern: ^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$
+        - items:
+            - split: true
+            - prefix: 'コーラス:'
+              split: true
+              strip: true
+          pattern: ^歌:(.+)\s*コーラス:(.+)$
+        - items:
+            - split: true
+          pattern: ^歌:(.+)$
+        - items:
+            - split: true
+            - prefix: 'コーラス:'
+              split: true
+              strip: true
+          pattern: ^(.+)\s*\(コーラス:(.+)\)$
+        - items:
+            - prefix: 'CV:'
+              strip: true
+            - split: true
+          pattern: ^(.+)\s*\(as\s*(.+)\)$
+        - items:
+            - split: true
+            - split: true
+              strip: true
+          pattern: ^(.+)\s*\((.+)\)$
+        - items:
+            - split: true
+            - prefix: feat.
+              split: true
+              strip: true
+          pattern: ^(.+)\s*feat\.\s*(.+)$
+    prefix: 'Artist:'
+  track:
+    prefix: 'Title:'
+package:
+  authors:
+    - Tatsuya Koishi
+  description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
+  email:
+    - tkoishi@b-shock.co.jp
+  license: MIT
+  url: https://github.com/pooza/mulukhiya-toot-proxy
+  version: 4.8.5
+parser:
+  note:
+    fields:
+      attachment: fileIds
+      body: text
+      poll:
+        options: choices
+      spoiler: cw
+  toot:
+    fields:
+      attachment: media_ids
+      body: status
+      poll:
+        options: options
+      spoiler: spoiler_text
+pleroma:
+  attachment:
+    limit: 4
+    types:
+      animation_image: null
+      audio: audio/mpeg
+      image: image/jpeg
+      video: video/mp4
+  chat:
+    field: content
+  dbms: postgres
+  display_name: Pleroma
+  features:
+    annict: true
+    favorite_tags: true
+    feed: true
+    media_catalog: true
+    streaming: true
+    webhook: true
+  handlers:
+    alert:
+      - slack_alert
+      - line_alert
+      - mail_alert
+    follow:
+      - welcome_mention
+    mention:
+      - welcome_mention
+    post_bookmark:
+      - dropbox_bookmark
+      - growi_bookmark
+      - lemmy_bookmark
+      - result_notification
+    post_chat:
+      - result_notification
+    post_toot:
+      - user_config_command
+      - growi_clipping_command
+      - dropbox_clipping_command
+      - lemmy_clipping_command
+      - result_notification
+    post_upload:
+      - result_notification
     post_webhook:
       - result_notification
     pre_chat:
@@ -418,87 +808,6 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - tagging
-    post_chat:
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - lemmy_bookmark
-      - result_notification
-    announce:
-      - post_announce
-      - growi_announce
-      - dropbox_announce
-      - hexo_announce
-    follow:
-      - welcome_mention
-    mention:
-      - announcement_mention
-      - welcome_mention
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-meisskey:
-  display_name: めいすきー
-  sns_type: misskey
-  url: https://meisskey.example.com/
-  dbms: mongo
-  features:
-    webhook: true
-    media_catalog: true
-    favorite_tags: true
-    feed: true
-    announcement: true
-    streaming: true
-    annict: true
-    futured_tag: true
-  oauth:
-    scopes:
-      default:
-        - write:notes
-        - write:drive
-        - read:drive
-      infobot:
-        - write:drive
-        - write:following
-        - write:messaging
-        - write:notes
-        - read:account
-        - read:blocks
-        - read:drive
-        - read:favorites
-        - read:following
-        - read:messaging
-        - read:mutes
-        - read:notifications
-        - read:page-likes
-        - read:pages
-        - read:reactions
-        - read:user-groups
-  status:
-    parser: note
-    key: noteId
-    label: ポスト
-    max_length: 1000
-  attachment:
-    limit: 4
-    types:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
-  chat:
-    field: text
-  handlers:
     pre_toot:
       - user_config_command
       - growi_clipping_command
@@ -509,6 +818,8 @@ meisskey:
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
+      - amazon_image
+      - you_tube_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -522,17 +833,19 @@ meisskey:
       - spoiler
       - tagging
       - invalid_command
-    post_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - lemmy_clipping_command
-      - result_notification
+    pre_upload:
+      - image_format_convert
+      - animation_image_format_convert
+      - audio_format_convert
+      - video_format_convert
+      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
+      - amazon_image
+      - you_tube_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -545,64 +858,6 @@ meisskey:
       - you_tube_url_nowplaying
       - spoiler
       - tagging
-    post_webhook:
-      - result_notification
-    pre_chat:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - songwhip_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - tagging
-    post_chat:
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - lemmy_bookmark
-      - result_notification
-    announce:
-      - post_announce
-      - growi_announce
-      - dropbox_announce
-      - hexo_announce
-    follow:
-      - welcome_mention
-    mention:
-      - announcement_mention
-      - welcome_mention
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-pleroma:
-  display_name: Pleroma
-  sns_type: mastodon
-  url: https://pleroma.example.com/
-  dbms: postgres
-  features:
-    webhook: true
-    media_catalog: true
-    favorite_tags: true
-    feed: true
-    streaming: true
-    annict: true
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -614,153 +869,68 @@ pleroma:
         - read
         - write:statuses
         - write:media
+  sns_type: mastodon
   status:
-    parser: toot
     key: id
     label: ステータス
     max_length: 5000
-  attachment:
-    limit: 4
-    types:
-      image: image/jpeg
-      video: video/mp4
-      audio: audio/mpeg
-      animation_image: null
-  chat:
-    field: content
-  handlers:
-    pre_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - lemmy_clipping_command
-      - mention_visibility
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - songwhip_nowplaying
-      - amazon_image
-      - you_tube_image
-      - long_text_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - spoiler
-      - tagging
-      - invalid_command
-    post_toot:
-      - user_config_command
-      - growi_clipping_command
-      - dropbox_clipping_command
-      - lemmy_clipping_command
-      - result_notification
-    pre_webhook:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - songwhip_nowplaying
-      - amazon_image
-      - you_tube_image
-      - webhook_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - spoiler
-      - tagging
-    post_webhook:
-      - result_notification
-    pre_chat:
-      - itunes_nowplaying
-      - amazon_nowplaying
-      - spotify_nowplaying
-      - songwhip_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - amazon_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - tagging
-    post_chat:
-      - result_notification
-    pre_upload:
-      - image_format_convert
-      - animation_image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    post_upload:
-      - result_notification
-    post_bookmark:
-      - dropbox_bookmark
-      - growi_bookmark
-      - lemmy_bookmark
-      - result_notification
-    follow:
-      - welcome_mention
-    mention:
-      - welcome_mention
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-amazon:
-  marketplace: jp
-  urls:
-    jp: https://www.amazon.co.jp/
-  cache:
-    ttl: 86400
-  resources:
-    - Images.Primary.Small
-    - Images.Primary.Medium
-    - Images.Primary.Large
-    - Images.Variants.Small
-    - Images.Variants.Medium
-    - Images.Variants.Large
-    - ItemInfo.ByLineInfo
-    - ItemInfo.ContentInfo
-    - ItemInfo.ContentRating
-    - ItemInfo.Classifications
-    - ItemInfo.ExternalIds
-    - ItemInfo.Features
-    - ItemInfo.ManufactureInfo
-    - ItemInfo.ProductInfo
-    - ItemInfo.TechnicalInfo
-    - ItemInfo.Title
-    - ItemInfo.TradeInInfo
-  patterns:
-    - pattern: /dp/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /gp/product/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /o/ASIN/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /gp/video/detail/([[:alnum:]]+)
-      shortenable: true
-  affiliate: false
+    parser: toot
+  url: https://pleroma.example.com/
+postgres:
+  dsn: null
+  query_log: false
+  slow_query:
+    seconds: 3
+puma:
+  pidfile: tmp/pids/puma.pid
+  port: 3008
+  rackup: app/initializer/config.ru
+redis:
   retry:
+    limit: 3
     seconds: 1
+sidekiq:
+  auth:
+    password: null
+    user: admin
+  concurrency: 5
+  dashboard:
+    session:
+      max_age: 86400
+    url: /mulukhiya/sidekiq
+  dynamic: true
+  redis:
+    dsn: redis://localhost:6379/2
+  schedule:
+    annict_polling:
+      class: Mulukhiya::AnnictPollingWorker
+      every: 5m
+    announcement:
+      class: Mulukhiya::AnnouncementWorker
+      every: 1m
+    feed_update:
+      class: Mulukhiya::FeedUpdateWorker
+      every: 5m
+    media_cleaning:
+      class: Mulukhiya::MediaCleaningWorker
+      every: 10m
+    program_update:
+      class: Mulukhiya::ProgramUpdateWorker
+      every: 1m
+    tagging_dictionary_update:
+      class: Mulukhiya::TaggingDictionaryUpdateWorker
+      every: 10m
+    user_tag_initialize:
+      class: Mulukhiya::UserTagInitializeWorker
+      cron: 2 4 * * *
+songwhip:
+  urls:
+    api: https://songwhip.com
+spoiler:
+  emoji: netabare
+  pattern: (ねた|ネタ)(ばれ|バレ)
 spotify:
   language: ja,en-US;q=0.9,en;q=0.8
-  urls:
-    track: https://open.spotify.com/
   patterns:
     - pattern: /track/([[:alnum:]]+)
       type: track
@@ -768,283 +938,113 @@ spotify:
       type: album
   retry:
     seconds: 1
-songwhip:
   urls:
-    api: https://songwhip.com
-line:
-  urls:
-    api: https://api.line.me
-annict:
-  urls:
-    default: https://annict.com
-    api: https://api.annict.com
-  interval:
-    seconds: 1
-  api:
-    me:
-      cache:
-        ttl: 3600
-      fields:
-        - id
-        - name
-        - username
-        - url
-        - avatar_url
-    records:
-      limit: 5
-      fields:
-        - id
-        - action
-        - created_at
-        - work.id
-        - work.title
-        - work.images
-        - episode.id
-        - episode.number_text
-        - episode.title
-        - record.comment
-    reviewed_works:
-      limit: 5
-      fields:
-        - id
-        - action
-        - work.id
-    reviews:
-      limit: 10
-      fields:
-        - id
-        - created_at
-        - body
-        - user.id
-        - work.id
-        - work.title
-        - work.images
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    scopes:
-      default:
-        - read
-itunes:
-  country: jp
-  lang: ja_jp
-  urls:
-    search: https://itunes.apple.com/search
-    lookup: https://itunes.apple.com/lookup
-  patterns:
-    - pattern: /album/.*?/?([[:digit:]]+)$
-      shortenable: true
-  hosts:
-    - music.apple.com
-    - itunes.apple.com
-youtube:
-  url: https://www.googleapis.com/
-twittodon:
-  pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
-growi:
-  urls:
-    create_page: /_api/v3/pages/create
-nowplaying:
-  album:
-    prefix: 'Album:'
-  track:
-    prefix: 'Title:'
-  artist:
-    prefix: 'Artist:'
-    parser:
-      delimiter:
-        pattern: '[/、]'
-      patterns:
-        - pattern: ^[^():]+[/、]
-          delimited: true
-        - pattern: '^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$'
-          delimited: true
-        - pattern: '^(.+\s*\(.+\)、?){2,}$'
-          delimited: true
-        - pattern: '^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$'
-          items:
-            - drop: true
-            - drop: true
-            - split: true
-            - strip: true
-              split: true
-              prefix: 'CV:'
-        - pattern: '^歌:(.+)\s*コーラス:(.+)$'
-          items:
-            - split: true
-            - strip: true
-              split: true
-              prefix: 'コーラス:'
-        - pattern: '^歌:(.+)$'
-          items:
-            - split: true
-        - pattern: '^(.+)\s*\(コーラス:(.+)\)$'
-          items:
-            - split: true
-            - strip: true
-              split: true
-              prefix: 'コーラス:'
-        - pattern: '^(.+)\s*\(as\s*(.+)\)$'
-          items:
-            - strip: true
-              prefix: 'CV:'
-            - split: true
-        - pattern: '^(.+)\s*\((.+)\)$'
-          items:
-            - split: true
-            - strip: true
-              split: true
-        - pattern: '^(.+)\s*feat\.\s*(.+)$'
-          items:
-            - split: true
-            - strip: true
-              split: true
-              prefix: feat.
-user_config:
-  redis:
-    dsn: redis://localhost:6379/1
-media:
-  metadata:
-    cache:
-      ttl: 8640000 #100日
-postgres:
-  dsn: null
-  query_log: false
-  slow_query:
-    seconds: 3
-mongo:
-  dsn: null
-  query_log: false
-alert:
-  hooks: []
-  mail:
-    to: null
-  line:
-    token: null
-    to: null
-sidekiq:
-  dashboard:
-    url: /mulukhiya/sidekiq
-    session:
-      max_age: 86400
-  redis:
-    dsn: redis://localhost:6379/2
-  auth:
-    user: admin
-    password: null
-  dynamic: true
-  concurrency: 5
-  schedule:
-    user_tag_initialize:
-      cron: '2 4 * * *'
-      class: Mulukhiya::UserTagInitializeWorker
-    media_cleaning:
-      every: 10m
-      class: Mulukhiya::MediaCleaningWorker
-    tagging_dictionary_update:
-      every: 10m
-      class: Mulukhiya::TaggingDictionaryUpdateWorker
-    program_update:
-      every: 1m
-      class: Mulukhiya::ProgramUpdateWorker
-    annict_polling:
-      every: 5m
-      class: Mulukhiya::AnnictPollingWorker
-    feed_update:
-      every: 5m
-      class: Mulukhiya::FeedUpdateWorker
-    announcement:
-      every: 1m
-      class: Mulukhiya::AnnouncementWorker
-puma:
-  port: 3008
-  pidfile: tmp/pids/puma.pid
-  rackup: app/initializer/config.ru
+    track: https://open.spotify.com/
 tagging:
-  user_tags:
-    extra_minutes: 2
-    clear_message: 固定タグをクリアしました。
+  dictionaries:
+    - edit:
+        url: null
+      name: プリキュア
+      type: relative
+      url: https://precure.ml/api/dic/v1/precure.json
+    - edit:
+        url: null
+      name: プリキュア歌手
+      type: relative
+      url: https://precure.ml/api/dic/v1/singer.json
+    - edit:
+        url: null
+      name: プリキュア作品
+      type: relative
+      url: https://precure.ml/api/dic/v1/series.json
+    - edit:
+        url: null
+      name: プリキュア妖精
+      url: https://precure.ml/api/dic/v2/fairy.json
+  media:
+    enable: true
+    tags:
+      audio: audio
+      image: image
+      video: video
   remote_default_tags:
     - precure_fun
     - delmulin
+  user_tags:
+    clear_message: 固定タグをクリアしました。
+    extra_minutes: 2
   word:
     minimum_length: 3
     minimum_length_kanji: 2
     without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
-  media:
-    enable: true
-    tags:
-      image: image
-      video: video
-      audio: audio
-  dictionaries:
-    - url: https://precure.ml/api/dic/v1/precure.json
-      name: プリキュア
-      type: relative
-      edit:
-        url: null
-    - url: https://precure.ml/api/dic/v1/singer.json
-      name: プリキュア歌手
-      type: relative
-      edit:
-        url: null
-    - url: https://precure.ml/api/dic/v1/series.json
-      name: プリキュア作品
-      type: relative
-      edit:
-        url: null
-    - url: https://precure.ml/api/dic/v2/fairy.json
-      name: プリキュア妖精
-      edit:
-        url: null
-feed:
-  tag:
-    limit: 100
-  media:
-    limit: 100
-  cache:
-    ttl: 600
-  custom: []
-api:
-  custom: []
-http:
-  retry:
-    limit: 3
-    seconds: 1
-websocket:
-  keepalive: 15
-  retry:
-    seconds: 5
-lemmy:
-  urls:
-    api: /api/v3/ws
-  subject:
-    max_length: 50
-redis:
-  retry:
-    limit: 3
-    seconds: 1
-nodeinfo:
-  cache:
-    ttl: 3600
+test:
+  timeout: 20
+twittodon:
+  pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
+user_config:
+  redis:
+    dsn: redis://localhost:6379/1
 webhook:
   sample: |
     あんなの、戦いのうちに入らないわ。
     奴らが本気で攻めてきたとき、あなたは本当に大切な人を守れるの？
-cli:
-  progress_bar:
-    format: '%c/%C (%p%%)| %B'
-agent:
-  info:
-    token: null
-    welcome:
-      template: welcome
-    announcement:
-      template: announcement
-  test:
-    token: null
-  accts:
-    - '@relayctl@hashtag-relay.dtp-mstdn.jp'
-crypt:
-  password: mulukhiya
-  salt: mulukhiya
-  encoder: base64
+websocket:
+  keepalive: 15
+  retry:
+    seconds: 5
+webui:
+  cache:
+    ttl: 86400
+  development:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
+  javascript:
+    minimize: true
+  metadata:
+    robots: noindex,nofollow
+    viewport: width=1000
+  production:
+    scripts:
+      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
+      - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
+      - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
+      - https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
+      - /mulukhiya/script/mulukhiya_lib
+      - /mulukhiya/script/activity_indicator
+    stylesheets:
+      - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
+      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
+      - /mulukhiya/style/default
+worker:
+  announcement:
+    interval:
+      seconds: 1
+  dropbox_clipping:
+    federate: true
+  growi_clipping:
+    federate: false
+  lemmy_clipping:
+    federate: false
+  media_cleaning:
+    days: 1
+youtube:
+  url: https://www.googleapis.com/
