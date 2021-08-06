@@ -1,7 +1,7 @@
 namespace :mulukhiya do
   namespace :tagging do
     namespace :user do
-      desc 'show tags'
+      desc 'show user tags'
       task :list do
         Mulukhiya::UserConfigStorage.tag_owners do |account|
           puts({
@@ -13,7 +13,7 @@ namespace :mulukhiya do
 
       task show: [:list]
 
-      desc 'clear tags'
+      desc 'clear user tags'
       task :clean do
         Mulukhiya::UserConfigStorage.clear_tags
       end
