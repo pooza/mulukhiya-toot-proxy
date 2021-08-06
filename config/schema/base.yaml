@@ -159,13 +159,13 @@ properties:
       client:
         type: object
         required:
-          - client_id
-          - client_secret
-    properties:
-      client_id:
-        type: string
-      client_secret:
-        type: string
+          - id
+          - secret
+        properties:
+          id:
+            type: string
+          secret:
+            type: string
   google:
     type: object
     required:
