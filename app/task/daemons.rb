@@ -11,7 +11,7 @@ namespace :mulukhiya do
       end
 
       desc "restart #{daemon}"
-      task restart: [:stop, :start]
+      task restart: ['config:lint', :stop, :start]
     end
   end
 end
