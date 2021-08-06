@@ -204,7 +204,6 @@ module Mulukhiya
     end
 
     def self.config?
-      return false unless controller_class.annict?
       return false if client_id.nil?
       return false if client_secret.nil?
       return true
