@@ -2,6 +2,7 @@
 .DS_Store
 ._*
 Thumbs.db
+Desktop.ini
 .fuse*
 *.log
 .sass-cache
