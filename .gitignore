@@ -6,5 +6,5 @@ Thumbs.db
 *.log
 .sass-cache
 dist
-*code-workspace
+*.code-workspace
 .vscode
