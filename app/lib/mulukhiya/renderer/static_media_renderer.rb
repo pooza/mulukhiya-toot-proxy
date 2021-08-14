@@ -4,8 +4,8 @@ module Mulukhiya
     attr_reader :name
 
     def name=(name)
-      raise Ginseng::RenderError, "Media file '#{name}' not found." unless File.exist?(path)
       @name = name
+      raise Ginseng::RenderError, "Media file '#{name}' not found." unless File.exist?(path)
     end
 
     def path
