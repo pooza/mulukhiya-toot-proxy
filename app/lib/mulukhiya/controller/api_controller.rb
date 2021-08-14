@@ -294,7 +294,9 @@ module Mulukhiya
         raise Ginseng::NotFoundError, 'Not Found' unless command
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
-        @renderer.message = JSON.parse(command.stdout)
+        @renderer = RawRenderer.new
+        @renderer.type = command.response[:type]
+        @renderer.body = command.response[:body]
         return @renderer.to_s
       rescue => e
         logger.error(error: e)
@@ -308,6 +310,10 @@ module Mulukhiya
       return params[:token].decrypt
     rescue
       return params[:token]
+    end
+
+    def self.default_type
+      return 'application/json; charset=UTF-8'
     end
   end
 end
