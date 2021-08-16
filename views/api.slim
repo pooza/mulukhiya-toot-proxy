@@ -183,6 +183,20 @@ html lang='ja'
               .field-update-button-container
                 button @click='getHealth' 実行
                 pre.result v-if='result.health' = '{{result.health}}'
+        - if Mulukhiya::CustomAPI.entries.present?
+          li
+            h3 @click='toggleVisibility("custom")' 独自機能
+            vue-slide-up-down :active='layout.details.custom'
+              - Mulukhiya::CustomAPI.entries.each do |entry|
+                .endpoint-container
+                  .link GET #{File.join('/mulukhiya/api', entry['path'])}
+                  .link-description = entry['description']
+                  .field-update-button-container
+                    button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                    pre.result = '{{result.' + entry['id'] + '}}'
+
+
+
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -240,6 +254,7 @@ html lang='ja'
               health: false,
               sidekiq: false,
               annict: false,
+              custom: false,
               about: false,
             },
           },
@@ -336,6 +351,15 @@ html lang='ja'
             this.result.health = null
             Vue.getHealth()
               .then(e => {this.result.health = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          execCustomAPI: function (id, path) {
+            this.result.health = null
+            Vue.execCustomAPI(path)
+              .then(e => {
+                this.result[id] = e
+                console.log(this.result.rubicure_series)
+              })
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getAbout: function () {

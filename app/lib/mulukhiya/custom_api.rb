@@ -11,7 +11,7 @@ module Mulukhiya
       return (config['/api/custom'] || []).map do |entry|
         entry.deep_stringify_keys!
         entry['title'] ||= entry['path']
-        entry['id'] = path.tr('/', '_')
+        entry['id'] = entry['path'].tr('/', '_')
         entry
       end
     end
