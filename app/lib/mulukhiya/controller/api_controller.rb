@@ -294,7 +294,7 @@ module Mulukhiya
         raise Ginseng::NotFoundError, 'Not Found' unless command
         command.exec
         raise Ginseng::Error, command.stderr unless command.status.zero?
-        @renderer = RawRenderer.new
+        @renderer = Ginseng::Web::RawRenderer.new
         @renderer.type = command.response[:type]
         @renderer.body = command.response[:body]
         return @renderer.to_s
