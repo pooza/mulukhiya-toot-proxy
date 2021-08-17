@@ -185,7 +185,6 @@ html lang='ja'
                 pre.result v-if='result.health' = '{{result.health}}'
         - if Mulukhiya::CustomAPI.entries.present?
           li
-            div ref='custom-api-entries' v-if='false' = Mulukhiya::CustomAPI.entries.to_json
             h3 @click='toggleVisibility("custom")' 独自機能
             vue-slide-up-down :active='layout.details.custom'
               - Mulukhiya::CustomAPI.entries.each do |entry|
@@ -194,7 +193,7 @@ html lang='ja'
                   .link-description = entry['description']
                   .field-update-button-container
                     button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
-                    pre.result = '{{result.' + entry['id'] + '}}'
+                    pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -258,8 +257,6 @@ html lang='ja'
           },
         },
         mounted: function () {
-          const custom_apis = JSON.parse(this.$refs.custom-api-entries.innerText)
-          custom_apis.map(entry => {this.result[entry.id] = false})
           Vue.getConfig()
             .then(e => {
               this.account = e.account
@@ -356,10 +353,7 @@ html lang='ja'
           execCustomAPI: function (id, path) {
             this.result.health = null
             Vue.execCustomAPI(path)
-              .then(e => {
-                this.result[id] = e
-                console.log(this.result.rubicure_series)
-              })
+              .then(e => Vue.set(this.result, id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getAbout: function () {
