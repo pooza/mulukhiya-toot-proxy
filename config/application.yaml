@@ -1009,7 +1009,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://use.fontawesome.com/releases/v5.15.4/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   javascript:
