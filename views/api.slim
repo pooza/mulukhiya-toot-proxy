@@ -185,7 +185,7 @@ html lang='ja'
                 pre.result v-if='result.health' = '{{result.health}}'
         - if Mulukhiya::CustomAPI.entries.present?
           li
-            h3 @click='toggleVisibility("custom")' 独自機能
+            h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
             vue-slide-up-down :active='layout.details.custom'
               - Mulukhiya::CustomAPI.entries.each do |entry|
                 .endpoint-container
