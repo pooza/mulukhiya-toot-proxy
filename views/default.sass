@@ -334,7 +334,6 @@ ul.links
     input[type='search']
       font:
         size: 0.8em
-        family: $monospace
       margin: 0 1em
     input[type='number']
       font:
@@ -470,14 +469,17 @@ section.fav-entries
       font:
         family: $sans-serif
 
-
-section.tagging-dictionary article.disabled
-  background:
-    color: lightgray
-  border:
-    color: transparent
-    radius: 6px
-  opacity: 0.8
+section.tagging-dictionary
+  .search-form-container
+    margin:
+      left: 1em
+  article.disabled
+    background:
+      color: lightgray
+    border:
+      color: transparent
+      radius: 6px
+    opacity: 0.8
 
 section.remote-dics
   margin:
@@ -542,6 +544,11 @@ input
 
 input.code
   width: calc(100% - 2em)
+
+input[type='search']
+  font:
+    family: $monospace
+  width: 20em;
 
 button
   font:
