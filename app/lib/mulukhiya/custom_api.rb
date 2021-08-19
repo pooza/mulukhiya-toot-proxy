@@ -22,7 +22,7 @@ module Mulukhiya
         entry.deep_stringify_keys!
         entry['dir'] ||= Environment.dir
         entry['title'] ||= entry['path']
-        entry['id'] = entry['path'].tr('/', '_')
+        entry['id'] = entry['path'].to_hashtag_base
         entry
       end
     end

@@ -289,6 +289,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    def command_entries
+      return CustomAPI.instance
+    end
+
     CustomAPI.entries.each do |entry|
       get File.join('/', entry['path']) do
         raise Ginseng::NotFoundError, 'Not Found' unless command
