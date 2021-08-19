@@ -3,6 +3,16 @@ module Mulukhiya
     include Singleton
     include Package
 
+    def create(entry)
+      command = CommandLine.create(entry)
+      command.exec
+      raise Ginseng::Error, command.stderr unless command.status.zero?
+      renderer = Ginseng::Web::RawRenderer.new
+      renderer.type = command.response[:type]
+      renderer.body = command.response[:body]
+      return @renderer.to_s
+    end
+
     def self.count
       return entries.count
     end
@@ -10,7 +20,7 @@ module Mulukhiya
     def self.entries
       return (config['/api/custom'] || []).map do |entry|
         entry.deep_stringify_keys!
-        entry['dir'] ||= File.join(Environment.dir, 'bin')
+        entry['dir'] ||= Environment.dir
         entry['title'] ||= entry['path']
         entry['id'] = entry['path'].tr('/', '_')
         entry

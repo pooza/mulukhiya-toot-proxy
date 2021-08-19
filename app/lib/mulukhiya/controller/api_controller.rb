@@ -292,11 +292,7 @@ module Mulukhiya
     CustomAPI.entries.each do |entry|
       get File.join('/', entry['path']) do
         raise Ginseng::NotFoundError, 'Not Found' unless command
-        command.exec
-        raise Ginseng::Error, command.stderr unless command.status.zero?
-        @renderer = Ginseng::Web::RawRenderer.new
-        @renderer.type = command.response[:type]
-        @renderer.body = command.response[:body]
+        @renderer = CustomAPI.instance.create(entry)
         return @renderer.to_s
       rescue => e
         logger.error(error: e)
