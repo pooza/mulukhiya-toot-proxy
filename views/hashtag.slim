@@ -78,7 +78,7 @@ html lang='ja'
         },
         methods: {
           onEnterTags: function () {
-            if (event.keyCode == 13) {this.search()}
+            this.search()
           },
           search: function () {
             this.dic_entries = {}

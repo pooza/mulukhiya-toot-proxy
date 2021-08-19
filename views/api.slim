@@ -32,7 +32,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage'
+              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage' @keydown.enter='onEnterMediaList'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -266,7 +266,10 @@ html lang='ja'
         },
         methods: {
           onEnterTags: function () {
-            if (event.keyCode == 13) {this.searchTags()}
+            this.searchTags()
+          },
+          onEnterMediaList: function () {
+            this.getMedias()
           },
           onInputMediaListPage: function () {
             const url = new URL('/mulukhiya/api/media', location.href)
