@@ -104,7 +104,7 @@ html lang='ja'
               .link POST /mulukhiya/api/tagging/tag/search
               pre.payload
                 | {{query_params.tagging_tag_search}}
-              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q'
+              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='onEnterTags'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
@@ -265,6 +265,9 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
+          onEnterTags: function () {
+            if (event.keyCode == 13) {this.searchTags()}
+          },
           onInputMediaListPage: function () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
