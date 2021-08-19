@@ -35,6 +35,13 @@ module Mulukhiya
       assert_kind_of(String, @user_config.to_s)
     end
 
+    def test_encrypt
+      values = @user_config.encrypt(sample: {password: 'bbb'}, token: 2222, foo: '焼きそば')
+      assert_equal(values['foo'], '焼きそば')
+      assert_equal(values['token'].decrypt, '2222')
+      assert_equal(values.dig('sample', 'password').decrypt, 'bbb')
+    end
+
     def test_disable?
       assert_false(@user_config.disable?('yakinori'))
       assert_boolean(@user_config.disable?('youtube_nowplaying_url'))
