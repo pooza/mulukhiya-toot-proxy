@@ -70,7 +70,7 @@ module Mulukhiya
       if arg.is_a?(Hash)
         arg.deep_stringify_keys!
         arg.each do |k, v|
-          if ['password', 'token', 'secret'].freeze.member?(k)
+          if config['/user_config/encrypt_fields'].member?(k)
             arg[k] = v.to_s.encrypt
           else
             arg[k] = encrypt(v)
