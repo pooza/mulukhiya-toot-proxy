@@ -192,8 +192,9 @@ html lang='ja'
                   .link GET #{File.join('/mulukhiya/api', entry['path'])}
                   .link-description = entry['description']
                   .field-update-button-container
-                    button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
-                    pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
+                    - unless entry['command'].last.is_a?(Symbol)
+                      button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                      pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'

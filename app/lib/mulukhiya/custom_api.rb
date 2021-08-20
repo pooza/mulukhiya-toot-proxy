@@ -3,8 +3,12 @@ module Mulukhiya
     include Singleton
     include Package
 
-    def create(entry)
+    def create(entry, params = {})
       command = CommandLine.create(entry)
+      if command.args.last.is_a?(Symbol)
+        key = command.args.pop
+        command.args.push(params[key])
+      end
       command.exec
       raise Ginseng::Error, command.stderr unless command.status.zero?
       renderer = Ginseng::Web::RawRenderer.new
