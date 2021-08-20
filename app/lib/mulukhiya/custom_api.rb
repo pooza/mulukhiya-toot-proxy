@@ -10,7 +10,7 @@ module Mulukhiya
       renderer = Ginseng::Web::RawRenderer.new
       renderer.type = command.response[:type]
       renderer.body = command.response[:body]
-      return @renderer.to_s
+      return renderer
     end
 
     def self.count
