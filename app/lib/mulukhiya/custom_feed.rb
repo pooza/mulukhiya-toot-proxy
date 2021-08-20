@@ -34,6 +34,7 @@ module Mulukhiya
     def self.entries
       return config['/feed/custom'].map do |entry|
         entry.deep_stringify_keys!
+        entry['dir'] ||= Environment.dir
         entry['title'] ||= entry['path']
         entry
       end

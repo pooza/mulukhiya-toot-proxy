@@ -32,7 +32,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage'
+              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage' @keydown.enter='onEnterMediaList'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -104,7 +104,7 @@ html lang='ja'
               .link POST /mulukhiya/api/tagging/tag/search
               pre.payload
                 | {{query_params.tagging_tag_search}}
-              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q'
+              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='onEnterTags'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
@@ -183,6 +183,18 @@ html lang='ja'
               .field-update-button-container
                 button @click='getHealth' 実行
                 pre.result v-if='result.health' = '{{result.health}}'
+        - if Mulukhiya::CustomAPI.entries.present?
+          li
+            h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
+            vue-slide-up-down :active='layout.details.custom'
+              - Mulukhiya::CustomAPI.entries.each do |entry|
+                .endpoint-container
+                  .link GET #{File.join('/mulukhiya/api', entry['path'])}
+                  .link-description = entry['description']
+                  .field-update-button-container
+                    - unless entry['command'].last.is_a?(Symbol)
+                      button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                      pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -240,6 +252,7 @@ html lang='ja'
               health: false,
               sidekiq: false,
               annict: false,
+              custom: false,
               about: false,
             },
           },
@@ -253,6 +266,12 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
+          onEnterTags: function () {
+            this.searchTags()
+          },
+          onEnterMediaList: function () {
+            this.getMedias()
+          },
           onInputMediaListPage: function () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
@@ -336,6 +355,12 @@ html lang='ja'
             this.result.health = null
             Vue.getHealth()
               .then(e => {this.result.health = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          execCustomAPI: function (id, path) {
+            this.result.health = null
+            Vue.execCustomAPI(path)
+              .then(e => Vue.set(this.result, id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getAbout: function () {

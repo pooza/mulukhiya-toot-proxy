@@ -1,8 +1,11 @@
 .bundle
 .DS_Store
-Thumbs.db
 ._*
+Thumbs.db
+Desktop.ini
 .fuse*
 *.log
 .sass-cache
 dist
+*.code-workspace
+.vscode

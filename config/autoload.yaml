@@ -6,6 +6,7 @@ inflections:
   canonical_url_handler: CanonicalURLHandler
   ci_test_case_filter: CITestCaseFilter
   css_renderer: CSSRenderer
+  custom_api: CustomAPI
   http: HTTP
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler

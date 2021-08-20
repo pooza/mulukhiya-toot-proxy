@@ -49,12 +49,15 @@ module Mulukhiya
         @command = CommandLine.create(entry) if entry
       end
       return @command
+    rescue => e
+      logger.error(error: e, entry: entry)
+      return nil
     end
 
     private
 
     def command_entries
-      return config["/#{name}/custom"]
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     def path_prefix

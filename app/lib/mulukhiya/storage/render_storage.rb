@@ -1,11 +1,23 @@
 module Mulukhiya
   class RenderStorage < Redis
+    def get(key)
+      return nil unless entry = super
+      return JSON.parse(entry) rescue entry
+    rescue => e
+      logger.error(error: e, key: key)
+      return nil
+    end
+
     def set(command, value)
-      setex(command, ttl, value.to_s)
+      setex(command, ttl, value)
     end
 
     def setex(command, ttl, value)
-      super(command, ttl, value.to_s)
+      if value.is_a?(Hash)
+        super(command, ttl, value.to_json)
+      else
+        super(command, ttl, value.to_s)
+      end
     end
 
     def create_key(key)

@@ -10,6 +10,7 @@ module Mulukhiya
         assert_kind_of([Array, String], entry['command'])
         assert_kind_of(String, entry['title'])
         assert_kind_of(String, entry['description'])
+        assert(Dir.exist?(entry['dir']))
         assert(URI.parse(entry['link']).absolute?)
       end
     end

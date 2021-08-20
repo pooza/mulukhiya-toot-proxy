@@ -20,6 +20,7 @@ gem 'sidekiq-failures'
 gem 'sidekiq-scheduler', '~>3.1.0'
 gem 'sidekiq-unique-jobs'
 gem 'vacuum', '~>3.0'
+gem 'webrick'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'

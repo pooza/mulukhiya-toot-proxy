@@ -23,7 +23,7 @@ html lang='ja'
       section.tagging-dictionary
         h3 タグを検索
         .search-form-container
-          input type='search' placeholder='検索キーワード' v-model.trim='keyword' @keydown.enter='onKeyDown'
+          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='onEnterTags'
           button.small :disabled='!keyword' @click='search' 検索
         article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
           h4
@@ -77,8 +77,8 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          onKeyDown: function () {
-            if (event.keyCode == 13) {this.search()}
+          onEnterTags: function () {
+            this.search()
           },
           search: function () {
             this.dic_entries = {}

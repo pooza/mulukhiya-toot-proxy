@@ -58,7 +58,7 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのAPIトークン' v-model.trim='form.growi.token'
+            input placeholder='GROWIのAPIトークン（保存時に暗号化されます）' v-model.trim='form.growi.token'
           .inline-field-container
             h4 URL
             input placeholder='GROWIのルートURL' v-model.trim='form.growi.url'
@@ -79,7 +79,7 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='Dropboxのアクセストークン' v-model.trim='form.dropbox.token'
+            input placeholder='Dropboxのアクセストークン（保存時に暗号化されます）' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
       section.config v-if='account.username && layout.sections.lemmy'
@@ -206,10 +206,8 @@ html lang='ja'
           updateForm: function (data) {
             this.result = jsyaml.dump(data.config)
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
-            this.form.growi.token = Vue.dig(data, 'config', 'growi', 'token')
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
             this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
-            this.form.dropbox.token = Vue.dig(data, 'config', 'dropbox', 'token')
             this.form.lemmy.host = Vue.dig(data, 'config', 'lemmy', 'host')
             this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
             this.form.lemmy.community = Vue.dig(data, 'config', 'lemmy', 'community')
@@ -254,11 +252,13 @@ html lang='ja'
             if (this.form.growi.url) {command.growi.url = this.form.growi.url}
             if (this.form.growi.prefix) {command.growi.prefix = this.form.growi.prefix}
             this.updateConfig(command)
+            this.form.growi.token = null
           },
           updateDropbox: function () {
             const command = {dropbox: {token: null}}
             if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
             this.updateConfig(command)
+            this.form.dropbox.token = null
           },
           updateLemmy: function () {
             const command = {lemmy: {host: null, user: null, community: null}}

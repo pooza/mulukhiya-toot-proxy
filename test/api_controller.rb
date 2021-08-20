@@ -110,11 +110,10 @@ module Mulukhiya
     end
 
     def test_costom_endpoints
-      assert_kind_of(Array, config['/api/custom'])
-      config['/api/custom'].each do |entry|
+      CustomAPI.entries.each do |entry|
+        next if entry['command'].last.is_a?(Symbol)
         get File.join('/', entry['path'])
         assert(last_response.ok?)
-        assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
       end
     end
   end

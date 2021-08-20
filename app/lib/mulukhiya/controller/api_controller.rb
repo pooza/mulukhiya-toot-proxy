@@ -289,12 +289,13 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    config['/api/custom'].each do |entry|
+    def command_entries
+      return CustomAPI.instance
+    end
+
+    CustomAPI.entries.each do |entry|
       get File.join('/', entry['path']) do
-        raise Ginseng::NotFoundError, 'Not Found' unless command
-        command.exec
-        raise Ginseng::Error, command.stderr unless command.status.zero?
-        @renderer.message = JSON.parse(command.stdout)
+        @renderer = CustomAPI.instance.create(entry, params)
         return @renderer.to_s
       rescue => e
         logger.error(error: e)
@@ -308,6 +309,10 @@ module Mulukhiya
       return params[:token].decrypt
     rescue
       return params[:token]
+    end
+
+    def self.default_type
+      return 'application/json; charset=UTF-8'
     end
   end
 end

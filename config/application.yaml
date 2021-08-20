@@ -732,7 +732,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.8.5
+  version: 4.9.0
 parser:
   note:
     fields:
@@ -982,6 +982,10 @@ test:
 twittodon:
   pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 user_config:
+  encrypt_fields:
+    - token
+    - password
+    - secret
   redis:
     dsn: redis://localhost:6379/1
 webhook:
@@ -1009,7 +1013,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.11/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v5.15.1/css/all.css
+      - https://use.fontawesome.com/releases/v5.15.4/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   javascript:

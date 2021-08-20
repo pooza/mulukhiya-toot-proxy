@@ -298,6 +298,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.execCustomAPI = async path => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(`/mulukhiya/api/${path}`)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.crawlAnnict = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

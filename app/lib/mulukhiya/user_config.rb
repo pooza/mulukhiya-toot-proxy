@@ -24,7 +24,7 @@ module Mulukhiya
     def update(values)
       values.deep_stringify_keys!
       handle_user_tags(values)
-      handle_lemmy_password(values)
+      values = encrypt(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
     rescue => e
@@ -66,6 +66,20 @@ module Mulukhiya
 
     alias to_s to_json
 
+    def encrypt(arg)
+      if arg.is_a?(Hash)
+        arg.deep_stringify_keys!
+        arg.each do |k, v|
+          if config['/user_config/encrypt_fields'].member?(k)
+            arg[k] = v.to_s.encrypt
+          else
+            arg[k] = encrypt(v)
+          end
+        end
+      end
+      return arg
+    end
+
     private
 
     def handle_user_tags(values)
@@ -81,11 +95,6 @@ module Mulukhiya
       elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
         Sidekiq.remove_schedule("user_tag_initialize_#{@account.username}")
       end
-    end
-
-    def handle_lemmy_password(values)
-      return unless password = values.dig('lemmy', 'password')
-      values['lemmy']['password'] = password.encrypt
     end
   end
 end

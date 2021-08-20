@@ -6,6 +6,7 @@ module Mulukhiya
 
     def initialize(channel = {})
       super
+      @http.retry_limit = 1
       @sns = sns_class.new
       @channel[:author] = @sns.maintainer_name
       @storage = RenderStorage.new
@@ -25,6 +26,16 @@ module Mulukhiya
 
     def to_s
       return storage[command] if storage[command].present? rescue super
+      return super
+    end
+
+    private
+
+    def fetch_image(uri)
+      return storage[uri] if storage[uri].present?
+      return storage[uri] = super
+    rescue => e
+      logger.error(error: e)
       return super
     end
   end
