@@ -31,7 +31,6 @@ module Mulukhiya
 
     CustomFeed.entries.each do |entry|
       get File.join('/', entry['path']) do
-        raise Ginseng::NotFoundError, 'Not Found' unless command
         @renderer = CustomFeed.instance.create(entry)
         return @renderer.to_s
       rescue => e
