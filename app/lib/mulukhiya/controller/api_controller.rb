@@ -295,6 +295,10 @@ module Mulukhiya
 
     CustomAPI.entries.each do |entry|
       get File.join('/', entry['path']) do
+        if entry['command'].last.is_a?(Symbol)
+          key = entry['command'].pop
+          entry['command'].push(params[key])
+        end
         @renderer = CustomAPI.instance.create(entry)
         return @renderer.to_s
       rescue => e

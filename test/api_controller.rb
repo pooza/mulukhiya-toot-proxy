@@ -111,6 +111,7 @@ module Mulukhiya
 
     def test_costom_endpoints
       CustomAPI.entries.each do |entry|
+        next if entry['command'].last.is_a?(Symbol)
         get File.join('/', entry['path'])
         assert(last_response.ok?)
       end
