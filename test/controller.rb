@@ -99,5 +99,17 @@ module Mulukhiya
     def test_status_label
       assert_kind_of(String, controller_class.status_label)
     end
+
+    def test_growi?
+      assert_boolean(controller_class.growi?)
+    end
+
+    def test_dropbox?
+      assert_boolean(controller_class.dropbox?)
+    end
+
+    def test_lemmy?
+      assert_boolean(controller_class.lemmy?)
+    end
   end
 end

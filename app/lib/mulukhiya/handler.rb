@@ -183,7 +183,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern) && !config.disable?(v)}
+      return Set.new(names.select {|v| v.match?(pattern) && !config.disable?(v)})
     end
 
     private
