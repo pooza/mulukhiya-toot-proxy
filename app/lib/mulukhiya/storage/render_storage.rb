@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def setex(command, ttl, value)
-      if value.is_a?(Hash)
+      if value.is_a?(Enumerator)
         super(command, ttl, value.to_json)
       else
         super(command, ttl, value.to_s)

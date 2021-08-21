@@ -5,7 +5,7 @@ module Mulukhiya
 
     def initialize(account)
       @account = account if account.is_a?(account_class)
-      if account.is_a?(Hash) && (token = account['/mulukhiya/token'])
+      if account.is_a?(Enumerator) && (token = account['/mulukhiya/token'])
         @account ||= account_class.get(token: token)
       end
       @account ||= account_class[account]
