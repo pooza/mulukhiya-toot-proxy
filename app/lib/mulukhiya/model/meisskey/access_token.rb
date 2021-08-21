@@ -38,7 +38,7 @@ module Mulukhiya
       end
 
       def scopes
-        return application.scopes
+        return Set.new(application.scopes)
       end
 
       def self.[](id)

@@ -97,7 +97,9 @@ module Mulukhiya
       end
 
       def oauth_scopes(type = :default)
-        return config["/#{name}/oauth/scopes/#{type}"] || [] rescue nil
+        return Set.new(config["/#{name}/oauth/scopes/#{type}"])
+      rescue
+        return Set.new
       end
 
       def oauth_client_name(type = :default)

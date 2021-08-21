@@ -18,7 +18,7 @@ module Mulukhiya
       alias to_s token
 
       def scopes
-        return values[:scopes].split(/\s+/)
+        return Set.new(values[:scopes].split(/\s+/))
       end
 
       def to_h

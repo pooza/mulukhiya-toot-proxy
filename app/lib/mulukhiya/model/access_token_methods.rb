@@ -6,6 +6,10 @@ module Mulukhiya
       return Webhook.create_digest(sns_class.new.uri, to_s)
     end
 
+    def scopes_valid?
+      return scopes == controller_class.oauth_scopes
+    end
+
     def self.included(base)
       base.extend(Methods)
     end
