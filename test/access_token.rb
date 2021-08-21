@@ -40,9 +40,19 @@ module Mulukhiya
       assert(@token.to_h.key?(:scopes))
     end
 
+    def test_account
+      return unless @token
+      assert_kind_of(account_class, @token.account)
+    end
+
     def test_scopes
       return unless @token
-      assert_kind_of(Array, @token.scopes)
+      assert_kind_of(Set, @token.scopes)
+    end
+
+    def test_scopes_valid?
+      return unless @token
+      assert(@token.scopes_valid?)
     end
 
     def test_webhook_entries

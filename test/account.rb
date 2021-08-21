@@ -79,6 +79,11 @@ module Mulukhiya
       assert_boolean(account.info?)
     end
 
+    def test_default_scopes
+      return unless account
+      assert_kind_of(Set, account.default_scopes)
+    end
+
     def test_locked?
       return unless account
       assert_boolean(account.locked?)

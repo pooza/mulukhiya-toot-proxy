@@ -15,8 +15,8 @@ module Mulukhiya
 
       def scopes
         matches = values[:scopes].match(/{(.*?)}/)[1]
-        return matches.split(',') if matches
-        return Ginseng::GatewayError, "Invalid scopes '#{values[:scopes]}'"
+        return Set.new(matches.split(',')) if matches
+        raise Ginseng::GatewayError, "Invalid scopes '#{values[:scopes]}'"
       rescue => e
         logger.error(error: e)
         return []
@@ -31,6 +31,7 @@ module Mulukhiya
             token: to_s,
             account: account,
             scopes: scopes,
+            scopes_valid: scopes_valid?,
           )
           @hash.deep_compact!
         end

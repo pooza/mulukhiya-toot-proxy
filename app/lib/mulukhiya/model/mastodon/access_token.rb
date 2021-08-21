@@ -18,7 +18,11 @@ module Mulukhiya
       alias to_s token
 
       def scopes
-        return values[:scopes].split(/\s+/)
+        return Set.new(values[:scopes].split(/\s+/))
+      end
+
+      def account
+        return user.account
       end
 
       def to_h
@@ -28,6 +32,7 @@ module Mulukhiya
             token: to_s,
             account: user.account,
             scopes: scopes,
+            scopes_valid: scopes_valid?,
           )
           @hash.deep_compact!
         end

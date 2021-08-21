@@ -176,14 +176,14 @@ module Mulukhiya
     def self.names
       names = []
       Event.all {|v| names.concat(v.handler_names.to_a)}
-      return names.uniq.sort
+      return Set.new(names.sort)
     rescue => e
       logger.error(error: e)
       return nil
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern) && !config.disable?(v)}
+      return Set.new(names.select {|v| v.match?(pattern) && !config.disable?(v)})
     end
 
     private

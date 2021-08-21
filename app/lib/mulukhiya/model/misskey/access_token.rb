@@ -25,6 +25,7 @@ module Mulukhiya
             token: to_s,
             account: account,
             scopes: scopes,
+            scopes_valid: scopes_valid?,
           )
           @hash.deep_compact!
         end
@@ -33,8 +34,9 @@ module Mulukhiya
 
       def scopes
         return application.scopes if application
-        return nil unless matches = permission.match(/{(.*?)}/)[1]
-        return matches.split(',')
+        matches = permission.match(/{(.*?)}/)[1]
+        return Set.new(matches.split(',')) if matches
+        raise Ginseng::GatewayError, "Invalid scopes '#{permission}'"
       end
 
       def self.get(key)

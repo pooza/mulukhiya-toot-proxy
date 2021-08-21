@@ -6,7 +6,7 @@ module Mulukhiya
       end
 
       def scopes
-        return permission
+        return Set.new(permission)
       end
 
       private

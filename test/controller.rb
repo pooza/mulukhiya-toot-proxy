@@ -65,7 +65,7 @@ module Mulukhiya
     end
 
     def test_oauth_scopes
-      assert_kind_of(Array, controller_class.oauth_scopes)
+      assert_kind_of(Set, controller_class.oauth_scopes)
       assert(controller_class.oauth_scopes.present?)
       controller_class.oauth_scopes.each do |scope|
         assert_kind_of(String, scope)
@@ -98,6 +98,18 @@ module Mulukhiya
 
     def test_status_label
       assert_kind_of(String, controller_class.status_label)
+    end
+
+    def test_growi?
+      assert_boolean(controller_class.growi?)
+    end
+
+    def test_dropbox?
+      assert_boolean(controller_class.dropbox?)
+    end
+
+    def test_lemmy?
+      assert_boolean(controller_class.lemmy?)
     end
   end
 end
