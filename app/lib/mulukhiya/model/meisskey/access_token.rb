@@ -16,6 +16,7 @@ module Mulukhiya
             token: to_s,
             account: account,
             scopes: scopes,
+            scopes_valid: scopes_valid?,
           )
           @hash.delete(:hash)
           @hash.deep_compact!

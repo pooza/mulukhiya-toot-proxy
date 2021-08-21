@@ -7,7 +7,9 @@ module Mulukhiya
     end
 
     def scopes_valid?
-      return scopes == controller_class.oauth_scopes
+      oauth_tokens = controller_class.oauth_scopes
+      oauth_tokens = controller_class.oauth_scopes(:infobot) if account.info?
+      return scopes == oauth_tokens
     end
 
     def self.included(base)
