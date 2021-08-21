@@ -21,6 +21,10 @@ module Mulukhiya
         return Set.new(values[:scopes].split(/\s+/))
       end
 
+      def account
+        return user.account
+      end
+
       def to_h
         unless @hash
           @hash = values.deep_symbolize_keys.merge(
@@ -28,6 +32,7 @@ module Mulukhiya
             token: to_s,
             account: user.account,
             scopes: scopes,
+            scopes_valid: scopes_valid?,
           )
           @hash.deep_compact!
         end
