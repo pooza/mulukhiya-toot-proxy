@@ -143,6 +143,11 @@ module Mulukhiya
       bar&.finish
     end
 
+    def default_scopes
+      return controller_class.oauth_scopes(:infobot) if info?
+      return controller_class.oauth_scopes
+    end
+
     def status_delete_limit
       return controller_class.status_delete_limit || attachments.count
     end
