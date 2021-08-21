@@ -49,7 +49,7 @@ module Mulukhiya
         names = Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
       end
       TestCaseFilter.all.select(&:active?).each {|v| v.exec(names)}
-      return names.uniq.sort
+      return Set.new(names.sort)
     end
 
     def self.dir
