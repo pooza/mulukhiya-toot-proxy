@@ -123,27 +123,27 @@ module Mulukhiya
 
     def test_user_tag_bases
       return unless account
-      assert_kind_of(Array, account.user_tag_bases)
+      assert_kind_of(Set, account.user_tag_bases)
     end
 
     def test_disabled_tag_bases
       return unless account
-      assert_kind_of(Array, account.disabled_tag_bases)
+      assert_kind_of(Set, account.disabled_tag_bases)
     end
 
     def test_featured_tag_bases
       return unless account
-      assert_kind_of(Array, account.featured_tag_bases)
+      assert_kind_of(Set, account.featured_tag_bases)
     end
 
     def test_field_tag_bases
       return unless account
-      assert_kind_of(Array, account.field_tag_bases)
+      assert_kind_of(Set, account.field_tag_bases)
     end
 
     def test_bio_tag_bases
       return unless account
-      assert_kind_of(Array, account.bio_tag_bases)
+      assert_kind_of(Set, account.bio_tag_bases)
     end
   end
 end

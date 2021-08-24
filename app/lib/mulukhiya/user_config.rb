@@ -46,7 +46,7 @@ module Mulukhiya
     end
 
     def tags
-      return self['/tagging/user_tags']
+      return self['/tagging/user_tags'].to_set
     end
 
     def clear_tags

@@ -11,16 +11,16 @@ module Mulukhiya
     end
 
     def matches(source)
-      r = []
+      set = Set[]
       text = create_temp_text(source)
       reverse_each do |k, v|
         next if TaggingDictionary.short?(k)
         next unless text.match?(v[:pattern])
-        r.push(k)
-        r.concat(v[:words])
+        set.add(k)
+        set.merge(v[:words])
         text.gsub!(v[:pattern], '')
       end
-      return r.uniq
+      return set
     end
 
     def concat(values)

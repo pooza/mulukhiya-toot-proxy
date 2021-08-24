@@ -57,17 +57,17 @@ module Mulukhiya
       alias recent_post recent_status
 
       def featured_tag_bases
-        tags = []
+        tags = Set[]
         return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
         timelines.each do |timeline|
           timeline['query'].each do |entry|
-            tags.concat(entry)
+            tags.merge(entry)
           end
         end
-        return tags.compact.uniq
+        return tags
       rescue => e
         logger.error(error: e, acct: acct.to_s)
-        return []
+        return Set[]
       end
 
       def admin?

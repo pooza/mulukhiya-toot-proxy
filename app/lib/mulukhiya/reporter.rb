@@ -7,7 +7,7 @@ module Mulukhiya
     def initialize(size = 0, val = nil)
       super
       @tags = TagContainer.new
-      @tags.concat(TagContainer.default_tag_bases)
+      @tags.merge(TagContainer.default_tag_bases)
       @temp = {}
     end
 

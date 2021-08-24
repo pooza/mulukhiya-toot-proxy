@@ -4,6 +4,6 @@ ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
 
 require 'mulukhiya'
 module Mulukhiya
-	ENV['RAKE'] = Package.full_name
-	load_tasks
+  ENV['RAKE'] = Package.full_name
+  load_tasks
 end

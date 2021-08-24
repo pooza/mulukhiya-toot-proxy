@@ -21,7 +21,7 @@ module Mulukhiya
       end
 
       def self.featured_tag_bases
-        return []
+        return Set[]
       end
 
       def self.get(key)

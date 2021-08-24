@@ -64,14 +64,14 @@ module Mulukhiya
       alias recent_note recent_status
 
       def featured_tag_bases
-        tag_bases = []
+        tag_bases = Set[]
         service.antennas.map {|v| v['keywords'].first}.each do |keywords|
-          tag_bases.concat(keywords.map(&:to_hashtag_base))
+          tag_bases.merge(keywords.map(&:to_hashtag_base))
         end
-        return tag_bases.uniq
+        return tag_bases
       rescue => e
         logger.error(error: e, acct: acct.to_s)
-        return []
+        return Set[]
       end
 
       alias attachments attachment

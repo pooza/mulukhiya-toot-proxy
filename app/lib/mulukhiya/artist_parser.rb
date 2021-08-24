@@ -9,22 +9,22 @@ module Mulukhiya
     end
 
     def parse
-      tags = []
+      tags = Set[]
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited] && (@depth <= @max_depth)
           @source.split(delimiters).each do |artist|
-            tags.concat(ArtistParser.new(artist, @depth).parse)
+            tags.merge(ArtistParser.new(artist, @depth).parse)
           end
         else
-          tags.concat(parse_part(matches, pattern_entry[:items]))
+          tags.merge(parse_part(matches, pattern_entry[:items]))
         end
         return tags
       end
-      return [@source]
+      return Set[@source]
     rescue => e
       logger.error(error: e)
-      return [@source]
+      return Set[@source]
     end
 
     alias exec parse

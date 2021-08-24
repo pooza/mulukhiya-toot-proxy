@@ -4,11 +4,11 @@ module Mulukhiya
       self.payload = payload
       return unless executable?
       tags.text = @status
-      tags.concat(TaggingDictionary.new.matches(payload)) if @status
-      tags.concat(media_tags) if TagContainer.media_tag?
+      tags.merge(TaggingDictionary.new.matches(payload)) if @status
+      tags.merge(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
       parser.text = payload[text_field] = update_status
-      result.push(tags: tags.create_tags)
+      result.push(tags: tags.create_tags.to_a)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
@@ -24,19 +24,19 @@ module Mulukhiya
     end
 
     def media_tags
-      tags = []
+      tags = Set[]
       (payload[attachment_field] || []).each do |id|
         type = attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|
           next unless type.start_with?("#{mediatype}/")
-          tags.push(config["/tagging/media/tags/#{mediatype}"])
+          tags.add(config["/tagging/media/tags/#{mediatype}"])
         rescue Ginseng::ConfigError => e
           result.push(info: e.message)
         end
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
       end
-      return tags.uniq
+      return tags
     end
 
     def update_status
@@ -48,7 +48,7 @@ module Mulukhiya
         break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         line = lines.pop.strip
         tags.text = lines.join("\n")
-        tags.concat(line.split(/\s+/))
+        tags.merge(line.split(/\s+/))
       end
       lines.push(tags.to_s)
       lines.push(via[1]) if via.present?

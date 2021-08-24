@@ -16,19 +16,19 @@ module Mulukhiya
     end
 
     def self.default_tags
-      return config['/tagging/default_tags'].map(&:to_hashtag) rescue []
+      return config['/tagging/default_tags'].map(&:to_hashtag).to_set rescue Set[]
     end
 
     def self.default_tag_bases
-      return config['/tagging/default_tags'].map(&:to_hashtag_base) rescue []
+      return config['/tagging/default_tags'].map(&:to_hashtag_base).to_set rescue Set[]
     end
 
     def self.remote_default_tags
-      return config['/tagging/remote_default_tags'].map(&:to_hashtag) rescue []
+      return config['/tagging/remote_default_tags'].map(&:to_hashtag).to_set rescue Set[]
     end
 
     def self.remote_default_tag_bases
-      return config['/tagging/remote_default_tags'].map(&:to_hashtag_base) rescue []
+      return config['/tagging/remote_default_tags'].map(&:to_hashtag_base).to_set rescue Set[]
     end
 
     def self.media_tag?
@@ -36,12 +36,12 @@ module Mulukhiya
     end
 
     def self.media_tag_bases
-      return [] unless media_tag?
+      return Set[] unless media_tag?
       return ['image', 'video', 'audio'].freeze.map do |tag|
         config["/tagging/media/tags/#{tag}"].to_hashtag_base
-      end
+      end.to_set
     rescue
-      return []
+      return Set[]
     end
   end
 end
