@@ -79,7 +79,7 @@ module Mulukhiya
     def artists
       return (track || album).artists.map(&:name).to_set
     rescue
-      return Set[]
+      return nil
     end
 
     def image_uri
