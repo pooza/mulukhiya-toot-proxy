@@ -48,7 +48,7 @@ module Mulukhiya
       push("#{album_prefix} #{uri.album_name.escape_toot}") if uri.album_name
       push("#{artist_prefix} #{uri.artists.map(&:escape_toot).join(', ')}")
       tags.merge(uri.artists)
-      result.push(url: uri.to_s, title: uri.title, artists: uri.artists.to_a)
+      result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
     end

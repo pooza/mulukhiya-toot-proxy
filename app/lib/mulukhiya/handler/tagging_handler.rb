@@ -8,7 +8,7 @@ module Mulukhiya
       tags.merge(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
       parser.text = payload[text_field] = update_status
-      result.push(tags: tags.create_tags.to_a)
+      result.push(tags: tags.create_tags)
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end
