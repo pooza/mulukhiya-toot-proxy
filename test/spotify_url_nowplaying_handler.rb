@@ -14,7 +14,7 @@ module Mulukhiya
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ',
         title: 'Special day',
-        artists: Set['宮本佳那子'],
+        artists: ['宮本佳那子'],
       }])
 
       @handler.clear
@@ -22,7 +22,7 @@ module Mulukhiya
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS',
         title: 'お願いジュンブライト',
-        artists: Set['牧野由依'],
+        artists: ['牧野由依'],
       }])
 
       @handler.clear
@@ -30,7 +30,7 @@ module Mulukhiya
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn',
         title: 'ボクは走るんだ!',
-        artists: Set['アイネス(CV:水橋かおり)'],
+        artists: ['アイネス(CV:水橋かおり)'],
       }])
     end
   end

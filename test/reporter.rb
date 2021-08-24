@@ -17,7 +17,7 @@ module Mulukhiya
           'itunes_url_nowplaying' => [{
             'url' => 'https://music.apple.com/jp/album//1352845788?i=1352845804',
             'title' => 'シュビドゥビ☆スイーツタイム',
-            'artists' => Set['宮本佳那子'],
+            'artists' => ['宮本佳那子'],
           }],
         },
       })
