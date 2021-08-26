@@ -265,16 +265,14 @@ module Mulukhiya
     end
 
     get '/feed/list' do
-      tags = TagContainer.default_tag_bases.clone
-      tags.merge(TagContainer.media_tag_bases)
+      tags = TagContainer.default_tags.clone
+      tags.merge(TagContainer.media_tags)
       if @sns.account
-        tags.merge(@sns.account.featured_tag_bases)
-        tags.merge(@sns.account.field_tag_bases)
-        tags.merge(@sns.account.bio_tag_bases)
+        tags.merge(@sns.account.featured_tags)
+        tags.merge(@sns.account.field_tags)
+        tags.merge(@sns.account.bio_tags)
       end
-      @renderer.message = tags.map do |tag|
-        hash_tag_class.get(tag: tag).to_h
-      end.deep_compact
+      @renderer.message = tags.map {|t| hash_tag_class.get(tag: t).to_h}.deep_compact
       return @renderer.to_s
     end
 

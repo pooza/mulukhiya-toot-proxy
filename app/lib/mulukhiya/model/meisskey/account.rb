@@ -56,7 +56,7 @@ module Mulukhiya
 
       alias recent_post recent_status
 
-      def featured_tag_bases
+      def featured_tags
         tags = TagContainer.new
         return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
         timelines.each do |timeline|
@@ -67,7 +67,7 @@ module Mulukhiya
         return tags
       rescue => e
         logger.error(error: e, acct: acct.to_s)
-        return Set[]
+        return TagContainer.new
       end
 
       def admin?

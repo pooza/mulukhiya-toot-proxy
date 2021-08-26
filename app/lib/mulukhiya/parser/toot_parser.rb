@@ -22,8 +22,8 @@ module Mulukhiya
 
     def all_tags
       tags = hashtags.clone
-      tags.merge(TagContainer.default_tag_bases)
-      tags.merge(@account.user_tag_bases) if @account
+      tags.merge(TagContainer.default_tags)
+      tags.merge(@account.user_tags) if @account
       return tags
     end
 

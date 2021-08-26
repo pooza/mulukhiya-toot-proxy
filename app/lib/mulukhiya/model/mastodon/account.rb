@@ -43,12 +43,12 @@ module Mulukhiya
 
       alias recent_toot recent_status
 
-      def featured_tag_bases
+      def featured_tags
         response = service.fetch_featured_tags(id)
-        return response.parsed_response.map {|v| v['name'].to_hashtag_base}.to_set
+        return TagContainer.new(response.parsed_response.map {|v| v['name']})
       rescue => e
         logger.error(error: e, acct: acct.to_s)
-        return Set[]
+        return TagContainer.new
       end
 
       def fields

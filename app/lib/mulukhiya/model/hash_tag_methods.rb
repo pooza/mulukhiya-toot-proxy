@@ -16,11 +16,11 @@ module Mulukhiya
     end
 
     def default?
-      return TagContainer.default_tag_bases.member?(name)
+      return TagContainer.default_tags.member?(name)
     end
 
     def remote_default?
-      return TagContainer.remote_default_tag_bases.member?(name)
+      return TagContainer.remote_default_tags.member?(name)
     end
 
     def local?
