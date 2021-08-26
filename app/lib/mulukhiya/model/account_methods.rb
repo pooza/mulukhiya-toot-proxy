@@ -91,14 +91,14 @@ module Mulukhiya
       return tags
     rescue => e
       logger.error(error: e, acct: acct.to_s)
-      return Set[]
+      return TagContainer.new
     end
 
     def bio_tags
       return TagContainer.scan(bio)
     rescue => e
       logger.error(error: e, acct: acct.to_s)
-      return Set[]
+      return TagContainer.new
     end
 
     def notify_verbose?
