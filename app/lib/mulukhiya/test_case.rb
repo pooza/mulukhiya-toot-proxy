@@ -44,12 +44,12 @@ module Mulukhiya
       if cases
         names = cases.split(',')
           .map {|v| [v, "#{v}Test", v.underscore, "#{v.underscore}_test"]}.flatten
-          .select {|v| File.exist?(File.join(dir, "#{v}.rb"))}.compact.uniq
+          .select {|v| File.exist?(File.join(dir, "#{v}.rb"))}.compact
       else
         names = Dir.glob(File.join(dir, '*.rb')).map {|v| File.basename(v, '.rb')}
       end
       TestCaseFilter.all.select(&:active?).each {|v| v.exec(names)}
-      return Set.new(names.sort)
+      return names.to_set
     end
 
     def self.dir

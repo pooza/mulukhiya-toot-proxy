@@ -40,10 +40,10 @@ module Mulukhiya
       return params[:reporter]
     end
 
-    def dispatch(body)
+    def dispatch(payload)
       handlers do |handler|
         next if handler.disable?
-        thread = Thread.new {handler.send("handle_#{label}".to_sym, body, params)}
+        thread = Thread.new {handler.send("handle_#{label}".to_sym, payload, params)}
         unless thread.join(handler.timeout)
           handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")
         end

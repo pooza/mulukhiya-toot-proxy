@@ -46,7 +46,7 @@ module Mulukhiya
     end
 
     def tags
-      return self['/tagging/user_tags']
+      return TagContainer.new(self['/tagging/user_tags'])
     end
 
     def clear_tags

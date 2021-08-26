@@ -2,11 +2,11 @@ module Mulukhiya
   class TagFeedRendererTest < TestCase
     def setup
       @renderer = TagFeedRenderer.new
-      @renderer.tag = TagContainer.default_tag_bases.first
+      @renderer.tag = TagContainer.default_tags.first
     end
 
     def test_tag
-      assert_equal(@renderer.tag, TagContainer.default_tag_bases.first)
+      assert_equal(@renderer.tag, TagContainer.default_tags.first)
     end
 
     def test_limit

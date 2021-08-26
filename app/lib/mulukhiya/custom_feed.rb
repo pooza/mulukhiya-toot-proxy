@@ -21,7 +21,7 @@ module Mulukhiya
       renderer.command = CommandLine.create(entry)
       unless storage[renderer.command]
         renderer.command.exec
-        raise Ginseng::Error, renderer.command.stderr unless renderer.command.status.zero?
+        raise renderer.command.stderr unless renderer.command.status.zero?
         renderer.entries = JSON.parse(renderer.command.stdout)
       end
       return renderer

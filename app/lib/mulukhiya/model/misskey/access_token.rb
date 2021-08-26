@@ -35,7 +35,7 @@ module Mulukhiya
       def scopes
         return application.scopes if application
         matches = permission.match(/{(.*?)}/)[1]
-        return Set.new(matches.split(',')) if matches
+        return matches.split(',').to_set if matches
         raise Ginseng::GatewayError, "Invalid scopes '#{permission}'"
       end
 

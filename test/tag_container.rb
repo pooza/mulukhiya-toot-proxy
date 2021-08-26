@@ -6,11 +6,11 @@ module Mulukhiya
     end
 
     def test_default_tags
-      assert_equal(TagContainer.default_tags, ['#美食丼', '#b_shock_don'])
+      assert_equal(TagContainer.default_tags, Set['美食丼', 'b-shock-don'])
     end
 
     def test_remote_default_tags
-      assert_equal(TagContainer.remote_default_tags, ['#gochisou_photo'])
+      assert_equal(TagContainer.remote_default_tags, Set['gochisou_photo'])
     end
   end
 end

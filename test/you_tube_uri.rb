@@ -44,8 +44,8 @@ module Mulukhiya
 
     def test_artists
       assert_nil(@root.artists)
-      assert_equal(@video.artists, ['プリキュア公式YouTubeチャンネル'])
-      assert_equal(@music.artists, ['宮本佳那子'])
+      assert_equal(@video.artists, Set['プリキュア公式YouTubeチャンネル'])
+      assert_equal(@music.artists, Set['宮本佳那子'])
     end
   end
 end

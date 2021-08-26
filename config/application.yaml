@@ -72,7 +72,6 @@ annict:
         - created_at
         - work.id
         - work.title
-        - work.images
         - episode.id
         - episode.number_text
         - episode.title
@@ -92,7 +91,6 @@ annict:
         - user.id
         - work.id
         - work.title
-        - work.images
       limit: 10
   interval:
     seconds: 1
@@ -732,7 +730,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.9.1
+  version: 4.9.2
 parser:
   note:
     fields:

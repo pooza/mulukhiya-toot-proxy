@@ -102,7 +102,7 @@ module Mulukhiya
       name ||= album['artistName'] if album
       return nil if name.nil?
       names = ArtistParser.new(name).parse
-      names = [name] unless names.present?
+      names = [name].to_set unless names.present?
       return names
     end
 

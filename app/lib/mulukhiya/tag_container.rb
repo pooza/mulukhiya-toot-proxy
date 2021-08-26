@@ -3,10 +3,14 @@ module Mulukhiya
     include Package
     attr_reader :account
 
+    def member?(item)
+      return super(item.to_hashtag_base)
+    end
+
     def account=(account)
       @account = account
-      reject! {|v| @account.disabled_tag_bases.member?(v)}
-      concat(@account.user_tag_bases)
+      reject! {|v| @account.disabled_tags.member?(v)}
+      merge(@account.user_tags)
     end
 
     def self.scan(text)
@@ -16,32 +20,24 @@ module Mulukhiya
     end
 
     def self.default_tags
-      return config['/tagging/default_tags'].map(&:to_hashtag) rescue []
-    end
-
-    def self.default_tag_bases
-      return config['/tagging/default_tags'].map(&:to_hashtag_base) rescue []
+      return TagContainer.new((config['/tagging/default_tags'] rescue []))
     end
 
     def self.remote_default_tags
-      return config['/tagging/remote_default_tags'].map(&:to_hashtag) rescue []
-    end
-
-    def self.remote_default_tag_bases
-      return config['/tagging/remote_default_tags'].map(&:to_hashtag_base) rescue []
+      return TagContainer.new((config['/tagging/remote_default_tags'] rescue []))
     end
 
     def self.media_tag?
       return config['/tagging/media/enable'] == true rescue true
     end
 
-    def self.media_tag_bases
-      return [] unless media_tag?
-      return ['image', 'video', 'audio'].freeze.map do |tag|
-        config["/tagging/media/tags/#{tag}"].to_hashtag_base
-      end
+    def self.media_tags
+      tags = TagContainer.new
+      return tags unless media_tag?
+      tags.merge(['image', 'video', 'audio'].freeze.map {|v| config["/tagging/media/tags/#{v}"]})
+      return tags
     rescue
-      return []
+      return TagContainer.new
     end
   end
 end

@@ -81,22 +81,24 @@ module Mulukhiya
       return @annict
     end
 
-    def featured_tag_bases
-      return []
+    def featured_tags
+      return TagContainer.new
     end
 
-    def field_tag_bases
-      return fields.map {|v| v['value']}.filter {|v| v.start_with?('#')}.map(&:to_hashtag_base)
+    def field_tags
+      tags = TagContainer.new
+      tags.merge(fields.map {|v| v['value']}.filter {|v| v.start_with?('#')})
+      return tags
     rescue => e
       logger.error(error: e, acct: acct.to_s)
-      return []
+      return TagContainer.new
     end
 
-    def bio_tag_bases
+    def bio_tags
       return TagContainer.scan(bio)
     rescue => e
       logger.error(error: e, acct: acct.to_s)
-      return []
+      return TagContainer.new
     end
 
     def notify_verbose?
@@ -108,20 +110,20 @@ module Mulukhiya
       return user_config["/handler/#{handler.underscore}/disable"] == true rescue false
     end
 
-    def user_tag_bases
-      return user_config['/tagging/user_tags'] || []
+    def user_tags
+      return TagContainer.new(user_config['/tagging/user_tags'] || [])
     end
 
-    alias tags user_tag_bases
+    alias tags user_tags
 
-    def disabled_tag_bases
+    def disabled_tags
       tags = TagContainer.new
       dic_cache = TaggingDictionary.new.cache
       (user_config['/tagging/tags/disabled'] || []).each do |tag|
-        tags.push(tag)
-        tags.concat(dic_cache[tag][:words])
+        tags.add(tag)
+        tags.merge(dic_cache[tag][:words])
       end
-      return tags.to_a
+      return tags
     rescue => e
       logger.error(error: e, acct: acct.to_s)
     end

@@ -10,7 +10,7 @@ module Mulukhiya
         command.args.push(params[key])
       end
       command.exec
-      raise Ginseng::Error, command.stderr unless command.status.zero?
+      raise command.stderr unless command.status.zero?
       renderer = Ginseng::Web::RawRenderer.new
       renderer.type = command.response[:type]
       renderer.body = command.response[:body]

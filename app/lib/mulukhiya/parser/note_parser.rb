@@ -21,10 +21,10 @@ module Mulukhiya
     alias tags hashtags
 
     def all_tags
-      container = hashtags.clone
-      container.concat(TagContainer.default_tag_bases)
-      container.concat(@account.user_tag_bases) if @account
-      return container
+      tags = hashtags.clone
+      tags.merge(TagContainer.default_tags)
+      tags.merge(@account.user_tags) if @account
+      return tags
     end
 
     def max_length

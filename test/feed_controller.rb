@@ -22,10 +22,10 @@ module Mulukhiya
 
     def test_default_tag
       return unless controller_class.feed?
-      return unless TagContainer.default_tag_bases.present?
+      return unless TagContainer.default_tags.present?
 
       service = sns_class.new
-      TagContainer.default_tag_bases.each do |tag|
+      TagContainer.default_tags.each do |tag|
         get service.create_uri("/tag/#{tag}").normalize.path
         assert(last_response.ok?)
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')

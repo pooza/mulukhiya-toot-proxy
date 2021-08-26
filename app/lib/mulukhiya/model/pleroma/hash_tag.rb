@@ -20,8 +20,8 @@ module Mulukhiya
         }
       end
 
-      def self.featured_tag_bases
-        return []
+      def self.featured_tags
+        return TagContainer.new
       end
 
       def self.get(key)

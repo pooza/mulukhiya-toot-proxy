@@ -88,22 +88,20 @@ module Mulukhiya
       })
 
       record = {
-        work: {id: 111, title: 'すごいあにめ', images: {recommended_url: 'https://image.example.com/thumbnail.png'}},
+        work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal(@service.create_payload(record, :record).raw, {
-        'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n",
       })
 
       record = {
-        work: {id: 111, title: 'すごいあにめ', images: {recommended_url: 'https://image.example.com/thumbnail.png'}},
+        work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal(@service.create_payload(record, :record).raw, {
-        'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n",
       })
@@ -127,20 +125,18 @@ module Mulukhiya
       })
 
       review = {
-        work: {id: 112, title: 'すごいあにめTHE MOVIE', images: {recommended_url: 'https://image.example.com/thumbnail.png'}},
+        work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal(@service.create_payload(review, :review).raw, {
-        'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
         'text' => "「すごいあにめTHE MOVIE」を視聴。\n\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n",
       })
 
       review = {
-        work: {id: 112, title: 'すごいあにめTHE MOVIE', images: {recommended_url: 'https://image.example.com/thumbnail.png'}},
+        work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal(@service.create_payload(review, :review).raw, {
-        'attachments' => [{'image_url' => 'https://image.example.com/thumbnail.png'}],
         'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n",
       })

@@ -94,9 +94,7 @@ module Mulukhiya
       return {
         event: @event.to_s,
         handler: underscore,
-        entries: @result.concat(@errors).map do |entry|
-          entry.is_a?(Hash) ? entry.deep_stringify_keys : entry
-        end,
+        entries: recursive_to_a(@result.concat(@errors)),
       }
     end
 
@@ -176,14 +174,14 @@ module Mulukhiya
     def self.names
       names = []
       Event.all {|v| names.concat(v.handler_names.to_a)}
-      return Set.new(names.sort)
+      return names.to_set
     rescue => e
       logger.error(error: e)
       return nil
     end
 
     def self.search(pattern)
-      return Set.new(names.select {|v| v.match?(pattern) && !config.disable?(v)})
+      return names.select {|v| v.match?(pattern) && !config.disable?(v)}.to_set
     end
 
     private
@@ -196,6 +194,19 @@ module Mulukhiya
       @prepared = false
       @event = params[:event] || 'unknown'
       @text_field = status_field
+    end
+
+    def recursive_to_a(arg)
+      case arg.class.to_s
+      when 'Hash'
+        return arg.deep_stringify_keys.transform_values do |v|
+          v.is_a?(Set) ? v.to_a : recursive_to_a(v)
+        end
+      when 'Array', 'Set'
+        return arg.map {|v| v.is_a?(Set) ? v.to_a : recursive_to_a(v)}
+      else
+        return arg
+      end
     end
   end
 end
