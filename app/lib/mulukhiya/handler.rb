@@ -174,7 +174,7 @@ module Mulukhiya
     def self.names
       names = []
       Event.all {|v| names.concat(v.handler_names.to_a)}
-      return names.sort.to_set
+      return names.to_set
     rescue => e
       logger.error(error: e)
       return nil

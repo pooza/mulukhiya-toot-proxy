@@ -9,17 +9,17 @@ module Mulukhiya
     end
 
     def parse
-      tags = Set[]
+      artists = Set[]
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited] && (@depth <= @max_depth)
           @source.split(delimiters).each do |artist|
-            tags.merge(ArtistParser.new(artist, @depth).parse)
+            artists.merge(ArtistParser.new(artist, @depth).parse)
           end
         else
-          tags.merge(parse_part(matches, pattern_entry[:items]))
+          artists.merge(parse_part(matches, pattern_entry[:items]))
         end
-        return tags
+        return artists
       end
       return Set[@source]
     rescue => e
@@ -32,16 +32,16 @@ module Mulukhiya
     private
 
     def parse_part(matches, items)
-      tags = Set[]
+      artists = Set[]
       items.each_with_index do |item, i|
         next if item['drop']
         if item['split']
-          tags.merge(matches[i + 1].split(delimiters).map(&:strip))
+          artists.merge(matches[i + 1].split(delimiters).map(&:strip))
         else
-          tags.add(matches[i + 1].strip)
+          artists.add(matches[i + 1].strip)
         end
       end
-      return tags
+      return artists
     end
 
     def patterns
