@@ -98,19 +98,6 @@ module Mulukhiya
       }
     end
 
-    def recursive_to_a(arg)
-      case arg.class.to_s
-      when 'Hash'
-        return arg.deep_stringify_keys.transform_values do |v|
-          v.is_a?(Set) ? v.to_a : recursive_to_a(v)
-        end
-      when 'Array', 'Set'
-        return arg.map {|v| v.is_a?(Set) ? v.to_a : recursive_to_a(v)}
-      else
-        return arg
-      end
-    end
-
     def debug_info
       return {result: @result, errors: @errors} if @result.present? || @errors.present?
       return nil
@@ -207,6 +194,19 @@ module Mulukhiya
       @prepared = false
       @event = params[:event] || 'unknown'
       @text_field = status_field
+    end
+
+    def recursive_to_a(arg)
+      case arg.class.to_s
+      when 'Hash'
+        return arg.deep_stringify_keys.transform_values do |v|
+          v.is_a?(Set) ? v.to_a : recursive_to_a(v)
+        end
+      when 'Array', 'Set'
+        return arg.map {|v| v.is_a?(Set) ? v.to_a : recursive_to_a(v)}
+      else
+        return arg
+      end
     end
   end
 end

@@ -32,13 +32,13 @@ module Mulukhiya
     private
 
     def parse_part(matches, items)
-      tags = []
+      tags = Set[]
       items.each_with_index do |item, i|
         next if item['drop']
         if item['split']
-          tags.concat(matches[i + 1].split(delimiters).map(&:strip))
+          tags.merge(matches[i + 1].split(delimiters).map(&:strip))
         else
-          tags.push(matches[i + 1].strip)
+          tags.add(matches[i + 1].strip)
         end
       end
       return tags

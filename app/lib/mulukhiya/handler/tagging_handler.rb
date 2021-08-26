@@ -24,7 +24,7 @@ module Mulukhiya
     end
 
     def media_tags
-      tags = Set[]
+      tags = TagContainer.new
       (payload[attachment_field] || []).each do |id|
         type = attachment_class[id].type
         ['video', 'image', 'audio'].freeze.each do |mediatype|

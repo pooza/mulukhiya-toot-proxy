@@ -57,7 +57,7 @@ module Mulukhiya
       alias recent_post recent_status
 
       def featured_tag_bases
-        tags = Set[]
+        tags = TagContainer.new
         return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
         timelines.each do |timeline|
           timeline['query'].each do |entry|
