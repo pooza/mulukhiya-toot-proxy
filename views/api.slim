@@ -67,7 +67,7 @@ html lang='ja'
                 .link GET /mulukhiya/api/program
                 .link-description
                   | キャッシュ済みの
-                  a href='#{config['/programs/url']}' target='_blank' noreferrer='noreferrer' 実況番組表
+                  a href='#{config['/programs/url']}' target='_blank' rel='noreferrer' 実況番組表
                   | を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
@@ -83,7 +83,7 @@ html lang='ja'
                     | スケジュール
                     code #{config['/sidekiq/schedule/program_update/every']}
                 .link-description
-                  a href='#{config['/programs/url']}' target='_blank' noreferrer='noreferrer' 実況番組表
+                  a href='#{config['/programs/url']}' target='_blank' rel='noreferrer' 実況番組表
                   | を取得し、キャッシュします。
                 .field-update-button-container
                   button @click='updatePrograms' 実行
@@ -122,7 +122,7 @@ html lang='ja'
               .link-description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
               - config['/tagging/dictionaries'].each do |dic|
                 .link
-                  a href=dic['url'] target='_blank' noreferrer='noreferrer' = dic['url'].ellipsize(64)
+                  a href=dic['url'] target='_blank' rel='noreferrer' = dic['url'].ellipsize(64)
               .field-update-button-container
                 button @click='updateTaggingDictionary' 実行
         li v-if='account.is_admin'

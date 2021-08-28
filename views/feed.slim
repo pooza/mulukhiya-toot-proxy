@@ -16,18 +16,18 @@ html lang='ja'
             li
               h4 メディアファイル
               .link
-                a href='/mulukhiya/feed/media' target='_blank' noreferrer='noreferrer' = slim.create_uri('/mulukhiya/feed/media')
+                a href='/mulukhiya/feed/media' target='_blank' rel='noreferrer' = slim.create_uri('/mulukhiya/feed/media')
           - Mulukhiya::CustomFeed.entries.each do |entry|
             li
               h4 #{entry['title']}
               .link
-                a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' noreferrer='noreferrer' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
+                a href='#{File.join('/mulukhiya/feed', entry['path'])}' target='_blank' rel='noreferrer' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
         h3 ハッシュタグ
         ul.links
           li v-for='feed in feeds'
             h4 = '{{feed.tag}}'
             .link
-              a :href='feed.feed_url' target='_blank' noreferrer='noreferrer' = '{{feed.feed_url}}'
+              a :href='feed.feed_url' target='_blank' rel='noreferrer' = '{{feed.feed_url}}'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

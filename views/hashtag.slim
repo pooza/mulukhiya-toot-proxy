@@ -14,10 +14,10 @@ html lang='ja'
           h3 プロフィールに含まれるタグ
           article.tag-entry v-for='(count, tag) in fav_entries'
             - if env.pleroma?
-              a :href='"/tag/" + tag' target='_blank' noreferrer='noreferrer'
+              a :href='"/tag/" + tag' target='_blank' rel='noreferrer'
                 span = '#{{tag}}'
             - else
-              a :href='"/tags/" + tag' target='_blank' noreferrer='noreferrer'
+              a :href='"/tags/" + tag' target='_blank' rel='noreferrer'
                 span = '#{{tag}}'
             span = '{{count}}'
       section.tagging-dictionary
@@ -46,10 +46,10 @@ html lang='ja'
             li
               h4 = dic.name
               .link-container
-                a.url href='#{dic.uri}' target='_blank' noreferrer='noreferrer' = dic.uri.to_s.ellipsize(64)
+                a.url href='#{dic.uri}' target='_blank' rel='noreferrer' = dic.uri.to_s.ellipsize(64)
                 - if dic.edit_uri
                   |&nbsp;
-                  a.edit href='#{dic.edit_uri}' target='_blank' noreferrer='noreferrer'  v-if='account.username'
+                  a.edit href='#{dic.edit_uri}' target='_blank' rel='noreferrer'  v-if='account.username'
                     i class='fas fa-edit' v-tooltip.left="'辞書の編集'"
     == slim.render 'fragment/footer'
     javascript:

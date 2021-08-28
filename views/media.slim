@@ -12,11 +12,11 @@ html lang='ja'
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
-            a :href='media.url' target='_blank' noreferrer='noreferrer' v-if='media.thumbnail_url && media.mediatype=="image"'
+            a :href='media.url' target='_blank' rel='noreferrer' v-if='media.thumbnail_url && media.mediatype=="image"'
               img :src='media.thumbnail_url'
             video :src='media.url' controls='' v-else-if='media.mediatype=="video"'
             audio :src='media.url' controls='' v-else-if='media.mediatype=="audio"'
-            a :href='media.url' target='_blank' noreferrer='noreferrer' v-else='' = '{{media.file_name}}'
+            a :href='media.url' target='_blank' rel='noreferrer' v-else='' = '{{media.file_name}}'
           ul.params
             li.param
               i class='fas fa-calendar'
@@ -36,7 +36,7 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-comment'
-              a :href='media.status_url' target='_blank' noreferrer='noreferrer' = controller.status_label
+              a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
       nav.media v-if='medias.length && !last'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
