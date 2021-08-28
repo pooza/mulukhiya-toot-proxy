@@ -107,7 +107,7 @@ GEM
     aws-eventstream (1.1.1)
     aws-sigv4 (1.2.4)
       aws-eventstream (~> 1, >= 1.0.2)
-    bootsnap (1.8.0)
+    bootsnap (1.8.1)
       msgpack (~> 1.0)
     brpoplpush-redis_script (0.1.2)
       concurrent-ruby (~> 1.0, >= 1.0.5)
@@ -374,7 +374,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
