@@ -45,7 +45,7 @@ html lang='ja'
           h4 新しいトークンを登録
           .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
           .description
-            a href=params[:oauth_url] target='_blank' 認証コードを取得
+            a href=params[:oauth_url] target='_blank' noreferrer='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
             - if env.misskey_type?
               | （認証後の、URL末尾の
@@ -63,7 +63,7 @@ html lang='ja'
           h4 お知らせボット用のトークンを登録
           .description #{controller.display_name}で認証を行って、お知らせボット用の新しいトークンを登録します。
           .description
-            a href=params[:infobot_oauth_url] target='_blank' 認証コードを取得
+            a href=params[:infobot_oauth_url] target='_blank' noreferrer='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
             - if env.misskey_type?
               | （認証後の、URL末尾の
@@ -82,7 +82,7 @@ html lang='ja'
           .description トークンを改行区切りで入力して、登録ボタンを押下してください。
           - if controller.oauth_webui_uri
             .description v-if='account.is_admin'
-              a href=controller.oauth_webui_uri target='_blank' #{controller.oauth_webui_uri}
+              a href=controller.oauth_webui_uri target='_blank' noreferrer='noreferrer' #{controller.oauth_webui_uri}
               | で作成したトークンを、bin/crypt.rbで暗号化して登録することもできます。
               | 以下の権限を含むものにしてください。
             .field v-if='account.is_admin'
