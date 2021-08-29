@@ -12,7 +12,7 @@ html lang='ja'
       section.config v-if='account.username'
         .field-container
           h3 URL
-          textarea ref='webhook_url_text' = '{{url}}'
+          textarea ref='webhook_url_text' {{url}}
           i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyWebhookURL'
           .alert このURLを公開してはいけません。
         .field-container

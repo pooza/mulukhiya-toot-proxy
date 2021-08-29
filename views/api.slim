@@ -71,7 +71,7 @@ html lang='ja'
                   | を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
-                  pre.result v-if='result.program_list' = '{{result.program_list}}'
+                  pre.result v-if='result.program_list' {{result.program_list}}
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .role moderator
@@ -96,7 +96,7 @@ html lang='ja'
                 .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
                 .field-update-button-container
                   button @click='getFavoriteTags' 実行
-                  pre.result v-if='result.favorite_tags' = '{{result.favorite_tags}}'
+                  pre.result v-if='result.favorite_tags' {{result.favorite_tags}}
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           vue-slide-up-down :active='layout.details.tagging_dic'
@@ -108,7 +108,7 @@ html lang='ja'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
-                pre.result v-if='result.search_tag' = '{{result.search_tag}}'
+                pre.result v-if='result.search_tag' {{result.search_tag}}
             .endpoint-container v-if='account.is_admin'
               .role admin
               .role moderator
@@ -150,7 +150,7 @@ html lang='ja'
                 .link-description フィードの一覧を返します。
                 .field-update-button-container
                   button @click='getFeeds' 実行
-                  pre.result v-if='result.feed_list' = '{{result.feed_list}}'
+                  pre.result v-if='result.feed_list' {{result.feed_list}}
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .role moderator
@@ -182,7 +182,7 @@ html lang='ja'
               .link-description モロヘイヤの動作状況を表示します。
               .field-update-button-container
                 button @click='getHealth' 実行
-                pre.result v-if='result.health' = '{{result.health}}'
+                pre.result v-if='result.health' {{result.health}}
         - if Mulukhiya::CustomAPI.entries.present?
           .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.entries.to_json
           li
@@ -205,7 +205,7 @@ html lang='ja'
               .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
               .field-update-button-container
                 button @click='getAbout' 実行
-                pre.result v-if='result.about' = '{{result.about}}'
+                pre.result v-if='result.about' {{result.about}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
