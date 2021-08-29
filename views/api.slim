@@ -191,8 +191,8 @@ html lang='ja'
               - Mulukhiya::CustomAPI.entries.each do |entry|
                 .endpoint-container
                   .link GET #{File.join('/mulukhiya/api', entry['path'])}
-                  - if entry['command'].last.is_a?(Symbol)
-                    input type='text' placeholder='#{entry['command'].last}' v-model.trim='query_params.#{entry['id']}'
+                  - if entry['params'].present?
+                    input type='text' placeholder='#{entry['params'].first.to_s}' v-model.trim='query_params.#{entry['id']}'
                   .link-description = entry['description']
                   .field-update-button-container
                     button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行

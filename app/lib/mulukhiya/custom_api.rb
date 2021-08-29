@@ -26,6 +26,7 @@ module Mulukhiya
         entry.deep_stringify_keys!
         entry['dir'] ||= Environment.dir
         entry['title'] ||= entry['path']
+        entry['params'] = entry['command'].select {|v| v.is_a?(Symbol)}
         entry['id'] = entry['path'].to_hashtag_base
         entry
       end
