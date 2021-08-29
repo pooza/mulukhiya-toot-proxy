@@ -14,16 +14,16 @@ html lang='ja'
           h3 プロフィールに含まれるタグ
           article.tag-entry v-for='(count, tag) in fav_entries'
             - if env.pleroma?
-              a :href='"/tag/" + tag' target='_blank'
+              a :href='"/tag/" + tag' target='_blank' rel='noreferrer'
                 span = '#{{tag}}'
             - else
-              a :href='"/tags/" + tag' target='_blank'
+              a :href='"/tags/" + tag' target='_blank' rel='noreferrer'
                 span = '#{{tag}}'
             span = '{{count}}'
       section.tagging-dictionary
         h3 タグを検索
         .search-form-container
-          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='onEnterTags'
+          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
           button.small :disabled='!keyword' @click='search' 検索
         article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
           h4
@@ -46,10 +46,10 @@ html lang='ja'
             li
               h4 = dic.name
               .link-container
-                a.url href='#{dic.uri}' target='_blank' = dic.uri.to_s.ellipsize(64)
+                a.url href='#{dic.uri}' target='_blank' rel='noreferrer' = dic.uri.to_s.ellipsize(64)
                 - if dic.edit_uri
                   |&nbsp;
-                  a.edit href='#{dic.edit_uri}' target='_blank'  v-if='account.username'
+                  a.edit href='#{dic.edit_uri}' target='_blank' rel='noreferrer'  v-if='account.username'
                     i class='fas fa-edit' v-tooltip.left="'辞書の編集'"
     == slim.render 'fragment/footer'
     javascript:
@@ -77,9 +77,6 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          onEnterTags: function () {
-            this.search()
-          },
           search: function () {
             this.dic_entries = {}
             if (this.keyword == '') {return}

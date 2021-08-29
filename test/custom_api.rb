@@ -6,9 +6,12 @@ module Mulukhiya
 
     def test_entries
       CustomAPI.entries.each do |entry|
+        assert_kind_of(String, entry['id'])
         assert_kind_of(String, entry['path'])
-        assert_kind_of([Array, String], entry['command'])
+        assert_kind_of(Array, entry['command'])
+        assert_kind_of(Array, entry['params'])
         assert_kind_of(String, entry['title'])
+        assert_kind_of(String, entry['description']) if entry['description']
         assert(Dir.exist?(entry['dir']))
       end
     end
