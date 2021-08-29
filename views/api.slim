@@ -184,17 +184,19 @@ html lang='ja'
                 button @click='getHealth' 実行
                 pre.result v-if='result.health' = '{{result.health}}'
         - if Mulukhiya::CustomAPI.entries.present?
+          .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.entries.to_json
           li
             h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
             vue-slide-up-down :active='layout.details.custom'
               - Mulukhiya::CustomAPI.entries.each do |entry|
                 .endpoint-container
                   .link GET #{File.join('/mulukhiya/api', entry['path'])}
+                  - if entry['command'].last.is_a?(Symbol)
+                    input type='text' placeholder='#{entry['command'].last}' v-model.trim='query_params.#{entry['id']}'
                   .link-description = entry['description']
                   .field-update-button-container
-                    - unless entry['command'].last.is_a?(Symbol)
-                      button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
-                      pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
+                    button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                    pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -263,6 +265,10 @@ html lang='ja'
               this.account = e.account
               this.config = e.config
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
+
+              JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
+                Vue.set(this.query_params, entry.id, null)
+              })
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
@@ -358,7 +364,8 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           execCustomAPI: function (id, path) {
-            this.result.health = null
+            Vue.set(this.result, id, null)
+            if (this.query_params[id]) {path = path.replace(/:.*$/, this.query_params[id])}
             Vue.execCustomAPI(path)
               .then(e => Vue.set(this.result, id, e))
               .catch(e => Vue.alert(this.$dialog, e))
