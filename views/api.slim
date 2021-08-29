@@ -266,11 +266,10 @@ html lang='ja'
               this.config = e.config
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => Vue.alert(this.$dialog, e))
-
-            JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
-              Vue.set(this.query_params, entry.id, null)
-              Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
-            })
+          JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
+            Vue.set(this.query_params, entry.id, null)
+            Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
+          })
         },
         methods: {
           onInputMediaListPage: function () {
