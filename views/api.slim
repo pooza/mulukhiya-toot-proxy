@@ -192,7 +192,7 @@ html lang='ja'
                 .endpoint-container
                   .link GET {{endpoints.#{entry['id']}}}
                   - if entry['params'].present?
-                    input type='text' placeholder='#{entry['params'].first.to_s}' v-model.trim='query_params.#{entry['id']}' @input='onInputCustomAPIParam("#{entry['id']}", "#{entry['path']}")' @keydown.enter='execCustomAPI("#{entry['id']}", "#{entry['path']}")'
+                    input type='text' placeholder='#{entry['params'].first.to_s}' v-model.trim='query_params.#{entry['id']}' @input='onInputCustomAPI("#{entry['id']}", "#{entry['path']}")' @keydown.enter='execCustomAPI("#{entry['id']}", "#{entry['path']}")'
                   .link-description = entry['description']
                   .field-update-button-container
                     button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
@@ -277,7 +277,7 @@ html lang='ja'
             url.searchParams.set('page', this.query_params.media_list.page)
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
-          onInputCustomAPIParam: function (id, path) {
+          onInputCustomAPI: function (id, path) {
             path = path.replace(/:[_a-z0-9]+/, this.query_params[id])
             Vue.set(this.endpoints, id, `/mulukhiya/api/${path}`)
           },
