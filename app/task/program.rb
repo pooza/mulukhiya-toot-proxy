@@ -2,7 +2,7 @@ namespace :mulukhiya do
   namespace :program do
     desc 'update programs'
     task :update do
-      Mulukhiya::ProgramUpdateWorker.new.perform_async
+      Mulukhiya::ProgramUpdateWorker.perform_async
     end
 
     desc 'show programs'
