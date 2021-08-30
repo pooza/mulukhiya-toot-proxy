@@ -32,7 +32,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage' @keydown.enter='getMedias'
+              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='getMedias'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -191,11 +191,11 @@ html lang='ja'
               - Mulukhiya::CustomAPI.entries.each do |entry|
                 .endpoint-container
                   .link GET {{endpoints.#{entry['id']}}}
-                  - if entry['params'].present?
-                    input type='text' placeholder='#{entry['params'].first.to_s}' v-model.trim='query_params.#{entry['id']}' @input='onInputCustomAPI("#{entry['id']}", "#{entry['path']}")' @keydown.enter='execCustomAPI("#{entry['id']}", "#{entry['path']}")'
+                  - entry['params'].each do |param|
+                    input type='text' placeholder='#{param.to_s}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' @keydown.enter='execCustomAPI("#{entry['id']}")'
                   .link-description = entry['description']
                   .field-update-button-container
-                    button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                    button @click='execCustomAPI("#{entry['id']}")' 実行
                     pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
@@ -218,8 +218,9 @@ html lang='ja'
           account: {is_admin: false, username: null},
           config: {annict: null},
           feed: {list: {href: null}},
+          entries: {},
           endpoints: {
-            media_list: '/mulukhiya/api/media?page=1'
+            media_list: '/mulukhiya/api/media?page=1',
           },
           query_params: {
             media_list: {page: 1},
@@ -267,19 +268,26 @@ html lang='ja'
               this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => Vue.alert(this.$dialog, e))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
-            Vue.set(this.query_params, entry.id, null)
+            const params = {}
+            entry.params.map(key => {params[key] = ''})
+            Vue.set(this.entries, entry.id, entry)
+            Vue.set(this.query_params, entry.id, params)
             Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
           })
         },
         methods: {
-          onInputMediaListPage: function () {
+          onInputMediaList: function () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
-          onInputCustomAPI: function (id, path) {
-            path = path.replace(/:[_a-z0-9]+/, this.query_params[id])
-            Vue.set(this.endpoints, id, `/mulukhiya/api/${path}`)
+          onInputCustomAPI: function (id, key) {
+            let endpoint = `/mulukhiya/api/${this.entries[id].path}`
+            this.query_params[id][key] = event.target.value
+            Object.keys(this.query_params[id]).map(k => {
+              endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
+            })
+            Vue.set(this.endpoints, id, endpoint)
           },
           toggleVisibility: function (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -361,10 +369,9 @@ html lang='ja'
               .then(e => {this.result.health = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          execCustomAPI: function (id, path) {
+          execCustomAPI: function (id) {
             Vue.set(this.result, id, null)
-            if (this.query_params[id]) {path = path.replace(/:.*$/, this.query_params[id])}
-            Vue.execCustomAPI(path)
+            Vue.execGET(this.endpoints[id])
               .then(e => Vue.set(this.result, id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
