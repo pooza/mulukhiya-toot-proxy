@@ -34,7 +34,7 @@ html lang='ja'
           token: null,
           url: null,
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {
               this.account = e.account
@@ -43,11 +43,11 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          copyWebhookURL: function () {
+          copyWebhookURL () {
             this.$refs.webhook_url_text.select()
             document.execCommand('copy')
           },
-          copyToken: function () {
+          copyToken () {
             this.$refs.token_text.select()
             document.execCommand('copy')
           },

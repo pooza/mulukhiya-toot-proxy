@@ -40,7 +40,7 @@ html lang='ja'
           account: {is_admin: false, username: null},
           feeds: [],
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => Vue.alert(this.$dialog, e))

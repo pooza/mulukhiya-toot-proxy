@@ -31,7 +31,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => Vue.alert(this.$dialog, e))

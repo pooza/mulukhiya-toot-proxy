@@ -66,7 +66,7 @@ html lang='ja'
           dic_entries: {},
           fav_entries: [],
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {
               this.account = e.account
@@ -77,18 +77,18 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          search: function () {
+          search () {
             this.dic_entries = {}
             if (this.keyword == '') {return}
             Vue.searchTags(this.keyword)
               .then(e => {this.dic_entries = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          isDisabledTag: function (tag) {
+          isDisabledTag (tag) {
             this.disabled_tags = this.disabled_tags || []
             return this.disabled_tags.includes(tag)
           },
-          setTagStatus: function (tag, flag) {
+          setTagStatus (tag, flag) {
             const command = {tagging: {tags: {disabled: []}}}
             this.disabled_tags = this.disabled_tags || []
             if (flag) {
