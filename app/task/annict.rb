@@ -2,7 +2,7 @@ namespace :mulukhiya do
   namespace :annict do
     desc 'crawl Annict'
     task :crawl do
-      Mulukhiya::AnnictPollingWorker.new.perform
+      Mulukhiya::AnnictPollingWorker.new.perform_async
     end
 
     desc 'crawl Annict (dryrun)'

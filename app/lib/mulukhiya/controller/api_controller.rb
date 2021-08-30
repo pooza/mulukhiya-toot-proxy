@@ -142,7 +142,7 @@ module Mulukhiya
 
     post '/media/file/clear' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      MediaCleaningWorker.new.perform
+      MediaCleaningWorker.new.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
@@ -198,7 +198,7 @@ module Mulukhiya
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      AnnouncementWorker.new.perform
+      AnnouncementWorker.new.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
@@ -221,7 +221,7 @@ module Mulukhiya
 
     post '/tagging/dic/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      TaggingDictionaryUpdateWorker.new.perform
+      TaggingDictionaryUpdateWorker.new.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
@@ -255,7 +255,7 @@ module Mulukhiya
 
     post '/tagging/usertag/clear' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      UserTagInitializeWorker.new.perform
+      UserTagInitializeWorker.new.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
@@ -278,7 +278,7 @@ module Mulukhiya
 
     post '/feed/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      Mulukhiya::FeedUpdateWorker.new.perform
+      Mulukhiya::FeedUpdateWorker.new.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
