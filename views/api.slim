@@ -217,7 +217,6 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           config: {annict: null},
-          feed: {list: {href: null}},
           entries: {},
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
@@ -265,7 +264,6 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
-              this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => Vue.alert(this.$dialog, e))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
