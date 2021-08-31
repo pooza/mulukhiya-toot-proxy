@@ -32,7 +32,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaListPage' @keydown.enter='getMedias'
+              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='getMedias'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -164,16 +164,6 @@ html lang='ja'
                 .link-description カスタムフィードの更新を行います。
                 .field-update-button-container
                   button @click='updateCustomFeeds' 実行
-        li v-if='account.username && config.annict'
-          h3 @click='toggleVisibility("annict")' Annict
-          vue-slide-up-down :active='layout.details.annict'
-            .endpoint-container
-              .link POST /mulukhiya/api/annict/crawl
-              pre.payload
-                | {{query_params.annict_crawl}}
-              .link-description Annictへの問い合わせを行います。
-              .field-update-button-container
-                button @click='crawlAnnict' 実行
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
@@ -191,11 +181,11 @@ html lang='ja'
               - Mulukhiya::CustomAPI.entries.each do |entry|
                 .endpoint-container
                   .link GET {{endpoints.#{entry['id']}}}
-                  - if entry['params'].present?
-                    input type='text' placeholder='#{entry['params'].first.to_s}' v-model.trim='query_params.#{entry['id']}' @input='onInputCustomAPIParam("#{entry['id']}", "#{entry['path']}")' @keydown.enter='execCustomAPI("#{entry['id']}", "#{entry['path']}")'
+                  - entry['params'].each do |param|
+                    input type='text' placeholder='#{param.to_s}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' @keydown.enter='execCustomAPI("#{entry['id']}")'
                   .link-description = entry['description']
                   .field-update-button-container
-                    button @click='execCustomAPI("#{entry['id']}", "#{entry['path']}")' 実行
+                    button @click='execCustomAPI("#{entry['id']}")' 実行
                     pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
@@ -216,10 +206,10 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          config: {annict: null},
-          feed: {list: {href: null}},
+          config: {},
+          entries: {},
           endpoints: {
-            media_list: '/mulukhiya/api/media?page=1'
+            media_list: '/mulukhiya/api/media?page=1',
           },
           query_params: {
             media_list: {page: 1},
@@ -230,7 +220,6 @@ html lang='ja'
             tagging_tag_search: {q: null},
             tagging_dic_update: {token: Vue.getToken()},
             tagging_usertag_clear: {token: Vue.getToken()},
-            annict_crawl: {token: Vue.getToken()},
             feed_update: {token: Vue.getToken()},
           },
           result: {
@@ -253,123 +242,120 @@ html lang='ja'
               feed: false,
               health: false,
               sidekiq: false,
-              annict: false,
               custom: false,
               about: false,
             },
           },
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {
               this.account = e.account
               this.config = e.config
-              this.feed.list.href = Vue.createURL('/mulukhiya/api/feed/list')
             }).catch(e => Vue.alert(this.$dialog, e))
-
-            JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
-              Vue.set(this.query_params, entry.id, null)
-              Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
-            })
+          JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
+            const params = {}
+            entry.params.map(key => {params[key] = ''})
+            Vue.set(this.entries, entry.id, entry)
+            Vue.set(this.query_params, entry.id, params)
+            Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
+          })
         },
         methods: {
-          onInputMediaListPage: function () {
+          onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
-          onInputCustomAPIParam: function (id, path) {
-            path = path.replace(/:[_a-z0-9]+/, this.query_params[id])
-            Vue.set(this.endpoints, id, `/mulukhiya/api/${path}`)
+          onInputCustomAPI (id, key) {
+            let endpoint = `/mulukhiya/api/${this.entries[id].path}`
+            this.query_params[id][key] = event.target.value
+            Object.keys(this.query_params[id]).map(k => {
+              endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
+            })
+            Vue.set(this.endpoints, id, endpoint)
           },
-          toggleVisibility: function (name) {
+          toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
           },
-          updateAnnouncement: function () {
+          updateAnnouncement () {
             Vue.updateAnnouncement()
               .then(e => {this.layout.details['announcement'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getMedias: function () {
+          getMedias () {
             this.result.media_list = null
             Vue.getMedias(this.query_params.media_list.page)
               .then(e => {this.result.media_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          clearMediaFiles: function () {
+          clearMediaFiles () {
             Vue.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          clearMediaMetadata: function () {
+          clearMediaMetadata () {
             Vue.clearMediaMetadata()
               .then(e => {this.layout.details['media'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          updatePrograms: function () {
+          updatePrograms () {
             Vue.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getPrograms: function () {
+          getPrograms () {
             this.result.program_list = null
             Vue.getPrograms()
               .then(e => {this.result.program_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getFavoriteTags: function () {
+          getFavoriteTags () {
             this.result.favorite_tags = null
             Vue.getFavoriteTags()
               .then(e => {this.result.favorite_tags = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          updateTaggingDictionary: function () {
+          updateTaggingDictionary () {
             Vue.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          clearUserTags: function () {
+          clearUserTags () {
             Vue.clearUserTags()
               .then(e => {this.layout.details['tagging_usertag'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getFeeds: function () {
+          getFeeds () {
             this.result.feed_list = null
             Vue.getFeeds()
               .then(e => {this.result.feed_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          updateCustomFeeds: function () {
+          updateCustomFeeds () {
             Vue.updateCustomFeeds()
               .then(e => {this.layout.details['feed'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          crawlAnnict: function () {
-            this.$dialog.confirm({body: 'Annictへの問い合わせを実行します。'}, {okText: '実行'})
-              .then(e => Vue.crawlAnnict())
-              .then(e => {this.layout.details['annict'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
-          },
-          searchTags: function () {
+          searchTags () {
             this.result.search_tag = null
             Vue.searchTags(this.query_params.tagging_tag_search.q)
               .then(e => {this.result.search_tag = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getHealth: function () {
+          getHealth () {
             this.result.health = null
             Vue.getHealth()
               .then(e => {this.result.health = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          execCustomAPI: function (id, path) {
+          execCustomAPI (id) {
             Vue.set(this.result, id, null)
-            if (this.query_params[id]) {path = path.replace(/:.*$/, this.query_params[id])}
-            Vue.execCustomAPI(path)
+            Vue.execGET(this.endpoints[id])
               .then(e => Vue.set(this.result, id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getAbout: function () {
+          getAbout () {
             this.result.about = null
             Vue.getAbout()
               .then(e => {this.result.about = e})

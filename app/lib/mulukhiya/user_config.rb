@@ -89,7 +89,7 @@ module Mulukhiya
         Sidekiq.set_schedule("user_tag_initialize_#{@account.username}", {
           at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
           class: 'Mulukhiya::UserTagInitializeWorker',
-          args: [{account: @account.id}],
+          args: [{account_id: @account.id}],
         })
         values['tagging']['minutes'] = nil
       elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?

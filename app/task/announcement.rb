@@ -2,7 +2,7 @@ namespace :mulukhiya do
   namespace :announcement do
     desc 'update announcements'
     task :update do
-      Mulukhiya::Announcement.new.announce
+      Mulukhiya::AnnouncementWorker.perform_async
     end
   end
 end

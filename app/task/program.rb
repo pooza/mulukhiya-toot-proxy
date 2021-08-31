@@ -2,8 +2,7 @@ namespace :mulukhiya do
   namespace :program do
     desc 'update programs'
     task :update do
-      Mulukhiya::Program.instance.update
-      puts "#{program.count.commaize} programs"
+      Mulukhiya::ProgramUpdateWorker.perform_async
     end
 
     desc 'show programs'

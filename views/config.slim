@@ -184,7 +184,7 @@ html lang='ja'
             },
           },
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {
               this.updateForm(e)
@@ -203,7 +203,7 @@ html lang='ja'
             })
         },
         methods: {
-          updateForm: function (data) {
+          updateForm (data) {
             this.result = jsyaml.dump(data.config)
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
@@ -229,12 +229,12 @@ html lang='ja'
               })
             }
           },
-          updateConfig: function (command) {
+          updateConfig (command) {
             Vue.updateConfig(command)
               .then(e => this.updateForm(e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          onChangeTags: function (e) {
+          onChangeTags (e) {
             if (e.code) {
               this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
               this.form.program.minutes = this.programs[e.code].minutes
@@ -243,10 +243,10 @@ html lang='ja'
               this.form.program.minutes = null
             }
           },
-          toggleVisibility: function (name) {
+          toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
           },
-          updateGrowi: function () {
+          updateGrowi () {
             const command = {growi: {url: null, token: null, prefix: null}}
             if (this.form.growi.token) {command.growi.token = this.form.growi.token}
             if (this.form.growi.url) {command.growi.url = this.form.growi.url}
@@ -254,13 +254,13 @@ html lang='ja'
             this.updateConfig(command)
             this.form.growi.token = null
           },
-          updateDropbox: function () {
+          updateDropbox () {
             const command = {dropbox: {token: null}}
             if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
             this.updateConfig(command)
             this.form.dropbox.token = null
           },
-          updateLemmy: function () {
+          updateLemmy () {
             const command = {lemmy: {host: null, user: null, community: null}}
             if (this.form.lemmy.host) {command.lemmy.host = this.form.lemmy.host}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
@@ -269,7 +269,7 @@ html lang='ja'
             this.updateConfig(command)
             this.form.lemmy.password = null
           },
-          updateTags: function () {
+          updateTags () {
             const command = {tagging: {user_tags: null, minutes: null}}
             if (this.form.tags) {
               command.tagging.user_tags = this.form.tags.split("\n")
@@ -281,25 +281,25 @@ html lang='ja'
             }
             this.updateConfig(command)
           },
-          updateLivecure: function () {
+          updateLivecure () {
             Vue.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          updateWebhook: function () {
+          updateWebhook () {
             const command = {webhook: {visibility: null}}
             if (this.form.webhook.visibility.code != 'public') {
               command.webhook.visibility = this.form.webhook.visibility.code
             }
             this.updateConfig(command)
           },
-          updateNotify: function () {
+          updateNotify () {
             const command = {notify: {verbose: null, user_config: null}}
             if (this.form.notify.verbose) {command.notify.verbose = true}
             if (this.form.notify.user_config) {command.notify.user_config = true}
             this.updateConfig(command)
           },
-          authAnnict: function () {
+          authAnnict () {
             Vue.authAnnict(this.form.annict.auth_code)
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -307,7 +307,7 @@ html lang='ja'
                 this.layout.details.annict = false
               }).catch(e => Vue.alert(this.$dialog, e))
           },
-          unauthAnnict: function () {
+          unauthAnnict () {
             this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {

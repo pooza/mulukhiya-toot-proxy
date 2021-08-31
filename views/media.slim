@@ -53,14 +53,14 @@ html lang='ja'
           page: 0,
           last: false,
         },
-        mounted: function () {
+        mounted () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => Vue.alert(this.$dialog, e))
           this.appendMedias()
         },
         methods: {
-          appendMedias: function () {
+          appendMedias () {
             this.page ++
             Vue.getMedias(this.page)
               .then(e => {
