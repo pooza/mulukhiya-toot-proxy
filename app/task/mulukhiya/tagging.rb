@@ -3,6 +3,13 @@ module Mulukhiya
 
   namespace :mulukhiya do
     namespace :tagging do
+      namespace :dic do
+        desc 'update tagging dictionary'
+        task :update do
+          TaggingDictionaryUpdateWorker.perform_async
+        end
+      end
+
       namespace :user do
         desc 'show user tags'
         task :list do
