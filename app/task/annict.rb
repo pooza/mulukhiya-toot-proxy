@@ -1,13 +1,12 @@
-namespace :mulukhiya do
-  namespace :annict do
-    desc 'crawl Annict'
-    task :crawl do
-      Mulukhiya::AnnictPollingWorker.perform_async
-    end
+module Mulukhiya
+  extend Rake::DSL
 
-    desc 'crawl Annict (dryrun)'
-    task :crawl_dryrun do
-      Mulukhiya::AnnictService.crawl_all(dryrun: true, all: true)
+  namespace :mulukhiya do
+    namespace :annict do
+      desc 'crawl Annict'
+      task :crawl do
+        AnnictPollingWorker.perform_async
+      end
     end
   end
 end
