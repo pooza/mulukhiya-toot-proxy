@@ -306,13 +306,5 @@ const MulukhiyaLib = {
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
-
-    Vue.crawlAnnict = async () => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.post('/mulukhiya/api/annict/crawl', {token: Vue.getToken()})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
   }
 }

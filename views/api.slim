@@ -164,16 +164,6 @@ html lang='ja'
                 .link-description カスタムフィードの更新を行います。
                 .field-update-button-container
                   button @click='updateCustomFeeds' 実行
-        li v-if='account.username && config.annict'
-          h3 @click='toggleVisibility("annict")' Annict
-          vue-slide-up-down :active='layout.details.annict'
-            .endpoint-container
-              .link POST /mulukhiya/api/annict/crawl
-              pre.payload
-                | {{query_params.annict_crawl}}
-              .link-description Annictへの問い合わせを行います。
-              .field-update-button-container
-                button @click='crawlAnnict' 実行
         li
           h3 @click='toggleVisibility("health")' 動作状況
           vue-slide-up-down :active='layout.details.health'
@@ -216,7 +206,7 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          config: {annict: null},
+          config: {},
           entries: {},
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
@@ -230,7 +220,6 @@ html lang='ja'
             tagging_tag_search: {q: null},
             tagging_dic_update: {token: Vue.getToken()},
             tagging_usertag_clear: {token: Vue.getToken()},
-            annict_crawl: {token: Vue.getToken()},
             feed_update: {token: Vue.getToken()},
           },
           result: {
@@ -253,7 +242,6 @@ html lang='ja'
               feed: false,
               health: false,
               sidekiq: false,
-              annict: false,
               custom: false,
               about: false,
             },
@@ -347,12 +335,6 @@ html lang='ja'
           updateCustomFeeds () {
             Vue.updateCustomFeeds()
               .then(e => {this.layout.details['feed'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
-          },
-          crawlAnnict () {
-            this.$dialog.confirm({body: 'Annictへの問い合わせを実行します。'}, {okText: '実行'})
-              .then(e => Vue.crawlAnnict())
-              .then(e => {this.layout.details['annict'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           searchTags () {

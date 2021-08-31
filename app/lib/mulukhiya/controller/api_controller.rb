@@ -184,17 +184,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/annict/crawl' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      @renderer.message = @sns.account.annict.crawl(webhook: @sns.account.webhook)
-    rescue => e
-      logger.error(error: e)
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
