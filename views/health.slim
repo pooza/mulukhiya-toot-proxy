@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 動作状況
       .result-container :class='{"error": 200 < result.status}'
-        pre = '{{result}}'
+        pre v-if='result' {{result}}
         .field-update-button-container
           button @click='load' 再読み込み
     == slim.render 'fragment/footer'

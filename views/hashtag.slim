@@ -14,12 +14,10 @@ html lang='ja'
           h3 プロフィールに含まれるタグ
           article.tag-entry v-for='(count, tag) in fav_entries'
             - if env.pleroma?
-              a :href='"/tag/" + tag' target='_blank' rel='noreferrer'
-                span = '#{{tag}}'
+              a :href='"/tag/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
             - else
-              a :href='"/tags/" + tag' target='_blank' rel='noreferrer'
-                span = '#{{tag}}'
-            span = '{{count}}'
+              a :href='"/tags/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
+            span.count v-if='count' {{count}}
       section.tagging-dictionary
         h3 タグを検索
         .search-form-container
@@ -35,7 +33,7 @@ html lang='ja'
           ul
             li
               strong パターン
-              code = "/{{entry.regexp}}/"
+              code v-if='entry.regexp' = "/{{entry.regexp}}/"
             li
               strong タグ
               code v-for='tag in entry.tags' = "{{tag}} "

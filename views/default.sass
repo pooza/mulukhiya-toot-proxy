@@ -170,9 +170,6 @@ nav.tokens
         radius: 6px
       display: inline-block
       width: 20em
-      font:
-        size: 1em
-        family: $monospace
     button
       font:
         size: 1em
@@ -199,7 +196,7 @@ nav.tokens
           family: $monospace
           weight: bold
         margin: 0 2px
-        padding: 2px
+        padding: 2px 0.5em
         border:
           width: 1px
           style: solid
@@ -342,7 +339,6 @@ ul.links
     input[type='number']
       font:
         size: 0.8em
-        family: $monospace
       margin: 0 1em
     .role
       float: right
@@ -535,7 +531,8 @@ textarea
   font:
     size: 0.8em
     family: $monospace
-  margin: 0 0.5em
+  margin: 0.5em
+  padding: 0.5em
   width: calc(100% - 4em)
   height: 6em
 
@@ -546,18 +543,29 @@ input
   font:
     size: 1em
 
-input.code
-  width: calc(100% - 2em)
-
 input[type='search']
   font:
     family: $monospace
-  width: 20em
+  width: calc(100% - 2em)
+  padding: 0 0.5em
+
+input[type='number']
+  font:
+    family: $monospace
+  width: 10em
+  padding: 0 0.5em
 
 input[type='text']
   font:
     family: $monospace
-  width: 20em
+  width: calc(100% - 2em)
+  padding: 0 0.5em
+
+input[type='password']
+  font:
+    family: $monospace
+  width: calc(100% - 2em)
+  padding: 0 0.5em
 
 button
   font:
@@ -673,10 +681,10 @@ a:hover
       color: black
       radius: 6px
     display: inline-block
-    margin: 0.5em
-    width: calc(100% - 13em)
+    margin: 0 0.5em
+    padding: 0 0.5em
+    width: calc(100% - 15em)
     font:
-      size: 1em
       family: $monospace
   input.short
     width: 10em
