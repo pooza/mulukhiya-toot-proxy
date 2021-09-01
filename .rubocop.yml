@@ -219,7 +219,7 @@ Metrics/BlockLength:
     - 'test/*'
     - '**/contract/*'
     - '**/controller/*'
-    - 'app/task/*'
+    - 'app/task/**/*.rb'
     - '*.gemspec'
 
 Metrics/MethodLength:
@@ -352,11 +352,11 @@ Sequel:
   Exclude:
     - '*'
   Include:
-    - '**/model/*'
+    - '**/model/**/*.rb'
 
 Rake:
   Exclude:
     - '*'
   Include:
     - 'Rakefile'
-    - 'app/task/*'
+    - 'app/task/**/*.rb'
