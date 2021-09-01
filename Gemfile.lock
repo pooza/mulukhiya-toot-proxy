@@ -407,6 +407,7 @@ DEPENDENCIES
   bootsnap (>= 1.7.0)
   dropbox_api
   dry-validation
+  faraday (~> 1.7.1)
   fastimage
   faye-websocket
   find
@@ -443,4 +444,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.25
+   2.2.26

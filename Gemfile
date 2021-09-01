@@ -4,6 +4,7 @@ gem 'bootsnap', '>=1.7.0'
 gem 'dropbox_api'
 gem 'dry-validation'
 gem 'fastimage'
+gem 'faraday', '~>1.7.1' # `Faraday::Connection#authorization` is deprecated; it will be removed in version 2.0.
 gem 'faye-websocket'
 gem 'find'
 gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng'
