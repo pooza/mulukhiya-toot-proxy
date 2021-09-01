@@ -25,9 +25,9 @@ html lang='ja'
         h3 ハッシュタグ
         ul.links
           li v-for='feed in feeds'
-            h4 = '{{feed.tag}}'
+            h4 v-if='feed.tag' {{feed.tag}}
             .link
-              a :href='feed.feed_url' target='_blank' rel='noreferrer' = '{{feed.feed_url}}'
+              a :href='feed.feed_url' target='_blank' rel='noreferrer' {{feed.feed_url}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

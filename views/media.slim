@@ -16,7 +16,7 @@ html lang='ja'
               img :src='media.thumbnail_url'
             video :src='media.url' controls='' v-else-if='media.mediatype=="video"'
             audio :src='media.url' controls='' v-else-if='media.mediatype=="audio"'
-            a :href='media.url' target='_blank' rel='noreferrer' v-else='' = '{{media.file_name}}'
+            a :href='media.url' target='_blank' rel='noreferrer' v-else='' {{media.file_name}}
           ul.params
             li.param
               i class='fas fa-calendar'
@@ -25,10 +25,10 @@ html lang='ja'
             i class='fas fa-image' v-if='media.thumbnail_url && media.mediatype=="image"'
             i class='fas fa-video' v-else-if='media.mediatype=="video"'
             i class='fas fa-play-circle' v-else-if='media.mediatype=="audio"'
-            li.param v-if='media.pixel_size' = '{{media.pixel_size}}'
-            li.param v-if='media.duration' = '{{media.duration}}s'
-            li.param = '{{media.type}}'
-            li.param v-if='media.file_size_str' = '{{media.file_size_str}}'
+            li.param v-if='media.pixel_size' {{media.pixel_size}}
+            li.param v-if='media.duration' {{media.duration}}s
+            li.param v-if='media.type' {{media.type}}
+            li.param v-if='media.file_size_str' {{media.file_size_str}}
           ul.params
             li.param
               i class='fas fa-user'

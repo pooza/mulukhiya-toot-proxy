@@ -18,8 +18,7 @@ html lang='ja'
                 .role admin
                 .role moderator
                 .link POST /mulukhiya/api/announcement/update
-                pre.payload
-                  | {{query_params.announcement_update}}
+                pre.payload v-if='query_params.announcement_update' {{query_params.announcement_update}}
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
                   .link-description
                     | スケジュール
@@ -41,8 +40,7 @@ html lang='ja'
               .role admin
               .role moderator
               .link POST /mulukhiya/api/media/file/clear
-              pre.payload
-                | {{query_params.media_file_clear}}
+              pre.payload v-if='query_params.media_file_clear' {{query_params.media_file_clear}}
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
                 .link-description
                   | スケジュール
@@ -54,8 +52,7 @@ html lang='ja'
               .role admin
               .role moderator
               .link POST /mulukhiya/api/media/metadata/clear
-              pre.payload
-                | {{query_params.media_metadata_clear}}
+              pre.payload v-if='query_params.media_metadata_clear' {{query_params.media_metadata_clear}}
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
                 button @click='clearMediaMetadata' 実行
@@ -76,8 +73,7 @@ html lang='ja'
                 .role admin
                 .role moderator
                 .link POST /mulukhiya/api/program/update
-                pre.payload
-                  | {{query_params.program_update}}
+                pre.payload v-if='query_params.program_update' {{query_params.program_update}}
                 - if config.keys('/sidekiq/schedule/program_update').member?('every')
                   .link-description
                     | スケジュール
@@ -102,8 +98,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
-              pre.payload
-                | {{query_params.tagging_tag_search}}
+              pre.payload v-if='query_params.tagging_tag_search' {{query_params.tagging_tag_search}}
               input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='searchTags'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
@@ -113,8 +108,7 @@ html lang='ja'
               .role admin
               .role moderator
               .link POST /mulukhiya/api/tagging/dic/update
-              pre.payload
-                | {{query_params.tagging_dic_update}}
+              pre.payload v-if='query_params.tagging_dic_update' {{query_params.tagging_dic_update}}
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
                 .link-description
                   | スケジュール
@@ -132,8 +126,7 @@ html lang='ja'
               .role admin
               .role moderator
               .link POST /mulukhiya/api/tagging/usertag/clear
-              pre.payload
-                | {{query_params.tagging_usertag_clear}}
+              pre.payload v-if='query_params.tagging_usertag_clear' {{query_params.tagging_usertag_clear}}
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
                 .link-description
                   | スケジュール
@@ -155,8 +148,7 @@ html lang='ja'
                 .role admin
                 .role moderator
                 .link POST /mulukhiya/api/feed/update
-                pre.payload
-                  | {{query_params.feed_update}}
+                pre.payload v-if='query_params.feed_update' {{query_params.feed_update}}
                 - if config.keys('/sidekiq/schedule/feed_update').member?('every')
                   .link-description
                     | スケジュール
@@ -186,7 +178,7 @@ html lang='ja'
                   .link-description = entry['description']
                   .field-update-button-container
                     button @click='execCustomAPI("#{entry['id']}")' 実行
-                    pre.result v-if='result.#{entry['id']}' = '{{result.' + entry['id'] + '}}'
+                    pre.result v-if='result.#{entry['id']}' {{result.#{entry['id']}}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'

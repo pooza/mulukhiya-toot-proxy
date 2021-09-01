@@ -12,14 +12,14 @@ html lang='ja'
       section v-if='account.username'
         h3 現在の設定
         .result-container
-          pre = '{{result}}'
+          pre v-if='result' {{result}}
       section.config v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
         vue-slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
           .inline-field-container
-            input.short placeholder='期限(分)' v-model.number='form.program.minutes'
+            input.short type='number' placeholder='期限(分)' v-model.number='form.program.minutes'
           - if controller.livecure?
             .field-container
               v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
@@ -58,7 +58,7 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='GROWIのAPIトークン（保存時に暗号化されます）' v-model.trim='form.growi.token'
+            input type='password' placeholder='GROWIのAPIトークン（保存時に暗号化されます）' v-model.trim='form.growi.token'
           .inline-field-container
             h4 URL
             input placeholder='GROWIのルートURL' v-model.trim='form.growi.url'
@@ -79,7 +79,7 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 トークン
-            input placeholder='Dropboxのアクセストークン（保存時に暗号化されます）' v-model.trim='form.dropbox.token'
+            input type='password' placeholder='Dropboxのアクセストークン（保存時に暗号化されます）' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
       section.config v-if='account.username && layout.sections.lemmy'
@@ -96,7 +96,7 @@ html lang='ja'
             input type='password' placeholder='Lemmyのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
           .inline-field-container
             h4 コミュニティID
-            input placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
+            input.short type='number' placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
           .field-update-button-container
             button @click='updateLemmy' 更新
       section.config v-if='account.username && layout.sections.annict'
@@ -113,7 +113,7 @@ html lang='ja'
             li 認証ボタンを押下。
           .inline-field-container
             h4 認証コード
-            input placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
+            input type='password' placeholder='Annictの認証コード' v-model.trim='form.annict.auth_code'
           .field-update-button-container
             button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
             button.alert @click='unauthAnnict' 認証を解除

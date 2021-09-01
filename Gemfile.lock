@@ -196,6 +196,7 @@ GEM
       ffi (>= 1.0.0)
       rake
     fileutils (1.5.0)
+    find (0.1.0)
     fugit (1.5.1)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
@@ -406,8 +407,10 @@ DEPENDENCIES
   bootsnap (>= 1.7.0)
   dropbox_api
   dry-validation
+  faraday (~> 1.7.1)
   fastimage
   faye-websocket
+  find
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -441,4 +444,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.25
+   2.2.26
