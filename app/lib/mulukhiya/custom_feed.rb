@@ -7,7 +7,11 @@ module Mulukhiya
     def update
       bar = ProgressBar.create(total: CustomFeed.count)
       CustomFeed.entries.each do |entry|
-        create(entry).save
+        renderer = create(entry)
+        renderer.command.exec
+        raise renderer.command.stderr unless renderer.command.status.zero?
+        renderer.entries = JSON.parse(renderer.command.stdout)
+        renderer.save
       rescue => e
         logger.error(error: e, feed: entry)
       ensure
