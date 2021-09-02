@@ -64,7 +64,7 @@ html lang='ja'
                 .link GET /mulukhiya/api/program
                 .link-description
                   | キャッシュ済みの
-                  a href='#{config['/programs/url']}' target='_blank' rel='noreferrer' 実況番組表
+                  a href=config['/programs/url'] target='_blank' rel='noreferrer' 実況番組表
                   | を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
@@ -79,7 +79,7 @@ html lang='ja'
                     | スケジュール
                     code #{config['/sidekiq/schedule/program_update/every']}
                 .link-description
-                  a href='#{config['/programs/url']}' target='_blank' rel='noreferrer' 実況番組表
+                  a href=config['/programs/url'] target='_blank' rel='noreferrer' 実況番組表
                   | を取得し、キャッシュします。
                 .field-update-button-container
                   button @click='updatePrograms' 実行

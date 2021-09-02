@@ -19,7 +19,7 @@ html lang='ja'
         a href='/mulukhiya/app/webhook' v-if='account.username' webhook
         a href='/mulukhiya/app/health' 動作状況
         a href='/mulukhiya/app/config' v-if='account.username' 環境設定
-        a href='#{config['/sidekiq/dashboard/url']}' target='_blank' rel='noreferrer' v-if='account.is_admin' Sidekiq
+        a href=config['/sidekiq/dashboard/url'] target='_blank' rel='noreferrer' v-if='account.is_admin' Sidekiq
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
