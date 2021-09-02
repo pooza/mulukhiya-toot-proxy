@@ -1,6 +1,6 @@
 module Mulukhiya
   class GrowiClippingWorker < ClippingWorker
-    sidekiq_options unique: :until_executed
+    sidekiq_options lock: :until_executed, on_conflict: :log
 
     def perform(params)
       return unless controller_class.growi?
