@@ -19,11 +19,6 @@ module Mulukhiya
     def create(entry)
       renderer = RSS20FeedRenderer.new(entry)
       renderer.command = CommandLine.create(entry)
-      unless storage[renderer.command]
-        renderer.command.exec
-        raise renderer.command.stderr unless renderer.command.status.zero?
-        renderer.entries = JSON.parse(renderer.command.stdout)
-      end
       return renderer
     end
 

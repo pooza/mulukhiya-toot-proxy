@@ -14,7 +14,6 @@ module Mulukhiya
 
     def save
       raise Ginseng::NotFoundError, 'Not Found' unless command
-      clear
       command.exec
       self.entries = JSON.parse(command.stdout)
       storage[command] = to_s
