@@ -40,7 +40,7 @@ module Mulukhiya
       path = File.join(Environment.dir, 'public/mulukhiya/script', "#{params['name']}.js")
       @renderer = Ginseng::Web::RawRenderer.new
       if File.exist?(path)
-        @renderer.type = ScriptRenderer.new.type
+        @renderer.type = 'text/javascript;charset=UTF-8'
         @renderer.body = File.read(path)
       else
         @renderer.status = 404
