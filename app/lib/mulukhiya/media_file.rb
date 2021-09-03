@@ -150,7 +150,6 @@ module Mulukhiya
     end
 
     def self.purge
-      bar = ProgressBar.create(total: all.count)
       files = []
       all do |path|
         next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
@@ -159,11 +158,7 @@ module Mulukhiya
         logger.info(class: 'MediaFile', message: 'delete', path: path)
       rescue => e
         logger.error(error: e, path: path)
-      ensure
-        bar&.increment
       end
-      bar&.finish
-      puts({'deleted' => files}.to_yaml) if Environment.rake? && files.present?
     end
 
     def self.all(&block)

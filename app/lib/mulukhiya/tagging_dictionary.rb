@@ -95,7 +95,6 @@ module Mulukhiya
     end
 
     def fetch
-      bar = ProgressBar.create(total: remote_dics.count)
       threads = []
       result = []
       remote_dics do |dic|
@@ -103,13 +102,10 @@ module Mulukhiya
           result.push(dic.parse)
         rescue => e
           logger.error(error: e, dic: {uri: dic.uri.to_s})
-        ensure
-          bar&.increment
         end
         threads.push(thread)
       end
       threads.each(&:join)
-      bar&.finish
       return result
     end
 
