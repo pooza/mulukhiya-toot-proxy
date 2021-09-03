@@ -1,6 +1,5 @@
 module Mulukhiya
   class LemmyClippingWorker < ClippingWorker
-    sidekiq_options lock: :until_executed, on_conflict: :log
 
     def perform(params)
       return unless controller_class.lemmy?

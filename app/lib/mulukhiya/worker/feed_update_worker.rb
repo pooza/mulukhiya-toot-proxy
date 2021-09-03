@@ -3,7 +3,7 @@ module Mulukhiya
     include Sidekiq::Worker
     include Package
     include SNSMethods
-    sidekiq_options retry: false, lock: :until_executed, on_conflict: :log
+    sidekiq_options retry: false
 
     def perform
       return unless controller_class.feed?
