@@ -38,6 +38,13 @@ module Mulukhiya
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
+    rescue => e
+      logger.error(error: e)
+      @renderer = Ginseng::Web::RawRenderer.new
+      @renderer.type = ScriptRenderer.new.type
+      @renderer.body = File.read(
+        File.join(Environment.dir, 'public/mulukhiya/script', "#{params['name']}.js"),
+      )
     end
 
     def token
