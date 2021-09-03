@@ -36,15 +36,17 @@ module Mulukhiya
       @renderer = ScriptRenderer.new
       @renderer.name = params[:name]
       return @renderer.to_s
+    rescue ExecJS::RuntimeUnavailable
+      path = File.join(Environment.dir, 'public/mulukhiya/script', "#{params['name']}.js")
+      @renderer = Ginseng::Web::RawRenderer.new
+      if File.exist?(path)
+        @renderer.type = ScriptRenderer.new.type
+        @renderer.body = File.read(path)
+      else
+        @renderer.status = 404
+      end
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
-    rescue => e
-      logger.error(error: e)
-      @renderer = Ginseng::Web::RawRenderer.new
-      @renderer.type = ScriptRenderer.new.type
-      @renderer.body = File.read(
-        File.join(Environment.dir, 'public/mulukhiya/script', "#{params['name']}.js"),
-      )
     end
 
     def token
