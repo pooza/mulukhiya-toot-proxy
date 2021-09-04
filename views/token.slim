@@ -77,7 +77,7 @@ html lang='ja'
               button :disabled='!input.infobot_authcode' @click='authMastodon(input.infobot_authcode, "infobot")' 認証
             - elsif env.misskey_type?
               button :disabled='!input.infobot_authcode' @click='authMisskey(input.infobot_authcode, "infobot")' 認証
-        .token
+        .token v-if='account.username'
           h4 トークンをまとめて登録
           .description トークンを改行区切りで入力して、登録ボタンを押下してください。
           - if controller.oauth_webui_uri

@@ -1,7 +1,7 @@
 module Mulukhiya
   class AnnouncementWorker
     include Sidekiq::Worker
-    sidekiq_options retry: false, unique: :until_executed
+    sidekiq_options retry: false
 
     def perform
       Announcement.new.announce

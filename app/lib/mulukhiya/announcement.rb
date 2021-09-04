@@ -11,17 +11,14 @@ module Mulukhiya
 
     def announce
       return unless controller_class.announcement?
-      bar = ProgressBar.create(total: fetch.count)
       fetch.each do |announcement|
         next if cache.member?(announcement[:id])
         Event.new(:announce, {sns: sns}).dispatch(announcement)
       rescue => e
         logger.error(error: e, announcement: announcement)
       ensure
-        bar&.increment
         sleep(config['/worker/announcement/interval/seconds'])
       end
-      bar&.finish
       save
     end
 

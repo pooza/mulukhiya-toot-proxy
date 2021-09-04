@@ -5,25 +5,16 @@ module Mulukhiya
     attr_accessor :storage
 
     def update
-      bar = ProgressBar.create(total: CustomFeed.count)
       CustomFeed.entries.each do |entry|
-        create(entry).save
+        create(entry).cache
       rescue => e
         logger.error(error: e, feed: entry)
-      ensure
-        bar&.increment
       end
-      bar&.finish
     end
 
     def create(entry)
       renderer = RSS20FeedRenderer.new(entry)
       renderer.command = CommandLine.create(entry)
-      unless storage[renderer.command]
-        renderer.command.exec
-        raise renderer.command.stderr unless renderer.command.status.zero?
-        renderer.entries = JSON.parse(renderer.command.stdout)
-      end
       return renderer
     end
 

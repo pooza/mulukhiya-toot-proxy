@@ -5,10 +5,7 @@ module Mulukhiya
 
     def create(entry, params = {})
       command = CommandLine.create(entry)
-      if command.args.last.is_a?(Symbol)
-        key = command.args.pop
-        command.args.push(params[key])
-      end
+      command.args.push(params[command.args.pop]) if command.args.last.is_a?(Symbol)
       command.exec
       raise Ginseng::RequestError, command.stderr unless command.status.zero?
       renderer = Ginseng::Web::RawRenderer.new

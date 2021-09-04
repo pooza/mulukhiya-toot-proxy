@@ -12,13 +12,16 @@ module Mulukhiya
       @storage = RenderStorage.new
     end
 
-    def save
+    def cache
       raise Ginseng::NotFoundError, 'Not Found' unless command
-      clear
       command.exec
+      raise command.stderr unless command.status.zero?
       self.entries = JSON.parse(command.stdout)
+      clear
       storage[command] = to_s
     end
+
+    alias save cache
 
     def clear
       storage[command] = nil
