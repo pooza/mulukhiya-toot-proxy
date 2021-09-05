@@ -150,11 +150,9 @@ module Mulukhiya
     end
 
     def self.purge
-      files = []
       all do |path|
         next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
         File.unlink(path)
-        files.push(path)
         logger.info(class: 'MediaFile', message: 'delete', path: path)
       rescue => e
         logger.error(error: e, path: path)
