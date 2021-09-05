@@ -730,7 +730,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.9.6
+  version: 4.9.7
 parser:
   note:
     fields:
@@ -1014,8 +1014,6 @@ webui:
       - https://use.fontawesome.com/releases/v5.15.4/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
-  javascript:
-    minimize: true
   metadata:
     robots: noindex,nofollow
     viewport: width=1000
