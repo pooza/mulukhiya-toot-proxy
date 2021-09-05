@@ -38,11 +38,9 @@ module Mulukhiya
       bar&.finish
     end
 
-    def self.tag_owners
-      return enum_for(__method__) unless block_given?
-      accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each do |account|
-        yield account
-      end
+    def self.tag_owners(&block)
+      return enum_for(__method__) unless block
+      accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each(&block)
     end
 
     def self.accounts

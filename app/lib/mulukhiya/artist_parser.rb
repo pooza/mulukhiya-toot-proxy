@@ -33,7 +33,8 @@ module Mulukhiya
 
     def parse_part(matches, items)
       artists = Set[]
-      items.reject {|v| v['drop']}.each_with_index do |item, i|
+      items.each_with_index do |item, i|
+        next if item['drop']
         if item['split']
           artists.merge(matches[i + 1].split(delimiters).map(&:strip))
         else
