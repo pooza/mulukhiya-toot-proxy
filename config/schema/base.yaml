@@ -269,11 +269,3 @@ properties:
               type: array
               items:
                 type: string
-  webui:
-    type: object
-    properties:
-      javascript:
-        type: object
-        properties:
-          minimize:
-            type: boolean
