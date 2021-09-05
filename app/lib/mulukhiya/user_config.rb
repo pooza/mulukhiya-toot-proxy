@@ -70,8 +70,10 @@ module Mulukhiya
       if arg.is_a?(Hash)
         arg.deep_stringify_keys!
         arg.each do |k, v|
+          next if v.to_s.empty?
           if config['/user_config/encrypt_fields'].member?(k)
-            arg[k] = v.to_s.encrypt
+            plain = (v.decrypt rescue v.to_s)
+            arg[k] = plain.encrypt
           else
             arg[k] = encrypt(v)
           end

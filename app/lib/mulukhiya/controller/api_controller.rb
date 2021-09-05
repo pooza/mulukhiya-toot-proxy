@@ -15,6 +15,7 @@ module Mulukhiya
 
     get '/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
+      @sns.account.user_config.token = token
       @renderer.message = {
         account: @sns.account.to_h,
         config: @sns.account.user_config.to_h,
