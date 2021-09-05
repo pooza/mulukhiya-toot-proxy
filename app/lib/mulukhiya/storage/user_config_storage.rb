@@ -40,8 +40,7 @@ module Mulukhiya
 
     def self.tag_owners
       return enum_for(__method__) unless block_given?
-      accounts do |account|
-        next unless account.user_config['/tagging/user_tags'].present?
+      accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each do |account|
         yield account
       end
     end

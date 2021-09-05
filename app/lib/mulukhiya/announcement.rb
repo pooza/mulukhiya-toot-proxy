@@ -11,8 +11,7 @@ module Mulukhiya
 
     def announce
       return unless controller_class.announcement?
-      fetch.each do |announcement|
-        next if cache.member?(announcement[:id])
+      fetch.reject {|v| cache.member?(v[:id])}.each do |announcement|
         Event.new(:announce, {sns: sns}).dispatch(announcement)
       rescue => e
         logger.error(error: e, announcement: announcement)

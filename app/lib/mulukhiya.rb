@@ -72,8 +72,7 @@ module Mulukhiya
   end
 
   def self.load_tasks
-    Find.find(File.join(dir, 'app/task')).each do |f|
-      next unless File.extname(f) == '.rb'
+    Find.find(File.join(dir, 'app/task')).select {|f| File.extname(f) == '.rb'}.each do |f|
       require f
     end
   end
