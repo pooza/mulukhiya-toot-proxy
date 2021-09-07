@@ -1,11 +1,11 @@
 module Mulukhiya
   class EnvironmentTest < TestCase
     def test_daemon_classes
-      assert_kind_of(Array, environment_class.daemon_classes)
+      assert_kind_of(Set, environment_class.daemon_classes)
     end
 
     def test_task_prefixes
-      assert_kind_of(Array, environment_class.task_prefixes)
+      assert_kind_of(Set, environment_class.task_prefixes)
     end
 
     def test_health

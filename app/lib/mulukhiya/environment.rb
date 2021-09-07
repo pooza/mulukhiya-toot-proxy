@@ -135,13 +135,13 @@ module Mulukhiya
     end
 
     def self.daemon_classes
-      return [PumaDaemon, SidekiqDaemon, ListenerDaemon].reject(&:disable?)
+      return [PumaDaemon, SidekiqDaemon, ListenerDaemon].reject(&:disable?).to_set
     end
 
     def self.task_prefixes
       return daemon_classes.map do |daemon|
         "mulukhiya:#{daemon.to_s.split('::').last.sub(/Daemon$/, '').underscore}"
-      end
+      end.to_set
     end
 
     def self.health
