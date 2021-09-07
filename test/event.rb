@@ -27,5 +27,12 @@ module Mulukhiya
       assert(@event.reporter.tags.member?('福山沙織'))
       assert(@event.reporter.tags.member?('井上由貴'))
     end
+
+    def test_syms
+      assert_kind_of(Set, Event.syms)
+      Event.syms.each do |sym|
+        assert_kind_of(Symbol, sym)
+      end
+    end
   end
 end
