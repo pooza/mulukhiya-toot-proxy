@@ -3,7 +3,7 @@
 ![release](https://img.shields.io/github/v/release/pooza/mulukhiya-toot-proxy.svg)
 ![test](https://github.com/pooza/mulukhiya-toot-proxy/workflows/test/badge.svg)
 
-各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。  
+各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。
 詳細は[wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki)にて。
 
 ## 対応インスタンス
@@ -11,6 +11,7 @@
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
   - [Groundpolis](https://github.com/Groundpolis/Groundpolis)での動作報告あり。
+  - [CherryPick](https://github.com/kokonect-link/cherrypick)での動作報告あり。
 - [Pleroma](https://git.pleroma.social/pleroma/pleroma)
 - [めいすきー](https://github.com/mei23/misskey)
 
@@ -54,6 +55,6 @@
 ずっと前に「AmazonのURL、もっと短くならない〜？」って言われてたのを思い出して作りました。
 
 プリキュアに加え、今はドラゴンクエストダイの大冒険のファンの為のインスタンス
-「[デルムリン丼](https://mstdn.delmulin.com)」も運営しています。  
+「[デルムリン丼](https://mstdn.delmulin.com)」も運営しています。
 「利用の条件」というほど強制力のあるお願いではないけど、プリキュアやダイ大にもし興味あったら
 覗いてください。みんな喜びます。

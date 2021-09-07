@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def clip(params)
-      params = {body: params.to_s} unless params.is_a?(Hash)
+      params = {body: params.to_s} unless params.is_a?(Enumerator)
       src = File.join(Environment.dir, 'tmp/media', params.to_json.adler32)
       dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])

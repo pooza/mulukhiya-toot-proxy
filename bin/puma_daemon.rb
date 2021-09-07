@@ -7,5 +7,5 @@ ENV['RAKE'] = nil
 require 'mulukhiya'
 module Mulukhiya
   ENV['RACK_ENV'] ||= Environment.type
-  Mulukhiya::PumaDaemon.spawn!
+  PumaDaemon.spawn!
 end

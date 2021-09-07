@@ -3,8 +3,7 @@ module Mulukhiya
     def parse
       result = {}
       fetch.each do |entry|
-        fields.each do |field|
-          next unless entry[field]
+        fields.select {|v| entry[v]}.each do |field|
           result[create_key(entry[field])] ||= create_entry(entry[field])
         end
       rescue => e

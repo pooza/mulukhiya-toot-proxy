@@ -64,7 +64,7 @@ module Mulukhiya
     end
 
     def self.syms
-      return config.keys("/#{Environment.controller_name}/handlers").map(&:to_sym)
+      return config.keys("/#{Environment.controller_name}/handlers").map(&:to_sym).to_set
     end
   end
 end

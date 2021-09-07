@@ -34,48 +34,32 @@ module Mulukhiya
 
     def test_media_tag
       return unless controller_class.feed?
-      if TagContainer.media_tag?
-        get '/tag/image'
-        if hash_tag_class.get(tag: config['/tagging/media/tags/image'])
-          assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
-          assert(last_response.ok?)
-        else
-          assert_false(last_response.ok?)
-          assert_equal(last_response.status, 404)
-        end
-
-        get '/tag/video'
-        if hash_tag_class.get(tag: config['/tagging/media/tags/video'])
-          assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
-          assert(last_response.ok?)
-        else
-          assert_false(last_response.ok?)
-          assert_equal(last_response.status, 404)
-        end
-
-        get '/tag/audio'
-        if hash_tag_class.get(tag: config['/tagging/media/tags/audio'])
-          assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
-          assert(last_response.ok?)
-        else
-          assert_false(last_response.ok?)
-          assert_equal(last_response.status, 404)
-        end
+      return unless TagContainer.media_tag?
+      get '/tag/image'
+      if hash_tag_class.get(tag: config['/tagging/media/tags/image'])
+        assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
+        assert(last_response.ok?)
       else
-        get '/tag/image'
         assert_false(last_response.ok?)
-        assert_equal(last_response.status, 403)
-        assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
+        assert_equal(last_response.status, 404)
+      end
 
-        get '/tag/video'
-        assert_false(last_response.ok?)
-        assert_equal(last_response.status, 403)
+      get '/tag/video'
+      if hash_tag_class.get(tag: config['/tagging/media/tags/video'])
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
+        assert(last_response.ok?)
+      else
+        assert_false(last_response.ok?)
+        assert_equal(last_response.status, 404)
+      end
 
-        get '/tag/audio'
-        assert_false(last_response.ok?)
-        assert_equal(last_response.status, 403)
+      get '/tag/audio'
+      if hash_tag_class.get(tag: config['/tagging/media/tags/audio'])
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
+        assert(last_response.ok?)
+      else
+        assert_false(last_response.ok?)
+        assert_equal(last_response.status, 404)
       end
     end
 

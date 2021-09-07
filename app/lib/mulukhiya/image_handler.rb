@@ -4,8 +4,7 @@ module Mulukhiya
       self.payload = payload
       return if parser.command?
       threads = []
-      parser.uris.each do |uri|
-        next unless updatable?(uri)
+      parser.uris.select {|v| updatable?(v)}.each do |uri|
         next unless image_uri = create_image_uri(uri)
         payload[attachment_field] ||= []
         next unless payload[attachment_field].count < attachment_limit

@@ -268,7 +268,7 @@ module Mulukhiya
 
     post '/feed/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
-      Mulukhiya::FeedUpdateWorker.perform_async
+      FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
       logger.error(error: e)
