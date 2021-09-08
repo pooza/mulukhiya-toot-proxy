@@ -233,7 +233,7 @@ GEM
     mini_mime (1.1.1)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
-    mongo (2.15.0)
+    mongo (2.15.1)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
     multi_json (1.15.0)
@@ -362,7 +362,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
