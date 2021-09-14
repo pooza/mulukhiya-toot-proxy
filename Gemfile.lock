@@ -391,7 +391,7 @@ DEPENDENCIES
   bootsnap (>= 1.7.0)
   dropbox_api
   dry-validation
-  faraday (~> 1.7.1)
+  faraday (~> 1.7)
   fastimage
   faye-websocket
   ginseng-core!
