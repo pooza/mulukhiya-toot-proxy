@@ -6,7 +6,6 @@ gem 'dry-validation'
 gem 'faraday', '~>1.7.1' # `Faraday::Connection#authorization` is deprecated; it will be removed in version 2.0.
 gem 'fastimage'
 gem 'faye-websocket'
-gem 'find'
 gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng'
 gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fediverse'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
