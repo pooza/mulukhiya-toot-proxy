@@ -145,5 +145,17 @@ module Mulukhiya
       return unless account
       assert_kind_of(TagContainer, account.bio_tags)
     end
+
+    def test_test_account
+      assert_kind_of(account_class, account_class.test_account)
+      config['/agent/test/token'] = 'aaa'
+      assert_nil(account_class.test_account)
+    end
+
+    def test_info_account
+      assert_kind_of(account_class, account_class.info_account)
+      config['/agent/info/token'] = 'bbb'
+      assert_nil(account_class.info_account)
+    end
   end
 end
