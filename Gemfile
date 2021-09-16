@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 ruby '~>3.0.0'
-gem 'bootsnap', '>=1.7.0'
+gem 'bootsnap', '>=1.9.0'
 gem 'dropbox_api'
 gem 'dry-validation'
 gem 'faraday', '~>1.7' # `Faraday::Connection#authorization` is deprecated; it will be removed in version 2.0.
