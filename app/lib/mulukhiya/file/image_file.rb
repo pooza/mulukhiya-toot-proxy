@@ -84,11 +84,10 @@ module Mulukhiya
       command.exec unless File.exist?(dest)
       raise command.stderr.split(/[\n`]/).first if command.status&.positive?
       unless File.exist?(dest)
-        mask = File.join(
-          File.dirname(dest),
-          "#{File.basename(dest, '.*')}-*#{File.extname(dest)}",
-        )
-        dest = Dir.glob(mask).max
+        finder = Ginseng::FileFinder.new
+        finder.dir = File.dirname(dest)
+        finder.patterns.push("#{File.basename(dest, '.*')}-*#{File.extname(dest)}")
+        dest = finder.exec.max
       end
       return ImageFile.new(dest)
     end

@@ -11,11 +11,11 @@ module Mulukhiya
         listener = MeisskeyListener.new
 
         listener.client.on :close do |e|
-          raise Ginseng::GatewayError, e.reason
+          raise Ginseng::GatewayError, e.message
         end
 
         listener.client.on :error do |e|
-          raise Ginseng::GatewayError, e.reason
+          raise Ginseng::GatewayError, e.message
         end
 
         listener.client.on :message do |message|

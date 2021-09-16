@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 153052896887c30393441161b408ddd42bcf4307
+  revision: 7ae176f553b03c75c18536bfef77d96d20b884a0
   specs:
-    ginseng-core (1.11.1)
+    ginseng-core (1.11.2)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -11,6 +11,7 @@ GIT
       erb
       facets
       fileutils
+      find
       httparty
       json-schema
       mail
@@ -121,23 +122,22 @@ GEM
     dropbox_api (0.1.19)
       faraday (~> 1.0)
       oauth2 (~> 1.1)
-    dry-configurable (0.12.1)
+    dry-configurable (0.13.0)
       concurrent-ruby (~> 1.0)
-      dry-core (~> 0.5, >= 0.5.0)
-    dry-container (0.8.0)
+      dry-core (~> 0.6)
+    dry-container (0.9.0)
       concurrent-ruby (~> 1.0)
-      dry-configurable (~> 0.1, >= 0.1.3)
+      dry-configurable (~> 0.13, >= 0.13.0)
     dry-core (0.7.1)
       concurrent-ruby (~> 1.0)
-    dry-equalizer (0.3.0)
     dry-inflector (0.2.1)
     dry-initializer (3.0.4)
     dry-logic (1.2.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
-    dry-schema (1.7.1)
+    dry-schema (1.8.0)
       concurrent-ruby (~> 1.0)
-      dry-configurable (~> 0.8, >= 0.8.3)
+      dry-configurable (~> 0.13, >= 0.13.0)
       dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
@@ -148,13 +148,12 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.6.0)
+    dry-validation (1.7.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
-      dry-core (~> 0.4)
-      dry-equalizer (~> 0.2)
+      dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
-      dry-schema (~> 1.5, >= 1.5.2)
+      dry-schema (~> 1.8, >= 1.8.0)
     e2mmap (0.1.0)
     erb (2.2.3)
       cgi
@@ -163,7 +162,7 @@ GEM
       tzinfo
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (1.7.1)
+    faraday (1.7.2)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -208,7 +207,7 @@ GEM
     http-form_data (2.3.0)
     http-parser (1.2.3)
       ffi-compiler (>= 1.0, < 2.0)
-    httparty (0.18.1)
+    httparty (0.19.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.8.10)
@@ -233,7 +232,7 @@ GEM
     mini_mime (1.1.1)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
-    mongo (2.15.0)
+    mongo (2.15.1)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
     multi_json (1.15.0)
@@ -265,7 +264,7 @@ GEM
       oauth2 (~> 1.4)
       omniauth (>= 1.9, < 3)
     optparse (0.1.1)
-    parallel (1.20.1)
+    parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
     pg (1.2.3)
@@ -303,7 +302,7 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.20.0)
+    rubocop (1.21.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -356,7 +355,7 @@ GEM
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
-    test-unit (3.4.5)
+    test-unit (3.4.7)
       power_assert
     thwait (0.2.0)
       e2mmap
@@ -369,9 +368,9 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
+    unf_ext (0.0.8)
     unicode (0.4.4.4)
-    unicode-display_width (2.0.0)
+    unicode-display_width (2.1.0)
     vacuum (3.4.1)
       aws-sigv4 (~> 1.0)
       http (~> 4.0)
@@ -392,10 +391,9 @@ DEPENDENCIES
   bootsnap (>= 1.7.0)
   dropbox_api
   dry-validation
-  faraday (~> 1.7.1)
+  faraday (~> 1.7)
   fastimage
   faye-websocket
-  find
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
