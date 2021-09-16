@@ -5,12 +5,12 @@ module Mulukhiya
   using Refines
 
   def self.dir
-    return File.expand_path('../..', __dir__)
+    return ::File.expand_path('../..', __dir__)
   end
 
   def self.setup_bootsnap
     Bootsnap.setup(
-      cache_dir: File.join(dir, 'tmp/cache'),
+      cache_dir: ::File.join(dir, 'tmp/cache'),
       development_mode: Environment.development?,
       load_path_cache: true,
       compile_cache_iseq: true,
@@ -19,10 +19,10 @@ module Mulukhiya
   end
 
   def self.loader
-    config = YAML.load_file(File.join(dir, 'config/autoload.yaml'))
+    config = YAML.load_file(::File.join(dir, 'config/autoload.yaml'))
     loader = Zeitwerk::Loader.new
     loader.inflector.inflect(config['inflections'])
-    loader.push_dir(File.join(dir, 'app/lib'))
+    loader.push_dir(::File.join(dir, 'app/lib'))
     loader.collapse('app/lib/mulukhiya/*')
     return loader
   end
@@ -73,7 +73,7 @@ module Mulukhiya
 
   def self.load_tasks
     finder = Ginseng::FileFinder.new
-    finder.dir = File.join(dir, 'app/task')
+    finder.dir = ::File.join(dir, 'app/task')
     finder.patterns.push('*.rb')
     finder.patterns.push('*.rake')
     finder.exec.each {|f| require f}
@@ -84,5 +84,5 @@ module Mulukhiya
   setup_bootsnap
   setup_sidekiq
   setup_debug
-  Environment.dbms_class.connect
+  Environment.dbms_class&.connect
 end
