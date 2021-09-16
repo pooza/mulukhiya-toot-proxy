@@ -7,6 +7,9 @@ module Mulukhiya
     def contract
       @contract ||= "Mulukhiya::#{command_name.camelize}CommandContract".constantize.new
       return @contract
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     def validate
