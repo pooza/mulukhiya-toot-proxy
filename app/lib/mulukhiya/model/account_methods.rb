@@ -182,7 +182,11 @@ module Mulukhiya
       end
 
       def test_account
+        return nil unless test_token
         return Environment.account_class.get(token: test_token)
+      rescue => e
+        logger.error(error: e)
+        return nil
       end
 
       def info_token
@@ -194,7 +198,11 @@ module Mulukhiya
       end
 
       def info_account
+        return nil unless info_token
         return Environment.account_class.get(token: info_token)
+      rescue => e
+        logger.error(error: e)
+        return nil
       end
     end
   end

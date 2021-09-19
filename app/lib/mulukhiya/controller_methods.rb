@@ -82,6 +82,8 @@ module Mulukhiya
 
       def dbms_class
         return "Mulukhiya::#{dbms_name.camelize}".constantize
+      rescue NameError
+        return nil
       end
 
       def parser_name
@@ -90,6 +92,8 @@ module Mulukhiya
 
       def parser_class
         return "Mulukhiya::#{parser_name.camelize}Parser".constantize
+      rescue NameError
+        return nil
       end
 
       def oauth_webui_uri

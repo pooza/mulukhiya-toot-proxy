@@ -7,7 +7,7 @@ module Mulukhiya
         [:start, :stop].freeze.each do |action|
           desc "#{action} #{daemon}"
           task action do
-            sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} #{action}"
+            sh "#{::File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} #{action}"
           rescue => e
             warn "#{e.class} #{daemon}:#{action} #{e.message}"
           end

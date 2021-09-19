@@ -107,7 +107,7 @@ GEM
     aws-eventstream (1.2.0)
     aws-sigv4 (1.4.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    bootsnap (1.8.1)
+    bootsnap (1.9.0)
       msgpack (~> 1.0)
     bson (4.12.1)
     builder (3.2.4)
@@ -158,11 +158,11 @@ GEM
     erb (2.2.3)
       cgi
     erubi (1.10.0)
-    et-orbi (1.2.4)
+    et-orbi (1.2.5)
       tzinfo
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (1.7.2)
+    faraday (1.8.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -191,7 +191,7 @@ GEM
       rake
     fileutils (1.5.0)
     find (0.1.0)
-    fugit (1.5.1)
+    fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.20.1)
@@ -388,7 +388,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bootsnap (>= 1.7.0)
+  bootsnap (>= 1.9.0)
   dropbox_api
   dry-validation
   faraday (~> 1.7)

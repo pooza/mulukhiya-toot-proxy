@@ -19,6 +19,8 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       config.raw.dig('test', 'filters').each do |entry|
         yield "Mulukhiya::#{entry['name'].camelize}TestCaseFilter".constantize.new(entry)
+      rescue => e
+        logger.error(error: e)
       end
     end
   end

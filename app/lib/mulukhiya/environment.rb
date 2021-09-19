@@ -36,6 +36,8 @@ module Mulukhiya
 
     def self.sns_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
+    rescue NameError
+      return nil
     end
 
     def self.controller_name
@@ -44,10 +46,14 @@ module Mulukhiya
 
     def self.controller_class
       return "Mulukhiya::#{controller_name.camelize}Controller".constantize
+    rescue NameError
+      return nil
     end
 
     def self.listener_class
       return "Mulukhiya::#{controller_name.camelize}Listener".constantize
+    rescue NameError
+      return nil
     end
 
     def self.mastodon?
@@ -79,7 +85,7 @@ module Mulukhiya
     end
 
     def self.dbms_name
-      return controller_class.dbms_name
+      return controller_class&.dbms_name
     end
 
     def self.postgres?
@@ -91,7 +97,7 @@ module Mulukhiya
     end
 
     def self.parser_name
-      return controller_class.parser_name
+      return controller_class&.parser_name
     end
 
     def self.toot?
@@ -104,34 +110,46 @@ module Mulukhiya
 
     def self.account_class
       return "Mulukhiya::#{controller_name.camelize}::Account".constantize
+    rescue NameError
+      return nil
     end
 
     def self.status_class
       return "Mulukhiya::#{controller_name.camelize}::Status".constantize
+    rescue NameError
+      return nil
     end
 
     def self.attachment_class
       return "Mulukhiya::#{controller_name.camelize}::Attachment".constantize
+    rescue NameError
+      return nil
     end
 
     def self.access_token_class
       return "Mulukhiya::#{controller_name.camelize}::AccessToken".constantize
+    rescue NameError
+      return nil
     end
 
     def self.hash_tag_class
       return "Mulukhiya::#{controller_name.camelize}::HashTag".constantize
+    rescue NameError
+      return nil
     end
 
     def self.sns_service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
+    rescue NameError
+      return nil
     end
 
     def self.parser_class
-      return controller_class.parser_class
+      return controller_class&.parser_class
     end
 
     def self.dbms_class
-      return controller_class.dbms_class
+      return controller_class&.dbms_class
     end
 
     def self.daemon_classes

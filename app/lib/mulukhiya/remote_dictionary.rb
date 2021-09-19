@@ -38,6 +38,9 @@ module Mulukhiya
     def self.create(params)
       params['type'] ||= 'multi_field'
       return "Mulukhiya::#{params['type'].camelize}RemoteDictionary".constantize.new(params)
+    rescue => e
+      logger.error(error: e)
+      return nil
     end
 
     private
