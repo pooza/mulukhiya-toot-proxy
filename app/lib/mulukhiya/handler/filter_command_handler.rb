@@ -21,7 +21,7 @@ module Mulukhiya
     private
 
     def remove_filter(phrase)
-      sns.filters.select {|v| v.is_a?(Enumerator)}.each do |filter|
+      sns.filters.select {|v| v.is_a?(Enumerable)}.each do |filter|
         next unless filter['phrase'] == phrase
         sns.unregister_filter(filter['id'])
       end
