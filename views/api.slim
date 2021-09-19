@@ -174,7 +174,8 @@ html lang='ja'
                 .endpoint-container
                   .link GET {{endpoints.#{entry['id']}}}
                   - entry['params'].each do |param|
-                    input type='text' placeholder='#{param.to_s}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' @keydown.enter='execCustomAPI("#{entry['id']}")'
+                    v-select :options='choices.#{entry['id']}_#{param}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' v-if='choices.#{entry['id']}_#{param}'
+                    input type='text' placeholder='#{param.to_s}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' @keydown.enter='execCustomAPI("#{entry['id']}")' v-else=''
                   .link-description = entry['description']
                   .field-update-button-container
                     button @click='execCustomAPI("#{entry['id']}")' 実行
@@ -194,6 +195,7 @@ html lang='ja'
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.component('vue-slide-up-down', VueSlideUpDown)
+      Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
         data: {
@@ -203,6 +205,7 @@ html lang='ja'
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
           },
+          choices: {},
           query_params: {
             media_list: {page: 1},
             announcement_update: {token: Vue.getToken()},
@@ -249,6 +252,13 @@ html lang='ja'
             const params = {}
             entry.params.map(key => {params[key] = ''})
             Vue.set(this.entries, entry.id, entry)
+            if (entry.choices) {
+              Object.keys(entry.choices).map(k => {
+                axios.get(entry.choices[k])
+                  .then(e => Vue.set(this.choices, `${entry.id}_${k}`, e.data))
+                  .catch(e => Vue.alert(this.$dialog, e))
+              })
+            }
             Vue.set(this.query_params, entry.id, params)
             Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
           })
@@ -261,7 +271,7 @@ html lang='ja'
           },
           onInputCustomAPI (id, key) {
             let endpoint = `/mulukhiya/api/${this.entries[id].path}`
-            this.query_params[id][key] = event.target.value
+            this.query_params[id][key] = event.target.value || event.target.innerText
             Object.keys(this.query_params[id]).map(k => {
               endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
             })
