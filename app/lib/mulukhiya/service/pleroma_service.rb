@@ -77,15 +77,13 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
-      message = [account.acct.to_s, message.dup].join("\n")
-      message.ellipsize!(TootParser.new.max_length)
-      status = {
-        PleromaController.status_field => message,
+      message = [account.acct.to_s, message].join("\n")
+      return post(
+        PleromaController.status_field => message.ellipsize(TootParser.new.max_length),
         PleromaController.spoiler_field => options['spoiler_text'],
         'visibility' => PleromaController.visibility_name('direct'),
         'in_reply_to_id' => options.dig('response', 'id'),
-      }
-      return post(status.compact)
+      )
     end
 
     def default_token

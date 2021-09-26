@@ -68,16 +68,14 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
-      message = [account.acct.to_s, message.dup].join("\n")
-      message.ellipsize!(NoteParser.new.max_length)
-      status = {
-        MisskeyController.status_field => message,
+      message = [account.acct.to_s, message].join("\n")
+      return post(
+        MisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
         MisskeyController.spoiler_field => options['spoiler_text'],
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
         'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
-      }
-      return post(status.compact)
+      )
     end
 
     def default_token

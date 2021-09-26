@@ -61,16 +61,14 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
-      message = [account.acct.to_s, message.dup].join("\n")
-      message.ellipsize!(NoteParser.new.max_length)
-      status = {
-        MeisskeyController.status_field => message,
+      message = [account.acct.to_s, message].join("\n")
+      return post(
+        MeisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
         MeisskeyController.spoiler_field => options['spoiler_text'],
         'visibleUserIds' => [account.id],
         'visibility' => MeisskeyController.visibility_name('direct'),
         'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
-      }
-      return post(status.compact)
+      )
     end
 
     def default_token
