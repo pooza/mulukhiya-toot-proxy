@@ -120,7 +120,7 @@ html lang='ja'
       section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
-          .inline-field-container
+          .field-container
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
