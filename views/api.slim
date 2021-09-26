@@ -75,7 +75,10 @@ html lang='ja'
                   .link-description
                     | スケジュール
                     code #{config['/sidekiq/schedule/program_update/every']}
-                .link-description 実況番組表を取得し、キャッシュします。
+                .link-description 以下の実況番組表を取得し、キャッシュを更新します。
+                - config['/program/urls'].each do |url|
+                  .link
+                    a href=url target='_blank' rel='noreferrer' = url.ellipsize(64)
                 .field-update-button-container
                   button @click='updatePrograms' 実行
         - if controller.favorite_tags?
