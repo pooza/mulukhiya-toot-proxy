@@ -881,6 +881,8 @@ postgres:
   query_log: false
   slow_query:
     seconds: 3
+program:
+  urls: []
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008

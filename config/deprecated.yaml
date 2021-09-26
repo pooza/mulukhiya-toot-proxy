@@ -1,3 +1,6 @@
+- key: /program/urls
+  aliases:
+    - /programs/url
 - key: /alert/hooks
   aliases:
     - /alert/slack/hooks
