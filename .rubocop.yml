@@ -353,10 +353,12 @@ Sequel:
     - '*'
   Include:
     - '**/model/**/*.rb'
+    - 'app/migration/**/*.rb'
 
 Rake:
   Exclude:
     - '*'
   Include:
     - 'Rakefile'
+    - '*.rake'
     - 'app/task/**/*.rb'
