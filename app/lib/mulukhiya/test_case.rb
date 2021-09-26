@@ -42,8 +42,8 @@ module Mulukhiya
 
     def self.names(cases = nil)
       if cases
-        names = cases.split(',')
-          .map {|v| [v, "#{v}Test", v.underscore, "#{v.underscore}_test"]}.flatten
+        names = cases.split(',').map(&:underscore)
+          .map {|v| [v, "#{v}_test", v.sub(/_test$/, '')]}.flatten
           .select {|v| File.exist?(File.join(dir, "#{v}.rb"))}.compact
       else
         finder = Ginseng::FileFinder.new
