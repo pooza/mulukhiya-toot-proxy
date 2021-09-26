@@ -5,11 +5,6 @@ module Mulukhiya
       return false
     end
 
-    def handle_post_toot(payload, params = {})
-      super
-      return unless parser.command_name == command_name
-    end
-
     def exec
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       sns.account.user_config.update(parser.params)
