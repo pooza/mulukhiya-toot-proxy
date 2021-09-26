@@ -725,7 +725,7 @@ nowplaying:
 package:
   authors:
     - Tatsuya Koishi
-  description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
+  description: 各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   email:
     - tkoishi@b-shock.co.jp
   license: MIT
