@@ -67,16 +67,17 @@ module Mulukhiya
       return Ginseng::URI.parse(response['url'])
     end
 
-    def notify(account, message, response = nil)
+    def notify(account, message, options = {})
       message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(NoteParser.new.max_length)
       status = {
         MisskeyController.status_field => message,
+        MisskeyController.spoiler_field => options['spoiler_text'],
         'visibleUserIds' => [account.id],
         'visibility' => MisskeyController.visibility_name('direct'),
+        'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
       }
-      status['replyId'] = (response.dig('createdNote', 'id') || response['id']) if response
-      return post(status)
+      return post(status.compact)
     end
 
     def default_token

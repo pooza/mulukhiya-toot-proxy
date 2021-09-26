@@ -69,15 +69,16 @@ module Mulukhiya
       return uri
     end
 
-    def notify(account, message, response = nil)
+    def notify(account, message, options = {})
       message = [account.acct.to_s, message.dup].join("\n")
       message.ellipsize!(TootParser.new.max_length)
       status = {
         MastodonController.status_field => message,
+        MastodonController.spoiler_field => options['spoiler_text'],
         'visibility' => MastodonController.visibility_name('direct'),
+        'in_reply_to_id' => options.dig('response', 'id'),
       }
-      status['in_reply_to_id'] = response['id'] if response
-      return post(status)
+      return post(status.compact)
     end
 
     def default_token

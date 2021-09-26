@@ -66,9 +66,9 @@ module Mulukhiya
       return dest if dest.valid?
     end
 
-    def notify(message, response = nil)
+    def notify(message, options = {})
       message = message.to_yaml unless message.is_a?(String)
-      return info_agent_service.notify(@sns.account, message, response)
+      return info_agent_service.notify(@sns.account, message, options)
     rescue => e
       logger.error(error: e, message: message)
     end
