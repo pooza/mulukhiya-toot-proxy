@@ -86,7 +86,6 @@ module Mulukhiya
 
     def handle_user_tags(values)
       flatten = values.key_flatten
-      flatten['/tagging/user_tags'] ||= flatten['/tags'] if flatten.key?('/tags')
       if minutes = flatten['/tagging/minutes']
         Sidekiq.set_schedule("user_tag_initialize_#{@account.username}", {
           at: (minutes + config['/tagging/user_tags/extra_minutes']).to_i.minutes.after,
