@@ -159,6 +159,7 @@ handler:
   image_resize:
     pixel: 1920
   itunes_image:
+    disable: true
     pixel: 480
     timeout: 10
   itunes_nowplaying:
@@ -195,6 +196,7 @@ handler:
   video_format_convert:
     timeout: 30
   you_tube_image:
+    disable: true
     timeout: 10
 http:
   retry:
