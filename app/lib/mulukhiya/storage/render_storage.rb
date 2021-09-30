@@ -12,6 +12,12 @@ module Mulukhiya
       setex(command, ttl, value)
     end
 
+    def key?(key)
+      return keys(create_key(key)).present?
+    end
+
+    alias exist? key?
+
     def setex(command, ttl, value)
       if value.is_a?(Enumerable)
         super(command, ttl, value.to_json)
