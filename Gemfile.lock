@@ -46,9 +46,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 013476856aa5e2ffefcf2cd00aab121ef05ab2de
+  revision: ff2e62baf1601790f129627caf0df68f81c6a161
   specs:
-    ginseng-redis (1.1.4)
+    ginseng-redis (1.1.5)
       redis
 
 GIT
@@ -361,7 +361,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
