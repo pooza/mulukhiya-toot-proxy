@@ -22,10 +22,10 @@ module Mulukhiya
       self.payload = payload
       return unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
-      payload['visibility'] = controller_class.visibility_name('direct')
+      payload[visibility_field] = controller_class.visibility_name('direct')
       payload.delete(spoiler_field)
       payload.delete(attachment_field)
-      payload.delete('poll')
+      payload.delete(poll_field)
       @prepared = true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)

@@ -4,7 +4,7 @@ module Mulukhiya
       self.payload = payload
       return if parser.command?
       parser.accts.select(&:agent?).each do |acct|
-        payload['visibility'] = controller_class.visibility_name('direct')
+        payload[visibility_field] = controller_class.visibility_name('direct')
         result.push(acct: acct.to_s)
       end
     rescue => e

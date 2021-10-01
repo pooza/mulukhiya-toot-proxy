@@ -16,8 +16,16 @@ module Mulukhiya
       return controller_class.status_field
     end
 
+    def visibility_field
+      return controller_class.visibility_field
+    end
+
     def attachment_field
       return controller_class.attachment_field
+    end
+
+    def poll_field
+      return controller_class.poll_field
     end
 
     def poll_options_field

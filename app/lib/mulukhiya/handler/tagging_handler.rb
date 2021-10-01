@@ -18,8 +18,8 @@ module Mulukhiya
     def executable?
       return false if parser.command?
       return false if parser.accts.any?(&:agent?)
-      return true if payload['visibility'].empty?
-      return true if payload['visibility'] == 'public'
+      return true if payload[visibility_field].empty?
+      return true if payload[visibility_field] == visibility_name('public')
       return false
     end
 

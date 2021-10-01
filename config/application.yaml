@@ -741,15 +741,19 @@ parser:
       attachment: fileIds
       body: text
       poll:
+        root: poll
         options: choices
       spoiler: cw
+      visibility: visibility
   toot:
     fields:
       attachment: media_ids
       body: status
       poll:
+        root: poll
         options: options
       spoiler: spoiler_text
+      visibility: visibility
 pleroma:
   attachment:
     limit: 4

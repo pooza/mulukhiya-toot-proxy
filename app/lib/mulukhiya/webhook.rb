@@ -30,7 +30,7 @@ module Mulukhiya
     end
 
     def post(payload)
-      body = payload.values.merge('visibility' => visibility)
+      body = payload.values.merge(visibility_field => visibility)
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter: reporter, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
