@@ -19,7 +19,7 @@ module Mulukhiya
       return false if parser.command?
       return false if parser.accts.any?(&:agent?)
       return true if payload[visibility_field].empty?
-      return true if payload[visibility_field] == visibility_name(:public)
+      return true if payload[visibility_field] == controller_class.visibility_name(:public)
       return false
     end
 
