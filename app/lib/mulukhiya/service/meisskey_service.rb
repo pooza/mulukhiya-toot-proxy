@@ -66,7 +66,7 @@ module Mulukhiya
         MeisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
         MeisskeyController.spoiler_field => options['spoiler_text'],
         'visibleUserIds' => [account.id],
-        MeisskeyController.visibility_field => MeisskeyController.visibility_name('direct'),
+        MeisskeyController.visibility_field => MeisskeyController.visibility_name(:direct),
         'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
       )
     end

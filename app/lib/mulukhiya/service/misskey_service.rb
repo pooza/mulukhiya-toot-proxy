@@ -73,7 +73,7 @@ module Mulukhiya
         MisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
         MisskeyController.spoiler_field => options['spoiler_text'],
         'visibleUserIds' => [account.id],
-        MisskeyController.visibility_field => MisskeyController.visibility_name('direct'),
+        MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),
         'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
       )
     end

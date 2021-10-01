@@ -22,7 +22,7 @@ module Mulukhiya
       self.payload = payload
       return unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
-      payload[visibility_field] = controller_class.visibility_name('direct')
+      payload[visibility_field] = controller_class.visibility_name(:direct)
       payload.delete(spoiler_field)
       payload.delete(attachment_field)
       payload.delete(poll_field)

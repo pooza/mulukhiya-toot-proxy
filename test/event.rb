@@ -21,7 +21,7 @@ module Mulukhiya
     def test_dispatch
       @event.dispatch(
         status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq',
-        visibility_field => visibility_name('private'),
+        visibility_field => visibility_name(:private),
       )
       assert(@event.reporter.tags.member?('宮本佳那子'))
       assert(@event.reporter.tags.member?('福山沙織'))
