@@ -5,7 +5,11 @@ module Mulukhiya
     namespace :program do
       desc 'update programs'
       task :update do
-        ProgramUpdateWorker.perform_async
+        if Environment.production?
+          ProgramUpdateWorker.perform_async
+        else
+          ProgramUpdateWorker.new.perform
+        end
       end
 
       desc 'show programs'
