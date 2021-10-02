@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e69b5885c4f6eca743d3503797429eb3e01c2e03
+  revision: 7e2b9dbcf2cb7e158766557e4f789e895baaffa8
   specs:
-    ginseng-core (1.11.4)
+    ginseng-core (1.11.5)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -330,7 +330,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.1.0)
-    sequel (5.48.0)
+    sequel (5.49.0)
     set (1.0.1)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)
