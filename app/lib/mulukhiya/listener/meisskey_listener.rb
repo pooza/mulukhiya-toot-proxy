@@ -6,10 +6,6 @@ module Mulukhiya
       logger.error(error: e)
     end
 
-    def self.verify_peer
-      return config['/meisskey/streaming/verify_peer']
-    end
-
     def self.start
       EM.run do
         listener = MeisskeyListener.new
