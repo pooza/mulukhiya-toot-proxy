@@ -8,7 +8,11 @@ module Mulukhiya
     attr_reader :client, :uri, :sns
 
     def verify_peer?
-      return config["/#{controller_name}/streaming/verify_peer"]
+      return config["/#{Environment.controller_name}/streaming/verify_peer"]
+    end
+
+    def keepalive
+      return config['/websocket/keepalive']
     end
 
     private
@@ -20,7 +24,7 @@ module Mulukhiya
         tls: {
           verify_peer: verify_peer?,
         },
-        ping: config['/websocket/keepalive'],
+        ping: keepalive,
       })
     end
 
