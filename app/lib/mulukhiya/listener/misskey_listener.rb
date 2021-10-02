@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def self.verify_peer
-      return config['/missley/streaming/verify_peer']
+      return config['/misskey/streaming/verify_peer']
     end
 
     def self.start
