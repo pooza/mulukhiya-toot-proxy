@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e69b5885c4f6eca743d3503797429eb3e01c2e03
+  revision: 7e2b9dbcf2cb7e158766557e4f789e895baaffa8
   specs:
-    ginseng-core (1.11.4)
+    ginseng-core (1.11.5)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -46,16 +46,16 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 013476856aa5e2ffefcf2cd00aab121ef05ab2de
+  revision: ff2e62baf1601790f129627caf0df68f81c6a161
   specs:
-    ginseng-redis (1.1.4)
+    ginseng-redis (1.1.5)
       redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ae5a12bd6c1e3bb8365f4962a1a6614d841f0bad
+  revision: 0a39700d0e134126963171e549b65efc2d73abce
   specs:
-    ginseng-web (1.3.15)
+    ginseng-web (1.3.16)
       erb
       puma (>= 5.3.0)
       rss
@@ -119,7 +119,7 @@ GEM
     date (3.1.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    dropbox_api (0.1.19)
+    dropbox_api (0.1.20)
       faraday (~> 1.0)
       oauth2 (~> 1.1)
     dry-configurable (0.13.0)
@@ -207,7 +207,7 @@ GEM
     http-form_data (2.3.0)
     http-parser (1.2.3)
       ffi-compiler (>= 1.0, < 2.0)
-    httparty (0.19.0)
+    httparty (0.20.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.8.10)
@@ -302,13 +302,13 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.21.0)
+    rubocop (1.22.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.9.1, < 2.0)
+      rubocop-ast (>= 1.12.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.12.0)
@@ -330,7 +330,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.1.0)
-    sequel (5.48.0)
+    sequel (5.49.0)
     set (1.0.1)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)

@@ -85,7 +85,7 @@ module Mulukhiya
       @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=aYSFvJ43-to&feature=share\n"})
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['牧野由依'],
-        title: 'Amefuribana',
+        title: '雨降花',
         url: 'https://music.youtube.com/watch?v=aYSFvJ43-to&feature=share',
       }])
     end

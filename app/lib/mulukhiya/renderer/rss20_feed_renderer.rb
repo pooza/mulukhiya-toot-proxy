@@ -17,25 +17,31 @@ module Mulukhiya
       command.exec
       raise command.stderr unless command.status.zero?
       self.entries = JSON.parse(command.stdout)
-      clear
-      storage[command] = to_s
+      storage[command] = render(update: true)
     end
 
     alias save cache
 
     def clear
-      storage[command] = nil
+      storage.del(command)
     end
 
-    def to_s
-      return storage[command] if storage[command].present? rescue super
-      return super
+    def render(params = {})
+      return feed.to_s if params[:update]
+      return feed.to_s unless storage.key?(command)
+      return storage[command]
+    rescue => e
+      logger.error(error: e)
+      return feed.to_s
     end
+
+    alias to_s render
 
     private
 
     def fetch_image(uri)
-      return storage[uri] if storage[uri].present?
+      return nil unless uri
+      return storage[uri] if storage.key?(uri)
       return storage[uri] = super
     rescue => e
       logger.error(error: e)

@@ -4,7 +4,11 @@ module Mulukhiya
     include Package
 
     def update
-      redis['program'] = @http.get(uri) if uri
+      programs = {}
+      uris.each do |uri|
+        programs.merge!(@http.get(uri).to_h)
+      end
+      redis['program'] = programs.to_json
     end
 
     def data
@@ -24,8 +28,8 @@ module Mulukhiya
       return data.to_yaml
     end
 
-    def uri
-      return Ginseng::URI.parse(config['/programs/url']) rescue nil
+    def uris
+      return config['/program/urls'].map {|v| Ginseng::URI.parse(v)}.to_set rescue []
     end
 
     alias to_s to_yaml

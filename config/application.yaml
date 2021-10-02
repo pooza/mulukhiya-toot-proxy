@@ -123,7 +123,7 @@ feed:
     limit: 100
 growi:
   urls:
-    create_page: /_api/v3/pages/create
+    create_page: /_api/v3/pages
 handler:
   amazon_image:
     disable: true
@@ -159,6 +159,7 @@ handler:
   image_resize:
     pixel: 1920
   itunes_image:
+    disable: true
     pixel: 480
     timeout: 10
   itunes_nowplaying:
@@ -173,6 +174,8 @@ handler:
     image_file: public/mulukhiya/media/background.png
     rows: 30
     text_length: 140
+  result_notification:
+    spoiler_text: 実行結果
   shortened_url:
     domains:
       - t.co
@@ -195,6 +198,7 @@ handler:
   video_format_convert:
     timeout: 30
   you_tube_image:
+    disable: true
     timeout: 10
 http:
   retry:
@@ -362,6 +366,8 @@ mastodon:
     label: 投稿
     max_length: 500
     parser: toot
+  streaming:
+    verify_peer: true
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -510,6 +516,8 @@ meisskey:
     label: ポスト
     max_length: 1000
     parser: note
+  streaming:
+    verify_peer: true
   url: https://meisskey.example.com/
 misskey:
   attachment:
@@ -659,6 +667,8 @@ misskey:
     label: ノート
     max_length: 500
     parser: note
+  streaming:
+    verify_peer: true
   url: https://misskey.example.com/
 mongo:
   dsn: null
@@ -725,27 +735,31 @@ nowplaying:
 package:
   authors:
     - Tatsuya Koishi
-  description: Fediverseインスタンスの投稿内容の更新等を行うプロキシ。通称「モロヘイヤ」。
+  description: 各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。通称「モロヘイヤ」。
   email:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.9.12
+  version: 4.10.0
 parser:
   note:
     fields:
       attachment: fileIds
       body: text
       poll:
+        root: poll
         options: choices
       spoiler: cw
+      visibility: visibility
   toot:
     fields:
       attachment: media_ids
       body: status
       poll:
+        root: poll
         options: options
       spoiler: spoiler_text
+      visibility: visibility
 pleroma:
   attachment:
     limit: 4
@@ -873,12 +887,16 @@ pleroma:
     label: ステータス
     max_length: 5000
     parser: toot
+  streaming:
+    verify_peer: true
   url: https://pleroma.example.com/
 postgres:
   dsn: null
   query_log: false
   slow_query:
     seconds: 3
+program:
+  urls: []
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008

@@ -26,13 +26,10 @@ module Mulukhiya
       errors = @contract.call(command: 'user_config', annict: {token: 222}).errors
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', notify: {verbose: true, user_config: true}).errors
+      errors = @contract.call(command: 'user_config', notify: {verbose: true}).errors
       assert(errors.empty?)
 
       errors = @contract.call(command: 'user_config', notify: {verbose: 111}).errors
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', notify: {user_config: 111}).errors
       assert_false(errors.empty?)
 
       errors = @contract.call(command: 'user_config', amazon: {affiliate: true}).errors

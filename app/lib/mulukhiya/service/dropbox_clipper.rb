@@ -7,7 +7,7 @@ module Mulukhiya
       src = File.join(Environment.dir, 'tmp/media', params.to_json.adler32)
       dest = "/#{Time.now.strftime('%Y/%m/%d-%H%M%S')}.md"
       File.write(src, params[:body])
-      return upload(dest, IO.read(src), {mode: :overwrite})
+      return upload(dest, File.read(src), {mode: :overwrite})
     rescue => e
       raise Ginseng::GatewayError, "Dropbox upload error (#{e.message})", e.backtrace
     ensure

@@ -25,7 +25,6 @@ module Mulukhiya
       end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
-        optional(:user_config).maybe(:bool)
       end
       required(:amazon).maybe(:hash).schema do
         optional(:affiliate).maybe(:bool)

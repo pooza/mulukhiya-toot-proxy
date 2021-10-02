@@ -70,7 +70,7 @@ module Mulukhiya
       end
 
       def livecure?
-        return false unless config['/programs/url'].present?
+        return false unless config['/program/urls'].count.positive?
         return true
       rescue Ginseng::ConfigError
         return false
@@ -116,6 +116,14 @@ module Mulukhiya
 
       def status_field
         return config["/parser/#{parser_name}/fields/body"]
+      end
+
+      def visibility_field
+        return config["/parser/#{parser_name}/fields/visibility"]
+      end
+
+      def poll_field
+        return config["/parser/#{parser_name}/fields/poll/root"]
       end
 
       def poll_options_field

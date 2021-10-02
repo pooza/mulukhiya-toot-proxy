@@ -6,31 +6,42 @@ module Mulukhiya
     end
 
     def handle_post_toot(payload, params = {})
-      notify(reporter.to_h, reporter.response) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'response' => reporter.response, 'spoiler_text' => spoiler_text})
     end
 
     def handle_post_webhook(payload, params = {})
-      notify(reporter.to_h, reporter.response) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'response' => reporter.response, 'spoiler_text' => spoiler_text})
     end
 
     def handle_post_upload(payload, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'spoiler_text' => spoiler_text})
     end
 
     def handle_post_fav(payload, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'spoiler_text' => spoiler_text})
     end
 
     def handle_post_boost(payload, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'spoiler_text' => spoiler_text})
     end
 
     def handle_post_bookmark(payload, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'spoiler_text' => spoiler_text})
     end
 
     def handle_post_search(payload, params = {})
-      notify(reporter.to_h) if reporter.to_h.present?
+      return unless reporter.to_h.present?
+      notify(reporter.to_h, {'spoiler_text' => spoiler_text})
+    end
+
+    def spoiler_text
+      return config['/handler/result_notification/spoiler_text'] rescue nil
     end
   end
 end

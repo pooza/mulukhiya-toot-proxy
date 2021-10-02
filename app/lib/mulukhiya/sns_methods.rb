@@ -16,8 +16,16 @@ module Mulukhiya
       return controller_class.status_field
     end
 
+    def visibility_field
+      return controller_class.visibility_field
+    end
+
     def attachment_field
       return controller_class.attachment_field
+    end
+
+    def poll_field
+      return controller_class.poll_field
     end
 
     def poll_options_field
@@ -66,9 +74,9 @@ module Mulukhiya
       return dest if dest.valid?
     end
 
-    def notify(message, response = nil)
+    def notify(message, options = {})
       message = message.to_yaml unless message.is_a?(String)
-      return info_agent_service.notify(@sns.account, message, response)
+      return info_agent_service.notify(@sns.account, message, options)
     rescue => e
       logger.error(error: e, message: message)
     end

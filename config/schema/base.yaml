@@ -1,65 +1,250 @@
 $schema: http://json-schema.org/draft-04/hyper-schema
-title: Local config
-type: object
-required:
-  - agent
-  - alert
-  - crypt
 properties:
+  agent:
+    properties:
+      info:
+        properties:
+          token:
+            type: string
+        required:
+          - token
+        type: object
+      test:
+        properties:
+          token:
+            type: string
+        required:
+          - token
+        type: object
+    required:
+      - test
+      - info
+    type: object
+  alert:
+    properties:
+      hooks:
+        items:
+          format: uri
+          type: string
+        type: array
+      line:
+        properties:
+          to:
+            type: string
+          token:
+            type: string
+        required:
+          - token
+          - to
+        type: object
+      mail:
+        properties:
+          to:
+            type: string
+        required:
+          - to
+        type: object
+    type: object
+  amazon:
+    properties:
+      access_key:
+        type: string
+      affiliate:
+        type: boolean
+      associate_tag:
+        type: string
+      secret_key:
+        type: string
+    required:
+      - associate_tag
+      - access_key
+      - secret_key
+    type: object
+  annict:
+    properties:
+      oauth:
+        properties:
+          client:
+            type: object
+          properties:
+            key:
+              type: string
+            secret:
+              type: string
+          required:
+            - key
+            - secret
+        required:
+          - client
+        status:
+          properties:
+            tags:
+              items:
+                type: string
+              type: array
+          type: object
+        type: object
+    required:
+      - oauth
+    type: object
+  api:
+    properties:
+      custom:
+        items:
+          properties:
+            command:
+              items:
+                type: string
+              type: array
+            path:
+              type: string
+          required:
+            - path
+            - command
+          type: object
+        type: array
+    type: object
   controller:
-    type: string
     enum:
       - mastodon
       - misskey
       - pleroma
       - meisskey
-  environment:
     type: string
+  crypt:
+    properties:
+      encoder:
+        enum:
+          - base64
+          - hex
+        type: string
+      password:
+        type: string
+      salt:
+        type: string
+    required:
+      - salt
+      - password
+    type: object
+  environment:
     enum:
       - development
       - production
-  agent:
-    type: object
-    required:
-      - test
-      - info
+    type: string
+  feed:
     properties:
-      test:
-        type: object
-        required:
-          - token
-        properties:
-          token:
-            type: string
-      info:
-        type: object
-        required:
-          - token
-        properties:
-          token:
-            type: string
-  tagging:
-    type: object
-    properties:
-      dictionaries:
-        type: array
+      custom:
         items:
-          type: object
-          required:
-            - url
           properties:
-            url:
+            command:
+              items:
+                type: string
+              type: array
+            description:
               type: string
-              format: uri
-            type:
+            path:
               type: string
-              enum:
-                - multi_field
-                - relative
-                - mecab
-      attachment_tags:
-        type: object
+            title:
+              type: string
+          required:
+            - path
+            - command
+          type: object
+        type: array
+    type: object
+  google:
+    properties:
+      api:
         properties:
+          key:
+            type: string
+        required:
+          - key
+        type: object
+    required:
+      - api
+    type: object
+  postgres:
+    properties:
+      dsn:
+        format: uri
+        type: string
+    required:
+      - dsn
+    type: object
+  program:
+    properties:
+      urls:
+        items:
+          format: uri
+          type: string
+        type: array
+    required:
+      - urls
+    type: object
+  programs:
+    properties:
+      url:
+        items:
+          format: uri
+          type: string
+        type: array
+    required:
+      - url
+    type: object
+  puma:
+    properties:
+      port:
+        type: integer
+    type: object
+  sidekiq:
+    properties:
+      auth:
+        properties:
+          password:
+            type: string
+          user:
+            type: string
+        required:
+          - password
+        type: object
+      concurrency:
+        type: integer
+      redis:
+        properties:
+          url:
+            format: uri
+            type: string
+        required:
+          - url
+        type: object
+      schedule:
+        properties: {}
+        type: object
+    type: object
+  spotify:
+    properties:
+      client:
+        properties:
+          id:
+            type: string
+          secret:
+            type: string
+        required:
+          - id
+          - secret
+        type: object
+    required:
+      - client
+    type: object
+  tagging:
+    properties:
+      attachment_tags:
+        properties:
+          audio:
+            type:
+              - string
+              - 'null'
           image:
             type:
               - string
@@ -68,204 +253,31 @@ properties:
             type:
               - string
               - 'null'
-          audio:
-            type:
-              - string
-              - 'null'
+        type: object
       default_tags:
-        type: array
         items:
           type: string
-  alert:
-    type: object
-    properties:
-      hooks:
         type: array
+      dictionaries:
         items:
-          type: string
-          format: uri
-      mail:
-        type: object
-        required:
-          - to
-        properties:
-          to:
-            type: string
-      line:
-        type: object
-        required:
-          - token
-          - to
-        properties:
-          token:
-            type: string
-          to:
-            type: string
-  postgres:
-    type: object
-    required:
-      - dsn
-    properties:
-      dsn:
-        type: string
-        format: uri
-  annict:
-    type: object
-    required:
-      - oauth
-    properties:
-      oauth:
-        type: object
-        required:
-          - client
-        properties:
-          client:
-            type: object
+          properties:
+            type:
+              enum:
+                - multi_field
+                - relative
+                - mecab
+              type: string
+            url:
+              format: uri
+              type: string
           required:
-            - key
-            - secret
-          properties:
-            key:
-              type: string
-            secret:
-              type: string
-        status:
+            - url
           type: object
-          properties:
-            tags:
-              type: array
-              items:
-                type: string
-  amazon:
-    type: object
-    required:
-      - associate_tag
-      - access_key
-      - secret_key
-    properties:
-      associate_tag:
-        type: string
-      access_key:
-        type: string
-      secret_key:
-        type: string
-      affiliate:
-        type: boolean
-  spotify:
-    type: object
-    required:
-      - client
-    properties:
-      client:
-        type: object
-        required:
-          - id
-          - secret
-        properties:
-          id:
-            type: string
-          secret:
-            type: string
-  google:
-    type: object
-    required:
-      - api
-    properties:
-      api:
-        type: object
-        required:
-          - key
-        properties:
-          key:
-            type: string
-  programs:
-    type: object
-    required:
-      - url
-    properties:
-      url:
-        type: string
-        format: uri
-  sidekiq:
-    type: object
-    properties:
-      concurrency:
-        type: integer
-      redis:
-        type: object
-        required:
-          - url
-        properties:
-          url:
-            type: string
-            format: uri
-      auth:
-        type: object
-        required:
-          - password
-        properties:
-          user:
-            type: string
-          password:
-            type: string
-      schedule:
-        type: object
-        properties: {}
-  puma:
-    type: object
-    properties:
-      port:
-        type: integer
-  crypt:
-    type: object
-    required:
-      - salt
-      - password
-    properties:
-      salt:
-        type: string
-      password:
-        type: string
-      encoder:
-        type: string
-        enum:
-          - base64
-          - hex
-  feed:
-    type: object
-    properties:
-      custom:
         type: array
-        items:
-          type: object
-          required:
-            - path
-            - command
-          properties:
-            path:
-              type: string
-            command:
-              type: array
-              items:
-                type: string
-            title:
-              type: string
-            description:
-              type: string
-  api:
     type: object
-    properties:
-      custom:
-        type: array
-        items:
-          type: object
-          required:
-            - path
-            - command
-          properties:
-            path:
-              type: string
-            command:
-              type: array
-              items:
-                type: string
+required:
+  - agent
+  - alert
+  - crypt
+title: Local config
+type: object

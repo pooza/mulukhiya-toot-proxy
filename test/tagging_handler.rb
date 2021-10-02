@@ -72,7 +72,7 @@ module Mulukhiya
     def test_handle_pre_toot_with_poll
       @handler.handle_pre_toot(
         status_field => 'アンケート',
-        'poll' => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
+        poll_field => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
       )
       @parser.text = @handler.payload[status_field]
       assert(@parser.all_tags.member?('ふたりはプリキュア'))

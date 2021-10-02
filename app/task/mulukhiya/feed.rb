@@ -5,7 +5,11 @@ module Mulukhiya
     namespace :feed do
       desc 'update custom feeds'
       task :update do
-        FeedUpdateWorker.perform_async
+        if Environment.production?
+          FeedUpdateWorker.perform_async
+        else
+          FeedUpdateWorker.new.perform
+        end
       end
     end
   end

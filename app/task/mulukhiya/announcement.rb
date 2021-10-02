@@ -5,7 +5,11 @@ module Mulukhiya
     namespace :announcement do
       desc 'update announcements'
       task :update do
-        AnnouncementWorker.perform_async
+        if Environment.production?
+          AnnouncementWorker.perform_async
+        else
+          AnnouncementWorker.new.perform
+        end
       end
     end
   end

@@ -12,7 +12,10 @@ module Mulukhiya
     def initialize
       @sns = info_agent_service
       @uri = @sns.streaming_uri
-      @client = Faye::WebSocket::Client.new(uri.to_s, nil, {
+      @client = Faye::WebSocket::Client.new(uri.to_s, [], {
+        tls: {
+          verify_peer: Environment.listener_class.verify_peer,
+        },
         ping: config['/websocket/keepalive'],
       })
     end

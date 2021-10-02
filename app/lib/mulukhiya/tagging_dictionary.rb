@@ -84,7 +84,7 @@ module Mulukhiya
     def create_temp_text(payload)
       return payload if payload.is_a?(String)
       parts = [payload[status_field], payload[spoiler_field], payload[chat_field]]
-      parts.concat(payload.dig('poll', poll_options_field) || [])
+      parts.concat(payload.dig(poll_field, poll_options_field) || [])
       (payload[attachment_field] || []).each do |id|
         next unless attachment = attachment_class[id]
         parts.push(attachment.description)

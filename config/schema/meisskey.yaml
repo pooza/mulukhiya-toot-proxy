@@ -21,6 +21,11 @@ meisskey:
         max_length:
           type: integer
       type: object
+    streaming:
+      properties:
+        verify_peer:
+          type: boolean
+      type: object
     url:
       format: uri
       type: string

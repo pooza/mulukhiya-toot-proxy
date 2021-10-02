@@ -120,7 +120,7 @@ html lang='ja'
       section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
-          .inline-field-container
+          .field-container
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
@@ -129,8 +129,6 @@ html lang='ja'
         h3 @click='toggleVisibility("notify")' 通知
         vue-slide-up-down :active='layout.details.notify'
           .inline-field-container
-            label
-              input type='checkbox' v-model='form.notify.user_config' 設定変更を通知
             label.alert
               input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
           .field-update-button-container
@@ -150,7 +148,7 @@ html lang='ja'
           result: null,
           programs: [],
           form: {
-            notify: {user_config: null, verbose: null},
+            notify: {verbose: null},
             livecure: false,
             annict: {auth_code: null},
             program: {minutes: null, tags: null},
@@ -211,7 +209,6 @@ html lang='ja'
             this.form.lemmy.host = Vue.dig(data, 'config', 'lemmy', 'host')
             this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
             this.form.lemmy.community = Vue.dig(data, 'config', 'lemmy', 'community')
-            this.form.notify.user_config = Vue.dig(data, 'config', 'notify', 'user_config') == true
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
             if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
               this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
@@ -294,9 +291,8 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateNotify () {
-            const command = {notify: {verbose: null, user_config: null}}
+            const command = {notify: {verbose: null}}
             if (this.form.notify.verbose) {command.notify.verbose = true}
-            if (this.form.notify.user_config) {command.notify.user_config = true}
             this.updateConfig(command)
           },
           authAnnict () {

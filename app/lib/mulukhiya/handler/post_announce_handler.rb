@@ -3,7 +3,7 @@ module Mulukhiya
     def announce(params = {})
       response = sns.post(
         status_field => create_body(params),
-        'visibility' => controller_class.visibility_name('unlisted'),
+        visibility_field => controller_class.visibility_name(:unlisted),
       )
       result.push(url: response['url'])
     end
