@@ -17,7 +17,7 @@ module Mulukhiya
       command.exec
       raise command.stderr unless command.status.zero?
       self.entries = JSON.parse(command.stdout)
-      storage[command] = render(update: true)
+      storage[command] = feed.to_s
     end
 
     alias save cache
@@ -26,16 +26,13 @@ module Mulukhiya
       storage.del(command)
     end
 
-    def render(params = {})
-      return feed.to_s if params[:update]
+    def to_s
       return feed.to_s unless storage.key?(command)
       return storage[command]
     rescue => e
       logger.error(error: e)
       return feed.to_s
     end
-
-    alias to_s render
 
     private
 
