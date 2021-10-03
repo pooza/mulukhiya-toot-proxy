@@ -21,6 +21,7 @@ filters:
       - handler
       - listener_daemon
       - listener
+      - render_storage
       - template
       - mailer
       - '*_controller'
