@@ -20,6 +20,7 @@ filters:
       - reporter
       - handler
       - listener_daemon
+      - listener
       - template
       - mailer
       - '*_controller'
