@@ -302,7 +302,7 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.22.0)
+    rubocop (1.22.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -361,7 +361,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
