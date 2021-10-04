@@ -13,4 +13,4 @@
 - $match:
     user.host: null
     app.name:
-      $regex: '^<%= Package.short_name %>'
+      $regex: '^<%= params[:package].short_name %>'

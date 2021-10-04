@@ -15,10 +15,11 @@ module Mulukhiya
 
     alias to_h values
 
-    def aggregate(name, params = {})
+    def self.aggregate(name, params = {})
       template = Template.new(File.join(Environment.dir, 'app/query/meisskey', "#{name}.yaml.erb"))
-      template.params = params
-      return collection.aggregate(YAML.parse(template.to_s))
+      template.params = Template.assign_values
+      params.each {|k, v| template[k] = v}
+      return collection.aggregate(YAML.safe_load(template.to_s))
     end
 
     private
