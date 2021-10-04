@@ -1,5 +1,5 @@
 - $sort:
-    createdAt: -2
+    createdAt: -1
 - $lookup:
     from: users
     localField: userId
@@ -13,4 +13,4 @@
 - $match:
     user.host: null
     app.name:
-      $regex: <%= Package.short_name %>
+      $regex: '^<%= Package.short_name %>'

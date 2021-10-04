@@ -15,6 +15,12 @@ module Mulukhiya
 
     alias to_h values
 
+    def aggregate(name, params = {})
+      template = Template.new(File.join(Environment.dir, 'app/query/meisskey', "#{name}.yaml.erb"))
+      template.params = params
+      return collection.aggregate(YAML.parse(template.to_s))
+    end
+
     private
 
     def method_missing(method, *args)
