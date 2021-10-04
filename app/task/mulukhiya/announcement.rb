@@ -5,10 +5,10 @@ module Mulukhiya
     namespace :announcement do
       desc 'update announcements'
       task :update do
-        if Environment.production?
-          AnnouncementWorker.perform_async
-        else
+        if Environment.development? || Environment.test?
           AnnouncementWorker.new.perform
+        else
+          AnnouncementWorker.perform_async
         end
       end
     end

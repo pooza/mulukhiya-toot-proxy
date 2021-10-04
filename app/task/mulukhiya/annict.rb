@@ -5,10 +5,10 @@ module Mulukhiya
     namespace :annict do
       desc 'crawl Annict'
       task :crawl do
-        if Environment.production?
-          AnnictPollingWorker.perform_async
-        else
+        if Environment.development? || Environment.test?
           AnnictPollingWorker.new.perform
+        else
+          AnnictPollingWorker.perform_async
         end
       end
     end

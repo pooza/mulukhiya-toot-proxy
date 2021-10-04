@@ -5,10 +5,10 @@ module Mulukhiya
     namespace :program do
       desc 'update programs'
       task :update do
-        if Environment.production?
-          ProgramUpdateWorker.perform_async
-        else
+        if Environment.development? || Environment.test?
           ProgramUpdateWorker.new.perform
+        else
+          ProgramUpdateWorker.perform_async
         end
       end
 

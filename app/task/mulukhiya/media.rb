@@ -20,10 +20,10 @@ module Mulukhiya
       namespace :file do
         desc 'clean media file cache'
         task :clean do
-          if Environment.production?
-            MediaCleaningWorker.perform_async
-          else
+          if Environment.development? || Environment.test?
             MediaCleaningWorker.new.perform
+          else
+            MediaCleaningWorker.perform_async
           end
         end
 
