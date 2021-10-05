@@ -41,6 +41,9 @@ module Mulukhiya
         return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2
       end
       raise 'Too large'
+    rescue => e
+      logger.error(error: e, size: size, attachment: id)
+      return size
     end
 
     def feed_entry
