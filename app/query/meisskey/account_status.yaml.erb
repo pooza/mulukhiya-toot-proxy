@@ -1,6 +1,6 @@
 - $match:
-    userId: <%= id %>
-		fileIds:
-		  $nin:
-			  - []
-				- null
+    userId: <%= params[:id] %>
+    fileIds:
+      $nin:
+        - []
+        - null

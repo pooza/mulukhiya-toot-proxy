@@ -2,14 +2,14 @@
     createdAt: -1
 - $lookup:
     from: users
-		localField: userId
-		foreignField: _id
-		as: user
+    localField: userId
+    foreignField: _id
+    as: user
 - $match:
     tags: <%= params[:tag] %>
-		visibility: <%= params[:visibility] %>
-		user._id:
-		  $ne: <%= params[:test_account]._id %>
+    visibility: <%= params[:visibility] %>
+    user._id:
+      $ne: <%= params[:test_account]._id %>
 <% if params[:local] -%>
 - $match:
     _user.host: null

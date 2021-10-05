@@ -92,20 +92,12 @@ module Mulukhiya
       end
 
       def self.statuses(page = 1)
-        page ||= 1
-        rows = Status.collection.aggregate([
-          {'$sort' => {'createdAt' => -1}},
-          {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
-          {'$match' => {
-            'fileIds' => {'$ne' => nil},
-            'user.isBot' => false,
-            '_user.host' => nil,
-            'visibility' => {'$in' => ['public', 'home']},
-          }},
-          {'$skip' => config['/feed/media/limit'] * (page - 1)},
-          {'$limit' => config['/feed/media/limit'] * page},
-        ])
-        return rows
+        return Status.aggregate('media_catalog', {
+          visibilities: [:public, :unlisted].map do |key|
+            [key, controller_class.visibility_name(key)]
+          end.to_h,
+          page: page || 1,
+        })
       end
 
       def self.collection
