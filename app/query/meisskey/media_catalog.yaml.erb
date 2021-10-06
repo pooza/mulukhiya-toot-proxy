@@ -1,10 +1,8 @@
-- $sort:
-    createdAt: -1
 - $lookup:
     from: users
     localField: userId
     foreignField: _id
-    as user
+    as: user
 - $match:
     fileIds:
       $ne: null
@@ -16,3 +14,5 @@
         - <%= params.dig(:visibilities, :unlisted) %>
 - $skip: <%= config['/feed/media/limit'] * (params[:page] - 1) %>
 - $limit: <%= config['/feed/media/limit'] * params[:page] %>
+- $sort:
+    createdAt: -1

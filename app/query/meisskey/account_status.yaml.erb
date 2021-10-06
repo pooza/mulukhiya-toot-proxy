@@ -1,5 +1,8 @@
+- $addFields:
+    userId_string:
+      $toString: $userId
 - $match:
-    userId: <%= params[:id] %>
+    userId_string: <%= params[:id] %>
     fileIds:
       $nin:
         - []
