@@ -92,12 +92,7 @@ module Mulukhiya
       end
 
       def self.statuses(page = 1)
-        return Status.aggregate('media_catalog', {
-          visibilities: [:public, :unlisted].map do |key|
-            [key, controller_class.visibility_name(key)]
-          end.to_h,
-          page: page || 1,
-        })
+        return Status.aggregate('media_catalog', {page: page || 1})
       end
 
       def self.collection

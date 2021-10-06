@@ -7,9 +7,12 @@
     as: user
 - $match:
     tags: <%= params[:tag] %>
-    visibility: <%= params[:visibility] %>
+    visibility: <%= controller_class.visibility_name(:public) %>
     user._id:
-      $ne: <%= params[:test_account]._id %>
+      $ne:
+        $convert:
+          input: <%= test_account._id %>
+          to: objectId
 <% if params[:local] -%>
     _user.host: null
 <% end -%>

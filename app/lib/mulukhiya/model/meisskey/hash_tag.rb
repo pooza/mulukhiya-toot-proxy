@@ -82,8 +82,6 @@ module Mulukhiya
       def notes(params = {})
         return Status.aggregate('hash_tag_notes', {
           tag: raw_name,
-          visibility: controller_class.visibility_name(:public),
-          test_account: test_account,
           local: params[:local],
           limit: params[:limit],
         })
