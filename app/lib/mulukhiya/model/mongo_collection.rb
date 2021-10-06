@@ -18,15 +18,7 @@ module Mulukhiya
     def self.aggregate(name, params = {})
       template = Template.new(File.join(Environment.dir, 'app/query/meisskey', "#{name}.yaml.erb"))
       template.params = params
-      query = YAML.safe_load(template.to_s)
-
-      ic query
-      collection.aggregate(query).each {|v| ic v} if name == 'account_status'
-
-      exit
-
-
-      return collection.aggregate(query)
+      return collection.aggregate(YAML.safe_load(template.to_s))
     end
 
     private

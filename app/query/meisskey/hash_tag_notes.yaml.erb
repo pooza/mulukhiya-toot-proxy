@@ -5,12 +5,12 @@
     as: user
 - $addFields:
     user._id_string:
-      $toString: $user._id
+      $toString: $users._id
 - $match:
     tags: <%= params[:tag] %>
-    visibility: <%= params[:visibility] %>
+    visibility: <%= controller_class.visibility_name(:public) %>
     user._id_string:
-      $ne: <%= params[:test_account]._id %>
+      $ne: <%= test_account._id %>
 <% if params[:local] -%>
     _user.host: null
 <% end -%>
