@@ -1,21 +1,21 @@
-- $sort:
-    createdAt: -1
 - $lookup:
     from: users
     localField: userId
     foreignField: _id
     as: user
+- $addFields:
+    user._id_string:
+      $toString: $user._id
 - $match:
     tags: <%= params[:tag] %>
-    visibility: <%= controller_class.visibility_name(:public) %>
-    user._id:
-      $ne:
-        $convert:
-          input: <%= test_account._id %>
-          to: objectId
+    visibility: <%= params[:visibility] %>
+    user._id_string:
+      $ne: <%= params[:test_account]._id %>
 <% if params[:local] -%>
     _user.host: null
 <% end -%>
 <% if params[:limit] -%>
 - $limit: <%= params[:limit] %>
 <% end -%>
+- $sort:
+    createdAt: -1

@@ -1,6 +1,9 @@
 - $addFields:
-    key:
-      $toObjectId: <%= params[:id] %>
+    userId_string:
+      $toString: $userId
 - $match:
-    userId:
-      $toObjectId: <%= params[:id] %>
+    userId_string: <%= params[:id] %>
+    fileIds:
+      $nin:
+        - []
+        - null

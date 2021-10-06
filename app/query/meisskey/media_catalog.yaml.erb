@@ -1,5 +1,3 @@
-- $sort:
-    createdAt: -1
 - $lookup:
     from: users
     localField: userId
@@ -16,3 +14,5 @@
         - <%= controller_class.visibility_name(:unlisted) %>
 - $skip: <%= config['/feed/media/limit'] * (params[:page] - 1) %>
 - $limit: <%= config['/feed/media/limit'] * params[:page] %>
+- $sort:
+    createdAt: -1
