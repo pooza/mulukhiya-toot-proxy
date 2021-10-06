@@ -1,0 +1,16 @@
+- $sort:
+    createdAt: -1
+- $lookup:
+    from: users
+    localField: userId
+    foreignField: _id
+    as: user
+- $lookup:
+    from: apps
+    localField: appId
+    foreignField: _id
+    as: app
+- $match:
+    user.host: null
+    app.name:
+      $regex: '^<%= package_class.short_name %>'

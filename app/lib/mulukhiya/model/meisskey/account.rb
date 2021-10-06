@@ -89,10 +89,7 @@ module Mulukhiya
       def attachments
         unless @attachments
           @attachments = []
-          rows = Status.collection.aggregate([
-            {'$match' => {'userId' => _id, 'fileIds' => {'$nin' => [[], nil]}}},
-          ])
-          rows.each do |row|
+          Status.aggregate('account_status', {id: _id}).each do |row|
             @attachments.concat(row[:_files].map {|f| Attachment[f[:_id]]})
           end
         end

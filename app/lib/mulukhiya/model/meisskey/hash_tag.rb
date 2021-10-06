@@ -45,17 +45,10 @@ module Mulukhiya
 
       def self.favorites
         favorites = {}
-        accounts = Account.collection.aggregate([
-          {'$match' => {
-            'host' => nil,
-            'isBot' => {'$ne' => true},
-            'tags' => {'$nin' => [[], nil]},
-          }},
-        ])
-        accounts.each do |account|
-          account.to_h['tags'].each do |v|
-            favorites[v] ||= 0
-            favorites[v] += 1
+        Account.aggregate('tag_owners').map {|v| v.to_h['tags']}.each do |tags|
+          tags.each do |tag|
+            favorites[tag] ||= 0
+            favorites[tag] += 1
           end
         end
         return favorites.sort_by {|_, v| v}.reverse.to_h
@@ -87,18 +80,11 @@ module Mulukhiya
       private
 
       def notes(params = {})
-        criteria = [
-          {'$sort' => {'createdAt' => -1}},
-          {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
-          {'$match' => {
-            'tags' => raw_name,
-            'visibility' => 'public',
-            'user._id' => {'$ne' => test_account._id},
-          }},
-        ]
-        criteria.push('$match' => {'_user.host' => nil}) if params[:local]
-        criteria.push('$limit' => params[:limit])
-        return Status.collection.aggregate(criteria)
+        return Status.aggregate('hash_tag_notes', {
+          tag: raw_name,
+          local: params[:local],
+          limit: params[:limit],
+        })
       end
 
       def collection_name

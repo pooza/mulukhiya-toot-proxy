@@ -20,6 +20,8 @@ filters:
       - reporter
       - handler
       - listener_daemon
+      - listener
+      - render_storage
       - template
       - mailer
       - '*_controller'
@@ -94,6 +96,7 @@ filters:
   - name: listener
     cases:
       - listener_daemon
+      - listener
   - name: livecure
     cases:
       - program

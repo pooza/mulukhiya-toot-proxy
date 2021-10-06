@@ -64,15 +64,7 @@ module Mulukhiya
 
       def self.webhook_entries
         return enum_for(__method__) unless block_given?
-        AccessToken.collection.aggregate([
-          {'$sort' => {'createdAt' => -1}},
-          {'$lookup' => {from: 'users', localField: 'userId', foreignField: '_id', as: 'user'}},
-          {'$lookup' => {from: 'apps', localField: 'appId', foreignField: '_id', as: 'app'}},
-          {'$match' => {
-            'user.host' => nil,
-            'app.name' => {'$regex' => "^#{Package.short_name}"},
-          }},
-        ]).each do |row|
+        AccessToken.aggregate('webhook_entries').each do |row|
           yield AccessToken[row['_id']].to_h
         end
       end

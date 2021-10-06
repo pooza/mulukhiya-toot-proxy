@@ -25,7 +25,7 @@ FROM
       INNER JOIN "user" ON note."userId" = "user".id
     WHERE (0 < array_length(note."fileIds", 1))
       AND (note."userHost" IS null)
-      AND (note."visibility" IN ('public', 'home'))
+      AND (note."visibility" IN ('<%= controller_class.visibility_name(:public) %>', '<%= controller_class.visibility_name(:unlisted) %>'))
       AND ("user"."isBot" = false)
       AND ("user".id <> '<%= test_account.id %>')
     GROUP BY

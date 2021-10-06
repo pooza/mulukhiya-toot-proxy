@@ -1,0 +1,18 @@
+- $lookup:
+    from: users
+    localField: userId
+    foreignField: _id
+    as: user
+- $match:
+    fileIds:
+      $ne: null
+    user.isBot: false
+    _user.host: null
+    visibility:
+      $in:
+        - <%= controller_class.visibility_name(:public) %>
+        - <%= controller_class.visibility_name(:unlisted) %>
+- $skip: <%= config['/feed/media/limit'] * (params[:page] - 1) %>
+- $limit: <%= config['/feed/media/limit'] * params[:page] %>
+- $sort:
+    createdAt: -1

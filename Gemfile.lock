@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 7e2b9dbcf2cb7e158766557e4f789e895baaffa8
+  revision: 1efb1d619cd36af8d7ef76f81474ecbf1575e511
   specs:
-    ginseng-core (1.11.5)
+    ginseng-core (1.11.6)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -216,7 +216,7 @@ GEM
     json (2.5.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
-    jwt (2.2.3)
+    jwt (2.3.0)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -232,7 +232,7 @@ GEM
     mini_mime (1.1.1)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
-    mongo (2.15.1)
+    mongo (2.16.0)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
     multi_json (1.15.0)
@@ -302,7 +302,7 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.22.0)
+    rubocop (1.22.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
