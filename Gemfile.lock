@@ -355,13 +355,12 @@ GEM
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
-    test-unit (3.4.7)
+    test-unit (3.4.8)
       power_assert
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
