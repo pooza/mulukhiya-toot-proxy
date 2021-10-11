@@ -229,7 +229,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_magick (4.11.0)
-    mini_mime (1.1.1)
+    mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
     mongo (2.16.0)
@@ -355,7 +355,7 @@ GEM
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
-    test-unit (3.4.7)
+    test-unit (3.4.8)
       power_assert
     thwait (0.2.0)
       e2mmap
