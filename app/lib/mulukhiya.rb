@@ -80,10 +80,13 @@ module Mulukhiya
     finder.exec.each {|f| require f}
   end
 
+  Dir.chdir(dir)
+  ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
   Bundler.require
   loader.setup
   setup_bootsnap
   setup_sidekiq
   setup_debug
+  ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
 end
