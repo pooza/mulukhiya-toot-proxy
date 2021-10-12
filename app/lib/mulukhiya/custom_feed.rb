@@ -1,40 +1,57 @@
 module Mulukhiya
   class CustomFeed
-    include Singleton
     include Package
-    attr_accessor :storage
+    include SNSMethods
+    attr_reader :params
 
-    def update
-      CustomFeed.entries.each do |entry|
-        create(entry).cache
-      rescue => e
-        logger.error(error: e, feed: entry)
-      end
+    def initialize(params)
+      @params = params.deep_symbolize_keys
+      @params[:dir] ||= Environment.dir
     end
 
-    def create(entry)
-      renderer = RSS20FeedRenderer.new(entry)
-      renderer.command = CommandLine.create(entry)
-      return renderer
+    def uri
+      @uri ||= sns_class.new.create_uri(fullpath)
+      return @uri
+    end
+
+    def path
+      return File.join('/', params[:path])
+    end
+
+    def fullpath
+      return File.join('/mulukhiya/feed', params[:path])
+    end
+
+    def title
+      return params[:title] || path
+    end
+
+    def update
+      renderer.cache
+    end
+
+    def command
+      @command ||= CommandLine.create(params)
+      return @command
+    end
+
+    def renderer
+      unless @renderer
+        @renderer = RSS20FeedRenderer.new(params)
+        @renderer.command = command
+      end
+      return @renderer
     end
 
     def self.count
-      return entries.count
+      return all.count
     end
 
-    def self.entries
-      return config['/feed/custom'].map do |entry|
-        entry.deep_stringify_keys!
-        entry['dir'] ||= Environment.dir
-        entry['title'] ||= entry['path']
-        entry
+    def self.all
+      return enum_for(__method__) unless block_given?
+      config['/feed/custom'].each do |entry|
+        yield CustomFeed.new(entry)
       end
-    end
-
-    private
-
-    def initialize
-      @storage = RenderStorage.new
     end
   end
 end

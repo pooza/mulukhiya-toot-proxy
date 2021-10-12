@@ -23,5 +23,9 @@ module Mulukhiya
         push(row)
       end
     end
+
+    def self.uri
+      return sns_class.new.create_uri('/mulukhiya/feed/media')
+    end
   end
 end

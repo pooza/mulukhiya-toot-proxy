@@ -7,7 +7,7 @@ module Mulukhiya
 
     def perform
       return unless controller_class.feed?
-      CustomFeed.instance.update
+      CustomFeed.all(&:update)
     end
   end
 end

@@ -1,12 +1,6 @@
 #!/usr/bin/env ruby
-dir = File.expand_path('..', __dir__)
-$LOAD_PATH.unshift(File.join(dir, 'app/lib'))
-ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
+$LOAD_PATH.unshift(File.join(File.expand_path('..', __dir__), 'app/lib'))
 ENV['RAKE'] = nil
 
-Dir.chdir(dir)
 require 'mulukhiya'
-module Mulukhiya
-  ENV['RACK_ENV'] ||= Environment.type
-  SidekiqDaemon.spawn!
-end
+Mulukhiya::SidekiqDaemon.spawn!

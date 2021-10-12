@@ -16,12 +16,12 @@ html lang='ja'
             li
               h4 メディアファイル
               .link
-                a href='/mulukhiya/feed/media' target='_blank' rel='noreferrer' = slim.create_uri('/mulukhiya/feed/media')
-          - Mulukhiya::CustomFeed.entries.each do |entry|
+                a href='/mulukhiya/feed/media' target='_blank' rel='noreferrer' = Mulukhiya::MediaFeedRenderer.uri
+          - Mulukhiya::CustomFeed.all do |feed|
             li
-              h4 #{entry['title']}
+              h4 #{feed.title}
               .link
-                a href=File.join('/mulukhiya/feed', entry['path']) target='_blank' rel='noreferrer' = slim.create_uri(File.join('/mulukhiya/feed', entry['path']))
+                a href=feed.fullpath target='_blank' rel='noreferrer' = feed.uri
         h3 ハッシュタグ
         ul.links
           li v-for='feed in feeds'

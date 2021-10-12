@@ -1,11 +1,59 @@
 module Mulukhiya
   class CustomAPI
-    include Singleton
     include Package
+    include SNSMethods
+    attr_reader :params
 
-    def create(entry, params = {})
-      command = CommandLine.create(entry)
-      command.args.push(params[command.args.pop]) if command.args.last.is_a?(Symbol)
+    def initialize(params)
+      @params = params.deep_symbolize_keys
+      @params[:dir] ||= Environment.dir
+    end
+
+    def id
+      return path.to_hashtag_base
+    end
+
+    def uri
+      @uri ||= sns_class.new.create_uri(fullpath)
+      return @uri
+    end
+
+    def path
+      return File.join('/', params[:path])
+    end
+
+    def fullpath
+      return File.join('/mulukhiya/api', params[:path])
+    end
+
+    def args
+      return params[:command].select {|v| v.is_a?(Symbol)}
+    end
+
+    def args?
+      return args.present?
+    end
+
+    def description
+      return params[:description]
+    end
+
+    def to_h
+      return params.merge(
+        id: id,
+        fullpath: fullpath,
+        args: args,
+      )
+    end
+
+    def create_command(args = {})
+      command = CommandLine.create(params)
+      command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
+      return command
+    end
+
+    def create_renderer(args = {})
+      command = create_command(args)
       command.exec
       raise Ginseng::RequestError, command.stderr unless command.status.zero?
       renderer = Ginseng::Web::RawRenderer.new
@@ -19,24 +67,23 @@ module Mulukhiya
       return renderer
     end
 
+    def self.present?
+      return config['/api/custom'].present?
+    end
+
+    def self.to_json
+      return all.map(&:to_h).to_json
+    end
+
     def self.count
-      return entries.count
+      return all.count
     end
 
-    def self.entries
-      return (config['/api/custom'] || []).map do |entry|
-        entry.deep_stringify_keys!
-        entry['dir'] ||= Environment.dir
-        entry['title'] ||= entry['path']
-        entry['params'] = entry['command'].select {|v| v.is_a?(Symbol)}
-        entry['id'] = entry['path'].to_hashtag_base
-        entry
+    def self.all
+      return enum_for(__method__) unless block_given?
+      config['/api/custom'].each do |entry|
+        yield CustomAPI.new(entry)
       end
-    end
-
-    private
-
-    def initialize
     end
   end
 end

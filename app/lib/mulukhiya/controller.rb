@@ -41,24 +41,7 @@ module Mulukhiya
       return nil
     end
 
-    def command
-      unless @command
-        entry = command_entries.map(&:deep_stringify_keys).find do |v|
-          v['path'] == request.path.sub(Regexp.new("^#{path_prefix}/"), '')
-        end
-        @command = CommandLine.create(entry) if entry
-      end
-      return @command
-    rescue => e
-      logger.error(error: e, entry: entry)
-      return nil
-    end
-
     private
-
-    def command_entries
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
-    end
 
     def path_prefix
       return '' if Environment.test?

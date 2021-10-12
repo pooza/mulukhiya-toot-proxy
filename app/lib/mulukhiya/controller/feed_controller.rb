@@ -25,13 +25,9 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def command_entries
-      return CustomFeed.instance
-    end
-
-    CustomFeed.entries.each do |entry|
-      get File.join('/', entry['path']) do
-        @renderer = CustomFeed.instance.create(entry)
+    CustomFeed.all do |feed|
+      get feed.path do
+        @renderer = feed.renderer
         return @renderer.to_s
       rescue => e
         logger.error(error: e)
