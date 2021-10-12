@@ -4,8 +4,8 @@ module Mulukhiya
     attr_reader :params
 
     def initialize(params)
-      @params = params.deep_stringify_keys
-      @params['dir'] ||= Environment.dir
+      @params = params.deep_symbolize_keys
+      @params[:dir] ||= Environment.dir
     end
 
     def id
@@ -13,15 +13,15 @@ module Mulukhiya
     end
 
     def path
-      return File.join('/', params['path'])
+      return File.join('/', params[:path])
     end
 
     def fullpath
-      return File.join('/mulukhiya/api', path)
+      return File.join('/mulukhiya/api', params[:path])
     end
 
     def args
-      return params['command'].select {|v| v.is_a?(Symbol)}
+      return params[:command].select {|v| v.is_a?(Symbol)}
     end
 
     def args?
@@ -29,7 +29,7 @@ module Mulukhiya
     end
 
     def description
-      return params['description']
+      return params[:description]
     end
 
     def to_h
