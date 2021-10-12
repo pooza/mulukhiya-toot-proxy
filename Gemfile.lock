@@ -71,10 +71,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/rspotify.git
-  revision: d2ce609531c54e8fd6f684cb8834040ea5fbe016
+  revision: d8f8bfae192322c976eacf2ce9bd0a62d780ef0a
   branch: master.pooza
   specs:
-    rspotify (2.10.2)
+    rspotify (2.10.3)
       addressable (~> 2.8)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.1)
@@ -361,7 +361,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
