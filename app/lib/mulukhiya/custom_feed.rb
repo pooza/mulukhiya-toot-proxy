@@ -6,7 +6,6 @@ module Mulukhiya
     def initialize(params)
       @params = params.deep_stringify_keys
       @params['dir'] ||= Environment.dir
-      @params['title'] ||= entry['path']
     end
 
     def path
@@ -18,7 +17,7 @@ module Mulukhiya
     end
 
     def title
-      return params['title']
+      return params['title'] || params['path']
     end
 
     def update

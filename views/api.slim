@@ -163,21 +163,21 @@ html lang='ja'
               .field-update-button-container
                 button @click='getHealth' 実行
                 pre.result v-if='result.health' {{result.health}}
-        .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.entries.to_json
-        - if Mulukhiya::CustomAPI.entries.present?
+        .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.to_json
+        - if Mulukhiya::CustomAPI.present?
           li
             h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
             vue-slide-up-down :active='layout.details.custom'
-              - Mulukhiya::CustomAPI.entries.each do |entry|
+              - Mulukhiya::CustomAPI.all do |api|
                 .endpoint-container
-                  .link GET {{endpoints.#{entry['id']}}}
-                  - entry['params'].each do |param|
-                    v-select :options='choices.#{entry['id']}_#{param}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' v-if='choices.#{entry['id']}_#{param}'
-                    input type='text' placeholder='#{param.to_s}' @input='onInputCustomAPI("#{entry['id']}", "#{param}")' @keydown.enter='execCustomAPI("#{entry['id']}")' v-else=''
-                  .link-description = entry['description']
+                  .link GET {{endpoints.#{api.id}}}
+                  - api.args.each do |arg|
+                    v-select :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' v-if='choices.#{api.id}_#{arg}'
+                    input type='text' placeholder='#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' @keydown.enter='execCustomAPI("#{api.id}")' v-else=''
+                  .link-description = api.description
                   .field-update-button-container
-                    button @click='execCustomAPI("#{entry['id']}")' 実行
-                    pre.result v-if='result.#{entry['id']}' {{result.#{entry['id']}}}
+                    button @click='execCustomAPI("#{api.id}")' 実行
+                    pre.result v-if='result.#{api.id}' {{result.#{api.id}}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -248,7 +248,7 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
-            entry.params.map(key => {params[key] = ''})
+            entry.args.map(key => {params[key] = ''})
             Vue.set(this.entries, entry.id, entry)
             if (entry.choices) {
               Object.keys(entry.choices).map(k => {
@@ -258,7 +258,7 @@ html lang='ja'
               })
             }
             Vue.set(this.query_params, entry.id, params)
-            Vue.set(this.endpoints, entry.id, `/mulukhiya/api/${entry.path}`)
+            Vue.set(this.endpoints, entry.id, `${entry.fullpath}`)
           })
         },
         methods: {

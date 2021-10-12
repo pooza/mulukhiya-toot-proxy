@@ -277,13 +277,9 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def command_entries
-      return CustomAPI.instance
-    end
-
-    CustomAPI.entries.each do |entry|
-      get File.join('/', entry['path']) do
-        @renderer = CustomAPI.instance.create(entry, params)
+    CustomAPI.all do |api|
+      get api.path do
+        @renderer = api.create_renderer(params)
         return @renderer.to_s
       rescue => e
         logger.error(error: e)
