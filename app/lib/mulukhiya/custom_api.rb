@@ -1,6 +1,7 @@
 module Mulukhiya
   class CustomAPI
     include Package
+    include SNSMethods
     attr_reader :params
 
     def initialize(params)
@@ -10,6 +11,11 @@ module Mulukhiya
 
     def id
       return path.to_hashtag_base
+    end
+
+    def uri
+      @uri ||= sns_class.new.create_uri(fullpath)
+      return @uri
     end
 
     def path
@@ -77,8 +83,6 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       config['/api/custom'].each do |entry|
         yield CustomAPI.new(entry)
-      rescue => e
-        logger.error(error: e, api: entry)
       end
     end
   end

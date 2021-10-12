@@ -12,6 +12,13 @@ module Mulukhiya
       end
     end
 
+    def test_uri
+      CustomAPI.all.reject(&:args?).each do |api|
+        assert_kind_of(Ginseng::URI, api.uri)
+        assert_kind_of(HTTParty::Response, http.get(api.uri))
+      end
+    end
+
     def test_path
       CustomAPI.all do |api|
         assert_kind_of(String, api.path)
