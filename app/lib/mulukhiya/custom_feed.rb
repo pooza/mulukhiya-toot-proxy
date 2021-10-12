@@ -4,20 +4,20 @@ module Mulukhiya
     attr_reader :params
 
     def initialize(params)
-      @params = params.deep_stringify_keys
-      @params['dir'] ||= Environment.dir
+      @params = params.deep_symbolize_keys
+      @params[:dir] ||= Environment.dir
     end
 
     def path
-      return File.join('/', params['path'])
+      return File.join('/', params[:path])
     end
 
     def fullpath
-      return File.join('/mulukhiya/feed', path)
+      return File.join('/mulukhiya/feed', params[:path])
     end
 
     def title
-      return params['title'] || params['path']
+      return params[:title] || path
     end
 
     def update
