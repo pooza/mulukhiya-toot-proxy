@@ -10,6 +10,13 @@ module Mulukhiya
       assert_kind_of(Integer, CustomFeed.count)
     end
 
+    def test_uri
+      CustomFeed.all do |feed|
+        assert_kind_of(Ginseng::URI, feed.uri)
+        assert_kind_of(HTTParty::Response, http.get(feed.uri))
+      end
+    end
+
     def test_path
       CustomFeed.all do |feed|
         assert_kind_of(String, feed.path)

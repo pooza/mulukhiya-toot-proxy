@@ -1,11 +1,17 @@
 module Mulukhiya
   class CustomFeed
     include Package
+    include SNSMethods
     attr_reader :params
 
     def initialize(params)
       @params = params.deep_symbolize_keys
       @params[:dir] ||= Environment.dir
+    end
+
+    def uri
+      @uri ||= sns_class.new.create_uri(fullpath)
+      return @uri
     end
 
     def path
@@ -45,8 +51,6 @@ module Mulukhiya
       return enum_for(__method__) unless block_given?
       config['/feed/custom'].each do |entry|
         yield CustomFeed.new(entry)
-      rescue => e
-        logger.error(error: e, feed: entry)
       end
     end
   end
