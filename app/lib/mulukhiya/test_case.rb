@@ -28,6 +28,11 @@ module Mulukhiya
       return nil
     end
 
+    def http
+      @http ||= HTTP.new
+      return @http
+    end
+
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
