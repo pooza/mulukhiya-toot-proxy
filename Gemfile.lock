@@ -270,7 +270,7 @@ GEM
     pg (1.2.3)
     power_assert (2.0.1)
     public_suffix (4.0.6)
-    puma (5.5.0)
+    puma (5.5.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.5.2)
@@ -361,7 +361,6 @@ GEM
       e2mmap
     tilt (2.0.10)
     time (0.1.0)
-      date
     timecop (0.9.4)
     timeout (0.1.1)
     tzinfo (2.0.4)
