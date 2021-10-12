@@ -64,8 +64,8 @@ module Mulukhiya
     end
 
     def test_costom_endpoints
-      CustomFeed.entries.each do |entry|
-        get File.join('/', entry['path'])
+      CustomFeed.all do |feed|
+        get feed.path
         assert(last_response.ok?)
         assert_equal(last_response.content_type, 'application/rss+xml; charset=UTF-8')
       end
