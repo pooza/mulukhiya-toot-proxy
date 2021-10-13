@@ -6,7 +6,7 @@ module Mulukhiya
       @file = media_class.new(payload[image_field][:tempfile].path)
       return unless convertable?
       return unless @dest = convert
-      payload[image_field][:org_tempfile] ||= payload[image_field][:tempfile]
+      payload[image_field][:org_tempfile] ||= payload.dig(image_field, :tempfile)
       payload[image_field][:tempfile] = @dest
     rescue => e
       logger.error(error: e)

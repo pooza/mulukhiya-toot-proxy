@@ -33,7 +33,7 @@ module Mulukhiya
     def test_note_zenkaku
       header 'Content-Type', 'application/json'
       post '/api/notes/create', {status_field => '！!！!！', 'i' => test_token}.to_json
-      assert(JSON.parse(last_response.body)['createdNote']['text'].include?('！!！!！'))
+      assert(JSON.parse(last_response.body).dig('createdNote', 'text').include?('！!！!！'))
     end
 
     def test_webhook_entries

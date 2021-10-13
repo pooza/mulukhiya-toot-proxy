@@ -35,8 +35,8 @@ module Mulukhiya
 
     post '/api/drive/files/create' do
       Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
-      @reporter.response = @sns.upload(params[:file][:tempfile].path, {
-        filename: params[:file][:filename],
+      @reporter.response = @sns.upload(params.dig(:file, :tempfile).path, {
+        filename: params.dig(:file, :filename),
       })
       Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
       @renderer.message = JSON.parse(@reporter.response.body)

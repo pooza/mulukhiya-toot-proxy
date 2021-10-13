@@ -49,7 +49,7 @@ module Mulukhiya
       reviewed_works.each do |work|
         uri = api_service.create_uri('/v1/reviews')
         uri.query_values = {
-          filter_work_id: work['work']['id'],
+          filter_work_id: work.dig('work', 'id'),
           fields: config['/annict/api/reviews/fields'].join(','),
           page: 1,
           per_page: config['/annict/api/reviews/limit'],

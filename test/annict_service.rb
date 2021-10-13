@@ -21,8 +21,8 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.records)
       @service.records do |record|
         assert_kind_of(Hash, record)
-        assert_kind_of(String, record['work']['title'])
-        assert_kind_of([Float, NilClass], record['episode']['number'])
+        assert_kind_of(String, record.dig('work', 'title'))
+        assert_kind_of([Float, NilClass], record.dig('episode', 'number'))
         uri = Ginseng::URI.parse(record.dig('work', 'images', 'recomended_url'))
         assert(uri.absolute?) if uri
       end
@@ -38,7 +38,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.reviewed_works)
       @service.reviewed_works do |work|
         assert_kind_of(Hash, work)
-        assert_kind_of(Integer, work['work']['id'])
+        assert_kind_of(Integer, work.dig('work', 'id'))
       end
     end
 
@@ -47,7 +47,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.reviews)
       @service.reviews do |review|
         assert_kind_of(Hash, review)
-        assert_kind_of(String, review['work']['title'])
+        assert_kind_of(String, review.dig('work', 'title'))
         uri = Ginseng::URI.parse(review.dig('work', 'images', 'recomended_url'))
         assert(uri.absolute?) if uri
       end

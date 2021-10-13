@@ -4,7 +4,7 @@ module Mulukhiya
     include SNSMethods
 
     def local?
-      return true if note['user']['host'].empty?
+      return true if note.dig('user', 'host').empty?
       return true if acct.host == Environment.domain_name
       return false
     rescue => e
