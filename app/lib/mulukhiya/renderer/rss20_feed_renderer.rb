@@ -39,11 +39,12 @@ module Mulukhiya
     private
 
     def fetch_image(uri)
+      return nil unless uri
       metadata_storage.push(uri) unless metadata_storage.key?(uri)
       return metadata_storage[uri]
     rescue => e
       logger.error(error: e)
-      return super
+      return {}
     end
   end
 end
