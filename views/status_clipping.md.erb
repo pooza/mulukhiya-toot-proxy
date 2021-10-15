@@ -1,6 +1,6 @@
 <%# encoding: UTF-8 -%>
 ## アカウント
-[<%= params[:account][:display_name] %>](<%= params[:account][:url] %>)
+[<%= params.dig(:account, :display_name) %>](<%= params.dig(:account, :url)%>)
 <% if params[:status] -%>
 ## 本文
 <%= params[:status] %>
