@@ -114,8 +114,6 @@ crypt:
   salt: mulukhiya
 environment: development
 feed:
-  cache:
-    ttl: 600
   custom: []
   media:
     limit: 100
@@ -1013,8 +1011,6 @@ websocket:
   retry:
     seconds: 5
 webui:
-  cache:
-    ttl: 86400
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
