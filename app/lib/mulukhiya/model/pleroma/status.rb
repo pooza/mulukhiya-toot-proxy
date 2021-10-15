@@ -17,7 +17,7 @@ module Mulukhiya
 
       def acct
         unless @acct
-          @acct = Acct.new(data[:account][:acct])
+          @acct = Acct.new(data.dig(:account, :acct))
           @acct.host ||= Environment.domain_name
         end
         return @acct

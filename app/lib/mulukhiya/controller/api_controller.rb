@@ -234,7 +234,7 @@ module Mulukhiya
           dic[word][:word] = word
           dic[word][:short] = TaggingDictionary.short?(word)
           dic[word][:words].unshift(word)
-          dic[word][:tags] = TagContainer.new(dic[word][:words]).create_tags
+          dic[word][:tags] = TagContainer.new(dic.dig(word, :words)).create_tags
         rescue => e
           logger.error(error: e, entry: entry)
         end
