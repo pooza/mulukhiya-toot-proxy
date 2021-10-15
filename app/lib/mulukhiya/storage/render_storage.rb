@@ -1,5 +1,12 @@
 module Mulukhiya
   class RenderStorage < Redis
+    attr_accessor :ttl
+
+    def initialize(params = {})
+      super
+      @ttl = 300
+    end
+
     def get(key)
       return nil unless entry = super
       return JSON.parse(entry) rescue entry
@@ -22,10 +29,6 @@ module Mulukhiya
 
     def create_key(key)
       return super(key.to_s.adler32)
-    end
-
-    def ttl
-      return config['/feed/cache/ttl']
     end
 
     def prefix

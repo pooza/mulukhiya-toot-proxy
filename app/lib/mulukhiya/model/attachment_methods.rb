@@ -18,21 +18,12 @@ module Mulukhiya
     end
 
     def meta
-      unless @http
-        @http = HTTP.new
-        @http.retry_limit = 1
-      end
-      File.write(path, @http.get(uri)) unless File.exist?(path)
-      redis = MediaMetadataStorage.new
-      redis.push(path) unless redis[path]
-      return redis[path]
+      storage = MediaMetadataStorage.new
+      storage.push(uri) unless storage.key?(uri)
+      return storage[uri]
     rescue => e
       logger.error(error: e, path: path)
       return nil
-    end
-
-    def path
-      return File.join(Environment.dir, 'tmp/media', id.to_s.adler32)
     end
 
     def size_str

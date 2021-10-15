@@ -114,6 +114,8 @@ crypt:
   salt: mulukhiya
 environment: development
 feed:
+  cache:
+    ttl: 600
   custom: []
   media:
     limit: 100
