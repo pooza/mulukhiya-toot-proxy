@@ -21,7 +21,7 @@ module Mulukhiya
 
     post %r{/api/v([12])/media} do
       Event.new(:pre_upload, {reporter: @reporter, sns: @sns}).dispatch(params)
-      @reporter.response = @sns.upload(params[:file][:tempfile].path, {
+      @reporter.response = @sns.upload(params.dig(:file, :tempfile).path, {
         version: params[:captures].first.to_i,
       })
       Event.new(:post_upload, {reporter: @reporter, sns: @sns}).dispatch(params)

@@ -1,20 +1,30 @@
 module Mulukhiya
   class MediaMetadataStorage < Redis
-    def get(path)
-      return nil unless entry = super
+    attr_reader :http
+
+    def initialize(params = {})
+      super
+      @http = HTTP.new
+      @http.retry_limit = 1
+    end
+
+    def get(uri)
+      return supernil unless entry = super(uri)
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       logger.error(error: e, key: key)
       return nil
     end
 
-    def push(path)
-      path = path.path if path.is_a?(File)
-      setex(path, ttl, MediaFile.new(path).file.values.to_json)
+    def set(uri, value)
+      setex(uri, ttl, value.to_json)
     end
 
-    def create_key(key)
-      return super(File.read(key).adler32)
+    def push(uri)
+      path = File.join(Environment.dir, 'tmp/media', uri.to_s.adler32)
+      File.write(path, http.get(uri)) unless File.exist?(path)
+      values = MediaFile.new(path).file.values.merge(url: uri.to_s)
+      set(uri, values)
     end
 
     def ttl

@@ -740,7 +740,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.10.2
+  version: 4.10.3
 parser:
   note:
     fields:
@@ -938,7 +938,7 @@ sidekiq:
       every: 10m
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
-      cron: 2 4 * * *
+      cron: 2 3 * * *
 songwhip:
   urls:
     api: https://songwhip.com
@@ -1013,8 +1013,6 @@ websocket:
   retry:
     seconds: 5
 webui:
-  cache:
-    ttl: 86400
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js

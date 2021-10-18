@@ -7,6 +7,7 @@ module Mulukhiya
         subtype: subtype,
         duration: duration,
         size: size,
+        length: size,
       }
     end
 

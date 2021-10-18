@@ -31,7 +31,7 @@ module Mulukhiya
       cnt ||= 0
       categories.each do |category|
         response = @vacuum.search_items(keywords: keyword, search_index: category)
-        items = JSON.parse(response.to_s)['SearchResult']['Items']
+        items = JSON.parse(response.to_s).dig('SearchResult', 'Items')
         next unless items.present?
         return items.first['ASIN']
       end
@@ -48,7 +48,7 @@ module Mulukhiya
       cnt ||= 0
       unless item = @storage[asin]
         response = @vacuum.get_items(item_ids: [asin], resources: config['/amazon/resources'])
-        item = JSON.parse(response.to_s)['ItemsResult']['Items'].first
+        item = JSON.parse(response.to_s).dig('ItemsResult', 'Items').first
         @storage[asin] = item
       end
       return item

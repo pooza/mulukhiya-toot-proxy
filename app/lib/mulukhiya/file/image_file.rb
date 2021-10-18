@@ -8,6 +8,7 @@ module Mulukhiya
         width: width,
         height: height,
         size: size,
+        length: size,
       }
     end
 

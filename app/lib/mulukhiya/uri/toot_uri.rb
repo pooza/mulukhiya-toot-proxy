@@ -4,7 +4,7 @@ module Mulukhiya
     include SNSMethods
 
     def local?
-      return Ginseng::URI.parse(toot['account']['url']).host == Environment.domain_name
+      return Ginseng::URI.parse(toot.dig('account', 'url')).host == Environment.domain_name
     rescue => e
       logger.error(error: e)
       return false
