@@ -938,7 +938,7 @@ sidekiq:
       every: 10m
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
-      cron: 2 4 * * *
+      cron: 2 3 * * *
 songwhip:
   urls:
     api: https://songwhip.com
