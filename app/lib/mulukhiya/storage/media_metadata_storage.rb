@@ -8,32 +8,23 @@ module Mulukhiya
       @http.retry_limit = 1
     end
 
-    def get(path)
-      return nil unless entry = super
+    def get(uri)
+      return supernil unless entry = super(uri)
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       logger.error(error: e, key: key)
       return nil
     end
 
-    def push(key)
-      if key.is_a?(Ginseng::URI)
-        path = File.join(Environment.dir, 'tmp/media', key.to_s.adler32)
-        File.write(path, http.get(key)) unless File.exist?(path)
-        values = MediaFile.new(path).file.values.merge(url: key.to_s)
-      else
-        key = key.path if key.is_a?(File)
-        values = MediaFile.new(key).file.values
-      end
-      setex(key, ttl, values.to_json)
+    def set(uri, value)
+      setex(uri, ttl, value.to_json)
     end
 
-    def create_key(key)
-      if key.is_a?(Ginseng::URI)
-        key = File.join(Environment.dir, 'tmp/media', key.to_s.adler32)
-        File.write(path, http.get(key)) unless File.exist?(key)
-      end
-      return super(File.read(key).adler32)
+    def push(uri)
+      path = File.join(Environment.dir, 'tmp/media', uri.to_s.adler32)
+      File.write(path, http.get(uri)) unless File.exist?(path)
+      values = MediaFile.new(path).file.values.merge(url: uri.to_s)
+      set(uri, values)
     end
 
     def ttl
