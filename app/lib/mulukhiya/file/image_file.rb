@@ -31,10 +31,10 @@ module Mulukhiya
       @type ||= super
       @type ||= detail_info.match(/\s+Mime\stype:\s*(.*)$/i)[1]
       return @type
-    rescue NoMethodError
-      return nil
     rescue => e
       logger.error(error: e, file: path)
+      @type = super
+      return @type
     end
 
     def mediatype
