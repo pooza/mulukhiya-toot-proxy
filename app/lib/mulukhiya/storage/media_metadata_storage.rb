@@ -25,9 +25,6 @@ module Mulukhiya
       File.write(path, http.get(uri)) unless File.exist?(path)
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
       set(uri, values)
-    rescue Ginseng::GatewayError => e
-      logger.error(error: e, url: uri.to_s)
-      set(uri, {})
     end
 
     def ttl
