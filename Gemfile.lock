@@ -1,16 +1,17 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: f735e36331265d8d497ece4d4beaa6f09861db6f
+  revision: 809981d80d46f56326a9e73cfc93b3d5f0bf5cc9
   specs:
-    ginseng-core (1.11.7)
+    ginseng-core (1.11.8)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
       daemon-spawn
       date
       erb
+      etc
       facets
-      fileutils (= 1.5.0)
+      fileutils
       find
       httparty
       json-schema
@@ -25,7 +26,6 @@ GIT
       securerandom
       set
       time
-      unicode
       yajl-ruby
       zeitwerk (>= 2.4.0)
       zlib
@@ -160,6 +160,7 @@ GEM
     erubi (1.10.0)
     et-orbi (1.2.5)
       tzinfo
+    etc (1.3.0)
     eventmachine (1.2.7)
     facets (3.1.0)
     faraday (1.8.0)
@@ -213,7 +214,7 @@ GEM
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     io-wait (0.2.0)
-    json (2.6.0)
+    json (2.6.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.3.0)
@@ -302,7 +303,7 @@ GEM
     ricecream (0.2.0)
     rss (0.2.9)
       rexml
-    rubocop (1.22.2)
+    rubocop (1.22.3)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -331,7 +332,7 @@ GEM
       ffi (~> 1.9)
     securerandom (0.1.1)
     sequel (5.49.0)
-    set (1.0.1)
+    set (1.0.2)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -369,7 +370,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8)
-    unicode (0.4.4.4)
     unicode-display_width (2.1.0)
     vacuum (3.4.1)
       aws-sigv4 (~> 1.0)
@@ -393,6 +393,7 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
+  fileutils (= 1.5.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -423,4 +424,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.29
+   2.2.30

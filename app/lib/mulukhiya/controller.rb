@@ -25,9 +25,7 @@ module Mulukhiya
       e.package = Package.full_name
       @renderer = default_renderer_class.new
       @renderer.status = e.status
-      @renderer.message = e.to_h
-      @renderer.message.delete(:backtrace)
-      @renderer.message[:error] = e.message
+      @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
       Event.new(:alert).dispatch(e)
       logger.error(error: e)
       return @renderer.to_s

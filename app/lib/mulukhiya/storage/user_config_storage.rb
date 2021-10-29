@@ -9,8 +9,7 @@ module Mulukhiya
     end
 
     def set(key, values)
-      ['c', 'command'].freeze.each {|k| values.delete(k) if values.member?(k)}
-      super(key, values.to_json)
+      super(key, values.except('c', 'command').to_json)
       save
     end
 
