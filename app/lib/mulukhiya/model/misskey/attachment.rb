@@ -7,25 +7,22 @@ module Mulukhiya
       many_to_one :account, key: :userId
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            acct: account.acct.to_s,
-            file_name: name,
-            file_size_str: size_str,
-            type: type,
-            mediatype: mediatype,
-            created_at: date,
-            created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
-            meta: meta,
-            url: webpublicUrl || values[:url],
-            thumbnail_url: thumbnailUrl,
-            pixel_size: pixel_size,
-            duration: duration,
-          )
-          @hash.delete(:properties)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          acct: account.acct.to_s,
+          file_name: name,
+          file_size_str: size_str,
+          type: type,
+          mediatype: mediatype,
+          created_at: date,
+          created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+          meta: meta,
+          url: webpublicUrl || values[:url],
+          thumbnail_url: thumbnailUrl,
+          pixel_size: pixel_size,
+          duration: duration,
+        ).except(
+          :properties,
+        ).deep_compact
       end
 
       def meta

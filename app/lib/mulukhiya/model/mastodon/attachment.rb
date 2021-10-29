@@ -7,26 +7,23 @@ module Mulukhiya
       many_to_one :status
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            acct: status.account.acct.to_s,
-            status_url: status.public_uri.to_s,
-            file_name: name,
-            file_size_str: size_str,
-            type: type,
-            mediatype: mediatype,
-            created_at: date,
-            created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
-            meta: meta,
-            pixel_size: pixel_size,
-            duration: duration,
-            url: uri('original').to_s,
-            thumbnail_url: uri('small').to_s,
-          )
-          @hash.delete(:file_meta)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          acct: status.account.acct.to_s,
+          status_url: status.public_uri.to_s,
+          file_name: name,
+          file_size_str: size_str,
+          type: type,
+          mediatype: mediatype,
+          created_at: date,
+          created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+          meta: meta,
+          pixel_size: pixel_size,
+          duration: duration,
+          url: uri('original').to_s,
+          thumbnail_url: uri('small').to_s,
+        ).except(
+          :file_meta,
+        ).deep_compact
       end
 
       alias name file_file_name

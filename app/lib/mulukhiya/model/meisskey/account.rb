@@ -4,20 +4,17 @@ module Mulukhiya
       include AccountMethods
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            url: uri.to_s,
-            is_admin: admin?,
-            is_moderator: moderator?,
-            is_info_bot: info?,
-            is_test_bot: test?,
-            display_name: display_name,
-          )
-          @hash.delete(:password)
-          @hash.delete(:keypair)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          url: uri.to_s,
+          is_admin: admin?,
+          is_moderator: moderator?,
+          is_info_bot: info?,
+          is_test_bot: test?,
+          display_name: display_name,
+        ).except(
+          :password,
+          :keypair,
+        ).deep_compact
       end
 
       def host

@@ -9,22 +9,19 @@ module Mulukhiya
       end
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            name: name.to_hashtag_base,
-            tag: raw_name.to_hashtag,
-            url: uri.to_s,
-            feed_url: feed_uri.to_s,
-          )
-          @hash.delete(:attachedUserIds)
-          @hash.delete(:attachedLocalUserIds)
-          @hash.delete(:attachedRemoteUserIds)
-          @hash.delete(:mentionedUserIds)
-          @hash.delete(:mentionedLocalUserIds)
-          @hash.delete(:mentionedRemoteUserIds)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          name: name.to_hashtag_base,
+          tag: raw_name.to_hashtag,
+          url: uri.to_s,
+          feed_url: feed_uri.to_s,
+        ).except(
+          :attachedUserIds,
+          :attachedLocalUserIds,
+          :attachedRemoteUserIds,
+          :mentionedUserIds,
+          :mentionedLocalUserIds,
+          :mentionedRemoteUserIds,
+        ).deep_compact
       end
 
       def create_feed(params)

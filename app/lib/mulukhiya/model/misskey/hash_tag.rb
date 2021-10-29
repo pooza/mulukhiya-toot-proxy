@@ -7,18 +7,15 @@ module Mulukhiya
       attr_writer :raw_name
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            tag: raw_name.to_hashtag,
-            url: uri.to_s,
-            feed_url: feed_uri.to_s,
-          )
-          @hash.delete(:mentionedUserIds)
-          @hash.delete(:mentionedLocalUserIds)
-          @hash.delete(:mentionedRemoteUserIds)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          tag: raw_name.to_hashtag,
+          url: uri.to_s,
+          feed_url: feed_uri.to_s,
+        ).except(
+          :mentionedUserIds,
+          :mentionedLocalUserIds,
+          :mentionedRemoteUserIds,
+        ).deep_compact
       end
 
       def self.get(key)

@@ -7,22 +7,19 @@ module Mulukhiya
       attr_accessor :token
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            username: username,
-            is_admin: admin?,
-            is_moderator: moderator?,
-            is_info_bot: info?,
-            is_test_bot: test?,
-            display_name: display_name,
-            url: uri.to_s,
-          )
-          @hash.delete(:password_hash)
-          @hash.delete(:keys)
-          @hash.delete(:magic_key)
-          @hash.deep_compact!
-        end
-        return @hash
+        return values.deep_symbolize_keys.merge(
+          username: username,
+          is_admin: admin?,
+          is_moderator: moderator?,
+          is_info_bot: info?,
+          is_test_bot: test?,
+          display_name: display_name,
+          url: uri.to_s,
+        ).except(
+          :password_hash,
+          :keys,
+          :magic_key,
+        ).deep_compact
       end
 
       def acct
