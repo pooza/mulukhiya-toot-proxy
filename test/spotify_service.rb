@@ -5,13 +5,13 @@ module Mulukhiya
     end
 
     def test_search_track
-      track = @service.search_track('ありがとうのうた')
-      assert(track.name.include?('ありがとうのうた'))
+      track = @service.search_track('キラキラしちゃってMy True Love！')
+      assert(track.name.include?('キラキラしちゃって My True Love!'))
     end
 
     def test_lookup_track
-      track = @service.lookup_track('3IOVLLqm6RNpoUVjx33HKF')
-      assert_equal(track.name, 'ありがとうのうた')
+      track = @service.lookup_track('1TohZQho6JsNn5SJX44LYD')
+      assert_equal(track.name, 'キラキラしちゃって My True Love!')
     end
 
     def test_lookup_album
