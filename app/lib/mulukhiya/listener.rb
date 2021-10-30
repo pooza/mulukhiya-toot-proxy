@@ -7,10 +7,6 @@ module Mulukhiya
     include SNSMethods
     attr_reader :client, :uri, :sns
 
-    def verify_peer?
-      return config["/#{Environment.controller_name}/streaming/verify_peer"]
-    end
-
     def keepalive
       return config['/websocket/keepalive']
     end
@@ -21,9 +17,6 @@ module Mulukhiya
       @sns = info_agent_service
       @uri = @sns.streaming_uri
       @client = Faye::WebSocket::Client.new(uri.to_s, [], {
-        tls: {
-          verify_peer: verify_peer?,
-        },
         ping: keepalive,
       })
     end

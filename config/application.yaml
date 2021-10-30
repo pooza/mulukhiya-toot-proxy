@@ -366,8 +366,6 @@ mastodon:
     label: 投稿
     max_length: 500
     parser: toot
-  streaming:
-    verify_peer: true
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -516,8 +514,6 @@ meisskey:
     label: ポスト
     max_length: 1000
     parser: note
-  streaming:
-    verify_peer: true
   url: https://meisskey.example.com/
 misskey:
   attachment:
@@ -667,8 +663,6 @@ misskey:
     label: ノート
     max_length: 500
     parser: note
-  streaming:
-    verify_peer: true
   url: https://misskey.example.com/
 mongo:
   dsn: null
@@ -887,8 +881,6 @@ pleroma:
     label: ステータス
     max_length: 5000
     parser: toot
-  streaming:
-    verify_peer: true
   url: https://pleroma.example.com/
 postgres:
   dsn: null
