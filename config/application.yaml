@@ -92,6 +92,7 @@ annict:
         - work.id
         - work.title
       limit: 10
+  chars: 200
   interval:
     seconds: 1
   oauth:
