@@ -30,11 +30,11 @@ module Mulukhiya
         listener = MisskeyListener.new
 
         listener.client.on :close do |e|
-          raise Ginseng::GatewayError, (e.message rescue e.to_s)
+          raise Ginseng::GatewayError, e.message
         end
 
         listener.client.on :error do |e|
-          raise Ginseng::GatewayError, (e.message rescue e.to_s)
+          raise Ginseng::GatewayError, e.message
         end
 
         listener.client.on :message do |message|
