@@ -984,9 +984,15 @@ tagging:
       audio: audio
       image: image
       video: video
-  remote_default_tags:
-    - precure_fun
-    - delmulin
+  remote:
+    - pattern: プリキュア
+      tags:
+        - precure_fun
+      url: https://precure.ml
+    - pattern: ダイの大冒険
+      tags:
+        - delmulin
+      url: https://mstdn.delmulin.com
   user_tags:
     clear_message: 固定タグをクリアしました。
     extra_minutes: 2

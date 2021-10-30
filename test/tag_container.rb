@@ -2,7 +2,6 @@ module Mulukhiya
   class TagContainerTest < TestCase
     def setup
       config['/tagging/default_tags'] = ['美食丼', 'b-shock-don']
-      config['/tagging/remote_default_tags'] = ['gochisou_photo']
     end
 
     def test_default_tags
@@ -10,7 +9,7 @@ module Mulukhiya
     end
 
     def test_remote_default_tags
-      assert_equal(TagContainer.remote_default_tags, Set['gochisou_photo'])
+      assert_equal(TagContainer.remote_default_tags, Set['precure_fun', 'delmulin'])
     end
   end
 end

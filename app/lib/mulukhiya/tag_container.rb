@@ -24,7 +24,11 @@ module Mulukhiya
     end
 
     def self.remote_default_tags
-      return TagContainer.new((config['/tagging/remote_default_tags'] rescue []))
+      tags = TagContainer.new
+      config['/tagging/remote'].each do |remote|
+        tags.merge(remote['tags'])
+      end
+      return tags
     end
 
     def self.media_tag?
