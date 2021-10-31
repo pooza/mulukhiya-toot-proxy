@@ -13,7 +13,7 @@ module Mulukhiya
 
       alias local? local
 
-      def visible?
+      def public?
         return visibility.zero?
       end
 
