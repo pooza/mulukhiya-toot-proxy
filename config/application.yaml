@@ -175,6 +175,11 @@ handler:
     image_file: public/mulukhiya/media/background.png
     rows: 30
     text_length: 140
+  media_tag:
+    tags:
+      audio: audio
+      image: image
+      video: video
   result_notification:
     spoiler_text: 実行結果
   shortened_url:
@@ -313,6 +318,7 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -341,6 +347,7 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -441,6 +448,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - media_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -463,6 +471,7 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -487,6 +496,7 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
   oauth:
     scopes:
@@ -587,6 +597,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - media_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -610,6 +621,7 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -634,6 +646,7 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
   oauth:
     scopes:
@@ -820,6 +833,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - media_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -844,6 +858,7 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -870,6 +885,7 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - media_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -978,12 +994,6 @@ tagging:
         url: null
       name: プリキュア妖精
       url: https://precure.ml/api/dic/v2/fairy.json
-  media:
-    enable: true
-    tags:
-      audio: audio
-      image: image
-      video: video
   remote:
     - pattern: プリキュア
       tags:

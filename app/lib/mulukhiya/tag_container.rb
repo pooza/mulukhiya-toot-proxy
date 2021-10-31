@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def self.media_tag?
-      return config['/tagging/media/enable'] == true rescue true
+      return Handler.create('media_tag').disable? == false
     end
 
     def self.media_tags

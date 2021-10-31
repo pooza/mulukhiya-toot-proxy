@@ -5,7 +5,6 @@ module Mulukhiya
       return unless executable?
       tags.text = @status
       tags.merge(TaggingDictionary.new.matches(payload)) if @status
-      tags.merge(media_tags) if TagContainer.media_tag?
       tags.account = @sns.account
       parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
@@ -21,22 +20,6 @@ module Mulukhiya
       return true if payload[visibility_field].empty?
       return true if payload[visibility_field] == controller_class.visibility_name(:public)
       return false
-    end
-
-    def media_tags
-      tags = TagContainer.new
-      (payload[attachment_field] || []).each do |id|
-        type = attachment_class[id].type
-        ['video', 'image', 'audio'].freeze.each do |mediatype|
-          next unless type.start_with?("#{mediatype}/")
-          tags.add(config["/tagging/media/tags/#{mediatype}"])
-        rescue Ginseng::ConfigError => e
-          result.push(info: e.message)
-        end
-      rescue => e
-        errors.push(class: e.class.to_s, message: e.message, attachment_id: id)
-      end
-      return tags
     end
 
     def update_status
