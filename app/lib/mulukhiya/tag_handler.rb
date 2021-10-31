@@ -3,9 +3,9 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return unless executable?
-      tags.merge(additional_tags)
+      tags.merge(addition_tags)
       tags.reject! {|v| removal_tags.member?(v)}
-      result.push(additional_tags: additional_tags, removal_tags: removal_tags)
+      result.push(addition_tags: addition_tags, removal_tags: removal_tags)
     end
 
     def executable?
@@ -20,7 +20,7 @@ module Mulukhiya
       return TagContainer.new
     end
 
-    def additional_tags
+    def addition_tags
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
   end

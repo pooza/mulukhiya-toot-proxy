@@ -1,6 +1,6 @@
 module Mulukhiya
   class MediaTagHandler < TagHandler
-    def additional_tags
+    def addition_tags
       unless @media_tags
         @media_tags = TagContainer.new
         (payload[attachment_field] || []).map {|id| attachment_class[id].type}.each do |type|

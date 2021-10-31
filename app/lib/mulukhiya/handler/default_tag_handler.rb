@@ -1,6 +1,6 @@
 module Mulukhiya
   class DefaultTagHandler < TagHandler
-    def additional_tags
+    def addition_tags
       return TagContainer.default_tags
     end
   end

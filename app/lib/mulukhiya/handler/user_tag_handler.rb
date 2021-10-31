@@ -4,7 +4,7 @@ module Mulukhiya
       return @sns.account.disabled_tags
     end
 
-    def additional_tags
+    def addition_tags
       return @sns.account.user_tags
     end
   end

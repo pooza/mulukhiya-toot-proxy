@@ -1,6 +1,6 @@
 module Mulukhiya
   class DictionaryTagHandler < TagHandler
-    def additional_tags
+    def addition_tags
       return TaggingDictionary.new.matches(payload)
     end
   end
