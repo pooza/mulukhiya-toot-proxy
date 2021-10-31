@@ -1,15 +1,6 @@
 module Mulukhiya
-  class MediaTagHandler < Handler
-    def handle_pre_toot(payload, params = {})
-      self.payload = payload
-      tags.text = @status
-      tags.merge(media_tags)
-      result.push(tags: media_tags)
-    end
-
-    private
-
-    def media_tags
+  class MediaTagHandler < TagHandler
+    def additional_tags
       unless @media_tags
         @media_tags = TagContainer.new
         (payload[attachment_field] || []).map {|id| attachment_class[id].type}.each do |type|
