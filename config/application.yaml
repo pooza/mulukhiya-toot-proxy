@@ -1045,8 +1045,6 @@ tagging:
     without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
 test:
   timeout: 20
-twittodon:
-  pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 user_config:
   encrypt_fields:
     - token

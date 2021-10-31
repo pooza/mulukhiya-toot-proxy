@@ -2,10 +2,18 @@ module Mulukhiya
   class TagHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      tags.text = @status
+      return unless executable?
       tags.merge(additional_tags)
       tags.reject! {|v| removal_tags.member?(v)}
-      result.push(tags: additional_tags)
+      result.push(additional_tags: additional_tags, removal_tags: removal_tags)
+    end
+
+    def executable?
+      return false if parser.command?
+      return false if parser.accts.any?(&:agent?)
+      return true if payload[visibility_field].empty?
+      return true if payload[visibility_field] == controller_class.visibility_name(:public)
+      return false
     end
 
     def removal_tags
