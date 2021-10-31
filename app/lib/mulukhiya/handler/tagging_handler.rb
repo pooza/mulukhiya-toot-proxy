@@ -3,8 +3,6 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return unless executable?
-      tags.text = @status
-      tags.merge(TaggingDictionary.new.matches(payload)) if @status
       parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
     rescue => e

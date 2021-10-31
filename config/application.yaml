@@ -319,6 +319,7 @@ mastodon:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -350,6 +351,7 @@ mastodon:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -453,6 +455,7 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -478,6 +481,7 @@ meisskey:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -505,6 +509,7 @@ meisskey:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -608,6 +613,7 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -634,6 +640,7 @@ misskey:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -661,6 +668,7 @@ misskey:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -850,6 +858,7 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -877,6 +886,7 @@ pleroma:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
@@ -906,6 +916,7 @@ pleroma:
       - you_tube_url_nowplaying
       - spoiler
       - default_tag
+      - dictionary_tag
       - media_tag
       - user_tag
       - tagging
