@@ -2,6 +2,7 @@ module Mulukhiya
   class UserTagHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
+      tags.text = @status
       tags.merge(user_tags)
       result.push(tags: user_tags)
 
