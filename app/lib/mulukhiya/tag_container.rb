@@ -13,14 +13,11 @@ module Mulukhiya
     end
 
     def self.default_tags
+      return DefaultTagHandler.tags
     end
 
     def self.remote_default_tags
-      tags = TagContainer.new
-      config['/tagging/remote'].each do |remote|
-        tags.merge(remote['tags'])
-      end
-      return tags
+      return DefaultTagHandler.remote_tags
     end
 
     def self.media_tag?
