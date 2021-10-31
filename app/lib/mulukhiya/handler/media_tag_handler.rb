@@ -2,6 +2,7 @@ module Mulukhiya
   class MediaTagHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
+      tags.text = @status
       tags.merge(media_tags)
       result.push(tags: media_tags)
     end
