@@ -13,7 +13,6 @@ module Mulukhiya
     end
 
     def self.default_tags
-      return TagContainer.new((config['/tagging/default_tags'] rescue []))
     end
 
     def self.remote_default_tags
@@ -29,12 +28,7 @@ module Mulukhiya
     end
 
     def self.media_tags
-      tags = TagContainer.new
-      return tags unless media_tag?
-      tags.merge(['image', 'video', 'audio'].freeze.map {|v| config["/tagging/media/tags/#{v}"]})
-      return tags
-    rescue
-      return TagContainer.new
+      return MediaTagHandler.all_tags
     end
   end
 end

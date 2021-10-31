@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_default_tags
-      assert_equal(TagContainer.default_tags, Set['美食丼', 'b-shock-don'])
+      assert_equal(DefaultTagHandler.tags, Set['美食丼', 'b-shock-don'])
     end
 
     def test_remote_default_tags

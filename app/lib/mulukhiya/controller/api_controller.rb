@@ -255,8 +255,8 @@ module Mulukhiya
     end
 
     get '/feed/list' do
-      tags = TagContainer.default_tags.clone
-      tags.merge(TagContainer.media_tags)
+      tags = DefaultTagHandler.tags.clone
+      tags.merge(MediaTagHandler.all_tags)
       if @sns.account
         tags.merge(@sns.account.featured_tags)
         tags.merge(@sns.account.field_tags)

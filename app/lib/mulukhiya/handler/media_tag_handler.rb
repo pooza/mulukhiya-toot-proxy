@@ -14,5 +14,14 @@ module Mulukhiya
       super
       @media_tags = nil
     end
+
+    def self.all_tags
+      tags = TagContainer.new
+      return tags unless media_tag?
+      tags.merge([:image, :video, :audio].freeze.map {|v| config["/tagging/media/tags/#{v}"]})
+      return tags
+    rescue
+      return TagContainer.new
+    end
   end
 end
