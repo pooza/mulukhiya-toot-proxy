@@ -1,16 +1,9 @@
 module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
     include Package
-    attr_reader :account
 
     def member?(item)
       return super(item.to_hashtag_base)
-    end
-
-    def account=(account)
-      @account = account
-      reject! {|v| @account.disabled_tags.member?(v)}
-      merge(@account.user_tags)
     end
 
     def self.scan(text)

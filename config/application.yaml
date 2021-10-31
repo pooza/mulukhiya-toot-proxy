@@ -320,6 +320,7 @@ mastodon:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -350,6 +351,7 @@ mastodon:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -452,6 +454,7 @@ meisskey:
       - you_tube_url_nowplaying
       - default_tag
       - media_tag
+      - user_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -476,6 +479,7 @@ meisskey:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -502,6 +506,7 @@ meisskey:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
   oauth:
     scopes:
@@ -604,6 +609,7 @@ misskey:
       - you_tube_url_nowplaying
       - default_tag
       - media_tag
+      - user_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -629,6 +635,7 @@ misskey:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -655,6 +662,7 @@ misskey:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
   oauth:
     scopes:
@@ -843,6 +851,7 @@ pleroma:
       - you_tube_url_nowplaying
       - default_tag
       - media_tag
+      - user_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -869,6 +878,7 @@ pleroma:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -897,6 +907,7 @@ pleroma:
       - spoiler
       - default_tag
       - media_tag
+      - user_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
