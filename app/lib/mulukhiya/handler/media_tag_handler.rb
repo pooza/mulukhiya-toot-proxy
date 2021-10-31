@@ -3,11 +3,16 @@ module Mulukhiya
     def addition_tags
       unless @media_tags
         @media_tags = TagContainer.new
-        (payload[attachment_field] || []).map {|id| attachment_class[id].type}.each do |type|
-          @media_tags.add([:video, :image, :audio].freeze.find {|v| type.start_with?("#{v}/")})
-        end
+        @media_tag.merge((payload[attachment_field] || []).map {|id| create_media_tags(id)})
       end
       return @media_tags
+    end
+
+    def create_media_tags(id)
+      type = attachment_class[id].type
+      return [:video, :image, :audio].freeze.select {|v| type.start_with?("#{v}/")}.map do |media|
+        config["/handler/media_tag/tags/#{media}"]
+      end.to_set
     end
 
     def payload=(payload)
