@@ -5,7 +5,6 @@ module Mulukhiya
       return unless executable?
       tags.text = @status
       tags.merge(TaggingDictionary.new.matches(payload)) if @status
-      tags.account = @sns.account
       parser.text = payload[text_field] = update_status
       result.push(tags: tags.create_tags)
     rescue => e
