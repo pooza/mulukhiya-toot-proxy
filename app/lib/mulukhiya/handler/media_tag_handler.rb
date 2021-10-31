@@ -9,5 +9,10 @@ module Mulukhiya
       end
       return @media_tags
     end
+
+    def payload=(payload)
+      super
+      @media_tags = nil
+    end
   end
 end
