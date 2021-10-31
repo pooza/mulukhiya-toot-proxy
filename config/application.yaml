@@ -318,6 +318,7 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
       - invalid_command
@@ -347,6 +348,7 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
   oauth:
@@ -448,6 +450,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
       - media_tag
       - tagging
     pre_toot:
@@ -471,6 +474,7 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
       - invalid_command
@@ -496,6 +500,7 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
   oauth:
@@ -597,6 +602,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
       - media_tag
       - tagging
     pre_toot:
@@ -621,6 +627,7 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
       - invalid_command
@@ -646,6 +653,7 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
   oauth:
@@ -833,6 +841,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
       - media_tag
       - tagging
     pre_toot:
@@ -858,6 +867,7 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
       - invalid_command
@@ -885,6 +895,7 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
       - media_tag
       - tagging
   oauth:
