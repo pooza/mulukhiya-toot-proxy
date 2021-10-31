@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def remote_default?
-      return TagContainer.remote_default_tags.member?(name)
+      return DefaultTagHandler.remote_tags.member?(name)
     end
 
     def local?
