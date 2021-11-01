@@ -11,7 +11,7 @@ module Mulukhiya
     end
 
     def accounts(params)
-      return UserConfigStorage.accounts unless id = params['account_id']
+      return UserConfigStorage.accounts unless id = params[:account_id]
       yield account_class[id]
     end
   end

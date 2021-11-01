@@ -6,7 +6,7 @@ module Mulukhiya
 
     def self.perform_async(*args)
       if Environment.development? || Environment.test?
-        new.perform(args)
+        args.each {|params| new.perform(params.deep_symbolize_keys)}
       else
         client_push('class' => self, 'args' => args)
       end
