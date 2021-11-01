@@ -71,10 +71,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/rspotify.git
-  revision: d8f8bfae192322c976eacf2ce9bd0a62d780ef0a
+  revision: 554fd873037f8491e900cf215d9b8495bc2bd292
   branch: master.pooza
   specs:
-    rspotify (2.10.3)
+    rspotify (2.11.0)
       addressable (~> 2.8)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.1)
