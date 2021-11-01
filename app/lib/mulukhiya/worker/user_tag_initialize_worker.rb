@@ -1,8 +1,5 @@
 module Mulukhiya
-  class UserTagInitializeWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class UserTagInitializeWorker < Worker
     sidekiq_options retry: false
 
     def perform(params = {})

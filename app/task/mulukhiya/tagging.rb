@@ -6,11 +6,7 @@ module Mulukhiya
       namespace :dic do
         desc 'update tagging dictionary'
         task :update do
-          if Environment.development? || Environment.test?
-            TaggingDictionaryUpdateWorker.new.perform
-          else
-            TaggingDictionaryUpdateWorker.perform_async
-          end
+          TaggingDictionaryUpdateWorker.perform_async
         end
       end
 

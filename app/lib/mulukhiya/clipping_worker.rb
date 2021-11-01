@@ -1,8 +1,5 @@
 module Mulukhiya
-  class ClippingWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class ClippingWorker < Worker
     sidekiq_options retry: 3
 
     def underscore

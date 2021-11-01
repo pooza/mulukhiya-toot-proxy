@@ -1,6 +1,6 @@
 module Mulukhiya
   class DropboxClippingWorker < ClippingWorker
-    def perform(params)
+    def perform(params = {})
       params.deep_stringify_keys!
       return unless controller_class.dropbox?
       return unless account = account_class[params['account_id']]

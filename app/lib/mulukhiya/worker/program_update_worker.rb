@@ -1,11 +1,8 @@
 module Mulukhiya
-  class ProgramUpdateWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class ProgramUpdateWorker < Worker
     sidekiq_options retry: false
 
-    def perform
+    def perform(params = {})
       return unless controller_class.livecure?
       Program.instance.update
     end

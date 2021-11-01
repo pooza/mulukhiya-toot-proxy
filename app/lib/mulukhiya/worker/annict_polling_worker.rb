@@ -1,11 +1,8 @@
 module Mulukhiya
-  class AnnictPollingWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class AnnictPollingWorker < Worker
     sidekiq_options retry: false
 
-    def perform
+    def perform(params = {})
       return unless controller_class.annict?
       AnnictService.crawl_all
     end

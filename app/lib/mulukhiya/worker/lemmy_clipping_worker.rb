@@ -1,6 +1,6 @@
 module Mulukhiya
   class LemmyClippingWorker < ClippingWorker
-    def perform(params)
+    def perform(params = {})
       params.deep_stringify_keys!
       return unless controller_class.lemmy?
       return unless account = account_class[params['account_id']]
