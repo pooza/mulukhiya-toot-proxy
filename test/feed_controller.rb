@@ -36,7 +36,7 @@ module Mulukhiya
       return unless controller_class.feed?
       return unless TagContainer.media_tag?
       get '/tag/image'
-      if hash_tag_class.get(tag: config['/tagging/media/tags/image'])
+      if hash_tag_class.get(tag: config['/handler/media_tag/tags/image'])
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
         assert(last_response.ok?)
       else
@@ -45,7 +45,7 @@ module Mulukhiya
       end
 
       get '/tag/video'
-      if hash_tag_class.get(tag: config['/tagging/media/tags/video'])
+      if hash_tag_class.get(tag: config['/handler/media_tag/tags/video'])
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
         assert(last_response.ok?)
       else
@@ -54,7 +54,7 @@ module Mulukhiya
       end
 
       get '/tag/audio'
-      if hash_tag_class.get(tag: config['/tagging/media/tags/audio'])
+      if hash_tag_class.get(tag: config['/handler/media_tag/tags/audio'])
         assert_equal(last_response.content_type, 'application/atom+xml; charset=UTF-8')
         assert(last_response.ok?)
       else
