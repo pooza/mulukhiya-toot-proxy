@@ -785,8 +785,8 @@ parser:
       attachment: fileIds
       body: text
       poll:
-        root: poll
         options: choices
+        root: poll
       spoiler: cw
       visibility: visibility
   toot:
@@ -794,8 +794,8 @@ parser:
       attachment: media_ids
       body: status
       poll:
-        root: poll
         options: options
+        root: poll
       spoiler: spoiler_text
       visibility: visibility
 pleroma:

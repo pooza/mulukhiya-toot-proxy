@@ -1,0 +1,36 @@
+module Mulukhiya
+  class DictionaryTagHandlerTest < TestCase
+    def setup
+      config['/tagging/word/minimum_length'] = 3
+      config['/tagging/word/minimum_length_kanji'] = 2
+      config['/agent/accts'] = ['@pooza']
+      config['/tagging/dictionaries'] = [
+        {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
+      ]
+      TaggingDictionary.new.refresh
+
+      @handler = Handler.create('dictionary_tag')
+    end
+
+    def teardown
+      super
+      TaggingDictionary.new.refresh
+    end
+
+    def test_handle_pre_toot
+      @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアマーメイド")
+      assert_equal(@handler.addition_tags, Set['キュアマーメイド', '海藤 みなみ', '浅野 真澄'])
+    end
+
+    def test_handle_pre_toot_with_poll
+      @handler.handle_pre_toot(
+        status_field => 'アンケート',
+        poll_field => {poll_options_field => ['項目1', '項目2', 'ふたりはプリキュア']},
+      )
+      assert_equal(@handler.addition_tags, Set['ふたりはプリキュア'])
+    end
+  end
+end
