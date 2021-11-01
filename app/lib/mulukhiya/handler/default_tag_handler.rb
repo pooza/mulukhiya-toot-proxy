@@ -1,5 +1,10 @@
 module Mulukhiya
   class DefaultTagHandler < TagHandler
+    def disable?
+      return false unless DefaultTagHandler.tags.present?
+      return super
+    end
+
     def addition_tags
       return DefaultTagHandler.tags
     end
