@@ -13,7 +13,7 @@ module Mulukhiya
       if Environment.development? || Environment.test?
         args.each {|params| new.perform(params.deep_symbolize_keys)}
       else
-        client_push('class' => self, 'args' => args)
+        client_push('class' => self, 'args' => args.deep_symbolize_keys)
       end
     end
   end

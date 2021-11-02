@@ -1,8 +1,8 @@
 module Mulukhiya
   class InvalidCommandHandler < Handler
     def disable?
-      return false unless parser.command?
-      return true
+      return true unless parser.command?
+      return false
     end
 
     def handle_pre_toot(payload, params = {})
