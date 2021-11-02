@@ -1,7 +1,7 @@
 module Mulukhiya
   class DictionaryTagHandler < TagHandler
     def disable?
-      return false unless TaggingDictionary.new.remote_dics.present?
+      return true unless TaggingDictionary.new.remote_dics.present?
       return super
     end
 
