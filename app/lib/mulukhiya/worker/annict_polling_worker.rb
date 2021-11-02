@@ -2,8 +2,12 @@ module Mulukhiya
   class AnnictPollingWorker < Worker
     sidekiq_options retry: false
 
+    def disable?
+      return true if controller_class.annict?
+      return false
+    end
+
     def perform(params = {})
-      return unless controller_class.annict?
       AnnictService.crawl_all
     end
   end

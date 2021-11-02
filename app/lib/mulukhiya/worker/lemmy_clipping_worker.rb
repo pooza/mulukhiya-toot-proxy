@@ -1,7 +1,11 @@
 module Mulukhiya
   class LemmyClippingWorker < ClippingWorker
+    def disable?
+      return true unless controller_class.lemmy?
+      return false
+    end
+
     def perform(params = {})
-      return unless controller_class.lemmy?
       return unless account = account_class[params[:account_id]]
       return unless account.lemmy
       return unless uri = create_status_uri(params[:uri])
