@@ -3,7 +3,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def disable?
-      return true if controller_class.annict?
+      return true unless controller_class.annict?
       return false
     end
 
