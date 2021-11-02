@@ -14,7 +14,7 @@ module Mulukhiya
       tags = TagContainer.new
       text = create_temp_text(source)
       reverse_each do |k, v|
-        next if TaggingDictionary.short?(k)
+        next if self.class.short?(k)
         next unless text.match?(v[:pattern])
         tags.add(k)
         tags.merge(v[:words])
@@ -74,13 +74,6 @@ module Mulukhiya
       return config['/tagging/word/minimum_length_kanji']
     end
 
-    private
-
-    def redis
-      @redis ||= Redis.new
-      return @redis
-    end
-
     def create_temp_text(payload)
       return payload if payload.is_a?(String)
       parts = [payload[status_field], payload[spoiler_field], payload[chat_field]]
@@ -92,6 +85,13 @@ module Mulukhiya
         logger.error(error: e)
       end
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
+    end
+
+    private
+
+    def redis
+      @redis ||= Redis.new
+      return @redis
     end
 
     def fetch
