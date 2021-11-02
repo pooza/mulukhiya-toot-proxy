@@ -331,7 +331,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.1.1)
-    sequel (5.49.0)
+    sequel (5.50.0)
     set (1.0.2)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)
