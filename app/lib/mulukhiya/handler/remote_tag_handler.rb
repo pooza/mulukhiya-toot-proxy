@@ -6,7 +6,7 @@ module Mulukhiya
       self.class.entries.select {|v| text.match?(v['pattern'])}.each do |remote|
         tags.merge(remote['tags'])
         service = Ginseng::Fediverse::MulukhiyaService.new(remote['url'])
-        next unless sns.uri.host == service.uri.host
+        next unless sns.uri.host == service.base_uri.host
         tags.merge(service.search_hashtags(text))
       rescue => e
         logger.error(error: e, remote: remote)
