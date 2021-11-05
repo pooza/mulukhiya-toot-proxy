@@ -7,7 +7,7 @@ module Mulukhiya
 
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
-      (payload['attachments'] || []).first(attachment_limit).map do |attachment|
+      (payload['attachments'] || []).map do |attachment|
         Thread.new do
           uri = Ginseng::URI.parse(attachment['image_url'])
           raise Ginseng::RequestError, "Invalid URL '#{uri}'" unless uri&.absolute?

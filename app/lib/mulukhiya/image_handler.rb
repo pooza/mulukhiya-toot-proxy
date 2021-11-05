@@ -4,7 +4,7 @@ module Mulukhiya
       self.payload = payload
       return if parser.command?
       payload[attachment_field] ||= []
-      parser.uris.select {|v| updatable?(v)}.first(attachment_limit).each do |uri|
+      parser.uris.select {|v| updatable?(v)}.map do |uri|
         Thread.new do
           payload[attachment_field].push(sns.upload_remote_resource(create_image_uri(uri), {
             response: :id,
