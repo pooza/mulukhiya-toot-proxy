@@ -207,8 +207,6 @@ handler:
       audio: audio
       image: image
       video: video
-  result_notification:
-    spoiler_text: 実行結果
   remote_tag:
     services:
       - pattern: プリキュア
@@ -219,6 +217,8 @@ handler:
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
+  result_notification:
+    spoiler_text: 実行結果
   shortened_url:
     domains:
       - t.co
