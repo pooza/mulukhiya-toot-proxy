@@ -40,15 +40,18 @@ module Mulukhiya
       return params[:reporter]
     end
 
+    def method
+      return "handle_#{label}".to_sym
+    end
+
     def dispatch(payload)
       handlers do |handler|
         next if handler.disable?
-        thread = Thread.new {handler.send("handle_#{label}".to_sym, payload, params)}
-        unless thread.join(handler.timeout)
-          handler.errors.push(message: 'execution expired', timeout: "#{handler.timeout}s")
+        unless Thread.new {handler.send(method, payload, params)}.join(handler.timeout)
+          handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
         end
         break if handler.prepared?
-      rescue RestClient::Exception, HTTParty::Error => e
+      rescue => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure
         reporter.push(handler)

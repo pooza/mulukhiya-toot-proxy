@@ -7,9 +7,8 @@ module Mulukhiya
 
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
-      threads = []
-      (payload['attachments'] || []).each do |attachment|
-        thread = Thread.new do
+      (payload['attachments'] || []).first(attachment_limit).map do |attachment|
+        Thread.new do
           uri = Ginseng::URI.parse(attachment['image_url'])
           raise Ginseng::RequestError, "Invalid URL '#{uri}'" unless uri&.absolute?
           payload[attachment_field] ||= []
@@ -18,9 +17,7 @@ module Mulukhiya
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
         end
-        threads.push(thread)
-      end
-      threads.each(&:join)
+      end.each(&:join)
     end
   end
 end
