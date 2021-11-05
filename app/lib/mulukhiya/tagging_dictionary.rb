@@ -11,8 +11,8 @@ module Mulukhiya
     end
 
     def matches(source)
+      text = source.dup
       tags = TagContainer.new
-      text = create_temp_text(source)
       reverse_each do |k, v|
         next if self.class.short?(k)
         next unless text.match?(v[:pattern])

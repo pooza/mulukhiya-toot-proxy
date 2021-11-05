@@ -152,6 +152,18 @@ module Mulukhiya
       @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2') if @status.present?
     end
 
+    def flatten_payload
+      parts = [status_field, spoiler_field, chat_field].map {|k| payload[k]}
+      parts.concat(payload.dig(poll_field, poll_options_field) || [])
+      (payload[attachment_field] || []).each do |id|
+        next unless attachment = attachment_class[id]
+        parts.push(attachment.description)
+      rescue => e
+        logger.error(error: e)
+      end
+      return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
+    end
+
     def parser
       unless @parser
         @parser = @reporter.parser || parser_class.new(@status)
