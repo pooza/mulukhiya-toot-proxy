@@ -1,7 +1,7 @@
 module Mulukhiya
   class TagContainerTest < TestCase
     def setup
-      config['/tagging/default_tags'] = ['美食丼', 'b-shock-don']
+      config['/handler/default_tag/tags'] = ['美食丼', 'b-shock-don']
     end
 
     def test_default_tags

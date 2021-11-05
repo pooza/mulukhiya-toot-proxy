@@ -1,10 +1,10 @@
 module Mulukhiya
   class DictionaryTagHandlerTest < TestCase
     def setup
-      config['/tagging/word/minimum_length'] = 3
-      config['/tagging/word/minimum_length_kanji'] = 2
+      config['/handler/dictionary_tag/word/min'] = 3
+      config['/handler/dictionary_tag/word/min_kanji'] = 2
       config['/agent/accts'] = ['@pooza']
-      config['/tagging/dictionaries'] = [
+      config['/handler/dictionary_tag/dics'] = [
         {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'relative'},
         {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'relative'},
         {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'relative'},

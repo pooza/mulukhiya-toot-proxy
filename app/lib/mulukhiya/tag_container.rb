@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def self.media_tags
-      return MediaTagHandler.all_tags
+      return MediaTagHandler.all.values
     end
   end
 end

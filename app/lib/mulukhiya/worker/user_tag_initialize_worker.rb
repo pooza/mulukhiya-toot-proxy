@@ -6,7 +6,7 @@ module Mulukhiya
       accounts(params) do |account|
         next unless account.user_config['/tagging/user_tags'].present?
         account.user_config.clear_tags
-        info_agent_service.notify(account, config['/tagging/user_tags/clear_message'])
+        info_agent_service.notify(account, config['/worker/user_tag_initialize/message'])
       end
     end
 

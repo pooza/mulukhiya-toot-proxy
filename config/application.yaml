@@ -152,6 +152,33 @@ handler:
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   default:
     timeout: 5
+  default_tag:
+    tags: []
+  dictionary_tag:
+    dics:
+      - edit:
+          url: null
+        name: プリキュア
+        type: relative
+        url: https://precure.ml/api/dic/v1/precure.json
+      - edit:
+          url: null
+        name: プリキュア歌手
+        type: relative
+        url: https://precure.ml/api/dic/v1/singer.json
+      - edit:
+          url: null
+        name: プリキュア作品
+        type: relative
+        url: https://precure.ml/api/dic/v1/series.json
+      - edit:
+          url: null
+        name: プリキュア妖精
+        url: https://precure.ml/api/dic/v2/fairy.json
+    word:
+      min: 3
+      min_kanji: 2
+      without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   hexo_announce:
     category: お知らせ
     comments: false
@@ -182,6 +209,16 @@ handler:
       video: video
   result_notification:
     spoiler_text: 実行結果
+  remote_tag:
+    services:
+      - pattern: プリキュア
+        tags:
+          - precure_fun
+        url: https://precure.ml
+      - pattern: ダイの大冒険
+        tags:
+          - delmulin
+        url: https://mstdn.delmulin.com
   shortened_url:
     domains:
       - t.co
@@ -201,6 +238,8 @@ handler:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
+  user_tag:
+    extra_minutes: 2
   video_format_convert:
     timeout: 30
   you_tube_image:
@@ -1017,43 +1056,6 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
-tagging:
-  dictionaries:
-    - edit:
-        url: null
-      name: プリキュア
-      type: relative
-      url: https://precure.ml/api/dic/v1/precure.json
-    - edit:
-        url: null
-      name: プリキュア歌手
-      type: relative
-      url: https://precure.ml/api/dic/v1/singer.json
-    - edit:
-        url: null
-      name: プリキュア作品
-      type: relative
-      url: https://precure.ml/api/dic/v1/series.json
-    - edit:
-        url: null
-      name: プリキュア妖精
-      url: https://precure.ml/api/dic/v2/fairy.json
-  remote:
-    - pattern: プリキュア
-      tags:
-        - precure_fun
-      url: https://precure.ml
-    - pattern: ダイの大冒険
-      tags:
-        - delmulin
-      url: https://mstdn.delmulin.com
-  user_tags:
-    clear_message: 固定タグをクリアしました。
-    extra_minutes: 2
-  word:
-    minimum_length: 3
-    minimum_length_kanji: 2
-    without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
 test:
   timeout: 20
 user_config:
@@ -1121,5 +1123,7 @@ worker:
     federate: false
   media_cleaning:
     days: 1
+  user_tag_initialize:
+    message: 固定タグをクリアしました。
 youtube:
   url: https://www.googleapis.com/

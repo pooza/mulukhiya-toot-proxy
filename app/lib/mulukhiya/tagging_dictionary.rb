@@ -52,39 +52,21 @@ module Mulukhiya
       logger.error(error: e)
     end
 
-    def remote_dics(&block)
-      return enum_for(__method__) unless block
-      RemoteDictionary.all(&block)
-    end
-
     def self.short?(word)
       return true if word.match?("^#{without_kanji_pattern}{,#{minimum_length - 1}}$")
       return word.length < minimum_length_kanji
     end
 
     def self.without_kanji_pattern
-      return config['/tagging/word/without_kanji_pattern']
+      return config['/handler/dictionary_tag/word/without_kanji_pattern']
     end
 
     def self.minimum_length
-      return config['/tagging/word/minimum_length']
+      return config['/handler/dictionary_tag/word/min']
     end
 
     def self.minimum_length_kanji
-      return config['/tagging/word/minimum_length_kanji']
-    end
-
-    def create_temp_text(payload)
-      return payload if payload.is_a?(String)
-      parts = [payload[status_field], payload[spoiler_field], payload[chat_field]]
-      parts.concat(payload.dig(poll_field, poll_options_field) || [])
-      (payload[attachment_field] || []).each do |id|
-        next unless attachment = attachment_class[id]
-        parts.push(attachment.description)
-      rescue => e
-        logger.error(error: e)
-      end
-      return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
+      return config['/handler/dictionary_tag/word/min_kanji']
     end
 
     private
@@ -95,17 +77,14 @@ module Mulukhiya
     end
 
     def fetch
-      threads = []
       result = []
-      remote_dics do |dic|
-        thread = Thread.new do
+      RemoteDictionary.all.map do |dic|
+        Thread.new do
           result.push(dic.parse)
         rescue => e
-          logger.error(error: e, dic: {uri: dic.uri.to_s})
+          logger.error(error: e, dic: {url: dic.uri.to_s})
         end
-        threads.push(thread)
-      end
-      threads.each(&:join)
+      end.each(&:join)
       return result
     end
 

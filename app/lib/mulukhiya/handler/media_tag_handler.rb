@@ -13,13 +13,9 @@ module Mulukhiya
       @media_tags = nil
     end
 
-    def self.all_tags
-      tags = TagContainer.new
-      return tags unless TagContainer.media_tag?
-      tags.merge([:image, :video, :audio].freeze.map {|v| config["/handler/media_tag/tags/#{v}"]})
-      return tags
-    rescue
-      return TagContainer.new
+    def self.all
+      return {} unless TagContainer.media_tag?
+      return [:image, :video, :audio].map {|v| [v, config["/handler/media_tag/tags/#{v}"]]}.to_h
     end
 
     private
@@ -30,8 +26,8 @@ module Mulukhiya
 
     def create_media_tags(id)
       type = attachment_class[id].type
-      mediatype = [:video, :image, :audio].freeze.select {|v| type.start_with?("#{v}/")}
-      return TagContainer.new([config["/handler/media_tag/tags/#{mediatype}"]])
+      media = [:image, :video, :audio].select {|v| type.start_with?("#{v}/")}
+      return TagContainer.new([self.class.all[media]])
     end
   end
 end
