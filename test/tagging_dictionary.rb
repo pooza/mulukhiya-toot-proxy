@@ -1,15 +1,9 @@
 module Mulukhiya
   class TaggingDictionaryTest < TestCase
     def setup
-      config['/tagging/word/minimum_length'] = 3
-      config['/tagging/word/minimum_length_kanji'] = 2
+      config['/handler/dictionary_tag/word/min'] = 3
+      config['/handler/dictionary_tag/word/min_kanji'] = 2
       @dic = TaggingDictionary.new
-    end
-
-    def test_remote_dics
-      @dic.remote_dics do |d|
-        assert_kind_of(RemoteDictionary, d)
-      end
     end
 
     def test_short?

@@ -1,9 +1,8 @@
 module Mulukhiya
-  class TaggingDictionaryUpdateWorker
-    include Sidekiq::Worker
+  class TaggingDictionaryUpdateWorker < Worker
     sidekiq_options retry: false
 
-    def perform
+    def perform(params = {})
       TaggingDictionary.new.refresh
     end
   end

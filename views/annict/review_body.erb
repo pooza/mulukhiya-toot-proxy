@@ -1,6 +1,6 @@
 <%# encoding: UTF-8 -%>
 <% if params.dig(:review, :body).present? -%>
 
-<%= params.dig(:review, :body).ellipsize(200) %>
+<%= params.dig(:review, :body).ellipsize(config['/annict/chars']) %>
 <% end -%>
 https://annict.com/works/<%= params.dig(:review, :work, :id) %>/records

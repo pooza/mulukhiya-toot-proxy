@@ -1,9 +1,8 @@
 module Mulukhiya
-  class AnnouncementWorker
-    include Sidekiq::Worker
+  class AnnouncementWorker < Worker
     sidekiq_options retry: false
 
-    def perform
+    def perform(params = {})
       Announcement.new.announce
     end
   end

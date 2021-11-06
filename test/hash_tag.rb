@@ -3,7 +3,7 @@ module Mulukhiya
     def setup
       @nowplaying = hash_tag_class.get(tag: 'nowplaying')
       @nowplaying.raw_name = 'NowPlaying'
-      @default = hash_tag_class.get(tag: TagContainer.default_tags&.first)
+      @default = hash_tag_class.get(tag: DefaultTagHandler.tags.first)
     end
 
     test 'テスト用ハッシュタグの有無' do

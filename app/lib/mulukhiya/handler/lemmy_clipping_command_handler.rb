@@ -8,11 +8,7 @@ module Mulukhiya
     def exec
       return unless uri = Ginseng::URI.parse(parser.params['url'])
       return unless uri.absolute?
-      if Environment.development? || Environment.test?
-        LemmyClippingWorker.new.perform(uri: uri.to_s, account_id: sns.account.id)
-      else
-        LemmyClippingWorker.perform_async(uri: uri.to_s, account_id: sns.account.id)
-      end
+      LemmyClippingWorker.perform_async(uri: uri.to_s, account_id: sns.account.id)
     end
   end
 end

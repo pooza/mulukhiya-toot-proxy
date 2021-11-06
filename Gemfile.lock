@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 649740f3d298e5e0837fff90ae55542f28c178bc
+  revision: 2b087379114eb1075b2e88a20c3cc645098d0a02
   specs:
-    ginseng-fediverse (1.6.1)
+    ginseng-fediverse (1.6.2)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -71,10 +71,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/rspotify.git
-  revision: d8f8bfae192322c976eacf2ce9bd0a62d780ef0a
+  revision: 554fd873037f8491e900cf215d9b8495bc2bd292
   branch: master.pooza
   specs:
-    rspotify (2.10.3)
+    rspotify (2.11.0)
       addressable (~> 2.8)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.1)
@@ -158,7 +158,7 @@ GEM
     erb (2.2.3)
       cgi
     erubi (1.10.0)
-    et-orbi (1.2.5)
+    et-orbi (1.2.6)
       tzinfo
     etc (1.3.0)
     eventmachine (1.2.7)
@@ -211,7 +211,7 @@ GEM
     httparty (0.20.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.10)
+    i18n (1.8.11)
       concurrent-ruby (~> 1.0)
     io-wait (0.2.0)
     json (2.6.1)
@@ -261,7 +261,7 @@ GEM
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
       rack-protection
-    omniauth-oauth2 (1.7.1)
+    omniauth-oauth2 (1.7.2)
       oauth2 (~> 1.4)
       omniauth (>= 1.9, < 3)
     optparse (0.2.0)
@@ -314,7 +314,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.12.0)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.11.5)
+    rubocop-performance (1.12.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -331,7 +331,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.1.1)
-    sequel (5.49.0)
+    sequel (5.50.0)
     set (1.0.2)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)

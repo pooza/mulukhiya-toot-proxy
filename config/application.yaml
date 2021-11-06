@@ -92,6 +92,7 @@ annict:
         - work.id
         - work.title
       limit: 10
+  chars: 200
   interval:
     seconds: 1
   oauth:
@@ -151,6 +152,33 @@ handler:
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   default:
     timeout: 5
+  default_tag:
+    tags: []
+  dictionary_tag:
+    dics:
+      - edit:
+          url: null
+        name: プリキュア
+        type: relative
+        url: https://precure.ml/api/dic/v1/precure.json
+      - edit:
+          url: null
+        name: プリキュア歌手
+        type: relative
+        url: https://precure.ml/api/dic/v1/singer.json
+      - edit:
+          url: null
+        name: プリキュア作品
+        type: relative
+        url: https://precure.ml/api/dic/v1/series.json
+      - edit:
+          url: null
+        name: プリキュア妖精
+        url: https://precure.ml/api/dic/v2/fairy.json
+    word:
+      min: 3
+      min_kanji: 2
+      without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   hexo_announce:
     category: お知らせ
     comments: false
@@ -174,6 +202,21 @@ handler:
     image_file: public/mulukhiya/media/background.png
     rows: 30
     text_length: 140
+  media_tag:
+    tags:
+      audio: audio
+      image: image
+      video: video
+  remote_tag:
+    services:
+      - pattern: プリキュア
+        tags:
+          - precure_fun
+        url: https://precure.ml
+      - pattern: ダイの大冒険
+        tags:
+          - delmulin
+        url: https://mstdn.delmulin.com
   result_notification:
     spoiler_text: 実行結果
   shortened_url:
@@ -195,6 +238,8 @@ handler:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
+  user_tag:
+    extra_minutes: 2
   video_format_convert:
     timeout: 30
   you_tube_image:
@@ -312,6 +357,11 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -340,6 +390,11 @@ mastodon:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -440,6 +495,11 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -462,6 +522,11 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -486,6 +551,11 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
   oauth:
     scopes:
@@ -586,6 +656,11 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -609,6 +684,11 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -633,6 +713,11 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
   oauth:
     scopes:
@@ -740,15 +825,15 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.10.5
+  version: 4.11.0
 parser:
   note:
     fields:
       attachment: fileIds
       body: text
       poll:
-        root: poll
         options: choices
+        root: poll
       spoiler: cw
       visibility: visibility
   toot:
@@ -756,8 +841,8 @@ parser:
       attachment: media_ids
       body: status
       poll:
-        root: poll
         options: options
+        root: poll
       spoiler: spoiler_text
       visibility: visibility
 pleroma:
@@ -819,6 +904,11 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -843,6 +933,11 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
       - invalid_command
     pre_upload:
@@ -869,6 +964,11 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - spoiler
+      - default_tag
+      - dictionary_tag
+      - media_tag
+      - user_tag
+      - remote_tag
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -956,47 +1056,8 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
-tagging:
-  dictionaries:
-    - edit:
-        url: null
-      name: プリキュア
-      type: relative
-      url: https://precure.ml/api/dic/v1/precure.json
-    - edit:
-        url: null
-      name: プリキュア歌手
-      type: relative
-      url: https://precure.ml/api/dic/v1/singer.json
-    - edit:
-        url: null
-      name: プリキュア作品
-      type: relative
-      url: https://precure.ml/api/dic/v1/series.json
-    - edit:
-        url: null
-      name: プリキュア妖精
-      url: https://precure.ml/api/dic/v2/fairy.json
-  media:
-    enable: true
-    tags:
-      audio: audio
-      image: image
-      video: video
-  remote_default_tags:
-    - precure_fun
-    - delmulin
-  user_tags:
-    clear_message: 固定タグをクリアしました。
-    extra_minutes: 2
-  word:
-    minimum_length: 3
-    minimum_length_kanji: 2
-    without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
 test:
   timeout: 20
-twittodon:
-  pattern: \n(\n\(?.*?via\.\s+[^)]*\)?)$
 user_config:
   encrypt_fields:
     - token
@@ -1062,5 +1123,7 @@ worker:
     federate: false
   media_cleaning:
     days: 1
+  user_tag_initialize:
+    message: 固定タグをクリアしました。
 youtube:
   url: https://www.googleapis.com/

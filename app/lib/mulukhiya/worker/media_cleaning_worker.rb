@@ -1,9 +1,8 @@
 module Mulukhiya
-  class MediaCleaningWorker
-    include Sidekiq::Worker
+  class MediaCleaningWorker < Worker
     sidekiq_options retry: false
 
-    def perform
+    def perform(params = {})
       MediaFile.purge
     end
   end

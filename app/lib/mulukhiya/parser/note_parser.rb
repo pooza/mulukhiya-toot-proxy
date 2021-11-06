@@ -22,7 +22,7 @@ module Mulukhiya
 
     def all_tags
       tags = hashtags.clone
-      tags.merge(TagContainer.default_tags)
+      tags.merge(DefaultTagHandler.tags)
       tags.merge(@account.user_tags) if @account
       return tags
     end

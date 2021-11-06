@@ -1,20 +1,17 @@
 module Mulukhiya
-  class UserTagInitializeWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class UserTagInitializeWorker < Worker
     sidekiq_options retry: false
 
     def perform(params = {})
       accounts(params) do |account|
         next unless account.user_config['/tagging/user_tags'].present?
         account.user_config.clear_tags
-        info_agent_service.notify(account, config['/tagging/user_tags/clear_message'])
+        info_agent_service.notify(account, config['/worker/user_tag_initialize/message'])
       end
     end
 
     def accounts(params)
-      return UserConfigStorage.accounts unless id = params['account_id']
+      return UserConfigStorage.accounts unless id = params[:account_id]
       yield account_class[id]
     end
   end

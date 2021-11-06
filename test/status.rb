@@ -35,9 +35,9 @@ module Mulukhiya
       assert_boolean(@status.local?)
     end
 
-    def test_visible?
+    def test_public?
       return unless @status
-      assert_boolean(@status.visible?)
+      assert_boolean(@status.public?)
     end
 
     def test_text

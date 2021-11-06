@@ -3,19 +3,21 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if parser.command?
-      threads = []
-      parser.uris.select {|v| updatable?(v)}.each do |uri|
-        next unless image_uri = create_image_uri(uri)
-        payload[attachment_field] ||= []
-        next unless payload[attachment_field].count < attachment_limit
-        thread = Thread.new do
-          payload[attachment_field].push(
-            sns.upload_remote_resource(image_uri, {response: :id, trim_times: trim_times}),
-          )
+      payload[attachment_field] ||= []
+      parser.uris.select {|v| updatable?(v)}.map do |uri|
+        Thread.new do
+          next if attachment_limit <= payload[attachment_field].count
+          payload[attachment_field].push(upload(uri))
+        rescue => e
+          errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
         end
-        threads.push(thread)
-      end
-      threads.each(&:join)
+      end.each(&:join)
+    end
+
+    def upload(uri, params = {})
+      uri = create_image_uri(uri) rescue uri
+      params[:trim_times] ||= trim_times
+      return super
     end
 
     def trim_times

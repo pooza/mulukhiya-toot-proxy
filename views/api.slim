@@ -112,7 +112,7 @@ html lang='ja'
                   | スケジュール
                   code #{config['/sidekiq/schedule/tagging_dictionary_update/every']}
               .link-description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
-              - config['/tagging/dictionaries'].each do |dic|
+              - config['/handler/dictionary_tag/dics'].each do |dic|
                 .link
                   a href=dic['url'] target='_blank' rel='noreferrer' = dic['url'].ellipsize(64)
               .field-update-button-container

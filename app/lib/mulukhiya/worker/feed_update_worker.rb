@@ -1,12 +1,13 @@
 module Mulukhiya
-  class FeedUpdateWorker
-    include Sidekiq::Worker
-    include Package
-    include SNSMethods
+  class FeedUpdateWorker < Worker
     sidekiq_options retry: false
 
-    def perform
-      return unless controller_class.feed?
+    def disable?
+      return true unless controller_class.feed?
+      return false
+    end
+
+    def perform(params = {})
       CustomFeed.all(&:update)
     end
   end
