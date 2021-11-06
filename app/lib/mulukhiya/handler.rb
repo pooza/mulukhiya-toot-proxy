@@ -164,6 +164,13 @@ module Mulukhiya
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
 
+    def upload(uri, params = {})
+      uri = Ginseng::URI.parse(uri) unless uri.is_a?(Ginseng::URI)
+      raise "Invalid URL '#{uri}'" unless uri.absolute?
+      params[:response] ||= :id
+      return sns.upload_remote_resource(uri, params)
+    end
+
     def parser
       unless @parser
         @parser = @reporter.parser || parser_class.new(@status)

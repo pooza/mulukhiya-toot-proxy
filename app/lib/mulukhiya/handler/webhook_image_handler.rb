@@ -10,9 +10,9 @@ module Mulukhiya
       payload[attachment_field] ||= []
       (payload['attachments'] || []).map do |attachment|
         Thread.new do
-          uri = Ginseng::URI.parse(attachment['image_url'])
-          raise Ginseng::RequestError, "Invalid URL '#{uri}'" unless uri&.absolute?
-          payload[attachment_field].push(sns.upload_remote_resource(uri, {response: :id}))
+          next unless uri = Ginseng::URI.parse(attachment['image_url'])
+          next if attachment_limit <= payload[attachment_field].count
+          payload[attachment_field].push(upload(uri))
           result.push(source_url: uri.to_s)
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
