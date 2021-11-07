@@ -167,8 +167,8 @@ module Mulukhiya
         body: {
           'grant_type' => 'authorization_code',
           'redirect_uri' => config['/annict/oauth/redirect_uri'],
-          'client_id' => AnnictService.client_id,
-          'client_secret' => AnnictService.client_secret,
+          'client_id' => self.class.client_id,
+          'client_secret' => self.class.client_secret,
           'code' => code,
         },
       })
@@ -177,10 +177,10 @@ module Mulukhiya
     def oauth_uri
       uri = oauth_service.create_uri('/oauth/authorize')
       uri.query_values = {
-        client_id: AnnictService.client_id,
+        client_id: self.class.client_id,
         response_type: 'code',
         redirect_uri: config['/annict/oauth/redirect_uri'],
-        scope: AnnictService.oauth_scopes.join(' '),
+        scope: self.class.oauth_scopes.join(' '),
       }
       return uri
     end

@@ -40,7 +40,7 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return AccessToken.first(key)
+        return first(key)
       end
     end
   end

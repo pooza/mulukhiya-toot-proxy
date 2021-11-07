@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def create_image_uri(asin)
-      return nil unless AmazonService.config?
+      return nil unless self.class.config?
       item = lookup(asin)
       ['Large', 'Medium', 'Small'].freeze.each do |size|
         uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def search(keyword, categories)
-      return nil unless AmazonService.config?
+      return nil unless self.class.config?
       cnt ||= 0
       categories.each do |category|
         response = @vacuum.search_items(keywords: keyword, search_index: category)

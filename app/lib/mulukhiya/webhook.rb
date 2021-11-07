@@ -7,7 +7,7 @@ module Mulukhiya
     attr_reader :sns, :reporter
 
     def digest
-      return Webhook.create_digest(@sns.uri, @sns.token)
+      return self.class.create_digest(@sns.uri, @sns.token)
     end
 
     def visibility
@@ -71,7 +71,7 @@ module Mulukhiya
     def self.all
       return enum_for(__method__) unless block_given?
       controller_class.webhook_entries do |entry|
-        yield Webhook.create(entry[:digest])
+        yield create(entry[:digest])
       end
     end
 

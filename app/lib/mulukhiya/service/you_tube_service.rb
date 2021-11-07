@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def api_key
-      return YouTubeService.api_key
+      return self.class.api_key
     end
 
     def self.api_key

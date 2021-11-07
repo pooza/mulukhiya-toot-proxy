@@ -21,8 +21,8 @@ module Mulukhiya
     end
 
     def self.config?
-      return false unless LineService.id
-      return false unless LineService.token
+      return false unless id
+      return false unless token
       return true
     end
   end
