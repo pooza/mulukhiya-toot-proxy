@@ -7,12 +7,12 @@ module Mulukhiya
 
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
-      payload[attachment_field] ||= []
+      payload['attachments'] ||= []
       (payload['attachments'] || []).map do |attachment|
         Thread.new do
           next unless uri = Ginseng::URI.parse(attachment['image_url'])
-          next if attachment_limit <= payload[attachment_field].count
-          payload[attachment_field].push(upload(uri))
+          next if attachment_limit <= payload['attachments'].count
+          payload['attachments'].push(upload(uri))
           result.push(source_url: uri.to_s)
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, attachment: attachment)
