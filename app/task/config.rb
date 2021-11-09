@@ -8,10 +8,10 @@ module Mulukhiya
       result = {controller: Environment.controller_name, environment: Environment.type}
       if config.errors.present?
         result[:config] = config.errors
-        puts result.deep_stringify_key.to_yaml
+        puts result.deep_stringify_keys.to_yaml
         exit 1
       else
-        result[:handlers] = Handler.names.to_a.sort #.join(', ')
+        result[:handlers] = Handler.names.to_a.sort
         result[:config] = 'OK'
         puts result.deep_stringify_keys.to_yaml
       end

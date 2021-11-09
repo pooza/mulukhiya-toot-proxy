@@ -9,6 +9,19 @@ module Mulukhiya
       return self.class.tags
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          tags: {
+            type: 'array',
+            items: {type: 'string'},
+          },
+        },
+        required: ['tags'],
+      )
+    end
+
     def self.tags
       return TagContainer.new((config['/handler/default_tag/tags']))
     end

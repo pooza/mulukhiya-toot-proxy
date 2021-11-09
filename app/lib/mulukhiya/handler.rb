@@ -105,10 +105,10 @@ module Mulukhiya
 
     def schema
       return {
-        'type' => 'object',
-        'properties' => {
-          'disabled' => {'type' => 'boolean'},
-          'timeout' => {'type' => 'string'},
+        type: 'object',
+        properties: {
+          disabled: {type: 'boolean'},
+          timeout: {type: 'integer'},
         },
       }
     end

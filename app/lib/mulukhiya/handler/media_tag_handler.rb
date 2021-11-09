@@ -11,6 +11,22 @@ module Mulukhiya
       @media_tags = nil
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          tags: {
+            type: 'object',
+            properties: {
+              audio: {type: 'string'},
+              image: {type: 'string'},
+              video: {type: 'string'},
+            },
+          },
+        },
+      )
+    end
+
     def self.all
       return {} unless TagContainer.media_tag?
       return [:image, :video, :audio].map {|v| [v, config["/handler/media_tag/tags/#{v}"]]}.to_h
