@@ -29,7 +29,7 @@ module Mulukhiya
     def self.all
       return enum_for(__method__) unless block_given?
       config['/handler/dictionary_tag/dics'].each do |dic|
-        yield RemoteDictionary.create(dic)
+        yield create(dic)
       rescue => e
         logger.error(error: e, dic: dic)
       end

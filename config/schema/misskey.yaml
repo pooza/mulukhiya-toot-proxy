@@ -1,34 +1,33 @@
-misskey:
-  properties:
-    attachment:
-      properties:
-        types:
-          properties:
-            animation_image:
-              type: string
-            audio:
-              type: string
-            image:
-              type: string
-            video:
-              type: string
-          type: object
-      type: object
-    status:
-      properties:
-        label:
-          type: string
-        max_length:
-          type: integer
-      type: object
-    streaming:
-      properties:
-        verify_peer:
-          type: boolean
-      type: object
-    url:
-      format: uri
-      type: string
-  required:
-    - url
-  type: object
+properties:
+  attachment:
+    properties:
+      types:
+        properties:
+          animation_image:
+            type: string
+          audio:
+            type: string
+          image:
+            type: string
+          video:
+            type: string
+        type: object
+    type: object
+  status:
+    properties:
+      label:
+        type: string
+      max_length:
+        type: integer
+    type: object
+  streaming:
+    properties:
+      verify_peer:
+        type: boolean
+    type: object
+  url:
+    format: uri
+    type: string
+required:
+  - url
+type: object

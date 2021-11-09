@@ -13,6 +13,19 @@ module Mulukhiya
       return dest
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          ignore: {
+            type: 'object',
+            properties: {domains: 'array', items: {type: 'string'}},
+            required: ['domains'],
+          },
+        },
+      )
+    end
+
     private
 
     def rewritable?(uri)

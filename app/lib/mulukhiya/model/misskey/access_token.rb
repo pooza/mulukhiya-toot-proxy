@@ -40,7 +40,7 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return AccessToken.first(hash: key[:token]) if key.key?(:token)
+        return first(hash: key[:token]) if key.key?(:token)
       end
     end
   end

@@ -14,6 +14,13 @@ module Mulukhiya
       return true
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {webp: {type: 'boolean'}},
+      )
+    end
+
     def type
       return controller_class.default_animation_image_type
     end

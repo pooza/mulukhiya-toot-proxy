@@ -9,7 +9,7 @@ module Mulukhiya
 
     def search_track(keyword)
       cnt ||= 0
-      return nil unless SpotifyService.config?
+      return nil unless self.class.config?
       return nil unless tracks = RSpotify::Track.search(keyword)
       return tracks.first
     rescue => e
@@ -22,7 +22,7 @@ module Mulukhiya
 
     def lookup_album(id)
       cnt ||= 0
-      return nil unless SpotifyService.config?
+      return nil unless self.class.config?
       return RSpotify::Album.find(id)
     rescue => e
       cnt += 1
@@ -34,7 +34,7 @@ module Mulukhiya
 
     def lookup_track(id)
       cnt ||= 0
-      return nil unless SpotifyService.config?
+      return nil unless self.class.config?
       return RSpotify::Track.find(id)
     rescue => e
       cnt += 1
@@ -46,7 +46,7 @@ module Mulukhiya
 
     def lookup_artist(id)
       cnt ||= 0
-      return nil unless SpotifyService.config?
+      return nil unless self.class.config?
       return RSpotify::Artist.find(id)
     rescue => e
       cnt += 1

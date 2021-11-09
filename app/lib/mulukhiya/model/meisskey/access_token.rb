@@ -61,7 +61,7 @@ module Mulukhiya
 
       def self.webhook_entries
         return enum_for(__method__) unless block_given?
-        AccessToken.aggregate('webhook_entries').each do |row|
+        aggregate('webhook_entries').each do |row|
           yield AccessToken[row['_id']].to_h
         end
       end

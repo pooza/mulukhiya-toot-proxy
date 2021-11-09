@@ -86,9 +86,9 @@ module Mulukhiya
           return account
         elsif acct = key[:acct]
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
-          return Account.first(username: acct.username, domain: acct.domain)
+          return first(username: acct.username, domain: acct.domain)
         end
-        return Account.first(key)
+        return first(key)
       end
     end
   end

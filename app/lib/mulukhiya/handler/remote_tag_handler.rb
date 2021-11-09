@@ -14,6 +14,26 @@ module Mulukhiya
       return tags
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          services: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                pattern: {type: 'string'},
+                tags: {type: 'array', items: {type: 'string'}},
+                url: {type: 'string', format: 'uri'},
+              },
+            },
+          },
+        },
+        required: ['services'],
+      )
+    end
+
     def self.entries
       return enum_for(__method__) unless block_given?
       config['/handler/remote_tag/services'].each do |service|

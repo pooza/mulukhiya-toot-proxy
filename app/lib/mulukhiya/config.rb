@@ -9,12 +9,14 @@ module Mulukhiya
 
     def schema
       unless @schema
-        @schema = Config.load_file('schema/base')
-        @schema['properties'][controller] = Config.load_file("schema/#{controller}")
-        @schema['required'].push(controller)
-        @schema['required'].push(dbms)
-        @schema['required'].push('controller') unless controller == 'mastodon'
-        @schema['properties']['handler'] = handlers
+        @schema = self.class.load_file('schema/base').deep_symbolize_keys
+        @schema[:properties].merge!(
+          controller_name.to_sym => self.class.load_file("schema/#{controller_name}"),
+          :handler => handlers,
+        )
+        @schema[:required].push('controller') unless controller_name == 'mastodon'
+        @schema[:required].concat([controller_name, dbms_name])
+        @schema.deep_stringify_keys!
       end
       return @schema
     end
@@ -33,14 +35,14 @@ module Mulukhiya
           handlers[handler.underscore] ||= handler.schema
         end
       end
-      return handlers
+      return {properties: handlers.deep_symbolize_keys}
     end
 
-    def controller
+    def controller_name
       return Environment.controller_name
     end
 
-    def dbms
+    def dbms_name
       return Environment.dbms_name
     end
   end
