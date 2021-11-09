@@ -13,6 +13,16 @@ module Mulukhiya
       return true
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          pixel: {type: 'integer'},
+        },
+        required: ['pixel'],
+      )
+    end
+
     def pixel
       return config['/handler/image_resize/pixel']
     end

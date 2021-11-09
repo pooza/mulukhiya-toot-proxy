@@ -24,8 +24,10 @@ module Mulukhiya
                 edit: {
                   type: 'object',
                   properties: {'url' => {type: 'string', format: 'uri'}},
+                  required: ['url'],
                 },
               },
+              required: ['url'],
             },
           },
           word: {

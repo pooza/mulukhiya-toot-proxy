@@ -14,6 +14,17 @@ module Mulukhiya
       result.push(path: path)
     end
 
+    def schema
+      return super.deep_merge(
+        type: 'object',
+        properties: {
+          category: {type: 'string'},
+          path: {type: 'string'},
+          comment: {type: 'boolean'},
+        },
+      )
+    end
+
     private
 
     def category
