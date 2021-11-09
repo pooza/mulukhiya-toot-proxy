@@ -12,12 +12,7 @@ module Mulukhiya
     def schema
       return super.deep_merge(
         type: 'object',
-        properties: {
-          tags: {
-            type: 'array',
-            items: {type: 'string'},
-          },
-        },
+        properties: {tags: {type: 'array', items: {type: 'string'}}},
         required: ['tags'],
       )
     end

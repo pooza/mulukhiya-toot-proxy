@@ -16,9 +16,7 @@ module Mulukhiya
     def schema
       return super.deep_merge(
         type: 'object',
-        properties: {
-          pixel: {type: 'integer'},
-        },
+        properties: {pixel: {type: 'integer'}},
         required: ['pixel'],
       )
     end

@@ -19,10 +19,7 @@ module Mulukhiya
         properties: {
           ignore: {
             type: 'object',
-            properties: {
-              domains: 'array',
-              items: {type: string},
-            },
+            properties: {domains: 'array', items: {type: 'string'}},
             required: ['domains'],
           },
         },

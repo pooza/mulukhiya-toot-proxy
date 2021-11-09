@@ -23,9 +23,7 @@ module Mulukhiya
     def schema
       return super.deep_merge(
         type: 'object',
-        properties: {
-          aplha: {type: 'boolean'},
-        },
+        properties: {aplha: {type: 'boolean'}},
       )
     end
 
