@@ -31,9 +31,9 @@ module Mulukhiya
           word: {
             type: 'object',
             properties: {
-              min: {'type' => 'integer'},
-              min_kanji: {'type' => 'integer'},
-              without_kanji_pattern: {'type' => 'string'},
+              min: {type: 'integer'},
+              min_kanji: {type: 'integer'},
+              without_kanji_pattern: {type: 'string'},
             },
           },
         },
