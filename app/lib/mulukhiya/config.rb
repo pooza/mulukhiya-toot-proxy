@@ -11,7 +11,7 @@ module Mulukhiya
       unless @schema
         @schema = self.class.load_file('schema/base').deep_symbolize_keys
         @schema[:properties].merge!(
-          controller_name.to_sym => self.class.load_file("schema/#{controller_name}"),
+          controller_name.to_sym => self.class.load_file("schema/controller/#{controller_name}"),
           :handler => handlers,
         )
         @schema[:required].push('controller') unless controller_name == 'mastodon'
