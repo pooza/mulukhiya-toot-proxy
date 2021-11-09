@@ -196,7 +196,7 @@ GEM
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.20.1)
-    hashie (4.1.0)
+    hashie (5.0.0)
     http (4.4.1)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
