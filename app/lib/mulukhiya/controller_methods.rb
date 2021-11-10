@@ -178,6 +178,10 @@ module Mulukhiya
         return parser_class.visibility_name(name)
       end
 
+      def schema
+        return Config.load_file("schema/controller/#{name}")
+      end
+
       def webhook_entries
         return Environment.access_token_class.webhook_entries
       end

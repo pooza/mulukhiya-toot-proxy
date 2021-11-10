@@ -1,4 +1,9 @@
+type: object
 properties:
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
   dics:
     type: array
     items:
@@ -16,7 +21,7 @@ properties:
           properties:
             url:
               type: string
-              format: uri,
+              format: uri
           required:
             - url
       required:

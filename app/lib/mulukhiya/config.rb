@@ -11,11 +11,11 @@ module Mulukhiya
       unless @schema
         @schema = self.class.load_file('schema/base').deep_symbolize_keys
         @schema[:properties].merge!(
-          controller_name.to_sym => self.class.load_file("schema/controller/#{controller_name}"),
-          :handler => handlers,
+          Environment.controller_name.to_sym => Environment.controller_class.schema,
+          :handler => Handler.all_schema,
         )
-        @schema[:required].push('controller') unless controller_name == 'mastodon'
-        @schema[:required].concat([controller_name, dbms_name])
+        @schema[:required].push('controller') unless Environment.controller_name == 'mastodon'
+        @schema[:required].concat([Environment.controller_name, Environment.dbms_name])
         @schema.deep_stringify_keys!
       end
       return @schema
@@ -24,26 +24,6 @@ module Mulukhiya
     def self.load_file(name)
       name += '.yaml' if File.extname(name).empty?
       return YAML.load_file(File.join(Environment.dir, 'config', name))
-    end
-
-    private
-
-    def handlers
-      handlers = {}
-      Event.all do |event|
-        event.handlers do |handler|
-          handlers[handler.underscore] = handler.schema
-        end
-      end
-      return {properties: handlers.deep_symbolize_keys}
-    end
-
-    def controller_name
-      return Environment.controller_name
-    end
-
-    def dbms_name
-      return Environment.dbms_name
     end
   end
 end

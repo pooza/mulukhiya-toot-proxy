@@ -1,3 +1,8 @@
+type: object
 properties:
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
   webp:
     type: boolean
