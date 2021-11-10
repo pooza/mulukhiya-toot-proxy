@@ -32,7 +32,7 @@ module Mulukhiya
       handlers = {}
       Event.all do |event|
         event.handlers do |handler|
-          handlers[handler.underscore] ||= handler.schema
+          handlers[handler.underscore] = handler.schema
         end
       end
       return {properties: handlers.deep_symbolize_keys}
