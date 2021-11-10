@@ -1,0 +1,34 @@
+properties:
+  dics:
+    type: array
+    items:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        name:
+          type: string
+        type:
+          type: string
+        edit:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri,
+          required:
+            - url
+      required:
+        - url
+  word:
+    type: object
+    properties:
+      min:
+        type: integer
+      min_kanji:
+        type: integer
+      without_kanji_pattern:
+        type: string
+required:
+  - dics

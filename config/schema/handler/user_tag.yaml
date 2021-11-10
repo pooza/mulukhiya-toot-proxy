@@ -1,0 +1,6 @@
+properties:
+  tags:
+    type: object
+    properties:
+      extra_minutes:
+        type: integer

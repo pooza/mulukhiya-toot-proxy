@@ -103,14 +103,14 @@ module Mulukhiya
       return nil
     end
 
+    def schema_path
+      path = File.join('config/schema/', "#{underscore}.yaml")
+      path = 'config/schema/default.yaml' unless File.exist?(File.join(Environment.dir, path))
+      return path
+    end
+
     def schema
-      return {
-        type: 'object',
-        properties: {
-          disabled: {type: 'boolean'},
-          timeout: {type: 'integer'},
-        },
-      }
+      return Config.load_file(schema_path)
     end
 
     def clear

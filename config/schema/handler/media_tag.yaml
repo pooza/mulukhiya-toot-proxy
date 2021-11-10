@@ -1,0 +1,10 @@
+properties:
+  tags:
+    type: object
+    properties:
+      audio:
+        type: string
+      image:
+        type: string
+      video:
+        type: string

@@ -1,0 +1,9 @@
+properties:
+  ignore:
+    type: object
+    properties:
+      domains: array
+      items:
+        type: string
+    required:
+      - domains

@@ -20,13 +20,6 @@ module Mulukhiya
       return config['/handler/image_format_convert/alpha'] == true
     end
 
-    def schema
-      return super.deep_merge(
-        type: 'object',
-        properties: {aplha: {type: 'boolean'}},
-      )
-    end
-
     def type
       return controller_class.default_image_type
     end
