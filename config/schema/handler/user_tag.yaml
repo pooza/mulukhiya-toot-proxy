@@ -1,11 +1,11 @@
-type: object
 properties:
   disabled:
     type: boolean
-  timeout:
-    type: integer
   tags:
-    type: object
     properties:
       extra_minutes:
         type: integer
+    type: object
+  timeout:
+    type: integer
+type: object

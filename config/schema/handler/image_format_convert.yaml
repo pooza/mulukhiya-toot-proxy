@@ -1,8 +1,8 @@
-type: object
 properties:
+  aplha:
+    type: boolean
   disabled:
     type: boolean
   timeout:
     type: integer
-  aplha:
-    type: boolean
+type: object

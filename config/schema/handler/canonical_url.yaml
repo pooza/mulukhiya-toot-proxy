@@ -1,15 +1,15 @@
-type: object
 properties:
   disabled:
     type: boolean
-  timeout:
-    type: integer
   ignore:
-    type: object
     properties:
       domains:
-        type: array
         items:
           type: string
+        type: array
     required:
       - domains
+    type: object
+  timeout:
+    type: integer
+type: object

@@ -1,33 +1,31 @@
-type: object
 properties:
-  disabled:
-    type: boolean
-  timeout:
-    type: integer
   dics:
-    type: array
     items:
-      type: object
       properties:
-        url:
-          type: string
-          format: uri
+        edit:
+          properties:
+            url:
+              format: uri
+              type: string
+          required:
+            - url
+          type: object
         name:
           type: string
         type:
           type: string
-        edit:
-          type: object
-          properties:
-            url:
-              type: string
-              format: uri
-          required:
-            - url
+        url:
+          format: uri
+          type: string
       required:
         - url
+      type: object
+    type: array
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
   word:
-    type: object
     properties:
       min:
         type: integer
@@ -35,5 +33,7 @@ properties:
         type: integer
       without_kanji_pattern:
         type: string
+    type: object
 required:
   - dics
+type: object

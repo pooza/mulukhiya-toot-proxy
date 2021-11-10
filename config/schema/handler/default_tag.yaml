@@ -1,12 +1,12 @@
-type: object
 properties:
   disabled:
     type: boolean
-  timeout:
-    type: integer
   tags:
-    type: array
     items:
       type: string
+    type: array
+  timeout:
+    type: integer
 required:
   - tags
+type: object

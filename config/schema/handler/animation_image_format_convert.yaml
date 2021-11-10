@@ -1,4 +1,3 @@
-type: object
 properties:
   disabled:
     type: boolean
@@ -6,3 +5,4 @@ properties:
     type: integer
   webp:
     type: boolean
+type: object
