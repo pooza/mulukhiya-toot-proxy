@@ -13,6 +13,10 @@ properties:
         name:
           type: string
         type:
+          enum:
+            - multi_field
+            - relative
+            - mecab
           type: string
         url:
           format: uri
