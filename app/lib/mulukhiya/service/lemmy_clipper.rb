@@ -43,8 +43,7 @@ module Mulukhiya
         login
 
         client.on(:error) do |e|
-          logger.info(websocket: uri.to_s, event: e.message)
-          EM.stop_event_loop
+          raise e.message
         end
 
         client.on(:message) do |message|
@@ -53,10 +52,10 @@ module Mulukhiya
           method_name = "handle_#{payload['op']}".underscore.to_sym
           logger.info(websocket: uri.to_s, method: method_name)
           EM.stop_event_loop if send(method_name, payload['data'], body) == :stop
-        rescue => e
-          logger.error(error: e, websocket: uri.to_s)
-          EM.stop_event_loop
         end
+      rescue => e
+        logger.error(error: e, websocket: uri.to_s)
+        EM.stop_event_loop
       end
     end
 
