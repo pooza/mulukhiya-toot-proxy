@@ -34,8 +34,8 @@ module Mulukhiya
 
     def growi
       unless @growi
-        raise Ginseng::ConfigError, '/growi/url undefined' unless user_config['/growi/url']
-        raise Ginseng::ConfigError, '/growi/token undefined' unless user_config['/growi/token']
+        return nil unless user_config['/growi/url'].present?
+        return nil unless user_config['/growi/token'].present?
         default_prefix = File.join('/', Package.short_name, 'user', username)
         @growi = GrowiClipper.new(
           uri: user_config['/growi/url'],
@@ -52,7 +52,7 @@ module Mulukhiya
     def lemmy
       unless @lemmy
         ['host', 'user', 'password', 'community'].freeze.each do |key|
-          raise Ginseng::ConfigError, "/lemmy/#{key} undefined" unless user_config["/lemmy/#{key}"]
+          return nil unless user_config["/lemmy/#{key}"].present?
         end
         @lemmy = LemmyClipper.new(
           host: user_config['/lemmy/host'],
@@ -68,6 +68,7 @@ module Mulukhiya
     end
 
     def dropbox
+      return nil unless user_config['/growi/token'].present?
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
     rescue => e
