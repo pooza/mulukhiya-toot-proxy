@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      params.deep_symbolize_keys!
       return unless account = account_class[params[:account_id]]
       return unless account.lemmy
       return unless uri = create_status_uri(params[:uri])
