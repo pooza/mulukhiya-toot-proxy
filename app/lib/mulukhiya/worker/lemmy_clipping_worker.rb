@@ -7,12 +7,10 @@ module Mulukhiya
 
     def perform(params = {})
       params.deep_symbolize_keys!
-      return unless account = account_class[params[:account_id]]
-      return unless account.lemmy
-      return unless uri = create_status_uri(params[:uri])
-      return unless uri.valid?
-      return unless uri.public?
-      account.lemmy.clip(url: uri.to_s)
+      unless lemmy = account_class[params[:account_id]]&.lemmy
+        raise Ginseng::ConfigError "Lemmy undefined (Account #{params[:account_id]})"
+      end
+      lemmy.clip(url: create_status_uri(params[:uri]))
     end
   end
 end
