@@ -8,7 +8,7 @@ module Mulukhiya
         method_name = create_method_name("#{payload['type']}_notification")
       end
       logger.info(class: self.class.to_s, method: method_name)
-      send(method_name.to_sym, payload)
+      return send(method_name.to_sym, payload)
     rescue NoMethodError
       logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
     rescue => e
