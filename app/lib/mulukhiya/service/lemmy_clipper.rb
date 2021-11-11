@@ -11,8 +11,8 @@ module Mulukhiya
     end
 
     def client
-      @client ||= Faye::WebSocket::Client.new(uri.to_s, nil, {
-        ping: config['/websocket/keepalive'],
+      @client ||= Faye::WebSocket::Client.new(uri.to_s, [], {
+        ping: keepalive,
       })
       return @client
     end
@@ -23,6 +23,10 @@ module Mulukhiya
         @uri.path = config['/lemmy/urls/api']
       end
       return @uri
+    end
+
+    def keepalive
+      return config['/websocket/keepalive']
     end
 
     def handle_login(payload, body)
@@ -38,22 +42,19 @@ module Mulukhiya
       EM.run do
         login
 
-        client.on(:close) do |e|
-          EM.stop_event_loop
-        end
-
         client.on(:error) do |e|
-          logger.error(error: e.message)
+          logger.info(websocket: uri.to_s, event: e.message)
           EM.stop_event_loop
         end
 
         client.on(:message) do |message|
           payload = JSON.parse(message.data)
           raise payload['error'] if payload['error']
-          method = "handle_#{payload['op']}".underscore.to_sym
-          EM.stop_event_loop if send(method, payload['data'], body) == :stop
+          method_name = "handle_#{payload['op']}".underscore.to_sym
+          logger.info(websocket: uri.to_s, method: method_name)
+          EM.stop_event_loop if send(method_name, payload['data'], body) == :stop
         rescue => e
-          logger.error(error: e)
+          logger.error(error: e, websocket: uri.to_s)
           EM.stop_event_loop
         end
       end
