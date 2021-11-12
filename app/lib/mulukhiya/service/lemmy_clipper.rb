@@ -12,6 +12,9 @@ module Mulukhiya
 
     def client
       @client ||= Faye::WebSocket::Client.new(uri.to_s, [], {
+        tls: {
+          verify_peer: verify_peer?,
+        },
         ping: keepalive,
       })
       return @client
@@ -27,6 +30,10 @@ module Mulukhiya
 
     def keepalive
       return config['/websocket/keepalive']
+    end
+
+    def verify_peer?
+      return config['/lemmy/verify_peer']
     end
 
     def handle_login(payload, body)

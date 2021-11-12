@@ -266,6 +266,7 @@ lemmy:
     max_length: 50
   urls:
     api: /api/v3/ws
+  verify_peer: true
 line:
   urls:
     api: https://api.line.me

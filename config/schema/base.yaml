@@ -164,6 +164,11 @@ properties:
     required:
       - api
     type: object
+  lemmy:
+    properties:
+      verify_peer:
+        type: boolean
+    type: object
   postgres:
     properties:
       dsn:
