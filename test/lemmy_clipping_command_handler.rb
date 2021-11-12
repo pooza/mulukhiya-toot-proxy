@@ -11,12 +11,12 @@ module Mulukhiya
       sleep(1)
 
       @handler.clear
-      @handler.handle_toot(status_field => "command: lemmy_clipping\nurl: https://mstdn.b-shock.org/web/statuses/101125535795976504")
+      @handler.handle_toot(status_field => "command: lemmy_clipping\nurl: https://mstdn.b-shock.org/@pooza/107261745532055084")
       assert(@handler.debug_info[:result].present?)
       sleep(1)
 
       @handler.clear
-      @handler.handle_toot(status_field => "command: lemmy_clipping\nurl: https://precure.ml/@pooza/101276312982799462")
+      @handler.handle_toot(status_field => "command: lemmy_clipping\nurl: https://precure.ml/@pooza/107261745992066604")
       assert(@handler.debug_info[:result].present?)
       sleep(1)
     end

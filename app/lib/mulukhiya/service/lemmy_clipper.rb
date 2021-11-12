@@ -87,8 +87,8 @@ module Mulukhiya
       data = {nsfw: false, community_id: @params[:community], auth: @jwt}
       data[:name] = body[:name].to_s if body[:name]
       if uri = create_status_uri(body[:url])
-        raise Ginseng::RequestError "Invalid URI #{uri}" unless uri.valid?
-        raise Ginseng::RequestError "Invalid URI #{uri}" unless uri.public?
+        raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
+        raise Ginseng::RequestError, "URI #{uri} not puclic" unless uri.public?
         data[:url] = uri.to_s
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s
