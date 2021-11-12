@@ -6,9 +6,11 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      return unless account = account_class[params[:account_id]]
-      return unless account.dropbox
-      account.dropbox.clip(body: create_body(params))
+      params.deep_symbolize_keys!
+      unless dropbox = account_class[params[:account_id]]&.dropbox
+        raise Ginseng::ConfigError "Dropbox undefined (Account #{params[:account_id]})"
+      end
+      dropbox.clip(body: create_body(params))
     end
   end
 end

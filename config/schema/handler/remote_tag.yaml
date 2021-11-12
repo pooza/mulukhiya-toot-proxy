@@ -1,0 +1,22 @@
+properties:
+  disabled:
+    type: boolean
+  services:
+    items:
+      properties:
+        pattern:
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+        url:
+          format: uri
+          type: string
+      type: object
+    type: array
+  timeout:
+    type: integer
+required:
+  - services
+type: object

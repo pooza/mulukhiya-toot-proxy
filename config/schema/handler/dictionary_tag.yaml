@@ -1,0 +1,43 @@
+properties:
+  dics:
+    items:
+      properties:
+        edit:
+          properties:
+            url:
+              format: uri
+              type: string
+          required:
+            - url
+          type: object
+        name:
+          type: string
+        type:
+          enum:
+            - multi_field
+            - relative
+            - mecab
+          type: string
+        url:
+          format: uri
+          type: string
+      required:
+        - url
+      type: object
+    type: array
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
+  word:
+    properties:
+      min:
+        type: integer
+      min_kanji:
+        type: integer
+      without_kanji_pattern:
+        type: string
+    type: object
+required:
+  - dics
+type: object

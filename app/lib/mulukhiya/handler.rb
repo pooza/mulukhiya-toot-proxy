@@ -104,13 +104,9 @@ module Mulukhiya
     end
 
     def schema
-      return {
-        type: 'object',
-        properties: {
-          disabled: {type: 'boolean'},
-          timeout: {type: 'integer'},
-        },
-      }
+      return Config.load_file("schema/handler/#{underscore}")
+    rescue
+      return Config.load_file('schema/handler/default')
     end
 
     def clear
@@ -201,6 +197,14 @@ module Mulukhiya
 
     def self.search(pattern)
       return names.select {|v| v.match?(pattern) && !config.disable?(v)}.to_set
+    end
+
+    def self.all_schema
+      properties = {}
+      Event.all do |event|
+        properties.merge!(event.handlers.map {|v| [v.underscore, v.schema]}.to_h)
+      end
+      return {type: 'object', properties: properties.deep_symbolize_keys}
     end
 
     private

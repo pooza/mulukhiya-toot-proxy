@@ -11,8 +11,11 @@ module Mulukhiya
     end
 
     def client
-      @client ||= Faye::WebSocket::Client.new(uri.to_s, nil, {
-        ping: config['/websocket/keepalive'],
+      @client ||= Faye::WebSocket::Client.new(uri.to_s, [], {
+        tls: {
+          verify_peer: verify_peer?,
+        },
+        ping: keepalive,
       })
       return @client
     end
@@ -23,6 +26,14 @@ module Mulukhiya
         @uri.path = config['/lemmy/urls/api']
       end
       return @uri
+    end
+
+    def keepalive
+      return config['/websocket/keepalive']
+    end
+
+    def verify_peer?
+      return config['/lemmy/verify_peer']
     end
 
     def handle_login(payload, body)
@@ -38,13 +49,8 @@ module Mulukhiya
       EM.run do
         login
 
-        client.on(:close) do |e|
-          EM.stop_event_loop
-        end
-
         client.on(:error) do |e|
-          logger.error(error: e.message)
-          EM.stop_event_loop
+          raise e.message
         end
 
         client.on(:message) do |message|
@@ -52,10 +58,10 @@ module Mulukhiya
           raise payload['error'] if payload['error']
           method = "handle_#{payload['op']}".underscore.to_sym
           EM.stop_event_loop if send(method, payload['data'], body) == :stop
-        rescue => e
-          logger.error(error: e)
-          EM.stop_event_loop
         end
+      rescue => e
+        logger.error(error: e, websocket: uri.to_s)
+        EM.stop_event_loop
       end
     end
 
@@ -77,9 +83,12 @@ module Mulukhiya
     end
 
     def post(body)
+      body.deep_symbolize_keys!
       data = {nsfw: false, community_id: @params[:community], auth: @jwt}
       data[:name] = body[:name].to_s if body[:name]
       if uri = create_status_uri(body[:url])
+        raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
+        raise Ginseng::RequestError, "URI #{uri} not puclic" unless uri.public?
         data[:url] = uri.to_s
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s

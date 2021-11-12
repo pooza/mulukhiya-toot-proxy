@@ -6,9 +6,11 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      return unless account = account_class[params[:account_id]]
-      return unless account.growi
-      account.growi.clip(body: create_body(params))
+      params.deep_symbolize_keys!
+      unless growi = account_class[params[:account_id]]&.growi
+        raise Ginseng::ConfigError "GROWI undefined (Account #{params[:account_id]})"
+      end
+      growi.clip(body: create_body(params))
     end
   end
 end

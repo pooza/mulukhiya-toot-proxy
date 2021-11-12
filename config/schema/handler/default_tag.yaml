@@ -1,0 +1,12 @@
+properties:
+  disabled:
+    type: boolean
+  tags:
+    items:
+      type: string
+    type: array
+  timeout:
+    type: integer
+required:
+  - tags
+type: object

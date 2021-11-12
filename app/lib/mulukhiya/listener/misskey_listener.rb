@@ -4,7 +4,7 @@ module Mulukhiya
       payload = JSON.parse(message.data)['body']
       method_name = create_method_name(payload['type'])
       logger.info(class: self.class.to_s, method: method_name)
-      send(method_name.to_sym, payload)
+      return send(method_name.to_sym, payload)
     rescue NoMethodError
       logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
     rescue => e
@@ -30,11 +30,11 @@ module Mulukhiya
         listener = MisskeyListener.new
 
         listener.client.on :close do |e|
-          raise Ginseng::GatewayError, e.message
+          raise Ginseng::GatewayError, (e.message rescue e.to_s)
         end
 
         listener.client.on :error do |e|
-          raise Ginseng::GatewayError, e.message
+          raise Ginseng::GatewayError, (e.message rescue e.to_s)
         end
 
         listener.client.on :message do |message|

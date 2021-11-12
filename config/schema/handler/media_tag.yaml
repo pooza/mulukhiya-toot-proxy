@@ -1,0 +1,15 @@
+properties:
+  disabled:
+    type: boolean
+  tags:
+    properties:
+      audio:
+        type: string
+      image:
+        type: string
+      video:
+        type: string
+    type: object
+  timeout:
+    type: integer
+type: object

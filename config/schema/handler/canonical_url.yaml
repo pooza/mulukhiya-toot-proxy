@@ -1,0 +1,15 @@
+properties:
+  disabled:
+    type: boolean
+  ignore:
+    properties:
+      domains:
+        items:
+          type: string
+        type: array
+    required:
+      - domains
+    type: object
+  timeout:
+    type: integer
+type: object

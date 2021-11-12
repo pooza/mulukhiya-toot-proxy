@@ -1,0 +1,12 @@
+properties:
+  category:
+    type: string
+  comment:
+    type: boolean
+  disabled:
+    type: boolean
+  path:
+    type: string
+  timeout:
+    type: integer
+type: object

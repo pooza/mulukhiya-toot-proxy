@@ -1,0 +1,11 @@
+properties:
+  disabled:
+    type: boolean
+  tags:
+    properties:
+      extra_minutes:
+        type: integer
+    type: object
+  timeout:
+    type: integer
+type: object
