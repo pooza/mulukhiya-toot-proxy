@@ -29,18 +29,6 @@ module Mulukhiya
       return config['/websocket/keepalive']
     end
 
-    def receive(message, body)
-      payload = JSON.parse(message.data)
-      raise payload['error'] if payload['error']
-      method_name = create_method_name(payload['op'])
-      logger.info(websocket: uri.to_s, method: method_name)
-      return send(method_name.to_sym, payload, body)
-    rescue NoMethodError
-      logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
-    rescue => e
-      logger.error(error: e, payload: (payload rescue message.data))
-    end
-
     def handle_login(payload, body)
       @jwt = payload['jwt']
       post(body)
@@ -58,8 +46,11 @@ module Mulukhiya
           raise e.message
         end
 
-        client.on :message do |message|
-          EM.stop_event_loop if receive(message, body) == :stop
+        client.on(:message) do |message|
+          payload = JSON.parse(message.data)
+          raise payload['error'] if payload['error']
+          method = "handle_#{payload['op']}".underscore.to_sym
+          EM.stop_event_loop if send(method, payload['data'], body) == :stop
         end
       rescue => e
         logger.error(error: e, websocket: uri.to_s)
@@ -68,10 +59,6 @@ module Mulukhiya
     end
 
     private
-
-    def create_method_name(name)
-      return "handle_#{name.gsub(/[^[:word:]]+/, '_')}".underscore
-    end
 
     def username
       return @params[:user]
