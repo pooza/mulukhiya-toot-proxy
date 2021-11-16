@@ -116,7 +116,7 @@ GEM
     connection_pool (2.2.5)
     crass (1.0.6)
     daemon-spawn (0.4.2)
-    date (3.2.0)
+    date (3.2.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dropbox_api (0.1.20)
