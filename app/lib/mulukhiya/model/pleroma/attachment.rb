@@ -80,14 +80,18 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
-        return enum_for(__method__, params) unless block_given?
-        return Postgres.instance.execute('media_catalog', query_params.merge(params)).each do |row|
-          next unless attachment = get(id: row['id'])
-          time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
-          attachment.date = Time.parse(time).getlocal
-          yield attachment.to_h.merge(status_url: row['status_uri'])
+        params[:page] ||= 1
+        storage = MediaCatalogRenderStorage.new
+        unless storage[params]
+          catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
+          storage[params] = catalog.select {|v| get(id: v['id'])}.map do |row|
+            time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
+            attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
+            attachment.date = Time.parse(time).getlocal
+            attachment.to_h.merge(status_url: row['status_uri'])
+          end
         end
+        return storage[params].map(&:deep_symbolize_keys)
       end
     end
   end
