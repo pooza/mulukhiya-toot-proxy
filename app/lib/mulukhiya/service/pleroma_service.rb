@@ -17,6 +17,7 @@ module Mulukhiya
         path = dest
       end
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
+      MediaCatalogRenderStorage.new.clear
       return super
     ensure
       FileUtils.rm_rf(dir) if dir
