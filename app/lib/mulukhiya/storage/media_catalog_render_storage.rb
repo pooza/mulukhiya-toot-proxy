@@ -1,7 +1,7 @@
 module Mulukhiya
   class MediaCatalogRenderStorage < RenderStorage
     def get(key)
-      return super.map(&:deep_symbolize_keys)
+      return super&.map(&:deep_symbolize_keys)
     end
 
     def ttl

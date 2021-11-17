@@ -67,14 +67,18 @@ module Mulukhiya
       def self.catalog(params = {})
         storage = MediaCatalogRenderStorage.new
         unless storage[params]
-          storage[params] = status[:_files].map do |row|
-            attachment = Attachment[row[:_id]]
-            attachment.to_h.deep_symbolize_keys.merge(
-              id: attachment.id,
-              date: attachment.createdAt,
-              status_url: attachment.uri.to_s,
-            )
+          attachments = []
+          statuses.each do |status|
+            status[:_files].each do |row|
+              attachment = Attachment[row[:_id]]
+              attachments.push(attachment.to_h.deep_symbolize_keys.merge(
+                id: attachment.id,
+                date: attachment.createdAt,
+                status_url: attachment.uri.to_s,
+              ))
+            end
           end
+          storage[params] = attachments
         end
         return storage[params]
       end
