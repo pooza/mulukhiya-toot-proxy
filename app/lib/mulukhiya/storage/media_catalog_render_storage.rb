@@ -4,6 +4,11 @@ module Mulukhiya
       return super&.map(&:deep_symbolize_keys)
     end
 
+    def setex(key, ttl, value)
+      super
+      logger.info(class: self.class.to_s, message: 'update', page: key[:page])
+    end
+
     def ttl
       return config['/webui/media/cache/ttl']
     end
