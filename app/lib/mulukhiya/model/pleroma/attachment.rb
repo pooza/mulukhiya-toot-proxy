@@ -65,29 +65,34 @@ module Mulukhiya
           return Attachment[row['id']]
         elsif key.key?(:id)
           return Attachment[key[:id]]
+        elsif key.key?(:row)
+          row = key[:row].deep_symbolize_keys
+          time = "#{row[:created_at].to_s.split(/\s+/)[0..1].join(' ')} UTC"
+          attachment = get(id: row[:id])
+          attachment.account = Account.get(acct: Acct.new("@#{row[:username]}@#{row[:host]}"))
+          attachment.date = Time.parse(time).getlocal
+          return attachment
         end
       end
 
       def self.feed
         return enum_for(__method__) unless block_given?
         Postgres.instance.execute('media_catalog', query_params).each do |row|
-          time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment = get(id: row['id'])
-          attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
-          attachment.date = Time.parse(time).getlocal
-          yield attachment.feed_entry
+          yield get(row: row).feed_entry
         end
       end
 
       def self.catalog(params = {})
-        return enum_for(__method__, params) unless block_given?
-        return Postgres.instance.execute('media_catalog', query_params.merge(params)).each do |row|
-          next unless attachment = get(id: row['id'])
-          time = "#{row['created_at'].to_s.split(/\s+/)[0..1].join(' ')} UTC"
-          attachment.account = Account.get(acct: Acct.new("@#{row['username']}@#{row['host']}"))
-          attachment.date = Time.parse(time).getlocal
-          yield attachment.to_h.merge(status_url: row['status_uri'])
+        params[:page] ||= 1
+        storage = MediaCatalogRenderStorage.new
+        unless storage[params]
+          catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
+          storage[params] = catalog.select {|v| v['id']}.map do |row|
+            attachment = get(row: row)
+            attachment.to_h.merge(status_url: row['status_uri'])
+          end
         end
+        return storage[params]
       end
     end
   end

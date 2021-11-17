@@ -74,12 +74,13 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
-        catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
-        key = catalog.to_json.adler32
-        storage = RenderStorage.new
-        storage.ttl = config['/webui/media/cache/ttl']
-        storage[key] = catalog.map {|row| Attachment[row[:id]].to_h} unless storage[key]
-        return storage[key].map(&:deep_symbolize_keys)
+        params[:page] ||= 1
+        storage = MediaCatalogRenderStorage.new
+        unless storage[params]
+          catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
+          storage[params] = catalog.map {|row| Attachment[row[:id]].to_h}
+        end
+        return storage[params]
       end
 
       def self.feed

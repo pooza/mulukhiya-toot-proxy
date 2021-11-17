@@ -266,6 +266,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.updateMediaCatalog = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/media/catalog/update', {token: Vue.getToken()})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

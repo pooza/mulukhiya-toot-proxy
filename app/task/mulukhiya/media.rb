@@ -34,6 +34,13 @@ module Mulukhiya
 
         task clear: [:clean]
       end
+
+      namespace :catalog do
+        desc 'update media catalog'
+        task :update do
+          MediaCatalogUpdateWorker.perform_async
+        end
+      end
     end
   end
 end

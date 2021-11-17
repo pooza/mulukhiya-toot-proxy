@@ -1,0 +1,16 @@
+properties:
+  disabled:
+    type: boolean
+  message:
+    type: string
+  tag:
+    type: string
+  url:
+    format: uri
+    type: string
+  timeout:
+    type: integer
+required:
+  - tag
+  - url
+type: object

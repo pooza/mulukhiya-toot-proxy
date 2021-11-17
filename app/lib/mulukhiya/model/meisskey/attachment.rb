@@ -65,19 +65,22 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
-        return enum_for(__method__, params) unless block_given?
-        statuses(params[:page]).each do |status|
-          status[:_files].each do |row|
-            attachment = Attachment[row[:_id]]
-            yield attachment.to_h.deep_symbolize_keys.merge(
-              id: attachment.id,
-              date: attachment.createdAt,
-              status_url: attachment.uri.to_s,
-            )
-          rescue => e
-            logger.error(error: e, row: row)
+        storage = MediaCatalogRenderStorage.new
+        unless storage[params]
+          attachments = []
+          statuses.each do |status|
+            status[:_files].each do |row|
+              attachment = Attachment[row[:_id]]
+              attachments.push(attachment.to_h.deep_symbolize_keys.merge(
+                id: attachment.id,
+                date: attachment.createdAt,
+                status_url: attachment.uri.to_s,
+              ))
+            end
           end
+          storage[params] = attachments
         end
+        return storage[params]
       end
 
       def self.feed

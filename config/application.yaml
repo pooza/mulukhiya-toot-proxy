@@ -182,6 +182,10 @@ handler:
   hexo_announce:
     category: お知らせ
     comments: false
+  image_copyright:
+    tag: null
+    message: ※画像有 著作権表示 参照のこと
+    url: null
   image_format_convert:
     alpha: true
   image_resize:
@@ -363,6 +367,7 @@ mastodon:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
       - invalid_command
     pre_upload:
@@ -396,6 +401,7 @@ mastodon:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -528,6 +534,7 @@ meisskey:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
       - invalid_command
     pre_upload:
@@ -557,6 +564,7 @@ meisskey:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
   oauth:
     scopes:
@@ -690,6 +698,7 @@ misskey:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
       - invalid_command
     pre_upload:
@@ -719,6 +728,7 @@ misskey:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
   oauth:
     scopes:
@@ -826,7 +836,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.11.4
+  version: 4.11.5
 parser:
   note:
     fields:
@@ -939,6 +949,7 @@ pleroma:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
       - invalid_command
     pre_upload:
@@ -970,6 +981,7 @@ pleroma:
       - media_tag
       - user_tag
       - remote_tag
+      - image_copyright
       - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -1028,6 +1040,9 @@ sidekiq:
     feed_update:
       class: Mulukhiya::FeedUpdateWorker
       every: 5m
+    media_catalog_update:
+      class: Mulukhiya::MediaCatalogUpdateWorker
+      cron: 4 3 * * *
     media_cleaning:
       class: Mulukhiya::MediaCleaningWorker
       every: 10m
