@@ -74,12 +74,12 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
-        return enum_for(__method__, params) unless block_given?
-        return Postgres.instance.execute('media_catalog', query_params.merge(params)).each do |row|
-          yield Attachment[row[:id]].to_h
-        rescue => e
-          logger.error(error: e, row: row)
-        end
+        catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
+        key = catalog.to_json.adler32
+        storage = RenderStorage.new
+        storage.ttl = config['/webui/media/cache/ttl']
+        storage[key] = catalog.map {|row| Attachment[row[:id]].to_h} unless storage[key]
+        return storage[key].map(&:deep_symbolize_keys)
       end
 
       def self.feed

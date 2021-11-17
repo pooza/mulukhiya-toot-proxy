@@ -45,5 +45,14 @@ module Mulukhiya
     rescue
       return params[:token]
     end
+
+    def self.media_copyright
+      return nil unless config['/webui/media/copyright/message']
+      return nil unless config['/webui/media/copyright/url']
+      return {
+        message: config['/webui/media/copyright/message'],
+        url: config['/webui/media/copyright/url'],
+      }
+    end
   end
 end
