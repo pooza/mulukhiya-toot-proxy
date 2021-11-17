@@ -1028,6 +1028,9 @@ sidekiq:
     feed_update:
       class: Mulukhiya::FeedUpdateWorker
       every: 5m
+    media_catalog_update:
+      class: Mulukhiya::MediaCatalogUpdateWorker
+      cron: 4 3 * * *
     media_cleaning:
       class: Mulukhiya::MediaCleaningWorker
       every: 10m

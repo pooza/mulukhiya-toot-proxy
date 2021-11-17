@@ -56,6 +56,14 @@ html lang='ja'
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
                 button @click='clearMediaMetadata' 実行
+            .endpoint-container v-if='account.is_admin'
+              .role admin
+              .role moderator
+              .link POST /mulukhiya/api/media/catalog/update
+              pre.payload v-if='query_params.media_catalog_update' {{query_params.media_catalog_update}}
+              .link-description メディアカタログを更新します。
+              .field-update-button-container
+                button @click='updateMediaCatalog' 実行
         - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表
@@ -209,6 +217,7 @@ html lang='ja'
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
             media_metadata_clear: {token: Vue.getToken()},
+            media_catalog_update: {token: Vue.getToken()},
             program_update: {token: Vue.getToken()},
             tagging_tag_search: {q: null},
             tagging_dic_update: {token: Vue.getToken()},
@@ -296,6 +305,11 @@ html lang='ja'
           },
           clearMediaMetadata () {
             Vue.clearMediaMetadata()
+              .then(e => {this.layout.details['media'] = false})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          updateMediaCatalog () {
+            Vue.updateMediaCatalog()
               .then(e => {this.layout.details['media'] = false})
               .catch(e => Vue.alert(this.$dialog, e))
           },
