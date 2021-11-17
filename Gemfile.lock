@@ -1,17 +1,17 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 809981d80d46f56326a9e73cfc93b3d5f0bf5cc9
+  revision: 1bdedd07eb6a26f118d91d220b5369fc8b7421ea
   specs:
-    ginseng-core (1.11.8)
+    ginseng-core (1.11.9)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
       daemon-spawn
-      date
+      date (>= 3.2.1)
       erb
       etc
       facets
-      fileutils
+      fileutils (= 1.5.0)
       find
       httparty
       json-schema
@@ -393,7 +393,6 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
-  fileutils (= 1.5.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
