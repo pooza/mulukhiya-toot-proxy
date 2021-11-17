@@ -1075,6 +1075,9 @@ websocket:
   retry:
     seconds: 5
 webui:
+  copyright:
+    message: null
+    url: null
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js

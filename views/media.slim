@@ -9,6 +9,10 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
+      - if Mulukhiya::UIController.media_copyright
+        ul.copyright
+          li
+            a href=Mulukhiya::UIController.media_copyright[:url] target='_blank' rel='noreferrer' = Mulukhiya::UIController.media_copyright[:message]
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container

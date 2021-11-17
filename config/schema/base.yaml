@@ -242,6 +242,20 @@ properties:
     required:
       - client
     type: object
+  webui:
+    properties:
+      copyright:
+        properties:
+          message:
+            type: string
+          url:
+            format: uri
+            type: string
+        type: object
+        required:
+          - message
+          - url
+    type: object
 required:
   - agent
   - alert
