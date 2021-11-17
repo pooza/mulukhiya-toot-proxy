@@ -1095,6 +1095,9 @@ webui:
       - https://use.fontawesome.com/releases/v5.15.4/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
+  media:
+    cache:
+      ttl: 8640000
   metadata:
     robots: noindex,nofollow
     viewport: width=1000

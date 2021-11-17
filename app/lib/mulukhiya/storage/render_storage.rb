@@ -15,15 +15,15 @@ module Mulukhiya
       return nil
     end
 
-    def set(command, value)
-      setex(command, ttl, value)
+    def set(key, value)
+      setex(key, ttl, value)
     end
 
-    def setex(command, ttl, value)
+    def setex(key, ttl, value)
       if value.is_a?(Enumerable)
-        super(command, ttl, value.to_json)
+        super(key, ttl, value.to_json)
       else
-        super(command, ttl, value.to_s)
+        super(key, ttl, value.to_s)
       end
     end
 
