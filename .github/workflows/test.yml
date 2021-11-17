@@ -40,9 +40,7 @@ jobs:
           bundle exec rake bundle:check
       - name: Run lint
         run: |
-          bundle exec rubocop
-          bundle exec rake erb:lint
-          bundle exec rake slim:lint
+          bundle exec rake lint
       - name: Run test
         run: |
           bundle exec rake test
