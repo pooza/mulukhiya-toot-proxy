@@ -80,7 +80,7 @@ module Mulukhiya
           catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
           storage[params] = catalog.map {|row| Attachment[row[:id]].to_h}
         end
-        return storage[params].map(&:deep_symbolize_keys)
+        return storage[params]
       end
 
       def self.feed

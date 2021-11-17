@@ -1,5 +1,9 @@
 module Mulukhiya
   class MediaCatalogRenderStorage < RenderStorage
+    def get(key)
+      return super.map(&:deep_symbolize_keys)
+    end
+
     def ttl
       return config['/webui/media/cache/ttl']
     end
