@@ -6,9 +6,16 @@ module Mulukhiya
 
     alias info nodeinfo
 
+    def post(body, params = {})
+      response = super
+      MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
+      return response
+    end
+
+    alias toot post
+
     def upload(path, params = {})
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
-      MediaCatalogRenderStorage.new.clear
       return super
     end
 
