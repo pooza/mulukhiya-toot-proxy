@@ -47,10 +47,11 @@ module Mulukhiya
     end
 
     def self.media_copyright
-      return nil unless [config['/webui/copyright/message'], config['/webui/copyright/url']].any?
+      return nil unless config['/webui/media/copyright/message']
+      return nil unless config['/webui/media/copyright/url']
       return {
-        message: config['/webui/copyright/message'],
-        url: config['/webui/copyright/url'],
+        message: config['/webui/media/copyright/message'],
+        url: config['/webui/media/copyright/url'],
       }
     end
   end

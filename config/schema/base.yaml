@@ -244,17 +244,20 @@ properties:
     type: object
   webui:
     properties:
-      copyright:
+      media:
         properties:
-          message:
-            type: string
-          url:
-            format: uri
-            type: string
+          copyright:
+            properties:
+              message:
+                type: string
+              url:
+                format: uri
+                type: string
+            type: object
+            required:
+              - message
+              - url
         type: object
-        required:
-          - message
-          - url
     type: object
 required:
   - agent

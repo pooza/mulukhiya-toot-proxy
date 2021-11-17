@@ -45,6 +45,7 @@ user_config:
   redis:
     dsn: redis://localhost:6379/1
 webui:
-  copyright:
-    message: 画像の著作権について
-    url: https://blog.example.com/copyright
+  media:
+    copyright:
+      message: 画像の著作権について
+      url: https://blog.example.com/copyright
