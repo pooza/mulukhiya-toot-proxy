@@ -4,6 +4,11 @@ module Mulukhiya
   class Postgres < Ginseng::Postgres::Database
     include Package
 
+    def initialize
+      super
+      @connection.convert_infinite_timestamps = :nil
+    end
+
     def loggable?
       return Environment.test? || Environment.development? || config['/postgres/query_log']
     end
