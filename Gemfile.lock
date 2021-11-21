@@ -116,7 +116,7 @@ GEM
     connection_pool (2.2.5)
     crass (1.0.6)
     daemon-spawn (0.4.2)
-    date (3.2.1)
+    date (3.2.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dropbox_api (0.1.20)
@@ -213,7 +213,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
-    io-wait (0.2.0)
+    io-wait (0.2.1)
     json (2.6.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
@@ -423,4 +423,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.30
+   2.2.31
