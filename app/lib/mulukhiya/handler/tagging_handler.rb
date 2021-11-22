@@ -3,7 +3,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       lines = @status.each_line(chomp: true).to_a
-      last = lines.pop if Ginseng::URI.parse(lines.last).absolute?
+      last = lines.pop if Ginseng::URI.parse(lines.last)&.absolute?
       lines.clone.reverse_each do |line|
         break unless /^\s*(#[[:word:]]+\s*)+$/.match?(line)
         tags.merge(lines.pop.strip.split(/\s+/))
