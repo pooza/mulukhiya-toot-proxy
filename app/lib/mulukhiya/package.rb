@@ -82,6 +82,10 @@ module Mulukhiya
     end
 
     module Methods
+      def environment_class
+        return Environment
+      end
+
       def logger
         return Logger.new
       end

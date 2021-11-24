@@ -20,10 +20,5 @@ module Mulukhiya
       end
       return @schema
     end
-
-    def self.load_file(name)
-      name += '.yaml' if File.extname(name).empty?
-      return YAML.load_file(File.join(Environment.dir, 'config', name))
-    end
   end
 end
