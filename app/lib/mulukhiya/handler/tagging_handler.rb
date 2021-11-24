@@ -24,6 +24,8 @@ module Mulukhiya
       return false unless uri.absolute?
       return false unless uri.scheme.match?(/^https?$/)
       return true
+    rescue Addressable::URI::InvalidURIError
+      return false
     end
   end
 end

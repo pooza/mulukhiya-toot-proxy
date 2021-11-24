@@ -25,6 +25,10 @@ module Mulukhiya
       @handler.tags.merge(['宮本佳那子', 'precure_fun', 'music_apple_com', 'iTunes'])
       @handler.handle_pre_toot(status_field => "#nowplaying https://music.apple.com/jp/album/1439287709?i=1439287882\nTitle: Kanako's プリキュア・エンディングテーマ・メドレー\nAlbum: PRECURE Best Songs Selection 「Dear my past self」\nArtist: 宮本佳那子")
       assert_equal(@handler.payload[status_field], "#nowplaying https://music.apple.com/jp/album/1439287709?i=1439287882\nTitle: Kanako's プリキュア・エンディングテーマ・メドレー\nAlbum: PRECURE Best Songs Selection 「Dear my past self」\nArtist: 宮本佳那子\n#宮本佳那子 #precure_fun #music_apple_com #iTunes")
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => ':nyatoran_anime: :pegitan_anime: :rabirin_anime:')
+      assert_equal(@handler.payload[status_field], ":nyatoran_anime: :pegitan_anime: :rabirin_anime:\n")
     end
   end
 end
