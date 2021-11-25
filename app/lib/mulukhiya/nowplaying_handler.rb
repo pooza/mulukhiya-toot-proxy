@@ -12,7 +12,7 @@ module Mulukhiya
       self.payload = payload
       return unless parser.nowplaying?
       return if parser.command?
-      @status.each_line do |line|
+      status_lines.each do |line|
         push(line)
         handle_line(line)
       end

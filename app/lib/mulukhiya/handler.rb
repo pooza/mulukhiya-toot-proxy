@@ -160,6 +160,11 @@ module Mulukhiya
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
 
+    def status_lines
+      return nil unless @status
+      return @status.each_line(chomp: true).to_a
+    end
+
     def upload(uri, params = {})
       uri = Ginseng::URI.parse(uri) unless uri.is_a?(Ginseng::URI)
       raise "Invalid URL '#{uri}'" unless uri.absolute?

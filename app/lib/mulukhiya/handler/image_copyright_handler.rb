@@ -11,7 +11,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return unless appendable?
-      lines = [message, uri.to_s, nil].concat(@status.each_line.to_a)
+      lines = [message, uri.to_s, nil].concat(status_lines)
       parser.text = payload[text_field] = lines.join("\n")
       result.push(tag: tag)
     end
