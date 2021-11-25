@@ -2,10 +2,6 @@ module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
     include Package
 
-    def member?(item)
-      return super(item.to_hashtag_base)
-    end
-
     def self.scan(text)
       return TagContainer.new(
         text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first),
