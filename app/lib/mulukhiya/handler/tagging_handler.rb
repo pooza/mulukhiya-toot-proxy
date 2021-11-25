@@ -14,13 +14,15 @@ module Mulukhiya
       parser.text = payload[text_field] = lines.join("\n")
     end
 
+    private
+
     def tags_line?(line)
       return /^\s*(#[[:word:]]+\s*)+$/.match?(line)
     end
 
     def end_with_uri?(lines)
       return false unless lines.present?
-      uri = Ginseng::URI.parse(lines.last)
+      return false unless uri = Ginseng::URI.parse(lines.last)
       return false unless uri.absolute?
       return false unless uri.scheme.match?(/^https?$/)
       return true
