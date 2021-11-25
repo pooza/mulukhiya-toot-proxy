@@ -2,7 +2,7 @@ module Mulukhiya
   class TaggingHandler < Handler
     def handle_pre_toot(payload, params = {})
       self.payload = payload
-      lines = @status.each_line(chomp: true).to_a
+      lines = status_lines.clone
       last = lines.pop if end_with_uri?(lines)
       lines.clone.reverse_each do |line|
         break unless tags_line?(line)
