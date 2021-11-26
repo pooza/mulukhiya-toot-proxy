@@ -13,12 +13,6 @@ module Mulukhiya
       save
     end
 
-    def save
-      super
-    rescue Redis::CommandError => e
-      logger.error(error: e)
-    end
-
     def update(key, values)
       values.deep_stringify_keys!
       if values.key?('tags')
