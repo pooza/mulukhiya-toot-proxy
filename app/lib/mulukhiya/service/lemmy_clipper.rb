@@ -36,14 +36,16 @@ module Mulukhiya
       return config['/lemmy/verify_peer']
     end
 
-    def handle_login(payload, params = {})
-      @jwt = payload['jwt']
-      post(params[:body])
+    def clip(body)
+      listen(method: :post, body: body)
     end
 
-    def handle_create_post(payload, params = {})
-      return :stop
+    def communities
+      listen(method: :fetch_communities)
+      return @communities
     end
+
+    private
 
     def listen(params = {})
       EM.run do
@@ -65,11 +67,20 @@ module Mulukhiya
       end
     end
 
-    def clip(body)
-      listen(body: body)
+    def handle_login(payload, params = {})
+      @jwt = payload['jwt']
+      send(params[:method], params[:body])
     end
 
-    private
+    def handle_create_post(payload, params = {})
+      return :stop
+    end
+
+    def handle_list_communities(payload, params = {})
+      @communities = payload['communities'].select {|c| c['subscribed']}
+        .map {|c| [c.dig('community', 'id'), c.dig('community', 'title')]}.sort.to_h
+      return :stop
+    end
 
     def username
       return @params[:user]
@@ -86,7 +97,7 @@ module Mulukhiya
       }}.to_json)
     end
 
-    def post(body)
+    def post(body = {})
       body.deep_symbolize_keys!
       data = {nsfw: false, community_id: @params[:community], auth: @jwt}
       data[:name] = body[:name].to_s if body[:name]
@@ -98,6 +109,13 @@ module Mulukhiya
         data[:body] ||= uri.to_s
       end
       client.send({op: 'CreatePost', data: data}.to_json)
+    end
+
+    def fetch_communities(body = {})
+      client.send({op: 'ListCommunities', data: {
+        limit: config['/lemmy/communities/limit'],
+        auth: @jwt,
+      }}.to_json)
     end
   end
 end

@@ -15,5 +15,9 @@ module Mulukhiya
     def test_clip
       @lemmy.clip(name: Time.now)
     end
+
+    def test_communities
+      assert_kind_of(Hash, @lemmy.communities)
+    end
   end
 end
