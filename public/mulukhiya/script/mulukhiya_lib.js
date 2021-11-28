@@ -299,6 +299,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getLemmyCommunities = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createURL('/mulukhiya/api/lemmy/communities'))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.authAnnict = async code => {
       const indicator = new ActivityIndicator()
       indicator.show()

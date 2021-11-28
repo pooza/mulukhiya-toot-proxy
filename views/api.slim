@@ -89,6 +89,16 @@ html lang='ja'
                     a href=url target='_blank' rel='noreferrer' = url.ellipsize(64)
                 .field-update-button-container
                   button @click='updatePrograms' 実行
+        - if controller.lemmy?
+          li v-if='account.username'
+            h3 @click='toggleVisibility("lemmy")' Lemmy
+            vue-slide-up-down :active='layout.details.lemmy'
+              .endpoint-container
+                .link GET /mulukhiya/api/lemmy/communities
+                .link-description 参加しているLemmyコミュニティを返します。
+                .field-update-button-container
+                  button @click='getLemmyCommunities' 実行
+                  pre.result v-if='result.lemmy_communities' {{result.lemmy_communities}}
         - if controller.favorite_tags?
           li
             h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
@@ -227,6 +237,7 @@ html lang='ja'
           result: {
             search_tag: null,
             favorite_tags: null,
+            lemmy_communities: null,
             media_list: null,
             program_list: null,
             feed_list: null,
@@ -239,6 +250,7 @@ html lang='ja'
               media: false,
               program: false,
               favorite_tags: false,
+              lemmy: false,
               tagging_dic: false,
               tagging_usertag: false,
               feed: false,
@@ -328,6 +340,15 @@ html lang='ja'
             this.result.favorite_tags = null
             Vue.getFavoriteTags()
               .then(e => {this.result.favorite_tags = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getLemmyCommunities () {
+            this.result.lemmy_communities = null
+            Vue.getLemmyCommunities()
+              .then(e => {
+                console.log(e)
+                this.result.lemmy_communities = e.communities
+              })
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateTaggingDictionary () {

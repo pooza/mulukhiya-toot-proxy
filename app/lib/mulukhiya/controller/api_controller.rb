@@ -265,6 +265,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/lemmy/communities' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.lemmy?
+      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless @sns.account.lemmy
+      @renderer.message = {communities: @sns.account.lemmy.communities}
+      return @renderer.to_s
+    rescue => e
+      logger.error(error: e)
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/feed/list' do
       tags = TagContainer.new
       tags.merge(DefaultTagHandler.tags)
