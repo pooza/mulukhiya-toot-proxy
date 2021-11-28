@@ -87,18 +87,23 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.lemmy'
           .inline-field-container
             h4 ホスト名
-            input placeholder='Lemmyのホスト名（lemmy.example.com等）' v-model.trim='form.lemmy.host'
+            input placeholder='Lemmyのホスト名（#{config['/lemmy/hosts/default']}等）' v-model.trim='form.lemmy.host'
           .inline-field-container
             h4 ユーザーID
             input placeholder='LemmyのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
           .inline-field-container
             h4 パスワード
             input type='password' placeholder='Lemmyのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
-          .inline-field-container
-            h4 コミュニティID
-            input.short type='number' placeholder='LemmyのコミュニティID' v-model.trim='form.lemmy.community'
-          .field-update-button-container
-            button @click='updateLemmy' 更新
+          .field-container
+            h4 コミュニティ
+            .post-auth v-if='options.lemmy_communities'
+              v-select :options='options.lemmy_communities' v-model='form.lemmy.community'
+              .field-update-button-container
+                button @click='updateLemmy' 更新
+            .pre-auth v-else=''
+              .alert 未設定です。
+              .field-update-button-container
+                button @click='updateLemmy' 認証
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
@@ -145,8 +150,12 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
+          config: null,
           result: null,
           programs: [],
+          lemmy: {
+            communities: {},
+          },
           form: {
             notify: {verbose: null},
             livecure: false,
@@ -161,6 +170,7 @@ html lang='ja'
           options: {
             program: [],
             visibility: [],
+            lemmy_communities: null,
           },
           layout: {
             sections: {
@@ -187,6 +197,16 @@ html lang='ja'
             .then(e => {
               this.updateForm(e)
               this.account = e.account
+              this.config = e.config
+              return Vue.getLemmyCommunities()
+            }).then(e => {
+              this.lemmy.communities = e
+              Object.keys(this.lemmy.communities)
+                .map(k => {
+                  this.options.lemmy_communities ||= []
+                  this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]})
+                })
+              this.form.lemmy.community = this.lemmy.communities[Vue.dig(this.config, 'lemmy', 'community')]
             }).catch(e => Vue.alert(this.$dialog, e))
           Vue.getPrograms()
             .then(e => {
@@ -208,7 +228,7 @@ html lang='ja'
             this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
             this.form.lemmy.host = Vue.dig(data, 'config', 'lemmy', 'host')
             this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
-            this.form.lemmy.community = Vue.dig(data, 'config', 'lemmy', 'community')
+            this.form.lemmy.community = this.lemmy.communities[Vue.dig(data, 'config', 'lemmy', 'community')]
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
             if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
               this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
@@ -262,7 +282,7 @@ html lang='ja'
             if (this.form.lemmy.host) {command.lemmy.host = this.form.lemmy.host}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
             if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
-            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community)}
+            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community.code)}
             this.updateConfig(command)
             this.form.lemmy.password = null
           },

@@ -266,6 +266,10 @@ itunes:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
 lemmy:
+  communities:
+    limit: 100
+  hosts:
+    default: lm.korako.me
   subject:
     max_length: 50
   urls:
@@ -836,7 +840,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.11.9
+  version: 4.11.10
 parser:
   note:
     fields:

@@ -166,6 +166,16 @@ properties:
     type: object
   lemmy:
     properties:
+      communities:
+        properties:
+          limit:
+            type: integer
+        type: object
+      hosts:
+        properties:
+          default:
+            type: string
+        type: object
       verify_peer:
         type: boolean
     type: object

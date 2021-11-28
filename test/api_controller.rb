@@ -78,6 +78,13 @@ module Mulukhiya
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end
 
+    def test_lemmy_communities
+      return unless test_account.lemmy
+      get "/lemmy/communities?token=#{test_account.token}"
+      assert(last_response.ok?)
+      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+    end
+
     def test_feed_list
       get '/feed/list'
       assert(last_response.ok?)

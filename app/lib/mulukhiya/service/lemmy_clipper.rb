@@ -36,16 +36,18 @@ module Mulukhiya
       return config['/lemmy/verify_peer']
     end
 
-    def handle_login(payload, body)
-      @jwt = payload['jwt']
-      post(body)
-    end
-
-    def handle_create_post(payload, body)
-      return :stop
-    end
-
     def clip(body)
+      listen(method: :post, body: body)
+    end
+
+    def communities
+      listen(method: :fetch_communities)
+      return @communities
+    end
+
+    private
+
+    def listen(params = {})
       EM.run do
         login
 
@@ -57,7 +59,7 @@ module Mulukhiya
           payload = JSON.parse(message.data)
           raise payload['error'] if payload['error']
           method = "handle_#{payload['op']}".underscore.to_sym
-          EM.stop_event_loop if send(method, payload['data'], body) == :stop
+          EM.stop_event_loop if send(method, payload['data'], params) == :stop
         end
       rescue => e
         logger.error(error: e, websocket: uri.to_s)
@@ -65,7 +67,23 @@ module Mulukhiya
       end
     end
 
-    private
+    def handle_login(payload, params = {})
+      @jwt = payload['jwt']
+      send(params[:method], params[:body])
+    end
+
+    def handle_create_post(payload, params = {})
+      return :stop
+    end
+
+    def handle_list_communities(payload, params = {})
+      @communities = payload['communities']
+        .select {|c| c['subscribed']}
+        .map {|c| [c.dig('community', 'id'), c.dig('community', 'title')]}
+        .sort_by(&:first)
+        .to_h
+      return :stop
+    end
 
     def username
       return @params[:user]
@@ -82,7 +100,7 @@ module Mulukhiya
       }}.to_json)
     end
 
-    def post(body)
+    def post(body = {})
       body.deep_symbolize_keys!
       data = {nsfw: false, community_id: @params[:community], auth: @jwt}
       data[:name] = body[:name].to_s if body[:name]
@@ -94,6 +112,13 @@ module Mulukhiya
         data[:body] ||= uri.to_s
       end
       client.send({op: 'CreatePost', data: data}.to_json)
+    end
+
+    def fetch_communities(body = {})
+      client.send({op: 'ListCommunities', data: {
+        limit: config['/lemmy/communities/limit'],
+        auth: @jwt,
+      }}.to_json)
     end
   end
 end
