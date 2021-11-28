@@ -101,7 +101,6 @@ html lang='ja'
               .field-update-button-container
                 button @click='updateLemmy' 更新
             .pre-auth v-else=''
-              .alert 未設定です。
               .field-update-button-container
                 button @click='updateLemmy' 認証
       section.config v-if='account.username && layout.sections.annict'
@@ -285,6 +284,13 @@ html lang='ja'
             if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community.code)}
             this.updateConfig(command)
             this.form.lemmy.password = null
+            Vue.getLemmyCommunities()
+              .then(e => {
+                this.lemmy.communities = e
+                this.options.lemmy_communities = []
+                Object.keys(this.lemmy.communities)
+                  .map(k => this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]}))
+              })
           },
           updateTags () {
             const command = {tagging: {user_tags: null, minutes: null}}
