@@ -67,6 +67,7 @@ html lang='ja'
             input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
           .field-update-button-container
             button @click='updateGrowi' 更新
+            button.alert @click='unauthGrowi' 認証を解除
       section.config v-if='account.username && layout.sections.dropbox'
         h3 @click='toggleVisibility("dropbox")' Dropbox
         vue-slide-up-down :active='layout.details.dropbox'
@@ -82,6 +83,7 @@ html lang='ja'
             input type='password' placeholder='Dropboxのアクセストークン（保存時に暗号化されます）' v-model.trim='form.dropbox.token'
           .field-update-button-container
             button @click='updateDropbox' 更新
+            button.alert @click='unauthDropbox' 認証を解除
       section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
@@ -100,9 +102,11 @@ html lang='ja'
               v-select :options='options.lemmy_communities' v-model='form.lemmy.community'
               .field-update-button-container
                 button @click='updateLemmy' 更新
+                button.alert @click='unauthLemmy' 認証を解除
             .pre-auth v-else=''
               .field-update-button-container
                 button @click='updateLemmy' 認証
+                button.alert @click='unauthLemmy' 認証を解除
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
@@ -246,9 +250,11 @@ html lang='ja'
             }
           },
           updateConfig (command) {
-            Vue.updateConfig(command)
-              .then(e => this.updateForm(e))
-              .catch(e => Vue.alert(this.$dialog, e))
+            return Vue.updateConfig(command)
+              .then(e => {
+                this.updateForm(e)
+                return e
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           onChangeTags (e) {
             if (e.code) {
@@ -270,11 +276,27 @@ html lang='ja'
             this.updateConfig(command)
             this.form.growi.token = null
           },
+          unauthGrowi () {
+            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'},{okText: '削除'})
+              .then(e => this.updateConfig({growi: null}))
+              .then(e => {
+                this.result = jsyaml.dump(e.config)
+                this.layout.details.growi = false
+              }).catch(e => Vue.alert(this.$dialog, e))
+          },
           updateDropbox () {
             const command = {dropbox: {token: null}}
             if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
             this.updateConfig(command)
             this.form.dropbox.token = null
+          },
+          unauthDropbox () {
+            this.$dialog.confirm({body: 'Dropboxの認証を解除します。'},{okText: '削除'})
+              .then(e => this.updateConfig({dropbox: null}))
+              .then(e => {
+                this.result = jsyaml.dump(e.config)
+                this.layout.details.dropbox = false
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateLemmy () {
             const command = {lemmy: {host: null, user: null, community: null}}
@@ -291,6 +313,15 @@ html lang='ja'
                 Object.keys(this.lemmy.communities)
                   .map(k => this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]}))
               })
+          },
+          unauthLemmy () {
+            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'},{okText: '削除'})
+              .then(e => this.updateConfig({lemmy: null}))
+              .then(e => {
+                console.log(e)
+                this.result = jsyaml.dump(e.config)
+                this.layout.details.lemmy = false
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateTags () {
             const command = {tagging: {user_tags: null, minutes: null}}
@@ -330,7 +361,7 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           unauthAnnict () {
-            this.$dialog.confirm({body: 'Annictのトークンを削除します。'},{okText: '削除'})
+            this.$dialog.confirm({body: 'Annictの認証を解除します。'},{okText: '削除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
