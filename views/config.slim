@@ -106,7 +106,6 @@ html lang='ja'
             .pre-auth v-else=''
               .field-update-button-container
                 button @click='updateLemmy' 認証
-                button.alert @click='unauthLemmy' 認証を解除
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
