@@ -36,16 +36,16 @@ module Mulukhiya
       return config['/lemmy/verify_peer']
     end
 
-    def handle_login(payload, body)
+    def handle_login(payload, params = {})
       @jwt = payload['jwt']
-      post(body)
+      post(params[:body])
     end
 
-    def handle_create_post(payload, body)
+    def handle_create_post(payload, params = {})
       return :stop
     end
 
-    def clip(body)
+    def listen(params = {})
       EM.run do
         login
 
@@ -57,12 +57,16 @@ module Mulukhiya
           payload = JSON.parse(message.data)
           raise payload['error'] if payload['error']
           method = "handle_#{payload['op']}".underscore.to_sym
-          EM.stop_event_loop if send(method, payload['data'], body) == :stop
+          EM.stop_event_loop if send(method, payload['data'], params) == :stop
         end
       rescue => e
         logger.error(error: e, websocket: uri.to_s)
         EM.stop_event_loop
       end
+    end
+
+    def clip(body)
+      listen(body: body)
     end
 
     private
