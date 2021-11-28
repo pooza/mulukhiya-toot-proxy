@@ -345,10 +345,7 @@ html lang='ja'
           getLemmyCommunities () {
             this.result.lemmy_communities = null
             Vue.getLemmyCommunities()
-              .then(e => {
-                console.log(e)
-                this.result.lemmy_communities = e.communities
-              })
+              .then(e => {this.result.lemmy_communities = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           updateTaggingDictionary () {
