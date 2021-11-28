@@ -166,6 +166,11 @@ properties:
     type: object
   lemmy:
     properties:
+      communities:
+        properties:
+          limit:
+            type: integer
+        type: object
       hosts:
         properties:
           default:
