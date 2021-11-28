@@ -266,6 +266,8 @@ itunes:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
 lemmy:
+  hosts:
+    default: lm.korako.me
   subject:
     max_length: 50
   urls:

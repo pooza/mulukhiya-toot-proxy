@@ -87,7 +87,7 @@ html lang='ja'
         vue-slide-up-down :active='layout.details.lemmy'
           .inline-field-container
             h4 ホスト名
-            input placeholder='Lemmyのホスト名（lemmy.example.com等）' v-model.trim='form.lemmy.host'
+            input placeholder='Lemmyのホスト名（#{config['/lemmy/hosts/default']}等）' v-model.trim='form.lemmy.host'
           .inline-field-container
             h4 ユーザーID
             input placeholder='LemmyのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
