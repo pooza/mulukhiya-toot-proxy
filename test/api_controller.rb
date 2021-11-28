@@ -80,7 +80,7 @@ module Mulukhiya
 
     def test_lemmy_communities
       return unless test_account.lemmy
-      get '/lemmy/communities?token=' + test_account.token
+      get "/lemmy/communities?token=#{test_account.token}"
       assert(last_response.ok?)
       assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
     end

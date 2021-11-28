@@ -51,9 +51,7 @@ module Mulukhiya
 
     def lemmy
       unless @lemmy
-        return nil unless [:host, :user, :password].all? do |key|
-          user_config["/lemmy/#{key}"]
-        end
+        return nil unless [:host, :user, :password].all? {|k| user_config["/lemmy/#{key}"]}
         @lemmy = LemmyClipper.new(
           host: user_config['/lemmy/host'],
           user: user_config['/lemmy/user'],
