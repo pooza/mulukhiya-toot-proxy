@@ -200,7 +200,7 @@ html lang='ja'
               this.config = e.config
               return Vue.getLemmyCommunities()
             }).then(e => {
-              this.lemmy.communities = e.communities
+              this.lemmy.communities = e
               Object.keys(this.lemmy.communities)
                 .map(k => {
                   this.options.lemmy_communities ||= []
