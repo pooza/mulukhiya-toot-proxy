@@ -15,13 +15,9 @@ module Mulukhiya
       return label.to_s
     end
 
-    def handlers
-      return enum_for(__method__) unless block_given?
-      handler_names do |v|
-        yield Handler.create(v, params)
-      rescue => e
-        logger.error(error: e, handler: v)
-      end
+    def handlers(&block)
+      return enum_for(__method__) unless block
+      handler_names.map {|v| Handler.create(v, params)}.each(&block)
     end
 
     def handler_names(&block)
@@ -58,11 +54,9 @@ module Mulukhiya
       return reporter
     end
 
-    def self.all
-      return enum_for(__method__) unless block_given?
-      syms.each do |sym|
-        yield Event.new(sym)
-      end
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      syms.map {|v| Event.new(v)}.map(&block)
     end
 
     def self.syms

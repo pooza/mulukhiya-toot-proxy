@@ -3,11 +3,9 @@ module Mulukhiya
     include Package
     attr_accessor :account
 
-    def accts
-      return enum_for(__method__) unless block_given?
-      text.scan(TootParser.acct_pattern).map(&:first).each do |acct|
-        yield Acct.new(acct)
-      end
+    def accts(&block)
+      return enum_for(__method__) unless block
+      text.scan(TootParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&block)
     end
 
     def to_sanitized

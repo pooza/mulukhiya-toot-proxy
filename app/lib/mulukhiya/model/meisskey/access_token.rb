@@ -52,18 +52,14 @@ module Mulukhiya
         return get(key)
       end
 
-      def self.all
-        return enum_for(__method__) unless block_given?
-        collection.find.each do |token|
-          yield AccessToken.new(token['_id'])
-        end
+      def self.all(&block)
+        return enum_for(__method__) unless block
+        collection.find.map {|v| AccessToken.new(v['_id'])}.each(&block)
       end
 
-      def self.webhook_entries
-        return enum_for(__method__) unless block_given?
-        aggregate('webhook_entries').each do |row|
-          yield AccessToken[row['_id']].to_h
-        end
+      def self.webhook_entries(&block)
+        return enum_for(__method__) unless block
+        aggregate('webhook_entries').map {|v| AccessToken[v['_id']]}.map(&:to_h).each(&block)
       end
 
       def self.collection

@@ -47,11 +47,9 @@ module Mulukhiya
       return all.count
     end
 
-    def self.all
-      return enum_for(__method__) unless block_given?
-      config['/feed/custom'].each do |entry|
-        yield CustomFeed.new(entry)
-      end
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      config['/feed/custom'].map {|v| CustomFeed.new(v)}.each(&block)
     end
   end
 end

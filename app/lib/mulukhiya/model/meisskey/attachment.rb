@@ -86,11 +86,7 @@ module Mulukhiya
       def self.feed
         return enum_for(__method__) unless block_given?
         statuses.each do |status|
-          status[:_files].each do |row|
-            yield Attachment[row[:_id]].feed_entry
-          rescue => e
-            logger.error(error: e, row: row)
-          end
+          status[:_files].map {|v| Attachment[v[:_id]]}.each {|v| yield v.feed_entry}
         end
       end
 
