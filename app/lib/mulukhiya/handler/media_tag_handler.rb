@@ -13,7 +13,7 @@ module Mulukhiya
 
     def self.all
       return {} unless TagContainer.media_tag?
-      return [:image, :video, :audio].map {|v| [v, config["/handler/media_tag/tags/#{v}"]]}.to_h
+      return [:image, :video, :audio].to_h {|v| [v, config["/handler/media_tag/tags/#{v}"]]}
     end
 
     private
