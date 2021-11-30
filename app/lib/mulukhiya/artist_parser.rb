@@ -47,12 +47,11 @@ module Mulukhiya
     def patterns
       return enum_for(__method__) unless block_given?
       config['/nowplaying/artist/parser/patterns'].each do |entry|
-        output = {
+        yield ({
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
           items: (entry['items'] || []),
-        }
-        yield output
+        })
       end
     end
 

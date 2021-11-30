@@ -16,11 +16,8 @@ module Mulukhiya
     def shortenable?
       return false unless itunes?
       return false unless album_id
-      config['/itunes/patterns'].each do |entry|
-        next unless path.match(entry['pattern'])
-        return entry['shortenable']
-      end
-      return false
+      return false unless entry = config['/itunes/patterns'].find {|v| path.match(v['pattern'])}
+      return entry['shortenable']
     end
 
     def shorten

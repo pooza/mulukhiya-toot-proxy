@@ -2,10 +2,11 @@ module Mulukhiya
   class AmazonServiceTest < TestCase
     def setup
       @service = AmazonService.new
+      @asins = ['B07VHY7DBH', 'B00TYVQN3O', 'B071DNWLBR']
     end
 
     def test_lookup
-      ['B07VHY7DBH', 'B00TYVQN3O', 'B071DNWLBR'].freeze.each do |asin|
+      @asins.each do |asin|
         assert_kind_of(Hash, @service.lookup(asin))
       end
     end
@@ -15,8 +16,7 @@ module Mulukhiya
     end
 
     def test_create_image_uri
-      ['B07VHY7DBH', 'B00TYVQN3O', 'B071DNWLBR'].freeze.each do |asin|
-        uri = @service.create_image_uri(asin)
+      @asins.map {|v| @service.create_image_uri(v)}.each do |uri|
         assert_equal(uri.scheme, 'https')
         assert_equal(uri.host, 'm.media-amazon.com')
       end
