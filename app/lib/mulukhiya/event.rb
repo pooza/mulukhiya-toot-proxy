@@ -24,12 +24,11 @@ module Mulukhiya
       end
     end
 
-    def handler_names
-      return enum_for(__method__) unless block_given?
-      return config["/#{Environment.controller_name}/handlers/#{label}"].each do |name|
-        next if config.disable?(Handler.create(name))
-        yield name
-      end
+    def handler_names(&block)
+      return enum_for(__method__) unless block
+      config["/#{Environment.controller_name}/handlers/#{label}"]
+        .reject {|v| config.disable?(Handler.create(v))}
+        .each(&block)
     end
 
     def count

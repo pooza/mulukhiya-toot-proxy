@@ -151,8 +151,7 @@ module Mulukhiya
     def flatten_payload
       parts = [status_field, spoiler_field, chat_field].map {|k| payload[k]}
       parts.concat(payload.dig(poll_field, poll_options_field) || [])
-      (payload[attachment_field] || []).each do |id|
-        next unless attachment = attachment_class[id]
+      (payload[attachment_field] || []).map {|id| attachment_class[id]}.each do |attachment|
         parts.push(attachment.description)
       rescue => e
         logger.error(error: e)
