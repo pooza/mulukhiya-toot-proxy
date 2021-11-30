@@ -56,7 +56,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      syms.map {|v| Event.new(v)}.map(&block)
+      syms.map {|v| Event.new(v)}.each(&block)
     end
 
     def self.syms
