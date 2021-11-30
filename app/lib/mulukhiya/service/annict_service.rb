@@ -55,7 +55,7 @@ module Mulukhiya
         }
         sleep(config['/annict/interval/seconds'])
         api_service.get(uri)['reviews'].each do |review|
-          next unless review['user']['id'] == account['id']
+          next unless review.dig('user', 'id') == account['id']
           yield review
         end
       end
