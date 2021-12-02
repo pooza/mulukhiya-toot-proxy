@@ -9,17 +9,14 @@ module Mulukhiya
     end
 
     def parse
-      artists = Set[]
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited] && (@depth <= @max_depth)
-          @source.split(delimiters).each do |artist|
+          return @source.split(delimiters).inject(Set[]) do |artists, artist|
             artists.merge(ArtistParser.new(artist, @depth).parse)
           end
-        else
-          artists.merge(parse_part(matches, pattern_entry[:items]))
         end
-        return artists
+        return Set.new(parse_part(matches, pattern_entry[:items]))
       end
       return Set[@source]
     rescue => e

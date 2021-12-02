@@ -61,11 +61,9 @@ module Mulukhiya
       alias recent_note recent_status
 
       def featured_tags
-        tags = TagContainer.new
-        service.antennas.map {|v| v['keywords'].first}.each do |keywords|
-          tags.merge(keywords)
+        return service.antennas.map {|v| v['keywords'].first}.inject(TagContainer.new) do |tags, v|
+          tags.merge(v)
         end
-        return tags
       rescue => e
         logger.error(error: e, acct: acct.to_s)
         return TagContainer.new

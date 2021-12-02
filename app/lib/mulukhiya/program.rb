@@ -4,11 +4,7 @@ module Mulukhiya
     include Package
 
     def update
-      programs = {}
-      uris.each do |uri|
-        programs.merge!(@http.get(uri).to_h)
-      end
-      redis['program'] = programs.to_json
+      redis['program'] = uris.inject({}) {|programs, v| programs.merge(@http.get(v).to_h)}.to_json
     end
 
     def data
