@@ -191,9 +191,7 @@ module Mulukhiya
     end
 
     def self.names
-      names = []
-      Event.all {|v| names.concat(v.handler_names.to_a)}
-      return names.to_set
+      return Event.all.inject(Set[]) {|names, e| names.merge(e.handler_names.to_a)}
     rescue => e
       logger.error(error: e)
       return nil
@@ -204,11 +202,12 @@ module Mulukhiya
     end
 
     def self.all_schema
-      properties = {}
-      Event.all do |event|
-        properties.merge!(event.handlers.map {|v| [v.underscore, v.schema]}.to_h)
-      end
-      return {type: 'object', properties: properties.deep_symbolize_keys}
+      return {
+        type: 'object',
+        properties: Event.all.inject({}) do |props, e|
+          props.merge(e.handlers.to_h {|v| [v.underscore, v.schema]}.deep_symbolize_keys)
+        end,
+      }
     end
 
     private
