@@ -149,7 +149,7 @@ module Mulukhiya
     end
 
     def flatten_payload
-      parts = [status_field, spoiler_field, chat_field].map {|k| payload[k]}
+      parts = payload.slice(status_field, spoiler_field, chat_field).values
       parts.concat(payload.dig(poll_field, poll_options_field) || [])
       (payload[attachment_field] || []).map {|id| attachment_class[id]}.each do |attachment|
         parts.push(attachment.description)

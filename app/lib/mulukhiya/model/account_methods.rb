@@ -86,7 +86,7 @@ module Mulukhiya
 
     def field_tags
       tags = TagContainer.new
-      tags.merge(fields.map {|v| v['value']}.filter {|v| v.start_with?('#')})
+      tags.merge(fields.map {|v| v['value']}.select {|v| v.start_with?('#')})
       return tags
     rescue => e
       logger.error(error: e, acct: acct.to_s)

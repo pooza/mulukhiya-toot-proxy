@@ -38,7 +38,7 @@ module Mulukhiya
       return true if uri.path == '/'
       return true if uri.path.empty?
       return true if uri.query_values.present?
-      return true if ignore_domains.any? {|v| uri.host.end_with?(v)}
+      return true if ignore_domains.any? {|domain| uri.host.end_with?(domain)}
       return true if AmazonURI.parse(uri.to_s).valid?
       return true if ItunesURI.parse(uri.to_s).valid?
       return false
