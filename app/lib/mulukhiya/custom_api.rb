@@ -79,11 +79,9 @@ module Mulukhiya
       return all.count
     end
 
-    def self.all
-      return enum_for(__method__) unless block_given?
-      config['/api/custom'].each do |entry|
-        yield CustomAPI.new(entry)
-      end
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      config['/api/custom'].map {|v| CustomAPI.new(v)}.each(&block)
     end
   end
 end

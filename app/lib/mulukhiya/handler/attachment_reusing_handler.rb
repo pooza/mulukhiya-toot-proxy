@@ -3,8 +3,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       return unless payload[attachment_field]
       ids = []
-      payload[attachment_field].each do |id|
-        next unless src = attachment_class[id]
+      payload[attachment_field].map {|id| attachment_class[id]}.each do |src|
         next unless dest = sns.search_dupllicated_attachment(src)
         ids.push(dest.id)
         next if dest.id == src.id

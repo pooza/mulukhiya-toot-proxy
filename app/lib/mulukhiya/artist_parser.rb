@@ -9,17 +9,14 @@ module Mulukhiya
     end
 
     def parse
-      artists = Set[]
       patterns do |pattern_entry|
         next unless matches = @source.match(pattern_entry[:pattern])
         if pattern_entry[:delimited] && (@depth <= @max_depth)
-          @source.split(delimiters).each do |artist|
+          return @source.split(delimiters).inject(Set[]) do |artists, artist|
             artists.merge(ArtistParser.new(artist, @depth).parse)
           end
-        else
-          artists.merge(parse_part(matches, pattern_entry[:items]))
         end
-        return artists
+        return Set.new(parse_part(matches, pattern_entry[:items]))
       end
       return Set[@source]
     rescue => e
@@ -44,16 +41,15 @@ module Mulukhiya
       return artists
     end
 
-    def patterns
-      return enum_for(__method__) unless block_given?
-      config['/nowplaying/artist/parser/patterns'].each do |entry|
-        output = {
+    def patterns(&block)
+      return enum_for(__method__) unless block
+      config['/nowplaying/artist/parser/patterns'].map do |entry|
+        {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
           items: (entry['items'] || []),
         }
-        yield output
-      end
+      end.each(&block)
     end
 
     def delimiters

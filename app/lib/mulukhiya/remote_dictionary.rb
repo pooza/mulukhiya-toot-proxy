@@ -26,13 +26,9 @@ module Mulukhiya
       return @edit_uri
     end
 
-    def self.all
-      return enum_for(__method__) unless block_given?
-      config['/handler/dictionary_tag/dics'].each do |dic|
-        yield create(dic)
-      rescue => e
-        logger.error(error: e, dic: dic)
-      end
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      config['/handler/dictionary_tag/dics'].map {|v| create(v)}.each(&block)
     end
 
     def self.create(params)

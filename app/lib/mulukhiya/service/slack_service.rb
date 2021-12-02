@@ -2,18 +2,14 @@ module Mulukhiya
   class SlackService < Ginseng::Slack
     include Package
 
-    def self.all
-      return enum_for(__method__) unless block_given?
-      uris do |uri|
-        yield SlackService.new(uri)
-      end
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      uris.map {|v| SlackService.new(v)}.each(&block)
     end
 
-    def self.uris
-      return enum_for(__method__) unless block_given?
-      config['/alert/hooks'].each do |href|
-        yield Ginseng::URI.parse(href)
-      end
+    def self.uris(&block)
+      return enum_for(__method__) unless block
+      config['/alert/hooks'].map {|v| Ginseng::URI.parse(v)}.each(&block)
     rescue Ginseng::ConfigError
       return nil
     end

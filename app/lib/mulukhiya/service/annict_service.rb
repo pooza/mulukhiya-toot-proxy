@@ -18,8 +18,8 @@ module Mulukhiya
       end
     end
 
-    def records
-      return enum_for(__method__) unless block_given?
+    def records(&block)
+      return enum_for(__method__) unless block
       uri = api_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
@@ -30,10 +30,7 @@ module Mulukhiya
         access_token: @token,
       }
       sleep(config['/annict/interval/seconds'])
-      api_service.get(uri)['activities'].each do |activity|
-        next unless activity['action'] == 'create_record'
-        yield activity
-      end
+      api_service.get(uri)['activities'].select {|v| v['action'] == 'create_record'}.each(&block)
     end
 
     def recent_reviews
@@ -44,8 +41,8 @@ module Mulukhiya
       end
     end
 
-    def reviews
-      return enum_for(__method__) unless block_given?
+    def reviews(&block)
+      return enum_for(__method__) unless block
       reviewed_works.each do |work|
         uri = api_service.create_uri('/v1/reviews')
         uri.query_values = {
@@ -57,15 +54,14 @@ module Mulukhiya
           access_token: @token,
         }
         sleep(config['/annict/interval/seconds'])
-        api_service.get(uri)['reviews'].each do |review|
-          next unless review['user']['id'] == account['id']
-          yield review
-        end
+        api_service.get(uri)['reviews']
+          .select {|v| v.dig('user', 'id') == account['id']}
+          .each(&block)
       end
     end
 
-    def reviewed_works
-      return enum_for(__method__) unless block_given?
+    def reviewed_works(&block)
+      return enum_for(__method__) unless block
       uri = api_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
@@ -76,10 +72,9 @@ module Mulukhiya
         access_token: @token,
       }
       sleep(config['/annict/interval/seconds'])
-      api_service.get(uri)['activities'].each do |activity|
-        next unless activity['action'] == 'create_review'
-        yield activity
-      end
+      api_service.get(uri)['activities']
+        .select {|v| v['action'] == 'create_review'}
+        .each(&block)
     end
 
     def create_payload(values, type)

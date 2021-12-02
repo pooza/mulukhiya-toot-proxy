@@ -3,8 +3,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def perform(params = {})
-      accounts(params).each do |account|
-        next unless account.user_config['/tagging/user_tags'].present?
+      accounts(params).select {|v| v.user_config['/tagging/user_tags'].present?}.each do |account|
         account.user_config.clear_tags
         info_agent_service.notify(account, config['/worker/user_tag_initialize/message'])
       end

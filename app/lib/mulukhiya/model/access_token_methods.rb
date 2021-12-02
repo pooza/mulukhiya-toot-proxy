@@ -15,12 +15,13 @@ module Mulukhiya
     end
 
     module Methods
-      def webhook_entries
-        return enum_for(__method__) unless block_given?
-        Postgres.instance.exec('webhook_tokens').each do |row|
-          token = Environment.access_token_class[row['id']]
-          yield token.to_h if token.valid?
-        end
+      def webhook_entries(&block)
+        return enum_for(__method__) unless block
+        Postgres.instance.exec('webhook_tokens')
+          .map {|row| Environment.access_token_class[row['id']]}
+          .select(&:valid?)
+          .map(&:to_h)
+          .each(&block)
       end
     end
   end

@@ -87,6 +87,15 @@ html lang='ja'
       section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
+          ol
+            li
+              | Lemmyサービスの認証情報（ホスト名、ユーザーID、パスワード）を入力してください。
+              | （ホスト名は
+              code #{config['/lemmy/hosts/default']}
+              | など）
+            li 認証ボタンを押下。
+            li ブックマークを投稿するコミュニティを選択してください。
+            li 更新ボタンを押下。
           .inline-field-container
             h4 ホスト名
             input placeholder='Lemmyのホスト名（#{config['/lemmy/hosts/default']}等）' v-model.trim='form.lemmy.host'
@@ -317,7 +326,6 @@ html lang='ja'
             this.$dialog.confirm({body: 'Lemmyの認証を解除します。'},{okText: '削除'})
               .then(e => this.updateConfig({lemmy: null}))
               .then(e => {
-                console.log(e)
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.lemmy = false
               }).catch(e => Vue.alert(this.$dialog, e))

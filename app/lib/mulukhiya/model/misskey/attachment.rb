@@ -66,13 +66,12 @@ module Mulukhiya
         return storage[params]
       end
 
-      def self.feed
-        return enum_for(__method__) unless block_given?
-        Postgres.instance.execute('media_catalog', query_params).each do |row|
-          yield Attachment[row[:id]].feed_entry
-        rescue => e
-          logger.error(error: e, row: row)
-        end
+      def self.feed(&block)
+        return enum_for(__method__) unless block
+        Postgres.instance.execute('media_catalog', query_params)
+          .map {|row| Attachment[row[:id]]}
+          .map(&:feed_entry)
+          .each(&block)
       end
     end
   end

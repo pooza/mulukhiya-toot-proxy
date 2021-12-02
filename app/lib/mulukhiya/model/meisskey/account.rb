@@ -54,14 +54,12 @@ module Mulukhiya
       alias recent_post recent_status
 
       def featured_tags
-        tags = TagContainer.new
-        return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
-        timelines.each do |timeline|
+        return TagContainer.new unless timelines = values.dig('clientSettings', 'tagTimelines')
+        return timelines.inject(TagContainer.new) do |tags, timeline|
           timeline['query'].each do |entry|
             tags.merge(entry)
           end
         end
-        return tags
       rescue => e
         logger.error(error: e, acct: acct.to_s)
         return TagContainer.new
@@ -84,11 +82,8 @@ module Mulukhiya
       end
 
       def attachments
-        unless @attachments
-          @attachments = []
-          Status.aggregate('account_status', {id: _id}).each do |row|
-            @attachments.concat(row[:_files].map {|f| Attachment[f[:_id]]})
-          end
+        @attachments ||= Status.aggregate('account_status', {id: _id}).inject([]) do |r, row|
+          r.concat(row[:_files].map {|file| Attachment[file[:_id]]})
         end
         return @attachments
       end

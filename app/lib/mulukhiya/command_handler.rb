@@ -13,9 +13,9 @@ module Mulukhiya
     end
 
     def validate
-      return contract.call(parser.params).errors.map do |error|
+      return contract.call(parser.params).errors.to_h do |error|
         ["/#{error.path.map(&:to_s).join('/')}", error.text]
-      end.to_h
+      end
     end
 
     def handle_pre_toot(payload, params = {})

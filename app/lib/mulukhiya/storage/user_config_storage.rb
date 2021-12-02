@@ -42,16 +42,15 @@ module Mulukhiya
       accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each(&block)
     end
 
-    def self.accounts
-      return enum_for(__method__) unless block_given?
+    def self.accounts(&block)
+      return enum_for(__method__) unless block
       storage = UserConfigStorage.new
-      storage.all_keys.each do |key|
-        id = key.split(':').last
-        next unless storage[id]['/tagging/user_tags']
-        id = id.to_i if id.match?(/^[[:digit:]]+$/)
-        next unless account = Environment.account_class[id]
-        yield account
-      end
+      storage.all_keys
+        .map {|v| v.split(':').last}
+        .select {|id| storage[id]['/tagging/user_tags']}
+        .map {|id| Environment.account_class[id]}
+        .reject(&:nil?)
+        .each(&block)
     end
   end
 end

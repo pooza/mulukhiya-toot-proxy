@@ -79,9 +79,8 @@ module Mulukhiya
     def handle_list_communities(payload, params = {})
       @communities = payload['communities']
         .select {|c| c['subscribed']}
-        .map {|c| [c.dig('community', 'id'), c.dig('community', 'title')]}
-        .sort_by(&:first)
-        .to_h
+        .sort_by {|c| c.dig('community', 'id')}
+        .to_h {|c| [c.dig('community', 'id'), c.dig('community', 'title')]}
       return :stop
     end
 

@@ -14,11 +14,9 @@ module Mulukhiya
       return tags
     end
 
-    def self.entries
-      return enum_for(__method__) unless block_given?
-      config['/handler/remote_tag/services'].each do |service|
-        yield service.deep_symbolize_keys
-      end
+    def self.entries(&block)
+      return enum_for(__method__) unless block
+      config['/handler/remote_tag/services'].map(&:deep_symbolize_keys).each(&block)
     end
   end
 end

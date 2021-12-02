@@ -20,18 +20,16 @@ module Mulukhiya
       return 'annict_account'
     end
 
-    def self.accounts
-      return enum_for(__method__) unless block_given?
+    def self.accounts(&block)
+      return enum_for(__method__) unless block
       storage = UserConfigStorage.new
-      storage.all_keys.each do |key|
-        id = key.split(':').last
-        next unless storage[id]['/annict/token']
-        id = id.to_i if id.match?(/^[[:digit:]]+$/)
-        next unless account = Environment.account_class[id]
-        next unless account.webhook
-        next unless account.annict
-        yield account
-      end
+      storage.all_keys
+        .map {|v| v.split(':').last}
+        .select {|id| storage[id]['/annict/token']}
+        .map {|id| Environment.account_class[id]}
+        .select(&:webhook)
+        .select(&:annict)
+        .each(&block)
     end
   end
 end
