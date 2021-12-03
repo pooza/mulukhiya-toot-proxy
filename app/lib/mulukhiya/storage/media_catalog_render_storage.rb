@@ -15,7 +15,7 @@ module Mulukhiya
 
     def create_key(key)
       return "#{prefix}:#{key[:page].to_i}" if key.is_a?(Hash)
-      return key
+      return super
     end
 
     def prefix
