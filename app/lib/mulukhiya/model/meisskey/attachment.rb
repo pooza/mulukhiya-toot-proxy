@@ -64,30 +64,31 @@ module Mulukhiya
         return Attachment.new(id)
       end
 
-      def self.catalog(params = {}, &block)
-        return enum_for(__method__, params) unless block
-        statuses(params[:page]).each do |status|
-          status[:_files].map {|f| Attachment[f[:_id]]}.map do |attachment|
-            attachment.to_h.deep_symbolize_keys.merge(
-              id: attachment.id,
-              date: attachment.createdAt,
-              status_url: attachment.uri.to_s,
-            )
-          rescue => e
-            logger.error(error: e, row: row)
-          end.each(&block)
+      def self.catalog(params = {})
+        storage = MediaCatalogRenderStorage.new
+        params[:page] ||= 1
+        unless storage[params]
+          attachments = []
+          Status.aggregate('media_catalog', {page: params[:page]}).each do |row|
+            status = Status[row[:_id]]
+            row[:_files].map {|f| Attachment[f[:_id]]}.each do |attachment|
+              attachments.push(attachment.to_h.deep_symbolize_keys.merge(
+                id: attachment.id,
+                date: status.createdAt,
+                status_url: status.uri.to_s,
+              ))
+            end
+          end
+          storage[params] = attachments
         end
+        return storage[params]
       end
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        statuses.each do |status|
+        Status.aggregate('media_catalog', {page: 1}).each do |status|
           status[:_files].map {|f| f[:_id]}.map {|id| Attachment[id]}.map(&:feed_entry).each(&block)
         end
-      end
-
-      def self.statuses(page = 1)
-        return Status.aggregate('media_catalog', {page: page || 1})
       end
 
       def self.collection
