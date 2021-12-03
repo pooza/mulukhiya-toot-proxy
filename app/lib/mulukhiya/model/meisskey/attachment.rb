@@ -69,7 +69,7 @@ module Mulukhiya
         params[:page] ||= 1
         unless storage[params]
           attachments = []
-          statuses(params[:page]).each do |row|
+          Status.aggregate('media_catalog', {page: params[:page]}).each do |row|
             status = Status[row[:_id]]
             row[:_files].map {|f| Attachment[f[:_id]]}.each do |attachment|
               attachments.push(attachment.to_h.deep_symbolize_keys.merge(
@@ -86,13 +86,10 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        statuses.each do |status|
+        params[:page] ||= 1
+        Status.aggregate('media_catalog', {page: params[:page]}).each do |status|
           status[:_files].map {|f| f[:_id]}.map {|id| Attachment[id]}.map(&:feed_entry).each(&block)
         end
-      end
-
-      def self.statuses(page = 1)
-        return Status.aggregate('media_catalog', {page: page || 1})
       end
 
       def self.collection
