@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def alert(params = {})
-      SlackService.broadcast(error.to_h)
+      SlackService.broadcast(error.to_h.merge(node: sns.node_name))
     end
   end
 end
