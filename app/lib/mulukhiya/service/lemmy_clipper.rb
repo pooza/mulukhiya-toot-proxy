@@ -51,17 +51,18 @@ module Mulukhiya
       EM.run do
         login
 
-        client.on(:error) do |e|
+        client.on :error do |e|
           raise e.message
         end
 
-        client.on(:message) do |message|
+        client.on :message do |message|
           payload = JSON.parse(message.data)
           raise payload['error'] if payload['error']
           method = "handle_#{payload['op']}".underscore.to_sym
           EM.stop_event_loop if send(method, payload['data'], params) == :stop
         end
       rescue => e
+        Event.new(:alert).dispatch(e)
         logger.error(error: e, websocket: uri.to_s)
         EM.stop_event_loop
       end
