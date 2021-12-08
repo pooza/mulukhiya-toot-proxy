@@ -18,7 +18,7 @@ module Mulukhiya
       end
     rescue => e
       Event.new(:alert).dispatch(e)
-      raise Ginseng::GatewayError, e.message, e.backtrace
+      raise e.message, e.backtrace
     end
   end
 end
