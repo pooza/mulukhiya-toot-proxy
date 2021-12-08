@@ -34,7 +34,7 @@ module Mulukhiya
 
       def recent_status
         rows = Postgres.instance.exec('recent_toot', {id: id})
-        return Status[rows.first['id']] if rows.present?
+        return Status[rows.first[:id]] if rows.present?
         return nil
       end
 
@@ -80,8 +80,8 @@ module Mulukhiya
       def self.get(key)
         if key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          account = Postgres.instance.exec('token_owner', {token: token})&.first
-          account = Account[account[:id]]
+          return nil unless account = Postgres.instance.exec('token_owner', {token: token})&.first
+          return nil unless account = Account[account[:id]]
           account.token = token
           return account
         elsif acct = key[:acct]
