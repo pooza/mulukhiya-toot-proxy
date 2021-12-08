@@ -16,6 +16,9 @@ module Mulukhiya
       else
         client_push('class' => self, 'args' => args.map(&:deep_symbolize_keys))
       end
+    rescue => e
+      Event.new(:alert).dispatch(e)
+      raise Ginseng::GatewayError, e.message, e.backtrace
     end
   end
 end
