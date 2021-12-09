@@ -14,6 +14,8 @@ module Mulukhiya
       return false if Ginseng::URI.parse(keyword)&.absolute?
       return true if @tracks[keyword] = @service.search_track(keyword)
       return false
+    rescue Addressable::URI::InvalidURIError
+      return false
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
       return false
