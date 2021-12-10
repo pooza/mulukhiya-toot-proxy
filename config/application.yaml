@@ -1076,6 +1076,9 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
+tagging:
+  normalize:
+    rules: []
 test:
   timeout: 20
 user_config:
