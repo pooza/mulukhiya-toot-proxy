@@ -2,6 +2,10 @@ module Mulukhiya
   class TaggingHandlerTest < TestCase
     def setup
       @handler = Handler.create('tagging')
+      config['/tagging/normalize/rules'].push(
+        'source' => 'ふたりはプリキュア_Max_Heart',
+        'normalized' => 'ふたりはプリキュアMax_Heart',
+      )
     end
 
     def test_handle_pre_toot
@@ -16,6 +20,10 @@ module Mulukhiya
       @handler.clear
       @handler.handle_pre_toot(status_field => "本文\n本文\n#1行目\n#2行目")
       assert_equal(@handler.payload[status_field], "本文\n本文\n#2行目 #1行目")
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => "本文\n本文\n#ふたりはプリキュア_Max_Heart")
+      assert_equal(@handler.payload[status_field], "本文\n本文\n#ふたりはプリキュアMax_Heart")
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "本文\n本文\n#1行目\n#2行目\nhttps://google.co.jp")

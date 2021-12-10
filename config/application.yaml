@@ -840,7 +840,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.11.14
+  version: 4.11.15
 parser:
   note:
     fields:
@@ -1076,6 +1076,9 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
+tagging:
+  normalize:
+    rules: []
 test:
   timeout: 20
 user_config:

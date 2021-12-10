@@ -87,11 +87,8 @@ module Mulukhiya
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
         unless storage[params]
-          catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
-          storage[params] = catalog.select {|v| v['id']}.map do |row|
-            attachment = get(row: row)
-            attachment.to_h.merge(status_url: row['status_uri'])
-          end
+          storage[params] = Postgres.instance.execute('media_catalog', query_params.merge(params))
+            .map {|row| get(row: row).to_h.merge(status_url: row[:status_uri])}
         end
         return storage[params]
       end

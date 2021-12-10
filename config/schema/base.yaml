@@ -269,6 +269,26 @@ properties:
               - url
         type: object
     type: object
+  tagging:
+    properties:
+      normalize:
+        properties:
+          rules:
+            items:
+              properties:
+                sourse:
+                  type: string
+                normalized:
+                  type: string
+              required:
+                - source
+                - normalized
+              type: object
+            type: array
+        required:
+          - rules
+        type: object
+    type: object
 required:
   - agent
   - alert
