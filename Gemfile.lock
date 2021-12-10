@@ -208,7 +208,7 @@ GEM
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.3.0)
-    loofah (2.12.0)
+    loofah (2.13.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -349,7 +349,7 @@ GEM
       rubocop (>= 0.78.0)
       slim (>= 3.0, < 5.0)
     temple (0.8.2)
-    test-unit (3.5.1)
+    test-unit (3.5.2)
       power_assert
     thwait (0.2.0)
       e2mmap
