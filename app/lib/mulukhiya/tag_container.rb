@@ -2,6 +2,13 @@ module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
     include Package
 
+    def normalize(word)
+      if rule = config['/tagging/normalize/rules'].find {|v| v['source'] == word.to_hashtag_base}
+        word = rule['normalized']
+      end
+      return super
+    end
+
     def self.scan(text)
       return TagContainer.new(
         text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first),
