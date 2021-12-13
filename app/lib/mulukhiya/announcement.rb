@@ -38,6 +38,7 @@ module Mulukhiya
     def save
       storage['announcements'] = fetch.to_h {|v| [v[:id], v]}.to_json
     rescue => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
     end
   end

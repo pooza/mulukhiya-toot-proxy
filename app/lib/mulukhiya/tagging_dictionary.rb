@@ -38,6 +38,7 @@ module Mulukhiya
       @cache ||= Marshal.load(redis['tagging_dictionary']) # rubocop:disable Security/MarshalLoad
       return @cache
     rescue => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       return nil
     end
@@ -49,6 +50,7 @@ module Mulukhiya
       clear
       update(cache)
     rescue => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
     end
 
@@ -72,6 +74,7 @@ module Mulukhiya
         Thread.new do
           result.push(dic.parse)
         rescue => e
+          Event.new(:alert).dispatch(e)
           logger.error(error: e, dic: {url: dic.uri.to_s})
         end
       end.each(&:join)

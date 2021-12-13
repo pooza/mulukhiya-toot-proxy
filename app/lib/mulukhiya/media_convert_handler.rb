@@ -3,12 +3,13 @@ module Mulukhiya
     attr_reader :image_field, :file
 
     def handle_pre_upload(payload, params = {})
-      @file = media_class.new(payload[image_field][:tempfile].path)
+      @file = media_class.new(payload.dig(image_field, :tempfile).path)
       return unless convertable?
       return unless @dest = convert
       payload[image_field][:org_tempfile] ||= payload.dig(image_field, :tempfile)
       payload[image_field][:tempfile] = @dest
     rescue => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       errors.push(class: e.class.to_s, message: e.message, file: file.path)
     end

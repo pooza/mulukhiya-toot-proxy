@@ -12,6 +12,7 @@ module Mulukhiya
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       @renderer.message = {error: e.message}
       notify('error' => e.raw_message)
@@ -29,6 +30,7 @@ module Mulukhiya
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
       notify(@renderer.message)
@@ -48,6 +50,7 @@ module Mulukhiya
       @renderer.status = @reporter.response.code
       return @renderer.to_s
     rescue RestClient::Exception => e
+      Event.new(:alert).dispatch(e)
       logger.error(error: e)
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
       notify(@renderer.message)
