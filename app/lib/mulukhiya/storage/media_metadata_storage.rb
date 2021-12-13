@@ -12,7 +12,7 @@ module Mulukhiya
       return supernil unless entry = super(uri)
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
-      logger.error(error: e, key: key)
+      e.log(key: key)
       return nil
     end
 
@@ -26,7 +26,7 @@ module Mulukhiya
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
       set(uri, values)
     rescue Ginseng::GatewayError => e
-      logger.error(error: e, url: uri.to_s)
+      e.log(url: uri.to_s)
       set(uri, {})
     end
 

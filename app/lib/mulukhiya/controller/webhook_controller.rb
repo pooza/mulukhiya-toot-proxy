@@ -12,8 +12,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -24,7 +23,7 @@ module Mulukhiya
       @renderer.message = {message: 'OK'}
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

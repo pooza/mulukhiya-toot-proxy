@@ -20,7 +20,7 @@ module Mulukhiya
       end
       return Set[@source]
     rescue => e
-      logger.error(error: e)
+      e.log
       return Set[@source]
     end
 

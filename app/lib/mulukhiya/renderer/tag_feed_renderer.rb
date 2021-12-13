@@ -18,7 +18,7 @@ module Mulukhiya
       @channel[:description] = "#{@sns.node_name} ##{tag}のタイムライン"
       @atom = nil
     rescue => e
-      logger.error(error: e, tag: tag)
+      e.log(tag: tag)
       @tag = nil
       @atom = nil
     end
@@ -57,7 +57,7 @@ module Mulukhiya
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       rescue => e
-        logger.error(error: e, row: row)
+        e.log(row: row)
       end
     end
 

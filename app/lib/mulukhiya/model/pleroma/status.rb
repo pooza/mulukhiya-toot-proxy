@@ -54,7 +54,7 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        logger.error(error: e)
+        e.log
         template = Template.new('status_clipping.md')
         template[:account] = account.to_h
         template[:status] = TootParser.new(text).to_md

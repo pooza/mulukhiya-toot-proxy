@@ -27,7 +27,7 @@ module Mulukhiya
         client_push('class' => self, 'args' => args.map(&:deep_symbolize_keys))
       end
     rescue => e
-      Event.new(:alert).dispatch(e)
+      e.alert
       raise e.message, e.backtrace
     end
   end

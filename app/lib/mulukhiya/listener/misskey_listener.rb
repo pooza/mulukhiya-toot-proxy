@@ -8,7 +8,7 @@ module Mulukhiya
     rescue NoMethodError
       logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
     rescue => e
-      logger.error(error: e, payload: (payload rescue message.data))
+      e.log(payload: (payload rescue message.data))
     end
 
     def handle_mention(payload)
@@ -22,7 +22,7 @@ module Mulukhiya
     def self.sender(payload)
       return Environment.account_class.get(id: payload.dig('body', 'user', 'id'))
     rescue => e
-      logger.error(error: e)
+      e.log
     end
 
     def self.start
@@ -43,8 +43,7 @@ module Mulukhiya
       end
     rescue => e
       @client = nil
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       sleep(config['/websocket/retry/seconds'])
       retry
     end

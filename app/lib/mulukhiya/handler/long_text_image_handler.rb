@@ -45,7 +45,7 @@ module Mulukhiya
       image.write(path)
       return path
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 

@@ -26,7 +26,7 @@ module Mulukhiya
       }
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -38,8 +38,7 @@ module Mulukhiya
       @renderer.message = {config: @sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -52,8 +51,7 @@ module Mulukhiya
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -72,8 +70,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -93,8 +90,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -106,7 +102,7 @@ module Mulukhiya
       @renderer.message = Program.instance.data
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -118,7 +114,7 @@ module Mulukhiya
       ProgramUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -139,7 +135,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -150,7 +146,7 @@ module Mulukhiya
       MediaCleaningWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -161,7 +157,7 @@ module Mulukhiya
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -172,7 +168,7 @@ module Mulukhiya
       MediaCatalogUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -194,8 +190,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -207,7 +202,7 @@ module Mulukhiya
       AnnouncementWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -219,7 +214,7 @@ module Mulukhiya
       @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -230,7 +225,7 @@ module Mulukhiya
       TaggingDictionaryUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -252,7 +247,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic.dig(word, :words)).create_tags
         rescue => e
-          logger.error(error: e, entry: entry)
+          e.log(entry: entry)
         end
         @renderer.message = dic
       end
@@ -264,7 +259,7 @@ module Mulukhiya
       UserTagInitializeWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -276,7 +271,7 @@ module Mulukhiya
       @renderer.message = @sns.account.lemmy&.communities || {}
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -300,7 +295,7 @@ module Mulukhiya
       FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -311,7 +306,7 @@ module Mulukhiya
         @renderer = api.create_renderer(params)
         return @renderer.to_s
       rescue => e
-        logger.error(error: e)
+        e.log
         @renderer.status = e.status
         @renderer.message = {error: e.message}
         return @renderer.to_s

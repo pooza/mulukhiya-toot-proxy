@@ -43,7 +43,7 @@ module Mulukhiya
       def fields
         return JSON.parse(values[:fields] || '[]')
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return []
       end
 
@@ -65,7 +65,7 @@ module Mulukhiya
           tags.merge(v)
         end
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return TagContainer.new
       end
 

@@ -28,8 +28,7 @@ module Mulukhiya
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
     end
 
     def token

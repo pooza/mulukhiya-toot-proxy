@@ -19,7 +19,7 @@ module Mulukhiya
       command.env = params[:env] if params[:env]
       return command
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
   end

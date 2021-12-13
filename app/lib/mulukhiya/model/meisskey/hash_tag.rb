@@ -50,7 +50,7 @@ module Mulukhiya
         end
         return favorites.sort_by {|_, v| v}.reverse.to_h
       rescue => e
-        logger.error(error: e)
+        e.log
         return {}
       end
 

@@ -44,14 +44,14 @@ module Mulukhiya
         response = service.fetch_featured_tags(id)
         return TagContainer.new(response.parsed_response.map {|v| v['name']})
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return TagContainer.new
       end
 
       def fields
         return JSON.parse(values[:fields] || '[]')
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return []
       end
 

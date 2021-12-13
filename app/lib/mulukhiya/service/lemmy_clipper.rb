@@ -62,8 +62,7 @@ module Mulukhiya
           EM.stop_event_loop if send(method, payload['data'], params) == :stop
         end
       rescue => e
-        Event.new(:alert).dispatch(e)
-        logger.error(error: e, websocket: uri.to_s)
+        e.alert(websocket: uri.to_s)
         EM.stop_event_loop
       end
     end

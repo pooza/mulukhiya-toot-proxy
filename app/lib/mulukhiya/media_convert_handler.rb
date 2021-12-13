@@ -9,8 +9,7 @@ module Mulukhiya
       payload[image_field][:org_tempfile] ||= payload.dig(image_field, :tempfile)
       payload[image_field][:tempfile] = @dest
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       errors.push(class: e.class.to_s, message: e.message, file: file.path)
     end
 

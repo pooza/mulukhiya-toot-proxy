@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        logger.error(error: e, k: k, v: v)
+        e.log(k: k, v: v)
       end
       update(sort_by {|k, _| k.length}.to_h)
     end
@@ -38,8 +38,7 @@ module Mulukhiya
       @cache ||= Marshal.load(redis['tagging_dictionary']) # rubocop:disable Security/MarshalLoad
       return @cache
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       return nil
     end
 
@@ -50,8 +49,7 @@ module Mulukhiya
       clear
       update(cache)
     rescue => e
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
     end
 
     def short?(word)
@@ -74,8 +72,7 @@ module Mulukhiya
         Thread.new do
           result.push(dic.parse)
         rescue => e
-          Event.new(:alert).dispatch(e)
-          logger.error(error: e, dic: {url: dic.uri.to_s})
+          e.alert(dic: {url: dic.uri.to_s})
         end
       end.each(&:join)
       return result

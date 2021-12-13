@@ -155,7 +155,7 @@ module Mulukhiya
         File.unlink(path)
         logger.info(class: 'MediaFile', message: 'delete', path: path)
       rescue => e
-        logger.error(error: e, path: path)
+        e.log(path: path)
       end
     end
 

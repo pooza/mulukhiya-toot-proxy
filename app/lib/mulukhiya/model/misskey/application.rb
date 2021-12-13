@@ -8,7 +8,7 @@ module Mulukhiya
         return matches.split(',').to_set if matches
         raise Ginseng::GatewayError, "Invalid scopes '#{permission}'"
       rescue => e
-        logger.error(error: e)
+        e.log
         return []
       end
     end

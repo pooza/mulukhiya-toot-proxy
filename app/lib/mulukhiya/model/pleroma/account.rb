@@ -56,7 +56,7 @@ module Mulukhiya
           entry
         end
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return []
       end
 
@@ -89,7 +89,7 @@ module Mulukhiya
         deletable_statuses.each do |status|
           service.delete_status(Ginseng::URI.parse(status['uri'])) unless params[:dryrun]
         rescue => e
-          logger.error(error: e, acct: acct.to_s)
+          e.log(acct: acct.to_s)
         ensure
           bar&.increment
         end

@@ -64,7 +64,7 @@ module Mulukhiya
       return Webhook.new(key) if key.is_a?(UserConfig)
       return controller_class.webhook_entries.find {|v| v[:digest] == key}[:account].webhook
     rescue => e
-      logger.error(error: e, key: key.to_s)
+      e.log(key: key.to_s)
       return nil
     end
 

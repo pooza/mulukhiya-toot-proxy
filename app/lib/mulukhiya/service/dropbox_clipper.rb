@@ -21,10 +21,10 @@ module Mulukhiya
       end
       return DropboxClipper.new((token.decrypt rescue token))
     rescue Ginseng::ConfigError => e
-      logger.error(error: e)
+      e.log
       return nil
     rescue => e
-      logger.error(error: e, params: params)
+      e.log(params: params)
       return nil
     end
   end

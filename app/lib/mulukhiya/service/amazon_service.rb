@@ -22,7 +22,7 @@ module Mulukhiya
         return uri if uri&.absolute?
       end
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
@@ -38,7 +38,7 @@ module Mulukhiya
       return nil
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/amazon/retry/seconds'])
       retry
@@ -54,7 +54,7 @@ module Mulukhiya
       return item
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/amazon/retry/seconds'])
       retry

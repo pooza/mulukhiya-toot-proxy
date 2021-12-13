@@ -9,7 +9,7 @@ module Mulukhiya
         next if sns.uri.host == service.base_uri.host
         tags.merge(service.search_hashtags(text))
       rescue => e
-        logger.error(error: e, remote: remote)
+        e.log(remote: remote)
       end
       return tags
     end

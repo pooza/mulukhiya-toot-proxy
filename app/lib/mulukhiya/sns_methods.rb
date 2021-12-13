@@ -78,7 +78,7 @@ module Mulukhiya
       message = message.to_yaml unless message.is_a?(String)
       return info_agent_service.notify(@sns.account, message, options)
     rescue => e
-      logger.error(error: e, message: message)
+      e.log(message: message)
     end
 
     def info_agent_service
@@ -90,7 +90,7 @@ module Mulukhiya
     def test_account
       return account_class.test_account
     rescue => e
-      logger.error(error: e)
+      e.log
     end
 
     def self.included(base)
