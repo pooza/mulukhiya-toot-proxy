@@ -1,0 +1,13 @@
+properties:
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
+  to:
+    type: string
+  token:
+    type: string
+required:
+  - to
+  - token
+type: object

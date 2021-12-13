@@ -12,7 +12,7 @@ module Mulukhiya
     end
 
     def default_receipt
-      receipt = (config['/alert/mail/to'] rescue nil)
+      receipt = (config['/handler/mail_alert/to'] rescue nil)
       receipt ||= sns_class.new.maintainer_email
       return receipt
     end

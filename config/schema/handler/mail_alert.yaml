@@ -1,0 +1,11 @@
+properties:
+  disabled:
+    type: boolean
+  timeout:
+    type: integer
+  to:
+    format: email
+    type: string
+required:
+  - to
+type: object

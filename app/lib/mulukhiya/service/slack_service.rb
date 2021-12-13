@@ -9,7 +9,7 @@ module Mulukhiya
 
     def self.uris(&block)
       return enum_for(__method__) unless block
-      config['/alert/hooks'].map {|v| Ginseng::URI.parse(v)}.each(&block)
+      config['/handler/slack_alert/hooks'].map {|v| Ginseng::URI.parse(v)}.each(&block)
     rescue Ginseng::ConfigError
       return nil
     end

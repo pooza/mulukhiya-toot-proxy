@@ -9,15 +9,15 @@ module Mulukhiya
     end
 
     def self.id
-      return config['/alert/line/to'] rescue nil
+      return config['/handler/line_alert/to'] rescue nil
     end
 
     def self.token
-      return config['/alert/line/token'].decrypt
+      return config['/handler/line_alert/token'].decrypt
     rescue Ginseng::ConfigError
       return nil
     rescue
-      return config['/alert/line/token']
+      return config['/handler/line_alert/token']
     end
 
     def self.config?
