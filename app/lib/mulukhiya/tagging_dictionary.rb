@@ -14,7 +14,7 @@ module Mulukhiya
       text = source.dup
       tags = TagContainer.new
       reverse_each do |k, v|
-        next if self.class.short?(k)
+        next if short?(k)
         next unless text.match?(v[:pattern])
         tags.add(k)
         tags.merge(v[:words])
@@ -52,21 +52,11 @@ module Mulukhiya
       logger.error(error: e)
     end
 
-    def self.short?(word)
-      return true if word.match?("^#{without_kanji_pattern}{,#{minimum_length - 1}}$")
-      return word.length < minimum_length_kanji
-    end
-
-    def self.without_kanji_pattern
-      return config['/handler/dictionary_tag/word/without_kanji_pattern']
-    end
-
-    def self.minimum_length
-      return config['/handler/dictionary_tag/word/min']
-    end
-
-    def self.minimum_length_kanji
-      return config['/handler/dictionary_tag/word/min_kanji']
+    def short?(word)
+      handler = Handler.create('dictionary_tag')
+      pattern = Regexp.new("^#{handler.without_kanji_pattern}{,#{handler.minimum_length - 1}}$")
+      return true if word.match?(pattern)
+      return word.length < handler.minimum_length_kanji
     end
 
     private

@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def self.tags
-      return TagContainer.new((config['/handler/default_tag/tags']))
+      return TagContainer.new(config['/handler/default_tag/tags'])
     end
   end
 end
