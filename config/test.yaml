@@ -23,7 +23,7 @@ filters:
       - sns_service
       - status
       - tag_container
-      - taggingdictionary
+      - tagging_dictionary
       - template
       - toot_uri
       - user_config
