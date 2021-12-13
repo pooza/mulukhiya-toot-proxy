@@ -1,8 +1,9 @@
 module Mulukhiya
   class HexoTestCaseFilter < TestCaseFilter
     def active?
-      config['/handler/hexo_announce/category']
-      config['/handler/hexo_announce/path']
+      handler = Handler.create('hexo_announce')
+      return true unless handler.handler_config(:category)
+      return true unless handler.handler_config(:dir)
       return false
     rescue
       return true

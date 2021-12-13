@@ -14,20 +14,21 @@ module Mulukhiya
       result.push(path: path)
     end
 
-    private
-
     def category
       return handler_config(:category)
     end
 
+    def dir
+      dir = handler_config(:dir)
+      return File.join(Environment.dir, dir) unless dir.start_with?('/')
+      return dir
+    end
+
+    private
+
     def path
       basename = payload[:title] || payload.to_json.adler32
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
-    end
-
-    def dir
-      path = handler_config(:path)
-      return File.join(Environment.dir, path) unless path.start_with?('/')
     end
   end
 end
