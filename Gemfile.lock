@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 41f42e6f97bd287972a490d095262b2d66c7f279
+  revision: ca64b6684c293fda8e8acda3428ea0e15c02b484
   specs:
-    ginseng-core (1.11.11)
+    ginseng-core (1.11.14)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler
@@ -12,7 +12,7 @@ GIT
       erb
       etc
       facets
-      fileutils (= 1.5.0)
+      fileutils (~> 1.5.0)
       find
       httparty
       json-schema
