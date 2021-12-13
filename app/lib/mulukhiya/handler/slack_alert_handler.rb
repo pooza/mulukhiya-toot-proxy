@@ -8,5 +8,12 @@ module Mulukhiya
     def alert(params = {})
       SlackService.broadcast(error.to_h.merge(node: sns.node_name))
     end
+
+    def uris(&block)
+      return enum_for(__method__) unless block
+      config['/handler/slack_alert/hooks'].map {|v| Ginseng::URI.parse(v)}.each(&block)
+    rescue Ginseng::ConfigError
+      return nil
+    end
   end
 end
