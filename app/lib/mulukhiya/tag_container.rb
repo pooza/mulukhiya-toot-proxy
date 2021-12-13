@@ -23,12 +23,8 @@ module Mulukhiya
       return RemoteTagHandler.tags
     end
 
-    def self.media_tag?
-      return Handler.create('media_tag').disable? == false
-    end
-
     def self.media_tags
-      return MediaTagHandler.all.values
+      return TagContainer.new(Handler.create('media_tag').all.values)
     end
   end
 end

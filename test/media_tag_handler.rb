@@ -5,10 +5,10 @@ module Mulukhiya
     end
 
     def test_all
-      assert_kind_of(Hash, @handler.class.all)
-      assert(@handler.class.all[:image].present?)
-      assert(@handler.class.all[:video].present?)
-      assert(@handler.class.all[:audio].present?)
+      assert_kind_of(Hash, @handler.all)
+      assert(@handler.all[:image].present?)
+      assert(@handler.all[:video].present?)
+      assert(@handler.all[:audio].present?)
     end
   end
 end

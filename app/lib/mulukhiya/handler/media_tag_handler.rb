@@ -11,9 +11,9 @@ module Mulukhiya
       @media_tags = nil
     end
 
-    def self.all
-      return {} unless TagContainer.media_tag?
-      return [:image, :video, :audio].to_h {|k| [k, config["/handler/media_tag/tags/#{k}"]]}
+    def all
+      return {} unless disable?
+      return [:image, :video, :audio].to_h {|k| [k, handler_config("tags/#{k}")]}
     end
 
     private
@@ -25,7 +25,7 @@ module Mulukhiya
     def create_media_tag(id)
       type = attachment_class[id].type
       media = [:image, :video, :audio].find {|v| type.start_with?("#{v}/")}
-      return self.class.all[media]
+      return all[media]
     end
   end
 end

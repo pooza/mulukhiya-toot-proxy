@@ -3,7 +3,7 @@ module Mulukhiya
     def addition_tags
       text = flatten_payload
       tags = TagContainer.new
-      self.class.all.select {|v| text.match?(v[:pattern])}.each do |remote|
+      all.select {|v| text.match?(v[:pattern])}.each do |remote|
         tags.merge(remote[:tags])
         service = Ginseng::Fediverse::MulukhiyaService.new(remote[:url])
         next if sns.uri.host == service.base_uri.host
@@ -14,13 +14,13 @@ module Mulukhiya
       return tags
     end
 
-    def self.tags
-      return TagContainer.new(all.map {|v| v[:tags]}.flatten)
+    def all(&block)
+      return enum_for(__method__) unless block
+      handler_config(:services).map(&:deep_symbolize_keys).each(&block)
     end
 
-    def self.all(&block)
-      return enum_for(__method__) unless block
-      config['/handler/remote_tag/services'].map(&:deep_symbolize_keys).each(&block)
+    def self.tags
+      return TagContainer.new(Handler.create('remote_tag').all.map {|v| v[:tags]}.flatten)
     end
   end
 end
