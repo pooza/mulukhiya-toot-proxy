@@ -175,6 +175,7 @@ handler:
   hexo_announce:
     category: お知らせ
     comments: false
+    dir: null
   image_copyright:
     message: ※画像有 著作権表示 参照のこと
     tag: null
@@ -242,6 +243,8 @@ handler:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
+  test:
+    timeout: 20
   user_tag:
     extra_minutes: 2
   video_format_convert:
@@ -1079,8 +1082,6 @@ spotify:
 tagging:
   normalize:
     rules: []
-test:
-  timeout: 20
 user_config:
   encrypt_fields:
     - token
