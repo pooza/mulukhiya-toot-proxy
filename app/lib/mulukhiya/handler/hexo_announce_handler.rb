@@ -17,7 +17,7 @@ module Mulukhiya
     private
 
     def category
-      return config['/handler/hexo_announce/category'] rescue nil
+      return handler_config(:category)
     end
 
     def path
@@ -26,9 +26,8 @@ module Mulukhiya
     end
 
     def dir
-      path = config['/handler/hexo_announce/path']
-      path = File.join(Environment.dir, path) unless path.start_with?('/')
-      return path
+      path = handler_config(:path)
+      return File.join(Environment.dir, path) unless path.start_with?('/')
     end
   end
 end

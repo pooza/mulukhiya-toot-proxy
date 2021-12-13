@@ -10,15 +10,11 @@ module Mulukhiya
     end
 
     def id
-      return config['/handler/line_alert/to'] rescue nil
+      return handler_config(:to)
     end
 
     def token
-      return config['/handler/line_alert/token'].decrypt
-    rescue Ginseng::ConfigError
-      return nil
-    rescue
-      return config['/handler/line_alert/token']
+      return handler_config(:token).decrypt rescue handler_config(:token)
     end
   end
 end

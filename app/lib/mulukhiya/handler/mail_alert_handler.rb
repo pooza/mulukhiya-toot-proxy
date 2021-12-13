@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def receipt
-      return config['/handler/mail_alert/to'] rescue sns.maintainer_email
+      return handler_config(:to) || sns.maintainer_email
     end
   end
 end

@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def pixel
-      return config['/handler/image_resize/pixel']
+      return handler_config(:pixel)
     end
   end
 end

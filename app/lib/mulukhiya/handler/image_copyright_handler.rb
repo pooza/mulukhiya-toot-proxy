@@ -21,18 +21,16 @@ module Mulukhiya
       return tags.member?(tag) || parser.tags.member?(tag)
     end
 
-    private
-
     def tag
-      return config['/handler/image_copyright/tag'] rescue nil
+      return handler_config(:tag)
     end
 
     def message
-      return config['/handler/image_copyright/message'] rescue nil
+      return handler_config(:message)
     end
 
     def uri
-      return Ginseng::URI.parse(config['/handler/image_copyright/url']) rescue nil
+      return Ginseng::URI.parse(handler_config(:url))
     end
   end
 end

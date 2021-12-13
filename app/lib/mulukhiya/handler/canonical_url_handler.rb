@@ -19,7 +19,7 @@ module Mulukhiya
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       return false if ignore?(uri)
       response = http.get(uri, {
-        headers: {'User-Agent' => config['/handler/canonical_url/useragent']},
+        headers: {'User-Agent' => handler_config(:useragent)},
       })
       return false unless element = response.body.nokogiri.xpath('//link[@rel="canonical"]').first
       return false unless canonical = Ginseng::URI.parse(element.attribute('href'))
@@ -38,14 +38,10 @@ module Mulukhiya
       return true if uri.path == '/'
       return true if uri.path.empty?
       return true if uri.query_values.present?
-      return true if ignore_domains.any? {|domain| uri.host.end_with?(domain)}
+      return true if (handler_config('ignore/domains') || []).any? {|domain| uri.host.end_with?(domain)}
       return true if AmazonURI.parse(uri.to_s).valid?
       return true if ItunesURI.parse(uri.to_s).valid?
       return false
-    end
-
-    def ignore_domains
-      return config['/handler/canonical_url/ignore/domains'] || []
     end
   end
 end

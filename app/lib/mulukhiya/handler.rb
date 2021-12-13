@@ -77,6 +77,12 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
+    def handler_config(key)
+      return config["/handler/#{underscore}/#{key}"]
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
     def verbose?
       return true
     end

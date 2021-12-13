@@ -23,7 +23,7 @@ module Mulukhiya
     end
 
     def domains
-      return config['/handler/shortened_url/domains'] rescue []
+      return handler_config(:domains) || []
     end
   end
 end
