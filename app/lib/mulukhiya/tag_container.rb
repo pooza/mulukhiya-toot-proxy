@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def self.remote_default_tags
-      return DefaultTagHandler.remote_tags
+      return RemoteTagHandler.tags
     end
 
     def self.media_tag?

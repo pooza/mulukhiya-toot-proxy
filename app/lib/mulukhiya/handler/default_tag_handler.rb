@@ -12,9 +12,5 @@ module Mulukhiya
     def self.tags
       return TagContainer.new((config['/handler/default_tag/tags']))
     end
-
-    def self.remote_tags
-      return TagContainer.new(RemoteTagHandler.entries.map {|v| v[:tags]}.flatten)
-    end
   end
 end

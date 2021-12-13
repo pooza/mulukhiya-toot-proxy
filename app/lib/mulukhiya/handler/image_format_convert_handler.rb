@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def detect_alpha?
-      return handler_config(:alpha) == true
+      return handler_config(:alpha)
     end
 
     def type
