@@ -9,13 +9,6 @@ agent:
       template: welcome
   test:
     token: null
-alert:
-  hooks: []
-  line:
-    to: null
-    token: null
-  mail:
-    to: null
 amazon:
   affiliate: false
   cache:
@@ -183,8 +176,8 @@ handler:
     category: お知らせ
     comments: false
   image_copyright:
-    tag: null
     message: ※画像有 著作権表示 参照のこと
+    tag: null
     url: null
   image_format_convert:
     alpha: true
@@ -198,6 +191,9 @@ handler:
     timeout: 10
   itunes_url_nowplaying:
     timeout: 10
+  line_alert:
+    to: null
+    token: null
   long_text_image:
     columns: 20
     disable: true
@@ -206,6 +202,8 @@ handler:
     image_file: public/mulukhiya/media/background.png
     rows: 30
     text_length: 140
+  mail_alert:
+    to: null
   media_tag:
     tags:
       audio: audio
@@ -235,6 +233,8 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
+  slack_alert:
+    hooks: []
   spotify_image:
     disable: true
     timeout: 10
