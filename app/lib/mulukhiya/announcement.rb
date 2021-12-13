@@ -16,7 +16,7 @@ module Mulukhiya
       rescue => e
         logger.error(error: e, announcement: announcement)
       ensure
-        sleep(config['/worker/announcement/interval/seconds'])
+        sleep(AnnouncementWorker.new.interval_seconds)
       end
       save
     end

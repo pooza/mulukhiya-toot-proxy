@@ -5,5 +5,9 @@ module Mulukhiya
     def perform(params = {})
       MediaFile.purge
     end
+
+    def days
+      return worker_config(:days)
+    end
   end
 end

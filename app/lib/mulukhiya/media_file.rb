@@ -151,7 +151,7 @@ module Mulukhiya
 
     def self.purge
       all do |path|
-        next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
+        next unless File.new(path).mtime < MediaCleaningWorker.new.days.days.ago
         File.unlink(path)
         logger.info(class: 'MediaFile', message: 'delete', path: path)
       rescue => e
