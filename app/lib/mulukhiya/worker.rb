@@ -8,6 +8,16 @@ module Mulukhiya
       return false
     end
 
+    def underscore
+      return self.class.to_s.split('::').last.sub(/Woeker$/, '').underscore
+    end
+
+    def worker_config(key)
+      return config["/worker/#{underscore}/#{key}"]
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
     def self.perform_async(*args)
       return if new.disable?
       if Environment.development? || Environment.test?

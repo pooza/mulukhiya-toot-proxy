@@ -2,13 +2,9 @@ module Mulukhiya
   class ClippingWorker < Worker
     sidekiq_options retry: 3
 
-    def underscore
-      return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
-    end
-
     def federate?
       return true if Environment.test?
-      return config["/worker/#{underscore}/federate"] == true rescue false
+      return worker_config(:federate)
     end
 
     def perform(params)
