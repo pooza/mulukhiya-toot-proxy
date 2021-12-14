@@ -1,4 +1,4 @@
-*.rb
+*
 !crypt.rb
 !decrypt.rb
 !listener_daemon.rb
