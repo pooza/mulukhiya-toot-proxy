@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def id
-      return handler_config(:to)
+      return handler_config(:id)
     end
 
     def token

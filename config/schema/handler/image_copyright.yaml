@@ -5,11 +5,11 @@ properties:
     type: string
   tag:
     type: string
+  timeout:
+    type: integer
   url:
     format: uri
     type: string
-  timeout:
-    type: integer
 required:
   - tag
   - url

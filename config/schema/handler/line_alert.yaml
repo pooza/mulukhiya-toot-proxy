@@ -1,13 +1,13 @@
 properties:
   disabled:
     type: boolean
+  id:
+    type: string
   timeout:
     type: integer
-  to:
-    type: string
   token:
     type: string
 required:
-  - to
+  - id
   - token
 type: object

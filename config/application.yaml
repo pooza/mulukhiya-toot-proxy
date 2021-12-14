@@ -279,6 +279,8 @@ lemmy:
     api: /api/v3/ws
   verify_peer: true
 line:
+  id: null
+  token: null
   urls:
     api: https://api.line.me
 mastodon:
