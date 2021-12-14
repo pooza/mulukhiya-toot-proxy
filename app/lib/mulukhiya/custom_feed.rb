@@ -9,9 +9,17 @@ module Mulukhiya
       @params[:dir] ||= Environment.dir
     end
 
+    def id
+      return path.to_hashtag_base
+    end
+
     def uri
       @uri ||= sns_class.new.create_uri(fullpath)
       return @uri
+    end
+
+    def dir
+      return @params[:dir]
     end
 
     def path
@@ -33,6 +41,10 @@ module Mulukhiya
     def command
       @command ||= CommandLine.create(params)
       return @command
+    end
+
+    def bundler?
+      return command.to_s.start_with?('bundle exec ')
     end
 
     def renderer

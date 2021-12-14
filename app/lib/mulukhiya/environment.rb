@@ -162,6 +162,19 @@ module Mulukhiya
       end.to_set
     end
 
+    def self.bundle_install
+      dirs = Set[]
+      dirs.merge(CustomAPI.all.select(&:bundler?).map(&:dir))
+      dirs.merge(CustomFeed.all.select(&:bundler?).map(&:dir))
+      dirs.map do |dir|
+        Thread.new do
+          command = CommandLine.new(['bundle', 'install'])
+          command.dir = dir
+          command.exec
+        end
+      end.each(&:join)
+    end
+
     def self.health
       values = {
         redis: Redis.health,

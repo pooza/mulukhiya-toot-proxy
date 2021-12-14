@@ -18,6 +18,10 @@ module Mulukhiya
       return @uri
     end
 
+    def dir
+      return @params[:dir]
+    end
+
     def path
       return File.join('/', params[:path])
     end
@@ -50,6 +54,10 @@ module Mulukhiya
       command = CommandLine.create(params)
       command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
       return command
+    end
+
+    def bundler?
+      return create_command.to_s.start_with?('bundle exec ')
     end
 
     def create_renderer(args = {})
