@@ -26,6 +26,10 @@ module Mulukhiya
       return File.join('/mulukhiya/api', params[:path])
     end
 
+    def dir
+      return @params[:dir]
+    end
+
     def args
       return params[:command].select {|v| v.is_a?(Symbol)}
     end
