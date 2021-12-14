@@ -3,10 +3,9 @@ module Mulukhiya
     def receive(message)
       payload = JSON.parse(message.data)['body']
       method_name = create_method_name(payload['type'])
-      logger.info(class: self.class.to_s, method: method_name)
       return send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.error(class: self.class.to_s, method: method_name, message: 'method undefined')
+      logger.info(class: self.class.to_s, method: method_name, message: 'method undefined')
     rescue => e
       e.log(payload: (payload rescue message.data))
     end

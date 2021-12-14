@@ -45,7 +45,7 @@ module Mulukhiya
     def refresh
       redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
       @cache = nil
-      logger.info(class: self.class.to_s, message: 'refreshed')
+      logger.info(class: self.class.to_s, method: __method__)
       clear
       update(cache)
     rescue => e
