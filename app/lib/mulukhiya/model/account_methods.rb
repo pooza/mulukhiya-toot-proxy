@@ -154,14 +154,14 @@ module Mulukhiya
     def test?
       return account_class.test_account&.id == id
     rescue => e
-      logger.info(error: e)
+      e.log
       return false
     end
 
     def info?
       return account_class.info_account&.id == id
     rescue => e
-      logger.info(error: e)
+      e.log
       return false
     end
 
