@@ -28,7 +28,8 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      Handler.create('dictionary_tag').all.map {|v| create(v)}.each(&block)
+      return unless handler = Handler.create('dictionary_tag')
+      handler.all.map {|v| create(v)}.each(&block)
     end
 
     def self.create(params)

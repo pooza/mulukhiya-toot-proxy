@@ -116,8 +116,8 @@ module Mulukhiya
     private
 
     def pixel_size
-      pixel = Handler.create('itunes_image').pixel
-      return "#{pixel}x#{pixel}"
+      return unless handler = Handler.create('itunes_image')
+      return "#{handler.pixel}x#{handler.pixel}"
     end
   end
 end

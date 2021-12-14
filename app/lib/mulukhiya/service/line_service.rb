@@ -9,11 +9,11 @@ module Mulukhiya
     end
 
     def self.id
-      return Handler.create('line_alert').id
+      return Handler.create('line_alert')&.id
     end
 
     def self.token
-      return Handler.create('line_alert').token
+      return Handler.create('line_alert')&.token
     end
 
     def self.config?

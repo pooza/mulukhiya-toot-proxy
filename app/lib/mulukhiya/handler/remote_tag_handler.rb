@@ -20,7 +20,11 @@ module Mulukhiya
     end
 
     def self.tags
-      return TagContainer.new(Handler.create('remote_tag').all.map {|v| v[:tags]}.flatten)
+      tags = TagContainer.new
+      if handler = Handler.create('remote_tag')
+        tags.merge(handler.all.map {|v| v[:tags]}.flatten)
+      end
+      return tags
     end
   end
 end

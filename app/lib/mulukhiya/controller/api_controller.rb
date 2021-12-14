@@ -47,7 +47,8 @@ module Mulukhiya
     post '/filter/add' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
-      Handler.create('filter_command').handle_toot(params, {sns: @sns})
+      raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create('filter_command')
+      handler.handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
     rescue => e

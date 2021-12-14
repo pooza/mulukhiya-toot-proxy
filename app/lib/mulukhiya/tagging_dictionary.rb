@@ -53,7 +53,7 @@ module Mulukhiya
     end
 
     def short?(word)
-      handler = Handler.create('dictionary_tag')
+      return false unless handler = Handler.create('dictionary_tag')
       pattern = Regexp.new("^#{handler.without_kanji_pattern}{,#{handler.minimum_length - 1}}$")
       return true if word.match?(pattern)
       return word.length < handler.minimum_length_kanji

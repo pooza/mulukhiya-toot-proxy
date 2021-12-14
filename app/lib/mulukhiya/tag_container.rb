@@ -24,7 +24,11 @@ module Mulukhiya
     end
 
     def self.media_tags
-      return TagContainer.new(Handler.create('media_tag').all.to_h.values)
+      tags = TagContainer.new
+      if handler = Handler.create('media_tag')
+        tags.merge(handler.all.to_h.values)
+      end
+      return tags
     end
   end
 end

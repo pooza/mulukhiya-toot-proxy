@@ -8,7 +8,7 @@ module Mulukhiya
     end
 
     def self.uris(&block)
-      return Handler.create('slack_alert').uris
+      return Handler.create('slack_alert')&.uris
     end
 
     def self.config?

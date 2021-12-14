@@ -12,7 +12,7 @@ module Mulukhiya
     end
 
     def default_receipt
-      return Handler.create('mail_alert').receipt
+      return Handler.create('mail_alert')&.receipt
     end
 
     def self.config?
