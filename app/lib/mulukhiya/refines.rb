@@ -11,6 +11,10 @@ module Mulukhiya
     end
 
     class ::StandardError
+      def log(values = {})
+        Logger.new.error({e: self}.merge(values))
+      end
+
       def alert(values = {})
         log(values)
         Event.new(:alert).dispatch(self)
