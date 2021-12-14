@@ -85,7 +85,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      config['/api/custom'].map {|v| CustomAPI.new(v)}.each(&block)
+      config['/api/custom'].map {|v| new(v)}.each(&block)
     end
   end
 end

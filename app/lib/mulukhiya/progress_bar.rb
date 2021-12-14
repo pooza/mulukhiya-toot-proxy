@@ -5,7 +5,7 @@ module Mulukhiya
     def self.create(params = {})
       return nil unless Environment.test?
       params[:format] ||= config['/cli/progress_bar/format']
-      return ProgressBar.new(params)
+      return new(params)
     end
   end
 end

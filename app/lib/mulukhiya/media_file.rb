@@ -146,7 +146,7 @@ module Mulukhiya
         "#{uri.to_s.adler32}#{File.extname(uri.path)}",
       )
       File.write(path, HTTP.new.get(uri).body)
-      return MediaFile.new(path).file
+      return new(path).file
     end
 
     def self.purge

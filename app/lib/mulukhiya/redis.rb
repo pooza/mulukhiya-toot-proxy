@@ -29,8 +29,7 @@ module Mulukhiya
     end
 
     def self.health
-      redis = Redis.new
-      redis.get('1')
+      new.get('1')
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}

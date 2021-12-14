@@ -16,7 +16,7 @@ module Mulukhiya
     end
 
     def self.config?
-      return Mailer.new.default_receipt.present?
+      return new.default_receipt.present?
     end
   end
 end

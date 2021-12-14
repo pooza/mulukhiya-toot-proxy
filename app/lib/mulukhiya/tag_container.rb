@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def self.scan(text)
-      return TagContainer.new(
+      return new(
         text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first),
       )
     end
@@ -24,7 +24,7 @@ module Mulukhiya
     end
 
     def self.media_tags
-      tags = TagContainer.new
+      tags = new
       if handler = Handler.create('media_tag')
         tags.merge(handler.all.to_h.values)
       end
