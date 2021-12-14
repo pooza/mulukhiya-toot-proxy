@@ -150,10 +150,10 @@ module Mulukhiya
     end
 
     def self.purge
-      all do |path|
-        next unless File.new(path).mtime < MediaCleaningWorker.new.days.days.ago
+      worker = MediaCleaningWorker.new
+      all.select {|f| File.new(f).mtime < worker.worker_config(:days).days.ago}.each do |path|
         File.unlink(path)
-        logger.info(class: 'MediaFile', message: 'delete', path: path)
+        logger.info(class: self, message: 'delete', path: path)
       rescue => e
         e.log(path: path)
       end

@@ -24,7 +24,7 @@ module Mulukhiya
     end
 
     def handle_announcement(payload)
-      sleep(AnnouncementWorker.new.interval_seconds)
+      sleep(AnnouncementWorker.new.worker_config('interval/seconds'))
       AnnouncementWorker.perform_async
     end
 

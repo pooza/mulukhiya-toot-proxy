@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def underscore
-      return self.class.to_s.split('::').last.sub(/Woeker$/, '').underscore
+      return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
     end
 
     def worker_config(key)
