@@ -28,7 +28,8 @@ module Mulukhiya
       render_storage.del(command)
     end
 
-    def to_s
+    def to_s(params = {})
+      return feed.to_s if params[:dynamic]
       return feed.to_s unless render_storage.key?(command)
       return render_storage[command]
     rescue => e

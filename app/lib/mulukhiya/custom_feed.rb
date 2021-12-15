@@ -34,6 +34,10 @@ module Mulukhiya
       return params[:title] || path
     end
 
+    def dynamic
+      return params[:dynamic] || false
+    end
+
     def update
       renderer.cache
     end

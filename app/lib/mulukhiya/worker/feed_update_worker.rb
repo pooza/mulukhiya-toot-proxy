@@ -8,7 +8,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      CustomFeed.all(&:update)
+      CustomFeed.all.reject(&:dynamic).each(&:update)
     end
   end
 end
