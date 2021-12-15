@@ -29,13 +29,10 @@ module Mulukhiya
     end
 
     def to_s
-      raise Ginseng::NotFoundError, 'Not Found' unless render_storage.key?(command)
+      return feed.to_s unless render_storage.key?(command)
       return render_storage[command]
     rescue => e
-      e.log(command: command.to_s)
-      command.exec
-      raise command.stderr unless command.status.zero?
-      self.entries = JSON.parse(command.stdout)
+      e.log
       return feed.to_s
     end
 
