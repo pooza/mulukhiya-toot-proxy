@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def self.create(params = {})
-      return nil unless Environment.test?
+      return nil if Environment.test?
       params[:format] ||= config['/cli/progress_bar/format']
       return new(params)
     end
