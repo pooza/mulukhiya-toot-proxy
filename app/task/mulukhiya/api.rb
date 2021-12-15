@@ -7,7 +7,7 @@ module Mulukhiya
         namespace api.id do
           unless api.args?
             desc "#{api.fullpath} : exec source command"
-            task :exec do
+            task exec: [:bundler] do
               puts api.create_command.to_s
               api.create_command.exec_system
             end

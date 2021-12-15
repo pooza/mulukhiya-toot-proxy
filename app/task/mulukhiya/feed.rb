@@ -11,7 +11,7 @@ module Mulukhiya
       CustomFeed.all do |feed|
         namespace feed.id do
           desc "#{feed.fullpath} : exec source command"
-          task :exec do
+          task exec: [:bundler] do
             puts feed.command.to_s
             feed.command.exec_system
           end
