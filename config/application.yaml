@@ -193,7 +193,7 @@ handler:
   itunes_url_nowplaying:
     timeout: 10
   line_alert:
-    to: null
+    id: null
     token: null
   long_text_image:
     columns: 20
