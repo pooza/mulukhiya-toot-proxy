@@ -41,12 +41,6 @@ module Mulukhiya
       end
     end
 
-    def test_dynamic
-      CustomFeed.all do |feed|
-        assert_boolean(feed.dynamic)
-      end
-    end
-
     def test_renderer
       CustomFeed.all do |feed|
         assert_kind_of(RSS20FeedRenderer, feed.renderer)

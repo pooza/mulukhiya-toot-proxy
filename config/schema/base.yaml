@@ -115,8 +115,6 @@ properties:
               items:
                 type: string
               type: array
-            dynamic:
-              type: boolean
             description:
               type: string
             path:
