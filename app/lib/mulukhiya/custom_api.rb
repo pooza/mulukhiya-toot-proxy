@@ -38,6 +38,15 @@ module Mulukhiya
       return args.present?
     end
 
+    def choices(key)
+      sns = sns_class.new
+      uri = sns.create_uri(params.dig(:choices, key))
+      return sns.http.get(uri).parsed_response
+    rescue => e
+      e.log(key: key)
+      return nil
+    end
+
     def description
       return params[:description]
     end
