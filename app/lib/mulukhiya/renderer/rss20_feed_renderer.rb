@@ -32,7 +32,7 @@ module Mulukhiya
       return feed.to_s unless render_storage.key?(command)
       return render_storage[command]
     rescue => e
-      logger.error(error: e)
+      e.log
       return feed.to_s
     end
 
@@ -43,7 +43,7 @@ module Mulukhiya
       metadata_storage.push(uri) unless metadata_storage.key?(uri)
       return metadata_storage[uri]
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
   end

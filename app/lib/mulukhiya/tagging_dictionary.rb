@@ -14,7 +14,7 @@ module Mulukhiya
       text = source.dup
       tags = TagContainer.new
       reverse_each do |k, v|
-        next if self.class.short?(k)
+        next if short?(k)
         next unless text.match?(v[:pattern])
         tags.add(k)
         tags.merge(v[:words])
@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        logger.error(error: e, k: k, v: v)
+        e.log(k: k, v: v)
       end
       update(sort_by {|k, _| k.length}.to_h)
     end
@@ -38,35 +38,25 @@ module Mulukhiya
       @cache ||= Marshal.load(redis['tagging_dictionary']) # rubocop:disable Security/MarshalLoad
       return @cache
     rescue => e
-      logger.error(error: e)
+      e.alert
       return nil
     end
 
     def refresh
       redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
       @cache = nil
-      logger.info(class: self.class.to_s, message: 'refreshed')
+      logger.info(class: self.class.to_s, method: __method__)
       clear
       update(cache)
     rescue => e
-      logger.error(error: e)
+      e.alert
     end
 
-    def self.short?(word)
-      return true if word.match?("^#{without_kanji_pattern}{,#{minimum_length - 1}}$")
-      return word.length < minimum_length_kanji
-    end
-
-    def self.without_kanji_pattern
-      return config['/handler/dictionary_tag/word/without_kanji_pattern']
-    end
-
-    def self.minimum_length
-      return config['/handler/dictionary_tag/word/min']
-    end
-
-    def self.minimum_length_kanji
-      return config['/handler/dictionary_tag/word/min_kanji']
+    def short?(word)
+      return false unless handler = Handler.create('dictionary_tag')
+      pattern = Regexp.new("^#{handler.without_kanji_pattern}{,#{handler.minimum_length - 1}}$")
+      return true if word.match?(pattern)
+      return word.length < handler.minimum_length_kanji
     end
 
     private
@@ -82,7 +72,7 @@ module Mulukhiya
         Thread.new do
           result.push(dic.parse)
         rescue => e
-          logger.error(error: e, dic: {url: dic.uri.to_s})
+          e.alert(dic: {url: dic.uri.to_s})
         end
       end.each(&:join)
       return result

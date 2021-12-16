@@ -3,7 +3,7 @@ module Mulukhiya
     def self.sender(payload)
       return Environment.account_class.get(id: payload.dig('body', 'user', 'id'))
     rescue => e
-      logger.error(error: e)
+      e.log
     end
 
     def self.start
@@ -24,8 +24,7 @@ module Mulukhiya
       end
     rescue => e
       @client = nil
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       sleep(config['/websocket/retry/seconds'])
       retry
     end

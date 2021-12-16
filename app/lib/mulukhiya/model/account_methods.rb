@@ -28,7 +28,7 @@ module Mulukhiya
     def webhook
       return Webhook.new(user_config)
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
@@ -45,7 +45,7 @@ module Mulukhiya
       end
       return @growi
     rescue => e
-      logger.error(error: e, acct: acct.to_s)
+      e.log(acct: acct.to_s)
       return nil
     end
 
@@ -61,7 +61,7 @@ module Mulukhiya
       end
       return @lemmy
     rescue => e
-      logger.error(error: e, acct: acct.to_s)
+      e.log(acct: acct.to_s)
       return nil
     end
 
@@ -70,7 +70,7 @@ module Mulukhiya
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
@@ -89,14 +89,14 @@ module Mulukhiya
       tags.merge(fields.map {|v| v['value']}.select {|v| v.start_with?('#')})
       return tags
     rescue => e
-      logger.error(error: e, acct: acct.to_s)
+      e.log(acct: acct.to_s)
       return TagContainer.new
     end
 
     def bio_tags
       return TagContainer.scan(bio)
     rescue => e
-      logger.error(error: e, acct: acct.to_s)
+      e.log(acct: acct.to_s)
       return TagContainer.new
     end
 
@@ -122,7 +122,7 @@ module Mulukhiya
         tags.merge(dic_cache[tag][:words])
       end
     rescue => e
-      logger.error(error: e, acct: acct.to_s)
+      e.log(acct: acct.to_s)
     end
 
     def attachments
@@ -135,7 +135,7 @@ module Mulukhiya
       attachments.first(status_delete_limit).each do |attachment|
         service.delete_attachment(attachment) unless params[:dryrun]
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
       ensure
         bar&.increment
       end
@@ -154,14 +154,14 @@ module Mulukhiya
     def test?
       return account_class.test_account&.id == id
     rescue => e
-      logger.info(error: e)
+      e.log
       return false
     end
 
     def info?
       return account_class.info_account&.id == id
     rescue => e
-      logger.info(error: e)
+      e.log
       return false
     end
 
@@ -182,7 +182,7 @@ module Mulukhiya
         return nil unless test_token
         return Environment.account_class.get(token: test_token)
       rescue => e
-        logger.error(error: e)
+        e.log
         return nil
       end
 
@@ -198,7 +198,7 @@ module Mulukhiya
         return nil unless info_token
         return Environment.account_class.get(token: info_token)
       rescue => e
-        logger.error(error: e)
+        e.log
         return nil
       end
     end

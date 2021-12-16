@@ -22,7 +22,7 @@ module Mulukhiya
       storage.push(uri) unless storage.key?(uri)
       return storage[uri]
     rescue => e
-      logger.error(error: e, path: path)
+      e.log(path: path)
       return nil
     end
 
@@ -33,7 +33,7 @@ module Mulukhiya
       end
       raise 'Too large'
     rescue => e
-      logger.error(error: e, size: size, attachment: id)
+      e.log(size: size, attachment: id)
       return size
     end
 

@@ -19,12 +19,12 @@ module Mulukhiya
       unless token = account.user_config['/dropbox/token']
         raise Ginseng::ConfigError, "Account #{account.acct} /dropbox/token undefined"
       end
-      return DropboxClipper.new((token.decrypt rescue token))
+      return new((token.decrypt rescue token))
     rescue Ginseng::ConfigError => e
-      logger.error(error: e)
+      e.log
       return nil
     rescue => e
-      logger.error(error: e, params: params)
+      e.log(params: params)
       return nil
     end
   end

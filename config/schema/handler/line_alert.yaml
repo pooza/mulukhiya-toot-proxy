@@ -1,16 +1,13 @@
 properties:
   disabled:
     type: boolean
-  message:
-    type: string
-  tag:
+  id:
     type: string
   timeout:
     type: integer
-  url:
-    format: uri
+  token:
     type: string
 required:
-  - tag
-  - url
+  - id
+  - token
 type: object

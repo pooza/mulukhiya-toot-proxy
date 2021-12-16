@@ -26,12 +26,25 @@ module Mulukhiya
       return File.join('/mulukhiya/api', params[:path])
     end
 
+    def dir
+      return @params[:dir]
+    end
+
     def args
       return params[:command].select {|v| v.is_a?(Symbol)}
     end
 
     def args?
       return args.present?
+    end
+
+    def choices(key)
+      sns = sns_class.new
+      uri = sns.create_uri(params.dig(:choices, key))
+      return sns.http.get(uri).parsed_response
+    rescue => e
+      e.log(key: key)
+      return nil
     end
 
     def description
@@ -81,7 +94,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      config['/api/custom'].map {|v| CustomAPI.new(v)}.each(&block)
+      config['/api/custom'].map {|v| new(v)}.each(&block)
     end
   end
 end

@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def detect_alpha?
-      return config['/handler/image_format_convert/alpha'] == true
+      return handler_config(:alpha)
     end
 
     def type

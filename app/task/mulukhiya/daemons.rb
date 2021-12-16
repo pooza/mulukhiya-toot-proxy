@@ -4,17 +4,22 @@ module Mulukhiya
   namespace :mulukhiya do
     [:listener, :puma, :sidekiq].freeze.each do |daemon|
       namespace daemon do
-        [:start, :stop].freeze.each do |action|
-          desc "#{action} #{daemon}"
-          task action do
-            sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} #{action}"
-          rescue => e
-            warn "#{e.class} #{daemon}:#{action} #{e.message}"
-          end
+        desc "stop #{daemon}"
+        task :stop do
+          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} stop"
+        rescue => e
+          warn "#{e.class} #{daemon}:stop #{e.message}"
+        end
+
+        desc "start #{daemon}"
+        task start: ['mulukhiya:api:bundler', 'mulukhiya:feed:bundler', 'config:lint'] do
+          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
+        rescue => e
+          warn "#{e.class} #{daemon}:start #{e.message}"
         end
 
         desc "restart #{daemon}"
-        task restart: ['config:lint', :stop, :start]
+        task restart: [:stop, :start]
       end
     end
   end

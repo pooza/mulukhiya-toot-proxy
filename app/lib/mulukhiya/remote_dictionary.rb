@@ -28,14 +28,15 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      config['/handler/dictionary_tag/dics'].map {|v| create(v)}.each(&block)
+      return unless handler = Handler.create('dictionary_tag')
+      handler.all.map {|v| create(v)}.each(&block)
     end
 
     def self.create(params)
       params['type'] ||= 'multi_field'
       return "Mulukhiya::#{params['type'].camelize}RemoteDictionary".constantize.new(params)
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 

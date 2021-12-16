@@ -1,18 +1,18 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 41f42e6f97bd287972a490d095262b2d66c7f279
+  revision: e0cc9eca30bc1de7d9488e8edeeab3a0d57cf154
   specs:
-    ginseng-core (1.11.11)
+    ginseng-core (1.11.15)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
-      bundler
+      bundler (~> 2.0)
       cgi (>= 0.3.1)
       daemon-spawn
       date (>= 3.2.1)
       erb
       etc
       facets
-      fileutils (= 1.5.0)
+      fileutils (>= 1.5.0)
       find
       httparty
       json-schema
@@ -73,25 +73,24 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (6.1.4.1)
-      actionview (= 6.1.4.1)
-      activesupport (= 6.1.4.1)
-      rack (~> 2.0, >= 2.0.9)
+    actionpack (7.0.0)
+      actionview (= 7.0.0)
+      activesupport (= 7.0.0)
+      rack (~> 2.0, >= 2.2.0)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (6.1.4.1)
-      activesupport (= 6.1.4.1)
+    actionview (7.0.0)
+      activesupport (= 7.0.0)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (6.1.4.1)
+    activesupport (7.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.2)
@@ -173,7 +172,7 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
-    fastimage (2.2.5)
+    fastimage (2.2.6)
     faye-websocket (0.11.1)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
@@ -222,7 +221,7 @@ GEM
     mini_magick (4.11.0)
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
-    minitest (5.14.4)
+    minitest (5.15.0)
     mongo (2.17.0)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.2)
@@ -305,7 +304,7 @@ GEM
       rubocop-ast (>= 1.12.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.14.0)
+    rubocop-ast (1.15.0)
       parser (>= 3.0.1.1)
     rubocop-performance (1.12.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -326,7 +325,7 @@ GEM
     securerandom (0.1.1)
     sequel (5.51.0)
     set (1.0.2)
-    sidekiq (6.2.2)
+    sidekiq (6.3.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -386,6 +385,7 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
+  fileutils (= 1.5.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -404,7 +404,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 6.2.0)
+  sidekiq (~> 6.3.0)
   sidekiq-scheduler (~> 3.1.0)
   slim_lint
   test-unit

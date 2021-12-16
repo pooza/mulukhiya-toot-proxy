@@ -32,7 +32,7 @@ module Mulukhiya
       @type ||= detail_info.match(/\s+Mime\stype:\s*(.*)$/i)[1]
       return @type
     rescue => e
-      logger.error(error: e, file: path)
+      e.log(file: path)
       @type = super
       return @type
     end
@@ -115,7 +115,7 @@ module Mulukhiya
       return file if file.type == type
       return nil
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
@@ -142,7 +142,7 @@ module Mulukhiya
       end
       return @size_info
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
   end

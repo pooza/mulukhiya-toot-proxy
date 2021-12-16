@@ -9,6 +9,10 @@ module Mulukhiya
       @params[:dir] ||= Environment.dir
     end
 
+    def id
+      return path.to_hashtag_base
+    end
+
     def uri
       @uri ||= sns_class.new.create_uri(fullpath)
       return @uri
@@ -20,6 +24,10 @@ module Mulukhiya
 
     def fullpath
       return File.join('/mulukhiya/feed', params[:path])
+    end
+
+    def dir
+      return @params[:dir]
     end
 
     def title
@@ -49,7 +57,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      config['/feed/custom'].map {|v| CustomFeed.new(v)}.each(&block)
+      config['/feed/custom'].map {|v| new(v)}.each(&block)
     end
   end
 end

@@ -14,21 +14,21 @@ module Mulukhiya
       result.push(path: path)
     end
 
-    private
-
     def category
-      return config['/handler/hexo_announce/category'] rescue nil
+      return handler_config(:category)
     end
+
+    def dir
+      dir = handler_config(:dir)
+      return File.join(Environment.dir, dir) unless dir.start_with?('/')
+      return dir
+    end
+
+    private
 
     def path
       basename = payload[:title] || payload.to_json.adler32
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
-    end
-
-    def dir
-      path = config['/handler/hexo_announce/path']
-      path = File.join(Environment.dir, path) unless path.start_with?('/')
-      return path
     end
   end
 end

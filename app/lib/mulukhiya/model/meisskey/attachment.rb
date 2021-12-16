@@ -49,7 +49,7 @@ module Mulukhiya
       end
 
       def date
-        return values['uploadDate']
+        return values['uploadDate'].getlocal
       end
 
       def name
@@ -74,7 +74,7 @@ module Mulukhiya
             row[:_files].map {|f| Attachment[f[:_id]]}.each do |attachment|
               attachments.push(attachment.to_h.deep_symbolize_keys.merge(
                 id: attachment.id,
-                date: status.createdAt,
+                date: status.createdAt.getlocal,
                 status_url: status.uri.to_s,
               ))
             end

@@ -11,7 +11,7 @@ module Mulukhiya
     end
 
     def respondable?
-      return false unless @status.match?(config['/handler/announcement_mention/pattern'])
+      return false unless @status.match?(handler_config(:pattern))
       return super
     end
   end

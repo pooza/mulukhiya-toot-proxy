@@ -77,6 +77,12 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
+    def handler_config(key)
+      return config["/handler/#{underscore}/#{key}"]
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
     def verbose?
       return true
     end
@@ -121,8 +127,8 @@ module Mulukhiya
     end
 
     def timeout
-      return config['/test/timeout'] if Environment.test?
-      return config["/handler/#{underscore}/timeout"]
+      return config['/handler/test/timeout'] if Environment.test?
+      return handler_config(:timeout)
     rescue Ginseng::ConfigError
       return config['/handler/default/timeout']
     end
@@ -154,7 +160,7 @@ module Mulukhiya
       (payload[attachment_field] || []).map {|id| attachment_class[id]}.each do |attachment|
         parts.push(attachment.description)
       rescue => e
-        logger.error(error: e)
+        e.log(attachment: attachment)
       end
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
@@ -186,14 +192,14 @@ module Mulukhiya
     def self.create(name, params = {})
       return "Mulukhiya::#{name.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
-      logger.error(error: e)
+      e.log(name: name)
       return nil
     end
 
     def self.names
       return Event.all.inject(Set[]) {|names, e| names.merge(e.handler_names.to_a)}
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 

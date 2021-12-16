@@ -7,12 +7,12 @@ module Mulukhiya
     end
 
     def test_short?
-      assert(TaggingDictionary.short?('ココ'))
-      assert(TaggingDictionary.short?('中'))
-      assert_false(TaggingDictionary.short?('館長'))
-      assert_false(TaggingDictionary.short?('DX3'))
-      assert_false(TaggingDictionary.short?('速水'))
-      assert_false(TaggingDictionary.short?('宇宙大魔王'))
+      assert(@dic.short?('ココ'))
+      assert(@dic.short?('中'))
+      assert_false(@dic.short?('館長'))
+      assert_false(@dic.short?('DX3'))
+      assert_false(@dic.short?('速水'))
+      assert_false(@dic.short?('宇宙大魔王'))
     end
   end
 end

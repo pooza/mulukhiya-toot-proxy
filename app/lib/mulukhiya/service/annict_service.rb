@@ -210,7 +210,7 @@ module Mulukhiya
       accounts.each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
-        logger.error(error: e, acct: account.acct.to_s)
+        e.log(acct: account.acct.to_s)
       ensure
         bar&.increment
       end

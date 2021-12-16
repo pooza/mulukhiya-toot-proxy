@@ -12,8 +12,6 @@ module Mulukhiya
       return dest
     end
 
-    private
-
     def rewritable?(uri)
       uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
       return domains.member?(uri.host)
@@ -23,7 +21,7 @@ module Mulukhiya
     end
 
     def domains
-      return config['/handler/shortened_url/domains'] rescue []
+      return handler_config(:domains) || []
     end
   end
 end

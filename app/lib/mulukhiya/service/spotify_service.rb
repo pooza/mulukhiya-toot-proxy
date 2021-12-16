@@ -14,7 +14,7 @@ module Mulukhiya
       return tracks.first
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/spotify/retry/seconds'])
       retry
@@ -26,7 +26,7 @@ module Mulukhiya
       return RSpotify::Album.find(id)
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/spotify/retry/seconds'])
       retry
@@ -38,7 +38,7 @@ module Mulukhiya
       return RSpotify::Track.find(id)
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/spotify/retry/seconds'])
       retry
@@ -50,7 +50,7 @@ module Mulukhiya
       return RSpotify::Artist.find(id)
     rescue => e
       cnt += 1
-      logger.error(error: e, count: cnt)
+      e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
       sleep(config['/spotify/retry/seconds'])
       retry
@@ -99,7 +99,7 @@ module Mulukhiya
       SpotifyService.new
       return true
     rescue => e
-      logger.error(error: e)
+      e.log
       return false
     end
 

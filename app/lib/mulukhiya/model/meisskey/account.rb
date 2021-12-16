@@ -61,7 +61,7 @@ module Mulukhiya
           end
         end
       rescue => e
-        logger.error(error: e, acct: acct.to_s)
+        e.log(acct: acct.to_s)
         return TagContainer.new
       end
 

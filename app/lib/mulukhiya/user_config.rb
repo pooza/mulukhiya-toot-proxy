@@ -28,7 +28,7 @@ module Mulukhiya
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
     rescue => e
-      logger.error(error: e)
+      e.alert
     end
 
     def token
@@ -85,10 +85,11 @@ module Mulukhiya
     private
 
     def handle_user_tags(values)
+      return unless handler = Handler.create('user_tag')
       flatten = values.key_flatten
       if minutes = flatten['/tagging/minutes']
         Sidekiq.set_schedule("user_tag_initialize_#{@account.username}", {
-          at: (minutes + config['/handler/user_tag/extra_minutes']).to_i.minutes.after,
+          at: (minutes + handler.extra_minutes).to_i.minutes.after,
           class: 'Mulukhiya::UserTagInitializeWorker',
           args: [{account_id: @account.id}],
         })

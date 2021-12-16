@@ -7,8 +7,6 @@ module Mulukhiya
       return dest
     end
 
-    private
-
     def rewritable?(uri)
       uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
       return uri.shortenable?

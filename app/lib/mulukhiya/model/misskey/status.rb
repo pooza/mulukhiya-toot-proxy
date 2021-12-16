@@ -27,7 +27,7 @@ module Mulukhiya
         end
         return @attachments
       rescue => e
-        logger.error(error: e)
+        e.log
         return []
       end
 
@@ -50,7 +50,7 @@ module Mulukhiya
       def to_md
         return uri.to_md
       rescue => e
-        logger.error(error: e)
+        e.log
         template = Template.new('status_clipping.md')
         template[:account] = account.to_h
         template[:status] = NoteParser.new(text).to_md

@@ -38,6 +38,8 @@ module Mulukhiya
     def test_command
       CustomFeed.all do |feed|
         assert_kind_of(CommandLine, feed.command)
+        feed.command.exec
+        assert_equal(feed.command.status, 0)
       end
     end
 

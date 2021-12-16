@@ -38,31 +38,31 @@ module Mulukhiya
       image.combine_options do |magick|
         magick.font font_path
         magick.gravity 'center'
-        magick.pointsize config['/handler/long_text_image/font_size']
+        magick.pointsize handler_config(:font_size)
         magick.draw %(text 0,0 '#{prepare_text(text)}')
       end
       path = File.join(Environment.dir, 'tmp/media', "#{text.adler32}.png")
       image.write(path)
       return path
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
     def image_path
-      return File.join(Environment.dir, config['/handler/long_text_image/image_file'])
+      return File.join(Environment.dir, handler_config(:image_file))
     end
 
     def font_path
-      return File.join(Environment.dir, config['/handler/long_text_image/font_file'])
+      return File.join(Environment.dir, handler_config(:font_file))
     end
 
     def columns
-      return config['/handler/long_text_image/columns']
+      return handler_config(:columns)
     end
 
     def rows
-      return config['/handler/long_text_image/rows']
+      return handler_config(:rows)
     end
 
     def today
@@ -74,7 +74,7 @@ module Mulukhiya
     end
 
     def text_length
-      return config['/handler/long_text_image/text_length']
+      return handler_config(:text_length)
     end
   end
 end

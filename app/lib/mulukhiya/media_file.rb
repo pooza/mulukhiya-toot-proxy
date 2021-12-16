@@ -146,16 +146,16 @@ module Mulukhiya
         "#{uri.to_s.adler32}#{File.extname(uri.path)}",
       )
       File.write(path, HTTP.new.get(uri).body)
-      return MediaFile.new(path).file
+      return new(path).file
     end
 
     def self.purge
-      all do |path|
-        next unless File.new(path).mtime < config['/worker/media_cleaning/days'].days.ago
+      worker = MediaCleaningWorker.new
+      all.select {|f| File.new(f).mtime < worker.worker_config(:days).days.ago}.each do |path|
         File.unlink(path)
-        logger.info(class: 'MediaFile', message: 'delete', path: path)
+        logger.info(class: to_s, method: __method__, path: path)
       rescue => e
-        logger.error(error: e, path: path)
+        e.log(path: path)
       end
     end
 

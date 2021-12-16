@@ -6,7 +6,7 @@ module Mulukhiya
 
     def setex(key, ttl, value)
       super
-      logger.info(class: self.class.to_s, message: 'update', page: key[:page])
+      logger.info(class: self.class.to_s, method: __method__, page: key[:page])
     end
 
     def ttl

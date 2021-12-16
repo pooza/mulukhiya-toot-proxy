@@ -14,7 +14,7 @@ module Mulukhiya
       return response if params[:raw]
       return Ginseng::URI.parse(response['url'])
     rescue => e
-      logger.error(error: e, url: uri.to_s)
+      e.log(url: uri.to_s)
       return nil
     end
   end

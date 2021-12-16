@@ -13,5 +13,9 @@ module Mulukhiya
     def create_image_uri(uri)
       return @image_uris[uri.to_s]
     end
+
+    def pixel
+      return handler_config(:pixel)
+    end
   end
 end

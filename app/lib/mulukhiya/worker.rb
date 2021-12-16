@@ -8,6 +8,16 @@ module Mulukhiya
       return false
     end
 
+    def underscore
+      return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
+    end
+
+    def worker_config(key)
+      return config["/worker/#{underscore}/#{key}"]
+    rescue Ginseng::ConfigError
+      return nil
+    end
+
     def self.perform_async(*args)
       return if new.disable?
       if Environment.development? || Environment.test?
@@ -17,7 +27,7 @@ module Mulukhiya
         client_push('class' => self, 'args' => args.map(&:deep_symbolize_keys))
       end
     rescue => e
-      Event.new(:alert).dispatch(e)
+      e.alert
       raise e.message, e.backtrace
     end
   end

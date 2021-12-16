@@ -41,7 +41,7 @@ module Mulukhiya
     end
 
     def spoiler_text
-      return config['/handler/result_notification/spoiler_text'] rescue nil
+      return handler_config(:spoiler_text)
     end
   end
 end

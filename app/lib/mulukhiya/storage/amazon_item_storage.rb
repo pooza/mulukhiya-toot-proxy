@@ -4,7 +4,7 @@ module Mulukhiya
       return nil unless entry = super
       return JSON.parse(entry)
     rescue => e
-      logger.error(error: e, key: key)
+      e.log(key: key)
       return nil
     end
 

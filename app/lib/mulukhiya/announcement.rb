@@ -14,9 +14,9 @@ module Mulukhiya
       fetch.reject {|v| cache.member?(v[:id])}.each do |announcement|
         Event.new(:announce, {sns: sns}).dispatch(announcement)
       rescue => e
-        logger.error(error: e, announcement: announcement)
+        e.log(announcement: announcement)
       ensure
-        sleep(config['/worker/announcement/interval/seconds'])
+        sleep(AnnouncementWorker.new.worker_config('interval/seconds'))
       end
       save
     end
@@ -38,7 +38,7 @@ module Mulukhiya
     def save
       storage['announcements'] = fetch.to_h {|v| [v[:id], v]}.to_json
     rescue => e
-      logger.error(error: e)
+      e.alert
     end
   end
 end

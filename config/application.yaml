@@ -9,13 +9,6 @@ agent:
       template: welcome
   test:
     token: null
-alert:
-  hooks: []
-  line:
-    to: null
-    token: null
-  mail:
-    to: null
 amazon:
   affiliate: false
   cache:
@@ -182,9 +175,10 @@ handler:
   hexo_announce:
     category: お知らせ
     comments: false
+    dir: null
   image_copyright:
-    tag: null
     message: ※画像有 著作権表示 参照のこと
+    tag: null
     url: null
   image_format_convert:
     alpha: true
@@ -198,6 +192,9 @@ handler:
     timeout: 10
   itunes_url_nowplaying:
     timeout: 10
+  line_alert:
+    id: null
+    token: null
   long_text_image:
     columns: 20
     disable: true
@@ -206,6 +203,8 @@ handler:
     image_file: public/mulukhiya/media/background.png
     rows: 30
     text_length: 140
+  mail_alert:
+    to: null
   media_tag:
     tags:
       audio: audio
@@ -235,6 +234,8 @@ handler:
       - git.io
       - spoti.fi
       - apple.co
+  slack_alert:
+    hooks: []
   spotify_image:
     disable: true
     timeout: 10
@@ -242,6 +243,8 @@ handler:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
+  test:
+    timeout: 20
   user_tag:
     extra_minutes: 2
   video_format_convert:
@@ -276,6 +279,8 @@ lemmy:
     api: /api/v3/ws
   verify_peer: true
 line:
+  id: null
+  token: null
   urls:
     api: https://api.line.me
 mastodon:
@@ -840,7 +845,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.11.15
+  version: 4.12.0
 parser:
   note:
     fields:
@@ -1079,8 +1084,6 @@ spotify:
 tagging:
   normalize:
     rules: []
-test:
-  timeout: 20
 user_config:
   encrypt_fields:
     - token

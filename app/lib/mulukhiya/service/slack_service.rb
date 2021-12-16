@@ -8,10 +8,7 @@ module Mulukhiya
     end
 
     def self.uris(&block)
-      return enum_for(__method__) unless block
-      config['/alert/hooks'].map {|v| Ginseng::URI.parse(v)}.each(&block)
-    rescue Ginseng::ConfigError
-      return nil
+      return Handler.create('slack_alert')&.uris
     end
 
     def self.config?

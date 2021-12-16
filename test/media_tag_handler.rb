@@ -5,10 +5,17 @@ module Mulukhiya
     end
 
     def test_all
-      assert_kind_of(Hash, @handler.class.all)
-      assert(@handler.class.all[:image].present?)
-      assert(@handler.class.all[:video].present?)
-      assert(@handler.class.all[:audio].present?)
+      config['/handler/media_tag/disable'] = false
+      assert_kind_of(Enumerator, @handler.all)
+      assert(@handler.all.to_h[:image].present?)
+      assert(@handler.all.to_h[:video].present?)
+      assert(@handler.all.to_h[:audio].present?)
+
+      config['/handler/media_tag/disable'] = true
+      assert_kind_of(Enumerator, @handler.all)
+      assert_nil(@handler.all.to_h[:image])
+      assert_nil(@handler.all.to_h[:video])
+      assert_nil(@handler.all.to_h[:audio])
     end
   end
 end

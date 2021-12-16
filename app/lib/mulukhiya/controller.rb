@@ -10,7 +10,7 @@ module Mulukhiya
       @sns = sns_class.new
       @sns.token = token
     rescue => e
-      logger.error(error: e)
+      e.log
       @sns.token = nil
     end
 
@@ -26,8 +26,7 @@ module Mulukhiya
       @renderer = default_renderer_class.new
       @renderer.status = e.status
       @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-      Event.new(:alert).dispatch(e)
-      logger.error(error: e)
+      e.alert
       return @renderer.to_s
     end
 

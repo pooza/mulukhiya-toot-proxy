@@ -26,7 +26,7 @@ module Mulukhiya
       }
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -38,7 +38,7 @@ module Mulukhiya
       @renderer.message = {config: @sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -47,11 +47,12 @@ module Mulukhiya
     post '/filter/add' do
       raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
-      Handler.create('filter_command').handle_toot(params, {sns: @sns})
+      raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create('filter_command')
+      handler.handle_toot(params, {sns: @sns})
       @renderer.message = {filters: @sns.filters}
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -70,7 +71,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -90,7 +91,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -102,7 +103,7 @@ module Mulukhiya
       @renderer.message = Program.instance.data
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -114,7 +115,7 @@ module Mulukhiya
       ProgramUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -135,7 +136,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -146,7 +147,7 @@ module Mulukhiya
       MediaCleaningWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -157,7 +158,7 @@ module Mulukhiya
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -168,7 +169,7 @@ module Mulukhiya
       MediaCatalogUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -190,7 +191,7 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -202,7 +203,7 @@ module Mulukhiya
       AnnouncementWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -214,7 +215,7 @@ module Mulukhiya
       @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -225,7 +226,7 @@ module Mulukhiya
       TaggingDictionaryUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -247,7 +248,7 @@ module Mulukhiya
           dic[word][:words].unshift(word)
           dic[word][:tags] = TagContainer.new(dic.dig(word, :words)).create_tags
         rescue => e
-          logger.error(error: e, entry: entry)
+          e.log(entry: entry)
         end
         @renderer.message = dic
       end
@@ -259,7 +260,7 @@ module Mulukhiya
       UserTagInitializeWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -271,7 +272,7 @@ module Mulukhiya
       @renderer.message = @sns.account.lemmy&.communities || {}
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -279,8 +280,8 @@ module Mulukhiya
 
     get '/feed/list' do
       tags = TagContainer.new
-      tags.merge(DefaultTagHandler.tags)
-      tags.merge(MediaTagHandler.all.values)
+      tags.merge(TagContainer.default_tags)
+      tags.merge(TagContainer.media_tags)
       if @sns.account
         tags.merge(@sns.account.featured_tags)
         tags.merge(@sns.account.field_tags)
@@ -295,7 +296,7 @@ module Mulukhiya
       FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
-      logger.error(error: e)
+      e.log
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -306,7 +307,7 @@ module Mulukhiya
         @renderer = api.create_renderer(params)
         return @renderer.to_s
       rescue => e
-        logger.error(error: e)
+        e.log
         @renderer.status = e.status
         @renderer.message = {error: e.message}
         return @renderer.to_s

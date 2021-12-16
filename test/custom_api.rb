@@ -31,6 +31,27 @@ module Mulukhiya
       end
     end
 
+    def test_choices
+      CustomAPI.all.select(&:args?).each do |api|
+        api.args.each do |arg|
+          assert_kind_of(Array, api.choices(arg))
+        end
+      end
+    end
+
+    def test_create_command
+      CustomAPI.all do |api|
+        command = api.create_command
+        assert_kind_of(CommandLine, command)
+        if api.args?
+          command.args.pop
+          command.args.push(api.choices(api.args.first).first)
+        end
+        command.exec
+        assert_equal(command.status, 0)
+      end
+    end
+
     def test_args
       CustomAPI.all do |api|
         assert_kind_of(Array, api.args)

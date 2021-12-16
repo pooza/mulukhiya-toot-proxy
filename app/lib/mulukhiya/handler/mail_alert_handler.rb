@@ -12,5 +12,9 @@ module Mulukhiya
       mailer.body = error.backtrace
       mailer.deliver
     end
+
+    def receipt
+      return handler_config(:to) || sns.maintainer_email
+    end
   end
 end

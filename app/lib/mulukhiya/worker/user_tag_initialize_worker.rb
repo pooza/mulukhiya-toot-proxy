@@ -5,7 +5,7 @@ module Mulukhiya
     def perform(params = {})
       accounts(params).select {|v| v.user_config['/tagging/user_tags'].present?}.each do |account|
         account.user_config.clear_tags
-        info_agent_service.notify(account, config['/worker/user_tag_initialize/message'])
+        info_agent_service.notify(account, worker_config(:message))
       end
     end
 

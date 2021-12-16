@@ -7,7 +7,7 @@ module Mulukhiya
       @account ||= account_class.test_account
       return @account
     rescue => e
-      logger.error(error: e)
+      e.log
       return nil
     end
 
@@ -20,7 +20,7 @@ module Mulukhiya
       config.raw.dig('test', 'filters').each do |entry|
         yield "Mulukhiya::#{entry['name'].camelize}TestCaseFilter".constantize.new(entry)
       rescue => e
-        logger.error(error: e)
+        e.log
       end
     end
   end

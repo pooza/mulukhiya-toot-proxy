@@ -36,7 +36,7 @@ module Mulukhiya
         @size ||= meta[:size]
         return @size
       rescue => e
-        logger.error(error: e, path: path)
+        e.log(path: path)
         return 0
       end
 

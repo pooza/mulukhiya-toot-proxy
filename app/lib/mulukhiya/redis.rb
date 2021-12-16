@@ -21,7 +21,7 @@ module Mulukhiya
         bar&.increment
       end
       bar&.finish
-      logger.info(class: self.class.to_s, prefix: prefix, message: 'clear')
+      logger.info(class: self.class.to_s, method: __method__, prefix: prefix)
     end
 
     def self.dsn
@@ -29,8 +29,7 @@ module Mulukhiya
     end
 
     def self.health
-      redis = Redis.new
-      redis.get('1')
+      new.get('1')
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}

@@ -20,31 +20,6 @@ properties:
       - test
       - info
     type: object
-  alert:
-    properties:
-      hooks:
-        items:
-          format: uri
-          type: string
-        type: array
-      line:
-        properties:
-          to:
-            type: string
-          token:
-            type: string
-        required:
-          - token
-          - to
-        type: object
-      mail:
-        properties:
-          to:
-            type: string
-        required:
-          - to
-        type: object
-    type: object
   amazon:
     properties:
       access_key:
@@ -291,7 +266,6 @@ properties:
     type: object
 required:
   - agent
-  - alert
   - crypt
 title: Local config
 type: object

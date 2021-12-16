@@ -44,7 +44,7 @@ module Mulukhiya
 
     def self.accounts(&block)
       return enum_for(__method__) unless block
-      storage = UserConfigStorage.new
+      storage = new
       storage.all_keys
         .map {|v| v.split(':').last}
         .select {|id| storage[id]['/tagging/user_tags']}
