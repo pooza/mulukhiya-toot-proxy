@@ -12,14 +12,14 @@ module Mulukhiya
         end
 
         desc "start #{daemon}"
-        task start: ['mulukhiya:api:bundler', 'mulukhiya:feed:bundler'] do
+        task start: ['mulukhiya:api:bundler', 'mulukhiya:feed:bundler', 'config:lint'] do
           sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
         rescue => e
           warn "#{e.class} #{daemon}:start #{e.message}"
         end
 
         desc "restart #{daemon}"
-        task restart: ['config:lint', :stop, :start]
+        task restart: [:stop, :start]
       end
     end
   end
