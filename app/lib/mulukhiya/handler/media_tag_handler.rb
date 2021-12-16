@@ -26,7 +26,7 @@ module Mulukhiya
     def create_media_tag(id)
       type = attachment_class[id].type
       media = [:image, :video, :audio].find {|v| type.start_with?("#{v}/")}
-      return all[media]
+      return all.to_a[media]
     end
   end
 end
