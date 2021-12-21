@@ -2,6 +2,7 @@ module Mulukhiya
   class MailAlertHandler < AlertHandler
     def disable?
       return true unless Mailer.config?
+      return true unless exist?
       return super
     end
 
@@ -15,6 +16,10 @@ module Mulukhiya
 
     def receipt
       return handler_config(:to) || sns.maintainer_email
+    end
+
+    def exist?
+      return File.exist?(handler_config(:sendmail_bin))
     end
   end
 end

@@ -204,6 +204,7 @@ handler:
     rows: 30
     text_length: 140
   mail_alert:
+    sendmail_bin: /usr/sbin/sendmail
     to: null
   media_tag:
     tags:
