@@ -90,7 +90,11 @@ module Mulukhiya
       dest = create_dest_path(f: __method__, type: type)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)
-      raise command.stderr.split(/[\n`]/).first if command.status&.positive?
+      if command.status&.positive?
+        message = command.stderr.split(/[\n`]/).first
+        raise "#{self.type} allowed by the security policy?" if message.include?('security policy')
+        raise message
+      end
       unless File.exist?(dest)
         finder = Ginseng::FileFinder.new
         finder.dir = File.dirname(dest)

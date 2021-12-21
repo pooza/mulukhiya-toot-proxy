@@ -10,5 +10,9 @@ module Mulukhiya
       @handler.handle_alert(e)
       assert_kind_of(Ginseng::RenderError, @handler.error)
     end
+
+    def test_exist?
+      assert_boolean(@handler.exist?)
+    end
   end
 end

@@ -233,24 +233,25 @@ module Mulukhiya
     end
 
     post '/tagging/tag/search' do
-      dic = {}
+      tags = {}
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors: errors}
       else
-        TaggingDictionary.new.cache.each do |entry|
+        dic = TaggingDictionary.new
+        dic.cache.each do |entry|
           word = entry.shift
           next unless params[:q].match?(entry.first[:regexp])
-          dic[word] = entry.first
-          dic[word][:word] = word
-          dic[word][:short] = TaggingDictionary.short?(word)
-          dic[word][:words].unshift(word)
-          dic[word][:tags] = TagContainer.new(dic.dig(word, :words)).create_tags
+          tags[word] = entry.first
+          tags[word][:word] = word
+          tags[word][:short] = dic.short?(word)
+          tags[word][:words].unshift(word)
+          tags[word][:tags] = TagContainer.new(tags.dig(word, :words)).create_tags
         rescue => e
           e.log(entry: entry)
         end
-        @renderer.message = dic
+        @renderer.message = tags
       end
       return @renderer.to_s
     end
