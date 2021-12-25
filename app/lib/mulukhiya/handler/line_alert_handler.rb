@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def alert(params = {})
-      LineService.new.say(error.to_h)
+      LineService.new.say(error.to_h.merge(node: sns.node_name))
     end
 
     def id
