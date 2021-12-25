@@ -87,7 +87,10 @@ module Mulukhiya
       def self.feed(&block)
         return enum_for(__method__) unless block
         Status.aggregate('media_catalog', {page: 1}).each do |status|
-          status[:_files].map {|f| f[:_id]}.map {|id| Attachment[id]}.map(&:feed_entry).each(&block)
+          status[:_files].map {|f| f[:_id]}
+            .map {|id| self[id]}
+            .map(&:feed_entry)
+            .each(&block)
         end
       end
 

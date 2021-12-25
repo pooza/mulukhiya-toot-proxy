@@ -18,7 +18,8 @@ module Mulukhiya
       def webhook_entries(&block)
         return enum_for(__method__) unless block
         Postgres.instance.exec('webhook_tokens')
-          .map {|row| Environment.access_token_class[row['id']]}
+          .map {|row| row[:id]}
+          .map {|id| Environment.access_token_class[id]}
           .select(&:valid?)
           .map(&:to_h)
           .each(&block)

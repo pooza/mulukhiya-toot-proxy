@@ -2,7 +2,7 @@ module Mulukhiya
   class MediaTagHandler < TagHandler
     def addition_tags
       tags = TagContainer.new
-      tags.merge(media_ids.filter_map {|id| create_media_tag(id)})
+      tags.merge(media_ids.map {|id| create_media_tag(id)})
       return tags
     end
 
