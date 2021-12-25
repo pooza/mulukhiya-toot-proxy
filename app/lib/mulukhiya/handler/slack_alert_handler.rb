@@ -11,7 +11,7 @@ module Mulukhiya
 
     def uris(&block)
       return enum_for(__method__) unless block
-      handler_config(:hooks).map {|v| Ginseng::URI.parse(v)}.each(&block)
+      handler_config(:hooks).filter_map {|v| Ginseng::URI.parse(v)}.each(&block)
     rescue Ginseng::ConfigError
       return nil
     end

@@ -44,7 +44,7 @@ module Mulukhiya
     end
 
     def image_uris
-      return images.map {|v| Ginseng::URI.parse(v['image_url'])}
+      return images.filter_map {|v| Ginseng::URI.parse(v['image_url'])}
     rescue => e
       e.log(payload: raw)
       return []

@@ -83,7 +83,7 @@ module Mulukhiya
 
       def attachments
         @attachments ||= Status.aggregate('account_status', {id: _id}).inject([]) do |r, row|
-          r.concat(row[:_files].map {|file| Attachment[file[:_id]]})
+          r.concat(row[:_files].filter_map {|file| Attachment[file[:_id]]})
         end
         return @attachments
       end

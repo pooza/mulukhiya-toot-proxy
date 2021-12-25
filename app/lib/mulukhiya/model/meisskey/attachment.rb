@@ -71,7 +71,7 @@ module Mulukhiya
           attachments = []
           Status.aggregate('media_catalog', {page: params[:page]}).each do |row|
             status = Status[row[:_id]]
-            row[:_files].map {|f| Attachment[f[:_id]]}.each do |attachment|
+            row[:_files].filter_map {|f| Attachment[f[:_id]]}.each do |attachment|
               attachments.push(attachment.to_h.deep_symbolize_keys.merge(
                 id: attachment.id,
                 date: status.createdAt.getlocal,

@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def uris
-      return config['/program/urls'].map {|v| Ginseng::URI.parse(v)}.to_set rescue []
+      return config['/program/urls'].filter_map {|v| Ginseng::URI.parse(v)}.to_set rescue []
     end
 
     alias to_s to_yaml
