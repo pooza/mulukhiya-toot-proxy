@@ -76,6 +76,14 @@ module Mulukhiya
       end
     end
 
+    def test_create_record_uri
+      assert_equal(AnnictService.create_record_uri(7879, 138_263).to_s, 'https://annict.com/works/7879/episodes/138263')
+    end
+
+    def test_create_review_uri
+      assert_equal(AnnictService.create_review_uri(7879).to_s, 'https://annict.com/works/7879/records')
+    end
+
     def test_create_payload
       return unless @service
       record = {

@@ -24,7 +24,7 @@ module Mulukhiya
       return enum_for(__method__) unless block
       storage = UserConfigStorage.new
       storage.all_keys
-        .map {|v| v.split(':').last}
+        .map {|key| key.split(':').last}
         .select {|id| storage[id]['/annict/token']}
         .filter_map {|id| Environment.account_class[id]}
         .select(&:webhook)
