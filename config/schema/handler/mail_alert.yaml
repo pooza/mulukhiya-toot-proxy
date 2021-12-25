@@ -1,6 +1,8 @@
 properties:
   disabled:
     type: boolean
+  sendmail_bin:
+    type: string
   timeout:
     type: integer
   to:

@@ -19,6 +19,10 @@ module Mulukhiya
         log(values)
         Event.new(:alert).dispatch(self)
       end
+
+      def source_class
+        return self.class
+      end
     end
   end
 end

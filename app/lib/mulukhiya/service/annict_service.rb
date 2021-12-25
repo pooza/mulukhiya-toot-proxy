@@ -154,10 +154,8 @@ module Mulukhiya
       return @service
     end
 
-    alias oauth_service service
-
     def auth(code)
-      return oauth_service.post('/oauth/token', {
+      return service.post('/oauth/token', {
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
@@ -170,7 +168,7 @@ module Mulukhiya
     end
 
     def oauth_uri
-      uri = oauth_service.create_uri('/oauth/authorize')
+      uri = service.create_uri('/oauth/authorize')
       uri.query_values = {
         client_id: self.class.client_id,
         response_type: 'code',
@@ -200,6 +198,14 @@ module Mulukhiya
       return false if client_id.nil?
       return false if client_secret.nil?
       return true
+    end
+
+    def self.create_record_uri(work_id, episode_id)
+      return new.service.create_uri("/works/#{work_id}/episodes/#{episode_id}")
+    end
+
+    def self.create_review_uri(work_id)
+      return new.service.create_uri("/works/#{work_id}/records")
     end
 
     def self.crawl_all(params = {})

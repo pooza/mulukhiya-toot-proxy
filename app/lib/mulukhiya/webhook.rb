@@ -70,7 +70,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      controller_class.webhook_entries.map {|v| create(v[:digest])}.each(&block)
+      controller_class.webhook_entries.filter_map {|v| create(v[:digest])}.each(&block)
     end
 
     private

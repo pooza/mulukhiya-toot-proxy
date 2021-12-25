@@ -17,7 +17,7 @@ module Mulukhiya
 
     def handlers(&block)
       return enum_for(__method__) unless block
-      handler_names.map {|v| Handler.create(v, params)}.each(&block)
+      handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
     end
 
     def handler_names(&block)

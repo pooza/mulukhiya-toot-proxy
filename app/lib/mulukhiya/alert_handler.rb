@@ -3,7 +3,6 @@ module Mulukhiya
     attr_reader :error
 
     def handle_alert(error, params = {})
-      error.package = Package.full_name
       @error = error
       alert
     end

@@ -7,11 +7,11 @@ module Mulukhiya
     end
 
     def self.rake?
-      return ENV['RAKE'].present? rescue false
+      return ENV['RAKE'].present?
     end
 
     def self.test?
-      return ENV['TEST'].present? rescue false
+      return ENV['TEST'].present?
     end
 
     def self.type
