@@ -46,8 +46,7 @@ module Mulukhiya
       return enum_for(__method__) unless block
       storage = new
       storage.all_keys
-        .map {|v| v.split(':').last}
-        .select {|id| storage[id]['/tagging/user_tags']}
+        .map {|key| key.split(':').last}
         .filter_map {|id| Environment.account_class[id]}
         .each(&block)
     end

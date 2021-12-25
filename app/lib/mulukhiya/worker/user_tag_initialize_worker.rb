@@ -3,15 +3,12 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def perform(params = {})
-      accounts(params).select {|v| v.user_config['/tagging/user_tags'].present?}.each do |account|
+      accounts = [account_class[params[:account_id]]] if params[:account_id]
+      accounts ||= UserConfigStorage.tag_owners.to_a
+      accounts.each do |account|
         account.user_config.clear_tags
         info_agent_service.notify(account, worker_config(:message))
       end
-    end
-
-    def accounts(params = {})
-      return UserConfigStorage.accounts.to_a unless id = params[:account_id]
-      return [account_class[id]]
     end
   end
 end

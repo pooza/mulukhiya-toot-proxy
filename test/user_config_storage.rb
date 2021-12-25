@@ -35,5 +35,12 @@ module Mulukhiya
         assert_kind_of(account_class, account)
       end
     end
+
+    def test_tag_owners
+      return unless account_class
+      UserConfigStorage.tag_owners do |account|
+        assert(account.user_config.tags.present?)
+      end
+    end
   end
 end
