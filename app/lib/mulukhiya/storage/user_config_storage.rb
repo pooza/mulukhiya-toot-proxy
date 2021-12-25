@@ -47,7 +47,7 @@ module Mulukhiya
       storage = new
       storage.all_keys
         .map {|key| key.split(':').last}
-        .filter_map {|id| Environment.account_class[id]}
+        .filter_map {|id| Environment.account_class[id] rescue nil}
         .each(&block)
     end
   end
