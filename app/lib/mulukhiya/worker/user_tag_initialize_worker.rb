@@ -10,8 +10,8 @@ module Mulukhiya
     end
 
     def accounts(params = {})
-      return [account_class[params[:account_id]]] if params[:account_id]
-      return UserConfigStorage.tag_owners.to_a
+      return UserConfigStorage.tag_owners.to_a unless id = params[:account_id]
+      return [account_class[id]]
     end
   end
 end
