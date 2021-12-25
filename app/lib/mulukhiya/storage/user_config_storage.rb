@@ -48,8 +48,7 @@ module Mulukhiya
       storage.all_keys
         .map {|v| v.split(':').last}
         .select {|id| storage[id]['/tagging/user_tags']}
-        .map {|id| Environment.account_class[id]}
-        .reject(&:nil?)
+        .filter_map {|id| Environment.account_class[id]}
         .each(&block)
     end
   end
