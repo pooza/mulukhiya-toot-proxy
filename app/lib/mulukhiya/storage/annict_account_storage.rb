@@ -26,7 +26,7 @@ module Mulukhiya
       storage.all_keys
         .map {|v| v.split(':').last}
         .select {|id| storage[id]['/annict/token']}
-        .map {|id| Environment.account_class[id]}
+        .filter_map {|id| Environment.account_class[id]}
         .select(&:webhook)
         .select(&:annict)
         .each(&block)

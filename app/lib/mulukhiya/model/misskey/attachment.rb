@@ -70,7 +70,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Postgres.instance.execute('media_catalog', query_params)
           .map {|row| row[:id]}
-          .map {|id| self[id]}
+          .filter_map {|id| self[id]}
           .map(&:feed_entry)
           .each(&block)
       end
