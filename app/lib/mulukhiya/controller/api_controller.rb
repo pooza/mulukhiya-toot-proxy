@@ -63,7 +63,7 @@ module Mulukhiya
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         response = @sns.auth(params[:code], params[:type])
         @renderer.message = response.parsed_response
@@ -82,7 +82,7 @@ module Mulukhiya
       errors = MisskeyAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         response = @sns.auth(params[:code], params[:type])
         token = @sns.create_access_token(response.parsed_response['accessToken'], params[:type])
@@ -128,7 +128,7 @@ module Mulukhiya
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       elsif controller_class.media_catalog?
         @renderer.message = attachment_class.catalog(params)
       else
@@ -181,7 +181,7 @@ module Mulukhiya
       errors = AnnictAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         response = AnnictService.new.auth(params[:code])
         @sns.account.user_config.update(annict: {token: response['access_token']})
@@ -237,7 +237,7 @@ module Mulukhiya
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         dic = TaggingDictionary.new
         dic.cache.each do |entry|
@@ -249,7 +249,7 @@ module Mulukhiya
           tags[word][:words].unshift(word)
           tags[word][:tags] = TagContainer.new(tags.dig(word, :words)).create_tags
         rescue => e
-          e.log(entry: entry)
+          e.log(entry:)
         end
         @renderer.message = tags
       end

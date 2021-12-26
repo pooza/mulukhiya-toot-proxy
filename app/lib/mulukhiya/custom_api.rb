@@ -43,7 +43,7 @@ module Mulukhiya
       uri = sns.create_uri(params.dig(:choices, key))
       return sns.http.get(uri).parsed_response
     rescue => e
-      e.log(key: key)
+      e.log(key:)
       return nil
     end
 
@@ -53,9 +53,9 @@ module Mulukhiya
 
     def to_h
       return params.merge(
-        id: id,
-        fullpath: fullpath,
-        args: args,
+        id:,
+        fullpath:,
+        args:,
       )
     end
 

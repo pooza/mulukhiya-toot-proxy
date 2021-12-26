@@ -29,7 +29,7 @@ module Mulukhiya
         self[k][:words] ||= []
         self[k][:words].concat(v[:words]) if v[:words].is_a?(Array)
       rescue => e
-        e.log(k: k, v: v)
+        e.log(k:, v:)
       end
       update(sort_by {|k, _| k.length}.to_h)
     end

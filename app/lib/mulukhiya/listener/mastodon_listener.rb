@@ -15,11 +15,11 @@ module Mulukhiya
     end
 
     def handle_mention_notification(payload)
-      Event.new(:mention, {sns: sns}).dispatch(payload)
+      Event.new(:mention, {sns:}).dispatch(payload)
     end
 
     def handle_follow_notification(payload)
-      Event.new(:follow, {sns: sns}).dispatch(payload)
+      Event.new(:follow, {sns:}).dispatch(payload)
     end
 
     def handle_announcement(payload)

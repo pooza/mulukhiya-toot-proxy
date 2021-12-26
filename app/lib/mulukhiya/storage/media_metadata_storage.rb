@@ -12,7 +12,7 @@ module Mulukhiya
       return supernil unless entry = super(uri)
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
-      e.log(key: key)
+      e.log(key:)
       return nil
     end
 

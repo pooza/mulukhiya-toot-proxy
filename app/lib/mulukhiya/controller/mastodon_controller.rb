@@ -85,7 +85,7 @@ module Mulukhiya
       message = @reporter.response.parsed_response
       if message.is_a?(Hash)
         message.deep_stringify_keys!
-        Event.new(:post_search, {reporter: @reporter, sns: @sns, message: message}).dispatch(params)
+        Event.new(:post_search, {reporter: @reporter, sns: @sns, message:}).dispatch(params)
         @renderer.message = message
       else
         @renderer.message = {

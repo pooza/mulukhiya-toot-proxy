@@ -2,11 +2,11 @@ module Mulukhiya
   class AudioFile < MediaFile
     def values
       return {
-        type: type,
-        mediatype: mediatype,
-        subtype: subtype,
-        duration: duration,
-        size: size,
+        type:,
+        mediatype:,
+        subtype:,
+        duration:,
+        size:,
         length: size,
       }
     end
@@ -34,7 +34,7 @@ module Mulukhiya
     end
 
     def convert_type(type)
-      dest = create_dest_path(f: __method__, type: type)
+      dest = create_dest_path(f: __method__, type:)
       command = CommandLine.new(['ffmpeg', '-y', '-i', path, dest])
       command.exec unless File.exist?(dest)
       return AudioFile.new(dest)

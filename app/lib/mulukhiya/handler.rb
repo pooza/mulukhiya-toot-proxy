@@ -160,7 +160,7 @@ module Mulukhiya
       (payload[attachment_field] || []).map {|id| attachment_class[id]}.each do |attachment|
         parts.push(attachment.description)
       rescue => e
-        e.log(attachment: attachment)
+        e.log(attachment:)
       end
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
@@ -192,7 +192,7 @@ module Mulukhiya
     def self.create(name, params = {})
       return "Mulukhiya::#{name.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
-      e.log(name: name)
+      e.log(name:)
       return nil
     end
 

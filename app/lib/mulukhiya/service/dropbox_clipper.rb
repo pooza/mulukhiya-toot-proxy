@@ -24,7 +24,7 @@ module Mulukhiya
       e.log
       return nil
     rescue => e
-      e.log(params: params)
+      e.log(params:)
       return nil
     end
   end

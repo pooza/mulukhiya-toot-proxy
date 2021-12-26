@@ -7,7 +7,7 @@ module Mulukhiya
       uris.map {|v| SlackService.new(v)}.each(&block)
     end
 
-    def self.uris(&block)
+    def self.uris(&)
       return Handler.create('slack_alert')&.uris
     end
 

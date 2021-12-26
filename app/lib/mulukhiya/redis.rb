@@ -21,7 +21,7 @@ module Mulukhiya
         bar&.increment
       end
       bar&.finish
-      logger.info(class: self.class.to_s, method: __method__, prefix: prefix)
+      logger.info(class: self.class.to_s, method: __method__, prefix:)
     end
 
     def self.dsn

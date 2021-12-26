@@ -107,6 +107,7 @@ GEM
     crass (1.0.6)
     daemon-spawn (0.4.2)
     date (3.2.2)
+    digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dropbox_api (0.1.20)
@@ -180,7 +181,7 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    fileutils (1.5.0)
+    fileutils (1.6.0)
     find (0.1.1)
     fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -233,12 +234,14 @@ GEM
     net-protocol (0.1.2)
       io-wait
       timeout
+    net-smtp (0.3.1)
+      digest
+      net-protocol
+      timeout
     netrc (0.11.0)
     nio4r (2.5.8)
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
-      racc (~> 1.4)
-    nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     oauth2 (1.4.7)
       faraday (>= 0.8, < 2.0)
@@ -385,7 +388,7 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
-  fileutils (= 1.5.0)
+  fileutils (= 1.6.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -395,6 +398,7 @@ DEPENDENCIES
   mimemagic (>= 0.4.0)
   mini_magick
   mongo
+  net-smtp
   rack-test
   rails-erb-lint
   ricecream
@@ -413,7 +417,7 @@ DEPENDENCIES
   webrick
 
 RUBY VERSION
-   ruby 3.0.3p157
+   ruby 3.1.0p0
 
 BUNDLED WITH
    2.3.3

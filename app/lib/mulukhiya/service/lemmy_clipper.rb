@@ -37,7 +37,7 @@ module Mulukhiya
     end
 
     def clip(body)
-      listen(method: :post, body: body)
+      listen(method: :post, body:)
     end
 
     def communities
@@ -95,7 +95,7 @@ module Mulukhiya
     def login
       client.send({op: 'Login', data: {
         username_or_email: username,
-        password: password,
+        password:,
       }}.to_json)
     end
 
@@ -110,7 +110,7 @@ module Mulukhiya
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s
       end
-      client.send({op: 'CreatePost', data: data}.to_json)
+      client.send({op: 'CreatePost', data:}.to_json)
     end
 
     def fetch_communities(body = {})

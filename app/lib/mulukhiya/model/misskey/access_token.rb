@@ -23,8 +23,8 @@ module Mulukhiya
           @hash = values.deep_symbolize_keys.merge(
             digest: webhook_digest,
             token: to_s,
-            account: account,
-            scopes: scopes,
+            account:,
+            scopes:,
             scopes_valid: scopes_valid?,
           )
           @hash.deep_compact!

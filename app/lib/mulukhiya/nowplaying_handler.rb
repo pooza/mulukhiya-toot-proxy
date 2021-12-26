@@ -18,7 +18,7 @@ module Mulukhiya
       end
       parser.text = payload[text_field] = @lines.values.join("\n")
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, payload: payload)
+      errors.push(class: e.class.to_s, message: e.message, payload:)
     end
 
     def handle_line(line)
@@ -40,7 +40,7 @@ module Mulukhiya
     rescue Addressable::URI::InvalidURIError
       return false
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
       return false
     end
 
@@ -52,7 +52,7 @@ module Mulukhiya
       tags.merge(uri.artists)
       result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
     end
 
     def verbose?

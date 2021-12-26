@@ -10,7 +10,7 @@ module Mulukhiya
         sns: info_agent_service,
         env: Environment,
         crypt: Crypt,
-        config: config,
+        config:,
         annict: AnnictService.new,
       }
     end

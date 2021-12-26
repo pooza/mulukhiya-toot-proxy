@@ -10,7 +10,7 @@ module Mulukhiya
           is_moderator: moderator?,
           is_info_bot: info?,
           is_test_bot: test?,
-          display_name: display_name,
+          display_name:,
         ).except(
           :password,
           :keypair,
@@ -101,7 +101,7 @@ module Mulukhiya
           return nil
         elsif key.key?(:token)
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          entry = collection.find(token: token).first
+          entry = collection.find(token:).first
           return Account.new(entry['_id']) if entry
           return AccessToken.get(hash: token).account
         end

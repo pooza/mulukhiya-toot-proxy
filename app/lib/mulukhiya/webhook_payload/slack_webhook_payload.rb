@@ -71,7 +71,7 @@ module Mulukhiya
       end
       return temp
     rescue => e
-      e.log(text: text)
+      e.log(text:)
       return text
     end
   end

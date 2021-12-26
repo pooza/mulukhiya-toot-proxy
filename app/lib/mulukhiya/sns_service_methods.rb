@@ -12,12 +12,12 @@ module Mulukhiya
     end
 
     def account
-      @account ||= account_class.get(token: token) rescue nil
+      @account ||= account_class.get(token:) rescue nil
       return @account
     end
 
     def access_token
-      @access_token ||= access_token_class.get(token: token) rescue nil
+      @access_token ||= access_token_class.get(token:) rescue nil
       return @access_token
     end
 

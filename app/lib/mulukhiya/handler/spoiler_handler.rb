@@ -7,7 +7,7 @@ module Mulukhiya
       return unless subject&.match?(pattern)
       subject.sub!(Regexp.new("^#{shortcode} *"), '')
       payload[spoiler_field] = "#{shortcode} #{subject}"
-      result.push(subject: subject)
+      result.push(subject:)
     end
 
     def shortcode

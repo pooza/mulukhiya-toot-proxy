@@ -22,7 +22,7 @@ module Mulukhiya
       storage.push(uri) unless storage.key?(uri)
       return storage[uri]
     rescue => e
-      e.log(path: path)
+      e.log(path:)
       return nil
     end
 
@@ -33,7 +33,7 @@ module Mulukhiya
       end
       raise 'Too large'
     rescue => e
-      e.log(size: size, attachment: id)
+      e.log(size:, attachment: id)
       return size
     end
 
@@ -42,7 +42,7 @@ module Mulukhiya
         link: uri.to_s,
         title: [name, "(#{size_str})", description].compact.join(' '),
         author: account.display_name,
-        date: date,
+        date:,
       }
     end
 

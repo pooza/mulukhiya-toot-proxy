@@ -18,7 +18,7 @@ module Mulukhiya
       @channel[:description] = "#{@sns.node_name} ##{tag}のタイムライン"
       @atom = nil
     rescue => e
-      e.log(tag: tag)
+      e.log(tag:)
       @tag = nil
       @atom = nil
     end
@@ -49,7 +49,7 @@ module Mulukhiya
       @atom = nil
       return nil unless controller_class.feed?
       return nil unless record
-      record.create_feed({limit: limit, tag: tag, local: record.local?}).each do |row|
+      record.create_feed({limit:, tag:, local: record.local?}).each do |row|
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),
@@ -57,7 +57,7 @@ module Mulukhiya
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       rescue => e
-        e.log(row: row)
+        e.log(row:)
       end
     end
 

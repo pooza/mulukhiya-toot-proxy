@@ -58,7 +58,7 @@ module Mulukhiya
         scopes: MastodonController.oauth_scopes(type).join(' '),
       }
       unless client = oauth_client_storage[body]
-        client = http.post('/api/v1/apps', {body: body}).body
+        client = http.post('/api/v1/apps', {body:}).body
         oauth_client_storage[body] = client
         redis.unlink('oauth_client')
       end

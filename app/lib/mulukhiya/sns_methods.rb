@@ -78,7 +78,7 @@ module Mulukhiya
       message = message.to_yaml unless message.is_a?(String)
       return info_agent_service.notify(@sns.account, message, options)
     rescue => e
-      e.log(message: message)
+      e.log(message:)
     end
 
     def info_agent_service
