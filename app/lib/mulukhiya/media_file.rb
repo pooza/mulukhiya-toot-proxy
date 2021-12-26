@@ -159,12 +159,12 @@ module Mulukhiya
       end
     end
 
-    def self.all(&block)
+    def self.all(&)
       return enum_for(__method__) unless block
       finder = Ginseng::FileFinder.new
       finder.dir = File.join(Environment.dir, 'tmp/media')
       finder.patterns.push('*')
-      finder.exec(&block)
+      finder.exec(&)
     end
   end
 end

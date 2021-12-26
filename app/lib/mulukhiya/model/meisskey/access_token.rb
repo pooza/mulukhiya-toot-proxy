@@ -52,14 +52,14 @@ module Mulukhiya
         return get(key)
       end
 
-      def self.all(&block)
+      def self.all(&)
         return enum_for(__method__) unless block
-        collection.find.filter_map {|v| AccessToken.new(v['_id'])}.each(&block)
+        collection.find.filter_map {|v| AccessToken.new(v['_id'])}.each(&)
       end
 
-      def self.webhook_entries(&block)
+      def self.webhook_entries(&)
         return enum_for(__method__) unless block
-        aggregate('webhook_entries').filter_map {|v| AccessToken[v['_id']]}.map(&:to_h).each(&block)
+        aggregate('webhook_entries').filter_map {|v| AccessToken[v['_id']]}.map(&:to_h).each(&)
       end
 
       def self.collection

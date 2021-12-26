@@ -37,18 +37,18 @@ module Mulukhiya
       bar&.finish
     end
 
-    def self.tag_owners(&block)
+    def self.tag_owners(&)
       return enum_for(__method__) unless block
-      accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each(&block)
+      accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each(&)
     end
 
-    def self.accounts(&block)
+    def self.accounts(&)
       return enum_for(__method__) unless block
       storage = new
       storage.all_keys
         .map {|key| key.split(':').last}
         .filter_map {|id| Environment.account_class[id] rescue nil}
-        .each(&block)
+        .each(&)
     end
   end
 end

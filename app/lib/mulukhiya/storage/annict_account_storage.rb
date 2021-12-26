@@ -20,7 +20,7 @@ module Mulukhiya
       return 'annict_account'
     end
 
-    def self.accounts(&block)
+    def self.accounts(&)
       return enum_for(__method__) unless block
       storage = UserConfigStorage.new
       storage.all_keys
@@ -29,7 +29,7 @@ module Mulukhiya
         .filter_map {|id| Environment.account_class[id] rescue nil}
         .select(&:webhook)
         .select(&:annict)
-        .each(&block)
+        .each(&)
     end
   end
 end

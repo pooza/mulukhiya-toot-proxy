@@ -84,13 +84,13 @@ module Mulukhiya
         return storage[params]
       end
 
-      def self.feed(&block)
+      def self.feed(&)
         return enum_for(__method__) unless block
         Status.aggregate('media_catalog', {page: 1}).each do |status|
           status[:_files].map {|f| f[:_id]}
             .filter_map {|id| self[id] rescue nil}
             .map(&:feed_entry)
-            .each(&block)
+            .each(&)
         end
       end
 

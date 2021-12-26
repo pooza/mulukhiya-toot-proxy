@@ -14,9 +14,9 @@ module Mulukhiya
       return tags
     end
 
-    def all(&block)
+    def all(&)
       return enum_for(__method__) unless block
-      handler_config(:services).map(&:deep_symbolize_keys).each(&block)
+      handler_config(:services).map(&:deep_symbolize_keys).each(&)
     end
 
     def self.tags
