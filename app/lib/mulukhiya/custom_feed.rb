@@ -55,9 +55,9 @@ module Mulukhiya
       return all.count
     end
 
-    def self.all(&)
+    def self.all(&block)
       return enum_for(__method__) unless block
-      config['/feed/custom'].map {|v| new(v)}.each(&)
+      config['/feed/custom'].map {|v| new(v)}.each(&block)
     end
   end
 end

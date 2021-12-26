@@ -21,9 +21,9 @@ module Mulukhiya
       return handler_config('word/min_kanji')
     end
 
-    def all(&)
+    def all(&block)
       return enum_for(__method__) unless block
-      handler_config(:dics).each(&)
+      handler_config(:dics).each(&block)
     end
   end
 end

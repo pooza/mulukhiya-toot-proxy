@@ -9,9 +9,9 @@ module Mulukhiya
       SlackService.broadcast(error.to_h.merge(node: sns.node_name))
     end
 
-    def uris(&)
+    def uris(&block)
       return enum_for(__method__) unless block
-      handler_config(:hooks).filter_map {|v| Ginseng::URI.parse(v)}.each(&)
+      handler_config(:hooks).filter_map {|v| Ginseng::URI.parse(v)}.each(&block)
     rescue Ginseng::ConfigError
       return nil
     end

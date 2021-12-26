@@ -41,7 +41,7 @@ module Mulukhiya
       return artists
     end
 
-    def patterns(&)
+    def patterns(&block)
       return enum_for(__method__) unless block
       config['/nowplaying/artist/parser/patterns'].map do |entry|
         {
@@ -49,7 +49,7 @@ module Mulukhiya
           delimited: entry['delimited'],
           items: (entry['items'] || []),
         }
-      end.each(&)
+      end.each(&block)
     end
 
     def delimiters

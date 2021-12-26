@@ -75,12 +75,12 @@ module Mulukhiya
         end
       end
 
-      def self.feed(&)
+      def self.feed(&block)
         return enum_for(__method__) unless block
         Postgres.instance.execute('media_catalog', query_params)
           .filter_map {|row| get(row:)}
           .map(&:feed_entry)
-          .each(&)
+          .each(&block)
       end
 
       def self.catalog(params = {})

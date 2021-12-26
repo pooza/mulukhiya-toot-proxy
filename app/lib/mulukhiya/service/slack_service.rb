@@ -2,15 +2,15 @@ module Mulukhiya
   class SlackService < Ginseng::Slack
     include Package
 
-    def self.all(&)
+    def self.all(&block)
       return enum_for(__method__) unless block
-      uris.map {|v| SlackService.new(v)}.each(&)
+      uris.map {|v| SlackService.new(v)}.each(&block)
     end
 
-    def self.uris(&)
+    def self.uris(&block)
       return enum_for(__method__) unless block
       return nil unless handler = Handler.create('slack_alert')
-      return handler.uris.each(&)
+      return handler.uris.each(&block)
     end
 
     def self.config?

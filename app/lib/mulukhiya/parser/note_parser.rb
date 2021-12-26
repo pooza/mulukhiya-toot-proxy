@@ -7,9 +7,9 @@ module Mulukhiya
       return NoteParser.sanitize(text.dup)
     end
 
-    def accts(&)
+    def accts(&block)
       return enum_for(__method__) unless block
-      text.scan(NoteParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&)
+      text.scan(NoteParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&block)
     end
 
     def hashtags

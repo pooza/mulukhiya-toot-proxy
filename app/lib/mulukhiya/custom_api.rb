@@ -92,9 +92,9 @@ module Mulukhiya
       return all.count
     end
 
-    def self.all(&)
+    def self.all(&block)
       return enum_for(__method__) unless block
-      config['/api/custom'].map {|v| new(v)}.each(&)
+      config['/api/custom'].map {|v| new(v)}.each(&block)
     end
   end
 end

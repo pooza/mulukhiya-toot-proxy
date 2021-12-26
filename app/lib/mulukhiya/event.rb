@@ -15,16 +15,16 @@ module Mulukhiya
       return label.to_s
     end
 
-    def handlers(&)
+    def handlers(&block)
       return enum_for(__method__) unless block
-      handler_names.filter_map {|v| Handler.create(v, params)}.each(&)
+      handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
     end
 
-    def handler_names(&)
+    def handler_names(&block)
       return enum_for(__method__) unless block
       config["/#{Environment.controller_name}/handlers/#{label}"]
         .reject {|v| config.disable?(Handler.create(v))}
-        .each(&)
+        .each(&block)
     end
 
     def count
@@ -54,9 +54,9 @@ module Mulukhiya
       return reporter
     end
 
-    def self.all(&)
+    def self.all(&block)
       return enum_for(__method__) unless block
-      syms.map {|v| new(v)}.each(&)
+      syms.map {|v| new(v)}.each(&block)
     end
 
     def self.syms

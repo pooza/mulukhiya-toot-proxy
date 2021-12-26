@@ -26,10 +26,10 @@ module Mulukhiya
       return @edit_uri
     end
 
-    def self.all(&)
+    def self.all(&block)
       return enum_for(__method__) unless block
       return unless handler = Handler.create('dictionary_tag')
-      handler.all.filter_map {|v| create(v)}.each(&)
+      handler.all.filter_map {|v| create(v)}.each(&block)
     end
 
     def self.create(params)
