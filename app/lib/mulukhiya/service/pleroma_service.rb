@@ -46,10 +46,10 @@ module Mulukhiya
     end
 
     def search_status_id(status)
-      case status.class.to_s
-      when status_class.to_s
+      case status
+      in Pleroma::Status
         status = status.id
-      when 'Ginseng::URI', 'TootURI'
+      in Ginseng::URI | TootURI
         response = @http.get(status, {follow_redirects: false})
         status = response.headers['location'].match(%r{/notice/(.*)})[1]
       end
