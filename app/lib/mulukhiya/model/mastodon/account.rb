@@ -78,17 +78,19 @@ module Mulukhiya
       alias locked? locked
 
       def self.get(key)
-        if key.key?(:token)
+        case key
+        in {token: token}
           return nil unless token = (key[:token].decrypt rescue key[:token])
           return nil unless account = Postgres.instance.exec('token_owner', {token: token})&.first
           return nil unless account = Account[account[:id]]
           account.token = token
           return account
-        elsif acct = key[:acct]
+        in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return first(username: acct.username, domain: acct.domain)
+        else
+          return first(key)
         end
-        return first(key)
       end
     end
   end
