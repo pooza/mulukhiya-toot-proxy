@@ -97,18 +97,20 @@ module Mulukhiya
       end
 
       def self.get(key)
-        if acct = key[:acct]
+        case key
+        in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           nickname = acct.username if acct.local?
           nickname ||= acct.to_s.sub(/^@/, '')
           return first(nickname: nickname)
-        elsif key.key?(:token)
-          return nil unless token = (key[:token].decrypt rescue key[:token])
-          account = AccessToken.first(token: token)&.account
+        in {token: token}
+          return nil unless token = (token.decrypt rescue token)
+          return nil unless account = AccessToken.first(token: token)&.account
           account.token = token
           return account
+        else
+          return first(key)
         end
-        return first(key)
       end
 
       private

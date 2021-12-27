@@ -40,7 +40,12 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return first(hash: key[:token]) if key.key?(:token)
+        case key
+        in {token: token}
+          return first(hash: token)
+        else
+          return first(key)
+        end
       end
     end
   end
