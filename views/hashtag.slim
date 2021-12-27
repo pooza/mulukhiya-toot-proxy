@@ -20,7 +20,7 @@ html lang='ja'
             span.count v-if='count' {{count}}
       section.tagging-dictionary
         h3 タグを検索
-        .search-form-container
+        nav.search-form-container
           input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
           button.small :disabled='!keyword' @click='search' 検索
         article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
