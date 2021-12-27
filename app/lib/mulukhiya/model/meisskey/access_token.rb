@@ -44,8 +44,16 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return nil unless record = collection.find(hash: key[:hash] || key[:token]).first
-        return AccessToken.new(record['_id'])
+        case key
+        in {hash: hash}
+          return nil unless record = collection.find(hash: hash).first
+          return new(record['_id'])
+        in {key: key}
+          return nil unless record = collection.find(hash: key).first
+          return new(record['_id'])
+        else
+          return nil
+        end
       end
 
       def self.first(key)
