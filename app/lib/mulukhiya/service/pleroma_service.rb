@@ -47,13 +47,14 @@ module Mulukhiya
 
     def search_status_id(status)
       case status
-      in Mastodon::Status | Misskey::Status | Meisskey::Status | Pleroma::Status
+      in Pleroma::Status
         status = status.id
       in Ginseng::URI
         response = @http.get(status, {follow_redirects: false})
         status = response.headers['location'].match(%r{/notice/(.*)})[1]
+      else
+        return super
       end
-      return super
     end
 
     def oauth_client(type = :default)
