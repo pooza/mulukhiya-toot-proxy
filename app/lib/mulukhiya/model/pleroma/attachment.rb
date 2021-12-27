@@ -59,14 +59,11 @@ module Mulukhiya
       end
 
       def self.get(key)
-        if key.key?(:acct)
-          rows = Postgres.instance.execute('attachment', key)
-          return nil unless row = rows.first
-          return Attachment[row['id']]
-        elsif key.key?(:id)
-          return Attachment[key[:id]]
-        elsif key.key?(:row)
-          row = key[:row].deep_symbolize_keys
+        case key
+        in {id: id}
+          return self[id]
+        in {row: row}
+          row = row.deep_symbolize_keys
           time = "#{row[:created_at].to_s.split(/\s+/)[0..1].join(' ')} UTC"
           attachment = get(id: row[:id])
           attachment.account = Account.get(acct: Acct.new("@#{row[:username]}@#{row[:host]}"))

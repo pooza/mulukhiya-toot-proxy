@@ -95,7 +95,7 @@ module Mulukhiya
       def self.get(key)
         case key
         in {id: id}
-          return Account.new(id)
+          return new(id)
         in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           entry = collection.find(username: acct.username, host: acct.domain).first
