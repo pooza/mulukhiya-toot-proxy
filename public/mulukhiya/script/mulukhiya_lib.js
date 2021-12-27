@@ -242,10 +242,10 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getMedias = async page => {
+    Vue.getMedias = async (page, keyword) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL(Vue.createURL('/mulukhiya/api/media', {query: {page: page || 1}})))
+      return axios.get(Vue.createURL(Vue.createURL('/mulukhiya/api/media', {query: {page: page || 1, q: keyword}})))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

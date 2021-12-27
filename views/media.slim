@@ -13,6 +13,9 @@ html lang='ja'
         ul.copyright
           li
             a href=Mulukhiya::UIController.media_copyright[:url] target='_blank' rel='noreferrer' = Mulukhiya::UIController.media_copyright[:message]
+      nav
+        input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchMedias'
+        button :disabled='!keyword' @click='searchMedias' 実行
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
@@ -55,6 +58,7 @@ html lang='ja'
           account: {is_admin: false, username: null},
           medias: [],
           page: 0,
+          keyword: null,
           last: false,
         },
         mounted () {
@@ -64,9 +68,14 @@ html lang='ja'
           this.appendMedias()
         },
         methods: {
+          searchMedias () {
+            this.page = 0
+            this.medias = []
+            this.appendMedias()
+          },
           appendMedias () {
             this.page ++
-            Vue.getMedias(this.page)
+            Vue.getMedias(this.page, this.keyword)
               .then(e => {
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
