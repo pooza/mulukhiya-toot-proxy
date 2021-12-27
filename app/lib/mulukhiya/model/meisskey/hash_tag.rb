@@ -55,7 +55,7 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return HashTag.new(id)
+        return new(id)
       end
 
       def self.get(key)

@@ -89,7 +89,7 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return Account.new(id)
+        return new(id)
       end
 
       def self.get(key)
@@ -113,7 +113,7 @@ module Mulukhiya
 
       def self.first(key)
         entry = collection.find(key).first
-        return Account.new(entry['_id']) if entry
+        return new(entry['_id']) if entry
         return nil
       end
 

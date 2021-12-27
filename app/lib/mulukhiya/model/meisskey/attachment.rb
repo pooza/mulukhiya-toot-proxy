@@ -61,7 +61,7 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return Attachment.new(id)
+        return new(id)
       end
 
       def self.catalog(params = {})

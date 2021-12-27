@@ -40,7 +40,7 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return AccessToken.new(id)
+        return new(id)
       end
 
       def self.get(key)
@@ -62,12 +62,12 @@ module Mulukhiya
 
       def self.all(&block)
         return enum_for(__method__) unless block
-        collection.find.filter_map {|v| AccessToken.new(v['_id'])}.each(&block)
+        collection.find.filter_map {|v| new(v['_id'])}.each(&block)
       end
 
       def self.webhook_entries(&block)
         return enum_for(__method__) unless block
-        aggregate('webhook_entries').filter_map {|v| AccessToken[v['_id']]}.map(&:to_h).each(&block)
+        aggregate('webhook_entries').filter_map {|v| self[v['_id']]}.map(&:to_h).each(&block)
       end
 
       def self.collection
