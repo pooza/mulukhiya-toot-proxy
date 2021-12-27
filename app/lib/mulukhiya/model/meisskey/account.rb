@@ -93,19 +93,22 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return Account.new(key[:id]) if key[:id]
-        if acct = key[:acct]
+        case key
+        in {id: id}
+          return Account.new(id)
+        in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           entry = collection.find(username: acct.username, host: acct.domain).first
-          return Account.new(entry['_id']) if entry
+          return new(entry['_id']) if entry
           return nil
-        elsif key.key?(:token)
-          return nil unless token = (key[:token].decrypt rescue key[:token])
+        in {token: token}
+          token = (token.decrypt rescue token)
           entry = collection.find(token: token).first
-          return Account.new(entry['_id']) if entry
+          return new(entry['_id']) if entry
           return AccessToken.get(hash: token).account
+        else
+          return first(key)
         end
-        return first(key)
       end
 
       def self.first(key)
