@@ -47,9 +47,9 @@ module Mulukhiya
 
     def search_status_id(status)
       case status
-      in Pleroma::Status
+      in Mastodon::Status | Misskey::Status | Meisskey::Status | Pleroma::Status
         status = status.id
-      in Ginseng::URI | TootURI
+      in Ginseng::URI
         response = @http.get(status, {follow_redirects: false})
         status = response.headers['location'].match(%r{/notice/(.*)})[1]
       end
