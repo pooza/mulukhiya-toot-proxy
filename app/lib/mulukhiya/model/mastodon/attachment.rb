@@ -75,14 +75,15 @@ module Mulukhiya
 
       def self.catalog(params = {})
         params[:page] ||= 1
-        records = Postgres.instance.execute('media_catalog', query_params.merge(params))
-          .map {|row| row[:id]}
-          .filter_map {|id| self[id] rescue nil}
-          .map(&:to_h)
-        return records if params[:q].present?
         storage = MediaCatalogRenderStorage.new
-        storage[params] = records unless storage[params]
-        return storage[params]
+        if storage[params].nil? || params[:q]
+          records = Postgres.instance.execute('media_catalog', query_params.merge(params))
+            .map {|row| row[:id]}
+            .filter_map {|id| self[id] rescue nil}
+            .map(&:to_h)
+          storage[params] = records unless params[:q]
+        end
+        return params[:q] ? records : storage[params]
       end
 
       def self.feed(&block)
