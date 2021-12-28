@@ -71,7 +71,7 @@ html lang='ja'
           searchMedias () {
             this.page = 0
             this.medias = []
-            this.appendMedias()
+            setTimeout(this.appendMedias, 500)
           },
           appendMedias () {
             this.page ++
@@ -81,7 +81,7 @@ html lang='ja'
                   this.medias = this.medias.concat(e)
                 } else {
                   this.last = true
-                  this.$dialog.alert('最後のページです。')
+                  this.$dialog.alert('メディアはこれ以上投稿されていません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },

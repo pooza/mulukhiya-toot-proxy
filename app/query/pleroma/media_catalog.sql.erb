@@ -29,6 +29,9 @@ FROM
       ) AS objects_actor ON objects_base.id = objects_actor.id
       INNER JOIN users ON objects_actor.actor[5] = users.nickname
     WHERE (objects_base.data->'attachment'->0->'url' IS NOT null)
+<% if params[:q] -%>
+      AND ((objects_base.data->'content')::varchar LIKE '%<%= params[:q] %>%')
+<% end -%>
       AND (users.actor_type = 'Person')
       AND (users.local = true)
       AND (users.invisible = false)
