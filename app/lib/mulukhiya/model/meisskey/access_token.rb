@@ -52,7 +52,7 @@ module Mulukhiya
           return nil unless record = collection.find(hash: key).first
           return new(record['_id'])
         else
-          return null
+          return nil
         end
       end
 
