@@ -55,15 +55,19 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return HashTag.new(id)
+        return new(id)
       end
 
       def self.get(key)
-        return nil if key[:tag].nil?
-        return nil unless tag = collection.find(tag: key[:tag].downcase).first
-        record = HashTag.new(tag['_id'])
-        record.raw_name = key[:tag]
-        return record
+        case key
+        in {tag: tag}
+          return nil unless tag = collection.find(tag: tag.downcase).first
+          record = new(tag['_id'])
+          record.raw_name = key[:tag]
+          return record
+        else
+          return nil
+        end
       end
 
       def self.first(key)

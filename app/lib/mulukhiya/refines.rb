@@ -12,7 +12,7 @@ module Mulukhiya
 
     class ::StandardError
       def log(values = {})
-        Logger.new.error({e: self}.merge(values))
+        Logger.new.error({error: self}.merge(values))
       end
 
       def alert(values = {})

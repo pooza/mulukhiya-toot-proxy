@@ -60,18 +60,20 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return Status.new(id)
+        return new(id)
       end
 
       def self.get(key)
-        if key.key?(:uri)
-          uri = NoteURI.parse(key[:uri])
+        case key
+        in {uri: uri}
+          uri = NoteURI.parse(uri)
           return nil unless uri.valid?
-          return Status.new(uri.id)
+          return new(uri.id)
+        else
+          entry = collection.find(key).first
+          return new(entry['_id']) if entry
+          return nil
         end
-        entry = collection.find(key).first
-        return Status.new(entry['_id']) if entry
-        return nil
       end
 
       def self.first(key)

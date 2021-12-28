@@ -25,10 +25,15 @@ module Mulukhiya
       end
 
       def self.get(key)
-        return nil if key[:tag].nil?
-        return nil unless record = HashTag.new(key[:tag].downcase)
-        record.raw_name = key[:tag]
-        return record
+        case key
+        in {tag: tag}
+          return nil if tag.nil?
+          return nil unless record = new(tag.downcase)
+          record.raw_name = tag
+          return record
+        else
+          return first(key)
+        end
       end
     end
   end
