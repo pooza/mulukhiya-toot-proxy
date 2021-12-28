@@ -48,8 +48,8 @@ module Mulukhiya
         in {hash: hash}
           return nil unless record = collection.find(hash: hash).first
           return new(record['_id'])
-        in {key: key}
-          return nil unless record = collection.find(hash: key).first
+        in {token: token}
+          return nil unless record = collection.find(hash: token).first
           return new(record['_id'])
         else
           return nil
