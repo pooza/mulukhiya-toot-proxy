@@ -4,24 +4,21 @@ module Mulukhiya
       include AttachmentMethods
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            id: id,
-            acct: account.acct.to_s,
-            file_name: name,
-            file_size_str: size_str,
-            type: type,
-            mediatype: mediatype,
-            created_at: date,
-            created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
-            meta: meta,
-            url: uri.to_s,
-            thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
-            pixel_size: pixel_size,
-            duration: duration,
-          )
-          @hash.deep_compact!
-        end
+        @hash ||= values.deep_symbolize_keys.merge(
+          id: id,
+          acct: account.acct.to_s,
+          file_name: name,
+          file_size_str: size_str,
+          type: type,
+          mediatype: mediatype,
+          created_at: date,
+          created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+          meta: meta,
+          url: uri.to_s,
+          thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
+          pixel_size: pixel_size,
+          duration: duration,
+        ).deep_compact
         return @hash
       end
 
