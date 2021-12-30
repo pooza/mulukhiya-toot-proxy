@@ -81,7 +81,7 @@ module Mulukhiya
         case key
         in {token: token}
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          return nil unless account = Postgres.instance.exec('token_owner', {token: token})&.first
+          return nil unless account = Postgres.instance.exec('token_owner', {token:})&.first
           return nil unless account = self[account[:id]]
           account.token = token
           return account

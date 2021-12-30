@@ -102,10 +102,10 @@ module Mulukhiya
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           nickname = acct.username if acct.local?
           nickname ||= acct.to_s.sub(/^@/, '')
-          return first(nickname: nickname)
+          return first(nickname:)
         in {token: token}
           return nil unless token = (token.decrypt rescue token)
-          return nil unless account = AccessToken.first(token: token)&.account
+          return nil unless account = AccessToken.first(token:)&.account
           account.token = token
           return account
         else
