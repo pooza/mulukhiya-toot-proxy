@@ -8,6 +8,10 @@
       $ne: null
     user.isBot: false
     _user.host: null
+<% if params[:q] -%>
+    text:
+      $regex: <%= params[:q] %>
+<% end -%>
     visibility:
       $in:
         - <%= controller_class.visibility_name(:public) %>

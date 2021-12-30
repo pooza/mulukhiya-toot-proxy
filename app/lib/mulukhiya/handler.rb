@@ -229,12 +229,12 @@ module Mulukhiya
     end
 
     def recursive_to_a(arg)
-      case arg.class.to_s
-      when 'Hash'
+      case arg
+      in Hash
         return arg.deep_stringify_keys.transform_values do |v|
           v.is_a?(Set) ? v.to_a : recursive_to_a(v)
         end
-      when 'Array', 'Set'
+      in Array | Set
         return arg.map {|v| v.is_a?(Set) ? v.to_a : recursive_to_a(v)}
       else
         return arg

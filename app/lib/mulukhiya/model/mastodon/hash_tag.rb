@@ -21,13 +21,15 @@ module Mulukhiya
       end
 
       def self.get(key)
-        if key.key?(:tag)
-          return nil if key[:tag].nil?
-          return unless record = first(name: key[:tag].downcase)
-          record.raw_name = key[:tag]
+        case key
+        in {tag: tag}
+          return nil if tag.nil?
+          return unless record = first(name: tag.downcase)
+          record.raw_name = tag
           return record
+        else
+          return first(key)
         end
-        return first(key)
       end
     end
   end

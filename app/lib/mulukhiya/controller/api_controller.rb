@@ -125,6 +125,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       @sns.token ||= @sns.default_token
       params[:page] = params[:page]&.to_i || 1
+      params.delete(:q) unless params[:q].present?
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422

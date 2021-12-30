@@ -46,14 +46,15 @@ module Mulukhiya
     end
 
     def search_status_id(status)
-      case status.class.to_s
-      when status_class.to_s
-        status = status.id
-      when 'Ginseng::URI', 'TootURI'
+      case status
+      in Pleroma::Status
+        return status.id
+      in Ginseng::URI
         response = @http.get(status, {follow_redirects: false})
-        status = response.headers['location'].match(%r{/notice/(.*)})[1]
+        return response.headers['location'].match(%r{/notice/(.*)})[1]
+      else
+        return super
       end
-      return super
     end
 
     def oauth_client(type = :default)

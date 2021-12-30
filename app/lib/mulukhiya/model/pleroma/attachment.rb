@@ -59,14 +59,11 @@ module Mulukhiya
       end
 
       def self.get(key)
-        if key.key?(:acct)
-          rows = Postgres.instance.execute('attachment', key)
-          return nil unless row = rows.first
-          return Attachment[row['id']]
-        elsif key.key?(:id)
-          return Attachment[key[:id]]
-        elsif key.key?(:row)
-          row = key[:row].deep_symbolize_keys
+        case key
+        in {id: id}
+          return self[id]
+        in {row: row}
+          row = row.deep_symbolize_keys
           time = "#{row[:created_at].to_s.split(/\s+/)[0..1].join(' ')} UTC"
           attachment = get(id: row[:id])
           attachment.account = Account.get(acct: Acct.new("@#{row[:username]}@#{row[:host]}"))
@@ -86,11 +83,12 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
-        unless storage[params]
-          storage[params] = Postgres.instance.execute('media_catalog', query_params.merge(params))
-            .filter_map {|row| get(row:).to_h.merge(status_url: row[:status_uri])}
+        if storage[params].nil? || params[:q]
+          records = Postgres.instance.execute('media_catalog', query_params.merge(params))
+            .filter_map {|row| get(row: row).to_h.merge(status_url: row[:status_uri])}
+          storage[params] = records unless params[:q]
         end
-        return storage[params]
+        return params[:q] ? records : storage[params]
       end
     end
   end

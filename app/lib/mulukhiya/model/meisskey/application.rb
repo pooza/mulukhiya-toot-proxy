@@ -2,7 +2,7 @@ module Mulukhiya
   module Meisskey
     class Application < MongoCollection
       def self.[](id)
-        return Application.new(id)
+        return new(id)
       end
 
       def scopes

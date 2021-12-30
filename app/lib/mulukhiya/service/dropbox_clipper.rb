@@ -19,7 +19,7 @@ module Mulukhiya
       unless token = account.user_config['/dropbox/token']
         raise Ginseng::ConfigError, "Account #{account.acct} /dropbox/token undefined"
       end
-      return new((token.decrypt rescue token))
+      return new(access_token: (token.decrypt rescue token))
     rescue Ginseng::ConfigError => e
       e.log
       return nil

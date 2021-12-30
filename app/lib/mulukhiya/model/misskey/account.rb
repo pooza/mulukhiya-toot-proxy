@@ -82,14 +82,16 @@ module Mulukhiya
       alias locked? isLocked
 
       def self.get(key)
-        if acct = key[:acct]
+        case key
+        in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return first(username: acct.username, host: acct.domain)
-        elsif key.key?(:token)
-          return nil unless token = (key[:token].decrypt rescue key[:token])
+        in {token: token}
+          return nil unless token = (token.decrypt rescue token)
           return first(key) || AccessToken.first(hash: token)&.account
+        else
+          return first(key)
         end
-        return first(key)
       end
     end
   end

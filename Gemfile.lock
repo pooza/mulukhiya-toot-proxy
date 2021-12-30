@@ -307,7 +307,7 @@ GEM
       rubocop-ast (>= 1.15.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.15.0)
+    rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
     rubocop-performance (1.13.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -374,7 +374,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.1)
-    zeitwerk (2.5.1)
+    zeitwerk (2.5.2)
     zlib (2.1.1)
 
 PLATFORMS

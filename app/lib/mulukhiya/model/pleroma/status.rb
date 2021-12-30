@@ -68,7 +68,7 @@ module Mulukhiya
       end
 
       def self.[](id)
-        return Status.new(id)
+        return new(id)
       end
     end
   end

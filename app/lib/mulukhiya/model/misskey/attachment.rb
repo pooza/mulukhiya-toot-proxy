@@ -55,15 +55,16 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
-        unless storage[params]
+        if storage[params].nil? || params[:q]
           catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
-          storage[params] = catalog.map do |row|
-            attachment = Attachment[row[:id]]
+          records = catalog.map do |row|
+            attachment = self[row[:id]]
             note = Status[row[:status_id]]
             attachment.to_h.merge(status_url: note.uri.to_s)
           end
+          storage[params] = records unless params[:q]
         end
-        return storage[params]
+        return params[:q] ? records : storage[params]
       end
 
       def self.feed(&block)
