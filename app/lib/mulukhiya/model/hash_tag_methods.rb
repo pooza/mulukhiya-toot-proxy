@@ -51,7 +51,7 @@ module Mulukhiya
       def favorites
         favorites = {}
         Postgres.instance.exec('tagged_accounts').each do |row|
-          parser = controller_class.parser_class.new(row['note'].downcase)
+          parser = controller_class.parser_class.new(row[:note].downcase)
           parser.tags.each do |v|
             favorites[v] ||= 0
             favorites[v] += 1
