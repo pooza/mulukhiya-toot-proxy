@@ -11,8 +11,7 @@ module Mulukhiya
           tag: raw_name.to_hashtag,
           url: uri.to_s,
           feed_url: feed_uri.to_s,
-        )
-        @hash.deep_compact!
+        ).deep_compact
         return @hash
       end
 

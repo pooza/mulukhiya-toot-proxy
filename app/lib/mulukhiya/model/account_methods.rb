@@ -66,7 +66,7 @@ module Mulukhiya
     end
 
     def dropbox
-      return nil unless user_config['/growi/token'].present?
+      return nil unless user_config['/dropbox/token'].present?
       @dropbox ||= DropboxClipper.create(account_id: id)
       return @dropbox
     rescue => e
