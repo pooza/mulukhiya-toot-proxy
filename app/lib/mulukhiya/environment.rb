@@ -162,6 +162,14 @@ module Mulukhiya
       end.to_set
     end
 
+    def self.pre_start_tasks
+      tasks = ['config:lint']
+      if config['/bundler/install']
+        tasks.concat(['mulukhiya:api:bundler', 'mulukhiya:feed:bundler'])
+      end
+      return tasks
+    end
+
     def self.health
       values = {
         redis: Redis.health,
