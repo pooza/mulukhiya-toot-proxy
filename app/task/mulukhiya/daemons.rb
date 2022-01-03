@@ -12,7 +12,7 @@ module Mulukhiya
         end
 
         desc "start #{daemon}"
-        task start: ['mulukhiya:api:bundler', 'mulukhiya:feed:bundler', 'config:lint'] do
+        task start: Environment.pre_start_tasks do
           sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
         rescue => e
           warn "#{e.class} #{daemon}:start #{e.message}"

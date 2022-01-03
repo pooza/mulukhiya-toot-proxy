@@ -79,6 +79,13 @@ properties:
           type: object
         type: array
     type: object
+  bundler:
+    properties:
+      install:
+        type: boolean
+    required:
+      - install
+    type: object
   controller:
     enum:
       - mastodon

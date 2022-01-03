@@ -55,7 +55,7 @@ module Mulukhiya
         }
         sleep(config['/annict/interval/seconds'])
         api_service.get(uri)['reviews']
-          .select {|v| v.dig('user', 'id') == account['id']}
+          .select {|review| review.dig('user', 'id') == account['id']}
           .each(&block)
       end
     end
@@ -73,7 +73,7 @@ module Mulukhiya
       }
       sleep(config['/annict/interval/seconds'])
       api_service.get(uri)['activities']
-        .select {|v| v['action'] == 'create_review'}
+        .select {|activity| activity['action'] == 'create_review'}
         .each(&block)
     end
 

@@ -23,7 +23,7 @@ module Mulukhiya
     def handler_names(&block)
       return enum_for(__method__) unless block
       config["/#{Environment.controller_name}/handlers/#{label}"]
-        .reject {|v| config.disable?(Handler.create(v))}
+        .reject {|name| config.disable?(Handler.create(name))}
         .each(&block)
     end
 

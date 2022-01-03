@@ -98,6 +98,8 @@ annict:
     default: https://annict.com
 api:
   custom: []
+bundler:
+  install: false
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
