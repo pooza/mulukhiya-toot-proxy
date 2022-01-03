@@ -11,24 +11,21 @@ module Mulukhiya
       end
 
       def to_h
-        unless @hash
-          @hash = data.deep_symbolize_keys.merge(
-            id:,
-            file_name: name,
-            file_size_str: size_str,
-            pixel_size:,
-            duration:,
-            type:,
-            mediatype:,
-            url: uri.to_s,
-            thumbnail_url: uri.to_s,
-            meta:,
-            created_at: date,
-            created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-            acct: account&.acct&.to_s,
-          )
-          @hash.deep_compact!
-        end
+        @hash ||= data.deep_symbolize_keys.merge(
+          id:,
+          file_name: name,
+          file_size_str: size_str,
+          pixel_size:,
+          duration:,
+          type:,
+          mediatype:,
+          url: uri.to_s,
+          thumbnail_url: uri.to_s,
+          meta:,
+          created_at: date,
+          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
+          acct: account&.acct&.to_s,
+        ).deep_compact
         return @hash
       end
 

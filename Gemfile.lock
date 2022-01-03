@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e0cc9eca30bc1de7d9488e8edeeab3a0d57cf154
+  revision: 8f117bbd82bafb196596a5b1342141cb821900f5
   specs:
-    ginseng-core (1.11.15)
+    ginseng-core (1.11.16)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -12,13 +12,14 @@ GIT
       erb
       etc
       facets
-      fileutils (>= 1.5.0)
+      fileutils (~> 1.6.0)
       find
       httparty
       json-schema
       mail
       multi_json
       net-protocol
+      net-smtp
       nokogiri (>= 1.12.5)
       optparse
       rake
@@ -33,30 +34,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 776260d71e3feb29207097e81cbbd7db5750d6b6
+  revision: 7c15ad66e553071ffc3519d4cf4da283d7937ed1
   specs:
-    ginseng-fediverse (1.6.4)
+    ginseng-fediverse (1.6.5)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 9ca3e3cfcfab784557bd9ea6ee831fe17162786c
+  revision: 07f2445e3a0ccdca2f733bce2836e89883faa89e
   specs:
-    ginseng-postgres (1.3.11)
+    ginseng-postgres (1.3.12)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: f1a356226c5a1463ccd729cc19150f0a8fb3c0f4
+  revision: 2dc0c1ddef42690dc940fb242fd8a3e43816d6a0
   specs:
-    ginseng-redis (1.1.7)
+    ginseng-redis (1.1.8)
       redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: f29308dd43056ce1c23a494997fdaf042cec53e6
+  revision: 6c6c4f9b13ee72b3ab00600b9cf46d27a021e67c
   specs:
-    ginseng-web (1.3.18)
+    ginseng-web (1.3.19)
       erb
       puma (>= 5.5.1)
       rss
@@ -258,7 +259,7 @@ GEM
       omniauth (>= 1.9, < 3)
     optparse (0.2.0)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     power_assert (2.0.1)
@@ -298,18 +299,18 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.24.0)
+    rubocop (1.24.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.15.0, < 2.0)
+      rubocop-ast (>= 1.15.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.13.0)
+    rubocop-performance (1.13.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -326,7 +327,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.1.1)
-    sequel (5.51.0)
+    sequel (5.52.0)
     set (1.0.2)
     sidekiq (6.3.1)
       connection_pool (>= 2.2.2)
@@ -388,7 +389,6 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
-  fileutils (= 1.6.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -398,7 +398,6 @@ DEPENDENCIES
   mimemagic (>= 0.4.0)
   mini_magick
   mongo
-  net-smtp
   rack-test
   rails-erb-lint
   ricecream

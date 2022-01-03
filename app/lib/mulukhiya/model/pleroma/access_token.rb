@@ -25,16 +25,13 @@ module Mulukhiya
       alias to_s token
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            digest: webhook_digest,
-            token: to_s,
-            account:,
-            scopes:,
-            scopes_valid: scopes_valid?,
-          )
-          @hash.deep_compact!
-        end
+        @hash ||= values.deep_symbolize_keys.merge(
+          digest: webhook_digest,
+          token: to_s,
+          account:,
+          scopes:,
+          scopes_valid: scopes_valid?,
+        ).deep_compact
         return @hash
       end
 

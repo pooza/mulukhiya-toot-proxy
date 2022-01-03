@@ -32,14 +32,11 @@ module Mulukhiya
       end
 
       def to_h
-        unless @hash
-          @hash = values.deep_symbolize_keys.merge(
-            uri: uri.to_s,
-            url: uri.to_s,
-            attachments: query['files'],
-          )
-          @hash.deep_compact!
-        end
+        @hash ||= values.deep_symbolize_keys.merge(
+          uri: uri.to_s,
+          url: uri.to_s,
+          attachments: query['files'],
+        ).deep_compact
         return @hash
       end
 
