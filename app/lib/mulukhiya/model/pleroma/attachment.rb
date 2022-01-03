@@ -12,16 +12,16 @@ module Mulukhiya
 
       def to_h
         @hash ||= data.deep_symbolize_keys.merge(
-          id: id,
+          id:,
           file_name: name,
           file_size_str: size_str,
-          pixel_size: pixel_size,
-          duration: duration,
-          type: type,
-          mediatype: mediatype,
+          pixel_size:,
+          duration:,
+          type:,
+          mediatype:,
           url: uri.to_s,
           thumbnail_url: uri.to_s,
-          meta: meta,
+          meta:,
           created_at: date,
           created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           acct: account&.acct&.to_s,

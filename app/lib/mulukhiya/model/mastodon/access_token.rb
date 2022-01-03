@@ -30,7 +30,7 @@ module Mulukhiya
           digest: webhook_digest,
           token: to_s,
           account: user.account,
-          scopes: scopes,
+          scopes:,
           scopes_valid: scopes_valid?,
         ).deep_compact
         return @hash
