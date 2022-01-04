@@ -37,13 +37,9 @@ module Mulukhiya
     end
 
     put '/api/v1/media/:id' do
-      if params[:thumbnail]
-        Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params)
-        reporter.response = sns.update_media(params[:id], params)
-        Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params)
-      else
-        reporter.response = sns.update_media(params[:id], params)
-      end
+      Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
+      reporter.response = sns.update_media(params[:id], params)
+      Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
