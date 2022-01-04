@@ -3,6 +3,8 @@ module Mulukhiya
     include Package
     include SNSMethods
     set :root, Environment.dir
+    attr_reader :sns, :reporter
+
     enable :method_override
 
     before do
