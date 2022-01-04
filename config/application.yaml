@@ -99,6 +99,7 @@ annict:
 api:
   custom: []
 bundler:
+  did_you_mean: true
   install: false
 cli:
   progress_bar:
