@@ -78,12 +78,13 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
+      options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
         MastodonController.status_field => message.ellipsize(TootParser.new.max_length),
-        MastodonController.spoiler_field => options['spoiler_text'],
+        MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
-        'in_reply_to_id' => options.dig('response', 'id'),
+        'in_reply_to_id' => options.dig(:response, :id),
       )
     end
 

@@ -76,13 +76,14 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
+      options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
         MisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
-        MisskeyController.spoiler_field => options['spoiler_text'],
+        MisskeyController.spoiler_field => options[:spoiler_text],
         'visibleUserIds' => [account.id],
         MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),
-        'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
+        'replyId' => options.dig(:response, :createdNote, :id) || options.dig(:response, :id),
       )
     end
 

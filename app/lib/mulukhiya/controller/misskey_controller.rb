@@ -12,7 +12,7 @@ module Mulukhiya
     rescue Ginseng::GatewayError => e
       e.alert
       @renderer.message = {error: e.message}
-      notify('error' => e.raw_message)
+      notify(error: e.raw_message)
       @renderer.status = e.source_status
       return @renderer.to_s
     end
@@ -28,7 +28,7 @@ module Mulukhiya
     rescue Ginseng::GatewayError => e
       e.alert
       @renderer.message = {error: e.message}
-      notify('error' => e.raw_message)
+      notify(error: e.raw_message)
       @renderer.status = e.source_status
       return @renderer.to_s
     end
