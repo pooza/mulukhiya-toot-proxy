@@ -77,7 +77,7 @@ module Mulukhiya
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
         if storage[params].nil? || params[:q]
-          records = Postgres.instance.execute('media_catalog', query_params.merge(params))
+          records = Postgres.instance.exec('media_catalog', query_params.merge(params))
             .map {|row| row[:id]}
             .filter_map {|id| self[id] rescue nil}
             .map(&:to_h)
@@ -88,7 +88,7 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.execute('media_catalog', query_params)
+        Postgres.instance.exec('media_catalog', query_params)
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)
