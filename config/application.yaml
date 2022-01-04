@@ -175,6 +175,12 @@ handler:
       min: 3
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
+  dropbox_announce:
+    disable: true
+  dropbox_bookmark:
+    disable: true
+  dropbox_clipping_command:
+    disable: true
   hexo_announce:
     category: お知らせ
     comments: false
