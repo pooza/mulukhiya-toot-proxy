@@ -44,7 +44,7 @@ module Mulukhiya
       return sns.http.get(uri).parsed_response
     rescue => e
       e.log(key:)
-      return nil
+      return []
     end
 
     def description
@@ -62,6 +62,7 @@ module Mulukhiya
     def create_command(args = {})
       command = CommandLine.create(params)
       command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
+      command.env['RUBYOPT'] = '--disable-did_you_mean' if config['/bundler/did_you_mean']
       return command
     end
 
