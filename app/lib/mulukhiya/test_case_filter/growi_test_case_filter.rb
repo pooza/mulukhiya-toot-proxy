@@ -1,7 +1,11 @@
 module Mulukhiya
   class GrowiTestCaseFilter < TestCaseFilter
     def active?
-      return account.growi.nil? rescue true
+      return true unless controller_class.growi?
+      return true if account.growi.nil?
+      return false
+    rescue
+      return true
     end
   end
 end
