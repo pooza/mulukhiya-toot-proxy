@@ -26,7 +26,7 @@ module Mulukhiya
       payload.delete(spoiler_field)
       payload.delete(attachment_field)
       payload.delete(poll_field)
-      @prepared = true
+      @break = true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
     end

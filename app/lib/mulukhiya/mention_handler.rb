@@ -15,7 +15,7 @@ module Mulukhiya
       return unless sender
       return if sender.bot?
       sns.notify(sender, create_body(params), payload['status'] || payload['body'])
-      @prepared = true
+      @break = true
     end
 
     def payload=(payload)
