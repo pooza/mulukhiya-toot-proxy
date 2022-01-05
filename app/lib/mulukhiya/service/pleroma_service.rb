@@ -15,6 +15,7 @@ module Mulukhiya
     alias toot post
 
     def upload(path, params = {})
+      path = path.path if path.is_a?(File)
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
         FileUtils.mkdir_p(dir)
