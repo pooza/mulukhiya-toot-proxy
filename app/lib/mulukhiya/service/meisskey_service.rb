@@ -16,6 +16,7 @@ module Mulukhiya
 
     def upload(path, params = {})
       path = path.path if path.is_a?(File)
+      path = path.path if path.is_a?(Tempfile)
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
         FileUtils.mkdir_p(dir)
