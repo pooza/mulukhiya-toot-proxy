@@ -883,6 +883,11 @@ parser:
         root: poll
       spoiler: spoiler_text
       visibility: visibility
+peer_tube:
+  hosts:
+    - fedimovie.com
+  urls:
+    video: /_api/v3/pages/:id
 pleroma:
   attachment:
     limit: 4
