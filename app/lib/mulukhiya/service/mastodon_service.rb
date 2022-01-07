@@ -16,6 +16,15 @@ module Mulukhiya
 
     def upload(path, params = {})
       path = path.path if path.is_a?(File)
+      if filename = params[:filename]
+        dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
+        FileUtils.mkdir_p(dir)
+        file = MediaFile.new(path)
+        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
+        dest = File.join(dir, dest)
+        FileUtils.copy(path, dest)
+        path = dest
+      end
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
     end
