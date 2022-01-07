@@ -32,12 +32,14 @@ module Mulukhiya
       return nil
     end
 
-    def track_name
-      return data&.dig('name')
-    end
+    alias track data
 
     def track?
       return data.present?
+    end
+
+    def track_name
+      return data&.dig('name')
     end
 
     alias title track_name
