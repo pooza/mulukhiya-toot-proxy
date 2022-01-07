@@ -380,6 +380,7 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -414,6 +415,7 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -521,6 +523,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -547,6 +550,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -577,6 +581,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -684,6 +689,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -711,6 +717,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -741,6 +748,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -934,6 +942,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -962,6 +971,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -994,6 +1004,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
