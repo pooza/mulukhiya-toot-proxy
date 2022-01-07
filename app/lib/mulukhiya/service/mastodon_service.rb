@@ -15,6 +15,7 @@ module Mulukhiya
     alias toot post
 
     def upload(path, params = {})
+      path = path.path if path.is_a?(File)
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
     end

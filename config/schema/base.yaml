@@ -166,6 +166,17 @@ properties:
       dsn:
         format: uri
         type: string
+      pgroonga:
+        type: boolean
+      query_log:
+        type: boolean
+      slow_query:
+        properties:
+          seconds:
+            type: integer
+        required:
+          - seconds
+        type: object
     required:
       - dsn
     type: object

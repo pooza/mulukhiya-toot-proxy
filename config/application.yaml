@@ -1024,6 +1024,7 @@ pleroma:
   url: https://pleroma.example.com/
 postgres:
   dsn: null
+  pgroonga: false
   query_log: false
   slow_query:
     seconds: 3
