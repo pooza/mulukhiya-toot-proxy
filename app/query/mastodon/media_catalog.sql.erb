@@ -21,9 +21,9 @@ WHERE (toots.local = true)
   AND (toots.deleted_at IS null)
   <% if params[:q] -%>
     <% if config['/postgres/pgroonga'] -%>
-      AND (toots.text &@ '<%= params[:q] %>')
+      AND ((toots.text &@ '<%= params[:q] %>') OR ((attachments.description &@ '<%= params[:q] %>')))
     <% else -%>
-      AND (toots.text LIKE '%<%= params[:q] %>%')
+      AND ((toots.text LIKE '%<%= params[:q] %>%') OR ((attachments.description LIKE '%<%= params[:q] %>%')))
     <% end -%>
   <% end -%>
   AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
