@@ -23,6 +23,7 @@ module Mulukhiya
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
         version: params[:captures].first.to_i,
+        filename: params.dig(:file, :filename),
       })
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)
