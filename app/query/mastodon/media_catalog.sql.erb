@@ -20,7 +20,11 @@ WHERE (toots.local = true)
   AND (toots.visibility < 2)
   AND (toots.deleted_at IS null)
   <% if params[:q] -%>
-    AND (toots.text LIKE '%<%= params[:q] %>%')
+    <% if config['/postgres/pgroonga'] -%>
+      AND (toots.text &@ '<%= params[:q] %>')
+    <% else -%>
+      AND (toots.text LIKE '%<%= params[:q] %>%')
+    <% end -%>
   <% end -%>
   AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
   AND (accounts.silenced_at IS null)

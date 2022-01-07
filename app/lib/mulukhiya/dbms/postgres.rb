@@ -8,6 +8,10 @@ module Mulukhiya
       return Environment.test? || Environment.development? || config['/postgres/query_log']
     end
 
+    def pgroonga?
+      return config['/postgres/pgroonga']
+    end
+
     def self.connect
       return instance if config?
     end
