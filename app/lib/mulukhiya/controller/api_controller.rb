@@ -123,7 +123,6 @@ module Mulukhiya
 
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       sns.token ||= sns.default_token
       params[:page] = params[:page]&.to_i || 1
       params.delete(:q) unless params[:q].present?
