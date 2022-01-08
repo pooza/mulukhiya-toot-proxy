@@ -22,7 +22,7 @@ module Mulukhiya
 
     def uri
       unless @uri
-        @uri = Ginseng::URI.parse("wss://#{@params[:host]}")
+        @uri = Ginseng::URI.parse("wss://#{Ginseng::URI.parse(@params[:url]).host}")
         @uri.path = config['/lemmy/urls/api']
       end
       return @uri

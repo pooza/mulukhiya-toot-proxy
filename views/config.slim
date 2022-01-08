@@ -88,23 +88,19 @@ html lang='ja'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
           ol
-            li
-              | Lemmyサービスの認証情報（ホスト名、ユーザーID、パスワード）を入力してください。
-              | （ホスト名は
-              code = config['/lemmy/hosts/default']
-              | など）
+            li Lemmyサービスの認証情報（URL、ユーザーID、パスワード）を入力してください。
             li 認証ボタンを押下。
             li ブックマークを投稿するコミュニティを選択してください。
             li 更新ボタンを押下。
           .inline-field-container
-            h4 ホスト名
-            input placeholder='Lemmyのホスト名（#{config['/lemmy/hosts/default']}等）' v-model.trim='form.lemmy.host'
+            h4 URL
+            input placeholder='LemmyサービスのURL（https://#{config['/lemmy/hosts/default']} など）' v-model.trim='form.lemmy.url'
           .inline-field-container
             h4 ユーザーID
-            input placeholder='LemmyのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
+            input placeholder='LemmyサービスのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
           .inline-field-container
             h4 パスワード
-            input type='password' placeholder='Lemmyのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
+            input type='password' placeholder='Lemmyサービスのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
           .field-container
             h4 コミュニティ
             .post-auth v-if='options.lemmy_communities'
@@ -176,7 +172,7 @@ html lang='ja'
             webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
-            lemmy: {host: null, user: null, passwrd: null, community: null},
+            lemmy: {url: null, user: null, passwrd: null, community: null},
           },
           options: {
             program: [],
@@ -237,7 +233,7 @@ html lang='ja'
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
             this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
             this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
-            this.form.lemmy.host = Vue.dig(data, 'config', 'lemmy', 'host')
+            this.form.lemmy.url = Vue.dig(data, 'config', 'lemmy', 'url')
             this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
             this.form.lemmy.community = this.lemmy.communities[Vue.dig(data, 'config', 'lemmy', 'community')]
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
@@ -307,8 +303,8 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateLemmy () {
-            const command = {lemmy: {host: null, user: null, community: null}}
-            if (this.form.lemmy.host) {command.lemmy.host = this.form.lemmy.host}
+            const command = {lemmy: {url: null, user: null, community: null, host: null}}
+            if (this.form.lemmy.url) {command.lemmy.url = this.form.lemmy.url}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
             if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
             if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community.code)}
