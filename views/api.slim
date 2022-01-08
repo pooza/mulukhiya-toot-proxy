@@ -32,6 +32,7 @@ html lang='ja'
             .endpoint-container
               .link GET {{endpoints.media_list}}
               input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='getMedias'
+              input type='search' placeholder='検索キーワード' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='getMedias'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='getMedias' 実行
@@ -223,7 +224,7 @@ html lang='ja'
           },
           choices: {},
           query_params: {
-            media_list: {page: 1},
+            media_list: {page: 1, q: null},
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
             media_metadata_clear: {token: Vue.getToken()},
@@ -286,6 +287,11 @@ html lang='ja'
           onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
+            if (this.query_params.media_list.q) {
+              url.searchParams.set('q', this.query_params.media_list.q)
+            } else {
+              url.searchParams.delete('q')
+            }
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
           onInputCustomAPI (id, key) {
@@ -306,7 +312,7 @@ html lang='ja'
           },
           getMedias () {
             this.result.media_list = null
-            Vue.getMedias(this.query_params.media_list.page)
+            Vue.getMedias(this.query_params.media_list.page, this.query_params.media_list.q)
               .then(e => {this.result.media_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
