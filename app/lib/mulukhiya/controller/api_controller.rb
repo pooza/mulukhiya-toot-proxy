@@ -126,6 +126,7 @@ module Mulukhiya
       sns.token ||= sns.default_token
       params[:page] = params[:page]&.to_i || 1
       params.delete(:q) unless params[:q].present?
+      params.delete(:q) unless sns.account
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
