@@ -8,7 +8,7 @@ module Mulukhiya
       params[:event] = label
       params[:reporter] ||= Reporter.new
       @label = label.to_sym
-      @params = params.deep_symbolize_keys
+      @params = params
     end
 
     def name
