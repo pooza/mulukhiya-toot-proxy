@@ -4,8 +4,8 @@ module Mulukhiya
     include SNSMethods
     attr_reader :params
 
-    def initialize(params)
-      @params = params.deep_symbolize_keys
+    def initialize(params = {})
+      @params = (params || {}).deep_symbolize_keys
       @params[:dir] ||= Environment.dir
     end
 

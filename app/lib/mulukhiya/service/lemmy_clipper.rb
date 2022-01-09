@@ -7,7 +7,7 @@ module Mulukhiya
     include SNSMethods
 
     def initialize(params = {})
-      @params = params&.deep_symbolize_keys
+      @params = (params || {}).deep_symbolize_keys
     end
 
     def client
