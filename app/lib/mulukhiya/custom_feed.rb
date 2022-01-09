@@ -5,7 +5,7 @@ module Mulukhiya
     attr_reader :params
 
     def initialize(params = {})
-      @params = (params || {}).deep_symbolize_keys
+      @params = params.deep_symbolize_keys
       @params[:dir] ||= Environment.dir
     end
 
