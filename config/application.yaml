@@ -332,6 +332,7 @@ mastodon:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -347,6 +348,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -361,6 +363,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -496,6 +499,7 @@ meisskey:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -504,6 +508,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -535,6 +540,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -662,6 +668,7 @@ misskey:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -670,6 +677,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -701,6 +709,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -920,6 +929,7 @@ pleroma:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -928,6 +938,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -959,6 +970,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -1180,6 +1192,8 @@ worker:
     federate: false
   lemmy_clipping:
     federate: false
+  nextcloud_clipping:
+    federate: true
   media_cleaning:
     days: 1
   user_tag_initialize:
