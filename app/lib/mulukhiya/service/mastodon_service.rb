@@ -15,8 +15,7 @@ module Mulukhiya
     alias toot post
 
     def upload(path, params = {})
-      path = path.path if path.is_a?(File)
-      path = path.path if path.is_a?(Tempfile)
+      path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
         FileUtils.mkdir_p(dir)
@@ -31,8 +30,7 @@ module Mulukhiya
     end
 
     def upload_remote_resource(uri, params = {})
-      file = MediaFile.download(uri)
-      payload = {file: {tempfile: file}}
+      payload = {file: {tempfile: MediaFile.download(uri)}}
       params[:version] ||= 1
       Event.new(:pre_upload, params).dispatch(payload)
       response = upload(payload.dig(:file, :tempfile).path, params)
