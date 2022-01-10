@@ -12,7 +12,8 @@ module Mulukhiya
     def data
       return nil unless config['/peer_tube/hosts'].member?(host)
       return nil unless id
-      return service.lookup(id)
+      @data ||= service.lookup(id)
+      return @data
     end
 
     def service
