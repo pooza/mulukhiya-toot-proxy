@@ -45,6 +45,10 @@ module Mulukhiya
         return Handler.search(/lemmy/).present?
       end
 
+      def nextcloud?
+        return Handler.search(/nextcloud/).present?
+      end
+
       def announcement?
         return config["/#{name}/features/announcement"] == true rescue false
       end

@@ -111,5 +111,9 @@ module Mulukhiya
     def test_lemmy?
       assert_boolean(controller_class.lemmy?)
     end
+
+    def test_nextcloud?
+      assert_boolean(controller_class.nextcloud?)
+    end
   end
 end

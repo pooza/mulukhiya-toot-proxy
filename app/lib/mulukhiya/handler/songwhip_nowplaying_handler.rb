@@ -25,7 +25,7 @@ module Mulukhiya
     rescue Addressable::URI::InvalidURIError
       return false
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
       return false
     end
 
@@ -35,7 +35,7 @@ module Mulukhiya
       push(songwhip_uri.to_s)
       result.push(source_url: uri.to_s, songwhip_url: songwhip_uri.to_s)
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
     end
   end
 end

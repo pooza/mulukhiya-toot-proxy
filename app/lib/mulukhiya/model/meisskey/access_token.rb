@@ -13,8 +13,8 @@ module Mulukhiya
         return values.deep_symbolize_keys.merge(
           digest: webhook_digest,
           token: to_s,
-          account: account,
-          scopes: scopes,
+          account:,
+          scopes:,
           scopes_valid: scopes_valid?,
         ).except(
           :hash,
@@ -46,7 +46,7 @@ module Mulukhiya
       def self.get(key)
         case key
         in {hash: hash}
-          return nil unless record = collection.find(hash: hash).first
+          return nil unless record = collection.find(hash:).first
           return new(record['_id'])
         in {token: token}
           return nil unless record = collection.find(hash: token).first

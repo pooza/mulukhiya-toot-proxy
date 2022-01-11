@@ -51,16 +51,16 @@ module Mulukhiya
     def values
       return {
         status_field => {
-          zen: zen,
-          action: action,
-          ref: ref,
-          after: after,
-          check_suite: check_suite,
-          check_run: check_run,
-          repository: repository,
-          issue: issue,
-          milestone: milestone,
-          head_commit: head_commit,
+          zen:,
+          action:,
+          ref:,
+          after:,
+          check_suite:,
+          check_run:,
+          repository:,
+          issue:,
+          milestone:,
+          head_commit:,
         }.deep_stringify_keys.deep_compact.to_yaml,
       }
     end

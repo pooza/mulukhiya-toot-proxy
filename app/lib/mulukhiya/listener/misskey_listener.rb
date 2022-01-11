@@ -11,11 +11,11 @@ module Mulukhiya
     end
 
     def handle_mention(payload)
-      Event.new(:mention, {sns: sns}).dispatch(payload)
+      Event.new(:mention, {sns:}).dispatch(payload)
     end
 
     def handle_followed(payload)
-      Event.new(:follow, {sns: sns}).dispatch(payload)
+      Event.new(:follow, {sns:}).dispatch(payload)
     end
 
     def self.sender(payload)

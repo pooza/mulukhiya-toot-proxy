@@ -17,6 +17,7 @@ FROM
       note.id as note_id,
       unnest(note."fileIds") as file_id,
       note.visibility,
+      note.text,
       note."createdAt",
       "user".username,
       "user".name AS display_name
@@ -26,9 +27,6 @@ FROM
     WHERE (0 < array_length(note."fileIds", 1))
       AND (note."userHost" IS null)
       AND (note."visibility" IN ('<%= controller_class.visibility_name(:public) %>', '<%= controller_class.visibility_name(:unlisted) %>'))
-      <% if params[:q] -%>
-        AND (note.text LIKE '%<%= params[:q] %>%')
-      <% end %>
       AND ("user"."isBot" = false)
       AND ("user".id <> '<%= test_account.id %>')
     GROUP BY
@@ -39,5 +37,9 @@ FROM
       note."createdAt" DESC
     LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
   ) AS note_file ON drive_file.id = note_file.file_id
+WHERE (drive_file."userHost" IS null)
+  <% if params[:q] %>
+    AND ((note_file.text LIKE '%<%= params[:q] %>%') OR (drive_file.name LIKE '%<%= params[:q] %>%'))
+  <% end %>
 ORDER BY
   note_file."createdAt" DESC

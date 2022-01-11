@@ -45,7 +45,7 @@ module Mulukhiya
         unless Thread.new {handler.send(method, payload, params)}.join(handler.timeout)
           handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
         end
-        break if handler.prepared?
+        break if handler.break?
       rescue => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure

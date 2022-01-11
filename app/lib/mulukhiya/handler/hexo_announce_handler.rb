@@ -11,7 +11,7 @@ module Mulukhiya
       params[:header] = true
       params[:format] = :md
       File.write(path, create_body(params))
-      result.push(path: path)
+      result.push(path:)
     end
 
     def category

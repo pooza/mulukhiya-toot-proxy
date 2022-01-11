@@ -11,15 +11,15 @@ module Mulukhiya
           acct: account.acct.to_s,
           file_name: name,
           file_size_str: size_str,
-          type: type,
-          mediatype: mediatype,
+          type:,
+          mediatype:,
           created_at: date,
           created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
-          meta: meta,
+          meta:,
           url: webpublicUrl || values[:url],
           thumbnail_url: thumbnailUrl,
-          pixel_size: pixel_size,
-          duration: duration,
+          pixel_size:,
+          duration:,
         ).except(
           :properties,
         ).deep_compact
@@ -56,8 +56,7 @@ module Mulukhiya
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
         if storage[params].nil? || params[:q]
-          catalog = Postgres.instance.execute('media_catalog', query_params.merge(params))
-          records = catalog.map do |row|
+          records = Postgres.instance.exec('media_catalog', query_params.merge(params)).map do |row|
             attachment = self[row[:id]]
             note = Status[row[:status_id]]
             attachment.to_h.merge(status_url: note.uri.to_s)
@@ -69,7 +68,7 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.execute('media_catalog', query_params)
+        Postgres.instance.exec('media_catalog', query_params)
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)

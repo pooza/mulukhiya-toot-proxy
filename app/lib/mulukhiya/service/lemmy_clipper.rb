@@ -7,7 +7,8 @@ module Mulukhiya
     include SNSMethods
 
     def initialize(params = {})
-      @params = params
+      @params = params.deep_symbolize_keys
+      @params[:password] = (@params[:password].decrypt rescue @params[:password])
     end
 
     def client
@@ -22,7 +23,7 @@ module Mulukhiya
 
     def uri
       unless @uri
-        @uri = Ginseng::URI.parse("wss://#{@params[:host]}")
+        @uri = Ginseng::URI.parse("wss://#{Ginseng::URI.parse(@params[:url]).host}")
         @uri.path = config['/lemmy/urls/api']
       end
       return @uri
@@ -37,7 +38,7 @@ module Mulukhiya
     end
 
     def clip(body)
-      listen(method: :post, body: body)
+      listen(method: :post, body:)
     end
 
     def communities
@@ -95,7 +96,7 @@ module Mulukhiya
     def login
       client.send({op: 'Login', data: {
         username_or_email: username,
-        password: password,
+        password:,
       }}.to_json)
     end
 
@@ -110,7 +111,7 @@ module Mulukhiya
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s
       end
-      client.send({op: 'CreatePost', data: data}.to_json)
+      client.send({op: 'CreatePost', data:}.to_json)
     end
 
     def fetch_communities(body = {})

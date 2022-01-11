@@ -13,7 +13,7 @@ module Mulukhiya
       return unless appendable?
       lines = [message, uri.to_s, nil].concat(status_lines)
       parser.text = payload[text_field] = lines.join("\n")
-      result.push(tag: tag)
+      result.push(tag:)
     end
 
     def appendable?

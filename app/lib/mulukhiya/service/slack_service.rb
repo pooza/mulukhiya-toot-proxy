@@ -8,7 +8,9 @@ module Mulukhiya
     end
 
     def self.uris(&block)
-      return Handler.create('slack_alert')&.uris
+      return enum_for(__method__) unless block
+      return nil unless handler = Handler.create('slack_alert')
+      return handler.uris.each(&block)
     end
 
     def self.config?

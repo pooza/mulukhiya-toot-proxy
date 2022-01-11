@@ -15,6 +15,7 @@ module Mulukhiya
     alias note post
 
     def upload(path, params = {})
+      path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
       if filename = params[:filename]
         dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
         FileUtils.mkdir_p(dir)
@@ -31,8 +32,7 @@ module Mulukhiya
     end
 
     def upload_remote_resource(uri, params = {})
-      file = MediaFile.download(uri)
-      payload = {file: {tempfile: file}}
+      payload = {file: {tempfile: MediaFile.download(uri)}}
       params[:filename] ||= File.basename(uri.path)
       Event.new(:pre_upload, params).dispatch(payload)
       response = upload(payload.dig(:file, :tempfile).path, params)
@@ -53,7 +53,7 @@ module Mulukhiya
         permission: MeisskeyController.oauth_scopes(type),
       }
       unless client = oauth_client_storage[body]
-        client = http.post('/api/app/create', {body: body}).body
+        client = http.post('/api/app/create', {body:}).body
         oauth_client_storage[body] = client
         redis.unlink('oauth_client')
       end
@@ -69,13 +69,14 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
+      options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
         MeisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
-        MeisskeyController.spoiler_field => options['spoiler_text'],
+        MeisskeyController.spoiler_field => options[:spoiler_text],
         'visibleUserIds' => [account.id],
         MeisskeyController.visibility_field => MeisskeyController.visibility_name(:direct),
-        'replyId' => options.dig('response', 'createdNote', 'id') || options.dig('response', 'id'),
+        'replyId' => options.dig(:response, :createdNote, :id) || options.dig(:response, :id),
       )
     end
 

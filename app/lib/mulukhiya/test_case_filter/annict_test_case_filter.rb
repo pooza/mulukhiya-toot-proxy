@@ -1,7 +1,10 @@
 module Mulukhiya
   class AnnictTestCaseFilter < TestCaseFilter
     def active?
-      return account.annict.nil? rescue true
+      return true unless account.annict
+      return false
+    rescue
+      return true
     end
   end
 end

@@ -12,9 +12,9 @@ module Mulukhiya
     def announce
       return unless controller_class.announcement?
       fetch.reject {|v| cache.member?(v[:id])}.each do |announcement|
-        Event.new(:announce, {sns: sns}).dispatch(announcement)
+        Event.new(:announce, {sns:}).dispatch(announcement)
       rescue => e
-        e.log(announcement: announcement)
+        e.log(announcement:)
       ensure
         sleep(AnnouncementWorker.new.worker_config('interval/seconds'))
       end

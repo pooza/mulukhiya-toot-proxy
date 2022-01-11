@@ -8,12 +8,12 @@ module Mulukhiya
 
       def to_h
         return values.deep_symbolize_keys.merge(
-          username: username,
+          username:,
           is_admin: admin?,
           is_moderator: moderator?,
           is_info_bot: info?,
           is_test_bot: test?,
-          display_name: display_name,
+          display_name:,
           url: uri.to_s,
         ).except(
           :password_hash,
@@ -102,10 +102,10 @@ module Mulukhiya
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           nickname = acct.username if acct.local?
           nickname ||= acct.to_s.sub(/^@/, '')
-          return first(nickname: nickname)
+          return first(nickname:)
         in {token: token}
           return nil unless token = (token.decrypt rescue token)
-          return nil unless account = AccessToken.first(token: token)&.account
+          return nil unless account = AccessToken.first(token:)&.account
           account.token = token
           return account
         else

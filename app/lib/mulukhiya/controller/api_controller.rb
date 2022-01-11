@@ -1,27 +1,27 @@
 module Mulukhiya
   class APIController < Controller
     get '/about' do
-      @sns.token ||= @sns.default_token
+      sns.token ||= sns.default_token
       @renderer.message = {package: config.raw.dig('application', 'package')}
       return @renderer.to_s
     end
 
     get '/health' do
-      @sns.token ||= @sns.default_token
+      sns.token ||= sns.default_token
       @renderer.message = Environment.health
       @renderer.status = @renderer.message[:status] || 200
       return @renderer.to_s
     end
 
     get '/config' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      @sns.account.user_config.token = token
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      sns.account.user_config.token = token
       @renderer.message = {
-        account: @sns.account.to_h,
-        config: @sns.account.user_config.to_h,
-        webhook: {url: @sns.account.webhook.uri.to_s},
-        filters: @sns.filters&.parsed_response,
-        token: @sns.access_token.to_h.except(:account),
+        account: sns.account.to_h,
+        config: sns.account.user_config.to_h,
+        webhook: {url: sns.account.webhook.uri.to_s},
+        filters: sns.filters&.parsed_response,
+        token: sns.access_token.to_h.except(:account),
         visibility_names: parser_class.visibility_names,
       }
       return @renderer.to_s
@@ -33,9 +33,9 @@ module Mulukhiya
     end
 
     post '/config/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      Handler.create('user_config_command').handle_toot(params, {sns: @sns})
-      @renderer.message = {config: @sns.account.user_config.to_h}
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      Handler.create('user_config_command').handle_toot(params, {sns:})
+      @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
       e.alert
@@ -45,11 +45,11 @@ module Mulukhiya
     end
 
     post '/filter/add' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
       raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create('filter_command')
-      handler.handle_toot(params, {sns: @sns})
-      @renderer.message = {filters: @sns.filters}
+      handler.handle_toot(params, {sns:})
+      @renderer.message = {filters: sns.filters}
       return @renderer.to_s
     rescue => e
       e.alert
@@ -63,9 +63,9 @@ module Mulukhiya
       errors = MastodonAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
-        response = @sns.auth(params[:code], params[:type])
+        response = sns.auth(params[:code], params[:type])
         @renderer.message = response.parsed_response
         @renderer.message['access_token_crypt'] = @renderer.message['access_token'].encrypt
       end
@@ -82,10 +82,10 @@ module Mulukhiya
       errors = MisskeyAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
-        response = @sns.auth(params[:code], params[:type])
-        token = @sns.create_access_token(response.parsed_response['accessToken'], params[:type])
+        response = sns.auth(params[:code], params[:type])
+        token = sns.create_access_token(response.parsed_response['accessToken'], params[:type])
         @renderer.message = response.parsed_response
         @renderer.message['access_token_crypt'] = token.encrypt
       end
@@ -99,7 +99,7 @@ module Mulukhiya
 
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      @sns.token ||= @sns.default_token
+      sns.token ||= sns.default_token
       @renderer.message = Program.instance.data
       return @renderer.to_s
     rescue => e
@@ -111,7 +111,7 @@ module Mulukhiya
 
     post '/program/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       ProgramUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -123,13 +123,14 @@ module Mulukhiya
 
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
-      @sns.token ||= @sns.default_token
+      sns.token ||= sns.default_token
       params[:page] = params[:page]&.to_i || 1
       params.delete(:q) unless params[:q].present?
+      params.delete(:q) unless sns.account
       errors = PagerContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       elsif controller_class.media_catalog?
         @renderer.message = attachment_class.catalog(params)
       else
@@ -144,7 +145,7 @@ module Mulukhiya
     end
 
     post '/media/file/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       MediaCleaningWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -155,7 +156,7 @@ module Mulukhiya
     end
 
     post '/media/metadata/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
@@ -166,7 +167,7 @@ module Mulukhiya
     end
 
     post '/media/catalog/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       MediaCatalogUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -178,17 +179,17 @@ module Mulukhiya
 
     post '/annict/auth' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       errors = AnnictAuthContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         response = AnnictService.new.auth(params[:code])
-        @sns.account.user_config.update(annict: {token: response['access_token']})
-        @sns.account.annict.updated_at = Time.now
+        sns.account.user_config.update(annict: {token: response['access_token']})
+        sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
-        @renderer.message = {config: @sns.account.user_config.to_h}
+        @renderer.message = {config: sns.account.user_config.to_h}
       end
       return @renderer.to_s
     rescue => e
@@ -200,7 +201,7 @@ module Mulukhiya
 
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       AnnouncementWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -212,7 +213,7 @@ module Mulukhiya
 
     get '/tagging/favorites' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.favorite_tags?
-      @sns.token ||= @sns.default_token
+      sns.token ||= sns.default_token
       @renderer.message = hash_tag_class.favorites
       return @renderer.to_s
     rescue => e
@@ -223,7 +224,7 @@ module Mulukhiya
     end
 
     post '/tagging/dic/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       TaggingDictionaryUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -238,7 +239,7 @@ module Mulukhiya
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
-        @renderer.message = {errors: errors}
+        @renderer.message = {errors:}
       else
         dic = TaggingDictionary.new
         dic.cache.each do |entry|
@@ -250,7 +251,7 @@ module Mulukhiya
           tags[word][:words].unshift(word)
           tags[word][:tags] = TagContainer.new(tags.dig(word, :words)).create_tags
         rescue => e
-          e.log(entry: entry)
+          e.log(entry:)
         end
         @renderer.message = tags
       end
@@ -258,7 +259,7 @@ module Mulukhiya
     end
 
     post '/tagging/usertag/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       UserTagInitializeWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -270,8 +271,8 @@ module Mulukhiya
 
     get '/lemmy/communities' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.lemmy?
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account
-      @renderer.message = @sns.account.lemmy&.communities || {}
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = sns.account.lemmy&.communities || {}
       return @renderer.to_s
     rescue => e
       e.log
@@ -284,17 +285,17 @@ module Mulukhiya
       tags = TagContainer.new
       tags.merge(TagContainer.default_tags)
       tags.merge(TagContainer.media_tags)
-      if @sns.account
-        tags.merge(@sns.account.featured_tags)
-        tags.merge(@sns.account.field_tags)
-        tags.merge(@sns.account.bio_tags)
+      if sns.account
+        tags.merge(sns.account.featured_tags)
+        tags.merge(sns.account.field_tags)
+        tags.merge(sns.account.bio_tags)
       end
       @renderer.message = tags.map {|t| hash_tag_class.get(tag: t).to_h}.deep_compact
       return @renderer.to_s
     end
 
     post '/feed/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless @sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e

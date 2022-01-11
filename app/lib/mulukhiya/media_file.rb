@@ -153,9 +153,9 @@ module Mulukhiya
       worker = MediaCleaningWorker.new
       all.select {|f| File.new(f).mtime < worker.worker_config(:days).days.ago}.each do |path|
         File.unlink(path)
-        logger.info(class: to_s, method: __method__, path: path)
+        logger.info(class: to_s, method: __method__, path:)
       rescue => e
-        e.log(path: path)
+        e.log(path:)
       end
     end
 

@@ -12,16 +12,16 @@ module Mulukhiya
 
       def to_h
         @hash ||= data.deep_symbolize_keys.merge(
-          id: id,
+          id:,
           file_name: name,
           file_size_str: size_str,
-          pixel_size: pixel_size,
-          duration: duration,
-          type: type,
-          mediatype: mediatype,
+          pixel_size:,
+          duration:,
+          type:,
+          mediatype:,
           url: uri.to_s,
           thumbnail_url: uri.to_s,
-          meta: meta,
+          meta:,
           created_at: date,
           created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           acct: account&.acct&.to_s,
@@ -33,7 +33,7 @@ module Mulukhiya
         @size ||= meta[:size]
         return @size
       rescue => e
-        e.log(path: path)
+        e.log(path:)
         return 0
       end
 
@@ -71,8 +71,8 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.execute('media_catalog', query_params)
-          .filter_map {|row| get(row: row)}
+        Postgres.instance.exec('media_catalog', query_params)
+          .filter_map {|row| get(row:)}
           .map(&:feed_entry)
           .each(&block)
       end
@@ -81,8 +81,8 @@ module Mulukhiya
         params[:page] ||= 1
         storage = MediaCatalogRenderStorage.new
         if storage[params].nil? || params[:q]
-          records = Postgres.instance.execute('media_catalog', query_params.merge(params))
-            .filter_map {|row| get(row: row).to_h.merge(status_url: row[:status_uri])}
+          records = Postgres.instance.exec('media_catalog', query_params.merge(params))
+            .filter_map {|row| get(row:).to_h.merge(status_url: row[:status_uri])}
           storage[params] = records unless params[:q]
         end
         return params[:q] ? records : storage[params]

@@ -15,13 +15,22 @@ module Mulukhiya
     alias toot post
 
     def upload(path, params = {})
+      path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
+      if filename = params[:filename]
+        dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
+        FileUtils.mkdir_p(dir)
+        file = MediaFile.new(path)
+        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
+        dest = File.join(dir, dest)
+        FileUtils.copy(path, dest)
+        path = dest
+      end
       params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
       return super
     end
 
     def upload_remote_resource(uri, params = {})
-      file = MediaFile.download(uri)
-      payload = {file: {tempfile: file}}
+      payload = {file: {tempfile: MediaFile.download(uri)}}
       params[:version] ||= 1
       Event.new(:pre_upload, params).dispatch(payload)
       response = upload(payload.dig(:file, :tempfile).path, params)
@@ -58,7 +67,7 @@ module Mulukhiya
         scopes: MastodonController.oauth_scopes(type).join(' '),
       }
       unless client = oauth_client_storage[body]
-        client = http.post('/api/v1/apps', {body: body}).body
+        client = http.post('/api/v1/apps', {body:}).body
         oauth_client_storage[body] = client
         redis.unlink('oauth_client')
       end
@@ -78,12 +87,13 @@ module Mulukhiya
     end
 
     def notify(account, message, options = {})
+      options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
         MastodonController.status_field => message.ellipsize(TootParser.new.max_length),
-        MastodonController.spoiler_field => options['spoiler_text'],
+        MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
-        'in_reply_to_id' => options.dig('response', 'id'),
+        'in_reply_to_id' => options.dig(:response, :id),
       )
     end
 

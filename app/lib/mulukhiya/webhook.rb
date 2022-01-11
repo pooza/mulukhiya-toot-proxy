@@ -23,7 +23,7 @@ module Mulukhiya
       @json ||= JSON.pretty_generate(
         sns: @sns.uri.to_s,
         token: @sns.token,
-        visibility: visibility,
+        visibility:,
         hook: uri.to_s,
       )
       return @json
@@ -32,9 +32,9 @@ module Mulukhiya
     def post(payload)
       body = payload.values.merge(visibility_field => visibility)
       reporter = Reporter.new
-      Event.new(:pre_webhook, {reporter: reporter, sns: @sns}).dispatch(body)
+      Event.new(:pre_webhook, {reporter:, sns: @sns}).dispatch(body)
       reporter.response = @sns.post(body)
-      Event.new(:post_webhook, {reporter: reporter, sns: @sns}).dispatch(body)
+      Event.new(:post_webhook, {reporter:, sns: @sns}).dispatch(body)
       return reporter
     end
 
@@ -55,7 +55,7 @@ module Mulukhiya
     def self.create_digest(uri, token)
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
-        token: token,
+        token:,
         salt: config['/crypt/salt'],
       }.to_json)
     end

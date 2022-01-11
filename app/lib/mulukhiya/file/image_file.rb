@@ -2,12 +2,12 @@ module Mulukhiya
   class ImageFile < MediaFile
     def values
       return {
-        type: type,
-        mediatype: mediatype,
-        subtype: subtype,
-        width: width,
-        height: height,
-        size: size,
+        type:,
+        mediatype:,
+        subtype:,
+        width:,
+        height:,
+        size:,
         length: size,
       }
     end
@@ -87,7 +87,7 @@ module Mulukhiya
 
     def convert_type(type)
       return convert_animation_type(type) if animated?
-      dest = create_dest_path(f: __method__, type: type)
+      dest = create_dest_path(f: __method__, type:)
       command = CommandLine.new(['convert', path, dest])
       command.exec unless File.exist?(dest)
       if command.status&.positive?

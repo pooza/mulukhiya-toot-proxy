@@ -14,7 +14,7 @@ module Mulukhiya
           is_moderator: moderator?,
           is_info_bot: info?,
           is_test_bot: test?,
-          display_name: display_name,
+          display_name:,
         ).except(
           :private_key,
           :public_key,
@@ -33,9 +33,8 @@ module Mulukhiya
       alias host domain
 
       def recent_status
-        rows = Postgres.instance.exec('recent_toot', {id: id})
-        return Status[rows.first[:id]] if rows.present?
-        return nil
+        return nil unless row = Postgres.instance.exec('recent_toot', {id:}).first
+        return Status[row[:id]]
       end
 
       alias recent_toot recent_status
@@ -81,8 +80,8 @@ module Mulukhiya
         case key
         in {token: token}
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          return nil unless account = Postgres.instance.exec('token_owner', {token: token})&.first
-          return nil unless account = self[account[:id]]
+          return nil unless row = Postgres.instance.exec('token_owner', {token:})&.first
+          return nil unless account = self[row[:id]]
           account.token = token
           return account
         in {acct: acct}

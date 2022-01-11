@@ -11,7 +11,7 @@ module Mulukhiya
       self.payload = payload
       announce(params) if @sns = params[:sns]
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, payload: payload)
+      errors.push(class: e.class.to_s, message: e.message, payload:)
       return false
     end
 

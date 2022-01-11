@@ -2,6 +2,8 @@ module Mulukhiya
   class Controller < Ginseng::Web::Sinatra
     include Package
     include SNSMethods
+    attr_reader :sns, :reporter
+
     set :root, Environment.dir
     enable :method_override
 

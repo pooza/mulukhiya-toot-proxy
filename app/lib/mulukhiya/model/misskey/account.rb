@@ -14,7 +14,7 @@ module Mulukhiya
           is_moderator: moderator?,
           is_info_bot: info?,
           is_test_bot: test?,
-          display_name: display_name,
+          display_name:,
         ).except(
           :token,
         ).deep_compact

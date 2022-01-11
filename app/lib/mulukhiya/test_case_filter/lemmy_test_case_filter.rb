@@ -1,7 +1,11 @@
 module Mulukhiya
   class LemmyTestCaseFilter < TestCaseFilter
     def active?
-      return account.lemmy.nil? rescue true
+      return true unless controller_class.lemmy?
+      return true unless account.lemmy
+      return false
+    rescue
+      return true
     end
   end
 end

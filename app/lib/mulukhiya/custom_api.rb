@@ -4,7 +4,7 @@ module Mulukhiya
     include SNSMethods
     attr_reader :params
 
-    def initialize(params)
+    def initialize(params = {})
       @params = params.deep_symbolize_keys
       @params[:dir] ||= Environment.dir
     end
@@ -43,8 +43,8 @@ module Mulukhiya
       uri = sns.create_uri(params.dig(:choices, key))
       return sns.http.get(uri).parsed_response
     rescue => e
-      e.log(key: key)
-      return nil
+      e.log(key:)
+      return []
     end
 
     def description
@@ -53,15 +53,16 @@ module Mulukhiya
 
     def to_h
       return params.merge(
-        id: id,
-        fullpath: fullpath,
-        args: args,
+        id:,
+        fullpath:,
+        args:,
       )
     end
 
     def create_command(args = {})
       command = CommandLine.create(params)
       command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
+      command.env['RUBYOPT'] = '--disable-did_you_mean' if config['/bundler/did_you_mean']
       return command
     end
 

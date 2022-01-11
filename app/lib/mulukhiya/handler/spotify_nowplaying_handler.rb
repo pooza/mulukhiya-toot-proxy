@@ -17,7 +17,7 @@ module Mulukhiya
     rescue Addressable::URI::InvalidURIError
       return false
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
       return false
     end
 
@@ -25,7 +25,7 @@ module Mulukhiya
       return unless track = @tracks[keyword]
       push(track.external_urls['spotify'])
       reporter.temp[:track_uris].push(track.external_urls['spotify'])
-      result.push(keyword: keyword)
+      result.push(keyword:)
     end
   end
 end

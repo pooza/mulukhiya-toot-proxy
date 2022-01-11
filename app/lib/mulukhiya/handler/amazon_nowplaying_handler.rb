@@ -18,7 +18,7 @@ module Mulukhiya
     rescue Addressable::URI::InvalidURIError
       return false
     rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword: keyword)
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
       return false
     end
 
@@ -26,7 +26,7 @@ module Mulukhiya
       return unless asin = @asins[keyword]
       push(@service.create_item_uri(asin).to_s)
       reporter.temp[:track_uris].push(@service.create_item_uri(asin).to_s)
-      result.push(keyword: keyword)
+      result.push(keyword:)
     end
   end
 end

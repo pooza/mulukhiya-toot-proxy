@@ -99,6 +99,7 @@ annict:
 api:
   custom: []
 bundler:
+  did_you_mean: true
   install: false
 cli:
   progress_bar:
@@ -174,6 +175,12 @@ handler:
       min: 3
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
+  dropbox_announce:
+    disable: true
+  dropbox_bookmark:
+    disable: true
+  dropbox_clipping_command:
+    disable: true
   hexo_announce:
     category: お知らせ
     comments: false
@@ -325,6 +332,7 @@ mastodon:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -340,6 +348,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -354,6 +363,7 @@ mastodon:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -373,6 +383,7 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -407,6 +418,7 @@ mastodon:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -487,6 +499,7 @@ meisskey:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -495,6 +508,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -514,6 +528,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -525,6 +540,7 @@ meisskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -540,6 +556,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -570,6 +587,7 @@ meisskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -650,6 +668,7 @@ misskey:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -658,6 +677,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -677,6 +697,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -688,6 +709,7 @@ misskey:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -704,6 +726,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -734,6 +757,7 @@ misskey:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -848,7 +872,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.12.7
+  version: 4.13.0
 parser:
   note:
     fields:
@@ -868,6 +892,11 @@ parser:
         root: poll
       spoiler: spoiler_text
       visibility: visibility
+peer_tube:
+  hosts:
+    - fedimovie.com
+  urls:
+    video: /api/v1/videos/
 pleroma:
   attachment:
     limit: 4
@@ -900,6 +929,7 @@ pleroma:
       - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
+      - nextcloud_bookmark
       - result_notification
     post_chat:
       - result_notification
@@ -908,6 +938,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -927,6 +958,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
       - media_tag
@@ -938,6 +970,7 @@ pleroma:
       - growi_clipping_command
       - dropbox_clipping_command
       - lemmy_clipping_command
+      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - amazon_nowplaying
@@ -955,6 +988,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -987,6 +1021,7 @@ pleroma:
       - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
+      - peer_tube_url_nowplaying
       - spoiler
       - default_tag
       - dictionary_tag
@@ -1017,6 +1052,7 @@ pleroma:
   url: https://pleroma.example.com/
 postgres:
   dsn: null
+  pgroonga: false
   query_log: false
   slow_query:
     seconds: 3
@@ -1156,6 +1192,8 @@ worker:
     federate: false
   lemmy_clipping:
     federate: false
+  nextcloud_clipping:
+    federate: true
   media_cleaning:
     days: 1
   user_tag_initialize:

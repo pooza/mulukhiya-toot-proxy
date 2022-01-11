@@ -120,7 +120,7 @@ module Mulukhiya
       @errors.clear
       @status = nil
       @parser = nil
-      @prepared = false
+      @break = false
       @reporter.clear
       @reporter.tags.clear
       @reporter.parser = nil
@@ -133,8 +133,8 @@ module Mulukhiya
       return config['/handler/default/timeout']
     end
 
-    def prepared?
-      return @prepared.present?
+    def break?
+      return @break.present?
     end
 
     def disable?
@@ -160,7 +160,7 @@ module Mulukhiya
       (payload[attachment_field] || []).map {|id| attachment_class[id]}.each do |attachment|
         parts.push(attachment.description)
       rescue => e
-        e.log(attachment: attachment)
+        e.log(attachment:)
       end
       return parts.compact.map {|v| v.gsub(Acct.pattern, '')}.join('::::')
     end
@@ -192,7 +192,7 @@ module Mulukhiya
     def self.create(name, params = {})
       return "Mulukhiya::#{name.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
-      e.log(name: name)
+      e.log(name:)
       return nil
     end
 
@@ -223,7 +223,7 @@ module Mulukhiya
       @errors = []
       @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
-      @prepared = false
+      @break = false
       @event = params[:event] || 'unknown'
       @text_field = status_field
     end

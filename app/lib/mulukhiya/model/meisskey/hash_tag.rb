@@ -26,8 +26,7 @@ module Mulukhiya
 
       def create_feed(params)
         return [] unless Mongo.config?
-        return notes(params).map do |row|
-          status = Status.new(row['_id'])
+        return notes(params).map {|v| Status.new(v['_id'])}.map do |status|
           {
             username: status.account.username,
             domain: status.account.acct.host,

@@ -6,7 +6,7 @@ module Mulukhiya
     def initialize(account)
       @account = account if account.is_a?(account_class)
       if account.is_a?(Enumerable) && (token = account['/mulukhiya/token'])
-        @account ||= account_class.get(token: token)
+        @account ||= account_class.get(token:)
       end
       @account ||= account_class[account]
       @storage = UserConfigStorage.new

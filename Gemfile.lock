@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e0cc9eca30bc1de7d9488e8edeeab3a0d57cf154
+  revision: 35b1af5ab03a6511387e1a78c09962c5aa68f895
   specs:
-    ginseng-core (1.11.15)
+    ginseng-core (1.11.17)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -12,13 +12,14 @@ GIT
       erb
       etc
       facets
-      fileutils (>= 1.5.0)
+      fileutils (~> 1.6.0)
       find
       httparty
       json-schema
       mail
       multi_json
       net-protocol
+      net-smtp
       nokogiri (>= 1.12.5)
       optparse
       rake
@@ -33,30 +34,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 776260d71e3feb29207097e81cbbd7db5750d6b6
+  revision: 7c15ad66e553071ffc3519d4cf4da283d7937ed1
   specs:
-    ginseng-fediverse (1.6.4)
+    ginseng-fediverse (1.6.5)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: 9ca3e3cfcfab784557bd9ea6ee831fe17162786c
+  revision: 07f2445e3a0ccdca2f733bce2836e89883faa89e
   specs:
-    ginseng-postgres (1.3.11)
+    ginseng-postgres (1.3.12)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: f1a356226c5a1463ccd729cc19150f0a8fb3c0f4
+  revision: 2dc0c1ddef42690dc940fb242fd8a3e43816d6a0
   specs:
-    ginseng-redis (1.1.7)
+    ginseng-redis (1.1.8)
       redis
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: f29308dd43056ce1c23a494997fdaf042cec53e6
+  revision: 2f246a13de77ff3bfbfb44bb046289a8a4871ae2
   specs:
-    ginseng-web (1.3.18)
+    ginseng-web (1.3.20)
       erb
       puma (>= 5.5.1)
       rss
@@ -73,20 +74,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.0)
-      actionview (= 7.0.0)
-      activesupport (= 7.0.0)
+    actionpack (7.0.1)
+      actionview (= 7.0.1)
+      activesupport (= 7.0.1)
       rack (~> 2.0, >= 2.2.0)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.0)
-      activesupport (= 7.0.0)
+    actionview (7.0.1)
+      activesupport (= 7.0.1)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.0)
+    activesupport (7.0.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -97,7 +98,7 @@ GEM
     aws-eventstream (1.2.0)
     aws-sigv4 (1.4.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    bootsnap (1.9.3)
+    bootsnap (1.9.4)
       msgpack (~> 1.0)
     bson (4.13.0)
     builder (3.2.4)
@@ -107,6 +108,7 @@ GEM
     crass (1.0.6)
     daemon-spawn (0.4.2)
     date (3.2.2)
+    digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dropbox_api (0.1.20)
@@ -153,34 +155,38 @@ GEM
     etc (1.3.0)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (1.8.0)
+    faraday (1.9.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
-      faraday-httpclient (~> 1.0.1)
+      faraday-httpclient (~> 1.0)
+      faraday-multipart (~> 1.0)
       faraday-net_http (~> 1.0)
-      faraday-net_http_persistent (~> 1.1)
+      faraday-net_http_persistent (~> 1.0)
       faraday-patron (~> 1.0)
       faraday-rack (~> 1.0)
-      multipart-post (>= 1.2, < 3)
+      faraday-retry (~> 1.0)
       ruby2_keywords (>= 0.0.4)
     faraday-em_http (1.0.0)
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
+    faraday-multipart (1.0.3)
+      multipart-post (>= 1.2, < 3)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
+    faraday-retry (1.0.3)
     fastimage (2.2.6)
     faye-websocket (0.11.1)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
-    ffi (1.15.4)
+    ffi (1.15.5)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    fileutils (1.5.0)
+    fileutils (1.6.0)
     find (0.1.1)
     fugit (1.5.2)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -214,13 +220,13 @@ GEM
       mini_mime (>= 0.1.1)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.1115)
+    mime-types-data (3.2022.0105)
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
     mini_magick (4.11.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.6.1)
+    mini_portile2 (2.7.1)
     minitest (5.15.0)
     mongo (2.17.0)
       bson (>= 4.8.2, < 5.0.0)
@@ -233,12 +239,16 @@ GEM
     net-protocol (0.1.2)
       io-wait
       timeout
+    net-smtp (0.3.1)
+      digest
+      net-protocol
+      timeout
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.12.5)
-      mini_portile2 (~> 2.6.1)
+    nokogiri (1.13.0)
+      mini_portile2 (~> 2.7.0)
       racc (~> 1.4)
-    nokogiri (1.12.5-x86_64-linux)
+    nokogiri (1.13.0-x86_64-linux)
       racc (~> 1.4)
     oauth2 (1.4.7)
       faraday (>= 0.8, < 2.0)
@@ -255,7 +265,7 @@ GEM
       omniauth (>= 1.9, < 3)
     optparse (0.2.0)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     power_assert (2.0.1)
@@ -315,7 +325,7 @@ GEM
       rubocop (~> 1.0)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
-    rufus-scheduler (3.8.0)
+    rufus-scheduler (3.8.1)
       fugit (~> 1.1, >= 1.1.6)
     sanitize (6.0.0)
       crass (~> 1.0.2)
@@ -385,7 +395,6 @@ DEPENDENCIES
   dry-validation
   fastimage
   faye-websocket
-  fileutils (= 1.5.0)
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
@@ -413,7 +422,7 @@ DEPENDENCIES
   webrick
 
 RUBY VERSION
-   ruby 3.0.3p157
+   ruby 3.1.0p0
 
 BUNDLED WITH
    2.3.4

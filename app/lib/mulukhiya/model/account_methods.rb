@@ -51,11 +51,14 @@ module Mulukhiya
 
     def lemmy
       unless @lemmy
-        return nil unless [:host, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
+        if user_config['/lemmy/url'].nil? && user_config['/lemmy/host']
+          user_config.update(lemmy: {url: "https://#{user_config['/lemmy/host']}", host: nil})
+        end
+        return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
         @lemmy = LemmyClipper.new(
-          host: user_config['/lemmy/host'],
+          url: user_config['/lemmy/url'],
           user: user_config['/lemmy/user'],
-          password: (user_config['/lemmy/password'].decrypt rescue user_config['/lemmy/password']),
+          password: user_config['/lemmy/password'],
           community: user_config['/lemmy/community'],
         )
       end
@@ -71,6 +74,22 @@ module Mulukhiya
       return @dropbox
     rescue => e
       e.log
+      return nil
+    end
+
+    def nextcloud
+      unless @nextcloud
+        return nil unless [:url, :user, :password].all? {|k| user_config["/nextcloud/#{k}"]}
+        @nextcloud = NextcloudClipper.new(
+          url: user_config['/nextcloud/url'],
+          user: user_config['/nextcloud/user'],
+          password: user_config['/nextcloud/password'],
+          prefix: user_config['/nextcloud/prefix'],
+        )
+      end
+      return @nextcloud
+    rescue => e
+      e.log(acct: acct.to_s)
       return nil
     end
 

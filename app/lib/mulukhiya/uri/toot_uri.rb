@@ -14,7 +14,7 @@ module Mulukhiya
       template = Template.new('status_clipping.md')
       template[:account] = toot['account']
       template[:status] = TootParser.new(toot['content']).to_md
-      template[:attachments] = toot['media_attachments']
+      template[:attachments] = (toot['media_attachments'] || []).map(&:deep_symbolize_keys)
       template[:url] = self
       return template.to_s
     rescue => e

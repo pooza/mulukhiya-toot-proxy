@@ -10,7 +10,7 @@ module Mulukhiya
         database: @dsn.dbname,
         user: @dsn.user,
         password: @dsn.password,
-        logger: logger,
+        logger:,
       })
       return @db
     end

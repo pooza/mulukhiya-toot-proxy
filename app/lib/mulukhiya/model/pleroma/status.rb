@@ -32,7 +32,7 @@ module Mulukhiya
       end
 
       def account
-        @account ||= Account.get(acct: acct)
+        @account ||= Account.get(acct:)
         return @account
       end
 

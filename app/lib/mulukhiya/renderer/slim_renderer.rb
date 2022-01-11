@@ -15,7 +15,7 @@ module Mulukhiya
 
     def assign_values
       return Template.assign_values.merge(
-        params: params,
+        params:,
         slim: SlimRenderer,
         scripts: config["/webui/#{Environment.type}/scripts"],
         stylesheets: config["/webui/#{Environment.type}/stylesheets"],
