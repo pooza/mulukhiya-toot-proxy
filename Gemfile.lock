@@ -244,6 +244,9 @@ GEM
       net-protocol
       timeout
     netrc (0.11.0)
+    nextcloud-ruby (0.1.2)
+      addressable (~> 2.5)
+      nokogiri (~> 1.8)
     nio4r (2.5.8)
     nokogiri (1.13.0)
       mini_portile2 (~> 2.7.0)
@@ -404,6 +407,7 @@ DEPENDENCIES
   mimemagic (>= 0.4.0)
   mini_magick
   mongo
+  nextcloud-ruby
   rack-test
   rails-erb-lint
   ricecream

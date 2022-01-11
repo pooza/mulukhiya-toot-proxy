@@ -77,6 +77,21 @@ module Mulukhiya
       return nil
     end
 
+    def nextcloud
+      unless @nextcloud
+        return nil unless [:url, :user, :password].all? {|k| user_config["/nextcloud/#{k}"]}
+        @nextcloud = NextcloudClipper.new(
+          url: user_config['/nextcloud/url'],
+          user: user_config['/nextcloud/user'],
+          password: (user_config['/nextcloud/password'].decrypt rescue user_config['/nextcloud/password']),
+        )
+      end
+      return @nextcloud
+    rescue => e
+      e.log(acct: acct.to_s)
+      return nil
+    end
+
     def annict
       return nil unless user_config['/annict/token'].present?
       @annict ||= AnnictService.new(user_config['/annict/token'])
