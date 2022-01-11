@@ -114,6 +114,16 @@ module Mulukhiya
       assert_kind_of(DropboxClipper, account.dropbox)
     end
 
+    def test_lemmy
+      return unless account&.lemmy
+      assert_kind_of(LemmyClipper, account.lemmy)
+    end
+
+    def test_nextcloud
+      return unless account&.nextcloud
+      assert_kind_of(NextcloudClipper, account.nextcloud)
+    end
+
     def test_disable?
       return unless account
       Event.new(:pre_toot).handlers do |handler|
