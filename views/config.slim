@@ -58,18 +58,27 @@ html lang='ja'
             li 更新ボタンを押下。
           .inline-field-container
             h4 URL
-            input placeholder='LemmyサービスのURL（https://#{config['/lemmy/hosts/default']} など）' v-model.trim='form.lemmy.url'
+            input placeholder='GROWIサービスのURL（https://example.growi.cloud/ など）' v-model.trim='form.growi.url'
           .inline-field-container
-            h4 ユーザーID
-            input placeholder='LemmyサービスのユーザーID（またはメールアドレス）' v-model.trim='form.lemmy.user'
+            h4 APIトークン
+            input placeholder='APIトークン（保存時に暗号化されます）' v-model.trim='form.growi.token'
           .inline-field-container
-            h4 パスワード
-            input type='password' placeholder='Lemmyサービスのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
+            h4 記事作成先
+            input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
+          .field-update-button-container
+            button @click='updateGrowi' 更新
+            button.alert @click='unauthGrowi' 認証を解除
       section.config v-if='account.username && layout.sections.nextcloud'
         h3 @click='toggleVisibility("nextcloud")' Nextcloud
         vue-slide-up-down :active='layout.details.nextcloud'
           ol
             li Nextcloudサービスの認証情報（URL、ユーザーID、パスワード）を入力してください。
+            li
+              | 必要ならば記事作成先を入力してください。空欄の場合は
+              code = "/mulukhiya"
+              | に記事が作成されます。
+              br
+              | また、このディレクトリをNextcloud側に前もって作成しておいてください。
             li 認証ボタンを押下。
           .inline-field-container
             h4 URL
@@ -80,6 +89,9 @@ html lang='ja'
           .inline-field-container
             h4 パスワード
             input type='password' placeholder='Nextcloudサービスのパスワード（保存時に暗号化されます）' v-model.trim='form.nextcloud.password'
+          .inline-field-container
+            h4 記事作成先
+            input placeholder='記事作成先のパス' v-model.trim='form.nextcloud.prefix'
           .field-update-button-container
             button @click='updateNextcloud' 更新
             button.alert @click='unauthNextcloud' 認証を解除
@@ -188,7 +200,7 @@ html lang='ja'
             growi: {token: null, url: null, prefix: null},
             dropbox: {token: null},
             lemmy: {url: null, user: null, passwrd: null, community: null},
-            nextcloud: {url: null, user: null, passwrd: null},
+            nextcloud: {url: null, user: null, passwrd: null, prefix: null},
           },
           options: {
             program: [],
@@ -256,6 +268,7 @@ html lang='ja'
             this.form.lemmy.community = this.lemmy.communities[Vue.dig(data, 'config', 'lemmy', 'community')]
             this.form.nextcloud.url = Vue.dig(data, 'config', 'nextcloud', 'url')
             this.form.nextcloud.user = Vue.dig(data, 'config', 'nextcloud', 'user')
+            this.form.nextcloud.prefix = Vue.dig(data, 'config', 'nextcloud', 'prefix')
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
             if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
               this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
@@ -351,6 +364,7 @@ html lang='ja'
             if (this.form.nextcloud.url) {command.nextcloud.url = this.form.nextcloud.url}
             if (this.form.nextcloud.user) {command.nextcloud.user = this.form.nextcloud.user}
             if (this.form.nextcloud.password) {command.nextcloud.password = this.form.nextcloud.password}
+            if (this.form.nextcloud.prefix) {command.nextcloud.prefix = this.form.nextcloud.prefix}
             this.updateConfig(command)
             this.form.nextcloud.password = null
           },
