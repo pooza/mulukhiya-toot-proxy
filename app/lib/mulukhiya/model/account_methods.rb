@@ -58,7 +58,7 @@ module Mulukhiya
         @lemmy = LemmyClipper.new(
           url: user_config['/lemmy/url'],
           user: user_config['/lemmy/user'],
-          password: (user_config['/lemmy/password'].decrypt rescue user_config['/lemmy/password']),
+          password: user_config['/lemmy/password'],
           community: user_config['/lemmy/community'],
         )
       end
@@ -83,7 +83,8 @@ module Mulukhiya
         @nextcloud = NextcloudClipper.new(
           url: user_config['/nextcloud/url'],
           user: user_config['/nextcloud/user'],
-          password: (user_config['/nextcloud/password'].decrypt rescue user_config['/nextcloud/password']),
+          password: user_config['/nextcloud/password'],
+          prefix: user_config['/nextcloud/prefix'],
         )
       end
       return @nextcloud

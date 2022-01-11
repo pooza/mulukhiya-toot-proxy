@@ -8,6 +8,7 @@ module Mulukhiya
 
     def initialize(params = {})
       @params = params.deep_symbolize_keys
+      @params[:password] = (@params[:password].decrypt rescue @params[:password])
     end
 
     def client
