@@ -80,6 +80,10 @@ filters:
     cases:
       - lemmy_clipper
       - 'lemmy*_handler'
+  - name: nextcloud
+    cases:
+      - nextcloud_clipper
+      - 'nextcloud*_handler'
   - name: hexo
     cases:
       - 'hexo*_handler'
