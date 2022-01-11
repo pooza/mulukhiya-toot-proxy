@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '~>3.1.0'
 gem 'bootsnap', '>=1.9.0'
-gem 'dropbox_api', github: 'pooza/dropbox_api'
+gem 'dropbox_api'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket'

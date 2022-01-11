@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/pooza/dropbox_api.git
-  revision: db78807937ae08616849c63f2198b48c9e1f1d55
-  specs:
-    dropbox_api (0.1.20)
-      faraday (~> 1.0)
-      oauth2 (~> 1.1)
-
-GIT
   remote: https://github.com/pooza/ginseng-core.git
   revision: 35b1af5ab03a6511387e1a78c09962c5aa68f895
   specs:
@@ -119,6 +111,9 @@ GEM
     digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    dropbox_api (0.1.20)
+      faraday (~> 1.0)
+      oauth2 (~> 1.1)
     dry-configurable (0.13.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.6)
@@ -396,7 +391,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap (>= 1.9.0)
-  dropbox_api!
+  dropbox_api
   dry-validation
   fastimage
   faye-websocket
