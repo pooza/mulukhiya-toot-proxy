@@ -27,9 +27,9 @@ module Mulukhiya
         url: create_uri(path).to_s,
         method: :put,
         headers: {
-          'Authorization' => "Basic #{Base64.encode64("#{@params[:user]}:#{@params[:password]}")}"
+          'Authorization' => "Basic #{Base64.encode64("#{@params[:user]}:#{@params[:password]}")}",
         },
-        payload: payload,
+        payload:,
       ).execute
     end
   end
