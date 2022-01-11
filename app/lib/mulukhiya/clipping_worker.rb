@@ -20,7 +20,6 @@ module Mulukhiya
       return uri.to_md if federate?
       return uri.to_s
     rescue => e
-      raise Ginseng::GatewayError, e.message, e.backtrace unless uri
       e.log(uri: uri.to_s)
       return uri.to_s
     end

@@ -16,7 +16,7 @@ module Mulukhiya
       template = Template.new('status_clipping.md')
       template[:account] = account
       template[:status] = parser.to_md
-      template[:attachments] = note['files']
+      template[:attachments] = (note['files'] || []).map(&:deep_symbolize_keys)
       template[:url] = self
       return template.to_s
     rescue => e
