@@ -2,7 +2,7 @@ module Mulukhiya
   class PeerTubeURITest < TestCase
     def setup
       @root = PeerTubeURI.parse('https://fedimovie.com/')
-      @video = PeerTubeURI.parse('https://fedimovie.com/api/v1/videos/iKu2ASqiBm796yuzqdx9Zt')
+      @video = PeerTubeURI.parse('https://fedimovie.com/api/v1/videos/taaJ1Sh8b5JvHUZeFD1Jzk')
     end
 
     def test_data
@@ -12,7 +12,7 @@ module Mulukhiya
 
     def test_title
       assert_nil(@root.title)
-      assert_equal(@video.title, '[LIVE] DJMAXをただやるだけ。')
+      assert_equal(@video.title, 'GPD Pocket 3 開封')
     end
 
     def test_album_name
@@ -27,7 +27,7 @@ module Mulukhiya
 
     def test_track_name
       assert_nil(@root.track_name)
-      assert_equal(@video.track_name, '[LIVE] DJMAXをただやるだけ。')
+      assert_equal(@video.track_name, 'GPD Pocket 3 開封')
     end
 
     def test_track?
@@ -37,7 +37,7 @@ module Mulukhiya
 
     def test_artists
       assert_nil(@root.artists)
-      assert_equal(@video.artists, Set['鴉河雛@PeerTube'])
+      assert_equal(@video.artists, Set['ぷーざ'])
     end
   end
 end
