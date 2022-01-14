@@ -896,7 +896,9 @@ peer_tube:
   hosts:
     - fedimovie.com
   urls:
-    video: /api/v1/videos/
+    video: /w/
+    api:
+      video: /api/v1/videos/
 pleroma:
   attachment:
     limit: 4
