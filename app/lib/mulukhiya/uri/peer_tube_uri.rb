@@ -3,8 +3,8 @@ module Mulukhiya
     include Package
 
     def id
-      return nil unless path.start_with?(config['/peer_tube/urls/video'])
-      return path.split('/')[4]
+      return nil unless config['/peer_tube/urls/video'].any? {|v| path.start_with?(v)}
+      return path.split('/').last
     rescue
       return nil
     end
