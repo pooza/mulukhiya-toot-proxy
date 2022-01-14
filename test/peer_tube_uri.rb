@@ -2,7 +2,7 @@ module Mulukhiya
   class PeerTubeURITest < TestCase
     def setup
       @root = PeerTubeURI.parse('https://fedimovie.com/')
-      @video = PeerTubeURI.parse('https://fedimovie.com/api/v1/videos/taaJ1Sh8b5JvHUZeFD1Jzk')
+      @video = PeerTubeURI.parse('https://fedimovie.com/w/taaJ1Sh8b5JvHUZeFD1Jzk')
     end
 
     def test_data
