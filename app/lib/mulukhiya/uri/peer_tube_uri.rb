@@ -4,7 +4,7 @@ module Mulukhiya
 
     def id
       return nil unless path.start_with?(config['/peer_tube/urls/video'])
-      return path.split('/')[4]
+      return path.split('/').last
     rescue
       return nil
     end
