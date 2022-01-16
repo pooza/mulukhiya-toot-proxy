@@ -1,5 +1,3 @@
-require 'base64'
-
 module Mulukhiya
   class NextcloudClipper
     include Package
@@ -25,7 +23,7 @@ module Mulukhiya
     end
 
     def auth_string
-      return "Basic #{Base64.encode64("#{@params[:user]}:#{@params[:password]}")}"
+      return Ginseng::Web::HTTP.create_basic_auth(@params[:user], @params[:password])
     end
 
     def upload(path, payload)
