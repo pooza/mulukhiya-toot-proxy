@@ -3,8 +3,7 @@ module Mulukhiya
     include ::Rack::Test::Methods
 
     def setup
-      @parser = sns_class.new.create_parser('')
-      @parser.account = account
+      @parser = Environment.sns_class.new.create_parser
       @path_prefix_pattern = %r{^/mulukhiya/webhook}
     end
 
@@ -25,20 +24,20 @@ module Mulukhiya
     end
 
     def test_get
-      return unless hook = @parser.account.webhook
+      return unless hook = test_account.webhook
       get hook.uri.path.sub(@path_prefix_pattern, '')
       assert(last_response.ok?)
     end
 
     def test_post
-      return unless hook = @parser.account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {text: 'ひらめけ！ホーリーソード！'}.to_json
       assert(last_response.ok?)
     end
 
     def test_post_with_attachment
-      return unless hook = @parser.account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {
         text: '武田信玄',
@@ -51,7 +50,7 @@ module Mulukhiya
     end
 
     def test_post_git_hub_payload
-      return unless hook = @parser.account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       header 'X-Github-Hook-Id', '武田信玄'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {zen: '武田信玄'}.to_json
@@ -60,7 +59,7 @@ module Mulukhiya
     end
 
     def test_invalid_request
-      return unless hook = @parser.account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {}.to_json
       assert_false(last_response.ok?)
