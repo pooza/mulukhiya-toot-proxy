@@ -32,6 +32,19 @@ module Mulukhiya
       return @oauth_client_storage
     end
 
+    def max_post_text_length
+      return super
+    rescue => e
+      e.log
+      return config["/#{Environment.controller_class}/status/default_max_length"]
+    end
+
+    def create_parser(text = '')
+      parser = parser_class.new(text)
+      parser.max_length = max_post_text_length
+      return parser
+    end
+
     def redis
       @redis ||= Redis.new
       return @redis

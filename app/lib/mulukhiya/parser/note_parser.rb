@@ -1,7 +1,8 @@
 module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
-    attr_accessor :account, :service
+    include SNSMethods
+    attr_accessor :account
 
     def to_sanitized
       return NoteParser.sanitize(text.dup)
@@ -25,11 +26,17 @@ module Mulukhiya
       return tags
     end
 
-    def max_length
-      length = config['/misskey/status/max_length'] unless Environment.misskey_type?
-      length ||= config["/#{Environment.controller_name}/status/max_length"]
-      length -= (all_tags.create_tags.join(' ').length + 1) if all_tags.present?
+    def default_max_length
+      length = service.max_post_text_length
+      length -= (all_tags.create_tags.join(' ').length + 5) if all_tags.present?
       return length
+    rescue => e
+      e.log(text:)
+      return config['/misskey/status/default_max_length']
+    end
+
+    def service
+      return Environment.misskey_type? ? sns_class.new : MisskeyService.new
     end
   end
 end

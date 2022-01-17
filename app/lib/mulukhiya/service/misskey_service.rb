@@ -79,7 +79,7 @@ module Mulukhiya
       options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
-        MisskeyController.status_field => message.ellipsize(NoteParser.new.max_length),
+        MisskeyController.status_field => message.ellipsize(max_post_text_length),
         MisskeyController.spoiler_field => options[:spoiler_text],
         'visibleUserIds' => [account.id],
         MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),

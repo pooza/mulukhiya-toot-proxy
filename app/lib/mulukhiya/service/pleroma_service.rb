@@ -89,7 +89,7 @@ module Mulukhiya
       options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
       return post(
-        PleromaController.status_field => message.ellipsize(TootParser.new.max_length),
+        PleromaController.status_field => message.ellipsize(max_post_text_length),
         PleromaController.spoiler_field => options[:spoiler_text],
         PleromaController.visibility_field => PleromaController.visibility_name(:direct),
         'in_reply_to_id' => options.dig(:response, :id),

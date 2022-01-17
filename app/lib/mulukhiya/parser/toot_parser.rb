@@ -1,6 +1,7 @@
 module Mulukhiya
   class TootParser < Ginseng::Fediverse::TootParser
     include Package
+    include SNSMethods
     attr_accessor :account
 
     def accts(&block)
@@ -25,11 +26,17 @@ module Mulukhiya
       return tags
     end
 
-    def max_length
-      length = config['/mastodon/status/max_length'] unless Environment.mastodon_type?
-      length ||= config["/#{Environment.controller_name}/status/max_length"]
-      length -= (all_tags.create_tags.join(' ').length + 1) if all_tags.present?
+    def default_max_length
+      length = service.max_post_text_length
+      length -= (all_tags.create_tags.join(' ').length + 5) if all_tags.present?
       return length
+    rescue => e
+      e.log(text:)
+      return config['/mastodon/status/default_max_length']
+    end
+
+    def service
+      return Environment.mastodon_type? ? sns_class.new : MastodonService.new
     end
   end
 end
