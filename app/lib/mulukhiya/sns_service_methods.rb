@@ -39,10 +39,6 @@ module Mulukhiya
       return config["/#{Environment.controller_class}/status/default_max_length"]
     end
 
-    def create_parser(text = '')
-      return parser_class.new(text)
-    end
-
     def redis
       @redis ||= Redis.new
       return @redis

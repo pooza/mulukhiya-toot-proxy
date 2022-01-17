@@ -10,10 +10,6 @@ module Mulukhiya
       super
     end
 
-    def to_sanitized
-      return NoteParser.sanitize(text.dup)
-    end
-
     def accts(&block)
       return enum_for(__method__) unless block
       text.scan(NoteParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&block)
@@ -24,6 +20,10 @@ module Mulukhiya
     end
 
     alias tags hashtags
+
+    def to_sanitized
+      return NoteParser.sanitize(text.dup)
+    end
 
     def default_max_length
       length = service.max_post_text_length
