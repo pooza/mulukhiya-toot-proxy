@@ -2,6 +2,13 @@ module Mulukhiya
   class TootParser < Ginseng::Fediverse::TootParser
     include Package
     include SNSMethods
+    attr_accessor :service
+
+    def initialize(text = '')
+      super
+      @service = sns_class.new if Environment.mastodon_type?
+      @service ||= MastodonService.new
+    end
 
     def accts(&block)
       return enum_for(__method__) unless block
@@ -30,10 +37,6 @@ module Mulukhiya
     rescue => e
       e.log(text:)
       return config['/mastodon/status/default_max_length']
-    end
-
-    def service
-      return Environment.mastodon_type? ? sns_class.new : MastodonService.new
     end
   end
 end

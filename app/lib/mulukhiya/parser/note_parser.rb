@@ -2,6 +2,13 @@ module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
     include SNSMethods
+    attr_accessor :service
+
+    def initialize(text = '')
+      super
+      @service = sns_class.new if Environment.misskey_type?
+      @service ||= MisskeyService.new
+    end
 
     def to_sanitized
       return NoteParser.sanitize(text.dup)
@@ -30,10 +37,6 @@ module Mulukhiya
     rescue => e
       e.log(text:)
       return config['/misskey/status/default_max_length']
-    end
-
-    def service
-      return Environment.misskey_type? ? sns_class.new : MisskeyService.new
     end
   end
 end
