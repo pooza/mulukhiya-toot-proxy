@@ -36,7 +36,7 @@ module Mulukhiya
       return length
     rescue => e
       e.log(text:)
-      return config['/mastodon/status/default_max_length']
+      return service.max_post_text_length
     end
   end
 end
