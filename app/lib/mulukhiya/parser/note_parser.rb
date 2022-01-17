@@ -2,7 +2,6 @@ module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
     include SNSMethods
-    attr_accessor :account
 
     def to_sanitized
       return NoteParser.sanitize(text.dup)
@@ -19,16 +18,14 @@ module Mulukhiya
 
     alias tags hashtags
 
-    def all_tags
-      tags = hashtags.clone
-      tags.merge(DefaultTagHandler.tags)
-      tags.merge(@account.user_tags) if @account
-      return tags
-    end
-
     def default_max_length
       length = service.max_post_text_length
-      length -= (all_tags.create_tags.join(' ').length + 5) if all_tags.present?
+      extra_tags = TagContainer.new
+      ['default_tag', 'user_tag']
+        .filter_map {|name| Handler.create(name)}
+        .reject(&:disable?)
+        .each {|h| extra_tags.merge(h.addition_tags)}
+      length -= extra_tags.sum {|v| v.to_hashtag.length + 1}
       return length
     rescue => e
       e.log(text:)

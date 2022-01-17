@@ -40,9 +40,7 @@ module Mulukhiya
     end
 
     def create_parser(text = '')
-      parser = parser_class.new(text)
-      parser.max_length = max_post_text_length
-      return parser
+      return parser_class.new(text)
     end
 
     def redis
