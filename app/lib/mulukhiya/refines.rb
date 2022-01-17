@@ -13,6 +13,7 @@ module Mulukhiya
     class ::StandardError
       def log(values = {})
         Logger.new.error({error: self}.merge(values))
+        warn(to_h.to_yaml) if Environment.test? && Environment.development?
       end
 
       def alert(values = {})

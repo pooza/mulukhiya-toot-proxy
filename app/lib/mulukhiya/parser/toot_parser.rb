@@ -1,7 +1,7 @@
 module Mulukhiya
   class TootParser < Ginseng::Fediverse::TootParser
     include Package
-    attr_accessor :account
+    include SNSMethods
 
     def accts(&block)
       return enum_for(__method__) unless block
@@ -18,18 +18,23 @@ module Mulukhiya
 
     alias tags hashtags
 
-    def all_tags
-      tags = hashtags.clone
-      tags.merge(DefaultTagHandler.tags)
-      tags.merge(@account.user_tags) if @account
-      return tags
+    def default_max_length
+      length = service.max_post_text_length
+      extra_tags = TagContainer.new
+      ['default_tag', 'user_tag']
+        .filter_map {|name| Handler.create(name)}
+        .reject(&:disable?)
+        .each {|h| extra_tags.merge(h.addition_tags)}
+      length -= extra_tags.sum {|v| v.to_hashtag.length + 1}
+      return length
+    rescue => e
+      e.log(text:)
+      return config['/mastodon/status/default_max_length']
     end
 
-    def max_length
-      length = config['/mastodon/status/max_length'] unless Environment.mastodon_type?
-      length ||= config["/#{Environment.controller_name}/status/max_length"]
-      length -= (all_tags.create_tags.join(' ').length + 1) if all_tags.present?
-      return length
+    def service
+      return sns_class.new if Environment.mastodon_type?
+      return MastodonService.new
     end
   end
 end

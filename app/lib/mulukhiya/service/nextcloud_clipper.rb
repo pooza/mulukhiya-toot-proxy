@@ -1,5 +1,3 @@
-require 'base64'
-
 module Mulukhiya
   class NextcloudClipper
     include Package
@@ -24,16 +22,12 @@ module Mulukhiya
       raise Ginseng::GatewayError, "Nextcloud upload error (#{e.message})", e.backtrace
     end
 
-    def auth_string
-      return "Basic #{Base64.encode64("#{@params[:user]}:#{@params[:password]}")}"
-    end
-
     def upload(path, payload)
       path = File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], path)
       return RestClient::Request.new(
         url: create_uri(path).to_s,
         method: :put,
-        headers: {'Authorization' => auth_string},
+        headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
         payload:,
       ).execute
     end

@@ -179,7 +179,7 @@ module Mulukhiya
 
     def parser
       unless @parser
-        @parser = @reporter.parser || parser_class.new(@status)
+        @parser = @reporter.parser || sns.create_parser(@status)
         @reporter.parser = @parser
       end
       return @parser

@@ -3,8 +3,7 @@ module Mulukhiya
     include ::Rack::Test::Methods
 
     def setup
-      @parser = NoteParser.new
-      @parser.account = account
+      @parser = Environment.sns_class.new.create_parser
       config['/handler/long_text_image/disable'] = true
     end
 

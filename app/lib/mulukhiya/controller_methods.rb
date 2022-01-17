@@ -147,7 +147,7 @@ module Mulukhiya
       end
 
       def attachment_limit
-        return config["/#{name}/attachment/limit"]
+        return (sns rescue sns_class.new).max_media_attachments
       end
 
       def status_key
