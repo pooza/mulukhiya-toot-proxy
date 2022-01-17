@@ -56,7 +56,7 @@ module Mulukhiya
       def featured_tags
         tags = TagContainer.new
         return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
-        timeliness.each do |timeline|
+        timelines.each do |timeline|
           timeline['query'].each do |entry|
             tags.merge(entry)
           end
