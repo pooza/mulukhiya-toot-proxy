@@ -146,10 +146,6 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/attachment"]
       end
 
-      def attachment_limit
-        return (sns rescue sns_class.new).max_media_attachments
-      end
-
       def status_key
         return config["/#{name}/status/key"]
       end
