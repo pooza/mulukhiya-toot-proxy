@@ -5,9 +5,9 @@ module Mulukhiya
     attr_accessor :service
 
     def initialize(text = '')
-      super
       @service = sns_class.new if Environment.misskey_type?
       @service ||= MisskeyService.new
+      super
     end
 
     def to_sanitized
