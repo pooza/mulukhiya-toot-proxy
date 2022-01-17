@@ -34,9 +34,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7c15ad66e553071ffc3519d4cf4da283d7937ed1
+  revision: d91a097a154f09024440bc95406e5427194b1470
   specs:
-    ginseng-fediverse (1.6.5)
+    ginseng-fediverse (1.7.1)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -425,4 +425,4 @@ RUBY VERSION
    ruby 3.1.0p0
 
 BUNDLED WITH
-   2.3.4
+   2.3.5
