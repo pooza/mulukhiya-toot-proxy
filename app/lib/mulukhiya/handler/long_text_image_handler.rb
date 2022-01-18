@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def executable?
-      return false if attachment_limit <= (payload[attachment_field] || []).count
+      return false if sns.max_media_attachments <= (payload[attachment_field] || []).count
       return text_length < payload[text_field]&.length
     end
 

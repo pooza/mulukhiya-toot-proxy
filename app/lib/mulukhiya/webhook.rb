@@ -62,7 +62,8 @@ module Mulukhiya
 
     def self.create(key)
       return new(key) if key.is_a?(UserConfig)
-      return controller_class.webhook_entries.find {|v| v[:digest] == key}[:account].webhook
+      return nil unless entry = controller_class.webhook_entries.find {|v| v[:digest] == key}
+      return entry[:account].webhook
     rescue => e
       e.log(key: key.to_s)
       return nil

@@ -8,7 +8,6 @@ module Mulukhiya
       assert_kind_of(Hash, @sns.info)
       assert_kind_of(String, @sns.maintainer_name)
       assert_kind_of(String, @sns.node_name)
-      assert(@sns.max_post_text_length.positive?)
     end
 
     def test_account

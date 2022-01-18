@@ -11,7 +11,7 @@ module Mulukhiya
       (payload['attachments'] || []).map do |attachment|
         Thread.new do
           next unless uri = Ginseng::URI.parse(attachment['image_url'])
-          next if attachment_limit <= payload[attachment_field].count
+          next if sns.max_media_attachments <= payload[attachment_field].count
           payload[attachment_field].push(upload(uri))
           result.push(source_url: uri.to_s)
         rescue => e

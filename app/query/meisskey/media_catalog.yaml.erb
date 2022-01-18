@@ -10,13 +10,13 @@
     _user.host: null
 <% if params[:q] -%>
     text:
-      $regex: <%= params[:q] %>
+      $regex: '<%= params[:q] %>'
 <% end -%>
     visibility:
       $in:
-        - <%= controller_class.visibility_name(:public) %>
-        - <%= controller_class.visibility_name(:unlisted) %>
-- $skip: <%= config['/feed/media/limit'] * (params[:page] - 1) %>
-- $limit: <%= config['/feed/media/limit'] * params[:page] %>
+        - '<%= controller_class.visibility_name(:public) %>'
+        - '<%= controller_class.visibility_name(:unlisted) %>'
+- $skip: <%= config['/feed/media/limit'].to_i * (params[:page].to_i - 1) %>
+- $limit: <%= config['/feed/media/limit'].to_i * params[:page].to_i %>
 - $sort:
     createdAt: -1

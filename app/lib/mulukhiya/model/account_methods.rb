@@ -135,11 +135,13 @@ module Mulukhiya
     alias tags user_tags
 
     def disabled_tags
-      dic_cache = TaggingDictionary.new.cache
-      return (user_config['/tagging/tags/disabled'] || []).inject(TagContainer.new) do |tags, tag|
+      dic = TaggingDictionary.new.cache
+      tags = TagContainer.new
+      (user_config['/tagging/tags/disabled'] || []).each do |tag|
         tags.add(tag)
-        tags.merge(dic_cache[tag][:words])
+        tags.merge(dic[tag][:words])
       end
+      return tags
     rescue => e
       e.log(acct: acct.to_s)
     end

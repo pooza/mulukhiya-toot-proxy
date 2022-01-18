@@ -44,7 +44,7 @@ module Mulukhiya
 
     def test_disable?
       assert_false(@user_config.disable?('yakinori'))
-      assert_boolean(@user_config.disable?('youtube_nowplaying_url'))
+      assert_boolean(@user_config.disable?('you_tube_url_nowplaying'))
     end
   end
 end

@@ -54,12 +54,14 @@ module Mulukhiya
       alias recent_post recent_status
 
       def featured_tags
-        return TagContainer.new unless timelines = values.dig('clientSettings', 'tagTimelines')
-        return timelines.inject(TagContainer.new) do |tags, timeline|
+        tags = TagContainer.new
+        return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
+        timelines.each do |timeline|
           timeline['query'].each do |entry|
             tags.merge(entry)
           end
         end
+        return tags
       rescue => e
         e.log(acct: acct.to_s)
         return TagContainer.new
@@ -105,7 +107,7 @@ module Mulukhiya
           return nil unless token = (token.decrypt rescue token)
           entry = collection.find(token:).first
           return new(entry['_id']) if entry
-          return AccessToken.get(hash: token).account
+          return AccessToken.get(hash: token)&.account
         else
           return first(key)
         end

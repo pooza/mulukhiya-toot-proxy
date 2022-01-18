@@ -6,7 +6,7 @@ module Mulukhiya
       payload[attachment_field] ||= []
       parser.uris.select {|v| updatable?(v)}.map do |uri|
         Thread.new do
-          next if attachment_limit <= payload[attachment_field].count
+          next if sns.max_media_attachments <= payload[attachment_field].count
           payload[attachment_field].push(upload(uri))
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)

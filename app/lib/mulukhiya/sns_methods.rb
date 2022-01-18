@@ -44,10 +44,6 @@ module Mulukhiya
       return controller_class.status_key
     end
 
-    def attachment_limit
-      return controller_class.attachment_limit
-    end
-
     def account_class
       return Environment.account_class
     end

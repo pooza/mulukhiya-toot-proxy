@@ -445,7 +445,6 @@ mastodon:
     limit: 40
   sns_type: mastodon
   status:
-    default_max_length: 500
     delete:
       limit: 30
     key: id
@@ -453,6 +452,8 @@ mastodon:
     parser: toot
   streaming:
     verify_peer: true
+  toot:
+    default_max_length: 500
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -594,6 +595,8 @@ meisskey:
       - remote_tag
       - image_copyright
       - tagging
+  note:
+    default_max_length: 1000
   oauth:
     scopes:
       default:
@@ -619,7 +622,6 @@ meisskey:
         - read:user-groups
   sns_type: misskey
   status:
-    default_max_length: 1000
     key: noteId
     label: ポスト
     parser: note
@@ -763,6 +765,8 @@ misskey:
       - remote_tag
       - image_copyright
       - tagging
+  note:
+    default_max_length: 500
   oauth:
     scopes:
       default:
@@ -792,7 +796,6 @@ misskey:
       url: /settings/api
   sns_type: misskey
   status:
-    default_max_length: 500
     key: noteId
     label: ノート
     parser: note
@@ -869,7 +872,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.13.2
+  version: 4.13.3
 parser:
   note:
     fields:
@@ -1030,6 +1033,8 @@ pleroma:
       - remote_tag
       - image_copyright
       - tagging
+  toot:
+    default_max_length: 5000
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -1043,7 +1048,6 @@ pleroma:
         - write:media
   sns_type: mastodon
   status:
-    default_max_length: 5000
     key: id
     label: ステータス
     parser: toot
