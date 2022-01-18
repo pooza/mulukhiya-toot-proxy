@@ -452,6 +452,8 @@ mastodon:
     parser: toot
   streaming:
     verify_peer: true
+  toot:
+    default_max_length: 500
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -593,6 +595,8 @@ meisskey:
       - remote_tag
       - image_copyright
       - tagging
+  note:
+    default_max_length: 1000
   oauth:
     scopes:
       default:
@@ -761,6 +765,8 @@ misskey:
       - remote_tag
       - image_copyright
       - tagging
+  note:
+    default_max_length: 500
   oauth:
     scopes:
       default:
@@ -1027,6 +1033,8 @@ pleroma:
       - remote_tag
       - image_copyright
       - tagging
+  toot:
+    default_max_length: 5000
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
