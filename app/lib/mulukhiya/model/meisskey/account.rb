@@ -107,7 +107,7 @@ module Mulukhiya
           return nil unless token = (token.decrypt rescue token)
           entry = collection.find(token:).first
           return new(entry['_id']) if entry
-          return AccessToken.get(hash: token).account
+          return AccessToken.get(hash: token)&.account
         else
           return first(key)
         end
