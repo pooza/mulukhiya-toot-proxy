@@ -7,10 +7,10 @@
     user._id_string:
       $toString: $users._id
 - $match:
-    tags: '<%= params[:tag] %>'
-    visibility: '<%= controller_class.visibility_name(:public) %>'
+    tags: <%= params[:tag] %>
+    visibility: <%= controller_class.visibility_name(:public) %>
     user._id_string:
-      $ne: '<%= test_account._id %>'
+      $ne: <%= test_account._id %>
 <% if params[:local] -%>
     _user.host: null
 <% end -%>

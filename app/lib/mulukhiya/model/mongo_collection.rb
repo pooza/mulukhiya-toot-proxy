@@ -17,7 +17,7 @@ module Mulukhiya
 
     def self.aggregate(name, params = {})
       template = Template.new(File.join(Environment.dir, 'app/query/meisskey', "#{name}.yaml.erb"))
-      template.params = params
+      template.params = params.transform_values {|v| v.is_a?(String) ? Regexp.escape(v) : v}
       return collection.aggregate(YAML.safe_load(template.to_s))
     end
 

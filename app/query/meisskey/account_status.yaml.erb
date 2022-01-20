@@ -2,7 +2,7 @@
     userId_string:
       $toString: $userId
 - $match:
-    userId_string: '<%= params[:id] %>'
+    userId_string: <%= params[:id] %>
     fileIds:
       $nin:
         - []

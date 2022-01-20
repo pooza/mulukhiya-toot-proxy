@@ -11,6 +11,6 @@
 - $match:
     user.host: null
     app.name:
-      $regex: '^<%= package_class.short_name %>'
+      $regex: ^<%= package_class.short_name %>
 - $sort:
     createdAt: -1

@@ -38,6 +38,7 @@ filters:
   - name: mongo
     cases:
       - mongo
+      - mongo_collection
   - name: mastodon
     cases:
       - mastodon_controller
