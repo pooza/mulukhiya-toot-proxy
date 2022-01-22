@@ -181,6 +181,8 @@ handler:
     disable: true
   dropbox_clipping_command:
     disable: true
+  filter_command:
+    minutes: 0
   hexo_announce:
     category: お知らせ
     comments: false
@@ -1196,6 +1198,8 @@ worker:
     federate: false
   lemmy_clipping:
     federate: false
+  livecure_filter_remove:
+    message: '#実況 タグのフィルタをクリアしました。'
   media_cleaning:
     days: 1
   nextcloud_clipping:

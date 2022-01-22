@@ -58,6 +58,14 @@ module Mulukhiya
       return super
     end
 
+    def unregister_filter(id, params = {})
+      if id.is_a?(String)
+        return unless filter = filters.find {|f| f['phrase'] == id}
+        id = filter['id']
+      end
+      return super
+    end
+
     def oauth_client(type = :default)
       return nil unless MastodonController.oauth_scopes(type)
       body = {
