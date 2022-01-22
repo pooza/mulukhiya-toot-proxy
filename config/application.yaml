@@ -182,7 +182,7 @@ handler:
   dropbox_clipping_command:
     disable: true
   filter_command:
-    minutes: 0
+    minutes: 300
   hexo_announce:
     category: お知らせ
     comments: false
