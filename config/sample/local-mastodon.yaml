@@ -31,8 +31,6 @@ handler:
 mastodon:
   search:
     limit: 100
-  status:
-    max_length: 600
   url: https://mstdn.example.com/
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon
