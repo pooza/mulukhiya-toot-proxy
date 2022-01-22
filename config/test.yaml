@@ -28,6 +28,7 @@ filters:
       - toot_uri
       - user_config
       - user_config_storage
+      - mastodon_service
       - user_tag_initialize_worker
       - livecure_filter_remove_worker
       - '*_controller'
