@@ -9,6 +9,7 @@ module Mulukhiya
 
     def test_unregister_filter
       return unless Environment.mastodon?
+      return if Environment.ci?
       @sns.register_filter(phrase: @key)
       assert(@sns.filters.find {|v| v['phrase'] == @key}.present?)
       @sns.unregister_filter(@key)
