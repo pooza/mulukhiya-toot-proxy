@@ -3,11 +3,12 @@ module Mulukhiya
     def perform(params = {})
       params.deep_symbolize_keys!
       unless account = account_class[params[:account_id]]
-        raise Ginseng::NotFoundError, "Account #{params[:account_id]} not found"
+        raise Ginseng::RequestError, "Account #{params[:account_id]} not found"
       end
-      sns = sns_class.new
-      sns.token = account.token
-      sns.unregister_filter(params[:phrase])
+      raise Ginseng::RequestError, 'phrase undefined' unless params[:phrase]
+      sns = account.webhook.sns
+      return unless filter = sns.filters.find {|v| v['phrase'] == params[:phrase]}
+      sns.unregister_filter(filter['id'])
       info_agent_service.notify(account, worker_config(:message))
     end
   end
