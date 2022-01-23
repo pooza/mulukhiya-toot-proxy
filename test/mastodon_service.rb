@@ -10,6 +10,7 @@ module Mulukhiya
     def test_filters
       assert_kind_of(HTTParty::Response, @service.filters)
 
+      @service.register_filter(tag: '実況')
       filters = @service.filters(tag: '実況')
       assert_kind_of(Array, filters)
       assert(filters.length.positive?)
