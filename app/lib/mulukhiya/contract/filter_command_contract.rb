@@ -4,6 +4,7 @@ module Mulukhiya
       required(:command).value(:string)
       optional(:phrase).value(:string)
       optional(:tag).value(:string)
+      optional(:minutes).value(:integer).value(gt?: 0)
       optional(:action).value(:string)
     end
 

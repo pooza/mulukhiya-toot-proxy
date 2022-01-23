@@ -22,7 +22,7 @@ module Mulukhiya
         optional(:host).maybe(:string)
         optional(:user).maybe(:string)
         optional(:password).maybe(:string)
-        optional(:community).maybe(:integer)
+        optional(:community).maybe(:integer).value(gt?: 0)
       end
       required(:nextcloud).maybe(:hash).schema do
         optional(:url).maybe(:string)
@@ -40,7 +40,7 @@ module Mulukhiya
         required(:tags).maybe(:hash).schema do
           required(:disabled).maybe(:array).each(:string)
         end
-        optional(:minutes).maybe(:integer)
+        optional(:minutes).maybe(:integer).value(gt?: 0)
       end
     end
 
