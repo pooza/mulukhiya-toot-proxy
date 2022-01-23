@@ -44,6 +44,7 @@ filters:
   - name: mastodon
     cases:
       - mastodon_controller
+      - mastodon_service
       - postgres
   - name: misskey
     cases:
