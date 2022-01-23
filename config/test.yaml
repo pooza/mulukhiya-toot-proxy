@@ -28,7 +28,9 @@ filters:
       - toot_uri
       - user_config
       - user_config_storage
+      - mastodon_service
       - user_tag_initialize_worker
+      - filter_unregister_worker
       - '*_controller'
       - '*_handler'
   - name: postgres
@@ -42,6 +44,7 @@ filters:
   - name: mastodon
     cases:
       - mastodon_controller
+      - mastodon_service
       - postgres
   - name: misskey
     cases:
@@ -81,6 +84,10 @@ filters:
     cases:
       - lemmy_clipper
       - 'lemmy*_handler'
+  - name: filter
+    cases:
+      - filter_command_handler
+      - filter_unregister_worker
   - name: nextcloud
     cases:
       - nextcloud_clipper

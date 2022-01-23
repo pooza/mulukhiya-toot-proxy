@@ -6,23 +6,15 @@ module Mulukhiya
     end
 
     def exec
-      params = parser.params.clone
-      params['phrase'] ||= params['tag'].to_hashtag
-
+      params = parser.params.deep_symbolize_keys
+      params[:phrase] ||= params[:tag]&.to_hashtag
+      params[:minutes] ||= handler_config(:minutes)
       case params['action']
       when 'register', nil
-        remove_filter(params['phrase'])
-        sns.register_filter(phrase: params['phrase'])
+        sns.filters(phrase: params[:phrase]).each {|f| sns.unregister_filter(f['id'])}
+        sns.register_filter(phrase: params[:phrase], minutes: params[:minutes])
       when 'unregister'
-        remove_filter(params['phrase'])
-      end
-    end
-
-    private
-
-    def remove_filter(phrase)
-      sns.filters.select {|f| f.is_a?(Enumerable) && f['phrase'] == phrase}.each do |filter|
-        sns.unregister_filter(filter['id'])
+        sns.filters(phrase: params[:phrase]).each {|f| sns.unregister_filter(f['id'])}
       end
     end
   end

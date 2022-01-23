@@ -17,8 +17,6 @@ properties:
     properties:
       label:
         type: string
-      max_length:
-        type: integer
     type: object
   streaming:
     properties:

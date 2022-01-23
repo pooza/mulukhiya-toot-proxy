@@ -58,6 +58,32 @@ module Mulukhiya
       return super
     end
 
+    def filters(params = {})
+      params.deep_symbolize_keys!
+      response = super
+      case params
+      in {phrase: phrase}
+        return response.parsed_response.select {|v| v['phrase'] == phrase}
+      in {tag: tag}
+        return response.parsed_response.select {|v| v['phrase'] == tag.to_hashtag}
+      else
+        return response
+      end
+    end
+
+    def register_filter(params = {})
+      params.deep_symbolize_keys!
+      params[:account_id] = account.id
+      params[:phrase] ||= params[:tag]&.to_hashtag
+      super
+      return unless params[:minutes]
+      Sidekiq.set_schedule("filter_unregister_#{account.username}", {
+        at: params[:minutes].minutes.after,
+        class: 'Mulukhiya::FilterUnregisterWorker',
+        args: [params],
+      })
+    end
+
     def oauth_client(type = :default)
       return nil unless MastodonController.oauth_scopes(type)
       body = {
