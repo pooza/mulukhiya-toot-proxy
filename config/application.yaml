@@ -1035,8 +1035,6 @@ pleroma:
       - remote_tag
       - image_copyright
       - tagging
-  toot:
-    default_max_length: 5000
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -1055,6 +1053,8 @@ pleroma:
     parser: toot
   streaming:
     verify_peer: true
+  toot:
+    default_max_length: 5000
   url: https://pleroma.example.com/
 postgres:
   dsn: null
