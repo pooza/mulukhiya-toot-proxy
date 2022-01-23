@@ -59,6 +59,7 @@ module Mulukhiya
     end
 
     def filters(params = {})
+      params.deep_symbolize_keys!
       response = super
       case params
       in {phrase: phrase}
@@ -68,6 +69,19 @@ module Mulukhiya
       else
         return response
       end
+    end
+
+    def register_filter(params = {})
+      params.deep_symbolize_keys!
+      params[:account_id] = account.id
+      params[:phrase] ||= params[:tag]&.to_hashtag
+      super
+      return unless params[:minutes]
+      Sidekiq.set_schedule("filter_unregister_#{account.username}", {
+        at: params[:minutes].minutes.after,
+        class: 'Mulukhiya::FilterUnregisterWorker',
+        args: [params],
+      })
     end
 
     def oauth_client(type = :default)

@@ -1194,12 +1194,12 @@ worker:
       seconds: 1
   dropbox_clipping:
     federate: true
+  filter_unregister:
+    message: '#実況 タグを公開に戻しました。'
   growi_clipping:
     federate: false
   lemmy_clipping:
     federate: false
-  livecure_filter_remove:
-    message: '#実況 タグのフィルタをクリアしました。'
   media_cleaning:
     days: 1
   nextcloud_clipping:

@@ -1,7 +1,8 @@
 module Mulukhiya
-  class LivecureFilterRemoveWorker < Worker
+  class FilterUnregisterWorker < Worker
     def perform(params = {})
       params.deep_symbolize_keys!
+      params[:phrase] ||= params[:tag]&.to_hashtag
       unless account = account_class[params[:account_id]]
         raise Ginseng::RequestError, "Account #{params[:account_id]} not found"
       end

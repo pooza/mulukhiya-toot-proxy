@@ -1,7 +1,7 @@
 module Mulukhiya
-  class LivecureFilterRemoveWorkerTest < TestCase
+  class FilterUnregisterWorkerTest < TestCase
     def setup
-      @worker = LivecureFilterRemoveWorker.new
+      @worker = FilterUnregisterWorker.new
       sns_class.new.register_filter(tag: '実況')
     end
 
