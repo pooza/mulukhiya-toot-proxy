@@ -58,12 +58,14 @@ module Mulukhiya
       return super
     end
 
-    def unregister_filter(id, params = {})
-      if id.is_a?(String)
-        return unless filter = filters.find {|f| f['phrase'] == id}
-        id = filter['id']
+    def filters(params = {})
+      response = super
+      case params
+      in {phrase: phrase}
+        return response.parsed_response.select {|v| v['name' == phrase]}
+      else
+        return response
       end
-      return super
     end
 
     def oauth_client(type = :default)
