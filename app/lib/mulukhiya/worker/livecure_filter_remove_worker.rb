@@ -7,8 +7,7 @@ module Mulukhiya
       end
       raise Ginseng::RequestError, 'phrase undefined' unless params[:phrase]
       sns = account.webhook.sns
-      return unless filter = sns.filters.find {|v| v['phrase'] == params[:phrase]}
-      sns.unregister_filter(filter['id'])
+      sns.filters(phrase: params[:phrase]).each {|f| sns.unregister_filter(f['id'])}
       info_agent_service.notify(account, worker_config(:message))
     end
   end

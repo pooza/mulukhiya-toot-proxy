@@ -62,7 +62,9 @@ module Mulukhiya
       response = super
       case params
       in {phrase: phrase}
-        return response.parsed_response.select {|v| v['name' == phrase]}
+        return response.parsed_response.select {|v| v['phrase'] == phrase}
+      in {tag: tag}
+        return response.parsed_response.select {|v| v['phrase'] == tag.to_hashtag}
       else
         return response
       end
