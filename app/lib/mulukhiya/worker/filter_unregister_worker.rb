@@ -1,5 +1,10 @@
 module Mulukhiya
   class FilterUnregisterWorker < Worker
+    def disable?
+      return true unless controller_class.filter?
+      return false
+    end
+
     def perform(params = {})
       params.deep_symbolize_keys!
       params[:phrase] ||= params[:tag]&.to_hashtag

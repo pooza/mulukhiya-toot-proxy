@@ -83,6 +83,10 @@ filters:
     cases:
       - lemmy_clipper
       - 'lemmy*_handler'
+  - name: filter
+    cases:
+      - filter_command_handler
+      - filter_unregister_worker
   - name: nextcloud
     cases:
       - nextcloud_clipper
