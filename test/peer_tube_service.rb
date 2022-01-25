@@ -8,7 +8,7 @@ module Mulukhiya
       assert_raises(Ginseng::GatewayError) do
         @service.lookup('iKu2ASqiBm796yuzqdx9Z')
       end
-      assert_kind_of(Hash, @service.lookup('iKu2ASqiBm796yuzqdx9Zt'))
+      assert_kind_of(Hash, @service.lookup('taaJ1Sh8b5JvHUZeFD1Jzk'))
     end
   end
 end
