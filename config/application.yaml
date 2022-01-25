@@ -286,7 +286,7 @@ lemmy:
   hosts:
     default: lm.korako.me
   subject:
-    max_length: 50
+    max_length: 200
   urls:
     api: /api/v3/ws
   verify_peer: true
