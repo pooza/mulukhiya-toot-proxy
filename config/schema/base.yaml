@@ -204,6 +204,8 @@ properties:
     properties:
       port:
         type: integer
+      workers:
+        type: integer
     type: object
   sidekiq:
     properties:

@@ -1068,6 +1068,7 @@ puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
   rackup: app/initializer/config.ru
+  workers: null
 redis:
   retry:
     limit: 3
