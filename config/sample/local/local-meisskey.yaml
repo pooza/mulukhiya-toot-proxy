@@ -15,6 +15,10 @@ handler:
       - タグ2
   image_resize:
     pixel: 1920
+  slack_alert:
+    hooks:
+      - https://hooks.slack.com/services/xxxxx
+      - https://discordapp.com/api/webhooks/xxxxx/slack
 meisskey:
   attachment:
     types:
