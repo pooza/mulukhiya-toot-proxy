@@ -26,10 +26,6 @@ module Mulukhiya
       return @uri
     end
 
-    def self.workers
-      return config['/puma/workers'] rescue Etc.nprocessors
-    end
-
     def self.disable?
       return false
     end
