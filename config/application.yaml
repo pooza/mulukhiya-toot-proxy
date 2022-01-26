@@ -151,26 +151,7 @@ handler:
   default_tag:
     tags: []
   dictionary_tag:
-    dics:
-      - edit:
-          url: null
-        name: プリキュア
-        type: relative
-        url: https://precure.ml/api/dic/v1/precure.json
-      - edit:
-          url: null
-        name: プリキュア歌手
-        type: relative
-        url: https://precure.ml/api/dic/v1/singer.json
-      - edit:
-          url: null
-        name: プリキュア作品
-        type: relative
-        url: https://precure.ml/api/dic/v1/series.json
-      - edit:
-          url: null
-        name: プリキュア妖精
-        url: https://precure.ml/api/dic/v2/fairy.json
+    dics: []
     word:
       min: 3
       min_kanji: 2
@@ -286,7 +267,7 @@ lemmy:
   hosts:
     default: lm.korako.me
   subject:
-    max_length: 50
+    max_length: 200
   urls:
     api: /api/v3/ws
   verify_peer: true
@@ -874,7 +855,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.13.5
+  version: 4.13.6
 parser:
   note:
     fields:
@@ -1035,8 +1016,6 @@ pleroma:
       - remote_tag
       - image_copyright
       - tagging
-  toot:
-    default_max_length: 5000
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -1055,6 +1034,8 @@ pleroma:
     parser: toot
   streaming:
     verify_peer: true
+  toot:
+    default_max_length: 5000
   url: https://pleroma.example.com/
 postgres:
   dsn: null
@@ -1068,6 +1049,8 @@ puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
   rackup: app/initializer/config.ru
+  threads: 5
+  workers: 0
 redis:
   retry:
     limit: 3

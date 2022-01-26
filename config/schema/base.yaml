@@ -204,6 +204,10 @@ properties:
     properties:
       port:
         type: integer
+      threads:
+        type: integer
+      workers:
+        type: integer
     type: object
   sidekiq:
     properties:

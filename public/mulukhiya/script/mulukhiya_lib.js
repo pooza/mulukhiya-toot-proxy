@@ -114,7 +114,7 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
         .then(e => {
-          tokens = Vue.getTokens()
+          const tokens = Vue.getTokens()
           tokens.push(token)
           Vue.setTokens(tokens)
           Vue.setToken(token)
