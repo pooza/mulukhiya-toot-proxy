@@ -151,26 +151,7 @@ handler:
   default_tag:
     tags: []
   dictionary_tag:
-    dics:
-      - edit:
-          url: null
-        name: プリキュア
-        type: relative
-        url: https://precure.ml/api/dic/v1/precure.json
-      - edit:
-          url: null
-        name: プリキュア歌手
-        type: relative
-        url: https://precure.ml/api/dic/v1/singer.json
-      - edit:
-          url: null
-        name: プリキュア作品
-        type: relative
-        url: https://precure.ml/api/dic/v1/series.json
-      - edit:
-          url: null
-        name: プリキュア妖精
-        url: https://precure.ml/api/dic/v2/fairy.json
+    dics: []
     word:
       min: 3
       min_kanji: 2

@@ -17,8 +17,6 @@ handler:
     tags:
       - タグ1
       - タグ2
-  dictionary_tag:
-    dics: []
   hexo_announce:
     category: お知らせ
   image_resize:
