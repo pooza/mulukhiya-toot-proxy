@@ -3,10 +3,6 @@ agent:
     token: your_token
   test:
     token: your_token
-alert:
-  hooks:
-    - https://hooks.slack.com/services/xxxxx
-    - https://discordapp.com/api/webhooks/xxxxx/slack
 controller: meisskey
 crypt:
   password: your_password
@@ -17,16 +13,8 @@ handler:
     tags:
       - タグ1
       - タグ2
-  hexo_announce:
-    category: お知らせ
   image_resize:
     pixel: 1920
-  itunes_image:
-    disable: true
-  spotify_image:
-    disable: true
-  you_tube_image:
-    disable: true
 meisskey:
   attachment:
     types:
@@ -42,8 +30,3 @@ sidekiq:
 user_config:
   redis:
     dsn: redis://localhost:6379/1
-webui:
-  media:
-    copyright:
-      message: 画像の著作権について
-      url: https://blog.example.com/copyright
