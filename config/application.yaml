@@ -444,6 +444,7 @@ media:
       ttl: 8640000
 meisskey:
   attachment:
+    limit: 4
     types:
       animation_image: null
       audio: audio/mpeg
@@ -613,6 +614,7 @@ meisskey:
   url: https://meisskey.example.com/
 misskey:
   attachment:
+    limit: 16
     types:
       animation_image: null
       audio: audio/mpeg
@@ -886,6 +888,7 @@ peer_tube:
       - /videos/watch/
 pleroma:
   attachment:
+    limit: 4
     types:
       animation_image: null
       audio: audio/mpeg
