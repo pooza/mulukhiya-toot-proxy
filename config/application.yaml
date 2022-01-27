@@ -138,7 +138,7 @@ handler:
   attachment_reusing:
     disable: true
   audio_format_convert:
-    timeout: 10
+    timeout: 30
   canonical_url:
     ignore:
       domains:
@@ -241,7 +241,7 @@ handler:
   user_tag:
     extra_minutes: 2
   video_format_convert:
-    timeout: 30
+    timeout: 90
   you_tube_image:
     disable: true
     timeout: 10
