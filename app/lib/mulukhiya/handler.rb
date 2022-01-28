@@ -128,8 +128,9 @@ module Mulukhiya
 
     def timeout
       return config['/handler/test/timeout'] if Environment.test?
-      return handler_config(:timeout)
-    rescue Ginseng::ConfigError
+      return handler_config(:timeout) || config['/handler/default/timeout']
+    rescue => e
+      logger.error(error: e)
       return config['/handler/default/timeout']
     end
 
