@@ -8,6 +8,12 @@ module Mulukhiya
       assert_kind_of(Set, Handler.search(/amazon/))
     end
 
+    def test_timeout
+      Handler.names.each do |name|
+        assert_kind_of(Integer, Handler.create(name).timeout)
+      end
+    end
+
     def test_summary
       handler = Handler.create('default_tag')
       handler.handle_toot('テスト', {})
