@@ -156,12 +156,6 @@ handler:
       min: 3
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
-  dropbox_announce:
-    disable: true
-  dropbox_bookmark:
-    disable: true
-  dropbox_clipping_command:
-    disable: true
   filter_command:
     minutes: 300
   hexo_announce:
@@ -303,7 +297,6 @@ mastodon:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -311,7 +304,6 @@ mastodon:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
@@ -328,7 +320,6 @@ mastodon:
       - user_config_command
       - filter_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -343,7 +334,6 @@ mastodon:
       - user_config_command
       - filter_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -471,7 +461,6 @@ meisskey:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -479,7 +468,6 @@ meisskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
@@ -489,7 +477,6 @@ meisskey:
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -521,7 +508,6 @@ meisskey:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -641,7 +627,6 @@ misskey:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -649,7 +634,6 @@ misskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
@@ -659,7 +643,6 @@ misskey:
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -691,7 +674,6 @@ misskey:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -915,7 +897,6 @@ pleroma:
     mention:
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
@@ -925,7 +906,6 @@ pleroma:
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -957,7 +937,6 @@ pleroma:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -1180,8 +1159,6 @@ worker:
       seconds: 1
   default:
     federate: false
-  dropbox_clipping:
-    federate: true
   filter_unregister:
     message: '#実況 タグを公開に戻しました。'
   media_cleaning:

@@ -37,10 +37,6 @@ module Mulukhiya
         return Handler.search(/growi/).present?
       end
 
-      def dropbox?
-        return Handler.search(/dropbox/).present?
-      end
-
       def lemmy?
         return Handler.search(/lemmy/).present?
       end

@@ -109,11 +109,6 @@ module Mulukhiya
       assert_kind_of(GrowiClipper, account.growi)
     end
 
-    def test_dropbox
-      return unless account&.dropbox
-      assert_kind_of(DropboxClipper, account.dropbox)
-    end
-
     def test_lemmy
       return unless account&.lemmy
       assert_kind_of(LemmyClipper, account.lemmy)

@@ -68,15 +68,6 @@ module Mulukhiya
       return nil
     end
 
-    def dropbox
-      return nil unless user_config['/dropbox/token'].present?
-      @dropbox ||= DropboxClipper.create(account_id: id)
-      return @dropbox
-    rescue => e
-      e.log
-      return nil
-    end
-
     def nextcloud
       unless @nextcloud
         return nil unless [:url, :user, :password].all? {|k| user_config["/nextcloud/#{k}"]}

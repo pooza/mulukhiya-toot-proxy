@@ -11,9 +11,6 @@ module Mulukhiya
         optional(:token).maybe(:string)
         optional(:prefix).maybe(:string)
       end
-      required(:dropbox).maybe(:hash).schema do
-        optional(:token).maybe(:string)
-      end
       required(:annict).maybe(:hash).schema do
         optional(:token).maybe(:string)
       end
@@ -57,7 +54,6 @@ module Mulukhiya
       values['tags'] ||= []
       values['webhook'] ||= {}
       values['growi'] ||= {}
-      values['dropbox'] ||= {}
       values['notify'] ||= {}
       values['amazon'] ||= {}
       values['annict'] ||= {}
