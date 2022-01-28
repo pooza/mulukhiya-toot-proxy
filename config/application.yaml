@@ -1178,14 +1178,12 @@ worker:
   announcement:
     interval:
       seconds: 1
+  default:
+    federate: false
   dropbox_clipping:
     federate: true
   filter_unregister:
     message: '#実況 タグを公開に戻しました。'
-  growi_clipping:
-    federate: false
-  lemmy_clipping:
-    federate: false
   media_cleaning:
     days: 1
   nextcloud_clipping:

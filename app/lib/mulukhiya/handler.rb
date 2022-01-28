@@ -78,9 +78,9 @@ module Mulukhiya
     end
 
     def handler_config(key)
-      return config["/handler/#{underscore}/#{key}"]
-    rescue Ginseng::ConfigError
-      return nil
+      value = (config["/handler/#{underscore}/#{key}"] rescue nil)
+      value = (config["/handler/#default/#{key}"] rescue nil) if value.nil?
+      return value
     end
 
     def verbose?
@@ -127,11 +127,7 @@ module Mulukhiya
     end
 
     def timeout
-      return config['/handler/test/timeout'] if Environment.test?
-      return handler_config(:timeout) || config['/handler/default/timeout']
-    rescue => e
-      logger.error(error: e)
-      return config['/handler/default/timeout']
+      return config['/handler/test/timeout']
     end
 
     def break?
