@@ -14,7 +14,7 @@ gem 'mimemagic', '>=0.4.0'
 gem 'mini_magick'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>6.3.0'
+gem 'sidekiq', '~>6.4.0' # CVE-2022-23837
 gem 'sidekiq-scheduler', '~>3.1.0'
 gem 'vacuum', '~>3.0'
 gem 'webrick'
