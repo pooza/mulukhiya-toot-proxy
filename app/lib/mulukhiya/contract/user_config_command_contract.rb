@@ -16,7 +16,6 @@ module Mulukhiya
       end
       required(:lemmy).maybe(:hash).schema do
         optional(:url).maybe(:string)
-        optional(:host).maybe(:string)
         optional(:user).maybe(:string)
         optional(:password).maybe(:string)
         optional(:community).maybe(:integer).value(gt?: 0)

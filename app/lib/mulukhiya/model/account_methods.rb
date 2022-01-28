@@ -51,9 +51,6 @@ module Mulukhiya
 
     def lemmy
       unless @lemmy
-        if user_config['/lemmy/url'].nil? && user_config['/lemmy/host']
-          user_config.update(lemmy: {url: "https://#{user_config['/lemmy/host']}", host: nil})
-        end
         return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
         @lemmy = LemmyClipper.new(
           url: user_config['/lemmy/url'],
