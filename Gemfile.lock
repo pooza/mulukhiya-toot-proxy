@@ -335,7 +335,7 @@ GEM
     securerandom (0.1.1)
     sequel (5.52.0)
     set (1.0.2)
-    sidekiq (6.3.1)
+    sidekiq (6.4.0)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -413,7 +413,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 6.3.0)
+  sidekiq (~> 6.4.0)
   sidekiq-scheduler (~> 3.1.0)
   slim_lint
   test-unit
