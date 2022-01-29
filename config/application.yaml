@@ -434,7 +434,7 @@ media:
       ttl: 8640000
 meisskey:
   attachment:
-    limit: 4
+    limit: 8
     types:
       animation_image: null
       audio: audio/mpeg
