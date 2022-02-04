@@ -11,6 +11,7 @@ gem 'ginseng-web', github: 'pooza/ginseng-web', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'mimemagic', '>=0.4.0'
 gem 'mini_magick'
+gem 'redis', '~>4.5.0'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.4.0' # CVE-2022-23837
