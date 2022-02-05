@@ -14,6 +14,13 @@ module Mulukhiya
 
     alias note post
 
+    def reaction(id, emoji, params = {})
+      return http.post('/api/notes/reactions/create', {
+        body: {noteId: search_status_id(id), reaction: emoji, i: token},
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def upload(path, params = {})
       path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
       if filename = params[:filename]

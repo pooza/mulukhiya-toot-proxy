@@ -58,6 +58,14 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/api/notes/reactions/create' do
+      reporter.response = sns.reaction(params[:noteId], params[:reaction])
+      Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
+      @renderer.message = reporter.response.parsed_response || {}
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    end
+
     def renote?
       return params[:renoteId].present?
     end
