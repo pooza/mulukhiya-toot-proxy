@@ -472,7 +472,11 @@ meisskey:
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
       - result_notification
     post_toot:
       - user_config_command
@@ -638,7 +642,11 @@ misskey:
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
       - result_notification
     post_toot:
       - user_config_command
@@ -901,7 +909,11 @@ pleroma:
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
       - result_notification
     post_toot:
       - user_config_command
