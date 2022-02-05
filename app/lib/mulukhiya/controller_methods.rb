@@ -57,6 +57,10 @@ module Mulukhiya
         return config["/#{name}/features/streaming"] == true rescue false
       end
 
+      def reaction?
+        return config["/#{name}/features/reaction"] == true rescue false
+      end
+
       def futured_tag?
         return config["/#{name}/features/futured_tag"] == true rescue false
       end

@@ -451,6 +451,7 @@ meisskey:
     feed: true
     futured_tag: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
@@ -623,6 +624,7 @@ misskey:
     feed: true
     futured_tag: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
@@ -897,6 +899,7 @@ pleroma:
     favorite_tags: true
     feed: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
