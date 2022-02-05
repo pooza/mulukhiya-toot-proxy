@@ -53,7 +53,7 @@ module Mulukhiya
         push(
           link: create_link(row[:uri]).to_s,
           title: create_title(row),
-          author: row[:display_name] || "@#{row[:username]}@#{row[:domain]}",
+          author: row[:display_name],
           date: Time.parse("#{row[:created_at]} UTC").getlocal,
         )
       rescue => e

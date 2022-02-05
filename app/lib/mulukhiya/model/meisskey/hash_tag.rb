@@ -30,7 +30,7 @@ module Mulukhiya
           {
             username: status.account.username,
             domain: status.account.acct.host,
-            display_name: status.account.name,
+            display_name: status.account.name || "@#{status.account.username}",
             spoiler_text: status.cw,
             text: status.text,
             uri: status.uri.to_s,
