@@ -478,6 +478,8 @@ meisskey:
       - result_notification
     post_fav:
       - result_notification
+    post_reaction:
+      - result_notification
     post_toot:
       - user_config_command
       - growi_clipping_command
@@ -647,6 +649,8 @@ misskey:
     post_chat:
       - result_notification
     post_fav:
+      - result_notification
+    post_reaction:
       - result_notification
     post_toot:
       - user_config_command
@@ -914,6 +918,8 @@ pleroma:
     post_chat:
       - result_notification
     post_fav:
+      - result_notification
+    post_reaction:
       - result_notification
     post_toot:
       - user_config_command
