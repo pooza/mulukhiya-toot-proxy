@@ -3,14 +3,14 @@ module Mulukhiya
     put '/api/v1/pleroma/statuses/:status_id/reactions/:emoji' do
       reporter.response = sns.reaction(params[:status_id], params[:emoji])
       Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
-      @renderer.message = reporter.response.parsed_response
+      @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
     end
 
     delete '/api/v1/pleroma/statuses/:status_id/reactions/:emoji' do
       reporter.response = sns.delete_reaction(params[:status_id], params[:emoji])
-      @renderer.message = reporter.response.parsed_response
+      @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
     end
