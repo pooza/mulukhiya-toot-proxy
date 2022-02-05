@@ -50,6 +50,9 @@ module Mulukhiya
     def handle_post_bookmark(payload, params = {})
     end
 
+    def handle_post_reaction(payload, params = {})
+    end
+
     def handle_post_search(payload, params = {})
     end
 
