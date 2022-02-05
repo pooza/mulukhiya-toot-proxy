@@ -1,5 +1,13 @@
 module Mulukhiya
   class PleromaController < MastodonController
+    put '/api/v1/pleroma/statuses/:status_id/reactions/:emoji' do
+      reporter.response = sns.reaction(params[:status_id], params[:emoji])
+      Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
+      @renderer.message = reporter.response.parsed_response
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    end
+
     post '/api/v1/pleroma/chats/:chat_id/messages' do
       reporter.tags.clear
       Event.new(:pre_chat, {reporter:, sns:}).dispatch(params)

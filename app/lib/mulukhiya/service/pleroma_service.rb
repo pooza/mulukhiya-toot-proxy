@@ -45,6 +45,14 @@ module Mulukhiya
       return delete_status(attachment.status, params)
     end
 
+    def reaction(status_id, emoji, params = {})
+      return RestClient::Request.new(
+        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").to_s,
+        method: :put,
+        headers: create_headers(params[:headers]),
+      ).execute
+    end
+
     def search_status_id(status)
       case status
       in Pleroma::Status
