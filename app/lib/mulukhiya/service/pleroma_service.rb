@@ -47,8 +47,16 @@ module Mulukhiya
 
     def reaction(status_id, emoji, params = {})
       return RestClient::Request.new(
-        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").to_s,
+        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").normalize.to_s,
         method: :put,
+        headers: create_headers(params[:headers]),
+      ).execute
+    end
+
+    def delete_reaction(status_id, emoji, params = {})
+      return RestClient::Request.new(
+        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").normalize.to_s,
+        method: :delete,
         headers: create_headers(params[:headers]),
       ).execute
     end
