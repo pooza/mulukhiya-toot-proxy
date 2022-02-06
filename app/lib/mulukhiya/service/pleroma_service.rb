@@ -53,7 +53,7 @@ module Mulukhiya
         method: :put,
         headers: create_headers(params[:headers]),
       ).execute
-      log(method: :put, url: uri, status: response.code, start: start)
+      logger.info(method: :put, url: uri, status: response.code, start: start)
       raise GatewayError, "Bad response #{response.code}" unless response.code < 400
       return response
     end
@@ -66,7 +66,7 @@ module Mulukhiya
         method: :delete,
         headers: create_headers(params[:headers]),
       ).execute
-      log(method: :delete, url: uri, status: response.code, start: start)
+      logger.info(method: :delete, url: uri, status: response.code, start: start)
       raise GatewayError, "Bad response #{response.code}" unless response.code < 400
       return response
     end

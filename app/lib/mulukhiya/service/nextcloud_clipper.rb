@@ -31,7 +31,7 @@ module Mulukhiya
         headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
         payload:,
       ).execute
-      log(method: :put, url: uri, status: response.code, start: start)
+      logger.info(method: :put, url: uri, status: response.code, start: start)
       raise GatewayError, "Bad response #{response.code}" unless response.code < 400
       return response
     end
