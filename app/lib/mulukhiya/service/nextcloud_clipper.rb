@@ -23,13 +23,17 @@ module Mulukhiya
     end
 
     def upload(path, payload)
-      path = File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], path)
-      return RestClient::Request.new(
-        url: create_uri(path).to_s,
+      uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], path))
+      start = Time.now
+      response = RestClient::Request.new(
+        url: uri.normalize.to_s,
         method: :put,
         headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
         payload:,
       ).execute
+      log(method: :put, url: uri, status: response.code, start: start)
+      raise GatewayError, "Bad response #{response.code}" unless response.code < 400
+      return response
     end
   end
 end

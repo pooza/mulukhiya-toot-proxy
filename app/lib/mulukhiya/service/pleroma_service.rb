@@ -46,19 +46,29 @@ module Mulukhiya
     end
 
     def reaction(status_id, emoji, params = {})
-      return RestClient::Request.new(
-        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").normalize.to_s,
+      uri = create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}")
+      start = Time.now
+      response = RestClient::Request.new(
+        url: uri.normalize.to_s,
         method: :put,
         headers: create_headers(params[:headers]),
       ).execute
+      log(method: :put, url: uri, status: response.code, start: start)
+      raise GatewayError, "Bad response #{response.code}" unless response.code < 400
+      return response
     end
 
     def delete_reaction(status_id, emoji, params = {})
-      return RestClient::Request.new(
-        url: create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}").normalize.to_s,
+      uri = create_uri("/api/v1/pleroma/statuses/#{status_id}/reactions/#{emoji}")
+      start = Time.now
+      response = RestClient::Request.new(
+        url: uri.normalize.to_s,
         method: :delete,
         headers: create_headers(params[:headers]),
       ).execute
+      log(method: :delete, url: uri, status: response.code, start: start)
+      raise GatewayError, "Bad response #{response.code}" unless response.code < 400
+      return response
     end
 
     def search_status_id(status)
