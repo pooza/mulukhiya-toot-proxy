@@ -15,25 +15,15 @@ module Mulukhiya
     end
 
     def clip(params)
-      params = {body: params.to_s} unless params.is_a?(Enumerable)
-      dest = File.join('/', @params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md")
-      return upload(dest, params[:body])
+      params = {payload: params.to_s} unless params.is_a?(Enumerable)
+      dest = File.join(@params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md")
+      uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], dest))
+      return @http.put(uri, {
+        headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
+        payload: params[:payload],
+      })
     rescue => e
       raise Ginseng::GatewayError, "Nextcloud upload error (#{e.message})", e.backtrace
-    end
-
-    def upload(path, payload)
-      uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], path))
-      start = Time.now
-      response = RestClient::Request.new(
-        url: uri.normalize.to_s,
-        method: :put,
-        headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
-        payload:,
-      ).execute
-      logger.info(method: :put, url: uri, status: response.code, start: start)
-      raise GatewayError, "Bad response #{response.code}" unless response.code < 400
-      return response
     end
   end
 end

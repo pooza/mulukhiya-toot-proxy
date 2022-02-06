@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_clip
-      assert_kind_of(RestClient::Response, account.nextcloud.clip("#{Time.now} #{__method__}"))
+      assert_kind_of(HTTParty::Response, account.nextcloud.clip("#{Time.now} #{__method__}"))
     end
   end
 end
