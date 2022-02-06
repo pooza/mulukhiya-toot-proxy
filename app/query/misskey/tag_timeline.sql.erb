@@ -12,6 +12,7 @@ FROM
   INNER JOIN "user" ON note."userId" = "user".id
 WHERE ('<%= params[:tag].downcase %>' = any(note.tags))
   AND (note.visibility = '<%= controller_class.visibility_name(:public) %>')
+  AND (note."text" IS NOT null)
   <% if params[:local] %>
     AND ("user".host IS null)
   <% end %>
