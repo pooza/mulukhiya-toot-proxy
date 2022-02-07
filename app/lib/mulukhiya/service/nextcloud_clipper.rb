@@ -15,12 +15,16 @@ module Mulukhiya
     end
 
     def clip(params)
-      params = {payload: params.to_s} unless params.is_a?(Enumerable)
+      params.deep_symbolize_keys!
+      params = {body: params.to_s} unless params.is_a?(Enumerable)
       dest = File.join(@params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md")
       uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], dest))
       return @http.put(uri, {
-        headers: {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])},
-        payload: params[:payload],
+        headers: {
+          'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password]),
+          'Content-Type' => MIMEType.type(File.extname(uri.path)),
+        },
+        body: params[:body],
       })
     rescue => e
       raise Ginseng::GatewayError, "Nextcloud upload error (#{e.message})", e.backtrace
