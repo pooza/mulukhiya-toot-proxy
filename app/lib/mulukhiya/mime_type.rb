@@ -10,7 +10,8 @@ module Mulukhiya
     end
 
     def type(ext)
-      return @types[ext]
+      ext = File.extname(ext) if File.extname(ext).present?
+      return @types[ext] || 'application/octet-stream'
     end
 
     def self.extname(type)

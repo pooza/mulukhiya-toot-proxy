@@ -22,7 +22,7 @@ module Mulukhiya
       return @http.put(uri, {
         headers: {
           'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password]),
-          'Content-Type' => MIMEType.type(File.extname(uri.path)),
+          'Content-Type' => MIMEType.type(uri.path),
         },
         body: params[:body],
       })

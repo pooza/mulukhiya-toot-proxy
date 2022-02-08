@@ -15,6 +15,7 @@ module Mulukhiya
       assert_equal(@mime.type('.webp'), 'image/webp')
       assert_equal(@mime.type('.mp4'), 'video/mp4')
       assert_equal(@mime.type('.mp3'), 'audio/mpeg')
+      assert_equal(@mime.type(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')), 'audio/mpeg')
     end
 
     def test_extnames
