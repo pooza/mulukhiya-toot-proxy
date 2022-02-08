@@ -162,5 +162,12 @@ module Mulukhiya
       config['/agent/info/token'] = 'bbb'
       assert_nil(account_class.info_account)
     end
+
+    def test_administrators
+      account_class.administrators do |account|
+        assert_kind_of(account_class, account)
+        assert(account.admin?)
+      end
+    end
   end
 end
