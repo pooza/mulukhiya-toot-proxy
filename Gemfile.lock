@@ -288,7 +288,7 @@ GEM
       loofah (~> 2.3)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis (4.5.1)
+    redis (4.6.0)
     regexp_parser (2.2.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
