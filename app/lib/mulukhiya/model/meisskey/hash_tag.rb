@@ -26,7 +26,7 @@ module Mulukhiya
 
       def create_feed(params)
         return [] unless Mongo.config?
-        return notes(params).map {|v| Status.new(v['_id'])}.map do |status|
+        return notes(params).map {|v| Status.new(v[:_id])}.map do |status|
           {
             username: status.account.username,
             domain: status.account.acct.host,
@@ -61,7 +61,7 @@ module Mulukhiya
         case key
         in {tag: tag}
           return nil unless tag = collection.find(tag: tag.downcase).first
-          record = new(tag['_id'])
+          record = new(tag[:_id])
           record.raw_name = key[:tag]
           return record
         else

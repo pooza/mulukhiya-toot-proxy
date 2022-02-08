@@ -101,12 +101,12 @@ module Mulukhiya
         in {acct: acct}
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           entry = collection.find(username: acct.username, host: acct.domain).first
-          return new(entry['_id']) if entry
+          return new(entry[:_id]) if entry
           return nil
         in {token: token}
           return nil unless token = (token.decrypt rescue token)
           entry = collection.find(token:).first
-          return new(entry['_id']) if entry
+          return new(entry[:_id]) if entry
           return AccessToken.get(hash: token)&.account
         else
           return first(key)
@@ -115,12 +115,21 @@ module Mulukhiya
 
       def self.first(key)
         entry = collection.find(key).first
-        return new(entry['_id']) if entry
+        return new(entry[:_id]) if entry
         return nil
       end
 
       def self.collection
         return Mongo.instance.db[:users]
+      end
+
+      def self.administrators(&block)
+        return enum_for(__method__) unless block
+        Account.aggregate('administrators')
+          .to_a
+          .map {|row| row[:_id]}
+          .filter_map {|id| Environment.account_class[id]}
+          .each(&block)
       end
 
       private
