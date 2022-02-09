@@ -109,11 +109,6 @@ module Mulukhiya
       assert_kind_of(GrowiClipper, account.growi)
     end
 
-    def test_dropbox
-      return unless account&.dropbox
-      assert_kind_of(DropboxClipper, account.dropbox)
-    end
-
     def test_lemmy
       return unless account&.lemmy
       assert_kind_of(LemmyClipper, account.lemmy)
@@ -166,6 +161,13 @@ module Mulukhiya
       assert_kind_of(account_class, account_class.info_account)
       config['/agent/info/token'] = 'bbb'
       assert_nil(account_class.info_account)
+    end
+
+    def test_administrators
+      account_class.administrators do |account|
+        assert_kind_of(account_class, account)
+        assert(account.admin?)
+      end
     end
   end
 end

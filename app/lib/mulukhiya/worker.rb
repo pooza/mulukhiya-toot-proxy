@@ -13,9 +13,9 @@ module Mulukhiya
     end
 
     def worker_config(key)
-      return config["/worker/#{underscore}/#{key}"]
-    rescue Ginseng::ConfigError
-      return nil
+      value = (config["/worker/#{underscore}/#{key}"] rescue nil)
+      value = (config["/worker/#default/#{key}"] rescue nil) if value.nil?
+      return value
     end
 
     def self.perform_async(*args)

@@ -156,12 +156,6 @@ handler:
       min: 3
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
-  dropbox_announce:
-    disable: true
-  dropbox_bookmark:
-    disable: true
-  dropbox_clipping_command:
-    disable: true
   filter_command:
     minutes: 300
   hexo_announce:
@@ -303,7 +297,6 @@ mastodon:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -311,7 +304,6 @@ mastodon:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
@@ -328,7 +320,6 @@ mastodon:
       - user_config_command
       - filter_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -343,7 +334,6 @@ mastodon:
       - user_config_command
       - filter_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -444,7 +434,7 @@ media:
       ttl: 8640000
 meisskey:
   attachment:
-    limit: 4
+    limit: 8
     types:
       animation_image: null
       audio: audio/mpeg
@@ -461,6 +451,7 @@ meisskey:
     feed: true
     futured_tag: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
@@ -471,7 +462,6 @@ meisskey:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -479,17 +469,21 @@ meisskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
       - result_notification
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -521,7 +515,6 @@ meisskey:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -631,6 +624,7 @@ misskey:
     feed: true
     futured_tag: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
@@ -641,7 +635,6 @@ misskey:
     announce:
       - post_announce
       - growi_announce
-      - dropbox_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -649,17 +642,21 @@ misskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
       - result_notification
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -691,7 +688,6 @@ misskey:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -857,7 +853,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.13.8
+  version: 4.14.0
 parser:
   note:
     fields:
@@ -903,6 +899,7 @@ pleroma:
     favorite_tags: true
     feed: true
     media_catalog: true
+    reaction: true
     streaming: true
     webhook: true
   handlers:
@@ -915,17 +912,21 @@ pleroma:
     mention:
       - welcome_mention
     post_bookmark:
-      - dropbox_bookmark
       - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
+    post_boost:
+      - result_notification
     post_chat:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
       - result_notification
     post_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -957,7 +958,6 @@ pleroma:
     pre_toot:
       - user_config_command
       - growi_clipping_command
-      - dropbox_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -1178,14 +1178,10 @@ worker:
   announcement:
     interval:
       seconds: 1
-  dropbox_clipping:
-    federate: true
+  default:
+    federate: false
   filter_unregister:
     message: '#実況 タグを公開に戻しました。'
-  growi_clipping:
-    federate: false
-  lemmy_clipping:
-    federate: false
   media_cleaning:
     days: 1
   nextcloud_clipping:

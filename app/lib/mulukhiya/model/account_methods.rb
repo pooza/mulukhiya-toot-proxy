@@ -51,9 +51,6 @@ module Mulukhiya
 
     def lemmy
       unless @lemmy
-        if user_config['/lemmy/url'].nil? && user_config['/lemmy/host']
-          user_config.update(lemmy: {url: "https://#{user_config['/lemmy/host']}", host: nil})
-        end
         return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
         @lemmy = LemmyClipper.new(
           url: user_config['/lemmy/url'],
@@ -65,15 +62,6 @@ module Mulukhiya
       return @lemmy
     rescue => e
       e.log(acct: acct.to_s)
-      return nil
-    end
-
-    def dropbox
-      return nil unless user_config['/dropbox/token'].present?
-      @dropbox ||= DropboxClipper.create(account_id: id)
-      return @dropbox
-    rescue => e
-      e.log
       return nil
     end
 
@@ -221,6 +209,14 @@ module Mulukhiya
       rescue => e
         e.log
         return nil
+      end
+
+      def administrators(&block)
+        return enum_for(__method__) unless block
+        Postgres.instance.exec('administrators')
+          .map {|row| row[:id]}
+          .filter_map {|id| Environment.account_class[id]}
+          .each(&block)
       end
     end
   end

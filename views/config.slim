@@ -95,22 +95,6 @@ html lang='ja'
           .field-update-button-container
             button @click='updateNextcloud' 更新
             button.alert @click='unauthNextcloud' 認証を解除
-      section.config v-if='account.username && layout.sections.dropbox'
-        h3 @click='toggleVisibility("dropbox")' Dropbox
-        vue-slide-up-down :active='layout.details.dropbox'
-          ol
-            li
-              | Dropboxの開発者向けページで、
-              a href='https://www.dropbox.com/developers/apps' target='_blank' rel='noreferrer' アプリケーション登録
-              | を行ってください。
-            li アクセストークンを取得して、下の欄に入力してください。
-            li 更新ボタンを押下。
-          .inline-field-container
-            h4 トークン
-            input type='password' placeholder='Dropboxのアクセストークン（保存時に暗号化されます）' v-model.trim='form.dropbox.token'
-          .field-update-button-container
-            button @click='updateDropbox' 更新
-            button.alert @click='unauthDropbox' 認証を解除
       section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
         vue-slide-up-down :active='layout.details.lemmy'
@@ -198,7 +182,6 @@ html lang='ja'
             tags: '',
             webhook: {token: null, visibility: null},
             growi: {token: null, url: null, prefix: null},
-            dropbox: {token: null},
             lemmy: {url: null, user: null, passwrd: null, community: null},
             nextcloud: {url: null, user: null, passwrd: null, prefix: null},
           },
@@ -212,13 +195,11 @@ html lang='ja'
               livecure: #{controller.livecure?},
               growi: #{controller.growi?},
               lemmy: #{controller.lemmy?},
-              dropbox: #{controller.dropbox?},
               nextcloud: #{controller.nextcloud?},
               annict: #{controller.annict?},
             },
             details: {
               growi: false,
-              dropbox: false,
               nextcloud: false,
               lemmy: false,
               tags: false,
@@ -319,20 +300,6 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.growi = false
-              }).catch(e => Vue.alert(this.$dialog, e))
-          },
-          updateDropbox () {
-            const command = {dropbox: {token: null}}
-            if (this.form.dropbox.token) {command.dropbox.token = this.form.dropbox.token}
-            this.updateConfig(command)
-            this.form.dropbox.token = null
-          },
-          unauthDropbox () {
-            this.$dialog.confirm({body: 'Dropboxの認証を解除します。'},{okText: '解除'})
-              .then(e => this.updateConfig({dropbox: null}))
-              .then(e => {
-                this.result = jsyaml.dump(e.config)
-                this.layout.details.dropbox = false
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateLemmy () {

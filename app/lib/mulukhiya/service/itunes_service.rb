@@ -62,7 +62,7 @@ module Mulukhiya
     def create_lookup_uri(id)
       uri = ItunesURI.parse(config['/itunes/urls/lookup'])
       uri.query_values = {
-        id: id,
+        id:,
         country: config['/itunes/country'],
         lang: config['/itunes/lang'],
       }

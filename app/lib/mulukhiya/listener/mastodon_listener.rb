@@ -9,7 +9,7 @@ module Mulukhiya
       end
       return send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.info(class: self.class.to_s, method: method_name, message: 'method undefined')
+      logger.info(class: self.class.to_s, method: method_name, message: 'method unimplemented')
     rescue => e
       e.log(payload: (payload rescue message.data))
     end
@@ -38,7 +38,9 @@ module Mulukhiya
         listener = MastodonListener.new
 
         listener.client.on :close do |e|
-          raise Ginseng::GatewayError, (e.message rescue e.to_s)
+          Environment.account_class.administrators.each do |admin|
+            info_agent_service.notify(admin, 'ストリーミングAPIへの接続が途絶えました。')
+          end
         end
 
         listener.client.on :error do |e|

@@ -63,6 +63,10 @@ module Mulukhiya
       assert_equal(feed.count, 5)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
+        assert(entry[:uri].present?)
+        assert(entry[:text].present?)
+        assert(entry[:display_name].present?)
+        assert(entry[:created_at].present?)
       end
     end
   end

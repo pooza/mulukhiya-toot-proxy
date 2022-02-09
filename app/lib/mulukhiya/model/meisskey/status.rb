@@ -68,7 +68,7 @@ module Mulukhiya
           return new(uri.id)
         else
           entry = collection.find(key).first
-          return new(entry['_id']) if entry
+          return new(entry[:_id]) if entry
           return nil
         end
       end

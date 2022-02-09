@@ -21,6 +21,7 @@ FROM
     FROM
       objects
     WHERE (objects.data->>'type' = 'Note')
+      AND (objects.data->>'source' IS NOT null)
     ORDER BY
       objects.id DESC
   ) AS statuses

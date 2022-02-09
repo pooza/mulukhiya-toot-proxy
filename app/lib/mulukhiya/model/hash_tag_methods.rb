@@ -38,7 +38,10 @@ module Mulukhiya
       return [] unless Postgres.config?
       params[:tag] = name
       params[:tag_id] = id rescue nil
-      return Postgres.instance.exec('tag_timeline', params).map(&:deep_symbolize_keys)
+      return Postgres.instance.exec('tag_timeline', params).map do |row|
+        row[:display_name] = "@#{row[:username]}" unless row[:display_name].present?
+        row
+      end
     end
 
     def self.included(base)

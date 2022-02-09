@@ -37,10 +37,6 @@ module Mulukhiya
         return Handler.search(/growi/).present?
       end
 
-      def dropbox?
-        return Handler.search(/dropbox/).present?
-      end
-
       def lemmy?
         return Handler.search(/lemmy/).present?
       end
@@ -59,6 +55,10 @@ module Mulukhiya
 
       def streaming?
         return config["/#{name}/features/streaming"] == true rescue false
+      end
+
+      def reaction?
+        return config["/#{name}/features/reaction"] == true rescue false
       end
 
       def futured_tag?

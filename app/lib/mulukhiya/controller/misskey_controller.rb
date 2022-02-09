@@ -5,7 +5,7 @@ module Mulukhiya
     post '/api/notes/create' do
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.note(params)
-      Event.new(:post_toot, {reporter:, sns:}).dispatch(params) unless renote?
+      Event.new((renote? ? :post_toot : :post_boost), {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
@@ -53,6 +53,14 @@ module Mulukhiya
     post '/api/notes/favorites/create' do
       reporter.response = sns.fav(params[:noteId])
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)
+      @renderer.message = reporter.response.parsed_response || {}
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    end
+
+    post '/api/notes/reactions/create' do
+      reporter.response = sns.reaction(params[:noteId], params[:reaction])
+      Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response || {}
       @renderer.status = reporter.response.code
       return @renderer.to_s

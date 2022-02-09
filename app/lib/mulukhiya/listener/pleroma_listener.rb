@@ -11,7 +11,9 @@ module Mulukhiya
         listener = PleromaListener.new
 
         listener.client.on :close do |e|
-          raise Ginseng::GatewayError, (e.message rescue e.to_s)
+          Environment.account_class.administrators.each do |admin|
+            info_agent_service.notify(admin, 'ストリーミングAPIへの接続が途絶えました。')
+          end
         end
 
         listener.client.on :error do |e|

@@ -104,10 +104,6 @@ module Mulukhiya
       assert_boolean(controller_class.growi?)
     end
 
-    def test_dropbox?
-      assert_boolean(controller_class.dropbox?)
-    end
-
     def test_lemmy?
       assert_boolean(controller_class.lemmy?)
     end

@@ -26,6 +26,9 @@ module Mulukhiya
         },
         ping: keepalive,
       })
+      account_class.administrators.each do |admin|
+        info_agent_service.notify(admin, 'ストリーミングAPIへ接続しました。')
+      end
     end
 
     def create_method_name(name)

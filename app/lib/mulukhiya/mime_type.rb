@@ -10,15 +10,16 @@ module Mulukhiya
     end
 
     def type(ext)
-      return @types[ext]
+      ext = File.extname(ext) if File.extname(ext).present?
+      return @types[ext] || 'application/octet-stream'
     end
 
     def self.extname(type)
-      return instance.extnames[type]
+      return instance.extname(type)
     end
 
     def self.type(ext)
-      return instance.types[ext]
+      return instance.type(ext)
     end
 
     private
@@ -28,6 +29,7 @@ module Mulukhiya
       @types['.mp4'] = 'video/mp4'
       @types['.mp3'] = 'audio/mpeg'
       @types['.webp'] = 'image/webp'
+      @types['.md'] = 'text/markdown'
       @extnames = @types.invert
       @extnames['video/mp4'] = '.mp4'
       @extnames['audio/mpeg'] = '.mp3'
