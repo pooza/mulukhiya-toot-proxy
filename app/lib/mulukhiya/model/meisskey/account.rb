@@ -127,8 +127,8 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Account.aggregate('administrators')
           .to_a
-          .map {|row| row[:_id]}
-          .filter_map {|id| Environment.account_class[id]}
+          .filter_map {|row| row[:_id]}
+          .filter_map {|id| Environment.account_class[id] rescue nil}
           .each(&block)
       end
 
