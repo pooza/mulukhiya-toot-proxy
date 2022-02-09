@@ -15,8 +15,8 @@ module Mulukhiya
     end
 
     def clip(params)
-      params.deep_symbolize_keys!
       params = {body: params.to_s} unless params.is_a?(Enumerable)
+      params.deep_symbolize_keys!
       dest = File.join(@params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md")
       uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], dest))
       return @http.put(uri, {
