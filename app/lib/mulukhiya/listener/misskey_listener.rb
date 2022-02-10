@@ -30,7 +30,7 @@ module Mulukhiya
 
         listener.client.on :close do
           Environment.account_class.administrators.each do |admin|
-            info_agent_service.notify(admin, 'ストリーミングAPIへの接続が途絶えました。')
+            info_agent_service.notify(admin, 'リスナーからストリーミングAPIへの接続が途絶えました。')
           end
         end
 
