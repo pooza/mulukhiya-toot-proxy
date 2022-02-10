@@ -16,16 +16,7 @@ location ~ ^/api/v[0-9]+/media$ {
     proxy_pass http://localhost:3008;
   }
 }
-location ~ ^/api/v[0-9]+/statuses/[a-zA-Z0-9]+/(favourite|reblog|bookmark)$ {
-  proxy_set_header Host $host;
-  if ($http_x_mulukhiya != '') {
-    proxy_pass http://localhost:4000;
-  }
-  if ($http_x_mulukhiya = '') {
-    proxy_pass http://localhost:3008;
-  }
-}
-location ~ ^/api/v[0-9]+/statuses/[a-zA-Z0-9]+/reactions/(.*)$ {
+location ~ ^/api/v[0-9]+/statuses/[a-zA-Z0-9]+/(favourite|reblog|reactions|bookmark)$ {
   proxy_set_header Host $host;
   if ($http_x_mulukhiya != '') {
     proxy_pass http://localhost:4000;
