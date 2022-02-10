@@ -23,13 +23,7 @@ AllCops:
 Naming/RescuedExceptionsVariableName:
   PreferredName: e
 
-Naming/InclusiveLanguage:
-  Enabled: false
-
 Style/FrozenStringLiteralComment:
-  Enabled: false
-
-Style/DoubleNegation:
   Enabled: false
 
 Style/FormatStringToken:
@@ -85,83 +79,8 @@ Style/RescueModifier:
 Style/StringLiterals:
   EnforcedStyle: single_quotes
 
-Style/HashTransformValues:
-  Enabled: true
-
-Style/HashEachMethods:
-  Enabled: true
-
-Style/HashTransformKeys:
-  Enabled: true
-
-Style/ExponentialNotation:
-  Enabled: true
-
-Style/SlicingWithRange:
-  Enabled: true
-
-Style/RedundantRegexpCharacterClass:
-  Enabled: true
-
-Style/RedundantRegexpEscape:
-  Enabled: true
-
-Style/RedundantFetchBlock:
-  Enabled: true
-
-Style/AccessorGrouping:
-  Enabled: true
-
-Style/BisectedAttrAccessor:
-  Enabled: true
-
-Style/RedundantAssignment:
-  Enabled: true
-
-Style/ArrayCoercion:
-  Enabled: true
-
-Style/CaseLikeIf:
-  Enabled: true
-
-Style/HashAsLastArrayItem:
-  Enabled: true
-
-Style/HashLikeCase:
-  Enabled: true
-
-Style/RedundantFileExtensionInRequire:
-  Enabled: true
-
-Style/ExplicitBlockArgument:
-  Enabled: true
-
-Style/GlobalStdStream:
-  Enabled: true
-
-Style/OptionalBooleanParameter:
-  Enabled: true
-
-Style/SingleArgumentDig:
-  Enabled: true
-
-Style/StringConcatenation:
-  Enabled: true
-
 Style/EmptyMethod:
   EnforcedStyle: expanded
-
-Style/CombinableLoops: # (new in 0.90)
-  Enabled: true
-
-Style/KeywordParametersOrder: # (new in 0.90)
-  Enabled: true
-
-Style/RedundantSelfAssignment: # (new in 0.90)
-  Enabled: true
-
-Style/SoleNestedConditional: # (new in 0.89)
-  Enabled: true
 
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
@@ -192,22 +111,13 @@ Layout/EmptyLineAfterGuardClause:
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
 Layout/LineLength:
   Max: 100
   Exclude:
     - 'test/*'
 
-Layout/EmptyLinesAroundAttributeAccessor:
-  Enabled: true
-
 Layout/EndOfLine:
   EnforcedStyle: lf
-
-Layout/LineEndStringConcatenationIndentation:
-  Enabled: false
 
 Metrics/AbcSize:
   Max: 30
@@ -258,94 +168,7 @@ Metrics/PerceivedComplexity:
 Lint/AssignmentInCondition:
   Enabled: false
 
-Lint/UnusedBlockArgument:
-  Enabled: false
-
 Lint/UnusedMethodArgument:
-  Enabled: false
-
-Lint/RaiseException:
-  Enabled: true
-
-Lint/StructNewOverride:
-  Enabled: true
-
-Lint/DuplicateElsifCondition:
-  Enabled: true
-
-Lint/DeprecatedOpenSSLConstant:
-  Enabled: true
-
-Lint/BinaryOperatorWithIdenticalOperands:
-  Enabled: true
-
-Lint/DuplicateRescueException:
-  Enabled: true
-
-Lint/EmptyConditionalBody:
-  Enabled: true
-
-Lint/FloatComparison:
-  Enabled: true
-
-Lint/MissingSuper:
-  Enabled: true
-
-Lint/OutOfRangeRegexpRef:
-  Enabled: true
-
-Lint/SelfAssignment:
-  Enabled: true
-
-Lint/TopLevelReturnWithArgument:
-  Enabled: true
-
-Lint/UnreachableLoop:
-  Enabled: true
-
-Lint/MixedRegexpCaptureTypes:
-  Enabled: true
-
-Lint/DuplicateRequire: # (new in 0.90)
-  Enabled: true
-
-Lint/EmptyFile: # (new in 0.90)
-  Enabled: true
-
-Lint/TrailingCommaInAttributeDeclaration: # (new in 0.90)
-  Enabled: true
-
-Lint/UselessMethodDefinition: # (new in 0.90)
-  Enabled: true
-
-Performance/AncestorsInclude:
-  Enabled: true
-
-Performance/BigDecimalWithNumericArgument:
-  Enabled: true
-
-Performance/RedundantSortBlock:
-  Enabled: true
-
-Performance/RedundantStringChars:
-  Enabled: true
-
-Performance/ReverseFirst:
-  Enabled: true
-
-Performance/SortReverse:
-  Enabled: true
-
-Performance/Squeeze:
-  Enabled: true
-
-Performance/StringInclude:
-  Enabled: true
-
-Performance/Sum: # (new in 1.8)
-  Enabled: true
-
-Sequel/ConcurrentIndex:
   Enabled: false
 
 Sequel:
