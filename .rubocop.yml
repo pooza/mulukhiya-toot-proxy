@@ -178,6 +178,9 @@ Sequel:
     - '**/model/**/*.rb'
     - 'app/migration/**/*.rb'
 
+Sequel/ConcurrentIndex:
+  Enabled: false
+
 Rake:
   Exclude:
     - '*'
