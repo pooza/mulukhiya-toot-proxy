@@ -2,12 +2,11 @@ module Mulukhiya
   class TootParser < Ginseng::Fediverse::TootParser
     include Package
     include SNSMethods
-    attr_accessor :service
 
-    def initialize(text = '')
+    def default_service
       @service = sns_class.new if Environment.mastodon_type?
       @service ||= MastodonService.new
-      super
+      return @service
     end
 
     def accts(&block)
