@@ -16,6 +16,16 @@ module Mulukhiya
       return admin? || moderator?
     end
 
+    def reactionable?
+      http = HTTP.new
+      http.base_uri = "https://#{acct.host}"
+      response = http.get('/nodeinfo/2.0')
+      return ['misskey', 'pleroma'].member?(response['software']['name'])
+    rescue => e
+      e.log(acct: acct.to_s)
+      return false
+    end
+
     def service
       unless @service
         @service = sns_class.new
