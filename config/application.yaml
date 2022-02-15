@@ -488,6 +488,11 @@ meisskey:
       - result_notification
     post_chat:
       - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
+      - reply_reaction
+      - result_notification
     post_toot:
       - user_config_command
       - growi_clipping_command
@@ -650,6 +655,11 @@ misskey:
       - lemmy_bookmark
       - result_notification
     post_chat:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
+      - reply_reaction
       - result_notification
     post_toot:
       - user_config_command
@@ -900,6 +910,11 @@ pleroma:
       - lemmy_bookmark
       - result_notification
     post_chat:
+      - result_notification
+    post_fav:
+      - result_notification
+    post_reaction:
+      - reply_reaction
       - result_notification
     post_toot:
       - user_config_command
