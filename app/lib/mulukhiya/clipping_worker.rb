@@ -15,9 +15,9 @@ module Mulukhiya
       params.deep_symbolize_keys!
       uri = create_status_uri(params[:uri])
       raise Ginseng::RequestError, "Invalid URL '#{params[:uri]}'" unless uri&.valid?
+      return uri.to_md if federate?
       return uri.to_md if uri.public?
       return uri.to_md if uri.local?
-      return uri.to_md if federate?
       return uri.to_s
     rescue => e
       raise Ginseng::GatewayError, e.message, e.backtrace unless uri
