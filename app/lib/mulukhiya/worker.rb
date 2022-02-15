@@ -14,7 +14,7 @@ module Mulukhiya
 
     def worker_config(key)
       value = (config["/worker/#{underscore}/#{key}"] rescue nil)
-      value = (config["/worker/#default/#{key}"] rescue nil) if value.nil?
+      value = (config["/worker/default/#{key}"] rescue nil) if value.nil?
       return value
     end
 
