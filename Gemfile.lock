@@ -34,9 +34,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 876be5f2d4a71b4b763b4ea631d110a3e52d99ce
+  revision: fc94370c4bd7a9845799fd9105677d59ffc3538f
   specs:
-    ginseng-fediverse (1.7.7)
+    ginseng-fediverse (1.7.8)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -227,7 +227,7 @@ GEM
     minitest (5.15.0)
     mongo (2.17.0)
       bson (>= 4.8.2, < 5.0.0)
-    msgpack (1.4.4)
+    msgpack (1.4.5)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -272,7 +272,7 @@ GEM
     raabro (1.4.0)
     racc (1.6.0)
     rack (2.2.3)
-    rack-protection (2.1.0)
+    rack-protection (2.2.0)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -343,10 +343,10 @@ GEM
       sidekiq (>= 3)
       thwait
       tilt (>= 1.4.0)
-    sinatra (2.1.0)
+    sinatra (2.2.0)
       mustermann (~> 1.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.0)
       tilt (~> 2.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
@@ -422,4 +422,4 @@ RUBY VERSION
    ruby 3.1.0p0
 
 BUNDLED WITH
-   2.3.6
+   2.3.7
