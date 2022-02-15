@@ -4,9 +4,9 @@ module Mulukhiya
     include SNSMethods
 
     def default_service
-      @service = sns_class.new if Environment.misskey_type?
-      @service ||= MisskeyService.new
-      return @service
+      service = sns_class.new if Environment.misskey_type?
+      service ||= MisskeyService.new
+      return service
     end
 
     def accts(&block)

@@ -34,7 +34,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: fc94370c4bd7a9845799fd9105677d59ffc3538f
+  revision: 4bba7dd90d86450de63fc70837a8c4caeb5786cd
   specs:
     ginseng-fediverse (1.7.8)
 
