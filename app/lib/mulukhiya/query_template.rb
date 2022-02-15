@@ -10,7 +10,7 @@ module Mulukhiya
     private
 
     def dir
-      return "app/query/#{Environment.controller_name}"
+      return File.join('app/query', Environment.controller_name)
     end
   end
 end
