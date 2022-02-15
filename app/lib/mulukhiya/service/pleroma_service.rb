@@ -7,6 +7,10 @@ module Mulukhiya
     alias info nodeinfo
 
     def post(body, params = {})
+      body = {status_field => body} if body.is_a?(String)
+      if status = params[:reply]
+        body['in_reply_to_id'] = status.id
+      end
       response = super
       MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
       return response
