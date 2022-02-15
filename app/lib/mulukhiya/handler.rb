@@ -91,24 +91,24 @@ module Mulukhiya
     end
 
     def reportable?
-      return false if verbose? && !sns.account.notify_verbose? && @errors.empty?
+      return false if verbose? && !sns.account.notify_verbose? && errors.empty?
       return loggable?
     end
 
     def loggable?
-      return @result.present? || @errors.present?
+      return result.present? || errors.present?
     end
 
     def summary
       return {
         event: @event.to_s,
         handler: underscore,
-        entries: recursive_to_a(@result.concat(@errors)),
+        entries: recursive_to_a(result.concat(errors)),
       }
     end
 
     def debug_info
-      return {result: @result, errors: @errors} if @result.present? || @errors.present?
+      return {result:, errors:} if result.present? || errors.present?
       return nil
     end
 
