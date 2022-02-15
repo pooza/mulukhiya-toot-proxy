@@ -4,7 +4,7 @@ module Mulukhiya
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
       return if receipt.reactionable?
-      sns.post("#{receipt.acct} #{payload[:reaction]}", {reply: status})
+      sns.post("#{receipt.acct} #{payload[:reaction]}", {reply: status.to_h})
       result.push(reply: status.id, reaction: payload[:reaction])
     end
   end
