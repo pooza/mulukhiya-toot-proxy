@@ -207,6 +207,8 @@ handler:
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
+  reply_reaction:
+    disable: true
   result_notification:
     spoiler_text: 実行結果
   shortened_url:

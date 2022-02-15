@@ -20,7 +20,7 @@ module Mulukhiya
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"
       response = http.get('/nodeinfo/2.0')
-      return ['misskey', 'pleroma'].include?(response['software']['name'])
+      return ['misskey', 'pleroma'].member?(response['software']['name'])
     rescue => e
       e.log(acct: acct.to_s)
       return false
