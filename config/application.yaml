@@ -927,6 +927,7 @@ pleroma:
     post_fav:
       - result_notification
     post_reaction:
+      - reply_reaction
       - result_notification
     post_toot:
       - user_config_command
