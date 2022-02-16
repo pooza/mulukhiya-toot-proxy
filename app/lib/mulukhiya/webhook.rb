@@ -7,7 +7,7 @@ module Mulukhiya
     attr_reader :sns, :reporter
 
     def digest
-      return self.class.create_digest(@sns.uri, @sns.token)
+      return self.class.create_digest(sns.uri, sns.token)
     end
 
     def visibility
@@ -15,14 +15,14 @@ module Mulukhiya
     end
 
     def uri
-      @uri ||= @sns.create_uri("/mulukhiya/webhook/#{digest}")
+      @uri ||= sns.create_uri("/mulukhiya/webhook/#{digest}")
       return @uri
     end
 
     def to_json(opts = nil)
       @json ||= JSON.pretty_generate(
-        sns: @sns.uri.to_s,
-        token: @sns.token,
+        sns: sns.uri.to_s,
+        token: sns.token,
         visibility:,
         hook: uri.to_s,
       )
@@ -32,9 +32,9 @@ module Mulukhiya
     def post(payload)
       body = payload.values.merge(visibility_field => visibility)
       reporter = Reporter.new
-      Event.new(:pre_webhook, {reporter:, sns: @sns}).dispatch(body)
-      reporter.response = @sns.post(body)
-      Event.new(:post_webhook, {reporter:, sns: @sns}).dispatch(body)
+      Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
+      reporter.response = sns.post(body)
+      Event.new(:post_webhook, {reporter:, sns:}).dispatch(body)
       return reporter
     end
 

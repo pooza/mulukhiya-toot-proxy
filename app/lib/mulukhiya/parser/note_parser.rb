@@ -2,12 +2,11 @@ module Mulukhiya
   class NoteParser < Ginseng::Fediverse::NoteParser
     include Package
     include SNSMethods
-    attr_accessor :service
 
-    def initialize(text = '')
-      @service = sns_class.new if Environment.misskey_type?
-      @service ||= MisskeyService.new
-      super
+    def default_service
+      service = sns_class.new if Environment.misskey_type?
+      service ||= MisskeyService.new
+      return service
     end
 
     def accts(&block)
