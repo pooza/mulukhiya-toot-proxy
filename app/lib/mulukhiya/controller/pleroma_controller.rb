@@ -16,7 +16,6 @@ module Mulukhiya
     end
 
     post '/api/v1/pleroma/chats/:chat_id/messages' do
-      reporter.tags.clear
       Event.new(:pre_chat, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.say(params)
       Event.new(:post_chat, {reporter:, sns:}).dispatch(params)
