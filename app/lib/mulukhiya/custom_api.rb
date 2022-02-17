@@ -67,12 +67,17 @@ module Mulukhiya
     end
 
     def create_renderer(args = {})
-      command = create_command(args)
-      command.exec
-      raise Ginseng::RequestError, command.stderr unless command.status.zero?
+      storage = CustomAPIRenderStorage.new
+      unless storage[args]
+        command = create_command(args)
+        command.exec
+        raise Ginseng::RequestError, command.stderr unless command.status.zero?
+        storage[args] = command.response
+      end
+      cache = storage[args]
       renderer = Ginseng::Web::RawRenderer.new
-      renderer.type = command.response[:type]
-      renderer.body = command.response[:body]
+      renderer.type = cache[:type]
+      renderer.body = cache[:body]
       return renderer
     rescue => e
       renderer = Ginseng::Web::JSONRenderer.new

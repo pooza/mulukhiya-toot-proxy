@@ -98,6 +98,8 @@ annict:
     default: https://annict.com
 api:
   custom: []
+  cache:
+    ttl: 86400
 bundler:
   did_you_mean: true
   install: false
