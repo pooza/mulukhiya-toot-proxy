@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def create_key(key)
-      return "#{prefix}:#{key[:page].to_i}" if key.is_a?(Hash)
+      return "#{prefix}:#{key.to_json.adler32}" if key.is_a?(Hash)
       return key
     end
 
