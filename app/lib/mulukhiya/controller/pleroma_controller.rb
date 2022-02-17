@@ -26,7 +26,6 @@ module Mulukhiya
     rescue Ginseng::GatewayError => e
       e.alert
       @renderer.message = {error: e.message}
-      notify(error: e.raw_message)
       @renderer.status = e.source_status
       return @renderer.to_s
     end
@@ -43,7 +42,6 @@ module Mulukhiya
     rescue RestClient::Exception => e
       e.alert
       @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
-      notify(@renderer.message)
       @renderer.status = e.response&.code || 400
       return @renderer.to_s
     end
