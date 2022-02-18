@@ -1,7 +1,7 @@
 module Mulukhiya
   class CustomAPIRenderStorage < RenderStorage
     def get(key)
-      return super&.map(&:deep_symbolize_keys)
+      return super&.deep_symbolize_keys
     end
 
     def setex(key, ttl, value)
