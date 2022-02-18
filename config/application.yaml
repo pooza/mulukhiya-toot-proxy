@@ -868,6 +868,7 @@ parser:
       poll:
         options: choices
         root: poll
+      reply_to: replyId
       spoiler: cw
       visibility: visibility
   toot:
@@ -877,6 +878,7 @@ parser:
       poll:
         options: options
         root: poll
+      reply_to: in_reply_to
       spoiler: spoiler_text
       visibility: visibility
 peer_tube:
