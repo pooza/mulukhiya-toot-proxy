@@ -224,7 +224,7 @@ module Mulukhiya
       @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @break = false
-      @event = (params[:event] || 'unknown').to_sym
+      @event = params[:event].to_sym || :unknown
       @text_field = status_field
     end
 

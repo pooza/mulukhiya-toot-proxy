@@ -106,7 +106,7 @@ module Mulukhiya
         MastodonController.status_field => message.ellipsize(max_post_text_length),
         MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
-        'in_reply_to_id' => options.dig(:response, :id),
+        MastodonController.reply_to_field => options.dig(:response, :id),
       )
     end
 
