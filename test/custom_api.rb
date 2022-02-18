@@ -53,9 +53,7 @@ module Mulukhiya
     end
 
     def test_create_renderer
-      CustomAPI.all.reject(&:args?).each do |api|
-        api.create_renderer
-      end
+      CustomAPI.all.reject(&:args?).each(&:create_renderer)
     end
 
     def test_args

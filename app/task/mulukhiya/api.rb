@@ -20,6 +20,15 @@ module Mulukhiya
         end
       end
 
+      namespace :cache do
+        desc 'clean API response cache'
+        task :clean do
+          CustomAPIRenderStorage.new.clear
+        end
+
+        task clear: [:clean]
+      end
+
       desc 'all custom API : bundle install'
       multitask bundler: CustomAPI.all.map(&:id).map {|v| "#{v}:bundler"}
     end
