@@ -17,7 +17,6 @@ module Mulukhiya
     end
 
     post '/api/messaging/messages/create' do
-      reporter.tags.clear
       Event.new(:pre_chat, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.say(params)
       Event.new(:post_chat, {reporter:, sns:}).dispatch(params)

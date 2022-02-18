@@ -92,7 +92,7 @@ module Mulukhiya
         PleromaController.status_field => message.ellipsize(max_post_text_length),
         PleromaController.spoiler_field => options[:spoiler_text],
         PleromaController.visibility_field => PleromaController.visibility_name(:direct),
-        'in_reply_to_id' => options.dig(:response, :id),
+        PleromaController.reply_to_field => options.dig(:response, :id),
       )
     end
 

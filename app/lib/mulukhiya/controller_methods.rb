@@ -126,6 +126,10 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/visibility"]
       end
 
+      def reply_to_field
+        return config["/parser/#{parser_name}/fields/reply_to"]
+      end
+
       def poll_field
         return config["/parser/#{parser_name}/fields/poll/root"]
       end

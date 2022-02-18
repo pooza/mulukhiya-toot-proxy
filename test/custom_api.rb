@@ -52,6 +52,12 @@ module Mulukhiya
       end
     end
 
+    def test_create_renderer
+      CustomAPI.all.reject(&:args?).each do |api|
+        assert_kind_of(Ginseng::Web::RawRenderer, api.create_renderer)
+      end
+    end
+
     def test_args
       CustomAPI.all do |api|
         assert_kind_of(Array, api.args)

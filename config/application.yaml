@@ -98,6 +98,8 @@ annict:
     default: https://annict.com
 api:
   custom: []
+  cache:
+    ttl: 86400
 bundler:
   did_you_mean: true
   install: false
@@ -857,7 +859,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.14.3
+  version: 4.14.4
 parser:
   note:
     fields:
@@ -866,6 +868,7 @@ parser:
       poll:
         options: choices
         root: poll
+      reply_to: replyId
       spoiler: cw
       visibility: visibility
   toot:
@@ -875,6 +878,7 @@ parser:
       poll:
         options: options
         root: poll
+      reply_to: in_reply_to
       spoiler: spoiler_text
       visibility: visibility
 peer_tube:

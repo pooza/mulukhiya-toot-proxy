@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def dir
-      return @params[:dir]
+      return params[:dir]
     end
 
     def args
@@ -66,13 +66,23 @@ module Mulukhiya
       return command
     end
 
+    def storage
+      @storage ||= CustomAPIRenderStorage.new
+      return @storage
+    end
+
     def create_renderer(args = {})
-      command = create_command(args)
-      command.exec
-      raise Ginseng::RequestError, command.stderr unless command.status.zero?
+      key = params.merge(args:)
+      unless storage[key]
+        command = create_command(args)
+        command.exec
+        raise Ginseng::RequestError, command.stderr unless command.status.zero?
+        storage[key] = command.response
+      end
+      cache = storage[key]
       renderer = Ginseng::Web::RawRenderer.new
-      renderer.type = command.response[:type]
-      renderer.body = command.response[:body]
+      renderer.type = cache[:type]
+      renderer.body = cache[:body]
       return renderer
     rescue => e
       renderer = Ginseng::Web::JSONRenderer.new

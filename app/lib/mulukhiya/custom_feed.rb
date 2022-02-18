@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def dir
-      return @params[:dir]
+      return params[:dir]
     end
 
     def title

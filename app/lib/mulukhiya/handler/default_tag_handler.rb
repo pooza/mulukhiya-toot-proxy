@@ -2,6 +2,7 @@ module Mulukhiya
   class DefaultTagHandler < TagHandler
     def disable?
       return true unless self.class.tags.present?
+      return true unless @event == :pre_toot
       return super
     end
 

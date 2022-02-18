@@ -64,6 +64,13 @@ properties:
     type: object
   api:
     properties:
+      cache:
+        properties:
+          ttl:
+            type: integer
+        required:
+          - ttl
+        type: object
       custom:
         items:
           properties:

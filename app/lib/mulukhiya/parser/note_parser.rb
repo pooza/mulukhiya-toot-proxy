@@ -28,7 +28,7 @@ module Mulukhiya
       length = service.max_post_text_length
       extra_tags = TagContainer.new
       ['default_tag', 'user_tag']
-        .filter_map {|name| Handler.create(name)}
+        .filter_map {|name| Handler.create(name, {event: :pre_toot})}
         .reject(&:disable?)
         .each {|h| extra_tags.merge(h.addition_tags)}
       length -= extra_tags.sum {|v| v.to_hashtag.length + 1}
