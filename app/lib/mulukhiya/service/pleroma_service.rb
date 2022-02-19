@@ -58,12 +58,12 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless PleromaController.oauth_scopes(type)
+      return nil unless scopes = PleromaController.oauth_scopes(type)
       body = {
         client_name: PleromaController.oauth_client_name(type),
         website: config['/package/url'],
         redirect_uris: config['/pleroma/oauth/redirect_uri'],
-        scopes: PleromaController.oauth_scopes(type).join(' '),
+        scopes: scopes.join(' '),
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/v1/apps', {body:}).body
