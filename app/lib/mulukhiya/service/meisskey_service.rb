@@ -46,11 +46,11 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MeisskeyController.oauth_scopes(type)
+      return nil unless scopes = MeisskeyController.oauth_scopes(type)
       body = {
         name: MeisskeyController.oauth_client_name(type),
         description: config['/package/description'],
-        permission: MeisskeyController.oauth_scopes(type),
+        permission: scopes,
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/app/create', {body:}).body

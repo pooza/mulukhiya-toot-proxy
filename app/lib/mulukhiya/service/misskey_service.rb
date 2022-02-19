@@ -53,11 +53,11 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MisskeyController.oauth_scopes(type)
+      return nil unless scopes = MisskeyController.oauth_scopes(type)
       body = {
         name: MisskeyController.oauth_client_name(type),
         description: config['/package/description'],
-        permission: MisskeyController.oauth_scopes(type),
+        permission: scopes,
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/app/create', {body:}).body
