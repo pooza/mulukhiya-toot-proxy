@@ -97,9 +97,9 @@ annict:
     api: https://api.annict.com
     default: https://annict.com
 api:
-  custom: []
   cache:
     ttl: 86400
+  custom: []
 bundler:
   did_you_mean: true
   install: false
@@ -201,11 +201,11 @@ handler:
       video: video
   remote_tag:
     services:
-      - pattern: プリキュア
+      - pattern: (プリキュア|precure)
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: ダイの大冒険
+      - pattern: ダイ(大|の大冒険)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
