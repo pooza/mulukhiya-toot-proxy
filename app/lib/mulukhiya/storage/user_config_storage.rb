@@ -44,8 +44,7 @@ module Mulukhiya
 
     def self.accounts(&block)
       return enum_for(__method__) unless block
-      storage = new
-      storage.all_keys
+      new.all_keys
         .map {|key| key.split(':').last}
         .filter_map {|id| Environment.account_class[id] rescue nil}
         .each(&block)
