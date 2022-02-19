@@ -55,7 +55,6 @@ module Mulukhiya
       unless client = oauth_client_storage[body]
         client = http.post('/api/app/create', {body:}).body
         oauth_client_storage[body] = client
-        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end
