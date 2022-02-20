@@ -81,7 +81,7 @@ module Mulukhiya
       return post(
         MisskeyController.status_field => message.ellipsize(max_post_text_length),
         MisskeyController.spoiler_field => options[:spoiler_text],
-        'visibleUserIds' => [account.id],
+        MisskeyController.visible_users_field => [account.id],
         MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),
         MisskeyController.reply_to_field => reply_to,
       )
