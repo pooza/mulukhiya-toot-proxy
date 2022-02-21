@@ -53,16 +53,15 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MisskeyController.oauth_scopes(type)
+      return nil unless scopes = MisskeyController.oauth_scopes(type)
       body = {
         name: MisskeyController.oauth_client_name(type),
         description: config['/package/description'],
-        permission: MisskeyController.oauth_scopes(type),
+        permission: scopes,
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/app/create', {body:}).body
         oauth_client_storage[body] = client
-        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end
@@ -82,7 +81,7 @@ module Mulukhiya
       return post(
         MisskeyController.status_field => message.ellipsize(max_post_text_length),
         MisskeyController.spoiler_field => options[:spoiler_text],
-        'visibleUserIds' => [account.id],
+        MisskeyController.visible_users_field => [account.id],
         MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),
         MisskeyController.reply_to_field => reply_to,
       )

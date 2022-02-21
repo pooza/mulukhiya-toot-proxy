@@ -72,17 +72,16 @@ module Mulukhiya
     end
 
     def oauth_client(type = :default)
-      return nil unless MastodonController.oauth_scopes(type)
+      return nil unless scopes = MastodonController.oauth_scopes(type)
       body = {
         client_name: MastodonController.oauth_client_name(type),
         website: config['/package/url'],
         redirect_uris: config['/mastodon/oauth/redirect_uri'],
-        scopes: MastodonController.oauth_scopes(type).join(' '),
+        scopes: scopes.join(' '),
       }
       unless client = oauth_client_storage[body]
         client = http.post('/api/v1/apps', {body:}).body
         oauth_client_storage[body] = client
-        redis.unlink('oauth_client')
       end
       return JSON.parse(client)
     end

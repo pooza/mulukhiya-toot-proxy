@@ -10,9 +10,7 @@ module Mulukhiya
     end
 
     def self.scan(text)
-      return new(
-        text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first),
-      )
+      return new(text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first))
     end
 
     def self.default_tags

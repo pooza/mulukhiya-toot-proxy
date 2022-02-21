@@ -150,6 +150,10 @@ module Mulukhiya
         return config["/parser/#{parser_name}/fields/attachment"]
       end
 
+      def visible_users_field
+        return config["/parser/#{parser_name}/fields/visible_users"]
+      end
+
       def status_key
         return config["/#{name}/status/key"]
       end
