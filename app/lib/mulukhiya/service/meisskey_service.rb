@@ -74,7 +74,7 @@ module Mulukhiya
       return post(
         MeisskeyController.status_field => message.ellipsize(max_post_text_length),
         MeisskeyController.spoiler_field => options[:spoiler_text],
-        'visibleUserIds' => [account.id],
+        MeisskeyController.visible_users_field => [account.id],
         MeisskeyController.visibility_field => MeisskeyController.visibility_name(:direct),
         MeisskeyController.reply_to_field => reply_to,
       )

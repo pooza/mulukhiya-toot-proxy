@@ -871,6 +871,7 @@ parser:
       reply_to: replyId
       spoiler: cw
       visibility: visibility
+      visible_users: visibleUserIds
   toot:
     fields:
       attachment: media_ids
