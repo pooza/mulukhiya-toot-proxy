@@ -36,6 +36,8 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Controller$/, '').underscore
     end
 
+    alias underscore name
+
     def token
       return nil
     end
