@@ -111,6 +111,9 @@ Layout/EmptyLineAfterGuardClause:
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
+Layout/LineEndStringConcatenationIndentation:
+  EnforcedStyle: indented
+
 Layout/LineLength:
   Max: 100
   Exclude:
