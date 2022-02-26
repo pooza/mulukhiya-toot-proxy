@@ -6,185 +6,144 @@ require:
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
   DisplayCopNames: true
-  NewCops: enable
+  Exclude:
+    - '**/._*'
+    - '**/.git/**/*'
+    - public/**/*
+    - config/**/*
+    - tmp/**/*
+    - '**/old/**/*'
   Include:
     - '**/*.rb'
     - '**/Rakefile'
     - '**/config.ru'
-  Exclude:
-    - '**/._*'
-    - '**/.git/**/*'
-    - 'public/**/*'
-    - 'config/**/*'
-    - 'tmp/**/*'
-    - '**/old/**/*'
+  NewCops: enable
   TargetRubyVersion: 3.1
-
-Naming/RescuedExceptionsVariableName:
-  PreferredName: e
-
-Style/FrozenStringLiteralComment:
+Layout/EmptyLineAfterGuardClause:
   Enabled: false
-
-Style/FormatStringToken:
-  EnforcedStyle: template
-
-Style/Documentation:
-  Enabled: false
-
-Style/RedundantReturn:
-  Enabled: false
-
-Style/RescueStandardError:
-  Enabled: false
-
-Style/SymbolArray:
-  EnforcedStyle: brackets
-
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: comma
-
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: comma
-
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: comma
-
-Style/WordArray:
-  EnforcedStyle: brackets
-
-Style/IdenticalConditionalBranches:
-  Exclude:
-    - 'test/*'
-
-Style/IfUnlessModifier:
-  Exclude:
-    - 'test/*'
-
-Style/AsciiComments:
-  Enabled: false
-
-Style/FormatString:
-  EnforcedStyle: percent
-
-Style/ConditionalAssignment:
-  Enabled: false
-
-Style/YodaCondition:
-  Enabled: false
-
-Style/RescueModifier:
-  Enabled: false
-
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-
-Style/EmptyMethod:
-  EnforcedStyle: expanded
-
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: consistent
-
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-
+Layout/EndOfLine:
+  EnforcedStyle: lf
 Layout/FirstArgumentIndentation:
   EnforcedStyle: consistent
-
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+Layout/LineEndStringConcatenationIndentation:
+  EnforcedStyle: indented
+Layout/LineLength:
+  Exclude:
+    - test/*
+  Max: 100
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
 Layout/SpaceBeforeBlockBraces:
   EnforcedStyle: space
-
 Layout/SpaceInsideBlockBraces:
   EnforcedStyle: no_space
   EnforcedStyleForEmptyBraces: no_space
   SpaceBeforeBlockParameters: false
-
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-
-Layout/LineLength:
-  Max: 100
-  Exclude:
-    - 'test/*'
-
-Layout/EndOfLine:
-  EnforcedStyle: lf
-
-Metrics/AbcSize:
-  Max: 30
-  Exclude:
-    - 'test/*'
-
-Metrics/BlockLength:
-  Exclude:
-    - 'test/*'
-    - '**/contract/*'
-    - '**/controller/*'
-    - 'app/task/**/*.rb'
-    - '*.gemspec'
-
-Metrics/MethodLength:
-  Max: 20
-  Exclude:
-    - 'test/*'
-
-Metrics/ClassLength:
-  Max: 200
-  Exclude:
-    - 'test/*'
-    - '**/contract/*'
-    - '**/controller/*'
-    - '**/service/*'
-
-Metrics/ModuleLength:
-  Max: 200
-  Exclude:
-    - 'test/*'
-    - '**/contract/*'
-    - '**/controller/*'
-    - '**/service/*'
-
-Metrics/CyclomaticComplexity:
-  Max: 10
-  Exclude:
-    - 'test/*'
-    - '**/contract/*'
-
-Metrics/PerceivedComplexity:
-  Max: 10
-  Exclude:
-    - 'test/*'
-    - '**/contract/*'
-
 Lint/AssignmentInCondition:
   Enabled: false
-
 Lint/UnusedMethodArgument:
   Enabled: false
-
+Metrics/AbcSize:
+  Exclude:
+    - test/*
+  Max: 30
+Metrics/BlockLength:
+  Exclude:
+    - test/*
+    - '**/contract/*'
+    - '**/controller/*'
+    - app/task/**/*.rb
+    - '*.gemspec'
+Metrics/ClassLength:
+  Exclude:
+    - test/*
+    - '**/contract/*'
+    - '**/controller/*'
+    - '**/service/*'
+  Max: 200
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - test/*
+    - '**/contract/*'
+  Max: 10
+Metrics/MethodLength:
+  Exclude:
+    - test/*
+  Max: 20
+Metrics/ModuleLength:
+  Exclude:
+    - test/*
+    - '**/contract/*'
+    - '**/controller/*'
+    - '**/service/*'
+  Max: 200
+Metrics/PerceivedComplexity:
+  Exclude:
+    - test/*
+    - '**/contract/*'
+  Max: 10
+Naming/RescuedExceptionsVariableName:
+  PreferredName: e
+Rake:
+  Exclude:
+    - '*'
+  Include:
+    - Rakefile
+    - '*.rake'
+    - app/task/**/*.rb
 Sequel:
   Exclude:
     - '*'
   Include:
     - '**/model/**/*.rb'
-    - 'app/migration/**/*.rb'
-
+    - app/migration/**/*.rb
 Sequel/ConcurrentIndex:
   Enabled: false
-
-Rake:
+Style/AsciiComments:
+  Enabled: false
+Style/ConditionalAssignment:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+Style/FormatString:
+  EnforcedStyle: percent
+Style/FormatStringToken:
+  EnforcedStyle: template
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/IdenticalConditionalBranches:
   Exclude:
-    - '*'
-  Include:
-    - 'Rakefile'
-    - '*.rake'
-    - 'app/task/**/*.rb'
+    - test/*
+Style/IfUnlessModifier:
+  Exclude:
+    - test/*
+Style/RedundantReturn:
+  Enabled: false
+Style/RescueModifier:
+  Enabled: false
+Style/RescueStandardError:
+  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+Style/SymbolArray:
+  EnforcedStyle: brackets
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+Style/WordArray:
+  EnforcedStyle: brackets
+Style/YodaCondition:
+  Enabled: false

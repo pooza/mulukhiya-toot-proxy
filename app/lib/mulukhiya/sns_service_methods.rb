@@ -22,8 +22,7 @@ module Mulukhiya
     end
 
     def clear_oauth_client(type = :default)
-      type ||= :default
-      oauth_client_storage.unlink(type)
+      oauth_client_storage.unlink(type || :default)
     end
 
     def oauth_client_storage

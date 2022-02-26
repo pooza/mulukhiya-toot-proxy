@@ -71,10 +71,14 @@ module Mulukhiya
     end
 
     def notify(message, options = {})
+      options[:accounts] ||= Environment.account_class.administrators if options[:administrators]
+      options[:accounts] ||= [@sns.account]
       message = message.deep_stringify_keys.to_yaml unless message.is_a?(String)
-      return info_agent_service.notify(@sns.account, message, options.deep_symbolize_keys)
-    rescue => e
-      e.log(message:)
+      options[:accounts].each do |account|
+        return info_agent_service.notify(account, message, options.deep_symbolize_keys)
+      rescue => e
+        e.log(message:)
+      end
     end
 
     def info_agent_service

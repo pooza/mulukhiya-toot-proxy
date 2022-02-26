@@ -38,9 +38,7 @@ module Mulukhiya
         listener = MastodonListener.new
 
         listener.client.on :close do
-          Environment.account_class.administrators.each do |admin|
-            info_agent_service.notify(admin, 'リスナーからストリーミングAPIへの接続が途絶えました。')
-          end
+          notify('リスナーからストリーミングAPIへの接続が途絶えました。', {administrators: true})
         end
 
         listener.client.on :error do |e|

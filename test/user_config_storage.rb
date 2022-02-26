@@ -26,7 +26,7 @@ module Mulukhiya
       @storage.update(@key, {'cc' => {'e' => nil, 'f' => nil}})
       assert_equal(@storage[@key], {'/a' => 111, '/b' => 222})
 
-      @storage.del(@key)
+      @storage.unlink(@key)
     end
 
     def test_accounts

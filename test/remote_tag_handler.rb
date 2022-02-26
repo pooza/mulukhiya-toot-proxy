@@ -2,6 +2,8 @@ module Mulukhiya
   class RemoteTagHandlerTest < TestCase
     def setup
       @handler = Handler.create('remote_tag')
+      config['/handler/dictionary_tag/word/min'] = 3
+      config['/handler/dictionary_tag/word/min_kanji'] = 2
     end
 
     def test_handle_pre_toot
@@ -9,7 +11,7 @@ module Mulukhiya
       assert_equal(@handler.addition_tags, Set['precure_fun', 'キュアホワイト', '雪城 ほのか', 'ゆかな'])
 
       @handler.handle_pre_toot(status_field => 'ダイの大冒険 このあと9時30分から、テレビ東京系列にて第55話「黒の核晶（コア）」放送！')
-      assert_equal(@handler.addition_tags, Set['delmulin', 'ダイ', '種﨑 敦美', 'ダイの大冒険', '黒の核晶'])
+      assert_equal(@handler.addition_tags, Set['delmulin', '種﨑 敦美', 'ダイの大冒険', '黒の核晶'])
     end
   end
 end

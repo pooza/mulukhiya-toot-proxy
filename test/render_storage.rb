@@ -13,7 +13,7 @@ module Mulukhiya
       @storage[@key] = @renderer.to_s
 
       assert_kind_of(String, @storage[@key])
-      @storage.del(@key)
+      @storage.unlink(@key)
       assert_nil(@storage[@key])
     end
   end

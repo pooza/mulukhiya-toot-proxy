@@ -25,7 +25,7 @@ module Mulukhiya
     alias save cache
 
     def clear
-      render_storage.del(command)
+      render_storage.unlink(command)
     end
 
     def to_s
