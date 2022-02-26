@@ -26,9 +26,7 @@ module Mulukhiya
         },
         ping: keepalive,
       })
-      account_class.administrators.each do |admin|
-        info_agent_service.notify(admin, 'リスナーからストリーミングAPIへ接続しました。')
-      end
+      notify('リスナーからストリーミングAPIへ接続しました。', {administrators: true})
     end
 
     def create_method_name(name)
