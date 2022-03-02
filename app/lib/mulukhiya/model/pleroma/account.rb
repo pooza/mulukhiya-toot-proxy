@@ -61,9 +61,11 @@ module Mulukhiya
       end
 
       def recent_status
-        notes = service.statuses(account_id: id)
-        note = notes&.first
-        return Status[note['id']] if note
+        return nil unless row = Postgres.instance.exec('recent_toot', {acct:}).first
+        location = service.http.get(row[:uri], {follow_redirects: false}).headers[:location]
+        return Status[location.split('/').last]
+      rescue => e
+        e.log(account_id: id)
         return nil
       end
 

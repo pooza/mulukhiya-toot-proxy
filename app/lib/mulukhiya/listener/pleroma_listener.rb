@@ -11,7 +11,7 @@ module Mulukhiya
         listener = PleromaListener.new
 
         listener.client.on :close do
-          notify('リスナーからストリーミングAPIへの接続が途絶えました。', {administrators: true})
+          raise 'An unintended disconnection has occurred.'
         end
 
         listener.client.on :error do |e|
@@ -24,7 +24,7 @@ module Mulukhiya
       end
     rescue => e
       @client = nil
-      e.alert
+      e.log
       sleep(config['/websocket/retry/seconds'])
       retry
     end

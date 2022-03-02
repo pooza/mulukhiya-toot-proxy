@@ -8,8 +8,12 @@ module Mulukhiya
       assert_boolean(@listener.verify_peer?)
     end
 
+    def test_root_cert_file
+      assert(File.exist?(@listener.root_cert_file))
+    end
+
     def test_keepalive
-      assert_kind_of(Integer, @listener.keepalive)
+      assert(@listener.keepalive.positive?)
     end
   end
 end

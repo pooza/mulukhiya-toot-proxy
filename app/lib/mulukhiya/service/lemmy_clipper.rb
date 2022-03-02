@@ -15,6 +15,7 @@ module Mulukhiya
       @client ||= Faye::WebSocket::Client.new(uri.to_s, [], {
         tls: {
           verify_peer: verify_peer?,
+          root_cert_file:,
         },
         ping: keepalive,
       })
@@ -35,6 +36,12 @@ module Mulukhiya
 
     def verify_peer?
       return config['/lemmy/verify_peer']
+    end
+
+    def root_cert_file
+      return config['/lemmy/root_cert_file']
+    rescue
+      return ENV['SSL_CERT_FILE']
     end
 
     def clip(body)
