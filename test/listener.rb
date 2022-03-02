@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def test_keepalive
-      assert_kind_of(Integer, @listener.keepalive)
+      assert(@listener.keepalive.positive?)
     end
   end
 end

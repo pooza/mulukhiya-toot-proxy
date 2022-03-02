@@ -26,7 +26,7 @@ module Mulukhiya
 
     def test_size
       return unless @attachment
-      assert_kind_of(Integer, @attachment.size)
+      assert(@attachment.size.positive?)
     end
 
     def test_size_str

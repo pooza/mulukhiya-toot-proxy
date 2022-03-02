@@ -10,7 +10,7 @@ module Mulukhiya
 
     def test_timeout
       Handler.names.each do |name|
-        assert_kind_of(Integer, Handler.create(name).timeout)
+        assert(Handler.create(name).timeout.positive?)
       end
     end
 

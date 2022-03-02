@@ -11,7 +11,7 @@ module Mulukhiya
     def test_account
       return unless @service
       assert_kind_of(Hash, @service.account)
-      assert_kind_of(Integer, @service.account['id'])
+      assert(@service.account['id'].positive?)
       assert_kind_of(String, @service.account['name'])
       assert_kind_of(String, @service.account['username'])
     end
@@ -38,7 +38,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.reviewed_works)
       @service.reviewed_works do |work|
         assert_kind_of(Hash, work)
-        assert_kind_of(Integer, work.dig('work', 'id'))
+        assert(work.dig('work', 'id').positive?)
       end
     end
 
