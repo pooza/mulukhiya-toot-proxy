@@ -8,6 +8,14 @@ module Mulukhiya
       assert_kind_of(Faye::WebSocket::Client, @lemmy.client)
     end
 
+    def test_verify_peer?
+      assert_boolean(@lemmy.verify_peer?)
+    end
+
+    def test_root_cert_file
+      assert(File.exist?(@lemmy.root_cert_file))
+    end
+
     def test_uri
       assert_kind_of(Ginseng::URI, @lemmy.uri)
     end
