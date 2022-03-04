@@ -41,7 +41,7 @@ module Mulukhiya
     def command
       unless @command
         @command = CommandLine.create(params)
-        @command.env['RUBYOPT'] = '--disable-did_you_mean' if config['/bundler/did_you_mean']
+        @command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/bundler/did_you_mean']
       end
       return @command
     end
