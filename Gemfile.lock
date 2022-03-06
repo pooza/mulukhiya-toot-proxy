@@ -34,9 +34,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 598096b0d107c2043570781ed6d98f180df53cea
+  revision: 7c7c4cca81eb0672dffe457bb9f3acc43a14ead8
   specs:
-    ginseng-fediverse (1.7.9)
+    ginseng-fediverse (1.7.10)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -170,6 +170,10 @@ GEM
       et-orbi (~> 1.1, >= 1.1.8)
       raabro (~> 1.4)
     gli (2.21.0)
+    graphql (1.13.10)
+    graphql-client (0.17.0)
+      activesupport (>= 3.0)
+      graphql (~> 1.10)
     hashie (5.0.0)
     http (4.4.1)
       addressable (~> 2.3)
@@ -293,7 +297,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.16.0)
       parser (>= 3.1.1.0)
-    rubocop-performance (1.13.2)
+    rubocop-performance (1.13.3)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -377,6 +381,7 @@ DEPENDENCIES
   ginseng-redis!
   ginseng-web!
   ginseng-youtube!
+  graphql-client
   mimemagic (>= 0.4.0)
   mini_magick
   mongo
