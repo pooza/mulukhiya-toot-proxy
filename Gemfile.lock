@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/pooza/faye-websocket-ruby.git
+  revision: d63217fbedca4321a97f298a073d56576f01234c
+  specs:
+    faye-websocket (0.11.1)
+      eventmachine (>= 0.12.0)
+      websocket-driver (>= 0.5.1)
+
+GIT
   remote: https://github.com/pooza/ginseng-core.git
   revision: 4bc892dab42c79821aa8deaba5298858c4e23e07
   specs:
@@ -157,9 +165,6 @@ GEM
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (2.0.1)
     fastimage (2.2.6)
-    faye-websocket (0.11.1)
-      eventmachine (>= 0.12.0)
-      websocket-driver (>= 0.5.1)
     ffi (1.15.5)
     ffi (1.15.5-x64-mingw-ucrt)
     ffi-compiler (1.0.1)
@@ -377,7 +382,7 @@ DEPENDENCIES
   bootsnap (>= 1.9.0)
   dry-validation
   fastimage
-  faye-websocket
+  faye-websocket!
   ginseng-core!
   ginseng-fediverse!
   ginseng-postgres!
