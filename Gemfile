@@ -3,7 +3,6 @@ ruby '~>3.1.0'
 gem 'bootsnap', '>=1.9.0'
 gem 'dry-validation'
 gem 'fastimage'
-gem 'faye-websocket'
 gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng'
 gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fediverse'
 gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
@@ -18,6 +17,7 @@ gem 'sidekiq', '~>6.4.0' # CVE-2022-23837
 gem 'sidekiq-scheduler', '~>3.1.0'
 gem 'vacuum', '~>3.0'
 gem 'webrick'
+gem 'websocket-client-simple'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
