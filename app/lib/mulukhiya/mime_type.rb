@@ -30,6 +30,7 @@ module Mulukhiya
       @types['.mp3'] = 'audio/mpeg'
       @types['.webp'] = 'image/webp'
       @types['.md'] = 'text/markdown'
+      @types['.mkv'] = 'video/x-matroska'
       @extnames = @types.invert
       @extnames['video/mp4'] = '.mp4'
       @extnames['audio/mpeg'] = '.mp3'

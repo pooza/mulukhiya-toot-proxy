@@ -56,7 +56,7 @@ module Mulukhiya
 
     def type
       type = Marcel::MimeType.for Pathname.new(path)
-      if (type.split('/').first == 'application')
+      if type.split('/').first == 'application'
         command = CommandLine.new(['file', '-b', '--mime', path])
         command.exec
         type = command.stdout.split(';').first if command.status.zero?
