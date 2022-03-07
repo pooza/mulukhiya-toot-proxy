@@ -165,7 +165,7 @@ module Mulukhiya
       finder = Ginseng::FileFinder.new
       finder.dir = File.join(Environment.dir, 'tmp/media')
       finder.patterns.push('*')
-      finder.exec.select {|p| FileTest.file?(p)}.each(&block)
+      finder.exec.select {|f| FileTest.file?(f)}.each(&block)
     end
   end
 end
