@@ -15,21 +15,6 @@ module Mulukhiya
 
     alias to_h values
 
-    def type
-      return [mediatype, subtype].join('/') if invalid_mediatype?
-      return super
-    end
-
-    def mediatype
-      return default_mediatype if invalid_mediatype?
-      return super
-    end
-
-    def subtype
-      return "x-#{video_stream['codec_name'].downcase}" if invalid_mediatype?
-      return super
-    end
-
     def width
       return video_stream['width'].to_i if video_stream&.dig('width')
       return nil
@@ -50,10 +35,6 @@ module Mulukhiya
       command = CommandLine.new(['ffmpeg', '-y', '-i', path, dest])
       command.exec unless File.exist?(dest)
       return VideoFile.new(dest)
-    end
-
-    def invalid_mediatype?
-      return mimemagic&.mediatype == 'application' && video_stream.present?
     end
   end
 end

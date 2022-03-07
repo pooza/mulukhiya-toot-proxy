@@ -26,12 +26,12 @@ module Mulukhiya
 
     def test_subtype
       assert_equal(@mp4.subtype, 'mp4')
-      assert_equal(@mkv.subtype, 'x-h264')
+      assert_equal(@mkv.subtype, 'x-matroska')
     end
 
     def test_type
       assert_equal(@mp4.type, 'video/mp4')
-      assert_equal(@mkv.type, 'video/x-h264')
+      assert_equal(@mkv.type, 'video/x-matroska')
     end
 
     def test_width
