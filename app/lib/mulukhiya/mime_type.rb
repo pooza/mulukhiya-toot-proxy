@@ -3,7 +3,7 @@ require 'rack/mime'
 module Mulukhiya
   class MIMEType
     include Singleton
-    const DEFAULT = 'application/octet-stream'.freeze
+    DEFAULT = 'application/octet-stream'.freeze
     attr_reader :types, :extnames
 
     def extname(type)
