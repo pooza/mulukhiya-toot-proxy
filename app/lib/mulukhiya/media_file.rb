@@ -62,6 +62,9 @@ module Mulukhiya
         type = command.stdout.split(';').first if command.status.zero?
       end
       return type
+    rescue => e
+      e.log(file: path)
+      return MIMEType::DEFAULT
     end
 
     def extname
