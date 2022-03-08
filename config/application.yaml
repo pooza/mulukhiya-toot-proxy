@@ -442,7 +442,7 @@ meisskey:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: text
@@ -616,7 +616,7 @@ misskey:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: text
@@ -897,7 +897,7 @@ pleroma:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: content

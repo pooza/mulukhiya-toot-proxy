@@ -24,7 +24,7 @@ handler:
 pleroma:
   attachment:
     types:
-      image: image/jpeg
+      image: image/webp
   url: https://pleroma.example.com/
 postgres:
   dsn: postgres://pleroma@localhost:5432/pleroma
