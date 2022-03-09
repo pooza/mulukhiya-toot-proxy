@@ -3,5 +3,5 @@
 
 <%= params.dig(:review, :body).ellipsize(config['/annict/chars']) %>
 <% end -%>
-<%= params.dig(:review, :work, :title).to_hashtag %>
 <%= Mulukhiya::AnnictService.create_review_uri(params.dig(:review, :work, :id)) %>
+<%= params.dig(:review, :work, :title).to_hashtag %>
