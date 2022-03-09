@@ -47,11 +47,12 @@ module Mulukhiya
     alias note post
 
     def command(text = nil)
+      text ||= config['/webhook/sample']
       return CommandLine.new([
         'curl',
         '-H', 'Content-Type: application/json',
         '-X', 'POST',
-        '-d', {text: text || config['/webhook/sample'], visibility:}.to_json,
+        '-d', {text:, visibility:}.to_json,
         uri.to_s
       ])
     end
