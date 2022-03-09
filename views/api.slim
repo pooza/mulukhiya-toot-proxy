@@ -95,7 +95,7 @@ html lang='ja'
             h3 @click='toggleVisibility("lemmy")' Lemmy
             vue-slide-up-down :active='layout.details.lemmy'
               .endpoint-container
-                .link GET /mulukhiya/api/lemmy/communities
+                .link GET {{endpoints.lemmy_communities}}
                 .link-description 参加しているLemmyコミュニティを返します。
                 .field-update-button-container
                   button @click='getLemmyCommunities' 実行
@@ -221,10 +221,12 @@ html lang='ja'
           entries: {},
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
+            lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
-            media_list: {page: 1, q: null},
+            media_list: {page: 1, q: null, token: Vue.getToken()},
+            lemmy_communities: {token: Vue.getToken()},
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
             media_metadata_clear: {token: Vue.getToken()},
@@ -267,6 +269,9 @@ html lang='ja'
             .then(e => {
               this.account = e.account
               this.config = e.config
+              if (Vue.getToken()) {
+                this.endpoints.media_list += `&token=${encodeURIComponent(Vue.getToken())}`
+              }
             }).catch(e => Vue.alert(this.$dialog, e))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
@@ -292,6 +297,7 @@ html lang='ja'
             } else {
               url.searchParams.delete('q')
             }
+            if (Vue.getToken()) {url.searchParams.set('token', Vue.getToken())}
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
           onInputCustomAPI (id, key) {
