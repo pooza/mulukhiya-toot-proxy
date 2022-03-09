@@ -62,8 +62,7 @@ module Mulukhiya
 
       def recent_status
         return nil unless row = Postgres.instance.exec('recent_toot', {acct:}).first
-        location = service.http.get(row[:uri], {follow_redirects: false}).headers[:location]
-        return Status[location.split('/').last]
+        return Status[service.search_status_id(URI.parse(row[:uri]))]
       rescue => e
         e.log(account_id: id)
         return nil
