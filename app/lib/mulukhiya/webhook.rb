@@ -34,9 +34,7 @@ module Mulukhiya
 
     def post(payload)
       body = payload.values
-      body[visibility_field] = parser_class.visibility_name(
-        (body[visibility_field] || visibility),
-      )
+      body[visibility_field] = parser_class.visibility_name(body[visibility_field] || visibility)
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
       reporter.response = sns.post(body)
