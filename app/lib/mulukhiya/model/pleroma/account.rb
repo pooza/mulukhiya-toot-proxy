@@ -62,7 +62,7 @@ module Mulukhiya
 
       def recent_status
         return nil unless row = Postgres.instance.exec('recent_toot', {acct:}).first
-        return Status[service.search_status_id(URI.parse(row[:uri]))]
+        return Status[service.search_status_id(Ginseng::URI.parse(row[:uri]))]
       rescue => e
         e.log(account_id: id)
         return nil

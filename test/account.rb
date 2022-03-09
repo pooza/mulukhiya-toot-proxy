@@ -157,6 +157,10 @@ module Mulukhiya
       assert_nil(account_class.test_account)
     end
 
+    def test_recent_status
+      assert_kind_of(status_class, test_account.recent_status)
+    end
+
     def test_info_account
       assert_kind_of(account_class, account_class.info_account)
       config['/agent/info/token'] = 'bbb'
