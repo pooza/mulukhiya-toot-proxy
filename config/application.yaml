@@ -792,6 +792,9 @@ misskey:
 mongo:
   dsn: null
   query_log: false
+nextcloud:
+  urls:
+    file: /remote.php/dav/files
 nodeinfo:
   cache:
     ttl: 3600

@@ -1,6 +1,7 @@
 module Mulukhiya
   class NextcloudClipper
     include Package
+    attr_reader :http
 
     def initialize(params)
       @params = params.deep_symbolize_keys
@@ -10,24 +11,38 @@ module Mulukhiya
       @http.base_uri = @params[:url]
     end
 
+    def path_prefix
+      return File.join(@http.base_uri.path, config['/nextcloud/urls/file'], @params[:user])
+    end
+
     def create_uri(href)
-      return @http.create_uri(href)
+      return @http.create_uri(File.join(path_prefix, href))
     end
 
     def clip(params)
       params = {body: params.to_s} unless params.is_a?(Enumerable)
       params.deep_symbolize_keys!
-      dest = File.join(@params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md")
-      uri = create_uri(File.join(@http.base_uri.path, 'remote.php/dav/files', @params[:user], dest))
-      return @http.put(uri, {
-        headers: {
-          'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password]),
-          'Content-Type' => MIMEType.type(uri.path),
-        },
-        body: params[:body],
-      })
+      headers = {'Authorization' => HTTP.create_basic_auth(@params[:user], @params[:password])}
+      uri = create_uri(File.join(@params[:prefix], "#{Time.now.strftime('%Y%m%d-%H%M%S')}.md"))
+      dig(uri, {headers:})
+      headers['Content-Type'] = MIMEType.type(uri.path)
+      body = params[:body]
+      return @http.put(uri, {headers:, body:})
     rescue => e
       raise Ginseng::GatewayError, "Nextcloud upload error (#{e.message})", e.backtrace
+    end
+
+    def dig(uri, params)
+      path = uri.path.sub(path_prefix, '')
+      href = '/'
+      File.dirname(path).split('/').each do |part|
+        href = File.join(href, part)
+        uri = create_uri(href)
+        @http.get(uri, {headers: params[:headers]})
+      rescue => e
+        e.log(uri:)
+        @http.mkcol(uri, {headers: params[:headers]})
+      end
     end
   end
 end
