@@ -4,14 +4,12 @@ module Mulukhiya
 
     def mkcol(uri, options = {})
       cnt ||= 0
-      options[:headers] = create_headers(options[:headers])
-      options[:body] = create_body(options[:body], options[:headers])
       start = Time.now
       uri = create_uri(uri)
       response = RestClient::Request.execute(
         method: :mkcol,
         url: uri.normalize.to_s,
-        headers: options[:headers],
+        headers: create_headers(options[:headers]),
       )
       log(method: :mkcol, url: uri, status: response.code, start:)
       raise Ginseng::GatewayError, "Bad response #{response.code}" unless response.code < 400
