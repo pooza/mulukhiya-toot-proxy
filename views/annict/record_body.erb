@@ -3,5 +3,5 @@
 
 <%= params.dig(:record, :record, :comment).ellipsize(config['/annict/chars']) %>
 <% end -%>
-<%= params.dig(:record, :work, :title).to_hashtag %>
 <%= Mulukhiya::AnnictService.create_record_uri(params.dig(:record, :work, :id), params.dig(:record, :episode, :id)) %>
+<%= params.dig(:record, :work, :title).to_hashtag %>

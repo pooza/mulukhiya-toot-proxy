@@ -24,7 +24,7 @@ handler:
 misskey:
   attachment:
     types:
-      image: image/jpeg
+      image: image/webp
   url: https://misskey.example.com/
 postgres:
   dsn: postgres://misskey@localhost:5432/misskey

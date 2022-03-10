@@ -14,6 +14,7 @@ module Mulukhiya
       assert_equal(@mime.type('.png'), 'image/png')
       assert_equal(@mime.type('.webp'), 'image/webp')
       assert_equal(@mime.type('.mp4'), 'video/mp4')
+      assert_equal(@mime.type('.mkv'), 'video/x-matroska')
       assert_equal(@mime.type('.mp3'), 'audio/mpeg')
       assert_equal(@mime.type('.md'), 'text/markdown')
       assert_equal(@mime.type(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')), 'audio/mpeg')
@@ -28,6 +29,7 @@ module Mulukhiya
       assert_equal(@mime.extname('image/png'), '.png')
       assert_equal(@mime.extname('image/webp'), '.webp')
       assert_equal(@mime.extname('video/mp4'), '.mp4')
+      assert_equal(@mime.extname('video/x-matroska'), '.mkv')
       assert_equal(@mime.extname('audio/mpeg'), '.mp3')
       assert_equal(@mime.extname('text/markdown'), '.md')
     end

@@ -3,6 +3,7 @@ require 'rack/mime'
 module Mulukhiya
   class MIMEType
     include Singleton
+    DEFAULT = 'application/octet-stream'.freeze
     attr_reader :types, :extnames
 
     def extname(type)
@@ -11,7 +12,7 @@ module Mulukhiya
 
     def type(ext)
       ext = File.extname(ext) if File.extname(ext).present?
-      return @types[ext] || 'application/octet-stream'
+      return @types[ext] || DEFAULT
     end
 
     def self.extname(type)
@@ -30,6 +31,7 @@ module Mulukhiya
       @types['.mp3'] = 'audio/mpeg'
       @types['.webp'] = 'image/webp'
       @types['.md'] = 'text/markdown'
+      @types['.mkv'] = 'video/x-matroska'
       @extnames = @types.invert
       @extnames['video/mp4'] = '.mp4'
       @extnames['audio/mpeg'] = '.mp3'

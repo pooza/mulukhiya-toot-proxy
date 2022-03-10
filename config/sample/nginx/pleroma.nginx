@@ -45,6 +45,6 @@ location ~ ^/api/v[0-9]+/pleroma/chats/[a-zA-Z0-9]+/messages$ {
   }
 }
 location ^~ /mulukhiya {
-  proxy_set_header Host $http_host;
+  proxy_set_header Host $host;
   proxy_pass http://localhost:3008;
 }

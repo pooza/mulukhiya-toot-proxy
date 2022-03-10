@@ -1,4 +1,3 @@
-require 'eventmachine'
 require 'faye/websocket'
 
 module Mulukhiya
@@ -16,6 +15,7 @@ module Mulukhiya
         tls: {
           verify_peer: verify_peer?,
           root_cert_file:,
+          logger:,
         },
         ping: keepalive,
       })

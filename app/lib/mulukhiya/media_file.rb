@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def mediatype
-      return mimemagic&.mediatype
+      return type.split('/').first
     end
 
     def default_mediatype
@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def subtype
-      return mimemagic&.subtype
+      return type.split('/').last
     end
 
     def image?
@@ -55,7 +55,16 @@ module Mulukhiya
     end
 
     def type
-      return mimemagic.to_s
+      type = Marcel::MimeType.for Pathname.new(path)
+      if type.split('/').first == 'application'
+        command = CommandLine.new(['file', '-b', '--mime', path])
+        command.exec
+        type = command.stdout.split(';').first if command.status.zero?
+      end
+      return type
+    rescue => e
+      e.log(file: path)
+      return MIMEType::DEFAULT
     end
 
     def extname
@@ -112,11 +121,6 @@ module Mulukhiya
       )
     end
 
-    def mimemagic
-      @mimemagic ||= MimeMagic.by_magic(self)
-      return @mimemagic
-    end
-
     def streams
       unless @streams
         command = CommandLine.new([
@@ -164,7 +168,7 @@ module Mulukhiya
       finder = Ginseng::FileFinder.new
       finder.dir = File.join(Environment.dir, 'tmp/media')
       finder.patterns.push('*')
-      finder.exec(&block)
+      finder.exec.select {|f| FileTest.file?(f)}.each(&block)
     end
   end
 end

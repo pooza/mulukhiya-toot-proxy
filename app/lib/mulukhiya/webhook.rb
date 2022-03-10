@@ -12,6 +12,9 @@ module Mulukhiya
 
     def visibility
       return parser_class.visibility_name(@user_config['/webhook/visibility'])
+    rescue => e
+      e.log
+      return 'public'
     end
 
     def uri
@@ -30,7 +33,8 @@ module Mulukhiya
     end
 
     def post(payload)
-      body = payload.values.merge(visibility_field => visibility)
+      body = payload.values
+      body[visibility_field] = parser_class.visibility_name(body[visibility_field] || visibility)
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
       reporter.response = sns.post(body)
@@ -43,11 +47,12 @@ module Mulukhiya
     alias note post
 
     def command(text = nil)
+      text ||= config['/webhook/sample']
       return CommandLine.new([
         'curl',
         '-H', 'Content-Type: application/json',
         '-X', 'POST',
-        '-d', {text: text || config['/webhook/sample']}.to_json,
+        '-d', {text:, visibility:}.to_json,
         uri.to_s
       ])
     end

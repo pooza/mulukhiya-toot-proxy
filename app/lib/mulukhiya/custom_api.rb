@@ -62,7 +62,7 @@ module Mulukhiya
     def create_command(args = {})
       command = CommandLine.create(params)
       command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
-      command.env['RUBYOPT'] = '--disable-did_you_mean' if config['/bundler/did_you_mean']
+      command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/bundler/did_you_mean']
       return command
     end
 

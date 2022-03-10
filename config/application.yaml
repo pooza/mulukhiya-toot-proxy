@@ -442,7 +442,7 @@ meisskey:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: text
@@ -616,7 +616,7 @@ misskey:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: text
@@ -792,6 +792,9 @@ misskey:
 mongo:
   dsn: null
   query_log: false
+nextcloud:
+  urls:
+    file: /remote.php/dav/files
 nodeinfo:
   cache:
     ttl: 3600
@@ -859,7 +862,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.14.7
+  version: 4.15.0
 parser:
   note:
     fields:
@@ -897,7 +900,7 @@ pleroma:
     types:
       animation_image: null
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   chat:
     field: content

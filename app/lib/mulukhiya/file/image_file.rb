@@ -23,6 +23,7 @@ module Mulukhiya
     end
 
     def type
+      return @type if @type
       if Environment.mastodon?
         command = CommandLine.new(['file', '-b', '--mime', path])
         command.exec
@@ -33,8 +34,7 @@ module Mulukhiya
       return @type
     rescue => e
       e.log(file: path)
-      @type = super
-      return @type
+      return @type = super
     end
 
     def mediatype

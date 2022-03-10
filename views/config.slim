@@ -77,8 +77,6 @@ html lang='ja'
               | 必要ならば記事作成先を入力してください。空欄の場合は
               code = "/mulukhiya"
               | に記事が作成されます。
-              br
-              | また、このディレクトリをNextcloud側に前もって作成しておいてください。
             li 更新ボタンを押下。
           .inline-field-container
             h4 URL
@@ -327,7 +325,7 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateNextcloud () {
-            const command = {nextcloud: {url: null, user: null}}
+            const command = {nextcloud: {url: null, user: null, prefix: null}}
             if (this.form.nextcloud.url) {command.nextcloud.url = this.form.nextcloud.url}
             if (this.form.nextcloud.user) {command.nextcloud.user = this.form.nextcloud.user}
             if (this.form.nextcloud.password) {command.nextcloud.password = this.form.nextcloud.password}
