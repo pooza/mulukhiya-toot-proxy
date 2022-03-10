@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def dig(uri, params)
-      path = uri.path.sub(path_prefix, '')
+      path = uri.path.sub(Regexp.new("^#{Regexp.escape(path_prefix)}"), '')
       href = '/'
       File.dirname(path).split('/').each do |part|
         href = File.join(href, part)
