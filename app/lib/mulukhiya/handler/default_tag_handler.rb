@@ -2,7 +2,7 @@ module Mulukhiya
   class DefaultTagHandler < TagHandler
     def disable?
       return true unless self.class.tags.present?
-      return true unless @event == :pre_toot
+      return true unless [:pre_toot, :pre_webhook].member?(@event)
       return super
     end
 

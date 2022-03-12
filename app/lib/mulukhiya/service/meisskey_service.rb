@@ -45,6 +45,16 @@ module Mulukhiya
       return super
     end
 
+    def announcements(params = {})
+      response = http.get('/api/meta', {
+        body: {i: token}.to_json,
+        headers: create_headers(params[:headers]),
+      })
+      return response['announcements'].map do |entry|
+        entry.deep_symbolize_keys.merge(content: entry['text'], id: entry.to_json.adler32)
+      end
+    end
+
     def oauth_client(type = :default)
       return nil unless scopes = MeisskeyController.oauth_scopes(type)
       body = {
