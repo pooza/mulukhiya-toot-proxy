@@ -62,23 +62,19 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
+        records = []
         params[:page] ||= 1
-        storage = MediaCatalogRenderStorage.new
-        if storage[params].nil? || params[:q]
-          records = []
-          Status.aggregate('media_catalog', params).each do |row|
-            status = Status[row[:_id]]
-            row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
-              records.push(attachment.to_h.deep_symbolize_keys.merge(
-                id: attachment.id,
-                date: status.createdAt.getlocal,
-                status_url: status.uri.to_s,
-              ))
-            end
+        Status.aggregate('media_catalog', params).each do |row|
+          status = Status[row[:_id]]
+          row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
+            records.push(attachment.to_h.deep_symbolize_keys.merge(
+              id: attachment.id,
+              date: status.createdAt.getlocal,
+              status_url: status.uri.to_s,
+            ))
           end
-          storage[params] = records unless params[:q]
         end
-        return params[:q] ? records : storage[params]
+        return records
       end
 
       def self.feed(&block)
