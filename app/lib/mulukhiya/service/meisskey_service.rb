@@ -51,7 +51,7 @@ module Mulukhiya
         headers: create_headers(params[:headers]),
       })
       return response['announcements'].map do |entry|
-        {id: entry.to_json.adler32, title: entry['title'], text: entry['text']}
+        entry.deep_symbolize_keys.merge(content: entry['text'], id: entry.to_json.adler32)
       end
     end
 
