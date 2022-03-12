@@ -16,7 +16,7 @@
       $in:
         - <%= controller_class.visibility_name(:public) %>
         - <%= controller_class.visibility_name(:unlisted) %>
-- $skip: <%= config['/feed/media/limit'].to_i * (params[:page].to_i - 1) %>
-- $limit: <%= config['/feed/media/limit'].to_i * params[:page].to_i %>
 - $sort:
     createdAt: -1
+- $skip: <%= config['/feed/media/limit'].to_i * (params[:page].to_i - 1) %>
+- $limit: <%= config['/feed/media/limit'].to_i * params[:page].to_i %>
