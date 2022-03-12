@@ -14,8 +14,8 @@
 <% if params[:local] -%>
     _user.host: null
 <% end -%>
+- $sort:
+    createdAt: -1
 <% if params[:limit] -%>
 - $limit: <%= params[:limit].to_i %>
 <% end -%>
-- $sort:
-    createdAt: -1
