@@ -185,10 +185,10 @@ module Mulukhiya
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def test_token
         return config['/agent/test/token'].decrypt
       rescue Ginseng::ConfigError

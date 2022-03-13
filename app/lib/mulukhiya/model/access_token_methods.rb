@@ -11,10 +11,10 @@ module Mulukhiya
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def webhook_entries(&block)
         return enum_for(__method__) unless block
         Postgres.instance.exec('webhook_tokens')

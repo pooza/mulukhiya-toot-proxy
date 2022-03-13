@@ -78,10 +78,10 @@ module Mulukhiya
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def environment_class
         return Environment
       end
