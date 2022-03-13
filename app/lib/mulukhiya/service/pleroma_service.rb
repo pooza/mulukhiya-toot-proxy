@@ -7,9 +7,9 @@ module Mulukhiya
     alias info nodeinfo
 
     def post(body, params = {})
-      response = super
+      return super
+    ensure
       MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
-      return response
     end
 
     alias toot post
