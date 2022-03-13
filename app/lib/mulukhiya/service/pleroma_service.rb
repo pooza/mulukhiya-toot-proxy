@@ -6,44 +6,7 @@ module Mulukhiya
 
     alias info nodeinfo
 
-    def post(body, params = {})
-      return super
-    ensure
-      MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
-    end
-
     alias toot post
-
-    def upload(path, params = {})
-      path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
-      if filename = params[:filename]
-        dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
-        FileUtils.mkdir_p(dir)
-        file = MediaFile.new(path)
-        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
-        dest = File.join(dir, dest)
-        FileUtils.copy(path, dest)
-        path = dest
-      end
-      params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
-      return super
-    ensure
-      FileUtils.rm_rf(dir) if dir
-    end
-
-    def upload_remote_resource(uri, params = {})
-      payload = {file: {tempfile: MediaFile.download(uri)}}
-      params[:filename] ||= File.basename(uri.path)
-      Event.new(:pre_upload, params).dispatch(payload)
-      response = upload(payload.dig(:file, :tempfile).path, params)
-      Event.new(:post_upload, params).dispatch(payload)
-      return response
-    end
-
-    def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(String)
-      return delete_status(attachment.status, params)
-    end
 
     def search_status_id(status)
       case status
