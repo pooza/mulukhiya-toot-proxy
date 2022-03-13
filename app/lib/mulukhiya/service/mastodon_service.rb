@@ -108,9 +108,5 @@ module Mulukhiya
         MastodonController.reply_to_field => options.dig(:response, :id),
       )
     end
-
-    def default_token
-      return account_class.test_token
-    end
   end
 end

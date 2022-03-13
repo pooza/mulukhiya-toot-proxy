@@ -34,5 +34,9 @@ module Mulukhiya
       @redis ||= Redis.new
       return @redis
     end
+
+    def default_token
+      return account_class.test_token
+    end
   end
 end

@@ -86,9 +86,5 @@ module Mulukhiya
         MisskeyController.reply_to_field => reply_to,
       )
     end
-
-    def default_token
-      return account_class.test_token
-    end
   end
 end
