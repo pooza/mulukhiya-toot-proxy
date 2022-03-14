@@ -100,23 +100,19 @@ module Mulukhiya
     end
 
     def test_webhook
-      return unless account&.webhook
-      assert_kind_of(Webhook, account.webhook)
+      assert_kind_of([Webhook, NilClass], account.webhook)
     end
 
     def test_growi
-      return unless account&.growi
-      assert_kind_of(GrowiClipper, account.growi)
+      assert_kind_of([GrowiClipper, NilClass], account.growi)
     end
 
     def test_lemmy
-      return unless account&.lemmy
-      assert_kind_of(LemmyClipper, account.lemmy)
+      assert_kind_of([LemmyClipper, NilClass], account.lemmy)
     end
 
     def test_nextcloud
-      return unless account&.nextcloud
-      assert_kind_of(NextcloudClipper, account.nextcloud)
+      assert_kind_of([NextcloudClipper, NilClass], account.nextcloud)
     end
 
     def test_disable?
