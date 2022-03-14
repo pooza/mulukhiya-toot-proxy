@@ -11,7 +11,7 @@ module Mulukhiya
         return false if to_s.empty?
         return false unless account
         return true unless application
-        return application.name == Package.name
+        return application.name.start_with?(Package.short_name)
       end
 
       def to_s

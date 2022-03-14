@@ -6,7 +6,7 @@ module Mulukhiya
       def valid?
         return false if to_s.empty?
         return false unless account
-        return application.name == Package.name
+        return application.name.start_with?(Package.short_name)
       end
 
       def to_h
