@@ -145,7 +145,7 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Only test users can run it' unless test?
       bar = ProgressBar.create(total: status_delete_limit)
       attachments.first(status_delete_limit).each do |attachment|
-        service.delete_attachment(attachment) unless params[:dryrun]
+        service.delete_attachment(attachment)
       rescue => e
         e.log(acct: acct.to_s)
       ensure
