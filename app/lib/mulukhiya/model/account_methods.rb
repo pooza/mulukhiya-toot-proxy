@@ -44,8 +44,7 @@ module Mulukhiya
 
     def growi
       unless @growi
-        return nil unless user_config['/growi/url'].present?
-        return nil unless user_config['/growi/token'].present?
+        return nil unless [:url, :token].all? {|k| user_config["/growi/#{k}"]}
         default_prefix = File.join('/', Package.short_name, 'user', username)
         @growi = GrowiClipper.new(
           uri: user_config['/growi/url'],
