@@ -36,11 +36,6 @@ html lang='ja'
             .value
               code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
               i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#webhook-" + current_account.username'
-        .all-tokens v-if='all_tokens'
-          h4 全てのトークン
-          .description 他のブラウザやPCに、トークンを持ち出すことができます。
-          textarea ref='all_tokens' :value='all_tokens'
-          i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" @click='copyAllTokens'
       nav.tokens
         h3 トークンの登録
         .token
@@ -188,10 +183,6 @@ html lang='ja'
           },
           getAllTokens () {
             return this.accounts.map(v => v.token).join("\n")
-          },
-          copyAllTokens () {
-            this.$refs.all_tokens.select()
-            document.execCommand('copy')
           },
           isLoggedIn (account) {
             return account.token == this.token
