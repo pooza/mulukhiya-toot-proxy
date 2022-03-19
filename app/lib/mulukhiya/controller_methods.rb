@@ -1,10 +1,10 @@
 module Mulukhiya
   module ControllerMethods
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def name
         return to_s.split('::').last.sub(/Controller$/, '').underscore
       end

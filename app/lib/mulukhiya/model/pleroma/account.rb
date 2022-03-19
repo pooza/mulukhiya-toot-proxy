@@ -88,7 +88,7 @@ module Mulukhiya
         raise Ginseng::AuthError, 'Only test users can run it' unless test?
         bar = ProgressBar.create(total: deletable_statuses.count)
         deletable_statuses.each do |status|
-          service.delete_status(Ginseng::URI.parse(status['uri'])) unless params[:dryrun]
+          service.delete_status(Ginseng::URI.parse(status['uri']))
         rescue => e
           e.log(acct: acct.to_s)
         ensure

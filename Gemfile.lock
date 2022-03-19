@@ -42,9 +42,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 7c7c4cca81eb0672dffe457bb9f3acc43a14ead8
+  revision: c33cb7f2428d9cb5c4edef378446f81c08475ac4
   specs:
-    ginseng-fediverse (1.7.10)
+    ginseng-fediverse (1.7.11)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -200,7 +200,7 @@ GEM
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.3.0)
-    loofah (2.14.0)
+    loofah (2.15.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -355,7 +355,7 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8)
+    unf_ext (0.0.8.1)
     unicode-display_width (2.1.0)
     vacuum (3.4.1)
       aws-sigv4 (~> 1.0)

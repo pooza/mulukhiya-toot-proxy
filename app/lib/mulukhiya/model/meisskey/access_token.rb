@@ -3,12 +3,6 @@ module Mulukhiya
     class AccessToken < MongoCollection
       include AccessTokenMethods
 
-      def valid?
-        return false if to_s.empty?
-        return false unless account
-        return application.name == Package.name
-      end
-
       def to_h
         return values.deep_symbolize_keys.merge(
           digest: webhook_digest,

@@ -6,42 +6,7 @@ module Mulukhiya
 
     alias info nodeinfo
 
-    def post(body, params = {})
-      response = super
-      MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
-      return response
-    end
-
     alias toot post
-
-    def upload(path, params = {})
-      path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
-      if filename = params[:filename]
-        dir = File.join(Environment.dir, 'tmp/media/upload', path.adler32)
-        FileUtils.mkdir_p(dir)
-        file = MediaFile.new(path)
-        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
-        dest = File.join(dir, dest)
-        FileUtils.copy(path, dest)
-        path = dest
-      end
-      params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
-      return super
-    end
-
-    def upload_remote_resource(uri, params = {})
-      payload = {file: {tempfile: MediaFile.download(uri)}}
-      params[:version] ||= 1
-      Event.new(:pre_upload, params).dispatch(payload)
-      response = upload(payload.dig(:file, :tempfile).path, params)
-      Event.new(:post_upload, params).dispatch(payload)
-      return response
-    end
-
-    def delete_attachment(attachment, params = {})
-      attachment = attachment_class[attachment] if attachment.is_a?(Integer)
-      return delete_status(attachment.status, params) if attachment.status
-    end
 
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
@@ -107,10 +72,6 @@ module Mulukhiya
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
         MastodonController.reply_to_field => options.dig(:response, :id),
       )
-    end
-
-    def default_token
-      return account_class.test_token
     end
   end
 end

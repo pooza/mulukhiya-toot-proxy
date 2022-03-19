@@ -1,5 +1,7 @@
 module Mulukhiya
   module AttachmentMethods
+    include SNSMethods
+
     def mediatype
       return type.split('/').first
     end
@@ -47,10 +49,10 @@ module Mulukhiya
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def query_params
         return {
           limit: config['/feed/media/limit'],

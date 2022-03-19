@@ -43,16 +43,13 @@ module Mulukhiya
     end
 
     def growi
-      unless @growi
-        return nil unless user_config['/growi/url'].present?
-        return nil unless user_config['/growi/token'].present?
-        default_prefix = File.join('/', Package.short_name, 'user', username)
-        @growi = GrowiClipper.new(
-          uri: user_config['/growi/url'],
-          token: user_config['/growi/token'],
-          prefix: user_config['/growi/prefix'] || default_prefix,
-        )
-      end
+      return nil unless [:url, :token].all? {|k| user_config["/growi/#{k}"]}
+      default_prefix = File.join('/', Package.short_name, 'user', username)
+      @growi ||= GrowiClipper.new(
+        uri: user_config['/growi/url'],
+        token: user_config['/growi/token'],
+        prefix: user_config['/growi/prefix'] || default_prefix,
+      )
       return @growi
     rescue => e
       e.log(acct: acct.to_s)
@@ -60,15 +57,13 @@ module Mulukhiya
     end
 
     def lemmy
-      unless @lemmy
-        return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
-        @lemmy = LemmyClipper.new(
-          url: user_config['/lemmy/url'],
-          user: user_config['/lemmy/user'],
-          password: user_config['/lemmy/password'],
-          community: user_config['/lemmy/community'],
-        )
-      end
+      return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
+      @lemmy ||= LemmyClipper.new(
+        url: user_config['/lemmy/url'],
+        user: user_config['/lemmy/user'],
+        password: user_config['/lemmy/password'],
+        community: user_config['/lemmy/community'],
+      )
       return @lemmy
     rescue => e
       e.log(acct: acct.to_s)
@@ -76,15 +71,13 @@ module Mulukhiya
     end
 
     def nextcloud
-      unless @nextcloud
-        return nil unless [:url, :user, :password].all? {|k| user_config["/nextcloud/#{k}"]}
-        @nextcloud = NextcloudClipper.new(
-          url: user_config['/nextcloud/url'],
-          user: user_config['/nextcloud/user'],
-          password: user_config['/nextcloud/password'],
-          prefix: user_config['/nextcloud/prefix'],
-        )
-      end
+      return nil unless [:url, :user, :password].all? {|k| user_config["/nextcloud/#{k}"]}
+      @nextcloud ||= NextcloudClipper.new(
+        url: user_config['/nextcloud/url'],
+        user: user_config['/nextcloud/user'],
+        password: user_config['/nextcloud/password'],
+        prefix: user_config['/nextcloud/prefix'],
+      )
       return @nextcloud
     rescue => e
       e.log(acct: acct.to_s)
@@ -92,7 +85,7 @@ module Mulukhiya
     end
 
     def annict
-      return nil unless user_config['/annict/token'].present?
+      return nil unless [:token].all? {|k| user_config["/annict/#{k}"]}
       @annict ||= AnnictService.new(user_config['/annict/token'])
       return @annict
     end
@@ -152,7 +145,7 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Only test users can run it' unless test?
       bar = ProgressBar.create(total: status_delete_limit)
       attachments.first(status_delete_limit).each do |attachment|
-        service.delete_attachment(attachment) unless params[:dryrun]
+        service.delete_attachment(attachment)
       rescue => e
         e.log(acct: acct.to_s)
       ensure
@@ -185,10 +178,10 @@ module Mulukhiya
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def test_token
         return config['/agent/test/token'].decrypt
       rescue Ginseng::ConfigError

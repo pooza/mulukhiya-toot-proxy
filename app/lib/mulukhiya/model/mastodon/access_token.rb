@@ -12,7 +12,7 @@ module Mulukhiya
         return false unless user.account
         return false if expires_in.present?
         return false if revoked_at.present?
-        return application.name == Package.name
+        return true
       end
 
       alias to_s token

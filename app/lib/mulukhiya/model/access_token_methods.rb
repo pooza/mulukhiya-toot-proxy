@@ -2,19 +2,25 @@ module Mulukhiya
   module AccessTokenMethods
     include SNSMethods
 
+    def valid?
+      return false if to_s.empty?
+      return false unless account
+      return true
+    end
+
     def webhook_digest
       return Webhook.create_digest(sns_class.new.uri, to_s)
     end
 
     def scopes_valid?
-      return scopes == account.default_scopes
+      return [:default, :infobot].map {|v| controller_class.oauth_scopes(v)}.member?(scopes)
     end
 
     def self.included(base)
-      base.extend(Methods)
+      base.extend(ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
       def webhook_entries(&block)
         return enum_for(__method__) unless block
         Postgres.instance.exec('webhook_tokens')
