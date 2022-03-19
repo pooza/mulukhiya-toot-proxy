@@ -29,11 +29,13 @@ html lang='ja'
           .field
             .title トークン:
             .value
-              code v-if='current_account.token' {{current_account.token}}
+              code :id='"token-" + current_account.username' v-if='current_account.token' {{current_account.token}}
+              i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#token-" + current_account.username'
           .field
             .title webhook:
             .value
-              code v-if='current_account.webhook' {{current_account.webhook}}
+              code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
+              i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#webhook-" + current_account.username'
         .all-tokens v-if='all_tokens'
           h4 全てのトークン
           .description 他のブラウザやPCに、トークンを持ち出すことができます。
@@ -120,6 +122,7 @@ html lang='ja'
               this.accounts = e
               this.all_tokens = this.getAllTokens()
             }).catch(e => Vue.alert(this.$dialog, e))
+          new ClipboardJS('.token i');
         },
         methods: {
           switchAccount (account) {
