@@ -1153,7 +1153,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
       - https://cdn.jsdelivr.net/npm/axios@0.26/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
-      - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
+      - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
