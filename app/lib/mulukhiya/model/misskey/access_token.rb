@@ -7,13 +7,6 @@ module Mulukhiya
       many_to_one :account, key: :userId
       many_to_one :application, key: :appId
 
-      def valid?
-        return false if to_s.empty?
-        return false unless account
-        return true unless application
-        return application.name.start_with?(Package.short_name)
-      end
-
       def to_s
         return values[:hash]
       end

@@ -2,6 +2,12 @@ module Mulukhiya
   module AccessTokenMethods
     include SNSMethods
 
+    def valid?
+      return false if to_s.empty?
+      return false unless account
+      return true
+    end
+
     def webhook_digest
       return Webhook.create_digest(sns_class.new.uri, to_s)
     end
