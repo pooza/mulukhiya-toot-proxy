@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def scopes_valid?
-      return scopes == account.default_scopes
+      return [:default, :infobot].map {|v| controller_class.oauth_scopes(v)}.member?(scopes)
     end
 
     def self.included(base)
