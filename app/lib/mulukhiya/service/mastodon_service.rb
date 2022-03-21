@@ -8,6 +8,16 @@ module Mulukhiya
 
     alias toot post
 
+    def statuses(params = {})
+      case params[:type]
+      when 'account'
+        response = http.get("/api/v1/accounts/#{account.id}/statuses")
+        return response.parsed_response
+      else
+        return super
+      end
+    end
+
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super

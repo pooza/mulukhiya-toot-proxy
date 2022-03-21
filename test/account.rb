@@ -147,6 +147,14 @@ module Mulukhiya
       assert_kind_of(TagContainer, account.bio_tags)
     end
 
+    def test_statuses
+      return unless controller_class.update_status?
+      assert_kind_of(Array, statuses = account.statuses)
+      statuses.first(10).each do |status|
+        assert_kind_of(Hash, status)
+      end
+    end
+
     def test_test_account
       assert_kind_of(account_class, account_class.test_account)
       config['/agent/test/token'] = 'aaa'

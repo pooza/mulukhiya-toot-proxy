@@ -1,0 +1,33 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: controller.status_label}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 = controller.status_label
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+        },
+        mounted () {
+          Vue.getConfig()
+            .then(e => {
+              this.account = e.account
+            }).catch(e => Vue.alert(this.$dialog, e))
+          Vue.getFavoriteTags()
+            .then(e => {this.fav_entries = e})
+            .catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+        },
+      })

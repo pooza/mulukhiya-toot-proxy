@@ -292,6 +292,7 @@ mastodon:
     futured_tag: true
     media_catalog: true
     streaming: true
+    update_status: true
     webhook: true
   handlers:
     alert:

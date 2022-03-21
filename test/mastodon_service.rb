@@ -7,6 +7,13 @@ module Mulukhiya
       @key = SecureRandom.hex.adler32
     end
 
+    def test_statuses
+      assert_kind_of(Array, statuses = @service.statuses(type: 'account'))
+      statuses.first(10).each do |status|
+        assert_kind_of(Hash, status)
+      end
+    end
+
     def test_filters
       assert_kind_of(HTTParty::Response, @service.filters)
 

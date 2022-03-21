@@ -276,6 +276,15 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getStatuses = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createURL('/mulukhiya/api/status'))
+        .then(e => e.data)
+        .catch(e => e.response.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
