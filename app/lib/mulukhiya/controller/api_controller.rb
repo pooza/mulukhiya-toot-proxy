@@ -180,14 +180,7 @@ module Mulukhiya
     get '/status' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      params[:page] = params[:page]&.to_i || 1
-      errors = PagerContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors:}
-      else
-        @renderer.message = sns.account.statuses
-      end
+      @renderer.message = sns.account.statuses
       return @renderer.to_s
     rescue => e
       e.log
