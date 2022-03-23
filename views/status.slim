@@ -15,13 +15,17 @@ html lang='ja'
           .spoiler-text v-if='status.spoiler_text' = '{{status.spoiler_text}}'
           pre.body = '{{status.body}}'
           .footer-tags
-            i class='fa fa-tag'
+            h4
+              i class='fa fa-tag'
+              | タグの編集
             .tag v-for='tag in status.footer_tags'
               | {{tag}}
-              i class='fa fa-xmark'
+              a href='#' @click='deleteTag(status.id, tag)'
+                i class='fa fa-xmark'
             .tag
-              | タグを追加
-              i class='fa fa-pencil'
+              | 新規タグを追加
+              a href='#' @click='createTag(status.id)'
+                i class='fa fa-pencil'
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -42,5 +46,16 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
+          createTag(id) {
+            this.$dialog
+              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
+              .then(e => Vue.createTag(id, e.data))
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          deleteTag(id, tag) {
+            Vue.deleteTag(id, tag)
+              .then(e => {})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
         },
       })

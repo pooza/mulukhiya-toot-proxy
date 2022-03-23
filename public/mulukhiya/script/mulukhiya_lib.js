@@ -285,6 +285,24 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.createTag = async (id, tag) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post(Vue.createURL('/mulukhiya/api/status/${id}/tag', {token: Vue.getToken(), tag: tag}))
+        .then(e => e.data)
+        .catch(e => e.response.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.deleteTag = async (id, tag) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.delete(Vue.createURL('/mulukhiya/api/status/${id}/tag', {token: Vue.getToken(), tag: tag}))
+        .then(e => e.data)
+        .catch(e => e.response.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
