@@ -288,7 +288,7 @@ const MulukhiyaLib = {
     Vue.createTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post(Vue.createURL('/mulukhiya/api/status/${id}/tag', {token: Vue.getToken(), tag: tag}))
+      return axios.post('/mulukhiya/api/status/tag', {token: Vue.getToken(), id: id, tag: tag})
         .then(e => e.data)
         .catch(e => e.response.data)
         .finally(e => indicator.hide())
@@ -297,7 +297,7 @@ const MulukhiyaLib = {
     Vue.deleteTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.delete(Vue.createURL('/mulukhiya/api/status/${id}/tag', {token: Vue.getToken(), tag: tag}))
+      return axios.delete('/mulukhiya/api/status/tag', {data: {token: Vue.getToken(), id: id, tag: tag}})
         .then(e => e.data)
         .catch(e => e.response.data)
         .finally(e => indicator.hide())
