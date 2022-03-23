@@ -521,9 +521,36 @@ article
   .spoiler-text
     font:
       family: $sans-serif
-  .content
-    p
-      margin: 0
+  .footer-tags
+    font:
+      size: 0.9em
+      family: $sans-serif
+    .tag
+      display: inline-block
+      color: darkslategray
+      margin: 1px 2px
+      padding: 2px 0.5em
+      border:
+        width: 1px
+        style: solid
+        color: darkslategray
+        radius: 3px
+      i
+        margin:
+          left: 0.5em
+    .tag::before
+      content: '#'
+  pre.body
+    border:
+      color: transparent
+      radius: 6px
+    background:
+      color: papayawhip
+    white-space: pre-line
+    margin: 0.5em 0
+    font:
+      size: 0.9em
+      family: $serif
 
 textarea
   border:

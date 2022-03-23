@@ -12,7 +12,15 @@ module Mulukhiya
       case params[:type]
       when 'account'
         response = http.get("/api/v1/accounts/#{account.id}/statuses")
-        return response.parsed_response
+        return response.parsed_response.map do |status|
+          parser = TootParser.new(status['content'])
+          status.merge(
+            created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+            body: parser.body,
+            footer: parser.footer,
+            footer_tags: TagContainer.scan(parser.footer).to_a,
+          )
+        end
       else
         return super
       end

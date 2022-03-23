@@ -11,9 +11,17 @@ html lang='ja'
       h2 = controller.status_label
       - if controller.update_status?
         article v-for='status in statuses'
-          .created-at = '{{status.created_at}}'
+          .created-at = '{{status.created_at_str}}'
           .spoiler-text v-if='status.spoiler_text' = '{{status.spoiler_text}}'
-          .content v-html='status.content'
+          pre.body = '{{status.body}}'
+          .footer-tags
+            i class='fa fa-tag'
+            .tag v-for='tag in status.footer_tags'
+              | {{tag}}
+              i class='fa fa-xmark'
+            .tag
+              | タグを追加
+              i class='fa fa-pencil'
     javascript:
       'use strict'
       Vue.use(VTooltip)
