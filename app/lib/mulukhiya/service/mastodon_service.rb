@@ -19,6 +19,7 @@ module Mulukhiya
             body: parser.body,
             footer: parser.footer,
             footer_tags: TagContainer.scan(parser.footer).to_a,
+            visibility_class: TootParser.visibility_icon(status['visibility']),
           )
         end
       else

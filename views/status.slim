@@ -11,8 +11,11 @@ html lang='ja'
       h2 = controller.status_label
       - if controller.update_status?
         article v-for='status in statuses'
-          .created-at = '{{status.created_at_str}}'
-          .spoiler-text v-if='status.spoiler_text' = '{{status.spoiler_text}}'
+          .visibility
+            | {{status.visibility}}
+            i :class="'fa fa-' + status.visibility_class"
+          .header = '{{status.created_at_str}}'
+          .header v-if='status.spoiler_text' {{status.spoiler_text}}
           pre.body = '{{status.body}}'
           .footer-tags
             h4
