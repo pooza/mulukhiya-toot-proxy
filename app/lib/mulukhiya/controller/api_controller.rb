@@ -180,7 +180,7 @@ module Mulukhiya
     get '/status' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      @renderer.message = sns.account.statuses
+      @renderer.message = sns.account.statuses(params)
       return @renderer.to_s
     rescue => e
       e.log

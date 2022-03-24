@@ -276,10 +276,12 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getStatuses = async () => {
+    Vue.getStatuses = async min_id => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/status'))
+      const query = {limit: 50}
+      if (min_id) {query.min_id = min_id}
+      return axios.get(Vue.createURL('/mulukhiya/api/status', {query: query}))
         .then(e => e.data)
         .catch(e => e.response.data)
         .finally(e => indicator.hide())

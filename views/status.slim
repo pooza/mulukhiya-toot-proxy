@@ -14,7 +14,11 @@ html lang='ja'
           .visibility
             | {{status.visibility}}
             i :class="'fa fa-' + status.visibility_icon"
-          .header = '{{status.created_at_str}}'
+          .header
+            i class='fa fa-calendar'
+            | {{status.created_at_str}}
+          - if env.development?
+            .header = '{{status.id}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
           pre.body = '{{status.body}}'
           .footer-tags
@@ -29,6 +33,8 @@ html lang='ja'
               | 新規タグを追加
               a href='#' @click='createTag(status.id)'
                 i class='fa fa-pencil'
+        nav.media v-if='false && statuses.length && !last_page'
+          a @click='appendStatuses' 続きを読む…
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -39,14 +45,14 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           statuses: [],
+          last_page: false,
+          min_id: null,
         },
         mounted () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => Vue.alert(this.$dialog, e))
-          Vue.getStatuses()
-            .then(e => {this.statuses = e})
-            .catch(e => Vue.alert(this.$dialog, e))
+          this.appendStatuses()
         },
         methods: {
           createTag(id) {
@@ -59,6 +65,19 @@ html lang='ja'
             Vue.deleteTag(id, tag)
               .then(e => {})
               .catch(e => Vue.alert(this.$dialog, e))
+          },
+          appendStatuses () {
+            this.page ++
+            Vue.getStatuses(this.min_id)
+              .then(e => {
+                if (0 < e.length) {
+                  this.statuses = this.statuses.concat(e)
+                  this.min_id = this.statuses[this.statuses.length - 1].id
+                } else {
+                  this.last_page = true
+                  this.$dialog.alert('最後のページです')
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

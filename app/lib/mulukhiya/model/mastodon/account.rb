@@ -32,8 +32,8 @@ module Mulukhiya
 
       alias host domain
 
-      def statuses
-        return service.statuses(type: 'account')
+      def statuses(params = {})
+        return service.statuses(params.merge(type: 'account'))
       end
 
       def recent_status

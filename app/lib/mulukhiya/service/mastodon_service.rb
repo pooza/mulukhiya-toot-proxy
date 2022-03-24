@@ -11,9 +11,9 @@ module Mulukhiya
     def statuses(params = {})
       case params[:type]
       when 'account'
-        response = http.get("/api/v1/accounts/#{account.id}/statuses", {
-          headers: create_headers(params[:headers]),
-        })
+        uri = create_uri("/api/v1/accounts/#{account.id}/statuses")
+        uri.query_values = params.except(:type).compact
+        response = http.get(uri)
       else
         response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
       end
