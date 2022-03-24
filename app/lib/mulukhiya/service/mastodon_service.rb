@@ -11,19 +11,21 @@ module Mulukhiya
     def statuses(params = {})
       case params[:type]
       when 'account'
-        response = http.get("/api/v1/accounts/#{account.id}/statuses")
-        return response.parsed_response.map do |status|
-          parser = TootParser.new(status['content'])
-          status.merge(
-            created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
-            body: parser.body,
-            footer: parser.footer,
-            footer_tags: TagContainer.scan(parser.footer).to_a,
-            visibility_class: TootParser.visibility_icon(status['visibility']),
-          )
-        end
+        response = http.get("/api/v1/accounts/#{account.id}/statuses", {
+          headers: create_headers(params[:headers]),
+        })
       else
-        return super
+        response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
+      end
+      return response.parsed_response.map do |status|
+        parser = TootParser.new(status['content'])
+        status.merge(
+          created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+          body: parser.body,
+          footer: parser.footer,
+          footer_tags: TagContainer.scan(parser.footer).to_a,
+          visibility_icon: TootParser.visibility_icon(status['visibility']),
+        )
       end
     end
 

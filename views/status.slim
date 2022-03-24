@@ -13,7 +13,7 @@ html lang='ja'
         article v-for='status in statuses'
           .visibility
             | {{status.visibility}}
-            i :class="'fa fa-' + status.visibility_class"
+            i :class="'fa fa-' + status.visibility_icon"
           .header = '{{status.created_at_str}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
           pre.body = '{{status.body}}'
