@@ -8,14 +8,14 @@ module Mulukhiya
 
     def test_title
       assert_nil(@root.title)
-      assert_equal(@video.title, '【キラキラ☆プリキュアアラモード】後期エンディング 「シュビドゥビ☆スイーツタイム」 （歌：宮本佳那子）')
-      assert_equal(@music.title, 'キミに100パーセント')
+      assert_equal('【キラキラ☆プリキュアアラモード】後期エンディング 「シュビドゥビ☆スイーツタイム」 （歌：宮本佳那子）', @video.title)
+      assert_equal('キミに100パーセント', @music.title)
     end
 
     def test_music?
       assert_false(@root.music?)
       assert_false(@video.music?)
-      assert(@music.music?)
+      assert_predicate(@music, :music?)
     end
 
     def test_album_name
@@ -32,14 +32,14 @@ module Mulukhiya
 
     def test_track_name
       assert_nil(@root.track_name)
-      assert_equal(@video.track_name, '【キラキラ☆プリキュアアラモード】後期エンディング 「シュビドゥビ☆スイーツタイム」 （歌：宮本佳那子）')
-      assert_equal(@music.track_name, 'キミに100パーセント')
+      assert_equal('【キラキラ☆プリキュアアラモード】後期エンディング 「シュビドゥビ☆スイーツタイム」 （歌：宮本佳那子）', @video.track_name)
+      assert_equal('キミに100パーセント', @music.track_name)
     end
 
     def test_track?
       assert_false(@root.track?)
-      assert(@video.track?)
-      assert(@music.track?)
+      assert_predicate(@video, :track?)
+      assert_predicate(@music, :track?)
     end
 
     def test_artists

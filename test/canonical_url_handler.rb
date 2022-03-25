@@ -51,11 +51,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.apple.com/jp/apple-music/')
-      assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://www.apple.com/jp/apple-music/')
+      assert_equal('https://www.apple.com/jp/apple-music/', @handler.debug_info[:result].first[:rewrited_url])
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://twitter.com/rna/status/997883017312878592')
-      assert_equal(@handler.debug_info[:result].first[:rewrited_url], 'https://twitter.com/rna/status/997883017312878592')
+      assert_equal('https://twitter.com/rna/status/997883017312878592', @handler.debug_info[:result].first[:rewrited_url])
     end
   end
 end

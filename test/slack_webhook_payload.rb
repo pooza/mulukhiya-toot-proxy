@@ -64,27 +64,27 @@ module Mulukhiya
 
     def test_blocks?
       assert_false(@normal.blocks?)
-      assert(@blocks.blocks?)
+      assert_predicate(@blocks, :blocks?)
       assert_false(@growi.blocks?)
     end
 
     def test_attachments?
-      assert(@normal.attachments?)
+      assert_predicate(@normal, :attachments?)
       assert_false(@blocks.attachments?)
-      assert(@growi.attachments?)
+      assert_predicate(@growi, :attachments?)
     end
 
     def test_header
-      assert_equal(@normal.header, 'ネタバレ注意1')
-      assert_equal(@blocks.header, 'ネタバレ注意2')
-      assert_equal(@normal.spoiler_text, 'ネタバレ注意1')
-      assert_equal(@blocks.spoiler_text, 'ネタバレ注意2')
+      assert_equal('ネタバレ注意1', @normal.header)
+      assert_equal('ネタバレ注意2', @blocks.header)
+      assert_equal('ネタバレ注意1', @normal.spoiler_text)
+      assert_equal('ネタバレ注意2', @blocks.spoiler_text)
     end
 
     def test_text
-      assert_equal(@normal.text, '1: つかみ男につかまれると、体力ゲージが減少していく。')
-      assert_equal(@blocks.text, '2: つかみ男につかまれると、体力ゲージが減少していく。')
-      assert_equal(@growi.text, '🔔 [ pooza ](https://mulukhiya.growi.cloud/user/pooza) created [ /mulukhiya/user/pooza/2020/09/12/135825 ](https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825)')
+      assert_equal('1: つかみ男につかまれると、体力ゲージが減少していく。', @normal.text)
+      assert_equal('2: つかみ男につかまれると、体力ゲージが減少していく。', @blocks.text)
+      assert_equal('🔔 [ pooza ](https://mulukhiya.growi.cloud/user/pooza) created [ /mulukhiya/user/pooza/2020/09/12/135825 ](https://mulukhiya.growi.cloud/mulukhiya/user/pooza/2020/09/12/135825)', @growi.text)
     end
 
     def test_images
@@ -97,13 +97,13 @@ module Mulukhiya
       assert_kind_of(Array, @normal.image_uris)
       @normal.image_uris.each do |uri|
         assert_kind_of(Ginseng::URI, uri)
-        assert(uri.absolute?)
+        assert_predicate(uri, :absolute?)
       end
 
       assert_kind_of(Array, @blocks.image_uris)
       @blocks.image_uris.each do |uri|
         assert_kind_of(Ginseng::URI, uri)
-        assert(uri.absolute?)
+        assert_predicate(uri, :absolute?)
       end
     end
   end

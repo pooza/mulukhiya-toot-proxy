@@ -11,7 +11,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY')
-      assert(@handler.debug_info[:result].present?) if @handler.debug_info
+      assert_predicate(@handler.debug_info[:result], :present?) if @handler.debug_info
     end
   end
 end

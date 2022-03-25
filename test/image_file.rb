@@ -18,107 +18,107 @@ module Mulukhiya
     end
 
     def test_image?
-      assert(@png_rgba.image?)
+      assert_predicate(@png_rgba, :image?)
       assert_false(@mp3.image?)
       assert_false(@mp4.image?)
-      assert(@webp.image?)
-      assert(@agif.image?)
-      assert(@awebp.image?)
-      assert(@apng.image?)
+      assert_predicate(@webp, :image?)
+      assert_predicate(@agif, :image?)
+      assert_predicate(@awebp, :image?)
+      assert_predicate(@apng, :image?)
     end
 
     def test_mediatype
-      assert_equal(@png_rgba.mediatype, 'image')
-      assert_equal(@webp.mediatype, 'image')
+      assert_equal('image', @png_rgba.mediatype)
+      assert_equal('image', @webp.mediatype)
     end
 
     def test_subtype
-      assert_equal(@png_rgba.subtype, 'png')
-      assert_equal(@webp.subtype, 'webp')
+      assert_equal('png', @png_rgba.subtype)
+      assert_equal('webp', @webp.subtype)
     end
 
     def test_type
-      assert_equal(@png_rgba.type, 'image/png')
-      assert_equal(@webp.type, 'image/webp')
+      assert_equal('image/png', @png_rgba.type)
+      assert_equal('image/webp', @webp.type)
     end
 
     def test_width
-      assert_equal(@png_rgba.width, 140)
-      assert_equal(@webp.width, 320)
+      assert_equal(140, @png_rgba.width)
+      assert_equal(320, @webp.width)
     end
 
     def test_height
-      assert_equal(@png_rgba.height, 130)
-      assert_equal(@webp.height, 241)
+      assert_equal(130, @png_rgba.height)
+      assert_equal(241, @webp.height)
     end
 
     def test_aspect
-      assert_equal(@png_rgba.aspect, 1.0769230769230769)
-      assert_equal(@webp.aspect, 1.3278008298755186)
+      assert_in_delta(@png_rgba.aspect, 1.0769230769230769)
+      assert_in_delta(@webp.aspect, 1.3278008298755186)
     end
 
     def test_long_side
-      assert_equal(@png_rgba.long_side, 140)
-      assert_equal(@webp.long_side, 320)
+      assert_equal(140, @png_rgba.long_side)
+      assert_equal(320, @webp.long_side)
     end
 
     def test_alpha?
-      assert(@png_rgba.alpha?)
+      assert_predicate(@png_rgba, :alpha?)
       assert_false(@png_rgb.alpha?)
       assert_false(@webp.alpha?)
     end
 
     def test_animated?
       assert_false(@png_rgba.animated?)
-      assert(@agif.animated?)
+      assert_predicate(@agif, :animated?)
       assert_false(@webp.animated?)
-      assert(@awebp.animated?) if config['/handler/animation_image_format_convert/webp']
-      assert(@apng.animated?) if config['/handler/animation_image_format_convert/png']
+      assert_predicate(@awebp, :animated?) if config['/handler/animation_image_format_convert/webp']
+      assert_predicate(@apng, :animated?) if config['/handler/animation_image_format_convert/png']
     end
 
     def test_recommended_name
-      assert_equal(@webp.recommended_name, '4.sm-1.webp')
-      assert_equal(@invalid_webp.recommended_name, '本当はwebp画像.webp')
+      assert_equal('4.sm-1.webp', @webp.recommended_name)
+      assert_equal('本当はwebp画像.webp', @invalid_webp.recommended_name)
     end
 
     def test_recommended_extname
-      assert_equal(@png_rgba.recommended_extname, '.png')
-      assert_equal(@apng.recommended_extname, '.png')
-      assert_equal(@webp.recommended_extname, '.webp')
-      assert_equal(@awebp.recommended_extname, '.webp')
+      assert_equal('.png', @png_rgba.recommended_extname)
+      assert_equal('.png', @apng.recommended_extname)
+      assert_equal('.webp', @webp.recommended_extname)
+      assert_equal('.webp', @awebp.recommended_extname)
     end
 
     def test_recommended_extname?
-      assert(@agif.recommended_extname?)
-      assert(@png_rgba.recommended_extname?)
-      assert(@apng.recommended_extname?)
-      assert(@webp.recommended_extname?)
-      assert(@awebp.recommended_extname?)
+      assert_predicate(@agif, :recommended_extname?)
+      assert_predicate(@png_rgba, :recommended_extname?)
+      assert_predicate(@apng, :recommended_extname?)
+      assert_predicate(@webp, :recommended_extname?)
+      assert_predicate(@awebp, :recommended_extname?)
     end
 
     def test_resize
       converted = @png_rgba.resize(32)
       assert_kind_of(ImageFile, converted)
-      assert_equal(converted.width, 32)
-      assert_equal(converted.height, 30)
+      assert_equal(32, converted.width)
+      assert_equal(30, converted.height)
     end
 
     def test_convert_type
       converted = @png_rgba.convert_type('image/jpeg')
       assert_kind_of(ImageFile, converted)
-      assert_equal(converted.type, 'image/jpeg')
+      assert_equal('image/jpeg', converted.type)
 
       return unless @pdf
       converted = @pdf.convert_type('image/jpeg')
       assert_kind_of(ImageFile, converted)
-      assert_equal(converted.type, 'image/jpeg')
+      assert_equal('image/jpeg', converted.type)
     end
 
     def test_convert_animation_type
       assert_nil(@png_rgba.convert_animation_type)
       assert_nil(@agif.convert_animation_type)
-      assert_equal(@awebp.convert_animation_type.type, 'image/gif') if config['/handler/animation_image_format_convert/webp']
-      assert_equal(@apng.convert_animation_type.type, 'image/gif') if config['/handler/animation_image_format_convert/png']
+      assert_equal('image/gif', @awebp.convert_animation_type.type) if config['/handler/animation_image_format_convert/webp']
+      assert_equal('image/gif', @apng.convert_animation_type.type) if config['/handler/animation_image_format_convert/png']
     end
   end
 end

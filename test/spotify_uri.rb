@@ -9,14 +9,14 @@ module Mulukhiya
 
     def test_spotify?
       assert_false(@google.spotify?)
-      assert(@root.spotify?)
-      assert(@track.spotify?)
-      assert(@album.spotify?)
+      assert_predicate(@root, :spotify?)
+      assert_predicate(@track, :spotify?)
+      assert_predicate(@album, :spotify?)
     end
 
     def test_track_id
       assert_nil(@root.track_id)
-      assert_equal(@track.track_id, '7f47OJZ6x9EZ4G2ZWOOlQZ')
+      assert_equal('7f47OJZ6x9EZ4G2ZWOOlQZ', @track.track_id)
       assert_nil(@album.track_id)
     end
 
@@ -28,14 +28,14 @@ module Mulukhiya
 
     def test_track?
       assert_false(@root.track?)
-      assert(@track.track?)
+      assert_predicate(@track, :track?)
       assert_false(@album.track?)
     end
 
     def test_album_id
       assert_nil(@root.album_id)
       assert_nil(@track.album_id)
-      assert_equal(@album.album_id, '7xtiD9nNWrbbAtbbInNllD')
+      assert_equal('7xtiD9nNWrbbAtbbInNllD', @album.album_id)
     end
 
     def test_album
@@ -47,24 +47,24 @@ module Mulukhiya
     def test_album?
       assert_false(@root.album?)
       assert_false(@track.album?)
-      assert(@album.album?)
+      assert_predicate(@album, :album?)
     end
 
     def test_title
       assert_nil(@root.title)
-      assert_equal(@track.title, 'ガンバランスdeダンス ~夢みる奇跡たち~')
-      assert_equal(@album.title, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+      assert_equal('ガンバランスdeダンス ~夢みる奇跡たち~', @track.title)
+      assert_equal('Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】', @album.title)
     end
 
     def test_album_name
       assert_nil(@root.album_name)
-      assert_equal(@track.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
-      assert_equal(@album.album_name, 'Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】')
+      assert_equal('Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】', @track.album_name)
+      assert_equal('Yes! プリキュア5 ボーカルベスト!! 【Yes! プリキュア5】', @album.album_name)
     end
 
     def test_track_name
       assert_nil(@root.track_name)
-      assert_equal(@track.track_name, 'ガンバランスdeダンス ~夢みる奇跡たち~')
+      assert_equal('ガンバランスdeダンス ~夢みる奇跡たち~', @track.track_name)
       assert_nil(@album.track_name)
     end
 

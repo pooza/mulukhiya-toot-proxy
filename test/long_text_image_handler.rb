@@ -10,13 +10,13 @@ module Mulukhiya
       Timecop.travel(Time.parse('2021/04/01'))
 
       Timecop.travel(Time.parse('2021/03/31'))
-      assert(@handler.disable?)
+      assert_predicate(@handler, :disable?)
 
       Timecop.travel(Time.parse('2021/04/01'))
       assert_false(@handler.disable?)
 
       Timecop.travel(Time.parse('2021/04/02'))
-      assert(@handler.disable?)
+      assert_predicate(@handler, :disable?)
     end
 
     def test_executable?
@@ -28,7 +28,7 @@ module Mulukhiya
       Timecop.travel(Time.parse('2021/04/01'))
 
       @handler.handle_pre_toot(status_field => 'あ' * 500)
-      assert_equal(@handler.debug_info[:result].first, {message: '今日は4月1日です。'})
+      assert_equal({message: '今日は4月1日です。'}, @handler.debug_info[:result].first)
     end
   end
 end

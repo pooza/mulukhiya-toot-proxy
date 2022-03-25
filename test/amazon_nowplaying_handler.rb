@@ -9,7 +9,7 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.handle_pre_toot(status_field => "#nowplaying #五條真由美 ガンバランス de ダンス\n")
-      assert(@handler.debug_info[:result].present?) if @handler.debug_info
+      assert_predicate(@handler.debug_info[:result], :present?) if @handler.debug_info
     end
   end
 end

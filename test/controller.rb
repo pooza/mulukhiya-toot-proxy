@@ -66,7 +66,7 @@ module Mulukhiya
 
     def test_oauth_scopes
       assert_kind_of(Set, controller_class.oauth_scopes)
-      assert(controller_class.oauth_scopes.present?)
+      assert_predicate(controller_class.oauth_scopes, :present?)
       controller_class.oauth_scopes.each do |scope|
         assert_kind_of(String, scope)
       end

@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_create_key
-      assert_equal(@storage.create_key({page: 1}), 'media_catalog:1')
+      assert_equal('media_catalog:1', @storage.create_key({page: 1}))
     end
 
     def test_get

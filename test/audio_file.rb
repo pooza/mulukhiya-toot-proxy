@@ -11,31 +11,31 @@ module Mulukhiya
     end
 
     def test_audio?
-      assert(@mp3.audio?)
+      assert_predicate(@mp3, :audio?)
       assert_false(@png.audio?)
       assert_false(@mp4.audio?)
     end
 
     def test_mediatype
-      assert_equal(@mp3.mediatype, 'audio')
+      assert_equal('audio', @mp3.mediatype)
     end
 
     def test_subtype
-      assert_equal(@mp3.subtype, 'mpeg')
+      assert_equal('mpeg', @mp3.subtype)
     end
 
     def test_type
-      assert_equal(@mp3.type, 'audio/mpeg')
+      assert_equal('audio/mpeg', @mp3.type)
     end
 
     def test_duration
-      assert_equal(@mp3.duration, 5.041625)
+      assert_in_delta(@mp3.duration, 5.041625)
     end
 
     def test_convert_type
       converted = @mp3.convert_type('audio/mpeg')
       assert_kind_of(AudioFile, converted)
-      assert_equal(converted.type, 'audio/mpeg')
+      assert_equal('audio/mpeg', converted.type)
     end
   end
 end

@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def test_create_body
-      assert_equal(@handler.create_body, "1行目\n\n2行目\n")
+      assert_equal("1行目\n\n2行目\n", @handler.create_body)
     end
   end
 end

@@ -5,12 +5,12 @@ module Mulukhiya
     end
 
     def test_deep_compact
-      assert_equal(@array.deep_compact, [{ab: 12}, 1])
+      assert_equal([{ab: 12}, 1], @array.deep_compact)
     end
 
     def test_deep_compact!
       cloned = @array.deep_compact!
-      assert_equal(cloned, [{ab: 12}, 1])
+      assert_equal([{ab: 12}, 1], cloned)
     end
   end
 end

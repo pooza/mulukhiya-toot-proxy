@@ -38,7 +38,7 @@ module Mulukhiya
 
     def test_digest
       Webhook.all do |hook|
-        assert(hook.digest.present?)
+        assert_predicate(hook.digest, :present?)
       end
     end
 
@@ -76,7 +76,7 @@ module Mulukhiya
     def test_command
       command = @test_hook.command
       command.exec
-      assert(command.status.zero?)
+      assert_predicate(command.status, :zero?)
       status = JSON.parse(command.stdout)
       assert_kind_of(Hash, status)
       assert(['id', 'account', 'createdNote'].member?(status.keys.first))

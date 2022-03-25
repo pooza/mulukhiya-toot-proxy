@@ -237,11 +237,11 @@ module Mulukhiya
     end
 
     def test_action
-      assert_equal(@payload.action, 'completed')
+      assert_equal('completed', @payload.action)
     end
 
     def test_check_suite
-      assert_equal(@payload.check_suite, {conclusion: 'success', url: nil})
+      assert_equal({conclusion: 'success', url: nil}, @payload.check_suite)
     end
   end
 end

@@ -15,15 +15,15 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'キュアスタ！ https://goo.gl/uJJKpV')
-      assert_equal(@handler.debug_info[:result].count, 1)
+      assert_equal(1, @handler.debug_info[:result].count)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://bit.ly/2Lquwnt')
-      assert_equal(@handler.debug_info[:result].count, 1)
+      assert_equal(1, @handler.debug_info[:result].count)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW')
-      assert_equal(@handler.debug_info[:result].count, 2)
+      assert_equal(2, @handler.debug_info[:result].count)
     end
   end
 end

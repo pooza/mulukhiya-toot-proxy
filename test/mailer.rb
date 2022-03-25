@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     test '管理者向けメールアドレスの有無' do
-      assert(Mailer.config?)
+      assert_predicate(Mailer, :config?)
     end
   end
 end

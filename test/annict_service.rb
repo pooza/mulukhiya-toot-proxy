@@ -11,7 +11,7 @@ module Mulukhiya
     def test_account
       return unless @service
       assert_kind_of(Hash, @service.account)
-      assert(@service.account['id'].positive?)
+      assert_predicate(@service.account['id'], :positive?)
       assert_kind_of(String, @service.account['name'])
       assert_kind_of(String, @service.account['username'])
     end
@@ -24,7 +24,7 @@ module Mulukhiya
         assert_kind_of(String, record.dig('work', 'title'))
         assert_kind_of([Float, NilClass], record.dig('episode', 'number'))
         uri = Ginseng::URI.parse(record.dig('work', 'images', 'recomended_url'))
-        assert(uri.absolute?) if uri
+        assert_predicate(uri, :absolute?) if uri
       end
     end
 
@@ -38,7 +38,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, @service.reviewed_works)
       @service.reviewed_works do |work|
         assert_kind_of(Hash, work)
-        assert(work.dig('work', 'id').positive?)
+        assert_predicate(work.dig('work', 'id'), :positive?)
       end
     end
 
@@ -49,7 +49,7 @@ module Mulukhiya
         assert_kind_of(Hash, review)
         assert_kind_of(String, review.dig('work', 'title'))
         uri = Ginseng::URI.parse(review.dig('work', 'images', 'recomended_url'))
-        assert(uri.absolute?) if uri
+        assert_predicate(uri, :absolute?) if uri
       end
     end
 
@@ -70,18 +70,18 @@ module Mulukhiya
 
     def test_oauth_scopes
       assert_kind_of(Array, AnnictService.oauth_scopes)
-      assert(AnnictService.oauth_scopes.present?)
+      assert_predicate(AnnictService.oauth_scopes, :present?)
       AnnictService.oauth_scopes.each do |scope|
         assert_kind_of(String, scope)
       end
     end
 
     def test_create_record_uri
-      assert_equal(AnnictService.create_record_uri(7879, 138_263).to_s, 'https://annict.com/works/7879/episodes/138263')
+      assert_equal('https://annict.com/works/7879/episodes/138263', AnnictService.create_record_uri(7879, 138_263).to_s)
     end
 
     def test_create_review_uri
-      assert_equal(AnnictService.create_review_uri(7879).to_s, 'https://annict.com/works/7879/records')
+      assert_equal('https://annict.com/works/7879/records', AnnictService.create_review_uri(7879).to_s)
     end
 
     def test_create_payload
@@ -91,63 +91,63 @@ module Mulukhiya
         episode: {id: 111, number_text: '第24回', title: '良回'},
         record: {comment: ''},
       }
-      assert_equal(@service.create_payload(record, :record).raw, {
+      assert_equal({
         'text' => "すごいあにめ\n第24回「良回」を視聴。\nhttps://annict.com/works/111/episodes/111\n#すごいあにめ\n",
-      })
+      }, @service.create_payload(record, :record).raw)
 
       record = {
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
-      assert_equal(@service.create_payload(record, :record).raw, {
+      assert_equal({
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ\n",
-      })
+      }, @service.create_payload(record, :record).raw)
 
       record = {
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！"},
       }
-      assert_equal(@service.create_payload(record, :record).raw, {
+      assert_equal({
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ\n",
-      })
+      }, @service.create_payload(record, :record).raw)
 
       record = {
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 113, number_text: 'EXTRA EPISODE'},
         record: {comment: "楽しい！\nすごいアニメのおまけ回だった！"},
       }
-      assert_equal(@service.create_payload(record, :record).raw, {
+      assert_equal({
         'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ\n",
-      })
+      }, @service.create_payload(record, :record).raw)
 
       record = {
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 114, title: '何話とか特に決まってない回'},
         record: {comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！"},
       }
-      assert_equal(@service.create_payload(record, :record).raw, {
+      assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ\n",
-      })
+      }, @service.create_payload(record, :record).raw)
 
       review = {
         work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "超楽しい！\nすばらしい劇場版だった！",
       }
-      assert_equal(@service.create_payload(review, :review).raw, {
+      assert_equal({
         'text' => "「すごいあにめTHE MOVIE」を視聴。\n\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
-      })
+      }, @service.create_payload(review, :review).raw)
 
       review = {
         work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！",
       }
-      assert_equal(@service.create_payload(review, :review).raw, {
+      assert_equal({
         'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
-      })
+      }, @service.create_payload(review, :review).raw)
     end
   end
 end

@@ -7,7 +7,7 @@ module Mulukhiya
 
     def test_to_s
       assert_kind_of(String, @renderer.to_s)
-      assert(@renderer.to_s.present?)
+      assert_predicate(@renderer.to_s, :present?)
     end
   end
 end

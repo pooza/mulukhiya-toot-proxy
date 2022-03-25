@@ -14,8 +14,8 @@ module Mulukhiya
 
     def test_title
       assert_nil(@root.title)
-      assert_equal(@video.title, 'GPD Pocket 3 開封')
-      assert_equal(@videol.title, 'GPD Pocket 3 開封')
+      assert_equal('GPD Pocket 3 開封', @video.title)
+      assert_equal('GPD Pocket 3 開封', @videol.title)
     end
 
     def test_album_name
@@ -32,14 +32,14 @@ module Mulukhiya
 
     def test_track_name
       assert_nil(@root.track_name)
-      assert_equal(@video.track_name, 'GPD Pocket 3 開封')
-      assert_equal(@videol.track_name, 'GPD Pocket 3 開封')
+      assert_equal('GPD Pocket 3 開封', @video.track_name)
+      assert_equal('GPD Pocket 3 開封', @videol.track_name)
     end
 
     def test_track?
       assert_false(@root.track?)
-      assert(@video.track?)
-      assert(@videol.track?)
+      assert_predicate(@video, :track?)
+      assert_predicate(@videol, :track?)
     end
 
     def test_artists

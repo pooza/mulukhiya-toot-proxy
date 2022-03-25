@@ -16,8 +16,8 @@ module Mulukhiya
       assert_kind_of(Array, @announcement.fetch)
       @announcement.fetch.first(5).each do |entry|
         assert_kind_of(Hash, entry)
-        assert(entry[:id].present?)
-        assert(entry[:content].present?)
+        assert_predicate(entry[:id], :present?)
+        assert_predicate(entry[:content], :present?)
       end
     end
   end

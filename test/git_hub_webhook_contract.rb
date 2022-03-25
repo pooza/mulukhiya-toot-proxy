@@ -6,7 +6,7 @@ module Mulukhiya
 
     def test_call
       errors = @contract.call(digest: 'fuga').errors
-      assert(errors.empty?)
+      assert_empty(errors)
 
       errors = @contract.call(digest: 11).errors
       assert_false(errors.empty?)

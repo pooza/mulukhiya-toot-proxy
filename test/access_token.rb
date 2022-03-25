@@ -16,19 +16,19 @@ module Mulukhiya
     def test_webhook_digest
       return unless @token
       assert_kind_of(String, @token.webhook_digest)
-      assert(@token.webhook_digest.present?)
+      assert_predicate(@token.webhook_digest, :present?)
     end
 
     def test_to_s
       return unless @token
       assert_kind_of(String, @token.to_s)
-      assert(@token.to_s.present?)
+      assert_predicate(@token.to_s, :present?)
     end
 
     def test_token
       return unless @token
       assert_kind_of(String, @token.token)
-      assert(@token.token.present?)
+      assert_predicate(@token.token, :present?)
     end
 
     def test_to_h
@@ -52,7 +52,7 @@ module Mulukhiya
 
     def test_scopes_valid?
       return unless @token
-      assert(@token.scopes_valid?)
+      assert_predicate(@token, :scopes_valid?)
     end
 
     def test_webhook_entries

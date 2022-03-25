@@ -5,8 +5,8 @@ module Mulukhiya
     end
 
     def test_create_key
-      assert_equal(@storage.create_key({}), 'custom_api:24445177')
-      assert_equal(@storage.create_key({name: 'maho_girls'}), 'custom_api:1338115969')
+      assert_equal('custom_api:24445177', @storage.create_key({}))
+      assert_equal('custom_api:1338115969', @storage.create_key({name: 'maho_girls'}))
     end
 
     def test_get

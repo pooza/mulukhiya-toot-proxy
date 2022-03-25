@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def test_count
-      assert(@program.count.positive?)
+      assert_predicate(@program.count, :positive?)
     end
 
     def test_to_yaml

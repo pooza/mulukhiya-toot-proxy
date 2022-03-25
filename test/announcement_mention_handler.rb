@@ -13,7 +13,7 @@ module Mulukhiya
       assert_false(@handler.respondable?)
 
       @handler.handle_mention('status' => {'content' => 'お知らせ'})
-      assert(@handler.respondable?)
+      assert_predicate(@handler, :respondable?)
     end
   end
 end

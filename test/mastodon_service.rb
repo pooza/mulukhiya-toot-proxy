@@ -25,7 +25,7 @@ module Mulukhiya
       @service.register_filter(tag: '実況')
       filters = @service.filters(tag: '実況')
       assert_kind_of(Array, filters)
-      assert(filters.length.positive?)
+      assert_predicate(filters.length, :positive?)
       filters.first(5).each do |filter|
         assert_kind_of(String, filter['id'])
         assert_kind_of(String, filter['phrase'])

@@ -13,26 +13,26 @@ module Mulukhiya
 
     def test_note_length
       post '/api/notes/create', {status_field => 'A' * @parser.max_length, 'i' => test_token}
-      assert(last_response.ok?)
+      assert_predicate(last_response, :ok?)
 
       post '/api/notes/create', {status_field => 'B' * (@parser.max_length + 1), 'i' => test_token}
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 400)
+      assert_equal(400, last_response.status)
 
       header 'Content-Type', 'application/json'
       post '/api/notes/create', {status_field => 'C' * @parser.max_length, 'i' => test_token}.to_json
-      assert(last_response.ok?)
+      assert_predicate(last_response, :ok?)
 
       header 'Content-Type', 'application/json'
       post '/api/notes/create', {status_field => 'D' * (@parser.max_length + 1), 'i' => test_token}.to_json
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 400)
+      assert_equal(400, last_response.status)
     end
 
     def test_note_zenkaku
       header 'Content-Type', 'application/json'
       post '/api/notes/create', {status_field => '！!！!！', 'i' => test_token}.to_json
-      assert(JSON.parse(last_response.body).dig('createdNote', 'text').include?('！!！!！'))
+      assert_includes(JSON.parse(last_response.body).dig('createdNote', 'text'), '！!！!！')
     end
 
     def test_webhook_entries

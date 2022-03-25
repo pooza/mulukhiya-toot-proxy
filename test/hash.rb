@@ -5,12 +5,12 @@ module Mulukhiya
     end
 
     def test_deep_compact
-      assert_equal(@hash.deep_compact, {a: {ab: 12}, c: 1})
+      assert_equal({a: {ab: 12}, c: 1}, @hash.deep_compact)
     end
 
     def test_deep_compact!
       cloned = @hash.deep_compact!
-      assert_equal(cloned, {a: {ab: 12}, c: 1})
+      assert_equal({a: {ab: 12}, c: 1}, cloned)
     end
   end
 end

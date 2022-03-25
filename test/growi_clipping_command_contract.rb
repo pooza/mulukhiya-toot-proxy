@@ -6,7 +6,7 @@ module Mulukhiya
 
     def test_call
       errors = @contract.call(command: 'growi_clipping', url: 'https://mstdn.example.com/web/statuses/111').errors
-      assert(errors.empty?)
+      assert_empty(errors)
 
       errors = @contract.call(command: 'test').errors
       assert_false(errors.empty?)

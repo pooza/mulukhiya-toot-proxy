@@ -6,10 +6,10 @@ module Mulukhiya
 
     def test_call
       errors = @contract.call(command: 'filter', phrase: 'うんこ').errors
-      assert(errors.empty?)
+      assert_empty(errors)
 
       errors = @contract.call(command: 'filter', tag: 'うんこ', action: 'register').errors
-      assert(errors.empty?)
+      assert_empty(errors)
 
       errors = @contract.call(command: 'f', phrase: 'うんこ').errors
       assert_false(errors.empty?)

@@ -15,7 +15,7 @@ module Mulukhiya
       assert_false(errors.empty?)
 
       errors = @contract.call(id: 'aaaaaaacdfg', tag: 'precure_fun').errors
-      assert(errors.empty?)
+      assert_empty(errors)
     end
   end
 end

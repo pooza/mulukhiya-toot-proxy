@@ -16,7 +16,7 @@ module Mulukhiya
     def test_name
       return unless @attachment
       assert_kind_of(String, @attachment.name)
-      assert(@attachment.present?)
+      assert_predicate(@attachment, :present?)
     end
 
     def test_date
@@ -26,7 +26,7 @@ module Mulukhiya
 
     def test_size
       return unless @attachment
-      assert(@attachment.size.positive?)
+      assert_predicate(@attachment.size, :positive?)
     end
 
     def test_size_str

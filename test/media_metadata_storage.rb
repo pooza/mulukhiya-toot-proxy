@@ -7,7 +7,7 @@ module Mulukhiya
 
     def test_push
       @storage.push(@uri)
-      assert_equal(@storage[@uri], {
+      assert_equal({
         height: 353,
         mediatype: 'image',
         size: 53_882,
@@ -16,7 +16,7 @@ module Mulukhiya
         type: 'image/jpeg',
         width: 500,
         url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg',
-      })
+      }, @storage[@uri])
     end
   end
 end
