@@ -33,6 +33,7 @@ module Mulukhiya
         },
         ping: keepalive,
       })
+      logger.info(class: self.class.to_s, method: __method__, url: uri.to_s)
       notify('リスナーからストリーミングAPIへ接続しました。', {administrators: true})
     end
 
