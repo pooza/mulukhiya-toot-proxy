@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_root_cert_file
-      assert_path_exists(@listener.root_cert_file)
+      assert_path_exist(@listener.root_cert_file)
     end
 
     def test_keepalive

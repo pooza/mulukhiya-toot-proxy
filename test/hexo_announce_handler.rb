@@ -7,7 +7,7 @@ module Mulukhiya
 
     def test_handle_announce
       @handler.handle_announce({content: 'お知らせです。Hexo'}, {sns: info_agent_service})
-      assert_path_exists(@handler.debug_info[:result].first[:path])
+      assert_path_exist(@handler.debug_info[:result].first[:path])
     end
   end
 end
