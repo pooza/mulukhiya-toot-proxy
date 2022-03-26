@@ -5,6 +5,11 @@ module Mulukhiya
     def setup
       @service = MastodonService.new
       @key = SecureRandom.hex.adler32
+      @status = account.recent_status
+    end
+
+    test 'テスト用投稿の有無' do
+      assert_not_nil(account.recent_status)
     end
 
     def test_statuses
@@ -17,6 +22,12 @@ module Mulukhiya
         assert_kind_of(String, status[:footer])
         assert_kind_of(Array, status[:footer_tags])
       end
+    end
+
+    def test_update_status
+      text = '1' + @status.text
+      r = @service.update_status(@status, text)
+      assert(text.start_with?(TootParser.new(r['content']).body))
     end
 
     def test_filters

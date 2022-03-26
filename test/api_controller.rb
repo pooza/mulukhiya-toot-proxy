@@ -97,6 +97,21 @@ module Mulukhiya
       assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
+    def test_status
+      get '/status'
+      assert_false(last_response.ok?)
+
+      get "/status?token=#{test_account.token}"
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
+
+      JSON.parse(last_response.body).first(10).each do |status|
+        assert_kind_of(String, status['id'])
+        assert_kind_of(String, status['content'])
+        assert_kind_of(Hash, status['account'])
+      end
+    end
+
     def test_costom_endpoints
       CustomAPI.all.reject(&:args?).each do |api|
         get api.path

@@ -48,6 +48,10 @@ module Mulukhiya
       assert_boolean(controller_class.livecure?)
     end
 
+    def update_status?
+      assert_boolean(controller_class.update_status?)
+    end
+
     def test_parser_name
       assert_kind_of(String, controller_class.parser_name)
     end
