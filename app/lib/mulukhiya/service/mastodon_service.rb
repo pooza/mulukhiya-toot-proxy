@@ -8,6 +8,25 @@ module Mulukhiya
 
     alias toot post
 
+    def update_status(status, body, params = {})
+      status = status.id if status.is_a?(status_class)
+      body = {status: body.to_s} unless body.is_a?(Hash)
+      body.deep_symbolize_keys!
+      response = http.put("/api/v1/statuses/#{status}", {
+        body: body.compact,
+        headers: create_headers(params[:headers]),
+      })
+      status = JSON.parse(response.body)
+      parser = TootParser.new(status['content'])
+      return status.merge(
+        created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+        body: parser.body,
+        footer: parser.footer,
+        footer_tags: TagContainer.scan(parser.footer).to_a,
+        visibility_icon: TootParser.visibility_icon(status['visibility']),
+      )
+    end
+
     def statuses(params = {})
       case params[:type]
       when 'account'

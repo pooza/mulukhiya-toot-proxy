@@ -212,6 +212,13 @@ module Mulukhiya
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
+      else
+        status = status_class[params[:id]]
+        parser = parser_class.new(status.text)
+        tags = TagContainer.scan(parser.footer)
+        tags.delete(params[:tag])
+        body = [parser.body, tags.map(&:to_hashtag).join(' ')]
+        @renderer.message = sns.update_status(params[:id], body.join("\n"))
       end
       return @renderer.to_s
     rescue => e
