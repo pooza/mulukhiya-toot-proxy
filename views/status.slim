@@ -58,6 +58,7 @@ html lang='ja'
             this.$dialog
               .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
               .then(e => Vue.createTag(id, e.data))
+              .then(e => Vue.set(this.statuses, e.id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
           deleteTag(id, tag) {
