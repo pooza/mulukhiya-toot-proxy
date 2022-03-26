@@ -198,11 +198,12 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
-        parser = parser_class.new(status.text)
-        tags = TagContainer.scan(parser.footer)
+        tags = TagContainer.scan(status.parser.footer)
         tags.push(params[:tag])
-        body = [parser.body, tags.map(&:to_hashtag).join(' ')]
-        @renderer.message = sns.update_status(params[:id], body.join("\n"))
+        @renderer.message = sns.update_status(
+          params[:id],
+          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
+        )
       end
       return @renderer.to_s
     rescue => e
@@ -221,11 +222,12 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
-        parser = parser_class.new(status.text)
-        tags = TagContainer.scan(parser.footer)
+        tags = TagContainer.scan(status.parser.footer)
         tags.delete(params[:tag])
-        body = [parser.body, tags.map(&:to_hashtag).join(' ')]
-        @renderer.message = sns.update_status(params[:id], body.join("\n"))
+        @renderer.message = sns.update_status(
+          params[:id],
+          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
+        )
       end
       return @renderer.to_s
     rescue => e

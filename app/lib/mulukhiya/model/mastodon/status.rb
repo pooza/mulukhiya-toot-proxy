@@ -36,6 +36,11 @@ module Mulukhiya
         return @public_uri
       end
 
+      def parser
+        @parser ||= TootParser.new(text)
+        return @parser
+      end
+
       def to_h
         @hash ||= values.deep_symbolize_keys.deep_compact
         return @hash

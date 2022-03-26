@@ -16,15 +16,7 @@ module Mulukhiya
         body: body.compact,
         headers: create_headers(params[:headers]),
       })
-      status = JSON.parse(response.body)
-      parser = TootParser.new(status['content'])
-      return status.merge(
-        created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
-        body: parser.body,
-        footer: parser.footer,
-        footer_tags: TagContainer.scan(parser.footer).to_a,
-        visibility_icon: TootParser.visibility_icon(status['visibility']),
-      )
+      return self.class.create_status_info(response.body)
     end
 
     def statuses(params = {})
@@ -36,16 +28,7 @@ module Mulukhiya
       else
         response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
       end
-      return response.parsed_response.map do |status|
-        parser = TootParser.new(status['content'])
-        status.merge(
-          created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
-          body: parser.body,
-          footer: parser.footer,
-          footer_tags: TagContainer.scan(parser.footer).to_a,
-          visibility_icon: TootParser.visibility_icon(status['visibility']),
-        )
-      end
+      return response.parsed_response.map {|s| self.class.create_status_info(s['content'])}
     end
 
     def search_status_id(status)
@@ -111,6 +94,18 @@ module Mulukhiya
         MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
         MastodonController.reply_to_field => options.dig(:response, :id),
+      )
+    end
+
+    def self.create_status_info(text)
+      status = JSON.parse(text)
+      parser = TootParser.new(status['content'])
+      return status.merge(
+        created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+        body: parser.body,
+        footer: parser.footer,
+        footer_tags: TagContainer.scan(parser.footer).to_a,
+        visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end
   end
