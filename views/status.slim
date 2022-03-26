@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 = controller.status_label
       - if controller.update_status?
-        article v-for='status in statuses'
+        article v-for='(status, id) in statuses'
           .visibility
             | {{status.visibility}}
             i :class="'fa fa-' + status.visibility_icon"
@@ -44,7 +44,7 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
-          statuses: [],
+          statuses: {},
           last_page: false,
           min_id: null,
         },
@@ -71,8 +71,8 @@ html lang='ja'
             Vue.getStatuses(this.min_id)
               .then(e => {
                 if (0 < e.length) {
-                  this.statuses = this.statuses.concat(e)
-                  this.min_id = this.statuses[this.statuses.length - 1].id
+                  e.map(v => {Vue.set(this.statuses, v.id, v)})
+                  this.min_id = e[e.length - 1].id
                 } else {
                   this.last_page = true
                   this.$dialog.alert('最後のページです')
