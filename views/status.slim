@@ -27,11 +27,11 @@ html lang='ja'
               | タグの編集
             .tag v-for='tag in status.footer_tags'
               | {{tag}}
-              a href='#' @click='deleteTag(status.id, tag)'
+              a href='javascript:void(0)' @click='deleteTag(status.id, tag)'
                 i class='fa fa-xmark'
             .tag
               | 新規タグを追加
-              a href='#' @click='createTag(status.id)'
+              a href='javascript:void(0)' @click='createTag(status.id)'
                 i class='fa fa-pencil'
         nav.media v-if='false && statuses.length && !last_page'
           a @click='appendStatuses' 続きを読む…
