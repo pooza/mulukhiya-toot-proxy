@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def test_update_status
-      text = '1' + @status.text
+      text = "1#{@status.text}"
       r = @service.update_status(@status, text)
       assert(text.start_with?(TootParser.new(r['content']).body))
     end
