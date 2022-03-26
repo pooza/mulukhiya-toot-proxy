@@ -9,10 +9,9 @@ module Mulukhiya
     alias toot post
 
     def update_status(status, body, params = {})
-      status = status.id if status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
-      response = http.put("/api/v1/statuses/#{status}", {
+      response = http.put("/api/v1/statuses/#{search_status_id(status)}", {
         body: body.compact,
         headers: create_headers(params[:headers]),
       })
@@ -28,7 +27,7 @@ module Mulukhiya
       else
         response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
       end
-      return response.parsed_response.map {|s| self.class.create_status_info(s['content'])}
+      return response.parsed_response.map {|s| self.class.create_status_info(s)}
     end
 
     def search_status_id(status)
@@ -97,9 +96,9 @@ module Mulukhiya
       )
     end
 
-    def self.create_status_info(text)
-      status = JSON.parse(text)
-      parser = TootParser.new(status['content'])
+    def self.create_status_info(status)
+      status = JSON.parse(status) unless status.is_a?(Hash)
+      parser = TootParser.new(TootParser.sanitize(status['content']))
       return status.merge(
         created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
         body: parser.body,
