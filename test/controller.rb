@@ -52,6 +52,10 @@ module Mulukhiya
       assert_boolean(controller_class.update_status?)
     end
 
+    def test_account_timeline?
+      assert_boolean(controller_class.account_timeline?)
+    end
+
     def test_parser_name
       assert_kind_of(String, controller_class.parser_name)
     end

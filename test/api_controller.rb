@@ -98,7 +98,7 @@ module Mulukhiya
     end
 
     def test_status
-      return unless controller_class.update_status?
+      return unless controller_class.account_timeline?
       get '/status'
       assert_false(last_response.ok?)
 

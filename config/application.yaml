@@ -293,6 +293,7 @@ mastodon:
     media_catalog: true
     streaming: true
     update_status: true
+    account_timeline: true
     webhook: true
   handlers:
     alert:
@@ -1190,6 +1191,9 @@ webui:
       - https://use.fontawesome.com/releases/v6.1.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
+  status:
+    timeline:
+      limit: 50
 worker:
   announcement:
     interval:

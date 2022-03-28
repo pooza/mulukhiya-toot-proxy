@@ -61,6 +61,10 @@ module Mulukhiya
         return config["/#{name}/features/update_status"] == true rescue false
       end
 
+      def account_timeline?
+        return config["/#{name}/features/account_timeline"] == true rescue false
+      end
+
       def reaction?
         return config["/#{name}/features/reaction"] == true rescue false
       end

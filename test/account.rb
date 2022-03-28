@@ -148,7 +148,7 @@ module Mulukhiya
     end
 
     def test_statuses
-      return unless controller_class.update_status?
+      return unless controller_class.account_timeline?
       assert_kind_of(Array, statuses = account.statuses)
       statuses.first(10).each do |status|
         assert_kind_of(Hash, status)
