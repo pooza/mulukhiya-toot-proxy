@@ -9,9 +9,14 @@ module Mulukhiya
     alias toot post
 
     def update_status(status, body, params = {})
+      status = status_class[status] unless status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
-      response = http.put("/api/v1/statuses/#{search_status_id(status)}", {
+      body[:media_ids] ||= status.attachments.map(&:id)
+      body[:in_reply_to_id] ||= status.in_reply_to_id
+      body[:spoiler_text] ||= status.spoiler_text
+      body[:visibility] ||= status.visibility
+      response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
         headers: create_headers(params[:headers]),
       })
