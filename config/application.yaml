@@ -284,6 +284,7 @@ mastodon:
   dbms: postgres
   display_name: Mastodon
   features:
+    account_timeline: true
     annict: true
     announcement: true
     favorite_tags: true
@@ -293,7 +294,6 @@ mastodon:
     media_catalog: true
     streaming: true
     update_status: true
-    account_timeline: true
     webhook: true
   handlers:
     alert:

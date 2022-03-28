@@ -24,8 +24,8 @@ module Mulukhiya
     end
 
     def statuses(params = {})
-      case params[:type]
-      when 'account'
+      case params[:type].to_sym
+      when :account
         uri = create_uri("/api/v1/accounts/#{account.id}/statuses")
         uri.query_values = params.except(:type).compact
         response = http.get(uri)
