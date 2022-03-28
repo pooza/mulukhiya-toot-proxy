@@ -155,8 +155,8 @@ handler:
   dictionary_tag:
     dics: []
     word:
-      min: 3
-      min_kanji: 2
+      min: 2
+      min_kanji: 1
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   filter_command:
     minutes: 300
