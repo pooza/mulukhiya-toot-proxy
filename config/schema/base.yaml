@@ -292,6 +292,18 @@ properties:
               - url
             type: object
         type: object
+      status:
+        properties:
+          timeline:
+            properties:
+              limit:
+                type: integer
+            required:
+              - limit
+            type: object
+        required:
+          - timeline
+        type: object
     type: object
 required:
   - agent
