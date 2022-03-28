@@ -1,6 +1,7 @@
 ---
 title: ''
-labels: bug
+labels:
+  - bug
 ---
 
 ## 概要
