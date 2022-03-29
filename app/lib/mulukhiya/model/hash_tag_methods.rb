@@ -16,6 +16,7 @@ module Mulukhiya
     end
 
     def deletable?
+      return false if default?
       return true
     end
 
