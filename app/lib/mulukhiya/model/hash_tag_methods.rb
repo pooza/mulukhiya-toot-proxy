@@ -15,6 +15,10 @@ module Mulukhiya
       return true
     end
 
+    def deletable?
+      return true
+    end
+
     def default?
       return DefaultTagHandler.tags.member?(name)
     end

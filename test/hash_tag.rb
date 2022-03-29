@@ -31,6 +31,11 @@ module Mulukhiya
       assert_boolean(@nowplaying.listable?)
     end
 
+    def test_deletable?
+      assert_boolean(@nowplaying.deletable?) if @nowplaying
+      assert_false(@default.deletable?) if @default
+    end
+
     def test_default?
       return unless @nowplaying
       assert_boolean(@nowplaying.default?)

@@ -19,6 +19,11 @@ module Mulukhiya
         return listable != false
       end
 
+      def deletable?
+        return false if default?
+        return super
+      end
+
       def self.get(key)
         case key
         in {tag: tag}

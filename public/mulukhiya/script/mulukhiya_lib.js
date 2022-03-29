@@ -292,7 +292,6 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.post('/mulukhiya/api/status/tag', {token: Vue.getToken(), id: id, tag: tag})
         .then(e => e.data)
-        .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 
@@ -301,7 +300,6 @@ const MulukhiyaLib = {
       indicator.show()
       return axios.delete('/mulukhiya/api/status/tag', {data: {token: Vue.getToken(), id: id, tag: tag}})
         .then(e => e.data)
-        .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 

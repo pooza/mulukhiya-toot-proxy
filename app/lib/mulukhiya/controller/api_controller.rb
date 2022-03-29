@@ -217,6 +217,8 @@ module Mulukhiya
     delete '/status/tag' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless tag = hash_tag_class.get(tag: params[:tag])
+      raise Ginseng::AuthError, 'Default hashtags cannot be deleted.' unless tag.deletable?
       errors = StatusTagContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
