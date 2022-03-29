@@ -1,4 +1,3 @@
-<%# encoding: UTF-8 -%>
 <% if params.dig(:row, :username).present? -%>
 <%= "[@#{params.dig(:row, :username)}@#{params.dig(:row, :domain) || params[:env].domain_name}]" -%>
 <% end -%>
