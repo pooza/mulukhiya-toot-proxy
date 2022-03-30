@@ -48,7 +48,7 @@ module Mulukhiya
           command.args.push(api.choices(api.args.first).first)
         end
         command.exec
-        assert_equal(command.status, 0)
+        assert_equal(0, command.status)
       end
     end
 

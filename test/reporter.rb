@@ -12,7 +12,7 @@ module Mulukhiya
     end
 
     def test_to_h
-      assert_equal(@reporter.to_h, {
+      assert_equal({
         'unknown' => {
           'itunes_url_nowplaying' => [{
             'url' => 'https://music.apple.com/jp/album//1352845788?i=1352845804',
@@ -20,11 +20,11 @@ module Mulukhiya
             'artists' => ['宮本佳那子'],
           }],
         },
-      })
+      }, @reporter.to_h)
     end
 
     def test_to_s
-      assert_equal(@reporter.to_s, "---\nunknown:\n  itunes_url_nowplaying:\n  - url: https://music.apple.com/jp/album//1352845788?i=1352845804\n    title: シュビドゥビ☆スイーツタイム\n    artists:\n    - 宮本佳那子\n")
+      assert_equal("---\nunknown:\n  itunes_url_nowplaying:\n  - url: https://music.apple.com/jp/album//1352845788?i=1352845804\n    title: シュビドゥビ☆スイーツタイム\n    artists:\n    - 宮本佳那子\n", @reporter.to_s)
     end
   end
 end

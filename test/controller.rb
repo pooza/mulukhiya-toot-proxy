@@ -48,6 +48,14 @@ module Mulukhiya
       assert_boolean(controller_class.livecure?)
     end
 
+    def test_update_status?
+      assert_boolean(controller_class.update_status?)
+    end
+
+    def test_account_timeline?
+      assert_boolean(controller_class.account_timeline?)
+    end
+
     def test_parser_name
       assert_kind_of(String, controller_class.parser_name)
     end
@@ -66,7 +74,7 @@ module Mulukhiya
 
     def test_oauth_scopes
       assert_kind_of(Set, controller_class.oauth_scopes)
-      assert(controller_class.oauth_scopes.present?)
+      assert_predicate(controller_class.oauth_scopes, :present?)
       controller_class.oauth_scopes.each do |scope|
         assert_kind_of(String, scope)
       end

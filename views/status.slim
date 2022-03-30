@@ -1,0 +1,83 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {current: controller.status_label}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 = controller.status_label
+      - if controller.update_status?
+        article v-for='(status, id) in statuses'
+          .visibility
+            i :class="'fa fa-' + status.visibility_icon"
+          .header
+            i class='fa fa-calendar'
+            | {{status.created_at_str}}
+          - if env.development?
+            .header = '{{status.id}}'
+          .header v-if='status.spoiler_text' {{status.spoiler_text}}
+          pre.body = '{{status.body}}'
+          .footer-tags
+            h4
+              i class='fa fa-tag'
+              | タグの編集
+            .tag v-for='tag in status.footer_tags'
+              | {{tag}}
+              a href='javascript:void(0)' @click='deleteTag(status.id, tag)'
+                i class='fa fa-xmark'
+            .tag
+              | 新規タグを追加
+              a href='javascript:void(0)' @click='createTag(status.id)'
+                i class='fa fa-pencil'
+        nav.media v-if='false && statuses.length && !last_page'
+          a @click='appendStatuses' 続きを読む…
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+          statuses: {},
+          last_page: false,
+          min_id: null,
+        },
+        mounted () {
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
+            .catch(e => Vue.alert(this.$dialog, e))
+          this.appendStatuses()
+        },
+        methods: {
+          createTag(id) {
+            this.$dialog
+              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
+              .then(e => Vue.createTag(id, e.data))
+              .then(e => Vue.set(this.statuses, e.id, e))
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          deleteTag(id, tag) {
+            Vue.deleteTag(id, tag)
+              .then(e => Vue.set(this.statuses, e.id, e))
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          appendStatuses () {
+            this.page ++
+            Vue.getStatuses(this.min_id)
+              .then(e => {
+                if (0 < e.length) {
+                  e.map(v => {Vue.set(this.statuses, v.id, v)})
+                  this.min_id = e[e.length - 1].id
+                } else {
+                  this.last_page = true
+                  this.$dialog.alert('最後のページです')
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
+          },
+        },
+      })

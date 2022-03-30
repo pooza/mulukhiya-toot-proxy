@@ -12,12 +12,12 @@ module Mulukhiya
 
     def test_name
       return unless @nowplaying
-      assert_equal(@nowplaying.name, 'nowplaying')
+      assert_equal('nowplaying', @nowplaying.name)
     end
 
     def test_raw_name
       return unless @nowplaying
-      assert_equal(@nowplaying.raw_name, 'NowPlaying')
+      assert_equal('NowPlaying', @nowplaying.raw_name)
     end
 
     def test_uri
@@ -29,6 +29,11 @@ module Mulukhiya
     def test_listable?
       return unless @nowplaying
       assert_boolean(@nowplaying.listable?)
+    end
+
+    def test_deletable?
+      assert_boolean(@nowplaying.deletable?) if @nowplaying
+      assert_false(@default.deletable?) if @default
     end
 
     def test_default?
@@ -60,13 +65,13 @@ module Mulukhiya
       return unless @default
       feed = @default.create_feed(limit: 5)
       assert_kind_of(Array, feed)
-      assert_equal(feed.count, 5)
+      assert_equal(5, feed.count)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
-        assert(entry[:uri].present?)
-        assert(entry[:text].present?)
-        assert(entry[:display_name].present?)
-        assert(entry[:created_at].present?)
+        assert_predicate(entry[:uri], :present?)
+        assert_predicate(entry[:text], :present?)
+        assert_predicate(entry[:display_name], :present?)
+        assert_predicate(entry[:created_at], :present?)
       end
     end
   end

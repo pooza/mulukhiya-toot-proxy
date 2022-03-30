@@ -9,15 +9,15 @@ module Mulukhiya
     end
 
     def test_type
-      assert_equal(@mime.type('.jpeg'), 'image/jpeg')
-      assert_equal(@mime.type('.jpg'), 'image/jpeg')
-      assert_equal(@mime.type('.png'), 'image/png')
-      assert_equal(@mime.type('.webp'), 'image/webp')
-      assert_equal(@mime.type('.mp4'), 'video/mp4')
-      assert_equal(@mime.type('.mkv'), 'video/x-matroska')
-      assert_equal(@mime.type('.mp3'), 'audio/mpeg')
-      assert_equal(@mime.type('.md'), 'text/markdown')
-      assert_equal(@mime.type(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')), 'audio/mpeg')
+      assert_equal('image/jpeg', @mime.type('.jpeg'))
+      assert_equal('image/jpeg', @mime.type('.jpg'))
+      assert_equal('image/png', @mime.type('.png'))
+      assert_equal('image/webp', @mime.type('.webp'))
+      assert_equal('video/mp4', @mime.type('.mp4'))
+      assert_equal('video/x-matroska', @mime.type('.mkv'))
+      assert_equal('audio/mpeg', @mime.type('.mp3'))
+      assert_equal('text/markdown', @mime.type('.md'))
+      assert_equal('audio/mpeg', @mime.type(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')))
     end
 
     def test_extnames
@@ -25,13 +25,13 @@ module Mulukhiya
     end
 
     def test_extname
-      assert_equal(@mime.extname('image/jpeg'), '.jpg')
-      assert_equal(@mime.extname('image/png'), '.png')
-      assert_equal(@mime.extname('image/webp'), '.webp')
-      assert_equal(@mime.extname('video/mp4'), '.mp4')
-      assert_equal(@mime.extname('video/x-matroska'), '.mkv')
-      assert_equal(@mime.extname('audio/mpeg'), '.mp3')
-      assert_equal(@mime.extname('text/markdown'), '.md')
+      assert_equal('.jpg', @mime.extname('image/jpeg'))
+      assert_equal('.png', @mime.extname('image/png'))
+      assert_equal('.webp', @mime.extname('image/webp'))
+      assert_equal('.mp4', @mime.extname('video/mp4'))
+      assert_equal('.mkv', @mime.extname('video/x-matroska'))
+      assert_equal('.mp3', @mime.extname('audio/mpeg'))
+      assert_equal('.md', @mime.extname('text/markdown'))
     end
   end
 end

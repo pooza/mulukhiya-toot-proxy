@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_name
-      assert_equal(Package.name, 'mulukhiya-toot-proxy')
+      assert_equal('mulukhiya-toot-proxy', Package.name)
     end
 
     def test_version

@@ -5,8 +5,8 @@ module Mulukhiya
     end
 
     def test_escape_toot
-      assert_equal('#キボウレインボウ#'.escape_toot, '# キボウレインボウ#')
-      assert_equal('IDOLM@STER'.escape_toot, 'IDOLM@ STER')
+      assert_equal('# キボウレインボウ#', '#キボウレインボウ#'.escape_toot)
+      assert_equal('IDOLM@ STER', 'IDOLM@STER'.escape_toot)
     end
 
     def test_crypt

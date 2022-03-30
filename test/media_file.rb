@@ -3,7 +3,7 @@ module Mulukhiya
     def test_all
       assert_kind_of(Enumerator, MediaFile.all)
       MediaFile.all do |f|
-        assert(File.exist?(f))
+        assert_path_exist(f)
       end
     end
 

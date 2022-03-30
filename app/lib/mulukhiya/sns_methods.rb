@@ -20,6 +20,10 @@ module Mulukhiya
       return controller_class.visibility_field
     end
 
+    def reply_to_field
+      return controller_class.reply_to_field
+    end
+
     def attachment_field
       return controller_class.attachment_field
     end

@@ -14,7 +14,7 @@ module Mulukhiya
 
     def test_fetch
       RemoteDictionary.all do |dic|
-        assert(dic.fetch.present?)
+        assert_predicate(dic.fetch, :present?)
       end
     end
   end

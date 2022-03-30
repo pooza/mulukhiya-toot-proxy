@@ -177,6 +177,69 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/status' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      params[:limit] ||= config['/webui/status/timeline/limit']
+      @renderer.message = sns.account.statuses(params)
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/status/tag' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = StatusTagContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        status = status_class[params[:id]]
+        tags = TagContainer.scan(status.parser.footer)
+        tags.push(params[:tag])
+        @renderer.message = sns.update_status(
+          params[:id],
+          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
+        )
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    delete '/status/tag' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless tag = hash_tag_class.get(tag: params[:tag])
+      raise Ginseng::AuthError, 'Default hashtags cannot be deleted.' unless tag.deletable?
+      errors = StatusTagContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        status = status_class[params[:id]]
+        tags = TagContainer.scan(status.parser.footer)
+        tags.delete(params[:tag])
+        @renderer.message = sns.update_status(
+          params[:id],
+          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
+        )
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/annict/auth' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

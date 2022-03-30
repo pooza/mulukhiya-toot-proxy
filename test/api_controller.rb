@@ -13,94 +13,110 @@ module Mulukhiya
 
     def test_about
       get '/about'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_config
       get '/config'
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 403)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_equal(403, last_response.status)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_program
       return unless controller_class.livecure?
 
       get '/program'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_media
       return unless controller_class.media_catalog?
 
       get '/media'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
 
       get '/media?page=0'
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 422)
+      assert_equal(422, last_response.status)
 
       get '/media?page=1'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
 
       get '/media?page=2'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_health
       get '/health'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_tag_search
       post '/tagging/tag/search'
       assert_false(last_response.ok?)
-      assert_equal(last_response.status, 422)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_equal(422, last_response.status)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
 
       header 'Content-Type', 'application/json'
       post '/tagging/tag/search', {q: 'まこぴー'}.to_json
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
       assert_kind_of(Hash, JSON.parse(last_response.body))
     end
 
     def test_favorite_tags
       return unless controller_class.favorite_tags?
       get '/tagging/favorites'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_lemmy_communities
       return unless test_account.lemmy
       get "/lemmy/communities?token=#{test_account.token}"
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_feed_list
       get '/feed/list'
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
 
       uri = sns_class.new.create_uri('/feed/list')
       uri.query_values = {token: test_token.encrypt}
       get uri.to_s
-      assert(last_response.ok?)
-      assert_equal(last_response.content_type, 'application/json; charset=UTF-8')
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
+    end
+
+    def test_status
+      return unless controller_class.account_timeline?
+      get '/status'
+      assert_false(last_response.ok?)
+
+      get "/status?token=#{test_account.token}"
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
+
+      JSON.parse(last_response.body).first(10).each do |status|
+        assert_kind_of(String, status['id'])
+        assert_kind_of(String, status['content'])
+        assert_kind_of(Hash, status['account'])
+      end
     end
 
     def test_costom_endpoints
       CustomAPI.all.reject(&:args?).each do |api|
         get api.path
-        assert(last_response.ok?)
+        assert_predicate(last_response, :ok?)
       end
     end
   end

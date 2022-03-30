@@ -15,8 +15,8 @@ module Mulukhiya
     def test_acct
       return unless account
       assert_kind_of(Acct, account.acct)
-      assert(account.acct.host.present?)
-      assert(account.acct.username.present?)
+      assert_predicate(account.acct.host, :present?)
+      assert_predicate(account.acct.username, :present?)
     end
 
     def test_to_h
@@ -71,7 +71,7 @@ module Mulukhiya
 
     def test_test?
       return unless account
-      assert(account.test?)
+      assert_predicate(account, :test?)
     end
 
     def test_info?
@@ -147,6 +147,14 @@ module Mulukhiya
       assert_kind_of(TagContainer, account.bio_tags)
     end
 
+    def test_statuses
+      return unless controller_class.account_timeline?
+      assert_kind_of(Array, statuses = account.statuses)
+      statuses.first(10).each do |status|
+        assert_kind_of(Hash, status)
+      end
+    end
+
     def test_test_account
       assert_kind_of(account_class, account_class.test_account)
       config['/agent/test/token'] = 'aaa'
@@ -166,7 +174,7 @@ module Mulukhiya
     def test_administrators
       account_class.administrators do |account|
         assert_kind_of(account_class, account)
-        assert(account.admin?)
+        assert_predicate(account, :admin?)
       end
     end
   end

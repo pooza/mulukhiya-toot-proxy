@@ -11,11 +11,11 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.amazon.co.jp/dp/B08JH42SHR')
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.amazon.co.jp/dp/B08BDYBCLQ')
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
     end
   end
 end

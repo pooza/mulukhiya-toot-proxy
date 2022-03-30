@@ -13,7 +13,7 @@ html lang='ja'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
           h4
-            a href='#' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
+            a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
             span.alert v-else='' 壊れたトークン
             span.role v-if='current_account.is_moderator' moderator
             span.role v-if='current_account.is_admin' admin

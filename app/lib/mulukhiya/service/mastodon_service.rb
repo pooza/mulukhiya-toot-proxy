@@ -8,6 +8,33 @@ module Mulukhiya
 
     alias toot post
 
+    def update_status(status, body, params = {})
+      status = status_class[status] unless status.is_a?(status_class)
+      body = {status: body.to_s} unless body.is_a?(Hash)
+      body.deep_symbolize_keys!
+      body[:media_ids] ||= status.attachments.map(&:id)
+      body[:in_reply_to_id] ||= status.in_reply_to_id
+      body[:spoiler_text] ||= status.spoiler_text
+      body[:visibility] ||= status.visibility
+      response = http.put("/api/v1/statuses/#{status.id}", {
+        body: body.compact,
+        headers: create_headers(params[:headers]),
+      })
+      return self.class.create_status_info(response.body)
+    end
+
+    def statuses(params = {})
+      case params[:type].to_sym
+      when :account
+        uri = create_uri("/api/v1/accounts/#{account.id}/statuses")
+        uri.query_values = params.except(:type).compact
+        response = http.get(uri)
+      else
+        response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
+      end
+      return response.parsed_response.map {|s| self.class.create_status_info(s)}
+    end
+
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super
@@ -71,6 +98,18 @@ module Mulukhiya
         MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
         MastodonController.reply_to_field => options.dig(:response, :id),
+      )
+    end
+
+    def self.create_status_info(status)
+      status = JSON.parse(status) unless status.is_a?(Hash)
+      parser = TootParser.new(TootParser.sanitize(status['content']))
+      return status.merge(
+        created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+        body: parser.body,
+        footer: parser.footer,
+        footer_tags: TagContainer.scan(parser.footer).to_a,
+        visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end
   end

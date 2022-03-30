@@ -1,6 +1,10 @@
 ---
+name: bug_report
+about: バグ報告
 title: ''
 labels: bug
+assignees: ''
+
 ---
 
 ## 概要

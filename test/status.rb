@@ -10,7 +10,7 @@ module Mulukhiya
 
     def test_id
       return unless @status
-      assert(@status.id.present?)
+      assert_predicate(@status.id, :present?)
     end
 
     def test_to_h

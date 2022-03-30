@@ -8,6 +8,7 @@ module Mulukhiya
     def initialize(params = {})
       @params = params.deep_symbolize_keys
       @params[:password] = (@params[:password].decrypt rescue @params[:password])
+      logger.info(class: self.class.to_s, method: __method__, url: uri.to_s)
     end
 
     def client
@@ -101,10 +102,10 @@ module Mulukhiya
     end
 
     def login
-      client.send({op: 'Login', data: {
+      client.send(op: 'Login', data: {
         username_or_email: username,
         password:,
-      }}.to_json)
+      })
     end
 
     def post(body = {})
@@ -118,14 +119,14 @@ module Mulukhiya
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= uri.to_s
       end
-      client.send({op: 'CreatePost', data:}.to_json)
+      client.send(op: 'CreatePost', data:)
     end
 
     def fetch_communities(body = {})
-      client.send({op: 'ListCommunities', data: {
+      client.send(op: 'ListCommunities', data: {
         limit: config['/lemmy/communities/limit'],
         auth: @jwt,
-      }}.to_json)
+      })
     end
   end
 end

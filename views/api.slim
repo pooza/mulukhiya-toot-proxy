@@ -10,6 +10,16 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 API
       ul.links
+        - if controller.update_status?
+          li v-if='account.username'
+            h3 @click='toggleVisibility("status")' = controller.status_label
+            vue-slide-up-down :active='layout.details.status'
+              .endpoint-container
+                .link GET {{endpoints.statuses}}
+                .link-description = "このアカウントからの#{controller.status_label}を取得します。"
+                .field-update-button-container
+                  button @click='getStatuses' 実行
+                  pre.result v-if='result.statuses' {{result.statuses}}
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
@@ -222,6 +232,7 @@ html lang='ja'
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
+            statuses: `/mulukhiya/api/status?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
@@ -244,6 +255,7 @@ html lang='ja'
             media_list: null,
             program_list: null,
             feed_list: null,
+            statuses: null,
             health: null,
             about: null,
           },
@@ -261,6 +273,7 @@ html lang='ja'
               sidekiq: false,
               custom: false,
               about: false,
+              status: false,
             },
           },
         },
@@ -385,6 +398,12 @@ html lang='ja'
             this.result.search_tag = null
             Vue.searchTags(this.query_params.tagging_tag_search.q)
               .then(e => {this.result.search_tag = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getStatuses () {
+            this.result.statuses = null
+            Vue.getStatuses()
+              .then(e => {this.result.statuses = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getHealth () {

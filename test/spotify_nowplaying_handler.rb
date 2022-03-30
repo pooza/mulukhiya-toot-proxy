@@ -9,7 +9,7 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.handle_pre_toot(status_field => "#nowplaying エビカニクス\n")
-      assert_equal(@handler.debug_info[:result], [{keyword: 'エビカニクス'}])
+      assert_equal([{keyword: 'エビカニクス'}], @handler.debug_info[:result])
     end
   end
 end

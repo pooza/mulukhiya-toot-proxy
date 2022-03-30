@@ -11,7 +11,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://www.amazon.co.jp/dp/B00QIUDCXS\n")
-      assert_equal(@handler.debug_info[:result], [{url: 'https://www.amazon.co.jp/dp/B00QIUDCXS'}]) if @handler.debug_info[:result].present?
+      assert_equal([{url: 'https://www.amazon.co.jp/dp/B00QIUDCXS'}], @handler.debug_info[:result]) if @handler.debug_info[:result].present?
     end
   end
 end

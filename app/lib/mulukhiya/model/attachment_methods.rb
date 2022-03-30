@@ -29,6 +29,7 @@ module Mulukhiya
     end
 
     def size_str
+      return nil unless size
       ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'].freeze.each_with_index do |unit, i|
         unitsize = 1024.pow(i)
         return "#{(size.to_f / unitsize).floor.commaize}#{unit}B" if size < unitsize * 1024 * 2

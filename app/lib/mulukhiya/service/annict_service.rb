@@ -222,8 +222,8 @@ module Mulukhiya
       end
       bar&.finish
       return unless Environment.rake?
-      results.each do |key, result|
-        puts({acct: key, result:}.deep_stringify_keys.to_yaml)
+      results.each do |acct, result|
+        puts({acct:, result:}.deep_stringify_keys.to_yaml)
       end
     end
   end

@@ -9,7 +9,7 @@ module Mulukhiya
       assert_nil(@handler.debug_info)
 
       @handler.handle_pre_toot(status_field => "#nowplaying #五條真由美 ガンバランス de ダンス\n")
-      assert_equal(@handler.debug_info[:result], [{keyword: '#五條真由美 ガンバランス de ダンス'}])
+      assert_equal([{keyword: '#五條真由美 ガンバランス de ダンス'}], @handler.debug_info[:result])
     end
   end
 end

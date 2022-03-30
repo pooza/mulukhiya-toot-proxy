@@ -13,7 +13,7 @@ module Mulukhiya
       config['/handler/image_format_convert/alpha'] = true
       assert_false(@handler.convertable?)
       config['/handler/image_format_convert/alpha'] = false
-      assert(@handler.convertable?)
+      assert_predicate(@handler, :convertable?)
     end
 
     def test_detect_alpha?

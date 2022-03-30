@@ -14,19 +14,19 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_toot(status_field => "command: user_config\n#{@key}: 1")
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
 
       @handler.clear
       @handler.handle_toot(status_field => "command: user_config\n#{@key}: null")
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
 
       @handler.clear
       @handler.handle_toot(status_field => %({"command": "user_config", "#{@key}": 2}))
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
 
       @handler.clear
       @handler.handle_toot(status_field => %({"command": "user_config", "#{@key}": null}))
-      assert(@handler.debug_info[:result].present?)
+      assert_predicate(@handler.debug_info[:result], :present?)
     end
   end
 end

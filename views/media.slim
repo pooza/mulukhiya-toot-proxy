@@ -44,7 +44,7 @@ html lang='ja'
             li.param
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
-      nav.media v-if='medias.length && !last'
+      nav.media v-if='medias.length && !last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:
@@ -59,7 +59,7 @@ html lang='ja'
           medias: [],
           page: 0,
           keyword: null,
-          last: false,
+          last_page: false,
         },
         mounted () {
           Vue.getConfig()
@@ -71,7 +71,7 @@ html lang='ja'
           searchMedias () {
             this.page = 0
             this.medias = []
-            this.last = false
+            this.last_page = false
             setTimeout(this.appendMedias, 500)
           },
           appendMedias () {
@@ -81,7 +81,7 @@ html lang='ja'
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
                 } else {
-                  this.last = true
+                  this.last_page = true
                   this.$dialog.alert('メディアはこれ以上投稿されていません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))

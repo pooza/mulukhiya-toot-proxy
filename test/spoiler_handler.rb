@@ -10,13 +10,13 @@ module Mulukhiya
       body = {controller_class.status_field => '普通の文章'}
       @handler.handle_pre_toot(body)
       assert_nil(@handler.debug_info)
-      assert_equal(body[controller_class.status_field], '普通の文章')
+      assert_equal('普通の文章', body[controller_class.status_field])
 
       @handler.clear
       body = {controller_class.status_field => '18禁'}
       @handler.handle_pre_toot(body)
       assert_nil(@handler.debug_info)
-      assert_equal(body[controller_class.status_field], '18禁')
+      assert_equal('18禁', body[controller_class.status_field])
 
       @handler.clear
       body = {
@@ -32,7 +32,7 @@ module Mulukhiya
         controller_class.status_field => 'ネタバレ文章',
       }
       @handler.handle_pre_toot(body)
-      assert_equal(body[controller_class.spoiler_field], ':netabare: ネタバレ')
+      assert_equal(':netabare: ネタバレ', body[controller_class.spoiler_field])
 
       @handler.clear
       body = {
@@ -40,7 +40,7 @@ module Mulukhiya
         controller_class.status_field => 'ネタバレ文章',
       }
       @handler.handle_pre_toot(body)
-      assert_equal(body[controller_class.spoiler_field], ':netabare: ネタバレ')
+      assert_equal(':netabare: ネタバレ', body[controller_class.spoiler_field])
     end
   end
 end
