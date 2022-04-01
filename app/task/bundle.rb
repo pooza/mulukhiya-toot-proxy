@@ -15,9 +15,7 @@ module Mulukhiya
 
     desc 'check gems'
     task :check do
-      unless Environment.gem_fresh?
-        exit 1
-      end
+      exit 1 unless Environment.gem_fresh?
     end
   end
 end
