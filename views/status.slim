@@ -20,7 +20,7 @@ html lang='ja'
             .header = '{{status.id}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
           pre.body = '{{status.body}}'
-          .footer-tags
+          .footer-tags v-if='status.taggable'
             h4
               i class='fa fa-tag'
               | タグの編集

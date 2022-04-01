@@ -21,6 +21,7 @@ module Mulukhiya
         assert_kind_of(String, status[:body])
         assert_kind_of(String, status[:footer])
         assert_kind_of(Array, status[:footer_tags])
+        assert_boolean(status[:taggable])
       end
     end
 
