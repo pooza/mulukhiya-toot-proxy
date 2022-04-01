@@ -201,11 +201,11 @@ handler:
       video: video
   remote_tag:
     services:
-      - pattern: (プリキュア|precure)
+      - pattern: (プリキュア|precure|キュアスタ)
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: ダイ(大|の大冒険)
+      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
