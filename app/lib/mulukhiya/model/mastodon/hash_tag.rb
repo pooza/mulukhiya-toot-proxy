@@ -13,7 +13,7 @@ module Mulukhiya
           feed_url: feed_uri.to_s,
           is_default: default?,
           is_deletable: deletable?,
-        ).deep_compact
+        ).compact
         return @hash
       end
 

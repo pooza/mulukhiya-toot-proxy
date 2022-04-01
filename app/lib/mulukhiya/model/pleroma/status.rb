@@ -63,7 +63,7 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= data.deep_compact
+        @hash ||= data.compact
         return @hash
       end
 

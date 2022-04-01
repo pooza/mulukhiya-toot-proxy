@@ -36,7 +36,7 @@ module Mulukhiya
           uri: uri.to_s,
           url: uri.to_s,
           attachments: query['files'],
-        ).deep_compact
+        ).compact
         return @hash
       end
 
