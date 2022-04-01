@@ -25,8 +25,8 @@ html lang='ja'
               i class='fa fa-tag'
               | タグの編集
             .tag v-for='tag in status.footer_tags'
-              | {{tag}}
-              a href='javascript:void(0)' @click='deleteTag(status.id, tag)'
+              | {{tag.name}}
+              a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
                 i class='fa fa-xmark'
             .tag
               | 新規タグを追加

@@ -21,6 +21,12 @@ module Mulukhiya
         assert_kind_of(String, status[:body])
         assert_kind_of(String, status[:footer])
         assert_kind_of(Array, status[:footer_tags])
+        status[:footer_tags].each do |tag|
+          assert_kind_of(Hash, tag)
+          assert_kind_of(String, status[:name])
+          assert_boolean(String, status[:is_deletable])
+          assert_boolean(String, status[:is_default])
+        end
         assert_boolean(status[:taggable])
       end
     end
