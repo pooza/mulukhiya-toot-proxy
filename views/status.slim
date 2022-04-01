@@ -19,7 +19,7 @@ html lang='ja'
           - if env.development?
             .header = '{{status.id}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
-          pre.body = '{{status.body}}'
+          pre.body v-if='status.body' = '{{status.body}}'
           .footer-tags v-if='status.taggable'
             h4
               i class='fa fa-tag'

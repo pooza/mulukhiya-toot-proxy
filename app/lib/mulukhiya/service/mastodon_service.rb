@@ -107,7 +107,7 @@ module Mulukhiya
       return status.merge(
         created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
         body: parser.body,
-        taggable: [:public, :unlisted].member?(status['visibility'].to_sym),
+        taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,
         footer_tags: TagContainer.scan(parser.footer).to_a,
         visibility_icon: TootParser.visibility_icon(status['visibility']),
