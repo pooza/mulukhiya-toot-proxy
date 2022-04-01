@@ -61,17 +61,19 @@ module Mulukhiya
       end
 
       def to_h
+        footer_tags = TagContainer.scan(parser.footer).to_a
+        if footer_tags.present?
+          footer_tags = footer_tags.filter_map {|tag| Mastodon::HashTag.get(name: tag)}.map(&:to_h)
+        end
         @hash ||= values.deep_symbolize_keys.merge(
           created_at_str: created_at.getlocal.strftime('%Y/%m/%d %H:%M:%S'),
           body: parser.body,
           is_taggable: taggable?,
           footer: parser.footer,
-          footer_tags: TagContainer.scan(parser.footer)
-            .filter_map {|tag| Environment.hash_tag_class.get(name: tag)}
-            .map(&:to_h),
+          footer_tags:,
           visibility_name:,
           visibility_icon:,
-        ).deep_compact
+        ).compact
         return @hash
       end
 

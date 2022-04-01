@@ -35,7 +35,7 @@ html lang='ja'
               | 新規タグを追加
               a href='javascript:void(0)' @click='createTag(status.id)'
                 i class='fa fa-pencil'
-        nav.media v-if='false && statuses.length && !last_page'
+        nav.media v-if='!last_page'
           a @click='appendStatuses' 続きを読む…
     javascript:
       'use strict'
@@ -48,7 +48,7 @@ html lang='ja'
           account: {is_admin: false, username: null},
           statuses: {},
           last_page: false,
-          min_id: null,
+          page: 0,
         },
         mounted () {
           Vue.getConfig()
@@ -71,11 +71,10 @@ html lang='ja'
           },
           appendStatuses () {
             this.page ++
-            Vue.getStatuses(this.min_id)
+            Vue.getStatuses(this.page)
               .then(e => {
                 if (0 < e.length) {
                   e.map(v => {Vue.set(this.statuses, v.id, v)})
-                  this.min_id = e[e.length - 1].id
                 } else {
                   this.last_page = true
                   this.$dialog.alert('最後のページです')

@@ -23,18 +23,6 @@ module Mulukhiya
       return self.class.create_status_info(response.body)
     end
 
-    def statuses(params = {})
-      case params[:type].to_sym
-      when :account
-        uri = create_uri("/api/v1/accounts/#{account.id}/statuses")
-        uri.query_values = params.except(:type).compact
-        response = http.get(uri)
-      else
-        response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
-      end
-      return response.parsed_response.map {|s| self.class.create_status_info(s)}
-    end
-
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super

@@ -152,6 +152,17 @@ module Mulukhiya
       assert_kind_of(Array, statuses = account.statuses)
       statuses.first(10).each do |status|
         assert_kind_of(Hash, status)
+        assert_kind_of(String, status[:created_at_str])
+        assert_kind_of(Time, Time.parse(status[:created_at_str]))
+        assert_kind_of(String, status[:body])
+        assert_kind_of(String, status[:footer])
+        assert_kind_of(Array, status[:footer_tags])
+        status[:footer_tags].each do |tag|
+          assert_kind_of(Hash, tag)
+          assert_boolean(tag[:is_deletable])
+          assert_boolean(tag[:is_default])
+        end
+        assert_boolean(status[:is_taggable])
       end
     end
 

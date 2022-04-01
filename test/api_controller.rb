@@ -107,9 +107,8 @@ module Mulukhiya
       assert_equal('application/json; charset=UTF-8', last_response.content_type)
 
       JSON.parse(last_response.body).first(10).each do |status|
-        assert_kind_of(String, status['id'])
-        assert_kind_of(String, status['content'])
-        assert_kind_of(Hash, status['account'])
+        assert_kind_of([String, Integer], status['id'])
+        assert_kind_of([String, NilClass], status['content'])
       end
     end
 

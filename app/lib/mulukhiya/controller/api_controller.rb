@@ -181,6 +181,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
+      params[:page] = params[:page]&.to_i || 1
       @renderer.message = sns.account.statuses(params)
       return @renderer.to_s
     rescue => e
