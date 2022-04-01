@@ -29,7 +29,7 @@ module Mulukhiya
           assert_boolean(String, status[:is_deletable])
           assert_boolean(String, status[:is_default])
         end
-        assert_boolean(status[:taggable])
+        assert_boolean(status[:is_taggable])
       end
     end
 

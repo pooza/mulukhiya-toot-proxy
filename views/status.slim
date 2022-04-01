@@ -15,12 +15,13 @@ html lang='ja'
             i :class="'fa fa-' + status.visibility_icon"
           .header
             i class='fa fa-calendar'
-            a :href='status.webui_url' = '{{status.created_at_str}}'
+            a :href='status.webui_url' target='_blank' rel='noreferrer' v-if='status.is_taggable' = '{{status.created_at_str}}'
+            span v-else='' = '{{status.created_at_str}}'
           - if env.development?
             .header = '{{status.id}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
           pre.body v-if='status.body' = '{{status.body}}'
-          .footer-tags v-if='status.taggable'
+          .footer-tags v-if='status.is_taggable'
             h4
               i class='fa fa-tag'
               | タグの編集

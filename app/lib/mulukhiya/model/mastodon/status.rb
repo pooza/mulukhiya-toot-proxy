@@ -41,8 +41,37 @@ module Mulukhiya
         return @parser
       end
 
+      def visibility_name
+        case visibility
+        when 0
+          return TootParser.visibility_name(:public)
+        when 1
+          return TootParser.visibility_name(:unlisted)
+        when 2
+          return TootParser.visibility_name(:private)
+        when 3
+          return TootParser.visibility_name(:direct)
+        else
+          return nil
+        end
+      end
+
+      def visibility_icon
+        return TootParser.visibility_icon(visibility_name)
+      end
+
       def to_h
-        @hash ||= values.deep_symbolize_keys.deep_compact
+        @hash ||= values.deep_symbolize_keys.merge(
+          created_at_str: created_at.getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+          body: parser.body,
+          is_taggable: taggable?,
+          footer: parser.footer,
+          footer_tags: TagContainer.scan(parser.footer)
+            .filter_map {|tag| Environment.hash_tag_class.get(name: tag)}
+            .map(&:to_h),
+          visibility_name:,
+          visibility_icon:,
+        ).deep_compact
         return @hash
       end
 

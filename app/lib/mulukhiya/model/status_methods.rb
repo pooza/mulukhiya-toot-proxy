@@ -4,6 +4,9 @@ module Mulukhiya
       return visibility == controller_class.visibility_name(:public)
     end
 
-    alias taggable? public?
+    def taggable?
+      return falxe unless public?
+      return true
+    end
   end
 end

@@ -109,7 +109,7 @@ module Mulukhiya
         created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
         webui_url: service.create_uri("/mulukhiya/app/status/#{status['id']}").to_s,
         body: parser.body,
-        taggable: status['visibility'] == MastodonController.visibility_name(:public),
+        is_taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,
         footer_tags: TagContainer.scan(parser.footer)
           .filter_map {|tag| Environment.hash_tag_class.get(name: tag)}
