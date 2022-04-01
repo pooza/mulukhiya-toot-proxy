@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def taggable?
-      return falxe unless public?
+      return false unless public?
       return true
     end
   end
