@@ -156,7 +156,7 @@ handler:
     dics: []
     word:
       min: 2
-      min_kanji: 1
+      min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   filter_command:
     minutes: 300
