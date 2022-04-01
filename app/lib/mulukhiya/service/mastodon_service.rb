@@ -104,8 +104,10 @@ module Mulukhiya
     def self.create_status_info(status)
       status = JSON.parse(status) unless status.is_a?(Hash)
       parser = TootParser.new(TootParser.sanitize(status['content']))
+      service = new
       return status.merge(
         created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+        webui_url: service.create_uri("/mulukhiya/app/status/#{status['id']}").to_s,
         body: parser.body,
         taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,

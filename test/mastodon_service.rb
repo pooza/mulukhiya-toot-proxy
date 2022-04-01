@@ -24,6 +24,8 @@ module Mulukhiya
         status[:footer_tags].each do |tag|
           assert_kind_of(Hash, tag)
           assert_kind_of(String, status[:name])
+          assert_kind_of(String, status[:webui_url])
+          assert_predicate(URI.parse(status[:webui_url]), :absolute?)
           assert_boolean(String, status[:is_deletable])
           assert_boolean(String, status[:is_default])
         end

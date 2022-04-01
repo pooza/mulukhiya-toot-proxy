@@ -15,7 +15,7 @@ html lang='ja'
             i :class="'fa fa-' + status.visibility_icon"
           .header
             i class='fa fa-calendar'
-            | {{status.created_at_str}}
+            a :href='status.webui_url' = '{{status.created_at_str}}'
           - if env.development?
             .header = '{{status.id}}'
           .header v-if='status.spoiler_text' {{status.spoiler_text}}
