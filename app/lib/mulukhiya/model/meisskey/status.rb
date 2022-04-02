@@ -28,6 +28,10 @@ module Mulukhiya
         return acct.host == Environment.domain_name
       end
 
+      def visibility
+        return data[:visibility]
+      end
+
       alias visibility_name visibility
 
       def uri
@@ -42,7 +46,7 @@ module Mulukhiya
       alias public_uri uri
 
       def attachments
-        return data[:files]
+        return data[:files].map {|row| Attachment[row[:id]]}
       end
 
       def to_h
