@@ -171,8 +171,8 @@ GEM
       rake
     fileutils (1.6.0)
     find (0.1.1)
-    fugit (1.5.2)
-      et-orbi (~> 1.1, >= 1.1.8)
+    fugit (1.5.3)
+      et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gli (2.21.0)
     graphql (1.13.11)
