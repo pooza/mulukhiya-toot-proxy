@@ -44,7 +44,7 @@ html lang='ja'
             li.param
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
-      nav.media v-if='medias.length && !last_page'
+      nav.appender-container v-if='!last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
     javascript:

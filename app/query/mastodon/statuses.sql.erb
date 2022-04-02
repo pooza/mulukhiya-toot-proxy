@@ -7,6 +7,13 @@ WHERE (toots.reblog_of_id IS null)
   AND (toots.visibility < 3)
   AND (toots.deleted_at IS null)
   AND (toots.local = true)
+  <% if params[:q] %>
+    <% if config['/postgres/pgroonga'] %>
+      AND (toots.text &@ '<%= params[:q] %>')
+    <% else %>
+      AND (toots.text LIKE '%<%= params[:q] %>%')
+    <% end %>
+  <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
   AND (accounts.id = '<%= params[:id] %>')
