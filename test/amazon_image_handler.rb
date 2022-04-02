@@ -1,7 +1,7 @@
 module Mulukhiya
   class AmazonImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('amazon_image')
+      @handler = Handler.create(:amazon_image)
     end
 
     def test_handle_pre_toot

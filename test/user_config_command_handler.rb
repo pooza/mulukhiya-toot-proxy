@@ -3,7 +3,7 @@ require 'securerandom'
 module Mulukhiya
   class UserConfigCommandHandlerTest < TestCase
     def setup
-      @handler = Handler.create('user_config_command')
+      @handler = Handler.create(:user_config_command)
       @key = SecureRandom.hex(16)
     end
 

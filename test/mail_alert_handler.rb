@@ -1,7 +1,7 @@
 module Mulukhiya
   class MailAlertHandlerTest < TestCase
     def setup
-      @handler = Handler.create('mail_alert')
+      @handler = Handler.create(:mail_alert)
     end
 
     def test_handle_alert

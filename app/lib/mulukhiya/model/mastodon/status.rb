@@ -41,8 +41,40 @@ module Mulukhiya
         return @parser
       end
 
+      def visibility_name
+        case visibility
+        when 0
+          return TootParser.visibility_name(:public)
+        when 1
+          return TootParser.visibility_name(:unlisted)
+        when 2
+          return TootParser.visibility_name(:private)
+        when 3
+          return TootParser.visibility_name(:direct)
+        else
+          return nil
+        end
+      end
+
+      def visibility_icon
+        return TootParser.visibility_icon(visibility_name)
+      end
+
       def to_h
-        @hash ||= values.deep_symbolize_keys.deep_compact
+        footer_tags = TagContainer.scan(parser.footer).to_a
+        if footer_tags.present?
+          footer_tags = footer_tags.filter_map {|tag| Mastodon::HashTag.get(name: tag)}.map(&:to_h)
+        end
+        @hash ||= values.deep_symbolize_keys.merge(
+          id: id.to_s,
+          created_at_str: created_at.getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+          body: parser.body,
+          is_taggable: taggable?,
+          footer: parser.footer,
+          footer_tags:,
+          visibility_name:,
+          visibility_icon:,
+        ).compact
         return @hash
       end
 

@@ -1,7 +1,7 @@
 module Mulukhiya
   class LineAlertHandlerTest < TestCase
     def setup
-      @handler = Handler.create('line_alert')
+      @handler = Handler.create(:line_alert)
     end
 
     def test_handle_alert

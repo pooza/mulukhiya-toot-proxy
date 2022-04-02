@@ -2,7 +2,7 @@ module Mulukhiya
   class ReporterTest < TestCase
     def setup
       @reporter = Reporter.new
-      handler = Handler.create('itunes_url_nowplaying')
+      handler = Handler.create(:itunes_url_nowplaying)
       handler.handle_pre_toot(status_field => "シュビドゥビ☆スイーツタイム\n#nowplaying https://music.apple.com/jp/album//1352845788?i=1352845804\n")[status_field]
       @reporter.push(handler.summary)
     end

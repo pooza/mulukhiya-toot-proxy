@@ -1,0 +1,69 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    nav.breadcrumbs
+      ul
+        li
+          a href='/' = sns.node_name
+        li
+          a href='/mulukhiya' モロヘイヤHOME
+        li
+          a href='/mulukhiya/app/status' = controller.status_label
+        li = params.dig(:status, :id)
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 = "投稿: #{params.dig(:status, :id)}"
+      article
+        - if params.dig(:status, :spoiler_text).present?
+          .header = params.dig(:status, :spoiler_text).present?
+        - if params.dig(:status, :body).present?
+          pre.body = params.dig(:status, :body)
+        - if params.dig(:status, :is_taggable)
+          .footer-tags
+            h4
+              i class='fa fa-tag'
+              | タグの編集
+            - params.dig(:status, :footer_tags).each do |tag|
+              .tag
+                = tag[:name]
+                - if tag[:is_deletable]
+                  a href='javascript:void(0)' @click="deleteTag('#{params.dig(:status, :id)}', '#{tag[:name]}')"
+                    i class='fa fa-xmark'
+            .tag
+              | 新規タグを追加
+              a href='javascript:void(0)' @click="createTag('#{params.dig(:status, :id)}')"
+                i class='fa fa-pencil'
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+        },
+        mounted () {
+          Vue.getConfig()
+            .then(e => {this.account = e.account})
+            .catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          createTag (id) {
+            this.$dialog
+              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
+              .then(e => Vue.createTag(id, e.data))
+              .then(e => location.reload())
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          deleteTag (id, tag) {
+            Vue.deleteTag(id, tag)
+              .then(e => location.reload())
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+        },
+      })

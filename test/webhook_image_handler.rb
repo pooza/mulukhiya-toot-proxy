@@ -1,7 +1,7 @@
 module Mulukhiya
   class WebhookImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('webhook_image')
+      @handler = Handler.create(:webhook_image)
     end
 
     def test_handle_pre_webhook

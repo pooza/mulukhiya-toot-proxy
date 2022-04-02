@@ -1,7 +1,7 @@
 module Mulukhiya
   class GrowiAnnounceHandlerTest < TestCase
     def setup
-      @handler = Handler.create('growi_announce')
+      @handler = Handler.create(:growi_announce)
       config['/agent/info/token'] = test_token
     end
 

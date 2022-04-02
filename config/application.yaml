@@ -156,7 +156,7 @@ handler:
     dics: []
     word:
       min: 2
-      min_kanji: 1
+      min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   filter_command:
     minutes: 300
@@ -201,11 +201,11 @@ handler:
       video: video
   remote_tag:
     services:
-      - pattern: (プリキュア|precure)
+      - pattern: (プリキュア|precure|キュアスタ)
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: ダイ(大|の大冒険)
+      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
@@ -864,7 +864,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.16.0
+  version: 4.16.1
 parser:
   note:
     fields:

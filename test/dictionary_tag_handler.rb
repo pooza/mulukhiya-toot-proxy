@@ -12,7 +12,7 @@ module Mulukhiya
       ]
       TaggingDictionary.new.refresh
 
-      @handler = Handler.create('dictionary_tag')
+      @handler = Handler.create(:dictionary_tag)
     end
 
     def teardown

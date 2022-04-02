@@ -40,6 +40,11 @@ module Mulukhiya
       assert_boolean(@status.public?)
     end
 
+    def test_taggable?
+      return unless @status
+      assert_boolean(@status.taggable?)
+    end
+
     def test_text
       return unless @status
       assert_kind_of(String, @status.text)

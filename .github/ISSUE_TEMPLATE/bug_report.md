@@ -1,10 +1,9 @@
 ---
-name: bug_report
+name: バグ報告
 about: バグ報告
 title: ''
 labels: bug
 assignees: ''
-
 ---
 
 ## 概要

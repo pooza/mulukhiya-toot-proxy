@@ -23,18 +23,6 @@ module Mulukhiya
       return self.class.create_status_info(response.body)
     end
 
-    def statuses(params = {})
-      case params[:type].to_sym
-      when :account
-        uri = create_uri("/api/v1/accounts/#{account.id}/statuses")
-        uri.query_values = params.except(:type).compact
-        response = http.get(uri)
-      else
-        response = http.get('/api/v1/timelines/home', {headers: create_headers(params[:headers])})
-      end
-      return response.parsed_response.map {|s| self.class.create_status_info(s)}
-    end
-
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super
@@ -104,11 +92,16 @@ module Mulukhiya
     def self.create_status_info(status)
       status = JSON.parse(status) unless status.is_a?(Hash)
       parser = TootParser.new(TootParser.sanitize(status['content']))
+      service = new
       return status.merge(
         created_at_str: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
+        webui_url: service.create_uri("/mulukhiya/app/status/#{status['id']}").to_s,
         body: parser.body,
+        is_taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,
-        footer_tags: TagContainer.scan(parser.footer).to_a,
+        footer_tags: TagContainer.scan(parser.footer)
+          .filter_map {|tag| Environment.hash_tag_class.get(name: tag)}
+          .map(&:to_h),
         visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end

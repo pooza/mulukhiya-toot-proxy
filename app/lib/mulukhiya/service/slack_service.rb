@@ -9,7 +9,7 @@ module Mulukhiya
 
     def self.uris(&block)
       return enum_for(__method__) unless block
-      return nil unless handler = Handler.create('slack_alert')
+      return nil unless handler = Handler.create(:slack_alert)
       return handler.uris.each(&block)
     end
 

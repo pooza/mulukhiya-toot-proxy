@@ -1,7 +1,7 @@
 module Mulukhiya
   class MentionVisibilityHandlerTest < TestCase
     def setup
-      @handler = Handler.create('mention_visibility')
+      @handler = Handler.create(:mention_visibility)
       config['/agent/accts'] = ['@relayctl@hashtag-relay.dtp-mstdn.jp']
     end
 

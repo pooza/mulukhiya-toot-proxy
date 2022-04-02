@@ -1,7 +1,7 @@
 module Mulukhiya
   class SlackAlertHandlerTest < TestCase
     def setup
-      @handler = Handler.create('slack_alert')
+      @handler = Handler.create(:slack_alert)
     end
 
     def test_handle_alert

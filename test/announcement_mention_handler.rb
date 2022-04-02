@@ -1,7 +1,7 @@
 module Mulukhiya
   class AnnouncementHandlerTest < TestCase
     def setup
-      @handler = Handler.create('announcement_mention')
+      @handler = Handler.create(:announcement_mention)
     end
 
     def test_template

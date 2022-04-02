@@ -1,7 +1,7 @@
 module Mulukhiya
   class MediaTagHandlerTest < TestCase
     def setup
-      @handler = Handler.create('media_tag')
+      @handler = Handler.create(:media_tag)
     end
 
     def test_all

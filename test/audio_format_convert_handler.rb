@@ -1,7 +1,7 @@
 module Mulukhiya
   class AudioFormatConvertHandlerTest < TestCase
     def setup
-      @handler = Handler.create('audio_format_convert')
+      @handler = Handler.create(:audio_format_convert)
       @handler.handle_pre_upload(file: {
         tempfile: File.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3')),
       })

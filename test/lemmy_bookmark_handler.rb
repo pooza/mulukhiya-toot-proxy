@@ -1,7 +1,7 @@
 module Mulukhiya
   class LemmyBookmarkHandlerTest < TestCase
     def setup
-      @handler = Handler.create('lemmy_bookmark')
+      @handler = Handler.create(:lemmy_bookmark)
       @status = account.recent_status
     end
 

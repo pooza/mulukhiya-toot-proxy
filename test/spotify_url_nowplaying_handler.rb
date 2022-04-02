@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpotifyURLNowplayingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('spotify_url_nowplaying')
+      @handler = Handler.create(:spotify_url_nowplaying)
     end
 
     def test_handle_pre_toot

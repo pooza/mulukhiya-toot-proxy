@@ -25,7 +25,7 @@ module Mulukhiya
           account:,
           scopes:,
           scopes_valid: scopes_valid?,
-        ).deep_compact
+        ).compact
         return @hash
       end
 

@@ -25,7 +25,7 @@ module Mulukhiya
           created_at: date,
           created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           acct: account&.acct&.to_s,
-        ).deep_compact
+        ).compact
         return @hash
       end
 

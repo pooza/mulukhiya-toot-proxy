@@ -190,7 +190,7 @@ module Mulukhiya
     end
 
     def self.create(name, params = {})
-      return "Mulukhiya::#{name.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
+      return "Mulukhiya::#{name.to_s.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
       e.log(name:)
       return nil

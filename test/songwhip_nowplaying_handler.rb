@@ -1,7 +1,7 @@
 module Mulukhiya
   class SongwhipNowplayingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('songwhip_nowplaying')
+      @handler = Handler.create(:songwhip_nowplaying)
     end
 
     def test_handle_pre_toot

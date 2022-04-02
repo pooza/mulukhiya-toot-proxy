@@ -28,7 +28,7 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      return unless handler = Handler.create('dictionary_tag')
+      return unless handler = Handler.create(:dictionary_tag)
       handler.all.filter_map {|v| create(v)}.each(&block)
     end
 

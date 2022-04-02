@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('itunes_image')
+      @handler = Handler.create(:itunes_image)
     end
 
     def test_handle_pre_toot

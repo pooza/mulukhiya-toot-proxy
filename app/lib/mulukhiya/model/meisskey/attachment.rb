@@ -18,7 +18,7 @@ module Mulukhiya
           thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
           pixel_size:,
           duration:,
-        ).deep_compact
+        ).compact
         return @hash
       end
 

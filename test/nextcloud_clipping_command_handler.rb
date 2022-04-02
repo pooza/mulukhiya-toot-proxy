@@ -1,7 +1,7 @@
 module Mulukhiya
   class NextcloudClippingCommandHandlerTest < TestCase
     def setup
-      @handler = Handler.create('nextcloud_clipping_command')
+      @handler = Handler.create(:nextcloud_clipping_command)
     end
 
     def test_handle_toot

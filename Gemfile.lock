@@ -63,11 +63,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: f46cd05a51192bc7130c6e19eaac6be68c470a3d
+  revision: 48580e46ae1a625344f1127664a6cb97512ef678
   specs:
-    ginseng-web (1.3.23)
+    ginseng-web (1.3.24)
       erb
-      puma (>= 5.6.2)
+      puma (>= 5.6.4)
       rss
       sassc
       sinatra
@@ -171,8 +171,8 @@ GEM
       rake
     fileutils (1.6.0)
     find (0.1.1)
-    fugit (1.5.2)
-      et-orbi (~> 1.1, >= 1.1.8)
+    fugit (1.5.3)
+      et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gli (2.21.0)
     graphql (1.13.11)
@@ -195,12 +195,11 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.10.0)
       concurrent-ruby (~> 1.0)
-    io-wait (0.2.1)
     json (2.6.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jwt (2.3.0)
-    loofah (2.15.0)
+    loofah (2.16.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -213,15 +212,14 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.8.0)
     minitest (5.15.0)
-    mongo (2.17.0)
+    mongo (2.17.1)
       bson (>= 4.8.2, < 5.0.0)
     msgpack (1.4.5)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    net-protocol (0.1.2)
-      io-wait
+    net-protocol (0.1.3)
       timeout
     net-smtp (0.3.1)
       digest
@@ -251,7 +249,7 @@ GEM
     parallel (1.22.1)
     parser (3.1.1.0)
       ast (~> 2.4.1)
-    pg (1.3.4)
+    pg (1.3.5)
     power_assert (2.0.1)
     public_suffix (4.0.6)
     puma (5.6.4)
@@ -319,7 +317,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.2.0)
-    sequel (5.54.0)
+    sequel (5.55.0)
     set (1.0.2)
     sidekiq (6.4.1)
       connection_pool (>= 2.2.2)

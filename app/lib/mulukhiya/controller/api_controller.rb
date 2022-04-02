@@ -34,7 +34,7 @@ module Mulukhiya
 
     post '/config/update' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      Handler.create('user_config_command').handle_toot(params, {sns:})
+      Handler.create(:user_config_command).handle_toot(params, {sns:})
       @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
@@ -47,7 +47,7 @@ module Mulukhiya
     post '/filter/add' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
-      raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create('filter_command')
+      raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create(:filter_command)
       handler.handle_toot(params, {sns:})
       @renderer.message = {filters: sns.filters}
       return @renderer.to_s
@@ -181,6 +181,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
+      params[:page] = params[:page]&.to_i || 1
       @renderer.message = sns.account.statuses(params)
       return @renderer.to_s
     rescue => e

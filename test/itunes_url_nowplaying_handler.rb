@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesURLNowplayingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('itunes_url_nowplaying')
+      @handler = Handler.create(:itunes_url_nowplaying)
     end
 
     def test_handle_pre_toot

@@ -11,7 +11,9 @@ module Mulukhiya
           tag: raw_name.to_hashtag,
           url: uri.to_s,
           feed_url: feed_uri.to_s,
-        ).deep_compact
+          is_default: default?,
+          is_deletable: deletable?,
+        ).compact
         return @hash
       end
 

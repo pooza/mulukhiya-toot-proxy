@@ -16,6 +16,21 @@ module Mulukhiya
       @renderer.status = 404
     end
 
+    get '/app/status/:id' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id].to_s]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.taggable?
+      @renderer = SlimRenderer.new
+      @renderer.template = 'status_detail'
+      @renderer[:status] = status.to_h
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    rescue Ginseng::AuthError
+      @renderer.status = 403
+    end
+
     get '/media/:name' do
       @renderer = StaticMediaRenderer.new
       @renderer.name = params[:name]
