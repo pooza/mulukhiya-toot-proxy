@@ -34,7 +34,7 @@ module Mulukhiya
 
     def test_media_tag
       return unless controller_class.feed?
-      return if Handler.create('media_tag').disable?
+      return if Handler.create(:media_tag).disable?
       get '/tag/image'
       if hash_tag_class.get(tag: config['/handler/media_tag/tags/image'])
         assert_equal('application/rss+xml; charset=UTF-8', last_response.content_type)

@@ -1,7 +1,7 @@
 module Mulukhiya
   class YouTubeImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('you_tube_image')
+      @handler = Handler.create(:you_tube_image)
     end
 
     def test_handle_pre_toot

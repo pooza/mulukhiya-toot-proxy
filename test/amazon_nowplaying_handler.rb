@@ -1,7 +1,7 @@
 module Mulukhiya
   class AmazonNowplayingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('amazon_nowplaying')
+      @handler = Handler.create(:amazon_nowplaying)
     end
 
     def test_handle_pre_toot

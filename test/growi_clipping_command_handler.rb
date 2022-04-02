@@ -1,7 +1,7 @@
 module Mulukhiya
   class GrowiClippingCommandHandlerTest < TestCase
     def setup
-      @handler = Handler.create('growi_clipping_command')
+      @handler = Handler.create(:growi_clipping_command)
     end
 
     def test_handle_toot

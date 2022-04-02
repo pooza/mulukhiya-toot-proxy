@@ -1,7 +1,7 @@
 module Mulukhiya
   class CanonicalURLHandlerTest < TestCase
     def setup
-      @handler = Handler.create('canonical_url')
+      @handler = Handler.create(:canonical_url)
     end
 
     def test_handle_pre_toot

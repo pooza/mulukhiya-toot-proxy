@@ -1,7 +1,7 @@
 module Mulukhiya
   class ImageCopyrightHandlerTest < TestCase
     def setup
-      @handler = Handler.create('image_copyright')
+      @handler = Handler.create(:image_copyright)
       config['/handler/image_copyright/tag'] = 'ダイ大魂の絆'
       config['/handler/image_copyright/message'] = '※画像有 著作権表示 参照のこと'
       config['/handler/image_copyright/url'] = 'https://blog.delmulin.com/articles/魂の絆'

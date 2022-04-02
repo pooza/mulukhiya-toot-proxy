@@ -1,7 +1,7 @@
 module Mulukhiya
   class ShortenedURLHandlerTest < TestCase
     def setup
-      @handler = Handler.create('shortened_url')
+      @handler = Handler.create(:shortened_url)
     end
 
     def test_handle_pre_toot

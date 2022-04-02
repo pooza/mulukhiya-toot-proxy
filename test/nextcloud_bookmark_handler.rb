@@ -1,7 +1,7 @@
 module Mulukhiya
   class NextcloudBookmarkHandlerTest < TestCase
     def setup
-      @handler = Handler.create('nextcloud_bookmark')
+      @handler = Handler.create(:nextcloud_bookmark)
       @status = account.recent_status
     end
 

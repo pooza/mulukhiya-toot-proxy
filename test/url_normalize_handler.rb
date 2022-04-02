@@ -1,7 +1,7 @@
 module Mulukhiya
   class URLNormalizeHandlerTest < TestCase
     def setup
-      @handler = Handler.create('url_normalize')
+      @handler = Handler.create(:url_normalize)
     end
 
     def test_handle_pre_toot

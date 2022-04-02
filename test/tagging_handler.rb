@@ -1,7 +1,7 @@
 module Mulukhiya
   class TaggingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('tagging')
+      @handler = Handler.create(:tagging)
       config['/tagging/normalize/rules'].push(
         'source' => 'ふたりはプリキュア_Max_Heart',
         'normalized' => 'ふたりはプリキュアMax_Heart',

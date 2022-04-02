@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesURLHandlerTest < TestCase
     def setup
-      @handler = Handler.create('itunes_url')
+      @handler = Handler.create(:itunes_url)
     end
 
     def test_handle_pre_toot

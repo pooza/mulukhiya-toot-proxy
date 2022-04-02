@@ -1,7 +1,7 @@
 module Mulukhiya
   class ResultNotificationHandlerTest < TestCase
     def setup
-      @handler = Handler.create('result_notification')
+      @handler = Handler.create(:result_notification)
     end
 
     def test_handle_post_toot

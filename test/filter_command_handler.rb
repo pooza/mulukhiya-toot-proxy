@@ -3,7 +3,7 @@ require 'securerandom'
 module Mulukhiya
   class FilterCommandHandlerTest < TestCase
     def setup
-      @handler = Handler.create('filter_command')
+      @handler = Handler.create(:filter_command)
       @key = SecureRandom.hex(16)
     end
 

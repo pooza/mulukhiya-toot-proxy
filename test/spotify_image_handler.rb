@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpotifyImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('spotify_image')
+      @handler = Handler.create(:spotify_image)
     end
 
     def test_handle_pre_toot

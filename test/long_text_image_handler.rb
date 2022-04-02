@@ -1,7 +1,7 @@
 module Mulukhiya
   class LongTextImageHandlerTest < TestCase
     def setup
-      @handler = Handler.create('long_text_image')
+      @handler = Handler.create(:long_text_image)
     end
 
     def test_disable?

@@ -1,7 +1,7 @@
 module Mulukhiya
   class RemoteTagHandlerTest < TestCase
     def setup
-      @handler = Handler.create('remote_tag')
+      @handler = Handler.create(:remote_tag)
       config['/handler/dictionary_tag/word/min'] = 2
       config['/handler/dictionary_tag/word/min_kanji'] = 2
     end

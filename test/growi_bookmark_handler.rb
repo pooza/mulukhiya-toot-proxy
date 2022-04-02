@@ -1,7 +1,7 @@
 module Mulukhiya
   class GrowiBookmarkHandlerTest < TestCase
     def setup
-      @handler = Handler.create('growi_bookmark')
+      @handler = Handler.create(:growi_bookmark)
       @status = account.recent_status
     end
 

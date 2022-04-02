@@ -85,7 +85,7 @@ module Mulukhiya
     private
 
     def handle_user_tags(values)
-      return unless handler = Handler.create('user_tag')
+      return unless handler = Handler.create(:user_tag)
       flatten = values.key_flatten
       if minutes = flatten['/tagging/minutes']
         Sidekiq.set_schedule("user_tag_initialize_#{@account.username}", {

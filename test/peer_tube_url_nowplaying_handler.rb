@@ -1,7 +1,7 @@
 module Mulukhiya
   class PeerTubeURLNowplayingHandlerTest < TestCase
     def setup
-      @handler = Handler.create('peer_tube_url_nowplaying')
+      @handler = Handler.create(:peer_tube_url_nowplaying)
     end
 
     def test_handle_pre_toot

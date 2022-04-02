@@ -1,7 +1,7 @@
 module Mulukhiya
   class LemmyClippingCommandHandlerTest < TestCase
     def setup
-      @handler = Handler.create('lemmy_clipping_command')
+      @handler = Handler.create(:lemmy_clipping_command)
     end
 
     def test_handle_toot

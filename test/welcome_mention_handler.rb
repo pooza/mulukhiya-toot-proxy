@@ -1,7 +1,7 @@
 module Mulukhiya
   class WelcomeMentionHandlerTest < TestCase
     def setup
-      @handler = Handler.create('welcome_mention')
+      @handler = Handler.create(:welcome_mention)
     end
 
     def test_template

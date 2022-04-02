@@ -23,7 +23,7 @@ module Mulukhiya
 
     def self.media_tags
       tags = new
-      if handler = Handler.create('media_tag')
+      if handler = Handler.create(:media_tag)
         tags.merge(handler.all.to_h.values)
       end
       return tags

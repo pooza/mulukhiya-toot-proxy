@@ -1,7 +1,7 @@
 module Mulukhiya
   class SpoilerHandlerTest < TestCase
     def setup
-      @handler = Handler.create('spoiler')
+      @handler = Handler.create(:spoiler)
       config['/spoiler/emoji'] = 'netabare'
     end
 

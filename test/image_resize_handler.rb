@@ -1,7 +1,7 @@
 module Mulukhiya
   class ImageResizeHandlerTest < TestCase
     def setup
-      @handler = Handler.create('image_resize')
+      @handler = Handler.create(:image_resize)
       @handler.handle_pre_upload(file: {
         tempfile: File.new(
           File.join(Environment.dir, 'public/mulukhiya/media/icon.png'),
