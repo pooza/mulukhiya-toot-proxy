@@ -12,7 +12,7 @@ module Mulukhiya
           type:,
           mediatype:,
           created_at: date,
-          created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           meta:,
           url: uri.to_s,
           thumbnail_url: values.dig('metadata', 'thumbnailUrl'),

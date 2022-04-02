@@ -10,6 +10,9 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 = controller.status_label
       - if controller.update_status?
+        nav.search-form-container
+          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchStatuses'
+          button.small :disabled='!keyword' @click='searchStatuses' 検索
         article v-for='(status, id) in statuses'
           .visibility
             i :class="'fa fa-' + status.visibility_icon"
@@ -35,7 +38,7 @@ html lang='ja'
               | 新規タグを追加
               a href='javascript:void(0)' @click='createTag(status.id)'
                 i class='fa fa-pencil'
-        nav.media v-if='!last_page'
+        nav.appender-container v-if='!last_page'
           a @click='appendStatuses' 続きを読む…
     javascript:
       'use strict'
@@ -47,8 +50,9 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           statuses: {},
-          last_page: false,
           page: 0,
+          keyword: null,
+          last_page: false,
         },
         mounted () {
           Vue.getConfig()
@@ -69,15 +73,21 @@ html lang='ja'
               .then(e => Vue.set(this.statuses, e.id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
+          searchStatuses () {
+            this.page = 0
+            this.statuses = {}
+            this.last_page = false
+            setTimeout(this.appendStatuses, 500)
+          },
           appendStatuses () {
             this.page ++
-            Vue.getStatuses(this.page)
+            Vue.getStatuses(this.page, this.keyword)
               .then(e => {
                 if (0 < e.length) {
                   e.map(v => {Vue.set(this.statuses, v.id, v)})
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('最後のページです')
+                  this.$dialog.alert('これ以上投稿はありません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },

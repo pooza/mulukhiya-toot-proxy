@@ -18,6 +18,11 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 = "投稿: #{params.dig(:status, :id)}"
       article
+        .visibility
+          i class='fa fa-#{params.dig(:status, :visibility_icon)}'
+        .header
+          i class='fa fa-calendar'
+          | #{params.dig(:status, :created_at_str)}
         - if params.dig(:status, :spoiler_text).present?
           .header = params.dig(:status, :spoiler_text).present?
         - if params.dig(:status, :body).present?

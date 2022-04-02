@@ -182,7 +182,14 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
       params[:page] = params[:page]&.to_i || 1
-      @renderer.message = sns.account.statuses(params)
+      params.delete(:q) unless params[:q].present?
+      errors = PagerContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        @renderer.message = sns.account.statuses(params)
+      end
       return @renderer.to_s
     rescue => e
       e.log
