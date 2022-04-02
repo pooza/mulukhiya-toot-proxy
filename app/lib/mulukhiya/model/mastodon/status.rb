@@ -25,20 +25,24 @@ module Mulukhiya
       end
 
       def public_uri
-        unless @public_uri
-          if Environment.mastodon_type?
-            service = sns_class.new
-          else
-            service = MastodonService.new
-          end
-          @public_uri = service.create_uri("/@#{account.username}/#{id}")
-        end
+        @public_uri ||= service.create_uri("/@#{account.username}/#{id}")
         return @public_uri
       end
 
-      def parser
-        @parser ||= TootParser.new(text)
-        return @parser
+      def webui_uri
+        @webui_uri ||= service.create_uri("/mulukhiya/app/status/#{id}")
+        return @webui_uri
+      end
+
+      def service
+        unless @service
+          if Environment.mastodon_type?
+            @service = sns_class.new
+          else
+            @service = MastodonService.new
+          end
+        end
+        return @service
       end
 
       def visibility_name
@@ -56,10 +60,6 @@ module Mulukhiya
         end
       end
 
-      def visibility_icon
-        return TootParser.visibility_icon(visibility_name)
-      end
-
       def date
         return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
@@ -69,12 +69,11 @@ module Mulukhiya
           id: id.to_s,
           created_at: date,
           created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          body: parser.body,
+          body:,
+          footer:,
           is_taggable: taggable?,
-          footer: parser.footer,
-          footer_tags: TagContainer.scan(parser.footer)
-            .filter_map {|tag| Mastodon::HashTag.get(tag:)}
-            .map(&:to_h),
+          footer_tags: footer_tags.map(&:to_h),
+          webui_url: webui_uri.to_s,
           visibility_name:,
           visibility_icon:,
         ).compact

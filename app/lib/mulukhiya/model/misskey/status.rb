@@ -10,10 +10,21 @@ module Mulukhiya
         return userHost.nil?
       end
 
+      def service
+        unless @service
+          if Environment.misskey_type?
+            @service = sns_class.new
+          else
+            @service = MisskeyService.new
+          end
+        end
+        return @service
+      end
+
       def uri
         unless @uri
           @uri = Ginseng::URI.parse(self[:uri]) if self[:uri].present?
-          @uri ||= sns_class.new.create_uri("/notes/#{id}")
+          @uri ||= service.create_uri("/notes/#{id}")
           @uri = create_status_uri(@uri)
         end
         return @uri
@@ -31,17 +42,17 @@ module Mulukhiya
         return []
       end
 
+      alias visibility_name visibility
+
       def to_h
         @hash ||= values.deep_symbolize_keys.merge(
           uri: uri.to_s,
           url: uri.to_s,
-          attachments: query['files'],
+          visibility:,
+          visibility_name:,
+          attachments: data[:files],
         ).compact
         return @hash
-      end
-
-      def query
-        return sns_class.new.fetch_status(id)
       end
 
       def to_md

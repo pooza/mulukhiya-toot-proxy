@@ -10,9 +10,15 @@ module Mulukhiya
         @id = id
       end
 
-      def data
-        @data ||= PleromaService.new.fetch_status(id).parsed_response.deep_symbolize_keys
-        return @data
+      def service
+        unless @service
+          if Environment.mastodon_type?
+            @service = sns_class.new
+          else
+            @service = PleromaService.new
+          end
+        end
+        return @service
       end
 
       def acct
@@ -30,6 +36,8 @@ module Mulukhiya
       def visibility
         return data[:visibility]
       end
+
+      alias visibility_name visibility
 
       def account
         @account ||= Account.get(acct:)
