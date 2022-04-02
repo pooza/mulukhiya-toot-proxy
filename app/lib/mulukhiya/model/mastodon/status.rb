@@ -66,6 +66,7 @@ module Mulukhiya
           footer_tags = footer_tags.filter_map {|tag| Mastodon::HashTag.get(name: tag)}.map(&:to_h)
         end
         @hash ||= values.deep_symbolize_keys.merge(
+          id: id.to_s,
           created_at_str: created_at.getlocal.strftime('%Y/%m/%d %H:%M:%S'),
           body: parser.body,
           is_taggable: taggable?,

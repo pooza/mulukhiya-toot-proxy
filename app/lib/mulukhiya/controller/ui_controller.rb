@@ -19,7 +19,7 @@ module Mulukhiya
     get '/app/status/:id' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id].to_s]
       raise Ginseng::AuthError, 'Unauthorized' unless status.taggable?
       @renderer = SlimRenderer.new
       @renderer.template = 'status_detail'
