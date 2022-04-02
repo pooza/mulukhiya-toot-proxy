@@ -15,7 +15,7 @@ module Mulukhiya
           type:,
           mediatype:,
           created_at: date,
-          created_at_str: date.strftime('%Y/%m/%d %H:%M:%S'),
+          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           meta:,
           pixel_size:,
           duration:,
