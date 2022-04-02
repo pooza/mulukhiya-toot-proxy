@@ -73,7 +73,7 @@ module Mulukhiya
           is_taggable: taggable?,
           footer: parser.footer,
           footer_tags: TagContainer.scan(parser.footer)
-            .filter_map {|tag| Mastodon::HashTag.get(name: tag)}
+            .filter_map {|tag| Mastodon::HashTag.get(tag:)}
             .map(&:to_h),
           visibility_name:,
           visibility_icon:,
