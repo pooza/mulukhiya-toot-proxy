@@ -28,9 +28,7 @@ module Mulukhiya
         case key
         in {tag: tag}
           return nil if tag.nil?
-          record = (new(name: tag) rescue new(name: tag.downcase))
-          record ||= new(name: tag.downcase)
-          return nil unless record
+          return nil unless record = new(name: tag.downcase)
           record.raw_name = tag
           return record
         else
