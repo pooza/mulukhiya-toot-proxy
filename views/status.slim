@@ -15,7 +15,7 @@ html lang='ja'
           button.small :disabled='!keyword' @click='searchStatuses' 検索
         article v-for='(status, id) in statuses' v-if='account.username'
           .visibility
-            i :class="'fa fa-' + status.visibility_icon"
+            i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
           .header
             i class='fa fa-calendar'
             - if env.development?
