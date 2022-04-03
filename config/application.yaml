@@ -755,7 +755,7 @@ misskey:
       - image_copyright
       - tagging
   note:
-    default_max_length: 500
+    default_max_length: 3000
   oauth:
     scopes:
       default:
@@ -864,7 +864,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.16.2
+  version: 4.16.3
 parser:
   note:
     fields:

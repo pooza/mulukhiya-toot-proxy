@@ -5,6 +5,17 @@ module Mulukhiya
       include StatusMethods
       include SNSMethods
 
+      def service
+        unless @service
+          if Environment.misskey_type?
+            @service = sns_class.new
+          else
+            @service = MeisskeyService.new
+          end
+        end
+        return @service
+      end
+
       def account
         return Account.new(values['userId'])
       end
@@ -17,10 +28,16 @@ module Mulukhiya
         return acct.host == Environment.domain_name
       end
 
+      def visibility
+        return data[:visibility]
+      end
+
+      alias visibility_name visibility
+
       def uri
         unless @uri
           @uri = Ginseng::URI.parse(values['uri']) if values['uri'].present?
-          @uri ||= sns_class.new.create_uri("/notes/#{id}")
+          @uri ||= service.create_uri("/notes/#{id}")
           @uri = create_status_uri(@uri)
         end
         return @uri
@@ -29,20 +46,18 @@ module Mulukhiya
       alias public_uri uri
 
       def attachments
-        return query['files']
+        return data[:files].map {|row| Attachment[row[:id]]}
       end
 
       def to_h
         @hash ||= values.deep_symbolize_keys.merge(
           uri: uri.to_s,
           url: uri.to_s,
+          visibility:,
+          visibility_name:,
           attachments: attachments.map(&:to_h),
         ).compact
         return @hash
-      end
-
-      def query
-        return sns_class.new.fetch_status(id)
       end
 
       def to_md
