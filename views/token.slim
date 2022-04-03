@@ -22,17 +22,17 @@ html lang='ja'
             span.role v-if='isLoggedIn(current_account)' logged in
             i class='fas fa-trash' @click='deleteAccount(current_account)' v-tooltip.left="'トークンの削除'" v-else=''
           .field
-            .title 権限:
+            .title 権限
             .value
               .scope v-for='scope in current_account.scopes' {{scope}}
               span.alert v-if='!current_account.scopes_valid' 古いトークンかも知れません。作り直しをお勧めします。
           .field
-            .title トークン:
+            .title トークン
             .value
               code :id='"token-" + current_account.username' v-if='current_account.token' {{current_account.token}}
               i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#token-" + current_account.username'
           .field
-            .title webhook:
+            .title webhook
             .value
               code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
               i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#webhook-" + current_account.username'
@@ -83,7 +83,7 @@ html lang='ja'
               | で作成したトークンを、bin/crypt.rbで暗号化して登録することもできます。
               | 以下の権限を含むものにしてください。
             .field v-if='account.is_admin'
-              .title 権限:
+              .title 権限
               .value
                 - controller.oauth_scopes.each do |scope|
                   .scope = scope
