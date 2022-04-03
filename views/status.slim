@@ -15,16 +15,20 @@ html lang='ja'
           button.small :disabled='!keyword' @click='searchStatuses' 検索
         article v-for='(status, id) in statuses' v-if='account.username'
           .visibility
-            i :class="'fa fa-' + status.visibility_icon"
+            i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
           .header
             i class='fa fa-calendar'
             - if env.development?
               a :href='status.webui_url' target='_blank' rel='noreferrer' = '{{status.created_at_str}}'
             - else
               | {{status.created_at_str}}
+          .header v-if='status.spoiler_text'
+            i class='fa fa-circle-exclamation'
+            | {{status.spoiler_text}}
           - if env.development?
-            .header = '{{status.id}}'
-          .header v-if='status.spoiler_text' {{status.spoiler_text}}
+            .header
+              i class='fa fa-id-badge'
+              | {{status.id}}
           pre.body v-if='status.body' = '{{status.body}}'
           .footer-tags v-if='status.is_taggable'
             h4

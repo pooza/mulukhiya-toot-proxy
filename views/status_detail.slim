@@ -19,12 +19,14 @@ html lang='ja'
       h2 = "投稿: #{params.dig(:status, :id)}"
       article
         .visibility
-          i class='fa fa-#{params.dig(:status, :visibility_icon)}'
+          i class='fa fa-#{params.dig(:status, :visibility_icon)}' v-tooltip.left="'#{params.dig(:status, :visibility_name)}'"
         .header
           i class='fa fa-calendar'
           | #{params.dig(:status, :created_at_str)}
         - if params.dig(:status, :spoiler_text).present?
-          .header = params.dig(:status, :spoiler_text).present?
+          .header
+            i class='fa fa-circle-exclamation'
+            | #{params.dig(:status, :spoiler_text)}
         - if params.dig(:status, :body).present?
           pre.body = params.dig(:status, :body)
         - if params.dig(:status, :is_taggable)
