@@ -234,7 +234,7 @@ module Mulukhiya
       else
         status = status_class[params[:id]]
         tags = TagContainer.scan(status.parser.footer)
-        tags.delete_if {|v| v.downcase == tag.name.downcase}
+        tags.delete_if {|v| v.casecmp(tag.name).zero?}
         @renderer.message = sns.update_status(
           params[:id],
           [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),

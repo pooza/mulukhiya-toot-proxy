@@ -60,7 +60,9 @@ module Mulukhiya
       def self.get(key)
         case key
         in {tag: tag}
-          return nil unless tag = collection.find(tag: tag.downcase).first
+          tag = collection.find(tag:).first
+          tag ||= collection.find(tag: tag.downcase).first
+          return nil unless tag
           record = new(tag[:_id])
           record.raw_name = key[:tag]
           return record
