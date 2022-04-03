@@ -755,7 +755,7 @@ misskey:
       - image_copyright
       - tagging
   note:
-    default_max_length: 500
+    default_max_length: 3000
   oauth:
     scopes:
       default:
