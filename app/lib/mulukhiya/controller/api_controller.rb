@@ -207,8 +207,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
-        tags = TagContainer.scan(status.parser.footer)
-        tags.push(params[:tag])
+        tags = TagContainer.scan(status.parser.footer).push(params[:tag])
         @renderer.message = sns.update_status(
           params[:id],
           [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
@@ -233,8 +232,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
-        tags = TagContainer.scan(status.parser.footer)
-        tags.delete_if {|v| v.casecmp(tag.name).zero?}
+        tags = TagContainer.scan(status.parser.footer).reject {|v| v.casecmp(tag.name).zero?}
         @renderer.message = sns.update_status(
           params[:id],
           [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
