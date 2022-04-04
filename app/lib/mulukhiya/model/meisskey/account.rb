@@ -128,7 +128,7 @@ module Mulukhiya
         Account.aggregate('administrators')
           .to_a
           .filter_map {|row| row[:_id]}
-          .filter_map {|id| Environment.account_class[id] rescue nil}
+          .filter_map {|id| Account[id] rescue nil}
           .each(&block)
       end
 

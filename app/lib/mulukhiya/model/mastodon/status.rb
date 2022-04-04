@@ -85,7 +85,7 @@ module Mulukhiya
         return template.to_s
       end
 
-      def sefl.visibility_names
+      def self.visibility_names
         return [:public, :unlisted, :private, :direct].map {|v| TootParser.visibility_name(v)}
       end
     end
