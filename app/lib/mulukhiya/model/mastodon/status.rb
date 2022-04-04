@@ -17,6 +17,11 @@ module Mulukhiya
         return visibility.zero?
       end
 
+      def updatable_by?(target)
+        target = Account[target] unless target.is_a?(Account)
+        return account.id == target.id
+      end
+
       alias attachments attachment
 
       def uri
@@ -46,18 +51,7 @@ module Mulukhiya
       end
 
       def visibility_name
-        case visibility
-        when 0
-          return TootParser.visibility_name(:public)
-        when 1
-          return TootParser.visibility_name(:unlisted)
-        when 2
-          return TootParser.visibility_name(:private)
-        when 3
-          return TootParser.visibility_name(:direct)
-        else
-          return nil
-        end
+        return self.class.visibility_names[visibility]
       end
 
       def date
@@ -89,6 +83,10 @@ module Mulukhiya
         template[:status] = TootParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def sefl.visibility_names
+        return [:public, :unlisted, :private, :direct].map {|v| TootParser.visibility_name(v)}
       end
     end
   end
