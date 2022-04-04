@@ -14,7 +14,7 @@ module Mulukhiya
       return parser_class.visibility_name(@user_config['/webhook/visibility'])
     rescue => e
       e.log
-      return 'public'
+      return parser_class.visibility_name(:public)
     end
 
     def uri
