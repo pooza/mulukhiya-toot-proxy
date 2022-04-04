@@ -207,6 +207,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
+        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         tags = TagContainer.scan(status.parser.footer).push(params[:tag])
         @renderer.message = sns.update_status(
           params[:id],
@@ -232,6 +233,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         status = status_class[params[:id]]
+        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         tags = TagContainer.scan(status.parser.footer).reject {|v| v.casecmp(tag.name).zero?}
         @renderer.message = sns.update_status(
           params[:id],
