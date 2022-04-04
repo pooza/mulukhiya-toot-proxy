@@ -58,7 +58,7 @@ module Mulukhiya
       end
     end
     Sidekiq::Web.use(Rack::Session::Cookie, {
-      secret: Config.instance['/crypt/password'],
+      secret: Crypt.password,
       same_site: true,
       max_age: Config.instance['/sidekiq/dashboard/session/max_age'],
     })
