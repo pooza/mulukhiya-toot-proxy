@@ -19,7 +19,7 @@ module Mulukhiya
 
       def updatable_by?(target)
         target = Account[target] unless target.is_a?(Account)
-        return account.id == target.id
+        return account&.id == target&.id
       end
 
       alias attachments attachment

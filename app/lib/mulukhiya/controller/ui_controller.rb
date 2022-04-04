@@ -21,7 +21,6 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id].to_s]
       raise Ginseng::AuthError, 'Unauthorized' unless status.taggable?
-      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       @renderer = SlimRenderer.new
       @renderer.template = 'status_detail'
       @renderer[:status] = status.to_h
