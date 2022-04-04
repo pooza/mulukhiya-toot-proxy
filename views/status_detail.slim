@@ -17,7 +17,7 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 = "投稿: #{params.dig(:status, :id)}"
-      article
+      article.status
         .visibility
           i class='fa fa-#{params.dig(:status, :visibility_icon)}' v-tooltip.left="'#{params.dig(:status, :visibility_name)}'"
         .header

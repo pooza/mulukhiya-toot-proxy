@@ -13,7 +13,7 @@ html lang='ja'
         nav.search-form-container v-if='account.username'
           input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchStatuses'
           button.small :disabled='!keyword' @click='searchStatuses' 検索
-        article v-for='(status, id) in statuses' v-if='account.username'
+        article.status v-for='(status, id) in statuses' v-if='account.username'
           .visibility
             i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
           .header
