@@ -61,7 +61,7 @@ module Mulukhiya
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
         token:,
-        salt: (config['/crypt/salt'] || Crypt.password),
+        salt: (config['/crypt/salt'] rescue Crypt.password),
       }.to_json)
     end
 
