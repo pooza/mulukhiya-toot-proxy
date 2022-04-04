@@ -5,7 +5,6 @@ agent:
     token: your_token
 crypt:
   password: your_password
-  salt: your_salt
 environment: production
 handler:
   default_tag:
