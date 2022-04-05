@@ -234,7 +234,7 @@ module Mulukhiya
       else
         status = status_class[params[:id]]
         raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-        tags = TagContainer.scan(status.parser.footer).reject {|v| v.casecmp(tag.name).zero?}
+        tags = TagContainer.scan(status.parser.footer).delete(tag.name)
         @renderer.message = sns.update_status(
           params[:id],
           [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),

@@ -2,6 +2,15 @@ module Mulukhiya
   class TagContainerTest < TestCase
     def setup
       config['/handler/default_tag/tags'] = ['美食丼', 'b-shock-don']
+      @tags = TagContainer.new
+    end
+
+    def test_delete
+      @tags.add('tver')
+      assert_equal(Set['tver'], @tags)
+
+      @tags.delete('TVer')
+      assert_equal(Set[], @tags)
     end
 
     def test_default_tags
