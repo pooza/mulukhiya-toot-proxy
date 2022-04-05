@@ -198,6 +198,20 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/status/:id' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      @renderer.message = status.to_h
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/status/tag' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

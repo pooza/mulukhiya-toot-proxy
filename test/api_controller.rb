@@ -109,6 +109,10 @@ module Mulukhiya
       JSON.parse(last_response.body).first(10).each do |status|
         assert_kind_of([String, Integer], status['id'])
         assert_kind_of([String, NilClass], status['content'])
+
+        get "/status/#{status['id']}?token=#{test_account.token}"
+        assert_predicate(last_response, :ok?)
+        assert_equal('application/json; charset=UTF-8', last_response.content_type)
       end
     end
 
