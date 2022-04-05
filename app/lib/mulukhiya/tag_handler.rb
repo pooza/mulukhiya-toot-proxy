@@ -5,7 +5,7 @@ module Mulukhiya
       return unless executable?
       tags.merge(addition_tags)
       result.push(addition_tags:) if addition_tags.present?
-      tags.reject! {|v| removal_tags.member?(v)}
+      removal_tags.each {|v| tags.delete(v)}
       result.push(removal_tags:) if removal_tags.present?
     end
 

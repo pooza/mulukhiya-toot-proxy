@@ -281,9 +281,17 @@ const MulukhiyaLib = {
       indicator.show()
       const query = {page: page || 1}
       if (keyword) {query.q = keyword}
-      return axios.get(Vue.createURL('/mulukhiya/api/status', {query: query}))
+      return axios.get(Vue.createURL('/mulukhiya/api/status/list', {query: query}))
         .then(e => e.data)
         .catch(e => e.response.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.getStatus = async id => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createURL(`/mulukhiya/api/status/${id}`))
+        .then(e => e.data)
         .finally(e => indicator.hide())
     }
 

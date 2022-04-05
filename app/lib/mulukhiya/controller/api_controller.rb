@@ -177,7 +177,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/status' do
+    get '/status/list' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
@@ -190,6 +190,20 @@ module Mulukhiya
       else
         @renderer.message = sns.account.statuses(params)
       end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    get '/status/:id' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      @renderer.message = status.to_h
       return @renderer.to_s
     rescue => e
       e.log
@@ -234,7 +248,7 @@ module Mulukhiya
       else
         status = status_class[params[:id]]
         raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-        tags = TagContainer.scan(status.parser.footer).reject {|v| v.casecmp(tag.name).zero?}
+        tags = TagContainer.scan(status.parser.footer).delete(tag.name)
         @renderer.message = sns.update_status(
           params[:id],
           [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),

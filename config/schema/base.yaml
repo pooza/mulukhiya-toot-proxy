@@ -112,7 +112,6 @@ properties:
       salt:
         type: string
     required:
-      - salt
       - password
     type: object
   environment:

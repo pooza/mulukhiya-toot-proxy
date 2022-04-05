@@ -110,7 +110,6 @@ controller: mastodon
 crypt:
   encoder: base64
   password: mulukhiya
-  salt: mulukhiya
 environment: development
 feed:
   cache:
@@ -864,7 +863,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.16.5
+  version: 4.16.6
 parser:
   note:
     fields:

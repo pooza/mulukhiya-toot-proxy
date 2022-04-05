@@ -14,7 +14,7 @@ module Mulukhiya
       return parser_class.visibility_name(@user_config['/webhook/visibility'])
     rescue => e
       e.log
-      return 'public'
+      return parser_class.visibility_name(:public)
     end
 
     def uri
@@ -61,7 +61,7 @@ module Mulukhiya
       return Digest::SHA256.hexdigest({
         sns: uri.to_s,
         token:,
-        salt: config['/crypt/salt'],
+        salt: (config['/crypt/salt'] rescue Crypt.password),
       }.to_json)
     end
 

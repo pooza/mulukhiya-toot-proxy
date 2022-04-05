@@ -6,7 +6,6 @@ agent:
 controller: pleroma
 crypt:
   password: your_password
-  salt: your_salt
 environment: production
 handler:
   default_tag:

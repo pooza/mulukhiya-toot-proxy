@@ -13,37 +13,31 @@ html lang='ja'
           a href='/mulukhiya' モロヘイヤHOME
         li
           a href='/mulukhiya/app/status' = controller.status_label
-        li = params.dig(:status, :id)
+        li = params[:id]
     main#app class=env.type
       == slim.render 'fragment/message'
-      h2 = "投稿: #{params.dig(:status, :id)}"
-      article.status
+      article.status v-if='status.id'
         .visibility
-          i class='fa fa-#{params.dig(:status, :visibility_icon)}' v-tooltip.left="'#{params.dig(:status, :visibility_name)}'"
+          i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
         .header
           i class='fa fa-calendar'
-          | #{params.dig(:status, :created_at_str)}
-        - if params.dig(:status, :spoiler_text).present?
-          .header
-            i class='fa fa-circle-exclamation'
-            | #{params.dig(:status, :spoiler_text)}
-        - if params.dig(:status, :body).present?
-          pre.body = params.dig(:status, :body)
-        - if params.dig(:status, :is_taggable)
-          .footer-tags
-            h4
-              i class='fa fa-tag'
-              | タグの編集
-            - params.dig(:status, :footer_tags).each do |tag|
-              .tag
-                = tag[:name]
-                - if tag[:is_deletable]
-                  a href='javascript:void(0)' @click="deleteTag('#{params.dig(:status, :id)}', '#{tag[:name]}')"
-                    i class='fa fa-xmark'
-            .tag
-              | 新規タグを追加
-              a href='javascript:void(0)' @click="createTag('#{params.dig(:status, :id)}')"
-                i class='fa fa-pencil'
+          | {{status.created_at_str}}
+        .header v-if='status.spoiler_text'
+          i class='fa fa-circle-exclamation'
+          | {{status.spoiler_text}}
+        pre.body v-if='status.body' = '{{status.body}}'
+        .footer-tags v-if='status.is_taggable'
+          h4
+            i class='fa fa-tag'
+            | タグの編集
+          .tag v-for='tag in status.footer_tags'
+            | {{tag.name}}
+            a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
+              i class='fa fa-xmark'
+          .tag
+            | 新規タグを追加
+            a href='javascript:void(0)' @click='createTag(status.id)'
+              i class='fa fa-pencil'
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -53,10 +47,15 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
+          status: {},
         },
         mounted () {
           Vue.getConfig()
-            .then(e => {this.account = e.account})
+            .then(e => {
+              this.account = e.account
+              return (new URL(location.href)).pathname.split('/').slice(-1)[0]
+            }).then(id => Vue.getStatus(id))
+            .then(e => {this.status = e})
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
@@ -64,12 +63,12 @@ html lang='ja'
             this.$dialog
               .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
               .then(e => Vue.createTag(id, e.data))
-              .then(e => location.reload())
+              .then(e => {this.status = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           deleteTag (id, tag) {
             Vue.deleteTag(id, tag)
-              .then(e => location.reload())
+              .then(e => {this.status = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
         },
