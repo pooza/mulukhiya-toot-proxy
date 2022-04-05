@@ -177,7 +177,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/status' do
+    get '/status/list' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
