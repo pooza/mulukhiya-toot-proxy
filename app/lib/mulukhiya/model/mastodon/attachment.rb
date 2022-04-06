@@ -23,7 +23,7 @@ module Mulukhiya
           thumbnail_url: uri('small').to_s,
         ).except(
           :file_meta,
-        ).deep_compact
+        ).compact
       end
 
       alias name file_file_name

@@ -21,7 +21,7 @@ module Mulukhiya
           :mentionedUserIds,
           :mentionedLocalUserIds,
           :mentionedRemoteUserIds,
-        ).deep_compact
+        ).compact
       end
 
       def create_feed(params)

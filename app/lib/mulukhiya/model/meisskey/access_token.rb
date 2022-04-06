@@ -12,7 +12,7 @@ module Mulukhiya
           scopes_valid: scopes_valid?,
         ).except(
           :hash,
-        ).deep_compact
+        ).compact
       end
 
       def token
