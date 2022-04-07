@@ -41,6 +41,10 @@ module Mulukhiya
       return HTTP
     end
 
+    def tag_container_class
+      return TagContainer
+    end
+
     def you_tube_service_class
       return YouTubeService
     end

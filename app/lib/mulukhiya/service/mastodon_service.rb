@@ -99,9 +99,7 @@ module Mulukhiya
         body: parser.body,
         is_taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,
-        footer_tags: TagContainer.scan(parser.footer)
-          .filter_map {|tag| Mastodon::HashTag.get(tag:)}
-          .map(&:to_h),
+        footer_tags: parser.footer_tags.filter_map {|tag| Mastodon::HashTag.get(tag:)}.map(&:to_h),
         visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end

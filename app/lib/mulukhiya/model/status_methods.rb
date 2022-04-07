@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def footer_tags
-      return TagContainer.scan(footer).filter_map {|tag| hash_tag_class.get(tag:)}
+      return parser.footer_tags.filter_map {|tag| hash_tag_class.get(tag:)}
     end
 
     def visibility_icon
