@@ -14,10 +14,9 @@ module Mulukhiya
       body.deep_symbolize_keys!
       body[:media_ids] ||= status.attachments.map(&:id)
       body[:spoiler_text] ||= status.spoiler_text
-      body[:visibility] ||= status.visibility
+      body[:visibility] ||= status.visibility_name
       response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
-        headers: create_headers(params[:headers]),
       })
       return self.class.create_status_info(response.body)
     end
