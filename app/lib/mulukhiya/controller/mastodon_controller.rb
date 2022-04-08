@@ -18,22 +18,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    put '/api/v1/statuses/:id' do
-      # Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
-      reporter.response = sns.update_status(params[:id], params.to_h, {
-        count: @headers['X-Mulukhiya-Count']&.to_i,
-        headers: @headers,
-      })
-      # Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
-      @renderer.message = reporter.response
-      return @renderer.to_s
-    rescue Ginseng::GatewayError => e
-      e.alert
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
-      return @renderer.to_s
-    end
-
     post %r{/api/v([12])/media} do
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
