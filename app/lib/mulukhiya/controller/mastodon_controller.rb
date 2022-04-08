@@ -2,7 +2,7 @@ module Mulukhiya
   class MastodonController < Controller
     include ControllerMethods
 
-    post '/api/v1/statuses' do
+    post '/api/:version/statuses' do
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.toot(params)
@@ -18,10 +18,10 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post %r{/api/v([12])/media} do
+    post '/api/:version/media' do
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
-        version: params[:captures].first.to_i,
+        version: api_version,
         filename: params.dig(:file, :filename),
       })
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
@@ -35,7 +35,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    put '/api/v1/media/:id' do
+    put '/api/:version/media/:id' do
       Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       reporter.response = sns.update_media(params[:id], params)
       Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
@@ -49,7 +49,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/favourite' do
+    post '/api/:version/statuses/:id/favourite' do
       reporter.response = sns.fav(params[:id])
       Event.new(:post_fav, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
@@ -57,7 +57,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/reblog' do
+    post '/api/:version/statuses/:id/reblog' do
       reporter.response = sns.boost(params[:id])
       Event.new(:post_boost, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
@@ -65,7 +65,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/bookmark' do
+    post '/api/:version/statuses/:id/bookmark' do
       reporter.response = sns.bookmark(params[:id])
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
@@ -73,7 +73,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/api/v2/search' do
+    get '/api/:version/search' do
       params[:limit] = config['/mastodon/search/limit']
       reporter.response = sns.search(params[:q], params)
       message = reporter.response.parsed_response
@@ -89,6 +89,10 @@ module Mulukhiya
       end
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    end
+
+    def api_service
+      return params[:version].sub(/^v/, '').to_i
     end
 
     def token
