@@ -55,6 +55,11 @@ module Mulukhiya
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
     post '/api/:version/statuses/:id/reblog' do
@@ -62,6 +67,11 @@ module Mulukhiya
       Event.new(:post_boost, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
@@ -71,11 +81,19 @@ module Mulukhiya
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
     get '/api/:version/search' do
-      params[:limit] = config['/mastodon/search/limit']
-      reporter.response = sns.search(params[:q], params)
+      raise Ginseng::NotFoundError, 'Not Found' if api_version < 2
+      reporter.response = sns.search(params[:q], {
+        version: api_version,
+        limit: config['/mastodon/search/limit'],
+      })
       message = reporter.response.parsed_response
       if message.is_a?(Hash)
         message.deep_stringify_keys!
@@ -88,6 +106,13 @@ module Mulukhiya
         }
       end
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::NotFoundError
+      @renderer.status = 404
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 

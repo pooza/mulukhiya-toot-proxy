@@ -6,12 +6,22 @@ module Mulukhiya
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
     delete '/api/:version/pleroma/statuses/:status_id/reactions/:emoji' do
       reporter.response = sns.delete_reaction(params[:status_id], params[:emoji])
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 

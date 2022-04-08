@@ -52,6 +52,11 @@ module Mulukhiya
       @renderer.message = reporter.response.parsed_response || {}
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
     post '/api/notes/reactions/create' do
@@ -59,6 +64,11 @@ module Mulukhiya
       Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response || {}
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
