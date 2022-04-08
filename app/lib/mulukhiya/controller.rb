@@ -42,6 +42,10 @@ module Mulukhiya
       return nil
     end
 
+    def api_version
+      return params[:version].sub(/^v/, '').to_i
+    end
+
     private
 
     def path_prefix

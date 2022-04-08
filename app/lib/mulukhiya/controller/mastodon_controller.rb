@@ -91,10 +91,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    def api_version
-      return params[:version].sub(/^v/, '').to_i
-    end
-
     def token
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return nil

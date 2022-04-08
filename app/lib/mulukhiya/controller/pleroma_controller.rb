@@ -44,9 +44,5 @@ module Mulukhiya
       @renderer.status = e.response&.code || 400
       return @renderer.to_s
     end
-
-    def api_version
-      return params[:version].sub(/^v/, '').to_i
-    end
   end
 end
