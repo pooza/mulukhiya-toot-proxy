@@ -13,12 +13,12 @@ module Mulukhiya
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
       body[:media_ids] ||= status.attachments.map(&:id)
-      body[:in_reply_to_id] ||= status.in_reply_to_id
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility
+      params[:count] = (params[:count] || 0) + 1
       response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
-        headers: create_headers(params[:headers]),
+        headers: create_headers(params[:headers], params),
       })
       return self.class.create_status_info(response.body)
     end
@@ -87,6 +87,13 @@ module Mulukhiya
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
         MastodonController.reply_to_field => options.dig(:response, :id),
       )
+    end
+
+    def create_headers(headers = {}, params = {})
+      dest = super(headers)
+      dest['X-Mulukhiya-Count'] = params[:count].to_s
+      dest['X-Mulukhiya'] = nil if params[:count] < 2
+      return dest
     end
 
     def self.create_status_info(status)

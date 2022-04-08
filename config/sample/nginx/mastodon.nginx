@@ -38,7 +38,7 @@ location ~ ^/api/v[0-9]+/statuses/[0-9]+/(favourite|reblog|bookmark)$ {
     proxy_pass http://localhost:3008;
   }
 }
-location ~ ^/api/v[0-9]+/media/[0-9]+$ {
+location ~ ^/api/v[0-9]+/(media|statuses)/[0-9]+$ {
   proxy_set_header Host $host;
   proxy_set_header X-Real-IP $remote_addr;
   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
