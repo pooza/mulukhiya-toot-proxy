@@ -15,7 +15,6 @@ module Mulukhiya
       body[:media_ids] ||= status.attachments.map(&:id)
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility
-      params[:count] = (params[:count] || 0) + 1
       response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
         headers: create_headers(params[:headers], params),
@@ -89,10 +88,11 @@ module Mulukhiya
       )
     end
 
-    def create_headers(headers = {}, params = {})
-      dest = super(headers)
+    def create_headers(source = {}, params = {})
+      params[:count] = (params[:count] || 0) + 1
+      dest = super(source)
       dest['X-Mulukhiya-Count'] = params[:count].to_s
-      dest['X-Mulukhiya'] = nil if params[:count] < 2
+      dest.delete('X-Mulukhiya') if params[:count] < 2
       return dest
     end
 
