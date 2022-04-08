@@ -27,10 +27,10 @@ module Mulukhiya
       # Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       @renderer.message = reporter.response
       return @renderer.to_s
-    rescue => e
+    rescue Ginseng::GatewayError => e
       e.alert
       @renderer.message = {error: e.message}
-      @renderer.status = e.status
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
