@@ -17,6 +17,7 @@ module Mulukhiya
       body[:visibility] ||= status.visibility_name
       response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
+        headers: create_headers(params[:headers]),
       })
       return self.class.create_status_info(response.body)
     end
