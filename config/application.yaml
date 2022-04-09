@@ -1192,7 +1192,7 @@ webui:
       - /mulukhiya/style/default
   status:
     timeline:
-      limit: 50
+      limit: 20
 worker:
   announcement:
     interval:
