@@ -810,9 +810,9 @@ nowplaying:
         - delimited: true
           pattern: ^[^():]+[/、]
         - delimited: true
-          pattern: ^(((歌|語り):)?.+\s*\(CV[.:]\s*.+\)、?){2,}$
+          pattern: ^(((歌|語り):)?.+[[:blank:]]*\(CV[.:[:blank:]]*.+\)、?){2,}$
         - delimited: true
-          pattern: ^(.+\s*\(.+\)、?){2,}$
+          pattern: ^(.+[[:blank:]]*\(.+\)、?){2,}$
         - items:
             - drop: true
             - drop: true
@@ -820,13 +820,13 @@ nowplaying:
             - prefix: 'CV:'
               split: true
               strip: true
-          pattern: ^((歌|語り):)?(.+)\s*\(CV[.:]\s*(.+)\)$
+          pattern: ^((歌|語り):)?(.+)[[:blank:]]*\(CV[.:[:blank:]]*(.+)\)$
         - items:
             - split: true
             - prefix: 'コーラス:'
               split: true
               strip: true
-          pattern: ^歌:(.+)\s*コーラス:(.+)$
+          pattern: ^歌:(.+)[[:blank:]]*コーラス:(.+)$
         - items:
             - split: true
           pattern: ^歌:(.+)$
@@ -835,23 +835,23 @@ nowplaying:
             - prefix: 'コーラス:'
               split: true
               strip: true
-          pattern: ^(.+)\s*\(コーラス:(.+)\)$
+          pattern: ^(.+)[[:blank:]]*\(コーラス:(.+)\)$
         - items:
             - prefix: 'CV:'
               strip: true
             - split: true
-          pattern: ^(.+)\s*\(as\s*(.+)\)$
+          pattern: ^(.+)[[:blank:]]*\(as[[:blank:]]*(.+)\)$
         - items:
             - split: true
             - split: true
               strip: true
-          pattern: ^(.+)\s*\((.+)\)$
+          pattern: ^(.+)[[:blank:]]*\((.+)\)$
         - items:
             - split: true
             - prefix: feat.
               split: true
               strip: true
-          pattern: ^(.+)\s*feat\.\s*(.+)$
+          pattern: ^(.+)[[:blank:]]*feat\.[[:blank:]]*(.+)$
     prefix: 'Artist:'
   track:
     prefix: 'Title:'

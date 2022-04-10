@@ -5,7 +5,7 @@ module Mulukhiya
       lines = status_lines.clone
       lines.clone.reverse_each do |line|
         break unless tags_line?(line)
-        tags.merge(lines.pop.strip.split(/\s+/))
+        tags.merge(lines.pop.strip.split(/[[:blank:]]+/))
       end
       tags.text = lines.join("\n")
       lines.push(tags.create_tags.join(' '))
@@ -15,7 +15,7 @@ module Mulukhiya
     private
 
     def tags_line?(line)
-      return /^\s*(#[[:word:]]+\s*)+$/.match?(line)
+      return /^[[:blank:]]*(#[[:word:]]+[[:blank:]]*)+$/.match?(line)
     end
   end
 end

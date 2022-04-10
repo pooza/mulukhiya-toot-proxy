@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def handle_line(line)
-      return unless matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
+      return unless matches = line.strip.match(/^#nowplaying[[:blank:]]+(.*)$/i)
       @recent_keyword = matches[1]
       return unless updatable?(@recent_keyword)
       update(@recent_keyword)
