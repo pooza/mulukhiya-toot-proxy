@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def to_s
-      return to_h.to_yaml
+      return to_h.deep_stringify_keys.to_yaml
     end
   end
 end

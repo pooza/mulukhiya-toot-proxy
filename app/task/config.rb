@@ -19,7 +19,7 @@ module Mulukhiya
 
     desc 'show schema'
     task :schema do
-      puts config.schema.to_yaml
+      puts config.schema.deep_stringify_keys.to_yaml
     end
   end
 end
