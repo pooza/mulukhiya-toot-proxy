@@ -15,11 +15,13 @@ html lang='ja'
             h3 @click='toggleVisibility("status")' = controller.status_label
             vue-slide-up-down :active='layout.details.status'
               .endpoint-container
-                .link GET {{endpoints.statuses}}
+                .link GET {{endpoints.status_list}}
+                input type='number' placeholder='ページ' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='getStatuses'
+                input type='search' placeholder='検索キーワード' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='getStatuses'
                 .link-description = "このアカウントからの#{controller.status_label}を取得します。"
                 .field-update-button-container
                   button @click='getStatuses' 実行
-                  pre.result v-if='result.statuses' {{result.statuses}}
+                  pre.result v-if='result.status_list' {{result.status_list}}
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
@@ -232,11 +234,12 @@ html lang='ja'
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
-            statuses: `/mulukhiya/api/status/list?token=${encodeURIComponent(Vue.getToken())}`,
+            status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
             media_list: {page: 1, q: null, token: Vue.getToken()},
+            status_list: {page: 1, q: null, token: Vue.getToken()},
             lemmy_communities: {token: Vue.getToken()},
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
@@ -255,7 +258,7 @@ html lang='ja'
             media_list: null,
             program_list: null,
             feed_list: null,
-            statuses: null,
+            status_list: null,
             health: null,
             about: null,
           },
@@ -312,6 +315,18 @@ html lang='ja'
             }
             if (Vue.getToken()) {url.searchParams.set('token', Vue.getToken())}
             this.endpoints.media_list = `${url.pathname}${url.search}`
+          },
+          onInputStatusList () {
+            const url = new URL('/mulukhiya/api/status/list', location.href)
+            url.searchParams.set('page', this.query_params.status_list.page)
+            url.searchParams.set('q', null)
+            if (this.query_params.status_list.q) {
+              url.searchParams.set('q', this.query_params.status_list.q)
+            } else {
+              url.searchParams.delete('q')
+            }
+            if (Vue.getToken()) {url.searchParams.set('token', Vue.getToken())}
+            this.endpoints.status_list = `${url.pathname}${url.search}`
           },
           onInputCustomAPI (id, key) {
             let endpoint = `/mulukhiya/api/${this.entries[id].path}`
@@ -401,9 +416,9 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getStatuses () {
-            this.result.statuses = null
-            Vue.getStatuses()
-              .then(e => {this.result.statuses = e})
+            this.result.status_list = null
+            Vue.getStatuses(this.query_params.status_list.page, this.query_params.status_list.q)
+              .then(e => {this.result.status_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getHealth () {
