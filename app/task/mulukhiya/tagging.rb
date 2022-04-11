@@ -17,7 +17,7 @@ module Mulukhiya
             puts({
               account: account.acct.to_s,
               tags: account.user_config.tags,
-            }).deep_stringify_keys.to_yaml
+            }).to_yaml
           end
         end
 

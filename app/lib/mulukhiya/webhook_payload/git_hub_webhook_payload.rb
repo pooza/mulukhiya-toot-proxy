@@ -61,7 +61,7 @@ module Mulukhiya
           issue:,
           milestone:,
           head_commit:,
-        }.deep_compact.deep_stringify_keys.to_yaml,
+        }.deep_compact.to_yaml,
       }
     end
 

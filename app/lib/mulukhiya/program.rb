@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def to_yaml
-      return data.deep_stringify_keys.to_yaml
+      return data.to_yaml
     end
 
     def uris

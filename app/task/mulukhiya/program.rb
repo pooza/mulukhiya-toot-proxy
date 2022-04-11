@@ -10,7 +10,7 @@ module Mulukhiya
 
       desc 'show programs'
       task :show do
-        puts Program.instance.deep_stringify_keys.to_yaml
+        puts Program.instance.to_yaml
       end
     end
   end

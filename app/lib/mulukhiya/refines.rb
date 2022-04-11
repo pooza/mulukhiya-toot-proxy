@@ -10,10 +10,28 @@ module Mulukhiya
       end
     end
 
+    class ::Hash
+      def to_yaml
+        return YAML.dump(self.deep_stringify_keys)
+      end
+    end
+
+    class ::Array
+      def to_yaml
+        return YAML.dump(self.deep_stringify_keys)
+      end
+    end
+
+    class ::Set
+      def to_yaml
+        return YAML.dump(self.to_a.deep_stringify_keys)
+      end
+    end
+
     class ::StandardError
       def log(values = {})
         Logger.new.error({error: self}.merge(values))
-        warn(to_h.deep_stringify_keys.to_yaml) if Environment.test? && Environment.development?
+        warn(to_h.to_yaml) if Environment.test? && Environment.development?
       end
 
       def alert(values = {})

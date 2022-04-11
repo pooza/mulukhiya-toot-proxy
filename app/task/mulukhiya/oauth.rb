@@ -8,7 +8,7 @@ module Mulukhiya
           namespace client do
             desc "show OAuth client (#{client})"
             task :show do
-              puts Environment.sns_class.new.oauth_client(client).deep_stringify_keys.to_yaml
+              puts Environment.sns_class.new.oauth_client(client).to_yaml
             end
 
             desc "clean OAuth client (#{client})"
