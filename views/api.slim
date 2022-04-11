@@ -16,7 +16,7 @@ html lang='ja'
             vue-slide-up-down :active='layout.details.status'
               .endpoint-container
                 .link GET {{endpoints.status_list}}
-                input type='number' placeholder='ページ' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
+                input type='number' placeholder='ページ番号' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
                 input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
                 .link-description = "@{{account.username}}からの#{controller.status_label}を取得します。"
                 .field-update-button-container
@@ -68,7 +68,7 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
+              input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
               input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
