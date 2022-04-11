@@ -27,7 +27,7 @@ html lang='ja'
                 input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_detail.id' @input='onInputStatusDetail' @keydown.enter='delay(getStatus)'
                 .link-description = "#{controller.status_label}を1件、取得します。"
                 .field-update-button-container
-                  button @click='delay(getStatuses)' 実行
+                  button @click='delay(getStatus)' :disabled='!query_params.status_detail.id' 実行
                   pre.result v-if='result.status_detail' {{result.status_detail}}
         - if controller.announcement?
           li v-if='account.is_admin'
@@ -437,7 +437,7 @@ html lang='ja'
               .then(e => {this.result.status_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          getStatuses () {
+          getStatus () {
             this.result.status_detail = null
             Vue.getStatus(this.query_params.status_detail.id)
               .then(e => {this.result.status_detail = e})
