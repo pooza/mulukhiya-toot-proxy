@@ -20,10 +20,6 @@ gem 'sidekiq-scheduler', '~>3.1.0'
 gem 'vacuum', '~>3.0'
 gem 'webrick'
 
-group :annict do
-  gem 'graphql-client'
-end
-
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
 end
