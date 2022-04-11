@@ -62,6 +62,33 @@ location ~ ^/api/v[0-9]+/media/[0-9]+$ {
     proxy_pass http://localhost:3000;
   }
 }
+location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+  proxy_set_header Proxy "";
+  proxy_pass_header Server;
+  proxy_buffering on;
+  proxy_redirect off;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection $connection_upgrade;
+  tcp_nodelay on;
+  if ($http_x_mulukhiya_purpose != '') {
+    proxy_pass http://localhost:3008;
+  }
+  set $test "${request_method}${http_x_mulukhiya}";
+  if ($test ~* '^PUT.+') {
+    proxy_pass http://localhost:3000;
+  }
+  if ($test = 'PUT') {
+    return 405;
+  }
+  if ($test ~* '^(GET|POST)') {
+    proxy_pass http://localhost:3000;
+  }
+}
 location ^~ /mulukhiya {
   proxy_set_header Host $host;
   proxy_set_header X-Real-IP $remote_addr;
