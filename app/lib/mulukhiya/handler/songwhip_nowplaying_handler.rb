@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def handle_line(line)
-      if matches = line.strip.match(/^#nowplaying\s+(.*)$/i)
+      if matches = line.strip.match(/^#nowplaying[[:blank:]]+(.*)$/i)
         @recent_keyword = matches[1]
       elsif reporter.temp[:track_uris].member?(line)
         @recent_keyword = line

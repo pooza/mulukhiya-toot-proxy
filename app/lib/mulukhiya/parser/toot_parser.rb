@@ -14,10 +14,6 @@ module Mulukhiya
       text.scan(TootParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&block)
     end
 
-    def hashtags
-      return TagContainer.scan(text)
-    end
-
     alias tags hashtags
 
     def to_sanitized

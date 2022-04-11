@@ -47,7 +47,7 @@ html lang='ja'
                 a.url href=dic.uri target='_blank' rel='noreferrer' = dic.uri.to_s.ellipsize(64)
                 - if dic.edit_uri
                   |&nbsp;
-                  a.edit href=dic.edit_uri target='_blank' rel='noreferrer'  v-if='account.username'
+                  a.edit href=dic.edit_uri target='_blank' rel='noreferrer' v-if='account.username'
                     i class='fas fa-edit' v-tooltip.left="'辞書の編集'"
     == slim.render 'fragment/footer'
     javascript:

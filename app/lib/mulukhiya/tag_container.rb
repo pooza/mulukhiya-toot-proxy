@@ -9,10 +9,6 @@ module Mulukhiya
       return super
     end
 
-    def delete(tag)
-      reject! {|v| v.casecmp(tag).zero?}
-    end
-
     def self.scan(text)
       return new(text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first))
     end

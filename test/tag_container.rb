@@ -13,6 +13,10 @@ module Mulukhiya
       assert_equal(Set[], @tags)
     end
 
+    def test_scan
+      assert_kind_of(TagContainer, TagContainer.scan('インドの山奥で修業して'))
+    end
+
     def test_default_tags
       assert_equal(TagContainer.default_tags, Set['美食丼', 'b-shock-don'])
     end

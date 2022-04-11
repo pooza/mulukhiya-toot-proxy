@@ -18,7 +18,7 @@ module Mulukhiya
         ).except(
           :private_key,
           :public_key,
-        ).deep_compact
+        ).compact
       end
 
       def display_name

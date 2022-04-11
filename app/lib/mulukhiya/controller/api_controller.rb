@@ -222,11 +222,11 @@ module Mulukhiya
       else
         status = status_class[params[:id]]
         raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-        tags = TagContainer.scan(status.parser.footer).push(params[:tag])
-        @renderer.message = sns.update_status(
-          params[:id],
-          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
-        )
+        tags = status.parser.footer_tags.push(params[:tag])
+        body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
+        @renderer.message = sns.update_status(params[:id], body, {
+          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
+        })
       end
       return @renderer.to_s
     rescue => e
@@ -248,11 +248,11 @@ module Mulukhiya
       else
         status = status_class[params[:id]]
         raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-        tags = TagContainer.scan(status.parser.footer).delete(tag.name)
-        @renderer.message = sns.update_status(
-          params[:id],
-          [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n"),
-        )
+        tags = status.parser.footer_tags.delete(tag.name)
+        body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
+        @renderer.message = sns.update_status(params[:id], body, {
+          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
+        })
       end
       return @renderer.to_s
     rescue => e

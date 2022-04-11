@@ -19,7 +19,7 @@ module Mulukhiya
           :password_hash,
           :keys,
           :magic_key,
-        ).deep_compact
+        ).compact
       end
 
       def acct

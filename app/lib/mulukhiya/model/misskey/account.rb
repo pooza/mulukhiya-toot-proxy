@@ -17,7 +17,7 @@ module Mulukhiya
           display_name:,
         ).except(
           :token,
-        ).deep_compact
+        ).compact
       end
 
       def display_name

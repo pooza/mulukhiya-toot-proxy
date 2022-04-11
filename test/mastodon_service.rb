@@ -14,7 +14,9 @@ module Mulukhiya
 
     def test_update_status
       text = "1#{@status.text}"
-      r = @service.update_status(@status, text)
+      r = @service.update_status(@status, text, {
+        headers: {'X-Mulukhiya-Purpose' => 'test'},
+      })
       assert(text.start_with?(TootParser.new(r['content']).body))
     end
 

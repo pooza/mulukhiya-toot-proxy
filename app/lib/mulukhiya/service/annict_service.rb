@@ -223,7 +223,7 @@ module Mulukhiya
       bar&.finish
       return unless Environment.rake?
       results.each do |acct, result|
-        puts({acct:, result:}.deep_stringify_keys.to_yaml)
+        puts({acct:, result:}.to_yaml)
       end
     end
   end

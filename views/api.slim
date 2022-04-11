@@ -15,11 +15,38 @@ html lang='ja'
             h3 @click='toggleVisibility("status")' = controller.status_label
             vue-slide-up-down :active='layout.details.status'
               .endpoint-container
-                .link GET {{endpoints.statuses}}
-                .link-description = "このアカウントからの#{controller.status_label}を取得します。"
+                .link GET {{endpoints.status_list}}
+                input type='number' placeholder='ページ番号' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
+                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
+                .link-description = "@{{account.username}}からの#{controller.status_label}を取得します。"
                 .field-update-button-container
-                  button @click='getStatuses' 実行
-                  pre.result v-if='result.statuses' {{result.statuses}}
+                  button @click='delay(getStatuses)' 実行
+                  pre.result v-if='result.status_list' {{result.status_list}}
+              .endpoint-container
+                .link GET {{endpoints.status_detail}}
+                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_detail.id' @input='onInputStatusDetail' @keydown.enter='delay(getStatus)'
+                .link-description = "#{controller.status_label}を1件、取得します。"
+                .field-update-button-container
+                  button @click='delay(getStatus)' :disabled='!query_params.status_detail.id' 実行
+                  pre.result v-if='result.status_detail' {{result.status_detail}}
+              .endpoint-container
+                .link POST /mulukhiya/api/status/tag
+                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_create_tag.id'
+                input type='text' placeholder='タグ名' v-model.trim='query_params.status_create_tag.tag'
+                pre.payload v-if='query_params.status_create_tag' {{query_params.status_create_tag}}
+                .link-description = "#{controller.status_label}の本文末尾にハッシュタグを追加します。"
+                .field-update-button-container
+                  button @click='createTag' :disabled='!query_params.status_create_tag.id || !query_params.status_create_tag.tag' 実行
+                  pre.result v-if='result.status_create_tag' {{result.status_create_tag}}
+              .endpoint-container
+                .link DELETE /mulukhiya/api/status/tag
+                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_delete_tag.id'
+                input type='text' placeholder='タグ名' v-model.trim='query_params.status_delete_tag.tag'
+                pre.payload v-if='query_params.status_delete_tag' {{query_params.status_delete_tag}}
+                .link-description = "#{controller.status_label}の本文末尾からハッシュタグを削除します。"
+                .field-update-button-container
+                  button @click='deleteTag' :disabled='!query_params.status_delete_tag.id || !query_params.status_delete_tag.tag' 実行
+                  pre.result v-if='result.status_delete_tag' {{result.status_delete_tag}}
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
@@ -41,11 +68,11 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='getMedias'
-              input type='search' placeholder='検索キーワード' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='getMedias' v-if='account.username'
+              input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
+              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
-                button @click='getMedias' 実行
+                button @click='delay(getMedias)' 実行
                 pre.result v-if='result.media_list' {{result.media_list}}
             .endpoint-container v-if='account.is_admin'
               .role admin
@@ -232,11 +259,16 @@ html lang='ja'
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
-            statuses: `/mulukhiya/api/status/list?token=${encodeURIComponent(Vue.getToken())}`,
+            status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
+            status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
             media_list: {page: 1, q: null, token: Vue.getToken()},
+            status_list: {page: 1, q: null, token: Vue.getToken()},
+            status_detail: {id: null, token: Vue.getToken()},
+            status_create_tag: {id: null, tag: null, token: Vue.getToken()},
+            status_delete_tag: {id: null, tag: null, token: Vue.getToken()},
             lemmy_communities: {token: Vue.getToken()},
             announcement_update: {token: Vue.getToken()},
             media_file_clear: {token: Vue.getToken()},
@@ -255,7 +287,10 @@ html lang='ja'
             media_list: null,
             program_list: null,
             feed_list: null,
-            statuses: null,
+            status_list: null,
+            status_detail: null,
+            status_create_tag: null,
+            status_delete_tag: null,
             health: null,
             about: null,
           },
@@ -305,13 +340,28 @@ html lang='ja'
           onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
+            url.searchParams.delete('q')
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
-            } else {
-              url.searchParams.delete('q')
             }
             if (Vue.getToken()) {url.searchParams.set('token', Vue.getToken())}
             this.endpoints.media_list = `${url.pathname}${url.search}`
+          },
+          onInputStatusList () {
+            const url = new URL('/mulukhiya/api/status/list', location.href)
+            url.searchParams.set('page', this.query_params.status_list.page)
+            url.searchParams.delete('q')
+            if (this.query_params.status_list.q) {
+              url.searchParams.set('q', this.query_params.status_list.q)
+            }
+            url.searchParams.set('token', Vue.getToken())
+            this.endpoints.status_list = `${url.pathname}${url.search}`
+          },
+          onInputStatusDetail () {
+            const url = new URL('/mulukhiya/api/status/:id', location.href)
+            url.pathname = url.pathname.replace(':id', this.query_params.status_detail.id)
+            url.searchParams.set('token', Vue.getToken())
+            this.endpoints.status_detail = `${url.pathname}${url.search}`
           },
           onInputCustomAPI (id, key) {
             let endpoint = `/mulukhiya/api/${this.entries[id].path}`
@@ -323,6 +373,9 @@ html lang='ja'
           },
           toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
+          },
+          delay (proc) {
+            setTimeout(proc, 500)
           },
           updateAnnouncement () {
             Vue.updateAnnouncement()
@@ -401,9 +454,27 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getStatuses () {
-            this.result.statuses = null
-            Vue.getStatuses()
-              .then(e => {this.result.statuses = e})
+            this.result.status_list = null
+            Vue.getStatuses(this.query_params.status_list.page, this.query_params.status_list.q)
+              .then(e => {this.result.status_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getStatus () {
+            this.result.status_detail = null
+            Vue.getStatus(this.query_params.status_detail.id)
+              .then(e => {this.result.status_detail = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          createTag () {
+            this.result.status_create_tag = null
+            Vue.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
+              .then(e => {this.result.status_create_tag = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          deleteTag () {
+            this.result.status_delete_tag = null
+            Vue.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
+              .then(e => {this.result.status_delete_tag = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getHealth () {

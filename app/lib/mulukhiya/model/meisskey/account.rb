@@ -14,7 +14,7 @@ module Mulukhiya
         ).except(
           :password,
           :keypair,
-        ).deep_compact
+        ).compact
       end
 
       def host

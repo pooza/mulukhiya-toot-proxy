@@ -13,9 +13,8 @@ module Mulukhiya
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
       body[:media_ids] ||= status.attachments.map(&:id)
-      body[:in_reply_to_id] ||= status.in_reply_to_id
       body[:spoiler_text] ||= status.spoiler_text
-      body[:visibility] ||= status.visibility
+      body[:visibility] ||= status.visibility_name
       response = http.put("/api/v1/statuses/#{status.id}", {
         body: body.compact,
         headers: create_headers(params[:headers]),
@@ -99,9 +98,7 @@ module Mulukhiya
         body: parser.body,
         is_taggable: status['visibility'] == MastodonController.visibility_name(:public),
         footer: parser.footer,
-        footer_tags: TagContainer.scan(parser.footer)
-          .filter_map {|tag| Mastodon::HashTag.get(tag:)}
-          .map(&:to_h),
+        footer_tags: parser.footer_tags.filter_map {|tag| Mastodon::HashTag.get(tag:)}.map(&:to_h),
         visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end

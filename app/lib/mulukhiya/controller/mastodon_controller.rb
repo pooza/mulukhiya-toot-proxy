@@ -2,7 +2,7 @@ module Mulukhiya
   class MastodonController < Controller
     include ControllerMethods
 
-    post '/api/v1/statuses' do
+    post '/api/:version/statuses' do
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.toot(params)
@@ -18,64 +18,82 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post %r{/api/v([12])/media} do
+    post '/api/:version/media' do
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
-        version: params[:captures].first.to_i,
+        version: api_version,
         filename: params.dig(:file, :filename),
       })
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
-    rescue RestClient::Exception => e
+    rescue Ginseng::GatewayError => e
       e.alert
-      @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
-      @renderer.status = e.response&.code || 400
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
-    put '/api/v1/media/:id' do
+    put '/api/:version/media/:id' do
       Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       reporter.response = sns.update_media(params[:id], params)
       Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
-    rescue RestClient::Exception => e
+    rescue Ginseng::GatewayError => e
       e.alert
-      @renderer.message = e.response ? JSON.parse(e.response.body) : e.message
-      @renderer.status = e.response&.code || 400
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/favourite' do
+    post '/api/:version/statuses/:id/favourite' do
       reporter.response = sns.fav(params[:id])
       Event.new(:post_fav, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/reblog' do
+    post '/api/:version/statuses/:id/reblog' do
       reporter.response = sns.boost(params[:id])
       Event.new(:post_boost, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
-    post '/api/v1/statuses/:id/bookmark' do
+    post '/api/:version/statuses/:id/bookmark' do
       reporter.response = sns.bookmark(params[:id])
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
     end
 
-    get '/api/v2/search' do
-      params[:limit] = config['/mastodon/search/limit']
-      reporter.response = sns.search(params[:q], params)
+    get '/api/:version/search' do
+      raise Ginseng::NotFoundError, 'Not Found' if api_version < 2
+      reporter.response = sns.search(params[:q], {
+        version: api_version,
+        limit: config['/mastodon/search/limit'],
+      })
       message = reporter.response.parsed_response
       if message.is_a?(Hash)
         message.deep_stringify_keys!
@@ -88,6 +106,13 @@ module Mulukhiya
         }
       end
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::NotFoundError
+      @renderer.status = 404
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
       return @renderer.to_s
     end
 

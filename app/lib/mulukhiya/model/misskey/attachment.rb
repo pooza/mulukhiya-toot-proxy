@@ -22,7 +22,7 @@ module Mulukhiya
           duration:,
         ).except(
           :properties,
-        ).deep_compact
+        ).compact
       end
 
       def meta
