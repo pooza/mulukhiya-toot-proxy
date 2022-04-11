@@ -12,19 +12,19 @@ module Mulukhiya
 
     class ::Hash
       def to_yaml
-        return YAML.dump(self.deep_stringify_keys)
+        return YAML.dump(deep_stringify_keys)
       end
     end
 
     class ::Array
       def to_yaml
-        return YAML.dump(self.deep_stringify_keys)
+        return YAML.dump(deep_stringify_keys)
       end
     end
 
     class ::Set
       def to_yaml
-        return YAML.dump(self.to_a.deep_stringify_keys)
+        return YAML.dump(to_a.deep_stringify_keys)
       end
     end
 
