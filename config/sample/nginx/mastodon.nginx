@@ -85,7 +85,7 @@ location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
   if ($test = 'PUT') {
     return 405;
   }
-  if ($test ~* '^(GET|POST)') {
+  if ($test ~* '^(GET|POST|DELETE)') {
     proxy_pass http://localhost:3000;
   }
 }
