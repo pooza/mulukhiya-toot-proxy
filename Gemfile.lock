@@ -400,7 +400,6 @@ DEPENDENCIES
   test-unit
   timecop
   vacuum (~> 3.0)
-  webrick
 
 RUBY VERSION
    ruby 3.1.1p18
