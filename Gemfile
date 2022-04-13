@@ -12,13 +12,11 @@ gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tu
 gem 'marcel'
 gem 'mini_magick'
 gem 'optparse'
-gem 'redis', '~>4.5.0'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.4.0' # CVE-2022-23837
 gem 'sidekiq-scheduler', '~>3.1.0'
 gem 'vacuum', '~>3.0'
-gem 'webrick'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
