@@ -13,6 +13,7 @@ module Mulukhiya
           next unless uri = Ginseng::URI.parse(attachment['image_url'])
           next if sns.max_media_attachments <= payload[attachment_field].count
           payload[attachment_field].push(upload(uri))
+          tags.push('image')
           result.push(source_url: uri.to_s)
         rescue => e
           errors.push(class: e.class.to_s, message: e.message, attachment:)
