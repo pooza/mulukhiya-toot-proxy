@@ -399,7 +399,6 @@ mastodon:
       - spoiler
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - image_copyright
@@ -514,7 +513,6 @@ meisskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - tagging
@@ -573,7 +571,6 @@ meisskey:
       - spoiler
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - image_copyright
@@ -688,7 +685,6 @@ misskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - tagging
@@ -748,7 +744,6 @@ misskey:
       - spoiler
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - image_copyright
@@ -965,7 +960,6 @@ pleroma:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - tagging
@@ -1028,7 +1022,6 @@ pleroma:
       - spoiler
       - default_tag
       - dictionary_tag
-      - media_tag
       - user_tag
       - remote_tag
       - image_copyright
