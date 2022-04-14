@@ -1,10 +1,5 @@
 module Mulukhiya
   class MediaTagHandler < TagHandler
-    def disable?
-      return true unless @event == :pre_toot
-      return super
-    end
-
     def addition_tags
       tags = TagContainer.new
       tags.merge(media_ids.filter_map {|id| create_media_tag(id)})

@@ -399,7 +399,7 @@ mastodon:
       - spoiler
       - default_tag
       - dictionary_tag
-      - user_tag
+      - media_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -513,7 +513,6 @@ meisskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -571,7 +570,7 @@ meisskey:
       - spoiler
       - default_tag
       - dictionary_tag
-      - user_tag
+      - media_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -685,7 +684,6 @@ misskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -744,7 +742,7 @@ misskey:
       - spoiler
       - default_tag
       - dictionary_tag
-      - user_tag
+      - media_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -960,7 +958,6 @@ pleroma:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -1022,7 +1019,7 @@ pleroma:
       - spoiler
       - default_tag
       - dictionary_tag
-      - user_tag
+      - media_tag
       - remote_tag
       - image_copyright
       - tagging
