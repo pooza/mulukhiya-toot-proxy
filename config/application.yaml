@@ -400,7 +400,6 @@ mastodon:
       - default_tag
       - dictionary_tag
       - media_tag
-      - user_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -514,8 +513,6 @@ meisskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -574,7 +571,6 @@ meisskey:
       - default_tag
       - dictionary_tag
       - media_tag
-      - user_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -688,8 +684,6 @@ misskey:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -749,7 +743,6 @@ misskey:
       - default_tag
       - dictionary_tag
       - media_tag
-      - user_tag
       - remote_tag
       - image_copyright
       - tagging
@@ -863,7 +856,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.17.1
+  version: 4.17.2
 parser:
   note:
     fields:
@@ -965,8 +958,6 @@ pleroma:
       - peer_tube_url_nowplaying
       - default_tag
       - dictionary_tag
-      - media_tag
-      - user_tag
       - remote_tag
       - tagging
     pre_toot:
@@ -1029,7 +1020,6 @@ pleroma:
       - default_tag
       - dictionary_tag
       - media_tag
-      - user_tag
       - remote_tag
       - image_copyright
       - tagging
