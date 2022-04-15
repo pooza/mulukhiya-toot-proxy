@@ -1137,7 +1137,7 @@ websocket:
 webui:
   development:
     scripts:
-      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.js
+      - https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js
       - https://cdn.jsdelivr.net/npm/vue-select@3.18/dist/vue-select.min.js
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
@@ -1164,7 +1164,7 @@ webui:
     viewport: width=1000
   production:
     scripts:
-      - https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js
+      - https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js
       - https://cdn.jsdelivr.net/npm/vue-select@3.18/dist/vue-select.min.js
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
