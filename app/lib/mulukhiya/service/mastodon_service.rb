@@ -33,6 +33,7 @@ module Mulukhiya
     end
 
     def search(keyword, params = {})
+      params[:resolve] = true
       params[:limit] ||= config['/mastodon/search/limit']
       return super
     end
