@@ -275,7 +275,6 @@ line:
     api: https://api.line.me
 logger:
   mask_fields:
-    - token
     - password
     - secret
 mastodon:

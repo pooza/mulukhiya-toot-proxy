@@ -12,7 +12,7 @@ module Mulukhiya
         arg.deep_stringify_keys!
         arg.reject {|_, v| v.to_s.empty?}.each do |k, v|
           if config['/logger/mask_fields'].member?(k)
-            arg[k] = '--secret--'
+            arg.delete(k)
           else
             arg[k] = mask(v)
           end
