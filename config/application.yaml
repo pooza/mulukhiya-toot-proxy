@@ -273,6 +273,11 @@ line:
   token: null
   urls:
     api: https://api.line.me
+logger:
+  mask_fields:
+    - token
+    - password
+    - secret
 mastodon:
   attachment:
     types:
