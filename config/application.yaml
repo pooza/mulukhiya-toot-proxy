@@ -273,6 +273,10 @@ line:
   token: null
   urls:
     api: https://api.line.me
+logger:
+  mask_fields:
+    - password
+    - secret
 mastodon:
   attachment:
     types:
@@ -856,7 +860,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.17.4
+  version: 4.17.5
 parser:
   note:
     fields:

@@ -110,8 +110,7 @@ module Mulukhiya
 
     def post(body = {})
       body.deep_symbolize_keys!
-      data = {nsfw: false, community_id: @params[:community], auth: @jwt}
-      data[:name] = body[:name].to_s if body[:name]
+      data = {community_id: @params[:community], auth: @jwt, name: body[:name]&.to_s}
       if uri = create_status_uri(body[:url])
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not puclic" unless uri.public?
