@@ -47,6 +47,17 @@ module Mulukhiya
       return @service
     end
 
+    def subject
+      unless @subject
+        @subject = note['cw'] if note['cw'].present?
+        @subject ||= note['text']
+        @subject.sanitize!
+        Ginseng::URI.scan(@subject.dup) {|uri| @subject.gsub!(uri.to_s, '')}
+        @subject.gsub!(/[\s[:blank:]]+/, ' ')
+      end
+      return @subject
+    end
+
     def account
       unless @account
         @account = note['user'].clone
