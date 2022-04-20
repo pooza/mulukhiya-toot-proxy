@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 041536a66d5e7367dd3e6661173900f3f18b2af2
+  revision: 8daf4d5e8bcba755b3c588c06069b58794cb2efd
   specs:
-    ginseng-core (1.13.1)
+    ginseng-core (1.13.2)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -42,9 +42,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: c11e730375327d576aa821b075fefbd6194188d1
+  revision: 62d356ae7ee7bedd1b443978c2cfdcc053c2852c
   specs:
-    ginseng-fediverse (1.8.1)
+    ginseng-fediverse (1.8.2)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -105,7 +105,7 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.2)
     aws-eventstream (1.2.0)
-    aws-sigv4 (1.4.0)
+    aws-sigv4 (1.5.0)
       aws-eventstream (~> 1, >= 1.0.2)
     bootsnap (1.11.1)
       msgpack (~> 1.2)
@@ -316,7 +316,7 @@ GEM
     securerandom (0.2.0)
     sequel (5.55.0)
     set (1.0.2)
-    sidekiq (6.4.1)
+    sidekiq (6.4.2)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)

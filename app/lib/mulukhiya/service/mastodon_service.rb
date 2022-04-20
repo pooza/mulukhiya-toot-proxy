@@ -32,12 +32,6 @@ module Mulukhiya
       return super
     end
 
-    def search(keyword, params = {})
-      params[:resolve] = true
-      params[:limit] ||= config['/mastodon/search/limit']
-      return super
-    end
-
     def register_filter(params = {})
       params.deep_symbolize_keys!
       params[:account_id] = account.id
