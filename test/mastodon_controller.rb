@@ -11,17 +11,6 @@ module Mulukhiya
       return MastodonController
     end
 
-    def test_search
-      header 'Authorization', "Bearer #{test_token}"
-      get '/api/v2/search?q=hoge'
-      assert_predicate(last_response, :ok?)
-
-      header 'Authorization', "Bearer #{test_token}"
-      get '/api/v1/search?q=hoge'
-      assert_false(last_response.ok?)
-      assert_equal(404, last_response.status)
-    end
-
     def test_toot_length
       header 'Authorization', "Bearer #{test_token}"
       post '/api/v1/statuses', {status_field => 'A' * @parser.max_length}

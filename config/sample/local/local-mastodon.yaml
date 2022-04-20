@@ -18,8 +18,6 @@ handler:
       - https://hooks.slack.com/services/xxxxx
       - https://discordapp.com/api/webhooks/xxxxx/slack
 mastodon:
-  search:
-    limit: 100
   url: https://mstdn.example.com/
 postgres:
   dsn: postgres://postgres@localhost:5432/mastodon

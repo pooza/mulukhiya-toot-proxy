@@ -88,34 +88,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/api/:version/search' do
-      raise Ginseng::NotFoundError, 'Not Found' if api_version < 2
-      reporter.response = sns.search(params[:q], {
-        version: api_version,
-        limit: config['/mastodon/search/limit'],
-      })
-      message = reporter.response.parsed_response
-      if message.is_a?(Hash)
-        message.deep_stringify_keys!
-        Event.new(:post_search, {reporter:, sns:, message:}).dispatch(params)
-        @renderer.message = message
-      else
-        @renderer.message = {
-          path: request.path,
-          error: message.nokogiri.xpath('//h1').first.inner_text.chomp,
-        }
-      end
-      @renderer.status = reporter.response.code
-      return @renderer.to_s
-    rescue Ginseng::NotFoundError
-      @renderer.status = 404
-    rescue Ginseng::GatewayError => e
-      e.alert
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
-      return @renderer.to_s
-    end
-
     def token
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return nil

@@ -321,8 +321,6 @@ mastodon:
       - result_notification
     post_fav:
       - result_notification
-    post_search:
-      - result_notification
     post_thumbnail:
       - result_notification
     post_toot:
@@ -422,8 +420,6 @@ mastodon:
         - write:media
     webui:
       url: /settings/applications
-  search:
-    limit: 40
   sns_type: mastodon
   status:
     delete:

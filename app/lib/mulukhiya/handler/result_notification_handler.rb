@@ -35,11 +35,6 @@ module Mulukhiya
       notify(reporter.to_h, {spoiler_text:})
     end
 
-    def handle_post_search(payload, params = {})
-      return unless reporter.to_h.present?
-      notify(reporter.to_h, {spoiler_text:})
-    end
-
     def spoiler_text
       return handler_config(:spoiler_text)
     end
