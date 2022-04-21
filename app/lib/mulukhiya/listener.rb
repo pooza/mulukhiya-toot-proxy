@@ -13,7 +13,7 @@ module Mulukhiya
     def root_cert_file
       return config["/#{Environment.controller_name}/streaming/root_cert_file"]
     rescue
-      return ENV['SSL_CERT_FILE']
+      return ENV.fetch('SSL_CERT_FILE', nil)
     end
 
     def keepalive
