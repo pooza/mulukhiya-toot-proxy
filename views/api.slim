@@ -69,6 +69,7 @@ html lang='ja'
             .endpoint-container
               .link GET {{endpoints.media_list}}
               input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
+              toggle-button v-model='query_params.media_list.only_person' @input='onInputMediaList' v-tooltip.bottom="'ボットからの投稿を除く'"
               input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
@@ -247,6 +248,7 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
+      Vue.use(window['vue-js-toggle-button'].default)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       Vue.component('vue-slide-up-down', VueSlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
@@ -264,7 +266,7 @@ html lang='ja'
           },
           choices: {},
           query_params: {
-            media_list: {page: 1, q: null, only_person: 1, token: Vue.getToken()},
+            media_list: {page: 1, q: null, only_person: true, token: Vue.getToken()},
             status_list: {page: 1, q: null, token: Vue.getToken()},
             status_detail: {id: null, token: Vue.getToken()},
             status_create_tag: {id: null, tag: null, token: Vue.getToken()},
@@ -340,7 +342,7 @@ html lang='ja'
           onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
-            url.searchParams.set('only_pserson', this.query_params.media_list.only_person)
+            url.searchParams.set('only_person', this.query_params.media_list.only_person ? 1 : 0)
             url.searchParams.delete('q')
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
@@ -385,7 +387,7 @@ html lang='ja'
           },
           getMedias () {
             this.result.media_list = null
-            Vue.getMedias(this.query_params.media_list.page, this.query_params.media_list.q)
+            Vue.getMedias(this.query_params.media_list.page, this.query_params.media_list.q, this.query_params.media_list.only_person)
               .then(e => {this.result.media_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
