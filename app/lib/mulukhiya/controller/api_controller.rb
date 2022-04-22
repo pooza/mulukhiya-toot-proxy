@@ -127,7 +127,7 @@ module Mulukhiya
       params[:page] = params[:page]&.to_i || 1
       params.delete(:q) unless params[:q].present?
       params.delete(:q) unless sns.account
-      errors = PagerContract.new.exec(params)
+      errors = MediaListContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
@@ -158,17 +158,6 @@ module Mulukhiya
     post '/media/metadata/clear' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       MediaMetadataStorage.new.clear
-      return @renderer.to_s
-    rescue => e
-      e.log
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
-    post '/media/catalog/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
-      MediaCatalogUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
       e.log

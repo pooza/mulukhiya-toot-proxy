@@ -31,7 +31,9 @@ FROM
       <% if params[:q] %>
         AND ((objects_base.data->'content')::varchar LIKE '%<%= params[:q] %>%')
       <% end %>
-      AND (users.actor_type = 'Person')
+      <% unless params[:only_person].to_i.zero? %>
+        AND (users.actor_type = 'Person')
+      <% end %>
       AND (users.local = true)
       AND (users.invisible = false)
     ORDER BY

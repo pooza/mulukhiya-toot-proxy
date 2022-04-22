@@ -13,9 +13,14 @@ html lang='ja'
         ul.copyright
           li
             a href=Mulukhiya::UIController.media_copyright[:url] target='_blank' rel='noreferrer' = Mulukhiya::UIController.media_copyright[:message]
-      nav.search-form-container v-if='account.username'
-        input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchMedias'
-        button.small :disabled='!keyword' @click='searchMedias' 検索
+      nav.search-form-container class='clearfix' v-if='account.username'
+        .search-control
+          i class='fa fa-person'
+          toggle-button v-model='only_person' v-tooltip.left="'ボットからの投稿を除く'"
+        .search-control
+          i class='fa fa-magnifying-glass'
+          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchMedias'
+          button.small @click='searchMedias' 検索
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
@@ -51,6 +56,7 @@ html lang='ja'
       'use strict'
       Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
+      Vue.use(window['vue-js-toggle-button'].default)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',
@@ -59,6 +65,7 @@ html lang='ja'
           medias: [],
           page: 0,
           keyword: null,
+          only_person: true,
           last_page: false,
         },
         mounted () {
@@ -76,7 +83,8 @@ html lang='ja'
           },
           appendMedias () {
             this.page ++
-            Vue.getMedias(this.page, this.keyword)
+            console.log(this.only_person)
+            Vue.getMedias(this.page, this.keyword, this.only_person)
               .then(e => {
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)

@@ -2,12 +2,6 @@ module Mulukhiya
   module SNSServiceMethods
     include SNSMethods
 
-    def post(body, params = {})
-      return super
-    ensure
-      MediaCatalogUpdateWorker.perform_async if body[attachment_field].present?
-    end
-
     def upload(path, params = {})
       path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
       if filename = params[:filename]

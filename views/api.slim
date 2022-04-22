@@ -257,14 +257,14 @@ html lang='ja'
           config: {},
           entries: {},
           endpoints: {
-            media_list: '/mulukhiya/api/media?page=1',
+            media_list: '/mulukhiya/api/media?page=1&only_person=1',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
             status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
             status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
-            media_list: {page: 1, q: null, token: Vue.getToken()},
+            media_list: {page: 1, q: null, only_person: 1, token: Vue.getToken()},
             status_list: {page: 1, q: null, token: Vue.getToken()},
             status_detail: {id: null, token: Vue.getToken()},
             status_create_tag: {id: null, tag: null, token: Vue.getToken()},
@@ -340,6 +340,7 @@ html lang='ja'
           onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
+            url.searchParams.set('only_pserson', this.query_params.media_list.only_person)
             url.searchParams.delete('q')
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
@@ -455,9 +456,12 @@ html lang='ja'
           },
           getStatuses () {
             this.result.status_list = null
-            Vue.getStatuses(this.query_params.status_list.page, this.query_params.status_list.q)
-              .then(e => {this.result.status_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+            Vue.getStatuses(
+              this.query_params.status_list.page,
+              this.query_params.status_list.q,
+              this.query_params.status_list.only_person
+            ).then(e => {this.result.status_list = e})
+            .catch(e => Vue.alert(this.$dialog, e))
           },
           getStatus () {
             this.result.status_detail = null
