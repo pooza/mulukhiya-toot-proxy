@@ -141,6 +141,7 @@ handler:
   audio_format_convert:
     timeout: 30
   canonical_url:
+    disable: true
     ignore:
       domains:
         - instagram.com
