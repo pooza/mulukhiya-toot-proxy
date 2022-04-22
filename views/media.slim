@@ -83,7 +83,6 @@ html lang='ja'
           },
           appendMedias () {
             this.page ++
-            console.log(this.only_person)
             Vue.getMedias(this.page, this.keyword, this.only_person)
               .then(e => {
                 if (0 < e.length) {
