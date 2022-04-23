@@ -25,7 +25,9 @@ WHERE (toots.local = true)
       AND ((toots.text LIKE '%<%= params[:q] %>%') OR ((attachments.description LIKE '%<%= params[:q] %>%')))
     <% end %>
   <% end %>
-  AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
+  <% unless params[:only_person].to_i.zero? %>
+    AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
+  <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
   AND (accounts.id <> '<%= test_account.id %>')

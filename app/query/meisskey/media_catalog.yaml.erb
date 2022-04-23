@@ -6,7 +6,9 @@
 - $match:
     fileIds:
       $ne: null
+<% unless params[:only_person].to_i.zero? -%>
     user.isBot: false
+<% end -%>
     _user.host: null
 <% if params[:q] -%>
     text:
