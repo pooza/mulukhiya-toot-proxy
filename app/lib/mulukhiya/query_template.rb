@@ -8,7 +8,7 @@ module Mulukhiya
       super
     end
 
-      def self.escape(value)
+    def self.escape(value)
       return Postgres.instance.escape_string(value)
     end
 
