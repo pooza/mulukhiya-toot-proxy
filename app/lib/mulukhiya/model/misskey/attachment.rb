@@ -54,6 +54,7 @@ module Mulukhiya
 
       def self.catalog(params = {})
         params[:page] ||= 1
+        params[:limit] ||= config['/webui/media/catalog/limit']
         return Postgres.instance.exec('media_catalog', query_params.merge(params)).map do |row|
           attachment = self[row[:id]]
           note = Status[row[:status_id]]

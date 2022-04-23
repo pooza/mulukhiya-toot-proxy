@@ -79,6 +79,7 @@ module Mulukhiya
 
       def self.catalog(params = {})
         params[:page] ||= 1
+        params[:limit] ||= config['/webui/media/catalog/limit']
         return Postgres.instance.exec('media_catalog', query_params.merge(params))
             .filter_map {|row| get(row:).to_h.merge(status_url: row[:status_uri])}
       end
