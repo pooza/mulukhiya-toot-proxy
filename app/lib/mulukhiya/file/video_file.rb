@@ -16,15 +16,15 @@ module Mulukhiya
     alias to_h values
 
     def width
-      return video_stream&.fetch('width')
+      return video_stream.fetch('width').to_i rescue nil
     end
 
     def height
-      return video_stream&.fetch('height')
+      return video_stream.fetch('height').to_i rescue nil
     end
 
     def duration
-      return video_stream&.fetch('duration')
+      return video_stream.fetch('duration').to_f rescue nil
     end
 
     def convert_type(type)
