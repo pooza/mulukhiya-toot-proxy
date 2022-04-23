@@ -20,6 +20,8 @@ properties:
     type: object
   streaming:
     properties:
+      root_cert_file:
+        type: string
       verify_peer:
         type: boolean
     type: object
