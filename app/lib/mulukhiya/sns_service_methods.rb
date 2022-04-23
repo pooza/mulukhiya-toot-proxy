@@ -13,7 +13,7 @@ module Mulukhiya
         FileUtils.copy(path, dest)
         path = dest
       end
-      params[:trim_times].times {ImageFile.new(path).trim!} if params&.dig(:trim_times)
+      params[:trim_times].times {ImageFile.new(path).trim!} if params&.fetch(:trim_times)
       return super
     ensure
       FileUtils.rm_rf(dir) if dir

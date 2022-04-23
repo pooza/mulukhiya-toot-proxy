@@ -14,8 +14,7 @@ module Mulukhiya
     alias to_h values
 
     def duration
-      return audio_stream['duration'].to_f if audio_stream&.dig('duration')
-      return nil
+      return audio_stream&.fetch('duration')
     end
 
     def convert_type(type)
