@@ -35,9 +35,8 @@ module Mulukhiya
       def statuses(params = {})
         params[:limit] ||= config['/webui/status/timeline/limit']
         params[:page] ||= 1
-        return Postgres.instance.exec('statuses', params.merge(id:))
-            .filter_map {|row| Status[row[:id]]}
-            .map(&:to_h)
+        rows = Postgres.instance.exec('statuses', params.merge(id:))
+        return rows.filter_map {|v| Status[v[:id]]}.map(&:to_h)
       end
 
       def recent_status

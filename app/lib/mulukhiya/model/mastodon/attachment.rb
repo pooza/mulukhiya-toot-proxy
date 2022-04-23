@@ -76,15 +76,14 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.instance.exec('media_catalog', query_params.merge(params))
-            .map {|row| row[:id]}
-            .filter_map {|id| self[id] rescue nil}
-            .map(&:to_h)
+        rows = Postgres.instance.exec('media_catalog', params)
+        return rows.map {|v| v[:id]}.filter_map {|v| self[v]}.map(&:to_h)
       end
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.exec('media_catalog', query_params)
+        params = {pare: 1, limit: config['/feed/media/limit']}
+        Postgres.instance.exec('media_catalog', params)
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)

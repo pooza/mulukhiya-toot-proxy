@@ -48,17 +48,5 @@ module Mulukhiya
         date:,
       }
     end
-
-    def self.included(base)
-      base.extend(ClassMethods)
-    end
-
-    module ClassMethods
-      def query_params
-        return {
-          limit: config['/feed/media/limit'],
-        }
-      end
-    end
   end
 end

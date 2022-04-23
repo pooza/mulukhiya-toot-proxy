@@ -80,7 +80,8 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Status.aggregate('media_catalog', {page: 1}).each do |status|
+        params = {pare: 1, limit: config['/feed/media/limit']}
+        Status.aggregate('media_catalog', params).each do |status|
           status[:_files].map {|f| f[:_id]}
             .filter_map {|id| self[id] rescue nil}
             .map(&:feed_entry)
