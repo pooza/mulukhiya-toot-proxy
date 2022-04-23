@@ -63,6 +63,7 @@ module Mulukhiya
 
       def self.catalog(params = {})
         params[:page] ||= 1
+        params[:limit] ||= config['/webui/media/catalog/limit']
         records = []
         Status.aggregate('media_catalog', params).each do |row|
           status = Status[row[:_id]]

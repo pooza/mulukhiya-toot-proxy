@@ -242,7 +242,7 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getMedias = async (page, keyword, only_person = true) => {
+    Vue.getMedias = async (page, keyword, only_person = false) => {
       const indicator = new ActivityIndicator()
       indicator.show()
       const query = {

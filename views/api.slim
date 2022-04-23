@@ -259,14 +259,14 @@ html lang='ja'
           config: {},
           entries: {},
           endpoints: {
-            media_list: '/mulukhiya/api/media?page=1&only_person=1',
+            media_list: '/mulukhiya/api/media?page=1&only_person=0',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
             status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
             status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
-            media_list: {page: 1, q: null, only_person: true, token: Vue.getToken()},
+            media_list: {page: 1, q: null, only_person: false, token: Vue.getToken()},
             status_list: {page: 1, q: null, token: Vue.getToken()},
             status_detail: {id: null, token: Vue.getToken()},
             status_create_tag: {id: null, tag: null, token: Vue.getToken()},
