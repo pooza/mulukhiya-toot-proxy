@@ -3,7 +3,12 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def self.escape(value)
+    def initialize(name)
+      name = name.to_s
+      super
+    end
+
+      def self.escape(value)
       return Postgres.instance.escape_string(value)
     end
 

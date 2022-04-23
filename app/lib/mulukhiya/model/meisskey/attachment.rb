@@ -65,7 +65,7 @@ module Mulukhiya
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
         records = []
-        Status.aggregate('media_catalog', params).each do |row|
+        Status.aggregate(:media_catalog, params).each do |row|
           status = Status[row[:_id]]
           row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
             records.push(attachment.to_h.deep_symbolize_keys.merge(
@@ -80,8 +80,7 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        params = {pare: 1, limit: config['/feed/media/limit']}
-        Status.aggregate('media_catalog', params).each do |status|
+        Status.aggregate(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit}).each do |status|
           status[:_files].map {|f| f[:_id]}
             .filter_map {|id| self[id] rescue nil}
             .map(&:feed_entry)

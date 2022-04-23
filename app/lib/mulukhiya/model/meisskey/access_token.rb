@@ -61,7 +61,7 @@ module Mulukhiya
 
       def self.webhook_entries(&block)
         return enum_for(__method__) unless block
-        aggregate('webhook_entries').filter_map {|v| self[v[:_id]]}.map(&:to_h).each(&block)
+        aggregate(:webhook_entries).filter_map {|v| self[v[:_id]]}.map(&:to_h).each(&block)
       end
 
       def self.collection

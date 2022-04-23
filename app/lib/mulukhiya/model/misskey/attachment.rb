@@ -55,7 +55,7 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.instance.exec('media_catalog', params).map do |row|
+        return Postgres.exec(:media_catalog, params).map do |row|
           attachment = self[row[:id]]
           note = Status[row[:status_id]]
           attachment.to_h.merge(status_url: note.uri.to_s)
@@ -64,8 +64,7 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        params = {pare: 1, limit: config['/feed/media/limit']}
-        Postgres.instance.exec('media_catalog', params)
+        Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)
