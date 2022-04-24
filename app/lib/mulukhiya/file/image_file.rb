@@ -49,7 +49,8 @@ module Mulukhiya
       @subtype ||= super
       @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[2]
       return @subtype
-    rescue NoMethodError
+    rescue => e
+      e.log(file: path)
       return nil
     end
 
@@ -119,7 +120,7 @@ module Mulukhiya
       return file if file.type == type
       return nil
     rescue => e
-      e.log
+      e.log(file: path)
       return nil
     end
 
@@ -146,7 +147,7 @@ module Mulukhiya
       end
       return @size_info
     rescue => e
-      e.log
+      e.log(file: path)
       return nil
     end
   end

@@ -17,14 +17,23 @@ module Mulukhiya
 
     def width
       return video_stream.fetch('width').to_i rescue nil
+    rescue => e
+      e.log(file: path)
+      return nil
     end
 
     def height
       return video_stream.fetch('height').to_i rescue nil
+    rescue => e
+      e.log(file: path)
+      return nil
     end
 
     def duration
       return video_stream.fetch('duration').to_f rescue nil
+    rescue => e
+      e.log(file: path)
+      return nil
     end
 
     def convert_type(type)
