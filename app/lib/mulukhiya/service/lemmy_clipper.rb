@@ -66,6 +66,7 @@ module Mulukhiya
 
         client.on :message do |message|
           payload = JSON.parse(message.data)
+          raise 'Empty message (rate limit?)' unless payload
           raise payload['error'] if payload['error']
           method = "handle_#{payload['op']}".underscore.to_sym
           EM.stop_event_loop if send(method, payload['data'], params) == :stop
