@@ -48,7 +48,7 @@ module Mulukhiya
       end
 
       def duration
-        return meta.dig(:original, :duration)
+        return meta.dig(:original, :duration)&.round(2)
       end
 
       alias type file_content_type
