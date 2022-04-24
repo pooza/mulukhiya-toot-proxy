@@ -40,7 +40,7 @@ module Mulukhiya
       end
 
       def recent_status
-        return nil unless row = Postgres.exec(:recent_toot, {id:}).first
+        return nil unless row = Postgres.first(:recent_toot, {id:})
         return Status[row[:id]]
       end
 
@@ -87,7 +87,7 @@ module Mulukhiya
         case key
         in {token: token}
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          return nil unless row = Postgres.exec(:token_owner, {token:})&.first
+          return nil unless row = Postgres.first(:token_owner, {token:})
           return nil unless account = self[row[:id]]
           account.token = token
           return account
