@@ -6,7 +6,7 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h
+      def to_h # rubocop:disable Metrics/AbcSize
         return values.deep_symbolize_keys.merge(
           acct: status.account.acct.to_s,
           username: status.account.acct.username,
