@@ -9,6 +9,7 @@ module Mulukhiya
       def to_h
         return values.deep_symbolize_keys.merge(
           acct: status.account.acct.to_s,
+          username: status.account.acct.username,
           status_url: status.public_uri.to_s,
           file_name: name,
           file_size_str: size_str,
@@ -20,6 +21,7 @@ module Mulukhiya
           pixel_size:,
           duration:,
           url: uri('original').to_s,
+          tagging_url: status.webui_uri.to_s,
           thumbnail_url: uri('small').to_s,
         ).except(
           :file_meta,

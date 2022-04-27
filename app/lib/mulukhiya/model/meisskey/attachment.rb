@@ -7,6 +7,7 @@ module Mulukhiya
         @hash ||= values.deep_symbolize_keys.merge(
           id:,
           acct: account.acct.to_s,
+          username: account.acct.username,
           file_name: name,
           file_size_str: size_str,
           type:,
