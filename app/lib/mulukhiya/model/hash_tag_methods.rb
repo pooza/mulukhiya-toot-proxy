@@ -43,7 +43,7 @@ module Mulukhiya
       return [] unless Postgres.config?
       params[:tag] = name
       params[:tag_id] = id rescue nil
-      return Postgres.instance.exec('tag_timeline', params).map do |row|
+      return Postgres.exec(:tag_timeline, params).map do |row|
         row[:display_name] = "@#{row[:username]}" unless row[:display_name].present?
         row
       end
@@ -56,7 +56,7 @@ module Mulukhiya
     module ClassMethods
       def favorites
         favorites = {}
-        Postgres.instance.exec('tagged_accounts').each do |row|
+        Postgres.exec(:tagged_accounts).each do |row|
           parser = controller_class.parser_class.new(row[:note].downcase)
           parser.tags.each do |v|
             favorites[v] ||= 0

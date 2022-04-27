@@ -27,5 +27,9 @@ module Mulukhiya
     def self.uri
       return sns_class.new.create_uri('/mulukhiya/feed/media')
     end
+
+    def self.limit
+      return config['/feed/media/limit']
+    end
   end
 end

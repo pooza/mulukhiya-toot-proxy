@@ -216,7 +216,7 @@ module Mulukhiya
 
       def administrators(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.exec('administrators')
+        Postgres.exec(:administrators)
           .map {|row| row[:id]}
           .filter_map {|id| Environment.account_class[id]}
           .each(&block)

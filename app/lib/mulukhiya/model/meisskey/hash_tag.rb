@@ -41,7 +41,7 @@ module Mulukhiya
 
       def self.favorites
         favorites = {}
-        Account.aggregate('tag_owners').map {|v| v.to_h['tags']}.each do |tags|
+        Account.aggregate(:tag_owners).map {|v| v.to_h['tags']}.each do |tags|
           tags.each do |tag|
             favorites[tag] ||= 0
             favorites[tag] += 1
@@ -82,7 +82,7 @@ module Mulukhiya
       private
 
       def notes(params = {})
-        return Status.aggregate('hash_tag_notes', {
+        return Status.aggregate(:hash_tag_notes, {
           tag: raw_name,
           local: params[:local],
           limit: params[:limit],

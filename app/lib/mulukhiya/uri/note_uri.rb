@@ -25,7 +25,7 @@ module Mulukhiya
 
     def parser
       unless @parser
-        @parser = NoteParser.new(note&.dig('text') || '')
+        @parser = NoteParser.new(note.fetch('text', ''))
         @parser.service = service
       end
       return @parser

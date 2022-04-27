@@ -49,6 +49,10 @@ html lang='ja'
             li.param
               i class='fas fa-comment'
               a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
+          ul.params v-if='account.username==media.username'
+            li.param
+              i class='fas fa-tag'
+              a :href='media.tagging_url' target='_blank' rel='noreferrer' タグづけ
       nav.appender-container v-if='!last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'

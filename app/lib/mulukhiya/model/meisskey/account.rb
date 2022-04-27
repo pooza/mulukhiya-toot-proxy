@@ -84,7 +84,7 @@ module Mulukhiya
       end
 
       def attachments
-        @attachments ||= Status.aggregate('account_status', {id: _id}).inject([]) do |r, row|
+        @attachments ||= Status.aggregate(:account_status, {id: _id}).inject([]) do |r, row|
           r.concat(row[:_files].filter_map {|file| Attachment[file[:_id]]})
         end
         return @attachments
@@ -125,7 +125,7 @@ module Mulukhiya
 
       def self.administrators(&block)
         return enum_for(__method__) unless block
-        Account.aggregate('administrators')
+        Account.aggregate(:administrators)
           .to_a
           .filter_map {|row| row[:_id]}
           .filter_map {|id| Account[id] rescue nil}

@@ -16,17 +16,23 @@ module Mulukhiya
     alias to_h values
 
     def width
-      return video_stream['width'].to_i if video_stream&.dig('width')
+      return video_stream.fetch('width').to_i
+    rescue => e
+      e.log(file: path)
       return nil
     end
 
     def height
-      return video_stream['height'].to_i if video_stream&.dig('height')
+      return video_stream.fetch('height').to_i
+    rescue => e
+      e.log(file: path)
       return nil
     end
 
     def duration
-      return video_stream['duration'].to_f if video_stream&.dig('duration')
+      return video_stream.fetch('duration').to_f
+    rescue => e
+      e.log(file: path)
       return nil
     end
 

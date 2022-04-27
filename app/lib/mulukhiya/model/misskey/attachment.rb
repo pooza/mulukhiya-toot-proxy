@@ -9,6 +9,7 @@ module Mulukhiya
       def to_h
         return values.deep_symbolize_keys.merge(
           acct: account.acct.to_s,
+          username: account.acct.username,
           file_name: name,
           file_size_str: size_str,
           type:,
@@ -55,7 +56,7 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.instance.exec('media_catalog', query_params.merge(params)).map do |row|
+        return Postgres.exec(:media_catalog, params).map do |row|
           attachment = self[row[:id]]
           note = Status[row[:status_id]]
           attachment.to_h.merge(status_url: note.uri.to_s)
@@ -64,7 +65,7 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.exec('media_catalog', query_params)
+        Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)

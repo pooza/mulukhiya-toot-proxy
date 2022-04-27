@@ -164,6 +164,8 @@ properties:
           default:
             type: string
         type: object
+      root_cert_file:
+        type: string
       verify_peer:
         type: boolean
     type: object
@@ -237,7 +239,6 @@ properties:
           - url
         type: object
       schedule:
-        properties: {}
         type: object
     type: object
   spotify:
@@ -279,6 +280,13 @@ properties:
     properties:
       media:
         properties:
+          catalog:
+            properties:
+              limit:
+                type: integer
+            required:
+              - limit
+            type: object
           copyright:
             properties:
               message:

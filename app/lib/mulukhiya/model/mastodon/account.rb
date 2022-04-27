@@ -35,13 +35,12 @@ module Mulukhiya
       def statuses(params = {})
         params[:limit] ||= config['/webui/status/timeline/limit']
         params[:page] ||= 1
-        return Postgres.instance.exec('statuses', params.merge(id:))
-            .filter_map {|row| Status[row[:id]]}
-            .map(&:to_h)
+        rows = Postgres.exec(:statuses, params.merge(id:))
+        return rows.filter_map {|v| Status[v[:id]]}.map(&:to_h)
       end
 
       def recent_status
-        return nil unless row = Postgres.instance.exec('recent_toot', {id:}).first
+        return nil unless row = Postgres.first(:recent_toot, {id:})
         return Status[row[:id]]
       end
 
@@ -88,7 +87,7 @@ module Mulukhiya
         case key
         in {token: token}
           return nil unless token = (key[:token].decrypt rescue key[:token])
-          return nil unless row = Postgres.instance.exec('token_owner', {token:})&.first
+          return nil unless row = Postgres.first(:token_owner, {token:})
           return nil unless account = self[row[:id]]
           account.token = token
           return account

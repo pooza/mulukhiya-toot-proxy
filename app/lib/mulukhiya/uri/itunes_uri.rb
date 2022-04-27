@@ -54,7 +54,7 @@ module Mulukhiya
     end
 
     def album_name
-      return album&.dig('collectionName')
+      return album&.fetch('collectionName')
     end
 
     def track_id
@@ -87,7 +87,7 @@ module Mulukhiya
     end
 
     def track_name
-      return track&.dig('trackName')
+      return track&.fetch('trackName')
     end
 
     def title

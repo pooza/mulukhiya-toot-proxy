@@ -6,9 +6,10 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h
+      def to_h # rubocop:disable Metrics/AbcSize
         return values.deep_symbolize_keys.merge(
           acct: status.account.acct.to_s,
+          username: status.account.acct.username,
           status_url: status.public_uri.to_s,
           file_name: name,
           file_size_str: size_str,
@@ -20,6 +21,7 @@ module Mulukhiya
           pixel_size:,
           duration:,
           url: uri('original').to_s,
+          tagging_url: status.webui_uri.to_s,
           thumbnail_url: uri('small').to_s,
         ).except(
           :file_meta,
@@ -76,15 +78,13 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.instance.exec('media_catalog', query_params.merge(params))
-            .map {|row| row[:id]}
-            .filter_map {|id| self[id] rescue nil}
-            .map(&:to_h)
+        rows = Postgres.exec(:media_catalog, params)
+        return rows.map {|v| v[:id]}.filter_map {|v| self[v]}.map(&:to_h)
       end
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.instance.exec('media_catalog', query_params)
+        Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
           .map {|row| row[:id]}
           .filter_map {|id| self[id] rescue nil}
           .map(&:feed_entry)

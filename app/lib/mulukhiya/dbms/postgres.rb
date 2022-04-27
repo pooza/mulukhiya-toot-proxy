@@ -16,6 +16,14 @@ module Mulukhiya
       return instance if config?
     end
 
+    def self.exec(name, params = {})
+      return instance.exec(name, params)
+    end
+
+    def self.first(name, params = {})
+      return instance.exec(name, params)&.first
+    end
+
     def self.config?
       return dsn.present?
     end
