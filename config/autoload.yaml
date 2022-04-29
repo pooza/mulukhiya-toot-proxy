@@ -4,7 +4,6 @@ inflections:
   amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
   api_controller: APIController
   canonical_url_handler: CanonicalURLHandler
-  ci_test_case_filter: CITestCaseFilter
   css_renderer: CSSRenderer
   custom_api: CustomAPI
   custom_api_render_storage: CustomAPIRenderStorage
