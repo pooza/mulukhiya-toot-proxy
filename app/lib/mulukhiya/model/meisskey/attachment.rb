@@ -68,12 +68,13 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         records = []
         Status.aggregate(:media_catalog, params).each do |row|
-          status = Status[row[:_id]]
+          note = Status[row[:_id]]
           row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
             records.push(attachment.to_h.deep_symbolize_keys.merge(
               id: attachment.id,
-              date: status.createdAt.getlocal,
-              status_url: status.uri.to_s,
+              date: note.createdAt.getlocal,
+              status_url: note.uri.to_s,
+              body: note.body,
             ))
           end
         end

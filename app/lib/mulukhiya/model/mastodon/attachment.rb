@@ -11,6 +11,7 @@ module Mulukhiya
           acct: status.account.acct.to_s,
           username: status.account.acct.username,
           account_display_name: status.account.display_name,
+          body: status.body,
           status_url: status.public_uri.to_s,
           file_name: name,
           file_size_str: size_str,

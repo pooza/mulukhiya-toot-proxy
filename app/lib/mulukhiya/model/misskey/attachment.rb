@@ -60,7 +60,10 @@ module Mulukhiya
         return Postgres.exec(:media_catalog, params).map do |row|
           attachment = self[row[:id]]
           note = Status[row[:status_id]]
-          attachment.to_h.merge(status_url: note.uri.to_s)
+          attachment.to_h.merge(
+            status_url: note.uri.to_s,
+            body: note.body,
+          )
         end
       end
 
