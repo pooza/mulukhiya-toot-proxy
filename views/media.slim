@@ -48,7 +48,8 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-comment'
-              a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
+              a :href='media.status_url' target='_blank' rel='noreferrer' v-if='media.body' {{media.body}}
+              a :href='media.status_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
           ul.params v-if='account.username==media.username'
             li.param
               i class='fas fa-tag'
