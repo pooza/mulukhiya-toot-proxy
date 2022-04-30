@@ -1,7 +1,7 @@
 module Mulukhiya
   module StatusMethods
     def parser
-      @parser ||= parser_class.new(text)
+      @parser ||= parser_class.new(text || '')
       return @parser
     end
 
