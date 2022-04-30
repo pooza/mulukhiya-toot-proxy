@@ -7,7 +7,7 @@ module Mulukhiya
     def test_to_s
       r = @renderer.to_s
       assert_equal('<?xml version="1.0" encoding="UTF-8"?>', r.each_line.to_a.first.chomp)
-      assert_includes(r, '<item>') unless Environment.ci?
+      assert_includes(r, '<item>')
     end
 
     def test_uri

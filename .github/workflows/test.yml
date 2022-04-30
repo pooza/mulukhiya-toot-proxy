@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:12
+        image: postgres:13
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
@@ -41,6 +41,3 @@ jobs:
       - name: Run lint
         run: |
           bundle exec rake lint
-      - name: Run test
-        run: |
-          bundle exec rake test

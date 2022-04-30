@@ -44,15 +44,16 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-user'
-              | {{media.acct}}
+              | {{media.account_display_name}}
           ul.params
             li.param
               i class='fas fa-comment'
-              a :href='media.status_url' target='_blank' rel='noreferrer' = controller.status_label
+              a :href='media.status_url' target='_blank' rel='noreferrer' v-if='media.body' {{media.body}}
+              a :href='media.status_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
           ul.params v-if='account.username==media.username'
             li.param
               i class='fas fa-tag'
-              a :href='media.tagging_url' target='_blank' rel='noreferrer' タグづけ
+              a :href='media.webui_url' target='_blank' rel='noreferrer' タグづけ
       nav.appender-container v-if='!last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'

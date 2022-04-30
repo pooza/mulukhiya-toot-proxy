@@ -9,7 +9,6 @@ module Mulukhiya
     end
 
     def test_health
-      return if Environment.ci?
       assert_kind_of(Hash, environment_class.health)
       assert_equal('OK', environment_class.health.dig(:redis, :status))
       assert_equal('OK', environment_class.health.dig(:sidekiq, :status))

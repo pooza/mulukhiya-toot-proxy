@@ -29,7 +29,7 @@ html lang='ja'
         .footer-tags v-if='status.is_taggable'
           h4
             i class='fa fa-tag'
-            | タグの編集
+            | タグづけ
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'

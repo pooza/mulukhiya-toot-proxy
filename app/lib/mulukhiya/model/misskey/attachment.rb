@@ -10,6 +10,7 @@ module Mulukhiya
         return values.deep_symbolize_keys.merge(
           acct: account.acct.to_s,
           username: account.acct.username,
+          account_display_name: account.display_name,
           file_name: name,
           file_size_str: size_str,
           type:,
@@ -59,7 +60,10 @@ module Mulukhiya
         return Postgres.exec(:media_catalog, params).map do |row|
           attachment = self[row[:id]]
           note = Status[row[:status_id]]
-          attachment.to_h.merge(status_url: note.uri.to_s)
+          attachment.to_h.merge(
+            status_url: note.uri.to_s,
+            body: note.body,
+          )
         end
       end
 

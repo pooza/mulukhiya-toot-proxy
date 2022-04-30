@@ -30,7 +30,9 @@ module Mulukhiya
     end
 
     def duration
-      return video_stream.fetch('duration').to_f
+      duration = video_stream.fetch('duration', nil)
+      duration ||= video_stream.dig('tags', 'DURATION')
+      return duration.to_f
     rescue => e
       e.log(file: path)
       return nil

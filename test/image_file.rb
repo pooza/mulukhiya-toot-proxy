@@ -10,7 +10,7 @@ module Mulukhiya
       @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/11750_thumbnail.gif'))
       @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'))
       @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
-      @pdf = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/yogokumi.pdf')) unless Environment.ci?
+      @pdf = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/yogokumi.pdf'))
     end
 
     def test_values
