@@ -10,6 +10,7 @@ module Mulukhiya
         return values.deep_symbolize_keys.merge(
           acct: account.acct.to_s,
           username: account.acct.username,
+          account_display_name: account.display_name,
           file_name: name,
           file_size_str: size_str,
           type:,

@@ -26,6 +26,7 @@ module Mulukhiya
           created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
           acct: account&.acct&.to_s,
           username: account&.username,
+          account_display_name: account&.display_name,
         ).compact
         return @hash
       end
