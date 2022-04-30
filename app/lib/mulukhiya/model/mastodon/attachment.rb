@@ -6,7 +6,7 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h # rubocop:disable Metrics/AbcSize Metrics/MethodLength
+      def to_h # rubocop:disable Metrics/AbcSize
         return values.deep_symbolize_keys.merge(
           acct: status.account.acct.to_s,
           username: status.account.acct.username,
@@ -25,8 +25,6 @@ module Mulukhiya
           url: uri('original').to_s,
           webui_url: status.webui_uri.to_s,
           thumbnail_url: uri('small').to_s,
-        ).except(
-          :file_meta,
         ).compact
       end
 
