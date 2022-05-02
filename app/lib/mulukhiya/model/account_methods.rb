@@ -218,7 +218,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Postgres.exec(:administrators)
           .map {|row| row[:id]}
-          .filter_map {|id| Environment.account_class[id]}
+          .filter_map {|id| Environment.account_class[id] rescue nil}
           .each(&block)
       end
     end
