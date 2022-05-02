@@ -6,24 +6,18 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h # rubocop:disable Metrics/AbcSize
+      def to_h
         return values.deep_symbolize_keys.merge(
-          acct: status.account.acct.to_s,
-          username: status.account.acct.username,
-          account_display_name: status.account.display_name,
-          body: status.body,
-          status_url: status.public_uri.to_s,
+          account: account.to_h,
+          status: status.to_h,
           file_name: name,
           file_size_str: size_str,
           type:,
           mediatype:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          meta:,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           pixel_size:,
           duration:,
           url: uri('original').to_s,
-          webui_url: status.webui_uri.to_s,
           thumbnail_url: uri('small').to_s,
         ).compact
       end

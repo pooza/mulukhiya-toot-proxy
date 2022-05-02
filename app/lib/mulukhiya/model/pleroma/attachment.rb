@@ -21,12 +21,8 @@ module Mulukhiya
           mediatype:,
           url: uri.to_s,
           thumbnail_url: uri.to_s,
-          meta:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          acct: account&.acct&.to_s,
-          username: account&.username,
-          account_display_name: account&.display_name,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
+          account: account.to_h,
         ).compact
         return @hash
       end
@@ -75,13 +71,15 @@ module Mulukhiya
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
         rows = Postgres.exec(:media_catalog, params)
-        return rows.filter_map {|row| get(row:).to_h.merge(status_url: row[:status_uri])}
+        return rows.filter_map do |row|
+          get(row:).to_h.merge(status: {url: row[:status_uri]})
+        end
       end
 
       def self.feed(&block)
         return enum_for(__method__) unless block
         Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
-          .filter_map {|row| get(row:)}
+          .filter_map {|row| get(row:) rescue nil}
           .map(&:feed_entry)
           .each(&block)
       end

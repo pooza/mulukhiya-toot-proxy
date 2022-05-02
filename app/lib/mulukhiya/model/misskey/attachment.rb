@@ -8,22 +8,16 @@ module Mulukhiya
 
       def to_h
         return values.deep_symbolize_keys.merge(
-          acct: account.acct.to_s,
-          username: account.acct.username,
-          account_display_name: account.display_name,
+          account: account.to_h,
           file_name: name,
           file_size_str: size_str,
           type:,
           mediatype:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          meta:,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           url: webpublicUrl || values[:url],
           thumbnail_url: thumbnailUrl,
           pixel_size:,
           duration:,
-        ).except(
-          :properties,
         ).compact
       end
 
@@ -59,11 +53,7 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         return Postgres.exec(:media_catalog, params).map do |row|
           attachment = self[row[:id]]
-          note = Status[row[:status_id]]
-          attachment.to_h.merge(
-            status_url: note.uri.to_s,
-            body: note.body,
-          )
+          attachment.to_h.merge(status: Status[row[:status_id]]&.to_h)
         end
       end
 

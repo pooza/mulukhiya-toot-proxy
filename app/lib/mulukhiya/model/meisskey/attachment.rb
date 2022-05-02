@@ -6,16 +6,12 @@ module Mulukhiya
       def to_h
         @hash ||= values.deep_symbolize_keys.merge(
           id:,
-          acct: account.acct.to_s,
-          username: account.acct.username,
-          account_display_name: account.display_name,
+          account: account.to_h,
           file_name: name,
           file_size_str: size_str,
           type:,
           mediatype:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          meta:,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           url: uri.to_s,
           thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
           pixel_size:,
@@ -68,13 +64,11 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         records = []
         Status.aggregate(:media_catalog, params).each do |row|
-          note = Status[row[:_id]]
           row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
             records.push(attachment.to_h.deep_symbolize_keys.merge(
               id: attachment.id,
               date: note.createdAt.getlocal,
-              status_url: note.uri.to_s,
-              body: note.body,
+              status: Status[row[:_id]]&.to_h,
             ))
           end
         end
