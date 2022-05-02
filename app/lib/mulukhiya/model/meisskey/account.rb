@@ -11,6 +11,7 @@ module Mulukhiya
           is_info_bot: info?,
           is_test_bot: test?,
           display_name:,
+          acct: acct.to_s,
         ).except(
           :password,
           :keypair,
@@ -127,7 +128,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Account.aggregate(:administrators)
           .to_a
-          .filter_map {|row| row[:_id]}
+          .filter_map {|row| row[:_id] rescue nil}
           .filter_map {|id| Account[id] rescue nil}
           .each(&block)
       end

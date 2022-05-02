@@ -21,7 +21,17 @@ module Mulukhiya
 
     def test_to_h
       return unless account
-      assert_kind_of(Hash, account.to_h)
+      h = account.to_h
+      assert_kind_of(Hash, h)
+      assert_kind_of(String, h[:url])
+      assert_kind_of(String, h[:acct])
+      assert_kind_of(String, h[:username])
+      assert_kind_of(String, h[:display_name])
+    end
+
+    def test_uri
+      return unless account
+      assert_kind_of(Ginseng::URI, account.uri)
     end
 
     def test_username
@@ -152,8 +162,8 @@ module Mulukhiya
       assert_kind_of(Array, statuses = account.statuses)
       statuses.first(10).each do |status|
         assert_kind_of(Hash, status)
-        assert_kind_of(String, status[:created_at_str])
-        assert_kind_of(Time, Time.parse(status[:created_at_str]))
+        assert_kind_of(String, status[:created_at])
+        assert_kind_of(Time, Time.parse(status[:created_at]))
         assert_kind_of(String, status[:body])
         assert_kind_of(String, status[:footer])
         assert_kind_of(Array, status[:footer_tags])
