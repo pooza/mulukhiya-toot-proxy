@@ -26,6 +26,11 @@ module Mulukhiya
       return @data
     end
 
+    def webui_uri
+      @webui_uri ||= service.create_uri("/mulukhiya/app/status/#{id}")
+      return @webui_uri
+    end
+
     def public?
       return visibility == controller_class.visibility_name(:public)
     end

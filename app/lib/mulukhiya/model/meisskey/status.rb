@@ -53,6 +53,8 @@ module Mulukhiya
         @hash ||= values.deep_symbolize_keys.merge(
           uri: uri.to_s,
           url: uri.to_s,
+          public_url: public_uri.to_s,
+          webui_url: webui_uri.to_s,
           visibility:,
           visibility_name:,
           attachments: attachments.map(&:to_h),

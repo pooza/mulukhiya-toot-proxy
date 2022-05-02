@@ -71,7 +71,15 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= data.compact
+        @hash ||= values.deep_symbolize_keys.merge(
+          uri: uri.to_s,
+          url: uri.to_s,
+          public_url: public_uri.to_s,
+          webui_url: webui_uri.to_s,
+          visibility:,
+          visibility_name:,
+          attachments: data[:files],
+        ).compact
         return @hash
       end
 
