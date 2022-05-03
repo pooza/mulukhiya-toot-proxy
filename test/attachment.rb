@@ -11,16 +11,18 @@ module Mulukhiya
     def test_to_h
       return unless @attachment
       h = @attachment.to_h
+      assert(h.key?(:id))
       assert_kind_of(Hash, h)
+      assert_kind_of(Hash, h[:account])
+      assert_kind_of([String, NilClass], h[:created_at])
+      assert_kind_of([Float, NilClass], h[:duration])
       assert_kind_of(String, h[:file_name])
       assert_kind_of(String, h[:file_size_str])
-      assert_kind_of(String, h[:type])
       assert_kind_of(String, h[:mediatype])
-      assert_kind_of([String, NilClass], h[:created_at])
       assert_kind_of([String, NilClass], h[:pixel_size])
-      assert_kind_of([String, NilClass], h[:duration])
+      assert_kind_of([String, NilClass], h[:thumbnail_url])
+      assert_kind_of(String, h[:type])
       assert_kind_of(String, h[:url])
-      assert_kind_of(String, h[:thumbnail_url])
     end
 
     def test_name
