@@ -6,21 +6,6 @@ module Mulukhiya
       include SNSMethods
       many_to_one :account, key: :userId
 
-      def to_h
-        return values.deep_symbolize_keys.merge(
-          account: account.to_h,
-          file_name: name,
-          file_size_str: size_str,
-          type:,
-          mediatype:,
-          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          url: webpublicUrl || values[:url],
-          thumbnail_url: thumbnailUrl,
-          pixel_size:,
-          duration:,
-        ).compact
-      end
-
       def meta
         unless @meta
           @meta = JSON.parse(values[:properties]).deep_symbolize_keys
@@ -38,6 +23,10 @@ module Mulukhiya
         else
           return MisskeyService.new.create_uri(webpublicUrl || url)
         end
+      end
+
+      def thumbnail_uri
+        return uri('small')
       end
 
       def date

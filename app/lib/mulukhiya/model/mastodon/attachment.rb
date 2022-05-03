@@ -7,19 +7,7 @@ module Mulukhiya
       many_to_one :status
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          account: account.to_h,
-          status: status.to_h,
-          file_name: name,
-          file_size_str: size_str,
-          type:,
-          mediatype:,
-          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          pixel_size:,
-          duration:,
-          url: uri('original').to_s,
-          thumbnail_url: uri('small').to_s,
-        ).compact
+        return super.merge(status: status.to_h)
       end
 
       alias name file_file_name
@@ -67,6 +55,10 @@ module Mulukhiya
 
       def uri(size = 'original')
         return MastodonService.new.create_uri(path(size))
+      end
+
+      def thumbnail_uri
+        return uri('small')
       end
 
       def self.catalog(params = {})

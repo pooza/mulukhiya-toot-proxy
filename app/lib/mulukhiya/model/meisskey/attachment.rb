@@ -3,23 +3,6 @@ module Mulukhiya
     class Attachment < MongoCollection
       include AttachmentMethods
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          id:,
-          account: account.to_h,
-          file_name: name,
-          file_size_str: size_str,
-          type:,
-          mediatype:,
-          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          url: uri.to_s,
-          thumbnail_url: values.dig('metadata', 'thumbnailUrl'),
-          pixel_size:,
-          duration:,
-        ).compact
-        return @hash
-      end
-
       def account
         return Account[values.dig('metadata', 'userId')]
       end
@@ -29,8 +12,12 @@ module Mulukhiya
       end
 
       def uri
-        @uri ||= Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
+          @uri ||= Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
         return @uri
+      end
+
+      def thumbnail_uri
+        return Ginseng::URI.parse(values.dig('metadata', 'thumbnailUrl'))
       end
 
       def meta

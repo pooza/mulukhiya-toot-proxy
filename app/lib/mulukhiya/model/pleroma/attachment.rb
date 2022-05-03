@@ -10,23 +10,6 @@ module Mulukhiya
         return uri.path.split('/').last
       end
 
-      def to_h
-        @hash ||= data.deep_symbolize_keys.merge(
-          id:,
-          file_name: name,
-          file_size_str: size_str,
-          pixel_size:,
-          duration:,
-          type:,
-          mediatype:,
-          url: uri.to_s,
-          thumbnail_url: uri.to_s,
-          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          account: account.to_h,
-        ).compact
-        return @hash
-      end
-
       def size
         @size ||= meta[:size]
         return @size
@@ -47,6 +30,8 @@ module Mulukhiya
         @uri ||= Ginseng::URI.parse(data[:url].first[:href])
         return @uri
       end
+
+      alias thumbnail_uri uri
 
       def data
         @data ||= JSON.parse(values[:data]).deep_symbolize_keys
