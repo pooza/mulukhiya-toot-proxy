@@ -84,6 +84,10 @@ module Mulukhiya
           visibility:,
           visibility_name:,
           attachments: data[:files],
+          body:,
+          footer:,
+          footer_tags: footer_tags.map(&:to_h),
+          is_taggable: taggable?,
         ).compact
         return @hash
       end
