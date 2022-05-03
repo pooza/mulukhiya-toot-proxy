@@ -29,7 +29,6 @@ module Mulukhiya
       assert_kind_of(Hash, h)
       assert_kind_of(String, h[:webui_url])
       assert_kind_of(String, h[:public_url])
-      assert_kind_of(String, h[:public_url])
       assert_kind_of(String, h[:created_at])
       assert_kind_of([String, NilClass], h[:body])
       assert_kind_of([String, NilClass], h[:footer])
