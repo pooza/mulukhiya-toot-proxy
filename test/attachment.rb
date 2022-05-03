@@ -16,7 +16,7 @@ module Mulukhiya
       assert_kind_of(String, h[:file_size_str])
       assert_kind_of(String, h[:type])
       assert_kind_of(String, h[:mediatype])
-      assert_kind_of(String, h[:created_at])
+      assert_kind_of([String, NilClass], h[:created_at])
       assert_kind_of([String, NilClass], h[:pixel_size])
       assert_kind_of([String, NilClass], h[:duration])
       assert_kind_of(String, h[:url])

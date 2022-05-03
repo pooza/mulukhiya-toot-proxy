@@ -48,5 +48,21 @@ module Mulukhiya
         date:,
       }
     end
+
+    def to_h
+      return values.deep_symbolize_keys.merge(
+        account: account.to_h,
+        created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
+        duration:,
+        file_name: name,
+        file_size_str: size_str,
+        id:,
+        mediatype:,
+        pixel_size:,
+        thumbnail_url: thumbnail_uri.to_s,
+        type:,
+        url: uri.to_s,
+      ).compact
+    end
   end
 end
