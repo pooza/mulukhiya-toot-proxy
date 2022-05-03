@@ -53,23 +53,6 @@ module Mulukhiya
         return data[:files].map {|row| Attachment[row[:id]]}
       end
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          uri: uri.to_s,
-          url: uri.to_s,
-          public_url: public_uri.to_s,
-          webui_url: webui_uri.to_s,
-          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          body:,
-          footer:,
-          footer_tags: footer_tags.map(&:to_h),
-          is_taggable: taggable?,
-          visibility:,
-          visibility_name:,
-          attachments: attachments.map(&:to_h),
-        ).compact
-        return @hash
-      end
 
       def to_md
         return uri.to_md
