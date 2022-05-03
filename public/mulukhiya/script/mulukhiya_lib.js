@@ -147,7 +147,7 @@ const MulukhiyaLib = {
         username: data.account.username,
         token: token_crypted,
         scopes: data.token.scopes,
-        scopes_valid: data.token.scopes_valid,
+        is_scopes_valid: data.token.is_scopes_valid,
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,
         is_info_bot: data.account.is_info_bot,

@@ -25,7 +25,7 @@ html lang='ja'
             .title 権限
             .value
               .scope v-for='scope in current_account.scopes' {{scope}}
-              span.alert v-if='!current_account.scopes_valid' 古いトークンかも知れません。作り直しをお勧めします。
+              span.alert v-if='!current_account.is_scopes_valid' 古いトークンかも知れません。作り直しをお勧めします。
           .field
             .title トークン
             .value
