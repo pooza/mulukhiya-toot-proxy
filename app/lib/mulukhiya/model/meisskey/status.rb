@@ -53,7 +53,6 @@ module Mulukhiya
         return data[:files].map {|row| Attachment[row[:id]]}
       end
 
-
       def to_md
         return uri.to_md
       rescue => e

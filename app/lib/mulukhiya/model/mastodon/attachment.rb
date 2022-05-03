@@ -6,10 +6,6 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h
-        return super.merge(status: status.to_h)
-      end
-
       alias name file_file_name
 
       alias filename file_file_name
@@ -64,8 +60,10 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        rows = Postgres.exec(:media_catalog, params)
-        return rows.map {|v| v[:id]}.filter_map {|v| self[v]}.map(&:to_h)
+        return Postgres.exec(:media_catalog, params)
+            .map {|v| v[:id]}
+            .filter_map {|v| self[v] rescue nil}
+            .map {|v| v.to_h.merge(status: v.status.to_h)}
       end
 
       def self.feed(&block)

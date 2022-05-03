@@ -12,7 +12,7 @@ module Mulukhiya
       end
 
       def uri
-          @uri ||= Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
+        @uri ||= Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
         return @uri
       end
 
