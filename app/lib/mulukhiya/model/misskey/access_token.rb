@@ -11,17 +11,6 @@ module Mulukhiya
         return values[:hash]
       end
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          digest: webhook_digest,
-          token: to_s,
-          account:,
-          scopes:,
-          scopes_valid: scopes_valid?,
-        ).compact
-        return @hash
-      end
-
       def scopes
         return application.scopes if application
         matches = permission.match(/{(.*?)}/)[1]
