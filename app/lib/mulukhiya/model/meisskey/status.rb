@@ -33,7 +33,7 @@ module Mulukhiya
       end
 
       def visibility
-        return data[:visibility]
+        return values[:visibility]
       end
 
       alias visibility_name visibility
@@ -50,7 +50,7 @@ module Mulukhiya
       alias public_uri uri
 
       def attachments
-        return data[:files].map {|row| Attachment[row[:id]]}
+        return values[:files].map {|row| Attachment[row[:id]]}
       end
 
       def to_md
@@ -62,6 +62,10 @@ module Mulukhiya
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def to_h
+        return super.merge(attachments: values[:files])
       end
 
       def self.[](id)

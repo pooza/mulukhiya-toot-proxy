@@ -64,6 +64,10 @@ module Mulukhiya
         return template.to_s
       end
 
+      def to_h
+        return super.merge(attachments: attachments.map(&:to_h))
+      end
+
       def self.visibility_names
         return [:public, :unlisted, :private, :direct].map {|v| TootParser.visibility_name(v)}
       end

@@ -67,6 +67,7 @@ module Mulukhiya
     def test_catalog
       return unless @attachment
       assert_kind_of(Hash, attachment_class.catalog.first)
+      assert_kind_of(Hash, attachment_class.catalog(only_person: 1).first)
     end
   end
 end
