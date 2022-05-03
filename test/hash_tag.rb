@@ -23,6 +23,7 @@ module Mulukhiya
     def test_uri
       return unless @nowplaying
       assert_kind_of(Ginseng::URI, @nowplaying.uri)
+      assert_predicate(@nowplaying.uri, :absolute?)
       assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
     end
 
@@ -53,7 +54,14 @@ module Mulukhiya
 
     def test_to_h
       return unless @nowplaying
-      assert_kind_of(Hash, @nowplaying.to_h)
+      h = @nowplaying.to_h
+      assert_kind_of(Hash, h)
+      assert_kind_of(String, h[:feed_url])
+      assert_boolean(h[:is_default])
+      assert_boolean(h[:is_deletable])
+      assert_kind_of(String, h[:name])
+      assert_kind_of(String, h[:tag])
+      assert_kind_of(String, h[:url])
     end
 
     def test_favorites

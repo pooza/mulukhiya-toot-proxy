@@ -9,6 +9,7 @@ module Mulukhiya
     def test_uri
       RemoteDictionary.all do |dic|
         assert_kind_of(Ginseng::URI, dic.uri)
+        assert_predicate(dic.uri, :absolute?)
       end
     end
 

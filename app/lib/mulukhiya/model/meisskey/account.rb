@@ -4,17 +4,7 @@ module Mulukhiya
       include AccountMethods
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          url: uri.to_s,
-          is_admin: admin?,
-          is_moderator: moderator?,
-          is_info_bot: info?,
-          is_test_bot: test?,
-          display_name:,
-        ).except(
-          :password,
-          :keypair,
-        ).compact
+        return super.except(:password, :keypair)
       end
 
       def host
@@ -38,7 +28,7 @@ module Mulukhiya
       end
 
       def fields
-        return values['vields'] || []
+        return values['fields'] || []
       end
 
       def bio
@@ -85,7 +75,7 @@ module Mulukhiya
 
       def attachments
         @attachments ||= Status.aggregate(:account_status, {id: _id}).inject([]) do |r, row|
-          r.concat(row[:_files].filter_map {|file| Attachment[file[:_id]]})
+          r.concat((row[:_files] || []).filter_map {|file| Attachment[file[:_id]]})
         end
         return @attachments
       end
@@ -127,7 +117,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Account.aggregate(:administrators)
           .to_a
-          .filter_map {|row| row[:_id]}
+          .filter_map {|row| row[:_id] rescue nil}
           .filter_map {|id| Account[id] rescue nil}
           .each(&block)
       end

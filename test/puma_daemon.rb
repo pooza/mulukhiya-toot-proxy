@@ -14,6 +14,7 @@ module Mulukhiya
 
     def test_root_uri
       assert_kind_of(Ginseng::URI, @daemon.root_uri)
+      assert_predicate(@daemon.root_uri, :absolute?)
     end
 
     def test_disable?

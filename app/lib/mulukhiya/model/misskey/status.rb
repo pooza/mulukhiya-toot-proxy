@@ -30,6 +30,10 @@ module Mulukhiya
         return @uri
       end
 
+      def date
+        return createdAt.getlocal
+      end
+
       alias public_uri uri
 
       def attachments
@@ -45,14 +49,7 @@ module Mulukhiya
       alias visibility_name visibility
 
       def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          uri: uri.to_s,
-          url: uri.to_s,
-          visibility:,
-          visibility_name:,
-          attachments: data[:files],
-        ).compact
-        return @hash
+        return super.merge(attachments: data[:files])
       end
 
       def to_md

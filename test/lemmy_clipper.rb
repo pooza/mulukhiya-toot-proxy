@@ -18,6 +18,7 @@ module Mulukhiya
 
     def test_uri
       assert_kind_of(Ginseng::URI, @lemmy.uri)
+      assert_predicate(@lemmy.uri, :absolute?)
     end
 
     def test_clip

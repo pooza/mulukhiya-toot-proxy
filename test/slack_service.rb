@@ -17,6 +17,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, SlackService.all)
       SlackService.uris do |uri|
         assert_kind_of(Ginseng::URI, uri)
+        assert_predicate(uri, :absolute?)
       end
     end
   end

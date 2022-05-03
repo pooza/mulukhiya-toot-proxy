@@ -37,6 +37,10 @@ module Mulukhiya
         return data[:visibility]
       end
 
+      def date
+        return Time.parse(data[:created_at])
+      end
+
       alias visibility_name visibility
 
       def account
@@ -71,8 +75,7 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= data.compact
-        return @hash
+        return super.merge(attachments: data[:files])
       end
 
       def self.[](id)

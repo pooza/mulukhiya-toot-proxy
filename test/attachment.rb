@@ -10,7 +10,19 @@ module Mulukhiya
 
     def test_to_h
       return unless @attachment
-      assert_kind_of(Hash, @attachment.to_h)
+      h = @attachment.to_h
+      assert(h.key?(:id))
+      assert_kind_of(Hash, h)
+      assert_kind_of(Hash, h[:account])
+      assert_kind_of([String, NilClass], h[:created_at])
+      assert_kind_of([Float, NilClass], h[:duration])
+      assert_kind_of(String, h[:file_name])
+      assert_kind_of(String, h[:file_size_str])
+      assert_kind_of(String, h[:mediatype])
+      assert_kind_of([String, NilClass], h[:pixel_size])
+      assert_kind_of([String, NilClass], h[:thumbnail_url])
+      assert_kind_of(String, h[:type])
+      assert_kind_of(String, h[:url])
     end
 
     def test_name
@@ -47,6 +59,13 @@ module Mulukhiya
     def test_uri
       return unless @attachment
       assert_kind_of(Ginseng::URI, @attachment.uri)
+      assert_predicate(@attachment.uri, :absolute?)
+    end
+
+    def test_thumbnail_uri
+      return unless @attachment
+      assert_kind_of(Ginseng::URI, @attachment.thumbnail_uri)
+      assert_predicate(@attachment.thumbnail_uri, :absolute?)
     end
 
     def test_feed
@@ -57,6 +76,7 @@ module Mulukhiya
     def test_catalog
       return unless @attachment
       assert_kind_of(Hash, attachment_class.catalog.first)
+      assert_kind_of(Hash, attachment_class.catalog(only_person: 1).first)
     end
   end
 end

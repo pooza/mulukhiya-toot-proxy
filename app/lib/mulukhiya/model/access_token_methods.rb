@@ -16,6 +16,17 @@ module Mulukhiya
       return [:default, :infobot].map {|v| controller_class.oauth_scopes(v)}.member?(scopes)
     end
 
+    def to_h
+      @hash ||= values.deep_symbolize_keys.merge(
+        account:,
+        digest: webhook_digest,
+        is_scopes_valid: scopes_valid?,
+        scopes: scopes.to_a,
+        token: to_s,
+      ).compact
+      return @hash
+    end
+
     def self.included(base)
       base.extend(ClassMethods)
     end

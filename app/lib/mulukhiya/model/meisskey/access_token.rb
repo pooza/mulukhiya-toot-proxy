@@ -4,15 +4,7 @@ module Mulukhiya
       include AccessTokenMethods
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          digest: webhook_digest,
-          token: to_s,
-          account:,
-          scopes:,
-          scopes_valid: scopes_valid?,
-        ).except(
-          :hash,
-        ).compact
+        return super.except(:hash)
       end
 
       def token

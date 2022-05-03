@@ -9,19 +9,14 @@ module Mulukhiya
       end
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          name: name.to_hashtag_base,
-          tag: raw_name.to_hashtag,
-          url: uri.to_s,
-          feed_url: feed_uri.to_s,
-        ).except(
+        return super.except(
           :attachedUserIds,
           :attachedLocalUserIds,
           :attachedRemoteUserIds,
           :mentionedUserIds,
           :mentionedLocalUserIds,
           :mentionedRemoteUserIds,
-        ).compact
+        )
       end
 
       def create_feed(params)

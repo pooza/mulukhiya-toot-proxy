@@ -6,28 +6,6 @@ module Mulukhiya
       include SNSMethods
       many_to_one :status
 
-      def to_h # rubocop:disable Metrics/AbcSize
-        return values.deep_symbolize_keys.merge(
-          acct: status.account.acct.to_s,
-          username: status.account.acct.username,
-          account_display_name: status.account.display_name,
-          body: status.body,
-          status_url: status.public_uri.to_s,
-          file_name: name,
-          file_size_str: size_str,
-          type:,
-          mediatype:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          meta:,
-          pixel_size:,
-          duration:,
-          url: uri('original').to_s,
-          webui_url: status.webui_uri.to_s,
-          thumbnail_url: uri('small').to_s,
-        ).compact
-      end
-
       alias name file_file_name
 
       alias filename file_file_name
@@ -75,11 +53,17 @@ module Mulukhiya
         return MastodonService.new.create_uri(path(size))
       end
 
+      def thumbnail_uri
+        return uri('small')
+      end
+
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
         rows = Postgres.exec(:media_catalog, params)
-        return rows.map {|v| v[:id]}.filter_map {|v| self[v]}.map(&:to_h)
+        return rows.map {|v| v[:id]}.filter_map {|v| self[v] rescue nil}.map do |record|
+          record.to_h.merge(status: record.status.to_h)
+        end
       end
 
       def self.feed(&block)

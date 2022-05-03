@@ -24,12 +24,16 @@ module Mulukhiya
         return account.acct
       end
 
+      def date
+        return createdAt.getlocal
+      end
+
       def local?
         return acct.host == Environment.domain_name
       end
 
       def visibility
-        return data[:visibility]
+        return values['visibility']
       end
 
       alias visibility_name visibility
@@ -46,18 +50,7 @@ module Mulukhiya
       alias public_uri uri
 
       def attachments
-        return data[:files].map {|row| Attachment[row[:id]]}
-      end
-
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          uri: uri.to_s,
-          url: uri.to_s,
-          visibility:,
-          visibility_name:,
-          attachments: attachments.map(&:to_h),
-        ).compact
-        return @hash
+        return values['files']&.map {|row| Attachment[row[:id]]} || []
       end
 
       def to_md
@@ -69,6 +62,10 @@ module Mulukhiya
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def to_h
+        return super.merge(attachments: values['files'])
       end
 
       def self.[](id)

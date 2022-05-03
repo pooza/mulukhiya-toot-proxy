@@ -8,16 +8,7 @@ module Mulukhiya
       one_to_many :attachment, key: :userId
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          url: uri.to_s,
-          is_admin: admin?,
-          is_moderator: moderator?,
-          is_info_bot: info?,
-          is_test_bot: test?,
-          display_name:,
-        ).except(
-          :token,
-        ).compact
+        return super.except(:token)
       end
 
       def display_name

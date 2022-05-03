@@ -57,6 +57,7 @@ module Mulukhiya
     def test_uri
       Webhook.all do |hook|
         assert_kind_of(Ginseng::URI, hook.uri)
+        assert_predicate(hook.uri, :absolute?)
       end
     end
 

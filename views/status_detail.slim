@@ -21,7 +21,7 @@ html lang='ja'
           i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
         .header
           i class='fa fa-calendar'
-          | {{status.created_at_str}}
+          | {{status.created_at}}
         .header v-if='status.spoiler_text'
           i class='fa fa-circle-exclamation'
           | {{status.spoiler_text}}

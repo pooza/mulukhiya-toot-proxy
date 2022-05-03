@@ -9,16 +9,7 @@ module Mulukhiya
       attr_accessor :token
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          is_admin: admin?,
-          is_moderator: moderator?,
-          is_info_bot: info?,
-          is_test_bot: test?,
-          display_name:,
-        ).except(
-          :private_key,
-          :public_key,
-        ).compact
+        return super.except(:private_key, :public_key)
       end
 
       def display_name
@@ -31,6 +22,11 @@ module Mulukhiya
       end
 
       alias host domain
+
+      def uri
+        @uri ||= service.create_uri("/@#{username}")
+        return @uri
+      end
 
       def statuses(params = {})
         params[:limit] ||= config['/webui/status/timeline/limit']

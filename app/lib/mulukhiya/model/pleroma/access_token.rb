@@ -18,17 +18,6 @@ module Mulukhiya
 
       alias to_s token
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          digest: webhook_digest,
-          token: to_s,
-          account:,
-          scopes:,
-          scopes_valid: scopes_valid?,
-        ).compact
-        return @hash
-      end
-
       def self.get(key)
         return first(key)
       end

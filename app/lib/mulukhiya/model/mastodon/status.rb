@@ -34,11 +34,6 @@ module Mulukhiya
         return @public_uri
       end
 
-      def webui_uri
-        @webui_uri ||= service.create_uri("/mulukhiya/app/status/#{id}")
-        return @webui_uri
-      end
-
       def service
         unless @service
           if Environment.mastodon_type?
@@ -58,22 +53,6 @@ module Mulukhiya
         return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          id: id.to_s,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          body:,
-          footer:,
-          is_taggable: taggable?,
-          footer_tags: footer_tags.map(&:to_h),
-          webui_url: webui_uri.to_s,
-          visibility_name:,
-          visibility_icon:,
-        ).compact
-        return @hash
-      end
-
       def to_md
         return uri.to_md
       rescue => e
@@ -83,6 +62,10 @@ module Mulukhiya
         template[:status] = TootParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def to_h
+        return super.merge(attachments: attachments.map(&:to_h))
       end
 
       def self.visibility_names

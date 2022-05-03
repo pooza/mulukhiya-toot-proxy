@@ -10,27 +10,6 @@ module Mulukhiya
         return uri.path.split('/').last
       end
 
-      def to_h
-        @hash ||= data.deep_symbolize_keys.merge(
-          id:,
-          file_name: name,
-          file_size_str: size_str,
-          pixel_size:,
-          duration:,
-          type:,
-          mediatype:,
-          url: uri.to_s,
-          thumbnail_url: uri.to_s,
-          meta:,
-          created_at: date,
-          created_at_str: date&.strftime('%Y/%m/%d %H:%M:%S'),
-          acct: account&.acct&.to_s,
-          username: account&.username,
-          account_display_name: account&.display_name,
-        ).compact
-        return @hash
-      end
-
       def size
         @size ||= meta[:size]
         return @size
@@ -51,6 +30,8 @@ module Mulukhiya
         @uri ||= Ginseng::URI.parse(data[:url].first[:href])
         return @uri
       end
+
+      alias thumbnail_uri uri
 
       def data
         @data ||= JSON.parse(values[:data]).deep_symbolize_keys
@@ -75,13 +56,15 @@ module Mulukhiya
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
         rows = Postgres.exec(:media_catalog, params)
-        return rows.filter_map {|row| get(row:).to_h.merge(status_url: row[:status_uri])}
+        return rows.filter_map do |row|
+          get(row:).to_h.merge(status: {url: row[:status_uri]})
+        end
       end
 
       def self.feed(&block)
         return enum_for(__method__) unless block
         Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
-          .filter_map {|row| get(row:)}
+          .filter_map {|row| get(row:) rescue nil}
           .map(&:feed_entry)
           .each(&block)
       end

@@ -49,6 +49,17 @@ module Mulukhiya
       end
     end
 
+    def to_h
+      return values.deep_symbolize_keys.merge(
+        feed_url: feed_uri.to_s,
+        is_default: default?,
+        is_deletable: deletable?,
+        name: name.to_hashtag_base,
+        tag: raw_name.to_hashtag,
+        url: uri.to_s,
+      ).compact
+    end
+
     def self.included(base)
       base.extend(ClassMethods)
     end

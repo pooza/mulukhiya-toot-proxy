@@ -25,7 +25,22 @@ module Mulukhiya
 
     def test_to_h
       return unless @status
-      assert_kind_of(Hash, @status.to_h)
+      h = @status.to_h
+      assert_kind_of(Hash, h)
+      assert_kind_of(String, h[:webui_url])
+      assert_kind_of(String, h[:public_url])
+      assert_kind_of(String, h[:created_at])
+      assert_kind_of(String, h[:body])
+      assert_kind_of(String, h[:footer])
+      assert_kind_of(Array, h[:footer_tags])
+      h[:footer_tags].each do |tag|
+        assert_kind_of(Hash, tag)
+      end
+    end
+
+    def test_date
+      return unless @status
+      assert_kind_of(Time, @status.date)
     end
 
     def test_account
@@ -92,11 +107,17 @@ module Mulukhiya
     def test_uri
       return unless @status
       assert_kind_of(Ginseng::URI, @status.uri)
+      assert_predicate(@status.uri, :absolute?)
     end
 
     def test_public_uri
       return unless @status
       assert_kind_of(Ginseng::URI, @status.public_uri)
+    end
+
+    def test_webui_uri
+      return unless @status
+      assert_kind_of(Ginseng::URI, @status.webui_uri)
     end
 
     def test_to_md

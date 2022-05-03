@@ -8,6 +8,7 @@ module Mulukhiya
       assert_kind_of(Set, @program.uris)
       @program.uris.each do |uri|
         assert_kind_of(Addressable::URI, uri)
+        assert_predicate(uri, :absolute?)
       end
     end
 

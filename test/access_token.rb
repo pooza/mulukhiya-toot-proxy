@@ -34,10 +34,11 @@ module Mulukhiya
     def test_to_h
       return unless @token
       assert_kind_of(Hash, @token.to_h)
-      assert(@token.to_h.key?(:token))
-      assert(@token.to_h.key?(:digest))
-      assert(@token.to_h.key?(:account))
-      assert(@token.to_h.key?(:scopes))
+      assert_kind_of(account_class, @token.to_h[:account])
+      assert_kind_of(String, @token.to_h[:digest])
+      assert_boolean(@token.to_h[:is_scopes_valid])
+      assert_kind_of(Array, @token.to_h[:scopes])
+      assert_kind_of(String, @token.to_h[:token])
     end
 
     def test_account

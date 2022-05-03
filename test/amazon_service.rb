@@ -17,6 +17,7 @@ module Mulukhiya
 
     def test_create_image_uri
       @asins.map {|v| @service.create_image_uri(v)}.each do |uri|
+        assert_predicate(uri, :absolute?)
         assert_equal('https', uri.scheme)
         assert_equal('m.media-amazon.com', uri.host)
       end

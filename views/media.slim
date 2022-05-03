@@ -32,7 +32,7 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-calendar'
-              | {{media.created_at_str}}
+              | {{media.created_at}}
           ul.params
             i class='fas fa-image' v-if='media.thumbnail_url && media.mediatype=="image"'
             i class='fas fa-video' v-else-if='media.mediatype=="video"'
@@ -44,16 +44,16 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-user'
-              | {{media.account_display_name}}
+              | {{media.account.display_name}}
           ul.params
             li.param
               i class='fas fa-comment'
-              a :href='media.status_url' target='_blank' rel='noreferrer' v-if='media.body' {{media.body}}
-              a :href='media.status_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
-          ul.params v-if='account.username==media.username'
+              a :href='media.status.public_url' target='_blank' rel='noreferrer' v-if='media.status.body' {{media.status.body}}
+              a :href='media.status.public_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
+          ul.params v-if='account.acct==media.account.acct'
             li.param
               i class='fas fa-tag'
-              a :href='media.webui_url' target='_blank' rel='noreferrer' タグづけ
+              a :href='media.status.webui_url' target='_blank' rel='noreferrer' タグづけ
       nav.appender-container v-if='!last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'

@@ -177,6 +177,19 @@ module Mulukhiya
       return false
     end
 
+    def to_h
+      return values.deep_symbolize_keys.merge(
+        acct: acct.to_s,
+        display_name:,
+        is_admin: admin?,
+        is_info_bot: info?,
+        is_moderator: moderator?,
+        is_test_bot: test?,
+        url: uri.to_s,
+        username:,
+      ).compact
+    end
+
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -218,7 +231,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Postgres.exec(:administrators)
           .map {|row| row[:id]}
-          .filter_map {|id| Environment.account_class[id]}
+          .filter_map {|id| Environment.account_class[id] rescue nil}
           .each(&block)
       end
     end
