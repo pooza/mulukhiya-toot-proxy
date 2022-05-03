@@ -15,6 +15,15 @@ module Mulukhiya
         return TagContainer.new
       end
 
+      def to_h
+        return {
+          name: name.to_hashtag_base,
+          tag: raw_name.to_hashtag,
+          url: uri.to_s,
+          feed_url: feed_uri.to_s,
+        }
+      end
+
       def self.get(key)
         case key
         in {tag: tag}
@@ -22,8 +31,6 @@ module Mulukhiya
           return nil unless record = new(tag.downcase)
           record.raw_name = tag
           return record
-        else
-          return first(key)
         end
       end
     end
