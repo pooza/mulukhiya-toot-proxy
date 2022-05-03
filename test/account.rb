@@ -23,10 +23,14 @@ module Mulukhiya
       return unless account
       h = account.to_h
       assert_kind_of(Hash, h)
-      assert_kind_of(String, h[:url])
       assert_kind_of(String, h[:acct])
-      assert_kind_of(String, h[:username])
       assert_kind_of(String, h[:display_name])
+      assert_boolean(h[:is_admin])
+      assert_boolean(h[:is_info_bot])
+      assert_boolean(h[:is_moderator])
+      assert_boolean(h[:is_test_bot])
+      assert_kind_of(String, h[:url])
+      assert_kind_of(String, h[:username])
     end
 
     def test_uri
