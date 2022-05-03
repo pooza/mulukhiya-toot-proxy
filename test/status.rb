@@ -31,8 +31,8 @@ module Mulukhiya
       assert_kind_of(String, h[:public_url])
       assert_kind_of(String, h[:public_url])
       assert_kind_of(String, h[:created_at])
-      assert_kind_of(String, h[:body])
-      assert_kind_of(String, h[:footer])
+      assert_kind_of([String, NilClass], h[:body])
+      assert_kind_of([String, NilClass], h[:footer])
       assert_kind_of(Array, h[:footer_tags])
       h[:footer_tags].each do |tag|
         assert_kind_of(Hash, tag)
