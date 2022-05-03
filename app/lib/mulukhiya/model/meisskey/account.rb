@@ -28,7 +28,7 @@ module Mulukhiya
       end
 
       def fields
-        return values['vields'] || []
+        return values['fields'] || []
       end
 
       def bio
@@ -75,7 +75,7 @@ module Mulukhiya
 
       def attachments
         @attachments ||= Status.aggregate(:account_status, {id: _id}).inject([]) do |r, row|
-          r.concat(row[:_files].filter_map {|file| Attachment[file[:_id]]})
+          r.concat((row[:_files] || []).filter_map {|file| Attachment[file[:_id]]})
         end
         return @attachments
       end
