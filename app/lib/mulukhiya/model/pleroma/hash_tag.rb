@@ -11,15 +11,6 @@ module Mulukhiya
         @name = name
       end
 
-      def to_h
-        return {
-          name: name.to_hashtag_base,
-          tag: raw_name.to_hashtag,
-          url: uri.to_s,
-          feed_url: feed_uri.to_s,
-        }
-      end
-
       def self.featured_tags
         return TagContainer.new
       end

@@ -6,17 +6,6 @@ module Mulukhiya
       include SNSMethods
       attr_writer :raw_name
 
-      def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
-          tag: raw_name.to_hashtag,
-          url: uri.to_s,
-          feed_url: feed_uri.to_s,
-          is_default: default?,
-          is_deletable: deletable?,
-        ).compact
-        return @hash
-      end
-
       def listable?
         return listable != false
       end

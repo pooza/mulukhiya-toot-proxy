@@ -7,15 +7,11 @@ module Mulukhiya
       attr_writer :raw_name
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          tag: raw_name.to_hashtag,
-          url: uri.to_s,
-          feed_url: feed_uri.to_s,
-        ).except(
+        return super.except(
           :mentionedUserIds,
           :mentionedLocalUserIds,
           :mentionedRemoteUserIds,
-        ).compact
+        )
       end
 
       def self.get(key)
