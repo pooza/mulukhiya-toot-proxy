@@ -62,7 +62,7 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         rows = Postgres.exec(:media_catalog, params)
         return rows.map {|v| v[:id]}.filter_map {|v| self[v] rescue nil}.map do |record|
-          record.to_h.merge(status: rcord.status.to_h)
+          record.to_h.merge(status: record.status.to_h)
         end
       end
 
