@@ -37,6 +37,10 @@ module Mulukhiya
         return data[:visibility]
       end
 
+      def created_at
+        return data[:created_at]
+      end
+
       alias visibility_name visibility
 
       def account
@@ -76,6 +80,7 @@ module Mulukhiya
           url: uri.to_s,
           public_url: public_uri.to_s,
           webui_url: webui_uri.to_s,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           visibility:,
           visibility_name:,
           attachments: data[:files],

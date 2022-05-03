@@ -24,6 +24,10 @@ module Mulukhiya
         return account.acct
       end
 
+      def date
+        return createdAt.getlocal
+      end
+
       def local?
         return acct.host == Environment.domain_name
       end
@@ -55,6 +59,7 @@ module Mulukhiya
           url: uri.to_s,
           public_url: public_uri.to_s,
           webui_url: webui_uri.to_s,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           visibility:,
           visibility_name:,
           attachments: attachments.map(&:to_h),

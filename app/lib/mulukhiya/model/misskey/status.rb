@@ -30,6 +30,10 @@ module Mulukhiya
         return @uri
       end
 
+      def date
+        return createdAt.getlocal
+      end
+
       alias public_uri uri
 
       def attachments
@@ -50,6 +54,7 @@ module Mulukhiya
           url: uri.to_s,
           public_url: public_uri.to_s,
           webui_url: webui_uri.to_s,
+          created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
           visibility:,
           visibility_name:,
           attachments: data[:files],
