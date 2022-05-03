@@ -54,9 +54,8 @@ module Mulukhiya
           row[:_files].filter_map {|f| self[f[:_id]]}.each do |attachment|
             note = Status[row[:_id]]
             records.push(attachment.to_h.deep_symbolize_keys.merge(
-              id: attachment.id,
-              date: note.createdAt.getlocal,
-              status: Status[row[:_id]]&.to_h,
+              date: note.date,
+              status: note.to_h,
             ))
           end
         end
