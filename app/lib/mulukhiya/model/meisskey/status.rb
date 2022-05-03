@@ -33,7 +33,7 @@ module Mulukhiya
       end
 
       def visibility
-        return values[:visibility]
+        return values['visibility']
       end
 
       alias visibility_name visibility
@@ -50,7 +50,7 @@ module Mulukhiya
       alias public_uri uri
 
       def attachments
-        return values[:files].map {|row| Attachment[row[:id]]}
+        return values['files']&.map {|row| Attachment[row[:id]]} || []
       end
 
       def to_md
@@ -65,7 +65,7 @@ module Mulukhiya
       end
 
       def to_h
-        return super.merge(attachments: values[:files])
+        return super.merge(attachments: values['files'])
       end
 
       def self.[](id)
