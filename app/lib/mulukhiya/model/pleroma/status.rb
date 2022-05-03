@@ -37,8 +37,8 @@ module Mulukhiya
         return data[:visibility]
       end
 
-      def created_at
-        return data[:created_at]
+      def date
+        return Time.parse(data[:created_at])
       end
 
       alias visibility_name visibility
@@ -75,7 +75,7 @@ module Mulukhiya
       end
 
       def to_h
-        @hash ||= values.deep_symbolize_keys.merge(
+        @hash ||= data.deep_symbolize_keys.merge(
           uri: uri.to_s,
           url: uri.to_s,
           public_url: public_uri.to_s,
