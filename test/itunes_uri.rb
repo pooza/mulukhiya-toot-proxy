@@ -88,7 +88,9 @@ module Mulukhiya
     def test_image_uri
       assert_nil(@music.image_uri)
       assert_kind_of(Ginseng::URI, @track.image_uri)
+      assert_predicate(@track.image_uri, :absolute?)
       assert_kind_of(Ginseng::URI, @album.image_uri)
+      assert_predicate(@album.image_uri, :absolute?)
     end
   end
 end

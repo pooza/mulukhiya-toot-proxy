@@ -66,6 +66,7 @@ module Mulukhiya
     def test_oauth_uri
       return unless @service
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
+      assert_predicate(@service.oauth_uri, :absolute?)
     end
 
     def test_oauth_scopes

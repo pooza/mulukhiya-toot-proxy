@@ -12,6 +12,7 @@ module Mulukhiya
 
     def test_uri
       assert_kind_of(Ginseng::URI, MediaFeedRenderer.uri)
+      assert_predicate(MediaFeedRenderer.uri, :absolute?)
       assert_kind_of(HTTParty::Response, http.get(MediaFeedRenderer.uri))
     end
   end

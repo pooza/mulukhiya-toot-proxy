@@ -107,6 +107,7 @@ module Mulukhiya
     def test_uri
       return unless @status
       assert_kind_of(Ginseng::URI, @status.uri)
+      assert_predicate(@status.uri, :absolute?)
     end
 
     def test_public_uri

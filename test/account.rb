@@ -36,6 +36,7 @@ module Mulukhiya
     def test_uri
       return unless account
       assert_kind_of(Ginseng::URI, account.uri)
+      assert_predicate(account.uri, :absolute?)
     end
 
     def test_username

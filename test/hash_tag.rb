@@ -23,6 +23,7 @@ module Mulukhiya
     def test_uri
       return unless @nowplaying
       assert_kind_of(Ginseng::URI, @nowplaying.uri)
+      assert_predicate(@nowplaying.uri, :absolute?)
       assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
     end
 

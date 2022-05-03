@@ -59,6 +59,13 @@ module Mulukhiya
     def test_uri
       return unless @attachment
       assert_kind_of(Ginseng::URI, @attachment.uri)
+      assert_predicate(@attachment.uri, :absolute?)
+    end
+
+    def test_thumbnail_uri
+      return unless @attachment
+      assert_kind_of(Ginseng::URI, @attachment.thumbnail_uri)
+      assert_predicate(@attachment.thumbnail_uri, :absolute?)
     end
 
     def test_feed
