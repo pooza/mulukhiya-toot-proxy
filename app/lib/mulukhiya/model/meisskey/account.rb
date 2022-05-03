@@ -4,18 +4,7 @@ module Mulukhiya
       include AccountMethods
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          url: uri.to_s,
-          is_admin: admin?,
-          is_moderator: moderator?,
-          is_info_bot: info?,
-          is_test_bot: test?,
-          display_name:,
-          acct: acct.to_s,
-        ).except(
-          :password,
-          :keypair,
-        ).compact
+        return super.except(:password, :keypair)
       end
 
       def host

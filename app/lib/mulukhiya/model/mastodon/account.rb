@@ -9,18 +9,7 @@ module Mulukhiya
       attr_accessor :token
 
       def to_h
-        return values.deep_symbolize_keys.merge(
-          url: uri.to_s,
-          is_admin: admin?,
-          is_moderator: moderator?,
-          is_info_bot: info?,
-          is_test_bot: test?,
-          display_name:,
-          acct: acct.to_s,
-        ).except(
-          :private_key,
-          :public_key,
-        ).compact
+        return super.except(:private_key, :public_key)
       end
 
       def display_name
