@@ -1,10 +1,5 @@
 module Mulukhiya
   class AnnouncementMentionHandler < MentionHandler
-    def disable?
-      return true unless controller_class.announcement?
-      return super
-    end
-
     def handle_mention(payload, params = {})
       params[:announcement] = Announcement.new
       super(payload, params)

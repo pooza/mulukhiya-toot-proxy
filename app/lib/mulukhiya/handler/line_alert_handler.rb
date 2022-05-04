@@ -1,7 +1,8 @@
 module Mulukhiya
   class LineAlertHandler < AlertHandler
     def disable?
-      return true unless LineService.config?
+      return true unless id
+      return true unless token
       return super
     end
 

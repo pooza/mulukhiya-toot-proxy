@@ -1,7 +1,7 @@
 module Mulukhiya
   class MailAlertHandler < AlertHandler
     def disable?
-      return true unless Mailer.config?
+      return true unless receipt
       return true unless exist?
       return super
     end

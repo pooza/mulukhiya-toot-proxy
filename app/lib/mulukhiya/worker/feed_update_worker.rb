@@ -4,7 +4,8 @@ module Mulukhiya
 
     def disable?
       return true unless controller_class.feed?
-      return false
+      return true unless CustomFeed.all.present?
+      return super
     end
 
     def perform(params = {})

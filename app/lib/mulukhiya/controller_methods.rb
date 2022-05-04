@@ -18,14 +18,17 @@ module Mulukhiya
       end
 
       def media_catalog?
+        return false unless info_agent_service
         return config["/#{name}/features/media_catalog"] == true rescue false
       end
 
       def favorite_tags?
+        return false unless info_agent_service
         return config["/#{name}/features/favorite_tags"] == true rescue false
       end
 
       def feed?
+        return false unless info_agent_service
         return config["/#{name}/features/feed"] rescue false
       end
 

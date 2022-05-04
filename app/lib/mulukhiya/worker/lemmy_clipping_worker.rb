@@ -2,7 +2,7 @@ module Mulukhiya
   class LemmyClippingWorker < ClippingWorker
     def disable?
       return true unless controller_class.lemmy?
-      return false
+      return super
     end
 
     def perform(params = {})

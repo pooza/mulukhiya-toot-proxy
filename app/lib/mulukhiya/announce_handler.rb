@@ -3,6 +3,7 @@ module Mulukhiya
     attr_reader :sns
 
     def disable?
+      return true unless account_class.info_token
       return true unless controller_class.announcement?
       return super
     end

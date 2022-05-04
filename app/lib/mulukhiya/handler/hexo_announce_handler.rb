@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def dir
-      dir = handler_config(:dir)
+      return nil unless dir = handler_config(:dir)
       return File.join(Environment.dir, dir) unless dir&.start_with?('/')
       return dir
     end

@@ -4,7 +4,7 @@ module Mulukhiya
 
     def disable?
       return true unless controller_class.livecure?
-      return false
+      return super
     end
 
     def perform(params = {})

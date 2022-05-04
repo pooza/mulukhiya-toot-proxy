@@ -146,14 +146,15 @@ html lang='ja'
             v-select :options='options.visibility' v-model='form.webhook.visibility'
           .field-update-button-container
             button @click='updateWebhook' 更新
-      section.config v-if='account.username'
-        h3 @click='toggleVisibility("notify")' 通知
-        vue-slide-up-down :active='layout.details.notify'
-          .inline-field-container
-            label.alert
-              input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
-          .field-update-button-container
-            button @click='updateNotify' 更新
+      - if sns
+        section.config v-if='account.username'
+          h3 @click='toggleVisibility("notify")' 通知
+          vue-slide-up-down :active='layout.details.notify'
+            .inline-field-container
+              label.alert
+                input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
+            .field-update-button-container
+              button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
     javascript:
       'use strict'

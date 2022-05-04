@@ -75,6 +75,7 @@ module Mulukhiya
     end
 
     def notify(message, options = {})
+      return unless account_class.info_token
       options[:accounts] ||= Environment.account_class.administrators if options[:administrators]
       options[:accounts] ||= [@sns.account]
       message = message.to_yaml unless message.is_a?(String)
@@ -86,8 +87,9 @@ module Mulukhiya
     end
 
     def info_agent_service
+      return nil unless token = account_class.info_token
       service = Environment.sns_service_class.new
-      service.token = account_class.info_token
+      service.token = token
       return service
     end
 
@@ -111,8 +113,9 @@ module Mulukhiya
       end
 
       def info_agent_service
+        return nil unless token = Environment.account_class.info_token
         service = Environment.sns_service_class.new
-        service.token = Environment.account_class.info_token
+        service.token = token
         return service
       end
     end

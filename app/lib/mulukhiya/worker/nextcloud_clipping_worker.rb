@@ -2,7 +2,7 @@ module Mulukhiya
   class NextcloudClippingWorker < ClippingWorker
     def disable?
       return true unless controller_class.nextcloud?
-      return false
+      return super
     end
 
     def perform(params = {})

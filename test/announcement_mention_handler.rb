@@ -1,5 +1,5 @@
 module Mulukhiya
-  class AnnouncementHandlerTest < TestCase
+  class AnnouncementMentionHandlerTest < TestCase
     def setup
       @handler = Handler.create(:announcement_mention)
     end
