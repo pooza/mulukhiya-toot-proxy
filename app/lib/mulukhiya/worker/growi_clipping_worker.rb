@@ -2,7 +2,7 @@ module Mulukhiya
   class GrowiClippingWorker < ClippingWorker
     def disable?
       return true unless controller_class.growi?
-      return false
+      return super
     end
 
     def perform(params = {})

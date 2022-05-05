@@ -74,10 +74,6 @@ module Mulukhiya
         return template.to_s
       end
 
-      def to_h
-        return super.merge(attachments: data[:files])
-      end
-
       def self.[](id)
         return new(id)
       end

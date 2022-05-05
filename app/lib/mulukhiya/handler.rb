@@ -88,7 +88,7 @@ module Mulukhiya
     end
 
     def reportable?
-      return false if verbose? && !sns.account.notify_verbose? && errors.empty?
+      return false if verbose? && !sns.account&.notify_verbose? && errors.empty?
       return loggable?
     end
 
@@ -136,7 +136,7 @@ module Mulukhiya
 
     def disable?
       return true unless Environment.dbms_class.config?
-      return true if sns.account.disable?(self)
+      return true if sns.account&.disable?(self)
       return true if config.disable?(self)
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError

@@ -48,10 +48,6 @@ module Mulukhiya
 
       alias visibility_name visibility
 
-      def to_h
-        return super.merge(attachments: data[:files])
-      end
-
       def to_md
         return uri.to_md
       rescue => e

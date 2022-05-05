@@ -1,5 +1,10 @@
 module Mulukhiya
   class MentionVisibilityHandler < Handler
+    def disable?
+      return true unless Environment.dbms_class.config?
+      return false
+    end
+
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if parser.command?

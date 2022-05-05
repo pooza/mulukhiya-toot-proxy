@@ -4,6 +4,7 @@ module Mulukhiya
 
     def disable?
       return true unless controller_class.announcement?
+      return true unless info_agent_service
       return super
     end
 

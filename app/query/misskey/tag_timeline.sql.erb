@@ -15,7 +15,9 @@ WHERE ('<%= params[:tag].downcase %>' = any(note.tags))
   <% if params[:local] %>
     AND ("user".host IS null)
   <% end %>
-  AND ("user".id <> '<%= test_account.id %>')
+  <% if test_account %>
+    AND ("user".id <> '<%= test_account.id %>')
+  <% end %>
 ORDER BY
   created_at DESC
 LIMIT <%= params[:limit] %> OFFSET 0

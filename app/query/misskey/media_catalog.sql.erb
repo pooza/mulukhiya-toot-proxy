@@ -29,7 +29,9 @@ FROM
       <% unless params[:only_person].to_i.zero? %>
         AND ("user"."isBot" = false)
       <% end %>
-      AND ("user".id <> '<%= test_account.id %>')
+      <% if test_account %>
+        AND ("user".id <> '<%= test_account.id %>')
+      <% end %>
     GROUP BY
       note_id,
       file_id,

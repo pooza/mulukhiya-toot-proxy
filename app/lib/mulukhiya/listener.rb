@@ -23,7 +23,7 @@ module Mulukhiya
     private
 
     def initialize
-      @sns = info_agent_service
+      return unless @sns = info_agent_service
       @uri = @sns.streaming_uri
       @client = Faye::WebSocket::Client.new(uri.to_s, [], {
         tls: {

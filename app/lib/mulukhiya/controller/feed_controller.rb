@@ -8,8 +8,9 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       e.log
+      @renderer = Ginseng::Web::XMLRenderer.new
       @renderer.status = e.status
-      @renderer.message = {error: e.message}
+      @renderer.message = e.message
       return @renderer.to_s
     end
 
@@ -20,8 +21,9 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       e.log
+      @renderer = Ginseng::Web::XMLRenderer.new
       @renderer.status = e.status
-      @renderer.message = {error: e.message}
+      @renderer.message = e.message
       return @renderer.to_s
     end
 
@@ -33,7 +35,7 @@ module Mulukhiya
         e.log
         @renderer = Ginseng::Web::XMLRenderer.new
         @renderer.status = e.status
-        @renderer.message = {error: e.message}
+        @renderer.message = e.message
         return @renderer.to_s
       end
     end

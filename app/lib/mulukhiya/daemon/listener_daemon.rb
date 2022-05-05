@@ -17,7 +17,10 @@ module Mulukhiya
     end
 
     def self.disable?
-      return [:follow, :mention].sum {|v| Event.new(v).count}.zero?
+      return true unless Environment.dbms_class.config?
+      return true unless Environment.account_class.info_token
+      return true if [:follow, :mention].sum {|v| Event.new(v).count}.zero?
+      return false
     end
 
     def self.health

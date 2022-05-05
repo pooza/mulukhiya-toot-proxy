@@ -195,6 +195,7 @@ handler:
     sendmail_bin: /usr/sbin/sendmail
     to: null
   media_tag:
+    disable: true
     tags:
       audio: audio
       image: image
@@ -512,7 +513,6 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging
@@ -683,7 +683,6 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging
@@ -857,7 +856,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.17.11
+  version: 4.18.0
 parser:
   note:
     fields:
@@ -957,7 +956,6 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging

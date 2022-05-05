@@ -5,6 +5,7 @@ module Mulukhiya
     def disable?
       return true unless Environment.dbms_class.config?
       return true unless controller_class.streaming?
+      return true unless info_agent_service
       return false
     end
 

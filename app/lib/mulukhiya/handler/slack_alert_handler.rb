@@ -1,7 +1,7 @@
 module Mulukhiya
   class SlackAlertHandler < AlertHandler
     def disable?
-      return true unless SlackService.config?
+      return true unless uris.present?
       return super
     end
 

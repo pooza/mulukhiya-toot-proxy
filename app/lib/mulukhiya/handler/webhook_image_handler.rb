@@ -1,7 +1,7 @@
 module Mulukhiya
   class WebhookImageHandler < Handler
     def disable?
-      return true unless sns.account.webhook
+      return true unless sns.account&.webhook
       return super
     end
 

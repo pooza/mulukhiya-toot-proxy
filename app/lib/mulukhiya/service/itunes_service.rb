@@ -37,6 +37,7 @@ module Mulukhiya
     end
 
     def create_spotify_uri(track)
+      return nil unless SpotifyService.config?
       spotify = SpotifyService.new
       return nil unless track = spotify.search_track(create_keyword(track))
       return spotify.create_track_uri(track)

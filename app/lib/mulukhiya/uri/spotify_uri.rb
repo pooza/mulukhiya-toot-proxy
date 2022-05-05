@@ -4,6 +4,7 @@ module Mulukhiya
 
     def initialize(options = {})
       super
+      return unless SpotifyService.config?
       @spotify = SpotifyService.new
     end
 

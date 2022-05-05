@@ -3,4 +3,7 @@ $LOAD_PATH.unshift(File.join(File.expand_path('..', __dir__), 'app/lib'))
 ENV['RAKE'] = nil
 
 require 'mulukhiya'
-Mulukhiya::SidekiqDaemon.spawn!
+module Mulukhiya
+  exit 1 if SidekiqDaemon.disable?
+  SidekiqDaemon.spawn!
+end

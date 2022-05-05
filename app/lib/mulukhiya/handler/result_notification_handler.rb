@@ -2,6 +2,7 @@ module Mulukhiya
   class ResultNotificationHandler < Handler
     def disable?
       return true unless Environment.dbms_class.config?
+      return true unless info_agent_service
       return false
     end
 

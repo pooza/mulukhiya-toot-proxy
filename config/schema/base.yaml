@@ -6,19 +6,12 @@ properties:
         properties:
           token:
             type: string
-        required:
-          - token
         type: object
       test:
         properties:
           token:
             type: string
-        required:
-          - token
         type: object
-    required:
-      - test
-      - info
     type: object
   amazon:
     properties:
@@ -232,11 +225,11 @@ properties:
         type: integer
       redis:
         properties:
-          url:
+          dsn:
             format: uri
             type: string
         required:
-          - url
+          - dsn
         type: object
       schedule:
         type: object
@@ -276,6 +269,17 @@ properties:
           - rules
         type: object
     type: object
+  user_config:
+    properties:
+      redis:
+        properties:
+          dsn:
+            format: uri
+            type: string
+        required:
+          - dsn
+        type: object
+    type: object
   webui:
     properties:
       media:
@@ -313,7 +317,7 @@ properties:
         type: object
     type: object
 required:
-  - agent
+  - controller
   - crypt
 title: Local config
 type: object

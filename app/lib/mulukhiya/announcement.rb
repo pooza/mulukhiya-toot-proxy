@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def fetch
-      return sns.announcements
+      return sns&.announcements
     end
 
     def load

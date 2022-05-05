@@ -10,7 +10,8 @@ module Mulukhiya
 
     def test_timeout
       Handler.names.each do |name|
-        assert_predicate(Handler.create(name).timeout, :positive?)
+        next unless handler = Handler.create(name)
+        assert_predicate(handler.timeout, :positive?)
       end
     end
 

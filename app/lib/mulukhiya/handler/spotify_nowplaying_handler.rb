@@ -2,6 +2,7 @@ module Mulukhiya
   class SpotifyNowplayingHandler < NowplayingHandler
     def initialize(params = {})
       super
+      return unless SpotifyService.config?
       @service = SpotifyService.new
     end
 

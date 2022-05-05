@@ -2,7 +2,7 @@ module Mulukhiya
   class FilterUnregisterWorker < Worker
     def disable?
       return true unless controller_class.filter?
-      return false
+      return super
     end
 
     def perform(params = {})
@@ -14,7 +14,7 @@ module Mulukhiya
       raise Ginseng::RequestError, 'phrase undefined' unless params[:phrase]
       sns = account.webhook.sns
       sns.filters(phrase: params[:phrase]).each {|f| sns.unregister_filter(f['id'])}
-      info_agent_service.notify(account, worker_config(:message))
+      info_agent_service&.notify(account, worker_config(:message))
     end
   end
 end

@@ -95,14 +95,6 @@ html lang='ja'
               .link-description メディアファイルのメタデータをクリアします。
               .field-update-button-container
                 button @click='clearMediaMetadata' 実行
-            .endpoint-container v-if='account.is_admin'
-              .role admin
-              .role moderator
-              .link POST /mulukhiya/api/media/catalog/update
-              pre.payload v-if='query_params.media_catalog_update' {{query_params.media_catalog_update}}
-              .link-description メディアカタログを更新します。
-              .field-update-button-container
-                button @click='updateMediaCatalog' 実行
         - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表

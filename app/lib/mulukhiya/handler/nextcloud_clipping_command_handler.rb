@@ -1,7 +1,7 @@
 module Mulukhiya
   class NextcloudClippingCommandHandler < CommandHandler
     def disable?
-      return true unless sns.account.nextcloud
+      return true unless sns.account&.nextcloud
       return super
     end
 

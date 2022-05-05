@@ -1,5 +1,10 @@
 module Mulukhiya
   class AmazonImageHandler < ImageHandler
+    def disable?
+      return true unless AmazonService.config?
+      return super
+    end
+
     def updatable?(uri)
       uri = AmazonURI.parse(uri.to_s) unless uri.is_a?(AmazonURI)
       return false unless uri.amazon?

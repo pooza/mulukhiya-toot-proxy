@@ -3,4 +3,7 @@ $LOAD_PATH.unshift(File.join(File.expand_path('..', __dir__), 'app/lib'))
 ENV['RAKE'] = nil
 
 require 'mulukhiya'
-Mulukhiya::ListenerDaemon.spawn!
+module Mulukhiya
+  exit 1 if ListenerDaemon.disable?
+  ListenerDaemon.spawn!
+end
