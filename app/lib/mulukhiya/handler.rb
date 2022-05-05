@@ -88,7 +88,7 @@ module Mulukhiya
     end
 
     def reportable?
-      return false if verbose? && !sns.account.notify_verbose? && errors.empty?
+      return false if verbose? && !sns.account&.notify_verbose? && errors.empty?
       return loggable?
     end
 
