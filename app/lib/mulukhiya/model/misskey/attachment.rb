@@ -44,7 +44,6 @@ module Mulukhiya
         return Postgres.exec(:media_catalog, params).map do |row|
           self[row[:id]].to_h.merge(
             status: {
-              id: row[:status_id],
               body: row[:status_text],
               public_url: service.create_uri("/notes/#{row[:status_id]}").to_s,
             },

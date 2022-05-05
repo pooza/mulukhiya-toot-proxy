@@ -57,7 +57,7 @@ module Mulukhiya
             records.push(attachment.to_h.merge(
               account: {username: account.username, display_name: account.display_name},
               date: note.date,
-              status: {id: note.id, body: note.body, public_url: note.public_uri.to_s},
+              status: {body: note.body, public_url: note.public_uri.to_s},
             ))
           end
         end
