@@ -65,7 +65,7 @@ module Mulukhiya
           next unless h = self[row[:id]].to_h
           h[:status] = {
             id: row[:status_id],
-            body: Environment.parser_class.new(row[:text]).body,
+            body: row[:text],
             visibility: Environment.status_class.visibility_names[row[:visibility]],
           }
           catalog.push(h)
