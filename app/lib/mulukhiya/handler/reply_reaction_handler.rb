@@ -1,5 +1,10 @@
 module Mulukhiya
   class ReplyReactionHandler < Handler
+    def disable?
+      return true unless controller_class.reaction?
+      return false
+    end
+
     def handle_post_reaction(payload, params = {})
       payload[status_key] ||= payload[:status_id]
       payload[:reaction] ||= payload[:emoji]

@@ -3,5 +3,8 @@ $LOAD_PATH.unshift(File.join(File.expand_path('..', __dir__), 'app/lib'))
 ENV['RAKE'] = nil
 
 require 'mulukhiya'
-exit 1 if  Mulukhiya::PumaDaemon.disable?
-Mulukhiya::PumaDaemon.spawn!
+module Mulukhiya
+  exit 1 if PumaDaemon.disable?
+  PumaDaemon.spawn!
+end
+

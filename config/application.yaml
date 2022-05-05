@@ -195,6 +195,7 @@ handler:
     sendmail_bin: /usr/sbin/sendmail
     to: null
   media_tag:
+    disable: true
     tags:
       audio: audio
       image: image
@@ -512,7 +513,6 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging
@@ -683,7 +683,6 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging
@@ -957,7 +956,6 @@ pleroma:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - default_tag
       - dictionary_tag
       - remote_tag
       - tagging

@@ -3,7 +3,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def disable?
-      return true unless account_class.info_token
+      return true unless info_agent_service
       return super
     end
 
