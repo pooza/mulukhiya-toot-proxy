@@ -60,13 +60,14 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
+        service = MastodonService.new
         return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
           next catalog unless h = self[row[:id]].to_h
           h[:account] = row.slice(:username, :display_name)
           h[:status] = {
             id: row[:status_id],
             body: row[:toot_text],
-            visibility: Environment.status_class.visibility_names[row[:visibility]],
+            url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}")
           }
           catalog.push(h)
         end
