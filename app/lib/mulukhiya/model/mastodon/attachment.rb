@@ -66,7 +66,7 @@ module Mulukhiya
           h[:account] = row.slice(:username, :display_name)
           h[:status] = {
             id: row[:status_id],
-            body: row[:toot_text],
+            body: row[:status_text],
             public_url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s,
           }
           catalog.push(h)
