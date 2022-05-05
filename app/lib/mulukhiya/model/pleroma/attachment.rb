@@ -57,7 +57,10 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         rows = Postgres.exec(:media_catalog, params)
         return rows.filter_map do |row|
-          get(row:).to_h.merge(status: {url: row[:status_uri]})
+          get(row:).to_h.merge(
+            account: {username: row[:username]},
+            status: {body: row[:status_text], public_url: row[:status_uri]},
+          )
         end
       end
 

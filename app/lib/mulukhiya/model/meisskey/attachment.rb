@@ -52,10 +52,12 @@ module Mulukhiya
         records = []
         Status.aggregate(:media_catalog, params).each do |row|
           note = Status[row[:_id]]
+          account = Account[row[:user].first[:_id]]
           (row[:_files] || []).filter_map {|f| self[f[:_id]]}.each do |attachment|
-            records.push(attachment.to_h.deep_symbolize_keys.merge(
+            records.push(attachment.to_h.merge(
+              account: {username: account.username, display_name: account.display_name},
               date: note.date,
-              status: note.to_h,
+              status: {body: note.body, public_url: note.public_uri.to_s},
             ))
           end
         end

@@ -60,9 +60,16 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        rows = Postgres.exec(:media_catalog, params)
-        return rows.map {|v| v[:id]}.filter_map {|v| self[v] rescue nil}.map do |record|
-          record.to_h.merge(status: record.status.to_h)
+        service = MastodonService.new
+        return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
+          next catalog unless h = self[row[:id]].to_h
+          h[:account] = row.slice(:username, :display_name)
+          h[:status] = {
+            body: row[:status_text],
+            public_url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s,
+            webui_url: service.create_uri("/mulukhiya/app/status/#{row[:status_id]}").to_s,
+          }
+          catalog.push(h)
         end
       end
 

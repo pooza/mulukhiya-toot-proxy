@@ -4,6 +4,7 @@ SELECT
   attachments.type,
   statuses.id AS status_id,
   statuses.uri AS status_uri,
+  statuses.text AS status_text,
   statuses.username,
   statuses.host,
   statuses.created_at
@@ -12,6 +13,7 @@ FROM
     SELECT
       objects_base.id,
       objects_base.data->>'id' AS uri,
+      objects_base.data->>'source' AS text,
       jsonb_array_elements(objects_base.data->'attachment')->'url'->0->'href'->>0 AS attachment_uri,
       objects_actor.actor[5] AS username,
       objects_actor.actor[3] AS host,
