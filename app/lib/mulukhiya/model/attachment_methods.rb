@@ -51,7 +51,6 @@ module Mulukhiya
 
     def to_h
       return values.deep_symbolize_keys.merge(
-        account: account.to_h,
         created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
         duration:,
         file_name: name,

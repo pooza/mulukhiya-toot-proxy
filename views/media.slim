@@ -50,7 +50,7 @@ html lang='ja'
               i class='fas fa-comment'
               a :href='media.status.public_url' target='_blank' rel='noreferrer' v-if='media.status.body' {{media.status.body}}
               a :href='media.status.public_url' target='_blank' rel='noreferrer' v-else='' = controller.status_label
-          ul.params v-if='account.acct==media.account.acct'
+          ul.params v-if='account.username==media.account.username'
             li.param
               i class='fas fa-tag'
               a :href='media.status.webui_url' target='_blank' rel='noreferrer' タグづけ

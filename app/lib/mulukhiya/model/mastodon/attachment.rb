@@ -62,6 +62,8 @@ module Mulukhiya
         params[:limit] ||= config['/webui/media/catalog/limit']
         return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
           next catalog unless h = self[row[:id]].to_h
+          h[:account] = row.slice(:username, :display_name)
+          h[:account][:display_name] ||= "@#{row[:username]}"
           h[:status] = {
             id: row[:status_id],
             body: row[:toot_text],
