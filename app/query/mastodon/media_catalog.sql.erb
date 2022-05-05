@@ -30,7 +30,9 @@ WHERE (toots.local = true)
   <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
-  AND (accounts.id <> '<%= test_account.id %>')
+  <% if test_account %>
+    AND (accounts.id <> '<%= test_account.id %>')
+  <% end %>
 ORDER BY
   attachments.id DESC
 LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>

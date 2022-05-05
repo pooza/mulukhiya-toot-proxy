@@ -7,7 +7,7 @@ module Mulukhiya
       return {
         package: Package,
         controller: controller_class,
-        sns: info_agent_service,
+        sns: info_agent_service || sns_class.new,
         env: Environment,
         crypt: Crypt,
         config:,
