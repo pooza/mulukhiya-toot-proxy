@@ -67,7 +67,7 @@ module Mulukhiya
           h[:status] = {
             id: row[:status_id],
             body: row[:toot_text],
-            url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s
+            public_url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s
           }
           catalog.push(h)
         end
