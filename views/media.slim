@@ -44,7 +44,7 @@ html lang='ja'
           ul.params
             li.param
               i class='fas fa-user'
-              | {{media.account.display_name}}
+              | {{media.account.display_name || '@' + media.account.username}}
           ul.params
             li.param
               i class='fas fa-comment'
