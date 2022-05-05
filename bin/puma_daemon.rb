@@ -7,4 +7,3 @@ module Mulukhiya
   exit 1 if PumaDaemon.disable?
   PumaDaemon.spawn!
 end
-

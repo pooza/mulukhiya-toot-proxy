@@ -7,4 +7,3 @@ module Mulukhiya
   exit 1 if SidekiqDaemon.disable?
   SidekiqDaemon.spawn!
 end
-

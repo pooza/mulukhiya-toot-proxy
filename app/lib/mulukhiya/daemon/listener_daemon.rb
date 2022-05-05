@@ -18,8 +18,7 @@ module Mulukhiya
 
     def self.disable?
       return true unless Environment.account_class.info_token
-      return true if Event.new(:follow).count.zero?
-      return true if Event.new(:mention).count.zero?
+      return true if [:follow, :mention].sum {|v| Event.new(v).count}.zero?
       return false
     end
 
