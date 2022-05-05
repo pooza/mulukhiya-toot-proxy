@@ -40,9 +40,16 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
+        service = MisskeyService.new
         return Postgres.exec(:media_catalog, params).map do |row|
-          attachment = self[row[:id]]
-          attachment.to_h.merge(status: Status[row[:status_id]]&.to_h)
+          self[row[:id]].to_h.merge(
+            status: {
+              id: row[:status_id],
+              body: row[:status_text],
+              public_url: service.create_uri("/notes/#{row[:status_id]}").to_s,
+            },
+            account: row.slice(:username, :display_name),
+          )
         end
       end
 
