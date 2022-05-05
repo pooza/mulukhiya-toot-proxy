@@ -60,10 +60,17 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        rows = Postgres.exec(:media_catalog, params)
-        return rows.map {|v| v[:id]}.filter_map {|v| self[v] rescue nil}.map do |record|
-          record.to_h.merge(status: record.status.to_h)
+        catalog = []
+        Postgres.exec(:media_catalog, params).each do |row|
+          next unless h = self[row[:id]].to_h
+          h[:status] = {
+            id: row[:status_id],
+            text: row[:text],
+            visibility: Environment.status_class.visibility_names[row[:visibility]],
+          }
+          catalog.push(h)
         end
+        return catalog
       end
 
       def self.feed(&block)
