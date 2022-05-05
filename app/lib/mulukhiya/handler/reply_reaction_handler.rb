@@ -2,7 +2,7 @@ module Mulukhiya
   class ReplyReactionHandler < Handler
     def disable?
       return true unless controller_class.reaction?
-      return false
+      return super
     end
 
     def handle_post_reaction(payload, params = {})

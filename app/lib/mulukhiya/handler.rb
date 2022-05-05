@@ -187,10 +187,7 @@ module Mulukhiya
     end
 
     def self.create(name, params = {})
-      klass = "Mulukhiya::#{name.to_s.sub(/_handler$/, '').camelize}Handler".constantize
-      handler = klass.new(params)
-      return nil if handler.disable?
-      return handler
+      return "Mulukhiya::#{name.to_s.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
       e.log(name:)
       return nil
