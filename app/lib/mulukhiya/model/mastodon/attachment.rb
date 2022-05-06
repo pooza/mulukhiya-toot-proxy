@@ -60,15 +60,16 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
-          next catalog unless h = self[row[:id]].to_h
-          h[:account] = row.slice(:username, :display_name)
-          h[:status] = {
-            body: row[:status_text],
-            public_url: Status.create_uri(:public, row).to_s,
-            webui_url: Status.create_uri(:webui, row).to_s,
-          }
-          catalog.push(h)
+        return Postgres.exec(:media_catalog, params).filter_map do |row|
+          next unless attachment = self[row[:id]]
+          attachment.to_h.merge(
+            account: row.slice(:username, :display_name),
+            status: {
+              body: row[:status_text],
+              public_url: Status.create_uri(:public, row).to_s,
+              webui_url: Status.create_uri(:webui, row).to_s,
+            },
+          )
         end
       end
 
