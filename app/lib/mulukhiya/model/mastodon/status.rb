@@ -30,18 +30,12 @@ module Mulukhiya
       end
 
       def public_uri
-        @public_uri ||= service.create_uri("/@#{account.username}/#{id}")
+        @public_uri ||= self.class.create_uri(:public, {username: account.username, id:})
         return @public_uri
       end
 
       def service
-        unless @service
-          if Environment.mastodon_type?
-            @service = sns_class.new
-          else
-            @service = MastodonService.new
-          end
-        end
+        @service ||= MastodonService.new
         return @service
       end
 
@@ -62,6 +56,17 @@ module Mulukhiya
         template[:status] = TootParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def self.create_uri(type, params)
+        service = MastodonService.new
+        params[:id] ||= params[:status_id]
+        case type.to_sym
+          in :public
+            return service.create_uri("/@#{params[:username]}/#{params[:id]}")
+          in :webui
+            return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
+        end
       end
 
       def self.visibility_names
