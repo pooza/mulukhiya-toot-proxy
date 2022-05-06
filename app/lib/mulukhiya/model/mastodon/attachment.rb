@@ -40,11 +40,11 @@ module Mulukhiya
         return {}
       end
 
-      def path(size = 'original')
+      def path(size = :original)
         return File.join(
           '/media/media_attachments/files',
           id.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1/'),
-          size,
+          size.to_s,
           filename,
         )
       end
