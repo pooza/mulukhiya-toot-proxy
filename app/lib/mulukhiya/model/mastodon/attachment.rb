@@ -60,7 +60,6 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        service = MastodonService.new
         return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
           next catalog unless h = self[row[:id]].to_h
           h[:account] = row.slice(:username, :display_name)

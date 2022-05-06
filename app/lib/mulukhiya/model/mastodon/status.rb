@@ -62,10 +62,10 @@ module Mulukhiya
         service = MastodonService.new
         params[:id] ||= params[:status_id]
         case type.to_sym
-          in :public
-            return service.create_uri("/@#{params[:username]}/#{params[:id]}")
-          in :webui
-            return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
+        in :public
+          return service.create_uri("/@#{params[:username]}/#{params[:id]}")
+        in :webui
+          return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
         end
       end
 
