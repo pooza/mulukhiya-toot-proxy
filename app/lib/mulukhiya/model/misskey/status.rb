@@ -22,6 +22,7 @@ module Mulukhiya
           else
             @uri = self.class.create_uri(:public, {id:})
           end
+          @uri = create_status_uri(uri)
         end
         return @uri
       end

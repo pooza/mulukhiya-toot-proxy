@@ -35,10 +35,11 @@ module Mulukhiya
       def uri
         unless @uri
           if values[:uri].present?
-            @uri = Ginseng::URI.parse(values[:uri])
+            uri = Ginseng::URI.parse(values[:uri])
           else
-            @uri = self.class.create_uri(:public, {id:})
+            uri = self.class.create_uri(:public, {id:})
           end
+          @uri = create_status_uri(uri)
         end
         return @uri
       end
