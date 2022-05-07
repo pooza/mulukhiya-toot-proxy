@@ -16,17 +16,13 @@ module Mulukhiya
         return {}
       end
 
-      def uri(size = 'original')
-        case size
-        when 'small', 'thumbnail'
+      def create_uri(size = :original)
+        case size.to_sym
+        in :small | :thumbnail
           return MisskeyService.new.create_uri(thumbnailUrl || webpublicUrl || url)
-        else
+        in :original
           return MisskeyService.new.create_uri(webpublicUrl || url)
         end
-      end
-
-      def thumbnail_uri
-        return uri('small')
       end
 
       def date
@@ -40,12 +36,11 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        service = MisskeyService.new
         return Postgres.exec(:media_catalog, params).map do |row|
           self[row[:id]].to_h.merge(
             status: {
               body: row[:status_text],
-              public_url: service.create_uri("/notes/#{row[:status_id]}").to_s,
+              public_url: Status.create_uri(:public, row).to_s,
             },
             account: row.slice(:username, :display_name),
           )

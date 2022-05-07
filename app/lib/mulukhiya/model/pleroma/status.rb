@@ -11,13 +11,7 @@ module Mulukhiya
       end
 
       def service
-        unless @service
-          if Environment.mastodon_type?
-            @service = sns_class.new
-          else
-            @service = PleromaService.new
-          end
-        end
+        @service ||= PleromaService.new
         return @service
       end
 

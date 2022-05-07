@@ -6,13 +6,7 @@ module Mulukhiya
       include SNSMethods
 
       def service
-        unless @service
-          if Environment.misskey_type?
-            @service = sns_class.new
-          else
-            @service = MeisskeyService.new
-          end
-        end
+        @service ||= MeisskeyService.new
         return @service
       end
 
@@ -40,9 +34,12 @@ module Mulukhiya
 
       def uri
         unless @uri
-          @uri = Ginseng::URI.parse(values['uri']) if values['uri'].present?
-          @uri ||= service.create_uri("/notes/#{id}")
-          @uri = create_status_uri(@uri)
+          if values[:uri].present?
+            uri = Ginseng::URI.parse(values[:uri])
+          else
+            uri = self.class.create_uri(:public, {id:})
+          end
+          @uri = create_status_uri(uri)
         end
         return @uri
       end
@@ -87,6 +84,15 @@ module Mulukhiya
 
       def self.collection
         return Mongo.instance.db[:notes]
+      end
+
+      def self.create_uri(type, params)
+        service = MeisskeyService.new
+        params[:id] ||= params[:status_id]
+        case type.to_sym
+        in :public
+          return service.create_uri("/notes/#{params[:id]}")
+        end
       end
 
       private

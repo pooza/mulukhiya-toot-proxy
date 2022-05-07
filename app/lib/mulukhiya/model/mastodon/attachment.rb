@@ -40,36 +40,32 @@ module Mulukhiya
         return {}
       end
 
-      def path(size = 'original')
+      def path(size = :original)
         return File.join(
           '/media/media_attachments/files',
           id.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1/'),
-          size,
+          size.to_s,
           filename,
         )
       end
 
-      def uri(size = 'original')
+      def create_uri(size = :original)
         return MastodonService.new.create_uri(path(size))
-      end
-
-      def thumbnail_uri
-        return uri('small')
       end
 
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        service = MastodonService.new
-        return Postgres.exec(:media_catalog, params).inject([]) do |catalog, row|
-          next catalog unless h = self[row[:id]].to_h
-          h[:account] = row.slice(:username, :display_name)
-          h[:status] = {
-            body: row[:status_text],
-            public_url: service.create_uri("/@#{row[:username]}/#{row[:status_id]}").to_s,
-            webui_url: service.create_uri("/mulukhiya/app/status/#{row[:status_id]}").to_s,
-          }
-          catalog.push(h)
+        return Postgres.exec(:media_catalog, params).filter_map do |row|
+          next unless attachment = self[row[:id]]
+          attachment.to_h.merge(
+            account: row.slice(:username, :display_name),
+            status: {
+              body: row[:status_text],
+              public_url: Status.create_uri(:public, row).to_s,
+              webui_url: Status.create_uri(:webui, row).to_s,
+            },
+          )
         end
       end
 

@@ -3,7 +3,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     def disable?
-      return true unless DictionaryTagHandler.all.present?
+      return true unless Handler.create(:dictionary_tag).all.present?
       return super
     end
 

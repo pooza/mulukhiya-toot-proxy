@@ -26,12 +26,9 @@ module Mulukhiya
         return data[:url].first[:mediaType]
       end
 
-      def uri
-        @uri ||= Ginseng::URI.parse(data[:url].first[:href])
-        return @uri
+      def create_uri(size = :original)
+        return Ginseng::URI.parse(data[:url].first[:href])
       end
-
-      alias thumbnail_uri uri
 
       def data
         @data ||= JSON.parse(values[:data]).deep_symbolize_keys

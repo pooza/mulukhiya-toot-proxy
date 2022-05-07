@@ -11,21 +11,18 @@ module Mulukhiya
       end
 
       def service
-        unless @service
-          if Environment.misskey_type?
-            @service = sns_class.new
-          else
-            @service = MisskeyService.new
-          end
-        end
+        @service ||= MisskeyService.new
         return @service
       end
 
       def uri
         unless @uri
-          @uri = Ginseng::URI.parse(self[:uri]) if self[:uri].present?
-          @uri ||= service.create_uri("/notes/#{id}")
-          @uri = create_status_uri(@uri)
+          if self[:uri].present?
+            uri = Ginseng::URI.parse(self[:uri])
+          else
+            uri = self.class.create_uri(:public, {id:})
+          end
+          @uri = create_status_uri(uri)
         end
         return @uri
       end
@@ -57,6 +54,15 @@ module Mulukhiya
         template[:status] = NoteParser.new(text).to_md
         template[:url] = uri.to_s
         return template.to_s
+      end
+
+      def self.create_uri(type, params)
+        service = MisskeyService.new
+        params[:id] ||= params[:status_id]
+        case type.to_sym
+        in :public
+          return service.create_uri("/notes/#{params[:id]}")
+        end
       end
     end
   end
