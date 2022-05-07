@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_perform
-      assert_predicate(@worker.perform, :present?)
+      assert_kind_of(Hash, @worker.perform)
     end
   end
 end
