@@ -13,7 +13,7 @@ module Mulukhiya
 
       def create_uri(size = :original)
         case size.to_sym
-        in :small, :thumbnail
+        in :small | :thumbnail
           return Ginseng::URI.parse(values.dig('metadata', 'thumbnailUrl'))
         in :original
           return Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))

@@ -18,7 +18,7 @@ module Mulukhiya
 
       def create_uri(size = :original)
         case size.to_sym
-        in :small, :thumbnail
+        in :small | :thumbnail
           return MisskeyService.new.create_uri(thumbnailUrl || webpublicUrl || url)
         in :original
           return MisskeyService.new.create_uri(webpublicUrl || url)
