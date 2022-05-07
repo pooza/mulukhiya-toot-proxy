@@ -6,11 +6,18 @@ module Mulukhiya
       return type.split('/').first
     end
 
+    def width
+      return meta&.fetch(:width, nil)
+    end
+
+    def height
+      return meta&.fetch(:height, nil)
+    end
+
     def pixel_size
-      return nil unless meta
-      return nil unless meta[:width]
-      return nil unless meta[:height]
-      return "#{meta[:width]}x#{meta[:height]}"
+      return nil unless width
+      return nil unless height
+      return "#{width}x#{height}"
     end
 
     def duration

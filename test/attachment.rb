@@ -45,6 +45,16 @@ module Mulukhiya
       assert_kind_of(String, @attachment.size_str)
     end
 
+    def test_width
+      return unless @attachment
+      assert_kind_of([Integer, NilClass], @attachment.width)
+    end
+
+    def test_height
+      return unless @attachment
+      assert_kind_of([Integer, NilClass], @attachment.height)
+    end
+
     def test_description
       return unless @attachment
       assert_kind_of([String, NilClass], @attachment.description)
