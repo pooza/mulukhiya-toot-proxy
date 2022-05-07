@@ -49,12 +49,8 @@ module Mulukhiya
         )
       end
 
-      def uri(size = 'original')
+      def create_uri(size = :original)
         return MastodonService.new.create_uri(path(size))
-      end
-
-      def thumbnail_uri
-        return uri('small')
       end
 
       def self.catalog(params = {})

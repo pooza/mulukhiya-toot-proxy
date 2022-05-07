@@ -11,13 +11,13 @@ module Mulukhiya
         return contentType
       end
 
-      def uri
-        @uri ||= Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
-        return @uri
-      end
-
-      def thumbnail_uri
-        return Ginseng::URI.parse(values.dig('metadata', 'thumbnailUrl'))
+      def create_uri(size = :original)
+        case size.to_sym
+        in :small, :thumbnail
+          return Ginseng::URI.parse(values.dig('metadata', 'thumbnailUrl'))
+        else
+          return Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
+        end
       end
 
       def meta

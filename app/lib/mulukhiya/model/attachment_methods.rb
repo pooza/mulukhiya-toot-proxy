@@ -19,6 +19,14 @@ module Mulukhiya
       return meta[:duration].to_f.round(2)
     end
 
+    def uri
+      return create_uri(:original)
+    end
+
+    def thumbnail_uri
+      return create_uri(:small)
+    end
+
     def meta
       storage = MediaMetadataStorage.new
       storage.push(uri) unless storage.key?(uri)
