@@ -20,7 +20,7 @@ module Mulukhiya
         case size.to_sym
         in :small, :thumbnail
           return MisskeyService.new.create_uri(thumbnailUrl || webpublicUrl || url)
-        else
+        in :original
           return MisskeyService.new.create_uri(webpublicUrl || url)
         end
       end

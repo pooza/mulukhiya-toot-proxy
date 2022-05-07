@@ -15,7 +15,7 @@ module Mulukhiya
         case size.to_sym
         in :small, :thumbnail
           return Ginseng::URI.parse(values.dig('metadata', 'thumbnailUrl'))
-        else
+        in :original
           return Ginseng::URI.parse(values['src'] || values.dig('metadata', 'url'))
         end
       end
