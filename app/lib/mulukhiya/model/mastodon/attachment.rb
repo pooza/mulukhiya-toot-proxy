@@ -63,7 +63,7 @@ module Mulukhiya
             status: {
               body: row[:status_text],
               public_url: Status.create_uri(:public, row).to_s,
-              webui_url: Status.create_uri(:webui, row).to_s,
+              webui_url: Status.create_uri(:webui, {id: row[:status_id]}).to_s,
             },
           )
         end
