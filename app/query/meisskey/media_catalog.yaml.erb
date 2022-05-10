@@ -11,14 +11,15 @@
 <% end -%>
     _user.host: null
 <% if params[:rule] -%>
-    text:
-      $and:
+    $and:
 <% params[:rule].keywords.each do |keyword| -%>
-        - $regex: <%= keyword %>
+      - text:
+          $regex: <%= keyword %>
 <% end -%>
 <% params[:rule].negative_keywords.each do |keyword| -%>
-        - $not:
-            $regex: <%= params[:q] %>
+      - text:
+          $not:
+            $regex: <%= keyword %>
 <% end -%>
 <% end -%>
     visibility:
