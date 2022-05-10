@@ -24,7 +24,7 @@ module Mulukhiya
     def parse
       text.split(/[\s[:blank:]]+/).each do |keyword|
         if keyword.start_with?(keyword)
-          negative_keywords.add(keyword.sub(%{^-}, ''))
+          negative_keywords.add(keyword.sub(%(^-), ''))
         else
           keywords.add(keyword)
         end
