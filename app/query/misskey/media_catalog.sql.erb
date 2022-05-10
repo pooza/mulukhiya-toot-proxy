@@ -42,8 +42,14 @@ FROM
     LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
   ) AS note_file ON drive_file.id = note_file.file_id
 WHERE (drive_file."userHost" IS null)
-  <% if params[:q] %>
-    AND ((note_file.text LIKE '%<%= params[:q] %>%') OR (drive_file.name LIKE '%<%= params[:q] %>%'))
+  <% if params[:rule] %>
+    <% params[:rule].keywords.each do |keyword| %>
+      AND ((note_file.text LIKE '%<%= keyword %>%') OR (drive_file.name LIKE '%<%= keyword %>%'))
+    <% end %>
+    <% params[:rule].negative_keywords.each do |keyword| %>
+      AND (note_file.text NOT LIKE '%<%= keyword %>%')
+      AND (drive_file.name NOT LIKE '%<%= keyword %>%')
+    <% end %>
   <% end %>
 ORDER BY
   note_file."createdAt" DESC

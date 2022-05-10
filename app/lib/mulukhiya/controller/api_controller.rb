@@ -132,6 +132,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       elsif controller_class.media_catalog?
+        params[:rule] = SearchRule.new(params[:q]) if params[:q]
         @renderer.message = attachment_class.catalog(params)
       else
         @renderer.status = 404
@@ -177,6 +178,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
+        params[:rule] = SearchRule.new(params[:q]) if params[:q]
         @renderer.message = sns.account.statuses(params)
       end
       return @renderer.to_s

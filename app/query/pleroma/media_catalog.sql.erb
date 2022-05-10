@@ -30,8 +30,13 @@ FROM
       ) AS objects_actor ON objects_base.id = objects_actor.id
       INNER JOIN users ON objects_actor.actor[5] = users.nickname
     WHERE (objects_base.data->'attachment'->0->'url' IS NOT null)
-      <% if params[:q] %>
-        AND ((objects_base.data->'content')::varchar LIKE '%<%= params[:q] %>%')
+      <% if params[:rule] %>
+        <% params[:rule].keywords.each do |keyword| %>
+          AND ((objects_base.data->'content')::varchar LIKE '%<%= keyword %>%')
+        <% end %>
+        <% params[:rule].negative_keywords.each do |keyword| %>
+          AND ((objects_base.data->'content')::varchar NOT LIKE '%<%= keyword %>%')
+        <% end %>
       <% end %>
       <% unless params[:only_person].to_i.zero? %>
         AND (users.actor_type = 'Person')

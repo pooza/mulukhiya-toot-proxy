@@ -19,11 +19,23 @@ WHERE (toots.local = true)
   AND (toots.reblog_of_id IS null)
   AND (toots.visibility < 2)
   AND (toots.deleted_at IS null)
-  <% if params[:q] %>
+  <% if params[:rule] %>
     <% if config['/postgres/pgroonga'] %>
-      AND ((toots.text &@ '<%= params[:q] %>') OR ((attachments.description &@ '<%= params[:q] %>')))
+      <% params[:rule].keywords.each do |keyword| %>
+        AND ((toots.text &@ '<%= keyword %>') OR (attachments.description &@ '<%= keyword %>'))
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (NOT (toots.text &@ '<%= keyword %>'))
+        AND ((attachments.description IS NULL) OR (NOT (attachments.description &@ '<%= keyword %>')))
+      <% end %>
     <% else %>
-      AND ((toots.text LIKE '%<%= params[:q] %>%') OR ((attachments.description LIKE '%<%= params[:q] %>%')))
+      <% params[:rule].keywords.each do |keyword| %>
+        AND ((toots.text LIKE '%<%= keyword %>%') OR (attachments.description LIKE '%<%= keyword %>%'))
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (toots.text NOT LIKE '%<%= keyword %>%')
+        AND ((attachments.description IS NULL) OR (attachments.description NOT LIKE '%<%= keyword %>%'))
+      <% end %>
     <% end %>
   <% end %>
   <% unless params[:only_person].to_i.zero? %>

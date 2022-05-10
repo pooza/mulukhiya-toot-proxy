@@ -10,9 +10,17 @@
     user.isBot: false
 <% end -%>
     _user.host: null
-<% if params[:q] -%>
-    text:
-      $regex: <%= params[:q] %>
+<% if params[:rule] -%>
+    $and:
+<% params[:rule].keywords.each do |keyword| -%>
+      - text:
+          $regex: <%= keyword %>
+<% end -%>
+<% params[:rule].negative_keywords.each do |keyword| -%>
+      - text:
+          $not:
+            $regex: <%= keyword %>
+<% end -%>
 <% end -%>
     visibility:
       $in:
