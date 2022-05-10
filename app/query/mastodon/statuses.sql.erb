@@ -7,11 +7,23 @@ WHERE (toots.reblog_of_id IS null)
   AND (toots.visibility < 3)
   AND (toots.deleted_at IS null)
   AND (toots.local = true)
-  <% if params[:q] %>
+  <% if params[:rule] %>
     <% if config['/postgres/pgroonga'] %>
-      AND (toots.text &@ '<%= params[:q] %>')
+      <% params[:rule].keywords.each do |keyword| %>
+        AND ((toots.text &@ '<%= keyword %>') OR (toots.spoiler_text &@ '<%= keyword %>'))
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (NOT (toots.text &@ '<%= keyword %>'))
+        AND ((toots.spoiler_text IS NULL) OR (NOT (toots.spoiler_text &@ '<%= keyword %>')))
+      <% end %>
     <% else %>
-      AND (toots.text LIKE '%<%= params[:q] %>%')
+      <% params[:rule].keywords.each do |keyword| %>
+        AND ((toots.text LIKE '%<%= keyword %>%') OR (toots.spoiler_text LIKE '%<%= keyword %>%'))
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (toots.text NOT LIKE '%<%= keyword %>%')
+        AND ((toots.spoiler_text IS NULL) OR (toots.spoiler_text NOT LIKE '%<%= keyword %>%'))
+      <% end %>
     <% end %>
   <% end %>
   AND (accounts.silenced_at IS null)
