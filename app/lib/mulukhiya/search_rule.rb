@@ -1,5 +1,5 @@
 module Mulukhiya
-  class SearchKeywordParser
+  class SearchRule
     include Package
     include SNSMethods
     attr_reader :text

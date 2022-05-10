@@ -1,7 +1,7 @@
 module Mulukhiya
-  class SearchKeywordParserTest < TestCase
+  class SearchRuleTest < TestCase
     def setup
-      @parser = SearchKeywordParser.new('ゆいぴょん ここぴー らんらん -マリっぺ')
+      @parser = SearchRule.new('ゆいぴょん ここぴー らんらん -マリっぺ')
     end
 
     def test_text
