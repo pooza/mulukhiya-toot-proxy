@@ -9,12 +9,12 @@ module Mulukhiya
       parse
     end
 
-    def keyrowds
+    def keywords
       @keywords ||= Set[]
       return @keywords
     end
 
-    def negative_keyrowds
+    def negative_keywords
       @negative_keyrowds ||= Set[]
       return @negative_keyrowds
     end
@@ -24,7 +24,7 @@ module Mulukhiya
     def parse
       text.split(/[\s[:blank:]]+/).each do |keyword|
         if keyword.start_with?('-')
-          negative_keywords.add(keyword.sub(%(^-), ''))
+          negative_keywords.add(keyword.sub(/^-/, ''))
         else
           keywords.add(keyword)
         end
