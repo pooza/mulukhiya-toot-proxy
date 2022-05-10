@@ -5,7 +5,7 @@ module Mulukhiya
     attr_reader :text
 
     def initialize(text)
-      @text = text
+      @text = text.to_s
       parse
     end
 
