@@ -45,7 +45,7 @@ FROM
 WHERE (drive_file."userHost" IS null)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws('::::', note_file.text, note_file.cw, drive_file.name) &@ '<%= keyword %>')
+      AND (concat_ws('::::', note_file.text, note_file.cw, drive_file.name) LIKE '%<%= keyword %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
       AND (coalesce(note_file.text, '') NOT LIKE '%<%= keyword %>%')
