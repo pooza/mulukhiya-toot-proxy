@@ -292,18 +292,6 @@ ul.links
       width: 1px
       color: dimgray
       radius: 6px
-    input[type='search']
-      font:
-        size: 0.8em
-      margin: 0 1em
-    input[type='text']
-      font:
-        size: 0.8em
-      margin: 0 1em
-    input[type='number']
-      font:
-        size: 0.8em
-      margin: 0 1em
     .v-select
       font:
         size: 0.6em
@@ -343,6 +331,11 @@ ul.links
       font:
         size: 0.6em
         family: $monospace
+    .control
+      margin: 0.2em 1em
+      font:
+        size: 0.8em
+        family: $sans-serif
 
 ul.medias
   list:
@@ -504,9 +497,10 @@ section.disabled h3::after
 nav.search-form-container
   margin: 0em 1em
   input[type='search']
-    width: calc(100% - 12em)
-  .search-control
-    display: inline
+    width: calc(100% - 8em)
+  .control
+    font:
+      size: 0.8em
 
 article.status
   margin: 1em

@@ -10,19 +10,19 @@ WHERE (toots.reblog_of_id IS null)
   <% if params[:rule] %>
     <% if config['/postgres/pgroonga'] %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND ((toots.text &@ '<%= keyword %>') OR (toots.spoiler_text &@ '<%= keyword %>'))
+        AND (concat_ws('::::', toots.text, toots.spoiler_text) &@ '<%= keyword %>')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
-        AND (NOT (toots.text &@ '<%= keyword %>'))
-        AND ((toots.spoiler_text IS NULL) OR (NOT (toots.spoiler_text &@ '<%= keyword %>')))
+        AND (NOT (coalesce(toots.text, '') &@ '<%= keyword %>'))
+        AND (NOT (coalesce(toots.spoiler_text, '') &@ '<%= keyword %>'))
       <% end %>
     <% else %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND ((toots.text LIKE '%<%= keyword %>%') OR (toots.spoiler_text LIKE '%<%= keyword %>%'))
+        AND (concat_ws('::::', toots.text, toots.spoiler_text) LIKE '%<%= keyword %>%')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
-        AND (toots.text NOT LIKE '%<%= keyword %>%')
-        AND ((toots.spoiler_text IS NULL) OR (toots.spoiler_text NOT LIKE '%<%= keyword %>%'))
+        AND (coalesce(toots.text, '') NOT LIKE '%<%= keyword %>%')
+        AND (coalesce(toots.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
       <% end %>
     <% end %>
   <% end %>

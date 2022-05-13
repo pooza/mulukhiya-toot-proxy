@@ -13,11 +13,17 @@
 <% if params[:rule] -%>
     $and:
 <% params[:rule].keywords.each do |keyword| -%>
-      - text:
-          $regex: <%= keyword %>
+      - $or:
+        - text:
+            $regex: <%= keyword %>
+        - cw:
+            $regex: <%= keyword %>
 <% end -%>
 <% params[:rule].negative_keywords.each do |keyword| -%>
       - text:
+          $not:
+            $regex: <%= keyword %>
+      - cw:
           $not:
             $regex: <%= keyword %>
 <% end -%>

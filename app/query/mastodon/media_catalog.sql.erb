@@ -22,19 +22,21 @@ WHERE (toots.local = true)
   <% if params[:rule] %>
     <% if config['/postgres/pgroonga'] %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND ((toots.text &@ '<%= keyword %>') OR (attachments.description &@ '<%= keyword %>'))
+        AND (concat_ws('::::', toots.text, toots.spoiler_text, attachments.description) &@ '<%= keyword %>')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
-        AND (NOT (toots.text &@ '<%= keyword %>'))
-        AND ((attachments.description IS NULL) OR (NOT (attachments.description &@ '<%= keyword %>')))
+        AND (NOT (coalesce(toots.text, '') &@ '<%= keyword %>'))
+        AND (NOT (coalesce(toots.spoiler_text, '') &@ '<%= keyword %>'))
+        AND (NOT (coalesce(attachments.description, '') &@ '<%= keyword %>'))
       <% end %>
     <% else %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND ((toots.text LIKE '%<%= keyword %>%') OR (attachments.description LIKE '%<%= keyword %>%'))
+        AND (concat_ws('::::', toots.text, attachments.description) LIKE '%<%= keyword %>%')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
-        AND (toots.text NOT LIKE '%<%= keyword %>%')
-        AND ((attachments.description IS NULL) OR (attachments.description NOT LIKE '%<%= keyword %>%'))
+        AND (coalesce(toots.text, '') NOT LIKE '%<%= keyword %>%')
+        AND (coalesce(toots.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
+        AND (coalesce(attachments.description, '') NOT LIKE '%<%= keyword %>%')
       <% end %>
     <% end %>
   <% end %>
