@@ -69,7 +69,9 @@ html lang='ja'
             .endpoint-container
               .link GET {{endpoints.media_list}}
               input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
-              toggle-button v-model='query_params.media_list.only_person' @input='onInputMediaList' v-tooltip.bottom="'ボットからの投稿を除く'"
+              label
+                input type='checkbox' v-model='query_params.media_list.only_person' @input='onInputMediaList'
+                | ボットからの投稿を除く
               input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
