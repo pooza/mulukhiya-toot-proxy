@@ -16,23 +16,33 @@ html lang='ja'
             vue-slide-up-down :active='layout.details.status'
               .endpoint-container
                 .link GET {{endpoints.status_list}}
-                input type='number' placeholder='ページ番号' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
-                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
+                .control
+                  i class='fa fa-file'
+                  input type='number' placeholder='ページ番号' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
+                .control
+                  i class='fa fa-magnifying-glass'
+                  input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
                 .link-description = "@{{account.username}}からの#{controller.status_label}を取得します。"
                 .field-update-button-container
                   button @click='delay(getStatuses)' 実行
                   pre.result v-if='result.status_list' {{result.status_list}}
               .endpoint-container
                 .link GET {{endpoints.status_detail}}
-                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_detail.id' @input='onInputStatusDetail' @keydown.enter='delay(getStatus)'
+                .control
+                  i class='fa fa-id-badge'
+                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_detail.id' @input='onInputStatusDetail' @keydown.enter='delay(getStatus)'
                 .link-description = "#{controller.status_label}を1件、取得します。"
                 .field-update-button-container
                   button @click='delay(getStatus)' :disabled='!query_params.status_detail.id' 実行
                   pre.result v-if='result.status_detail' {{result.status_detail}}
               .endpoint-container
                 .link POST /mulukhiya/api/status/tag
-                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_create_tag.id'
-                input type='text' placeholder='タグ名' v-model.trim='query_params.status_create_tag.tag'
+                .control
+                  i class='fa fa-id-badge'
+                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_create_tag.id'
+                .control
+                  i class='fa fa-tag'
+                  input type='text' placeholder='タグ名' v-model.trim='query_params.status_create_tag.tag'
                 pre.payload v-if='query_params.status_create_tag' {{query_params.status_create_tag}}
                 .link-description = "#{controller.status_label}の本文末尾にハッシュタグを追加します。"
                 .field-update-button-container
@@ -40,8 +50,12 @@ html lang='ja'
                   pre.result v-if='result.status_create_tag' {{result.status_create_tag}}
               .endpoint-container
                 .link DELETE /mulukhiya/api/status/tag
-                input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_delete_tag.id'
-                input type='text' placeholder='タグ名' v-model.trim='query_params.status_delete_tag.tag'
+                .control
+                  i class='fa fa-id-badge'
+                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_delete_tag.id'
+                .control
+                  i class='fa fa-tag'
+                  input type='text' placeholder='タグ名' v-model.trim='query_params.status_delete_tag.tag'
                 pre.payload v-if='query_params.status_delete_tag' {{query_params.status_delete_tag}}
                 .link-description = "#{controller.status_label}の本文末尾からハッシュタグを削除します。"
                 .field-update-button-container
@@ -68,11 +82,16 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
-              input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
-              label
-                input type='checkbox' v-model='query_params.media_list.only_person' @input='onInputMediaList'
-                | ボットからの投稿を除く
-              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
+              .control
+                i class='fa fa-file'
+                input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
+              .control
+                i class='fa fa-magnifying-glass'
+                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
+              .control
+                label
+                  input type='checkbox' v-model='query_params.media_list.only_person' @input='onInputMediaList'
+                  | ボットからの投稿を除く
               .link-description 最近投稿されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='delay(getMedias)' 実行
@@ -148,7 +167,9 @@ html lang='ja'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
               pre.payload v-if='query_params.tagging_tag_search' {{query_params.tagging_tag_search}}
-              input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='searchTags'
+              .control
+                i class='fa fa-magnifying-glass'
+                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='searchTags'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
@@ -224,7 +245,8 @@ html lang='ja'
                   .link GET {{endpoints.#{api.id}}}
                   - api.args.each do |arg|
                     v-select :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' v-if='choices.#{api.id}_#{arg}'
-                    input type='text' placeholder='#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' @keydown.enter='execCustomAPI("#{api.id}")' v-else=''
+                    .control
+                      input type='text' placeholder='#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' @keydown.enter='execCustomAPI("#{api.id}")' v-else=''
                   .link-description = api.description
                   .field-update-button-container
                     button @click='execCustomAPI("#{api.id}")' 実行
