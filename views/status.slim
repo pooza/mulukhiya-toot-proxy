@@ -93,7 +93,7 @@ html lang='ja'
                   e.map(v => {Vue.set(this.statuses, v.id, v)})
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('これ以上投稿はありません。')
+                  this.$dialog.alert('投稿はこれ以上ありません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },
