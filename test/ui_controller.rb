@@ -2,8 +2,7 @@ module Mulukhiya
   class UIControllerTest < TestCase
     include ::Rack::Test::Methods
 
-    def disable?
-      return true if Environment.ci?
+    def setup
       config['/crypt/encoder'] = 'base64'
     end
 

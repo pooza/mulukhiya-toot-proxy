@@ -1,10 +1,5 @@
 module Mulukhiya
   class ControllerTest < TestCase
-    def disable?
-      return true if Environment.ci?
-      return super
-    end
-
     def test_name
       assert_kind_of(String, controller_class.name)
     end

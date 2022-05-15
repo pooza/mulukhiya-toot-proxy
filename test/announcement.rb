@@ -1,7 +1,6 @@
 module Mulukhiya
   class AnnouncementTest < TestCase
     def disable?
-      return true if Environment.ci?
       return true unless controller_class.announcement?
       return super
     end

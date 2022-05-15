@@ -2,11 +2,6 @@ require 'securerandom'
 
 module Mulukhiya
   class UserConfigTest < TestCase
-    def disable?
-      return true if Environment.ci?
-      return super
-    end
-
     def setup
       @user_config = UserConfig.new(account.id)
       @key1 = SecureRandom.hex(16)

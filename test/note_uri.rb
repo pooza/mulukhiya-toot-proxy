@@ -1,7 +1,6 @@
 module Mulukhiya
   class NoteURITest < TestCase
     def disable?
-      return true if Environment.ci?
       return true unless Environment.note?
       return super
     end

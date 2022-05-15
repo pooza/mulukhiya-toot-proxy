@@ -1,10 +1,5 @@
 module Mulukhiya
   class MailerTest < TestCase
-    def disable?
-      return true if Environment.ci?
-      return super
-    end
-
     def setup
       @mailer = Mailer.new
     end

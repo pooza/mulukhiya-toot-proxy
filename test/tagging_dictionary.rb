@@ -1,10 +1,5 @@
 module Mulukhiya
   class TaggingDictionaryTest < TestCase
-    def disable?
-      return true if Environment.ci?
-      return super
-    end
-
     def setup
       config['/handler/dictionary_tag/word/min'] = 3
       config['/handler/dictionary_tag/word/min_kanji'] = 2

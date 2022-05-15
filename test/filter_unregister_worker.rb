@@ -2,6 +2,7 @@ module Mulukhiya
   class FilterUnregisterWorkerTest < TestCase
     def disable?
       return true unless controller_class.filter?
+      return true if FilterUnregisterWorker.new.disable?
       return super
     end
 
