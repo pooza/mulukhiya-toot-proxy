@@ -2,7 +2,15 @@ module Mulukhiya
   class TagContainerTest < TestCase
     def setup
       config['/handler/default_tag/tags'] = ['美食丼', 'b-shock-don']
+      config['/tagging/normalize/rules'] = [
+        {'source' => 'ふたりはプリキュア_Max_Heart', 'normalized' => 'ふたりはプリキュアMax_Heart'},
+        {'source' => 'ドラゴンクエスト_ダイの大冒険_2020年版', 'normalized' => 'ドラゴンクエストダイの大冒険'},
+      ]
       @tags = TagContainer.new
+    end
+
+    def test_normalize
+      assert_equal('ドラゴンクエストダイの大冒険', @tags.normalize('ドラゴンクエスト_ダイの大冒険_2020年版'))
     end
 
     def test_delete
