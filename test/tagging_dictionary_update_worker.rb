@@ -1,10 +1,5 @@
 module Mulukhiya
   class TaggingDictionaryUpdateTest < TestCase
-    def disable?
-      return true if TaggingDictionaryUpdateWorker.new.disable?
-      return super
-    end
-
     def setup
       @worker = TaggingDictionaryUpdateWorker.new
     end

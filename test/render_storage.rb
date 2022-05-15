@@ -1,5 +1,10 @@
 module Mulukhiya
   class RenderStorageTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def setup
       @storage = RenderStorage.new
       @renderer = RSS20FeedRenderer.new

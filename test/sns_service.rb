@@ -1,5 +1,10 @@
 module Mulukhiya
   class SNSServiceTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def setup
       @sns = sns_class.new
     end

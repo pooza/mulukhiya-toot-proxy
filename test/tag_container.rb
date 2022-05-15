@@ -1,5 +1,10 @@
 module Mulukhiya
   class TagContainerTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def setup
       config['/handler/default_tag/tags'] = ['美食丼', 'b-shock-don']
       config['/tagging/normalize/rules'] = [

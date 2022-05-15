@@ -5,6 +5,7 @@ module Mulukhiya
     include SNSMethods
 
     def disable?
+      return true if Environment.ci?
       return false
     end
 

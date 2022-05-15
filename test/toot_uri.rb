@@ -1,6 +1,7 @@
 module Mulukhiya
   class TootURITest < TestCase
     def disable?
+      return true if Environment.ci?
       return true unless Environment.toot?
       return super
     end

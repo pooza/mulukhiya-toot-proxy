@@ -1,5 +1,10 @@
 module Mulukhiya
   class ReporterTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def setup
       @reporter = Reporter.new
       handler = Handler.create(:itunes_url_nowplaying)

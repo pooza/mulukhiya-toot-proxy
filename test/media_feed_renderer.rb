@@ -1,6 +1,7 @@
 module Mulukhiya
   class MediaFeedRendererTest < TestCase
     def disable?
+      return true if Environment.ci?
       return true unless controller_class.feed?
       return super
     end

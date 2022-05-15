@@ -1,5 +1,10 @@
 module Mulukhiya
   class HandlerTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def test_names
       assert_kind_of(Set, Handler.names)
     end

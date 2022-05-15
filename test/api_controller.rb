@@ -2,6 +2,11 @@ module Mulukhiya
   class APIControllerTest < TestCase
     include ::Rack::Test::Methods
 
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def app
       return APIController
     end

@@ -2,6 +2,11 @@ require 'securerandom'
 
 module Mulukhiya
   class UserConfigStorageTest < TestCase
+    def disable?
+      return true if Environment.ci?
+      return super
+    end
+
     def setup
       @storage = UserConfigStorage.new
       @key = SecureRandom.hex(16)
