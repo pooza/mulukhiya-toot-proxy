@@ -1,7 +1,6 @@
 module Mulukhiya
   class MentionVisibilityHandler < Handler
-    def disable?
-      return true unless Environment.dbms_class.config?
+    def disableable?
       return false
     end
 

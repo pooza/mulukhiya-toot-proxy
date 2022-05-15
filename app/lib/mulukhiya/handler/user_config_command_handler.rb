@@ -1,7 +1,6 @@
 module Mulukhiya
   class UserConfigCommandHandler < CommandHandler
-    def disable?
-      return true unless Environment.dbms_class.config?
+    def disableable?
       return false
     end
 

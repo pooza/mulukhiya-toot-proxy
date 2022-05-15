@@ -136,11 +136,15 @@ module Mulukhiya
 
     def disable?
       return true unless Environment.dbms_class.config?
-      return true if sns.account&.disable?(self)
-      return true if config.disable?(self)
+      return true if disableable? && sns.account&.disable?(self)
+      return true if disableable? && config.disable?(self)
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
+    end
+
+    def disableable?
+      return true
     end
 
     alias disabled? disable?

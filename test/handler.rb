@@ -8,6 +8,13 @@ module Mulukhiya
       assert_kind_of(Set, Handler.search(/amazon/))
     end
 
+    def test_disableable?
+      Handler.names.each do |name|
+        next unless handler = Handler.create(name)
+        assert_boolean(handler.disableable?)
+      end
+    end
+
     def test_timeout
       Handler.names.each do |name|
         next unless handler = Handler.create(name)
