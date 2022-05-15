@@ -18,6 +18,13 @@ module Mulukhiya
       return value
     end
 
+    def self.create(name)
+      return "Mulukhiya::#{name.to_s.sub(/_worker$/, '').camelize}Worker".constantize.new
+    rescue => e
+      e.log(name:)
+      return nil
+    end
+
     def self.perform_async(*args)
       return if new.disable?
       if Environment.development? || Environment.test?

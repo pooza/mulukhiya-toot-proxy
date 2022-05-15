@@ -50,6 +50,7 @@ module Mulukhiya
       Sidekiq::Testing.fake!
       names(cases).each do |name|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
+        raise 'disabled' if name.end_with?('_worker') && Worker.create(name).disable?
         puts "+ case: #{name}" if Environment.test?
         require File.join(dir, "#{name}.rb")
       rescue => e
