@@ -1,10 +1,5 @@
 module Mulukhiya
   class ClippingWorkerTest < TestCase
-    def disable?
-      return true if ClippingWorker.new.disable?
-      return super
-    end
-
     def setup
       @worker = ClippingWorker.new
     end
