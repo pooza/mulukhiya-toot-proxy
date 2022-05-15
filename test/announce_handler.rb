@@ -1,5 +1,10 @@
 module Mulukhiya
   class AnnounceHandlerTest < TestCase
+    def disable?
+      return true unless controller_class.announcement?
+      return super
+    end
+
     def setup
       @handler = AnnounceHandler.new
       @handler.payload = {content: "1行目\n\n2行目"}

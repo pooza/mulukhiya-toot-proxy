@@ -1,5 +1,10 @@
 module Mulukhiya
   class MediaFeedRendererTest < TestCase
+    def disable?
+      return true unless controller_class.feed?
+      return super
+    end
+
     def setup
       @renderer = MediaFeedRenderer.new
     end
