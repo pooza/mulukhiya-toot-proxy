@@ -1,5 +1,10 @@
 module Mulukhiya
   class UserTagInitializeWorkerTest < TestCase
+    def disable?
+      return true if UserTagInitializeWorker.new.disable?
+      return super
+    end
+
     def setup
       @worker = UserTagInitializeWorker.new
       test_account.user_config.update(tagging: {user_tags: ['実況']})
