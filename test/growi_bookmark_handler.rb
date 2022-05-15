@@ -1,5 +1,11 @@
 module Mulukhiya
   class GrowiBookmarkHandlerTest < TestCase
+    def disable?
+      return true unless controller_class.growi?
+      return true unless (account.growi rescue nil)
+      return super
+    end
+
     def setup
       @handler = Handler.create(:growi_bookmark)
       @status = account.recent_status

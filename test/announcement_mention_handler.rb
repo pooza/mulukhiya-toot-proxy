@@ -1,5 +1,10 @@
 module Mulukhiya
   class AnnouncementMentionHandlerTest < TestCase
+    def active?
+      return true unless controller_class.announcement?
+      return super
+    end
+
     def setup
       @handler = Handler.create(:announcement_mention)
     end

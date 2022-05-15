@@ -2,6 +2,11 @@ require 'securerandom'
 
 module Mulukhiya
   class MastodonServiceTest < TestCase
+    def disable?
+      return true unless Environment.mastodon?
+      return super
+    end
+
     def setup
       @service = MastodonService.new
       @key = SecureRandom.hex.adler32

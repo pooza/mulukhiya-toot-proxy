@@ -1,5 +1,10 @@
 module Mulukhiya
   class MastodonAuthContractTest < TestCase
+    def disable?
+      return true unless Environment.mastodon_type?
+      return super
+    end
+
     def setup
       @contract = MastodonAuthContract.new
     end

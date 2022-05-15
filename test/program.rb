@@ -1,5 +1,10 @@
 module Mulukhiya
   class ProgramTest < TestCase
+    def disable?
+      return true unless controller_class.livecure?
+      return super
+    end
+
     def setup
       @program = Program.instance
     end

@@ -1,5 +1,10 @@
 module Mulukhiya
   class YouTubeURLNowplayingHandlerTest < TestCase
+    def disable?
+      return true unless YouTubeService.config?
+      return super
+    end
+
     def setup
       @handler = Handler.create(:you_tube_url_nowplaying)
     end

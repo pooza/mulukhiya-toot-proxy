@@ -1,5 +1,11 @@
 module Mulukhiya
   class NextcloudClippingCommandContractTest < TestCase
+    def disable?
+      return true unless controller_class.nextcloud?
+      return true unless (account.nextcloud rescue nil)
+      return super
+    end
+
     def setup
       @contract = NextcloudClippingCommandContract.new
     end

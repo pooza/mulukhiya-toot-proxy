@@ -1,5 +1,10 @@
 module Mulukhiya
   class SpotifyServiceTest < TestCase
+    def disable?
+      return true unless SpotifyService.config?
+      return super
+    end
+
     def setup
       @service = SpotifyService.new
     end

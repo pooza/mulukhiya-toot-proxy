@@ -1,5 +1,10 @@
 module Mulukhiya
   class HexoAnnounceHandlerTest < TestCase
+    def disable?
+      return true unless Handler.create(:hexo_announce)
+      return super
+    end
+
     def setup
       @handler = Handler.create(:hexo_announce)
       config['/agent/info/token'] = test_token

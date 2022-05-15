@@ -1,5 +1,11 @@
 module Mulukhiya
   class LemmyClipperTest < TestCase
+    def disable?
+      return true unless controller_class.lemmy?
+      return true unless (account.lemmy rescue nil)
+      return super
+    end
+
     def setup
       @lemmy = account.lemmy
     end

@@ -1,5 +1,10 @@
 module Mulukhiya
   class TootURITest < TestCase
+    def disable?
+      return true unless Environment.toot?
+      return super
+    end
+
     def setup
       @uri = TootURI.parse('https://precure.ml/web/statuses/101118840135913675')
     end

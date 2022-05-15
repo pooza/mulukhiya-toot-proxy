@@ -2,6 +2,11 @@ module Mulukhiya
   class MisskeyControllerTest < TestCase
     include ::Rack::Test::Methods
 
+    def disable?
+      return true unless Environment.misskey?
+      return super
+    end
+
     def setup
       @parser = parser_class.new
       config['/handler/long_text_image/disable'] = true

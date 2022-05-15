@@ -1,5 +1,11 @@
 module Mulukhiya
   class WebhookTest < TestCase
+    def disable?
+      return true unless controller_class.webhook?
+      return true unless (account.webhook rescue nil)
+      return super
+    end
+
     def setup
       @test_hook = account.webhook
       @payloads = {
