@@ -7,6 +7,10 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def underscore
+      return self.class.to_s.split('::').last.underscore.sub(/_test$/, '')
+    end
+
     def disable?
       return false
     end
