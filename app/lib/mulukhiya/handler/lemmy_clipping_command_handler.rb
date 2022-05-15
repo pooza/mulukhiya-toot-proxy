@@ -1,6 +1,7 @@
 module Mulukhiya
   class LemmyClippingCommandHandler < CommandHandler
     def disable?
+      return true unless controller_class.lemmy?
       return true unless sns.account&.lemmy
       return super
     end
