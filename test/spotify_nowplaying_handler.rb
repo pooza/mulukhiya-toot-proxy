@@ -1,10 +1,5 @@
 module Mulukhiya
   class SpotifyNowplayingHandlerTest < TestCase
-    def disable?
-      return true unless SpotifyService.config?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:spotify_nowplaying)
     end

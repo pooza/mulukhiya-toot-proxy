@@ -1,11 +1,5 @@
 module Mulukhiya
   class WebhookImageHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.webhook?
-      return true unless (account.webhook rescue nil)
-      return super
-    end
-
     def setup
       @handler = Handler.create(:webhook_image)
     end

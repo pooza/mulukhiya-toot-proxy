@@ -1,10 +1,5 @@
 module Mulukhiya
   class LineAlertHandlerTest < TestCase
-    def disable?
-      return true unless LineService.config?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:line_alert)
     end

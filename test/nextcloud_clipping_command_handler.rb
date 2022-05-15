@@ -1,11 +1,5 @@
 module Mulukhiya
   class NextcloudClippingCommandHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.nextcloud?
-      return true unless (account.nextcloud rescue nil)
-      return super
-    end
-
     def setup
       @handler = Handler.create(:nextcloud_clipping_command)
     end

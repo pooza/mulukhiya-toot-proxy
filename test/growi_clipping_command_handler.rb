@@ -1,11 +1,5 @@
 module Mulukhiya
   class GrowiClippingCommandHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.growi?
-      return true unless (account.growi rescue nil)
-      return super
-    end
-
     def setup
       @handler = Handler.create(:growi_clipping_command)
     end

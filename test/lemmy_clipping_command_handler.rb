@@ -1,11 +1,5 @@
 module Mulukhiya
   class LemmyClippingCommandHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.lemmy?
-      return true unless (account.lemmy rescue nil)
-      return super
-    end
-
     def setup
       @handler = Handler.create(:lemmy_clipping_command)
     end

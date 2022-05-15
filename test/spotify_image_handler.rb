@@ -1,10 +1,5 @@
 module Mulukhiya
   class SpotifyImageHandlerTest < TestCase
-    def disable?
-      return true unless SpotifyService.config?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:spotify_image)
     end

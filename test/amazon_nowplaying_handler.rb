@@ -1,10 +1,5 @@
 module Mulukhiya
   class AmazonNowplayingHandlerTest < TestCase
-    def disable?
-      return true unless AmazonService.config?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:amazon_nowplaying)
     end

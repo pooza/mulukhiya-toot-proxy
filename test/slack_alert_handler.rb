@@ -1,10 +1,5 @@
 module Mulukhiya
   class SlackAlertHandlerTest < TestCase
-    def disable?
-      return true unless SlackService.config?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:slack_alert)
     end

@@ -1,6 +1,6 @@
 module Mulukhiya
   class AnnouncementTest < TestCase
-    def active?
+    def disable?
       return true unless controller_class.announcement?
       return super
     end

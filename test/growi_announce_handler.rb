@@ -1,11 +1,5 @@
 module Mulukhiya
   class GrowiAnnounceHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.growi?
-      return true unless (account.growi rescue nil)
-      return super
-    end
-
     def setup
       @handler = Handler.create(:growi_announce)
       config['/agent/info/token'] = test_token

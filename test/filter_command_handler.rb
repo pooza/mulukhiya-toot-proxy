@@ -2,11 +2,6 @@ require 'securerandom'
 
 module Mulukhiya
   class FilterCommandHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.filter?
-      return super
-    end
-
     def setup
       @handler = Handler.create(:filter_command)
       @key = SecureRandom.hex(16)
