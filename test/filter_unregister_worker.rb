@@ -1,5 +1,10 @@
 module Mulukhiya
   class FilterUnregisterWorkerTest < TestCase
+    def disable?
+      return true unless controller_class.filter?
+      return super
+    end
+
     def setup
       @worker = FilterUnregisterWorker.new
       sns_class.new.register_filter(tag: '実況')

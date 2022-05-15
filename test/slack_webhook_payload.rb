@@ -1,5 +1,10 @@
 module Mulukhiya
   class SlackWebhookPayloadTest < TestCase
+    def disable?
+      return true unless SlackService.config?
+      return super
+    end
+
     def setup
       @normal = SlackWebhookPayload.new(%({
         "spoiler_text": "ネタバレ注意1",

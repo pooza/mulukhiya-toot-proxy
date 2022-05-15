@@ -1,11 +1,18 @@
 module Mulukhiya
   class AnnictServiceTest < TestCase
+    def disable?
+      return true unless controller_class.annict?
+      return true unless AnnictService.config?
+      return true unless (account.annict rescue nil)
+      return super
+    end
+
     def setup
-      @service = account.annict if AnnictService.config?
+      @service = account.annict
     end
 
     def test_config?
-      assert_boolean(AnnictService.config?)
+      assert_predicate(AnnictService, :config?)
     end
 
     def test_account

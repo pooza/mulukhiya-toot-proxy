@@ -1,5 +1,10 @@
 module Mulukhiya
   class FilterCommandContractTest < TestCase
+    def disable?
+      return true unless controller_class.filter?
+      return super
+    end
+
     def setup
       @contract = FilterCommandContract.new
     end

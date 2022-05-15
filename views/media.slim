@@ -21,7 +21,7 @@ html lang='ja'
         .control
           label
             input type='checkbox' v-model='only_person'
-            | ボットからの投稿を除く
+            | ボットからの#{controller.status_label}を除く
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
@@ -94,7 +94,7 @@ html lang='ja'
                   this.medias = this.medias.concat(e)
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('メディアはこれ以上投稿されていません。')
+                  this.$dialog.alert('メディアはこれ以上ありません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },

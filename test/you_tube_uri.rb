@@ -1,5 +1,10 @@
 module Mulukhiya
   class YouTubeURITest < TestCase
+    def disable?
+      return true unless YouTubeService.config?
+      return super
+    end
+
     def setup
       @root = YouTubeURI.parse('https://www.youtube.com')
       @video = YouTubeURI.parse('https://www.youtube.com/watch?v=uFfsTeExwbQ')

@@ -1,5 +1,11 @@
 module Mulukhiya
   class TagFeedRendererTest < TestCase
+    def disable?
+      return true unless controller_class.feed?
+      return true if DefaultTagHandler.tags.empty?
+      return super
+    end
+
     def setup
       @renderer = TagFeedRenderer.new
       @renderer.tag = DefaultTagHandler.tags.first

@@ -1,5 +1,10 @@
 module Mulukhiya
   class AmazonURITest < TestCase
+    def disable?
+      return true unless AmazonService.config?
+      return super
+    end
+
     def test_shortenable?
       uri = AmazonURI.parse('https://google.com')
       assert_false(uri.shortenable?)

@@ -1,5 +1,10 @@
 module Mulukhiya
   class SlackServiceTest < TestCase
+    def disable?
+      return true unless SlackService.config?
+      return super
+    end
+
     def test_config?
       assert_boolean(SlackService.config?)
     end

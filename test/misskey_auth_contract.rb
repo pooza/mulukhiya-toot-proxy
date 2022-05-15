@@ -1,5 +1,10 @@
 module Mulukhiya
   class MisskeyAuthContractTest < TestCase
+    def disable?
+      return true unless Environment.misskey_type?
+      return super
+    end
+
     def setup
       @contract = MisskeyAuthContract.new
     end

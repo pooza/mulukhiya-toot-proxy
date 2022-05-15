@@ -1,5 +1,10 @@
 module Mulukhiya
   class SlackWebhookContractTest < TestCase
+    def disable?
+      return true unless SlackService.config?
+      return super
+    end
+
     def setup
       @contract = SlackWebhookContract.new
     end

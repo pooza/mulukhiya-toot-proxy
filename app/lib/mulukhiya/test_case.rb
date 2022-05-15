@@ -7,6 +7,18 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def underscore
+      return self.class.to_s.split('::').last.underscore.sub(/_test$/, '')
+    end
+
+    def disable?
+      return false
+    end
+
+    def run_test
+      super unless disable?
+    end
+
     def teardown
       config.reload
       @handler&.clear
@@ -38,6 +50,7 @@ module Mulukhiya
       Sidekiq::Testing.fake!
       names(cases).each do |name|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
+        raise 'disabled' if name.end_with?('_worker') && Worker.create(name).disable?
         puts "+ case: #{name}" if Environment.test?
         require File.join(dir, "#{name}.rb")
       rescue => e
@@ -56,7 +69,6 @@ module Mulukhiya
         finder.patterns.push('*.rb')
         names = finder.exec.map {|v| File.basename(v, '.rb')}
       end
-      TestCaseFilter.all.select(&:active?).each {|v| v.exec(names)}
       return names.to_set
     end
 

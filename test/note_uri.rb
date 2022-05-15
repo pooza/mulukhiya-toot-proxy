@@ -1,5 +1,10 @@
 module Mulukhiya
   class NoteURITest < TestCase
+    def disable?
+      return true unless Environment.note?
+      return super
+    end
+
     def setup
       @uri = NoteURI.parse(account.recent_status.uri)
     end

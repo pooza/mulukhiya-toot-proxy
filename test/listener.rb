@@ -1,5 +1,11 @@
 module Mulukhiya
   class ListenerTest < TestCase
+    def disable?
+      return true unless controller_class.streaming?
+      return true unless Environment.daemon_classes.member?(ListenerDaemon)
+      return false
+    end
+
     def setup
       @listener = Environment.listener_class.new
     end

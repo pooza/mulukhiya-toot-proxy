@@ -1,5 +1,10 @@
 module Mulukhiya
   class AnnouncementTest < TestCase
+    def disable?
+      return true unless controller_class.announcement?
+      return super
+    end
+
     def setup
       @announcement = Announcement.new
     end

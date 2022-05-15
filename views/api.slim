@@ -91,8 +91,8 @@ html lang='ja'
               .control
                 label
                   input type='checkbox' v-model='query_params.media_list.only_person' @input='onInputMediaList'
-                  | ボットからの投稿を除く
-              .link-description 最近投稿されたメディアファイルを表示します。
+                  | ボットからの#{controller.status_label}を除く
+              .link-description 最近#{controller.status_label}されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='delay(getMedias)' 実行
                 pre.result v-if='result.media_list' {{result.media_list}}
@@ -166,10 +166,10 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_dic'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
-              pre.payload v-if='query_params.tagging_tag_search' {{query_params.tagging_tag_search}}
               .control
                 i class='fa fa-magnifying-glass'
                 input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='searchTags'
+              pre.payload v-if='query_params.tagging_tag_search' {{query_params.tagging_tag_search}}
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行

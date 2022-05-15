@@ -1,5 +1,11 @@
 module Mulukhiya
   class NextcloudClipperTest < TestCase
+    def disable?
+      return true unless controller_class.nextcloud?
+      return true unless (account.nextcloud rescue nil)
+      return super
+    end
+
     def test_create
       assert_kind_of(NextcloudClipper, account.nextcloud)
     end

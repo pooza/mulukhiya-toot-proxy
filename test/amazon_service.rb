@@ -1,5 +1,10 @@
 module Mulukhiya
   class AmazonServiceTest < TestCase
+    def disable?
+      return true unless AmazonService.config?
+      return super
+    end
+
     def setup
       @service = AmazonService.new
       @asins = ['B07VHY7DBH', 'B00TYVQN3O', 'B071DNWLBR']

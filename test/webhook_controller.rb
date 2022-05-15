@@ -2,6 +2,12 @@ module Mulukhiya
   class WebhookControllerTest < TestCase
     include ::Rack::Test::Methods
 
+    def disable?
+      return true unless controller_class.webhook?
+      return true unless (account.webhook rescue nil)
+      return super
+    end
+
     def setup
       @parser = parser_class.new
       @path_prefix_pattern = %r{^/mulukhiya/webhook}

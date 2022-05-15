@@ -1,6 +1,7 @@
 module Mulukhiya
   class GrowiAnnounceHandler < AnnounceHandler
     def disable?
+      return true unless controller_class.growi?
       return true unless sns.account&.growi
       return super
     end

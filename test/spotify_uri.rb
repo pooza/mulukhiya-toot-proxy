@@ -1,5 +1,10 @@
 module Mulukhiya
   class SpotifyURITest < TestCase
+    def disable?
+      return true unless SpotifyService.config?
+      return super
+    end
+
     def setup
       @google = SpotifyURI.parse('https://google.com')
       @root = SpotifyURI.parse('https://spotify.com')
