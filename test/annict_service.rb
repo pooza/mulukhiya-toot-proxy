@@ -12,7 +12,7 @@ module Mulukhiya
     end
 
     def test_config?
-      assert(AnnictService.config?)
+      assert_predicate(AnnictService, :config?)
     end
 
     def test_account
