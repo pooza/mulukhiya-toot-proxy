@@ -1,10 +1,5 @@
 module Mulukhiya
   class StatusTest < TestCase
-    def disable?
-      return true unless Environment.dbms_class.config?
-      return super
-    end
-
     def setup
       @status = account.recent_status
     end

@@ -1,10 +1,5 @@
 module Mulukhiya
   class AccountTest < TestCase
-    def disable?
-      return true unless Environment.dbms_class.config?
-      return super
-    end
-
     test 'テスト用アカウントの有無' do
       assert_not_nil(account)
     end

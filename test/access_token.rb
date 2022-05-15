@@ -1,10 +1,5 @@
 module Mulukhiya
   class AccessTokenTest < TestCase
-    def disable?
-      return true unless Environment.dbms_class.config?
-      return super
-    end
-
     def setup
       @token = sns_class.new.access_token
     end
