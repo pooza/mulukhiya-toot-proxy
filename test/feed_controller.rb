@@ -2,6 +2,11 @@ module Mulukhiya
   class FeedControllerTest < TestCase
     include ::Rack::Test::Methods
 
+    def disable?
+      return true unless controller_class.feed?
+      return super
+    end
+
     def app
       return FeedController
     end
@@ -12,7 +17,6 @@ module Mulukhiya
     end
 
     def test_media
-      return unless controller_class.feed?
       return unless controller_class.media_catalog?
 
       get '/media'
@@ -21,7 +25,6 @@ module Mulukhiya
     end
 
     def test_default_tag
-      return unless controller_class.feed?
       return unless DefaultTagHandler.tags.present?
 
       service = sns_class.new
@@ -33,7 +36,6 @@ module Mulukhiya
     end
 
     def test_media_tag
-      return unless controller_class.feed?
       return if Handler.create(:media_tag).disable?
       get '/tag/image'
       if hash_tag_class.get(tag: config['/handler/media_tag/tags/image'])

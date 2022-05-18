@@ -1,5 +1,10 @@
 module Mulukhiya
   class CustommAPIRenderStorageTest < TestCase
+    def disable?
+      return true if CustomAPI.all.empty?
+      return super
+    end
+
     def setup
       @storage = CustomAPIRenderStorage.new
     end

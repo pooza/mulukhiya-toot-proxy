@@ -1,5 +1,10 @@
 module Mulukhiya
   class RemoteDictionaryTest < TestCase
+    def disable?
+      return true if RemoteDictionary.all.empty?
+      return super
+    end
+
     def test_all
       RemoteDictionary.all do |dic|
         assert_kind_of(RemoteDictionary, dic)
