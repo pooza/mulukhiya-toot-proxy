@@ -31,7 +31,7 @@ WHERE (toots.local = true)
       <% end %>
     <% else %>
       <% params[:rule].keywords.each do |keyword| %>
-        AND (concat_ws('::::', toots.text, attachments.description) LIKE '%<%= keyword %>%')
+        AND (concat_ws('::::', toots.text, toots.spoiler_text, attachments.description) LIKE '%<%= keyword %>%')
       <% end %>
       <% params[:rule].negative_keywords.each do |keyword| %>
         AND (coalesce(toots.text, '') NOT LIKE '%<%= keyword %>%')
