@@ -1,7 +1,7 @@
 module Mulukhiya
   class CustomFeedTest < TestCase
     def disable?
-      return true if CustomFeed.all.empty?
+      return true unless CustomFeed.all.present?
       return super
     end
 

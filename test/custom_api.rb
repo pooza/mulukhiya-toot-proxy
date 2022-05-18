@@ -1,7 +1,7 @@
 module Mulukhiya
   class CustomAPITest < TestCase
     def disable?
-      return true if CustomAPI.all.empty?
+      return true unless CustomAPI.all.present?
       return super
     end
 

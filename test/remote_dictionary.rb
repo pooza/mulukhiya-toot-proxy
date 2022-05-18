@@ -1,7 +1,7 @@
 module Mulukhiya
   class RemoteDictionaryTest < TestCase
     def disable?
-      return true if RemoteDictionary.all.empty?
+      return true unless RemoteDictionary.all.present?
       return super
     end
 
