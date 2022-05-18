@@ -42,30 +42,30 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: f0a1f2992a8662c84781f9d26aba5a658f42047b
+  revision: 9603f99750e96ce7b5d8e77f8a4617400b3957b8
   specs:
-    ginseng-fediverse (1.8.3)
+    ginseng-fediverse (1.8.4)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
-  revision: a05cd698092f923926a53e0196303e0641390a64
+  revision: 92a453b5cd3b061f3fc389af4e9d75ef1f8f0aa7
   specs:
-    ginseng-postgres (1.3.14)
+    ginseng-postgres (1.3.15)
       pg
       sequel
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 2c609fe0d5b4ba3c19b3dada09ba322f88850733
+  revision: d8cbbbd0994d625f3d2176bc1f4e2bf5651cbd9f
   specs:
-    ginseng-redis (1.1.10)
+    ginseng-redis (1.1.11)
       redis (~> 4.5.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 197b7942573ea86d9d0bc9c36350e64f9e8c51e8
+  revision: 785be4ab5b088a3f6e4f976cdc8c87b577aa82a8
   specs:
-    ginseng-web (1.3.25)
+    ginseng-web (1.3.26)
       erb
       puma (>= 5.6.4)
       rss
@@ -164,7 +164,7 @@ GEM
     faraday (2.3.0)
       faraday-net_http (~> 2.0)
       ruby2_keywords (>= 0.0.4)
-    faraday-net_http (2.0.2)
+    faraday-net_http (2.0.3)
     fastimage (2.2.6)
     ffi (1.15.5)
     ffi-compiler (1.0.1)
