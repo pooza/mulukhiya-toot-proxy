@@ -312,9 +312,11 @@ html lang='ja'
             Vue.getLemmyCommunities()
               .then(e => {
                 this.lemmy.communities = e
-                this.options.lemmy_communities = []
+                this.options.lemmy_communities ||= []
                 Object.keys(this.lemmy.communities)
-                  .map(k => this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]}))
+                  .map(k => {
+                    this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]})
+                  })
               })
           },
           unauthLemmy () {
@@ -323,6 +325,8 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.lemmy = false
+                this.lemmy.communities = {}
+                this.options.lemmy_communities = null
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateNextcloud () {
