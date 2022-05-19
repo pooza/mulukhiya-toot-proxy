@@ -5,10 +5,10 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: '環境設定'}
+    == slim.render 'fragment/breadcrumbs', {current: 'ユーザー環境設定'}
     main#app class=env.type
       == slim.render 'fragment/message'
-      h2 環境設定
+      h2 ユーザー環境設定
       section v-if='account.username'
         h3 現在の設定
         .result-container
