@@ -8,16 +8,32 @@ module Mulukhiya
       assert_kind_of(Set, Handler.search(/amazon/))
     end
 
+    def test_names
+      Handler.names do |name|
+        assert_kind_of(String, name)
+      end
+    end
+
+    def test_all
+      Handler.all do |handler|
+        assert_kind_of(Handler, handler)
+      end
+    end
+
+    def test_underscore
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
+        assert_kind_of(String, handler.underscore)
+      end
+    end
+
     def test_disableable?
-      Handler.names.each do |name|
-        next unless handler = Handler.create(name)
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
         assert_boolean(handler.disableable?)
       end
     end
 
     def test_timeout
-      Handler.names.each do |name|
-        next unless handler = Handler.create(name)
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
         assert_predicate(handler.timeout, :positive?)
       end
     end

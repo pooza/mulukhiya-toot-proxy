@@ -2,10 +2,6 @@ module Mulukhiya
   class MentionHandler < Handler
     attr_reader :sender
 
-    def disableable?
-      return false
-    end
-
     def disable?
       return true unless controller_class.streaming?
       return true unless info_agent_service

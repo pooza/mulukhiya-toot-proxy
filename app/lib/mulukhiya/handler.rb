@@ -1,8 +1,16 @@
 module Mulukhiya
-  class Handler
+  class Handler # rubocop:disable Metrics/ClassLength
     include Package
     include SNSMethods
     attr_reader :reporter, :event, :sns, :errors, :result, :payload, :text_field
+
+    def name
+      return self.class.to_s.split('::').last
+    end
+
+    def underscore
+      return name.sub(/Handler$/, '').underscore
+    end
 
     def handle_pre_toot(payload, params = {})
       return payload
@@ -71,10 +79,6 @@ module Mulukhiya
       @sns = params[:sns]
       handle_pre_toot(payload, params)
       return handle_post_toot(payload, params)
-    end
-
-    def underscore
-      return self.class.to_s.split('::').last.sub(/Handler$/, '').underscore
     end
 
     def handler_config(key)
@@ -202,6 +206,20 @@ module Mulukhiya
     rescue => e
       e.log
       return nil
+    end
+
+    def self.all_names
+      return Event.all.inject(Set[]) {|names, e| names.merge(e.all_handler_names.to_a)}
+    rescue => e
+      e.log
+      return nil
+    end
+
+    def self.all(&block)
+      return enum_for(__method__) unless block
+      reporter = Reporter.new
+      sns = sns_class.new
+      all_names.map {|v| create(v, {reporter:, sns:})}.sort_by(&:underscore).each(&block)
     end
 
     def self.search(pattern)

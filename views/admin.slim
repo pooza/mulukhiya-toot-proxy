@@ -8,24 +8,70 @@ html lang='ja'
     == slim.render 'fragment/breadcrumbs', {current: '管理'}
     main#app class=env.type
       == slim.render 'fragment/message'
+      .hidden ref='handler_names' v-show='false' = Mulukhiya::Handler.all.map {|v| {name: v.underscore, disable: v.disable?}}.to_json
       h2 管理
-      section v-if='account.is_admin'
-      | aaa
+      - Mulukhiya::Event.all do |event|
+        section.config v-if='account.is_admin'
+          h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
+          vue-slide-up-down :active='layout.details.#{event.name}'
+            - event.all_handlers do |handler|
+              .field-container
+                h4 = handler.underscore
+                .description
+                  a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'
+                    | このハンドラの説明
+                - if handler.disableable?
+                  label
+                    input type='checkbox' v-model='handlers.#{handler.underscore}'
+                    | 無効化
+                - else
+                  label.disabled
+                    input type='checkbox' v-model='handlers.#{handler.underscore}' disabled='1'
+                    | 無効化
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
       Vue.use(VTooltip)
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      Vue.component('vue-slide-up-down', VueSlideUpDown)
       new Vue({
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
+          handlers: {},
+          layout: {
+            details: {
+              alert: false,
+              announce: false,
+              follow: false,
+              mention: false,
+              post_bookmark: false,
+              post_boost: false,
+              post_fav: false,
+              post_thumbnail: false,
+              post_toot: false,
+              post_upload: false,
+              post_webhook: false,
+              pre_thumbnail: false,
+              pre_toot: true,
+              pre_upload: true,
+              pre_webhook: false,
+            },
+          },
           feeds: [],
         },
         mounted () {
           Vue.getConfig()
             .then(e => {this.account = e.account})
             .catch(e => Vue.alert(this.$dialog, e))
+          JSON.parse(this.$refs.handler_names.innerText).map(v => {
+            Vue.set(this.handlers, v.name, v.disable)
+          })
+        },
+        methods: {
+          toggleVisibility (name) {
+            this.layout.details[name] = !this.layout.details[name]
+          },
         },
       })
