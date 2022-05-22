@@ -2,7 +2,7 @@ module Mulukhiya
   class TagFeedRendererTest < TestCase
     def disable?
       return true unless controller_class.feed?
-      return true if DefaultTagHandler.tags.empty?
+      return true unless DefaultTagHandler.tags.present?
       return super
     end
 

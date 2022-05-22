@@ -15,7 +15,7 @@ module Mulukhiya
         task :list do
           UserConfigStorage.tag_owners do |account|
             puts({
-              account: account.acct.to_s,
+              acct: account.acct.to_s,
               tags: account.user_config.tags,
             }).to_yaml
           end
