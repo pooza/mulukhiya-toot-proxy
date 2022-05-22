@@ -10,7 +10,7 @@ module Mulukhiya
       end
     end
 
-    def handlers
+    def test_handlers
       @event.handlers do |handler|
         assert_kind_of(Handler, handler)
       end

@@ -1,14 +1,11 @@
 module Mulukhiya
   class HandlerTest < TestCase
-    def test_names
-      assert_kind_of(Set, Handler.names)
-    end
-
     def test_search
       assert_kind_of(Set, Handler.search(/amazon/))
     end
 
     def test_names
+      assert_kind_of(Set, Handler.names)
       Handler.names do |name|
         assert_kind_of(String, name)
       end
