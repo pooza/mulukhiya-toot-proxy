@@ -3,6 +3,8 @@ properties:
     type: boolean
   disabled:
     type: boolean
+  gif:
+    type: boolean
   timeout:
     type: integer
 type: object

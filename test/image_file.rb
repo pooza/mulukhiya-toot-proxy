@@ -8,6 +8,7 @@ module Mulukhiya
       @webp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/4.sm-1.webp'))
       @invalid_webp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/本当はwebp画像.png'))
       @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/11750_thumbnail.gif'))
+      @gif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/file_example_GIF_500kB.gif'))
       @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'))
       @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
       @pdf = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/yogokumi.pdf'))
@@ -60,6 +61,13 @@ module Mulukhiya
     def test_long_side
       assert_equal(140, @png_rgba.long_side)
       assert_equal(320, @webp.long_side)
+    end
+
+    def test_gif?
+      assert_predicate(@agif, :gif?)
+      assert_predicate(@gif, :gif?)
+      assert_false(@png_rgb.gif?)
+      assert_false(@webp.gif?)
     end
 
     def test_alpha?

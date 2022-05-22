@@ -170,6 +170,7 @@ handler:
     url: null
   image_format_convert:
     alpha: true
+    gif: true
   image_resize:
     pixel: 1920
   itunes_image:
