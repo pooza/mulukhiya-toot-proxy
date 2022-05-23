@@ -2,10 +2,10 @@ module Mulukhiya
   class InvalidCommandHandler < Handler
     def disable?
       return true unless parser.command?
-      return super
+      return false
     end
 
-    def disableable?
+    def toggleable?
       return false
     end
 

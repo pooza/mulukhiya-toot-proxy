@@ -2,10 +2,10 @@ module Mulukhiya
   class ResultNotificationHandler < Handler
     def disable?
       return true unless info_agent_service
-      return super
+      return false
     end
 
-    def disableable?
+    def toggleable?
       return false
     end
 
