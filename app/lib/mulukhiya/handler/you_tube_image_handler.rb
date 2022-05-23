@@ -1,7 +1,7 @@
 module Mulukhiya
   class YouTubeImageHandler < ImageHandler
-    def disable?
-      return true unless YouTubeService.config?
+    def toggleable?
+      return false unless YouTubeService.config?
       return super
     end
 

@@ -1,8 +1,8 @@
 module Mulukhiya
   class UserTagHandler < TagHandler
-    def disable?
-      return true unless sns.account
-      return true if sns.account.test?
+    def toggleable?
+      return false unless sns.account
+      return false if sns.account.test?
       return super
     end
 

@@ -1,8 +1,8 @@
 module Mulukhiya
   class MailAlertHandler < AlertHandler
-    def disable?
-      return true unless receipt
-      return true unless exist?
+    def toggleable?
+      return false unless receipt
+      return false unless exist?
       return super
     end
 

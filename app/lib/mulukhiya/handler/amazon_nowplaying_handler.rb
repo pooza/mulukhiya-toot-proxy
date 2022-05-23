@@ -6,8 +6,8 @@ module Mulukhiya
       @service = AmazonService.new
     end
 
-    def disable?
-      return true unless AmazonService.config?
+    def toggleable?
+      return false unless AmazonService.config?
       return super
     end
 

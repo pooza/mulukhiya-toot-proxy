@@ -1,7 +1,7 @@
 module Mulukhiya
   class AnnounceHandlerTest < TestCase
-    def disable?
-      return true unless controller_class.announcement?
+    def toggleable?
+      return false unless controller_class.announcement?
       return super
     end
 

@@ -142,12 +142,13 @@ module Mulukhiya
       return true unless Environment.dbms_class.config?
       return true if disableable? && sns.account&.disable?(self)
       return true if disableable? && config.disable?(self)
+      return true unless toggleable?
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
     end
 
-    def disableable?
+    def toggleable?
       return true
     end
 
