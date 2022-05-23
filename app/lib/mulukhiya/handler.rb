@@ -139,7 +139,6 @@ module Mulukhiya
     end
 
     def disable?
-      return true unless Environment.dbms_class.config?
       return true if disableable? && sns.account&.disable?(self)
       return true if disableable? && config.disable?(self)
       return true unless toggleable?
