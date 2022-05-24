@@ -81,7 +81,7 @@ nav.breadcrumbs
   padding: 6px
   background:
     color: lightgreen
-  opacity: 0.85
+  opacity: 0.9
   ul
     margin: 0
     line:
@@ -223,7 +223,7 @@ main
   padding: 0.5em
   background:
     color: white
-  opacity: 0.95
+  opacity: 0.9
   p
     font:
       size: 1em
@@ -253,8 +253,14 @@ section.config
   h3:hover
     background:
       color: aliceblue
-    opacity: 0.8
+    opacity: 0.9
     cursor: pointer
+  .indented
+    margin:
+      left: 1em
+  .disabled
+    background:
+      color: lightgray
 
 ul.links
   list:
@@ -262,7 +268,7 @@ ul.links
   h3:hover
     background:
       color: aliceblue
-    opacity: 0.8
+    opacity: 0.9
     cursor: pointer
   .endpoint-container
     margin: 0.5em
@@ -343,7 +349,7 @@ ul.medias
       radius: 6px
     background:
       color: white
-    opacity: 0.8
+    opacity: 0.9
     padding: 0.5em
     float: left
     width: 12em
@@ -443,7 +449,7 @@ section.tagging-dictionary
     border:
       color: transparent
       radius: 6px
-    opacity: 0.8
+    opacity: 0.9
 
 section.remote-dics
   margin:
@@ -476,7 +482,7 @@ section.disabled h3::after
   padding: 2px 0.5em
   background:
     color: bisque
-  opacity: 0.8
+  opacity: 0.9
   font:
     size: 0.5em
   color: firebrick
@@ -655,7 +661,7 @@ a:hover
   margin: 0.5em
   background:
     color: lightgray
-  opacity: 0.85
+  opacity: 0.9
   font:
     family: $sans-serif
   i
@@ -667,7 +673,7 @@ a:hover
   padding: 2px 0.5em
   background:
     color: bisque
-  opacity: 0.8
+  opacity: 0.9
   font:
     size: 0.5em
     weight: normal
@@ -695,7 +701,7 @@ a:hover
   .vs__dropdown-toggle
     background:
       color: white
-    opacity: 0.8
+    opacity: 0.9
   .vs__clear
     display: none
   .vs__selected
@@ -703,6 +709,41 @@ a:hover
   .vs__selected-options
     height: 1em
     margin: 0.2em
+
+.handler-container
+  float: left
+  width: 14em
+  height: 4em
+  border:
+    width: 1px
+    style: solid
+    color: darkgray
+    radius: 6px
+  background:
+    color: white
+  opacity: 0.9
+  margin: 0.2em
+  padding: 0.2em
+  h4
+    margin: 0.2
+    border:
+      bottom:
+        style: solid
+        color: darkgray
+        width: 1px
+  label
+    display: inline-block
+    font:
+      size: 0.8em
+  input[type="checkbox"]
+    margin:
+      left: 0.5em
+    width: 1.5em
+  .description
+    display: inline-block
+    margin: 0 0.5em
+    font:
+      size: 0.8em
 
 .field-container
   margin:
@@ -717,8 +758,6 @@ a:hover
     display: inline-block
     font:
       size: 0.8em
-  label.disabled
-    color: gray
   input[type="checkbox"]
     margin:
       left: 0.5em
@@ -809,7 +848,7 @@ code
     color: back
     width: 1px
     radius: 4px
-  opacity: 0.8
+  opacity: 0.9
 
 .clearfix::after
   content: ""

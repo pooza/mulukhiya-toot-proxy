@@ -13,18 +13,16 @@ html lang='ja'
       - Mulukhiya::Event.all do |event|
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
-          vue-slide-up-down :active='layout.details.#{event.name}'
+          vue-slide-up-down class='clearfix indented' :active='layout.details.#{event.name}'
             - event.all_handlers do |handler|
-              .field-container
+              .handler-container :class="{disabled: handlers.#{handler.underscore}}"
                 h4 = handler.underscore
-                - if handler.disableable?
-                  label
+                label
+                  - if handler.toggleable?
                     input type='checkbox' v-model='handlers.#{handler.underscore}'
-                    | 無効化
-                - else
-                  label.disabled
+                  - else
                     input type='checkbox' v-model='handlers.#{handler.underscore}' disabled='1'
-                    | 無効化
+                  | 無効化
                 .description
                   a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'
                     | このハンドラの説明
