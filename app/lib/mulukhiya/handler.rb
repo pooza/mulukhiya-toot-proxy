@@ -139,8 +139,8 @@ module Mulukhiya
     end
 
     def disable?
-      return true if disableable? && sns.account&.disable?(self)
-      return true if disableable? && config.disable?(self)
+      return true if toggleable? && sns.account&.disable?(self)
+      return true if toggleable? && config.disable?(self)
       return true unless toggleable?
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError

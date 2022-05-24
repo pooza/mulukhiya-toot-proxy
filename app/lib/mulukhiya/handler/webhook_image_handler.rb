@@ -1,9 +1,13 @@
 module Mulukhiya
   class WebhookImageHandler < Handler
+    def disable?
+      return true unless controller_class.webhook?
+      return true unless sns.account&.webhook
+      return false
+    end
+
     def toggleable?
-      return false unless controller_class.webhook?
-      return false unless sns.account&.webhook
-      return super
+      return false
     end
 
     def handle_pre_webhook(payload, params = {})
