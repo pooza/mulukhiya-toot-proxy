@@ -23,9 +23,9 @@ module Mulukhiya
       end
     end
 
-    def test_disableable?
+    def test_toggleable?
       Handler.names.map {|v| Handler.create(v)}.each do |handler|
-        assert_boolean(handler.disableable?)
+        assert_boolean(handler.toggleable?)
       end
     end
 
