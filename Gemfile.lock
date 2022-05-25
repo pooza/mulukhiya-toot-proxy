@@ -182,7 +182,7 @@ GEM
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       http-parser (~> 1.2.0)
-    http-cookie (1.0.4)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http-parser (1.2.3)
@@ -347,7 +347,7 @@ GEM
     time (0.2.0)
       date
     timecop (0.9.5)
-    timeout (0.2.0)
+    timeout (0.3.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
