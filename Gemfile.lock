@@ -152,7 +152,6 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
       dry-schema (~> 1.9, >= 1.9.1)
-    e2mmap (0.1.0)
     erb (2.2.3)
       cgi
     erubi (1.10.0)
@@ -284,13 +283,13 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.29.1)
+    rubocop (1.30.0)
       parallel (~> 1.10)
       parser (>= 3.1.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.17.0, < 2.0)
+      rubocop-ast (>= 1.18.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.18.0)
@@ -320,12 +319,10 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sidekiq-scheduler (3.1.1)
-      e2mmap
-      redis (>= 3, < 5)
+    sidekiq-scheduler (4.0.0)
+      redis (>= 4.2.0)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 3)
-      thwait
+      sidekiq (>= 4)
       tilt (>= 1.4.0)
     sinatra (2.2.0)
       mustermann (~> 1.0)
@@ -341,8 +338,6 @@ GEM
     temple (0.8.2)
     test-unit (3.5.3)
       power_assert
-    thwait (0.2.0)
-      e2mmap
     tilt (2.0.10)
     time (0.2.0)
       date
@@ -352,7 +347,7 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8.1)
+    unf_ext (0.0.8.2)
     unicode-display_width (2.1.0)
     vacuum (3.4.1)
       aws-sigv4 (~> 1.0)
@@ -361,7 +356,7 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    yajl-ruby (1.4.2)
+    yajl-ruby (1.4.3)
     zeitwerk (2.5.4)
     zlib (2.1.1)
 
@@ -395,7 +390,7 @@ DEPENDENCIES
   rubocop-sequel
   ruby-progressbar
   sidekiq (~> 6.4.0)
-  sidekiq-scheduler (~> 3.1.0)
+  sidekiq-scheduler (~> 4.0.0)
   slim_lint
   test-unit
   timecop
