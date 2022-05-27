@@ -13,18 +13,18 @@ html lang='ja'
         h3 一般
         ul.links
           - if controller.media_catalog?
-            li
+            li.endpoint-container
               h4 メディアファイル
               .link
                 a href='/mulukhiya/feed/media' target='_blank' rel='noreferrer' = Mulukhiya::MediaFeedRenderer.uri
           - Mulukhiya::CustomFeed.all do |feed|
-            li
+            li.endpoint-container
               h4 #{feed.title}
               .link
                 a href=feed.fullpath target='_blank' rel='noreferrer' = feed.uri
         h3 ハッシュタグ
         ul.links
-          li v-for='feed in feeds'
+          li.endpoint-container v-for='feed in feeds'
             h4 v-if='feed.tag' {{feed.tag}}
             .link
               a :href='feed.feed_url' target='_blank' rel='noreferrer' {{feed.feed_url}}
