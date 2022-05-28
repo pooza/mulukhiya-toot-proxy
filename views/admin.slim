@@ -10,6 +10,8 @@ html lang='ja'
       == slim.render 'fragment/message'
       .hidden ref='handler_names' v-show='false' = Mulukhiya::Handler.all.map {|v| {name: v.underscore, disable: v.disable?}}.to_json
       h2 管理
+      .field-update-button-container
+        button @click='restartPuma' 再起動
       - Mulukhiya::Event.all do |event|
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
@@ -27,8 +29,6 @@ html lang='ja'
                   .description
                     a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'
                       | このハンドラの説明
-            .field-update-button-container
-              button @click='' 更新
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -73,6 +73,11 @@ html lang='ja'
         methods: {
           toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
+          },
+          restartPuma () {
+            this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
+              .then(e => Vue.restartPuma())
+              .catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

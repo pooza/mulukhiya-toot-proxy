@@ -381,6 +381,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/admin/puma/restart' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      PumaDaemon.restart
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     CustomAPI.all do |api|
       get api.path do
         @renderer = api.create_renderer(params)

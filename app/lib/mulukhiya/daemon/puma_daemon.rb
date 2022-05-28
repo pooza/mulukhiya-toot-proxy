@@ -30,6 +30,10 @@ module Mulukhiya
       return false
     end
 
+    def self.restart
+      CommandLine.new(['rake', 'restart']).exec
+    end
+
     private
 
     def initializer_path
