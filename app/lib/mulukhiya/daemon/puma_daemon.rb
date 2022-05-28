@@ -31,7 +31,7 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new(['rake', 'restart']).exec
+      CommandLine.new(['rake', 'mulukhiya:puma:restart']).exec
     end
 
     private

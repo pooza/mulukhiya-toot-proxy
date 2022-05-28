@@ -383,7 +383,10 @@ module Mulukhiya
 
     post '/admin/puma/restart' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
-      PumaDaemon.restart
+      Sidekiq.set_schedule('puma_daemon_restart', {
+        at: 10.seconds.after,
+        class: 'Mulukhiya::PumaDaemonRestartWorker',
+      })
       return @renderer.to_s
     rescue => e
       e.log

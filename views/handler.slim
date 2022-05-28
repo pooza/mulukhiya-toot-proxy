@@ -5,11 +5,11 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: '管理'}
+    == slim.render 'fragment/breadcrumbs', {current: 'ハンドラ'}
     main#app class=env.type
       == slim.render 'fragment/message'
       .hidden ref='handler_names' v-show='false' = Mulukhiya::Handler.all.map {|v| {name: v.underscore, disable: v.disable?}}.to_json
-      h2 管理
+      h2 ハンドラ
       .field-update-button-container
         button @click='restartPuma' 再起動
       - Mulukhiya::Event.all do |event|
