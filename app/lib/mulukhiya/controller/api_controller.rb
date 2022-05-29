@@ -383,7 +383,7 @@ module Mulukhiya
 
     post '/admin/handler/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
-      config.update_file(handler: {params[:handler] => params[:flag]})
+      config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
       return @renderer.to_s
     rescue => e
       e.log
@@ -395,7 +395,7 @@ module Mulukhiya
     post '/admin/puma/restart' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       Sidekiq.set_schedule('puma_daemon_restart', {
-        at: 10.seconds.after,
+        at: config['/puma/restart/seconds'].seconds.after,
         class: 'Mulukhiya::PumaDaemonRestartWorker',
       })
       return @renderer.to_s

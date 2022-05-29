@@ -1056,6 +1056,8 @@ puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
   rackup: app/initializer/config.ru
+  restart:
+    seconds: 2
   threads: 5
   workers: 0
 redis:

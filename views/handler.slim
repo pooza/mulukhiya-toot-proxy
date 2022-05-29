@@ -76,8 +76,10 @@ html lang='ja'
           },
           restartPuma () {
             this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
-              .then(e => Vue.restartPuma())
-              .catch(e => Vue.alert(this.$dialog, e))
+              .then(e => {
+                Vue.restartPuma()
+                this.restartable = false
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           onChangeHandler (e) {
             Vue.toggleHandler(e.target.value, e.target.checked)

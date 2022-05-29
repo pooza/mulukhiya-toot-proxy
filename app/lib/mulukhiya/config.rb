@@ -2,8 +2,17 @@ module Mulukhiya
   class Config < Ginseng::Config
     include Package
 
+    def local_file_path
+      dirs.each do |dir|
+        suffix = suffixes.find {|v| File.exist?(File.join(dir, "local#{v}"))}
+        return File.join(dir, "local#{suffix}") unless suffix.nil?
+      end
+      return nil
+    end
+
     def update_file(values)
-      logger.info(values)
+      return unless path = local_file_path
+      File.write(path, raw['local'].deep_merge(values.deep_stringify_keys).to_yaml)
     end
 
     def disable?(handler)
