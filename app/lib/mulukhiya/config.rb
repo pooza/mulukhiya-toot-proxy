@@ -2,6 +2,10 @@ module Mulukhiya
   class Config < Ginseng::Config
     include Package
 
+    def update_file(values)
+      logger.info(values)
+    end
+
     def disable?(handler)
       handler = Handler.create(handler.to_s) unless handler.is_a?(Handler)
       return self["/handler/#{handler.underscore}/disable"] == true rescue false

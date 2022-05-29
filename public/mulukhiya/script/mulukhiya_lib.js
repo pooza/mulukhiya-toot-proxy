@@ -355,6 +355,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.toggleHandler = async (handler, flag) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/admin/handler/config', {token: Vue.getToken(), handler: handler, flag: flag})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.execGET = async path => {
       const indicator = new ActivityIndicator()
       indicator.show()

@@ -10,7 +10,7 @@ html lang='ja'
       == slim.render 'fragment/message'
       .hidden ref='handler_names' v-show='false' = Mulukhiya::Handler.all.map {|v| {name: v.underscore, disable: v.disable?}}.to_json
       h2 ハンドラ
-      .field-update-button-container
+      .field-update-button-container v-if='restartable'
         button @click='restartPuma' 再起動
       - Mulukhiya::Event.all do |event|
         section.config v-if='account.is_admin'
@@ -22,7 +22,7 @@ html lang='ja'
                   h4 = handler.underscore
                   label
                     - if handler.toggleable?
-                      input type='checkbox' v-model='handlers.#{handler.underscore}'
+                      input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value='#{handler.underscore}'
                     - else
                       input type='checkbox' v-model='handlers.#{handler.underscore}' disabled='1'
                     | 無効化
@@ -41,6 +41,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           handlers: {},
+          restartable: false,
           layout: {
             details: {
               alert: false,
@@ -60,7 +61,6 @@ html lang='ja'
               pre_webhook: false,
             },
           },
-          feeds: [],
         },
         mounted () {
           Vue.getConfig()
@@ -77,6 +77,11 @@ html lang='ja'
           restartPuma () {
             this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
               .then(e => Vue.restartPuma())
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          onChangeHandler (e) {
+            Vue.toggleHandler(e.target.value, e.target.checked)
+              .then(e => {this.restartable = true})
               .catch(e => Vue.alert(this.$dialog, e))
           },
         },
