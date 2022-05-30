@@ -12,6 +12,7 @@ html lang='ja'
       h2 ハンドラ
       .field-update-button-container v-if='restartable'
         button @click='restartPuma' 再起動
+        p.alert 再起動している間（数十秒程度）は操作できなくなります。
       - Mulukhiya::Event.all do |event|
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
