@@ -22,13 +22,11 @@ module Mulukhiya
 
     def default_max_length
       length = service.max_post_text_length
-      extra_tags = TagContainer.new
-      [:default_tag, :user_tag]
-        .filter_map {|name| Handler.create(name, {event: :pre_toot})}
+      length -= [:default_tag, :user_tag]
+        .filter_map {|name| Handler.create(name)}
         .reject(&:disable?)
-        .each {|h| extra_tags.merge(h.addition_tags)}
-      length -= extra_tags.sum {|v| v.to_hashtag.length + 1}
-      return length
+        .inject(TagContainer.new) {|tags, h| tags.merge(h.addition_tags)}
+        .sum {|v| v.to_hashtag.length + 1}
     rescue => e
       e.log(text:)
       return service.max_post_text_length
