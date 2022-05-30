@@ -1,8 +1,12 @@
 module Mulukhiya
   class GrowiAnnounceHandler < AnnounceHandler
+    def disable?
+      return true unless sns.account&.growi
+      return super
+    end
+
     def toggleable?
       return false unless controller_class.growi?
-      return false unless sns.account&.growi
       return super
     end
 

@@ -205,6 +205,10 @@ properties:
     properties:
       port:
         type: integer
+      restart:
+        properties:
+          seconds: integer
+        type: object
       threads:
         type: integer
       workers:
