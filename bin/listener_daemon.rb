@@ -5,5 +5,5 @@ ENV['RAKE'] = nil
 require 'mulukhiya'
 module Mulukhiya
   exit 1 if ListenerDaemon.disable?
-  ListenerDaemon.spawn!
+  ListenerDaemon.spawn!(singleton: true)
 end

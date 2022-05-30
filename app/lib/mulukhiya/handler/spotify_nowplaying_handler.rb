@@ -6,8 +6,8 @@ module Mulukhiya
       @service = SpotifyService.new
     end
 
-    def disable?
-      return true unless SpotifyService.config?
+    def toggleable?
+      return false unless SpotifyService.config?
       return super
     end
 

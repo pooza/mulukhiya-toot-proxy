@@ -24,6 +24,19 @@ module Mulukhiya
       return enum_for(__method__) unless block
       config["/#{Environment.controller_name}/handlers/#{label}"]
         .reject {|name| config.disable?(Handler.create(name))}
+        .sort_by(&:underscore)
+        .each(&block)
+    end
+
+    def all_handlers(&block)
+      return enum_for(__method__) unless block
+      all_handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
+    end
+
+    def all_handler_names(&block)
+      return enum_for(__method__) unless block
+      config["/#{Environment.controller_name}/handlers/#{label}"]
+        .sort_by(&:underscore)
         .each(&block)
     end
 

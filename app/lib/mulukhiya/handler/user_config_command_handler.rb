@@ -1,6 +1,10 @@
 module Mulukhiya
   class UserConfigCommandHandler < CommandHandler
-    def disableable?
+    def disable?
+      return false
+    end
+
+    def toggleable?
       return false
     end
 

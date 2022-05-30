@@ -2,9 +2,9 @@ module Mulukhiya
   class AnnounceHandler < Handler
     attr_reader :sns
 
-    def disable?
-      return true unless controller_class.announcement?
-      return true unless info_agent_service
+    def toggleable?
+      return false unless controller_class.announcement?
+      return false unless info_agent_service
       return super
     end
 

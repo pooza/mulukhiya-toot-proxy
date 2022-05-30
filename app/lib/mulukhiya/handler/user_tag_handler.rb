@@ -1,8 +1,8 @@
 module Mulukhiya
   class UserTagHandler < TagHandler
     def disable?
-      return true unless sns.account
-      return super
+      return true if Environment.test?
+      return false
     end
 
     def removal_tags

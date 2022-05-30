@@ -6,8 +6,8 @@ handler:
   default_tag:
     tags:
       - your_default_hash_tag
-  reply_reaction:
-    disable: true
+  image_format_convert:
+    gif: false
 misskey:
   url: https://misskey.example.com/
 postgres:

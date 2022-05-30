@@ -10,7 +10,7 @@ module Mulukhiya
       return false unless file
       return false unless file.image?
       return false if file.type == type
-      return false if file.type == 'image/gif'
+      return false if detect_gif? && file.gif?
       return false if detect_alpha? && file.alpha?
       return false if file.animated?
       return true
@@ -18,6 +18,10 @@ module Mulukhiya
 
     def detect_alpha?
       return handler_config(:alpha)
+    end
+
+    def detect_gif?
+      return handler_config(:gif)
     end
 
     def type

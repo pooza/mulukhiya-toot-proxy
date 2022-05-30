@@ -1,7 +1,7 @@
 module Mulukhiya
   class ReplyReactionHandler < Handler
-    def disable?
-      return true unless controller_class.reaction?
+    def toggleable?
+      return false unless controller_class.reaction?
       return super
     end
 

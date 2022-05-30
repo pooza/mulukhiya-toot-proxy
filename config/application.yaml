@@ -170,6 +170,7 @@ handler:
     url: null
   image_format_convert:
     alpha: true
+    gif: true
   image_resize:
     pixel: 1920
   itunes_image:
@@ -856,7 +857,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.18.8
+  version: 4.19.0
 parser:
   note:
     fields:
@@ -1055,6 +1056,8 @@ puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
   rackup: app/initializer/config.ru
+  restart:
+    seconds: 2
   threads: 5
   workers: 0
 redis:

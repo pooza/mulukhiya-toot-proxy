@@ -1,5 +1,13 @@
 module Mulukhiya
   class TaggingHandler < Handler
+    def disable?
+      return false
+    end
+
+    def toggleable?
+      return false
+    end
+
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       lines = status_lines.clone

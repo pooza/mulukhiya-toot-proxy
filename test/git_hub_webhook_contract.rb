@@ -1,5 +1,11 @@
 module Mulukhiya
   class GitHubWebhookContractTest < TestCase
+    def disable?
+      return true unless controller_class.webhook?
+      return true unless (account.webhook rescue nil)
+      return super
+    end
+
     def setup
       @contract = GitHubWebhookContract.new
     end

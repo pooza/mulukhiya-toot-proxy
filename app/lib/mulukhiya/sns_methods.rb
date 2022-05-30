@@ -76,13 +76,14 @@ module Mulukhiya
 
     def notify(message, options = {})
       return true unless info_agent_service
-      options[:accounts] ||= Environment.account_class.administrators if options[:administrators]
-      options[:accounts] ||= [@sns.account]
+      options[:accounts] = Environment.account_class.administrators if options[:administrators]
+      options[:accounts] ||= [@sns.account] if @sns&.account
+      options[:accounts] ||= []
       message = message.to_yaml unless message.is_a?(String)
       options[:accounts].each do |account|
         return info_agent_service.notify(account, message, options.deep_symbolize_keys)
       rescue => e
-        e.log(message:)
+        e.log(message:, acct: account.acct.to_s)
       end
     end
 

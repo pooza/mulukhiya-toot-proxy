@@ -46,6 +46,10 @@ module Mulukhiya
       return false
     end
 
+    def self.restart
+      CommandLine.new(['rake', 'mulukhiya:sidekiq:restart']).exec
+    end
+
     def self.health
       stats = Sidekiq::Stats.new
       pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}

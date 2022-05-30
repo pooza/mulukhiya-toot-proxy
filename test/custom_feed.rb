@@ -1,5 +1,10 @@
 module Mulukhiya
   class CustomFeedTest < TestCase
+    def disable?
+      return true unless CustomFeed.all.present?
+      return super
+    end
+
     def test_all
       CustomFeed.all do |feed|
         assert_kind_of(CustomFeed, feed)

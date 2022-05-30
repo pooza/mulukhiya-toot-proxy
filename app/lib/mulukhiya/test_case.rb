@@ -7,18 +7,6 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def underscore
-      return self.class.to_s.split('::').last.underscore.sub(/_test$/, '')
-    end
-
-    def disable?
-      return false
-    end
-
-    def run_test
-      super unless disable?
-    end
-
     def teardown
       config.reload
       @handler&.clear

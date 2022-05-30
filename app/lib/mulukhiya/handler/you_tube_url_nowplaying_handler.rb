@@ -1,7 +1,7 @@
 module Mulukhiya
   class YouTubeURLNowplayingHandler < NowplayingHandler
-    def disable?
-      return true unless YouTubeService.config?
+    def toggleable?
+      return false unless YouTubeService.config?
       return super
     end
 

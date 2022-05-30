@@ -381,6 +381,31 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/admin/handler/config' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/admin/puma/restart' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      Sidekiq.set_schedule('puma_daemon_restart', {
+        at: config['/puma/restart/seconds'].seconds.after,
+        class: 'Mulukhiya::PumaDaemonRestartWorker',
+      })
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     CustomAPI.all do |api|
       get api.path do
         @renderer = api.create_renderer(params)

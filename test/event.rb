@@ -10,7 +10,13 @@ module Mulukhiya
       end
     end
 
-    def handlers
+    def test_handlers
+      @event.handlers do |handler|
+        assert_kind_of(Handler, handler)
+      end
+    end
+
+    def all_handlers
       @event.handlers do |handler|
         assert_kind_of(Handler, handler)
         assert_boolean(handler.disable?)

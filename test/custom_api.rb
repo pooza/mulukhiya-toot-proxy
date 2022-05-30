@@ -1,5 +1,10 @@
 module Mulukhiya
   class CustomAPITest < TestCase
+    def disable?
+      return true unless CustomAPI.all.present?
+      return super
+    end
+
     def test_all
       CustomAPI.all do |api|
         assert_kind_of(CustomAPI, api)

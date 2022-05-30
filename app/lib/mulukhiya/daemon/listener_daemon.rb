@@ -23,6 +23,10 @@ module Mulukhiya
       return false
     end
 
+    def self.restart
+      CommandLine.new(['rake', 'mulukhiya:listener:restart']).exec
+    end
+
     def self.health
       pid = File.read(File.join(Environment.dir, 'tmp/pids/ListenerDaemon.pid')).to_i
       raise "PID '#{pid}' was dead" unless Process.alive?(pid)

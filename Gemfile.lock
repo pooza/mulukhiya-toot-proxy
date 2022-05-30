@@ -134,7 +134,7 @@ GEM
     dry-logic (1.2.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
-    dry-schema (1.9.1)
+    dry-schema (1.9.2)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.13, >= 0.13.0)
       dry-core (~> 0.5, >= 0.5)
@@ -147,13 +147,12 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.8.0)
+    dry-validation (1.8.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
-      dry-schema (~> 1.9, >= 1.9.1)
-    e2mmap (0.1.0)
+      dry-schema (~> 1.8, >= 1.8.0)
     erb (2.2.3)
       cgi
     erubi (1.10.0)
@@ -296,7 +295,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.18.0)
       parser (>= 3.1.1.0)
-    rubocop-minitest (0.19.1)
+    rubocop-minitest (0.20.0)
       rubocop (>= 0.90, < 2.0)
     rubocop-performance (1.14.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -321,12 +320,10 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sidekiq-scheduler (3.1.1)
-      e2mmap
-      redis (>= 3, < 5)
+    sidekiq-scheduler (4.0.0)
+      redis (>= 4.2.0)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 3)
-      thwait
+      sidekiq (>= 4)
       tilt (>= 1.4.0)
     sinatra (2.2.0)
       mustermann (~> 1.0)
@@ -342,8 +339,6 @@ GEM
     temple (0.8.2)
     test-unit (3.5.3)
       power_assert
-    thwait (0.2.0)
-      e2mmap
     tilt (2.0.10)
     time (0.2.0)
       date
@@ -396,7 +391,7 @@ DEPENDENCIES
   rubocop-sequel
   ruby-progressbar
   sidekiq (~> 6.4.0)
-  sidekiq-scheduler (~> 3.1.0)
+  sidekiq-scheduler (~> 4.0.0)
   slim_lint
   test-unit
   timecop

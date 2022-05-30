@@ -72,6 +72,10 @@ module Mulukhiya
       return false
     end
 
+    def gif?
+      return type == 'image/gif'
+    end
+
     def resize(pixel)
       dest = create_dest_path(f: __method__, p: pixel, type: subtype)
       command = CommandLine.new(['convert', '-resize', "#{pixel}x#{pixel}", path, dest])

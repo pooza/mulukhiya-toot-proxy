@@ -15,7 +15,7 @@ gem 'optparse'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.4.0' # CVE-2022-23837
-gem 'sidekiq-scheduler', '~>3.1.0'
+gem 'sidekiq-scheduler', '~>4.0.0'
 gem 'vacuum', '~>3.0'
 
 group :postgres do

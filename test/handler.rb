@@ -1,23 +1,36 @@
 module Mulukhiya
   class HandlerTest < TestCase
-    def test_names
-      assert_kind_of(Set, Handler.names)
-    end
-
     def test_search
       assert_kind_of(Set, Handler.search(/amazon/))
     end
 
-    def test_disableable?
-      Handler.names.each do |name|
-        next unless handler = Handler.create(name)
-        assert_boolean(handler.disableable?)
+    def test_names
+      assert_kind_of(Set, Handler.names)
+      Handler.names do |name|
+        assert_kind_of(String, name)
+      end
+    end
+
+    def test_all
+      Handler.all do |handler|
+        assert_kind_of(Handler, handler)
+      end
+    end
+
+    def test_underscore
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
+        assert_kind_of(String, handler.underscore)
+      end
+    end
+
+    def test_toggleable?
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
+        assert_boolean(handler.toggleable?)
       end
     end
 
     def test_timeout
-      Handler.names.each do |name|
-        next unless handler = Handler.create(name)
+      Handler.names.map {|v| Handler.create(v)}.each do |handler|
         assert_predicate(handler.timeout, :positive?)
       end
     end
