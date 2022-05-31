@@ -17,7 +17,7 @@ html lang='ja'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
           vue-slide-up-down :active='layout.details.#{event.name}'
             .clearfix class='indented'
-              - event.all_handlers do |handler|
+              - event.all_handlers.sort_by(&:underscore).each do |handler|
                 .handler-container :class="{disabled: handlers.#{handler.underscore}}"
                   h4 = handler.underscore
                   label
