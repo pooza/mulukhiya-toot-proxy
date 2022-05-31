@@ -18,7 +18,7 @@ module Mulukhiya
       tags.text = lines.join("\n")
       lines.push(tags.create_tags.join(' '))
       parser.text = payload[text_field] = lines.join("\n")
-      result.push(tags:)
+      result.push(tags:) if tags.present?
     end
 
     private

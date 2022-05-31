@@ -250,7 +250,7 @@ const MulukhiyaLib = {
         only_person: (only_person ? 1 : 0)
       }
       if (keyword) {query.q = keyword}
-      return axios.get(Vue.createURL(Vue.createURL('/mulukhiya/api/media', {query: query})))
+      return axios.get(Vue.createURL('/mulukhiya/api/media', {query: query}))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
@@ -343,6 +343,14 @@ const MulukhiyaLib = {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/annict/auth', {token: Vue.getToken(), code: code})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.getHandlers = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(Vue.createURL('/mulukhiya/api/admin/handler/list'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

@@ -381,6 +381,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/admin/handler/list' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      @renderer.message = Mulukhiya::Handler.all.map {|v| {name: v.underscore, disable: v.disable?}}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/admin/handler/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       config.update_file(handler: {params[:handler] => {disable: params[:flag]}})

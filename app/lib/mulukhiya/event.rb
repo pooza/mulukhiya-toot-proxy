@@ -17,19 +17,29 @@ module Mulukhiya
 
     def handlers(&block)
       return enum_for(__method__) unless block
-      handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
+      handlers = []
+      handler_names.map do |name|
+        Thread.new {handlers.push(Handler.create(name, params))}
+      end.each(&:join)
+      handlers.compact.each(&block)
     end
 
     def handler_names(&block)
       return enum_for(__method__) unless block
-      config["/#{Environment.controller_name}/handlers/#{label}"]
-        .reject {|name| config.disable?(Handler.create(name))}
-        .each(&block)
+      names = []
+      config["/#{Environment.controller_name}/handlers/#{label}"].map do |name|
+        Thread.new {names.push(name) unless config.disable?(Handler.create(name))}
+      end.each(&:join)
+      names.compact.each(&block)
     end
 
     def all_handlers(&block)
       return enum_for(__method__) unless block
-      all_handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
+      handlers = []
+      all_handler_names.map do |name|
+        Thread.new {handlers.push(Handler.create(name, params))}
+      end.each(&:join)
+      handlers.compact.each(&block)
     end
 
     def all_handler_names(&block)

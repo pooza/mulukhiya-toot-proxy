@@ -18,7 +18,7 @@ module Mulukhiya
       params[:grant] ||= GRANT_OWNER
       params[:path] ||= File.join(@prefix, Time.now.strftime('%Y/%m/%d/%H%M%S%L'))
       response = @http.post(config['/growi/urls/create_page'], {body: params})
-      return response if response['data']['page']
+      return response if response['page']
       raise Ginseng::GatewayError, 'Invalid response'
     end
   end
