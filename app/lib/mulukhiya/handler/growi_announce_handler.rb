@@ -13,7 +13,7 @@ module Mulukhiya
     def announce(params = {})
       params[:format] = :md
       response = sns.account.growi.clip(body: create_body(params))
-      result.push(path: response.dig('data', 'page', 'path'))
+      result.push(path: response.dig('page', 'path'))
     end
   end
 end
