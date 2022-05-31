@@ -219,7 +219,11 @@ module Mulukhiya
       return enum_for(__method__) unless block
       reporter = Reporter.new
       sns = sns_class.new
-      all_names.map {|v| create(v, {reporter:, sns:})}.sort_by(&:underscore).each(&block)
+      handlers = []
+      all_names.map do |name|
+        Thread.new {handlers.push(create(name, {reporter:, sns:}))}
+      end.each(&:join)
+      handlers.compact.sort_by(&:underscore).each(&block)
     end
 
     def self.search(pattern)
