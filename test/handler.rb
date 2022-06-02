@@ -25,7 +25,7 @@ module Mulukhiya
 
     def test_disable?
       Handler.all do |handler|
-        assert(handler.disable?)
+        assert_predicate(handler, :disable?)
       end
     end
 

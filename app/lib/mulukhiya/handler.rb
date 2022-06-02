@@ -230,7 +230,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern)}
+      return names.grep(pattern)
     end
 
     def self.all_schema
