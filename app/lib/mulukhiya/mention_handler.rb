@@ -15,6 +15,7 @@ module Mulukhiya
       return unless sender
       return if sender.bot?
       sns.notify(sender, create_body(params), payload['status'] || payload['body'])
+      result.push(sender: sender.acct.to_s)
       @break = true
     end
 
@@ -26,6 +27,10 @@ module Mulukhiya
 
     def respondable?
       return true
+    end
+
+    def verbose?
+      return false
     end
 
     def template
