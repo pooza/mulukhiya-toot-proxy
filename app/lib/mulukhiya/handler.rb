@@ -139,9 +139,14 @@ module Mulukhiya
     end
 
     def disable?
+      return true if disable_config?
+      return true unless toggleable?
+      return false
+    end
+
+    def disable_config?
       return true if toggleable? && sns.account&.disable?(self)
       return true if toggleable? && config.disable?(self)
-      return true unless toggleable?
       return false
     rescue Ginseng::ConfigError, Ginseng::DatabaseError
       return false
@@ -150,8 +155,6 @@ module Mulukhiya
     def toggleable?
       return true
     end
-
-    alias disabled? disable?
 
     def payload=(payload)
       @payload = payload
@@ -227,7 +230,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.select {|v| v.match?(pattern) && !config.disable?(v)}.to_set
+      return names.select {|v| v.match?(pattern)}
     end
 
     def self.all_schema
