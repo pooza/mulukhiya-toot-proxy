@@ -2,7 +2,7 @@ module Mulukhiya
   class ResultNotificationHandler < Handler
     def disable?
       return true unless info_agent_service
-      return false
+      return super
     end
 
     def handle_post_toot(payload, params = {})

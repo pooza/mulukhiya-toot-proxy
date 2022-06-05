@@ -1,7 +1,7 @@
 module Mulukhiya
   class InvalidCommandHandler < Handler
     def disable?
-      return true if parser.command?
+      return true unless parser.command?
       return false
     end
 

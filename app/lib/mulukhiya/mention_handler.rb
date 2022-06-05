@@ -5,7 +5,7 @@ module Mulukhiya
     def disable?
       return true unless controller_class.streaming?
       return true unless info_agent_service
-      return false
+      return super
     end
 
     def handle_mention(payload, params = {})
