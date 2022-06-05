@@ -4,6 +4,10 @@ module Mulukhiya
       return false
     end
 
+    def toggleable?
+      return false
+    end
+
     def exec
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       sns.account.user_config.update(parser.params)

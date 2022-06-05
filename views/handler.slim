@@ -21,7 +21,10 @@ html lang='ja'
                 .handler-container :class="{disabled: handlers.#{handler.underscore}}"
                   h4 = handler.underscore
                   label
-                    input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value=handler.underscore
+                    - if handler.toggleable?
+                      input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value=handler.underscore
+                    - else
+                      input type='checkbox' v-model='handlers.#{handler.underscore}' disabled='1'
                     | 無効化
                   .description
                     a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'

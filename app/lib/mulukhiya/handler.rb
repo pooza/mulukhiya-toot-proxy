@@ -146,6 +146,10 @@ module Mulukhiya
       return false
     end
 
+    def toggleable?
+      return true
+    end
+
     def payload=(payload)
       @payload = payload
       @status = payload[text_field] || ''
