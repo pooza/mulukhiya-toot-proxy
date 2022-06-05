@@ -1,9 +1,5 @@
 module Mulukhiya
   class UserTagHandler < TagHandler
-    def disable?
-      return false
-    end
-
     def removal_tags
       return sns.account.disabled_tags
     end
