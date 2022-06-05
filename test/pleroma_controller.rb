@@ -8,8 +8,9 @@ module Mulukhiya
     end
 
     def setup
-      @parser = parser_class.new
       config['/handler/long_text_image/disable'] = true
+      config['/handler/user_tag/disable'] = true
+      @parser = parser_class.new
     end
 
     def app

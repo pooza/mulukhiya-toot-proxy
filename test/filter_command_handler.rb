@@ -2,8 +2,8 @@ require 'securerandom'
 
 module Mulukhiya
   class FilterCommandHandlerTest < TestCase
-    def toggleable?
-      return false unless controller_class.filter?
+    def disable?
+      return true unless controller_class.filter?
       return super
     end
 

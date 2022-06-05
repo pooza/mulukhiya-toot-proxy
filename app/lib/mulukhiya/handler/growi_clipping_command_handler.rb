@@ -1,12 +1,8 @@
 module Mulukhiya
   class GrowiClippingCommandHandler < CommandHandler
     def disable?
+      return true unless controller_class.growi?
       return true unless sns.account&.growi
-      return super
-    end
-
-    def toggleable?
-      return false unless controller_class.growi?
       return super
     end
 

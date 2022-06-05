@@ -1,8 +1,8 @@
 module Mulukhiya
   class HexoAnnounceHandler < AnnounceHandler
-    def toggleable?
-      return false unless category
-      return false unless dir
+    def disable?
+      return true unless category
+      return true unless dir
       return super
     end
 

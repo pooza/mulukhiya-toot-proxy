@@ -18,19 +18,19 @@ module Mulukhiya
     end
 
     def test_underscore
-      Handler.names.map {|v| Handler.create(v)}.each do |handler|
+      Handler.all do |handler|
         assert_kind_of(String, handler.underscore)
       end
     end
 
-    def test_toggleable?
-      Handler.names.map {|v| Handler.create(v)}.each do |handler|
-        assert_boolean(handler.toggleable?)
+    def test_disable?
+      Handler.all do |handler|
+        assert_boolean(handler.disable?)
       end
     end
 
     def test_timeout
-      Handler.names.map {|v| Handler.create(v)}.each do |handler|
+      Handler.all do |handler|
         assert_predicate(handler.timeout, :positive?)
       end
     end

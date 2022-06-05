@@ -139,19 +139,16 @@ module Mulukhiya
     end
 
     def disable?
-      return true if toggleable? && sns.account&.disable?(self)
-      return true if toggleable? && config.disable?(self)
-      return true unless toggleable?
+      return true if sns.account&.disable?(self)
+      return true if config.disable?(self)
       return false
-    rescue Ginseng::ConfigError, Ginseng::DatabaseError
+    rescue Ginseng::ConfigError
       return false
     end
 
     def toggleable?
       return true
     end
-
-    alias disabled? disable?
 
     def payload=(payload)
       @payload = payload

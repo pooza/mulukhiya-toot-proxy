@@ -1,7 +1,7 @@
 module Mulukhiya
   class FilterCommandHandler < CommandHandler
-    def toggleable?
-      return false unless controller_class.filter?
+    def disable?
+      return true unless controller_class.filter?
       return super
     end
 

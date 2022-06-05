@@ -3,11 +3,7 @@ module Mulukhiya
     def disable?
       return true unless controller_class.webhook?
       return true unless sns.account&.webhook
-      return false
-    end
-
-    def toggleable?
-      return false
+      return super
     end
 
     def handle_pre_webhook(payload, params = {})

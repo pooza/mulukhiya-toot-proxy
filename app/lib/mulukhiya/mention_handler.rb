@@ -2,9 +2,9 @@ module Mulukhiya
   class MentionHandler < Handler
     attr_reader :sender
 
-    def toggleable?
-      return false unless controller_class.streaming?
-      return false unless info_agent_service
+    def disable?
+      return true unless controller_class.streaming?
+      return true unless info_agent_service
       return super
     end
 
@@ -15,6 +15,7 @@ module Mulukhiya
       return unless sender
       return if sender.bot?
       sns.notify(sender, create_body(params), payload['status'] || payload['body'])
+      result.push(sender: sender.acct.to_s)
       @break = true
     end
 
@@ -26,6 +27,10 @@ module Mulukhiya
 
     def respondable?
       return true
+    end
+
+    def verbose?
+      return false
     end
 
     def template

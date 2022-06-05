@@ -17,10 +17,7 @@ module Mulukhiya
 
     def handlers(&block)
       return enum_for(__method__) unless block
-      config["/#{Environment.controller_name}/handlers/#{label}"]
-        .filter_map {|name| Handler.create(name, params)}
-        .reject(&:disable?)
-        .each(&block)
+      handler_names.filter_map {|v| Handler.create(v, params)}.each(&block)
     end
 
     def handler_names(&block)

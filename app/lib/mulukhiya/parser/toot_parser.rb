@@ -25,7 +25,7 @@ module Mulukhiya
       length -= [:default_tag, :user_tag]
         .filter_map {|name| Handler.create(name)}
         .reject(&:disable?)
-        .inject(TagContainer.new) {|tags, h| tags.merge(h.addition_tags)}
+        .inject(Set[]) {|tags, h| tags.merge(h.addition_tags)}
         .sum {|v| v.to_hashtag.length + 1}
       return length
     rescue => e
