@@ -29,6 +29,7 @@ module Mulukhiya
       @break = true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, status: @status)
+      @break = true
     end
 
     def handle_post_toot(payload, params = {})
