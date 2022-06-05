@@ -12,6 +12,11 @@ module Mulukhiya
       return nil
     end
 
+    def disable?
+      return true unless parser.command?
+      return super
+    end
+
     def validate
       return contract.call(parser.params).errors.to_h do |error|
         ["/#{error.path.map(&:to_s).join('/')}", error.text]
