@@ -251,6 +251,12 @@ html lang='ja'
                   .field-update-button-container
                     button @click='execCustomAPI("#{api.id}")' 実行
                     pre.result v-if='result.#{api.id}' {{result.#{api.id}}}
+        li v-if='account.is_admin'
+          h3 @click='toggleVisibility("handler")' ハンドラ
+          vue-slide-up-down :active='layout.details.handler'
+            .endpoint-container
+              .role admin
+              .link GET {{endpoints.handler_list}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -278,12 +284,14 @@ html lang='ja'
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
             status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
             status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
+            handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
             media_list: {page: 1, q: null, only_person: false, token: Vue.getToken()},
             status_list: {page: 1, q: null, token: Vue.getToken()},
             status_detail: {id: null, token: Vue.getToken()},
+            handler_list: {token: Vue.getToken()},
             status_create_tag: {id: null, tag: null, token: Vue.getToken()},
             status_delete_tag: {id: null, tag: null, token: Vue.getToken()},
             lemmy_communities: {token: Vue.getToken()},
@@ -308,6 +316,7 @@ html lang='ja'
             status_detail: null,
             status_create_tag: null,
             status_delete_tag: null,
+            handler_list: null,
             health: null,
             about: null,
           },
@@ -322,7 +331,7 @@ html lang='ja'
               tagging_usertag: false,
               feed: false,
               health: false,
-              sidekiq: false,
+              handler: false,
               custom: false,
               about: false,
               status: false,
