@@ -53,6 +53,7 @@ module Mulukhiya
 
     def dispatch(payload)
       handlers do |handler|
+        next if handler.disable?
         unless Thread.new {handler.send(method, payload, params)}.join(handler.timeout)
           handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
         end
