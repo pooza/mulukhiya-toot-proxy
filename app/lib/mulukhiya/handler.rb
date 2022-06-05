@@ -224,7 +224,7 @@ module Mulukhiya
     end
 
     def self.search(pattern)
-      return names.grep(pattern).to_set
+      return names.select {|v| v.match?(pattern) && !config.disable?(v)}.to_set
     end
 
     def self.all_schema
