@@ -384,7 +384,7 @@ module Mulukhiya
     get '/admin/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       @renderer.message = Handler.all.map do |handler|
-        {name: handler.underscore, disable: handler.disable_config?}
+        {name: handler.underscore, disable: config.disable?(handler)}
       end
       return @renderer.to_s
     rescue => e

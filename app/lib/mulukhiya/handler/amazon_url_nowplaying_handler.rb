@@ -1,7 +1,7 @@
 module Mulukhiya
   class AmazonURLNowplayingHandler < NowplayingHandler
-    def toggleable?
-      return false unless AmazonService.config?
+    def disable?
+      return true unless AmazonService.config?
       return super
     end
 

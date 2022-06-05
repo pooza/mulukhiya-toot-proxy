@@ -2,10 +2,10 @@ module Mulukhiya
   class MentionHandler < Handler
     attr_reader :sender
 
-    def toggleable?
-      return false unless controller_class.streaming?
-      return false unless info_agent_service
-      return super
+    def disable?
+      return true unless controller_class.streaming?
+      return true unless info_agent_service
+      return false
     end
 
     def handle_mention(payload, params = {})

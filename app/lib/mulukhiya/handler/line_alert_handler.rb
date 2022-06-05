@@ -1,8 +1,8 @@
 module Mulukhiya
   class LineAlertHandler < AlertHandler
-    def toggleable?
-      return false unless id
-      return false unless token
+    def disable?
+      return true unless id
+      return true unless token
       return super
     end
 

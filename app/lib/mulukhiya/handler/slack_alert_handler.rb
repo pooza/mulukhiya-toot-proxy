@@ -1,7 +1,7 @@
 module Mulukhiya
   class SlackAlertHandler < AlertHandler
-    def toggleable?
-      return false unless uris.present?
+    def disable?
+      return true unless uris.present?
       return super
     end
 

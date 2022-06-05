@@ -5,10 +5,6 @@ module Mulukhiya
       return false
     end
 
-    def toggleable?
-      return false
-    end
-
     def handle_post_toot(payload, params = {})
       return unless reporter.to_h.present?
       notify(reporter.to_h, {response: reporter.response, spoiler_text:})

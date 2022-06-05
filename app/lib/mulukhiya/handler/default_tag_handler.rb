@@ -1,7 +1,7 @@
 module Mulukhiya
   class DefaultTagHandler < TagHandler
-    def toggleable?
-      return false unless self.class.tags.present?
+    def disable?
+      return true unless self.class.tags.present?
       return super
     end
 

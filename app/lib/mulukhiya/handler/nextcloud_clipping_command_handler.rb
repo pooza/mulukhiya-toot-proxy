@@ -1,12 +1,8 @@
 module Mulukhiya
   class NextcloudClippingCommandHandler < CommandHandler
     def disable?
+      return true unless controller_class.nextcloud?
       return true unless sns.account&.nextcloud
-      return super
-    end
-
-    def toggleable?
-      return false unless controller_class.nextcloud?
       return super
     end
 

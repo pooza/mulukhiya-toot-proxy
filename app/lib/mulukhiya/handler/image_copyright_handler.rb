@@ -1,10 +1,10 @@
 module Mulukhiya
   class ImageCopyrightHandler < Handler
-    def toggleable?
-      return false unless tag.present?
-      return false unless message.present?
-      return false unless uri.present?
-      return false unless uri.absolute?
+    def disable?
+      return true unless tag.present?
+      return true unless message.present?
+      return true unless uri.present?
+      return true unless uri.absolute?
       return super
     end
 

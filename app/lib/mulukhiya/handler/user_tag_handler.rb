@@ -1,7 +1,6 @@
 module Mulukhiya
   class UserTagHandler < TagHandler
     def disable?
-      return true if Environment.test?
       return false
     end
 

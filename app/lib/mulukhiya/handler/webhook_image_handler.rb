@@ -6,10 +6,6 @@ module Mulukhiya
       return false
     end
 
-    def toggleable?
-      return false
-    end
-
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
       payload[attachment_field] ||= []

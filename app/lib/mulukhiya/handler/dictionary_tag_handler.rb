@@ -1,7 +1,7 @@
 module Mulukhiya
   class DictionaryTagHandler < TagHandler
-    def toggleable?
-      return false unless RemoteDictionary.all.present?
+    def disable?
+      return true unless RemoteDictionary.all.present?
       return super
     end
 
