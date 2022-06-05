@@ -257,6 +257,10 @@ html lang='ja'
             .endpoint-container
               .role admin
               .link GET {{endpoints.handler_list}}
+              .link-description ハンドラの有効/無効設定を返します。
+              .field-update-button-container
+                button @click='getHandlers' 実行
+                pre.result v-if='result.handler_list' {{result.handler_list}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           vue-slide-up-down :active='layout.details.about'
@@ -505,6 +509,12 @@ html lang='ja'
             this.result.status_delete_tag = null
             Vue.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
               .then(e => {this.result.status_delete_tag = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getHandlers () {
+            this.result.handler_list = null
+            Vue.getHandlers()
+              .then(e => {this.result.handler_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getHealth () {
