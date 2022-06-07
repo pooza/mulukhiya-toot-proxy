@@ -1,7 +1,6 @@
 - unless env.production?
   .message-container
-    .message
-      = "environment: #{env.type}"
+    .message = "environment: #{env.type}"
 
 .message-container
   .message v-if='account.username'

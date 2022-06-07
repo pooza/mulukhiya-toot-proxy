@@ -5,7 +5,7 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: controller.status_label}
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: controller.status_label}]}
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 = controller.status_label
