@@ -1,18 +1,18 @@
 - unless env.production?
   .message-container
-    p
+    .message
       = "environment: #{env.type}"
 
 .message-container
-  p v-if='account.username'
+  .message v-if='account.username'
     | login: @{{account.username}}
+    .role v-if='account.is_moderator' moderator
+    .role v-if='account.is_admin' admin
+    .role v-if='account.is_test_bot' test bot
+    .role v-if='account.is_info_bot' info bot
     a href='/mulukhiya/app/token'
       i class='fas fa-user' v-tooltip.left="'トークンの管理'"
-    span.role v-if='account.is_moderator' moderator
-    span.role v-if='account.is_admin' admin
-    span.role v-if='account.is_test_bot' test bot
-    span.role v-if='account.is_info_bot' info bot
-  p v-else=''
+  .message v-else=''
     a href='/mulukhiya/app/token' トークンの登録
     | を行ってください。
     a href='/mulukhiya/app/token'
