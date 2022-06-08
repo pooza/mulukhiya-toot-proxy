@@ -1,7 +1,7 @@
 module Mulukhiya
   class ClippingWorkerTest < TestCase
     def setup
-      @worker = ClippingWorker.new
+      @worker = Worker.create(:clipping)
     end
 
     def test_create_body

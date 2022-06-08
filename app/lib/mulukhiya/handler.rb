@@ -83,8 +83,19 @@ module Mulukhiya
 
     def handler_config(key)
       value = (config["/handler/#{underscore}/#{key}"] rescue nil)
-      value = (config["/handler/#default/#{key}"] rescue nil) if value.nil?
+      value = (config["/handler/default/#{key}"] rescue nil) if value.nil?
       return value
+    end
+
+    def to_h
+      return {
+        name: underscore,
+        timeout:,
+        is_disable: disable?,
+        is_verbose: verbose?,
+        is_experimental: experimental?,
+        is_toggleable: toggleable?,
+      }
     end
 
     def verbose?
@@ -102,7 +113,7 @@ module Mulukhiya
 
     def summary
       return {
-        event: @event.to_s,
+        event: event.to_s,
         handler: underscore,
         entries: recursive_to_a(result.concat(errors)),
       }
@@ -131,7 +142,7 @@ module Mulukhiya
     end
 
     def timeout
-      return config['/handler/test/timeout']
+      return handler_config(:timeout)
     end
 
     def break?
@@ -146,8 +157,12 @@ module Mulukhiya
       return false
     end
 
+    def experimental?
+      return handler_config(:experimental) == true
+    end
+
     def toggleable?
-      return true
+      return handler_config(:toggleable) == true
     end
 
     def payload=(payload)

@@ -29,6 +29,24 @@ module Mulukhiya
       end
     end
 
+    def test_toggleable?
+      Handler.all do |handler|
+        assert_boolean(handler.toggleable?)
+      end
+    end
+
+    def test_experimental?
+      Handler.all do |handler|
+        assert_boolean(handler.experimental?)
+      end
+    end
+
+    def test_to_h?
+      Handler.all do |handler|
+        assert_kind_of(Hash, handler.to_h)
+      end
+    end
+
     def test_timeout
       Handler.all do |handler|
         assert_predicate(handler.timeout, :positive?)

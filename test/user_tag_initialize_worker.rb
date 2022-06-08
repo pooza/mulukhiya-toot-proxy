@@ -1,7 +1,7 @@
 module Mulukhiya
   class UserTagInitializeWorkerTest < TestCase
     def setup
-      @worker = UserTagInitializeWorker.new
+      @worker = Worker.create(:user_tag_initialize)
       test_account.user_config.update(tagging: {user_tags: ['実況']})
     end
 
