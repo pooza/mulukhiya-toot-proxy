@@ -87,6 +87,17 @@ module Mulukhiya
       return value
     end
 
+    def to_h
+      return {
+        name: underscore,
+        timeout:,
+        is_disable: disable?,
+        is_verbose: verbose?,
+        is_experimental: experimental?,
+        is_toggleable: toggleable?,
+      }
+    end
+
     def verbose?
       return true
     end
@@ -102,7 +113,7 @@ module Mulukhiya
 
     def summary
       return {
-        event: @event.to_s,
+        event: event.to_s,
         handler: underscore,
         entries: recursive_to_a(result.concat(errors)),
       }
