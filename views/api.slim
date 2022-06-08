@@ -22,7 +22,11 @@ html lang='ja'
                 .control
                   i class='fa fa-magnifying-glass'
                   input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
-                .link-description = "@{{account.username}}からの#{controller.status_label}を取得します。"
+                .control
+                  label
+                    input type='checkbox' v-model='query_params.status_list.self' @change='onInputStatusList'
+                    | 自分の#{controller.status_label}のみ
+                .link-description = "#{controller.status_label}の一覧を取得します。"
                 .field-update-button-container
                   button @click='delay(getStatuses)' 実行
                   pre.result v-if='result.status_list' {{result.status_list}}
@@ -286,14 +290,14 @@ html lang='ja'
           endpoints: {
             media_list: '/mulukhiya/api/media?page=1&only_person=0',
             lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
-            status_list: `/mulukhiya/api/status/list?page=1&token=${encodeURIComponent(Vue.getToken())}`,
+            status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(Vue.getToken())}`,
             status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
             handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(Vue.getToken())}`,
           },
           choices: {},
           query_params: {
             media_list: {page: 1, q: null, only_person: false, token: Vue.getToken()},
-            status_list: {page: 1, q: null, token: Vue.getToken()},
+            status_list: {page: 1, q: null, self: true, token: Vue.getToken()},
             status_detail: {id: null, token: Vue.getToken()},
             handler_list: {token: Vue.getToken()},
             status_create_tag: {id: null, tag: null, token: Vue.getToken()},
@@ -385,6 +389,7 @@ html lang='ja'
             if (this.query_params.status_list.q) {
               url.searchParams.set('q', this.query_params.status_list.q)
             }
+            url.searchParams.set('self', this.query_params.status_list.self ? 1 : 0)
             url.searchParams.set('token', Vue.getToken())
             this.endpoints.status_list = `${url.pathname}${url.search}`
           },
@@ -486,12 +491,9 @@ html lang='ja'
           },
           getStatuses () {
             this.result.status_list = null
-            Vue.getStatuses(
-              this.query_params.status_list.page,
-              this.query_params.status_list.q,
-              this.query_params.status_list.only_person
-            ).then(e => {this.result.status_list = e})
-            .catch(e => Vue.alert(this.$dialog, e))
+            Vue.getStatuses(this.query_params.status_list)
+              .then(e => {this.result.status_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
           },
           getStatus () {
             this.result.status_detail = null

@@ -11,9 +11,14 @@ html lang='ja'
       h2 = controller.status_label
       - if controller.update_status?
         nav.search-form-container v-if='account.username'
-          i class='fa fa-magnifying-glass'
-          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchStatuses'
-          button.small :disabled='!keyword' @click='searchStatuses' 検索
+          .control
+            i class='fa fa-magnifying-glass'
+            input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchStatuses'
+            button.small @click='searchStatuses' 検索
+          .control
+            label
+              input type='checkbox' v-model='self'
+              | 自分の#{controller.status_label}のみ
         article.status v-for='(status, id) in statuses' v-if='account.username'
           .visibility
             i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
@@ -30,8 +35,11 @@ html lang='ja'
             .header
               i class='fa fa-id-badge'
               | {{status.id}}
+          .header v-if='!self'
+            i class='fas fa-user'
+            | {{status.account.display_name || '@' + status.account.username}}
           pre.body v-if='status.body' = '{{status.body}}'
-          .footer-tags v-if='status.is_taggable'
+          .footer-tags v-if='status.is_taggable && account.username==status.account.username'
             h4
               i class='fa fa-tag'
               | タグづけ
@@ -55,6 +63,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           statuses: {},
+          self: true,
           page: 0,
           keyword: null,
           last_page: false,
@@ -87,7 +96,7 @@ html lang='ja'
           },
           appendStatuses () {
             this.page ++
-            Vue.getStatuses(this.page, this.keyword)
+            Vue.getStatuses({page: this.page, q: this.keyword, self: this.self})
               .then(e => {
                 if (0 < e.length) {
                   e.map(v => {Vue.set(this.statuses, v.id, v)})

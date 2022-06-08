@@ -124,7 +124,8 @@ module Mulukhiya
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
-      params[:page] = params[:page]&.to_i || 1
+      params[:page] = (params[:page] || 1).to_i
+      params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
       params.delete(:q) unless params[:q].present?
       params.delete(:q) unless sns.account
       errors = MediaListContract.new.exec(params)
@@ -171,9 +172,10 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       params[:limit] ||= config['/webui/status/timeline/limit']
-      params[:page] = params[:page]&.to_i || 1
+      params[:page] = (params[:page] || 1).to_i
+      params[:self] = (params[:self] || 0).to_i.zero? ? 0 : 1
       params.delete(:q) unless params[:q].present?
-      errors = PagerContract.new.exec(params)
+      errors = StatusListContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
