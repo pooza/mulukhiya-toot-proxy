@@ -83,7 +83,7 @@ module Mulukhiya
 
     def handler_config(key)
       value = (config["/handler/#{underscore}/#{key}"] rescue nil)
-      value = (config["/handler/#default/#{key}"] rescue nil) if value.nil?
+      value = (config["/handler/default/#{key}"] rescue nil) if value.nil?
       return value
     end
 
