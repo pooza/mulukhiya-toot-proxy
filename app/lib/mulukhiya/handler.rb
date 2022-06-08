@@ -142,7 +142,7 @@ module Mulukhiya
     end
 
     def timeout
-      return config['/handler/test/timeout']
+      return handler_config(:timeout)
     end
 
     def break?

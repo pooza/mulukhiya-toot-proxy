@@ -253,8 +253,6 @@ handler:
     timeout: 10
   tagging:
     toggleable: false
-  test:
-    timeout: 20
   user_config_command:
     toggleable: false
   user_tag:

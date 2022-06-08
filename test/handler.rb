@@ -43,7 +43,6 @@ module Mulukhiya
 
     def test_to_h?
       Handler.all do |handler|
-        ic handler.to_h
         assert_kind_of(Hash, handler.to_h)
       end
     end
