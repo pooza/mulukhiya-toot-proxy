@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def setup
-      @worker = FilterUnregisterWorker.new
+      @worker = Worker.create(:filter_unregister)
       sns_class.new.register_filter(tag: '実況')
     end
 

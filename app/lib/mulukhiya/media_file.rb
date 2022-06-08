@@ -154,7 +154,7 @@ module Mulukhiya
     end
 
     def self.purge
-      worker = MediaCleaningWorker.new
+      worker = Worker.create(:media_cleaning)
       all.select {|f| File.new(f).mtime < worker.worker_config(:days).days.ago}.each do |path|
         File.unlink(path)
         logger.info(class: to_s, method: __method__, path:)
