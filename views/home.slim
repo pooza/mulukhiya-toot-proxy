@@ -5,7 +5,7 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME'}]}
     main#app class=env.type
       == slim.render 'fragment/message'
       h1 = package.name

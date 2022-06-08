@@ -1,7 +1,7 @@
 module Mulukhiya
-  class MediaListContractTest < TestCase
+  class StatusListContractTest < TestCase
     def setup
-      @contract = MediaListContract.new
+      @contract = StatusListContract.new
     end
 
     def test_call
@@ -17,14 +17,14 @@ module Mulukhiya
       errors = @contract.call(page: 2).errors
       assert_empty(errors)
 
-      errors = @contract.call(only_person: 1).errors
-      assert_empty(errors)
-
-      errors = @contract.call(only_person: 0).errors
-      assert_empty(errors)
-
-      errors = @contract.call(only_person: 'false').errors
+      errors = @contract.call(page: 2, self: 'false').errors
       assert_false(errors.empty?)
+
+      errors = @contract.call(page: 2, self: 0).errors
+      assert_empty(errors)
+
+      errors = @contract.call(page: 2, self: 1).errors
+      assert_empty(errors)
 
       errors = @contract.call(q: 0).errors
       assert_false(errors.empty?)

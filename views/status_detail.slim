@@ -5,15 +5,7 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    nav.breadcrumbs
-      ul
-        li
-          a href='/' = sns.node_name
-        li
-          a href='/mulukhiya' モロヘイヤHOME
-        li
-          a href='/mulukhiya/app/status' = controller.status_label
-        li = params[:id]
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: controller.status_label, href: '/mulukhiya/app/status'}, {label: params[:id]}]}
     main#app class=env.type
       == slim.render 'fragment/message'
       article.status v-if='status.id'
@@ -25,6 +17,9 @@ html lang='ja'
         .header v-if='status.spoiler_text'
           i class='fa fa-circle-exclamation'
           | {{status.spoiler_text}}
+        .header
+          i class='fas fa-user'
+          | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
         .footer-tags v-if='status.is_taggable'
           h4

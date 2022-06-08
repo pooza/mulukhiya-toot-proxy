@@ -5,7 +5,7 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {current: 'メディアカタログ'}
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'メディアカタログ'}]}
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 メディアカタログ
