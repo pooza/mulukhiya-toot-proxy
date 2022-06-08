@@ -19,7 +19,10 @@ html lang='ja'
             .clearfix class='indented'
               - event.all_handlers.sort_by(&:underscore).each do |handler|
                 .handler-container :class="{disabled: handlers.#{handler.underscore}}"
-                  h4 = handler.underscore
+                  h4
+                    - if handler.experimental?
+                      i class='fa fa-flask' v-tooltip.right="'実験的機能'"
+                    = handler.underscore
                   label
                     - if handler.toggleable?
                       input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value=handler.underscore
