@@ -17,6 +17,9 @@ html lang='ja'
         .header v-if='status.spoiler_text'
           i class='fa fa-circle-exclamation'
           | {{status.spoiler_text}}
+        .header
+          i class='fas fa-user'
+          | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
         .footer-tags v-if='status.is_taggable'
           h4
