@@ -125,12 +125,16 @@ growi:
 handler:
   amazon_image:
     disable: true
+    experimental: true
   amazon_nowplaying:
     disable: true
+    experimental: true
   amazon_url_nowplaying:
     disable: true
+    experimental: true
   animation_image_format_convert:
     disable: true
+    experimental: true
     png: true
     timeout: 10
     webp: false
@@ -138,10 +142,12 @@ handler:
     pattern: お[知し]らせ
   attachment_reusing:
     disable: true
+    experimental: true
   audio_format_convert:
     timeout: 30
   canonical_url:
     disable: true
+    experimental: true
     ignore:
       domains:
         - instagram.com
@@ -149,7 +155,9 @@ handler:
         - toei-anim.co.jp
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   default:
+    experimental: false
     timeout: 5
+    toggleable: true
   default_tag:
     tags: []
   dictionary_tag:
@@ -173,8 +181,11 @@ handler:
     gif: true
   image_resize:
     pixel: 1920
+  invalid_command:
+    toggleable: false
   itunes_image:
     disable: true
+    experimental: true
     pixel: 480
     timeout: 10
   itunes_nowplaying:
@@ -187,6 +198,7 @@ handler:
   long_text_image:
     columns: 20
     disable: true
+    experimental: true
     font_file: font/HackGen-Regular.ttf
     font_size: 30
     image_file: public/mulukhiya/media/background.png
@@ -197,6 +209,7 @@ handler:
     to: null
   media_tag:
     disable: true
+    experimental: true
     tags:
       audio: audio
       image: image
@@ -213,6 +226,7 @@ handler:
         url: https://mstdn.delmulin.com
   reply_reaction:
     disable: true
+    experimental: true
   result_notification:
     spoiler_text: 実行結果
   shortened_url:
@@ -231,19 +245,25 @@ handler:
     hooks: []
   spotify_image:
     disable: true
+    experimental: true
     timeout: 10
   spotify_nowplaying:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
+  tagging:
+    toggleable: false
   test:
     timeout: 20
+  user_config_command:
+    toggleable: false
   user_tag:
     extra_minutes: 2
   video_format_convert:
     timeout: 90
   you_tube_image:
     disable: true
+    experimental: true
     timeout: 10
 http:
   retry:

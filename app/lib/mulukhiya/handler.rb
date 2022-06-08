@@ -146,8 +146,12 @@ module Mulukhiya
       return false
     end
 
+    def experimental?
+      return handler_config(:experimental) == true
+    end
+
     def toggleable?
-      return true
+      return handler_config(:toggleable) == true
     end
 
     def payload=(payload)
