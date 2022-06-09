@@ -266,7 +266,7 @@ GEM
       gli (~> 2.1)
       json
       rainbow (>= 2.2.2, < 4.0)
-    rails-html-sanitizer (1.4.2)
+    rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
     rainbow (3.1.1)
     rake (13.0.6)
