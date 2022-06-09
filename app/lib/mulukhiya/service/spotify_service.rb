@@ -57,15 +57,15 @@ module Mulukhiya
     end
 
     def create_track_uri(track)
-      uri = SpotifyURI.parse(config['/spotify/urls/track'])
+      return nil unless uri = SpotifyURI.parse(config['/spotify/urls/track'])
       uri.track_id = track.id
-      return nil unless uri&.absolute?
+      return nil unless uri.absolute?
       return uri
     end
 
     def create_image_uri(track)
-      uri = Ginseng::URI.parse(track.album.images.first['url'])
-      return nil unless uri&.absolute?
+      return nil unless uri = Ginseng::URI.parse(track.album.images.first['url'])
+      return nil unless uri.absolute?
       return uri
     end
 

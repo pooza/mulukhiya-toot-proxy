@@ -18,8 +18,9 @@ module Mulukhiya
       return nil unless self.class.config?
       item = lookup(asin)
       ['Large', 'Medium', 'Small'].freeze.each do |size|
-        uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
-        return uri if uri&.absolute?
+        next unless uri = Ginseng::URI.parse(item.dig('Images', 'Primary', size, 'URL'))
+        next unless uri.absolute?
+        return uri
       end
     rescue => e
       e.log

@@ -25,8 +25,8 @@ module Mulukhiya
     end
 
     def create_track_uri(track)
-      uri = ItunesURI.parse(track['collectionViewUrl'])
-      return nil unless uri&.absolute?
+      return nil unless uri = ItunesURI.parse(track['collectionViewUrl'])
+      return nil unless uri.absolute?
       return uri
     end
 
