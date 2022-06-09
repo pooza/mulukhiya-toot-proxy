@@ -875,7 +875,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.19.7
+  version: 4.19.8
 parser:
   note:
     fields:
