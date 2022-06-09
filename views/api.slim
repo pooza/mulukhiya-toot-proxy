@@ -420,7 +420,7 @@ html lang='ja'
           },
           getMedias () {
             this.result.media_list = null
-            Vue.getMedias(this.query_params.media_list.page, this.query_params.media_list.q, this.query_params.media_list.only_person)
+            Vue.getMedias(this.query_params.media_list)
               .then(e => {this.result.media_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
