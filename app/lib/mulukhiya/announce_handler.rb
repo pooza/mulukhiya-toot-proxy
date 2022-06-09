@@ -4,8 +4,8 @@ module Mulukhiya
 
     def disable?
       return true unless controller_class.announcement?
-      return true unless Worker.create(:announcement).disable?
       return true unless info_agent_service
+      return true if Worker.create(:announcement).disable?
       return super
     end
 
