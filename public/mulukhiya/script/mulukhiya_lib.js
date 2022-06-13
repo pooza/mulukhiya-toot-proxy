@@ -243,9 +243,8 @@ const MulukhiyaLib = {
     }
 
     Vue.getMedias = async params => {
-      params = params || {}
-      params.page = params.page || 1
-      params.only_person = params.only_person ? 1: 0
+      params.page = Number(params.page || 1)
+      params.only_person = params.only_person ? 1 : 0
       if (!params.q) {delete params.q}
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -272,9 +271,8 @@ const MulukhiyaLib = {
     }
 
     Vue.getStatuses = async params => {
-      params = params || {}
-      params.page = params.page || 1
-      params.self = params.self ? 1: 0
+      params.page = Number(params.page || 1)
+      params.self = params.self ? 1 : 0
       if (!params.q) {delete params.q}
       const indicator = new ActivityIndicator()
       indicator.show()
