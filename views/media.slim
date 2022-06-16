@@ -88,7 +88,7 @@ html lang='ja'
           },
           appendMedias () {
             this.page ++
-            Vue.getMedias(this.page, this.keyword, this.only_person)
+            Vue.getMedias({page: this.page, q: this.keyword, only_person: this.only_person})
               .then(e => {
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)

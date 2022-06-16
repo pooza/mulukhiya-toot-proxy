@@ -105,7 +105,10 @@ module Mulukhiya
     end
 
     def convert_type(type)
-      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+      dest = create_dest_path(f: __method__, type:)
+      command = CommandLine.new(['ffmpeg', '-y', '-i', path, dest])
+      command.exec unless File.exist?(dest)
+      return self.class.new(dest)
     end
 
     alias convert_format convert_type

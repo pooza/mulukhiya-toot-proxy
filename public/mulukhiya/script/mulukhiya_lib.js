@@ -242,16 +242,15 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getMedias = async (page, keyword, only_person = false) => {
+    Vue.getMedias = async params => {
+      params.page = Number(params.page || 1)
+      params.only_person = params.only_person ? 1 : 0
+      if (!params.q) {delete params.q}
       const indicator = new ActivityIndicator()
       indicator.show()
-      const query = {
-        page: page || 1,
-        only_person: (only_person ? 1 : 0)
-      }
-      if (keyword) {query.q = keyword}
-      return axios.get(Vue.createURL('/mulukhiya/api/media', {query: query}))
+      return axios.get(Vue.createURL('/mulukhiya/api/media', {query: params}))
         .then(e => e.data)
+        .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 
@@ -272,9 +271,8 @@ const MulukhiyaLib = {
     }
 
     Vue.getStatuses = async params => {
-      params = params || {}
-      params.page = params.page || 1
-      params.self = params.self ? 1: 0
+      params.page = Number(params.page || 1)
+      params.self = params.self ? 1 : 0
       if (!params.q) {delete params.q}
       const indicator = new ActivityIndicator()
       indicator.show()

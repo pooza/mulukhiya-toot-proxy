@@ -13,8 +13,8 @@ module Mulukhiya
 
     def updatable?(keyword)
       return false if Ginseng::URI.parse(keyword)&.absolute?
-      return true if @asins[keyword] = @service.search(keyword, ['DigitalMusic', 'Music'])
-      return false
+      return false unless @asins[keyword] = @service.search(keyword, ['DigitalMusic', 'Music'])
+      return true
     rescue Addressable::URI::InvalidURIError
       return false
     rescue => e

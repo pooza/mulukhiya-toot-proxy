@@ -29,13 +29,13 @@ html lang='ja'
           .field
             .title トークン
             .value
-              code :id='"token-" + current_account.username' v-if='current_account.token' {{current_account.token}}
               i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#token-" + current_account.username'
+              code :id='"token-" + current_account.username' v-if='current_account.token' {{current_account.token}}
           .field
             .title webhook
             .value
-              code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
               i class='fas fa-clipboard' v-tooltip.left="'クリップボードにコピー'" :data-clipboard-target='"#webhook-" + current_account.username'
+              code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
       nav.tokens
         h3 トークンの登録
         .token
