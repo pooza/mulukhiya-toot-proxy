@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def normalize(word)
-      if rule = self.class.normalize_rules.find {|v| v['source'] == word.to_hashtag_base}
+      if rule = TaggingHandler.normalize_rules.find {|v| v['source'] == word.to_hashtag_base}
         word = rule['normalized']
       end
       return super
@@ -11,10 +11,6 @@ module Mulukhiya
 
     def self.scan(text)
       return new(text.scan(Ginseng::Fediverse::Parser.hashtag_pattern).map(&:first))
-    end
-
-    def self.normalize_rules
-      return config['/tagging/normalize/rules'] rescue []
     end
 
     def self.default_tags

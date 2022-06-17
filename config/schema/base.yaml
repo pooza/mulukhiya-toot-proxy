@@ -253,26 +253,6 @@ properties:
     required:
       - client
     type: object
-  tagging:
-    properties:
-      normalize:
-        properties:
-          rules:
-            items:
-              properties:
-                normalized:
-                  type: string
-                sourse:
-                  type: string
-              required:
-                - source
-                - normalized
-              type: object
-            type: array
-        required:
-          - rules
-        type: object
-    type: object
   user_config:
     properties:
       redis:

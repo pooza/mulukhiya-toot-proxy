@@ -17,6 +17,10 @@ module Mulukhiya
       result.push(tags:) if tags.present?
     end
 
+    def self.normalize_rules
+      return new.handler_config('normalize/rules') || []
+    end
+
     private
 
     def tags_line?(line)

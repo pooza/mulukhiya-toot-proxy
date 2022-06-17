@@ -253,6 +253,8 @@ handler:
     timeout: 10
   tagging:
     toggleable: false
+    normalize:
+      rules: []
   user_config_command:
     toggleable: false
   user_tag:
@@ -1133,9 +1135,6 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
-tagging:
-  normalize:
-    rules: []
 user_config:
   encrypt_fields:
     - token

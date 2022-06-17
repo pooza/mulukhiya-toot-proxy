@@ -1,0 +1,23 @@
+properties:
+  disabled:
+    type: boolean
+  normalize:
+    properties:
+      rules:
+        items:
+          properties:
+            normalized:
+              type: string
+            sourse:
+              type: string
+          required:
+            - source
+            - normalized
+          type: object
+        type: array
+    required:
+      - rules
+    type: object
+  timeout:
+    type: integer
+type: object
