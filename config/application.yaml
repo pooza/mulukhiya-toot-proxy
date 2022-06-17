@@ -252,9 +252,9 @@ handler:
   spotify_url_nowplaying:
     timeout: 10
   tagging:
-    toggleable: false
     normalize:
       rules: []
+    toggleable: false
   user_config_command:
     toggleable: false
   user_tag:
