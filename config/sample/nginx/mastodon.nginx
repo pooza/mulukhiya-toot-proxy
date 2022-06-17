@@ -90,10 +90,10 @@ location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
   }
 }
 location = /api/v1/timelines/public {
-  if ($arg_local ~* ^(false|f|0|off)$) {
+  if ($arg_local !~* ^(true|t|1|on)$) {
     proxy_pass http://localhost:3000;
   }
-  if ($arg_local !~* ^(false|f|0|off)$) {
+  if ($arg_local ~* ^(true|t|1|on)$) {
     return 302 /api/v1/timelines/tag/your_default_hashtag;
   }
 }
