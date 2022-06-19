@@ -3,4 +3,11 @@
 <%= params.dig(:record, :record, :comment).ellipsize(config['/annict/chars']) %>
 <% end -%>
 <%= Mulukhiya::AnnictService.create_record_uri(params.dig(:record, :work, :id), params.dig(:record, :episode, :id)) %>
-<%= params.dig(:record, :work, :title).to_hashtag %>
+<%=
+
+  [
+	  params.dig(:record, :work, :title),
+		"#{params.dig(:record, :episode, :number_text).match(/[[:digit:]]+/).to_a.first}話",
+		params.dig(:record, :episode, :title),
+	].select(&:present?).map(&:to_hashtag).join(' ')
+%>
