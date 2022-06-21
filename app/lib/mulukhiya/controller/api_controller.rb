@@ -2,7 +2,7 @@ module Mulukhiya
   class APIController < Controller
     get '/about' do
       sns.token ||= sns.default_token
-      @renderer.message = {package: config.raw.dig('application', 'package')}
+      @renderer.message = config.about
       return @renderer.to_s
     end
 

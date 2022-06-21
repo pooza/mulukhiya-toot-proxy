@@ -17,6 +17,8 @@ properties:
     properties:
       label:
         type: string
+      spoiler_text:
+        type: string
     type: object
   streaming:
     properties:

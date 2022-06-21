@@ -450,6 +450,7 @@ mastodon:
     key: id
     label: 投稿
     parser: toot
+    spoiler_text: null
   streaming:
     verify_peer: true
   toot:
@@ -626,6 +627,7 @@ meisskey:
     key: noteId
     label: ポスト
     parser: note
+    spoiler_text: null
   streaming:
     verify_peer: true
   url: https://meisskey.example.com/
@@ -801,6 +803,7 @@ misskey:
     key: noteId
     label: ノート
     parser: note
+    spoiler_text: null
   streaming:
     verify_peer: true
   url: https://misskey.example.com/
@@ -1059,6 +1062,7 @@ pleroma:
     key: id
     label: ステータス
     parser: toot
+    spoiler_text: null
   streaming:
     verify_peer: true
   toot:

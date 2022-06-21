@@ -20,5 +20,14 @@ module Mulukhiya
       end
       return @schema
     end
+
+    def about
+      return {
+        package: raw.dig('application', 'package'),
+        config: {
+          status: Environment.status_class.default,
+        },
+      }
+    end
   end
 end
