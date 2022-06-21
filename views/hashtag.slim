@@ -11,7 +11,7 @@ html lang='ja'
       h2 ハッシュタグ
       section.tagging-dictionary
         h3 タグを検索
-        .total
+        .total v-if='account.is_admin'
           | 登録済みのタグ
           = Mulukhiya::TaggingDictionary.new.count.commaize
           | 件

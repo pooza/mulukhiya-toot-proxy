@@ -50,7 +50,6 @@ module Mulukhiya
     def refresh
       clear
       redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
-      logger.info(class: self.class.to_s, method: __method__)
       update(cache)
     rescue => e
       e.alert
@@ -74,9 +73,11 @@ module Mulukhiya
       result = []
       RemoteDictionary.all.map do |dic|
         Thread.new do
-          result.push(dic.parse)
+          words = dic.parse
+          logger.info(dic: dic.to_h.merge(words: words.count, message: 'load'))
+          result.push(words)
         rescue => e
-          e.alert(dic: {url: dic.uri.to_s})
+          e.alert(dic: dic.to_h)
         end
       end.each(&:join)
       return result
