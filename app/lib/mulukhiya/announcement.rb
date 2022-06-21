@@ -11,18 +11,19 @@ module Mulukhiya
 
     def announce
       return unless controller_class.announcement?
-      fetch.reject {|v| cache.member?(v[:id])}.each do |announcement|
+      response = fetch
+      response.reject {|v| cache.member?(v[:id])}.each do |announcement|
         Event.new(:announce, {sns:}).dispatch(announcement)
       rescue => e
         e.log(announcement:)
       ensure
         sleep(Worker.create(:announcement).worker_config('interval/seconds'))
       end
-      save
+      save(response)
     end
 
     def fetch
-      return sns&.announcements
+      return sns&.announcements || []
     end
 
     def load
@@ -35,8 +36,8 @@ module Mulukhiya
 
     alias cache load
 
-    def save
-      storage['announcements'] = fetch.to_h {|v| [v[:id], v]}.to_json
+    def save(response)
+      storage['announcements'] = response.to_h {|v| [v[:id], v]}.to_json
     rescue => e
       e.alert
     end
