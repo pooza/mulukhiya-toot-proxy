@@ -9,17 +9,12 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 ハッシュタグ
-      - if controller.favorite_tags?
-        section.fav-entries
-          h3 プロフィールに含まれるタグ
-          article.tag-entry v-for='(count, tag) in fav_entries'
-            - if env.pleroma?
-              a :href='"/tag/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
-            - else
-              a :href='"/tags/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
-            span.count v-if='count' {{count}}
       section.tagging-dictionary
         h3 タグを検索
+        .total
+          | 登録済みのタグ
+          = Mulukhiya::TaggingDictionary.new.count.commaize
+          | 件
         nav.search-form-container
           i class='fa fa-magnifying-glass'
           input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
@@ -38,6 +33,15 @@ html lang='ja'
             li
               strong タグ
               code v-for='tag in entry.tags' = "{{tag}} "
+      - if controller.favorite_tags?
+        section.fav-entries
+          h3 プロフィールに含まれるタグ
+          article.tag-entry v-for='(count, tag) in fav_entries'
+            - if env.pleroma?
+              a :href='"/tag/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
+            - else
+              a :href='"/tags/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
+            span.count v-if='count' {{count}}
       section.remote-dics
         h3 辞書
         ul

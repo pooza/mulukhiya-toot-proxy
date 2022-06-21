@@ -10,6 +10,11 @@ module Mulukhiya
       update(cache)
     end
 
+    def clear
+      @cache = nil
+      super
+    end
+
     def matches(source)
       text = source.dup
       tags = TagContainer.new
@@ -43,10 +48,9 @@ module Mulukhiya
     end
 
     def refresh
-      redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
-      @cache = nil
-      logger.info(class: self.class.to_s, method: __method__)
       clear
+      redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
+      logger.info(class: self.class.to_s, method: __method__)
       update(cache)
     rescue => e
       e.alert
