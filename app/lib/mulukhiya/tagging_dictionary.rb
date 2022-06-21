@@ -74,7 +74,7 @@ module Mulukhiya
       RemoteDictionary.all.map do |dic|
         Thread.new do
           words = dic.parse
-          logger.info(dic: dic.to_h.merge(words: words.count, message: 'load'))
+          logger.info(dic: dic.to_h.merge(words: words.count))
           result.push(words)
         rescue => e
           e.alert(dic: dic.to_h)

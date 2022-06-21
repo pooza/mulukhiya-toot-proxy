@@ -15,6 +15,7 @@ html lang='ja'
           | 登録済みのタグ
           = Mulukhiya::TaggingDictionary.new.count.commaize
           | 件
+          .role admin
         nav.search-form-container
           i class='fa fa-magnifying-glass'
           input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
