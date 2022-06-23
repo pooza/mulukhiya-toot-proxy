@@ -124,5 +124,29 @@ module Mulukhiya
       return unless @status
       assert_kind_of(String, @status.to_md)
     end
+
+    def test_default
+      assert_kind_of(Hash, status_class.default)
+      assert_kind_of([String, NilClass], status_class.default[:default_hashtag])
+      assert_kind_of([String, NilClass], status_class.default[:spoiler_text])
+    end
+
+    def test_default_hashtag
+      config['/handler/default_tag/tags'] = ['precure_fun']
+      assert_equal('#precure_fun', status_class.default_hashtag)
+      config['/handler/default_tag/tags'] = ['delmulin']
+      assert_equal('#delmulin', status_class.default_hashtag)
+      config['/handler/default_tag/tags'] = []
+      assert_nil(status_class.default_hashtag)
+      config['/handler/default_tag/tags'] = nil
+      assert_nil(status_class.default_hashtag)
+    end
+
+    def test_spoiler_text
+      config["/#{Environment.controller_name}/status/spoiler_text"] = ':netabare: '
+      assert_equal(':netabare: ', status_class.spoiler_text)
+      config["/#{Environment.controller_name}/status/spoiler_text"] = nil
+      assert_nil(status_class.spoiler_text)
+    end
   end
 end

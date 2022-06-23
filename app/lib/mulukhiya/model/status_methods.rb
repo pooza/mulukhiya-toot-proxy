@@ -57,5 +57,25 @@ module Mulukhiya
       ).compact
       return @hash
     end
+
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+      def default
+        return {spoiler_text:, default_hashtag:}
+      end
+
+      def spoiler_text
+        return config["/#{Environment.controller_name}/status/spoiler_text"] rescue nil
+      end
+
+      def default_hashtag
+        return nil unless handler = Handler.create(:default_tag)
+        return nil unless tag = handler.handler_config(:tags)&.first
+        return tag.to_hashtag
+      end
+    end
   end
 end

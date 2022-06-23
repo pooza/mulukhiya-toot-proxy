@@ -26,6 +26,10 @@ module Mulukhiya
       return @edit_uri
     end
 
+    def to_h
+      return {uri: uri.to_s}
+    end
+
     def self.all(&block)
       return enum_for(__method__) unless block
       return unless handler = Handler.create(:dictionary_tag)

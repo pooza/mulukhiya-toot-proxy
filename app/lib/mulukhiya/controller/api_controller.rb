@@ -2,7 +2,7 @@ module Mulukhiya
   class APIController < Controller
     get '/about' do
       sns.token ||= sns.default_token
-      @renderer.message = {package: config.raw.dig('application', 'package')}
+      @renderer.message = config.about
       return @renderer.to_s
     end
 
@@ -401,6 +401,24 @@ module Mulukhiya
     post '/admin/handler/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/admin/agent/config' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      if params[:info_token]
+        raise Ginseng::AuthError, 'Unauthorized' unless sns.account.admin? || sns.account.info?
+        config.update_file(agent: {info: {token: params[:info_token]}})
+      end
+      if params[:test_token]
+        raise Ginseng::AuthError, 'Unauthorized' unless sns.account.admin? || sns.account.test?
+        config.update_file(agent: {test: {token: params[:test_token]}})
+      end
       return @renderer.to_s
     rescue => e
       e.log

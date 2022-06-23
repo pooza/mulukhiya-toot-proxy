@@ -6,10 +6,14 @@ properties:
         properties:
           token:
             type: string
+          username:
+            type: string
         type: object
       test:
         properties:
           token:
+            type: string
+          username:
             type: string
         type: object
     type: object
@@ -252,26 +256,6 @@ properties:
         type: object
     required:
       - client
-    type: object
-  tagging:
-    properties:
-      normalize:
-        properties:
-          rules:
-            items:
-              properties:
-                normalized:
-                  type: string
-                sourse:
-                  type: string
-              required:
-                - source
-                - normalized
-              type: object
-            type: array
-        required:
-          - rules
-        type: object
     type: object
   user_config:
     properties:

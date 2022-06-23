@@ -1,5 +1,5 @@
 module Mulukhiya
-  class TaggingDictionaryUpdateTest < TestCase
+  class TaggingDictionaryUpdateWorderTest < TestCase
     def setup
       @worker = Worker.create(:tagging_dictionary_update)
     end

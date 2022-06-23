@@ -10,6 +10,11 @@ module Mulukhiya
       update(cache)
     end
 
+    def clear
+      @cache = nil
+      super
+    end
+
     def matches(source)
       text = source.dup
       tags = TagContainer.new
@@ -43,10 +48,8 @@ module Mulukhiya
     end
 
     def refresh
-      redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
-      @cache = nil
-      logger.info(class: self.class.to_s, method: __method__)
       clear
+      redis['tagging_dictionary'] = Marshal.dump(merge(fetch))
       update(cache)
     rescue => e
       e.alert
@@ -70,9 +73,11 @@ module Mulukhiya
       result = []
       RemoteDictionary.all.map do |dic|
         Thread.new do
-          result.push(dic.parse)
+          words = dic.parse
+          logger.info(dic: dic.to_h.merge(words: words.count))
+          result.push(words)
         rescue => e
-          e.alert(dic: {url: dic.uri.to_s})
+          e.alert(dic: dic.to_h)
         end
       end.each(&:join)
       return result

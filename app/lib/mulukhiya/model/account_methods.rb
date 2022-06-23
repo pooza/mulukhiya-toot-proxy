@@ -164,14 +164,18 @@ module Mulukhiya
     end
 
     def test?
-      return account_class.test_account&.id == id
+      return true if account_class.test_account&.id == id
+      return true if username == config['/agent/test/username']
+      return false
     rescue => e
       e.log
       return false
     end
 
     def info?
-      return account_class.info_account&.id == id
+      return true if account_class.info_account&.id == id
+      return true if username == config['/agent/info/username']
+      return false
     rescue => e
       e.log
       return false

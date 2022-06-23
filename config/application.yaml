@@ -7,8 +7,10 @@ agent:
     token: null
     welcome:
       template: welcome
+    username: info
   test:
     token: null
+    username: test
 amazon:
   affiliate: false
   cache:
@@ -252,6 +254,8 @@ handler:
   spotify_url_nowplaying:
     timeout: 10
   tagging:
+    normalize:
+      rules: []
     toggleable: false
   user_config_command:
     toggleable: false
@@ -448,6 +452,7 @@ mastodon:
     key: id
     label: 投稿
     parser: toot
+    spoiler_text: null
   streaming:
     verify_peer: true
   toot:
@@ -624,6 +629,7 @@ meisskey:
     key: noteId
     label: ポスト
     parser: note
+    spoiler_text: null
   streaming:
     verify_peer: true
   url: https://meisskey.example.com/
@@ -799,6 +805,7 @@ misskey:
     key: noteId
     label: ノート
     parser: note
+    spoiler_text: null
   streaming:
     verify_peer: true
   url: https://misskey.example.com/
@@ -875,7 +882,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.19.8
+  version: 4.20.0
 parser:
   note:
     fields:
@@ -1057,6 +1064,7 @@ pleroma:
     key: id
     label: ステータス
     parser: toot
+    spoiler_text: null
   streaming:
     verify_peer: true
   toot:
@@ -1133,9 +1141,6 @@ spotify:
     seconds: 1
   urls:
     track: https://open.spotify.com/
-tagging:
-  normalize:
-    rules: []
 user_config:
   encrypt_fields:
     - token

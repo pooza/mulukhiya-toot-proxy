@@ -371,6 +371,22 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.setInfoToken = async token => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/admin/agent/config', {token: Vue.getToken(), info_token: token})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    Vue.setTestToken = async token => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/admin/agent/config', {token: Vue.getToken(), test_token: token})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.execGET = async path => {
       const indicator = new ActivityIndicator()
       indicator.show()
