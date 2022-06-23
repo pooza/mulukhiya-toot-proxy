@@ -9,6 +9,9 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 トークンの管理
+      .field-update-button-container v-if='restartable'
+        button @click='restartPuma' 再起動
+        p.alert 再起動している間（数十秒程度）は操作できなくなります。
       nav.tokens v-if='accounts.length'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
@@ -103,6 +106,7 @@ html lang='ja'
           tokens: [],
           all_tokens: null,
           token: Vue.getToken(),
+          restartable: false,
           input: {
             authcode: null,
             infobot_authcode: null,
@@ -128,15 +132,14 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           registerTokens () {
-            Promise.all(
-              this.input.token.trim().split("\n").map(token => Vue.registerToken(token))
-            ).then(e => {this.account = e[0]})
-            .then(e => Vue.getAccounts())
-            .then(e => {
-              this.accounts = e
-              this.all_tokens = this.getAllTokens()
-              this.input.token = null
-            }).catch(e => Vue.alert(this.$dialog, e))
+            Promise.all(this.input.token.trim().split("\n").map(token => Vue.registerToken(token)))
+              .then(e => {this.account = e[0]})
+              .then(e => Vue.getAccounts())
+              .then(e => {
+                this.accounts = e
+                this.all_tokens = this.getAllTokens()
+                this.input.token = null
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteAccount (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
@@ -159,6 +162,16 @@ html lang='ja'
               }).then(e => {
                 Vue.setToken(this.token)
                 this.account = e
+                if (this.account.is_info_bot) {
+                  Vue.setInfoToken(this.token)
+                    .then(e => {this.restartable = true})
+                    .catch(e => Vue.alert(this.$dialog, e))
+                }
+                if (this.account.is_test_bot) {
+                  Vue.setTestToken(this.token)
+                    .then(e => {this.restartable = true})
+                    .catch(e => Vue.alert(this.$dialog, e))
+                }
                 return Vue.getAccounts()
               }).then(e => {
                 this.accounts = e
@@ -186,6 +199,12 @@ html lang='ja'
           },
           isLoggedIn (account) {
             return account.token == this.token
+          },
+          restartPuma () {
+            this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
+              .then(e => Vue.restartPuma())
+              .then(e => {this.restartable = false})
+              .catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

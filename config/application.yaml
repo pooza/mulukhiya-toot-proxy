@@ -7,8 +7,10 @@ agent:
     token: null
     welcome:
       template: welcome
+    username: info
   test:
     token: null
+    username: test
 amazon:
   affiliate: false
   cache:
