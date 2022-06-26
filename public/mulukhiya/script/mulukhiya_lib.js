@@ -201,10 +201,11 @@ const MulukhiyaLib = {
     Vue.createProgramTags = program => {
       const tags = []
       if (program) {
-        tags.push('実況')
         tags.push(program.series)
         if (program.episode) {tags.push(`${program.episode}${program.episode_suffix || '話'}`)}
+        if (program.subtitle) {tags.push(`「${program.subtitle}」`)}
         if (program.air) {tags.push('エア番組')}
+        if (program.livecure) {tags.push('実況')}
         if (program.extra_tags) {tags.concat(program.extra_tags)}
       }
       return tags
