@@ -11,25 +11,23 @@ module Mulukhiya
     end
 
     def test_name
-      return unless @nowplaying
-      assert_equal('nowplaying', @nowplaying.name)
+      assert_equal('nowplaying', @nowplaying.name) if @nowplaying
     end
 
     def test_raw_name
-      return unless @nowplaying
-      assert_equal('NowPlaying', @nowplaying.raw_name)
+      assert_equal('NowPlaying', @nowplaying.raw_name) if @nowplaying
     end
 
     def test_uri
       return unless @nowplaying
       assert_kind_of(Ginseng::URI, @nowplaying.uri)
       assert_predicate(@nowplaying.uri, :absolute?)
-      assert(@nowplaying.uri.path.match?(%r{/nowplaying$}))
+      assert_match(%r{/nowplaying$}, @nowplaying.uri.path)
     end
 
     def test_listable?
-      return unless @nowplaying
-      assert_boolean(@nowplaying.listable?)
+      assert_boolean(@nowplaying.listable?) if @nowplaying
+      assert_boolean(@default.listable?) if @default
     end
 
     def test_deletable?
@@ -38,18 +36,18 @@ module Mulukhiya
     end
 
     def test_default?
-      return unless @nowplaying
-      assert_boolean(@nowplaying.default?)
+      assert_boolean(@nowplaying.default?) if @nowplaying
+      assert_predicate(@default, :default?) if @default
     end
 
     def test_remote_default?
-      return unless @nowplaying
-      assert_boolean(@nowplaying.remote_default?)
+      assert_boolean(@nowplaying.remote_default?) if @nowplaying
+      assert_boolean(@default.remote_default?) if @default
     end
 
     def test_local?
-      return unless @nowplaying
-      assert_boolean(@nowplaying.local?)
+      assert_boolean(@nowplaying.local?) if @nowplaying
+      assert_boolean(@default.local?) if @default
     end
 
     def test_to_h
@@ -73,7 +71,7 @@ module Mulukhiya
       return unless @default
       feed = @default.create_feed(limit: 5)
       assert_kind_of(Array, feed)
-      assert_equal(5, feed.count)
+      assert_includes(1..5, feed.count)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
         assert_predicate(entry[:uri], :present?)

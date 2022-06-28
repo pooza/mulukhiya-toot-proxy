@@ -19,7 +19,7 @@ module Mulukhiya
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)
     ensure
-      File.unlink(path) if path && File.exist?(path)
+      FileUtils.rm_rf(path)
     end
 
     def verbose?

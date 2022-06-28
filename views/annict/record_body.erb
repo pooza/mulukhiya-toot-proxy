@@ -6,7 +6,7 @@
 <%=
   [
     params.dig(:record, :work, :title),
-    "#{params.dig(:record, :episode, :number_text).match(/[[:digit:]]+/).to_a.first}話",
+    Mulukhiya::AnnictService.create_episode_number_text(params.dig(:record, :episode, :number_text)),
     params.dig(:record, :episode, :title),
   ].select(&:present?).map(&:to_hashtag).join(' ')
 %>
