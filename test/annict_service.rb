@@ -92,6 +92,14 @@ module Mulukhiya
       assert_equal('https://annict.com/works/7879/records', AnnictService.create_review_uri(7879).to_s)
     end
 
+    def test_create_episode_number_text
+      assert_nil(AnnictService.create_episode_number_text(nil))
+      assert_equal('幕間回', AnnictService.create_episode_number_text('幕間回'))
+      assert_equal('1話', AnnictService.create_episode_number_text('1話'))
+      assert_equal('12話', AnnictService.create_episode_number_text('STAGE.12'))
+      assert_equal('12.5話', AnnictService.create_episode_number_text('第12.5回'))
+    end
+
     def test_create_payload
       return unless @service
       record = {

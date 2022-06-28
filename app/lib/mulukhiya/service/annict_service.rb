@@ -210,7 +210,7 @@ module Mulukhiya
 
     def self.create_episode_number_text(str)
       return unless str
-      return str unless match = str.match(/[[:digit:]]+/)
+      return str unless match = str.match(/[[:digit:]][.[:digit:]]*/)
       return "#{match}話"
     end
 
