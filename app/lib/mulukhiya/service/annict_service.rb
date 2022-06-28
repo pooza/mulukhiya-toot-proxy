@@ -208,6 +208,12 @@ module Mulukhiya
       return new.service.create_uri("/works/#{work_id}/records")
     end
 
+    def self.create_episode_number_text(str)
+      return unless str
+      return str unless match = str.match(/[[:digit:]]+/)
+      return "#{match}話"
+    end
+
     def self.crawl_all(params = {})
       return unless controller_class.annict?
       accounts = AnnictAccountStorage.accounts
