@@ -109,7 +109,7 @@ module Mulukhiya
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal({
-        'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #24話 #良回\n",
+        'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
       }, @service.create_payload(record, :record).raw)
 
       record = {
@@ -119,7 +119,7 @@ module Mulukhiya
       }
       assert_equal({
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
-        'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #24話 #良回\n",
+        'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
       }, @service.create_payload(record, :record).raw)
 
       record = {
@@ -128,7 +128,7 @@ module Mulukhiya
         record: {comment: "楽しい！\nすごいアニメのおまけ回だった！"},
       }
       assert_equal({
-        'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ #24話 #良回\n",
+        'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ\n",
       }, @service.create_payload(record, :record).raw)
 
       record = {
