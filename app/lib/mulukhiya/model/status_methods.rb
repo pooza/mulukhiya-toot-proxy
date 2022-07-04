@@ -64,11 +64,31 @@ module Mulukhiya
 
     module ClassMethods
       def default
-        return {spoiler_text:, default_hashtag:}
+        return {
+          spoiler: {
+            text: spoiler_text,
+            emoji: spoiler_emoji,
+            shortcode: spoiler_shortcode,
+          },
+          default_hashtag:,
+        }
       end
 
       def spoiler_text
         return config["/#{Environment.controller_name}/status/spoiler_text"] rescue nil
+      end
+
+      def spoiler_emoji
+        return config['/spoiler/emoji'] rescue nil
+      end
+
+      def spoiler_shortcode
+        return nil unless emoji = spoiler_emoji
+        return ":#{emoji}:"
+      end
+
+      def spoiler_pattern
+        return Regexp.new(config['/spoiler/pattern'])
       end
 
       def default_hashtag

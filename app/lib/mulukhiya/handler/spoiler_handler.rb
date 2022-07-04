@@ -11,11 +11,11 @@ module Mulukhiya
     end
 
     def shortcode
-      return ":#{config['/spoiler/emoji']}:"
+      return status_class.spoiler_shortcode
     end
 
     def pattern
-      return Regexp.new(config['/spoiler/pattern'])
+      return status_class.spoiler_pattern
     end
   end
 end

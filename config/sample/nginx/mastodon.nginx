@@ -94,7 +94,7 @@ location = /api/v1/timelines/public {
     proxy_pass http://localhost:3000;
   }
   if ($arg_local ~* ^(true|t|1|on)$) {
-    return 302 /api/v1/timelines/tag/your_default_hashtag;
+    return 302 /api/v1/timelines/tag/your_default_hashtag?max_id=$arg_max_id;
   }
 }
 location ^~ /mulukhiya {
