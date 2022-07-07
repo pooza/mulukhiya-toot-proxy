@@ -10,5 +10,6 @@ properties:
   path:
     type: string
   timeout:
+    minimum: 1
     type: integer
 type: object

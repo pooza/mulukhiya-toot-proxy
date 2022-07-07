@@ -43,12 +43,12 @@ properties:
         properties:
           client:
             properties:
-              key:
+              id:
                 type: string
               secret:
                 type: string
             required:
-              - key
+              - id
               - secret
             type: object
         required:
@@ -62,6 +62,7 @@ properties:
       cache:
         properties:
           ttl:
+            minimum: 0
             type: integer
         required:
           - ttl
@@ -107,8 +108,10 @@ properties:
           - hex
         type: string
       password:
+        minLength: 8
         type: string
       salt:
+        minLength: 8
         type: string
     required:
       - password
@@ -133,6 +136,7 @@ properties:
               format: uri
               type: string
             path:
+              format: ^/
               type: string
             title:
               type: string
@@ -159,17 +163,29 @@ properties:
       communities:
         properties:
           limit:
+            minimum: 0
             type: integer
         type: object
       hosts:
         properties:
           default:
+            format: hostname
             type: string
         type: object
       root_cert_file:
+        format: ^/
         type: string
       verify_peer:
         type: boolean
+    type: object
+  peer_tube:
+    properties:
+      hosts:
+        properties:
+          default:
+            format: hostname
+            type: string
+        type: object
     type: object
   postgres:
     properties:
@@ -183,6 +199,7 @@ properties:
       slow_query:
         properties:
           seconds:
+            minimum: 0
             type: integer
         required:
           - seconds
@@ -203,6 +220,7 @@ properties:
   puma:
     properties:
       port:
+        minimum: 1
         type: integer
       restart:
         properties:
@@ -211,8 +229,10 @@ properties:
           - seconds
         type: object
       threads:
+        minimum: 1
         type: integer
       workers:
+        minimum: 1
         type: integer
     type: object
   sidekiq:
@@ -220,6 +240,7 @@ properties:
       auth:
         properties:
           password:
+            minLength: 8
             type: string
           user:
             type: string
@@ -227,6 +248,7 @@ properties:
           - password
         type: object
       concurrency:
+        minimum: 1
         type: integer
       redis:
         properties:
@@ -244,6 +266,7 @@ properties:
       emoji:
         type: string
       pattern:
+        format: regex
         type: string
     type: object
   spotify:
@@ -279,6 +302,7 @@ properties:
           catalog:
             properties:
               limit:
+                minimum: 10
                 type: integer
             required:
               - limit
@@ -300,6 +324,7 @@ properties:
           timeline:
             properties:
               limit:
+                minimum: 10
                 type: integer
             required:
               - limit

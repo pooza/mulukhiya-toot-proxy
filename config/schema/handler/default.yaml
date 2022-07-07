@@ -2,5 +2,6 @@ properties:
   disabled:
     type: boolean
   timeout:
+    minimum: 1
     type: integer
 type: object

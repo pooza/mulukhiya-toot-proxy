@@ -11,5 +11,6 @@ properties:
         type: string
     type: object
   timeout:
+    minimum: 1
     type: integer
 type: object

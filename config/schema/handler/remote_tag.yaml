@@ -5,6 +5,7 @@ properties:
     items:
       properties:
         pattern:
+          format: regex
           type: string
         tags:
           items:
@@ -16,6 +17,7 @@ properties:
       type: object
     type: array
   timeout:
+    minimum: 1
     type: integer
 required:
   - services

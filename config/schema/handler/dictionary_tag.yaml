@@ -28,14 +28,18 @@ properties:
   disabled:
     type: boolean
   timeout:
+    minimum: 1
     type: integer
   word:
     properties:
       min:
+        minimum: 1
         type: integer
       min_kanji:
+        minimum: 1
         type: integer
       without_kanji_pattern:
+        format: regex
         type: string
     type: object
 required:
