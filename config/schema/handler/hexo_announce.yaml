@@ -1,8 +1,10 @@
 properties:
   category:
     type: string
-  comment:
+  comments:
     type: boolean
+  dir:
+    type: string
   disabled:
     type: boolean
   path:

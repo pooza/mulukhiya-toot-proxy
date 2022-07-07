@@ -8,6 +8,11 @@ properties:
             type: string
           username:
             type: string
+          welcome:
+            properties:
+              template: string
+            required: template
+            type: object
         type: object
       test:
         properties:
@@ -37,24 +42,17 @@ properties:
       oauth:
         properties:
           client:
+            properties:
+              key:
+                type: string
+              secret:
+                type: string
+            required:
+              - key
+              - secret
             type: object
-          properties:
-            key:
-              type: string
-            secret:
-              type: string
-          required:
-            - key
-            - secret
         required:
           - client
-        status:
-          properties:
-            tags:
-              items:
-                type: string
-              type: array
-          type: object
         type: object
     required:
       - oauth
@@ -75,6 +73,10 @@ properties:
               items:
                 type: string
               type: array
+            description:
+              type: string
+            dir:
+              type: string
             path:
               type: string
           required:
@@ -85,10 +87,10 @@ properties:
     type: object
   bundler:
     properties:
+      did_you_mean:
+        type: boolean
       install:
         type: boolean
-    required:
-      - install
     type: object
   controller:
     enum:
@@ -126,6 +128,9 @@ properties:
                 type: string
               type: array
             description:
+              type: string
+            link:
+              format: uri
               type: string
             path:
               type: string
@@ -195,16 +200,6 @@ properties:
     required:
       - urls
     type: object
-  programs:
-    properties:
-      url:
-        items:
-          format: uri
-          type: string
-        type: array
-    required:
-      - url
-    type: object
   puma:
     properties:
       port:
@@ -212,6 +207,8 @@ properties:
       restart:
         properties:
           seconds: integer
+        required:
+          - seconds
         type: object
       threads:
         type: integer
@@ -241,6 +238,13 @@ properties:
         type: object
       schedule:
         type: object
+    type: object
+  spoiler:
+    properties:
+      emoji:
+        type: string
+      pattern:
+        type: string
     type: object
   spotify:
     properties:
