@@ -10,8 +10,10 @@ properties:
             type: string
           welcome:
             properties:
-              template: string
-            required: template
+              template:
+                type: string
+            required:
+              - template
             type: object
         type: object
       test:
