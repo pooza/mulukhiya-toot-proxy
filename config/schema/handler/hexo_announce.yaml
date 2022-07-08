@@ -1,12 +1,15 @@
 properties:
   category:
     type: string
-  comment:
+  comments:
     type: boolean
+  dir:
+    type: string
   disabled:
     type: boolean
   path:
     type: string
   timeout:
+    minimum: 1
     type: integer
 type: object

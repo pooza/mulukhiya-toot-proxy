@@ -4,6 +4,7 @@ properties:
   id:
     type: string
   timeout:
+    minimum: 1
     type: integer
   token:
     type: string

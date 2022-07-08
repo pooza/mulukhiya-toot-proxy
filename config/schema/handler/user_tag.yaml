@@ -4,8 +4,10 @@ properties:
   tags:
     properties:
       extra_minutes:
+        minimum: 0
         type: integer
     type: object
   timeout:
+    minimum: 1
     type: integer
 type: object

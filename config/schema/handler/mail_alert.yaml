@@ -4,6 +4,7 @@ properties:
   sendmail_bin:
     type: string
   timeout:
+    minimum: 1
     type: integer
   to:
     format: email

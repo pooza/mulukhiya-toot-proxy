@@ -8,6 +8,11 @@ properties:
             type: string
           username:
             type: string
+          welcome:
+            properties:
+              template: string
+            required: template
+            type: object
         type: object
       test:
         properties:
@@ -37,24 +42,17 @@ properties:
       oauth:
         properties:
           client:
+            properties:
+              id:
+                type: string
+              secret:
+                type: string
+            required:
+              - id
+              - secret
             type: object
-          properties:
-            key:
-              type: string
-            secret:
-              type: string
-          required:
-            - key
-            - secret
         required:
           - client
-        status:
-          properties:
-            tags:
-              items:
-                type: string
-              type: array
-          type: object
         type: object
     required:
       - oauth
@@ -64,6 +62,7 @@ properties:
       cache:
         properties:
           ttl:
+            minimum: 0
             type: integer
         required:
           - ttl
@@ -75,6 +74,10 @@ properties:
               items:
                 type: string
               type: array
+            description:
+              type: string
+            dir:
+              type: string
             path:
               type: string
           required:
@@ -85,10 +88,10 @@ properties:
     type: object
   bundler:
     properties:
+      did_you_mean:
+        type: boolean
       install:
         type: boolean
-    required:
-      - install
     type: object
   controller:
     enum:
@@ -105,8 +108,10 @@ properties:
           - hex
         type: string
       password:
+        minLength: 8
         type: string
       salt:
+        minLength: 8
         type: string
     required:
       - password
@@ -127,7 +132,11 @@ properties:
               type: array
             description:
               type: string
+            link:
+              format: uri
+              type: string
             path:
+              format: ^/
               type: string
             title:
               type: string
@@ -154,17 +163,29 @@ properties:
       communities:
         properties:
           limit:
+            minimum: 0
             type: integer
         type: object
       hosts:
         properties:
           default:
+            format: hostname
             type: string
         type: object
       root_cert_file:
+        format: ^/
         type: string
       verify_peer:
         type: boolean
+    type: object
+  peer_tube:
+    properties:
+      hosts:
+        properties:
+          default:
+            format: hostname
+            type: string
+        type: object
     type: object
   postgres:
     properties:
@@ -178,6 +199,7 @@ properties:
       slow_query:
         properties:
           seconds:
+            minimum: 0
             type: integer
         required:
           - seconds
@@ -195,27 +217,22 @@ properties:
     required:
       - urls
     type: object
-  programs:
-    properties:
-      url:
-        items:
-          format: uri
-          type: string
-        type: array
-    required:
-      - url
-    type: object
   puma:
     properties:
       port:
+        minimum: 1
         type: integer
       restart:
         properties:
           seconds: integer
+        required:
+          - seconds
         type: object
       threads:
+        minimum: 1
         type: integer
       workers:
+        minimum: 1
         type: integer
     type: object
   sidekiq:
@@ -223,6 +240,7 @@ properties:
       auth:
         properties:
           password:
+            minLength: 8
             type: string
           user:
             type: string
@@ -230,6 +248,7 @@ properties:
           - password
         type: object
       concurrency:
+        minimum: 1
         type: integer
       redis:
         properties:
@@ -241,6 +260,14 @@ properties:
         type: object
       schedule:
         type: object
+    type: object
+  spoiler:
+    properties:
+      emoji:
+        type: string
+      pattern:
+        format: regex
+        type: string
     type: object
   spotify:
     properties:
@@ -275,6 +302,7 @@ properties:
           catalog:
             properties:
               limit:
+                minimum: 10
                 type: integer
             required:
               - limit
@@ -296,6 +324,7 @@ properties:
           timeline:
             properties:
               limit:
+                minimum: 10
                 type: integer
             required:
               - limit

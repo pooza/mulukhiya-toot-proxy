@@ -6,6 +6,7 @@ properties:
   tag:
     type: string
   timeout:
+    minimum: 1
     type: integer
   url:
     format: uri

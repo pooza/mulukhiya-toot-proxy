@@ -6,6 +6,7 @@ properties:
       type: string
     type: array
   timeout:
+    minimum: 1
     type: integer
 required:
   - tags
