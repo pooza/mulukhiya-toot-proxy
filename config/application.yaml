@@ -96,7 +96,9 @@ annict:
       default:
         - read
   urls:
-    api: https://api.annict.com
+    api:
+      rest: https://api.annict.com
+      graphql: https://api.annict.com/graphql
     default: https://annict.com
 api:
   cache:
@@ -882,7 +884,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.20.4
+  version: 4.20.5
 parser:
   note:
     fields:
