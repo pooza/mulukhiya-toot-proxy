@@ -20,7 +20,7 @@ module Mulukhiya
 
     def records(&block)
       return enum_for(__method__) unless block
-      uri = rest_api_service.create_uri('/v1/activities')
+      uri = rest_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
         fields: config['/annict/api/records/fields'].join(','),
@@ -30,7 +30,9 @@ module Mulukhiya
         access_token: @token,
       }
       sleep(config['/annict/interval/seconds'])
-      rest_api_service.get(uri)['activities'].select {|v| v['action'] == 'create_record'}.each(&block)
+      rest_service.get(uri)['activities'].select do |v|
+        v['action'] == 'create_record'
+      end.each(&block)
     end
 
     def recent_reviews
@@ -44,7 +46,7 @@ module Mulukhiya
     def reviews(&block)
       return enum_for(__method__) unless block
       reviewed_works.each do |work|
-        uri = rest_api_service.create_uri('/v1/reviews')
+        uri = rest_service.create_uri('/v1/reviews')
         uri.query_values = {
           filter_work_id: work.dig('work', 'id'),
           fields: config['/annict/api/reviews/fields'].join(','),
@@ -54,7 +56,7 @@ module Mulukhiya
           access_token: @token,
         }
         sleep(config['/annict/interval/seconds'])
-        rest_api_service.get(uri)['reviews']
+        rest_service.get(uri)['reviews']
           .select {|review| review.dig('user', 'id') == account['id']}
           .each(&block)
       end
@@ -62,7 +64,7 @@ module Mulukhiya
 
     def reviewed_works(&block)
       return enum_for(__method__) unless block
-      uri = rest_api_service.create_uri('/v1/activities')
+      uri = rest_service.create_uri('/v1/activities')
       uri.query_values = {
         filter_user_id: account['id'],
         fields: config['/annict/api/reviewed_works/fields'].join(','),
@@ -72,7 +74,7 @@ module Mulukhiya
         access_token: @token,
       }
       sleep(config['/annict/interval/seconds'])
-      rest_api_service.get(uri)['activities']
+      rest_service.get(uri)['activities']
         .select {|activity| activity['action'] == 'create_review'}
         .each(&block)
     end
@@ -92,13 +94,13 @@ module Mulukhiya
 
     def account
       unless accounts[@token]
-        uri = rest_api_service.create_uri('/v1/me')
+        uri = rest_service.create_uri('/v1/me')
         uri.query_values = {
           fields: config['/annict/api/me/fields'].join(','),
           access_token: @token,
         }
         sleep(config['/annict/interval/seconds'])
-        accounts[@token] = rest_api_service.get(uri).parsed_response
+        accounts[@token] = rest_service.get(uri).parsed_response
       end
       return accounts[@token]
     end
@@ -138,22 +140,20 @@ module Mulukhiya
       @updated_at = nil
     end
 
-    def rest_api_service
-      unless @rest_api_service
-        @rest_api_service = HTTP.new
-        @rest_api_service.base_uri = config['/annict/urls/api/rest']
+    def rest_service
+      unless @rest_service
+        @rest_service = HTTP.new
+        @rest_service.base_uri = config['/annict/urls/api/rest']
       end
-      return @rest_api_service
+      return @rest_service
     end
 
-    alias api_service rest_api_service
-
-    def graphql_api_service
-      unless @graphql_api_service
-        @graphql_api_service = HTTP.new
-        @graphql_api_service.base_uri = config['/annict/urls/api/graphql']
+    def graphql_service
+      unless @graphql_service
+        @graphql_service = HTTP.new
+        @graphql_service.base_uri = config['/annict/urls/api/graphql']
       end
-      return @graphql_api_service
+      return @graphql_service
     end
 
     def service
