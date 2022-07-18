@@ -1,0 +1,34 @@
+{
+  viewer {
+    name
+    username
+    avatarUrl
+    activities(orderBy: {field: CREATED_AT, direction: DESC}, first: 50) {
+      edges {
+        node {
+          ... on Record {
+            episode {
+              annictId
+              work {
+                annictId
+                title
+              }
+              numberText
+              title
+            }
+            comment
+            createdAt
+          }
+          ... on Review {
+            work {
+              annictId
+              title
+            }
+            body
+            createdAt
+          }
+        }
+      }
+    }
+  }
+}

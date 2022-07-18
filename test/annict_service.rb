@@ -100,6 +100,13 @@ module Mulukhiya
       assert_equal('12.5話', AnnictService.create_episode_number_text('第12.5回'))
     end
 
+    def test_accounts
+      AnnictService.accounts.each do |account|
+        assert_kind_of(account_class, account)
+        assert_kind_of(AnnictService, account.annict)
+      end
+    end
+
     def test_create_payload
       return unless @service
       record = {

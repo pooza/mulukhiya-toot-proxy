@@ -224,9 +224,12 @@ module Mulukhiya
       return "#{match}話"
     end
 
+    def self.accounts
+      return AnnictAccountStorage.accounts
+    end
+
     def self.crawl_all(params = {})
       return unless controller_class.annict?
-      accounts = AnnictAccountStorage.accounts
       bar = ProgressBar.create(total: accounts.count)
       results = {}
       accounts.each do |account|
