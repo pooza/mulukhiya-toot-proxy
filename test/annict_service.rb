@@ -70,6 +70,18 @@ module Mulukhiya
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
+    def test_activities
+      response = @service.activities
+      assert_kind_of(HTTParty::Response, response)
+      data = response.parsed_response
+      ic data.dig('data', 'viewer', 'name')
+      ic data.dig('data', 'viewer', 'username')
+      ic data.dig('data', 'viewer', 'avatarUrl')
+      ic data.dig('data', 'viewer', 'activities', 'edges')
+        .select {|v| v['createdAt'].present?}
+        .select {|v| Time.parse(v['createdAt']) <= @service.updated_at}
+    end
+
     def test_oauth_uri
       return unless @service
       assert_kind_of(Ginseng::URI, @service.oauth_uri)

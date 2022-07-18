@@ -156,6 +156,16 @@ module Mulukhiya
       return @graphql_service
     end
 
+    def activities
+      uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+      return graphql_service.post(uri.path, {
+        body: {
+          query: File.read(File.join(Environment.dir, 'app/query/annict/activity.graphql'))
+        },
+        headers: {'Authorization': "Bearer #{@token}"},
+      })
+    end
+
     def service
       unless @service
         @service = HTTP.new
