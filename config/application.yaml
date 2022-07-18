@@ -5,9 +5,9 @@ agent:
     announcement:
       template: announcement
     token: null
+    username: info
     welcome:
       template: welcome
-    username: info
   test:
     token: null
     username: test
@@ -97,8 +97,8 @@ annict:
         - read
   urls:
     api:
-      rest: https://api.annict.com
       graphql: https://api.annict.com/graphql
+      rest: https://api.annict.com
     default: https://annict.com
 api:
   cache:
