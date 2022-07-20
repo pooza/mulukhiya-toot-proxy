@@ -6,6 +6,7 @@
     activities(orderBy: {field: CREATED_AT, direction: DESC}, first: 50) {
       edges {
         node {
+          __typename
           ... on Record {
             episode {
               annictId

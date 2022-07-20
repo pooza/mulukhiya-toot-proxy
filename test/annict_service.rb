@@ -15,71 +15,27 @@ module Mulukhiya
       assert_predicate(AnnictService, :config?)
     end
 
-    def test_account
-      return unless @service
-      assert_kind_of(Hash, @service.account)
-      assert_predicate(@service.account['id'], :positive?)
-      assert_kind_of(String, @service.account['name'])
-      assert_kind_of(String, @service.account['username'])
-    end
-
-    def test_records
-      return unless @service
-      assert_kind_of(Enumerator, @service.records)
-      @service.records do |record|
-        assert_kind_of(Hash, record)
-        assert_kind_of(String, record.dig('work', 'title'))
-        assert_kind_of([Float, NilClass], record.dig('episode', 'number'))
-        uri = Ginseng::URI.parse(record.dig('work', 'images', 'recomended_url'))
-        assert_predicate(uri, :absolute?) if uri
-      end
-    end
-
-    def test_recent_records
-      return unless @service
-      assert_kind_of(Enumerator, @service.recent_records)
-    end
-
-    def test_reviewed_works
-      return unless @service
-      assert_kind_of(Enumerator, @service.reviewed_works)
-      @service.reviewed_works do |work|
-        assert_kind_of(Hash, work)
-        assert_predicate(work.dig('work', 'id'), :positive?)
-      end
-    end
-
-    def test_reviews
-      return unless @service
-      assert_kind_of(Enumerator, @service.reviews)
-      @service.reviews do |review|
-        assert_kind_of(Hash, review)
-        assert_kind_of(String, review.dig('work', 'title'))
-        uri = Ginseng::URI.parse(review.dig('work', 'images', 'recomended_url'))
-        assert_predicate(uri, :absolute?) if uri
-      end
-    end
-
-    def test_recent_reviews
-      return unless @service
-      assert_kind_of(Enumerator, @service.recent_reviews)
-    end
-
     def test_updated_at
       return unless @service
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
     def test_activities
-      response = @service.activities
-      assert_kind_of(HTTParty::Response, response)
-      data = response.parsed_response
-      ic data.dig('data', 'viewer', 'name')
-      ic data.dig('data', 'viewer', 'username')
-      ic data.dig('data', 'viewer', 'avatarUrl')
-      ic data.dig('data', 'viewer', 'activities', 'edges')
-        .select {|v| v['createdAt'].present?}
-        .select {|v| Time.parse(v['createdAt']) <= @service.updated_at}
+      activities = @service.activities
+      assert_kind_of(Enumerator, activities)
+      activities.each do |activity|
+        assert_kind_of(Hash, activity)
+        assert_kind_of(Time, Time.parse(activity['createdAt']))
+        case activity['__typename']
+        when 'Record'
+          assert_kind_of(Hash, activity['episode'])
+          assert_kind_of(Hash, activity.dig('episode', 'work'))
+          assert_kind_of(String, activity['comment'])
+        when 'Review'
+          assert_kind_of(Hash, activity['work'])
+          assert_kind_of(String, activity['body'])
+        end
+      end
     end
 
     def test_oauth_uri

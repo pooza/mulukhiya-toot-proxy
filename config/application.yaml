@@ -50,43 +50,6 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
 annict:
-  api:
-    me:
-      cache:
-        ttl: 3600
-      fields:
-        - id
-        - name
-        - username
-        - url
-        - avatar_url
-    records:
-      fields:
-        - id
-        - action
-        - created_at
-        - work.id
-        - work.title
-        - episode.id
-        - episode.number_text
-        - episode.title
-        - record.comment
-      limit: 5
-    reviewed_works:
-      fields:
-        - id
-        - action
-        - work.id
-      limit: 5
-    reviews:
-      fields:
-        - id
-        - created_at
-        - body
-        - user.id
-        - work.id
-        - work.title
-      limit: 10
   chars: 200
   interval:
     seconds: 1
