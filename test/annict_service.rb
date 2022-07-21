@@ -20,6 +20,14 @@ module Mulukhiya
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
+    def test_account
+      assert_kind_of(Hash, @service.account)
+      assert(@service.account[:id].positive?)
+      assert(@service.account[:name].present?)
+      assert(@service.account[:username].present?)
+      assert_kind_of(Ginseng::URI, @service.account[:avatar_uri])
+    end
+
     def test_activities
       activities = @service.activities
       assert_kind_of(Enumerator, activities)
@@ -78,13 +86,14 @@ module Mulukhiya
     def test_create_payload
       return unless @service
       record = {
+        '__typename' => 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 111, number_text: '第24回', title: '良回'},
         record: {comment: ''},
       }
       assert_equal({
         'text' => "すごいあにめ\n第24回「良回」を視聴。\nhttps://annict.com/works/111/episodes/111\n#すごいあにめ #24話 #良回\n",
-      }, @service.create_payload(record, :record).raw)
+      }, @service.create_payload(record).raw)
 
       record = {
         work: {id: 111, title: 'すごいあにめ'},

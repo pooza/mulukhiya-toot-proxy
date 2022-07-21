@@ -2,7 +2,7 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
-    attr_reader :timestamps, :accounts
+    attr_reader :timestamps, :accounts, :account
 
     def initialize(token = nil)
       @token = (token.decrypt rescue token)
@@ -10,6 +10,7 @@ module Mulukhiya
     end
 
     def create_payload(values)
+      ic values
       type = values['__typename'].underscore
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values
@@ -32,14 +33,33 @@ module Mulukhiya
       return recent
     end
 
+    def account
+      unless @account
+        uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+        response = graphql_service.post(uri.path, {
+          body: {query: query(:account)},
+          headers: {Authorization: "Bearer #{@token}"},
+        }).parsed_response
+        @account = {
+          id: response.dig('data', 'viewer', 'annictId'),
+          name: response.dig('data', 'viewer', 'name'),
+          username: response.dig('data', 'viewer', 'username'),
+          avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
+        }
+      end
+      return @account
+    end
+
     def activities(&block)
       return enum_for(__method__) unless block
       self.updated_at ||= Time.now
       uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-      graphql_service.post(uri.path, {
+      response = graphql_service.post(uri.path, {
         body: {query: query(:activity)},
         headers: {Authorization: "Bearer #{@token}"},
-      }).parsed_response
+      })
+      @account = {id: response['annictId'], username: response['username']}
+      response.parsed_response
         .dig('data', 'viewer', 'activities', 'edges')
         .filter_map {|activity| activity['node']}
         .select {|node| node['__typename'].present?}
@@ -52,7 +72,7 @@ module Mulukhiya
     end
 
     def updated_at
-      @updated_at ||= Time.parse(timestamps[account['id']]['time'])
+      @updated_at ||= Time.parse(timestamps[account[:id]]['time'])
       return @updated_at
     rescue
       return nil
@@ -60,7 +80,7 @@ module Mulukhiya
 
     def updated_at=(time)
       return if updated_at && Time.parse(time.to_s) < updated_at
-      timestamps[account['id']] = {time: time.to_s}
+      timestamps[account[:id]] = {time: time.to_s}
       @updated_at = nil
     end
 
