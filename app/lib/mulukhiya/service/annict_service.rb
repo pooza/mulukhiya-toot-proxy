@@ -25,25 +25,6 @@ module Mulukhiya
         .each(&block)
     end
 
-    def query(name)
-      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
-    end
-
-    def create_payload(values)
-      values.deep_symbolize_keys!
-      type = values[:__typename].underscore.to_sym
-      body_template = Template.new("annict/#{type}_body")
-      body_template[type] = values
-      title_template = Template.new("annict/#{type}_title")
-      title_template[type] = values
-      body = {text: [title_template.to_s, body_template.to_s].join}
-      if body_template.to_s.match?(config['/spoiler/pattern'])
-        body[:text] = body_template.to_s.lstrip
-        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
-      end
-      return SlackWebhookPayload.new(body)
-    end
-
     def account
       unless @account
         uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
@@ -61,7 +42,9 @@ module Mulukhiya
       return @account
     end
 
-    alias me account
+    def query(name)
+      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
+    end
 
     def crawl(params = {})
       return unless webhook = params[:webhook]
@@ -70,6 +53,21 @@ module Mulukhiya
       recent.each {|v| webhook.post(create_payload(v))}
       self.updated_at = recent.map {|v| v['createdAt']}.max unless params[:dryrun]
       return recent
+    end
+
+    def create_payload(values)
+      values.deep_symbolize_keys!
+      type = values[:__typename].underscore.to_sym
+      body_template = Template.new("annict/#{type}_body")
+      body_template[type] = values
+      title_template = Template.new("annict/#{type}_title")
+      title_template[type] = values
+      body = {text: [title_template.to_s, body_template.to_s].join}
+      if body_template.to_s.match?(config['/spoiler/pattern'])
+        body[:text] = body_template.to_s.lstrip
+        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
+      end
+      return SlackWebhookPayload.new(body)
     end
 
     def updated_at

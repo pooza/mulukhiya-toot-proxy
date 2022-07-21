@@ -46,6 +46,11 @@ module Mulukhiya
       end
     end
 
+    def test_updated_at
+      return unless @service
+      assert_kind_of([Time, NilClass], @service.updated_at)
+    end
+
     def test_oauth_uri
       return unless @service
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
