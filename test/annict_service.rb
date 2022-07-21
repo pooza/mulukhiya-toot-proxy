@@ -86,7 +86,7 @@ module Mulukhiya
     def test_create_payload
       return unless @service
       record = {
-        '__typename' => 'Record',
+        __typename: 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 111, number_text: '第24回', title: '良回'},
         record: {comment: ''},
@@ -96,15 +96,17 @@ module Mulukhiya
       }, @service.create_payload(record).raw)
 
       record = {
+        __typename: 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal({
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
-      }, @service.create_payload(record, :record).raw)
+      }, @service.create_payload(record).raw)
 
       record = {
+        __typename: 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 112, number_text: '第25回', title: '神回'},
         record: {comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！"},
@@ -112,42 +114,46 @@ module Mulukhiya
       assert_equal({
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
-      }, @service.create_payload(record, :record).raw)
+      }, @service.create_payload(record).raw)
 
       record = {
+        __typename: 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 113, number_text: 'EXTRA EPISODE'},
         record: {comment: "楽しい！\nすごいアニメのおまけ回だった！"},
       }
       assert_equal({
         'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ #EXTRA_EPISODE\n",
-      }, @service.create_payload(record, :record).raw)
+      }, @service.create_payload(record).raw)
 
       record = {
+        __typename: 'Record',
         work: {id: 111, title: 'すごいあにめ'},
         episode: {id: 114, title: '何話とか特に決まってない回'},
         record: {comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！"},
       }
       assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ #何話とか特に決まってない回\n",
-      }, @service.create_payload(record, :record).raw)
+      }, @service.create_payload(record).raw)
 
       review = {
+        __typename: 'Review',
         work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal({
         'text' => "「すごいあにめTHE MOVIE」を視聴。\n\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
-      }, @service.create_payload(review, :review).raw)
+      }, @service.create_payload(review).raw)
 
       review = {
+        __typename: 'Review',
         work: {id: 112, title: 'すごいあにめTHE MOVIE'},
         body: "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal({
         'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
-      }, @service.create_payload(review, :review).raw)
+      }, @service.create_payload(review).raw)
     end
   end
 end

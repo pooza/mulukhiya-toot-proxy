@@ -17,7 +17,6 @@ module Mulukhiya
         body: {query: query(:activity)},
         headers: {Authorization: "Bearer #{@token}"},
       })
-      @account = {id: response['annictId'], username: response['username']}
       response.parsed_response
         .dig('data', 'viewer', 'activities', 'edges')
         .filter_map {|activity| activity['node']}
@@ -31,7 +30,8 @@ module Mulukhiya
     end
 
     def create_payload(values)
-      type = values['__typename'].underscore
+      values.deep_symbolize_keys!
+      type = values[:__typename].underscore.to_sym
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values
       title_template = Template.new("annict/#{type}_title")
@@ -61,6 +61,8 @@ module Mulukhiya
       return @account
     end
 
+    alias me account
+
     def crawl(params = {})
       return unless webhook = params[:webhook]
       recent = activities.select {|v| Time.parse(v['createdAt']) <= updated_at}
@@ -69,8 +71,6 @@ module Mulukhiya
       self.updated_at = recent.map {|v| v['createdAt']}.max unless params[:dryrun]
       return recent
     end
-
-    alias me account
 
     def updated_at
       @updated_at ||= Time.parse(timestamps[account[:id]]['time'])
@@ -169,8 +169,16 @@ module Mulukhiya
       return "#{match}話"
     end
 
-    def self.accounts
-      return AnnictTimestampStorage.accounts
+    def self.accounts(&block)
+      return enum_for(__method__) unless block
+      storage = UserConfigStorage.new
+      storage.all_keys
+        .map {|key| key.split(':').last}
+        .select {|id| storage[id]['/annict/token']}
+        .filter_map {|id| Environment.account_class[id] rescue nil}
+        .select(&:webhook)
+        .select(&:annict)
+        .each(&block)
     end
 
     def self.crawl_all(params = {})
