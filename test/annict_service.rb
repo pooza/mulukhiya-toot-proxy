@@ -22,9 +22,9 @@ module Mulukhiya
 
     def test_account
       assert_kind_of(Hash, @service.account)
-      assert(@service.account[:id].positive?)
-      assert(@service.account[:name].present?)
-      assert(@service.account[:username].present?)
+      assert_predicate(@service.account[:id], :positive?)
+      assert_predicate(@service.account[:name], :present?)
+      assert_predicate(@service.account[:username], :present?)
       assert_kind_of(Ginseng::URI, @service.account[:avatar_uri])
     end
 

@@ -2,7 +2,7 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
-    attr_reader :timestamps, :accounts, :account
+    attr_reader :timestamps, :accounts
 
     def initialize(token = nil)
       @token = (token.decrypt rescue token)
