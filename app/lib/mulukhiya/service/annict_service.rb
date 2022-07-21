@@ -44,15 +44,6 @@ module Mulukhiya
       return SlackWebhookPayload.new(body)
     end
 
-    def crawl(params = {})
-      return unless webhook = params[:webhook]
-      recent = activities.select {|v| Time.parse(v['createdAt']) <= updated_at}
-      return unless recent.present?
-      recent.each {|v| webhook.post(create_payload(v))}
-      self.updated_at = recent.map {|v| v['createdAt']}.max unless params[:dryrun]
-      return recent
-    end
-
     def account
       unless @account
         uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
@@ -69,6 +60,17 @@ module Mulukhiya
       end
       return @account
     end
+
+    def crawl(params = {})
+      return unless webhook = params[:webhook]
+      recent = activities.select {|v| Time.parse(v['createdAt']) <= updated_at}
+      return unless recent.present?
+      recent.each {|v| webhook.post(create_payload(v))}
+      self.updated_at = recent.map {|v| v['createdAt']}.max unless params[:dryrun]
+      return recent
+    end
+
+    alias me account
 
     def updated_at
       @updated_at ||= Time.parse(timestamps[account[:id]]['time'])
