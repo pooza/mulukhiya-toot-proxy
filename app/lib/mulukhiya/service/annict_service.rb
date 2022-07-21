@@ -2,15 +2,35 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
-    attr_reader :timestamps, :accounts
+    attr_reader :timestamps
 
     def initialize(token = nil)
       @token = (token.decrypt rescue token)
       @timestamps = AnnictTimestampStorage.new
     end
 
+    def activities(&block)
+      return enum_for(__method__) unless block
+      self.updated_at ||= Time.now
+      uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+      response = graphql_service.post(uri.path, {
+        body: {query: query(:activity)},
+        headers: {Authorization: "Bearer #{@token}"},
+      })
+      @account = {id: response['annictId'], username: response['username']}
+      response.parsed_response
+        .dig('data', 'viewer', 'activities', 'edges')
+        .filter_map {|activity| activity['node']}
+        .select {|node| node['__typename'].present?}
+        .select {|node| node['createdAt'].present?}
+        .each(&block)
+    end
+
+    def query(name)
+      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
+    end
+
     def create_payload(values)
-      ic values
       type = values['__typename'].underscore
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values
@@ -48,27 +68,6 @@ module Mulukhiya
         }
       end
       return @account
-    end
-
-    def activities(&block)
-      return enum_for(__method__) unless block
-      self.updated_at ||= Time.now
-      uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-      response = graphql_service.post(uri.path, {
-        body: {query: query(:activity)},
-        headers: {Authorization: "Bearer #{@token}"},
-      })
-      @account = {id: response['annictId'], username: response['username']}
-      response.parsed_response
-        .dig('data', 'viewer', 'activities', 'edges')
-        .filter_map {|activity| activity['node']}
-        .select {|node| node['__typename'].present?}
-        .select {|node| node['createdAt'].present?}
-        .each(&block)
-    end
-
-    def query(name)
-      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
     end
 
     def updated_at
