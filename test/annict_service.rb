@@ -89,7 +89,7 @@ module Mulukhiya
         __typename: 'Record',
         episode: {
           annictId: 111,
-          number_text: '第24回',
+          numberText: '第24回',
           title: '良回',
           work: {annictId: 111, title: 'すごいあにめ'},
         },
@@ -103,7 +103,7 @@ module Mulukhiya
         __typename: 'Record',
         episode: {
           annictId: 112,
-          number_text: '第25回',
+          numberText: '第25回',
           title: '神回',
           work: {annictId: 111, title: 'すごいあにめ'},
         },
@@ -117,7 +117,7 @@ module Mulukhiya
         __typename: 'Record',
         episode: {
           annictId: 112,
-          number_text: '第25回',
+          numberText: '第25回',
           title: '神回',
           work: {annictId: 111, title: 'すごいあにめ'},
         },
@@ -132,7 +132,7 @@ module Mulukhiya
         __typename: 'Record',
         episode: {
           annictId: 113,
-          number_text: 'EXTRA EPISODE',
+          numberText: 'EXTRA EPISODE',
           work: {annictId: 111, title: 'すごいあにめ'},
         },
         comment: "楽しい！\nすごいアニメのおまけ回だった！",
