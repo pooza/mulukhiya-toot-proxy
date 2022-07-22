@@ -50,7 +50,7 @@ module Mulukhiya
     def crawl(params = {})
       return unless webhook = params[:webhook]
       self.updated_at ||= Time.now
-      recent = activities.select {|v| Time.parse(v['createdAt']) <= updated_at}
+      recent = activities.reject {|v| Time.parse(v['createdAt']) <= updated_at}
       return unless recent.present?
       recent.each {|v| webhook.post(create_payload(v))}
       self.updated_at = recent.map {|v| Time.parse(v['createdAt'])}.max unless params[:dryrun]
