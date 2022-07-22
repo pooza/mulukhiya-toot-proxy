@@ -17,6 +17,7 @@ module Mulukhiya
         body: {query: query(:activity)},
         headers: {Authorization: "Bearer #{@token}"},
       })
+
       response.parsed_response
         .dig('data', 'viewer', 'activities', 'edges')
         .filter_map {|activity| activity['node']}

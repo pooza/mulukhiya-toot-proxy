@@ -87,8 +87,12 @@ module Mulukhiya
       return unless @service
       record = {
         __typename: 'Record',
-        work: {annictId: 111, title: 'すごいあにめ'},
-        episode: {annictId: 111, number_text: '第24回', title: '良回'},
+        episode: {
+          annictId: 111,
+          number_text: '第24回',
+          title: '良回',
+          work: {annictId: 111, title: 'すごいあにめ'},
+        },
         comment: '',
       }
       assert_equal({
@@ -97,8 +101,12 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {annictId: 111, title: 'すごいあにめ'},
-        episode: {annictId: 112, number_text: '第25回', title: '神回'},
+        episode: {
+          annictId: 112,
+          number_text: '第25回',
+          title: '神回',
+          work: {annictId: 111, title: 'すごいあにめ'},
+        },
         comment: "すごい！\nすごいアニメの神回だった！",
       }
       assert_equal({
@@ -107,8 +115,12 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {annictId: 111, title: 'すごいあにめ'},
-        episode: {annictId: 112, number_text: '第25回', title: '神回'},
+        episode: {
+          annictId: 112,
+          number_text: '第25回',
+          title: '神回',
+          work: {annictId: 111, title: 'すごいあにめ'},
+        },
         comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！",
       }
       assert_equal({
@@ -118,8 +130,11 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {annictId: 111, title: 'すごいあにめ'},
-        episode: {annictId: 113, number_text: 'EXTRA EPISODE'},
+        episode: {
+          annictId: 113,
+          number_text: 'EXTRA EPISODE',
+          work: {annictId: 111, title: 'すごいあにめ'},
+        },
         comment: "楽しい！\nすごいアニメのおまけ回だった！",
       }
       assert_equal({
@@ -128,12 +143,30 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {annictId: 111, title: 'すごいあにめ'},
-        episode: {annictId: 114, title: '何話とか特に決まってない回'},
+        episode: {
+          annictId: 114,
+          title: '何話とか特に決まってない回',
+          work: {annictId: 111, title: 'すごいあにめ'},
+        },
         comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！",
       }
       assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ #何話とか特に決まってない回\n",
+      }, @service.create_payload(record).raw)
+
+      record = {
+        __typename: 'Record',
+        annictId: 4_141_053,
+        episode: {
+          annictId: 63_162,
+          work: {annictId: 4274, title: 'Go！プリンセスプリキュア'},
+          numberText: '第46話',
+          title: '美しい…!?さすらうシャットと雪の城！',
+        },
+        comment: "本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n",
+      }
+      assert_equal({
+        'text' => "Go！プリンセスプリキュア\n「美しい…!?さすらうシャットと雪の城！」を視聴。\n\n本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n\nhttps://annict.com/works/4274/episodes/63162\n#Go_プリンセスプリキュア #美しい_さすらうシャットと雪の城\n",
       }, @service.create_payload(record).raw)
 
       review = {
