@@ -1,6 +1,6 @@
-<% if params.dig(:record, :record, :comment).present? -%>
+<% if params.dig(:record, :comment).present? -%>
 
-<%= params.dig(:record, :record, :comment).ellipsize(config['/annict/chars']) %>
+<%= params.dig(:record, :comment).ellipsize(config['/annict/chars']) %>
 <% end -%>
 <%= Mulukhiya::AnnictService.create_record_uri(params.dig(:record, :work, :annictId), params.dig(:record, :episode, :annictId)) %>
 <%=

@@ -89,7 +89,7 @@ module Mulukhiya
         __typename: 'Record',
         work: {annictId: 111, title: 'すごいあにめ'},
         episode: {annictId: 111, number_text: '第24回', title: '良回'},
-        record: {comment: ''},
+        comment: '',
       }
       assert_equal({
         'text' => "すごいあにめ\n第24回「良回」を視聴。\nhttps://annict.com/works/111/episodes/111\n#すごいあにめ #24話 #良回\n",
@@ -99,7 +99,7 @@ module Mulukhiya
         __typename: 'Record',
         work: {annictId: 111, title: 'すごいあにめ'},
         episode: {annictId: 112, number_text: '第25回', title: '神回'},
-        record: {comment: "すごい！\nすごいアニメの神回だった！"},
+        comment: "すごい！\nすごいアニメの神回だった！",
       }
       assert_equal({
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
@@ -109,7 +109,7 @@ module Mulukhiya
         __typename: 'Record',
         work: {annictId: 111, title: 'すごいあにめ'},
         episode: {annictId: 112, number_text: '第25回', title: '神回'},
-        record: {comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！"},
+        comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！",
       }
       assert_equal({
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
@@ -120,7 +120,7 @@ module Mulukhiya
         __typename: 'Record',
         work: {annictId: 111, title: 'すごいあにめ'},
         episode: {annictId: 113, number_text: 'EXTRA EPISODE'},
-        record: {comment: "楽しい！\nすごいアニメのおまけ回だった！"},
+        comment: "楽しい！\nすごいアニメのおまけ回だった！",
       }
       assert_equal({
         'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ #EXTRA_EPISODE\n",
@@ -130,7 +130,7 @@ module Mulukhiya
         __typename: 'Record',
         work: {annictId: 111, title: 'すごいあにめ'},
         episode: {annictId: 114, title: '何話とか特に決まってない回'},
-        record: {comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！"},
+        comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！",
       }
       assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ #何話とか特に決まってない回\n",
