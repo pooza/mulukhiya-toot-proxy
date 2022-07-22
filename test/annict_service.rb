@@ -166,7 +166,7 @@ module Mulukhiya
         comment: "本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n",
       }
       assert_equal({
-        'text' => "Go！プリンセスプリキュア\n「美しい…!?さすらうシャットと雪の城！」を視聴。\n\n本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n\nhttps://annict.com/works/4274/episodes/63162\n#Go_プリンセスプリキュア #美しい_さすらうシャットと雪の城\n",
+        'text' => "Go！プリンセスプリキュア\n第46話「美しい…!?さすらうシャットと雪の城！」を視聴。\n\n本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n\nhttps://annict.com/works/4274/episodes/63162\n#Go_プリンセスプリキュア #46話 #美しい_さすらうシャットと雪の城\n",
       }, @service.create_payload(record).raw)
 
       review = {
