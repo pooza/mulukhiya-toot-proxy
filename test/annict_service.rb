@@ -15,11 +15,6 @@ module Mulukhiya
       assert_predicate(AnnictService, :config?)
     end
 
-    def test_updated_at
-      return unless @service
-      assert_kind_of([Time, NilClass], @service.updated_at)
-    end
-
     def test_account
       assert_kind_of(Hash, @service.account)
       assert_predicate(@service.account[:id], :positive?)
@@ -92,8 +87,8 @@ module Mulukhiya
       return unless @service
       record = {
         __typename: 'Record',
-        work: {id: 111, title: 'すごいあにめ'},
-        episode: {id: 111, number_text: '第24回', title: '良回'},
+        work: {annictId: 111, title: 'すごいあにめ'},
+        episode: {annictId: 111, number_text: '第24回', title: '良回'},
         record: {comment: ''},
       }
       assert_equal({
@@ -102,8 +97,8 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {id: 111, title: 'すごいあにめ'},
-        episode: {id: 112, number_text: '第25回', title: '神回'},
+        work: {annictId: 111, title: 'すごいあにめ'},
+        episode: {annictId: 112, number_text: '第25回', title: '神回'},
         record: {comment: "すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal({
@@ -112,8 +107,8 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {id: 111, title: 'すごいあにめ'},
-        episode: {id: 112, number_text: '第25回', title: '神回'},
+        work: {annictId: 111, title: 'すごいあにめ'},
+        episode: {annictId: 112, number_text: '第25回', title: '神回'},
         record: {comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！"},
       }
       assert_equal({
@@ -123,8 +118,8 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {id: 111, title: 'すごいあにめ'},
-        episode: {id: 113, number_text: 'EXTRA EPISODE'},
+        work: {annictId: 111, title: 'すごいあにめ'},
+        episode: {annictId: 113, number_text: 'EXTRA EPISODE'},
         record: {comment: "楽しい！\nすごいアニメのおまけ回だった！"},
       }
       assert_equal({
@@ -133,8 +128,8 @@ module Mulukhiya
 
       record = {
         __typename: 'Record',
-        work: {id: 111, title: 'すごいあにめ'},
-        episode: {id: 114, title: '何話とか特に決まってない回'},
+        work: {annictId: 111, title: 'すごいあにめ'},
+        episode: {annictId: 114, title: '何話とか特に決まってない回'},
         record: {comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！"},
       }
       assert_equal({
@@ -143,7 +138,7 @@ module Mulukhiya
 
       review = {
         __typename: 'Review',
-        work: {id: 112, title: 'すごいあにめTHE MOVIE'},
+        work: {annictId: 112, title: 'すごいあにめTHE MOVIE'},
         body: "超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal({
@@ -152,7 +147,7 @@ module Mulukhiya
 
       review = {
         __typename: 'Review',
-        work: {id: 112, title: 'すごいあにめTHE MOVIE'},
+        work: {annictId: 112, title: 'すごいあにめTHE MOVIE'},
         body: "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！",
       }
       assert_equal({

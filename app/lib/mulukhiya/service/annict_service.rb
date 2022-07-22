@@ -51,7 +51,7 @@ module Mulukhiya
       recent = activities.select {|v| Time.parse(v['createdAt']) <= updated_at}
       return unless recent.present?
       recent.each {|v| webhook.post(create_payload(v))}
-      self.updated_at = recent.map {|v| v['createdAt']}.max unless params[:dryrun]
+      self.updated_at = recent.map {|v| Time.parse(v['createdAt'])}.max unless params[:dryrun]
       return recent
     end
 

@@ -4,11 +4,12 @@
     name
     username
     avatarUrl
-    activities(orderBy: {field: CREATED_AT, direction: DESC}, first: 50) {
+    activities(orderBy: { field: CREATED_AT, direction: DESC }, first: 50) {
       edges {
         node {
           __typename
           ... on Record {
+            annictId
             episode {
               annictId
               work {
@@ -22,6 +23,7 @@
             createdAt
           }
           ... on Review {
+            annictId
             work {
               annictId
               title
