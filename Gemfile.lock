@@ -342,7 +342,7 @@ GEM
     temple (0.8.2)
     test-unit (3.5.3)
       power_assert
-    tilt (2.0.10)
+    tilt (2.0.11)
     time (0.2.0)
       date
     timecop (0.9.5)
