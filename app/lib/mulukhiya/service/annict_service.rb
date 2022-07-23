@@ -2,82 +2,63 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
-    attr_reader :timestamps, :accounts
+    attr_reader :timestamps
 
     def initialize(token = nil)
       @token = (token.decrypt rescue token)
       @timestamps = AnnictTimestampStorage.new
-      @accounts = AnnictAccountStorage.new
     end
 
-    def recent_records
-      return enum_for(__method__) unless block_given?
-      records do |record|
-        break if updated_at && Time.parse(record['created_at']) <= updated_at
-        yield record
-      end
-    end
-
-    def records(&block)
+    def activities(&block)
       return enum_for(__method__) unless block
-      uri = api_service.create_uri('/v1/activities')
-      uri.query_values = {
-        filter_user_id: account['id'],
-        fields: config['/annict/api/records/fields'].join(','),
-        page: 1,
-        per_page: config['/annict/api/records/limit'],
-        sort_id: 'desc',
-        access_token: @token,
-      }
-      sleep(config['/annict/interval/seconds'])
-      api_service.get(uri)['activities'].select {|v| v['action'] == 'create_record'}.each(&block)
-    end
+      uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+      response = graphql_service.post(uri.path, {
+        body: {query: query(:activity)},
+        headers: {Authorization: "Bearer #{@token}"},
+      })
 
-    def recent_reviews
-      return enum_for(__method__) unless block_given?
-      reviews do |review|
-        break if updated_at && Time.parse(review['created_at']) <= updated_at
-        yield review
-      end
-    end
-
-    def reviews(&block)
-      return enum_for(__method__) unless block
-      reviewed_works.each do |work|
-        uri = api_service.create_uri('/v1/reviews')
-        uri.query_values = {
-          filter_work_id: work.dig('work', 'id'),
-          fields: config['/annict/api/reviews/fields'].join(','),
-          page: 1,
-          per_page: config['/annict/api/reviews/limit'],
-          sort_id: 'desc',
-          access_token: @token,
-        }
-        sleep(config['/annict/interval/seconds'])
-        api_service.get(uri)['reviews']
-          .select {|review| review.dig('user', 'id') == account['id']}
-          .each(&block)
-      end
-    end
-
-    def reviewed_works(&block)
-      return enum_for(__method__) unless block
-      uri = api_service.create_uri('/v1/activities')
-      uri.query_values = {
-        filter_user_id: account['id'],
-        fields: config['/annict/api/reviewed_works/fields'].join(','),
-        page: 1,
-        per_page: config['/annict/api/reviewed_works/limit'],
-        sort_id: 'desc',
-        access_token: @token,
-      }
-      sleep(config['/annict/interval/seconds'])
-      api_service.get(uri)['activities']
-        .select {|activity| activity['action'] == 'create_review'}
+      response.parsed_response
+        .dig('data', 'viewer', 'activities', 'edges')
+        .filter_map {|activity| activity['node']}
+        .select {|node| node['__typename'].present?}
+        .select {|node| node['createdAt'].present?}
         .each(&block)
     end
 
-    def create_payload(values, type)
+    def account
+      unless @account
+        uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+        response = graphql_service.post(uri.path, {
+          body: {query: query(:account)},
+          headers: {Authorization: "Bearer #{@token}"},
+        }).parsed_response
+        @account = {
+          id: response.dig('data', 'viewer', 'annictId'),
+          name: response.dig('data', 'viewer', 'name'),
+          username: response.dig('data', 'viewer', 'username'),
+          avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
+        }
+      end
+      return @account
+    end
+
+    def query(name)
+      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
+    end
+
+    def crawl(params = {})
+      return unless webhook = params[:webhook]
+      self.updated_at = Time.now unless updated_at
+      recent = activities.select {|v| updated_at < Time.parse(v['createdAt'])}
+      return unless recent.present?
+      recent.each {|avtivity| webhook.post(create_payload(avtivity))}
+      self.updated_at = Time.now
+      return recent
+    end
+
+    def create_payload(values)
+      values.deep_symbolize_keys!
+      type = values[:__typename].underscore.to_sym
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values
       title_template = Template.new("annict/#{type}_title")
@@ -90,60 +71,34 @@ module Mulukhiya
       return SlackWebhookPayload.new(body)
     end
 
-    def account
-      unless accounts[@token]
-        uri = api_service.create_uri('/v1/me')
-        uri.query_values = {
-          fields: config['/annict/api/me/fields'].join(','),
-          access_token: @token,
-        }
-        sleep(config['/annict/interval/seconds'])
-        accounts[@token] = api_service.get(uri).parsed_response
-      end
-      return accounts[@token]
-    end
-
-    def crawl(params = {})
-      self.updated_at ||= Time.now
-      times = []
-      records = []
-      crawl_set(params).each do |key, result|
-        result.each do |record|
-          times.push(Time.parse(record['created_at']))
-          records.push(record)
-          params[:webhook]&.post(create_payload(record, key)) unless params[:dryrun]
-        end
-      end
-      self.updated_at = times.max if times.present? && !params[:dryrun]
-      return records
-    end
-
-    def crawl_set(params = {})
-      return {record: records, review: reviews} if params[:all]
-      return {record: recent_records, review: recent_reviews}
-    end
-
-    alias me account
-
     def updated_at
-      @updated_at ||= Time.parse(timestamps[account['id']]['time'])
+      @updated_at ||= Time.parse(timestamps[account[:id]]['time']).getlocal
       return @updated_at
-    rescue
+    rescue => e
+      e.log
       return nil
     end
 
     def updated_at=(time)
-      return if updated_at && Time.parse(time.to_s) < updated_at
-      timestamps[account['id']] = {time: time.to_s}
+      time = Time.parse(time.to_s).getlocal
+      timestamps[account[:id]] = {time: time.to_s} if updated_at.nil? || (updated_at < time)
       @updated_at = nil
     end
 
-    def api_service
-      unless @api_service
-        @api_service = HTTP.new
-        @api_service.base_uri = config['/annict/urls/api']
+    def rest_service
+      unless @rest_service
+        @rest_service = HTTP.new
+        @rest_service.base_uri = config['/annict/urls/api/rest']
       end
-      return @api_service
+      return @rest_service
+    end
+
+    def graphql_service
+      unless @graphql_service
+        @graphql_service = HTTP.new
+        @graphql_service.base_uri = config['/annict/urls/api/graphql']
+      end
+      return @graphql_service
     end
 
     def service
@@ -214,9 +169,20 @@ module Mulukhiya
       return "#{match}話"
     end
 
+    def self.accounts(&block)
+      return enum_for(__method__) unless block
+      storage = UserConfigStorage.new
+      storage.all_keys
+        .map {|key| key.split(':').last}
+        .select {|id| storage[id]['/annict/token']}
+        .filter_map {|id| Environment.account_class[id] rescue nil}
+        .select(&:webhook)
+        .select(&:annict)
+        .each(&block)
+    end
+
     def self.crawl_all(params = {})
       return unless controller_class.annict?
-      accounts = AnnictAccountStorage.accounts
       bar = ProgressBar.create(total: accounts.count)
       results = {}
       accounts.each do |account|

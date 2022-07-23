@@ -5,9 +5,9 @@ agent:
     announcement:
       template: announcement
     token: null
+    username: info
     welcome:
       template: welcome
-    username: info
   test:
     token: null
     username: test
@@ -50,43 +50,6 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
 annict:
-  api:
-    me:
-      cache:
-        ttl: 3600
-      fields:
-        - id
-        - name
-        - username
-        - url
-        - avatar_url
-    records:
-      fields:
-        - id
-        - action
-        - created_at
-        - work.id
-        - work.title
-        - episode.id
-        - episode.number_text
-        - episode.title
-        - record.comment
-      limit: 5
-    reviewed_works:
-      fields:
-        - id
-        - action
-        - work.id
-      limit: 5
-    reviews:
-      fields:
-        - id
-        - created_at
-        - body
-        - user.id
-        - work.id
-        - work.title
-      limit: 10
   chars: 200
   interval:
     seconds: 1
@@ -96,7 +59,9 @@ annict:
       default:
         - read
   urls:
-    api: https://api.annict.com
+    api:
+      graphql: https://api.annict.com/graphql
+      rest: https://api.annict.com
     default: https://annict.com
 api:
   cache:
@@ -882,7 +847,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.20.4
+  version: 4.21.0
 parser:
   note:
     fields:
