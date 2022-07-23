@@ -11,7 +11,6 @@ module Mulukhiya
 
     def activities(&block)
       return enum_for(__method__) unless block
-      self.updated_at ||= Time.now
       uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
       response = graphql_service.post(uri.path, {
         body: {query: query(:activity)},
@@ -49,11 +48,11 @@ module Mulukhiya
 
     def crawl(params = {})
       return unless webhook = params[:webhook]
-      self.updated_at ||= Time.now
+      self.updated_at = Time.now unless updated_at
       recent = activities.select {|v| updated_at < Time.parse(v['createdAt'])}
       return unless recent.present?
-      recent.each {|v| webhook.post(create_payload(v))}
-      self.updated_at = recent.map {|v| Time.parse(v['createdAt'])}.max
+      recent.each {|avtivity| webhook.post(create_payload(avtivity))}
+      self.updated_at = Time.now
       return recent
     end
 
@@ -73,15 +72,16 @@ module Mulukhiya
     end
 
     def updated_at
-      @updated_at ||= Time.parse(timestamps[account[:id]]['time'])
+      @updated_at ||= Time.parse(timestamps[account[:id]]['time']).getlocal
       return @updated_at
-    rescue
+    rescue => e
+      e.log
       return nil
     end
 
     def updated_at=(time)
-      return if updated_at && Time.parse(time.to_s) < updated_at
-      timestamps[account[:id]] = {time: time.to_s}
+      time = Time.parse(time.to_s).getlocal
+      timestamps[account[:id]] = {time: time.to_s} if updated_at.nil? || (updated_at < time)
       @updated_at = nil
     end
 
