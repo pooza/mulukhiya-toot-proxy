@@ -1070,7 +1070,7 @@ sidekiq:
   schedule:
     annict_polling:
       class: Mulukhiya::AnnictPollingWorker
-      every: 5m
+      every: 1m
     announcement:
       class: Mulukhiya::AnnouncementWorker
       every: 1m
