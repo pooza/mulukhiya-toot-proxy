@@ -11,14 +11,14 @@ module Mulukhiya
 
     def activities(&block)
       return enum_for(__method__) unless block
-      uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-      response = graphql_service.post(uri.path, {
-        body: {query: query(:activity)},
-        headers: {Authorization: "Bearer #{@token}"},
-      })
-
-      response.parsed_response
-        .dig('data', 'viewer', 'activities', 'edges')
+      response = query(:activity)
+      @account ||= {
+        id: response.dig('data', 'viewer', 'annictId'),
+        name: response.dig('data', 'viewer', 'name'),
+        username: response.dig('data', 'viewer', 'username'),
+        avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
+      }
+      response.dig('data', 'viewer', 'activities', 'edges')
         .filter_map {|activity| activity['node']}
         .select {|node| node['__typename'].present?}
         .select {|node| node['createdAt'].present?}
@@ -27,11 +27,7 @@ module Mulukhiya
 
     def account
       unless @account
-        uri = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-        response = graphql_service.post(uri.path, {
-          body: {query: query(:account)},
-          headers: {Authorization: "Bearer #{@token}"},
-        }).parsed_response
+        response = query(:account)
         @account = {
           id: response.dig('data', 'viewer', 'annictId'),
           name: response.dig('data', 'viewer', 'name'),
@@ -43,16 +39,19 @@ module Mulukhiya
     end
 
     def query(name)
-      return File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))
+      return graphql_service.post(Ginseng::URI.parse(config['/annict/urls/api/graphql']).path, {
+        body: {query: File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))},
+        headers: {Authorization: "Bearer #{@token}"},
+      }).parsed_response
     end
 
     def crawl(params = {})
       return unless webhook = params[:webhook]
-      self.updated_at = Time.now unless updated_at
+      touch unless updated_at
       recent = activities.select {|v| updated_at < Time.parse(v['createdAt'])}
       return unless recent.present?
       recent.each {|avtivity| webhook.post(create_payload(avtivity))}
-      self.updated_at = Time.now
+      touch
       return recent
     end
 
@@ -83,6 +82,10 @@ module Mulukhiya
       time = Time.parse(time.to_s).getlocal
       timestamps[account[:id]] = {time: time.to_s} if updated_at.nil? || (updated_at < time)
       @updated_at = nil
+    end
+
+    def touch
+      self.updated_at = Time.now
     end
 
     def rest_service
