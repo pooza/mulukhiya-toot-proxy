@@ -16,7 +16,9 @@ html lang='ja'
       nav.search-form-container class='clearfix' v-if='account.username'
         .control
           i class='fa fa-magnifying-glass'
-          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchMedias'
+          input type='search' placeholder='検索フレーズ' autocomplete="on" list="suggested_keywords" v-model.trim='keyword' @keydown.enter='searchMedias'
+          datalist id='suggested_keywords'
+            option v-for='keyword in suggested_keywords' {{keyword}}
           button.small @click='searchMedias' 検索
         .control
           label
@@ -68,6 +70,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           medias: [],
+          suggested_keywords: Vue.getSuggestedKeywords(),
           page: 0,
           keyword: null,
           only_person: false,
@@ -89,6 +92,7 @@ html lang='ja'
           appendMedias () {
             this.page ++
             Vue.getMedias({page: this.page, q: this.keyword, only_person: this.only_person})
+              this.suggested_keywords = Vue.getSuggestedKeywords()
               .then(e => {
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
