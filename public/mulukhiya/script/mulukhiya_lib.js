@@ -89,6 +89,17 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getSuggestedKeywords = () => {
+      return JSON.parse(localStorage.getItem('mulukhiya_suggested_keywords') || '[]')
+    }
+
+    Vue.registerSuggestedKeyword = keyword => {
+      let keywords = Vue.getSuggestedKeywords()
+      keywords.unshift(keyword)
+      keywords = Array.from(new Set(keywords.filter(v => (v != null)))).slice(0, 9)
+      localStorage.setItem('mulukhiya_suggested_keywords', JSON.stringify(keywords))
+    }
+
     Vue.getToken = () => {
       return localStorage.getItem('mulukhiya_token')
     }
@@ -246,7 +257,11 @@ const MulukhiyaLib = {
     Vue.getMedias = async params => {
       params.page = Number(params.page || 1)
       params.only_person = params.only_person ? 1 : 0
-      if (!params.q) {delete params.q}
+      if (params.q) {
+        Vue.registerSuggestedKeyword(params.q)
+      } else {
+        delete params.q
+      }
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createURL('/mulukhiya/api/media', {query: params}))
@@ -274,7 +289,11 @@ const MulukhiyaLib = {
     Vue.getStatuses = async params => {
       params.page = Number(params.page || 1)
       params.self = params.self ? 1 : 0
-      if (!params.q) {delete params.q}
+      if (params.q) {
+        Vue.registerSuggestedKeyword(params.q)
+      } else {
+        delete params.q
+      }
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(Vue.createURL('/mulukhiya/api/status/list', {query: params}))
