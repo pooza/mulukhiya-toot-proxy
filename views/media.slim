@@ -92,8 +92,8 @@ html lang='ja'
           appendMedias () {
             this.page ++
             Vue.getMedias({page: this.page, q: this.keyword, only_person: this.only_person})
-              this.suggested_keywords = Vue.getSuggestedKeywords()
               .then(e => {
+                this.suggested_keywords = Vue.getSuggestedKeywords()
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
                 } else {
