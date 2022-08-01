@@ -1179,7 +1179,7 @@ worker:
   filter_unregister:
     message: '#実況 タグを公開に戻しました。'
   media_cleaning:
-    days: 1
+    hours: 1
   nextcloud_clipping:
     federate: true
   user_tag_initialize:
