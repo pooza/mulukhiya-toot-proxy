@@ -28,7 +28,7 @@ module Mulukhiya
     end
 
     def create_key(key)
-      return super(key.to_s.adler32)
+      return super(key.to_s.sha256)
     end
 
     def prefix

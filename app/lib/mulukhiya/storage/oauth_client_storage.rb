@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def create_key(key)
-      return super(key.to_json.adler32)
+      return super(key.to_json.sha256)
     end
 
     def prefix

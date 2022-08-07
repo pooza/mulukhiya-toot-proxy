@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def push(uri)
-      path = File.join(Environment.dir, 'tmp/media', uri.to_s.adler32)
+      path = File.join(Environment.dir, 'tmp/media', uri.to_s.sha256)
       File.write(path, http.get(uri)) unless File.exist?(path)
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
       set(uri, values)

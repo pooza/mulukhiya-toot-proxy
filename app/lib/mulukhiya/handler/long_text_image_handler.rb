@@ -41,7 +41,7 @@ module Mulukhiya
         magick.pointsize handler_config(:font_size)
         magick.draw %(text 0,0 '#{prepare_text(text)}')
       end
-      path = File.join(Environment.dir, 'tmp/media', "#{text.adler32}.png")
+      path = File.join(Environment.dir, 'tmp/media', "#{text.sha256}.png")
       image.write(path)
       return path
     rescue => e

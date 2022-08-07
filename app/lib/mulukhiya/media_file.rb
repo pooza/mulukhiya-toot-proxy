@@ -1,5 +1,3 @@
-require 'digest/sha2'
-
 module Mulukhiya
   class MediaFile < File
     include Package
@@ -118,7 +116,7 @@ module Mulukhiya
     def create_dest_path(params = {})
       params[:extname] ||= MIMEType.extname(params[:type])
       params[:extname] ||= ".#{default_mediatype}"
-      params[:content] = Digest::SHA256.hexdigest(File.read(path))
+      params[:content] = File.read(path).sha256
       return File.join(
         Environment.dir,
         'tmp/media',
@@ -152,7 +150,7 @@ module Mulukhiya
       path = File.join(
         Environment.dir,
         'tmp/media',
-        "#{uri.to_s.adler32}#{File.extname(uri.path)}",
+        "#{uri.to_s.sha256}#{File.extname(uri.path)}",
       )
       File.write(path, HTTP.new.get(uri).body)
       return new(path).file

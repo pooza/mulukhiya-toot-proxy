@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def create_key(key)
-      return "#{prefix}:#{key.to_json.adler32}" if key.is_a?(Hash)
+      return "#{prefix}:#{key.to_json.sha256}" if key.is_a?(Hash)
       return key
     end
 
