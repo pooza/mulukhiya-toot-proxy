@@ -158,12 +158,14 @@ module Mulukhiya
 
     def self.purge
       worker = Worker.create(:media_cleaning)
-      all.select {|f| File.new(f).mtime < worker.worker_config(:hours).hours.ago}.each do |path|
+      time = worker.worker_config(:hours).hours.ago
+      all.select {|f| File.new(f).mtime < time}.each do |path|
         FileUtils.rm_rf(path)
         logger.info(class: to_s, method: __method__, path:)
       rescue => e
         e.log(path:)
       end
+      blank_dirs.each {|v| FileUtils.rm_rf(v)}
     end
 
     def self.all(&block)
@@ -172,6 +174,17 @@ module Mulukhiya
       finder.dir = File.join(Environment.dir, 'tmp/media')
       finder.patterns.push('*')
       finder.exec.select {|f| FileTest.file?(f)}.each(&block)
+    end
+
+    def self.blank_dirs(&block)
+      return enum_for(__method__) unless block
+      finder = Ginseng::FileFinder.new
+      finder.dir = File.join(Environment.dir, 'tmp/media')
+      finder.patterns.push('*')
+      finder.exec
+        .select {|path| FileTest.directory?(path)}
+        .select {|path| Dir.new(path).entries.length == 2}
+        .each(&block)
     end
   end
 end
