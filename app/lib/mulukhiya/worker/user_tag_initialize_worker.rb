@@ -12,6 +12,7 @@ module Mulukhiya
       if id = params[:account_id]
         clear_user_tags(account_class[id])
       else
+        logger.info(class: self.class.to_s, mode: 'all users')
         UserConfigStorage.tag_owners.each do |account|
           clear_user_tags(account)
         end
