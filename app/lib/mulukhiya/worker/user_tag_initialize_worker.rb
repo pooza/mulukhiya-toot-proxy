@@ -21,7 +21,7 @@ module Mulukhiya
     def clear_user_tags(account)
       account.user_config.clear_tags
       info_agent_service&.notify(account, worker_config(:message))
-      logger.info(class: self.class.to_s, acct: account.acct.to_s)
+      logger.info(class: self.class.to_s, acct: account.acct.to_s, message: 'user tag initialized')
     rescue => e
       e.log
     end
