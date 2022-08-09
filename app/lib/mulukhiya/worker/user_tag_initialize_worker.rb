@@ -8,15 +8,18 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      accounts(params).each do |account|
-        account.user_config.clear_tags
-        info_agent_service&.notify(account, worker_config(:message))
+      if id = params[:account_id]
+        clear_user_tags(account_class[id])
+      else
+        UserConfigStorage.tag_owners.each do |account|
+          clear_user_tags(account)
+        end
       end
     end
 
-    def accounts(params = {})
-      return UserConfigStorage.tag_owners.to_a unless id = params[:account_id]
-      return [account_class[id]]
+    def clear_user_tags(account)
+      account.user_config.clear_tags
+      info_agent_service&.notify(account, worker_config(:message))
     end
   end
 end
