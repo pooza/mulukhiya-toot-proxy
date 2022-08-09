@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      params.deep_symbolize_keys!
+      initialize_params(params)
       unless growi = account_class[params[:account_id]]&.growi
         raise Ginseng::ConfigError "GROWI undefined (Account #{params[:account_id]})"
       end

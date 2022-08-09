@@ -8,6 +8,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      initialize_params(params)
       if id = params[:account_id]
         clear_user_tags(account_class[id])
       else
@@ -20,6 +21,9 @@ module Mulukhiya
     def clear_user_tags(account)
       account.user_config.clear_tags
       info_agent_service&.notify(account, worker_config(:message))
+      logger.info(class: self.class.to_s, acct: account.acct.to_s)
+    rescue => e
+      e.log
     end
   end
 end

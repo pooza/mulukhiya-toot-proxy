@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      params.deep_symbolize_keys!
+      initialize_params(params)
       unless nextcloud = account_class[params[:account_id]]&.nextcloud
         raise Ginseng::ConfigError "Nextcloud undefined (Account #{params[:account_id]})"
       end
