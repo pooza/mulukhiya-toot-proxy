@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      params.deep_symbolize_keys!
+      initialize_params(params)
       unless lemmy = account_class[params[:account_id]]&.lemmy
         raise Ginseng::ConfigError "Lemmy undefined (Account #{params[:account_id]})"
       end

@@ -1,5 +1,3 @@
-require 'digest/sha2'
-
 module Mulukhiya
   class Webhook
     include Package
@@ -58,11 +56,11 @@ module Mulukhiya
     end
 
     def self.create_digest(uri, token)
-      return Digest::SHA256.hexdigest({
+      return {
         sns: uri.to_s,
         token:,
         salt: (config['/crypt/salt'] rescue Crypt.password),
-      }.to_json)
+      }.to_json.sha256
     end
 
     def self.create(key)

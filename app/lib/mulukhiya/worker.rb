@@ -18,6 +18,12 @@ module Mulukhiya
       return value
     end
 
+    def initialize_params(params)
+      return unless params.present?
+      params.deep_symbolize_keys!
+      logger.info(class: self.class.to_s, jid:, params:, message: 'params initialized')
+    end
+
     def self.create(name)
       return "Mulukhiya::#{name.to_s.sub(/_worker$/, '').camelize}Worker".constantize.new
     rescue => e

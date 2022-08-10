@@ -27,7 +27,7 @@ module Mulukhiya
     private
 
     def path
-      basename = payload[:title] || payload.to_json.adler32
+      basename = payload[:title] || payload.to_json.sha256
       return File.join(dir, "#{Date.today.strftime('%Y%m%d')}#{basename}.md")
     end
   end

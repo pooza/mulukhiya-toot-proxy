@@ -9,7 +9,6 @@ module Mulukhiya
 
     def setup
       @service = MastodonService.new
-      @key = SecureRandom.hex.adler32
       @status = account.recent_status
     end
 

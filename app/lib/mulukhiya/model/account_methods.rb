@@ -120,7 +120,7 @@ module Mulukhiya
     end
 
     def user_tags
-      return TagContainer.new(user_config['/tagging/user_tags'] || [])
+      return user_config.tags
     end
 
     alias tags user_tags
