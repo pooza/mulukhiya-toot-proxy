@@ -21,7 +21,11 @@ module Mulukhiya
     def initialize_params(params)
       return unless params.present?
       params.deep_symbolize_keys!
-      logger.info(class: self.class.to_s, jid:, params:, message: 'params initialized')
+      log(params:)
+    end
+
+    def log(message)
+      logger.info({class: self.class.to_s, jid:}.merge(message))
     end
 
     def self.create(name)
