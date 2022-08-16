@@ -1176,8 +1176,6 @@ worker:
       seconds: 1
   default:
     federate: false
-  filter_unregister:
-    message: '#実況 タグを公開に戻しました。'
   media_cleaning:
     hours: 1
   nextcloud_clipping:

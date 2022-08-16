@@ -37,12 +37,6 @@ module Mulukhiya
       params[:account_id] = account.id
       params[:phrase] ||= params[:tag]&.to_hashtag
       super
-      return unless params[:minutes]
-      Sidekiq.set_schedule("filter_unregister_#{account.username}", {
-        at: params[:minutes].minutes.after,
-        class: 'Mulukhiya::FilterUnregisterWorker',
-        args: [params],
-      })
     end
 
     def oauth_client(type = :default)
