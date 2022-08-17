@@ -20,6 +20,14 @@ module Mulukhiya
       return config['/websocket/keepalive']
     end
 
+    def underscore
+      return self.class.to_s.split('::').last.sub(/Listener$/, '').underscore
+    end
+
+    def log(message)
+      logger.info({listener: underscore, jid:}.merge(message))
+    end
+
     private
 
     def initialize
@@ -33,7 +41,7 @@ module Mulukhiya
         },
         ping: keepalive,
       })
-      logger.info(class: self.class.to_s, method: __method__, url: uri.to_s)
+      log(method: __method__, url: uri.to_s)
     end
 
     def create_method_name(name)

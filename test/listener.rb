@@ -21,5 +21,9 @@ module Mulukhiya
     def test_keepalive
       assert_predicate(@listener.keepalive, :positive?)
     end
+
+    def test_underscore
+      assert_kind_of(String, @listener.underscore)
+    end
   end
 end

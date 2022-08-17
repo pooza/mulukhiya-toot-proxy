@@ -9,7 +9,7 @@ module Mulukhiya
       end
       return send(method_name.to_sym, payload)
     rescue NoMethodError
-      logger.info(class: self.class.to_s, method: method_name, message: 'method unimplemented')
+      log(method: method_name, message: 'method unimplemented')
     rescue => e
       e.log(payload: (payload rescue message.data))
     end
