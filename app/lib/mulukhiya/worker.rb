@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def log(message)
-      logger.info({class: self.class.to_s, jid:}.merge(message))
+      logger.info({worker: underscore, jid:}.merge(message))
     end
 
     def self.create(name)
