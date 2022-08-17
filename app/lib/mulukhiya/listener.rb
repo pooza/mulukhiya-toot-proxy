@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def log(message)
-      logger.info({listener: underscore, jid:}.merge(message))
+      logger.info({listener: underscore}.merge(message))
     end
 
     private
