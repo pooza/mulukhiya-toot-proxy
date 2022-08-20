@@ -13,6 +13,14 @@ module Mulukhiya
       super
     end
 
+    def underscore
+      return self.class.to_s.split('::').last.sub(/Storage$/, '').underscore
+    end
+
+    def log(message)
+      logger.info({storage: underscore}.merge(message))
+    end
+
     def clear
       bar = ProgressBar.create(total: all_keys.count)
       all_keys.each do |key|
@@ -21,7 +29,7 @@ module Mulukhiya
         bar&.increment
       end
       bar&.finish
-      logger.info(class: self.class.to_s, method: __method__, prefix:)
+      log(method: __method__, prefix:)
     end
 
     def self.dsn

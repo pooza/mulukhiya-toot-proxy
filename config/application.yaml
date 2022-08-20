@@ -845,7 +845,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.21.4
+  version: 4.21.5
 parser:
   note:
     fields:
@@ -1176,8 +1176,6 @@ worker:
       seconds: 1
   default:
     federate: false
-  filter_unregister:
-    message: '#実況 タグを公開に戻しました。'
   media_cleaning:
     hours: 1
   nextcloud_clipping:
