@@ -29,7 +29,7 @@ module Mulukhiya
         bar&.increment
       end
       bar&.finish
-      logg(method: __method__, prefix:)
+      log(method: __method__, prefix:)
     end
 
     def self.dsn
