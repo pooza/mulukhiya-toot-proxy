@@ -25,6 +25,7 @@ module Mulukhiya
       File.write(path, http.get(uri)) unless File.exist?(path)
       values = MediaFile.new(path).file.values.merge(url: uri.to_s)
       set(uri, values)
+      log(url: uri.to_s)
     rescue Ginseng::GatewayError => e
       e.log(url: uri.to_s)
       set(uri, {})

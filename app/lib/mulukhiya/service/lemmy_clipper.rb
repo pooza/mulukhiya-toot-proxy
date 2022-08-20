@@ -8,7 +8,7 @@ module Mulukhiya
     def initialize(params = {})
       @params = params.deep_symbolize_keys
       @params[:password] = (@params[:password].decrypt rescue @params[:password])
-      logger.info(class: self.class.to_s, method: __method__, url: uri.to_s)
+      logger.info(clipper: self.class.to_s, method: __method__, url: uri.to_s)
     end
 
     def client

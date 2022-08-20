@@ -17,6 +17,7 @@ module Mulukhiya
 
     def set(key, value)
       setex(key, ttl, value)
+      log(key:)
     end
 
     def setex(key, ttl, value)
