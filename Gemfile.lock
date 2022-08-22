@@ -319,7 +319,7 @@ GEM
     securerandom (0.2.0)
     sequel (5.59.0)
     set (1.0.2)
-    sidekiq (6.5.4)
+    sidekiq (6.5.5)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.5.0)
