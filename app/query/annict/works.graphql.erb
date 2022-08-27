@@ -1,0 +1,15 @@
+{
+  searchWorks (
+    titles: "<%= params[:title] %>",
+    orderBy: {field: SEASON, direction: DESC}
+  ) {
+    edges {
+      node {
+        annictId
+        title
+				seasonYear
+        officialSiteUrl
+      }
+    }
+  }
+}

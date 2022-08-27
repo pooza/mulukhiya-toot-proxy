@@ -61,6 +61,7 @@ annict:
       graphql: https://api.annict.com/graphql
       rest: https://api.annict.com
     default: https://annict.com
+  works: []
 api:
   cache:
     ttl: 86400
