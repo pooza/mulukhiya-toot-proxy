@@ -11,7 +11,7 @@ module Mulukhiya
 
     def activities(&block)
       return enum_for(__method__) unless block
-      response = query(template: :activity)
+      response = query(file: :activity)
       @account ||= {
         id: response.dig('data', 'viewer', 'annictId'),
         name: response.dig('data', 'viewer', 'name'),
@@ -27,7 +27,7 @@ module Mulukhiya
 
     def account
       unless @account
-        response = query(template: :account)
+        response = query(file: :account)
         @account = {
           id: response.dig('data', 'viewer', 'annictId'),
           name: response.dig('data', 'viewer', 'name'),
@@ -42,7 +42,7 @@ module Mulukhiya
       template = Template.new(File.join(Environment.dir, 'app/query/annict/works.graphql.erb'))
       return config['/annict/works'].inject([]) do |entries, title|
         template[:title] = title
-        entries.concat(query(raw: template.to_s,).dig('data', 'searchWorks', 'edges').map do |work|
+        entries.concat(query(raw: template.to_s).dig('data', 'searchWorks', 'edges').map do |work|
           url = work.dig('node', 'officialSiteUrl')
           if url.present?
             work['node']['officialSiteUrl'] = Ginseng::URI.parse(url)
@@ -52,19 +52,6 @@ module Mulukhiya
           work['node']
         end)
       end
-    end
-
-    def query(params)
-      case params
-      in {raw: raw}
-        query = raw
-      in {template: template}
-        query = File.read(File.join(Environment.dir, "app/query/annict/#{template}.graphql"))
-      end
-      return graphql_service.post(Ginseng::URI.parse(config['/annict/urls/api/graphql']).path, {
-        body: {query:},
-        headers: {Authorization: "Bearer #{@token}"},
-      }).parsed_response
     end
 
     def crawl(params = {})
@@ -222,6 +209,21 @@ module Mulukhiya
       results.each do |acct, result|
         puts({acct:, result:}.to_yaml)
       end
+    end
+
+    private
+
+    def query(params)
+      case params
+      in {raw: raw}
+        query = raw
+      in {file: file}
+        query = File.read(File.join(Environment.dir, "app/query/annict/#{file}.graphql"))
+      end
+      return graphql_service.post(Ginseng::URI.parse(config['/annict/urls/api/graphql']).path, {
+        body: {query:},
+        headers: {Authorization: "Bearer #{@token}"},
+      }).parsed_response
     end
   end
 end
