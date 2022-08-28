@@ -188,8 +188,6 @@ module Mulukhiya
         .map {|key| key.split(':').last}
         .select {|id| storage[id]['/annict/token']}
         .filter_map {|id| Environment.account_class[id] rescue nil}
-        .reject(&:test?)
-        .reject(&:info?)
         .select(&:webhook)
         .select(&:annict)
         .each(&block)
@@ -199,7 +197,7 @@ module Mulukhiya
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
       results = {}
-      accounts.each do |account|
+      accounts.reject(&:test?).reject(&:agent?).each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
         e.log(acct: account.acct.to_s)
