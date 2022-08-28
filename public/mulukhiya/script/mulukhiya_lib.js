@@ -222,6 +222,14 @@ const MulukhiyaLib = {
       return tags
     }
 
+    Vue.getWorks = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get('/mulukhiya/api/program/works')
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.searchTags = async keyword => {
       const indicator = new ActivityIndicator()
       indicator.show()

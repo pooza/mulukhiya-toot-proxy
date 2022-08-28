@@ -145,6 +145,12 @@ html lang='ja'
                     a href=url target='_blank' rel='noreferrer' = url.ellipsize(64)
                 .field-update-button-container
                   button @click='updatePrograms' 実行
+              .endpoint-container
+                .link GET /mulukhiya/api/program/works
+                .link-description 作品一覧を返します。
+                .field-update-button-container
+                  button @click='getWorks' 実行
+                  pre.result v-if='result.work_list' {{result.work_list}}
         - if controller.lemmy?
           li v-if='account.username'
             h3 @click='toggleVisibility("lemmy")' Lemmy
@@ -319,6 +325,7 @@ html lang='ja'
             lemmy_communities: null,
             media_list: null,
             program_list: null,
+            work_list: null,
             feed_list: null,
             status_list: null,
             status_detail: null,
@@ -448,6 +455,12 @@ html lang='ja'
             this.result.program_list = null
             Vue.getPrograms()
               .then(e => {this.result.program_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getWorks () {
+            this.result.work_list = null
+            Vue.getWorks()
+              .then(e => {this.result.work_list = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getFavoriteTags () {

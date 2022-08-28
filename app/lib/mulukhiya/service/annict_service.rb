@@ -188,6 +188,8 @@ module Mulukhiya
         .map {|key| key.split(':').last}
         .select {|id| storage[id]['/annict/token']}
         .filter_map {|id| Environment.account_class[id] rescue nil}
+        .reject(&:test?)
+        .reject(&:info?)
         .select(&:webhook)
         .select(&:annict)
         .each(&block)
