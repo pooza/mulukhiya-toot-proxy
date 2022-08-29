@@ -34,6 +34,14 @@ module Mulukhiya
       end
     end
 
+    def test_episodes
+      id = @service.works.last['annictId']
+      @service.episodes(id).each do |episode|
+        assert_kind_of(String, episode['numberText'])
+        assert_kind_of(String, episode['title'])
+      end
+    end
+
     def test_activities
       activities = @service.activities
       assert_kind_of(Enumerator, activities)

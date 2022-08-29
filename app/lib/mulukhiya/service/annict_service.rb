@@ -54,6 +54,15 @@ module Mulukhiya
       end
     end
 
+    def episodes(id)
+      template = Template.new(File.join(Environment.dir, 'app/query/annict/episodes.graphql.erb'))
+      template[:work_id] = id
+      return query(raw: template.to_s)
+        .dig('data', 'searchWorks', 'nodes')
+        .first
+        .dig('episodes', 'nodes')
+    end
+
     def crawl(params = {})
       return unless webhook = params[:webhook]
       touch unless updated_at
