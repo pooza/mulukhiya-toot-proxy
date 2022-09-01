@@ -11,11 +11,18 @@ html lang='ja'
       h2 エピソード
       article.episode v-for='work in works'
         h3 = '{{work.title}}'
-        ul.params
-          li.param AnnictID: {{work.annictId}}
-          li.param 発表: {{work.seasonYear}}年
-          li.param v-if='work.officialSiteUrl'
-            a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
+        .info
+          ul.params
+            li.param AnnictID: {{work.annictId}}
+            li.param 発表: {{work.seasonYear}}年
+            li.param v-if='work.officialSiteUrl'
+              a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
+        .episode-container
+          h4 エピソード
+          ul.episodes v-if='episodes[work.annictId]'
+            li.episode v-for='episode in episodes[work.annictId]' = '{{episode.numberText}} {{episode.title}}'
+          nav v-else=''
+            button @click='getEpisodes(work.annictId)' = '取得'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
@@ -26,6 +33,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           works: [],
+          episodes: {},
         },
         mounted () {
           Vue.getConfig()
@@ -37,5 +45,13 @@ html lang='ja'
             .then(e => {
               this.works = e
             }).catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          getEpisodes (id) {
+            Vue.getEpisodes(id)
+              .then(e => {
+                Vue.set(this.episodes, id, e)
+              })
+          },
         },
       })

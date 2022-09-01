@@ -230,6 +230,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.getEpisodes = async id => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(`/mulukhiya/api/program/works/${id}/episodes`)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.searchTags = async keyword => {
       const indicator = new ActivityIndicator()
       indicator.show()

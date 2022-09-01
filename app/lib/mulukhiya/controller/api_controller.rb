@@ -136,6 +136,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/program/works/:id/episodes' do
+      raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
+      @renderer.message = annict.episodes(params[:id])
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
