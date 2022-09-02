@@ -12,17 +12,21 @@ html lang='ja'
       article.episode v-for='work in works'
         h3 = '{{work.title}}'
         .info
-          ul.params
+          ul.params class='clearfix'
             li.param AnnictID: {{work.annictId}}
-            li.param 発表: {{work.seasonYear}}年
+            li.param
+              i class='fa fa-calendar'
+              | 発表: {{work.seasonYear}}年
             li.param v-if='work.officialSiteUrl'
+              i class='fa fa-globe'
               a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
         .episode-container
-          h4 エピソード
           ul.episodes v-if='episodes[work.annictId]'
-            li.episode v-for='episode in episodes[work.annictId]' = '{{episode.numberText}} {{episode.title}}'
+            li.episode v-for='episode in episodes[work.annictId]'
+              strong = '{{episode.numberText}}'
+              | {{episode.title}}
           nav v-else=''
-            button @click='getEpisodes(work.annictId)' = '取得'
+            button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
