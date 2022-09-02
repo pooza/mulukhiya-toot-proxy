@@ -197,6 +197,7 @@ module Mulukhiya
         .filter_map {|id| Environment.account_class[id] rescue nil}
         .select(&:webhook)
         .select(&:annict)
+        .reject(&:bot?)
         .each(&block)
     end
 
