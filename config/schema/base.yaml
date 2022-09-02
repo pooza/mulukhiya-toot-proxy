@@ -56,6 +56,11 @@ properties:
         required:
           - client
         type: object
+      works:
+        items:
+          format: regex
+          type: string
+        type: array
     required:
       - oauth
     type: object

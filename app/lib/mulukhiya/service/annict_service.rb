@@ -11,7 +11,7 @@ module Mulukhiya
 
     def activities(&block)
       return enum_for(__method__) unless block
-      response = query(:activity)
+      response = query(file: :activity)
       @account ||= {
         id: response.dig('data', 'viewer', 'annictId'),
         name: response.dig('data', 'viewer', 'name'),
@@ -27,7 +27,7 @@ module Mulukhiya
 
     def account
       unless @account
-        response = query(:account)
+        response = query(file: :account)
         @account = {
           id: response.dig('data', 'viewer', 'annictId'),
           name: response.dig('data', 'viewer', 'name'),
@@ -38,11 +38,27 @@ module Mulukhiya
       return @account
     end
 
-    def query(name)
-      return graphql_service.post(Ginseng::URI.parse(config['/annict/urls/api/graphql']).path, {
-        body: {query: File.read(File.join(Environment.dir, "app/query/annict/#{name}.graphql"))},
-        headers: {Authorization: "Bearer #{@token}"},
-      }).parsed_response
+    def works
+      template = Template.new(File.join(Environment.dir, 'app/query/annict/works.graphql.erb'))
+      return config['/annict/works'].inject([]) do |entries, title|
+        template[:title] = title
+        entries.concat(query(raw: template.to_s).dig('data', 'searchWorks', 'edges').map do |work|
+          url = work.dig('node', 'officialSiteUrl')
+          if url.present?
+            work['node']['officialSiteUrl'] = Ginseng::URI.parse(url)
+          else
+            work['node'].delete('officialSiteUrl')
+          end
+          work['node']
+        end)
+      end
+    end
+
+    def episodes(id)
+      template = Template.new(File.join(Environment.dir, 'app/query/annict/episodes.graphql.erb'))
+      template[:work_id] = id
+      return unless work = query(raw: template.to_s).dig('data', 'searchWorks', 'nodes').first
+      return work.dig('episodes', 'nodes')
     end
 
     def crawl(params = {})
@@ -188,7 +204,7 @@ module Mulukhiya
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
       results = {}
-      accounts.each do |account|
+      accounts.reject(&:test?).reject(&:agent?).each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
         e.log(acct: account.acct.to_s)
@@ -200,6 +216,21 @@ module Mulukhiya
       results.each do |acct, result|
         puts({acct:, result:}.to_yaml)
       end
+    end
+
+    private
+
+    def query(params)
+      case params
+      in {raw: raw}
+        query = raw
+      in {file: file}
+        query = File.read(File.join(Environment.dir, "app/query/annict/#{file}.graphql"))
+      end
+      return graphql_service.post(Ginseng::URI.parse(config['/annict/urls/api/graphql']).path, {
+        body: {query:},
+        headers: {Authorization: "Bearer #{@token}"},
+      }).parsed_response
     end
   end
 end

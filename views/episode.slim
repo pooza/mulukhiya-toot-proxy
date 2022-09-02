@@ -1,0 +1,61 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'エピソード'}]}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 エピソード
+      article.episode v-for='work in works'
+        h3 = '{{work.title}}'
+        .info
+          ul.params class='clearfix'
+            li.param AnnictID: {{work.annictId}}
+            li.param
+              i class='fa fa-calendar'
+              | 発表: {{work.seasonYear}}年
+            li.param v-if='work.officialSiteUrl'
+              i class='fa fa-globe'
+              a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
+        .episode-container
+          ul.episodes v-if='episodes[work.annictId]'
+            li.episode v-for='episode in episodes[work.annictId]'
+              strong = '{{episode.numberText}}'
+              | {{episode.title}}
+          nav v-else=''
+            button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
+    == slim.render 'fragment/footer'
+    javascript:
+      'use strict'
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+          works: [],
+          episodes: {},
+        },
+        mounted () {
+          Vue.getConfig()
+            .then(e => {
+              this.account = e.account
+              this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
+            }).catch(e => Vue.alert(this.$dialog, e))
+          Vue.getWorks()
+            .then(e => {
+              this.works = e
+            }).catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          getEpisodes (id) {
+            Vue.getEpisodes(id)
+              .then(e => {
+                Vue.set(this.episodes, id, e)
+              })
+          },
+        },
+      })

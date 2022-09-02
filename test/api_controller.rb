@@ -30,6 +30,14 @@ module Mulukhiya
       get '/program'
       assert_predicate(last_response, :ok?)
       assert_equal('application/json; charset=UTF-8', last_response.content_type)
+
+      get '/program/works'
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
+      id = JSON.parse(last_response.body).last['annictId']
+      get "/program/works/#{id}/episodes"
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
     def test_media

@@ -1,0 +1,15 @@
+{
+  searchWorks (annictIds: [<%= params[:work_id] %>]) {
+    nodes {
+      annictId
+      title
+      seasonYear
+      episodes (orderBy: {field: SORT_NUMBER, direction: DESC}) {
+        nodes {
+          numberText
+          title
+        }
+      }
+    }
+  }
+}

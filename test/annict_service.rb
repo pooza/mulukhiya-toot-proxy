@@ -23,6 +23,25 @@ module Mulukhiya
       assert_kind_of(Ginseng::URI, @service.account[:avatar_uri])
     end
 
+    def test_works
+      works = @service.works
+      assert_kind_of(Array, works)
+      works.each do |work|
+        assert_kind_of(Integer, work['annictId'])
+        assert_kind_of(String, work['title'])
+        assert_kind_of(Integer, work['seasonYear'])
+        assert_kind_of(Ginseng::URI, work['officialSiteUrl']) if work['officialSiteUrl']
+      end
+    end
+
+    def test_episodes
+      id = @service.works.last['annictId']
+      @service.episodes(id).each do |episode|
+        assert_kind_of(String, episode['numberText'])
+        assert_kind_of(String, episode['title'])
+      end
+    end
+
     def test_activities
       activities = @service.activities
       assert_kind_of(Enumerator, activities)

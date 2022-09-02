@@ -13,6 +13,7 @@ module Mulukhiya
       return [
         `puma -V`.chomp,
         "Root URL: #{root_uri}",
+        "Redis DSN: #{config['/user_config/redis/dsn']}",
       ].join("\n")
     end
 
