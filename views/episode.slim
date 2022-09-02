@@ -22,7 +22,7 @@ html lang='ja'
               a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
         .episode-container
           ul.episodes v-if='episodes[work.annictId]'
-            li.episode v-for='episode in episodes[work.annictId]'
+            li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
               strong = '{{episode.numberText}}'
               | {{episode.title}}
           nav v-else=''
