@@ -204,7 +204,7 @@ module Mulukhiya
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
       results = {}
-      accounts.reject(&:test?).reject(&:agent?).each do |account|
+      accounts.each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
       rescue => e
         e.log(acct: account.acct.to_s)
