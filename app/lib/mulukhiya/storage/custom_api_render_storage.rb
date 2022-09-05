@@ -10,6 +10,7 @@ module Mulukhiya
 
     def create_key(key)
       return "#{prefix}:#{key.to_json.sha256}" if key.is_a?(Hash)
+      return key
     end
 
     def prefix
