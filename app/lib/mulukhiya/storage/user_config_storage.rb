@@ -11,7 +11,6 @@ module Mulukhiya
     def set(key, values)
       super(key, values.except('c', 'command').to_json)
       save
-      log(key:)
     end
 
     def update(key, values)

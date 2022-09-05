@@ -10,7 +10,6 @@ module Mulukhiya
 
     def set(key, values)
       super(key, values.to_json)
-      log(key:)
     end
 
     def prefix
