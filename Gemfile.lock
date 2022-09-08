@@ -316,7 +316,7 @@ GEM
       ffi (~> 1.9)
     securerandom (0.2.0)
     sequel (5.60.1)
-    set (1.0.2)
+    set (1.0.3)
     sidekiq (6.5.6)
       connection_pool (>= 2.2.5)
       rack (~> 2.0)
@@ -406,4 +406,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.3.21
+   2.3.22
