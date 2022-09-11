@@ -23,8 +23,11 @@ html lang='ja'
         .episode-container
           ul.episodes v-if='episodes[work.annictId]'
             li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
-              strong = '{{episode.numberText}}'
-              | {{episode.title}}
+              strong.number-text
+                | {{episode.numberText}}
+              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+              span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
+                | {{episode.title}}
           nav v-else=''
             button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'
@@ -49,6 +52,7 @@ html lang='ja'
             .then(e => {
               this.works = e
             }).catch(e => Vue.alert(this.$dialog, e))
+          new ClipboardJS('.episode i');
         },
         methods: {
           getEpisodes (id) {
