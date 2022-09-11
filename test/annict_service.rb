@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def test_episodes
-      id = @service.works.select.filter_map {|v| v['annictId']}[23]
+      id = id = @service.works.filter_map {|v| v['annictId']}.last
       @service.episodes(id).each do |episode|
         assert_kind_of(String, episode['numberText'])
         assert_kind_of(String, episode['title'])

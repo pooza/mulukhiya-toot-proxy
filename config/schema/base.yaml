@@ -41,6 +41,17 @@ properties:
     type: object
   annict:
     properties:
+      episodes:
+        properties:
+          ruby:
+            properties:
+              pattern:
+                format: regex
+                type: string
+              trim:
+                type: boolean
+            type: object
+        type: object
       oauth:
         properties:
           client:
