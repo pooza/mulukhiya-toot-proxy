@@ -35,10 +35,12 @@ module Mulukhiya
     end
 
     def test_episodes
-      id = @service.works.last['annictId']
+      id = @service.works.filter_map {|v| v['annictId']}.last
       @service.episodes(id).each do |episode|
         assert_kind_of(String, episode['numberText'])
         assert_kind_of(String, episode['title'])
+        assert_kind_of(String, episode['hashtag'])
+        assert_kind_of(Ginseng::URI, episode['url'])
       end
     end
 

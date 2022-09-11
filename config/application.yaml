@@ -62,6 +62,10 @@ annict:
       rest: https://api.annict.com
     default: https://annict.com
   works: []
+  episodes:
+    ruby:
+      pattern: '[(（][あ-んア-ン・ー]+[)）]'
+      trim: yes
 api:
   cache:
     ttl: 86400
@@ -180,6 +184,8 @@ handler:
       audio: audio
       image: image
       video: video
+  removal_rule_tag:
+    rules: []
   remote_tag:
     services:
       - pattern: (プリキュア|precure|キュアスタ)
@@ -846,7 +852,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.22.0
+  version: 4.22.1
 parser:
   note:
     fields:
@@ -1181,7 +1187,5 @@ worker:
     hours: 1
   nextcloud_clipping:
     federate: true
-  user_tag_initialize:
-    message: 固定タグをクリアしました。
 youtube:
   url: https://www.googleapis.com/

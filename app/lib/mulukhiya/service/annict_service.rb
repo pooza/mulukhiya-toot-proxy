@@ -58,7 +58,15 @@ module Mulukhiya
       template = Template.new(File.join(Environment.dir, 'app/query/annict/episodes.graphql.erb'))
       template[:work_id] = id
       return unless work = query(raw: template.to_s).dig('data', 'searchWorks', 'nodes').first
-      return work.dig('episodes', 'nodes')
+      sns = sns_class.new
+      return work.dig('episodes', 'nodes').map do |episode|
+        if config['/annict/episodes/ruby/trim']
+          episode['title'].gsub!(Regexp.new(config['/annict/episodes/ruby/pattern']), '')
+          episode['hashtag'] = episode['title'].to_hashtag
+          episode['url'] = sns.create_uri("/tags/#{episode['title'].to_hashtag_base}")
+        end
+        episode
+      end
     end
 
     def crawl(params = {})
