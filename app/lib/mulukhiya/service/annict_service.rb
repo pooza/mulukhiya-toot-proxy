@@ -60,7 +60,7 @@ module Mulukhiya
       return unless work = query(raw: template.to_s).dig('data', 'searchWorks', 'nodes').first
       sns = sns_class.new
       return work.dig('episodes', 'nodes').map do |episode|
-        if config['/annict/episodes/ruby/trim']
+        if config['/annict/episodes/ruby/trim'] && episode['title']
           episode['title'].gsub!(Regexp.new(config['/annict/episodes/ruby/pattern']), '')
           episode['hashtag'] = episode['title'].to_hashtag
           episode['url'] = sns.create_uri("/tags/#{episode['title'].to_hashtag_base}")
