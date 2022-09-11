@@ -39,6 +39,7 @@ module Mulukhiya
       @service.episodes(id).each do |episode|
         assert_kind_of(String, episode['numberText'])
         assert_kind_of(String, episode['title'])
+        assert_kind_of(String, episode['hashtag'])
       end
     end
 

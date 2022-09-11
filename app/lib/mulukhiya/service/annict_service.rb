@@ -61,6 +61,7 @@ module Mulukhiya
       return work.dig('episodes', 'nodes').map do |episode|
         if config['/annict/episodes/ruby/trim']
           episode['title'].gsub!(Regexp.new(config['/annict/episodes/ruby/pattern']), '')
+          episode['hashtag'] = episode['title'].to_hashtag
         end
         episode
       end

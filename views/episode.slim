@@ -25,9 +25,14 @@ html lang='ja'
             li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
               strong.number-text
                 | {{episode.numberText}}
-              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
-              span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
-                | {{episode.title}}
+              .title-container
+                i class='fas fa-clipboard' v-tooltip.bottom="'サブタイトルをクリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+                span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
+                  | {{episode.title}}
+              .hashtag-container
+                i class='fas fa-clipboard' v-tooltip.bottom="'ハッシュタグをクリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                  | {{episode.hashtag}}
           nav v-else=''
             button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'
