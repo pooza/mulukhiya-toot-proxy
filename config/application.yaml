@@ -364,6 +364,7 @@ mastodon:
       - media_tag
       - user_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
       - invalid_command
@@ -398,6 +399,7 @@ mastodon:
       - dictionary_tag
       - media_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
   oauth:
@@ -509,6 +511,7 @@ meisskey:
       - peer_tube_url_nowplaying
       - dictionary_tag
       - remote_tag
+      - removal_rule_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -537,6 +540,7 @@ meisskey:
       - media_tag
       - user_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
       - invalid_command
@@ -567,6 +571,7 @@ meisskey:
       - dictionary_tag
       - media_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
   note:
@@ -680,6 +685,7 @@ misskey:
       - peer_tube_url_nowplaying
       - dictionary_tag
       - remote_tag
+      - removal_rule_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -709,6 +715,7 @@ misskey:
       - media_tag
       - user_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
       - invalid_command
@@ -739,6 +746,7 @@ misskey:
       - dictionary_tag
       - media_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
   note:
@@ -954,6 +962,7 @@ pleroma:
       - peer_tube_url_nowplaying
       - dictionary_tag
       - remote_tag
+      - removal_rule_tag
       - tagging
     pre_toot:
       - user_config_command
@@ -984,6 +993,7 @@ pleroma:
       - media_tag
       - user_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
       - invalid_command
@@ -1016,6 +1026,7 @@ pleroma:
       - dictionary_tag
       - media_tag
       - remote_tag
+      - removal_rule_tag
       - image_copyright
       - tagging
   oauth:
