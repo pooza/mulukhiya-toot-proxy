@@ -40,6 +40,7 @@ module Mulukhiya
         assert_kind_of(String, episode['numberText'])
         assert_kind_of(String, episode['title'])
         assert_kind_of(String, episode['hashtag'])
+        assert_kind_of(Ginseng::URI, episode['url'])
       end
     end
 
