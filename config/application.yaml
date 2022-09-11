@@ -184,6 +184,8 @@ handler:
       audio: audio
       image: image
       video: video
+  removal_rule_tag:
+    rules: []
   remote_tag:
     services:
       - pattern: (プリキュア|precure|キュアスタ)
