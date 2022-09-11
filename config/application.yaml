@@ -62,6 +62,10 @@ annict:
       rest: https://api.annict.com
     default: https://annict.com
   works: []
+  episodes:
+    ruby:
+      pattern: '[(（][あ-んア-ン・ー]+[)）]'
+      trim: yes
 api:
   cache:
     ttl: 86400

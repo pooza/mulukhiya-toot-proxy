@@ -58,7 +58,15 @@ module Mulukhiya
       template = Template.new(File.join(Environment.dir, 'app/query/annict/episodes.graphql.erb'))
       template[:work_id] = id
       return unless work = query(raw: template.to_s).dig('data', 'searchWorks', 'nodes').first
-      return work.dig('episodes', 'nodes')
+      episodes = work.dig('episodes', 'nodes')
+      episodes.map do |episode|
+        if config['/annict/episodes/ruby/trim']
+          episode['title'].gsub!(Regexp.new(config['/annict/episodes/ruby/pattern']), '')
+        end
+        episode
+      end
+      ic episodes
+      return episodes
     end
 
     def crawl(params = {})
