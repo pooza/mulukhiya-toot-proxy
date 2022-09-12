@@ -60,10 +60,10 @@ module Mulukhiya
       return unless work = query(raw: template.to_s).dig('data', 'searchWorks', 'nodes').first
       sns = sns_class.new
       return work.dig('episodes', 'nodes').map do |episode|
-        if config['/annict/episodes/ruby/trim']
-          episode['title'].gsub!(Regexp.new(config['/annict/episodes/ruby/pattern']), '')
-          episode['hashtag'] = episode['title'].to_hashtag
-          episode['url'] = sns.create_uri("/tags/#{episode['title'].to_hashtag_base}")
+        if subtitle = episode['title']
+          episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+          episode['hashtag'] = subtitle.to_hashtag
+          episode['url'] = sns.create_uri("/tags/#{subtitle.to_hashtag_base}")
         end
         episode
       end
@@ -158,6 +158,18 @@ module Mulukhiya
         scope: self.class.oauth_scopes.join(' '),
       }
       return uri
+    end
+
+    def self.subtitle_trim_ruby?
+      return config['/annict/episodes/ruby/trim']
+    end
+
+    def self.ruby_pattern
+      return Regexp.new(config['/annict/episodes/ruby/pattern'])
+    end
+
+    def self.trim_ruby(title)
+      return title.gsub(ruby_pattern, '')
     end
 
     def self.oauth_scopes(key = 'default')
