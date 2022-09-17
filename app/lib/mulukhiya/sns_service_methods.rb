@@ -33,6 +33,10 @@ module Mulukhiya
       return super
     end
 
+    def create_tag_uri(tag)
+      return create_uri("/tags/#{tag.to_hashtag_base}")
+    end
+
     def nodeinfo
       unless info = redis['nodeinfo']
         ttl = [config['/nodeinfo/cache/ttl'], 86_400].min

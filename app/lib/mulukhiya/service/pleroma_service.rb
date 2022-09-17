@@ -20,6 +20,10 @@ module Mulukhiya
       end
     end
 
+    def create_tag_uri(tag)
+      return create_uri("/tag/#{tag.to_hashtag_base}")
+    end
+
     def oauth_client(type = :default)
       return nil unless scopes = PleromaController.oauth_scopes(type)
       body = {

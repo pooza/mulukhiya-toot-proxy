@@ -65,6 +65,10 @@ module Mulukhiya
     def test_favorites
       return unless controller_class.favorite_tags?
       assert_kind_of(Hash, hash_tag_class.favorites)
+      hash_tag_class.favorites.each do |_, values|
+        assert_predicate(Ginseng::URI.parse(values[:url]), :absolute?)
+        assert_predicate(values[:count], :positive?)
+      end
     end
 
     def test_create_feed

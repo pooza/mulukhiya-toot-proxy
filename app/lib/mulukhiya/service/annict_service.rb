@@ -61,7 +61,7 @@ module Mulukhiya
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
           episode['title'].strip!
           episode['hashtag'] = episode['title'].to_hashtag
-          episode['url'] = sns.create_uri("/tags/#{subtitle.to_hashtag_base}")
+          episode['url'] = sns.create_tag_uri(subtitle)
         end
         episode
       end
