@@ -51,6 +51,10 @@ amazon:
     jp: https://www.amazon.co.jp/
 annict:
   chars: 200
+  episodes:
+    ruby:
+      pattern: '[(（][あ-んア-ン・ー]+[)）]'
+      trim: true
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -62,10 +66,6 @@ annict:
       rest: https://api.annict.com
     default: https://annict.com
   works: []
-  episodes:
-    ruby:
-      pattern: '[(（][あ-んア-ン・ー]+[)）]'
-      trim: yes
 api:
   cache:
     ttl: 86400
@@ -184,8 +184,6 @@ handler:
       audio: audio
       image: image
       video: video
-  removal_rule_tag:
-    rules: []
   remote_tag:
     services:
       - pattern: (プリキュア|precure|キュアスタ)
@@ -196,6 +194,9 @@ handler:
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
+  removal_rule_tag:
+    disable: true
+    rules: []
   reply_reaction:
     disable: true
     experimental: true
@@ -860,7 +861,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.22.2
+  version: 4.22.3
 parser:
   note:
     fields:

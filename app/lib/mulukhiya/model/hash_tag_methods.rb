@@ -7,7 +7,7 @@ module Mulukhiya
     end
 
     def uri
-      @uri ||= sns_class.new.create_uri("/tags/#{name}")
+      @uri ||= sns_class.new.create_tag_uri(name)
       return @uri
     end
 
@@ -74,7 +74,9 @@ module Mulukhiya
             favorites[v] += 1
           end
         end
-        return favorites.sort_by {|_, v| v}.reverse.to_h
+        return favorites.sort_by {|_, v| v}.reverse.to_h do |tag, count|
+          [tag, {url: sns_class.new.create_tag_uri(tag).to_s, count:}]
+        end
       rescue => e
         e.log
         return {}

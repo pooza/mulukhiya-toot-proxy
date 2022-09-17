@@ -11,10 +11,6 @@ module Mulukhiya
         @name = name
       end
 
-      def self.featured_tags
-        return TagContainer.new
-      end
-
       def to_h
         return {
           feed_url: feed_uri.to_s,
@@ -24,6 +20,10 @@ module Mulukhiya
           tag: raw_name.to_hashtag,
           url: uri.to_s,
         }
+      end
+
+      def self.featured_tags
+        return TagContainer.new
       end
 
       def self.get(key)

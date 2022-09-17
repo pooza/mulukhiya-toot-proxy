@@ -37,12 +37,9 @@ html lang='ja'
       - if controller.favorite_tags?
         section.fav-entries
           h3 プロフィールに含まれるタグ
-          article.tag-entry v-for='(count, tag) in fav_entries'
-            - if env.pleroma?
-              a :href='"/tag/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
-            - else
-              a :href='"/tags/" + tag' target='_blank' rel='noreferrer' = '#{{tag}}'
-            span.count v-if='count' {{count}}
+          article.tag-entry v-for='(v, tag) in fav_entries'
+            a :href='v.url' target='_blank' rel='noreferrer' = '#{{tag}}'
+            span.count v-if='v.count' {{v.count}}
       section.remote-dics
         h3 辞書
         ul
