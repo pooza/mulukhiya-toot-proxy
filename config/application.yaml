@@ -65,7 +65,7 @@ annict:
   episodes:
     ruby:
       pattern: '[(（][あ-んア-ン・ー]+[)）]'
-      trim: yes
+      trim: true
 api:
   cache:
     ttl: 86400
