@@ -11,8 +11,8 @@ module Mulukhiya
     def executable?
       return true if rules.any? do |rule|
         pattern = Regexp.new(rule['search'])
-        next unless pattern.match?(parser.body)
-        @tags = rule['removal_tags']
+        next unless pattern.match?(parser.text)
+        @tags = rule['removal_tags'] || []
       end
       return false
     end
