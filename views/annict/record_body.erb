@@ -2,7 +2,12 @@
 
 <%= params.dig(:record, :comment).ellipsize(config['/annict/chars']) %>
 <% end -%>
-<%= Mulukhiya::AnnictService.create_record_uri(params.dig(:record, :episode, :work, :annictId), params.dig(:record, :episode, :annictId)) %>
+<%=
+  Mulukhiya::AnnictService.create_record_uri(
+    params.dig(:record, :episode, :work, :annictId),
+    params.dig(:record, :episode, :annictId),
+  )
+%>
 <%=
   [
     params.dig(:record, :episode, :work, :title),

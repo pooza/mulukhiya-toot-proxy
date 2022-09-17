@@ -1,6 +1,12 @@
 <%= params.dig(:record, :episode, :work, :title) %>
 <% if params.dig(:record, :episode, :numberText).present? || params.dig(:record, :episode, :title).present? -%>
 <% if params.dig(:record, :episode, :numberText).present? %><%= params.dig(:record, :episode, :numberText) %><% end -%>
-<% if params.dig(:record, :episode, :title).present? %>「<%= params.dig(:record, :episode, :title) %>」<% end -%>
+<% if params.dig(:record, :episode, :title).present? %>「<%=
+  if Mulukhiya::AnnictService.subtitle_trim_ruby?
+    Mulukhiya::AnnictService.trim_ruby(params.dig(:record, :episode, :title))
+  else
+    params.dig(:record, :episode, :title)
+  end
+%>」<% end -%>
 <% end -%>
 を視聴。
