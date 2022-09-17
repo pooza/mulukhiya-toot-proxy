@@ -59,7 +59,7 @@ module Mulukhiya
       return work.dig('episodes', 'nodes').map do |episode|
         if subtitle = episode['title']
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          episode['hashtag'] = subtitle.to_hashtag
+          episode['hashtag'] = episode['title'].to_hashtag
           episode['url'] = sns.create_uri("/tags/#{subtitle.to_hashtag_base}")
         end
         episode
