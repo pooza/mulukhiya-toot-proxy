@@ -185,6 +185,7 @@ handler:
       image: image
       video: video
   removal_rule_tag:
+    disable: true
     rules: []
   remote_tag:
     services:
