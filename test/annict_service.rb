@@ -8,6 +8,7 @@ module Mulukhiya
     end
 
     def setup
+      config['/annict/episodes/ruby/trim'] = true
       @service = account.annict
     end
 
@@ -173,6 +174,19 @@ module Mulukhiya
       }
       assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ #何話とか特に決まってない回\n",
+      }, @service.create_payload(record).raw)
+
+      record = {
+        __typename: 'Record',
+        episode: {
+          annictId: 114,
+          title: '影(ミスト)と死神(キル)',
+          work: {annictId: 111, title: 'ドラゴンクエスト ダイの大冒険'},
+        },
+        comment: 'ぼくの考えたシャドウバーンという幹部を本編に出演させてください。',
+      }
+      assert_equal({
+        'text' => "ドラゴンクエスト ダイの大冒険\n「影と死神」を視聴。\n\nぼくの考えたシャドウバーンという幹部を本編に出演させてください。\nhttps://annict.com/works/111/episodes/114\n#ドラゴンクエスト_ダイの大冒険 #影と死神\n",
       }, @service.create_payload(record).raw)
 
       record = {

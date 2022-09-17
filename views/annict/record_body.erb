@@ -9,9 +9,12 @@
   )
 %>
 <%=
+  if Mulukhiya::AnnictService.subtitle_trim_ruby? && (subtitle = params.dig(:record, :episode, :title))
+    subtitle = Mulukhiya::AnnictService.trim_ruby(subtitle)
+  end
   [
     params.dig(:record, :episode, :work, :title),
     Mulukhiya::AnnictService.create_episode_number_text(params.dig(:record, :episode, :numberText)),
-    params.dig(:record, :episode, :title),
+    subtitle,
   ].select(&:present?).map(&:to_hashtag).join(' ')
 %>
