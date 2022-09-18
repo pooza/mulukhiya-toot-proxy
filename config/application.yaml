@@ -420,6 +420,7 @@ mastodon:
       url: /settings/applications
   sns_type: mastodon
   status:
+    default_max_length: 500
     delete:
       limit: 30
     key: id
@@ -428,8 +429,6 @@ mastodon:
     spoiler_text: null
   streaming:
     verify_peer: true
-  toot:
-    default_max_length: 500
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -575,8 +574,6 @@ meisskey:
       - removal_rule_tag
       - image_copyright
       - tagging
-  note:
-    default_max_length: 1000
   oauth:
     scopes:
       default:
@@ -602,6 +599,7 @@ meisskey:
         - read:user-groups
   sns_type: misskey
   status:
+    default_max_length: 1000
     key: noteId
     label: ポスト
     parser: note
@@ -750,8 +748,6 @@ misskey:
       - removal_rule_tag
       - image_copyright
       - tagging
-  note:
-    default_max_length: 3000
   oauth:
     scopes:
       default:
@@ -781,6 +777,7 @@ misskey:
       url: /settings/api
   sns_type: misskey
   status:
+    default_max_length: 3000
     key: noteId
     label: ノート
     parser: note
@@ -1043,14 +1040,13 @@ pleroma:
         - write:media
   sns_type: mastodon
   status:
+    default_max_length: 5000
     key: id
     label: ステータス
     parser: toot
     spoiler_text: null
   streaming:
     verify_peer: true
-  toot:
-    default_max_length: 5000
   url: https://pleroma.example.com/
 postgres:
   dsn: null
