@@ -13,9 +13,7 @@ html lang='ja'
         nav.search-form-container v-if='account.username'
           .control
             i class='fa fa-magnifying-glass'
-            input type='search' placeholder='検索フレーズ' autocomplete="on" list="suggested_keywords" v-model.trim='keyword' @keydown.enter='searchStatuses'
-            datalist id='suggested_keywords'
-              option v-for='keyword in suggested_keywords' {{keyword}}
+            input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='searchStatuses'
             button.small @click='searchStatuses' 検索
           .control
             label
