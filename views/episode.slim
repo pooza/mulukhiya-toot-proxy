@@ -9,6 +9,11 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 エピソード
+      nav.search-form-container v-if='account.username'
+        .control
+          i class='fa fa-magnifying-glass'
+          input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='searchWorks'
+          button.small @click='searchWorks' 検索
       article.episode v-for='work in works'
         h3 = '{{work.title}}'
         .info
@@ -33,7 +38,7 @@ html lang='ja'
                 i class='fas fa-clipboard' v-tooltip.bottom="'ハッシュタグをクリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                 span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   | {{episode.hashtag}}
-                a :href='episode.url' target='_blank' rel='noreferrer'
+                a :href='episode.hashtag_url' target='_blank' rel='noreferrer'
                   i class='fas fa-link'
           nav v-else=''
             button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
@@ -46,8 +51,10 @@ html lang='ja'
         el: '#app',
         data: {
           account: {is_admin: false, username: null},
+          all_works: [],
           works: [],
           episodes: {},
+          keyword: null,
         },
         mounted () {
           Vue.getConfig()
@@ -57,7 +64,8 @@ html lang='ja'
             }).catch(e => Vue.alert(this.$dialog, e))
           Vue.getWorks()
             .then(e => {
-              this.works = e
+              this.all_works = e
+              this.works = this.all_works
             }).catch(e => Vue.alert(this.$dialog, e))
           new ClipboardJS('.episode i');
         },
@@ -67,6 +75,9 @@ html lang='ja'
               .then(e => {
                 Vue.set(this.episodes, id, e)
               })
+          },
+          searchWorks () {
+            this.works = this.all_works.filter(v => v.title.match(new RegExp(this.keyword, 'i')))
           },
         },
       })
