@@ -62,7 +62,7 @@ module Mulukhiya
           episode['title'].strip!
           episode['hashtag'] = episode['title'].to_hashtag
           episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
-          episode['hashtag_url'] = sns.create_tag_uri(episode['title']).to_s
+          episode['hashtag_url'] = episode['hashtag_uri'].to_s
         end
         episode
       end
