@@ -112,7 +112,7 @@ GEM
       msgpack (~> 1.2)
     bson (4.15.0)
     builder (3.2.4)
-    cgi (0.3.2)
+    cgi (0.3.3)
     concurrent-ruby (1.1.10)
     connection_pool (2.3.0)
     crass (1.0.6)
