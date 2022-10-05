@@ -1195,5 +1195,7 @@ worker:
     hours: 1
   nextcloud_clipping:
     federate: true
+  user_tag_initialize:
+    message: 固定タグをクリアしました。
 youtube:
   url: https://www.googleapis.com/
