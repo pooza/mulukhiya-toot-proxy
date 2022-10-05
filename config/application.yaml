@@ -1086,7 +1086,7 @@ sidekiq:
       every: 1m
     announcement:
       class: Mulukhiya::AnnouncementWorker
-      every: 1m
+      every: 10m
     feed_update:
       class: Mulukhiya::FeedUpdateWorker
       every: 5m
