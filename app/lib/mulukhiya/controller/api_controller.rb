@@ -340,6 +340,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/tagging/dic/annict/episodes' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
+      ids = annict.works.map {|v| v['annictId']}
+      @renderer.message = annict.episodes(ids.join(',')).map {|v| v['title']}.compact
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/tagging/tag/search' do
       tags = {}
       errors = TagSearchContract.new.exec(params)

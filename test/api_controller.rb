@@ -86,6 +86,13 @@ module Mulukhiya
       assert_equal('application/json; charset=UTF-8', last_response.content_type)
     end
 
+    def test_tag_episode
+      return unless controller_class.annict?
+      get '/tagging/dic/annict/episodes'
+      assert_predicate(last_response, :ok?)
+      assert_equal('application/json; charset=UTF-8', last_response.content_type)
+    end
+
     def test_lemmy_communities
       return unless test_account.lemmy
       get "/lemmy/communities?token=#{test_account.token}"

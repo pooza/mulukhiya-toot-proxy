@@ -54,18 +54,22 @@ module Mulukhiya
     end
 
     def episodes(id)
-      return unless work = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes').first
+      return unless episodes = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes')
       sns = sns_class.new
-      return work.dig('episodes', 'nodes').map do |episode|
-        if subtitle = episode['title']
-          episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          episode['title'].strip!
-          episode['hashtag'] = episode['title'].to_hashtag
-          episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
-          episode['hashtag_url'] = episode['hashtag_uri'].to_s
+      all = []
+      episodes.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
+        episodes.each do |episode|
+          if subtitle = episode['title']
+            episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+            episode['title'].strip!
+            episode['hashtag'] = episode['title'].to_hashtag
+            episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
+            episode['hashtag_url'] = episode['hashtag_uri'].to_s
+          end
+          all.push(episode)
         end
-        episode
       end
+      return all
     end
 
     def crawl(params = {})
