@@ -344,7 +344,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
       ids = annict.works.map {|v| v['annictId']}
-      @renderer.message = annict.episodes(ids.join(',')).map {|v| v['title']}.compact
+      @renderer.message = annict.episodes(ids.join(',')).filter_map {|v| v['title']}
       return @renderer.to_s
     rescue => e
       e.log

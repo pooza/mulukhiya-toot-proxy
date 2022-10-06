@@ -54,10 +54,10 @@ module Mulukhiya
     end
 
     def episodes(id)
-      return unless episodes = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes')
+      return unless entries = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes')
       sns = sns_class.new
       all = []
-      episodes.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
+      entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
         episodes.each do |episode|
           if subtitle = episode['title']
             episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
