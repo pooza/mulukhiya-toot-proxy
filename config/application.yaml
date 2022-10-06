@@ -420,6 +420,7 @@ mastodon:
       url: /settings/applications
   sns_type: mastodon
   status:
+    default_max_length: 500
     delete:
       limit: 30
     key: id
@@ -428,8 +429,6 @@ mastodon:
     spoiler_text: null
   streaming:
     verify_peer: true
-  toot:
-    default_max_length: 500
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -575,8 +574,6 @@ meisskey:
       - removal_rule_tag
       - image_copyright
       - tagging
-  note:
-    default_max_length: 1000
   oauth:
     scopes:
       default:
@@ -602,6 +599,7 @@ meisskey:
         - read:user-groups
   sns_type: misskey
   status:
+    default_max_length: 1000
     key: noteId
     label: ポスト
     parser: note
@@ -750,8 +748,6 @@ misskey:
       - removal_rule_tag
       - image_copyright
       - tagging
-  note:
-    default_max_length: 3000
   oauth:
     scopes:
       default:
@@ -781,6 +777,7 @@ misskey:
       url: /settings/api
   sns_type: misskey
   status:
+    default_max_length: 3000
     key: noteId
     label: ノート
     parser: note
@@ -861,7 +858,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.22.4
+  version: 4.23.0
 parser:
   note:
     fields:
@@ -1043,14 +1040,13 @@ pleroma:
         - write:media
   sns_type: mastodon
   status:
+    default_max_length: 5000
     key: id
     label: ステータス
     parser: toot
     spoiler_text: null
   streaming:
     verify_peer: true
-  toot:
-    default_max_length: 5000
   url: https://pleroma.example.com/
 postgres:
   dsn: null
@@ -1090,7 +1086,7 @@ sidekiq:
       every: 1m
     announcement:
       class: Mulukhiya::AnnouncementWorker
-      every: 1m
+      every: 10m
     feed_update:
       class: Mulukhiya::FeedUpdateWorker
       every: 5m
@@ -1146,7 +1142,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@0.27/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
       - /mulukhiya/script/mulukhiya_lib
@@ -1154,7 +1150,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.1.1/css/all.css
+      - https://use.fontawesome.com/releases/v6.2.0/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   media:
@@ -1175,7 +1171,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@0.27/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
       - /mulukhiya/script/mulukhiya_lib
@@ -1183,7 +1179,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.1.1/css/all.css
+      - https://use.fontawesome.com/releases/v6.2.0/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:
@@ -1199,5 +1195,7 @@ worker:
     hours: 1
   nextcloud_clipping:
     federate: true
+  user_tag_initialize:
+    message: 固定タグをクリアしました。
 youtube:
   url: https://www.googleapis.com/

@@ -199,6 +199,12 @@ html lang='ja'
                   a href=dic['url'] target='_blank' rel='noreferrer' = dic['url'].ellipsize(64)
               .field-update-button-container
                 button @click='updateTaggingDictionary' 実行
+            .endpoint-container
+              .link GET /mulukhiya/api/tagging/dic/annict/episodes
+              .link-description エピソードのハッシュタグ辞書を返します。
+              .field-update-button-container
+                button @click='getEpisodeTags' 実行
+                pre.result v-if='result.episode_tags' {{result.episode_tags}}
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           vue-slide-up-down :active='layout.details.tagging_usertag'
@@ -326,6 +332,7 @@ html lang='ja'
             media_list: null,
             program_list: null,
             work_list: null,
+            episode_tags: null,
             feed_list: null,
             status_list: null,
             status_detail: null,
@@ -461,6 +468,12 @@ html lang='ja'
             this.result.work_list = null
             Vue.getWorks()
               .then(e => {this.result.work_list = e})
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          getEpisodeTags () {
+            this.result.episode_tags = null
+            Vue.getEpisodeTags()
+              .then(e => {this.result.episode_tags = e})
               .catch(e => Vue.alert(this.$dialog, e))
           },
           getFavoriteTags () {
