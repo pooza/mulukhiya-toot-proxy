@@ -31,11 +31,11 @@ html lang='ja'
               strong.number-text
                 | {{episode.numberText}}
               .title-container
-                i class='fas fa-clipboard' v-tooltip.bottom="'サブタイトルをクリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+                i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
                 span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
                   | {{episode.title}}
               .hashtag-container
-                i class='fas fa-clipboard' v-tooltip.bottom="'ハッシュタグをクリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                 span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   | {{episode.hashtag}}
                 a :href='episode.hashtag_url' target='_blank' rel='noreferrer'
@@ -72,9 +72,7 @@ html lang='ja'
         methods: {
           getEpisodes (id) {
             Vue.getEpisodes(id)
-              .then(e => {
-                Vue.set(this.episodes, id, e)
-              })
+              .then(e => Vue.set(this.episodes, id, e))
           },
           searchWorks () {
             setTimeout(() => {

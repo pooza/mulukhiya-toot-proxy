@@ -25,6 +25,7 @@ module Mulukhiya
       return {
         package: raw.dig('application', 'package'),
         config: {
+          controller: self['/controller'],
           status: Environment.status_class.default,
         },
       }
