@@ -858,7 +858,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.23.1
+  version: 4.23.2
 parser:
   note:
     fields:
@@ -1145,6 +1145,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
+      - https://cdn.jsdelivr.net/npm/vue-i18n@9.2/dist/vue-i18n.global.min.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
@@ -1174,6 +1175,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
+      - https://cdn.jsdelivr.net/npm/vue-i18n@9.2/dist/vue-i18n.global.min.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
