@@ -7,6 +7,7 @@ module Mulukhiya
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://www.spotify.com/jp/')
+
       assert_nil(@handler.debug_info)
 
       @handler.clear

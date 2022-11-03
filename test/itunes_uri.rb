@@ -23,6 +23,7 @@ module Mulukhiya
 
       uri = @track.clone
       uri.album_id = '1299587999'
+
       assert_equal(1_299_587_999, uri.album_id)
     end
 
@@ -32,6 +33,7 @@ module Mulukhiya
 
       uri = @track.clone
       uri.track_id = '1299587999'
+
       assert_equal(1_299_587_999, uri.track_id)
     end
 

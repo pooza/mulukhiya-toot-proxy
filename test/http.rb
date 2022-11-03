@@ -6,9 +6,11 @@ module Mulukhiya
 
     def test_base_uri
       @http.base_uri = 'https://service1.example.com'
+
       assert_equal(@http.base_uri, Ginseng::URI.parse('https://service1.example.com'))
 
       @http.base_uri = Ginseng::URI.parse('https://service2.example.com')
+
       assert_equal(@http.base_uri, Ginseng::URI.parse('https://service2.example.com'))
 
       assert_raise RuntimeError do
@@ -16,6 +18,7 @@ module Mulukhiya
       end
 
       @http.base_uri = nil
+
       assert_nil(@http.base_uri)
     end
 
@@ -26,6 +29,7 @@ module Mulukhiya
       end
 
       @http.base_uri = 'https://service1.example.com'
+
       assert_equal(@http.create_uri('/fuga'), Ginseng::URI.parse('https://service1.example.com/fuga'))
     end
   end

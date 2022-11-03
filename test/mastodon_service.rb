@@ -21,6 +21,7 @@ module Mulukhiya
       r = @service.update_status(@status, text, {
         headers: {'X-Mulukhiya-Purpose' => 'test'},
       })
+
       assert(text.start_with?(TootParser.new(r['content']).body))
     end
 
@@ -29,6 +30,7 @@ module Mulukhiya
 
       @service.register_filter(tag: '実況')
       filters = @service.filters(tag: '実況')
+
       assert_kind_of(Array, filters)
       assert_predicate(filters.length, :positive?)
       filters.first(5).each do |filter|

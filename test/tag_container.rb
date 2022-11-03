@@ -15,9 +15,11 @@ module Mulukhiya
 
     def test_delete
       @tags.add('tver')
+
       assert_equal(Set['tver'], @tags)
 
       @tags.delete('TVer')
+
       assert_equal(Set[], @tags)
     end
 

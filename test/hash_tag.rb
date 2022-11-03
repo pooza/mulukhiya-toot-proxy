@@ -20,6 +20,7 @@ module Mulukhiya
 
     def test_uri
       return unless @nowplaying
+
       assert_kind_of(Ginseng::URI, @nowplaying.uri)
       assert_predicate(@nowplaying.uri, :absolute?)
       assert_match(%r{/nowplaying$}, @nowplaying.uri.path)
@@ -53,6 +54,7 @@ module Mulukhiya
     def test_to_h
       return unless @nowplaying
       h = @nowplaying.to_h
+
       assert_kind_of(Hash, h)
       assert_kind_of(String, h[:feed_url])
       assert_boolean(h[:is_default])
@@ -64,6 +66,7 @@ module Mulukhiya
 
     def test_favorites
       return unless controller_class.favorite_tags?
+
       assert_kind_of(Hash, hash_tag_class.favorites)
       hash_tag_class.favorites.each do |_, values|
         assert_predicate(Ginseng::URI.parse(values[:url]), :absolute?)
@@ -74,6 +77,7 @@ module Mulukhiya
     def test_create_feed
       return unless @default
       feed = @default.create_feed(limit: 5)
+
       assert_kind_of(Array, feed)
       assert_includes(1..5, feed.count)
       feed.each do |entry|

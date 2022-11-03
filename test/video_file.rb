@@ -60,6 +60,7 @@ module Mulukhiya
 
     def test_convert_type
       converted = @mp4.convert_type('video/mp4')
+
       assert_kind_of(VideoFile, converted)
       assert_equal('video/mp4', converted.type)
     end

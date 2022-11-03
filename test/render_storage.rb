@@ -14,6 +14,7 @@ module Mulukhiya
 
       assert_kind_of(String, @storage[@key])
       @storage.unlink(@key)
+
       assert_nil(@storage[@key])
     end
   end

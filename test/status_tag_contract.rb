@@ -6,18 +6,23 @@ module Mulukhiya
 
     def test_call
       errors = @contract.call({}).errors
+
       assert_false(errors.empty?)
 
       errors = @contract.call(id: 'zxxxxx').errors
+
       assert_false(errors.empty?)
 
       errors = @contract.call(tag: 'delmulin').errors
+
       assert_false(errors.empty?)
 
       errors = @contract.call(id: 'aaaaaaacdfg', tag: '#').errors
+
       assert_false(errors.empty?)
 
       errors = @contract.call(id: 'aaaaaaacdfg', tag: 'precure_fun').errors
+
       assert_empty(errors)
     end
   end

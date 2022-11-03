@@ -8,6 +8,7 @@ module Mulukhiya
       raise Ginseng::RenderError, 'Renderエラーが起きたというテスト。'
     rescue Ginseng::RenderError => e
       @handler.handle_alert(e)
+
       assert_kind_of(Ginseng::RenderError, @handler.error)
     end
 

@@ -11,6 +11,7 @@ module Mulukhiya
       assert_kind_of(Enumerator, MediaFile.all)
       MediaFile.all do |f|
         basename = File.basename(MediaFile.new(f).create_dest_path(extname: '.webp'), '.webp')
+
         assert_equal(64, basename.length)
       end
     end

@@ -47,12 +47,14 @@ module Mulukhiya
     def test_create_command
       CustomAPI.all do |api|
         command = api.create_command
+
         assert_kind_of(CommandLine, command)
         if api.args?
           command.args.pop
           command.args.push(api.choices(api.args.first).first)
         end
         command.exec
+
         assert_equal(0, command.status)
       end
     end

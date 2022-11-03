@@ -11,8 +11,10 @@ module Mulukhiya
         ),
       })
       config['/handler/image_format_convert/alpha'] = true
+
       assert_false(@handler.convertable?)
       config['/handler/image_format_convert/alpha'] = false
+
       assert_predicate(@handler, :convertable?)
 
       @handler.handle_pre_upload(file: {
@@ -21,8 +23,10 @@ module Mulukhiya
         ),
       })
       config['/handler/image_format_convert/gif'] = true
+
       assert_false(@handler.convertable?)
       config['/handler/image_format_convert/gif'] = false
+
       assert_predicate(@handler, :convertable?)
     end
 
@@ -40,6 +44,7 @@ module Mulukhiya
           File.join(Environment.dir, 'public/mulukhiya/media/icon.png'),
         ),
       })
+
       assert_kind_of(ImageFile, @handler.convert)
     end
   end

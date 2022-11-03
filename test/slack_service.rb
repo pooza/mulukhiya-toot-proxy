@@ -11,6 +11,7 @@ module Mulukhiya
 
     def test_all
       return unless SlackService.config?
+
       assert_kind_of(Enumerator, SlackService.all)
       SlackService.all do |slack|
         assert_kind_of(SlackService, slack)
@@ -19,6 +20,7 @@ module Mulukhiya
 
     def test_uris
       return unless SlackService.config?
+
       assert_kind_of(Enumerator, SlackService.all)
       SlackService.uris do |uri|
         assert_kind_of(Ginseng::URI, uri)

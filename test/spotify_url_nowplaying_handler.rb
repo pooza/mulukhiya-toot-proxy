@@ -7,10 +7,12 @@ module Mulukhiya
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/\n")
+
       assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ\n")
+
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/track/2oBorZqiVTpXAD8h7DCYWZ',
         title: 'Special day',
@@ -19,6 +21,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS\n")
+
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/album/0ownoI5JduviRJOXHTlLwS',
         title: 'お願いジュンブライト',
@@ -27,6 +30,7 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "#nowplaying https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn\n")
+
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://open.spotify.com/track/6ucReyW7eJ7LrzKqOKFkSn',
         title: 'ボクは走るんだ!',

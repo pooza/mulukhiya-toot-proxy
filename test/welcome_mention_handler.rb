@@ -10,9 +10,11 @@ module Mulukhiya
 
     def test_respondable?
       @handler.handle_mention('status' => {'content' => 'プリキュアパレス'})
+
       assert_predicate(@handler, :respondable?)
 
       @handler.handle_mention('status' => {'content' => 'お知らせ'})
+
       assert_predicate(@handler, :respondable?)
     end
   end

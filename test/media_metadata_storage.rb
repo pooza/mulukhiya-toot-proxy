@@ -7,6 +7,7 @@ module Mulukhiya
 
     def test_push
       @storage.push(@uri)
+
       assert_equal({
         height: 353,
         mediatype: 'image',

@@ -7,6 +7,7 @@ module Mulukhiya
 
     def test_handle_announce
       @handler.handle_announce({content: 'お知らせです。GROWI'}, {sns: info_agent_service})
+
       assert_kind_of(String, @handler.debug_info[:result].first[:path])
     end
   end

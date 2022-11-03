@@ -19,14 +19,17 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => '超魔ゾンビ最強伝説 #ダイの大冒険')
+
       assert_nil(@handler.debug_info)
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'ザボエラオンリーイベント！ #即売会 #ダイの大冒険')
+
       assert_equal([{removal_tags: Set['ダイの大冒険']}], @handler.debug_info[:result])
 
       @handler.clear
       @handler.handle_pre_toot(status_field => "ザボエラオンリーイベント！ #ダイの大冒険\n#即売会")
+
       assert_equal([{removal_tags: Set['ダイの大冒険']}], @handler.debug_info[:result])
     end
   end

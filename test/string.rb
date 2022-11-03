@@ -11,6 +11,7 @@ module Mulukhiya
 
     def test_crypt
       src = 'hoge'
+
       assert_equal(src, src.encrypt.decrypt)
     end
   end

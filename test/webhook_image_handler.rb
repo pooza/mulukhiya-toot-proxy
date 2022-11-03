@@ -13,6 +13,7 @@ module Mulukhiya
         ],
       )
       result = @handler.debug_info[:result]
+
       assert(result.member?(source_url: 'https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg'))
       assert(result.member?(source_url: 'https://images-na.ssl-images-amazon.com/images/I/21VK3xpmERL._AC_.jpg'))
     end

@@ -106,6 +106,7 @@ module Mulukhiya
 
     def test_resize
       converted = @png_rgba.resize(32)
+
       assert_kind_of(ImageFile, converted)
       assert_equal(32, converted.width)
       assert_equal(30, converted.height)
@@ -113,11 +114,13 @@ module Mulukhiya
 
     def test_convert_type
       converted = @png_rgba.convert_type('image/jpeg')
+
       assert_kind_of(ImageFile, converted)
       assert_equal('image/jpeg', converted.type)
 
       return unless @pdf
       converted = @pdf.convert_type('image/jpeg')
+
       assert_kind_of(ImageFile, converted)
       assert_equal('image/jpeg', converted.type)
     end
