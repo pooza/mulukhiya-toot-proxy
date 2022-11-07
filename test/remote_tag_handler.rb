@@ -26,6 +26,10 @@ module Mulukhiya
       @handler.handle_pre_toot(status_field => 'デルムリン丼 ハドラーブロス')
 
       assert_equal(@handler.addition_tags, Set['delmulin', 'ハドラー', '関 智一', 'ダイの大冒険', 'デルムリン丼'])
+
+      @handler.handle_pre_toot(status_field => '#delmulin ハドラーブロス')
+
+      assert_equal(@handler.addition_tags, Set['delmulin', 'ハドラー', '関 智一', 'ダイの大冒険'])
     end
   end
 end
