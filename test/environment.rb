@@ -14,6 +14,7 @@ module Mulukhiya
       assert_equal('OK', environment_class.health.dig(:sidekiq, :status))
       assert_equal('OK', environment_class.health.dig(Environment.dbms_class.to_s.split('::').last.underscore.to_sym, :status))
       assert_equal('OK', environment_class.health.dig(:streaming, :status)) if environment_class.daemon_classes.member?(ListenerDaemon)
+
       assert_equal(200, environment_class.health[:status])
     end
   end

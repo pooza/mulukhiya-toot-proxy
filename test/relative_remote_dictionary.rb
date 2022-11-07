@@ -13,6 +13,7 @@ module Mulukhiya
 
     def test_parse
       result = @dic.parse
+
       assert_kind_of(Hash, result)
       assert_equal({pattern: /キ[ユュ][アァ]ブロッサム/, regexp: 'キ[ユュ][アァ]ブロッサム', words: ['花咲 つぼみ', '水樹 奈々']}, result['キュアブロッサム'])
     end

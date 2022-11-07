@@ -18,6 +18,7 @@ module Mulukhiya
       assert_kind_of([NilClass, Array], @storage[{}])
       assert_kind_of([NilClass, Array], @storage[{name: 'maho_girls'}])
       @storage.clear
+
       assert_nil(@storage[{}])
       assert_nil(@storage[{name: 'maho_girls'}])
     end

@@ -7,6 +7,7 @@ module Mulukhiya
     def test_handle_pre_toot
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://music.apple.com/lookup?id=1241907142&lang=ja_jp')
+
       assert_nil(@handler.debug_info)
 
       @handler.clear

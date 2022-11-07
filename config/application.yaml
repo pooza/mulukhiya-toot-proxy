@@ -190,7 +190,7 @@ handler:
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼)
+      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼|delmulin)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
@@ -858,7 +858,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.23.2
+  version: 4.23.3
 parser:
   note:
     fields:

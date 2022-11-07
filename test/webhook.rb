@@ -83,8 +83,10 @@ module Mulukhiya
     def test_command
       command = @test_hook.command
       command.exec
+
       assert_predicate(command.status, :zero?)
       status = JSON.parse(command.stdout)
+
       assert_kind_of(Hash, status)
       assert(['id', 'account', 'createdNote'].member?(status.keys.first))
     end

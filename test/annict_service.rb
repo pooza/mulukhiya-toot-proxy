@@ -26,6 +26,7 @@ module Mulukhiya
 
     def test_works
       works = @service.works
+
       assert_kind_of(Array, works)
       works.each do |work|
         assert_kind_of(Integer, work['annictId'])
@@ -48,6 +49,7 @@ module Mulukhiya
 
     def test_activities
       activities = @service.activities
+
       assert_kind_of(Enumerator, activities)
       activities.each do |activity|
         assert_kind_of(Hash, activity)
@@ -66,11 +68,13 @@ module Mulukhiya
 
     def test_updated_at
       return unless @service
+
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
     def test_oauth_uri
       return unless @service
+
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
       assert_predicate(@service.oauth_uri, :absolute?)
     end
@@ -118,6 +122,7 @@ module Mulukhiya
         },
         comment: '',
       }
+
       assert_equal({
         'text' => "すごいあにめ\n第24回「良回」を視聴。\nhttps://annict.com/works/111/episodes/111\n#すごいあにめ #24話 #良回\n",
       }, @service.create_payload(record).raw)
@@ -132,6 +137,7 @@ module Mulukhiya
         },
         comment: "すごい！\nすごいアニメの神回だった！",
       }
+
       assert_equal({
         'text' => "すごいあにめ\n第25回「神回」を視聴。\n\nすごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
       }, @service.create_payload(record).raw)
@@ -146,6 +152,7 @@ module Mulukhiya
         },
         comment: "ネタバレ感想！すごい！\nすごいアニメの神回だった！",
       }
+
       assert_equal({
         'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
@@ -160,6 +167,7 @@ module Mulukhiya
         },
         comment: "楽しい！\nすごいアニメのおまけ回だった！",
       }
+
       assert_equal({
         'text' => "すごいあにめ\nEXTRA EPISODEを視聴。\n\n楽しい！\nすごいアニメのおまけ回だった！\nhttps://annict.com/works/111/episodes/113\n#すごいあにめ #EXTRA_EPISODE\n",
       }, @service.create_payload(record).raw)
@@ -173,6 +181,7 @@ module Mulukhiya
         },
         comment: "楽しい！\nすごいアニメの何話とか特に決まってない回だった！",
       }
+
       assert_equal({
         'text' => "すごいあにめ\n「何話とか特に決まってない回」を視聴。\n\n楽しい！\nすごいアニメの何話とか特に決まってない回だった！\nhttps://annict.com/works/111/episodes/114\n#すごいあにめ #何話とか特に決まってない回\n",
       }, @service.create_payload(record).raw)
@@ -186,6 +195,7 @@ module Mulukhiya
         },
         comment: 'ぼくの考えたシャドウバーンという幹部を本編に出演させてください。',
       }
+
       assert_equal({
         'text' => "ドラゴンクエスト ダイの大冒険\n「影と死神」を視聴。\n\nぼくの考えたシャドウバーンという幹部を本編に出演させてください。\nhttps://annict.com/works/111/episodes/114\n#ドラゴンクエスト_ダイの大冒険 #影と死神\n",
       }, @service.create_payload(record).raw)
@@ -201,6 +211,7 @@ module Mulukhiya
         },
         comment: "本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n",
       }
+
       assert_equal({
         'text' => "Go！プリンセスプリキュア\n第46話「美しい…!?さすらうシャットと雪の城！」を視聴。\n\n本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。\n\nhttps://annict.com/works/4274/episodes/63162\n#Go_プリンセスプリキュア #46話 #美しい_さすらうシャットと雪の城\n",
       }, @service.create_payload(record).raw)
@@ -210,6 +221,7 @@ module Mulukhiya
         work: {annictId: 112, title: 'すごいあにめTHE MOVIE'},
         body: "超楽しい！\nすばらしい劇場版だった！",
       }
+
       assert_equal({
         'text' => "「すごいあにめTHE MOVIE」を視聴。\n\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
       }, @service.create_payload(review).raw)
@@ -219,6 +231,7 @@ module Mulukhiya
         work: {annictId: 112, title: 'すごいあにめTHE MOVIE'},
         body: "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！",
       }
+
       assert_equal({
         'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",

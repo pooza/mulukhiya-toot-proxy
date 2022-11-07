@@ -20,11 +20,13 @@ module Mulukhiya
     def test_not_found
       header 'Content-Type', 'application/json'
       post '/', {text: 'ひらめけ！ホーリーソード！'}.to_json
+
       assert_false(last_response.ok?)
       assert_equal(404, last_response.status)
 
       header 'Content-Type', 'application/json'
       post '/0', {text: 'ひらめけ！ホーリーソード！'}.to_json
+
       assert_false(last_response.ok?)
       assert_equal(404, last_response.status)
     end
@@ -32,6 +34,7 @@ module Mulukhiya
     def test_get
       return unless hook = test_account.webhook
       get hook.uri.path.sub(@path_prefix_pattern, '')
+
       assert_predicate(last_response, :ok?)
     end
 
@@ -39,6 +42,7 @@ module Mulukhiya
       return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {text: 'ひらめけ！ホーリーソード！'}.to_json
+
       assert_predicate(last_response, :ok?)
     end
 
@@ -52,6 +56,7 @@ module Mulukhiya
           {image_url: 'https://images-na.ssl-images-amazon.com/images/I/21VK3xpmERL._AC_.jpg'},
         ],
       }.to_json
+
       assert_predicate(last_response, :ok?)
     end
 
@@ -60,6 +65,7 @@ module Mulukhiya
       header 'Content-Type', 'application/json'
       header 'X-Github-Hook-Id', '武田信玄'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {zen: '武田信玄'}.to_json
+
       assert_predicate(last_response, :ok?)
       assert_includes(last_response.body, 'zen: 武田信玄')
     end
@@ -68,6 +74,7 @@ module Mulukhiya
       return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {}.to_json
+
       assert_false(last_response.ok?)
       assert([422, 502].member?(last_response.status))
     end

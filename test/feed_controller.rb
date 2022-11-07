@@ -13,6 +13,7 @@ module Mulukhiya
 
     def test_not_found
       get '/noexistant'
+
       assert_false(last_response.ok?)
     end
 
@@ -20,6 +21,7 @@ module Mulukhiya
       return unless controller_class.media_catalog?
 
       get '/media'
+
       assert_predicate(last_response, :ok?)
       assert_equal('application/rss+xml; charset=UTF-8', last_response.content_type)
     end
@@ -30,6 +32,7 @@ module Mulukhiya
       service = sns_class.new
       DefaultTagHandler.tags.each do |tag|
         get service.create_uri("/tag/#{tag}").normalize.path
+
         assert_predicate(last_response, :ok?)
         assert_equal('application/rss+xml; charset=UTF-8', last_response.content_type)
       end
@@ -68,6 +71,7 @@ module Mulukhiya
     def test_costom_endpoints
       CustomFeed.all do |feed|
         get feed.path
+
         assert_predicate(last_response, :ok?)
         assert_equal('application/rss+xml; charset=UTF-8', last_response.content_type)
       end

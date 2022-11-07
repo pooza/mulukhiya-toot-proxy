@@ -34,6 +34,7 @@ module Mulukhiya
 
     def test_convert_type
       converted = @mp3.convert_type('audio/mpeg')
+
       assert_kind_of(AudioFile, converted)
       assert_equal('audio/mpeg', converted.type)
     end
