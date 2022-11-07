@@ -190,7 +190,7 @@ handler:
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼)
+      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼|delmulin)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
