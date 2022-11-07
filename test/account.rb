@@ -151,6 +151,7 @@ module Mulukhiya
 
     def test_disable?
       return unless account
+
       Event.new(:pre_toot).handlers do |handler|
         assert_boolean(account.disable?(handler))
       end
