@@ -30,12 +30,6 @@ module Mulukhiya
       return uri
     end
 
-    def create_amazon_uri(track)
-      amazon = AmazonService.new
-      return nil unless asin = amazon.search(create_keyword(track), ['DigitalMusic', 'Music'])
-      return amazon.create_item_uri(asin)
-    end
-
     def create_spotify_uri(track)
       return nil unless SpotifyService.config?
       spotify = SpotifyService.new

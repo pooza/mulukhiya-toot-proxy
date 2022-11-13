@@ -24,21 +24,6 @@ properties:
             type: string
         type: object
     type: object
-  amazon:
-    properties:
-      access_key:
-        type: string
-      affiliate:
-        type: boolean
-      associate_tag:
-        type: string
-      secret_key:
-        type: string
-    required:
-      - associate_tag
-      - access_key
-      - secret_key
-    type: object
   annict:
     properties:
       episodes:

@@ -93,15 +93,6 @@ growi:
   urls:
     create_page: /_api/v3/pages
 handler:
-  amazon_image:
-    disable: true
-    experimental: true
-  amazon_nowplaying:
-    disable: true
-    experimental: true
-  amazon_url_nowplaying:
-    disable: true
-    experimental: true
   animation_image_format_convert:
     disable: true
     experimental: true
@@ -341,12 +332,10 @@ mastodon:
       - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - itunes_image
       - spotify_image
-      - amazon_image
       - you_tube_image
       - long_text_image
       - shortened_url
