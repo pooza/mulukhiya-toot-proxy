@@ -1,10 +1,5 @@
 module Mulukhiya
   class AmazonURITest < TestCase
-    def disable?
-      return true unless AmazonService.config?
-      return super
-    end
-
     def test_shortenable?
       uri = AmazonURI.parse('https://google.com')
 
@@ -39,20 +34,6 @@ module Mulukhiya
       assert_equal('hoge', uri.asin)
     end
 
-    def test_associate_tag
-      uri = AmazonURI.parse('https://www.amazon.co.jp/dp/B00LNCTX48?tag=bshockfortrbl-22')
-
-      assert_equal('bshockfortrbl-22', uri.associate_tag)
-
-      uri.associate_tag = nil
-
-      assert_nil(uri.associate_tag)
-
-      uri.associate_tag = 'hoge'
-
-      assert_equal('hoge', uri.associate_tag)
-    end
-
     def test_shorten
       uri = AmazonURI.parse('https://www.amazon.co.jp')
 
@@ -62,15 +43,9 @@ module Mulukhiya
 
       assert_equal('https://www.amazon.co.jp/dp/hoge', uri.shorten.to_s)
 
-      uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge')
-      uri.associate_tag = 'bshockfortrbl-22'
-
       assert_equal('https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22', uri.shorten.to_s)
 
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge?a=eee')
-
-      assert_equal('https://www.amazon.co.jp/dp/hoge', uri.shorten.to_s)
-      uri.associate_tag = 'bshockfortrbl-22'
 
       assert_equal('https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22', uri.shorten.to_s)
     end

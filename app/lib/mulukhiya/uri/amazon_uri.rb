@@ -2,11 +2,6 @@ module Mulukhiya
   class AmazonURI < Ginseng::URI
     include Package
 
-    def initialize(options = {})
-      super
-      @service = AmazonService.new
-    end
-
     def shortenable?
       return false unless amazon?
       return false unless asin.present?
@@ -33,13 +28,6 @@ module Mulukhiya
     def asin=(id)
       self.path = "/dp/#{id}"
       self.fragment = nil
-    end
-
-    def item
-      return nil unless amazon?
-      return nil unless asin.present?
-      @item ||= @service.lookup(asin)
-      return @item
     end
 
     def associate_tag
@@ -85,19 +73,11 @@ module Mulukhiya
       return nil
     end
 
-    def image_uri
-      return nil unless amazon?
-      return nil unless asin
-      @image_uri ||= @service.create_image_uri(asin)
-      return @image_uri
-    end
-
     def shorten
       return self unless shortenable?
       dest = clone
       dest.asin = asin
       dest.query_values = nil
-      dest.query_values = {tag: associate_tag} if associate_tag
       return dest
     end
   end

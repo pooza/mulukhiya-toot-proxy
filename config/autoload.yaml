@@ -1,4 +1,6 @@
 inflections:
+  amazon_url_handler: AmazonURLHandler
+  animation_image_format_convert_handler: AnimationImageFormatConvertHandler
   api_controller: APIController
   canonical_url_handler: CanonicalURLHandler
   css_renderer: CSSRenderer

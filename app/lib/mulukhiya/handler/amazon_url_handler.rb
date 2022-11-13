@@ -3,8 +3,6 @@ module Mulukhiya
     def rewrite(uri)
       source = AmazonURI.parse(uri.to_s)
       dest = source.clone
-      dest.associate_tag = nil
-      dest.associate_tag = AmazonService.associate_tag if affiliate?
       dest = dest.shorten
       @status.sub!(source.to_s, dest.to_s)
       sns.account.config.update(amazon: {affiliate: nil})
