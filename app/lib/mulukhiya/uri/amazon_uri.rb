@@ -41,38 +41,6 @@ module Mulukhiya
       self.query_values = values
     end
 
-    def album
-      return nil
-    end
-
-    def album?
-      return false
-    end
-
-    def album_name
-      return nil
-    end
-
-    alias track item
-
-    def track?
-      return track.present?
-    end
-
-    def track_name
-      return track.dig('ItemInfo', 'Title', 'DisplayValue') if track
-    end
-
-    alias title track_name
-
-    def artists
-      contributors = item.dig('ItemInfo', 'ByLineInfo', 'Contributors').map {|v| v['Name']}
-      return nil unless contributors
-      return ArtistParser.new(contributors.join('、')).parse if track
-      return ArtistParser.new(contributors.join('、')).parse if album
-      return nil
-    end
-
     def shorten
       return self unless shortenable?
       dest = clone

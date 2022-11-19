@@ -42,20 +42,6 @@ module Mulukhiya
       uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge')
 
       assert_equal('https://www.amazon.co.jp/dp/hoge', uri.shorten.to_s)
-
-      assert_equal('https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22', uri.shorten.to_s)
-
-      uri = AmazonURI.parse('https://www.amazon.co.jp/長い長い長い商品名/dp/hoge?a=eee')
-
-      assert_equal('https://www.amazon.co.jp/dp/hoge?tag=bshockfortrbl-22', uri.shorten.to_s)
-    end
-
-    def test_image_uri
-      return unless uri = AmazonURI.parse('https://www.amazon.co.jp/dp/B08JH42SHR')
-
-      assert_predicate(uri, :absolute?)
-      assert_kind_of([Ginseng::URI, NilClass], uri.image_uri)
-      assert_predicate(uri.image_uri, :absolute?) if uri.image_uri
     end
   end
 end
