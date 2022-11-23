@@ -110,7 +110,7 @@ GEM
       msgpack (~> 1.2)
     bson (4.15.0)
     builder (3.2.4)
-    cgi (0.3.3)
+    cgi (0.3.5)
     concurrent-ruby (1.1.10)
     connection_pool (2.3.0)
     crass (1.0.6)
@@ -387,4 +387,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.3.25
+   2.3.26
