@@ -269,7 +269,7 @@ mastodon:
     types:
       animation_image: image/gif
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   dbms: postgres
   display_name: Mastodon
