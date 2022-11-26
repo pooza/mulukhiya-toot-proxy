@@ -64,6 +64,7 @@ module Mulukhiya
     })
     return Rack::URLMap.new(
       '/' => Environment.controller_class,
+      '/nodeinfo' => NodeinfoController,
       '/mulukhiya' => UIController,
       '/mulukhiya/api' => APIController,
       '/mulukhiya/feed' => FeedController,
