@@ -62,15 +62,12 @@ module Mulukhiya
       same_site: true,
       max_age: Config.instance['/sidekiq/dashboard/session/max_age'],
     })
-    return Rack::URLMap.new(
-      '/' => Environment.controller_class,
-      '/nodeinfo' => NodeinfoController,
-      '/mulukhiya' => UIController,
-      '/mulukhiya/api' => APIController,
-      '/mulukhiya/feed' => FeedController,
-      '/mulukhiya/webhook' => WebhookController,
-      '/mulukhiya/sidekiq' => Sidekiq::Web,
+    route = {'/' => Environment.controller_class}.merge(
+      YAML.load_file(File.join(dir, 'config/route.yaml')).to_h do |entry|
+        [entry['path'], entry['class'].constantize]
+      end,
     )
+    return Rack::URLMap.new(route)
   end
 
   def self.load_tasks

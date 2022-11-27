@@ -1,0 +1,12 @@
+- path: /nodeinfo
+  class: Mulukhiya::NodeinfoController
+- path: /mulukhiya
+  class: Mulukhiya::UIController
+- path: /mulukhiya/api
+  class: Mulukhiya::APIController
+- path: /mulukhiya/feed
+  class: Mulukhiya::FeedController
+- path: /mulukhiya/webhook
+  class: Mulukhiya::WebhookController
+- path: /mulukhiya/sidekiq
+  class: Sidekiq::Web
