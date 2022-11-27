@@ -1,7 +1,7 @@
 module Mulukhiya
   class NodeinfoController < Controller
-    get '/nodeinfo/:version' do
-      @renderer.message = config.about
+    get '/:version' do
+      @renderer.message = sns.nodeinfo.merge(mulukhiya: config.about)
       return @renderer.to_s
     end
   end
