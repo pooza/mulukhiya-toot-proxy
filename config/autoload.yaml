@@ -1,7 +1,6 @@
 inflections:
   amazon_uri: AmazonURI
   amazon_url_handler: AmazonURLHandler
-  amazon_url_nowplaying_handler: AmazonURLNowplayingHandler
   api_controller: APIController
   canonical_url_handler: CanonicalURLHandler
   css_renderer: CSSRenderer

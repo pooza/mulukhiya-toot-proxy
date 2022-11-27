@@ -10,8 +10,6 @@
 
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
-  - [Groundpolis](https://github.com/Groundpolis/Groundpolis)での動作報告あり。
-  - [CherryPick](https://github.com/kokonect-link/cherrypick)での動作報告あり。
 - [Pleroma](https://git.pleroma.social/pleroma/pleroma)
 - [めいすきー](https://github.com/mei23/misskey)
 

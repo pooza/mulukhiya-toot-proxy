@@ -33,14 +33,6 @@ module Mulukhiya
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', amazon: {affiliate: true}).errors
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', amazon: {affiliate: 333}).errors
-
-      assert_false(errors.empty?)
-
       errors = @contract.call(command: 'user_config', lemmy: {url: 111}).errors
 
       assert_false(errors.empty?)

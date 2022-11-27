@@ -16,7 +16,6 @@ gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>6.5.0'
 gem 'sidekiq-scheduler', '~>4.0.0'
-gem 'vacuum', '~>3.0'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'

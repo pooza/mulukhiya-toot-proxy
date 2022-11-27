@@ -93,15 +93,6 @@ growi:
   urls:
     create_page: /_api/v3/pages
 handler:
-  amazon_image:
-    disable: true
-    experimental: true
-  amazon_nowplaying:
-    disable: true
-    experimental: true
-  amazon_url_nowplaying:
-    disable: true
-    experimental: true
   animation_image_format_convert:
     disable: true
     experimental: true
@@ -278,7 +269,7 @@ mastodon:
     types:
       animation_image: image/gif
       audio: audio/mpeg
-      image: image/jpeg
+      image: image/webp
       video: video/mp4
   dbms: postgres
   display_name: Mastodon
@@ -341,12 +332,10 @@ mastodon:
       - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - itunes_image
       - spotify_image
-      - amazon_image
       - you_tube_image
       - long_text_image
       - shortened_url
@@ -355,7 +344,6 @@ mastodon:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -377,12 +365,10 @@ mastodon:
       - image_resize
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - itunes_image
       - spotify_image
-      - amazon_image
       - you_tube_image
       - webhook_image
       - shortened_url
@@ -391,7 +377,6 @@ mastodon:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -496,7 +481,6 @@ meisskey:
       - result_notification
     pre_chat:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - shortened_url
@@ -505,7 +489,6 @@ meisskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -520,7 +503,6 @@ meisskey:
       - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - long_text_image
@@ -530,7 +512,6 @@ meisskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -552,7 +533,6 @@ meisskey:
       - image_resize
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
@@ -562,7 +542,6 @@ meisskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -669,7 +648,6 @@ misskey:
       - result_notification
     pre_chat:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - shortened_url
@@ -678,7 +656,6 @@ misskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -693,7 +670,6 @@ misskey:
       - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - long_text_image
@@ -704,7 +680,6 @@ misskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -726,7 +701,6 @@ misskey:
       - image_resize
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
@@ -736,7 +710,6 @@ misskey:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -858,7 +831,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.23.3
+  version: 4.24.0
 parser:
   note:
     fields:
@@ -945,7 +918,6 @@ pleroma:
       - result_notification
     pre_chat:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
       - shortened_url
@@ -954,7 +926,6 @@ pleroma:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -969,10 +940,8 @@ pleroma:
       - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - amazon_image
       - you_tube_image
       - long_text_image
       - shortened_url
@@ -981,7 +950,6 @@ pleroma:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -1003,10 +971,8 @@ pleroma:
       - image_resize
     pre_webhook:
       - itunes_nowplaying
-      - amazon_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - amazon_image
       - you_tube_image
       - webhook_image
       - shortened_url
@@ -1015,7 +981,6 @@ pleroma:
       - itunes_url
       - amazon_url
       - itunes_url_nowplaying
-      - amazon_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
@@ -1142,7 +1107,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/axios@1.2/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
       - https://cdn.jsdelivr.net/npm/vue-i18n@9.2/dist/vue-i18n.global.js
@@ -1172,7 +1137,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2.0/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.0/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/axios@1.2/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
       - https://cdn.jsdelivr.net/npm/vue-i18n@9.2/dist/vue-i18n.global.min.js

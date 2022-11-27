@@ -28,9 +28,6 @@ module Mulukhiya
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
       end
-      required(:amazon).maybe(:hash).schema do
-        optional(:affiliate).maybe(:bool)
-      end
       required(:tagging).maybe(:hash).schema do
         required(:user_tags).maybe(:array).each(:string)
         required(:tags).maybe(:hash).schema do
@@ -54,7 +51,6 @@ module Mulukhiya
       values['webhook'] ||= {}
       values['growi'] ||= {}
       values['notify'] ||= {}
-      values['amazon'] ||= {}
       values['annict'] ||= {}
       values['lemmy'] ||= {}
       values['nextcloud'] ||= {}
