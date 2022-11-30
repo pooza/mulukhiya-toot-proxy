@@ -331,7 +331,7 @@ GEM
     tilt (2.0.11)
     time (0.2.0)
       date
-    timecop (0.9.5)
+    timecop (0.9.6)
     timeout (0.3.0)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
