@@ -764,9 +764,6 @@ mongo:
 nextcloud:
   urls:
     file: /remote.php/dav/files
-nodeinfo:
-  cache:
-    ttl: 3600
 nowplaying:
   album:
     prefix: 'Album:'
@@ -831,7 +828,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.24.0
+  version: 4.24.1
 parser:
   note:
     fields:
