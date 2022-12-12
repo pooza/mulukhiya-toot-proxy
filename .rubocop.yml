@@ -30,6 +30,8 @@ Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
+Layout/LineContinuationLeadingSpace:
+  EnforcedStyle: leading
 Layout/LineEndStringConcatenationIndentation:
   EnforcedStyle: indented
 Layout/LineLength:
