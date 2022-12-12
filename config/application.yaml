@@ -764,9 +764,6 @@ mongo:
 nextcloud:
   urls:
     file: /remote.php/dav/files
-nodeinfo:
-  cache:
-    ttl: 3600
 nowplaying:
   album:
     prefix: 'Album:'

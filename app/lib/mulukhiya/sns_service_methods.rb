@@ -34,12 +34,7 @@ module Mulukhiya
     end
 
     def nodeinfo
-      unless info = redis['nodeinfo']
-        ttl = [config['/nodeinfo/cache/ttl'], 86_400].min
-        info = super.to_json
-        redis.setex('nodeinfo', ttl, info)
-      end
-      return JSON.parse(info)
+      return super.merge(mulukhiya: config.about)
     end
 
     def account
