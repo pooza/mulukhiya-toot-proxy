@@ -334,7 +334,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     temple (0.8.2)
-    test-unit (3.5.5)
+    test-unit (3.5.7)
       power_assert
     tilt (2.0.11)
     time (0.2.0)
