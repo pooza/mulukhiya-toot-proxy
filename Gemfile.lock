@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 576719fac07a1837e7523163484e05257d0e2ea1
+  revision: f65ff61bace5fb575e00a47052df3705bc3b3638
   specs:
-    ginseng-core (1.13.11)
+    ginseng-core (1.13.12)
       actionpack (>= 7.0.4)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
@@ -25,12 +25,14 @@ GIT
       find
       httparty
       json-schema
+      loofah (>= 2.19.1)
       mail
       multi_json
       net-protocol
       net-smtp
       nokogiri (>= 1.13.10)
       optparse
+      rails-html-sanitizer (>= 1.4.4)
       rake
       rest-client
       sanitize
@@ -115,7 +117,7 @@ GEM
     connection_pool (2.3.0)
     crass (1.0.6)
     daemon-spawn (0.4.2)
-    date (3.3.1)
+    date (3.3.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dry-configurable (1.0.1)
@@ -158,7 +160,7 @@ GEM
     etc (1.4.2)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.7.1)
+    faraday (2.7.2)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
@@ -247,7 +249,7 @@ GEM
     raabro (1.4.0)
     racc (1.6.1)
     rack (2.2.4)
-    rack-protection (3.0.4)
+    rack-protection (3.0.5)
       rack
     rack-test (2.0.2)
       rack (>= 1.3)
@@ -307,7 +309,7 @@ GEM
       nokogiri (>= 1.12.0)
     sassc (2.4.0)
       ffi (~> 1.9)
-    securerandom (0.2.1)
+    securerandom (0.2.2)
     sequel (5.63.0)
     set (1.0.3)
     sidekiq (6.5.8)
@@ -319,10 +321,10 @@ GEM
       rufus-scheduler (~> 3.2)
       sidekiq (>= 4, < 7)
       tilt (>= 1.4.0)
-    sinatra (3.0.4)
+    sinatra (3.0.5)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.0.4)
+      rack-protection (= 3.0.5)
       tilt (~> 2.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
@@ -334,10 +336,10 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     temple (0.8.2)
-    test-unit (3.5.5)
+    test-unit (3.5.7)
       power_assert
     tilt (2.0.11)
-    time (0.2.0)
+    time (0.2.1)
       date
     timecop (0.9.6)
     timeout (0.3.1)
