@@ -34,10 +34,7 @@ module Mulukhiya
     end
 
     def nodeinfo
-      response = http.get('/nodeinfo/2.0.json', {
-        headers: {'X-Mulukhiya' => Package.full_name},
-      })
-      return response.merge(mulukhiya: config.about)
+      return super.merge(mulukhiya: config.about)
     end
 
     def account
