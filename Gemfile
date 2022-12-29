@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '~>3.1.0'
+ruby '~>3.2.0'
 gem 'bootsnap', '>=1.9.0'
 gem 'dry-validation'
 gem 'fastimage'
