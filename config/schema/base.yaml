@@ -238,6 +238,11 @@ properties:
         minimum: 1
         type: integer
     type: object
+  ruby:
+    properties:
+      jit:
+        type: boolean
+    type: object
   sidekiq:
     properties:
       auth:
