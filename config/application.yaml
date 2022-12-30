@@ -1030,6 +1030,8 @@ redis:
   retry:
     limit: 3
     seconds: 1
+ruby:
+  jit: false
 sidekiq:
   auth:
     password: null
