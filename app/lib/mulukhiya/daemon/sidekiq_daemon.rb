@@ -16,7 +16,8 @@ module Mulukhiya
       return [
         `sidekiq -V`.chomp,
         "Redis DSN: #{config['/sidekiq/redis/dsn']}",
-      ].join("\n")
+        ('Ruby YJIT: Ready' if jit_ready?),
+      ].compact.join("\n")
     end
 
     def self.username
