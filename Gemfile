@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '~>3.1.0'
+ruby '~>3.2.0'
 gem 'bootsnap', '>=1.9.0'
 gem 'dry-validation'
 gem 'fastimage'
@@ -14,7 +14,7 @@ gem 'mini_magick'
 gem 'optparse'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>6.5.0'
+gem 'sidekiq', '~>6.0'
 gem 'sidekiq-scheduler', '~>4.0.0'
 
 group :postgres do

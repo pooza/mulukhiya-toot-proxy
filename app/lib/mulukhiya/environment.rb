@@ -164,9 +164,7 @@ module Mulukhiya
 
     def self.pre_start_tasks
       tasks = ['config:lint']
-      if config['/bundler/install']
-        tasks.concat(['mulukhiya:api:bundler', 'mulukhiya:feed:bundler'])
-      end
+      tasks.push('mulukhiya:api:bundler', 'mulukhiya:feed:bundler') if config['/bundler/install']
       return tasks
     end
 
