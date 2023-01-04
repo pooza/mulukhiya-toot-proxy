@@ -157,9 +157,9 @@ module Mulukhiya
     end
 
     def self.task_prefixes
-      return daemon_classes.map do |daemon|
+      return daemon_classes.to_set do |daemon|
         "mulukhiya:#{daemon.to_s.split('::').last.sub(/Daemon$/, '').underscore}"
-      end.to_set
+      end
     end
 
     def self.pre_start_tasks
