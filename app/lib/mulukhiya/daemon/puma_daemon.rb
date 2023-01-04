@@ -14,7 +14,8 @@ module Mulukhiya
         `puma -V`.chomp,
         "Root URL: #{root_uri}",
         "Redis DSN: #{config['/user_config/redis/dsn']}",
-      ].join("\n")
+        ('Ruby YJIT: Ready' if jit_ready?),
+      ].compact.join("\n")
     end
 
     def root_uri
