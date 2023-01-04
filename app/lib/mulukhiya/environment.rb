@@ -168,6 +168,14 @@ module Mulukhiya
       return tasks
     end
 
+    def self.route
+      return {'/' => controller_class}.merge(
+        YAML.load_file(File.join(dir, 'config/route.yaml')).to_h do |entry|
+          [entry['path'], entry['class'].constantize]
+        end,
+      )
+    end
+
     def self.health
       values = {
         redis: Redis.health,
