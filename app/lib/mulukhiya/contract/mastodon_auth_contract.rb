@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     rule(:code) do
-      key.failure('空欄です。') if value.length.zero?
+      key.failure('空欄です。') if value.empty?
     end
   end
 end
