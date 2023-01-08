@@ -244,7 +244,13 @@ module Mulukhiya
     private
 
     def create_command_uri(tags)
-      return sns.create_command_uri(command: 'user_config', tagging: {user_tags: tags})
+      return sns.create_command_uri(
+        command: 'user_config',
+        tagging: {
+          user_tags: tags,
+          minutes: 25,
+        },
+      )
     end
 
     def query(template, params = {})
