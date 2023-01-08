@@ -61,7 +61,6 @@ module Mulukhiya
         episodes.each do |episode|
           next unless subtitle = episode['title']
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          episode['title'].strip!
           episode['hashtag'] = episode['title'].to_hashtag
           episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
           command = [entries.first['title'], '実況', episode['numberText'], episode['title']]
@@ -172,7 +171,7 @@ module Mulukhiya
     end
 
     def self.trim_ruby(title)
-      return title.gsub(ruby_pattern, '')
+      return title.gsub(ruby_pattern, '').strip
     end
 
     def self.oauth_scopes(key = 'default')
