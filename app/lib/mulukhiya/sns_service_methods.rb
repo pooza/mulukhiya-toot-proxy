@@ -56,6 +56,9 @@ module Mulukhiya
       return @oauth_client_storage
     end
 
+    def create_command_uri(title)
+    end
+
     def redis
       @redis ||= Redis.new
       return @redis

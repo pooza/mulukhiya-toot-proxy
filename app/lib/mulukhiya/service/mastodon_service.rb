@@ -77,6 +77,12 @@ module Mulukhiya
       )
     end
 
+    def create_command_uri(command)
+      uri = create_uri('/share')
+      uri.query_values = {text: command.to_yaml}
+      return uri
+    end
+
     def self.create_status_info(status)
       status = JSON.parse(status) unless status.is_a?(Hash)
       parser = TootParser.new(TootParser.sanitize(status['content']))

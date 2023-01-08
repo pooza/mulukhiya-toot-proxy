@@ -138,7 +138,13 @@ module Mulukhiya
 
     get '/program/works/:id/episodes' do
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
-      @renderer.message = annict.episodes(params[:id]).map {|v| v.merge(url: v['url'].to_s)}
+      @renderer.message = annict.episodes(params[:id]).map do |episode|
+        episode.merge(
+          url: episode['url'].to_s,
+          hashtag_url: episode['hashtag_uri'].to_s,
+          command_url: episode['command_uri'].to_s,
+        )
+      end
       return @renderer.to_s
     rescue => e
       e.log

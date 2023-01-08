@@ -2,11 +2,12 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
-    attr_reader :timestamps
+    attr_reader :timestamps, :sns
 
     def initialize(token = nil)
       @token = (token.decrypt rescue token)
       @timestamps = AnnictTimestampStorage.new
+      @sns = sns_class.new
     end
 
     def activities(&block)
@@ -55,17 +56,16 @@ module Mulukhiya
 
     def episodes(id)
       return unless entries = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes')
-      sns = sns_class.new
       all = []
       entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
         episodes.each do |episode|
-          if subtitle = episode['title']
-            episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-            episode['title'].strip!
-            episode['hashtag'] = episode['title'].to_hashtag
-            episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
-            episode['hashtag_url'] = episode['hashtag_uri'].to_s
-          end
+          next unless subtitle = episode['title']
+          episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+          episode['title'].strip!
+          episode['hashtag'] = episode['title'].to_hashtag
+          episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
+          command = [entries.first['title'], '実況', episode['numberText'], episode['title']]
+          episode['command_uri'] = create_command_uri(command)
           all.push(episode)
         end
       end
@@ -243,6 +243,10 @@ module Mulukhiya
     end
 
     private
+
+    def create_command_uri(tags)
+      return sns.create_command_uri(command: 'user_config', tagging: {user_tags: tags})
+    end
 
     def query(template, params = {})
       path = File.join(Environment.dir, 'app/query/annict', "#{template}.graphql.erb")
