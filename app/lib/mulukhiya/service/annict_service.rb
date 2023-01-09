@@ -63,8 +63,11 @@ module Mulukhiya
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
           episode['hashtag'] = episode['title'].to_hashtag
           episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
-          command = [entries.first['title'], '実況', episode['numberText'], episode['title']]
-          episode['command_uri'] = create_command_uri(command)
+          episode['command_uri'] = create_command_uri(
+            title: entries.first['title'],
+            subtitle: episode['title'],
+            number_text: episode['numberText'],
+          )
           all.push(episode)
         end
       end
@@ -243,11 +246,16 @@ module Mulukhiya
 
     private
 
-    def create_command_uri(tags)
+    def create_command_uri(params = {})
       return sns.create_command_uri(
         command: 'user_config',
         tagging: {
-          user_tags: tags,
+          user_tags: [
+            params[:title],
+            '実況',
+            self.class.create_episode_number_text(params[:number_text]),
+            params[:subtitle],
+          ],
           minutes: 25,
         },
       )

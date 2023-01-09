@@ -38,11 +38,11 @@ html lang='ja'
                 i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                 span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   | {{episode.hashtag}}
-              .link-container
+              .bubble-container
                 a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
                   i class='fas fa-comment'
                 | タイムライン
-              .link-container
+              .bubble-container
                 a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
                   i class='fas fa-microphone'
                 | 実況開始
