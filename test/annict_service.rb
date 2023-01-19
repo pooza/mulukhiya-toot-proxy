@@ -43,7 +43,7 @@ module Mulukhiya
         assert_kind_of(String, episode['title'])
         assert_kind_of(String, episode['hashtag'])
         assert_kind_of(Ginseng::URI, episode['hashtag_uri'])
-        assert_predicate(Ginseng::URI.parse(episode['hashtag_url'].to_s), :absolute?)
+        assert_kind_of(Ginseng::URI, episode['command_uri'])
       end
     end
 
