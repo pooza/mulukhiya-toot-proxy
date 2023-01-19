@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: beb0f140a35b3fa90047c394c38f795dcb9d3c09
+  revision: ee32d1f3f01268bcf60759e0375893a0e2ab7f13
   specs:
-    ginseng-core (1.13.15)
-      actionpack (>= 7.0.4)
+    ginseng-core (1.13.16)
+      actionpack (>= 7.0.4.1)
       activesupport (>= 6.1.3.2)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -32,6 +32,7 @@ GIT
       net-smtp
       nokogiri (>= 1.13.10)
       optparse
+      rack (>= 2.2.6.2)
       rails-html-sanitizer (>= 1.4.4)
       rake
       rest-client
