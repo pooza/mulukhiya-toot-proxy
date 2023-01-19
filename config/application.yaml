@@ -12,10 +12,6 @@ agent:
     token: null
     username: test
 amazon:
-  affiliate: false
-  cache:
-    ttl: 86400
-  marketplace: jp
   patterns:
     - pattern: /dp/([[:alnum:]]+)
       shortenable: true
@@ -27,26 +23,6 @@ amazon:
       shortenable: true
     - pattern: /gp/video/detail/([[:alnum:]]+)
       shortenable: true
-  resources:
-    - Images.Primary.Small
-    - Images.Primary.Medium
-    - Images.Primary.Large
-    - Images.Variants.Small
-    - Images.Variants.Medium
-    - Images.Variants.Large
-    - ItemInfo.ByLineInfo
-    - ItemInfo.ContentInfo
-    - ItemInfo.ContentRating
-    - ItemInfo.Classifications
-    - ItemInfo.ExternalIds
-    - ItemInfo.Features
-    - ItemInfo.ManufactureInfo
-    - ItemInfo.ProductInfo
-    - ItemInfo.TechnicalInfo
-    - ItemInfo.Title
-    - ItemInfo.TradeInInfo
-  retry:
-    seconds: 1
   urls:
     jp: https://www.amazon.co.jp/
 annict:
@@ -1115,7 +1091,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.2.0/css/all.css
+      - https://use.fontawesome.com/releases/v6.2.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   media:
@@ -1145,7 +1121,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.2.0/css/all.css
+      - https://use.fontawesome.com/releases/v6.2.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:
