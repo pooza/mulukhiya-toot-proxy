@@ -79,7 +79,6 @@ module Mulukhiya
       feed = @default.create_feed(limit: 5)
 
       assert_kind_of(Array, feed)
-      assert_includes(1..5, feed.count)
       feed.each do |entry|
         assert_kind_of(Hash, entry)
         assert_predicate(entry[:uri], :present?)

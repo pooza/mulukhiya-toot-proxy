@@ -97,6 +97,8 @@ Metrics/PerceivedComplexity:
   Max: 10
 Minitest/MultipleAssertions:
   Enabled: false
+Minitest/TestFileName:
+  Enabled: false
 Naming/RescuedExceptionsVariableName:
   PreferredName: e
 Rake:
