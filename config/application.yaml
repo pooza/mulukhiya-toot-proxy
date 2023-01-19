@@ -133,7 +133,7 @@ handler:
     columns: 20
     disable: true
     experimental: true
-    font_file: font/HackGen-Regular.ttf
+    font_file: public/mulukhiya/font/HackGen-Regular.ttf
     font_size: 30
     image_file: public/mulukhiya/media/background.png
     rows: 30
