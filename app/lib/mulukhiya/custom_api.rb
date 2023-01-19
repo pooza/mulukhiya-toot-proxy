@@ -63,6 +63,7 @@ module Mulukhiya
       command = CommandLine.create(params)
       command.args.push(args[command.args.pop]) if command.args.last.is_a?(Symbol)
       command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/ruby/did_you_mean']
+      command.env['RUBY_YJIT_ENABLE'] = 'yes' if config['/ruby/jit']
       return command
     end
 

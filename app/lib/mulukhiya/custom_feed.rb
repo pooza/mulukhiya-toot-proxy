@@ -42,6 +42,7 @@ module Mulukhiya
       unless @command
         @command = CommandLine.create(params)
         @command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/ruby/did_you_mean']
+        @command.env['RUBY_YJIT_ENABLE'] = 'yes' if config['/ruby/jit']
       end
       return @command
     end
