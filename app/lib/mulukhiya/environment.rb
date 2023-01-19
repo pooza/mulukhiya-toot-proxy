@@ -164,7 +164,9 @@ module Mulukhiya
 
     def self.pre_start_tasks
       tasks = ['config:lint']
-      tasks.push('mulukhiya:api:bundler', 'mulukhiya:feed:bundler') if config['/bundler/install']
+      if config['/ruby/bundler/install']
+        tasks.push('mulukhiya:api:bundler', 'mulukhiya:feed:bundler')
+      end
       return tasks
     end
 
