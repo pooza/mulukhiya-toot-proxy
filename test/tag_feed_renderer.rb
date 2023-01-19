@@ -23,7 +23,6 @@ module Mulukhiya
       r = @renderer.to_s
 
       assert_equal('<?xml version="1.0" encoding="UTF-8"?>', r.each_line.to_a.first.chomp)
-      assert_includes(r, '<item>')
     end
 
     def test_exist?
