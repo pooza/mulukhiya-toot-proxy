@@ -8,17 +8,6 @@ module Mulukhiya
     return File.expand_path('../..', __dir__)
   end
 
-  def self.setup_bootsnap
-    Bootsnap.setup(
-      cache_dir: File.join(dir, 'tmp/cache'),
-      development_mode: Environment.development?,
-      load_path_cache: true,
-      compile_cache_iseq: true,
-      compile_cache_yaml: true,
-      compile_cache_json: true,
-    )
-  end
-
   def self.loader
     config = YAML.load_file(File.join(dir, 'config/autoload.yaml'))
     loader = Zeitwerk::Loader.new
@@ -77,7 +66,6 @@ module Mulukhiya
   ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
   Bundler.require
   loader.setup
-  setup_bootsnap
   setup_sidekiq
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type

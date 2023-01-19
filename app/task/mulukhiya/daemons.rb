@@ -6,7 +6,6 @@ module Mulukhiya
       namespace daemon do
         desc "stop #{daemon}"
         task :stop do
-          ENV['RUBY_YJIT_ENABLE'] = '1' if config['/ruby/jit']
           sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} stop"
         rescue => e
           warn "#{e.class} #{daemon}:stop #{e.message}"
@@ -14,7 +13,7 @@ module Mulukhiya
 
         desc "start #{daemon}"
         task start: Environment.pre_start_tasks do
-          ENV['RUBY_YJIT_ENABLE'] = '1' if config['/ruby/jit']
+          ENV['RUBY_YJIT_ENABLE'] = 'yes' if config['/ruby/jit']
           sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
         rescue => e
           warn "#{e.class} #{daemon}:start #{e.message}"

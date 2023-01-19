@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 ruby '~>3.2.0'
-gem 'bootsnap', '>=1.9.0'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
