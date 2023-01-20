@@ -80,9 +80,12 @@ html lang='ja'
             Vue.getEpisodes(id)
               .then(e => Vue.set(this.episodes, id, e))
           },
-          searchWorks () {
+          searchWorks (keyword) {
             setTimeout(() => {
-              this.works = this.all_works.filter(v => v.title.match(new RegExp(this.keyword, 'i')))
+              Vue.searchWorks(keyword)
+                .then(e => {
+                  this.works = e
+                }).catch(e => Vue.alert(this.$dialog, e))
             }, 500)
           },
         },
