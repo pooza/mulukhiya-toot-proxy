@@ -39,8 +39,10 @@ module Mulukhiya
       return @account
     end
 
-    def works
-      return config['/annict/works'].inject([]) do |entries, title|
+    def works(keyword = nil)
+      keywords = config['/annict/works'] unless keyword
+      keywords ||= [keyword]
+      return keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
           url = work.dig('node', 'officialSiteUrl')
           if url.present?
