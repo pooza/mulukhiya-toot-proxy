@@ -225,7 +225,7 @@ const MulukhiyaLib = {
     Vue.getWorks = async keyword => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(`/mulukhiya/api/program/works?q=${keyword}`)
+       return axios.get(`/mulukhiya/api/program/works?q=${keyword}`)
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

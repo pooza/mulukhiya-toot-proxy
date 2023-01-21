@@ -12,8 +12,8 @@ html lang='ja'
       nav.search-form-container v-if='account.username'
         .control
           i class='fa fa-magnifying-glass'
-          input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='searchWorks'
-          button.small @click='searchWorks' 検索
+          input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='getWorks'
+          button.small @click='getWorks' 検索
       article.episode v-for='work in works'
         h3 = '{{work.title}}'
         .info
@@ -68,11 +68,7 @@ html lang='ja'
               this.account = e.account
               this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => Vue.alert(this.$dialog, e))
-          Vue.getWorks()
-            .then(e => {
-              this.all_works = e
-              this.works = this.all_works
-            }).catch(e => Vue.alert(this.$dialog, e))
+          this.getWorks()
           new ClipboardJS('.episode i');
         },
         methods: {
@@ -80,9 +76,9 @@ html lang='ja'
             Vue.getEpisodes(id)
               .then(e => Vue.set(this.episodes, id, e))
           },
-          searchWorks (keyword) {
+          getWorks () {
             setTimeout(() => {
-              Vue.searchWorks(keyword)
+              Vue.getWorks(this.keyword)
                 .then(e => {
                   this.works = e
                 }).catch(e => Vue.alert(this.$dialog, e))
