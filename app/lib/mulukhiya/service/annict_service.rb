@@ -40,7 +40,7 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = config['/annict/works'] if keyword.empty?
+      keywords = config['/annict/works'] unless keyword.present?
       keywords ||= [keyword]
       return keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|

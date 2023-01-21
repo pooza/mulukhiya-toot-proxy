@@ -78,7 +78,7 @@ html lang='ja'
           },
           getWorks () {
             setTimeout(() => {
-              Vue.getWorks(this.keyword)
+              Vue.getWorks({q: this.keyword})
                 .then(e => {
                   this.works = e
                 }).catch(e => Vue.alert(this.$dialog, e))
