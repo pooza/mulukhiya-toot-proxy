@@ -123,10 +123,16 @@ module Mulukhiya
 
     get '/program/works' do
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
-      @renderer.message = annict.works(params[:q]).map do |work|
-        values = work.deep_symbolize_keys
-        values[:officialSiteUrl] = values[:officialSiteUrl].to_s if values[:officialSiteUrl]
-        values
+      errors = AnnictWorkListContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        @renderer.message = annict.works(params[:q]).map do |work|
+          values = work.deep_symbolize_keys
+          values[:officialSiteUrl] = values[:officialSiteUrl].to_s if values[:officialSiteUrl]
+          values
+        end
       end
       return @renderer.to_s
     rescue => e
