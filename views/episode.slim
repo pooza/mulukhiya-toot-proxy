@@ -19,7 +19,7 @@ html lang='ja'
         .info
           ul.params class='clearfix'
             li.param AnnictID: {{work.annictId}}
-            li.param
+            li.param v-if='work.seasonYear'
               i class='fa fa-calendar'
               | 発表: {{work.seasonYear}}年
             li.param v-if='work.officialSiteUrl'
