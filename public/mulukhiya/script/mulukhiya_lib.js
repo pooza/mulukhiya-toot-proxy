@@ -337,7 +337,7 @@ const MulukhiyaLib = {
 
     Vue.createTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
-      indicator.sho
+      indicator.show()
       return axios.post('/mulukhiya/api/status/tag', {token: Vue.getToken(), id: id, tag: tag})
         .then(e => e.data)
         .finally(e => indicator.hide())
