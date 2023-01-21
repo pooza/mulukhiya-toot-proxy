@@ -222,10 +222,11 @@ const MulukhiyaLib = {
       return tags
     }
 
-    Vue.getWorks = async () => {
+    Vue.getWorks = async params => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get('/mulukhiya/api/program/works')
+      if (!params.q) {params = {}}
+      return axios.get(Vue.createURL(`/mulukhiya/api/program/works`, {query: params}))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

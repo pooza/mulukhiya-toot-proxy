@@ -20,6 +20,8 @@ AllCops:
     - '**/config.ru'
   NewCops: enable
   TargetRubyVersion: 3.2
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
 Layout/ArrayAlignment:
   EnforcedStyle: with_fixed_indentation
 Layout/EmptyLineAfterGuardClause:

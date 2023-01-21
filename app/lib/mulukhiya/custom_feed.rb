@@ -41,7 +41,10 @@ module Mulukhiya
     def command
       unless @command
         @command = CommandLine.create(params)
-        @command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/bundler/did_you_mean']
+        @command.env['RUBYOPT'] = '--disable-did_you_mean' unless config['/ruby/did_you_mean']
+        @command.env['RUBY_YJIT_ENABLE'] = 'yes' if config['/ruby/jit']
+        @command.env['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
+        @command.env['RACK_ENV'] ||= Environment.type
       end
       return @command
     end

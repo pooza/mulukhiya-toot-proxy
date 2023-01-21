@@ -89,13 +89,6 @@ properties:
           type: object
         type: array
     type: object
-  bundler:
-    properties:
-      did_you_mean:
-        type: boolean
-      install:
-        type: boolean
-    type: object
   controller:
     enum:
       - mastodon
@@ -240,6 +233,13 @@ properties:
     type: object
   ruby:
     properties:
+      bundler:
+        properties:
+          install:
+            type: boolean
+        type: object
+      did_you_mean:
+        type: boolean
       jit:
         type: boolean
     type: object

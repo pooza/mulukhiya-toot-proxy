@@ -46,9 +46,6 @@ api:
   cache:
     ttl: 86400
   custom: []
-bundler:
-  did_you_mean: true
-  install: false
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
@@ -136,7 +133,7 @@ handler:
     columns: 20
     disable: true
     experimental: true
-    font_file: font/HackGen-Regular.ttf
+    font_file: public/mulukhiya/font/HackGen-Regular.ttf
     font_size: 30
     image_file: public/mulukhiya/media/background.png
     rows: 30
@@ -1007,6 +1004,9 @@ redis:
     limit: 3
     seconds: 1
 ruby:
+  bundler:
+    install: false
+  did_you_mean: true
   jit: false
 sidekiq:
   auth:

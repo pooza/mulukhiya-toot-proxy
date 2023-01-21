@@ -18,7 +18,6 @@ module Mulukhiya
   end
 
   def self.setup_sidekiq
-    Redis.exists_returns_integer = true
     Sidekiq.configure_client do |config|
       config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
     end
@@ -31,6 +30,7 @@ module Mulukhiya
   def self.setup_debug
     Ricecream.disable
     return unless Environment.development?
+    require 'pp' # rubocop:disable Lint/RedundantRequireStatement
     Ricecream.enable
     Ricecream.include_context = true
     Ricecream.colorize = true
