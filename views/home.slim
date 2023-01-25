@@ -17,8 +17,7 @@ html lang='ja'
         - if controller.update_status?
           a href='/mulukhiya/app/status' v-if='account.username' = controller.status_label
         a href='/mulukhiya/app/hashtag' ハッシュタグ
-        - if config['/annict/works'].present?
-          a href='/mulukhiya/app/episode' エピソード
+        a href='/mulukhiya/app/episode' エピソード
         a href='/mulukhiya/app/api' API
         a href='/mulukhiya/app/health' 動作状況
         a href='/mulukhiya/app/config' v-if='account.username' 環境設定
