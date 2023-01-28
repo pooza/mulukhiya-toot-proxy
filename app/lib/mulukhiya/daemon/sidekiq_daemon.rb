@@ -19,14 +19,6 @@ module Mulukhiya
       ].compact.join("\n")
     end
 
-    def save_config
-      return super
-    end
-
-    def config_cache_path
-      return super
-    end
-
     def self.username
       return config['/sidekiq/auth/user'] rescue nil
     end
@@ -73,8 +65,6 @@ module Mulukhiya
     rescue => e
       return {error: e.message, status: 'NG'}
     end
-
-    private
 
     def initializer_path
       return File.join(Environment.dir, 'app/initializer/sidekiq.rb')
