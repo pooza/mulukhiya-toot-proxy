@@ -2,7 +2,8 @@ module Mulukhiya
   class TagFeedRenderer < Ginseng::Web::RSS20FeedRenderer
     include Package
     include SNSMethods
-    attr_reader :tag, :limit
+    attr_accessor :limit
+    attr_reader :tag
 
     def initialize(channel = {})
       super
@@ -16,16 +17,9 @@ module Mulukhiya
       @channel[:link] = record.uri.to_s
       @channel[:title] = "##{tag} | #{@sns.node_name}"
       @channel[:description] = "#{@sns.node_name} ##{tag}のタイムライン"
-      @atom = nil
     rescue => e
       e.log(tag:)
       @tag = nil
-      @atom = nil
-    end
-
-    def limit=(limit)
-      @limit = limit
-      @atom = nil
     end
 
     def exist?
@@ -46,7 +40,6 @@ module Mulukhiya
     end
 
     def fetch
-      @atom = nil
       return nil unless controller_class.feed?
       return nil unless record
       record.create_feed({limit:, tag:, local: record.local?}).each do |row|
