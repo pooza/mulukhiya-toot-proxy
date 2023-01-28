@@ -5,10 +5,10 @@ html lang='ja'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'エピソード'}]}
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'エピソードブラウザ'}]}
     main#app class=env.type
       == slim.render 'fragment/message'
-      h2 エピソード
+      h2 エピソードブラウザ
       nav.search-form-container v-if='account.username'
         .control
           i class='fa fa-magnifying-glass'

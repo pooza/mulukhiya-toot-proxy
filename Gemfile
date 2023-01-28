@@ -13,8 +13,8 @@ gem 'mini_magick'
 gem 'optparse'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>6.0'
-gem 'sidekiq-scheduler', '~>4.0.0'
+gem 'sidekiq', '~>7.0'
+gem 'sidekiq-scheduler', '~>5.0.0'
 
 group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
