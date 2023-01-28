@@ -7,7 +7,6 @@ module Mulukhiya
     def command
       return CommandLine.new([
         'sidekiq',
-        '--config', config_cache_path,
         '--require', initializer_path
       ])
     end
@@ -18,6 +17,14 @@ module Mulukhiya
         "Redis DSN: #{config['/sidekiq/redis/dsn']}",
         ('Ruby YJIT: Ready' if jit_ready?),
       ].compact.join("\n")
+    end
+
+    def save_config
+      return super
+    end
+
+    def config_cache_path
+      return super
     end
 
     def self.username

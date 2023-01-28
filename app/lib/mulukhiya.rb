@@ -18,13 +18,19 @@ module Mulukhiya
   end
 
   def self.setup_sidekiq
-    Sidekiq.configure_client do |config|
-      config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
+    daemon = SidekiqDaemon.new
+    daemon.save_config
+    config = YAML.load_file(daemon.config_cache_path)
+    Sidekiq.configure_client do |sidekiq|
+      sidekiq.redis = {url: config.dig('redis', 'dsn')}
     end
-    Sidekiq.configure_server do |config|
-      config.redis = {url: Config.instance['/sidekiq/redis/dsn']}
-      config.log_formatter = Sidekiq::Logger::Formatters::JSON.new
+    Sidekiq.configure_server do |sidekiq|
+      sidekiq.redis = {url: config.dig('redis', 'dsn')}
+      sidekiq.concurrency = config['concurrency']
+      sidekiq.logger = Sidekiq::Logger.new($stdout)
+      sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
     end
+    Sidekiq.schedule = config['schedule']
   end
 
   def self.setup_debug
