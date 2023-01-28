@@ -2,7 +2,8 @@ module Mulukhiya
   class TagFeedRenderer < Ginseng::Web::RSS20FeedRenderer
     include Package
     include SNSMethods
-    attr_reader :tag, :limit
+    attr_accessor :limit
+    attr_reader :tag
 
     def initialize(channel = {})
       super
@@ -19,10 +20,6 @@ module Mulukhiya
     rescue => e
       e.log(tag:)
       @tag = nil
-    end
-
-    def limit=(limit)
-      @limit = limit
     end
 
     def exist?
