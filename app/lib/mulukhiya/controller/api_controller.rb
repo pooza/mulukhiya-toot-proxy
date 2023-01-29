@@ -484,6 +484,7 @@ module Mulukhiya
         at: config['/puma/restart/seconds'].seconds.after,
         class: 'Mulukhiya::PumaDaemonRestartWorker',
       })
+      SidekiqScheduler::Scheduler.instance.reload_schedule!
       return @renderer.to_s
     rescue => e
       e.log
