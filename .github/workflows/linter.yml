@@ -17,6 +17,7 @@ jobs:
           fetch-depth: 0
       - name: bundle install
         run: |
+          gem install bundler -v '~>2.0'
           bundle install --jobs 4 --retry 3
       - name: Lint Code Base
         uses: github/super-linter@v4
