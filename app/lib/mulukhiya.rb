@@ -24,15 +24,6 @@ module Mulukhiya
     Sidekiq.configure_client do |sidekiq|
       sidekiq.redis = {url: config.dig('redis', 'dsn')}
     end
-    Sidekiq.configure_server do |sidekiq|
-      sidekiq.redis = {url: config.dig('redis', 'dsn')}
-      sidekiq.concurrency = config['concurrency']
-      sidekiq.logger = Sidekiq::Logger.new($stdout)
-      sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
-    end
-    Sidekiq::Scheduler.enabled = true
-    Sidekiq::Scheduler.dynamic = true
-    Sidekiq.schedule = config['schedule']
   end
 
   def self.setup_debug
