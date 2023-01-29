@@ -265,8 +265,6 @@ GEM
       loofah (~> 2.19, >= 2.19.1)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis (5.0.6)
-      redis-client (>= 0.9.0)
     redis-client (0.12.1)
       connection_pool
     regexp_parser (2.6.2)
@@ -315,14 +313,14 @@ GEM
     securerandom (0.2.2)
     sequel (5.64.0)
     set (1.0.3)
-    sidekiq (6.5.5)
-      connection_pool (>= 2.2.2)
-      rack (~> 2.0)
-      redis (>= 4.5.0)
-    sidekiq-scheduler (4.0.3)
-      redis (>= 4.2.0)
+    sidekiq (7.0.3)
+      concurrent-ruby (< 2)
+      connection_pool (>= 2.3.0)
+      rack (>= 2.2.4)
+      redis-client (>= 0.11.0)
+    sidekiq-scheduler (5.0.0)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 4, < 7)
+      sidekiq (>= 4, < 8)
       tilt (>= 1.4.0)
     sinatra (3.0.5)
       mustermann (~> 3.0)
@@ -390,8 +388,8 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 6.0)
-  sidekiq-scheduler (~> 4.0.0)
+  sidekiq (~> 7.0)
+  sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit
   timecop
