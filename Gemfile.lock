@@ -320,9 +320,10 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.5.0)
-    sidekiq-scheduler (5.0.0)
+    sidekiq-scheduler (4.0.3)
+      redis (>= 4.2.0)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 4, < 8)
+      sidekiq (>= 4, < 7)
       tilt (>= 1.4.0)
     sinatra (3.0.5)
       mustermann (~> 3.0)
@@ -391,7 +392,7 @@ DEPENDENCIES
   rubocop-sequel
   ruby-progressbar
   sidekiq (~> 6.0)
-  sidekiq-scheduler (~> 5.0.0)
+  sidekiq-scheduler (~> 4.0.0)
   slim_lint
   test-unit
   timecop
