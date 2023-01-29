@@ -7,6 +7,7 @@ module Mulukhiya
     def command
       return CommandLine.new([
         'sidekiq',
+        '--config', config_cache_path,
         '--require', initializer_path
       ])
     end
