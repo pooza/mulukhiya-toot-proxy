@@ -20,13 +20,9 @@ module Mulukhiya
   def self.setup_sidekiq
     daemon = SidekiqDaemon.new
     daemon.save_config
-    config = YAML.load_file(daemon.config_cache_path)
+    config = YAML.load_file(daemon.config_cache_path).deep_symbolize_keys
     Sidekiq.configure_client do |sidekiq|
-      sidekiq.redis = {url: config.dig('redis', 'dsn')}
-    end
-    Sidekiq.configure_server do |sidekiq|
-      sidekiq.redis = {url: config.dig('redis', 'dsn')}
-      sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
+      sidekiq.redis = {url: config.dig(:redis, :dsn)}
     end
   end
 

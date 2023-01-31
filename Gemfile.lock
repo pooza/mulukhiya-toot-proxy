@@ -60,11 +60,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: fc2ab401cf7386c5a13512a375fcb7994bcaae8d
-  branch: STABLE_1_1
+  revision: abae6b047f2cf844f785f50d2234e54955c57f3d
   specs:
-    ginseng-redis (1.1.9)
-      redis
+    ginseng-redis (2.0.0)
+      redis-client
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -217,12 +216,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.14.0)
+    nokogiri (1.14.1)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.14.0-aarch64-linux)
+    nokogiri (1.14.1-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.14.0-x86_64-linux)
+    nokogiri (1.14.1-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -266,8 +265,6 @@ GEM
       loofah (~> 2.19, >= 2.19.1)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis (5.0.6)
-      redis-client (>= 0.9.0)
     redis-client (0.12.1)
       connection_pool
     regexp_parser (2.6.2)
@@ -295,7 +292,7 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.24.1)
       parser (>= 3.1.1.0)
-    rubocop-minitest (0.26.1)
+    rubocop-minitest (0.27.0)
       rubocop (>= 0.90, < 2.0)
     rubocop-performance (1.15.2)
       rubocop (>= 1.7.0, < 2.0)
@@ -316,14 +313,14 @@ GEM
     securerandom (0.2.2)
     sequel (5.64.0)
     set (1.0.3)
-    sidekiq (6.5.5)
-      connection_pool (>= 2.2.2)
-      rack (~> 2.0)
-      redis (>= 4.5.0)
-    sidekiq-scheduler (4.0.3)
-      redis (>= 4.2.0)
+    sidekiq (7.0.3)
+      concurrent-ruby (< 2)
+      connection_pool (>= 2.3.0)
+      rack (>= 2.2.4)
+      redis-client (>= 0.11.0)
+    sidekiq-scheduler (5.0.1)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 4, < 7)
+      sidekiq (>= 4, < 8)
       tilt (>= 1.4.0)
     sinatra (3.0.5)
       mustermann (~> 3.0)
@@ -391,8 +388,8 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 6.0)
-  sidekiq-scheduler (~> 4.0.0)
+  sidekiq (~> 7.0)
+  sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit
   timecop
@@ -401,4 +398,4 @@ RUBY VERSION
    ruby 3.2.0p0
 
 BUNDLED WITH
-   2.4.5
+   2.4.6
