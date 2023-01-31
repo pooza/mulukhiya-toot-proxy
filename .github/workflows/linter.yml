@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
-          fetch-depth: 0
+          ruby-version: 3.2.0
       - name: bundle install
         run: |
           gem install bundler -v '~>2.0'
