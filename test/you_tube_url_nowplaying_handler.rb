@@ -87,7 +87,7 @@ module Mulukhiya
 
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['池田彩'],
-        title: '#キボウレインボウ#',
+        title: '♯キボウレインボウ♯',
         url: 'https://music.youtube.com/watch?v=xhV_q_kj2hU&feature=share',
       }])
 
