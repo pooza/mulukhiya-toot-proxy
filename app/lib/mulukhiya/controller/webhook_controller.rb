@@ -36,7 +36,6 @@ module Mulukhiya
     end
 
     def payload
-      @payload ||= GitHubWebhookPayload.new(params) if @headers['X-Github-Hook-Id']
       @payload ||= SlackWebhookPayload.new(params)
       return @payload
     end

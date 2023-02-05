@@ -26,7 +26,6 @@ module Mulukhiya
             {'type' => 'image', 'image_url' => 'https://images-na.ssl-images-amazon.com/images/I/71KPGeyC85L._AC_SL1500_.jpg'},
           ],
         ),
-        github: GitHubWebhookPayload.new(zen: 'ニンニク入れますか。'),
       }
     end
 
@@ -77,7 +76,6 @@ module Mulukhiya
       assert_kind_of(Reporter, @test_hook.post(@payloads[:image]))
       assert_kind_of(Reporter, @test_hook.post(@payloads[:spoiler]))
       assert_kind_of(Reporter, @test_hook.post(@payloads[:blocks]))
-      assert_kind_of(Reporter, @test_hook.post(@payloads[:github]))
     end
 
     def test_command
