@@ -21,6 +21,7 @@ module Mulukhiya
     daemon = SidekiqDaemon.new
     daemon.save_config
     config = YAML.load_file(daemon.config_cache_path).deep_symbolize_keys
+    Sidekiq.strict_args!(false)
     Sidekiq.configure_client do |sidekiq|
       sidekiq.redis = {url: config.dig(:redis, :dsn)}
     end
