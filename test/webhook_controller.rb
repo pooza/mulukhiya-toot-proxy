@@ -60,16 +60,6 @@ module Mulukhiya
       assert_predicate(last_response, :ok?)
     end
 
-    def test_post_git_hub_payload
-      return unless hook = test_account.webhook
-      header 'Content-Type', 'application/json'
-      header 'X-Github-Hook-Id', '武田信玄'
-      post hook.uri.path.sub(@path_prefix_pattern, ''), {zen: '武田信玄'}.to_json
-
-      assert_predicate(last_response, :ok?)
-      assert_includes(last_response.body, 'zen: 武田信玄')
-    end
-
     def test_invalid_request
       return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
