@@ -77,7 +77,7 @@ module Mulukhiya
       @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=-LeoA2spEwY&feature=share\n"})
 
       assert_equal(@handler.debug_info[:result], [{
-        artists: Set['キュアソード', '剣崎真琴', '宮本佳那子'],
+        artists: Set['Cure Sword ', 'Makoto Kenzaki', 'Kanako Miyamoto'],
         title: 'こころをこめて',
         url: 'https://music.youtube.com/watch?v=-LeoA2spEwY&feature=share',
       }])
