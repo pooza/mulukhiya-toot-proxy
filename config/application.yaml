@@ -821,7 +821,7 @@ parser:
       poll:
         options: options
         root: poll
-      reply_to: in_reply_to
+      reply_to: in_reply_to_id
       spoiler: spoiler_text
       visibility: visibility
 peer_tube:
