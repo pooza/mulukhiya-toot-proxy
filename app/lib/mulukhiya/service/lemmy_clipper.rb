@@ -126,6 +126,9 @@ module Mulukhiya
       client.send(op: 'ListCommunities', data: {
         limit: config['/lemmy/communities/limit'],
         auth: @jwt,
+        type_: 'Subscribed',
+        sort: 'New',
+        page: 1,
       })
     end
   end

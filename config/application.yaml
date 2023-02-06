@@ -220,7 +220,7 @@ itunes:
     search: https://itunes.apple.com/search
 lemmy:
   communities:
-    limit: 100
+    limit: 50
   hosts:
     default: lm.korako.me
   subject:
