@@ -24,6 +24,9 @@ module Mulukhiya
     Sidekiq.strict_args!(false)
     Sidekiq.configure_client do |sidekiq|
       sidekiq.redis = {url: config.dig(:redis, :dsn)}
+      sidekiq.logger = Sidekiq::Logger.new($stdout)
+      sidekiq.logger.level = config.dig(:logger, :level)
+      sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
     end
   end
 

@@ -1018,6 +1018,8 @@ sidekiq:
       max_age: 86400
     url: /mulukhiya/sidekiq
   dynamic: true
+  logger:
+    level: 1 # info
   redis:
     dsn: redis://localhost:6379/2
   schedule:
