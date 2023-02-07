@@ -112,6 +112,7 @@ html lang='ja'
             input type='password' placeholder='Lemmyサービスのパスワード（保存時に暗号化されます）' v-model.trim='form.lemmy.password'
           .field-container
             h4 コミュニティ
+            .alert v-if='!form.lemmy.community' コミュニティが未設定です。
             .post-auth v-if='options.lemmy_communities'
               v-select :options='options.lemmy_communities' v-model='form.lemmy.community'
               .field-update-button-container
