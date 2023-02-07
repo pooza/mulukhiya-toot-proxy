@@ -4,7 +4,14 @@ module Mulukhiya
   namespace :yaml do
     desc 'lint all YAML files'
     task :lint do
-      sh %(find . -name '*.yaml' -not -name '._*' | xargs yamllint)
+      finder = Ginseng::FileFinder.new
+      finder.dir = Environment.dir
+      finder.patterns.push('*.yaml')
+      finder.patterns.push('*.yml')
+      finder.exec.each do |f|
+        puts f
+        sh "yamllint #{f}"
+      end
     end
   end
 end
