@@ -110,6 +110,7 @@ module Mulukhiya
     end
 
     def post(body = {})
+      body ||= {}
       body.deep_symbolize_keys!
       raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       raise Ginseng::RequestError, 'invalid community' unless @params[:community]
@@ -125,6 +126,7 @@ module Mulukhiya
     end
 
     def fetch_communities(body = {})
+      body ||= {}
       body.deep_symbolize_keys!
       raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       client.send(op: 'ListCommunities', data: {
