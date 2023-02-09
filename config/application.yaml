@@ -220,7 +220,7 @@ itunes:
     search: https://itunes.apple.com/search
 lemmy:
   communities:
-    limit: 100
+    limit: 50
   hosts:
     default: lm.korako.me
   subject:
@@ -801,7 +801,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.25.6
+  version: 4.26.0
 parser:
   note:
     fields:
@@ -821,7 +821,7 @@ parser:
       poll:
         options: options
         root: poll
-      reply_to: in_reply_to
+      reply_to: in_reply_to_id
       spoiler: spoiler_text
       visibility: visibility
 peer_tube:
@@ -1018,6 +1018,8 @@ sidekiq:
       max_age: 86400
     url: /mulukhiya/sidekiq
   dynamic: true
+  logger:
+    level: 1 # info
   redis:
     dsn: redis://localhost:6379/2
   schedule:

@@ -21,8 +21,12 @@ module Mulukhiya
     daemon = SidekiqDaemon.new
     daemon.save_config
     config = YAML.load_file(daemon.config_cache_path).deep_symbolize_keys
+    Sidekiq.strict_args!(false)
     Sidekiq.configure_client do |sidekiq|
       sidekiq.redis = {url: config.dig(:redis, :dsn)}
+      sidekiq.logger = Sidekiq::Logger.new($stdout)
+      sidekiq.logger.level = config.dig(:logger, :level)
+      sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
     end
   end
 
@@ -34,7 +38,7 @@ module Mulukhiya
     Ricecream.include_context = true
     Ricecream.colorize = true
     Ricecream.prefix = "#{Package.name} | "
-    Ricecream.define_singleton_method(:arg_to_s, proc {|v| PP.pp(v)})
+    Ricecream.define_singleton_method(:arg_to_s, proc {|v| PP.pp(v)}) # rubocop:disable Lint/Debugger
   end
 
   def self.rack

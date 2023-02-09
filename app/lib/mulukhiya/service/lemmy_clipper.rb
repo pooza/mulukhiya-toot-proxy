@@ -111,6 +111,8 @@ module Mulukhiya
 
     def post(body = {})
       body.deep_symbolize_keys!
+      raise Ginseng::AuthError, 'invalid jwt' unless @jwt
+      raise Ginseng::RequestError, 'invalid community' unless @params[:community]
       data = {community_id: @params[:community], auth: @jwt, name: body[:name]&.to_s}
       if uri = create_status_uri(body[:url])
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
@@ -123,9 +125,14 @@ module Mulukhiya
     end
 
     def fetch_communities(body = {})
+      body.deep_symbolize_keys!
+      raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       client.send(op: 'ListCommunities', data: {
         limit: config['/lemmy/communities/limit'],
         auth: @jwt,
+        type_: 'Subscribed',
+        sort: 'New',
+        page: 1,
       })
     end
   end

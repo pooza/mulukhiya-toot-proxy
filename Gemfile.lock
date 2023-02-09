@@ -182,11 +182,11 @@ GEM
     json (2.6.3)
     json-schema (3.0.0)
       addressable (>= 2.8)
-    jwt (2.6.0)
+    jwt (2.7.0)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    mail (2.8.0.1)
+    mail (2.8.1)
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
@@ -267,7 +267,7 @@ GEM
     rake (13.0.6)
     redis-client (0.12.1)
       connection_pool
-    regexp_parser (2.6.2)
+    regexp_parser (2.7.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -280,7 +280,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.44.1)
+    rubocop (1.45.1)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
@@ -294,7 +294,7 @@ GEM
       parser (>= 3.1.1.0)
     rubocop-minitest (0.27.0)
       rubocop (>= 0.90, < 2.0)
-    rubocop-performance (1.15.2)
+    rubocop-performance (1.16.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -311,7 +311,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.2.2)
-    sequel (5.64.0)
+    sequel (5.65.0)
     set (1.0.3)
     sidekiq (7.0.3)
       concurrent-ruby (< 2)
@@ -330,8 +330,8 @@ GEM
     slim (5.0.0)
       temple (~> 0.10.0)
       tilt (>= 2.0.6, < 2.1)
-    slim_lint (0.23.0)
-      rubocop (>= 0.78.0)
+    slim_lint (0.24.0)
+      rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
     snaky_hash (2.0.1)
       hashie
@@ -344,6 +344,7 @@ GEM
       date
     timecop (0.9.6)
     timeout (0.3.1)
+    trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -356,6 +357,8 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
+    yamllint (0.0.9)
+      trollop (~> 2)
     zeitwerk (2.6.6)
     zlib (3.0.0)
 
@@ -393,6 +396,7 @@ DEPENDENCIES
   slim_lint
   test-unit
   timecop
+  yamllint
 
 RUBY VERSION
    ruby 3.2.0p0

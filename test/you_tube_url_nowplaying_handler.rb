@@ -33,7 +33,7 @@ module Mulukhiya
 
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['宮本佳那子'],
-        title: 'ガンバランスdeダンス ~夢みる奇跡たち~',
+        title: 'ガンバランスｄｅダンス～夢みる奇跡たち～',
         url: 'https://music.youtube.com/watch?v=HjsKI-StQPU&list=RDAMVMmwJiuNq1eHY',
       }])
 
@@ -51,7 +51,7 @@ module Mulukhiya
 
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['工藤真由'],
-        title: 'Tomorrow Song ~あしたのうた~',
+        title: 'Tomorrow Song～あしたのうた～',
         url: 'https://music.youtube.com/watch?v=GMWIH_Hcun0&feature=share',
       }])
 
@@ -69,7 +69,7 @@ module Mulukhiya
 
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['池田彩'],
-        title: 'Let\'s go! スマイルプリキュア!',
+        title: 'Let\'s go！スマイルプリキュア！',
         url: 'https://music.youtube.com/watch?v=vUMXlscW9Ms&feature=share',
       }])
 
@@ -77,7 +77,7 @@ module Mulukhiya
       @handler.handle_pre_toot({status_field => "#nowplaying https://music.youtube.com/watch?v=-LeoA2spEwY&feature=share\n"})
 
       assert_equal(@handler.debug_info[:result], [{
-        artists: Set['キュアソード', '剣崎真琴', '宮本佳那子'],
+        artists: Set['Cure Sword ', 'Makoto Kenzaki', 'Kanako Miyamoto'],
         title: 'こころをこめて',
         url: 'https://music.youtube.com/watch?v=-LeoA2spEwY&feature=share',
       }])
@@ -87,7 +87,7 @@ module Mulukhiya
 
       assert_equal(@handler.debug_info[:result], [{
         artists: Set['池田彩'],
-        title: '#キボウレインボウ#',
+        title: '♯キボウレインボウ♯',
         url: 'https://music.youtube.com/watch?v=xhV_q_kj2hU&feature=share',
       }])
 

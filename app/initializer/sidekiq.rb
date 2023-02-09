@@ -8,6 +8,7 @@ module Mulukhiya
     sidekiq.redis = {url: config.dig(:redis, :dsn)}
     sidekiq.concurrency = config[:concurrency]
     sidekiq.logger = Sidekiq::Logger.new($stdout)
+    sidekiq.logger.level = config.dig(:logger, :level)
     sidekiq.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
   end
   Sidekiq::Scheduler.enabled = true
