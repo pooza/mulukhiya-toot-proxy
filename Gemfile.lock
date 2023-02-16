@@ -313,7 +313,7 @@ GEM
     securerandom (0.2.2)
     sequel (5.65.0)
     set (1.0.3)
-    sidekiq (7.0.3)
+    sidekiq (7.0.5)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
