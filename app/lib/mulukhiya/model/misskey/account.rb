@@ -62,9 +62,13 @@ module Mulukhiya
 
       alias attachments attachment
 
-      alias admin? isAdmin
+      def admin?
+        return isRoot || isAdmin
+      end
 
-      alias moderator? isModerator
+      def moderator?
+        return isModerator || isRoot || isAdmin
+      end
 
       alias service? isBot
 
