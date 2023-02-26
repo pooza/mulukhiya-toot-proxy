@@ -77,3 +77,6 @@ location ^~ /nodeinfo {
     proxy_pass http://localhost:3008;
   }
 }
+location = /nodeinfo/2.0.json {
+  return 302 /nodeinfo/2.0;
+}

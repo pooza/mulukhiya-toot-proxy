@@ -6,12 +6,6 @@ module Mulukhiya
 
     alias info nodeinfo
 
-    def nodeinfo
-      return http.get('/nodeinfo/2.0', {
-        headers: {'X-Mulukhiya' => Package.full_name},
-      }).parsed_response
-    end
-
     alias note post
 
     def search_dupllicated_attachment(attachment, params = {})
