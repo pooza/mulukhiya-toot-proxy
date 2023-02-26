@@ -7,5 +7,4 @@ FROM "user"
 WHERE user_profile.description LIKE '%#%'
   AND ("user".host IS null)
   AND ("user"."isBot" = false)
-  AND ("user"."isSilenced" = false)
   AND ("user"."isSuspended" = false)
