@@ -8,3 +8,4 @@ WHERE user_profile.description LIKE '%#%'
   AND ("user".host IS null)
   AND ("user"."isBot" = false)
   AND ("user"."isSuspended" = false)
+  AND ("user"."isDeleted" = false)
