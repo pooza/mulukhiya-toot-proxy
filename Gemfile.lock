@@ -46,9 +46,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: dbea555cfc25ea47a4a3a34c02935e86126ac6f7
+  revision: c0f2197302ac5b1ba01c9c59a719f0da7c91a3b2
   specs:
-    ginseng-fediverse (1.8.7)
+    ginseng-fediverse (1.8.8)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -112,7 +112,7 @@ GEM
     bson (4.15.0)
     builder (3.2.4)
     cgi (0.3.6)
-    concurrent-ruby (1.2.0)
+    concurrent-ruby (1.2.2)
     connection_pool (2.3.0)
     crass (1.0.6)
     daemon-spawn (0.4.2)
@@ -139,11 +139,11 @@ GEM
       dry-logic (>= 1.5, < 2)
       dry-types (>= 1.7, < 2)
       zeitwerk (~> 2.6)
-    dry-types (1.7.0)
+    dry-types (1.7.1)
       concurrent-ruby (~> 1.0)
-      dry-core (~> 1.0, < 2)
-      dry-inflector (~> 1.0, < 2)
-      dry-logic (>= 1.4, < 2)
+      dry-core (~> 1.0)
+      dry-inflector (~> 1.0)
+      dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
     dry-validation (1.10.0)
       concurrent-ruby (~> 1.0)
@@ -194,7 +194,7 @@ GEM
     marcel (1.0.2)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2022.0105)
+    mime-types-data (3.2023.0218.1)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.1)
@@ -216,12 +216,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.14.1)
+    nokogiri (1.14.2)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.14.1-aarch64-linux)
+    nokogiri (1.14.2-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.14.1-x86_64-linux)
+    nokogiri (1.14.2-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -239,12 +239,12 @@ GEM
       omniauth (~> 2.0)
     optparse (0.3.1)
     parallel (1.22.1)
-    parser (3.2.0.0)
+    parser (3.2.1.0)
       ast (~> 2.4.1)
-    pg (1.4.5)
+    pg (1.4.6)
     power_assert (2.0.3)
     public_suffix (5.0.1)
-    puma (6.0.2)
+    puma (6.1.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.6.2)
@@ -265,7 +265,7 @@ GEM
       loofah (~> 2.19, >= 2.19.1)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis-client (0.12.1)
+    redis-client (0.12.2)
       connection_pool
     regexp_parser (2.7.0)
     rest-client (2.0.2)
@@ -280,20 +280,20 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.45.1)
+    rubocop (1.46.0)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.24.1, < 2.0)
+      rubocop-ast (>= 1.26.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.24.1)
-      parser (>= 3.1.1.0)
-    rubocop-minitest (0.27.0)
-      rubocop (>= 0.90, < 2.0)
+    rubocop-ast (1.26.0)
+      parser (>= 3.2.1.0)
+    rubocop-minitest (0.28.0)
+      rubocop (>= 1.39, < 2.0)
     rubocop-performance (1.16.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
@@ -313,7 +313,7 @@ GEM
     securerandom (0.2.2)
     sequel (5.65.0)
     set (1.0.3)
-    sidekiq (7.0.3)
+    sidekiq (7.0.6)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
@@ -343,7 +343,7 @@ GEM
     time (0.2.1)
       date
     timecop (0.9.6)
-    timeout (0.3.1)
+    timeout (0.3.2)
     trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -359,7 +359,7 @@ GEM
     yajl-ruby (1.4.3)
     yamllint (0.0.9)
       trollop (~> 2)
-    zeitwerk (2.6.6)
+    zeitwerk (2.6.7)
     zlib (3.0.0)
 
 PLATFORMS
@@ -399,7 +399,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.2.1p31
 
 BUNDLED WITH
-   2.4.6
+   2.4.7

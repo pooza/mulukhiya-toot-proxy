@@ -62,9 +62,9 @@ module Mulukhiya
 
       alias attachments attachment
 
-      alias admin? isAdmin
+      alias admin? isRoot
 
-      alias moderator? isModerator
+      alias moderator? isRoot
 
       alias service? isBot
 

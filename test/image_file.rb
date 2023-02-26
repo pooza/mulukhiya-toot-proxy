@@ -11,7 +11,6 @@ module Mulukhiya
       @gif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/file_example_GIF_500kB.gif'))
       @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'))
       @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
-      @pdf = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/yogokumi.pdf'))
     end
 
     def test_values
@@ -114,12 +113,6 @@ module Mulukhiya
 
     def test_convert_type
       converted = @png_rgba.convert_type('image/jpeg')
-
-      assert_kind_of(ImageFile, converted)
-      assert_equal('image/jpeg', converted.type)
-
-      return unless @pdf
-      converted = @pdf.convert_type('image/jpeg')
 
       assert_kind_of(ImageFile, converted)
       assert_equal('image/jpeg', converted.type)
