@@ -60,10 +60,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: abae6b047f2cf844f785f50d2234e54955c57f3d
+  revision: 870e2140e9366a82b5521818ca894ef371eb25b4
   specs:
-    ginseng-redis (2.0.0)
-      redis-client
+    ginseng-redis (2.0.1)
+      redis-client (~> 0.12.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -265,7 +265,7 @@ GEM
       loofah (~> 2.19, >= 2.19.1)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis-client (0.13.0)
+    redis-client (0.12.2)
       connection_pool
     regexp_parser (2.7.0)
     rest-client (2.0.2)
@@ -344,7 +344,6 @@ GEM
       date
     timecop (0.9.6)
     timeout (0.3.2)
-    trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -357,8 +356,6 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
-    yamllint (0.0.9)
-      trollop (~> 2)
     zeitwerk (2.6.7)
     zlib (3.0.0)
 
@@ -396,7 +393,6 @@ DEPENDENCIES
   slim_lint
   test-unit
   timecop
-  yamllint
 
 RUBY VERSION
    ruby 3.2.1p31
