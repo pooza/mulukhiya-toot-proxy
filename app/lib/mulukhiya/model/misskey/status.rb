@@ -33,6 +33,11 @@ module Mulukhiya
 
       alias public_uri uri
 
+      def updatable_by?(target)
+        target = Account[target] unless target.is_a?(Account)
+        return account&.id == target&.id
+      end
+
       def attachments
         @attachments ||= fileIds.match(/\{(.*)\}/)[1].split(',').map do |id|
           Attachment[id]

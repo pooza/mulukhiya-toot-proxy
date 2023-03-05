@@ -33,6 +33,7 @@ html lang='ja'
             | 新規タグを追加
             a href='javascript:void(0)' @click='createTag(status.id)'
               i class='fa fa-pencil'
+      .hidden ref='controller_name' v-show='false' = controller.name
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -58,13 +59,23 @@ html lang='ja'
             this.$dialog
               .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
               .then(e => Vue.createTag(id, e.data))
-              .then(e => {this.status = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .then(e => {
+                this.status = e
+                console.log(this.$refs.controller_name.innerText)
+                if (this.$refs.controller_name.innerText.trim() == 'misskey') { // TODO: 更新機能の有無で判定
+                  window.close()
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteTag (id, tag) {
             Vue.deleteTag(id, tag)
-              .then(e => {this.status = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .then(e => {
+                this.status = e
+                console.log(this.$refs.controller_name.innerText)
+                if (this.$refs.controller_name.innerText.trim() == 'misskey') { // TODO: 更新機能の有無で判定
+                  window.close()
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
         },
       })

@@ -60,10 +60,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: abae6b047f2cf844f785f50d2234e54955c57f3d
+  revision: 870e2140e9366a82b5521818ca894ef371eb25b4
   specs:
-    ginseng-redis (2.0.0)
-      redis-client
+    ginseng-redis (2.0.1)
+      redis-client (~> 0.12.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -198,7 +198,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.1)
-    minitest (5.17.0)
+    minitest (5.18.0)
     mongo (2.18.2)
       bson (>= 4.14.1, < 5.0.0)
     multi_json (1.15.0)
@@ -244,11 +244,11 @@ GEM
     pg (1.4.6)
     power_assert (2.0.3)
     public_suffix (5.0.1)
-    puma (6.1.0)
+    puma (6.1.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.6.2)
-    rack (2.2.6.2)
+    rack (2.2.6.3)
     rack-protection (3.0.5)
       rack
     rack-test (2.0.2)
@@ -280,7 +280,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.46.0)
+    rubocop (1.47.0)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
@@ -290,7 +290,7 @@ GEM
       rubocop-ast (>= 1.26.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.26.0)
+    rubocop-ast (1.27.0)
       parser (>= 3.2.1.0)
     rubocop-minitest (0.28.0)
       rubocop (>= 1.39, < 2.0)
@@ -301,7 +301,7 @@ GEM
       rubocop (~> 1.0)
     rubocop-sequel (0.3.4)
       rubocop (~> 1.0)
-    ruby-progressbar (1.11.0)
+    ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rufus-scheduler (3.8.2)
       fugit (~> 1.1, >= 1.1.6)
@@ -311,16 +311,16 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.2.2)
-    sequel (5.65.0)
+    sequel (5.66.0)
     set (1.0.3)
     sidekiq (7.0.6)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
       redis-client (>= 0.11.0)
-    sidekiq-scheduler (5.0.1)
+    sidekiq-scheduler (5.0.2)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 4, < 8)
+      sidekiq (>= 6, < 8)
       tilt (>= 1.4.0)
     sinatra (3.0.5)
       mustermann (~> 3.0)

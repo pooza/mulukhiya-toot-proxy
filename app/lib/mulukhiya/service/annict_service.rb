@@ -255,6 +255,7 @@ module Mulukhiya
           user_tags: [
             params[:title],
             '実況',
+            'エア番組',
             self.class.create_episode_number_text(params[:number_text]),
             params[:subtitle],
           ],

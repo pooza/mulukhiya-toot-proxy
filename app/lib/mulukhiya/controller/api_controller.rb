@@ -230,7 +230,6 @@ module Mulukhiya
     end
 
     get '/status/:id' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)

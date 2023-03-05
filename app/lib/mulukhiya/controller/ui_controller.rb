@@ -17,7 +17,6 @@ module Mulukhiya
     end
 
     get '/app/status/:id' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.account_timeline?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       @renderer = SlimRenderer.new
       @renderer.template = 'status_detail'
