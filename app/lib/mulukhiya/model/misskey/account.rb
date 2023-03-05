@@ -31,6 +31,16 @@ module Mulukhiya
         return @uri
       end
 
+      def statuses(params = {})
+        params[:limit] ||= config['/webui/status/timeline/limit']
+        params[:page] ||= 1
+        params[:account_id] = id
+        return Postgres.exec(:statuses, params).map do |row|
+          next unless status = Status[row[:id]]
+          status.to_h.merge(account: row.slice(:username, :display_name))
+        end
+      end
+
       def fields
         return JSON.parse(values[:fields] || '[]')
       rescue => e

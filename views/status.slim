@@ -9,7 +9,7 @@ html lang='ja'
     main#app class=env.type
       == slim.render 'fragment/message'
       h2 = controller.status_label
-      - if controller.update_status?
+      - if controller.account_timeline?
         nav.search-form-container v-if='account.username'
           .control
             i class='fa fa-magnifying-glass'
@@ -106,7 +106,7 @@ html lang='ja'
                   e.map(v => {Vue.set(this.statuses, v.id, v)})
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('投稿はこれ以上ありません。')
+                  this.$dialog.alert('#{controller.status_label}はこれ以上ありません。')
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },

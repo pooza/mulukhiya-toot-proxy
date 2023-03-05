@@ -580,6 +580,7 @@ misskey:
     media_catalog: true
     reaction: true
     streaming: true
+    update_status: true
     webhook: true
   handlers:
     alert:
