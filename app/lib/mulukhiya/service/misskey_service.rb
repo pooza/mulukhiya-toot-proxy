@@ -49,5 +49,11 @@ module Mulukhiya
         MisskeyController.reply_to_field => reply_to,
       )
     end
+
+    def create_command_uri(command)
+      uri = create_uri('/share')
+      uri.query_values = {text: command.to_yaml}
+      return uri
+    end
   end
 end
