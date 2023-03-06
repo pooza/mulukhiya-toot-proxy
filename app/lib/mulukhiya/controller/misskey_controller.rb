@@ -74,7 +74,7 @@ module Mulukhiya
     end
 
     def renote?
-      return params[:renoteId].present?
+      return params[:renoteId].present? && params[:text].empty?
     end
 
     def token
