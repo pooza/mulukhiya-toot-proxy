@@ -40,20 +40,6 @@ location ~ ^/api/notes/(favorites|reactions)/create$ {
     proxy_pass http://localhost:3008;
   }
 }
-location = /api/messaging/messages/create {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto https;
-  proxy_http_version 1.1;
-  proxy_redirect off;
-  if ($http_x_mulukhiya != '') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($http_x_mulukhiya = '') {
-    proxy_pass http://localhost:3008;
-  }
-}
 location ^~ /mulukhiya {
   proxy_set_header Host $host;
   proxy_set_header X-Real-IP $remote_addr;
