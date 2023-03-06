@@ -40,7 +40,7 @@ module Mulukhiya
     end
 
     post '/api/:version/media' do
-      filename = params.dig(:file, :filename)
+      filename = params[:name]
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {filename:})
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
