@@ -574,13 +574,13 @@ misskey:
   features:
     annict: true
     announcement: true
+    delete_and_tagging: true
     favorite_tags: true
     feed: true
     futured_tag: true
     media_catalog: true
     reaction: true
     streaming: true
-    update_status: true
     webhook: true
   handlers:
     alert:

@@ -14,7 +14,7 @@ html lang='ja'
           a href='/mulukhiya/app/feed' フィード
         - if controller.media_catalog?
           a href='/mulukhiya/app/media' メディアカタログ
-        - if controller.update_status? && controller.account_timeline?
+        - if controller.account_timeline?
           a href='/mulukhiya/app/status' v-if='account.username' = controller.status_label
         a href='/mulukhiya/app/hashtag' ハッシュタグ
         a href='/mulukhiya/app/episode' エピソードブラウザ
