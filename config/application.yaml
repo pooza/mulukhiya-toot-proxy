@@ -572,6 +572,7 @@ misskey:
   dbms: postgres
   display_name: Misskey
   features:
+    account_timeline: true
     annict: true
     announcement: true
     delete_and_tagging: true

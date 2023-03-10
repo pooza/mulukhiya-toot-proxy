@@ -84,7 +84,7 @@ module Mulukhiya
       assert_kind_of(String, controller_class.status_field)
     end
 
-    def test_poll_option_field
+    def test_poll_options_field
       assert_kind_of(String, controller_class.poll_options_field)
     end
 
