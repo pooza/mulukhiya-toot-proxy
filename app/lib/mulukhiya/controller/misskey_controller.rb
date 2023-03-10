@@ -5,7 +5,7 @@ module Mulukhiya
     post '/api/notes/create' do
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.note(params)
-      Event.new((renote? ? :post_toot : :post_boost), {reporter:, sns:}).dispatch(params)
+      Event.new((renote? ? :post_boost : :post_toot), {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
