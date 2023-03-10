@@ -61,7 +61,6 @@ html lang='ja'
           a @click='appendStatuses' 続きを読む…
       - else
         article.status #{controller.display_name}は一覧表示に対応していません。
-      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -82,9 +81,7 @@ html lang='ja'
           Vue.getConfig()
             .then(e => {
               this.account = e.account
-              if (this.account.username) {
-                this.appendStatuses()
-              }
+              if (this.account.username) {this.appendStatuses()}
             }).catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {

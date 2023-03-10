@@ -96,6 +96,6 @@ html lang='ja'
                 }).catch(e => Vue.alert(this.$dialog, e))
             }
           },
-          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim()},
+          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim() == 'true'},
         },
       })
