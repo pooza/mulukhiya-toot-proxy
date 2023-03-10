@@ -27,17 +27,17 @@ html lang='ja'
             | タグづけ
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
-            a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
+            a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
               i class='fa fa-xmark'
           .tag
             | 新規タグを追加
-            a href='javascript:void(0)' @click='createTag(status.id)'
+            a href='javascript:void(0)' @click='createTag()'
               i class='fa fa-pencil'
           - if controller.delete_and_tagging?
-            button.small
+            button.small @click='save'
               i class='fa fa-cloud-arrow-up'
               | 更新
-      .hidden ref='delete_and_tagging' = controller.delete_and_tagging?
+    .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -59,7 +59,7 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          createTag (id) {
+          createTag () {
             if (this.isDeleteAndTaggingMode()) {
               this.$dialog
                 .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
@@ -71,21 +71,27 @@ html lang='ja'
             } else {
               this.$dialog
                 .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
-                .then(e => Vue.createTag(id, e.data))
+                .then(e => Vue.createTag(this.status.id, e.data))
                 .then(e => {this.status = e})
                 .catch(e => Vue.alert(this.$dialog, e))
             }
           },
-          deleteTag (id, tag) {
+          deleteTag (tag) {
             if (this.isDeleteAndTaggingMode()) {
               this.status.footer_tags = this.status.footer_tags.filter(v => {
                 return v.name.replace(/^#/, '') != tag
               })
             } else {
-              Vue.deleteTag(id, tag)
+              Vue.deleteTag(this.status.id, tag)
                 .then(e => {this.status = e})
                 .catch(e => Vue.alert(this.$dialog, e))
             }
+          },
+          save () {
+            if (!this.isDeleteAndTaggingMode()) return
+            console.log(this.status.footer_tags)
+
+
           },
           isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim()},
         },
