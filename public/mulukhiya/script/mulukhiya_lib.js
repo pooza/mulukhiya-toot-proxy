@@ -343,6 +343,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.updateTags = async (id, tags) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/status/tags', {token: Vue.getToken(), id: id, tags: tags})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.deleteTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
       indicator.show()

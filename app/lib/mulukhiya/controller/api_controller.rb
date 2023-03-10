@@ -244,7 +244,7 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    put '/status/tags' do
+    post '/status/tags' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.delete_and_tagging?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       errors = StatusTagsContract.new.exec(params)
@@ -255,7 +255,7 @@ module Mulukhiya
         status = status_class[params[:id]]
         raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         status.parser.footer_tags.clear
-        status.parser.footer_tags.concat(params[:tag])
+        status.parser.footer_tags.concat(params[:tags])
         body = [
           status.parser.body,
           status.parser.footer_tags.map(&:to_hashtag).join(' '),

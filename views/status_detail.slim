@@ -34,10 +34,10 @@ html lang='ja'
             a href='javascript:void(0)' @click='createTag()'
               i class='fa fa-pencil'
           - if controller.delete_and_tagging?
-            button.small @click='save'
+            button.small @click='updateTags'
               i class='fa fa-cloud-arrow-up'
               | 更新
-    .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
+      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -87,11 +87,14 @@ html lang='ja'
                 .catch(e => Vue.alert(this.$dialog, e))
             }
           },
-          save () {
-            if (!this.isDeleteAndTaggingMode()) return
-            console.log(this.status.footer_tags)
-
-
+          updateTags () {
+            if (this.isDeleteAndTaggingMode()) {
+              Vue.updateTags(this.status.id, this.status.footer_tags.map(v => v.name))
+                .then(e => {
+                  this.status = e
+                  window.close()
+                }).catch(e => Vue.alert(this.$dialog, e))
+            }
           },
           isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim()},
         },
