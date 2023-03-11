@@ -139,6 +139,18 @@ html lang='ja'
           .field-update-button-container
             button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
             button.alert @click='unauthAnnict' 認証を解除
+          - if Mulukhiya::AnnictService.keywords.present?
+            .inline-field-container
+              label
+                input type='checkbox' v-model='form.annict.theme_works_only'
+                | タイトルに
+                - Mulukhiya::AnnictService.keywords.each do |w|
+                  | 「
+                  strong #{w}
+                  | 」
+                | が含まれる作品のみをレビュー対象とする
+            .field-update-button-container
+              button @click='updateAnnict' 更新
       section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
         vue-slide-up-down :active='layout.details.webhook'
@@ -177,7 +189,7 @@ html lang='ja'
           form: {
             notify: {verbose: null},
             livecure: false,
-            annict: {auth_code: null},
+            annict: {auth_code: null, theme_works_only: false},
             program: {minutes: null, tags: null},
             tags: '',
             webhook: {token: null, visibility: null},
@@ -250,6 +262,7 @@ html lang='ja'
             this.form.nextcloud.url = Vue.dig(data, 'config', 'nextcloud', 'url')
             this.form.nextcloud.user = Vue.dig(data, 'config', 'nextcloud', 'user')
             this.form.nextcloud.prefix = Vue.dig(data, 'config', 'nextcloud', 'prefix')
+            this.form.annict.theme_works_only = Vue.dig(data, 'config', 'annict', 'theme_works_only') == true
             this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
             if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
               this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
@@ -383,6 +396,11 @@ html lang='ja'
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
               }).catch(e => Vue.alert(this.$dialog, e))
+          },
+          updateAnnict () {
+            const command = {annict: {theme_works_only: null}}
+            if (this.form.annict.theme_works_only) {command.annict.theme_works_only = true}
+            this.updateConfig(command)
           },
           unauthAnnict () {
             this.$dialog.confirm({body: 'Annictの認証を解除します。'},{okText: '解除'})

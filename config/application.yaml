@@ -572,15 +572,16 @@ misskey:
   dbms: postgres
   display_name: Misskey
   features:
+    account_timeline: true
     annict: true
     announcement: true
+    delete_and_tagging: true
     favorite_tags: true
     feed: true
     futured_tag: true
     media_catalog: true
     reaction: true
     streaming: true
-    update_status: true
     webhook: true
   handlers:
     alert:
@@ -783,7 +784,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.26.3
+  version: 4.26.4
 parser:
   note:
     fields:

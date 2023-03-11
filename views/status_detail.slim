@@ -27,13 +27,17 @@ html lang='ja'
             | タグづけ
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
-            a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
+            a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
               i class='fa fa-xmark'
           .tag
             | 新規タグを追加
-            a href='javascript:void(0)' @click='createTag(status.id)'
+            a href='javascript:void(0)' @click='createTag()'
               i class='fa fa-pencil'
-      .hidden ref='controller_name' v-show='false' = controller.name
+          - if controller.delete_and_tagging?
+            button.small @click='updateTags'
+              i class='fa fa-cloud-arrow-up'
+              | 更新
+      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
       Vue.use(VTooltip)
@@ -55,27 +59,43 @@ html lang='ja'
             .catch(e => Vue.alert(this.$dialog, e))
         },
         methods: {
-          createTag (id) {
-            this.$dialog
-              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
-              .then(e => Vue.createTag(id, e.data))
-              .then(e => {
-                this.status = e
-                console.log(this.$refs.controller_name.innerText)
-                if (this.$refs.controller_name.innerText.trim() == 'misskey') { // TODO: 更新機能の有無で判定
-                  window.close()
-                }
-              }).catch(e => Vue.alert(this.$dialog, e))
+          createTag () {
+            if (this.isDeleteAndTaggingMode()) {
+              this.$dialog
+                .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
+                .then(e => {
+                  const tag = e.data.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
+                  if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
+                  this.status.footer_tags.push({name: tag, is_deletable: true})
+                }).catch(e => Vue.alert(this.$dialog, e))
+            } else {
+              this.$dialog
+                .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
+                .then(e => Vue.createTag(this.status.id, e.data))
+                .then(e => {this.status = e})
+                .catch(e => Vue.alert(this.$dialog, e))
+            }
           },
-          deleteTag (id, tag) {
-            Vue.deleteTag(id, tag)
-              .then(e => {
-                this.status = e
-                console.log(this.$refs.controller_name.innerText)
-                if (this.$refs.controller_name.innerText.trim() == 'misskey') { // TODO: 更新機能の有無で判定
-                  window.close()
-                }
-              }).catch(e => Vue.alert(this.$dialog, e))
+          deleteTag (tag) {
+            if (this.isDeleteAndTaggingMode()) {
+              this.status.footer_tags = this.status.footer_tags.filter(v => {
+                return v.name.replace(/^#/, '') != tag
+              })
+            } else {
+              Vue.deleteTag(this.status.id, tag)
+                .then(e => {this.status = e})
+                .catch(e => Vue.alert(this.$dialog, e))
+            }
           },
+          updateTags () {
+            if (this.isDeleteAndTaggingMode()) {
+              Vue.updateTags(this.status.id, this.status.footer_tags.map(v => v.name))
+                .then(e => {
+                  this.status = e
+                  window.close()
+                }).catch(e => Vue.alert(this.$dialog, e))
+            }
+          },
+          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim() == 'true'},
         },
       })

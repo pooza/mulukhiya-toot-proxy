@@ -40,7 +40,7 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = config['/annict/works'] unless keyword.present?
+      keywords = self.class.keywords unless keyword.present?
       keywords ||= [keyword]
       return keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
@@ -81,7 +81,11 @@ module Mulukhiya
       touch unless updated_at
       recent = activities.select {|v| updated_at < Time.parse(v['createdAt'])}
       return unless recent.present?
-      recent.each {|avtivity| webhook.post(create_payload(avtivity))}
+      keywords = self.class.keywords
+      recent.each do |activity|
+        next if keywords.present? && keywords.none? {|v| activity.to_json.include?(v)}
+        webhook.post(create_payload(activity))
+      end
       touch
       return recent
     end
@@ -193,6 +197,12 @@ module Mulukhiya
       return nil
     rescue
       return config['/annict/oauth/client/secret']
+    end
+
+    def self.keywords
+      return config['/annict/works'] || []
+    rescue
+      return []
     end
 
     def self.config?

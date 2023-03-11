@@ -42,19 +42,25 @@ html lang='ja'
             | {{status.account.display_name || '@' + status.account.username}}
           pre.body v-if='status.body' = '{{status.body}}'
           .footer-tags v-if='status.is_taggable && account.username==status.account.username'
-            h4
+            - if controller.delete_and_tagging?
               i class='fa fa-tag'
-              | タグづけ
-            .tag v-for='tag in status.footer_tags'
-              | {{tag.name}}
-              a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
-                i class='fa fa-xmark'
-            .tag
-              | 新規タグを追加
-              a href='javascript:void(0)' @click='createTag(status.id)'
-                i class='fa fa-pencil'
+              a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
+            - else
+              h4
+                i class='fa fa-tag'
+                | タグづけ
+              .tag v-for='tag in status.footer_tags'
+                | {{tag.name}}
+                a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
+                  i class='fa fa-xmark'
+              .tag
+                | 新規タグを追加
+                a href='javascript:void(0)' @click='createTag(status.id)'
+                  i class='fa fa-pencil'
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
+      - else
+        article.status #{controller.display_name}は一覧表示に対応していません。
     javascript:
       'use strict'
       Vue.use(VTooltip)

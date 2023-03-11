@@ -244,6 +244,34 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/status/tags' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.delete_and_tagging?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = StatusTagsContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        status = status_class[params[:id]]
+        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+        status.parser.footer_tags.clear
+        status.parser.footer_tags.concat(params[:tags])
+        body = [
+          status.parser.body,
+          status.parser.footer_tags.map(&:to_hashtag).join(' '),
+        ].join("\n")
+        @renderer.message = sns.update_status(params[:id], body, {
+          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
+        })
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/status/tag' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

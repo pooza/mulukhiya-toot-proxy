@@ -3,8 +3,16 @@ module Mulukhiya
     include SNSMethods
 
     def update_status(id, body, params = {})
+      status = status_class[id]
+      values = status.values.slice(status_field, reply_to_field, spoiler_field, visibility_field)
+      values[attachment_field] = status.attachments.map(&:id)
       delete_status(id, params)
-      return post(body, params)
+      if body.is_a?(Hash)
+        body = values.merge(body)
+      else
+        body = values.merge(status_field => body.to_s)
+      end
+      return post(body.deep_symbolize_keys, params)
     end
 
     def upload(path, params = {})
