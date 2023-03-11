@@ -139,12 +139,12 @@ html lang='ja'
           .field-update-button-container
             button :disabled='!form.annict.auth_code' @click='authAnnict' 認証
             button.alert @click='unauthAnnict' 認証を解除
-          - if config['/annict/works'].present?
+          - if Mulukhiya::AnnictService.keywords.present?
             .inline-field-container
               label
                 input type='checkbox' v-model='form.annict.theme_works_only'
                 | タイトルに
-                - config['/annict/works'].each do |w|
+                - Mulukhiya::AnnictService.keywords.each do |w|
                   | 「
                   strong #{w}
                   | 」
