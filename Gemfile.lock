@@ -280,7 +280,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.48.0)
+    rubocop (1.48.1)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
