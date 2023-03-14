@@ -248,7 +248,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.6.2)
-    rack (2.2.6.3)
+    rack (2.2.6.4)
     rack-protection (3.0.5)
       rack
     rack-test (2.0.2)
@@ -313,7 +313,7 @@ GEM
     securerandom (0.2.2)
     sequel (5.66.0)
     set (1.0.3)
-    sidekiq (7.0.6)
+    sidekiq (7.0.7)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
