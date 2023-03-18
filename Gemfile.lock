@@ -351,7 +351,7 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
-    version_gem (1.1.1)
+    version_gem (1.1.2)
     webrick (1.8.1)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
