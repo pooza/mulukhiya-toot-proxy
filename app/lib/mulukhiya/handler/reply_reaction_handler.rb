@@ -11,8 +11,19 @@ module Mulukhiya
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
       return if receipt.reactionable?
-      sns.post("#{receipt.acct} リアクション:#{payload[:reaction]}", {reply: status.to_h})
+      sns.post({
+        status_field => create_status(payload:, receipt:),
+        visibility_field => controller_class.visibility_name(:private),
+      }, {reply: status.to_h})
       result.push(reply: status.id, reaction: payload[:reaction])
+    end
+
+    def create_status(params)
+      return [
+        params[:receipt].acct,
+        "リアクション #{params.dig(:payload, :reaction)} を送りました。",
+        "sender: [#{Package.name}](#{Package.url}) #{Package.version}",
+      ].join("\n")
     end
   end
 end
