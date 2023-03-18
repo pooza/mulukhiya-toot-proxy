@@ -19,7 +19,9 @@ module Mulukhiya
     end
 
     def self.sender(payload)
-      return Environment.account_class.get(id: payload.dig('body', 'user', 'id'))
+      return Environment.account_class[
+        payload.dig('body', 'user', 'id') || payload.dig('body', 'id')
+      ]
     rescue => e
       e.log
     end
