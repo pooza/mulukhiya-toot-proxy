@@ -46,6 +46,24 @@ html lang='ja'
                 a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
                   i class='fas fa-microphone'
                 | 実況開始
+          ul.episodes v-else=''
+              strong.number-text
+              .link-container
+                i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId"
+                span.title :id="'episode-title-' + work.annictId"
+                  | {{work.title}}
+              .link-container
+                i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId"
+                span.hashtag :id="'episode-hashtag-' + work.annictId"
+                  | {{work.hashtag}}
+              .bubble-container
+                a :href='work.hashtag_url' target='_blank' rel='noreferrer' v-if='work.hashtag_url'
+                  i class='fas fa-comment'
+                | タイムライン
+              .bubble-container v-if='work.command_url'
+                a :href='work.command_url' target='_blank' rel='noreferrer' v-if='work.command_url'
+                  i class='fas fa-microphone'
+                | 実況開始
           nav v-else=''
             button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'
