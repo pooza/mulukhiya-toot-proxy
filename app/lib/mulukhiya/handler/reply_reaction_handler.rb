@@ -11,6 +11,7 @@ module Mulukhiya
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
       return if receipt.reactionable?
+      return unless receipt.service.nodeinfo.dig('mulukhiya', 'handlers').member?('reply_reaction')
       sns.post({
         status_field => create_status(payload:, receipt:),
         visibility_field => controller_class.visibility_name(:private),

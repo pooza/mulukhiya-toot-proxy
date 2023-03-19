@@ -17,7 +17,8 @@ module Mulukhiya
     end
 
     def reactionable?
-      return ['misskey', 'pleroma'].member?(sns.nodeinfo['software']['name'])
+      return false unless ['misskey'].member?(sns.nodeinfo.dig('software', 'name'))
+      return true
     rescue => e
       e.log(acct: acct.to_s)
       return false

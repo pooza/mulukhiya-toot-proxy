@@ -833,7 +833,7 @@ pleroma:
     favorite_tags: true
     feed: true
     media_catalog: true
-    reaction: true
+    reaction: false # 現状、Misskey互換のリアクションのみ対応。
     streaming: true
     webhook: true
   handlers:
