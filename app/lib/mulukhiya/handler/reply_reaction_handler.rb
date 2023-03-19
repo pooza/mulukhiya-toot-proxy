@@ -22,7 +22,8 @@ module Mulukhiya
       return [
         params[:receipt].acct,
         "リアクション #{params.dig(:payload, :reaction)} を送りました。",
-        "sender: [#{Package.name}](#{Package.url}) #{Package.version}",
+        '',
+        "[#{Package.name}](#{Package.url}) #{Package.version}",
       ].join("\n")
     end
   end
