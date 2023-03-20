@@ -1079,6 +1079,8 @@ webui:
       - https://use.fontawesome.com/releases/v6.2.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
+  episode:
+    minutes: 30
   media:
     cache:
       ttl: 8640000
