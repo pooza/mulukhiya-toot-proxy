@@ -15,18 +15,16 @@ module Mulukhiya
       return unless handlers.member?('reply_reaction')
       sns.post({
         status_field => create_status(payload:, receipt:),
-        visibility_field => controller_class.visibility_name(:private),
+        visibility_field => controller_class.visibility_name(:unlisted),
       }, {reply: status.to_h})
       result.push(reply: status.id, reaction: payload[:reaction])
     end
 
     def create_status(params)
-      return [
-        params[:receipt].acct,
-        "リアクション #{params.dig(:payload, :reaction)} を送りました。",
-        '',
-        "[#{Package.name}](#{Package.url}) #{Package.version}",
-      ].join("\n")
+      template = Template.new('reaction')
+      template[:payload] = params[:payload]
+      template[:receipt] = params[:receipt]
+      return template.to_s
     end
   end
 end
