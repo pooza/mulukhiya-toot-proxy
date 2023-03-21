@@ -37,6 +37,8 @@ html lang='ja'
             button.small @click='updateTags'
               i class='fa fa-cloud-arrow-up'
               | 更新
+        .footer-tags v-else=''
+          .alert #{controller.visibility_name(:public)}ではない#{controller.status_label}はタグ付けできません。
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
