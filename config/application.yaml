@@ -323,6 +323,7 @@ mastodon:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - user_tag
       - remote_tag
@@ -356,6 +357,7 @@ mastodon:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - remote_tag
       - removal_rule_tag
@@ -466,6 +468,7 @@ meisskey:
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
       - dictionary_tag
+      - emoji_tag
       - remote_tag
       - removal_rule_tag
       - tagging
@@ -491,6 +494,7 @@ meisskey:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - user_tag
       - remote_tag
@@ -521,6 +525,7 @@ meisskey:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - remote_tag
       - removal_rule_tag
@@ -642,6 +647,7 @@ misskey:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - user_tag
       - remote_tag
@@ -672,6 +678,7 @@ misskey:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - remote_tag
       - removal_rule_tag
@@ -883,6 +890,7 @@ pleroma:
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
       - dictionary_tag
+      - emoji_tag
       - remote_tag
       - removal_rule_tag
       - tagging
@@ -909,6 +917,7 @@ pleroma:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - user_tag
       - remote_tag
@@ -940,6 +949,7 @@ pleroma:
       - spoiler
       - default_tag
       - dictionary_tag
+      - emoji_tag
       - media_tag
       - remote_tag
       - removal_rule_tag
