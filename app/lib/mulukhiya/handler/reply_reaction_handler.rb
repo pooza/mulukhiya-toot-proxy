@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def create_status(params)
-      template = Template.new('reaction')
+      template = Template.new('reaction.md')
       template[:payload] = params[:payload]
       template[:receipt] = params[:receipt]
       return template.to_s
