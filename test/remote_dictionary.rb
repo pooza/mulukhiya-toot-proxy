@@ -26,7 +26,7 @@ module Mulukhiya
 
     def test_strict?
       RemoteDictionary.all do |dic|
-        assert_bool(dic.strict?)
+        assert_boolean(dic.strict?)
       end
     end
   end

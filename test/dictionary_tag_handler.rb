@@ -26,7 +26,7 @@ module Mulukhiya
 
       assert_equal(@handler.addition_tags, Set['キュアマーメイド', '海藤 みなみ', '浅野 真澄'])
 
-      @handler.handle_pre_toot(status_field => ":maam_g:")
+      @handler.handle_pre_toot(status_field => ':maam_g:')
 
       assert_equal(@handler.addition_tags, Set['マァム'])
     end
