@@ -45,7 +45,7 @@ module Mulukhiya
       return keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
           url = work.dig('node', 'officialSiteUrl')
-          work['node']['officialSiteUrl'] = Ginseng::URI.parse(url) if url.present?
+          work['node']['officialSiteUrl'] = url.present? ? Ginseng::URI.parse(url) : nil
           work['node'].compact.merge(
             'hashtag' => work.dig('node', 'title').to_hashtag,
             'hashtag_url' => sns.create_tag_uri(work.dig('node', 'title')).to_s,
