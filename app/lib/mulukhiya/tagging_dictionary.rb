@@ -21,7 +21,6 @@ module Mulukhiya
       reverse_each do |k, v|
         next if short?(k)
         next unless text.match?(v[:pattern])
-        tags.add(k)
         tags.merge(v[:words])
         text.gsub!(v[:pattern], '')
       end
