@@ -26,26 +26,45 @@ html lang='ja'
               i class='fa fa-globe'
               a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
         .episode-container
-          ul.episodes v-if='episodes[work.annictId]'
-            li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
-              strong.number-text
-                | {{episode.numberText}}
-              .link-container
-                i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
-                span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
-                  | {{episode.title}}
-              .link-container
-                i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
-                span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
-                  | {{episode.hashtag}}
-              .bubble-container
-                a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
-                  i class='fas fa-comment'
-                | タイムライン
-              .bubble-container v-if='episode.command_url'
-                a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
-                  i class='fas fa-microphone'
-                | 実況開始
+          div v-if='episodes[work.annictId]'
+            ul.episodes v-if='episodes[work.annictId].length'
+              li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
+                strong.number-text
+                  | {{episode.numberText}}
+                .link-container
+                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+                  span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
+                    | {{episode.title}}
+                .link-container
+                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                  span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                    | {{episode.hashtag}}
+                .bubble-container v-if='episode.hashtag_url'
+                  a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
+                    i class='fas fa-comment'
+                  | タイムライン
+                .bubble-container v-if='episode.command_url'
+                  a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
+                    i class='fas fa-microphone'
+                  | 実況開始
+            ul.episodes v-else=''
+              li.episode
+                .link-container
+                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId"
+                  span.title :id="'episode-title-' + work.annictId"
+                    | {{work.title}}
+                .link-container
+                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId"
+                  span.hashtag :id="'episode-hashtag-' + work.annictId"
+                    | {{work.hashtag}}
+                .bubble-container v-if='work.hashtag_url'
+                  a :href='work.hashtag_url' target='_blank' rel='noreferrer' v-if='work.hashtag_url'
+                    i class='fas fa-comment'
+                  | タイムライン
+                .bubble-container v-if='work.command_url'
+                  a :href='work.command_url' target='_blank' rel='noreferrer' v-if='work.command_url'
+                    i class='fas fa-microphone'
+                  | 実況開始
           nav v-else=''
             button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'

@@ -9,6 +9,7 @@ module Mulukhiya
         {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'relative'},
         {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'relative'},
         {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
+        {'url' => 'https://script.google.com/macros/s/AKfycbxXt73nNsHZ5gUtc0WQEu9xR4zuwmfaDiwEObbOUBSokWyi-qCEVkLlEjPTe-iSvAKPmQ/exec', 'type' => 'relative', 'strict' => true},
       ]
       TaggingDictionary.new.refresh
 
@@ -24,6 +25,10 @@ module Mulukhiya
       @handler.handle_pre_toot(status_field => "つよく、やさしく、美しく。\n#キュアマーメイド")
 
       assert_equal(@handler.addition_tags, Set['キュアマーメイド', '海藤 みなみ', '浅野 真澄'])
+
+      @handler.handle_pre_toot(status_field => ':maam_g:')
+
+      assert_equal(@handler.addition_tags, Set['マァム'])
     end
 
     def test_handle_pre_toot_with_poll

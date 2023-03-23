@@ -3,6 +3,7 @@ module Mulukhiya
     include ControllerMethods
 
     post '/api/notes/create' do
+      params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym] if quote?
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.note(params)
       Event.new((renote? ? :post_boost : :post_toot), {reporter:, sns:}).dispatch(params)
@@ -59,6 +60,10 @@ module Mulukhiya
 
     def renote?
       return params[:renoteId].present? && params[:text].empty?
+    end
+
+    def quote?
+      return params[:renoteId].present? && params[:text].present?
     end
 
     def token

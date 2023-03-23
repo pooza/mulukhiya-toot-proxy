@@ -17,7 +17,8 @@ module Mulukhiya
     end
 
     def reactionable?
-      return ['misskey', 'pleroma'].member?(sns.nodeinfo['software']['name'])
+      # TODO: 当面はMisskeyタイプのリアクションのみ対応
+      return ['misskey'].member?(service.nodeinfo.dig(:software, :name))
     rescue => e
       e.log(acct: acct.to_s)
       return false

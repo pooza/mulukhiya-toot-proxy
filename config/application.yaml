@@ -161,9 +161,6 @@ handler:
   removal_rule_tag:
     disable: true
     rules: []
-  reply_reaction:
-    disable: true
-    experimental: true
   result_notification:
     spoiler_text: 実行結果
   shortened_url:
@@ -784,7 +781,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.26.5
+  version: 4.27.0
 parser:
   note:
     fields:
@@ -833,7 +830,7 @@ pleroma:
     favorite_tags: true
     feed: true
     media_catalog: true
-    reaction: true
+    reaction: false # TODO: 当面はMisskeyタイプのリアクションのみ対応
     streaming: true
     webhook: true
   handlers:
@@ -1079,6 +1076,8 @@ webui:
       - https://use.fontawesome.com/releases/v6.2.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
+  episode:
+    minutes: 30
   media:
     cache:
       ttl: 8640000

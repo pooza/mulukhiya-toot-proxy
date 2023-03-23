@@ -45,12 +45,12 @@ module Mulukhiya
       return keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
           url = work.dig('node', 'officialSiteUrl')
-          if url.present?
-            work['node']['officialSiteUrl'] = Ginseng::URI.parse(url)
-          else
-            work['node'].delete('officialSiteUrl')
-          end
-          work['node']
+          work['node']['officialSiteUrl'] = url.present? ? Ginseng::URI.parse(url) : nil
+          work['node'].compact.merge(
+            'hashtag' => work.dig('node', 'title').to_hashtag,
+            'hashtag_url' => sns.create_tag_uri(work.dig('node', 'title')).to_s,
+            'command_url' => create_command_uri(title: work.dig('node', 'title')).to_s,
+          )
         end
         entries.concat(works)
       end
@@ -63,14 +63,16 @@ module Mulukhiya
         episodes.each do |episode|
           next unless subtitle = episode['title']
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          episode['hashtag'] = episode['title'].to_hashtag
-          episode['hashtag_uri'] = sns.create_tag_uri(episode['title'])
-          episode['command_uri'] = create_command_uri(
-            title: entries.first['title'],
-            subtitle: episode['title'],
-            number_text: episode['numberText'],
-          )
-          all.push(episode)
+          all.push(episode.merge(
+            'hashtag' => episode['title'].to_hashtag,
+            'hashtag_uri' => sns.create_tag_uri(episode['title']),
+            'command_uri' => create_command_uri(
+              title: entries.first['title'],
+              subtitle: episode['title'],
+              number_text: episode['numberText'],
+              minutes: config['/webui/episode/minutes'],
+            ),
+          ))
         end
       end
       return all
@@ -268,9 +270,9 @@ module Mulukhiya
             'エア番組',
             self.class.create_episode_number_text(params[:number_text]),
             params[:subtitle],
-          ],
-          minutes: 25,
-        },
+          ].compact,
+          minutes: params[:minutes],
+        }.deep_compact,
       )
     end
 
