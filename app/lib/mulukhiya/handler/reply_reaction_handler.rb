@@ -11,7 +11,9 @@ module Mulukhiya
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
       return if receipt.reactionable?
-      return unless version = receipt.service.nodeinfo.dig(:mulukhiya, :package, :version)
+      return unless remote_mulukhiya = receipt.service.nodeinfo[:mulukhiya]
+      logger.info(remote_mulukhiya:)
+      return unless version = remote_mulukhiya.dig(:package, :version)
       return if Gem::Version.create(version) < Gem::Version.create('4.27.0')
       sns.post({
         status_field => create_status(payload:, receipt:),
