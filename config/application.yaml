@@ -161,9 +161,6 @@ handler:
   removal_rule_tag:
     disable: true
     rules: []
-  reply_reaction:
-    disable: true
-    experimental: true
   result_notification:
     spoiler_text: 実行結果
   shortened_url:
