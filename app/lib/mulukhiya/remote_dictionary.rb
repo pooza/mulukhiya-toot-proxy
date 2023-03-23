@@ -52,7 +52,7 @@ module Mulukhiya
 
     def create_entry(word)
       pattern = create_pattern(word)
-      return {pattern:, regexp: pattern.source, words: []}
+      return {pattern:, regexp: pattern.source, words: [create_key(word)]}
     end
 
     def create_key(word)

@@ -15,7 +15,7 @@ module Mulukhiya
       result = @dic.parse
 
       assert_kind_of(Hash, result)
-      assert_equal({pattern: /パルテノンモード/, regexp: 'パルテノンモード', words: []}, result['パルテノンモード'])
+      assert_equal({pattern: /パルテノンモード/, regexp: 'パルテノンモード', words: ['パルテノンモード']}, result['パルテノンモード'])
     end
   end
 end
