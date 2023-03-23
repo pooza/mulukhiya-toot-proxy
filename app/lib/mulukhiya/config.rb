@@ -27,7 +27,6 @@ module Mulukhiya
         config: {
           controller: self['/controller'],
           status: Environment.status_class.default,
-          handlers: Handler.names.sort,
         },
       }
     end
