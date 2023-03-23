@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def strict?
-      return (@params['/strict'] rescue false)
+      return (@params['/strict'] rescue false) || false
     end
   end
 end
