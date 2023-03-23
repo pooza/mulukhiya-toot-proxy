@@ -26,6 +26,10 @@ module Mulukhiya
       return @edit_uri
     end
 
+    def strict?
+      return (@params['/strict'] rescue false)
+    end
+
     def to_h
       return {uri: uri.to_s}
     end

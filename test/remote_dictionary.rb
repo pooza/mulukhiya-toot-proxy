@@ -23,5 +23,11 @@ module Mulukhiya
         assert_predicate(dic.fetch, :present?)
       end
     end
+
+    def test_strict?
+      RemoteDictionary.all do |dic|
+        assert_bool(dic.strict?)
+      end
+    end
   end
 end
