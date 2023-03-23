@@ -18,7 +18,10 @@ module Mulukhiya
 
     def reactionable?
       # TODO: 当面はMisskeyタイプのリアクションのみ対応
-      return ['misskey'].member?(service.nodeinfo.dig('software', 'name'))
+      http = HTTP.new
+      http.base_uri = "https://#{acct.host}"
+      response = http.get('/nodeinfo/2.0')
+      return ['misskey'].member?(response.dig('software', 'name'))
     rescue => e
       e.log(acct: acct.to_s)
       return false
