@@ -113,7 +113,7 @@ GEM
     builder (3.2.4)
     cgi (0.3.6)
     concurrent-ruby (1.2.2)
-    connection_pool (2.3.0)
+    connection_pool (2.4.0)
     crass (1.0.6)
     daemon-spawn (0.4.2)
     date (3.3.3)
