@@ -46,9 +46,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: c0f2197302ac5b1ba01c9c59a719f0da7c91a3b2
+  revision: a502ee05e80357e646ea53202a1521832f57f47d
   specs:
-    ginseng-fediverse (1.8.8)
+    ginseng-fediverse (1.8.9)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -290,7 +290,7 @@ GEM
       rubocop-ast (>= 1.26.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.27.0)
+    rubocop-ast (1.28.0)
       parser (>= 3.2.1.0)
     rubocop-minitest (0.29.0)
       rubocop (>= 1.39, < 2.0)
