@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: 0a0e46ab42c1d99984e0be94e514c32659371c58
+  revision: 4ea0effb012f3403f5688f824a99baaff213a74a
   specs:
     faye-websocket (0.11.1)
       eventmachine (>= 0.12.0)
