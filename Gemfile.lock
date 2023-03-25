@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: 0a0e46ab42c1d99984e0be94e514c32659371c58
+  revision: 4ea0effb012f3403f5688f824a99baaff213a74a
   specs:
     faye-websocket (0.11.1)
       eventmachine (>= 0.12.0)
@@ -46,9 +46,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: c0f2197302ac5b1ba01c9c59a719f0da7c91a3b2
+  revision: a502ee05e80357e646ea53202a1521832f57f47d
   specs:
-    ginseng-fediverse (1.8.8)
+    ginseng-fediverse (1.8.9)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -113,7 +113,7 @@ GEM
     builder (3.2.4)
     cgi (0.3.6)
     concurrent-ruby (1.2.2)
-    connection_pool (2.3.0)
+    connection_pool (2.4.0)
     crass (1.0.6)
     daemon-spawn (0.4.2)
     date (3.3.3)
@@ -290,7 +290,7 @@ GEM
       rubocop-ast (>= 1.26.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.27.0)
+    rubocop-ast (1.28.0)
       parser (>= 3.2.1.0)
     rubocop-minitest (0.29.0)
       rubocop (>= 1.39, < 2.0)
