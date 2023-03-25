@@ -8,13 +8,6 @@ module Mulukhiya
 
     alias note post
 
-    def search_dupllicated_attachment(attachment, params = {})
-      attachment = attachment.to_h[:md5] if attachment.is_a?(attachment_class)
-      response = super
-      return response if params[:response] == :raw
-      return attachment_class[response.parsed_response.first['id']]
-    end
-
     def oauth_client(type = :default)
       return nil unless scopes = MisskeyController.oauth_scopes(type)
       body = {
