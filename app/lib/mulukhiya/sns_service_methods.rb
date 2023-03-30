@@ -21,7 +21,8 @@ module Mulukhiya
         dir = File.join(Environment.dir, 'tmp/media', File.read(path).sha256)
         FileUtils.mkdir_p(dir)
         file = MediaFile.new(path)
-        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
+        dest = File.basename(filename, File.extname(filename))
+        dest += file.recommended_extname unless dest.end_with?(file.recommended_extname)
         dest = File.join(dir, dest)
         FileUtils.copy(path, dest)
         path = dest
