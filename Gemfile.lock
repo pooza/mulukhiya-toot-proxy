@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 2088a6e5ef0517e3e01b0708079069ea7132c0bf
+  revision: 512adb936b83611071e5ba6ae557f31dd01053ed
   specs:
-    ginseng-core (1.13.18)
+    ginseng-core (1.13.19)
       actionpack (>= 7.0.4.1)
       activesupport (>= 7.0.4.3)
       addressable (>= 2.8.0)
@@ -39,7 +39,7 @@ GIT
       sanitize (>= 6.0.1)
       securerandom
       set
-      time
+      time (>= 0.2.2)
       yajl-ruby (>= 1.4.3)
       zeitwerk (>= 2.4.0)
       zlib
