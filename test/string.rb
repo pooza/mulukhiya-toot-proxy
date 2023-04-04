@@ -14,5 +14,10 @@ module Mulukhiya
 
       assert_equal(src, src.encrypt.decrypt)
     end
+
+    def test_blockquote
+      assert_equal("> aaa\n> bbb", "aaa\nbbb".blockquote)
+      assert_equal("| aaa\n| bbb", "aaa\nbbb".blockquote('|'))
+    end
   end
 end

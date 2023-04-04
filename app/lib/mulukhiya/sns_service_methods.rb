@@ -4,7 +4,12 @@ module Mulukhiya
 
     def update_status(id, body, params = {})
       status = status_class[id]
-      values = status.values.slice(status_field, reply_to_field, spoiler_field, visibility_field)
+      values = status.values.slice(
+        status_field.to_sym,
+        reply_to_field.to_sym,
+        spoiler_field.to_sym,
+        visibility_field.to_sym,
+      )
       values[attachment_field] = status.attachments.map(&:id)
       delete_status(id, params)
       if body.is_a?(Hash)
@@ -21,7 +26,8 @@ module Mulukhiya
         dir = File.join(Environment.dir, 'tmp/media', File.read(path).sha256)
         FileUtils.mkdir_p(dir)
         file = MediaFile.new(path)
-        dest = File.basename(filename, File.extname(filename)) + file.recommended_extname
+        dest = File.basename(filename, File.extname(filename))
+        dest += file.recommended_extname unless dest.end_with?(file.recommended_extname)
         dest = File.join(dir, dest)
         FileUtils.copy(path, dest)
         path = dest

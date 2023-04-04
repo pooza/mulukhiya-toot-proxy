@@ -76,7 +76,7 @@ module Mulukhiya
     end
 
     def artists
-      return (track || album).artists.map(&:name).to_set
+      return (track || album).artists.to_set(&:name)
     rescue
       return nil
     end

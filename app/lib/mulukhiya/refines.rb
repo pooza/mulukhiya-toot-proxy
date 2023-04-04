@@ -8,6 +8,10 @@ module Mulukhiya
       def decrypt
         return Crypt.new.decrypt(self)
       end
+
+      def blockquote(prompt = '>')
+        return dup.each_line.map {|l| "#{prompt} #{l.chomp}"}.join("\n")
+      end
     end
 
     class ::Hash

@@ -120,7 +120,7 @@ module Mulukhiya
         raise Ginseng::RequestError, "URI #{uri} not puclic" unless uri.public?
         data[:url] = uri.to_s
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
-        data[:body] ||= uri.to_s
+        data[:body] ||= "via: #{uri}"
       end
       client.send(op: 'CreatePost', data:)
     end
