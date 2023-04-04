@@ -9,8 +9,8 @@ module Mulukhiya
         return Crypt.new.decrypt(self)
       end
 
-      def blockquote(c = '>')
-        return self.dup.each_line.map {|l| "#{c} #{l.chomp}"}.join("\n")
+      def blockquote(prompt = '>')
+        return dup.each_line.map {|l| "#{prompt} #{l.chomp}"}.join("\n")
       end
     end
 
