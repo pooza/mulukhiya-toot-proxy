@@ -4,7 +4,12 @@ module Mulukhiya
 
     def update_status(id, body, params = {})
       status = status_class[id]
-      values = status.values.slice(status_field, reply_to_field, spoiler_field, visibility_field)
+      values = status.values.slice(
+        status_field.to_sym,
+        reply_to_field.to_sym,
+        spoiler_field.to_sym,
+        visibility_field.to_sym,
+      )
       values[attachment_field] = status.attachments.map(&:id)
       delete_status(id, params)
       if body.is_a?(Hash)
