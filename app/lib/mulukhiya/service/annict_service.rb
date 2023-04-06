@@ -83,9 +83,7 @@ module Mulukhiya
       touch unless updated_at
       recent = activities.select {|v| updated_at < Time.parse(v['createdAt'])}
       return unless recent.present?
-      keywords = self.class.keywords
-      recent.each do |activity|
-        next if keywords.present? && keywords.none? {|v| activity.to_json.include?(v)}
+      recent.select {|v| crawlable?(v, params)}.each do |activity|
         webhook.post(create_payload(activity))
       end
       touch
@@ -245,7 +243,10 @@ module Mulukhiya
       bar = ProgressBar.create(total: accounts.count)
       results = {}
       accounts.each do |account|
-        results[account.acct.to_s] = account.annict.crawl(params.merge(webhook: account.webhook))
+        results[account.acct.to_s] = account.annict.crawl(params.merge(
+          webhook: account.webhook,
+          account:,
+        ))
       rescue => e
         e.log(acct: account.acct.to_s)
       ensure
@@ -274,6 +275,14 @@ module Mulukhiya
           minutes: params[:minutes],
         }.deep_compact,
       )
+    end
+
+    def crawlable?(activity, params)
+      keywords = self.class.keywords
+      return true unless keywords.present?
+      return true unless account = params[:account]
+      return true unless account.user_config['/annict/theme_works_only']
+      return keywords.any? {|v| activity.to_json.include?(v)}
     end
 
     def query(template, params = {})
