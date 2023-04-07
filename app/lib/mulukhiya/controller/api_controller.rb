@@ -332,6 +332,7 @@ module Mulukhiya
       else
         response = AnnictService.new.auth(params[:code])
         sns.account.user_config.update(annict: {token: response['access_token']})
+        sns.account.annict.clear
         sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
         @renderer.message = {config: sns.account.user_config.to_h}

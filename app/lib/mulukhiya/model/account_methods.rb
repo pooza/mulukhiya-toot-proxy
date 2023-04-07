@@ -17,11 +17,11 @@ module Mulukhiya
     end
 
     def reactionable?
-      # TODO: 当面はMisskeyタイプのリアクションのみ対応
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"
       response = http.get('/nodeinfo/2.0')
-      return ['misskey'].member?(response.dig('software', 'name'))
+      return false unless software = response.dig('software', 'name')
+      return config["/#{software}/features/reaction"] == true
     rescue => e
       e.log(acct: acct.to_s)
       return false
