@@ -115,8 +115,15 @@ module Mulukhiya
 
     def updated_at=(time)
       time = Time.parse(time.to_s).getlocal
-      timestamps[account[:id]] = {time: time.to_s} if updated_at.nil? || (updated_at < time)
+      return unless updated_at.nil? || (updated_at < time)
       @updated_at = nil
+      timestamps[account[:id]] = {time: time.to_s}
+      logger.info(annict: {id: account[:id], updated_at: time.to_s})
+    end
+
+    def clear
+      timestamps.unlink(account[:id])
+      logger.info(annict: {id: account[:id], updated_at: 'deleted'})
     end
 
     def touch
