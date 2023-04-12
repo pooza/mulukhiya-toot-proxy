@@ -5,6 +5,7 @@ module Mulukhiya
 
     def initialize
       super
+      @handler = Handler.create(:dictionary_tag)
       @http = HTTP.new
       refresh unless cache.is_a?(Hash)
       update(cache)
@@ -55,10 +56,9 @@ module Mulukhiya
     end
 
     def short?(word)
-      return false unless handler = Handler.create(:dictionary_tag)
-      pattern = Regexp.new("^#{handler.without_kanji_pattern}{,#{handler.minimum_length - 1}}$")
+      pattern = Regexp.new("^#{@handler.without_kanji_pattern}{,#{@handler.minimum_length - 1}}$")
       return true if word.match?(pattern)
-      return word.length < handler.minimum_length_kanji
+      return word.length < @handler.minimum_length_kanji
     end
 
     private
