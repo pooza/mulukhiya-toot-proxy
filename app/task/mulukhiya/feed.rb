@@ -12,7 +12,7 @@ module Mulukhiya
         namespace feed.id do
           desc "#{feed.fullpath} : exec source command"
           task exec: [:bundler] do
-            puts feed.command.to_s
+            puts feed.command
             feed.command.exec_system
           end
 
