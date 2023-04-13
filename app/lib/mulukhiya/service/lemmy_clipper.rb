@@ -117,7 +117,7 @@ module Mulukhiya
       data = {community_id: @params[:community], auth: @jwt, name: body[:name]&.to_s}
       if uri = create_status_uri(body[:url])
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
-        raise Ginseng::RequestError, "URI #{uri} not puclic" unless uri.public?
+        raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
         data[:url] = uri.to_s
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= "via: #{uri}"
