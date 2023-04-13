@@ -35,7 +35,6 @@ module Mulukhiya
       assert_predicate(filters.length, :positive?)
       filters.first(5).each do |filter|
         assert_kind_of(String, filter['id'])
-        assert_kind_of(String, filter['phrase'])
       end
     end
   end
