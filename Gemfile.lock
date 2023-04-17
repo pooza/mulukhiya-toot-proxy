@@ -267,7 +267,7 @@ GEM
     rake (13.0.6)
     redis-client (0.12.2)
       connection_pool
-    regexp_parser (2.7.0)
+    regexp_parser (2.8.0)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -280,7 +280,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.50.1)
+    rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
