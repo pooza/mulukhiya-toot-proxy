@@ -19,9 +19,11 @@ module Mulukhiya
     def reactionable?
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"
-      response = http.get('/nodeinfo/2.0')
-      return false unless software = response.dig('software', 'name')
-      return config["/#{software}/features/reaction"] == true
+      software = http.get('/nodeinfo/2.0').parsed_response.dig('software', 'name')
+      return true if (config["/#{software}/features/reaction"] rescue nil)
+      capabilities = http.get('/api/v1/instance').parsed_response['fedibird_capabilities'] || []
+      return true if capabilities.member?('emoji_reaction')
+      return false
     rescue => e
       e.log(acct: acct.to_s)
       return false
