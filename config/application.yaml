@@ -147,14 +147,15 @@ handler:
       video: video
   remote_tag:
     services:
-      - pattern: (プリキュア|precure|キュアスタ)
+      - pattern: (プリキュア|キュアスタ|きゅあすきー|precure)
         tags:
           - precure_fun
         url: https://precure.ml
-      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼|delmulin)
+      - pattern: (ダイ(大|の大冒険)|デル(ムリン)?丼|ダイスキー|delmulin)
         tags:
           - delmulin
         url: https://mstdn.delmulin.com
+    toggleable: false
   removal_rule_tag:
     disable: true
     rules: []

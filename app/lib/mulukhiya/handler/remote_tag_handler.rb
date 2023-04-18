@@ -1,5 +1,9 @@
 module Mulukhiya
   class RemoteTagHandler < TagHandler
+    def disable?
+      return false
+    end
+
     def addition_tags
       text = flatten_payload
       dic = TaggingDictionary.new
