@@ -66,7 +66,7 @@ module Mulukhiya
         params[:id] ||= params[:status_id]
         case type.to_sym
         in :public
-          return service.create_uri("/notes/#{params[:id]}")
+          return service.create_uri("/notes/#{params[:status_id]}")
         end
       end
     end
