@@ -19,6 +19,4 @@ properties:
   timeout:
     minimum: 1
     type: integer
-required:
-  - services
 type: object
