@@ -172,6 +172,7 @@ handler:
       - youtu.be
       - git.io
       - spoti.fi
+      - spotify.link
       - apple.co
   slack_alert:
     hooks: []
