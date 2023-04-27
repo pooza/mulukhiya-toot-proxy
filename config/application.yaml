@@ -173,6 +173,7 @@ handler:
       - git.io
       - spoti.fi
       - spotify.link
+      - spotify.app.link
       - apple.co
   slack_alert:
     hooks: []
