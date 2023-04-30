@@ -241,7 +241,7 @@ GEM
     parallel (1.23.0)
     parser (3.2.2.1)
       ast (~> 2.4.1)
-    pg (1.5.2)
+    pg (1.5.3)
     power_assert (2.0.3)
     public_suffix (5.0.1)
     puma (6.2.2)
@@ -359,7 +359,7 @@ GEM
     yajl-ruby (1.4.3)
     yamllint (0.0.9)
       trollop (~> 2)
-    zeitwerk (2.6.7)
+    zeitwerk (2.6.8)
     zlib (3.0.0)
 
 PLATFORMS
