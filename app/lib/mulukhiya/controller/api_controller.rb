@@ -111,7 +111,6 @@ module Mulukhiya
 
     post '/program/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
       ProgramUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
