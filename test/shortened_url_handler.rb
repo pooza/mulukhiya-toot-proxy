@@ -29,6 +29,17 @@ module Mulukhiya
       @handler.handle_pre_toot(status_field => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW')
 
       assert_equal(2, @handler.debug_info[:result].count)
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://spotify.link/BgfsBAMTbzb')
+
+      assert_equal(1, @handler.debug_info[:result].count)
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://spotify.app.link/BgfsBAMTbzb?_p=c2153fdc9c077af1ea1990ffecb6')
+      ic @handler.debug_info
+
+      assert_equal(1, @handler.debug_info[:result].count)
     end
   end
 end
