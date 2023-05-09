@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     def test_accounts
-      return unless account_class
+      skip unless account_class
 
       UserConfigStorage.accounts do |account|
         assert_kind_of(account_class, account)
@@ -43,7 +43,7 @@ module Mulukhiya
     end
 
     def test_tag_owners
-      return unless account_class
+      skip unless account_class
 
       UserConfigStorage.tag_owners do |account|
         assert_predicate(account.user_config.tags, :present?)

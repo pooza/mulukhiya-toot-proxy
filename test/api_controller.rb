@@ -28,7 +28,7 @@ module Mulukhiya
     end
 
     def test_program
-      return unless controller_class.livecure?
+      skip unless controller_class.livecure?
 
       get '/program'
 
@@ -47,7 +47,7 @@ module Mulukhiya
     end
 
     def test_media
-      return unless controller_class.media_catalog?
+      skip unless controller_class.media_catalog?
 
       get '/media'
 
@@ -93,7 +93,7 @@ module Mulukhiya
     end
 
     def test_favorite_tags
-      return unless controller_class.favorite_tags?
+      skip unless controller_class.favorite_tags?
       get '/tagging/favorites'
 
       assert_predicate(last_response, :ok?)
@@ -101,7 +101,7 @@ module Mulukhiya
     end
 
     def test_tag_episode
-      return unless controller_class.annict?
+      skip unless controller_class.annict?
       get '/tagging/dic/annict/episodes'
 
       assert_predicate(last_response, :ok?)
@@ -109,7 +109,7 @@ module Mulukhiya
     end
 
     def test_lemmy_communities
-      return unless test_account.lemmy
+      skip unless test_account.lemmy
       get "/lemmy/communities?token=#{test_account.token}"
 
       assert_predicate(last_response, :ok?)
@@ -131,7 +131,7 @@ module Mulukhiya
     end
 
     def test_status
-      return unless controller_class.account_timeline?
+      skip unless controller_class.account_timeline?
       get '/status'
 
       assert_false(last_response.ok?)

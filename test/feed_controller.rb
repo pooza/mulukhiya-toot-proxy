@@ -18,7 +18,7 @@ module Mulukhiya
     end
 
     def test_media
-      return unless controller_class.media_catalog?
+      skip unless controller_class.media_catalog?
 
       get '/media'
 
@@ -27,7 +27,7 @@ module Mulukhiya
     end
 
     def test_default_tag
-      return unless DefaultTagHandler.tags.present?
+      skip unless DefaultTagHandler.tags.present?
 
       service = sns_class.new
       DefaultTagHandler.tags.each do |tag|
@@ -39,7 +39,7 @@ module Mulukhiya
     end
 
     def test_media_tag
-      return if Handler.create(:media_tag).disable?
+      skip if Handler.create(:media_tag).disable?
       get '/tag/image'
       if hash_tag_class.get(tag: config['/handler/media_tag/tags/image'])
         assert_equal('application/rss+xml; charset=UTF-8', last_response.content_type)
