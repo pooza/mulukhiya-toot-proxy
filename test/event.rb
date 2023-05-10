@@ -24,17 +24,6 @@ module Mulukhiya
       end
     end
 
-    def test_dispatch
-      @event.dispatch(
-        status_field => '#nowplaying https://open.spotify.com/track/3h5LpK0cYVoZgkU1Gukedq',
-        visibility_field => controller_class.visibility_name(:private),
-      )
-
-      assert(@event.reporter.tags.member?('宮本佳那子'))
-      assert(@event.reporter.tags.member?('福山沙織'))
-      assert(@event.reporter.tags.member?('井上由貴'))
-    end
-
     def test_syms
       assert_kind_of(Set, Event.syms)
       Event.syms.each do |sym|

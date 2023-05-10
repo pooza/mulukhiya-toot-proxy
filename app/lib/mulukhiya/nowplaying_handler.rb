@@ -26,6 +26,8 @@ module Mulukhiya
       @recent_keyword = matches[1]
       return unless updatable?(@recent_keyword)
       update(@recent_keyword)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
     end
 
     def create_uri(keyword)
@@ -50,9 +52,7 @@ module Mulukhiya
       push("#{album_prefix} #{uri.album_name.escape_toot}") if uri.album_name
       push("#{artist_prefix} #{uri.artists.map(&:escape_toot).join(', ')}")
       tags.merge(uri.artists) if handler_config(:tagging)
-      result.push(url: uri.to_s, title: uri.title)
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword:)
+      result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
     end
 
     def verbose?
