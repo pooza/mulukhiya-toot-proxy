@@ -52,7 +52,7 @@ module Mulukhiya
     end
 
     def test_webhook_entries
-      skip unless webhook = app.webhook_entries&.first
+      return unless webhook = app.webhook_entries&.first
 
       assert_kind_of(account_class, webhook[:account])
     end

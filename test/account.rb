@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_get
-      skip unless account
+      return unless account
 
       assert_equal(account_class.get(token: account.token).id, account.id)
       assert_equal(account_class.get(acct: account.acct.to_s).id, account.id)
@@ -14,7 +14,7 @@ module Mulukhiya
     end
 
     def test_acct
-      skip unless account
+      return unless account
 
       assert_kind_of(Acct, account.acct)
       assert_predicate(account.acct.host, :present?)
@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def test_to_h
-      skip unless account
+      return unless account
       h = account.to_h
 
       assert_kind_of(Hash, h)
@@ -37,98 +37,98 @@ module Mulukhiya
     end
 
     def test_uri
-      skip unless account
+      return unless account
 
       assert_kind_of(Ginseng::URI, account.uri)
       assert_predicate(account.uri, :absolute?)
     end
 
     def test_username
-      skip unless account
+      return unless account
 
       assert_kind_of(String, account.username)
     end
 
     def test_host
-      skip unless account
+      return unless account
 
       assert_kind_of(String, account.host)
     end
 
     def test_domain
-      skip unless account
+      return unless account
 
       assert_kind_of(String, account.domain)
     end
 
     def test_display_name
-      skip unless account
+      return unless account
 
       assert_kind_of(String, account.display_name)
     end
 
     def test_fields
-      skip unless account
+      return unless account
 
       assert_kind_of(Array, account.fields)
     end
 
     def test_bio
-      skip unless account
+      return unless account
 
       assert_kind_of(String, account.bio)
     end
 
     def test_operator?
-      skip unless account
+      return unless account
 
       assert_boolean(account.operator?)
     end
 
     def test_admin?
-      skip unless account
+      return unless account
 
       assert_boolean(account.admin?)
     end
 
     def test_moderator?
-      skip unless account
+      return unless account
 
       assert_boolean(account.moderator?)
     end
 
     def test_test?
-      skip unless account
+      return unless account
 
       assert_predicate(account, :test?)
     end
 
     def test_info?
-      skip unless account
+      return unless account
 
       assert_boolean(account.info?)
     end
 
     def test_default_scopes
-      skip unless account
+      return unless account
 
       assert_kind_of(Set, account.default_scopes)
     end
 
     def test_locked?
-      skip unless account
+      return unless account
 
       assert_boolean(account.locked?)
     end
 
     def test_notify_verbose?
-      skip unless account
+      return unless account
 
       assert_boolean(account.notify_verbose?)
     end
 
     def test_config
-      skip unless account
+      return unless account
 
       assert_kind_of(UserConfig, account.user_config)
     end
@@ -150,7 +150,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      skip unless account
+      return unless account
 
       Event.new(:pre_toot).handlers do |handler|
         assert_boolean(account.disable?(handler))
@@ -158,37 +158,37 @@ module Mulukhiya
     end
 
     def test_user_tags
-      skip unless account
+      return unless account
 
       assert_kind_of(TagContainer, account.user_tags)
     end
 
     def test_disabled_tags
-      skip unless account
+      return unless account
 
       assert_kind_of(TagContainer, account.disabled_tags)
     end
 
     def test_featured_tags
-      skip unless account
+      return unless account
 
       assert_kind_of(TagContainer, account.featured_tags)
     end
 
     def test_field_tags
-      skip unless account
+      return unless account
 
       assert_kind_of(TagContainer, account.field_tags)
     end
 
     def test_bio_tags
-      skip unless account
+      return unless account
 
       assert_kind_of(TagContainer, account.bio_tags)
     end
 
     def test_statuses
-      skip unless controller_class.account_timeline?
+      return unless controller_class.account_timeline?
 
       assert_kind_of(Array, statuses = account.statuses)
       statuses.first(10).each do |status|

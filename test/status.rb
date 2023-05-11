@@ -9,25 +9,25 @@ module Mulukhiya
     end
 
     def test_service
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Ginseng::Fediverse::Service, @status.service)
     end
 
     def test_parser
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Ginseng::Fediverse::Parser, @status.parser)
     end
 
     def test_id
-      skip unless @status
+      return unless @status
 
       assert_predicate(@status.id, :present?)
     end
 
     def test_to_h
-      skip unless @status
+      return unless @status
       h = @status.to_h
 
       assert_kind_of(Hash, h)
@@ -43,19 +43,19 @@ module Mulukhiya
     end
 
     def test_date
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Time, @status.date)
     end
 
     def test_account
-      skip unless @status
+      return unless @status
 
       assert_kind_of(account_class, @status.account)
     end
 
     def test_attachments
-      skip unless @status
+      return unless @status
 
       @status.attachments.each do |attachment|
         assert_kind_of([attachment_class, Hash], attachment)
@@ -63,37 +63,37 @@ module Mulukhiya
     end
 
     def test_local?
-      skip unless @status
+      return unless @status
 
       assert_boolean(@status.local?)
     end
 
     def test_public?
-      skip unless @status
+      return unless @status
 
       assert_boolean(@status.public?)
     end
 
     def test_taggable?
-      skip unless @status
+      return unless @status
 
       assert_boolean(@status.taggable?)
     end
 
     def test_body
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.body)
     end
 
     def test_footer
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.footer)
     end
 
     def test_footer_tags
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Array, @status.footer_tags)
       @status.footer_tags.each do |tag|
@@ -102,45 +102,45 @@ module Mulukhiya
     end
 
     def test_visibility_name
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.visibility_name)
       assert(@status.parser.class.visibility_names.values.member?(@status.visibility_name))
     end
 
     def test_visibility_icon
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.visibility_icon)
     end
 
     def test_text
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.text)
     end
 
     def test_uri
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Ginseng::URI, @status.uri)
       assert_predicate(@status.uri, :absolute?)
     end
 
     def test_public_uri
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Ginseng::URI, @status.public_uri)
     end
 
     def test_webui_uri
-      skip unless @status
+      return unless @status
 
       assert_kind_of(Ginseng::URI, @status.webui_uri)
     end
 
     def test_to_md
-      skip unless @status
+      return unless @status
 
       assert_kind_of(String, @status.to_md)
     end

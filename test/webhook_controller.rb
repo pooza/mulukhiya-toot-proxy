@@ -32,14 +32,14 @@ module Mulukhiya
     end
 
     def test_get
-      skip unless hook = test_account.webhook
+      return unless hook = test_account.webhook
       get hook.uri.path.sub(@path_prefix_pattern, '')
 
       assert_predicate(last_response, :ok?)
     end
 
     def test_post
-      skip unless hook = test_account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {text: 'ひらめけ！ホーリーソード！'}.to_json
 
@@ -47,7 +47,7 @@ module Mulukhiya
     end
 
     def test_post_with_attachment
-      skip unless hook = test_account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {
         text: '武田信玄',
@@ -61,7 +61,7 @@ module Mulukhiya
     end
 
     def test_invalid_request
-      skip unless hook = test_account.webhook
+      return unless hook = test_account.webhook
       header 'Content-Type', 'application/json'
       post hook.uri.path.sub(@path_prefix_pattern, ''), {}.to_json
 

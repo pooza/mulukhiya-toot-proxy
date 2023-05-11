@@ -10,7 +10,7 @@ module Mulukhiya
     end
 
     def test_all
-      skip unless SlackService.config?
+      return unless SlackService.config?
 
       assert_kind_of(Enumerator, SlackService.all)
       SlackService.all do |slack|
@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def test_uris
-      skip unless SlackService.config?
+      return unless SlackService.config?
 
       assert_kind_of(Enumerator, SlackService.all)
       SlackService.uris do |uri|

@@ -9,34 +9,34 @@ module Mulukhiya
     end
 
     def test_valid?
-      skip unless @token
+      return unless @token
 
       assert_boolean(@token.valid?)
     end
 
     def test_webhook_digest
-      skip unless @token
+      return unless @token
 
       assert_kind_of(String, @token.webhook_digest)
       assert_predicate(@token.webhook_digest, :present?)
     end
 
     def test_to_s
-      skip unless @token
+      return unless @token
 
       assert_kind_of(String, @token.to_s)
       assert_predicate(@token.to_s, :present?)
     end
 
     def test_token
-      skip unless @token
+      return unless @token
 
       assert_kind_of(String, @token.token)
       assert_predicate(@token.token, :present?)
     end
 
     def test_to_h
-      skip unless @token
+      return unless @token
 
       assert_kind_of(Hash, @token.to_h)
       assert_kind_of(account_class, @token.to_h[:account])
@@ -47,19 +47,19 @@ module Mulukhiya
     end
 
     def test_account
-      skip unless @token
+      return unless @token
 
       assert_kind_of(account_class, @token.account)
     end
 
     def test_scopes
-      skip unless @token
+      return unless @token
 
       assert_kind_of(Set, @token.scopes)
     end
 
     def test_scopes_valid?
-      skip unless @token
+      return unless @token
 
       assert_predicate(@token, :scopes_valid?)
     end

@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_to_h
-      skip unless @attachment
+      return unless @attachment
       h = @attachment.to_h
 
       assert(h.key?(:id))
@@ -26,76 +26,76 @@ module Mulukhiya
     end
 
     def test_name
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(String, @attachment.name)
       assert_predicate(@attachment, :present?)
     end
 
     def test_date
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of([Time, NilClass], @attachment.date)
     end
 
     def test_size
-      skip unless @attachment
+      return unless @attachment
 
       assert_predicate(@attachment.size, :positive?)
     end
 
     def test_size_str
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(String, @attachment.size_str)
     end
 
     def test_width
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of([Integer, NilClass], @attachment.width)
     end
 
     def test_height
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of([Integer, NilClass], @attachment.height)
     end
 
     def test_description
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of([String, NilClass], @attachment.description)
     end
 
     def test_meta
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(Hash, @attachment.meta)
     end
 
     def test_uri
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(Ginseng::URI, @attachment.uri)
       assert_predicate(@attachment.uri, :absolute?)
     end
 
     def test_thumbnail_uri
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(Ginseng::URI, @attachment.thumbnail_uri)
       assert_predicate(@attachment.thumbnail_uri, :absolute?)
     end
 
     def test_feed
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(Hash, attachment_class.feed.first)
     end
 
     def test_catalog
-      skip unless @attachment
+      return unless @attachment
 
       assert_kind_of(Hash, attachment_class.catalog.first)
       assert_kind_of(Hash, attachment_class.catalog(only_person: 1).first)

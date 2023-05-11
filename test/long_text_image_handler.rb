@@ -5,7 +5,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      skip unless Environment.production?
+      return unless Environment.production?
 
       Timecop.travel(Time.parse('2021/04/01'))
 

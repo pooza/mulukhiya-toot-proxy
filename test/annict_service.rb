@@ -77,13 +77,13 @@ module Mulukhiya
     end
 
     def test_updated_at
-      skip unless @service
+      return unless @service
 
       assert_kind_of([Time, NilClass], @service.updated_at)
     end
 
     def test_oauth_uri
-      skip unless @service
+      return unless @service
 
       assert_kind_of(Ginseng::URI, @service.oauth_uri)
       assert_predicate(@service.oauth_uri, :absolute?)
@@ -121,7 +121,7 @@ module Mulukhiya
     end
 
     def test_create_payload
-      skip unless @service
+      return unless @service
       record = {
         __typename: 'Record',
         episode: {
