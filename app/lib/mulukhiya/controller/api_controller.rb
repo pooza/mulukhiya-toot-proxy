@@ -325,7 +325,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
 
-      // 未実装
+      # 未実装
 
       return @renderer.to_s
     rescue => e
