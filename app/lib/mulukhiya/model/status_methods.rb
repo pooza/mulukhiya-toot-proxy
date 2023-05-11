@@ -35,6 +35,10 @@ module Mulukhiya
       return visibility == controller_class.visibility_name(:public)
     end
 
+    def nowplaying?
+      return text.match?(/#nowplaying/i)
+    end
+
     def taggable?
       return false unless public?
       return true
@@ -48,6 +52,7 @@ module Mulukhiya
         footer:,
         id: id.to_s,
         is_taggable: taggable?,
+        is_nowplaying: nowplaying?,
         public_url: public_uri.to_s,
         uri: uri.to_s,
         url: uri.to_s,

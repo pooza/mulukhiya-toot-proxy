@@ -41,7 +41,7 @@ html lang='ja'
             i class='fas fa-user'
             | {{status.account.display_name || '@' + status.account.username}}
           pre.body v-if='status.body' = '{{status.body}}'
-          .footer-tags v-if='status.is_taggable && account.username==status.account.username'
+          nav.footer-navigations v-if='status.is_taggable && account.username==status.account.username'
             - if controller.delete_and_tagging?
               i class='fa fa-tag'
               a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
@@ -57,6 +57,9 @@ html lang='ja'
                 | 新規タグを追加
                 a href='javascript:void(0)' @click='createTag(status.id)'
                   i class='fa fa-pencil'
+          nav.footer-navigations v-if='status.is_nowplaying && account.username==status.account.username'
+            i class='fa fa-music'
+            a href="xxx" ナウプレの誤判定を削除
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else

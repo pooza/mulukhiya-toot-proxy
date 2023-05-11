@@ -21,7 +21,7 @@ html lang='ja'
           i class='fas fa-user'
           | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
-        .footer-tags v-if='status.is_taggable'
+        nav.footer-navigations v-if='status.is_taggable'
           h4
             i class='fa fa-tag'
             | タグづけ
@@ -37,7 +37,7 @@ html lang='ja'
             button.small @click='updateTags'
               i class='fa fa-cloud-arrow-up'
               | 更新
-        .footer-tags v-else=''
+        nav.footer-navigations v-else=''
           .alert #{controller.visibility_name(:public)}ではない#{controller.status_label}はタグ付けできません。
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
