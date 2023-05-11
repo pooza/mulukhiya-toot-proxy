@@ -359,6 +359,14 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    Vue.deleteNowplaying = async (id) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.delete('/mulukhiya/api/status/nowplaying', {data: {token: Vue.getToken(), id: id}})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     Vue.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

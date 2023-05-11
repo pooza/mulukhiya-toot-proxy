@@ -321,6 +321,20 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    delete '/status/nowplaying' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+
+      // 未実装
+
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/annict/auth' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

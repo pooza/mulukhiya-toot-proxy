@@ -59,7 +59,7 @@ html lang='ja'
                   i class='fa fa-pencil'
           nav.footer-navigations v-if='status.is_nowplaying && account.username==status.account.username'
             i class='fa fa-music'
-            a href="xxx" ナウプレの誤判定を削除
+            a href='javascript:void(0)' @click='deleteNowplaying(status.id)' ナウプレの誤判定を削除
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else
@@ -97,6 +97,11 @@ html lang='ja'
           },
           deleteTag (id, tag) {
             Vue.deleteTag(id, tag)
+              .then(e => Vue.set(this.statuses, e.id, e))
+              .catch(e => Vue.alert(this.$dialog, e))
+          },
+          deleteNowplaying (id) {
+            Vue.deleteNowplaying(id)
               .then(e => Vue.set(this.statuses, e.id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
