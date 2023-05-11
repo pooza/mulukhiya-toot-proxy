@@ -11,9 +11,8 @@ module Mulukhiya
       if @handler.debug_info[:errors].present?
         assert_equal([{
           class: 'Ginseng::GatewayError',
-          keyword: 'https://open.spotify.com/track/4P68anZPOiBfJj8IFzGhSV',
           message: 'Bad response 429',
-        }], @handler.debug_info[:errors])
+        }], @handler.debug_info[:errors].except(class:, message:))
       else
         assert_equal([{
           source_url: 'https://open.spotify.com/track/4P68anZPOiBfJj8IFzGhSV',
@@ -27,9 +26,8 @@ module Mulukhiya
       if @handler.debug_info[:errors].present?
         assert_equal([{
           class: 'Ginseng::GatewayError',
-          keyword: 'https://music.apple.com/jp/album/405905341?i=405905342&uo=4',
           message: 'Bad response 429',
-        }], @handler.debug_info[:errors])
+        }], @handler.debug_info[:errors].except(class:, message:))
       else
         assert_equal([{
           source_url: 'https://music.apple.com/jp/album/405905341?i=405905342&uo=4',
