@@ -332,7 +332,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        @renderer.message = sns.update_status(status.id, NowplayingHandler.clear(body), {
+        @renderer.message = sns.update_status(status.id, NowplayingHandler.trim(body), {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end

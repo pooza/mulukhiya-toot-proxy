@@ -778,6 +778,12 @@ nowplaying:
               strip: true
           pattern: ^(.+)[[:blank:]]*feat\.[[:blank:]]*(.+)$
     prefix: 'Artist:'
+  domains:
+    - music.apple.com
+    - itunes.apple.com
+    - spotify.com
+    - youtube.com
+    - songwhip.com
   track:
     prefix: 'Title:'
 package:

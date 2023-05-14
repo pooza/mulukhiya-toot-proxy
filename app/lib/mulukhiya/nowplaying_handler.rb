@@ -59,12 +59,14 @@ module Mulukhiya
       return false
     end
 
-    def self.clear(body)
+    def self.trim(body)
       return body.each_line.reject do |line|
         return true if line.match?(Regexp.new("^#{config['/nowplaying/album/prefix']}: "))
         return true if line.match?(Regexp.new("^#{config['/nowplaying/artist/prefix']}: "))
         return true if line.match?(Regexp.new("^#{config['/nowplaying/track/prefix']}: "))
-        return true if line.match?(/^https://(music.apple.com|spotify.com|music.youtube.com)\./)
+        if (uri = URL.parse(line)) && uri.absolute?
+          return true if config['/nowplaying/domains'].any? {|d| uri.host.end_with?(d)}
+        end
         return false
       end.join("\n")
     end
