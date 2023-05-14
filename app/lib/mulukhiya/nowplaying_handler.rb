@@ -59,6 +59,16 @@ module Mulukhiya
       return false
     end
 
+    def self.clear(body)
+      return body.each_line.reject do |line|
+        return true if line.match?(Regexp.new("^#{config['/nowplaying/album/prefix']}: "))
+        return true if line.match?(Regexp.new("^#{config['/nowplaying/artist/prefix']}: "))
+        return true if line.match?(Regexp.new("^#{config['/nowplaying/track/prefix']}: "))
+        return true if line.match?(/^https://(music.apple.com|spotify.com|music.youtube.com)\./)
+        return false
+      end.join("\n")
+    end
+
     private
 
     def track_prefix

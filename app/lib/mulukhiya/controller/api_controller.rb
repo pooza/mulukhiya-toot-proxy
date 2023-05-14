@@ -326,14 +326,13 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
       errors = StatusTagContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        # tags = status.parser.footer_tags.delete(tag.name)
-        # body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
-        @renderer.message = sns.update_status(status.id, body, {
+        @renderer.message = sns.update_status(status.id, NowplayingHandler.clear(body), {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end
