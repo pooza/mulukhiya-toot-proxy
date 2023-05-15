@@ -183,9 +183,9 @@ GEM
     json-schema (4.0.0)
       addressable (>= 2.8)
     jwt (2.7.0)
-    loofah (2.20.0)
+    loofah (2.21.2)
       crass (~> 1.0.2)
-      nokogiri (>= 1.5.9)
+      nokogiri (>= 1.12.0)
     mail (2.8.1)
       mini_mime (>= 0.1.1)
       net-imap
@@ -197,7 +197,7 @@ GEM
     mime-types-data (3.2023.0218.1)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.8.1)
+    mini_portile2 (2.8.2)
     minitest (5.18.0)
     mongo (2.18.2)
       bson (>= 4.14.1, < 5.0.0)
@@ -216,12 +216,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.9)
-    nokogiri (1.14.3)
+    nokogiri (1.14.4)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.14.3-aarch64-linux)
+    nokogiri (1.14.4-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.14.3-x86_64-linux)
+    nokogiri (1.14.4-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -280,7 +280,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.50.2)
+    rubocop (1.51.0)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
@@ -290,9 +290,9 @@ GEM
       rubocop-ast (>= 1.28.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.28.0)
+    rubocop-ast (1.28.1)
       parser (>= 3.2.1.0)
-    rubocop-minitest (0.30.0)
+    rubocop-minitest (0.31.0)
       rubocop (>= 1.39, < 2.0)
     rubocop-performance (1.17.1)
       rubocop (>= 1.7.0, < 2.0)
@@ -311,7 +311,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.2.2)
-    sequel (5.67.0)
+    sequel (5.68.0)
     set (1.0.3)
     sidekiq (7.0.9)
       concurrent-ruby (< 2)
@@ -337,7 +337,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     temple (0.10.0)
-    test-unit (3.5.7)
+    test-unit (3.5.8)
       power_assert
     tilt (2.1.0)
     time (0.2.2)
@@ -402,4 +402,4 @@ RUBY VERSION
    ruby 3.2.2p53
 
 BUNDLED WITH
-   2.4.12
+   2.4.13

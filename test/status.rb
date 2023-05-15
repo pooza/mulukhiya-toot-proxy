@@ -74,6 +74,12 @@ module Mulukhiya
       assert_boolean(@status.public?)
     end
 
+    def test_nowplaying?
+      return unless @status
+
+      assert_boolean(@status.nowplaying?)
+    end
+
     def test_taggable?
       return unless @status
 

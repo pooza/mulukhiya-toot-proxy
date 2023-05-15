@@ -62,11 +62,12 @@ module Mulukhiya
       end
 
       def self.create_uri(type, params)
+        type ||= :public
         service = MisskeyService.new
         params[:id] ||= params[:status_id]
         case type.to_sym
         in :public
-          return service.create_uri("/notes/#{params[:status_id]}")
+          return service.create_uri("/notes/#{params[:id]}")
         end
       end
     end

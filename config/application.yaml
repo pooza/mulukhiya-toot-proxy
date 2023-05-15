@@ -122,6 +122,7 @@ handler:
   itunes_nowplaying:
     timeout: 10
   itunes_url_nowplaying:
+    tagging: false
     timeout: 10
   line_alert:
     id: null
@@ -145,6 +146,9 @@ handler:
       audio: audio
       image: image
       video: video
+  peer_tube_url_nowplaying:
+    tagging: false
+    timeout: 10
   remote_tag:
     services:
       - pattern: (プリキュア|キュアスタ|きゅあすきー|precure)
@@ -184,6 +188,7 @@ handler:
   spotify_nowplaying:
     timeout: 10
   spotify_url_nowplaying:
+    tagging: true
     timeout: 10
   tagging:
     normalize:
@@ -198,6 +203,9 @@ handler:
   you_tube_image:
     disable: true
     experimental: true
+    timeout: 10
+  you_tube_url_nowplaying:
+    tagging: false
     timeout: 10
 http:
   retry:
@@ -770,6 +778,12 @@ nowplaying:
               strip: true
           pattern: ^(.+)[[:blank:]]*feat\.[[:blank:]]*(.+)$
     prefix: 'Artist:'
+  domains:
+    - music.apple.com
+    - itunes.apple.com
+    - spotify.com
+    - youtube.com
+    - songwhip.com
   track:
     prefix: 'Title:'
 package:
@@ -780,7 +794,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.27.7
+  version: 4.28.0
 parser:
   note:
     fields:

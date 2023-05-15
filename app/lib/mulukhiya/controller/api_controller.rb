@@ -246,20 +246,20 @@ module Mulukhiya
     post '/status/tags' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.delete_and_tagging?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       errors = StatusTagsContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        status = status_class[params[:id]]
-        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         status.parser.footer_tags.clear
         status.parser.footer_tags.concat(params[:tags])
         body = [
           status.parser.body,
           status.parser.footer_tags.map(&:to_hashtag).join(' '),
         ].join("\n")
-        @renderer.message = sns.update_status(params[:id], body, {
+        @renderer.message = sns.update_status(status.id, body, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end
@@ -274,16 +274,16 @@ module Mulukhiya
     post '/status/tag' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       errors = StatusTagContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        status = status_class[params[:id]]
-        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         tags = status.parser.footer_tags.push(params[:tag])
         body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
-        @renderer.message = sns.update_status(params[:id], body, {
+        @renderer.message = sns.update_status(status.id, body, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end
@@ -300,16 +300,39 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless tag = hash_tag_class.get(tag: params[:tag])
       raise Ginseng::AuthError, 'Default hashtags cannot be deleted.' unless tag.deletable?
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       errors = StatusTagContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        status = status_class[params[:id]]
-        raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
         tags = status.parser.footer_tags.delete(tag.name)
         body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
-        @renderer.message = sns.update_status(params[:id], body, {
+        @renderer.message = sns.update_status(status.id, body, {
+          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
+        })
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    delete '/status/nowplaying' do
+      logger.info(params:)
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
+      errors = StatusNowplayingContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        @renderer.message = sns.update_status(status.id, NowplayingHandler.trim(body), {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end

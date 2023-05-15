@@ -14,21 +14,15 @@ module Mulukhiya
     end
 
     def test_id
-      return unless @uri
-
-      assert_kind_of(String, @uri.id)
+      assert_kind_of(String, @uri.id) if @uri
     end
 
     def test_service
-      return unless @uri
-
-      assert_kind_of(sns_class, @uri.service)
+      assert_kind_of(sns_class, @uri.service) if @uri
     end
 
     def test_to_md
-      return unless @uri
-
-      assert_kind_of(String, @uri.to_md)
+      assert_kind_of(String, @uri.to_md) if @uri
     end
   end
 end

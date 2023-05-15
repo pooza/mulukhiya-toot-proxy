@@ -15,7 +15,7 @@ module Mulukhiya
       return Ginseng::URI.parse(response['url'])
     rescue => e
       e.log(url: uri.to_s)
-      return nil
+      raise e.class, e.message, e.backtrace
     end
   end
 end

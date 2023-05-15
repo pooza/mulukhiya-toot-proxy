@@ -26,6 +26,8 @@ module Mulukhiya
       @recent_keyword = matches[1]
       return unless updatable?(@recent_keyword)
       update(@recent_keyword)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, keyword:)
     end
 
     def create_uri(keyword)
@@ -49,14 +51,24 @@ module Mulukhiya
       push("#{track_prefix} #{uri.track_name.escape_toot}") if uri.track?
       push("#{album_prefix} #{uri.album_name.escape_toot}") if uri.album_name
       push("#{artist_prefix} #{uri.artists.map(&:escape_toot).join(', ')}")
-      tags.merge(uri.artists)
+      tags.merge(uri.artists) if handler_config(:tagging)
       result.push(url: uri.to_s, title: uri.title, artists: uri.artists)
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, keyword:)
     end
 
     def verbose?
       return false
+    end
+
+    def self.trim(body)
+      lines = body.each_line
+        .grep_v(Regexp.new("^#{config['/nowplaying/album/prefix']} "))
+        .grep_v(Regexp.new("^#{config['/nowplaying/artist/prefix']}: "))
+        .grep_v(Regexp.new("^#{config['/nowplaying/track/prefix']}: "))
+        .reject do |line|
+          uri = Ginseng::URI.parse(line)
+          uri.absolute? && config['/nowplaying/domains'].any? {|d| uri.host.end_with?(d)}
+        end
+      return lines.join("\n")
     end
 
     private
