@@ -321,13 +321,13 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    delete '/status/nowplaying/:id' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.update_status?
+    delete '/status/nowplaying' do
+      logger.info(params:)
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
-      errors = StatusTagContract.new.exec(params)
+      errors = StatusNowplayingContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
