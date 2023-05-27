@@ -88,20 +88,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.4.3)
-      actionview (= 7.0.4.3)
-      activesupport (= 7.0.4.3)
-      rack (~> 2.0, >= 2.2.0)
+    actionpack (7.0.5)
+      actionview (= 7.0.5)
+      activesupport (= 7.0.5)
+      rack (~> 2.0, >= 2.2.4)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.4.3)
-      activesupport (= 7.0.4.3)
+    actionview (7.0.5)
+      activesupport (= 7.0.5)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.4.3)
+    activesupport (7.0.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -113,7 +113,7 @@ GEM
     builder (3.2.4)
     cgi (0.3.6)
     concurrent-ruby (1.2.2)
-    connection_pool (2.4.0)
+    connection_pool (2.4.1)
     crass (1.0.6)
     daemon-spawn (0.4.2)
     date (3.3.3)
@@ -159,7 +159,7 @@ GEM
     etc (1.4.2)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.7.4)
+    faraday (2.7.5)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
@@ -216,12 +216,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.5.9)
-    nokogiri (1.15.0)
+    nokogiri (1.15.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.15.0-aarch64-linux)
+    nokogiri (1.15.2-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.15.0-x86_64-linux)
+    nokogiri (1.15.2-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -261,8 +261,9 @@ GEM
       gli (~> 2.21.0)
       json
       rainbow (>= 3.1.1, < 4.0)
-    rails-html-sanitizer (1.5.0)
-      loofah (~> 2.19, >= 2.19.1)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
     rainbow (3.1.1)
     rake (13.0.6)
     redis-client (0.12.2)
@@ -337,7 +338,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     temple (0.10.1)
-    test-unit (3.5.8)
+    test-unit (3.5.9)
       power_assert
     tilt (2.1.0)
     time (0.2.2)
@@ -401,3 +402,5 @@ DEPENDENCIES
 RUBY VERSION
    ruby 3.2.2p53
 
+BUNDLED WITH
+   2.4.13
