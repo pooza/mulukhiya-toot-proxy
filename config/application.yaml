@@ -150,8 +150,6 @@ handler:
     tagging: false
     timeout: 10
   poipiku_image:
-    disable: true
-    experimental: true
     timeout: 10
   remote_tag:
     services:
@@ -988,6 +986,9 @@ pleroma:
   streaming:
     verify_peer: true
   url: https://pleroma.example.com/
+poipiku:
+  urls:
+    root: https://poipiku.com/
 postgres:
   dsn: null
   pgroonga: false
