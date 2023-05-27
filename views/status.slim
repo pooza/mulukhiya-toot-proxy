@@ -101,6 +101,12 @@ html lang='ja'
               .catch(e => Vue.alert(this.$dialog, e))
           },
           deleteNowplaying (id) {
+
+            this.$dialog.confirm({body: ''})
+              .then(Vue.setInfoToken(this.token))
+              .then(e => {this.restartable = true})
+              .catch(e => Vue.alert(this.$dialog, e))
+
             Vue.deleteNowplaying(id)
               .then(e => Vue.set(this.statuses, e.id, e))
               .catch(e => Vue.alert(this.$dialog, e))
