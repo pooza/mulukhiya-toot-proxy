@@ -802,7 +802,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.28.1
+  version: 4.28.2
 parser:
   note:
     fields:
