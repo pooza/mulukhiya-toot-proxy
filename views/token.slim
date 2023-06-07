@@ -142,7 +142,7 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           deleteAccount (account) {
-            this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバからは削除されません）`}, {okText: '削除'})
+            this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバーからは削除されません）`}, {okText: '削除'})
               .then(e => Vue.deleteToken(account.token))
               .then(e => {
                 this.tokens = e
