@@ -55,10 +55,12 @@ html lang='ja'
             this.$dialog.confirm({body: '誤判定のナウプレを削除します。'},{okText: '削除'})
               .then(e => Vue.deleteNowplaying(id))
               .then(e => {
-                if (e.createdNote) {
+                if (e.id) {
+                  location.href = `/mulukhiya/app/status/${e.id}`
+                } else if (e.createdNote) {
                   location.href = `/mulukhiya/app/status/${e.createdNote.id}`
                 } else {
-                  location.href = '/mulukhiya/app/status/'
+                  location.href = '/mulukhiya/app/status'
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },
