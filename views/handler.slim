@@ -78,7 +78,7 @@ html lang='ja'
             this.layout.details[name] = !this.layout.details[name]
           },
           restartPuma () {
-            this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
+            this.$dialog.confirm({body: 'Pumaを再起動します。'}, {okText: '再起動'})
               .then(e => Vue.restartPuma())
               .then(e => {this.restartable = false})
               .catch(e => Vue.alert(this.$dialog, e))

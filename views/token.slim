@@ -163,13 +163,13 @@ html lang='ja'
                 Vue.setToken(this.token)
                 this.account = e
                 if (this.account.is_info_bot) {
-                  this.$dialog.confirm({body: '今登録したトークンを、お知らせボットとして設定ファイルに登録しますか？'},{okText: '登録'})
+                  this.$dialog.confirm({body: '今登録したトークンを、お知らせボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
                     .then(Vue.setInfoToken(this.token))
                     .then(e => {this.restartable = true})
                     .catch(e => Vue.alert(this.$dialog, e))
                 }
                 if (this.account.is_test_bot) {
-                  this.$dialog.confirm({body: '今登録したトークンを、テストボットとして設定ファイルに登録しますか？'},{okText: '登録'})
+                  this.$dialog.confirm({body: '今登録したトークンを、テストボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
                     .then(Vue.setTestToken(this.token))
                     .then(e => {this.restartable = true})
                     .catch(e => Vue.alert(this.$dialog, e))

@@ -103,11 +103,6 @@ html lang='ja'
               .then(e => Vue.set(this.statuses, e.id, e))
               .catch(e => Vue.alert(this.$dialog, e))
           },
-          deleteNowplaying (id) {
-            Vue.deleteNowplaying(id)
-              .then(e => Vue.set(this.statuses, e.id, e))
-              .catch(e => Vue.alert(this.$dialog, e))
-          },
           searchStatuses () {
             this.page = 0
             this.statuses = {}

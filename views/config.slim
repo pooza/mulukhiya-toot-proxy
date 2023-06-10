@@ -308,7 +308,7 @@ html lang='ja'
             this.form.growi.token = null
           },
           unauthGrowi () {
-            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'},{okText: '削除'})
+            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'}, {okText: '削除'})
               .then(e => this.updateConfig({growi: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -334,7 +334,7 @@ html lang='ja'
               })
           },
           unauthLemmy () {
-            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({lemmy: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -353,7 +353,7 @@ html lang='ja'
             this.form.nextcloud.password = null
           },
           unauthNextcloud () {
-            this.$dialog.confirm({body: 'Nextcloudの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Nextcloudの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({nextcloud: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -403,7 +403,7 @@ html lang='ja'
             this.updateConfig(command)
           },
           unauthAnnict () {
-            this.$dialog.confirm({body: 'Annictの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Annictの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
