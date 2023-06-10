@@ -52,7 +52,7 @@ html lang='ja'
         },
         methods: {
           deleteNowplaying (id) {
-            this.$dialog.confirm({body: 'ナウプレを削除します。'},{okText: '削除'})
+            this.$dialog.confirm({body: '誤判定のナウプレを削除します。'},{okText: '削除'})
               .then(e => Vue.deleteNowplaying(id))
               .then(e => {
                 if (e.createdNote) {
