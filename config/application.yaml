@@ -150,7 +150,6 @@ handler:
     tagging: false
     timeout: 10
   poipiku_image:
-    disable: true
     timeout: 10
   remote_tag:
     services:
@@ -318,7 +317,6 @@ mastodon:
       - itunes_image
       - spotify_image
       - you_tube_image
-      - poipiku_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -353,7 +351,6 @@ mastodon:
       - spotify_image
       - you_tube_image
       - webhook_image
-      - poipiku_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -488,7 +485,6 @@ meisskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - poipiku_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -520,7 +516,6 @@ meisskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - poipiku_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -640,7 +635,6 @@ misskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - poipiku_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -672,7 +666,6 @@ misskey:
       - spotify_nowplaying
       - songwhip_nowplaying
       - webhook_image
-      - poipiku_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -915,7 +908,6 @@ pleroma:
       - spotify_nowplaying
       - songwhip_nowplaying
       - you_tube_image
-      - poipiku_image
       - long_text_image
       - shortened_url
       - url_normalize
@@ -948,7 +940,6 @@ pleroma:
       - songwhip_nowplaying
       - you_tube_image
       - webhook_image
-      - poipiku_image
       - shortened_url
       - url_normalize
       - canonical_url
