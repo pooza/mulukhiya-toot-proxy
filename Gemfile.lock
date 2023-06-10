@@ -182,7 +182,7 @@ GEM
     json (2.6.3)
     json-schema (4.0.0)
       addressable (>= 2.8)
-    jwt (2.7.0)
+    jwt (2.7.1)
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -269,7 +269,7 @@ GEM
     rake (13.0.6)
     redis-client (0.12.2)
       connection_pool
-    regexp_parser (2.8.0)
+    regexp_parser (2.8.1)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
