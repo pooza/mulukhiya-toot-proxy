@@ -59,7 +59,10 @@ html lang='ja'
                   i class='fa fa-pencil'
           nav.footer-navigations v-if='status.is_nowplaying && account.username==status.account.username'
             i class='fa fa-music'
-            a href='javascript:void(0)' @click='deleteNowplaying(status.id)' ナウプレの誤判定を削除
+            a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレに関する操作
+          nav.footer-navigations v-if='status.is_poipiku && account.username==status.account.username'
+            i class='fa fa-image'
+            a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピクに関する操作
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else

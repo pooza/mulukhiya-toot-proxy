@@ -39,6 +39,10 @@ module Mulukhiya
       return text.match?(/#nowplaying/i)
     end
 
+    def poipiku?
+      return parser.uris.any? {|v| PoipikuURI.parse(v).poipiku? rescue false}
+    end
+
     def taggable?
       return false unless public?
       return true
@@ -53,6 +57,7 @@ module Mulukhiya
         id: id.to_s,
         is_taggable: taggable?,
         is_nowplaying: nowplaying?,
+        is_poipiku: poipiku?,
         public_url: public_uri.to_s,
         uri: uri.to_s,
         url: uri.to_s,

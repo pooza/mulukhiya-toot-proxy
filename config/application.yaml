@@ -150,6 +150,7 @@ handler:
     tagging: false
     timeout: 10
   poipiku_image:
+    disable: true
     timeout: 10
   remote_tag:
     services:

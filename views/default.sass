@@ -538,11 +538,19 @@ article.status
     .tag::before
       content: '#'
     h4
+      margin:
+        top: 1em
       border:
         bottom:
           style: solid
           width: 1px
           color: dimgray
+    ul
+      margin: 0
+      padding: 0 1em
+      li
+        list:
+          style-type: none
   pre.body
     border:
       color: transparent
@@ -572,7 +580,8 @@ article.episode
   .episode-container
     margin: 0 1em
     li.episode
-      list-style-type: none
+      list:
+        style-type: none
       strong
         font:
           family: $sans-serif
