@@ -317,7 +317,6 @@ mastodon:
       - itunes_image
       - spotify_image
       - you_tube_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -485,7 +484,6 @@ meisskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -635,7 +633,6 @@ misskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -908,7 +905,6 @@ pleroma:
       - spotify_nowplaying
       - songwhip_nowplaying
       - you_tube_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
