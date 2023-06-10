@@ -43,8 +43,10 @@ html lang='ja'
           pre.body v-if='status.body' = '{{status.body}}'
           nav.footer-navigations v-if='status.is_taggable && account.username==status.account.username'
             - if controller.delete_and_tagging?
-              i class='fa fa-tag'
-              a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
+              ul
+                li
+                  i class='fa fa-tag'
+                  a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
             - else
               h4
                 i class='fa fa-tag'
