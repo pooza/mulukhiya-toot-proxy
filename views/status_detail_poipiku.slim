@@ -55,6 +55,16 @@ html lang='ja'
         },
         methods: {
           attachPoipikuImage (id) {
+            Vue.attachPoipikuImage(id)
+              .then(e => {
+                if (e.id) {
+                  location.href = `/mulukhiya/app/status/${e.id}/poipiku`
+                } else if (e.createdNote) {
+                  location.href = `/mulukhiya/app/status/${e.createdNote.id}/poipokiu`
+                } else {
+                  location.href = '/mulukhiya/app/status'
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
           },
           addFanartTag (id) {
           },

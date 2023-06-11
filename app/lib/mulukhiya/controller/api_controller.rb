@@ -322,17 +322,44 @@ module Mulukhiya
     end
 
     delete '/status/nowplaying' do
-      logger.info(params:)
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
-      errors = StatusNowplayingContract.new.exec(params)
+      errors = StatusContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
         @renderer.message = sns.update_status(status.id, NowplayingHandler.trim(body), {
+          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
+        })
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/status/poipiku' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      errors = StatusContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        payload = {
+          status_field => status.parser.body,
+          attachment_field => status.attachments.map(&:id).to_a,
+        }
+        handler = Handler.create(:poipiku_image)
+        handler.handle_pre_toot(payload)
+        sleep(5)
+        @renderer.message = sns.update_status(status.id, payload, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end

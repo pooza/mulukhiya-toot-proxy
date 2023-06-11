@@ -1,5 +1,5 @@
 module Mulukhiya
-  class StatusNowplayingContract < Contract
+  class StatusContract < Contract
     params do
       required(:id).value(:string)
     end
