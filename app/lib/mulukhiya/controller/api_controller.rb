@@ -358,7 +358,6 @@ module Mulukhiya
         }
         handler = Handler.create(:poipiku_image)
         handler.handle_pre_toot(payload)
-        sleep(5)
         @renderer.message = sns.update_status(status.id, payload, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
