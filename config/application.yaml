@@ -46,6 +46,10 @@ api:
   cache:
     ttl: 86400
   custom: []
+calckey:
+  features:
+    reaction: true
+  sns_type: misskey
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
@@ -62,6 +66,10 @@ feed:
     limit: 100
   tag:
     limit: 100
+fedibird:
+  features:
+    reaction: true
+  sns_type: misskey
 growi:
   urls:
     create_page: /_api/v3/pages
