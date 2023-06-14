@@ -1,11 +1,8 @@
 module Mulukhiya
   class ImageHandler < Handler
-    attr_reader :ids
-
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if parser.command?
-      @ids = []
       payload[attachment_field] ||= []
       parser.uris.select {|v| updatable?(v)}.map do |uri|
         next if sns.max_media_attachments <= payload[attachment_field].count
@@ -13,13 +10,13 @@ module Mulukhiya
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
+      return payload
     end
 
     def upload(uri, params = {})
       uri = create_image_uri(uri) rescue uri
       params[:trim_times] ||= trim_times
-      ids.push(id = super)
-      return id
+      return super
     end
 
     def trim_times
