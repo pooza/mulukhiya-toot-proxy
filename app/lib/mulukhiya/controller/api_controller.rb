@@ -358,9 +358,10 @@ module Mulukhiya
           spoiler_field.to_sym,
           visibility_field.to_sym,
         ).stringify_keys
-        values[attachment_field] = status.attachments.map(&:id)
-        payload = Handler.create(:poipiku_image).handle_pre_toot(values)
-        @renderer.message = sns.update_status(status.id, payload, {
+        # values[attachment_field] = status.attachments.map(&:id).to_a
+        values[attachment_field] = []
+        Handler.create(:poipiku_image).handle_pre_toot(values.stringify_keys)
+        @renderer.message = sns.update_status(status.id, values, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end
