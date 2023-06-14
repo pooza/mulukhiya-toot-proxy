@@ -1,10 +1,10 @@
 module Mulukhiya
   class ImageHandler < Handler
     def handle_pre_toot(payload, params = {})
+      payload[attachment_field] ||= []
       self.payload = payload
       return if parser.command?
-      payload[attachment_field] ||= []
-      parser.uris.select {|v| updatable?(v)}.map do |uri|
+      parser.uris.select {|v| updatable?(v)}.each do |uri|
         next if sns.max_media_attachments <= payload[attachment_field].count
         payload[attachment_field].push(upload(uri))
       rescue => e
