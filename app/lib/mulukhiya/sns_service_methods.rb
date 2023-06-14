@@ -11,13 +11,14 @@ module Mulukhiya
         visibility_field.to_sym,
       )
       values[attachment_field] = status.attachments.map(&:id)
-      delete_status(id, params)
       if body.is_a?(Hash)
         body = values.merge(body)
       else
         body = values.merge(status_field => body.to_s)
       end
-      return post(body.deep_symbolize_keys, params)
+      response = post(body.deep_symbolize_keys, params)
+      delete_status(id, params)
+      return response
     end
 
     def upload(path, params = {})

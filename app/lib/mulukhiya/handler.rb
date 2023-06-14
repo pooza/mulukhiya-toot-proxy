@@ -24,7 +24,7 @@ module Mulukhiya
     end
 
     def handle_post_webhook(payload, params = {})
-      handle_post_toot(payload, params)
+      return handle_post_toot(payload, params)
     end
 
     def handle_pre_chat(payload, params = {})
@@ -34,7 +34,7 @@ module Mulukhiya
 
     def handle_post_chat(payload, params = {})
       @text_field = chat_field
-      handle_post_toot(payload, params)
+      return handle_post_toot(payload, params)
     end
 
     def handle_pre_upload(payload, params = {})
