@@ -6,11 +6,11 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[id]
       values = status.payload
       if body.is_a?(Hash)
-        body = values.merge(body)
+        body = values.merge(body.deep_symbolize_keys)
       else
-        body = values.merge(status_field => body.to_s)
+        body = values.merge(status_field.to_sym => body.to_s)
       end
-      # values.delete(:fileIds)
+      values.delete(:fileIds)
       response = post(body, params)
       delete_status(status.id, params)
       return response
