@@ -48,6 +48,17 @@ module Mulukhiya
       return true
     end
 
+    def payload
+      payload = values.slice(
+        status_field.to_sym,
+        reply_to_field.to_sym,
+        spoiler_field.to_sym,
+        visibility_field.to_sym,
+      )
+      payload[attachment_field.to_sym] = attachments.map(&:id).to_a
+      return payload
+    end
+
     def to_h
       @hash ||= values.deep_symbolize_keys.merge(
         body:,

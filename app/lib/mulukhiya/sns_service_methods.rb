@@ -4,17 +4,13 @@ module Mulukhiya
 
     def update_status(id, body, params = {})
       status = status_class[id]
-      values = status.values.slice(
-        status_field.to_sym,
-        reply_to_field.to_sym,
-        spoiler_field.to_sym,
-        visibility_field.to_sym,
-      )
-      values[attachment_field] = status.attachments.map(&:id)
+      values = status.payload
+      values[attachment_field.to_sym] ||= []
       if body.is_a?(Hash)
-        body = values.merge(body)
+        values.merge(body.except(attachment_field.to_sym))
+        values[attachment_field.to_sym].concat(body[attachment_field.to_sym] || [])
       else
-        body = values.merge(status_field => body.to_s)
+        values.merge(status_field => body.to_s)
       end
       response = post(body.deep_symbolize_keys, params)
       delete_status(id, params)
