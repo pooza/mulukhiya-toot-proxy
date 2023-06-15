@@ -12,8 +12,6 @@ module Mulukhiya
       status = status_class[status] unless status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
-      body[:media_ids] ||= []
-      body[:media_ids] = body[:media_ids].concat(status.attachments.map(&:id)).uniq
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
       response = http.put("/api/v1/statuses/#{status.id}", {
