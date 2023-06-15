@@ -2,16 +2,16 @@ module Mulukhiya
   module SNSServiceMethods
     include SNSMethods
 
-    def update_status(id, body, params = {})
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[id]
+    def update_status(status, body, params = {})
+      status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
-      if body.is_a?(Hash)
-        body = values.merge(body.deep_symbolize_keys)
-      else
-        body = values.merge(status_field.to_sym => body.to_s)
-      end
-      values.delete(:fileIds)
-      response = post(body, params)
+      body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
+      body = values.merge(body.deep_symbolize_keys)
+
+      body.delete(:fileIds)
+      logger.info(payload: body)
+
+      response = post(body.compact, params)
       delete_status(status.id, params)
       return response
     end
