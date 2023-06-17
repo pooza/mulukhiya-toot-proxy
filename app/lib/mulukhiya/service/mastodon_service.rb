@@ -8,6 +8,20 @@ module Mulukhiya
 
     alias toot post
 
+    def post(body, params = {})
+      body = {status: body.to_s} unless body.is_a?(Hash)
+      body = body.deep_symbolize_keys
+      body[:media_ids] ||= []
+      body[:media_ids] = body[:media_ids].map(&:to_s)
+      body.delete(:in_reply_to_id) unless body[:in_reply_to_id].present?
+      body.delete(:spoiler_text) unless body[:spoiler_text].present?
+      body[:in_reply_to_id] = params.dig(:reply, :id) if params[:reply]
+      return http.post('/api/v1/statuses', {
+        body: body.compact,
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def update_status(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
