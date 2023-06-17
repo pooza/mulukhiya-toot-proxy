@@ -379,15 +379,13 @@ mastodon:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
       default:
-        - write:statuses
-        - write:media
-        - read:filters
-        - write:filters
-        - read:search
+        - read
+        - write
+        - follow
       infobot:
         - read
-        - write:statuses
-        - write:media
+        - write
+        - admin:read
     webui:
       url: /settings/applications
   sns_type: mastodon
