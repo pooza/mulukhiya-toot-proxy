@@ -11,8 +11,6 @@ module Mulukhiya
     def post(body, params = {})
       body = {status: body.to_s} unless body.is_a?(Hash)
       body = body.deep_symbolize_keys
-      body[:media_ids] ||= []
-      body[:media_ids] = body[:media_ids].map(&:to_s)
       body.delete(:in_reply_to_id) unless body[:in_reply_to_id].present?
       body.delete(:spoiler_text) unless body[:spoiler_text].present?
       body[:in_reply_to_id] = params.dig(:reply, :id) if params[:reply]
