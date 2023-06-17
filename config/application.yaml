@@ -523,6 +523,7 @@ meisskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
+      - poipiku_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -672,6 +673,7 @@ misskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
+      - poipiku_image
       - webhook_image
       - shortened_url
       - url_normalize

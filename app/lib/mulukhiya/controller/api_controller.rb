@@ -347,16 +347,14 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account.webhook
       errors = StatusContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        values = status.payload
-        Handler.create(:poipiku_image).handle_pre_toot(values.stringify_keys)
-        @renderer.message = sns.repost_status(status.id, values, {
-          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
-        })
+        @renderer.message = sns.account.webhook.post(text: status.text).response
+        sns.delete_status(status.id)
       end
       return @renderer.to_s
     rescue => e
