@@ -112,6 +112,10 @@ module Mulukhiya
       assert_boolean(controller_class.growi?)
     end
 
+    def test_poipiku?
+      assert_boolean(controller_class.poipiku?)
+    end
+
     def test_lemmy?
       assert_boolean(controller_class.lemmy?)
     end

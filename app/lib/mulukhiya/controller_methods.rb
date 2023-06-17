@@ -45,6 +45,10 @@ module Mulukhiya
         return Handler.search(/nextcloud/).present?
       end
 
+      def poipiku?
+        return Handler.search(/poipiku/).present?
+      end
+
       def announcement?
         return config["/#{name}/features/announcement"] == true rescue false
       end

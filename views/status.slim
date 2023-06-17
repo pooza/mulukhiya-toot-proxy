@@ -67,9 +67,10 @@ html lang='ja'
               li v-if='status.is_nowplaying'
                 i class='fa fa-music'
                 a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
-              li v-if='status.is_poipiku'
-                i class='fa fa-image'
-                a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
+              - unless controller.poipiku?
+                li v-if='status.is_poipiku'
+                  i class='fa fa-image'
+                  a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else
