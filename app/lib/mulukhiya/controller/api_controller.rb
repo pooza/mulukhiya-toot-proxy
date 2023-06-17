@@ -353,7 +353,10 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        @renderer.message = sns.account.webhook.post(text: status.text, visibility: status.visibility_name).response
+        @renderer.message = sns.account.webhook.post(
+          text: status.text,
+          visibility: status.visibility_name,
+        ).response
         sns.delete_status(status.id)
       end
       return @renderer.to_s
