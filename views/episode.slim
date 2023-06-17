@@ -43,10 +43,11 @@ html lang='ja'
                   a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
                     i class='fas fa-comment'
                   | タイムライン
-                .bubble-container v-if='episode.command_url'
-                  a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
-                    i class='fas fa-microphone'
-                  | 実況開始
+                - if env.mastodon_type?
+                  .bubble-container v-if='episode.command_url'
+                    a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
+                      i class='fas fa-microphone'
+                    | 実況開始
             ul.episodes v-else=''
               li.episode
                 .link-container
