@@ -357,6 +357,7 @@ mastodon:
       - itunes_image
       - spotify_image
       - you_tube_image
+      - poipiku_image
       - webhook_image
       - shortened_url
       - url_normalize
@@ -379,12 +380,15 @@ mastodon:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
       default:
-        - read
-        - write
-        - follow
+        - write:statuses
+        - write:media
+        - read:filters
+        - write:filters
+        - read:search
       infobot:
         - read
-        - write
+        - write:statuses
+        - write:media
         - admin:read
     webui:
       url: /settings/applications
@@ -941,6 +945,7 @@ pleroma:
       - spotify_nowplaying
       - songwhip_nowplaying
       - you_tube_image
+      - poipiku_image
       - webhook_image
       - shortened_url
       - url_normalize
