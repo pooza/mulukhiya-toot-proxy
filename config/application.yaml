@@ -47,6 +47,7 @@ api:
     ttl: 86400
   custom: []
 calckey:
+  display_name: Calckey
   features:
     reaction: true
   sns_type: misskey
@@ -67,9 +68,10 @@ feed:
   tag:
     limit: 100
 fedibird:
+  display_name: Fedibird
   features:
     reaction: true
-  sns_type: misskey
+  sns_type: mastodon
 growi:
   urls:
     create_page: /_api/v3/pages
