@@ -29,7 +29,7 @@ html lang='ja'
             li
               i class='fa fa-image'
               a href='javascript:void(0)' @click='attachPoipikuImage(status.id)' 画像を添付
-            li
+            li v-if='status.is_taggable'
               i class='fa fa-tag'
               a href='javascript:void(0)' @click='addFanartTag(status.id)' #fanart タグを追加
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
@@ -69,7 +69,7 @@ html lang='ja'
           addFanartTag (id) {
             const tag = 'fanart'
             if (this.isDeleteAndTaggingMode()) {
-\            } else {
+            } else {
               Vue.createTag(this.status.id, tag)
                 .then(e => {this.status = e})
                 .catch(e => Vue.alert(this.$dialog, e))
