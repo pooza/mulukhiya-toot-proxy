@@ -70,8 +70,7 @@ html lang='ja'
             const tag = 'fanart'
             if (this.isDeleteAndTaggingMode()) {
 \            } else {
-              Vue.deleteTag(this.status.id, tag)
-                .then(e => Vue.createTag(this.status.id, e.data))
+              Vue.createTag(this.status.id, tag)
                 .then(e => {this.status = e})
                 .catch(e => Vue.alert(this.$dialog, e))
             }
