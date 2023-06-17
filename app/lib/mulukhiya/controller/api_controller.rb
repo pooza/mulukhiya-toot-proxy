@@ -354,7 +354,7 @@ module Mulukhiya
       else
         values = status.payload
         Handler.create(:poipiku_image).handle_pre_toot(values.stringify_keys)
-        @renderer.message = sns.update_status(status.id, values, {
+        @renderer.message = sns.repost_status(status.id, values, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
       end

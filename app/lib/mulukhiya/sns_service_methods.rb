@@ -2,13 +2,15 @@ module Mulukhiya
   module SNSServiceMethods
     include SNSMethods
 
-    def update_status(status, body, params = {})
+    alias update_status repost_status
+
+    def repost_status(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
       body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
       body = values.merge(body.deep_symbolize_keys)
 
-      body.delete(:fileIds)
+      #body.delete(:fileIds)
       logger.info(payload: body)
 
       response = post(body.compact, params)
