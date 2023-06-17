@@ -49,7 +49,7 @@ html lang='ja'
             li v-if='status.is_nowplaying'
               i class='fa fa-music'
               a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
-            - unless controller.poipiku?
+            - if controller.poipiku?
               li v-if='status.is_poipiku'
                 i class='fa fa-image'
                 a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク

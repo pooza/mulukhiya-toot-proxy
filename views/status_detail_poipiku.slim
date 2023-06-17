@@ -21,7 +21,7 @@ html lang='ja'
           i class='fas fa-user'
           | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
-        - unless controller.poipiku?
+        - if controller.poipiku?
           nav.footer-navigations v-if='status.is_poipiku'
             h4
               i class='fa fa-image'
