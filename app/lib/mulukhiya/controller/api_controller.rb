@@ -353,8 +353,11 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
+        parser = parser_class.new(status.text)
+        tags = parser.tags.clone
+        tags.push('fanart') if params[:fanart]
         @renderer.message = sns.account.webhook.post(
-          text: status.text,
+          text: [parser.body, tags.to_s].join("\n"),
           visibility: status.visibility_name,
         ).response
         sns.delete_status(status.id)

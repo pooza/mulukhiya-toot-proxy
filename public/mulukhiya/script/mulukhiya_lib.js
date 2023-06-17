@@ -367,10 +367,12 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.attachPoipikuImage = async id => {
+    Vue.attachPoipikuImage = async (id, fanart) => {
+
+
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.put('/mulukhiya/api/status/poipiku', {token: Vue.getToken(), id: id})
+      return axios.put('/mulukhiya/api/status/poipiku', {token: Vue.getToken(), id: id, fanart: fanart})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }

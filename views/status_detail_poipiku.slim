@@ -29,9 +29,9 @@ html lang='ja'
             li
               i class='fa fa-image'
               a href='javascript:void(0)' @click='attachPoipikuImage(status.id)' 画像を添付
-            li v-if='status.is_taggable'
-              i class='fa fa-tag'
-              a href='javascript:void(0)' @click='addFanartTag(status.id)' #fanart タグを追加
+              label v-if='status.is_taggable'
+                input type='checkbox' v-model='input.fanart'
+                | #fanartタグを追加
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
@@ -43,6 +43,7 @@ html lang='ja'
         data: {
           account: {is_admin: false, username: null},
           status: {},
+          input: {fanart: false},
         },
         mounted () {
           Vue.getConfig()
@@ -55,12 +56,12 @@ html lang='ja'
         },
         methods: {
           attachPoipikuImage (id) {
-            Vue.attachPoipikuImage(id)
+            Vue.attachPoipikuImage(id, this.input.fanart)
               .then(e => {
                 if (e.id) {
-                  location.href = `/mulukhiya/app/status/${e.id}/poipiku`
+                  location.href = `/mulukhiya/app/status/${e.id}`
                 } else if (e.createdNote) {
-                  location.href = `/mulukhiya/app/status/${e.createdNote.id}/poipiku`
+                  location.href = `/mulukhiya/app/status/${e.createdNote.id}`
                 } else {
                   location.href = '/mulukhiya/app/status'
                 }
