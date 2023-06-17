@@ -67,6 +67,15 @@ html lang='ja'
               }).catch(e => Vue.alert(this.$dialog, e))
           },
           addFanartTag (id) {
+            const tag = 'fanart'
+            if (this.isDeleteAndTaggingMode()) {
+\            } else {
+              Vue.deleteTag(this.status.id, tag)
+                .then(e => Vue.createTag(this.status.id, e.data))
+                .then(e => {this.status = e})
+                .catch(e => Vue.alert(this.$dialog, e))
+            }
           },
+          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim() == 'true'},
         },
       })
