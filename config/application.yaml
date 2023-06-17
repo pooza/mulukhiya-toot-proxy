@@ -160,6 +160,7 @@ handler:
     tagging: false
     timeout: 10
   poipiku_image:
+    fanart_tag: fanart
     timeout: 10
   remote_tag:
     services:

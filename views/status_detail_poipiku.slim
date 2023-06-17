@@ -27,11 +27,14 @@ html lang='ja'
             | ポイピク操作
           ul
             li
-              i class='fa fa-image'
-              a href='javascript:void(0)' @click='attachPoipikuImage(status.id)' 画像を添付
+              .alert ポイピク画像の添付添付して再投稿します。この投稿は一度削除されます。
+              br
+              button.small @click='attachPoipikuImage(status.id)'
+                i class='fa fa-cloud-arrow-up'
+                | 更新
               label v-if='status.is_taggable'
                 input type='checkbox' v-model='input.fanart'
-                | #fanartタグを追加
+                | #{config['/handler/poipiku_image/fanart_tag'].to_hashtag}タグを追加
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'

@@ -355,7 +355,7 @@ module Mulukhiya
       else
         parser = parser_class.new(status.text)
         tags = parser.tags.clone
-        tags.push('fanart') if params[:fanart]
+        tags.push(config['/handler/poipiku_image/fanart_tag']) if params[:fanart]
         @renderer.message = sns.account.webhook.post(
           text: [parser.body, tags.to_s].join("\n"),
           visibility: status.visibility_name,
