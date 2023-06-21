@@ -26,7 +26,7 @@ html lang='ja'
             i class='fa fa-tag'
             | タグづけ
           - if controller.delete_and_tagging?
-            .alert タグづけを実行する前に、この投稿は一度削除されます。
+            .alert タグづけを実行する前に、この投稿は一旦削除されます。
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
