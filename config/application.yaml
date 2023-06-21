@@ -46,6 +46,11 @@ api:
   cache:
     ttl: 86400
   custom: []
+calckey:
+  display_name: Calckey
+  features:
+    reaction: true
+  sns_type: misskey
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
@@ -62,6 +67,11 @@ feed:
     limit: 100
   tag:
     limit: 100
+fedibird:
+  display_name: Fedibird
+  features:
+    reaction: true
+  sns_type: mastodon
 growi:
   urls:
     create_page: /_api/v3/pages
@@ -150,6 +160,7 @@ handler:
     tagging: false
     timeout: 10
   poipiku_image:
+    fanart_tag: fanart
     timeout: 10
   remote_tag:
     services:
@@ -317,8 +328,6 @@ mastodon:
       - itunes_image
       - spotify_image
       - you_tube_image
-      - poipiku_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -351,8 +360,8 @@ mastodon:
       - itunes_image
       - spotify_image
       - you_tube_image
-      - webhook_image
       - poipiku_image
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -383,6 +392,7 @@ mastodon:
         - read
         - write:statuses
         - write:media
+        - admin:read
     webui:
       url: /settings/applications
   sns_type: mastodon
@@ -487,8 +497,6 @@ meisskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - poipiku_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -518,8 +526,8 @@ meisskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - webhook_image
       - poipiku_image
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -639,8 +647,6 @@ misskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - poipiku_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -670,8 +676,8 @@ misskey:
       - itunes_nowplaying
       - spotify_nowplaying
       - songwhip_nowplaying
-      - webhook_image
       - poipiku_image
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -802,7 +808,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.28.1
+  version: 4.29.0
 parser:
   note:
     fields:
@@ -914,8 +920,6 @@ pleroma:
       - spotify_nowplaying
       - songwhip_nowplaying
       - you_tube_image
-      - poipiku_image
-      - long_text_image
       - shortened_url
       - url_normalize
       - canonical_url
@@ -946,8 +950,8 @@ pleroma:
       - spotify_nowplaying
       - songwhip_nowplaying
       - you_tube_image
-      - webhook_image
       - poipiku_image
+      - webhook_image
       - shortened_url
       - url_normalize
       - canonical_url

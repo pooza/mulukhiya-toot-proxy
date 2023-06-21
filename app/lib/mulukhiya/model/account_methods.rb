@@ -20,7 +20,7 @@ module Mulukhiya
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"
       software = http.get('/nodeinfo/2.0').parsed_response.dig('software', 'name')
-      return true if (config["/#{software}/features/reaction"] rescue nil)
+      return true if (config["/#{software.underscore}/features/reaction"] rescue nil)
       capabilities = http.get('/api/v1/instance').parsed_response['fedibird_capabilities'] || []
       return true if capabilities.member?('emoji_reaction')
       return false

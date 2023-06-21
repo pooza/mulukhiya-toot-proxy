@@ -25,6 +25,8 @@ html lang='ja'
           h4
             i class='fa fa-tag'
             | タグづけ
+          - if controller.delete_and_tagging?
+            .alert タグづけを実行する前に、この投稿は一旦削除されます。
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
@@ -39,6 +41,18 @@ html lang='ja'
               | 更新
         nav.footer-navigations v-else=''
           .alert #{controller.visibility_name(:public)}ではない#{controller.status_label}はタグ付けできません。
+        nav.footer-navigations v-if='status.is_nowplaying || status.is_poipiku'
+          h4
+            i class='fa fa-bolt'
+            | その他の操作
+          ul
+            li v-if='status.is_nowplaying'
+              i class='fa fa-music'
+              a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
+            - if controller.poipiku?
+              li v-if='status.is_poipiku'
+                i class='fa fa-image'
+                a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'

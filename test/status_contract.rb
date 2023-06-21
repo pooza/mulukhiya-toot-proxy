@@ -1,7 +1,7 @@
 module Mulukhiya
-  class StatusNowplayingContractTest < TestCase
+  class StatusContractTest < TestCase
     def setup
-      @contract = StatusNowplayingContract.new
+      @contract = StatusContract.new
     end
 
     def test_call

@@ -1,0 +1,85 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: controller.status_label, href: '/mulukhiya/app/status'}, {label: params[:id], href: "/mulukhiya/app/status/#{params[:id]}"}, {label: 'ポイピク'}]}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      article.status v-if='status.id'
+        .visibility
+          i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
+        .header
+          i class='fa fa-calendar'
+          | {{status.created_at}}
+        .header v-if='status.spoiler_text'
+          i class='fa fa-circle-exclamation'
+          | {{status.spoiler_text}}
+        .header
+          i class='fas fa-user'
+          | {{status.account.display_name || '@' + status.account.username}}
+        pre.body v-if='status.body' = '{{status.body}}'
+        - if controller.poipiku?
+          nav.footer-navigations v-if='status.is_poipiku'
+            h4
+              i class='fa fa-image'
+              | ポイピク操作
+            ul
+              li
+                .alert ポイピク画像の添付添付して再投稿します。その際、この投稿は一旦削除されます。
+                br
+                button.small @click='attachPoipikuImage(status.id)'
+                  i class='fa fa-cloud-arrow-up'
+                  | 更新
+                label v-if='status.is_taggable'
+                  input type='checkbox' v-model='input.fanart'
+                  | #{config['/handler/poipiku_image/fanart_tag'].to_hashtag}タグを追加
+      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
+    javascript:
+      'use strict'
+      Vue.use(VTooltip)
+      Vue.use(MulukhiyaLib)
+      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
+      new Vue({
+        el: '#app',
+        data: {
+          account: {is_admin: false, username: null},
+          status: {},
+          input: {fanart: false},
+        },
+        mounted () {
+          Vue.getConfig()
+            .then(e => {
+              this.account = e.account
+              return (new URL(location.href)).pathname.split('/').slice(-2)[0]
+            }).then(id => Vue.getStatus(id))
+            .then(e => {this.status = e})
+            .catch(e => Vue.alert(this.$dialog, e))
+        },
+        methods: {
+          attachPoipikuImage (id) {
+            Vue.attachPoipikuImage(id, this.input.fanart)
+              .then(e => {
+                if (e.id) {
+                  location.href = `/mulukhiya/app/status/${e.id}`
+                } else if (e.createdNote) {
+                  location.href = `/mulukhiya/app/status/${e.createdNote.id}`
+                } else {
+                  location.href = '/mulukhiya/app/status'
+                }
+              }).catch(e => Vue.alert(this.$dialog, e))
+          },
+          addFanartTag (id) {
+            const tag = 'fanart'
+            if (this.isDeleteAndTaggingMode()) {
+            } else {
+              Vue.createTag(this.status.id, tag)
+                .then(e => {this.status = e})
+                .catch(e => Vue.alert(this.$dialog, e))
+            }
+          },
+          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim() == 'true'},
+        },
+      })

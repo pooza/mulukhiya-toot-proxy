@@ -40,11 +40,11 @@ html lang='ja'
             li
               | GROWIのアカウントをお持ちでなければ、
               a href='https://growi.cloud/' target='_blank' rel='noreferrer' GROWI.cloud
-              | で新しいGROWIサーバを登録してください。
+              | で新しいGROWIサーバーを登録してください。
               br
-              | フリープランもあります。サーバを登録する手順の中で、新しいユーザーが作成できます。
+              | フリープランもあります。サーバーを登録する手順の中で、新しいユーザーが作成できます。
             li
-              | GROWIサーバのURLと、APIトークンを下の欄に入力してください。
+              | GROWIサーバーのURLと、APIトークンを下の欄に入力してください。
               br
               | APIトークンは、ユーザー設定画面（画面右上のユーザーアイコンをクリック）から作成できます。
             li
@@ -308,7 +308,7 @@ html lang='ja'
             this.form.growi.token = null
           },
           unauthGrowi () {
-            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'},{okText: '削除'})
+            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'}, {okText: '削除'})
               .then(e => this.updateConfig({growi: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -334,7 +334,7 @@ html lang='ja'
               })
           },
           unauthLemmy () {
-            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({lemmy: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -353,7 +353,7 @@ html lang='ja'
             this.form.nextcloud.password = null
           },
           unauthNextcloud () {
-            this.$dialog.confirm({body: 'Nextcloudの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Nextcloudの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({nextcloud: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)
@@ -403,7 +403,7 @@ html lang='ja'
             this.updateConfig(command)
           },
           unauthAnnict () {
-            this.$dialog.confirm({body: 'Annictの認証を解除します。'},{okText: '解除'})
+            this.$dialog.confirm({body: 'Annictの認証を解除します。'}, {okText: '解除'})
               .then(e => this.updateConfig({annict: null}))
               .then(e => {
                 this.result = jsyaml.dump(e.config)

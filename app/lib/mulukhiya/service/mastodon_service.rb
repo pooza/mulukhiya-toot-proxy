@@ -12,7 +12,6 @@ module Mulukhiya
       status = status_class[status] unless status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
       body.deep_symbolize_keys!
-      body[:media_ids] ||= status.attachments.map(&:id)
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
       response = http.put("/api/v1/statuses/#{status.id}", {
@@ -73,6 +72,7 @@ module Mulukhiya
         MastodonController.status_field => message.ellipsize(max_post_text_length),
         MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
+        MastodonController.reply_to_field => options.dig(:response, :id),
       )
     end
 

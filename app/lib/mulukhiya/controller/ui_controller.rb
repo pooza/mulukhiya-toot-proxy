@@ -30,6 +30,28 @@ module Mulukhiya
       @renderer.status = 403
     end
 
+    get '/app/status/:id/nowplaying' do
+      @renderer = SlimRenderer.new
+      @renderer.template = 'status_detail_nowplaying'
+      @renderer[:id] = params[:id]
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    rescue Ginseng::AuthError
+      @renderer.status = 403
+    end
+
+    get '/app/status/:id/poipiku' do
+      @renderer = SlimRenderer.new
+      @renderer.template = 'status_detail_poipiku'
+      @renderer[:id] = params[:id]
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    rescue Ginseng::AuthError
+      @renderer.status = 403
+    end
+
     get '/media/:name' do
       @renderer = StaticMediaRenderer.new
       @renderer.name = params[:name]

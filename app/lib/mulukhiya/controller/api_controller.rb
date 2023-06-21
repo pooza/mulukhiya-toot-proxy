@@ -322,12 +322,11 @@ module Mulukhiya
     end
 
     delete '/status/nowplaying' do
-      logger.info(params:)
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       raise Ginseng::NotFoundError, 'Not Found' unless body = status.parser.body
-      errors = StatusNowplayingContract.new.exec(params)
+      errors = StatusContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
@@ -335,6 +334,33 @@ module Mulukhiya
         @renderer.message = sns.update_status(status.id, NowplayingHandler.trim(body), {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/status/poipiku' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
+      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account.webhook
+      errors = StatusContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        parser = parser_class.new(status.text)
+        tags = parser.tags.clone
+        tags.push(config['/handler/poipiku_image/fanart_tag']) if params[:fanart]
+        @renderer.message = sns.account.webhook.post(
+          text: [parser.body, tags.to_s].join("\n"),
+          visibility: status.visibility_name,
+        ).response
+        sns.delete_status(status.id)
       end
       return @renderer.to_s
     rescue => e
