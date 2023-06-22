@@ -25,14 +25,14 @@ html lang='ja'
           .visibility
             i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
           .header
+            i class='fa fa-id-badge'
+            a :href='status.webui_url' = '{{status.id}}'
+          .header
             i class='fa fa-calendar'
             | {{status.created_at}}
           .header v-if='status.spoiler_text'
             i class='fa fa-circle-exclamation'
             | {{status.spoiler_text}}
-          .header
-            i class='fa fa-id-badge'
-            a :href='status.webui_url' = '{{status.id}}'
           .header
             i class='fas fa-user'
             | {{status.account.display_name || '@' + status.account.username}}
