@@ -54,7 +54,6 @@ html lang='ja'
               a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
             - if controller.poipiku?
               li v-if='status.is_poipiku'
-                .alert
                 i class='fa fa-image'
                 a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
