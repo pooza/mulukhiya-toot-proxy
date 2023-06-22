@@ -147,7 +147,7 @@ module Mulukhiya
         episode.merge(
           url: episode['url'].to_s,
           hashtag_url: episode['hashtag_uri'].to_s,
-          command_url: episode['command_uri'].to_s,
+          command_toot: episode['command_toot'],
         )
       end
       return @renderer.to_s

@@ -53,7 +53,7 @@ module Mulukhiya
         assert_kind_of(String, episode['title'])
         assert_kind_of(String, episode['hashtag'])
         assert_kind_of(Ginseng::URI, episode['hashtag_uri'])
-        assert_kind_of(Ginseng::URI, episode['command_uri'])
+        assert_kind_of(String, episode['command_toot'])
       end
     end
 

@@ -26,10 +26,7 @@ html lang='ja'
             i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
           .header
             i class='fa fa-calendar'
-            - if env.development?
-              a :href='status.webui_url' target='_blank' rel='noreferrer' = '{{status.created_at}}'
-            - else
-              | {{status.created_at}}
+            a :href='status.webui_url' target='_blank' rel='noreferrer' = '{{status.created_at}}'
           .header v-if='status.spoiler_text'
             i class='fa fa-circle-exclamation'
             | {{status.spoiler_text}}

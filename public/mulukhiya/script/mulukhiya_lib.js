@@ -31,6 +31,7 @@ const MulukhiyaLib = {
       return Vue.dig(e, 'response', 'data', 'error')
         || Vue.dig(e, 'response', 'data', 'message')
         || Vue.dig(e, 'message')
+        || e
     }
 
     Vue.dig = (target, ...keys) => {
@@ -368,8 +369,6 @@ const MulukhiyaLib = {
     }
 
     Vue.attachPoipikuImage = async (id, fanart) => {
-
-
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.put('/mulukhiya/api/status/poipiku', {token: Vue.getToken(), id: id, fanart: fanart})
