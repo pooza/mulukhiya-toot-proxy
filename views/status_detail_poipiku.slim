@@ -18,6 +18,9 @@ html lang='ja'
           i class='fa fa-circle-exclamation'
           | {{status.spoiler_text}}
         .header
+          i class='fa fa-id-badge'
+          a :href='status.webui_url' = '{{status.id}}'
+        .header
           i class='fas fa-user'
           | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
@@ -28,7 +31,10 @@ html lang='ja'
               | ポイピク操作
             ul
               li
-                .alert ポイピク画像の添付添付して再投稿します。その際、この投稿は一旦削除されます。
+                .alert
+                  | ポイピクの画像を添付して再投稿します。この#{controller.status_label}は一旦削除されます。
+                  br
+                  | あなたはこの画像の権利者ですね？その場合にだけ、この操作を実行してください。
                 br
                 button.small @click='attachPoipikuImage(status.id)'
                   i class='fa fa-cloud-arrow-up'

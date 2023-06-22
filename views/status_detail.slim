@@ -18,6 +18,9 @@ html lang='ja'
           i class='fa fa-circle-exclamation'
           | {{status.spoiler_text}}
         .header
+          i class='fa fa-id-badge'
+          | {{status.id}}
+        .header
           i class='fas fa-user'
           | {{status.account.display_name || '@' + status.account.username}}
         pre.body v-if='status.body' = '{{status.body}}'
@@ -26,7 +29,7 @@ html lang='ja'
             i class='fa fa-tag'
             | タグづけ
           - if controller.delete_and_tagging?
-            .alert タグづけを実行する前に、この投稿は一旦削除されます。
+            .alert タグづけを実行する前に、この#{controller.status_label}は一旦削除されます。
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
@@ -51,6 +54,7 @@ html lang='ja'
               a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
             - if controller.poipiku?
               li v-if='status.is_poipiku'
+                .alert
                 i class='fa fa-image'
                 a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
