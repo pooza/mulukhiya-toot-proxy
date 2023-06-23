@@ -49,7 +49,7 @@ module Mulukhiya
           work['node'].compact.merge(
             'hashtag' => work.dig('node', 'title').to_hashtag,
             'hashtag_url' => sns.create_tag_uri(work.dig('node', 'title')).to_s,
-            'command_url' => create_command_uri(title: work.dig('node', 'title')).to_s,
+            'command_toot' => create_command_toot(title: work.dig('node', 'title')),
           )
         end
         entries.concat(works)
@@ -66,7 +66,7 @@ module Mulukhiya
           all.push(episode.merge(
             'hashtag' => episode['title'].to_hashtag,
             'hashtag_uri' => sns.create_tag_uri(episode['title']),
-            'command_uri' => create_command_uri(
+            'command_toot' => create_command_toot(
               title: entries.first['title'],
               subtitle: episode['title'],
               number_text: episode['numberText'],
@@ -268,8 +268,8 @@ module Mulukhiya
 
     private
 
-    def create_command_uri(params = {})
-      return sns.create_command_uri(
+    def create_command_toot(params = {})
+      return {
         command: 'user_config',
         tagging: {
           user_tags: [
@@ -281,7 +281,7 @@ module Mulukhiya
           ].compact,
           minutes: params[:minutes],
         }.deep_compact,
-      )
+      }.to_yaml
     end
 
     def crawlable?(activity, params)

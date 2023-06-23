@@ -39,15 +39,14 @@ html lang='ja'
                   i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                     | {{episode.hashtag}}
+                .link-container v-if='episode.command_toot'
+                  i class='fas fa-clipboard' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  | 実況コマンド
+                  textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
                   a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
                     i class='fas fa-comment'
                   | タイムライン
-                - if env.mastodon_type?
-                  .bubble-container v-if='episode.command_url'
-                    a :href='episode.command_url' target='_blank' rel='noreferrer' v-if='episode.command_url'
-                      i class='fas fa-microphone'
-                    | 実況開始
             ul.episodes v-else=''
               li.episode
                 .link-container
@@ -103,6 +102,9 @@ html lang='ja'
                   this.works = e
                 }).catch(e => Vue.alert(this.$dialog, e))
             }, 500)
+          },
+          notifyCommandToot () {
+            Vue.alert(this.$dialog, '実況コマンドをコピーしました。このまま投稿してください。')
           },
         },
       })

@@ -69,8 +69,6 @@ feed:
     limit: 100
 fedibird:
   display_name: Fedibird
-  features:
-    reaction: true
   sns_type: mastodon
 growi:
   urls:

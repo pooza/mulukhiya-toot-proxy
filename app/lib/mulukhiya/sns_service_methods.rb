@@ -71,7 +71,7 @@ module Mulukhiya
       return @oauth_client_storage
     end
 
-    def create_command_uri(title)
+    def create_command_toot(params)
     end
 
     def redis

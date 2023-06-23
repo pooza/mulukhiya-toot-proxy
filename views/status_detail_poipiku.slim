@@ -12,6 +12,9 @@ html lang='ja'
         .visibility
           i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
         .header
+          i class='fa fa-id-badge'
+          a :href='status.webui_url' = '{{status.id}}'
+        .header
           i class='fa fa-calendar'
           | {{status.created_at}}
         .header v-if='status.spoiler_text'
@@ -28,7 +31,10 @@ html lang='ja'
               | ポイピク操作
             ul
               li
-                .alert ポイピク画像の添付添付して再投稿します。その際、この投稿は一旦削除されます。
+                .alert
+                  | ポイピクの画像を添付して再投稿します。この#{controller.status_label}は一旦削除されます。
+                  br
+                  | あなたはこの画像の権利者ですね？その場合にだけ、この操作を実行してください。
                 br
                 button.small @click='attachPoipikuImage(status.id)'
                   i class='fa fa-cloud-arrow-up'

@@ -12,6 +12,9 @@ html lang='ja'
         .visibility
           i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
         .header
+          i class='fa fa-id-badge'
+          | {{status.id}}
+        .header
           i class='fa fa-calendar'
           | {{status.created_at}}
         .header v-if='status.spoiler_text'
@@ -26,7 +29,7 @@ html lang='ja'
             i class='fa fa-tag'
             | タグづけ
           - if controller.delete_and_tagging?
-            .alert タグづけを実行する前に、この投稿は一旦削除されます。
+            .alert タグづけを実行する前に、この#{controller.status_label}は一旦削除されます。
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'
