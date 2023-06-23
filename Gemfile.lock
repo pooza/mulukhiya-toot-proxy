@@ -345,7 +345,7 @@ GEM
     time (0.2.2)
       date
     timecop (0.9.6)
-    timeout (0.3.2)
+    timeout (0.4.0)
     trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
