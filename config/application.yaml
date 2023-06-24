@@ -978,6 +978,7 @@ pleroma:
         - read
         - write:statuses
         - write:media
+        - admin:read
   sns_type: mastodon
   status:
     default_max_length: 5000
