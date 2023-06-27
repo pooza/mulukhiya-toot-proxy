@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def test_valid?
-      return unless @token
+      return false unless @token
 
       assert_boolean(@token.valid?)
     end
@@ -59,7 +59,7 @@ module Mulukhiya
     end
 
     def test_scopes_valid?
-      return unless @token
+      return false unless @token
 
       assert_predicate(@token, :scopes_valid?)
     end

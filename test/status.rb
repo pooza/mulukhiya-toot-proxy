@@ -63,31 +63,31 @@ module Mulukhiya
     end
 
     def test_local?
-      return unless @status
+      return false unless @status
 
       assert_boolean(@status.local?)
     end
 
     def test_public?
-      return unless @status
+      return false unless @status
 
       assert_boolean(@status.public?)
     end
 
     def test_nowplaying?
-      return unless @status
+      return false unless @status
 
       assert_boolean(@status.nowplaying?)
     end
 
     def test_poipiku?
-      return unless @status
+      return false unless @status
 
       assert_boolean(@status.poipiku?)
     end
 
     def test_taggable?
-      return unless @status
+      return false unless @status
 
       assert_boolean(@status.taggable?)
     end
