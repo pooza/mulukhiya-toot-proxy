@@ -80,31 +80,31 @@ module Mulukhiya
     end
 
     def test_operator?
-      return unless account
+      return false unless account
 
       assert_boolean(account.operator?)
     end
 
     def test_admin?
-      return unless account
+      return false unless account
 
       assert_boolean(account.admin?)
     end
 
     def test_moderator?
-      return unless account
+      return false unless account
 
       assert_boolean(account.moderator?)
     end
 
     def test_test?
-      return unless account
+      return false unless account
 
       assert_predicate(account, :test?)
     end
 
     def test_info?
-      return unless account
+      return false unless account
 
       assert_boolean(account.info?)
     end
@@ -116,13 +116,13 @@ module Mulukhiya
     end
 
     def test_locked?
-      return unless account
+      return false unless account
 
       assert_boolean(account.locked?)
     end
 
     def test_notify_verbose?
-      return unless account
+      return false unless account
 
       assert_boolean(account.notify_verbose?)
     end
@@ -150,7 +150,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      return unless account
+      return false unless account
 
       Event.new(:pre_toot).handlers do |handler|
         assert_boolean(account.disable?(handler))

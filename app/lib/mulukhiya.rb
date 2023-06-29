@@ -33,7 +33,7 @@ module Mulukhiya
   def self.setup_debug
     Ricecream.disable
     return unless Environment.development?
-    require 'pp' # rubocop:disable Lint/RedundantRequireStatement
+    require 'pp'
     Ricecream.enable
     Ricecream.include_context = true
     Ricecream.colorize = true

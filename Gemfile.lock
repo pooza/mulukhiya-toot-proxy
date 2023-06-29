@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 8580447a543bd89c47b02f9848ce4b0cd90febb3
+  revision: 1d7038e73f3f42a4f2345d1739fa6936f357e284
   specs:
-    ginseng-core (1.13.20)
-      actionpack (>= 7.0.4.1)
+    ginseng-core (1.13.21)
+      actionpack (>= 7.0.5.1)
       activesupport (>= 7.0.4.3)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -88,20 +88,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.5)
-      actionview (= 7.0.5)
-      activesupport (= 7.0.5)
+    actionpack (7.0.5.1)
+      actionview (= 7.0.5.1)
+      activesupport (= 7.0.5.1)
       rack (~> 2.0, >= 2.2.4)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.5)
-      activesupport (= 7.0.5)
+    actionview (7.0.5.1)
+      activesupport (= 7.0.5.1)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.5)
+    activesupport (7.0.5.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -159,7 +159,7 @@ GEM
     etc (1.4.2)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.7.7)
+    faraday (2.7.8)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
@@ -183,6 +183,7 @@ GEM
     json-schema (4.0.0)
       addressable (>= 2.8)
     jwt (2.7.1)
+    language_server-protocol (3.17.0.3)
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -282,8 +283,9 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.52.1)
+    rubocop (1.53.1)
       json (~> 2.3)
+      language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
       parser (>= 3.2.2.3)
       rainbow (>= 2.2.2, < 4.0)
@@ -339,7 +341,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     temple (0.10.2)
-    test-unit (3.6.0)
+    test-unit (3.6.1)
       power_assert
     tilt (2.2.0)
     time (0.2.2)

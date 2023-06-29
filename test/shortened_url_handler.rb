@@ -37,7 +37,6 @@ module Mulukhiya
 
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://spotify.app.link/BgfsBAMTbzb?_p=c2153fdc9c077af1ea1990ffecb6')
-      ic @handler.debug_info
 
       assert_equal(1, @handler.debug_info[:result].count)
     end
