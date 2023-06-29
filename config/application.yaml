@@ -190,7 +190,6 @@ handler:
       - spotify.link
       - spotify.app.link
       - apple.co
-      - news.yahoo.co.jp
   slack_alert:
     hooks: []
   spotify_image:
