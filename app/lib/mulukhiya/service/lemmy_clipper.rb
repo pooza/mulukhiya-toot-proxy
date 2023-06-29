@@ -35,6 +35,22 @@ module Mulukhiya
       @jwt = response['jwt']
     end
 
+    def clip(body)
+      body ||= {}
+      body.deep_symbolize_keys!
+      raise Ginseng::AuthError, 'invalid jwt' unless @jwt
+      raise Ginseng::RequestError, 'invalid community' unless @params[:community]
+      data = {community_id: @params[:community], auth: @jwt, name: body[:name]&.to_s}
+      if uri = create_status_uri(body[:url])
+        raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
+        raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
+        data[:url] = uri.to_s
+        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:body] ||= "via: #{uri}"
+      end
+      return http.post('/api/v3/post', {body: data})
+    end
+
     def communities
       raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       uri = self.uri.clone

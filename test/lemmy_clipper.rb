@@ -15,10 +15,12 @@ module Mulukhiya
       assert_predicate(@lemmy.uri, :absolute?)
     end
 
+    def test_clip
+      @lemmy.clip(name: Time.now)
+    end
+
     def test_communities
       assert_kind_of(Hash, @lemmy.communities)
-
-      ic @lemmy.communities
     end
   end
 end
