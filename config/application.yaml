@@ -241,9 +241,6 @@ lemmy:
     default: lm.korako.me
   subject:
     max_length: 100
-  urls:
-    api: /api/v3/ws
-  verify_peer: true
 line:
   id: null
   token: null
