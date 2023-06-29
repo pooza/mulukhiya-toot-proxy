@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 8580447a543bd89c47b02f9848ce4b0cd90febb3
+  revision: 1d7038e73f3f42a4f2345d1739fa6936f357e284
   specs:
-    ginseng-core (1.13.20)
-      actionpack (>= 7.0.4.1)
+    ginseng-core (1.13.21)
+      actionpack (>= 7.0.5.1)
       activesupport (>= 7.0.4.3)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
