@@ -283,7 +283,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.2.9)
       rexml
-    rubocop (1.53.1)
+    rubocop (1.54.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
