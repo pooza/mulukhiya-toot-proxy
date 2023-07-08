@@ -8,9 +8,10 @@ module Mulukhiya
     def handle_post_reaction(payload, params = {})
       payload[status_key] ||= payload[:status_id]
       payload[:reaction] ||= payload[:emoji]
+      return unless payload[:reaction].present?
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
-      return if receipt.reactionable?
+      return if receipt.reactionable? && !Environment.test?
       sns.post({
         status_field => create_status(payload:, receipt:),
         visibility_field => controller_class.visibility_name(:unlisted),
@@ -20,6 +21,7 @@ module Mulukhiya
 
     def create_status(params)
       template = Template.new('reaction.md')
+      params[:payload][:reaction].gsub!('@.', '') if params[:payload][:reaction].start_with?(':')
       template[:payload] = params[:payload]
       template[:receipt] = params[:receipt]
       return template.to_s
