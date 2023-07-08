@@ -9,7 +9,6 @@ module Mulukhiya
       finder.patterns.push('*.yaml')
       finder.patterns.push('*.yml')
       finder.exec.each do |f|
-        puts f
         sh "yamllint #{f}"
       end
     end
