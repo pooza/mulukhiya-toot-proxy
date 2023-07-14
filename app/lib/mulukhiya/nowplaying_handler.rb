@@ -86,6 +86,10 @@ module Mulukhiya
     end
 
     def push(line)
+      if Environment.note?
+        uri = Ginseng::URI.parse(line)
+        line = "[#{uri.host}](#{uri})" if uri.absolute?
+      end
       line.chomp!
       key = rand.to_s if line.empty?
       key ||= [line, @recent_keyword].join("\n").sha256
