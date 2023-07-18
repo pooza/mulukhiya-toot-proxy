@@ -126,12 +126,12 @@ handler:
     disable: true
     experimental: true
     pixel: 480
-    timeout: 10
+    timeout: 20
   itunes_nowplaying:
-    timeout: 10
+    timeout: 20
   itunes_url_nowplaying:
     tagging: false
-    timeout: 10
+    timeout: 20
   line_alert:
     id: null
     token: null
@@ -195,12 +195,12 @@ handler:
   spotify_image:
     disable: true
     experimental: true
-    timeout: 10
+    timeout: 20
   spotify_nowplaying:
-    timeout: 10
+    timeout: 20
   spotify_url_nowplaying:
     tagging: true
-    timeout: 10
+    timeout: 20
   tagging:
     normalize:
       rules: []
@@ -214,10 +214,10 @@ handler:
   you_tube_image:
     disable: true
     experimental: true
-    timeout: 10
+    timeout: 20
   you_tube_url_nowplaying:
     tagging: false
-    timeout: 10
+    timeout: 20
 http:
   retry:
     limit: 3
