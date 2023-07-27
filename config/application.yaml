@@ -26,7 +26,6 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
 annict:
-  chars: 200
   episodes:
     ruby:
       pattern: '[(（][あ-んア-ン・ー]+[)）]'
