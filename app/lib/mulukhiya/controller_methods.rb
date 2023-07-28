@@ -49,6 +49,10 @@ module Mulukhiya
         return Handler.search(/poipiku/).present?
       end
 
+      def max_length
+        return parser_class.new.max_length
+      end
+
       def announcement?
         return config["/#{name}/features/announcement"] == true rescue false
       end
