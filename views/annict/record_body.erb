@@ -1,6 +1,6 @@
 <% if params.dig(:record, :comment).present? -%>
 
-<%= params.dig(:record, :comment).ellipsize(controller.max_length - 200) %>
+<%= params.dig(:record, :comment).ellipsize(controller_class.max_length - 200) %>
 <% end -%>
 <%=
   Mulukhiya::AnnictService.create_record_uri(

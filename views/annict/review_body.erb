@@ -1,6 +1,6 @@
 <% if params.dig(:review, :body).present? -%>
 
-<%= params.dig(:review, :body).ellipsize(controller.max_length - 200) %>
+<%= params.dig(:review, :body).ellipsize(controller_class.max_length - 200) %>
 <% end -%>
 <%= Mulukhiya::AnnictService.create_review_uri(params.dig(:review, :work, :annictId)) %>
 <%= params.dig(:review, :work, :title).to_hashtag %>
