@@ -189,6 +189,13 @@ handler:
       - spotify.link
       - spotify.app.link
       - apple.co
+      - fb.me
+      - r10.to
+      - 00m.in
+      - bit.do
+      - tiny.cc
+      - is.gd
+      - cutt.ly
   slack_alert:
     hooks: []
   spotify_image:
