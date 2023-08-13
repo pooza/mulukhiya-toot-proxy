@@ -189,6 +189,13 @@ handler:
       - spotify.link
       - spotify.app.link
       - apple.co
+      - fb.me
+      - r10.to
+      - 00m.in
+      - bit.do
+      - tiny.cc
+      - is.gd
+      - cutt.ly
   slack_alert:
     hooks: []
   spotify_image:
@@ -802,7 +809,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.29.6
+  version: 4.29.7
 parser:
   note:
     fields:
