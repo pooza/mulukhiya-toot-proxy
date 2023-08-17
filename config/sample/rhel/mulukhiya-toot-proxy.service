@@ -1,0 +1,16 @@
+[Unit]
+Description=mulukhiya-toot-proxy
+After=network.target
+
+[Service]
+Type=forking
+User=__username__
+WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
+ExecStart=/bin/bash -lc 'bundle exec rake start'
+ExecStop=/bin/bash -lc 'bundle exec rake stop'
+TimeoutSec=15
+Restart=always
+Environment="LD_PRELOAD=/usr/lib64/libjemalloc.so.2"
+
+[Install]
+WantedBy=multi-user.target
