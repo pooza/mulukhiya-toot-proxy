@@ -25,7 +25,7 @@ html lang='ja'
               v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
-      - if controller.filter?
+      - if controller.filter? && controller.livecure?
         section.config v-if='account.username && layout.sections.livecure'
           h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
           vue-slide-up-down :active='layout.details.livecure'
