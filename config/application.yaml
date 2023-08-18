@@ -217,6 +217,8 @@ handler:
     extra_minutes: 2
   video_format_convert:
     timeout: 90
+  webhook_image:
+    timeout: 10
   you_tube_image:
     disable: true
     experimental: true
