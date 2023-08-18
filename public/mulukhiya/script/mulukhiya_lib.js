@@ -162,6 +162,7 @@ const MulukhiyaLib = {
         is_scopes_valid: data.token.is_scopes_valid,
         is_admin: data.account.is_admin,
         is_moderator: data.account.is_moderator,
+        is_operator: data.account.is_admin || data.account.is_moderator,
         is_info_bot: data.account.is_info_bot,
         is_test_bot: data.account.is_test_bot,
         webhook: data.webhook.url,

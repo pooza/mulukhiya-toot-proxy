@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# PROVIDE: mulukhiya_puma
+# REQUIRE: LOGIN
+
+# Add the following line to /etc/rc.conf to enable `mulukhiya':
+#
+#mulukhiya_enable="YES"
+
+. /etc/rc.subr
+
+name="mulukhiya_puma"
+rcvar="mulukhiya_enable"
+
+load_rc_config "$name"
+: ${mulukhiya_enable="NO"}
+: ${mulukhiya_path=""}
+: ${mulukhiya_user=""}
+
+export PATH=${PATH}:/usr/local/bin:/usr/local/sbin
+export LANG=ja_JP.UTF-8
+export LC_ALL=ja_JP.UTF-8
+
+start_cmd=${name}_start
+stop_cmd=${name}_stop
+
+mulukhiya_puma_start() {
+  cd $mulukhiya_path
+  sudo -u $mulukhiya_user /bin/bash -lc 'bundle exec rake mulukhiya:puma:start'
+}
+
+mulukhiya_puma_stop() {
+  cd $mulukhiya_path
+  sudo -u $mulukhiya_user /bin/bash -lc 'bundle exec rake mulukhiya:puma:stop'
+}
+
+run_rc_command "$1"

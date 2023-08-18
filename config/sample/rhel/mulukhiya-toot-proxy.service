@@ -10,6 +10,7 @@ ExecStart=/bin/bash -lc 'bundle exec rake start'
 ExecStop=/bin/bash -lc 'bundle exec rake stop'
 TimeoutSec=15
 Restart=always
+Environment="LD_PRELOAD=/usr/lib64/libjemalloc.so"
 
 [Install]
 WantedBy=multi-user.target
