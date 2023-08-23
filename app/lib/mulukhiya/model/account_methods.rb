@@ -97,6 +97,10 @@ module Mulukhiya
       return TagContainer.new
     end
 
+    def followed_tags
+      return TagContainer.new
+    end
+
     def field_tags
       tags = TagContainer.new
       tags.merge(fields.map {|v| v['value']}.select {|v| v.start_with?('#')})

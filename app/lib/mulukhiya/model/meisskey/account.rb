@@ -43,7 +43,7 @@ module Mulukhiya
 
       alias recent_post recent_status
 
-      def featured_tags
+      def followed_tags
         tags = TagContainer.new
         return tags unless timelines = values.dig('clientSettings', 'tagTimelines')
         timelines.each do |timeline|

@@ -175,6 +175,12 @@ module Mulukhiya
       assert_kind_of(TagContainer, account.featured_tags)
     end
 
+    def test_followed_tags
+      return unless account
+
+      assert_kind_of(TagContainer, account.followed_tags)
+    end
+
     def test_field_tags
       return unless account
 

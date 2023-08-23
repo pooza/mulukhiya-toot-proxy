@@ -61,7 +61,7 @@ module Mulukhiya
 
       alias recent_note recent_status
 
-      def featured_tags
+      def followed_tags
         tags = TagContainer.new
         service.antennas.map {|v| v['keywords'].first}.each {|v| tags.merge(v)}
         return tags

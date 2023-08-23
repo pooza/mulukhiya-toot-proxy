@@ -494,6 +494,7 @@ module Mulukhiya
       tags.merge(TagContainer.media_tags)
       if sns.account
         tags.merge(sns.account.featured_tags)
+        tags.merge(sns.account.followed_tags)
         tags.merge(sns.account.field_tags)
         tags.merge(sns.account.bio_tags)
       end
