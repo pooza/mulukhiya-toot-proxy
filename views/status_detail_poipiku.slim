@@ -58,7 +58,7 @@ html lang='ja'
         mounted () {
           Vue.getConfig()
             .then(e => {
-              this.account = e.account
+              this.account = Vue.createAccountInfo(e)
               return (new URL(location.href)).pathname.split('/').slice(-2)[0]
             }).then(id => Vue.getStatus(id))
             .then(e => {this.status = e})

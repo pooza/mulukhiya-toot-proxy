@@ -53,6 +53,14 @@ module Mulukhiya
         return TagContainer.new
       end
 
+      def followed_tags
+        response = service.fetch_followed_tags
+        return TagContainer.new(response.parsed_response.map {|v| v['name']})
+      rescue => e
+        e.log(acct: acct.to_s)
+        return TagContainer.new
+      end
+
       def fields
         return JSON.parse(values[:fields] || '[]')
       rescue => e

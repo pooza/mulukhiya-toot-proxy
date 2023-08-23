@@ -355,7 +355,7 @@ html lang='ja'
         mounted () {
           Vue.getConfig()
             .then(e => {
-              this.account = e.account
+              this.account = Vue.createAccountInfo(e)
               this.config = e.config
               if (Vue.getToken()) {
                 this.endpoints.media_list += `&token=${encodeURIComponent(Vue.getToken())}`

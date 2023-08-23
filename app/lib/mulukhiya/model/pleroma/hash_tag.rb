@@ -22,10 +22,6 @@ module Mulukhiya
         }
       end
 
-      def self.featured_tags
-        return TagContainer.new
-      end
-
       def self.get(key)
         case key
         in {tag: tag}

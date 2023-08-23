@@ -115,7 +115,7 @@ html lang='ja'
         },
         mounted () {
           Vue.getConfig()
-            .then(e => {this.account = e.account})
+            .then(e => {this.account = Vue.createAccountInfo(e)})
             .then(e => Vue.getAccounts())
             .then(e => {
               this.accounts = e
