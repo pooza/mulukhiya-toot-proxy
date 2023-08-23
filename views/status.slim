@@ -90,7 +90,7 @@ html lang='ja'
         mounted () {
           Vue.getConfig()
             .then(e => {
-              this.account = e.account
+              this.account = Vue.createAccountInfo(e)
               if (this.account.username) {this.appendStatuses()}
             }).catch(e => Vue.alert(this.$dialog, e))
         },

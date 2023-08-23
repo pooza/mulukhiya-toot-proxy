@@ -84,7 +84,7 @@ html lang='ja'
         mounted () {
           Vue.getConfig()
             .then(e => {
-              this.account = e.account
+              this.account = Vue.createAccountInfo(e)
               this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => Vue.alert(this.$dialog, e))
           this.getWorks()
