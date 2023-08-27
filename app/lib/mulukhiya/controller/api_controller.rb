@@ -282,7 +282,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         tags = status.parser.footer_tags.push(params[:tag])
-        body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
+        body = [status.parser.body, '', tags.map(&:to_hashtag).join(' ')].join("\n")
         @renderer.message = sns.update_status(status.id, body, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })
@@ -308,7 +308,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         tags = status.parser.footer_tags.delete(tag.name)
-        body = [status.parser.body, tags.map(&:to_hashtag).join(' ')].join("\n")
+        body = [status.parser.body, '', tags.map(&:to_hashtag).join(' ')].join("\n")
         @renderer.message = sns.update_status(status.id, body, {
           headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
         })

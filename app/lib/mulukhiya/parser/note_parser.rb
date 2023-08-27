@@ -27,7 +27,7 @@ module Mulukhiya
         .reject(&:disable?)
         .inject(Set[]) {|tags, h| tags.merge(h.addition_tags)}
         .sum {|v| v.to_hashtag.length + 1}
-      length -= 1
+      length -= 1 # 1行アキはMastodon 4.2対応
       return length
     rescue => e
       e.log(text:)
