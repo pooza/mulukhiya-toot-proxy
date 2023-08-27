@@ -12,9 +12,9 @@ module Mulukhiya
         tags.merge(lines.pop.strip.split(/[[:blank:]]+/))
       end
       tags.text = lines.join("\n")
+      lines.push('') if tags.text.present? && lines.last.present? # 1行アキはMastodon 4.2対応
       lines.push(tags.create_tags.join(' '))
       parser.text = payload[text_field] = lines.join("\n")
-      result.push(tags:) if tags.present?
     end
 
     def self.normalize_rules

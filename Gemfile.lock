@@ -8,11 +8,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e0d5bfc22e369caa3414e2236bb80e55c077c22c
+  revision: 42b39accaffd53217ddc431891488cabe879ee8a
   specs:
-    ginseng-core (1.13.23)
+    ginseng-core (1.13.25)
       actionpack (>= 7.0.5.1)
-      activesupport (>= 7.0.4.3)
+      activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
       cgi (>= 0.3.5)
@@ -30,7 +30,7 @@ GIT
       multi_json
       net-protocol
       net-smtp
-      nokogiri (>= 1.14.3)
+      nokogiri (>= 1.15.4)
       optparse
       rack (>= 2.2.6.2)
       rails-html-sanitizer (>= 1.4.4)
@@ -133,7 +133,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0, < 2)
       zeitwerk (~> 2.6)
-    dry-schema (1.13.2)
+    dry-schema (1.13.3)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 1.0, >= 1.0.1)
       dry-core (~> 1.0, < 2)
