@@ -257,6 +257,7 @@ module Mulukhiya
         status.parser.footer_tags.concat(params[:tags])
         body = [
           status.parser.body,
+          '',
           status.parser.footer_tags.map(&:to_hashtag).join(' '),
         ].join("\n")
         @renderer.message = sns.update_status(status.id, body, {
