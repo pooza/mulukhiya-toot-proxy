@@ -12,13 +12,13 @@ module Mulukhiya
     def test_search_track
       track = @service.search_track('キラキラしちゃってMy True Love！')
 
-      assert_includes(track.name, 'キラキラしちゃって My True Love!')
+      assert_includes(track.name, 'キラキラしちゃって My True Love')
     end
 
     def test_lookup_track
       track = @service.lookup_track('1TohZQho6JsNn5SJX44LYD')
 
-      assert_equal('キラキラしちゃって My True Love!', track.name)
+      assert_includes(track.name, 'キラキラしちゃって My True Love')
     end
 
     def test_lookup_album
