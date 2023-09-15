@@ -22,7 +22,7 @@ module Mulukhiya
     end
 
     def test_to_md
-      assert_equal("## アカウント\n[ぷーざ@キュアスタ！ :sabacan:](https://precure.ml/@pooza)\n## 本文\n本店わかんなかったけどw とりあえず最寄りの満州で、昼間からビールです。\n## URL\nhttps://precure.ml/web/statuses/101118840135913675\n", @uri.to_md) if @uri
+      assert_equal("## アカウント\n[ぷーざ@キュアスタ！](https://precure.ml/@pooza)\n## 本文\n本店わかんなかったけどw とりあえず最寄りの満州で、昼間からビールです。\n## URL\nhttps://precure.ml/web/statuses/101118840135913675\n", @uri.to_md) if @uri
     end
   end
 end
