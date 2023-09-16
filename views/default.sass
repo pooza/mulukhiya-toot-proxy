@@ -919,6 +919,14 @@ code
     width: 1px
     radius: 4px
   opacity: 0.9
+.tooltip[aria-hidden='true']
+  visibility: hidden
+  opacity: 0
+  transition: opacity .15s, visibility .15s
+.tooltip[aria-hidden='false']
+  visibility: visible
+  opacity: 1
+  transition: opacity .15s
 
 .clearfix::after
   content: ""
