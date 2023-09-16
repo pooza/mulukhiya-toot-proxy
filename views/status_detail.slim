@@ -59,7 +59,7 @@ html lang='ja'
       .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
     javascript:
       'use strict'
-      Vue.use(VTooltip)
+      Vue.use(VTooltip, {delay: 0, autoHide:true})
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
