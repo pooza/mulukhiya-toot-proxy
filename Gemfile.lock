@@ -60,10 +60,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 870e2140e9366a82b5521818ca894ef371eb25b4
+  revision: e8b3b3625c232eeef70d18663b2b8e713dcf0fa1
   specs:
-    ginseng-redis (2.0.1)
-      redis-client (~> 0.12.0)
+    ginseng-redis (2.0.2)
+      redis-client (~> 0.14.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -89,20 +89,20 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.7.2)
-      actionview (= 7.0.7.2)
-      activesupport (= 7.0.7.2)
+    actionpack (7.0.8)
+      actionview (= 7.0.8)
+      activesupport (= 7.0.8)
       rack (~> 2.0, >= 2.2.4)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.7.2)
-      activesupport (= 7.0.7.2)
+    actionview (7.0.8)
+      activesupport (= 7.0.8)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.7.2)
+    activesupport (7.0.8)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -111,6 +111,7 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     base64 (0.1.1)
+    bigdecimal (3.1.4)
     bson (4.15.0)
     builder (3.2.4)
     cgi (0.3.6)
@@ -161,7 +162,8 @@ GEM
     etc (1.4.2)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.7.10)
+    faraday (2.7.11)
+      base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
@@ -182,7 +184,7 @@ GEM
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     json (2.6.3)
-    json-schema (4.0.0)
+    json-schema (4.1.1)
       addressable (>= 2.8)
     jwt (2.7.1)
     language_server-protocol (3.17.0.3)
@@ -201,7 +203,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
-    minitest (5.19.0)
+    minitest (5.20.0)
     mongo (2.19.1)
       bson (>= 4.14.1, < 5.0.0)
     multi_json (1.15.0)
@@ -245,7 +247,7 @@ GEM
     parser (3.2.2.3)
       ast (~> 2.4.1)
       racc
-    pg (1.5.3)
+    pg (1.5.4)
     power_assert (2.0.3)
     public_suffix (5.0.3)
     puma (6.3.1)
@@ -271,7 +273,7 @@ GEM
       nokogiri (~> 1.14)
     rainbow (3.1.1)
     rake (13.0.6)
-    redis-client (0.12.2)
+    redis-client (0.14.1)
       connection_pool
     regexp_parser (2.8.1)
     rest-client (2.0.2)
@@ -286,7 +288,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.0)
       rexml
-    rubocop (1.56.1)
+    rubocop (1.56.3)
       base64 (~> 0.1.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -300,7 +302,7 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.29.0)
       parser (>= 3.2.1.0)
-    rubocop-minitest (0.31.0)
+    rubocop-minitest (0.31.1)
       rubocop (>= 1.39, < 2.0)
     rubocop-performance (1.19.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -313,19 +315,20 @@ GEM
     ruby2_keywords (0.0.5)
     rufus-scheduler (3.9.1)
       fugit (~> 1.1, >= 1.1.6)
-    sanitize (6.0.2)
+    sanitize (6.1.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.2.2)
-    sequel (5.71.0)
+    sequel (5.72.0)
+      bigdecimal
     set (1.0.3)
-    sidekiq (7.0.9)
+    sidekiq (7.1.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
-      redis-client (>= 0.11.0)
+      redis-client (>= 0.14.0)
     sidekiq-scheduler (5.0.3)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
@@ -399,7 +402,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 7.0)
+  sidekiq (~> 7.1.3)
   sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit
