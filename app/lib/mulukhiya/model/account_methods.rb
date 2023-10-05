@@ -12,6 +12,10 @@ module Mulukhiya
       return @acct
     end
 
+    def roles
+      return []
+    end
+
     def reactionable?
       http = HTTP.new
       http.base_uri = "https://#{acct.host}"

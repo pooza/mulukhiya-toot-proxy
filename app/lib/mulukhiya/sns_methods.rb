@@ -56,6 +56,10 @@ module Mulukhiya
       return Environment.status_class
     end
 
+    def role_class
+      return Environment.status_class
+    end
+
     def attachment_class
       return Environment.attachment_class
     end
@@ -75,10 +79,10 @@ module Mulukhiya
     end
 
     def notify(message, options = {})
-      return true unless info_agent_service
-      options[:accounts] ||= [@sns.account] if @sns&.account
-      options[:accounts] ||= []
+      return unless info_agent_service
       message = message.to_yaml unless message.is_a?(String)
+      options[:accounts] ||= []
+      options[:accounts].push(@sns.account) if @sns&.account
       options[:accounts].each do |account|
         return info_agent_service.notify(account, message, options.deep_symbolize_keys)
       rescue => e

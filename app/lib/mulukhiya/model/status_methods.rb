@@ -62,7 +62,6 @@ module Mulukhiya
     def to_h
       @hash ||= values.deep_symbolize_keys.merge(
         body:,
-        created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
         footer_tags: footer_tags.map(&:to_h),
         footer:,
         id: id.to_s,

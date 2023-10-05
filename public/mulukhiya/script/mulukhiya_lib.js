@@ -160,6 +160,7 @@ const MulukhiyaLib = {
         token: token_crypted,
         scopes: data?.token?.scopes || [],
         is_scopes_valid: data?.token?.is_scopes_valid,
+        roles: data.account.roles,
         is_admin: data.account.is_admin,
         is_info_bot: data.account.is_info_bot,
         is_test_bot: data.account.is_test_bot,

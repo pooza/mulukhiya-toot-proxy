@@ -12,6 +12,10 @@ module Mulukhiya
         return super.except(:private_key, :public_key)
       end
 
+      def roles
+        return [user&.role].compact
+      end
+
       def display_name
         return values[:display_name] if values[:display_name].present?
         return acct.to_s
@@ -75,7 +79,9 @@ module Mulukhiya
       alias attachments attachment
 
       def admin?
-        return user.admin
+        return true if user.admin
+        return true if roles.any?(&:admin?)
+        return false
       end
 
       def service?
