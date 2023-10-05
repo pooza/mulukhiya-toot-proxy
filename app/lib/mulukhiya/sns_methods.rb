@@ -76,7 +76,6 @@ module Mulukhiya
 
     def notify(message, options = {})
       return true unless info_agent_service
-      options[:accounts] = Environment.account_class.administrators if options[:administrators]
       options[:accounts] ||= [@sns.account] if @sns&.account
       options[:accounts] ||= []
       message = message.to_yaml unless message.is_a?(String)

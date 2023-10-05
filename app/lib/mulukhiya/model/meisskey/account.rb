@@ -113,15 +113,6 @@ module Mulukhiya
         return Mongo.instance.db[:users]
       end
 
-      def self.administrators(&block)
-        return enum_for(__method__) unless block
-        Account.aggregate(:administrators)
-          .to_a
-          .filter_map {|row| row[:_id] rescue nil}
-          .filter_map {|id| Account[id] rescue nil}
-          .each(&block)
-      end
-
       private
 
       def collection_name
