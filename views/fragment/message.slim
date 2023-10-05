@@ -5,7 +5,6 @@
 .message-container
   .message v-if='account.username'
     | login: @{{account.username}}
-    .role v-if='account.is_moderator' moderator
     .role v-if='account.is_admin' admin
     .role v-if='account.is_test_bot' test bot
     .role v-if='account.is_info_bot' info bot

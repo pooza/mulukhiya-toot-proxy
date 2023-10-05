@@ -71,7 +71,6 @@ html lang='ja'
             vue-slide-up-down :active='layout.details.announcement'
               .endpoint-container
                 .role admin
-                .role moderator
                 .link POST /mulukhiya/api/announcement/update
                 pre.payload v-if='query_params.announcement_update' {{query_params.announcement_update}}
                 - if config.keys('/sidekiq/schedule/announcement').member?('every')
@@ -102,7 +101,6 @@ html lang='ja'
                 pre.result v-if='result.media_list' {{result.media_list}}
             .endpoint-container v-if='account.is_operator'
               .role admin
-              .role moderator
               .link POST /mulukhiya/api/media/file/clear
               pre.payload v-if='query_params.media_file_clear' {{query_params.media_file_clear}}
               - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
@@ -114,7 +112,6 @@ html lang='ja'
                 button @click='clearMediaFiles' 実行
             .endpoint-container v-if='account.is_operator'
               .role admin
-              .role moderator
               .link POST /mulukhiya/api/media/metadata/clear
               pre.payload v-if='query_params.media_metadata_clear' {{query_params.media_metadata_clear}}
               .link-description メディアファイルのメタデータをクリアします。
@@ -178,7 +175,6 @@ html lang='ja'
                 pre.result v-if='result.search_tag' {{result.search_tag}}
             .endpoint-container v-if='account.is_operator'
               .role admin
-              .role moderator
               .link POST /mulukhiya/api/tagging/dic/update
               pre.payload v-if='query_params.tagging_dic_update' {{query_params.tagging_dic_update}}
               - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
@@ -202,7 +198,6 @@ html lang='ja'
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint-container
               .role admin
-              .role moderator
               .link POST /mulukhiya/api/tagging/usertag/clear
               pre.payload v-if='query_params.tagging_usertag_clear' {{query_params.tagging_usertag_clear}}
               - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
@@ -224,7 +219,6 @@ html lang='ja'
                   pre.result v-if='result.feed_list' {{result.feed_list}}
               .endpoint-container v-if='account.is_operator'
                 .role admin
-                .role moderator
                 .link POST /mulukhiya/api/feed/update
                 pre.payload v-if='query_params.feed_update' {{query_params.feed_update}}
                 - if config.keys('/sidekiq/schedule/feed_update').member?('every')

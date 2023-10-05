@@ -61,10 +61,6 @@ module Mulukhiya
         return isAdmin == true
       end
 
-      def moderator?
-        return isModerator == true
-      end
-
       def bot?
         return isBot == true
       end

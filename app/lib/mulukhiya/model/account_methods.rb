@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def operator?
-      return admin? || moderator?
+      return admin?
     end
 
     def reactionable?
@@ -194,7 +194,6 @@ module Mulukhiya
         display_name:,
         is_admin: admin?,
         is_info_bot: info?,
-        is_moderator: moderator?,
         is_test_bot: test?,
         url: uri.to_s,
         username:,

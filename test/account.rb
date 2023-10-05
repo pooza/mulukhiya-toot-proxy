@@ -26,7 +26,6 @@ module Mulukhiya
       assert_kind_of(String, h[:display_name])
       assert_boolean(h[:is_admin])
       assert_boolean(h[:is_info_bot])
-      assert_boolean(h[:is_moderator])
       assert_boolean(h[:is_test_bot])
       assert_kind_of(String, h[:url])
       assert_kind_of(String, h[:username])
@@ -67,10 +66,6 @@ module Mulukhiya
 
     def test_admin?
       assert_boolean(account.admin?)
-    end
-
-    def test_moderator?
-      assert_boolean(account.moderator?)
     end
 
     def test_test?

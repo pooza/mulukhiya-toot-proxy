@@ -78,10 +78,6 @@ module Mulukhiya
         return user.admin
       end
 
-      def moderator?
-        return user.moderator
-      end
-
       def service?
         return actor_type == 'Service'
       end
