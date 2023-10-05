@@ -66,7 +66,7 @@ html lang='ja'
                   button @click='deleteTag' :disabled='!query_params.status_delete_tag.id || !query_params.status_delete_tag.tag' 実行
                   pre.result v-if='result.status_delete_tag' {{result.status_delete_tag}}
         - if controller.announcement?
-          li v-if='account.is_operator'
+          li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
             vue-slide-up-down :active='layout.details.announcement'
               .endpoint-container
@@ -99,7 +99,7 @@ html lang='ja'
               .field-update-button-container
                 button @click='delay(getMedias)' 実行
                 pre.result v-if='result.media_list' {{result.media_list}}
-            .endpoint-container v-if='account.is_operator'
+            .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/file/clear
               pre.payload v-if='query_params.media_file_clear' {{query_params.media_file_clear}}
@@ -110,7 +110,7 @@ html lang='ja'
               .link-description メディアファイル変換結果をクリアします。
               .field-update-button-container
                 button @click='clearMediaFiles' 実行
-            .endpoint-container v-if='account.is_operator'
+            .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/metadata/clear
               pre.payload v-if='query_params.media_metadata_clear' {{query_params.media_metadata_clear}}
@@ -127,7 +127,7 @@ html lang='ja'
                 .field-update-button-container
                   button @click='getPrograms' 実行
                   pre.result v-if='result.program_list' {{result.program_list}}
-              .endpoint-container v-if='account.is_operator'
+              .endpoint-container v-if='account.is_admin'
                 .link POST /mulukhiya/api/program/update
                 pre.payload v-if='query_params.program_update' {{query_params.program_update}}
                 - if config.keys('/sidekiq/schedule/program_update').member?('every')
@@ -173,7 +173,7 @@ html lang='ja'
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
                 pre.result v-if='result.search_tag' {{result.search_tag}}
-            .endpoint-container v-if='account.is_operator'
+            .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
               pre.payload v-if='query_params.tagging_dic_update' {{query_params.tagging_dic_update}}
@@ -193,7 +193,7 @@ html lang='ja'
               .field-update-button-container
                 button @click='getEpisodeTags' 実行
                 pre.result v-if='result.episode_tags' {{result.episode_tags}}
-        li v-if='account.is_operator'
+        li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           vue-slide-up-down :active='layout.details.tagging_usertag'
             .endpoint-container
@@ -217,7 +217,7 @@ html lang='ja'
                 .field-update-button-container
                   button @click='getFeeds' 実行
                   pre.result v-if='result.feed_list' {{result.feed_list}}
-              .endpoint-container v-if='account.is_operator'
+              .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/feed/update
                 pre.payload v-if='query_params.feed_update' {{query_params.feed_update}}

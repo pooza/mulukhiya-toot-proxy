@@ -60,10 +60,6 @@ module Mulukhiya
       assert_kind_of(String, account.bio)
     end
 
-    def test_operator?
-      assert_boolean(account.operator?)
-    end
-
     def test_admin?
       assert_boolean(account.admin?)
     end

@@ -184,7 +184,7 @@ module Mulukhiya
     end
 
     post '/media/file/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       MediaCleaningWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -195,7 +195,7 @@ module Mulukhiya
     end
 
     post '/media/metadata/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       MediaMetadataStorage.new.clear
       return @renderer.to_s
     rescue => e
@@ -396,7 +396,7 @@ module Mulukhiya
 
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       AnnouncementWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -419,7 +419,7 @@ module Mulukhiya
     end
 
     post '/tagging/dic/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       TaggingDictionaryUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -467,7 +467,7 @@ module Mulukhiya
     end
 
     post '/tagging/usertag/clear' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       UserTagInitializeWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -504,7 +504,7 @@ module Mulukhiya
     end
 
     post '/feed/update' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       FeedUpdateWorker.perform_async
       return @renderer.to_s
     rescue => e
@@ -515,7 +515,7 @@ module Mulukhiya
     end
 
     get '/admin/handler/list' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       @renderer.message = Handler.all.map do |handler|
         {name: handler.underscore, disable: config.disable?(handler)}
       end
@@ -528,7 +528,7 @@ module Mulukhiya
     end
 
     post '/admin/handler/config' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
       return @renderer.to_s
     rescue => e
@@ -557,7 +557,7 @@ module Mulukhiya
     end
 
     post '/admin/puma/restart' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.operator?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       Sidekiq.set_schedule('puma_daemon_restart', {
         at: config['/puma/restart/seconds'].seconds.after,
         class: 'Mulukhiya::PumaDaemonRestartWorker',
