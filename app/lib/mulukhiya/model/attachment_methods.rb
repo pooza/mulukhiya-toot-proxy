@@ -66,7 +66,7 @@ module Mulukhiya
 
     def to_h
       return values.deep_symbolize_keys.merge(
-        created_at: date&.strftime('%Y/%m/%d %H:%M:%S'),
+        created_at: date&.getlocal&.strftime('%Y/%m/%d %H:%M:%S'),
         duration:,
         file_name: name,
         file_size_str: size_str,

@@ -2,10 +2,6 @@ module Mulukhiya
   module SNSServiceMethods
     include SNSMethods
 
-    def update_status(status, body, params = {})
-      return repost_status(status, body, params)
-    end
-
     def repost_status(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
