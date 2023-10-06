@@ -191,6 +191,7 @@ module Mulukhiya
     def to_h
       return values.deep_symbolize_keys.merge(
         acct: acct.to_s,
+        roles: roles.map(&:to_h),
         display_name:,
         is_admin: admin?,
         is_info_bot: info?,
