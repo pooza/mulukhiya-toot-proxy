@@ -300,7 +300,7 @@ module Mulukhiya
           name: viewer['name'],
           username: viewer['username'],
           avatar_uri: Ginseng::URI.parse(viewer['avatarUrl']),
-          works: viewer.dig('works', 'nodes')
+          works: viewer.dig('works', 'nodes'),
         }
       end
       return response
