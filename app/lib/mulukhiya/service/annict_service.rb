@@ -12,14 +12,7 @@ module Mulukhiya
 
     def activities(&block)
       return enum_for(__method__) unless block
-      response = query(:activity)
-      @account ||= {
-        id: response.dig('data', 'viewer', 'annictId'),
-        name: response.dig('data', 'viewer', 'name'),
-        username: response.dig('data', 'viewer', 'username'),
-        avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
-      }
-      response.dig('data', 'viewer', 'activities', 'edges')
+      query(:activity).dig('data', 'viewer', 'activities', 'edges')
         .filter_map {|activity| activity['node']}
         .select {|node| node['__typename'].present?}
         .select {|node| node['createdAt'].present?}
@@ -297,10 +290,17 @@ module Mulukhiya
       template = Template.new(path)
       template.params = params
       endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-      return graphql_service.post(endpoint.path, {
+      response = graphql_service.post(endpoint.path, {
         body: {query: template.to_s},
         headers: {Authorization: "Bearer #{@token}"},
       }).parsed_response
+      @account ||= {
+        id: response.dig('data', 'viewer', 'annictId'),
+        name: response.dig('data', 'viewer', 'name'),
+        username: response.dig('data', 'viewer', 'username'),
+        avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
+      }
+      return response
     end
   end
 end
