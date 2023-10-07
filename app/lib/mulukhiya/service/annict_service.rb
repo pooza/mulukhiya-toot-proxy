@@ -294,12 +294,14 @@ module Mulukhiya
         body: {query: template.to_s},
         headers: {Authorization: "Bearer #{@token}"},
       }).parsed_response
-      @account ||= {
-        id: response.dig('data', 'viewer', 'annictId'),
-        name: response.dig('data', 'viewer', 'name'),
-        username: response.dig('data', 'viewer', 'username'),
-        avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
-      }
+      if viewer = response.dig('data', 'viewer')
+        @account = {
+          id: viewer['annictId'],
+          name: viewer['name'],
+          username: viewer['username'],
+          avatar_uri: Ginseng::URI.parse(viewer['avatarUrl']),
+        }
+      end
       return response
     end
   end
