@@ -230,6 +230,8 @@ http:
   retry:
     limit: 3
     seconds: 1
+  timeout:
+    seconds: 30
 itunes:
   country: jp
   hosts:
