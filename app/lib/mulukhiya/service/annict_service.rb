@@ -20,15 +20,7 @@ module Mulukhiya
     end
 
     def account
-      unless @account
-        response = query(:account)
-        @account = {
-          id: response.dig('data', 'viewer', 'annictId'),
-          name: response.dig('data', 'viewer', 'name'),
-          username: response.dig('data', 'viewer', 'username'),
-          avatar_uri: Ginseng::URI.parse(response.dig('data', 'viewer', 'avatarUrl')),
-        }
-      end
+      @account ||= self.class.create_viewer_info(query(:account).dig('data', 'viewer'))
       return @account
     end
 
@@ -42,7 +34,7 @@ module Mulukhiya
           work['node'].compact.merge(
             'hashtag' => work.dig('node', 'title').to_hashtag,
             'hashtag_url' => sns.create_tag_uri(work.dig('node', 'title')).to_s,
-            'command_toot' => create_command_toot(title: work.dig('node', 'title')),
+            'command_toot' => self.class.create_command_toot(title: work.dig('node', 'title')),
           )
         end
         entries.concat(works)
@@ -59,7 +51,7 @@ module Mulukhiya
           all.push(episode.merge(
             'hashtag' => episode['title'].to_hashtag,
             'hashtag_uri' => sns.create_tag_uri(episode['title']),
-            'command_toot' => create_command_toot(
+            'command_toot' => self.class.create_command_toot(
               title: entries.first['title'],
               subtitle: episode['title'],
               number_text: episode['numberText'],
@@ -171,8 +163,31 @@ module Mulukhiya
       return uri
     end
 
+    def self.create_viewer_info(viewer)
+      viewer = viewer.clone.deep_symbolize_keys
+      return viewer.compact.merge(
+        id: viewer[:annictId],
+        avatar_uri: Ginseng::URI.parse(viewer[:avatarUrl]),
+        works: viewer.dig(:works, :nodes)
+          .select {|node| node[:viewerStatusState] == 'WATCHING'}
+          .map {|node| create_work_info(node)},
+      )
+    end
+
+    def self.create_work_info(work)
+      work.deep_stringify_keys!
+      sns = sns_class.new
+      url = work['officialSiteUrl']
+      work['officialSiteUrl'] = url.present? ? Ginseng::URI.parse(url) : nil
+      return work.compact.merge(
+        'hashtag' => work['title'].to_hashtag,
+        'hashtag_url' => sns.create_tag_uri(work['title']).to_s,
+        'command_toot' => create_command_toot(title: work['title']),
+      )
+    end
+
     def self.subtitle_trim_ruby?
-      return config['/annict/episodes/ruby/trim']
+      return config['/annict/episodes/ruby/trim'] == true
     end
 
     def self.ruby_pattern
@@ -238,6 +253,22 @@ module Mulukhiya
         .each(&block)
     end
 
+    def self.create_command_toot(params = {})
+      return {
+        command: 'user_config',
+        tagging: {
+          user_tags: [
+            params[:title],
+            '実況',
+            'エア番組',
+            create_episode_number_text(params[:number_text]),
+            params[:subtitle],
+          ].compact,
+          minutes: params[:minutes],
+        }.deep_compact,
+      }.to_yaml
+    end
+
     def self.crawl_all(params = {})
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
@@ -261,22 +292,6 @@ module Mulukhiya
 
     private
 
-    def create_command_toot(params = {})
-      return {
-        command: 'user_config',
-        tagging: {
-          user_tags: [
-            params[:title],
-            '実況',
-            'エア番組',
-            self.class.create_episode_number_text(params[:number_text]),
-            params[:subtitle],
-          ].compact,
-          minutes: params[:minutes],
-        }.deep_compact,
-      }.to_yaml
-    end
-
     def crawlable?(activity, params)
       keywords = self.class.keywords
       return true unless keywords.present?
@@ -295,13 +310,7 @@ module Mulukhiya
         headers: {Authorization: "Bearer #{@token}"},
       }).parsed_response
       if viewer = response.dig('data', 'viewer')
-        @account = {
-          id: viewer['annictId'],
-          name: viewer['name'],
-          username: viewer['username'],
-          avatar_uri: Ginseng::URI.parse(viewer['avatarUrl']),
-          works: viewer.dig('works', 'nodes'),
-        }
+        @account = self.class.create_viewer_info(viewer)
       end
       return response
     end
