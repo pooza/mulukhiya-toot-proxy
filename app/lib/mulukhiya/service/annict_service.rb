@@ -35,7 +35,7 @@ module Mulukhiya
       end
       entries.concat(account[:works])
       entries.uniq! {|v| v['annictId']}
-      return entries.sort_by {|v| v['seasonYear'] * 100_000 + v['annictId']}.reverse
+      return entries.sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
     end
 
     def episodes(id)
