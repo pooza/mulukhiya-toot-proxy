@@ -126,6 +126,12 @@ module Mulukhiya
       return nil
     end
 
+    def self.role_class
+      return "Mulukhiya::#{controller_name.camelize}::Role".constantize
+    rescue NameError
+      return nil
+    end
+
     def self.access_token_class
       return "Mulukhiya::#{controller_name.camelize}::AccessToken".constantize
     rescue NameError

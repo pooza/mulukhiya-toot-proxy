@@ -1,7 +1,0 @@
-SELECT
-  accounts.id
-FROM
-  accounts
-  INNER JOIN users ON users.account_id = accounts.id
-WHERE (accounts.domain IS null)
-  AND (users.admin = true)

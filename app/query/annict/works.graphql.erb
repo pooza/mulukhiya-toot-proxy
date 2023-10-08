@@ -1,4 +1,19 @@
 {
+  viewer {
+    annictId
+    name
+    username
+    avatarUrl
+    works {
+      nodes {
+        annictId
+        title
+        seasonYear
+        officialSiteUrl
+        viewerStatusState
+      }
+    }
+  }
   searchWorks (
     titles: "<%= params[:title] %>",
     orderBy: {field: SEASON, direction: DESC}

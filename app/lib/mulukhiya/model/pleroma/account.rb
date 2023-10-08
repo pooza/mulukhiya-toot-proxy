@@ -60,8 +60,6 @@ module Mulukhiya
 
       alias admin? is_admin
 
-      alias moderator? is_moderator
-
       def service?
         return actor_type == 'Service'
       end

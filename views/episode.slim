@@ -32,15 +32,15 @@ html lang='ja'
                 strong.number-text
                   | {{episode.numberText}}
                 .link-container
-                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
                   span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
                     | {{episode.title}}
                 .link-container
-                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                     | {{episode.hashtag}}
                 .link-container v-if='episode.command_toot'
-                  i class='fas fa-clipboard' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
@@ -50,11 +50,11 @@ html lang='ja'
             ul.episodes v-else=''
               li.episode
                 .link-container
-                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-title-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId"
                   span.title :id="'episode-title-' + work.annictId"
                     | {{work.title}}
                 .link-container
-                  i class='fas fa-clipboard' :data-clipboard-target="'#episode-hashtag-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
                     | {{work.hashtag}}
                 .bubble-container v-if='work.hashtag_url'

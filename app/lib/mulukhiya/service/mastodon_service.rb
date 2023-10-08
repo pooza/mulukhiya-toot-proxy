@@ -14,11 +14,10 @@ module Mulukhiya
       body.deep_symbolize_keys!
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
-      response = http.put("/api/v1/statuses/#{status.id}", {
-        body: body.compact,
-        headers: create_headers(params[:headers]),
-      })
-      return self.class.create_status_info(response.body)
+      super(status.id, body, params)
+      return status.to_h.merge(
+        account: status.account.to_h.slice(:username, :display_name),
+      )
     end
 
     def search_status_id(status)
@@ -73,21 +72,6 @@ module Mulukhiya
         MastodonController.spoiler_field => options[:spoiler_text],
         MastodonController.visibility_field => MastodonController.visibility_name(:direct),
         MastodonController.reply_to_field => options.dig(:response, :id),
-      )
-    end
-
-    def self.create_status_info(status)
-      status = JSON.parse(status) unless status.is_a?(Hash)
-      parser = TootParser.new(TootParser.sanitize(status['content']))
-      service = new
-      return status.merge(
-        created_at: Time.parse(status['created_at']).getlocal.strftime('%Y/%m/%d %H:%M:%S'),
-        webui_url: service.create_uri("/mulukhiya/app/status/#{status['id']}").to_s,
-        body: parser.body,
-        is_taggable: status['visibility'] == MastodonController.visibility_name(:public),
-        footer: parser.footer,
-        footer_tags: parser.footer_tags.filter_map {|tag| Mastodon::HashTag.get(tag:)}.map(&:to_h),
-        visibility_icon: TootParser.visibility_icon(status['visibility']),
       )
     end
   end

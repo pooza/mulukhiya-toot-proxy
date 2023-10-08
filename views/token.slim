@@ -18,7 +18,7 @@ html lang='ja'
           h4
             a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
             span.alert v-else='' 壊れたトークン
-            .role v-if='current_account.is_moderator' moderator
+            .role v-for='role in current_account.roles' v-if='role.is_visible' = '{{role.name}}'
             .role v-if='current_account.is_admin' admin
             .role v-if='current_account.is_test_bot' test bot
             .role v-if='current_account.is_info_bot' info bot

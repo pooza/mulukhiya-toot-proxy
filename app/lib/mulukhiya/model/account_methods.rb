@@ -12,8 +12,8 @@ module Mulukhiya
       return @acct
     end
 
-    def operator?
-      return admin? || moderator?
+    def roles
+      return []
     end
 
     def reactionable?
@@ -191,10 +191,10 @@ module Mulukhiya
     def to_h
       return values.deep_symbolize_keys.merge(
         acct: acct.to_s,
+        roles: roles.map(&:to_h),
         display_name:,
         is_admin: admin?,
         is_info_bot: info?,
-        is_moderator: moderator?,
         is_test_bot: test?,
         url: uri.to_s,
         username:,
@@ -236,14 +236,6 @@ module Mulukhiya
       rescue => e
         e.log
         return nil
-      end
-
-      def administrators(&block)
-        return enum_for(__method__) unless block
-        Postgres.exec(:administrators)
-          .map {|row| row[:id]}
-          .filter_map {|id| Environment.account_class[id] rescue nil}
-          .each(&block)
       end
     end
   end

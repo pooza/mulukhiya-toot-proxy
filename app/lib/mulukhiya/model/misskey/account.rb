@@ -6,6 +6,7 @@ module Mulukhiya
       include SNSMethods
       one_to_one :account_profile, key: :userId
       one_to_many :attachment, key: :userId
+      many_to_many :roles, left_key: :userId, right_key: :roleId, join_table: :role_assignment
 
       def to_h
         return super.except(:token)
@@ -72,9 +73,9 @@ module Mulukhiya
 
       alias attachments attachment
 
-      alias admin? isRoot
-
-      def moderator?
+      def admin?
+        return true if isRoot
+        return true if roles.any?(&:admin?)
         return false
       end
 

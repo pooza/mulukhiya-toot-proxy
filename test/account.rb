@@ -18,6 +18,13 @@ module Mulukhiya
       assert_predicate(account.acct.username, :present?)
     end
 
+    def test_roles
+      assert_kind_of(Array, account.roles)
+      account.roles.each do |role|
+        assert_kind_of(role_class, role)
+      end
+    end
+
     def test_to_h
       h = account.to_h
 
@@ -26,7 +33,6 @@ module Mulukhiya
       assert_kind_of(String, h[:display_name])
       assert_boolean(h[:is_admin])
       assert_boolean(h[:is_info_bot])
-      assert_boolean(h[:is_moderator])
       assert_boolean(h[:is_test_bot])
       assert_kind_of(String, h[:url])
       assert_kind_of(String, h[:username])
@@ -61,16 +67,8 @@ module Mulukhiya
       assert_kind_of(String, account.bio)
     end
 
-    def test_operator?
-      assert_boolean(account.operator?)
-    end
-
     def test_admin?
       assert_boolean(account.admin?)
-    end
-
-    def test_moderator?
-      assert_boolean(account.moderator?)
     end
 
     def test_test?
@@ -180,13 +178,6 @@ module Mulukhiya
       config['/agent/info/token'] = 'bbb'
 
       assert_nil(account_class.info_account)
-    end
-
-    def test_administrators
-      account_class.administrators do |account|
-        assert_kind_of(account_class, account)
-        assert_predicate(account, :admin?)
-      end
     end
   end
 end

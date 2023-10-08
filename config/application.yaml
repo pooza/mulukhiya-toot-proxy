@@ -230,6 +230,8 @@ http:
   retry:
     limit: 3
     seconds: 1
+  timeout:
+    seconds: 30
 itunes:
   country: jp
   hosts:
@@ -811,7 +813,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.29.11
+  version: 4.30.0
 parser:
   note:
     fields:
