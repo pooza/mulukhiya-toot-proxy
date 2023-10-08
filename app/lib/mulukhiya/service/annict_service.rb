@@ -27,15 +27,15 @@ module Mulukhiya
     def works(keyword = nil)
       keywords = self.class.keywords unless keyword.present?
       keywords ||= [keyword]
-      entries = keywords.inject([]) do |entries, title|
+      all = keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
           self.class.create_work_info(work['node'])
         end
         entries.concat(works)
       end
-      entries.concat(account[:works])
-      entries.uniq!
-      return entries.sort_by {|v| v['seasonYear']}.reverse
+      all.concat(account[:works])
+      all.uniq!
+      return all.sort_by {|v| v['seasonYear']}.reverse
     end
 
     def episodes(id)
