@@ -27,18 +27,15 @@ module Mulukhiya
     def works(keyword = nil)
       keywords = self.class.keywords unless keyword.present?
       keywords ||= [keyword]
-      return keywords.inject([]) do |entries, title|
+      entries = keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
-          url = work.dig('node', 'officialSiteUrl')
-          work['node']['officialSiteUrl'] = url.present? ? Ginseng::URI.parse(url) : nil
-          work['node'].compact.merge(
-            'hashtag' => work.dig('node', 'title').to_hashtag,
-            'hashtag_url' => sns.create_tag_uri(work.dig('node', 'title')).to_s,
-            'command_toot' => self.class.create_command_toot(title: work.dig('node', 'title')),
-          )
+          self.class.create_work_info(work['node'])
         end
         entries.concat(works)
       end
+      entries.concat(account[:works])
+      entries.uniq!
+      return entries.sort_by {|v| v['seasonYear']}.reverse
     end
 
     def episodes(id)
