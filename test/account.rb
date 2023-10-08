@@ -18,6 +18,14 @@ module Mulukhiya
       assert_predicate(account.acct.username, :present?)
     end
 
+    def test_roles
+      assert_kind_of(Array, account.roles)
+      account.roles.each do |role|
+        assert_kind_of(role_class, role)
+        ic role.to_h
+      end
+    end
+
     def test_to_h
       h = account.to_h
 

@@ -57,7 +57,7 @@ module Mulukhiya
     end
 
     def role_class
-      return Environment.status_class
+      return Environment.role_class
     end
 
     def attachment_class
