@@ -22,7 +22,6 @@ module Mulukhiya
       assert_kind_of(Array, account.roles)
       account.roles.each do |role|
         assert_kind_of(role_class, role)
-        ic role.to_h
       end
     end
 
