@@ -121,7 +121,8 @@ module Mulukhiya
     end
 
     get '/program/works' do
-      raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
+      annict = sns.account&.annict || account_class.info_account.annict
+      raise Ginseng::AuthError, 'Unauthorized' unless annict
       errors = AnnictWorkListContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
