@@ -4,10 +4,15 @@ module Mulukhiya
     include SNSMethods
     attr_reader :timestamps, :sns
 
-    def initialize(token = nil)
+    def initialize(token = nil, guest: true)
       @token = (token.decrypt rescue token)
+      @guest = guest
       @timestamps = AnnictTimestampStorage.new
       @sns = sns_class.new
+    end
+
+    def guest?
+      return @guest == true
     end
 
     def activities(&block)
@@ -33,7 +38,7 @@ module Mulukhiya
         end
         entries.concat(works)
       end
-      # all.concat(account[:works])
+      all.concat(account[:works]) unless guest?
       all.uniq! {|v| v['annictId']}
       return all.sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
     end

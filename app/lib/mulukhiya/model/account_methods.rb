@@ -89,7 +89,7 @@ module Mulukhiya
 
     def annict
       return nil unless [:token].all? {|k| user_config["/annict/#{k}"]}
-      @annict ||= AnnictService.new(user_config['/annict/token'])
+      @annict ||= AnnictService.new(user_config['/annict/token'], guest: bot?)
       return @annict
     end
 
