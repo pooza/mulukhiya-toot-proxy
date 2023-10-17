@@ -30,17 +30,21 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = self.class.keywords unless keyword.present?
-      keywords ||= [keyword]
-      all = keywords.inject([]) do |entries, title|
-        works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
-          self.class.create_work_info(work['node'])
-        end
-        entries.concat(works)
+      result = nil
+      works = []
+      (self.class.keywords || [keyword]).each do |title|
+        result = query(:works, {title:})
+        works.concat(result.dig('data', 'searchWorks', 'edges')
+          .map {|work| self.class.create_work_info(work['node'])})
       end
-      all.concat(account[:works]) unless guest?
-      all.uniq! {|v| v['annictId']}
-      return all.sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
+      unless guest?
+        works.concat(result.dig('data', 'viewer', 'works', 'nodes')
+          .select {|node| node['viewerStatusState'] == 'WATCHING'}
+          .map {|node| self.class.create_work_info(node)})
+      end
+      return works
+          .uniq {|v| v['annictId']}
+          .sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
     end
 
     def episodes(id)
@@ -170,9 +174,6 @@ module Mulukhiya
       return viewer.compact.merge(
         id: viewer[:annictId],
         avatar_uri: Ginseng::URI.parse(viewer[:avatarUrl]),
-        works: viewer.dig(:works, :nodes)
-          .select {|node| node[:viewerStatusState] == 'WATCHING'}
-          .map {|node| create_work_info(node)},
       )
     end
 

@@ -4,15 +4,6 @@
     name
     username
     avatarUrl
-    works {
-      nodes {
-        annictId
-        title
-        seasonYear
-        officialSiteUrl
-        viewerStatusState
-      }
-    }
     activities(orderBy: { field: CREATED_AT, direction: DESC }, first: 50) {
       edges {
         node {

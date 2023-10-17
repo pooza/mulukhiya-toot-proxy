@@ -58,6 +58,9 @@ crypt:
   encoder: base64
   password: mulukhiya
 environment: development
+fedibird:
+  display_name: Fedibird
+  sns_type: mastodon
 feed:
   cache:
     ttl: 600
@@ -66,9 +69,6 @@ feed:
     limit: 100
   tag:
     limit: 100
-fedibird:
-  display_name: Fedibird
-  sns_type: mastodon
 growi:
   urls:
     create_page: /_api/v3/pages
@@ -813,7 +813,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.30.1
+  version: 4.30.2
 parser:
   note:
     fields:
