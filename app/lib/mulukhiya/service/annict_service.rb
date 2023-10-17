@@ -30,22 +30,21 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = self.class.keywords unless keyword.present?
-      keywords ||= [keyword]
       result = nil
       works = []
-      keywords.each do |title|
+      (self.class.keywords || [keyword]).each do |title|
         result = query(:works, {title:})
         works.concat(result.dig('data', 'searchWorks', 'edges')
           .map {|work| self.class.create_work_info(work['node'])})
       end
       unless guest?
         works.concat(result.dig('data', 'viewer', 'works', 'nodes')
-          .select {|node| node[:viewerStatusState] == 'WATCHING'}
+          .select {|node| node['viewerStatusState'] == 'WATCHING'}
           .map {|node| self.class.create_work_info(node)})
       end
-      works.uniq! {|v| v['annictId']}
-      return works.sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
+      return works
+          .uniq {|v| v['annictId']}
+          .sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
     end
 
     def episodes(id)
