@@ -336,7 +336,7 @@ GEM
     sequel (5.73.0)
       bigdecimal
     set (1.0.3)
-    sidekiq (7.1.5)
+    sidekiq (7.1.6)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
