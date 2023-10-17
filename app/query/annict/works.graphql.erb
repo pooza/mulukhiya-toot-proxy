@@ -15,7 +15,8 @@
     }
   }
   searchWorks (
-    titles: "<%= params[:title] %>"
+    titles: "<%= params[:title] %>",
+    orderBy: {field: SEASON, direction: DESC}
   ) {
     edges {
       node {
