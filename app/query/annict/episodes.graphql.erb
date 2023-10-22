@@ -4,6 +4,15 @@
     name
     username
     avatarUrl
+    works {
+      nodes {
+        annictId
+        title
+        seasonYear
+        officialSiteUrl
+        viewerStatusState
+      }
+    }
   }
   searchWorks (annictIds: [<%= params[:id] %>]) {
     nodes {
