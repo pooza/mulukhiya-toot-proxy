@@ -46,5 +46,9 @@ module Mulukhiya
         MisskeyController.reply_to_field => reply_to,
       )
     end
+
+    def self.parse_aid(aid)
+      return Time.at((aid[0..7].to_i(36) / 1000) + 9_466_848_000, in: 'UTC').getlocal
+    end
   end
 end
