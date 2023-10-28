@@ -4,7 +4,6 @@ SELECT
   drive_file.type,
   drive_file.size AS file_size,
   drive_file.properties AS meta,
-  drive_file."createdAt" as created_at,
   note_file.note_id AS status_id,
   note_file.text AS status_text,
   note_file.visibility,
@@ -19,7 +18,6 @@ FROM
       note.visibility,
       note.text,
       note.cw,
-      note."createdAt",
       "user".username,
       "user".name AS display_name
     FROM
@@ -39,7 +37,7 @@ FROM
       file_id,
       "user".id
     ORDER BY
-      note."createdAt" DESC
+      note.id DESC
     LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
   ) AS note_file ON drive_file.id = note_file.file_id
 WHERE (drive_file."userHost" IS null)
@@ -54,4 +52,4 @@ WHERE (drive_file."userHost" IS null)
     <% end %>
   <% end %>
 ORDER BY
-  note_file."createdAt" DESC
+  note_file.note_id DESC

@@ -23,5 +23,5 @@ WHERE (note."renoteId" IS null)
     AND ("user".id = '<%= params[:account_id] %>')
   <% end %>
 ORDER BY
-  note."createdAt" DESC
+  note.id DESC
 LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>

@@ -1,6 +1,6 @@
 SELECT
   coalesce(note.url, concat('/notes/', note.id::varchar)) AS uri,
-  note."createdAt" AS created_at,
+  note.id AS aid,
   "user".username,
   "user".host AS domain,
   "user".name AS display_name,
@@ -19,5 +19,5 @@ WHERE ('<%= params[:tag].downcase %>' = any(note.tags))
     AND ("user".id <> '<%= test_account.id %>')
   <% end %>
 ORDER BY
-  created_at DESC
+  aid DESC
 LIMIT <%= params[:limit] %> OFFSET 0

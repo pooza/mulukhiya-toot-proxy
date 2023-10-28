@@ -60,6 +60,7 @@ module Mulukhiya
         link: uri.to_s,
         title: [name, "(#{size_str})", description].compact.join(' '),
         author: account.display_name,
+        created_at: date,
         date:,
       }
     end

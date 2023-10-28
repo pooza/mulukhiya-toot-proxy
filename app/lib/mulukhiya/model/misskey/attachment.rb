@@ -26,7 +26,7 @@ module Mulukhiya
       end
 
       def date
-        return createdAt.getlocal
+        return MisskeyService.parse_aid(id)
       end
 
       def description
