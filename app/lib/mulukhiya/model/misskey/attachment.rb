@@ -26,7 +26,7 @@ module Mulukhiya
       end
 
       def date
-        return createdAt.getlocal
+        return Time.at((id[0..7].to_i(36) / 1000) + 9_466_848_000, in: 'UTC').getlocal
       end
 
       def description

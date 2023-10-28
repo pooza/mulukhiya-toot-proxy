@@ -1,6 +1,5 @@
 SELECT
   coalesce(note.url, concat('/notes/', note.id::varchar)) AS uri,
-  note."createdAt" AS created_at,
   "user".username,
   "user".host AS domain,
   "user".name AS display_name,
