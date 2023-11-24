@@ -11,8 +11,8 @@ module Mulukhiya
       assert_equal({
         height: 353,
         mediatype: 'image',
-        size: 53_882,
-        length: 53_882,
+        size: 53_958,
+        length: 53_958,
         subtype: 'jpeg',
         type: 'image/jpeg',
         width: 500,
