@@ -310,6 +310,7 @@ module Mulukhiya
       response = graphql_service.post(endpoint.path, {
         body: {query: template.to_s},
         headers: {Authorization: "Bearer #{@token}"},
+        timeout: config['/annict/timeout'],
       }).parsed_response
       if viewer = response.dig('data', 'viewer')
         @account = self.class.create_viewer_info(viewer)
