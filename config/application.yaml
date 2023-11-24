@@ -1135,7 +1135,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
-      - https://cdn.jsdelivr.net/npm/vue-i18n@9.7vue-i18n/dist/vue-i18n.global.min.js
+      - https://cdn.jsdelivr.net/npm/vue-i18n@9.7/dist/vue-i18n.global.min.js
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
     stylesheets:
