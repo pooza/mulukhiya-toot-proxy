@@ -40,8 +40,8 @@ module Mulukhiya
       matches.each_with_index do |match, i|
         temp.gsub!(match, "____#{i}____")
       end
-      uris.select {|v| v.start_with?('http')}.each do |uri|
-        temp = "[#{uri.host}](#{uri})"
+      uris.select {|v| v.to_s.start_with?('http')}.each do |uri|
+        temp.gsub!(uri.to_s, "[#{uri.host}](#{uri})")
       end
       matches.each_with_index do |match, i|
         temp.gsub!("____#{i}____", match)
