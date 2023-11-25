@@ -86,10 +86,7 @@ module Mulukhiya
     end
 
     def push(line)
-      if Environment.note?
-        uri = Ginseng::URI.parse(line) rescue nil
-        line = "[#{uri.host}](#{uri})" if uri&.absolute? && uri.scheme.start_with?('http')
-      end
+      line = NoteParser.new(line).to_mfm if Environment.note?
       line.chomp!
       key = rand.to_s if line.empty?
       key ||= [line, @recent_keyword].join("\n").sha256
