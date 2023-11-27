@@ -34,7 +34,7 @@ module Mulukhiya
       return service.max_post_text_length
     end
 
-    def to_mfm
+    def mfmize
       temp = text.dup
       matches = text.scan(/\[.*?\]\(.*?\)/)
       matches.each_with_index do |match, i|
