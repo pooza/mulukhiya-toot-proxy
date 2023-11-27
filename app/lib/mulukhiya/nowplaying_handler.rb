@@ -86,7 +86,6 @@ module Mulukhiya
     end
 
     def push(line)
-      line = NoteParser.new(line).to_mfm if Environment.note?
       line.chomp!
       key = rand.to_s if line.empty?
       key ||= [line, @recent_keyword].join("\n").sha256
