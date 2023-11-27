@@ -155,6 +155,7 @@ handler:
       image: image
       video: video
   mfmize:
+    disable: true
     experimental: true
   peer_tube_url_nowplaying:
     tagging: false
