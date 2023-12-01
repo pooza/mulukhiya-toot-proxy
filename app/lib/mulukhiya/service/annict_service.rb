@@ -174,6 +174,7 @@ module Mulukhiya
           .select {|node| node[:viewerStatusState] == 'WATCHING'}
           .map {|node| create_work_info(node)}
       end
+      viewer[:works] ||= []
       return viewer
     end
 
