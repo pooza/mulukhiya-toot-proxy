@@ -29,7 +29,7 @@ module Mulukhiya
     def create_body(params = {})
       params[:format] ||= :sanitized
       params.merge!(payload)
-      params[:body] = parser.send("to_#{params[:format]}".to_sym)
+      params[:body] = parser.send(:"to_#{params[:format]}")
       template = Template.new('announcement')
       template.params = params
       return template.to_s
