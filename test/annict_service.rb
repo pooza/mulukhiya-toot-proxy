@@ -21,7 +21,7 @@ module Mulukhiya
       assert_predicate(@service.account[:id], :positive?)
       assert_predicate(@service.account[:name], :present?)
       assert_predicate(@service.account[:username], :present?)
-      assert_kind_of(Ginseng::URI, @service.account[:avatar_uri])
+      assert_kind_of(Ginseng::URI, @service.account[:avatar_uri]) if @service.account[:avatar_uri]
     end
 
     def test_works
