@@ -33,5 +33,20 @@ module Mulukhiya
       e.log(text:)
       return service.max_post_text_length
     end
+
+    def mfmize
+      temp = text.dup
+      matches = text.scan(/\[.*?\]\(.*?\)/)
+      matches.each_with_index do |match, i|
+        temp.gsub!(match, "____#{i}____")
+      end
+      uris.select {|v| v.to_s.start_with?('http')}.each do |uri|
+        temp.gsub!(uri.to_s, "[#{uri.host}](#{uri})")
+      end
+      matches.each_with_index do |match, i|
+        temp.gsub!("____#{i}____", match)
+      end
+      return temp
+    end
   end
 end

@@ -154,6 +154,9 @@ handler:
       audio: audio
       image: image
       video: video
+  mfmize:
+    disable: true
+    experimental: true
   peer_tube_url_nowplaying:
     tagging: false
     timeout: 10
@@ -484,8 +487,7 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - itunes_url
-      - amazon_url
+      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
@@ -506,8 +508,7 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - itunes_url
-      - amazon_url
+      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
@@ -537,8 +538,7 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - itunes_url
-      - amazon_url
+      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
@@ -656,8 +656,7 @@ misskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - itunes_url
-      - amazon_url
+      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
@@ -687,8 +686,7 @@ misskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - itunes_url
-      - amazon_url
+      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
@@ -814,7 +812,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.30.3
+  version: 4.30.4
 parser:
   note:
     fields:
