@@ -167,13 +167,16 @@ module Mulukhiya
 
     def self.create_viewer_info(viewer)
       viewer = viewer.clone.deep_symbolize_keys
-      return viewer.compact.merge(
+      viewer.compact.merge!(
         id: viewer[:annictId],
         avatar_uri: Ginseng::URI.parse(viewer[:avatarUrl]),
-        works: viewer.dig(:works, :nodes)
-          .select {|node| node[:viewerStatusState] == 'WATCHING'}
-          .map {|node| create_work_info(node)},
       )
+      if nodes = viewer.dig(:works, :nodes)
+        viewer[:works] = nodes
+          .select {|node| node[:viewerStatusState] == 'WATCHING'}
+          .map {|node| create_work_info(node)}
+      end
+      return viewer
     end
 
     def self.create_work_info(work)
