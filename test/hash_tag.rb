@@ -68,7 +68,7 @@ module Mulukhiya
       return unless controller_class.favorite_tags?
 
       assert_kind_of(Hash, hash_tag_class.favorites)
-      hash_tag_class.favorites.each do |_, values|
+      hash_tag_class.favorites.each_value do |values|
         assert_predicate(Ginseng::URI.parse(values[:url]), :absolute?)
         assert_predicate(values[:count], :positive?)
       end

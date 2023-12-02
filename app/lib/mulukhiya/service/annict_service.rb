@@ -4,6 +4,8 @@ module Mulukhiya
     include SNSMethods
     attr_reader :timestamps, :sns
 
+    INVALID_KEYWORD = '__??!!__'.freeze
+
     def initialize(token = nil, guest: true)
       @token = (token.decrypt rescue token)
       @guest = guest
@@ -30,8 +32,9 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = self.class.keywords unless keyword.present?
-      keywords ||= [keyword]
+      keywords = [keyword] if keyword.present?
+      keywords = self.class.keywords unless keywords.present?
+      keywords = [INVALID_KEYWORD] unless keywords.present?
       all = keywords.inject([]) do |entries, title|
         works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
           self.class.create_work_info(work['node'])
@@ -40,7 +43,7 @@ module Mulukhiya
       end
       all.concat(account[:works]) unless guest?
       all.uniq! {|v| v['annictId']}
-      return all.sort_by {|v| (v['seasonYear'] * 100_000) + v['annictId']}.reverse
+      return all.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
 
     def episodes(id)
@@ -314,9 +317,7 @@ module Mulukhiya
         headers: {Authorization: "Bearer #{@token}"},
         timeout: config['/annict/timeout'],
       }).parsed_response
-      if viewer = response.dig('data', 'viewer')
-        @account = self.class.create_viewer_info(viewer)
-      end
+      @account = self.class.create_viewer_info(response.dig('data', 'viewer')) unless guest?
       return response
     end
   end
