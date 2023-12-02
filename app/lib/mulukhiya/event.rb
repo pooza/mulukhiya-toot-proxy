@@ -48,7 +48,7 @@ module Mulukhiya
     end
 
     def method
-      return "handle_#{label}".to_sym
+      return :"handle_#{label}"
     end
 
     def dispatch(payload)

@@ -47,7 +47,7 @@ module Mulukhiya
         {
           pattern: Regexp.new(entry['pattern']),
           delimited: entry['delimited'],
-          items: (entry['items'] || []),
+          items: entry['items'] || [],
         }
       end.each(&block)
     end
