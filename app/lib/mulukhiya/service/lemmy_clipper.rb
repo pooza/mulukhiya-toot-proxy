@@ -40,7 +40,7 @@ module Mulukhiya
       body.deep_symbolize_keys!
       raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       raise Ginseng::RequestError, 'invalid community' unless @params[:community]
-      data = {community_id: @params[:community], auth: @jwt, name: body[:name]&.to_s}
+      data = {community_id: @params[:community], name: body[:name]&.to_s}
       if uri = create_status_uri(body[:url])
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
@@ -48,7 +48,10 @@ module Mulukhiya
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
-      return http.post('/api/v3/post', {body: data})
+      return http.post('/api/v3/post', {
+        body: data,
+        headers: {'Authorization' => "Bearer #{@jwt}"},
+      })
     end
 
     def communities
@@ -57,12 +60,13 @@ module Mulukhiya
       uri.path = '/api/v3/community/list'
       uri.query_values = {
         limit: config['/lemmy/communities/limit'],
-        auth: @jwt,
         type_: 'Subscribed',
         sort: 'New',
         page: 1,
       }
-      communities = http.get(uri)['communities'].map(&:deep_symbolize_keys)
+      communities = http.get(uri, {
+        headers: {'Authorization' => "Bearer #{@jwt}"},
+      })['communities'].map(&:deep_symbolize_keys)
       return communities.to_h {|v| [v.dig(:community, :id), v.dig(:community, :title)]}
     end
   end
