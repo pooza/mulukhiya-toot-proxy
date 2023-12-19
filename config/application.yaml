@@ -26,6 +26,9 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
 annict:
+  browser:
+    viewer:
+      works: false
   episodes:
     ruby:
       pattern: '[(（][あ-んア-ン・ー]+[)）]'
@@ -157,6 +160,7 @@ handler:
   mfmize:
     disable: true
     experimental: true
+    max_length: 100
   peer_tube_url_nowplaying:
     tagging: false
     timeout: 10
@@ -254,7 +258,7 @@ lemmy:
   hosts:
     default: lm.korako.me
   subject:
-    max_length: 100
+    max_length: 90
 line:
   id: null
   token: null
@@ -812,7 +816,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.30.5
+  version: 4.30.6
 parser:
   note:
     fields:

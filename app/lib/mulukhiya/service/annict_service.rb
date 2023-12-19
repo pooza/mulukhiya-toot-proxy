@@ -17,6 +17,12 @@ module Mulukhiya
       return @guest == true
     end
 
+    def viewers_works?
+      return false if guest?
+      return false unless config['/annict/browser/viewer/works']
+      return true
+    end
+
     def activities(&block)
       return enum_for(__method__) unless block
       query(:activity).dig('data', 'viewer', 'activities', 'edges')
@@ -28,6 +34,7 @@ module Mulukhiya
 
     def account
       @account ||= self.class.create_viewer_info(query(:account).dig('data', 'viewer'))
+      @account ||= {}
       return @account
     end
 
@@ -41,7 +48,7 @@ module Mulukhiya
         end
         entries.concat(works)
       end
-      all.concat(account[:works]) unless guest?
+      all.concat(account[:works]) if viewers_works?
       all.uniq! {|v| v['annictId']}
       return all.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
@@ -169,6 +176,7 @@ module Mulukhiya
     end
 
     def self.create_viewer_info(viewer)
+      return {} unless viewer
       viewer = viewer.clone.deep_symbolize_keys
       viewer[:id] = viewer[:annictId]
       viewer[:avatar_uri] = Ginseng::URI.parse(viewer[:avatarUrl]) if viewer[:avatar_uri]
