@@ -26,6 +26,9 @@ amazon:
   urls:
     jp: https://www.amazon.co.jp/
 annict:
+  browser:
+    viewer:
+      works: false
   episodes:
     ruby:
       pattern: '[(（][あ-んア-ン・ー]+[)）]'

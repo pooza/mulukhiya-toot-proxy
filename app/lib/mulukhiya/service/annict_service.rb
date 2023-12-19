@@ -17,6 +17,12 @@ module Mulukhiya
       return @guest == true
     end
 
+    def viewers_works?
+      return false if guest?
+      return false unless config['/annict/browser/viewer/works']
+      return true
+    end
+
     def activities(&block)
       return enum_for(__method__) unless block
       query(:activity).dig('data', 'viewer', 'activities', 'edges')
@@ -41,7 +47,7 @@ module Mulukhiya
         end
         entries.concat(works)
       end
-      all.concat(account[:works]) unless guest?
+      all.concat(account[:works]) if viewers_works?
       all.uniq! {|v| v['annictId']}
       return all.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
