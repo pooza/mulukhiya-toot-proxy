@@ -34,6 +34,7 @@ module Mulukhiya
 
     def account
       @account ||= self.class.create_viewer_info(query(:account).dig('data', 'viewer'))
+      @account ||= {}
       return @account
     end
 
@@ -175,6 +176,7 @@ module Mulukhiya
     end
 
     def self.create_viewer_info(viewer)
+      return {} unless viewer
       viewer = viewer.clone.deep_symbolize_keys
       viewer[:id] = viewer[:annictId]
       viewer[:avatar_uri] = Ginseng::URI.parse(viewer[:avatarUrl]) if viewer[:avatar_uri]
