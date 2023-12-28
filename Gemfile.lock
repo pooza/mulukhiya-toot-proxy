@@ -171,12 +171,12 @@ GEM
     etc (1.4.3)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.7.12)
+    faraday (2.8.1)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
-    fastimage (2.2.7)
+    fastimage (2.3.0)
     ffi (1.16.3)
     fileutils (1.7.2)
     find (0.2.0)
@@ -220,7 +220,7 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
-    net-imap (0.4.8)
+    net-imap (0.4.9)
       date
       net-protocol
     net-pop (0.1.2)
@@ -231,12 +231,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.0)
-    nokogiri (1.15.5)
+    nokogiri (1.16.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.15.5-aarch64-linux)
+    nokogiri (1.16.0-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-linux)
+    nokogiri (1.16.0-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -313,10 +313,10 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
-    rubocop-minitest (0.34.1)
+    rubocop-minitest (0.34.2)
       rubocop (>= 1.39, < 2.0)
       rubocop-ast (>= 1.30.0, < 2.0)
-    rubocop-performance (1.20.0)
+    rubocop-performance (1.20.1)
       rubocop (>= 1.48.1, < 2.0)
       rubocop-ast (>= 1.30.0, < 2.0)
     rubocop-rake (0.6.0)
@@ -335,7 +335,7 @@ GEM
     securerandom (0.3.1)
     sequel (5.75.0)
       bigdecimal
-    set (1.0.4)
+    set (1.1.0)
     sidekiq (7.1.6)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
@@ -419,7 +419,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.2.2p53
+   ruby 3.3.0p0
 
 BUNDLED WITH
-   2.5.1
+   2.5.3

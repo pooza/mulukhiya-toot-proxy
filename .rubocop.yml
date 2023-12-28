@@ -19,7 +19,7 @@ AllCops:
     - '**/Rakefile'
     - '**/config.ru'
   NewCops: enable
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.3
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 Layout/ArrayAlignment:

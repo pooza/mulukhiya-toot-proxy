@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '~>3.2.0'
+ruby '~>3.3.0'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
