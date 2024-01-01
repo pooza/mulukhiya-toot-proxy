@@ -212,6 +212,7 @@ GEM
     mime-types-data (3.2023.1205)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     mongo (2.19.3)
       bson (>= 4.14.1, < 5.0.0)
@@ -231,6 +232,9 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.0)
+    nokogiri (1.16.0)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.16.0-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
@@ -380,6 +384,7 @@ GEM
     zlib (3.1.0)
 
 PLATFORMS
+  x86_64-freebsd-13
   x86_64-linux
 
 DEPENDENCIES
