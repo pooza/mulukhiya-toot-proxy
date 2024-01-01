@@ -237,6 +237,8 @@ GEM
     nokogiri (1.16.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    nokogiri (1.16.0-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.16.0-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
@@ -386,6 +388,7 @@ GEM
     zlib (3.1.0)
 
 PLATFORMS
+  aarch64-linux
   x86_64-freebsd-13
   x86_64-linux
 
