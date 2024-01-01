@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 ruby '~>3.3.0'
+gem 'csv'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
@@ -15,6 +16,7 @@ gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>7.1.3' # CVE-2023-26141
 gem 'sidekiq-scheduler', '~>5.0.0'
+gem 'syslog'
 gem 'yamllint'
 
 group :postgres do
