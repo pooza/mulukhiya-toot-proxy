@@ -491,11 +491,11 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
+      - mfmize
       - dictionary_tag
       - remote_tag
       - removal_rule_tag
@@ -512,11 +512,11 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
+      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -542,11 +542,11 @@ meisskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
+      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -660,11 +660,11 @@ misskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
+      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -816,7 +816,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.30.6
+  version: 4.30.7
 parser:
   note:
     fields:
