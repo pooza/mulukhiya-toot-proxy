@@ -154,7 +154,8 @@ GEM
       dry-logic (>= 1.4, < 2)
       dry-types (>= 1.7, < 2)
       zeitwerk (~> 2.6)
-    dry-types (1.7.1)
+    dry-types (1.7.2)
+      bigdecimal (~> 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
       dry-inflector (~> 1.0)
@@ -166,7 +167,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (>= 1.12, < 2)
       zeitwerk (~> 2.6)
-    erb (4.0.3)
+    erb (4.0.4)
       cgi (>= 0.3.3)
     erubi (1.12.0)
     et-orbi (1.2.7)
@@ -209,7 +210,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.2)
-    mime-types (3.5.1)
+    mime-types (3.5.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.1205)
     mini_magick (4.12.0)
@@ -223,14 +224,14 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
-    net-imap (0.4.9)
+    net-imap (0.4.9.1)
       date
       net-protocol
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.2.2)
       timeout
-    net-smtp (0.4.0)
+    net-smtp (0.4.0.1)
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.0)
@@ -257,13 +258,13 @@ GEM
       omniauth (~> 2.0)
     optparse (0.4.0)
     parallel (1.24.0)
-    parser (3.2.2.4)
+    parser (3.3.0.2)
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
     power_assert (2.0.3)
     public_suffix (5.0.4)
-    puma (6.4.0)
+    puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.3)
@@ -427,4 +428,4 @@ RUBY VERSION
    ruby 3.3.0p0
 
 BUNDLED WITH
-   2.5.3
+   2.5.4
