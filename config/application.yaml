@@ -258,7 +258,7 @@ lemmy:
   hosts:
     default: lm.korako.me
   subject:
-    max_length: 90
+    max_length: 100
 line:
   id: null
   token: null

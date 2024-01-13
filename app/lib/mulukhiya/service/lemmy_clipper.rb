@@ -48,6 +48,7 @@ module Mulukhiya
         data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
+      data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
       return http.post('/api/v3/post', {
         body: data,
         headers: {'Authorization' => "Bearer #{@jwt}"},
