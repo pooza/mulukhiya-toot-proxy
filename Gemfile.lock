@@ -91,9 +91,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.1.2)
-      actionview (= 7.1.2)
-      activesupport (= 7.1.2)
+    actionpack (7.1.3)
+      actionview (= 7.1.3)
+      activesupport (= 7.1.3)
       nokogiri (>= 1.8.5)
       racc
       rack (>= 2.2.4)
@@ -101,13 +101,13 @@ GEM
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    actionview (7.1.2)
-      activesupport (= 7.1.2)
+    actionview (7.1.3)
+      activesupport (= 7.1.3)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (7.1.2)
+    activesupport (7.1.3)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -121,11 +121,11 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     base64 (0.2.0)
-    bigdecimal (3.1.5)
+    bigdecimal (3.1.6)
     bson (4.15.0)
     builder (3.2.4)
     cgi (0.4.1)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     crass (1.0.6)
     csv (3.2.8)
@@ -215,7 +215,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.5)
-    minitest (5.21.1)
+    minitest (5.21.2)
     mongo (2.19.3)
       bson (>= 4.14.1, < 5.0.0)
     multi_json (1.15.0)
@@ -259,7 +259,7 @@ GEM
       omniauth (~> 2.0)
     optparse (0.4.0)
     parallel (1.24.0)
-    parser (3.3.0.4)
+    parser (3.3.0.5)
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
@@ -269,12 +269,12 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.3)
-    rack (2.2.8)
-    rack-protection (3.2.0)
+    rack (3.0.8)
+    rack-protection (4.0.0)
       base64 (>= 0.1.0)
-      rack (~> 2.2, >= 2.2.4)
-    rack-session (1.0.2)
-      rack (< 3)
+      rack (>= 3.0.0, < 4)
+    rack-session (2.0.0)
+      rack (>= 3.0.0)
     rack-test (2.1.0)
       rack (>= 1.3)
     rails-dom-testing (2.2.0)
@@ -351,12 +351,13 @@ GEM
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
       tilt (>= 1.4.0)
-    sinatra (3.2.0)
+    sinatra (4.0.0)
       mustermann (~> 3.0)
-      rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.2.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.0.0)
+      rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
-    slim (5.2.0)
+    slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
     slim_lint (0.26.0)
@@ -430,4 +431,4 @@ RUBY VERSION
    ruby 3.3.0p0
 
 BUNDLED WITH
-   2.5.4
+   2.5.5
