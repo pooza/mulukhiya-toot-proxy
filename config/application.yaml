@@ -169,7 +169,7 @@ handler:
     timeout: 10
   remote_tag:
     services:
-      - pattern: (プリキュア|キュアスタ|きゅあすきー|precure)
+      - pattern: (プリキュア|ぷりきゅあ|キュアスタ|きゅあすきー|precure)
         tags:
           - precure_fun
         url: https://precure.ml
