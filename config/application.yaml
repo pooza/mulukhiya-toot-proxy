@@ -169,7 +169,7 @@ handler:
     timeout: 10
   remote_tag:
     services:
-      - pattern: (プリキュア|キュアスタ|きゅあすきー|precure)
+      - pattern: (プリキュア|ぷりきゅあ|キュアスタ|きゅあすきー|precure)
         tags:
           - precure_fun
         url: https://precure.ml
@@ -816,7 +816,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.30.9
+  version: 4.30.10
 parser:
   note:
     fields:

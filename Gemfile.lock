@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 9826291080c1674e418936506db17a255f75b971
+  revision: b5f5e33a244999e2d40f56a5ff86200324617a21
   specs:
     ginseng-fediverse (1.8.13)
 
@@ -91,9 +91,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.1.3)
-      actionview (= 7.1.3)
-      activesupport (= 7.1.3)
+    actionpack (7.1.3.2)
+      actionview (= 7.1.3.2)
+      activesupport (= 7.1.3.2)
       nokogiri (>= 1.8.5)
       racc
       rack (>= 2.2.4)
@@ -101,13 +101,13 @@ GEM
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    actionview (7.1.3)
-      activesupport (= 7.1.3)
+    actionview (7.1.3.2)
+      activesupport (= 7.1.3.2)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (7.1.3)
+    activesupport (7.1.3.2)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -183,7 +183,7 @@ GEM
     ffi (1.16.3)
     fileutils (1.7.2)
     find (0.2.0)
-    fugit (1.9.0)
+    fugit (1.10.0)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gli (2.21.1)
@@ -198,7 +198,8 @@ GEM
     json (2.7.1)
     json-schema (4.1.1)
       addressable (>= 2.8)
-    jwt (2.7.1)
+    jwt (2.8.0)
+      base64
     language_server-protocol (3.17.0.3)
     loofah (2.22.0)
       crass (~> 1.0.2)
@@ -262,14 +263,14 @@ GEM
     parser (3.3.0.5)
       ast (~> 2.4.1)
       racc
-    pg (1.5.4)
+    pg (1.5.5)
     power_assert (2.0.3)
     public_suffix (5.0.4)
     puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.3)
-    rack (3.0.9)
+    rack (3.0.9.1)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0, < 4)
@@ -368,7 +369,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.1)
     syslog (0.1.2)
     temple (0.10.3)
-    test-unit (3.6.1)
+    test-unit (3.6.2)
       power_assert
     tilt (2.1.0)
     time (0.3.0)
