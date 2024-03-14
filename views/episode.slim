@@ -15,7 +15,10 @@ html lang='ja'
           input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='getWorks'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
-        h3 = '{{work.title}}'
+        h3 :id="'work-title-' + work.annictId"
+          | {{work.title}}
+          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
+          button @click='getEpisodes(work.annictId)' v-if='!episodes[work.annictId]' = 'エピソード取得'
         .info
           ul.params class='clearfix'
             li.param AnnictID: {{work.annictId}}
@@ -50,10 +53,6 @@ html lang='ja'
             ul.episodes v-else=''
               li.episode
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId"
-                  span.title :id="'episode-title-' + work.annictId"
-                    | {{work.title}}
-                .link-container
                   i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
                     | {{work.hashtag}}
@@ -69,8 +68,6 @@ html lang='ja'
                   a :href='work.command_url' target='_blank' rel='noreferrer' v-if='work.command_url'
                     i class='fas fa-microphone'
                   | 実況開始
-          nav v-else=''
-            button.small @click='getEpisodes(work.annictId)' = 'エピソード取得'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
