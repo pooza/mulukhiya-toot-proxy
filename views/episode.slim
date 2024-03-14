@@ -15,7 +15,9 @@ html lang='ja'
           input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='getWorks'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
-        h3 = '{{work.title}}'
+        h3 :id="'work-title-' + work.annictId"
+          | {{work.title}}
+          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
         .info
           ul.params class='clearfix'
             li.param AnnictID: {{work.annictId}}
@@ -49,10 +51,6 @@ html lang='ja'
                   | タイムライン
             ul.episodes v-else=''
               li.episode
-                .link-container
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId"
-                  span.title :id="'episode-title-' + work.annictId"
-                    | {{work.title}}
                 .link-container
                   i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
