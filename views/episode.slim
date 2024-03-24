@@ -15,8 +15,8 @@ html lang='ja'
           input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='getWorks'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
-        h3 :id="'work-title-' + work.annictId"
-          | {{work.title}}
+        h3
+          spam :id="'work-title-' + work.annictId" {{work.title}}
           i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
           button @click='getEpisodes(work.annictId)' v-if='!episodes[work.annictId]' = 'エピソード取得'
         .info
