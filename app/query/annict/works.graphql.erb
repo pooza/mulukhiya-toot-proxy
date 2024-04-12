@@ -15,7 +15,7 @@
     }
   }
   searchWorks (
-    titles: "<%= params[:title] %>",
+    titles: <%= params[:title].to_json %>,
     orderBy: {field: SEASON, direction: DESC}
   ) {
     edges {
