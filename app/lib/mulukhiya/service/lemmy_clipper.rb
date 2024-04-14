@@ -8,7 +8,6 @@ module Mulukhiya
       @params = params.deep_symbolize_keys
       @http = HTTP.new
       @http.base_uri = uri
-      login
       logger.info(clipper: self.class.to_s, method: __method__, url: uri.to_s)
     end
 
@@ -26,6 +25,7 @@ module Mulukhiya
     end
 
     def login
+      return if @jwt
       response = http.post('/api/v3/user/login', {
         body: {
           username_or_email: username,
@@ -33,12 +33,14 @@ module Mulukhiya
         },
       })
       @jwt = response['jwt']
+    rescue => e
+      raise Ginseng::AuthError, e.message, e.backtrace
     end
 
     def clip(body)
+      login
       body ||= {}
       body.deep_symbolize_keys!
-      raise Ginseng::AuthError, 'invalid jwt' unless @jwt
       raise Ginseng::RequestError, 'invalid community' unless @params[:community]
       data = {community_id: @params[:community], name: body[:name]&.to_s}
       if uri = create_status_uri(body[:url])
@@ -56,7 +58,7 @@ module Mulukhiya
     end
 
     def communities
-      raise Ginseng::AuthError, 'invalid jwt' unless @jwt
+      login
       uri = self.uri.clone
       uri.path = '/api/v3/community/list'
       uri.query_values = {
