@@ -62,10 +62,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: e8b3b3625c232eeef70d18663b2b8e713dcf0fa1
+  revision: 9b46bdf6c2a34d385d84716ea69f1c40d3399cb3
   specs:
-    ginseng-redis (2.0.2)
-      redis-client (~> 0.14.0)
+    ginseng-redis (2.0.3)
+      redis-client
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -291,7 +291,7 @@ GEM
       nokogiri (~> 1.14)
     rainbow (3.1.1)
     rake (13.2.1)
-    redis-client (0.14.1)
+    redis-client (0.22.1)
       connection_pool
     regexp_parser (2.9.0)
     rest-client (2.0.2)
@@ -342,11 +342,11 @@ GEM
     sequel (5.79.0)
       bigdecimal
     set (1.1.0)
-    sidekiq (7.2.0)
+    sidekiq (7.2.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
-      redis-client (>= 0.14.0)
+      redis-client (>= 0.19.0)
     sidekiq-scheduler (5.0.3)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
@@ -420,7 +420,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 7.2.0)
+  sidekiq (~> 7.2.4)
   sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit

@@ -13,7 +13,7 @@ gem 'mini_magick'
 gem 'optparse'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>7.2.0'
+gem 'sidekiq', '~>7.2.4' # CVE-2024-32887
 gem 'sidekiq-scheduler', '~>5.0.0'
 gem 'yamllint'
 
