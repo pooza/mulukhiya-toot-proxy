@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: 81931516cf877e90a60ffd7f04912911ad31e322
+  revision: 9c67ef9d1804a92c84d68d410c92748fbcc96ccf
   specs:
-    faye-websocket (0.11.2)
+    faye-websocket (0.11.3)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
 
@@ -48,9 +48,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: b5f5e33a244999e2d40f56a5ff86200324617a21
+  revision: a0156dec9d765e07d536fadeb8defd4aeba1ec13
   specs:
-    ginseng-fediverse (1.8.13)
+    ginseng-fediverse (1.8.14)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -62,10 +62,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: e8b3b3625c232eeef70d18663b2b8e713dcf0fa1
+  revision: 9b46bdf6c2a34d385d84716ea69f1c40d3399cb3
   specs:
-    ginseng-redis (2.0.2)
-      redis-client (~> 0.14.0)
+    ginseng-redis (2.0.3)
+      redis-client
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
@@ -122,7 +122,7 @@ GEM
     ast (2.4.2)
     base64 (0.2.0)
     bigdecimal (3.1.7)
-    bson (4.15.0)
+    bson (5.0.0)
     builder (3.2.4)
     cgi (0.4.1)
     concurrent-ruby (1.2.3)
@@ -178,24 +178,25 @@ GEM
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
       net-http
-    fastimage (2.3.0)
+    fastimage (2.3.1)
     ffi (1.16.3)
     fileutils (1.7.2)
     find (0.2.0)
-    fugit (1.10.1)
-      et-orbi (~> 1, >= 1.2.7)
+    fugit (1.11.0)
+      et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
     gli (2.21.1)
     hashie (5.0.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
-    httparty (0.21.0)
+    httparty (0.22.0)
+      csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
-    json (2.7.1)
-    json-schema (4.2.0)
+    json (2.7.2)
+    json-schema (4.3.0)
       addressable (>= 2.8)
     jwt (2.8.1)
       base64
@@ -214,10 +215,10 @@ GEM
     mime-types-data (3.2024.0305)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.6)
     minitest (5.22.3)
-    mongo (2.19.3)
-      bson (>= 4.14.1, < 5.0.0)
+    mongo (2.20.0)
+      bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     mustermann (3.0.0)
@@ -232,16 +233,16 @@ GEM
       net-protocol
     net-protocol (0.2.2)
       timeout
-    net-smtp (0.4.0.1)
+    net-smtp (0.5.0)
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.1)
-    nokogiri (1.16.3)
+    nokogiri (1.16.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.3-aarch64-linux)
+    nokogiri (1.16.4-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.16.3-x86_64-linux)
+    nokogiri (1.16.4-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -257,14 +258,14 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
-    optparse (0.4.0)
+    optparse (0.5.0)
     parallel (1.24.0)
-    parser (3.3.0.5)
+    parser (3.3.1.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.6)
     power_assert (2.0.3)
-    public_suffix (5.0.4)
+    public_suffix (5.0.5)
     puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
@@ -290,8 +291,8 @@ GEM
       loofah (~> 2.21)
       nokogiri (~> 1.14)
     rainbow (3.1.1)
-    rake (13.1.0)
-    redis-client (0.14.1)
+    rake (13.2.1)
+    redis-client (0.22.1)
       connection_pool
     regexp_parser (2.9.0)
     rest-client (2.0.2)
@@ -306,7 +307,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.0)
       rexml
-    rubocop (1.62.1)
+    rubocop (1.63.4)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -317,14 +318,14 @@ GEM
       rubocop-ast (>= 1.31.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.31.2)
-      parser (>= 3.3.0.4)
+    rubocop-ast (1.31.3)
+      parser (>= 3.3.1.0)
     rubocop-minitest (0.35.0)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-performance (1.20.2)
+    rubocop-performance (1.21.0)
       rubocop (>= 1.48.1, < 2.0)
-      rubocop-ast (>= 1.30.0, < 2.0)
+      rubocop-ast (>= 1.31.1, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-sequel (0.3.4)
@@ -339,14 +340,14 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.3.1)
-    sequel (5.78.0)
+    sequel (5.79.0)
       bigdecimal
     set (1.1.0)
-    sidekiq (7.2.0)
+    sidekiq (7.2.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
-      redis-client (>= 0.14.0)
+      redis-client (>= 0.19.0)
     sidekiq-scheduler (5.0.3)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
@@ -360,7 +361,7 @@ GEM
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    slim_lint (0.26.0)
+    slim_lint (0.27.0)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
     snaky_hash (2.0.1)
@@ -420,7 +421,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 7.2.0)
+  sidekiq (~> 7.2.4)
   sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit
