@@ -4,8 +4,6 @@ module Mulukhiya
     include SNSMethods
     attr_reader :timestamps, :sns
 
-    INVALID_KEYWORD = '__??!!__'.freeze
-
     def initialize(token = nil, guest: true)
       @token = (token.decrypt rescue token)
       @guest = guest
@@ -41,7 +39,7 @@ module Mulukhiya
     def works(keyword = nil)
       titles = [keyword] if keyword.present?
       titles = self.class.keywords unless titles.present?
-      titles = [INVALID_KEYWORD] unless titles.present?
+      titles = nil unless titles.present?
       works = query(:works, {titles:}).dig('data', 'searchWorks', 'edges').map do |work|
         self.class.create_work_info(work['node'])
       end
@@ -313,10 +311,10 @@ module Mulukhiya
     end
 
     def query(template, variables = nil)
-      query = File.join(Environment.dir, 'app/query/annict', "#{template}.graphql")
-      endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
-      body = {query: File.read(query)}
+      query = File.read(File.join(Environment.dir, 'app/query/annict', "#{template}.graphql"))
+      body = {query:}
       body[:variables] = variables.deep_stringify_keys if variables
+      endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
       response = graphql_service.post(endpoint.path, {
         body: body.to_json,
         headers: {Authorization: "Bearer #{@token}"},
