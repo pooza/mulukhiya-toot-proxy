@@ -37,9 +37,9 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      titles = [keyword] if keyword.present?
+      titles = keyword.split(/\s+/) if keyword.present?
       titles = self.class.keywords unless titles.present?
-      titles = nil unless titles.present?
+      return [] unless titles.present?
       works = query(:works, {titles:}).dig('data', 'searchWorks', 'edges').map do |work|
         self.class.create_work_info(work['node'])
       end
