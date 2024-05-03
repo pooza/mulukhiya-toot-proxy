@@ -4,8 +4,6 @@ module Mulukhiya
     include SNSMethods
     attr_reader :timestamps, :sns
 
-    INVALID_KEYWORD = '__??!!__'.freeze
-
     def initialize(token = nil, guest: true)
       @token = (token.decrypt rescue token)
       @guest = guest
@@ -39,22 +37,19 @@ module Mulukhiya
     end
 
     def works(keyword = nil)
-      keywords = [keyword] if keyword.present?
-      keywords = self.class.keywords unless keywords.present?
-      keywords = [INVALID_KEYWORD] unless keywords.present?
-      all = keywords.inject([]) do |entries, title|
-        works = query(:works, {title:}).dig('data', 'searchWorks', 'edges').map do |work|
-          self.class.create_work_info(work['node'])
-        end
-        entries.concat(works)
+      titles = keyword.split(/\s+/) if keyword.present?
+      titles = self.class.keywords unless titles.present?
+      return [] unless titles.present?
+      works = query(:works, {titles:}).dig('data', 'searchWorks', 'edges').map do |work|
+        self.class.create_work_info(work['node'])
       end
-      all.concat(account[:works]) if viewers_works?
-      all.uniq! {|v| v['annictId']}
-      return all.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
+      works.concat(account[:works]) if viewers_works?
+      works.uniq! {|v| v['annictId']}
+      return works.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
 
     def episodes(id)
-      return unless entries = query(:episodes, {id:}).dig('data', 'searchWorks', 'nodes')
+      return unless entries = query(:episodes, {ids: [id]}).dig('data', 'searchWorks', 'nodes')
       all = []
       entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
         episodes.each do |episode|
@@ -315,13 +310,13 @@ module Mulukhiya
       return keywords.any? {|v| activity.to_json.include?(v)}
     end
 
-    def query(template, params = {})
-      path = File.join(Environment.dir, 'app/query/annict', "#{template}.graphql.erb")
-      template = Template.new(path)
-      template.params = params
+    def query(template, variables = nil)
+      query = File.read(File.join(Environment.dir, 'app/query/annict', "#{template}.graphql"))
+      body = {query:}
+      body[:variables] = variables.deep_stringify_keys if variables
       endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
       response = graphql_service.post(endpoint.path, {
-        body: {query: template.to_s},
+        body: body.to_json,
         headers: {Authorization: "Bearer #{@token}"},
         timeout: config['/annict/timeout'],
       }).parsed_response

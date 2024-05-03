@@ -220,7 +220,8 @@ GEM
     mongo (2.20.0)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
-    multi_xml (0.6.0)
+    multi_xml (0.7.1)
+      bigdecimal (~> 3.1)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
@@ -340,7 +341,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.3.1)
-    sequel (5.79.0)
+    sequel (5.80.0)
       bigdecimal
     set (1.1.0)
     sidekiq (7.2.4)
@@ -429,7 +430,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.3.0p0
+   ruby 3.3.1p55
 
 BUNDLED WITH
-   2.5.7
+   2.5.9

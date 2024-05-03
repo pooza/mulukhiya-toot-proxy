@@ -1,5 +1,5 @@
-{
-  searchWorks (annictIds: [<%= params[:id].to_i.to_json %>]) {
+query ($ids: [Int!]) {
+  searchWorks (annictIds: $ids) {
     nodes {
       annictId
       title

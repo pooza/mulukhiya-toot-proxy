@@ -1,4 +1,4 @@
-{
+query ($titles: [String!]) {
   viewer {
     annictId
     name
@@ -14,10 +14,7 @@
       }
     }
   }
-  searchWorks (
-    titles: <%= params[:title].to_json %>,
-    orderBy: {field: SEASON, direction: DESC}
-  ) {
+  searchWorks (titles: $titles, orderBy: {field: SEASON, direction: DESC}) {
     edges {
       node {
         annictId
