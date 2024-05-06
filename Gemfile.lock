@@ -302,7 +302,7 @@ GEM
       netrc (~> 0.8)
     rexml (3.2.6)
     ricecream (0.2.1)
-    rspotify (2.12.0)
+    rspotify (2.12.2)
       addressable (~> 2.8.0)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
