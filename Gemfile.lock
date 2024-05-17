@@ -300,7 +300,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.2.6)
+    rexml (3.2.8)
+      strscan (>= 3.0.9)
     ricecream (0.2.1)
     rspotify (2.12.2)
       addressable (~> 2.8.0)
@@ -368,6 +369,7 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
+    strscan (3.1.0)
     syslog (0.1.2)
     temple (0.10.3)
     test-unit (3.6.2)
