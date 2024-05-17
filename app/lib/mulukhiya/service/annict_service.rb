@@ -312,8 +312,8 @@ module Mulukhiya
 
     def query(template, variables = nil)
       query = File.read(File.join(Environment.dir, 'app/query/annict', "#{template}.graphql"))
-      body = {query:}
-      body[:variables] = variables.deep_stringify_keys if variables
+      variables&.deep_stringify_keys!
+      body = {query:, variables:}.compact
       endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
       response = graphql_service.post(endpoint.path, {
         body: body.to_json,
