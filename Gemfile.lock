@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e9ae5256ff8caff17e76e9a0cbdfac3f65879f8b
+  revision: f352eabd45f0bea0fa9fb7f896d78ffa07157347
   specs:
-    ginseng-core (1.14.1)
+    ginseng-core (1.14.2)
       actionpack (>= 7.0.5.1)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
@@ -121,7 +121,7 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     base64 (0.2.0)
-    bigdecimal (3.1.7)
+    bigdecimal (3.1.8)
     bson (5.0.0)
     builder (3.2.4)
     cgi (0.4.1)
@@ -193,7 +193,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.14.4)
+    i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     json (2.7.2)
     json-schema (4.3.0)
@@ -212,7 +212,7 @@ GEM
     marcel (1.0.4)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.0305)
+    mime-types-data (3.2024.0507)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.6)
@@ -227,7 +227,7 @@ GEM
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
-    net-imap (0.4.10)
+    net-imap (0.4.11)
       date
       net-protocol
     net-pop (0.1.2)
@@ -271,7 +271,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.3)
-    rack (3.0.10)
+    rack (3.0.11)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0, < 4)
