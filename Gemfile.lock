@@ -8,10 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: f352eabd45f0bea0fa9fb7f896d78ffa07157347
+  revision: c2cf88f27f223584d233d2fada62c08f63d32843
   specs:
-    ginseng-core (1.14.2)
-      actionpack (>= 7.0.5.1)
+    ginseng-core (1.14.3)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -26,15 +25,12 @@ GIT
       find
       httparty (>= 0.21.0)
       json-schema
-      loofah (>= 2.19.1)
       mail
       multi_json
       net-protocol
       net-smtp
-      nokogiri (>= 1.16.2)
+      nokogiri (>= 1.16.5)
       optparse
-      rack (>= 2.2.6.2)
-      rails-html-sanitizer (>= 1.4.4)
       rake
       rest-client
       sanitize (>= 6.0.2)
@@ -91,9 +87,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.1.3.2)
-      actionview (= 7.1.3.2)
-      activesupport (= 7.1.3.2)
+    actionpack (7.1.3.3)
+      actionview (= 7.1.3.3)
+      activesupport (= 7.1.3.3)
       nokogiri (>= 1.8.5)
       racc
       rack (>= 2.2.4)
@@ -101,13 +97,13 @@ GEM
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    actionview (7.1.3.2)
-      activesupport (= 7.1.3.2)
+    actionview (7.1.3.3)
+      activesupport (= 7.1.3.3)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (7.1.3.2)
+    activesupport (7.1.3.3)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -216,7 +212,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.6)
-    minitest (5.22.3)
+    minitest (5.23.0)
     mongo (2.20.0)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
@@ -237,7 +233,7 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     netrc (0.11.0)
-    nio4r (2.7.1)
+    nio4r (2.7.3)
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -295,7 +291,7 @@ GEM
     rake (13.2.1)
     redis-client (0.22.1)
       connection_pool
-    regexp_parser (2.9.0)
+    regexp_parser (2.9.2)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -392,7 +388,7 @@ GEM
     yajl-ruby (1.4.3)
     yamllint (0.0.9)
       trollop (~> 2)
-    zeitwerk (2.6.13)
+    zeitwerk (2.6.14)
     zlib (3.1.0)
 
 PLATFORMS
@@ -435,4 +431,4 @@ RUBY VERSION
    ruby 3.3.1p55
 
 BUNDLED WITH
-   2.5.9
+   2.5.10
