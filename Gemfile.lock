@@ -141,7 +141,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0, < 2)
       zeitwerk (~> 2.6)
-    dry-schema (1.13.3)
+    dry-schema (1.13.4)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 1.0, >= 1.0.1)
       dry-core (~> 1.0, < 2)
@@ -289,7 +289,7 @@ GEM
       nokogiri (~> 1.14)
     rainbow (3.1.1)
     rake (13.2.1)
-    redis-client (0.22.1)
+    redis-client (0.22.2)
       connection_pool
     regexp_parser (2.9.2)
     rest-client (2.0.2)
