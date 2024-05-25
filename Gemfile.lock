@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: c2cf88f27f223584d233d2fada62c08f63d32843
+  revision: f480c0d282ccd5a941b4dae7bc9625bde58c1e18
   specs:
-    ginseng-core (1.14.3)
+    ginseng-core (1.14.4)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -212,7 +212,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     mongo (2.20.0)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
@@ -266,7 +266,7 @@ GEM
     puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
-    racc (1.7.3)
+    racc (1.8.0)
     rack (3.0.11)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
