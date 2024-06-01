@@ -14,10 +14,10 @@ module Mulukhiya
     end
 
     def test_new
-      tags = TagContainer.new(['#私が_あなたを守る'])
+      tags = TagContainer.new(['#私が_あなたを守る', 'まゆの気持ち、ユキの気持ち'])
 
-      assert_equal(Set['私が_あなたを守る'], tags)
-      assert_equal('#私が_あなたを守る', tags.to_s)
+      assert_equal(Set['私が_あなたを守る', 'まゆの気持ち、ユキの気持ち'], tags)
+      assert_equal('#私が_あなたを守る #まゆの気持ち_ユキの気持ち', tags.to_s)
     end
 
     def test_delete
