@@ -7,7 +7,7 @@ module Mulukhiya
 
     def handle_mention(payload, params = {})
       params[:announcement] = Announcement.new
-      super(payload, params)
+      super
     end
 
     def respondable?

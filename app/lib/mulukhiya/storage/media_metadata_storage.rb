@@ -9,7 +9,7 @@ module Mulukhiya
     end
 
     def get(uri)
-      return supernil unless entry = super(uri)
+      return supernil unless entry = super
       return JSON.parse(entry).deep_symbolize_keys
     rescue => e
       e.log(key:)

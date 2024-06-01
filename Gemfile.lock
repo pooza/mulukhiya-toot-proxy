@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: c2cf88f27f223584d233d2fada62c08f63d32843
+  revision: f480c0d282ccd5a941b4dae7bc9625bde58c1e18
   specs:
-    ginseng-core (1.14.3)
+    ginseng-core (1.14.4)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -44,9 +44,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: a0156dec9d765e07d536fadeb8defd4aeba1ec13
+  revision: 13cf153752407c2c262b097d240599a5755a62e4
   specs:
-    ginseng-fediverse (1.8.14)
+    ginseng-fediverse (1.8.15)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -65,9 +65,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: a3e763996c2d4896bf11042e4315077e70296401
+  revision: 93682e1f7191ae7220522f08935e4839bb8d9fb0
   specs:
-    ginseng-web (1.3.29)
+    ginseng-web (1.3.31)
       erb
       puma (>= 6.4.2)
       rack (>= 2.2.6.4)
@@ -121,7 +121,7 @@ GEM
     bson (5.0.0)
     builder (3.2.4)
     cgi (0.4.1)
-    concurrent-ruby (1.2.3)
+    concurrent-ruby (1.3.1)
     connection_pool (2.4.1)
     crass (1.0.6)
     csv (3.3.0)
@@ -141,7 +141,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0, < 2)
       zeitwerk (~> 2.6)
-    dry-schema (1.13.3)
+    dry-schema (1.13.4)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 1.0, >= 1.0.1)
       dry-core (~> 1.0, < 2)
@@ -183,7 +183,7 @@ GEM
       raabro (~> 1.4)
     gli (2.21.1)
     hashie (5.0.0)
-    http-cookie (1.0.5)
+    http-cookie (1.0.6)
       domain_name (~> 0.5)
     httparty (0.22.0)
       csv
@@ -212,7 +212,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     mongo (2.20.0)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
@@ -257,7 +257,7 @@ GEM
       omniauth (~> 2.0)
     optparse (0.5.0)
     parallel (1.24.0)
-    parser (3.3.1.0)
+    parser (3.3.2.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.6)
@@ -266,7 +266,7 @@ GEM
     puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
-    racc (1.7.3)
+    racc (1.8.0)
     rack (3.0.11)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
@@ -289,7 +289,7 @@ GEM
       nokogiri (~> 1.14)
     rainbow (3.1.1)
     rake (13.2.1)
-    redis-client (0.22.1)
+    redis-client (0.22.2)
       connection_pool
     regexp_parser (2.9.2)
     rest-client (2.0.2)
@@ -305,7 +305,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.0)
       rexml
-    rubocop (1.63.5)
+    rubocop (1.64.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -388,8 +388,8 @@ GEM
     yajl-ruby (1.4.3)
     yamllint (0.0.9)
       trollop (~> 2)
-    zeitwerk (2.6.14)
-    zlib (3.1.0)
+    zeitwerk (2.6.15)
+    zlib (3.1.1)
 
 PLATFORMS
   aarch64-linux
@@ -428,7 +428,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.3.1p55
+   ruby 3.3.2p78
 
 BUNDLED WITH
-   2.5.10
+   2.5.11
