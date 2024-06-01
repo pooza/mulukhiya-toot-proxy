@@ -2,6 +2,18 @@ module Mulukhiya
   class TagContainer < Ginseng::Fediverse::TagContainer
     include Package
 
+    def initialize(strings = [])
+      strings = strings.to_a.map do |v|
+        case v
+        in String
+          v.sub(/^#/, '')
+        else
+          v
+        end
+      end
+      super
+    end
+
     def normalize(word)
       if rule = TaggingHandler.normalize_rules.find {|v| v['source'] == word.to_hashtag_base}
         word = rule['normalized']
