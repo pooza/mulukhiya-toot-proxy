@@ -183,7 +183,7 @@ GEM
       raabro (~> 1.4)
     gli (2.21.1)
     hashie (5.0.0)
-    http-cookie (1.0.5)
+    http-cookie (1.0.6)
       domain_name (~> 0.5)
     httparty (0.22.0)
       csv
