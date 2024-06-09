@@ -144,7 +144,7 @@ module Mulukhiya
 
     get '/program/works/:id/episodes' do
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
-      @renderer.message = annict.episodes(params[:id].to_i).map do |episode|
+      @renderer.message = annict.episodes([params[:id].to_i]).map do |episode|
         episode.merge(
           url: episode['url'].to_s,
           hashtag_url: episode['hashtag_uri'].to_s,
@@ -433,8 +433,13 @@ module Mulukhiya
     get '/tagging/dic/annict/episodes' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
-      ids = annict.works.map {|v| v['annictId']}
-      @renderer.message = annict.episodes(ids.join(',')).to_h {|v| [v['title'], []]}
+      episodes = annict.episodes(annict.works.map {|v| v['annictId'].to_i})
+      @renderer.message = episodes.to_h do |episode|
+        if (num = episode['numberText']) && (matches = num.match(/[0-9]+/))
+          num = "#{matches[0]}話"
+        end
+        [episode['title'], [num].compact]
+      end
       return @renderer.to_s
     rescue => e
       e.log
