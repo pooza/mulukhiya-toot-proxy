@@ -48,8 +48,8 @@ module Mulukhiya
       return works.sort_by {|v| (v['seasonYear'].to_i * 100_000) + v['annictId']}.reverse
     end
 
-    def episodes(id)
-      return unless entries = query(:episodes, {ids: [id]}).dig('data', 'searchWorks', 'nodes')
+    def episodes(ids)
+      return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
       all = []
       entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
         episodes.each do |episode|
