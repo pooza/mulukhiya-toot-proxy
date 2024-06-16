@@ -375,7 +375,7 @@ GEM
     tilt (2.1.0)
     time (0.3.0)
       date
-    timecop (0.9.9)
+    timecop (0.9.10)
     timeout (0.4.1)
     trollop (2.9.10)
     tzinfo (2.0.6)
