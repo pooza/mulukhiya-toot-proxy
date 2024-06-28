@@ -13,6 +13,7 @@ inflections:
   mime_type: MIMEType
   mongo_dsn: MongoDSN
   msn_uri: MsnURI
+  msn_url_handler: MsnURLHandler
   note_uri: NoteURI
   oauth_client_storage: OAuthClientStorage
   peer_tube_uri: PeerTubeURI

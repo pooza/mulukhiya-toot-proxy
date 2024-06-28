@@ -345,6 +345,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -379,6 +380,7 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
+      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -916,6 +918,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -939,6 +942,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -971,6 +975,7 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
+      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
