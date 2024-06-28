@@ -743,6 +743,13 @@ misskey:
 mongo:
   dsn: null
   query_log: false
+msn:
+  hosts:
+    - msn.com
+    - www.msn.com
+  patterns:
+    - pattern: /ja-jp/news/([^/]+)/([^/]+)/([^/]+)
+      shortenable: true
 nextcloud:
   urls:
     file: /remote.php/dav/files
