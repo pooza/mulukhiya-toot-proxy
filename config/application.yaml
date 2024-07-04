@@ -1016,7 +1016,6 @@ poipiku:
     root: https://poipiku.com/
 postgres:
   dsn: null
-  pgroonga: false
   query_log: false
   slow_query:
     seconds: 3
