@@ -750,7 +750,7 @@ msn:
     - msn.com
     - www.msn.com
   patterns:
-    - pattern: /ja-jp/news/([^/]+)/([^/]+)/([^/]+)
+    - pattern: /ja-jp/([^/]+)/([^/]+)/([^/]+)/([^/]+)
       shortenable: true
 nextcloud:
   urls:
