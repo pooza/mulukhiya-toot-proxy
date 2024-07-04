@@ -48,7 +48,7 @@ module Mulukhiya
     end
 
     def self.parse_aid(aid)
-      return Time.at((aid[0..7].to_i(36) / 1000) + 9_466_848_000, in: 'UTC').getlocal
+      return Time.at((aid[0..7].to_i(36) / 1000) + 946_684_800, in: 'UTC').getlocal
     end
   end
 end
