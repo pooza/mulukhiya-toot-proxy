@@ -18,7 +18,7 @@ module Mulukhiya
       return self unless shortenable?
       dest = clone
       pattern = Regexp.new(config['/msn/patterns'].find {|v| path.match(v['pattern'])}['pattern'])
-      dest.path = dest.path.gsub("#{path.match(pattern)[2]}/", '')
+      dest.path = dest.path.gsub("#{path.match(pattern)[3]}/", '')
       return dest
     end
   end
