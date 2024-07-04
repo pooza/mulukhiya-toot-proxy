@@ -7,7 +7,11 @@ FROM
   INNER JOIN "user" ON note."userId" = "user".id
 WHERE (note."renoteId" IS null)
   AND (note.visibility IN ('public', 'home'))
-  AND (note."userHost" IS null)
+  <% if params[:default_tags].present? %>
+    AND ((note."userHost" IS null) OR ('<%= params[:default_tags].first.downcase %>' = any(note.tags)))
+  <% else %>
+    AND (note."userHost" IS null)
+  <% end %>
   AND ("user"."isSuspended" = false)
   AND ("user"."isDeleted" = false)
   <% if params[:rule] %>
