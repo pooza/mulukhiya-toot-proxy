@@ -11,7 +11,12 @@ WHERE (toots.reblog_of_id IS null)
   AND (toots.visibility < 3)
   AND (toots.deleted_at IS null)
   <% if params[:default_tags].present? %>
-    AND ((toots.local = true) OR (tags.name = '<%= params[:default_tags].first.downcase %>')
+    AND (
+      (toots.local = true)
+      <% params[:default_tags].each do |tag| %>
+        OR (tags.name = '<%= tag.downcase %>')
+      <% end %>
+    )
   <% else %>
     AND (toots.local = true)
   <% end %>
