@@ -235,7 +235,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
       raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
       @renderer.message = status.to_h.merge(
-        account: status.account.to_h.slice(:username, :display_name),
+        account: status.account.to_h.slice(:username, :display_name, :acct),
       )
       return @renderer.to_s
     rescue => e

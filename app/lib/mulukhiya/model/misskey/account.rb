@@ -38,7 +38,7 @@ module Mulukhiya
         params[:account_id] = id
         return Postgres.exec(:statuses, params).map do |row|
           next unless status = Status[row[:id]]
-          status.to_h.merge(account: row.slice(:username, :display_name))
+          status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
         end
       end
 
