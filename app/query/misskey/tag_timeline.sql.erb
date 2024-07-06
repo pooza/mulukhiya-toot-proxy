@@ -13,7 +13,12 @@ WHERE ('<%= params[:tag].downcase %>' = any(note.tags))
   AND (note.visibility = '<%= controller_class.visibility_name(:public) %>')
   AND (note."text" IS NOT null)
   <% if params[:local] %>
-    AND ("user".host IS null)
+    AND (
+      (note."userHost" IS null)
+      <% params[:default_tags].each do |tag| %>
+        OR ('<%= tag.downcase %>' = any(note.tags))
+      <% end %>
+    )
   <% end %>
   <% if test_account %>
     AND ("user".id <> '<%= test_account.id %>')
