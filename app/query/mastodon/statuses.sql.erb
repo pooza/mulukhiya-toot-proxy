@@ -10,16 +10,12 @@ FROM
 WHERE (toots.reblog_of_id IS null)
   AND (toots.visibility < 3)
   AND (toots.deleted_at IS null)
-  <% if params[:default_tags].present? %>
-    AND (
-      (toots.local = true)
-      <% params[:default_tags].each do |tag| %>
-        OR (tags.name = '<%= tag.downcase %>')
-      <% end %>
-    )
-  <% else %>
-    AND (toots.local = true)
-  <% end %>
+  AND (
+    (toots.local = true)
+    <% params[:default_tags].each do |tag| %>
+      OR (tags.name = '<%= tag.downcase %>')
+    <% end %>
+  )
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
       AND (concat_ws(E'\t', toots.text, toots.spoiler_text) LIKE '%<%= keyword %>%')
