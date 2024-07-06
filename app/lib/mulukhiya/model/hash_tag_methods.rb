@@ -43,6 +43,7 @@ module Mulukhiya
       return [] unless Postgres.config?
       params[:tag] = name
       params[:tag_id] = id rescue nil
+      params[:default_tags] = DefaultTagHandler.tags
       return Postgres.exec(:tag_timeline, params).map do |row|
         row[:display_name] = "@#{row[:username]}" unless row[:display_name].present?
         row[:created_at] ||= MisskeyService.parse_aid(row[:aid])

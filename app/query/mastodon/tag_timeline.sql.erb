@@ -1,22 +1,28 @@
 SELECT
-  toots.uri,
-  toots.created_at,
+  statuses.uri,
+  statuses.created_at,
   accounts.username,
   accounts.domain,
   accounts.display_name,
-  toots.text,
-  toots.spoiler_text
+  statuses.text,
+  statuses.spoiler_text
 FROM
-  statuses AS toots
-  INNER JOIN statuses_tags ON statuses_tags.status_id = toots.id
-  INNER JOIN accounts ON toots.account_id = accounts.id
+  statuses
+  INNER JOIN statuses_tags ON statuses_tags.status_id = statuses.id
+  INNER JOIN tags ON statuses_tags.tag_id = tags.id
+  INNER JOIN accounts ON statuses.account_id = accounts.id
 WHERE (statuses_tags.tag_id = '<%= params[:tag_id] %>')
-  AND (toots.reblog_of_id IS null)
-  AND (toots.text IS NOT null)
-  AND (toots.visibility = 0)
-  AND (toots.deleted_at IS null)
+  AND (statuses.reblog_of_id IS null)
+  AND (statuses.text IS NOT null)
+  AND (statuses.visibility = 0)
+  AND (statuses.deleted_at IS null)
   <% if params[:local] %>
-    AND (toots.local = true)
+    AND (
+      statuses.local = true)
+      <% params[:default_tags].each do |tag| %>
+        OR (tags.name = '<%= tag.downcase %>')
+      <% end %>
+    )
   <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
@@ -24,5 +30,5 @@ WHERE (statuses_tags.tag_id = '<%= params[:tag_id] %>')
     AND (accounts.id <> '<%= test_account.id %>')
   <% end %>
 ORDER BY
-  toots.id DESC
+  statuses.id DESC
 LIMIT <%= params[:limit] %> OFFSET 0

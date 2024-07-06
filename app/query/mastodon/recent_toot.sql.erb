@@ -1,17 +1,17 @@
 SELECT
-  toots.id
+  statuses.id
 FROM
-  statuses AS toots
-  INNER JOIN accounts ON accounts.id = toots.account_id
+  statuses
+  INNER JOIN accounts ON accounts.id = statuses.account_id
   INNER JOIN users ON users.account_id = accounts.id
-WHERE (toots.visibility = 0)
-  AND (toots.deleted_at IS null)
+WHERE (statuses.visibility = 0)
+  AND (statuses.deleted_at IS null)
   AND (accounts.domain IS null)
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
   AND (accounts.id = '<%= params[:id] %>')
 GROUP BY
-  toots.id
+  statuses.id
 ORDER BY
-  toots.id DESC
+  statuses.id DESC
 LIMIT 1
