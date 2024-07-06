@@ -6,26 +6,26 @@ SELECT
   attachments.file_meta AS meta,
   attachments.description,
   attachments.created_at,
-  toots.id AS status_id,
-  toots.text AS status_text,
-  toots.visibility,
+  statuses.id AS status_id,
+  statuses.text AS status_text,
+  statuses.visibility,
   accounts.username,
   accounts.display_name
 FROM
   media_attachments AS attachments
-  INNER JOIN statuses AS toots ON attachments.status_id = toots.id
-  INNER JOIN accounts ON toots.account_id = accounts.id
-WHERE (toots.local = true)
-  AND (toots.reblog_of_id IS null)
-  AND (toots.visibility < 2)
-  AND (toots.deleted_at IS null)
+  INNER JOIN statuses ON attachments.status_id = statuses.id
+  INNER JOIN accounts ON statuses.account_id = accounts.id
+WHERE (statuses.local = true)
+  AND (statuses.reblog_of_id IS null)
+  AND (statuses.visibility < 2)
+  AND (statuses.deleted_at IS null)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', toots.text, toots.spoiler_text, attachments.description) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text, attachments.description) LIKE '%<%= keyword %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(toots.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(toots.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.text, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
       AND (coalesce(attachments.description, '') NOT LIKE '%<%= keyword %>%')
     <% end %>
   <% end %>

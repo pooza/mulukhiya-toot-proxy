@@ -1,28 +1,28 @@
 SELECT
-  toots.id,
+  statuses.id,
   accounts.username,
   accounts.display_name
 FROM
-  statuses AS toots
-  INNER JOIN accounts ON toots.account_id = accounts.id
-  INNER JOIN statuses_tags ON statuses_tags.status_id = toots.id
+  statuses
+  INNER JOIN accounts ON statuses.account_id = accounts.id
+  INNER JOIN statuses_tags ON statuses_tags.status_id = statuses.id
   INNER JOIN tags ON statuses_tags.tag_id = tags.id
-WHERE (toots.reblog_of_id IS null)
-  AND (toots.visibility < 3)
-  AND (toots.deleted_at IS null)
+WHERE (statuses.reblog_of_id IS null)
+  AND (statuses.visibility < 3)
+  AND (statuses.deleted_at IS null)
   AND (
-    (toots.local = true)
+    (statuses.local = true)
     <% params[:default_tags].each do |tag| %>
       OR (tags.name = '<%= tag.downcase %>')
     <% end %>
   )
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', toots.text, toots.spoiler_text) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text) LIKE '%<%= keyword %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(toots.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(toots.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.text, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
     <% end %>
   <% end %>
   AND (accounts.silenced_at IS null)
@@ -31,5 +31,5 @@ WHERE (toots.reblog_of_id IS null)
     AND (accounts.id = '<%= params[:account_id] %>')
   <% end %>
 ORDER BY
-  toots.id DESC
+  statuses.id DESC
 LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
