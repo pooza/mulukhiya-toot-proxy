@@ -114,14 +114,11 @@ html lang='ja'
           .field-container
             h4 コミュニティ
             .alert v-if='!form.lemmy.community' コミュニティが未設定です。
-            .post-auth v-if='options.lemmy_communities'
+            .post-auth
               v-select :options='options.lemmy_communities' v-model='form.lemmy.community'
               .field-update-button-container
                 button @click='updateLemmy' 更新
                 button.alert @click='unauthLemmy' 認証を解除
-            .pre-auth v-else=''
-              .field-update-button-container
-                button @click='updateLemmy' 認証
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         vue-slide-up-down :active='layout.details.annict'
