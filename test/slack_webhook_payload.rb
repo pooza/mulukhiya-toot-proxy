@@ -47,6 +47,7 @@ module Mulukhiya
           }
         ]
       }))
+    end
 
     def test_blocks?
       assert_false(@normal.blocks?)
