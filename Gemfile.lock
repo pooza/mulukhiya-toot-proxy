@@ -170,8 +170,9 @@ GEM
     etc (1.4.3)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.9.2)
+    faraday (2.10.0)
       faraday-net_http (>= 2.0, < 3.2)
+      logger
     faraday-net_http (3.1.0)
       net-http
     fastimage (2.3.1)
@@ -199,6 +200,7 @@ GEM
     jwt (2.8.2)
       base64
     language_server-protocol (3.17.0.3)
+    logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
