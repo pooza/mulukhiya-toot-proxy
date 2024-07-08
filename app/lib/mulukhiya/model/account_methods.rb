@@ -45,20 +45,6 @@ module Mulukhiya
       return nil
     end
 
-    def growi
-      return nil unless [:url, :token].all? {|k| user_config["/growi/#{k}"]}
-      default_prefix = File.join('/', Package.short_name, 'user', username)
-      @growi ||= GrowiClipper.new(
-        uri: user_config['/growi/url'],
-        token: user_config['/growi/token'],
-        prefix: user_config['/growi/prefix'] || default_prefix,
-      )
-      return @growi
-    rescue => e
-      e.log(acct: acct.to_s)
-      return nil
-    end
-
     def lemmy
       return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
       @lemmy ||= LemmyClipper.new(

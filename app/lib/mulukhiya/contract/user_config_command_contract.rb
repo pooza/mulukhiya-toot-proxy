@@ -6,11 +6,6 @@ module Mulukhiya
         optional(:token).maybe(:string)
         optional(:visibility).maybe(:string)
       end
-      required(:growi).maybe(:hash).schema do
-        optional(:url).maybe(:string)
-        optional(:token).maybe(:string)
-        optional(:prefix).maybe(:string)
-      end
       required(:annict).maybe(:hash).schema do
         optional(:token).maybe(:string)
       end
@@ -41,15 +36,10 @@ module Mulukhiya
       key.failure('コマンドが正しくありません。') unless value == 'user_config'
     end
 
-    rule(:growi) do
-      key.failure('URLが正しくありません。') if value[:url] && !Ginseng::URI.parse(value[:url]).absolute?
-    end
-
     def call(values)
       values = values.deep_stringify_keys || {}
       values['tags'] ||= []
       values['webhook'] ||= {}
-      values['growi'] ||= {}
       values['notify'] ||= {}
       values['annict'] ||= {}
       values['lemmy'] ||= {}

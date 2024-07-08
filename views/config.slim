@@ -34,41 +34,6 @@ html lang='ja'
                 input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
             .field-update-button-container
               button @click='updateLivecure' 更新
-      section.config v-if='account.username && layout.sections.growi'
-        h3 @click='toggleVisibility("growi")' GROWI
-        vue-slide-up-down :active='layout.details.growi'
-          ol
-            li
-              | GROWIのアカウントをお持ちでなければ、
-              a href='https://growi.cloud/' target='_blank' rel='noreferrer' GROWI.cloud
-              | で新しいGROWIサーバーを登録してください。
-              br
-              | フリープランもあります。サーバーを登録する手順の中で、新しいユーザーが作成できます。
-            li
-              | GROWIサーバーのURLと、APIトークンを下の欄に入力してください。
-              br
-              | APIトークンは、ユーザー設定画面（画面右上のユーザーアイコンをクリック）から作成できます。
-            li
-              | 必要ならば
-              code = "/user/{{account.username}}/draft"
-              | 等、記事作成先を入力してください。
-              br
-              | 空欄の場合は
-              code = "/mulukhiya/user/{{account.username}}"
-              | に記事が作成されます。
-            li 更新ボタンを押下。
-          .inline-field-container
-            h4 URL
-            input placeholder='GROWIサービスのURL（https://example.growi.cloud/ など）' v-model.trim='form.growi.url'
-          .inline-field-container
-            h4 APIトークン
-            input placeholder='APIトークン（保存時に暗号化されます）' v-model.trim='form.growi.token'
-          .inline-field-container
-            h4 記事作成先
-            input placeholder='記事作成先のパス' v-model.trim='form.growi.prefix'
-          .field-update-button-container
-            button @click='updateGrowi' 更新
-            button.alert @click='unauthGrowi' 認証を解除
       section.config v-if='account.username && layout.sections.nextcloud'
         h3 @click='toggleVisibility("nextcloud")' Nextcloud
         vue-slide-up-down :active='layout.details.nextcloud'
@@ -191,7 +156,6 @@ html lang='ja'
             program: {minutes: null, tags: null},
             tags: '',
             webhook: {token: null, visibility: null},
-            growi: {token: null, url: null, prefix: null},
             lemmy: {url: null, user: null, passwrd: null, community: null},
             nextcloud: {url: null, user: null, passwrd: null, prefix: null},
           },
@@ -203,13 +167,11 @@ html lang='ja'
           layout: {
             sections: {
               livecure: #{controller.livecure?},
-              growi: #{controller.growi?},
               lemmy: #{controller.lemmy?},
               nextcloud: #{controller.nextcloud?},
               annict: #{controller.annict?},
             },
             details: {
-              growi: false,
               nextcloud: false,
               lemmy: false,
               tags: false,
@@ -252,8 +214,6 @@ html lang='ja'
           updateForm (data) {
             this.result = jsyaml.dump(data.config)
             this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
-            this.form.growi.url = Vue.dig(data, 'config', 'growi', 'url')
-            this.form.growi.prefix = Vue.dig(data, 'config', 'growi', 'prefix')
             this.form.lemmy.url = Vue.dig(data, 'config', 'lemmy', 'url')
             this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
             this.form.lemmy.community = this.lemmy.communities[Vue.dig(data, 'config', 'lemmy', 'community')]
@@ -296,22 +256,6 @@ html lang='ja'
           },
           toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
-          },
-          updateGrowi () {
-            const command = {growi: {url: null, token: null, prefix: null}}
-            if (this.form.growi.token) {command.growi.token = this.form.growi.token}
-            if (this.form.growi.url) {command.growi.url = this.form.growi.url}
-            if (this.form.growi.prefix) {command.growi.prefix = this.form.growi.prefix}
-            this.updateConfig(command)
-            this.form.growi.token = null
-          },
-          unauthGrowi () {
-            this.$dialog.confirm({body: 'GROWIのトークンを削除します。'}, {okText: '削除'})
-              .then(e => this.updateConfig({growi: null}))
-              .then(e => {
-                this.result = jsyaml.dump(e.config)
-                this.layout.details.growi = false
-              }).catch(e => Vue.alert(this.$dialog, e))
           },
           updateLemmy () {
             const command = {lemmy: {url: null, user: null, community: null, host: null}}

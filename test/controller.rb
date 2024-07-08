@@ -108,10 +108,6 @@ module Mulukhiya
       assert_kind_of(String, controller_class.status_label)
     end
 
-    def test_growi?
-      assert_boolean(controller_class.growi?)
-    end
-
     def test_poipiku?
       assert_boolean(controller_class.poipiku?)
     end
