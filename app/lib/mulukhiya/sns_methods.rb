@@ -72,6 +72,10 @@ module Mulukhiya
       return Environment.hash_tag_class
     end
 
+    def poll_class
+      return Environment.poll_class
+    end
+
     def create_status_uri(src)
       dest = TootURI.parse(src.to_s)
       dest = NoteURI.parse(dest) unless dest&.valid?

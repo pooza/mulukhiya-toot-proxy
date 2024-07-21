@@ -12,6 +12,19 @@ module Mulukhiya
       return repost_status(status, body, params)
     end
 
+    def repost_status(status, body, params = {})
+      status = status_class[status] unless status.is_a?(status_class)
+      values = status.payload
+      body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
+      body = values.merge(body.deep_symbolize_keys)
+      if poll = status.poll
+        body[:poll] = {choices: poll.choices}
+      end
+      response = post(body.compact, params)
+      delete_status(status.id, params)
+      return response
+    end
+
     def oauth_client(type = :default)
       return nil unless scopes = MisskeyController.oauth_scopes(type)
       body = {

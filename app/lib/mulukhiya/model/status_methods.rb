@@ -26,6 +26,10 @@ module Mulukhiya
       return @data
     end
 
+    def poll
+      return nil
+    end
+
     def webui_uri
       @webui_uri ||= service.create_uri("/mulukhiya/app/status/#{id}")
       return @webui_uri
