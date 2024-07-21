@@ -14,6 +14,7 @@ module Mulukhiya
       body.deep_symbolize_keys!
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
+      body[:poll] ||= {options: status.poll.options}
       body[:media_ids] ||= status.attachments.map {|v| v.id.to_s}
       super(status.id, body, params)
       return status.to_h.merge(
