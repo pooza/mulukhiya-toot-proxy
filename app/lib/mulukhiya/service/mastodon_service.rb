@@ -15,9 +15,6 @@ module Mulukhiya
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
       body[:media_ids] ||= status.attachments.map {|v| v.id.to_s}
-
-      logger.info(body)
-
       super(status.id, body, params)
       return status.to_h.merge(
         account: status.account.to_h.slice(:username, :display_name),
