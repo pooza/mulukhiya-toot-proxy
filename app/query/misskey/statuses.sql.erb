@@ -9,7 +9,7 @@ WHERE (note."renoteId" IS null)
   AND (note.visibility IN ('public', 'home'))
   AND (
     (note."userHost" IS null)
-    <% params[:default_tags].each do |tag| %>
+    <% (params[:default_tags] || []).each do |tag| %>
       OR ('<%= tag.downcase %>' = any(note.tags))
     <% end %>
   )

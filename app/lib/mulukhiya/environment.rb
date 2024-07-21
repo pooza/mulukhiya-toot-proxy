@@ -144,6 +144,12 @@ module Mulukhiya
       return nil
     end
 
+    def self.poll_class
+      return "Mulukhiya::#{controller_name.camelize}::Poll".constantize
+    rescue NameError
+      return nil
+    end
+
     def self.sns_service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     rescue NameError

@@ -44,9 +44,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 13cf153752407c2c262b097d240599a5755a62e4
+  revision: 4e9e62529d2017093d0875595275aded7f83a478
   specs:
-    ginseng-fediverse (1.8.15)
+    ginseng-fediverse (1.8.16)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -170,8 +170,9 @@ GEM
     etc (1.4.3)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.9.2)
+    faraday (2.10.0)
       faraday-net_http (>= 2.0, < 3.2)
+      logger
     faraday-net_http (3.1.0)
       net-http
     fastimage (2.3.1)
@@ -183,7 +184,7 @@ GEM
     fugit (1.11.0)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
-    gli (2.21.1)
+    gli (2.21.5)
     hashie (5.0.0)
     http-cookie (1.0.6)
       domain_name (~> 0.5)
@@ -194,11 +195,12 @@ GEM
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     json (2.7.2)
-    json-schema (4.3.0)
+    json-schema (4.3.1)
       addressable (>= 2.8)
     jwt (2.8.2)
       base64
     language_server-protocol (3.17.0.3)
+    logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -211,11 +213,11 @@ GEM
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0702)
-    mini_magick (4.13.1)
+    mini_magick (5.0.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.7)
     minitest (5.24.1)
-    mongo (2.20.0)
+    mongo (2.20.1)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
     multi_xml (0.7.1)
@@ -229,6 +231,7 @@ GEM
       date
       net-protocol
     net-pop (0.1.2)
+      net-protocol
     net-protocol (0.2.2)
       timeout
     net-smtp (0.5.0)
@@ -258,7 +261,7 @@ GEM
       omniauth (~> 2.0)
     optparse (0.5.0)
     parallel (1.25.1)
-    parser (3.3.3.0)
+    parser (3.3.4.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.6)
@@ -268,7 +271,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.0)
-    rack (3.1.6)
+    rack (3.1.7)
     rack-protection (4.0.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0, < 4)
@@ -297,7 +300,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.3.1)
+    rexml (3.3.2)
       strscan
     ricecream (0.2.1)
     rspotify (2.12.2)
@@ -306,20 +309,20 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.0)
       rexml
-    rubocop (1.64.1)
+    rubocop (1.65.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.8, < 3.0)
+      regexp_parser (>= 2.4, < 3.0)
       rexml (>= 3.2.5, < 4.0)
       rubocop-ast (>= 1.31.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.3)
       parser (>= 3.3.1.0)
-    rubocop-minitest (0.35.0)
+    rubocop-minitest (0.35.1)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
     rubocop-performance (1.21.1)
@@ -429,7 +432,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.3.3p89
+   ruby 3.3.4p94
 
 BUNDLED WITH
-   2.5.14
+   2.5.16

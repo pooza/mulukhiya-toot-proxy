@@ -1,5 +1,11 @@
 module Mulukhiya
   class LemmyBookmarkHandlerTest < TestCase
+    def disable?
+      return true unless controller_class.lemmy?
+      return true unless (account.lemmy.login rescue nil)
+      return super
+    end
+
     def setup
       @handler = Handler.create(:lemmy_bookmark)
       @status = account.recent_status

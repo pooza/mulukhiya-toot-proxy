@@ -73,9 +73,6 @@ feed:
     limit: 100
   tag:
     limit: 100
-growi:
-  urls:
-    create_page: /_api/v3/pages
 handler:
   animation_image_format_convert:
     disable: true
@@ -296,7 +293,6 @@ mastodon:
       - mail_alert
     announce:
       - post_announce
-      - growi_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -304,7 +300,6 @@ mastodon:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
@@ -317,7 +312,6 @@ mastodon:
     post_toot:
       - user_config_command
       - filter_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -331,7 +325,6 @@ mastodon:
     pre_toot:
       - user_config_command
       - filter_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -455,7 +448,6 @@ meisskey:
       - mail_alert
     announce:
       - post_announce
-      - growi_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -463,7 +455,6 @@ meisskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
@@ -478,7 +469,6 @@ meisskey:
       - result_notification
     post_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -504,7 +494,6 @@ meisskey:
       - tagging
     pre_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -621,7 +610,6 @@ misskey:
       - mail_alert
     announce:
       - post_announce
-      - growi_announce
       - hexo_announce
     follow:
       - welcome_mention
@@ -629,7 +617,6 @@ misskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
@@ -642,7 +629,6 @@ misskey:
       - result_notification
     post_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -652,7 +638,6 @@ misskey:
       - result_notification
     pre_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility
@@ -825,7 +810,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.31.8
+  version: 4.32.0
 parser:
   note:
     fields:
@@ -887,7 +872,6 @@ pleroma:
     mention:
       - welcome_mention
     post_bookmark:
-      - growi_bookmark
       - lemmy_bookmark
       - nextcloud_bookmark
       - result_notification
@@ -902,7 +886,6 @@ pleroma:
       - result_notification
     post_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - result_notification
@@ -930,7 +913,6 @@ pleroma:
       - tagging
     pre_toot:
       - user_config_command
-      - growi_clipping_command
       - lemmy_clipping_command
       - nextcloud_clipping_command
       - mention_visibility

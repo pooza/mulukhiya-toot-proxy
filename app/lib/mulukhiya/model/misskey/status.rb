@@ -38,6 +38,11 @@ module Mulukhiya
         return account&.id == target&.id
       end
 
+      def poll
+        return nil unless hasPoll
+        return Poll[id]
+      end
+
       def attachments
         @attachments ||= fileIds.match(/\{(.*)\}/)[1].split(',').map do |id|
           Attachment[id]
@@ -49,6 +54,18 @@ module Mulukhiya
       end
 
       alias visibility_name visibility
+
+      def payload
+        payload = values.slice(
+          reply_to_field.to_sym,
+          spoiler_field.to_sym,
+          visibility_field.to_sym,
+          poll_field.to_sym => poll&.choices,
+        )
+        payload[status_field.to_sym] = text
+        payload[attachment_field.to_sym] = attachments.map(&:id).to_a
+        return payload
+      end
 
       def to_md
         return uri.to_md

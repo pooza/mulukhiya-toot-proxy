@@ -5,18 +5,6 @@ module Mulukhiya
     end
 
     def test_call
-      errors = @contract.call(command: 'user_config', growi: {url: 'https://growi.example.com', token: 'aa'}).errors
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', growi: {url: 11, token: ''}).errors
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', growi: {url: 'https://growi.example.com', token: 11}).errors
-
-      assert_false(errors.empty?)
-
       errors = @contract.call(command: 'user_config', annict: {token: 'aaa'}).errors
 
       assert_empty(errors)

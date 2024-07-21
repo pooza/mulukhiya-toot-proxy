@@ -30,6 +30,7 @@ html lang='ja'
             | タグづけ
           - if controller.delete_and_tagging?
             .alert タグづけを実行する前に、この#{controller.status_label}は一旦削除されます。
+            .alert タグ付けの実行後に、この#{controller.status_label}にアンケートがあれば、票数は削除されます。
           .tag v-for='tag in status.footer_tags'
             | {{tag.name}}
             a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(tag.name)'

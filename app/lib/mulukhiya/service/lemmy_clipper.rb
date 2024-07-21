@@ -38,7 +38,7 @@ module Mulukhiya
     end
 
     def clip(body)
-      login
+      login unless @jwt
       body ||= {}
       body.deep_symbolize_keys!
       raise Ginseng::RequestError, 'invalid community' unless @params[:community]
@@ -58,7 +58,7 @@ module Mulukhiya
     end
 
     def communities
-      login
+      login unless @jwt
       uri = self.uri.clone
       uri.path = '/api/v3/community/list'
       uri.query_values = {
