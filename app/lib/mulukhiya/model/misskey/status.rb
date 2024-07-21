@@ -56,8 +56,6 @@ module Mulukhiya
       alias visibility_name visibility
 
       def payload
-        logger.info(values:)
-
         payload = values.slice(
           reply_to_field.to_sym,
           spoiler_field.to_sym,
@@ -66,9 +64,6 @@ module Mulukhiya
         )
         payload[status_field.to_sym] = text
         payload[attachment_field.to_sym] = attachments.map(&:id).to_a
-
-        logger.info(payload:)
-
         return payload
       end
 
