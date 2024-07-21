@@ -11,6 +11,13 @@ module Mulukhiya
       @http.base_uri = @params[:url]
     end
 
+    def ping
+      @http.head('/')
+      return true
+    rescue
+      return false
+    end
+
     def path_prefix
       return File.join(@http.base_uri.path, config['/nextcloud/urls/file'], @params[:user])
     end

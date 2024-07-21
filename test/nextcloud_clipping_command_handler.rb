@@ -3,6 +3,7 @@ module Mulukhiya
     def disable?
       return true unless controller_class.nextcloud?
       return true unless (account.nextcloud rescue nil)
+      return true unless account.nextcloud.ping
       return super
     end
 
