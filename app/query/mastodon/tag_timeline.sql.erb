@@ -18,7 +18,7 @@ WHERE (statuses_tags.tag_id = '<%= params[:tag_id] %>')
   AND (statuses.deleted_at IS null)
   <% if params[:local] %>
     AND (
-      statuses.local = true)
+      (statuses.local = true)
       <% params[:default_tags].each do |tag| %>
         OR (tags.name = '<%= tag.downcase %>')
       <% end %>

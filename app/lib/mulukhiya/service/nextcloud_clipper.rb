@@ -12,9 +12,10 @@ module Mulukhiya
     end
 
     def ping
-      @http.head('/')
+      @http.head(@http.base_uri.path)
       return true
-    rescue
+    rescue => e
+      e.log
       return false
     end
 
