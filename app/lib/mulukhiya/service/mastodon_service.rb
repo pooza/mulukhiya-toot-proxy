@@ -11,15 +11,17 @@ module Mulukhiya
     def update_status(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       body = {status: body.to_s} unless body.is_a?(Hash)
-      body.deep_symbolize_keys!
       body[:spoiler_text] ||= status.spoiler_text
       body[:visibility] ||= status.visibility_name
-      body[:poll] ||= {options: status.poll.options}
-      body[:media_ids] ||= status.attachments.map {|v| v.id.to_s}
+      if status.poll
+        # body[:poll] = {options: status.poll.options}
+        body.delete(:media_ids)
+      else
+        body[:media_ids] = status.attachments.map {|v| v.id.to_s}
+        body.delete(:poll)
+      end
       super(status.id, body, params)
-      return status.to_h.merge(
-        account: status.account.to_h.slice(:username, :display_name),
-      )
+      return status.to_h.merge(account: status.account.to_h.slice(:username, :display_name))
     end
 
     def search_status_id(status)

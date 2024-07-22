@@ -1,6 +1,6 @@
 module Mulukhiya
   module Mastodon
-    class Poll < Sequel::Model(:poll)
+    class Poll < Sequel::Model(:polls)
       one_to_one :status
 
       def choices
