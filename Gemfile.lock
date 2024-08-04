@@ -170,7 +170,7 @@ GEM
     etc (1.4.3)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.10.0)
+    faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
       logger
     faraday-net_http (3.1.1)
@@ -222,7 +222,7 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
-    mustermann (3.0.0)
+    mustermann (3.0.1)
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
@@ -300,16 +300,16 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.3.2)
+    rexml (3.3.4)
       strscan
     ricecream (0.2.1)
     rspotify (2.12.2)
       addressable (~> 2.8.0)
       omniauth-oauth2 (>= 1.6)
       rest-client (~> 2.0.2)
-    rss (0.3.0)
+    rss (0.3.1)
       rexml
-    rubocop (1.65.0)
+    rubocop (1.65.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -342,7 +342,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.3.1)
-    sequel (5.82.0)
+    sequel (5.83.0)
       bigdecimal
     set (1.1.0)
     sidekiq (7.2.4)
@@ -350,7 +350,7 @@ GEM
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
       redis-client (>= 0.19.0)
-    sidekiq-scheduler (5.0.5)
+    sidekiq-scheduler (5.0.6)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
       tilt (>= 1.4.0, < 3)
@@ -435,4 +435,4 @@ RUBY VERSION
    ruby 3.3.4p94
 
 BUNDLED WITH
-   2.5.16
+   2.5.17
