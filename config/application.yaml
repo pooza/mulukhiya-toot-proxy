@@ -330,7 +330,6 @@ mastodon:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - you_tube_image
@@ -362,7 +361,6 @@ mastodon:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - you_tube_image
@@ -477,7 +475,6 @@ meisskey:
     pre_chat:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -497,7 +494,6 @@ meisskey:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -525,7 +521,6 @@ meisskey:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - poipiku_image
       - webhook_image
       - shortened_url
@@ -641,7 +636,6 @@ misskey:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -669,7 +663,6 @@ misskey:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - poipiku_image
       - webhook_image
       - shortened_url
@@ -741,7 +734,6 @@ nowplaying:
     - itunes.apple.com
     - spotify.com
     - youtube.com
-    - songwhip.com
   track:
     prefix: 'Title:'
 package:
@@ -838,7 +830,6 @@ pleroma:
     pre_chat:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -859,7 +850,6 @@ pleroma:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - you_tube_image
       - shortened_url
       - url_normalize
@@ -889,7 +879,6 @@ pleroma:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - you_tube_image
       - poipiku_image
       - webhook_image
@@ -995,9 +984,6 @@ sidekiq:
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
-songwhip:
-  urls:
-    api: https://songwhip.com
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)
