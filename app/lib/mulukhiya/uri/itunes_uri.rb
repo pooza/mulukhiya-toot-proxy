@@ -98,8 +98,7 @@ module Mulukhiya
       name = track['artistName'] if track
       name ||= album['artistName'] if album
       return nil if name.nil?
-      names = ArtistParser.new(name).parse
-      names = [name].to_set unless names.present?
+      names = [name].to_set
       return names
     end
 

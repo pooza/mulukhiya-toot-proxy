@@ -744,55 +744,6 @@ nowplaying:
   album:
     prefix: 'Album:'
   artist:
-    parser:
-      delimiter:
-        pattern: '[/、]'
-      patterns:
-        - delimited: true
-          pattern: ^[^():]+[/、]
-        - delimited: true
-          pattern: ^(((歌|語り):)?.+[[:blank:]]*\(CV[.:[:blank:]]*.+\)、?){2,}$
-        - delimited: true
-          pattern: ^(.+[[:blank:]]*\(.+\)、?){2,}$
-        - items:
-            - drop: true
-            - drop: true
-            - split: true
-            - prefix: 'CV:'
-              split: true
-              strip: true
-          pattern: ^((歌|語り):)?(.+)[[:blank:]]*\(CV[.:[:blank:]]*(.+)\)$
-        - items:
-            - split: true
-            - prefix: 'コーラス:'
-              split: true
-              strip: true
-          pattern: ^歌:(.+)[[:blank:]]*コーラス:(.+)$
-        - items:
-            - split: true
-          pattern: ^歌:(.+)$
-        - items:
-            - split: true
-            - prefix: 'コーラス:'
-              split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*\(コーラス:(.+)\)$
-        - items:
-            - prefix: 'CV:'
-              strip: true
-            - split: true
-          pattern: ^(.+)[[:blank:]]*\(as[[:blank:]]*(.+)\)$
-        - items:
-            - split: true
-            - split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*\((.+)\)$
-        - items:
-            - split: true
-            - prefix: feat.
-              split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*feat\.[[:blank:]]*(.+)$
     prefix: 'Artist:'
   domains:
     - music.apple.com

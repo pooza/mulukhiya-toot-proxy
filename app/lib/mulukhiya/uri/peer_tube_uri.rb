@@ -47,7 +47,7 @@ module Mulukhiya
 
     def artists
       return nil unless data
-      return ArtistParser.new(data.dig('account', 'displayName')).parse
+      return [data.dig('account', 'displayName')].to_set
     end
   end
 end
