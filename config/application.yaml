@@ -330,7 +330,6 @@ mastodon:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - you_tube_image
@@ -338,7 +337,6 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -363,7 +361,6 @@ mastodon:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - itunes_image
       - spotify_image
       - you_tube_image
@@ -373,7 +370,6 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -479,7 +475,6 @@ meisskey:
     pre_chat:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -499,7 +494,6 @@ meisskey:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -527,7 +521,6 @@ meisskey:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - poipiku_image
       - webhook_image
       - shortened_url
@@ -643,7 +636,6 @@ misskey:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
@@ -671,7 +663,6 @@ misskey:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - poipiku_image
       - webhook_image
       - shortened_url
@@ -730,13 +721,6 @@ misskey:
 mongo:
   dsn: null
   query_log: false
-msn:
-  hosts:
-    - msn.com
-    - www.msn.com
-  patterns:
-    - pattern: /ja-jp/([^/]+)/([^/]+)/([^/]+)/([^/]+)
-      shortenable: true
 nextcloud:
   urls:
     file: /remote.php/dav/files
@@ -744,62 +728,12 @@ nowplaying:
   album:
     prefix: 'Album:'
   artist:
-    parser:
-      delimiter:
-        pattern: '[/、]'
-      patterns:
-        - delimited: true
-          pattern: ^[^():]+[/、]
-        - delimited: true
-          pattern: ^(((歌|語り):)?.+[[:blank:]]*\(CV[.:[:blank:]]*.+\)、?){2,}$
-        - delimited: true
-          pattern: ^(.+[[:blank:]]*\(.+\)、?){2,}$
-        - items:
-            - drop: true
-            - drop: true
-            - split: true
-            - prefix: 'CV:'
-              split: true
-              strip: true
-          pattern: ^((歌|語り):)?(.+)[[:blank:]]*\(CV[.:[:blank:]]*(.+)\)$
-        - items:
-            - split: true
-            - prefix: 'コーラス:'
-              split: true
-              strip: true
-          pattern: ^歌:(.+)[[:blank:]]*コーラス:(.+)$
-        - items:
-            - split: true
-          pattern: ^歌:(.+)$
-        - items:
-            - split: true
-            - prefix: 'コーラス:'
-              split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*\(コーラス:(.+)\)$
-        - items:
-            - prefix: 'CV:'
-              strip: true
-            - split: true
-          pattern: ^(.+)[[:blank:]]*\(as[[:blank:]]*(.+)\)$
-        - items:
-            - split: true
-            - split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*\((.+)\)$
-        - items:
-            - split: true
-            - prefix: feat.
-              split: true
-              strip: true
-          pattern: ^(.+)[[:blank:]]*feat\.[[:blank:]]*(.+)$
     prefix: 'Artist:'
   domains:
     - music.apple.com
     - itunes.apple.com
     - spotify.com
     - youtube.com
-    - songwhip.com
   track:
     prefix: 'Title:'
 package:
@@ -810,7 +744,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.32.2
+  version: 4.32.3
 parser:
   note:
     fields:
@@ -896,12 +830,10 @@ pleroma:
     pre_chat:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -918,13 +850,11 @@ pleroma:
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - you_tube_image
       - shortened_url
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -949,7 +879,6 @@ pleroma:
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
-      - songwhip_nowplaying
       - you_tube_image
       - poipiku_image
       - webhook_image
@@ -957,7 +886,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -1056,9 +984,6 @@ sidekiq:
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
-songwhip:
-  urls:
-    api: https://songwhip.com
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)

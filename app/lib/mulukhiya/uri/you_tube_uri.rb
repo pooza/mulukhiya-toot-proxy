@@ -23,7 +23,7 @@ module Mulukhiya
     alias track_name title
 
     def artists
-      return ArtistParser.new(artist).parse if artist
+      return [artist].to_set if artist
       return nil
     end
   end

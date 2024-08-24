@@ -34,7 +34,7 @@ module Mulukhiya
       assert_equal(@handler.debug_info[:result], [{
         url: 'https://music.apple.com/jp/album/1299587212?uo=4',
         title: '「キラキラ☆プリキュアアラモード」後期主題歌シングルED:シュビドゥビ☆スイーツタイム/挿入歌:勇気が君を待ってる - EP',
-        artists: Set['宮本佳那子', '駒形友梨'],
+        artists: Set['歌:宮本佳那子/駒形友梨'],
       }])
     end
 

@@ -20,6 +20,7 @@ module Mulukhiya
       if poll = status.poll
         body[:poll] = {choices: poll.choices}
       end
+      body[:renoteId] = status.renoteId
       response = post(body.compact, params)
       delete_status(status.id, params)
       return response
