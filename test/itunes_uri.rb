@@ -84,7 +84,7 @@ module Mulukhiya
     def test_artists
       assert_nil(@music.artists)
       assert_equal(@track.artists, Set['宮本佳那子'])
-      assert_equal(@album.artists, Set['宮本佳那子', '駒形友梨'])
+      assert_equal(@album.artists, Set['歌:宮本佳那子/駒形友梨'])
     end
 
     def test_image_uri
