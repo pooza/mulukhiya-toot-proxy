@@ -338,7 +338,6 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -373,7 +372,6 @@ mastodon:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -730,13 +728,6 @@ misskey:
 mongo:
   dsn: null
   query_log: false
-msn:
-  hosts:
-    - msn.com
-    - www.msn.com
-  patterns:
-    - pattern: /ja-jp/([^/]+)/([^/]+)/([^/]+)/([^/]+)
-      shortenable: true
 nextcloud:
   urls:
     file: /remote.php/dav/files
@@ -852,7 +843,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -875,7 +865,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
@@ -908,7 +897,6 @@ pleroma:
       - url_normalize
       - canonical_url
       - itunes_url
-      - msn_url
       - amazon_url
       - itunes_url_nowplaying
       - spotify_url_nowplaying
