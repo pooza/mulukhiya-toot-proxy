@@ -301,7 +301,6 @@ mastodon:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
-      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -313,7 +312,6 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -326,7 +324,6 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -452,7 +449,6 @@ meisskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
-      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -466,7 +462,6 @@ meisskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -490,7 +485,6 @@ meisskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -611,7 +605,6 @@ misskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
-      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -623,7 +616,6 @@ misskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -632,7 +624,6 @@ misskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -721,9 +712,6 @@ misskey:
 mongo:
   dsn: null
   query_log: false
-nextcloud:
-  urls:
-    file: /remote.php/dav/files
 nowplaying:
   album:
     prefix: 'Album:'
@@ -807,7 +795,6 @@ pleroma:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
-      - nextcloud_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -821,7 +808,6 @@ pleroma:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -846,7 +832,6 @@ pleroma:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
-      - nextcloud_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -1074,8 +1059,6 @@ worker:
     federate: false
   media_cleaning:
     hours: 1
-  nextcloud_clipping:
-    federate: true
   user_tag_initialize:
     message: 固定タグをクリアしました。
 youtube:

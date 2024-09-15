@@ -15,11 +15,6 @@ module Mulukhiya
         optional(:password).maybe(:string)
         optional(:community).maybe(:integer).value(gt?: 0)
       end
-      required(:nextcloud).maybe(:hash).schema do
-        optional(:url).maybe(:string)
-        optional(:user).maybe(:string)
-        optional(:password).maybe(:string)
-      end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
       end
@@ -43,7 +38,6 @@ module Mulukhiya
       values['notify'] ||= {}
       values['annict'] ||= {}
       values['lemmy'] ||= {}
-      values['nextcloud'] ||= {}
       values['tagging'] ||= {}
       values['tagging']['user_tags'] ||= []
       values['tagging']['tags'] ||= {}

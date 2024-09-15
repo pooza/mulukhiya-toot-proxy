@@ -103,10 +103,6 @@ module Mulukhiya
       assert_kind_of([LemmyClipper, NilClass], account.lemmy)
     end
 
-    def test_nextcloud
-      assert_kind_of([NextcloudClipper, NilClass], account.nextcloud)
-    end
-
     def test_disable?
       Event.new(:pre_toot).handlers do |handler|
         assert_boolean(account.disable?(handler))
