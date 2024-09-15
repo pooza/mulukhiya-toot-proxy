@@ -24,7 +24,7 @@ module Mulukhiya
     def activities(&block)
       return enum_for(__method__) unless block
       query(:activity).dig('data', 'viewer', 'activities', 'edges')
-        .filter_map {|activity| activity['node']}
+        .filter_map {|activity| activity['item']}
         .select {|node| node['__typename'].present?}
         .select {|node| node['createdAt'].present?}
         .each(&block)
@@ -94,6 +94,9 @@ module Mulukhiya
         body[:text] = body_template.to_s.lstrip
         body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
       end
+
+      ic body
+
       return SlackWebhookPayload.new(body)
     end
 
