@@ -37,10 +37,6 @@ module Mulukhiya
         return Handler.search(/lemmy/).present?
       end
 
-      def nextcloud?
-        return Handler.search(/nextcloud/).present?
-      end
-
       def poipiku?
         return Handler.search(/poipiku/).present?
       end

@@ -53,30 +53,6 @@ module Mulukhiya
 
       assert_empty(errors)
 
-      errors = @contract.call(command: 'user_config', nextcloud: {url: 111}).errors
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', nextcloud: {url: 'https://nextcloud.example.com'}).errors
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', nextcloud: {user: 111}).errors
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', nextcloud: {user: 'pooza'}).errors
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', nextcloud: {password: 111}).errors
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', nextcloud: {password: 'you_pass_word'}).errors
-
-      assert_empty(errors)
-
       errors = @contract.call(command: 'user_config', tagging: nil).errors
 
       assert_empty(errors)
