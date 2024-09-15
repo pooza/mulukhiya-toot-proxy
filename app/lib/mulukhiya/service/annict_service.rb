@@ -94,9 +94,6 @@ module Mulukhiya
         body[:text] = body_template.to_s.lstrip
         body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
       end
-
-      ic body
-
       return SlackWebhookPayload.new(body)
     end
 
