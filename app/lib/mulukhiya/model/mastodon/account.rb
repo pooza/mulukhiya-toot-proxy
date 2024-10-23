@@ -37,7 +37,7 @@ module Mulukhiya
         params[:page] ||= 1
         params[:account_id] = id
         return Postgres.exec(:statuses, params).map do |row|
-          next unless status = Status[row[:id]]
+          next unless status = Status[row[:id].to_s]
           status.to_h.merge(account: {username:, display_name:, acct: acct.to_s})
         end
       end
@@ -79,7 +79,6 @@ module Mulukhiya
       alias attachments attachment
 
       def admin?
-        return true if user.admin
         return true if roles.any?(&:admin?)
         return false
       end
