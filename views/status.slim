@@ -42,7 +42,7 @@ html lang='ja'
                 li
                   i class='fa fa-tag'
                   a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
-            - else
+            - if controller.update_status?
               .tag v-for='tag in status.footer_tags'
                 | {{tag.name}}
                 a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
