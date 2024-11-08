@@ -2,7 +2,7 @@ module Mulukhiya
   module Mastodon
     class Role < Sequel::Model(:user_roles)
       def admin?
-        return (permissions & 1).positive?
+        return permissions.anybits?(1)
       end
 
       alias visible? highlighted
