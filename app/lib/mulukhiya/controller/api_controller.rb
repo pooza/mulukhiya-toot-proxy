@@ -219,7 +219,6 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         params[:rule] = SearchRule.new(params[:q]) if params[:q]
-        params[:default_tags] = DefaultTagHandler.tags
         @renderer.message = sns.account.statuses(params)
       end
       return @renderer.to_s

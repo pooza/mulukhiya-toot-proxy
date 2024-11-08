@@ -10,12 +10,7 @@ FROM
 WHERE (statuses.reblog_of_id IS null)
   AND (statuses.visibility < 3)
   AND (statuses.deleted_at IS null)
-  AND (
-    (statuses.local = true)
-    <% (params[:default_tags] || []).each do |tag| %>
-      OR (tags.name = '<%= tag.downcase %>')
-    <% end %>
-  )
+  AND (statuses.local = true)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
       AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text) LIKE '%<%= keyword %>%')
