@@ -17,10 +17,6 @@ html lang='ja'
             datalist id='suggested_keywords'
               option v-for='keyword in suggested_keywords' {{keyword}}
             button.small @click='searchStatuses' 検索
-          .control
-            label
-              input type='checkbox' v-model='self'
-              | 自分の#{controller.status_label}のみ
         article.status v-for='(status, id) in statuses' v-if='account.username'
           .visibility
             i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'

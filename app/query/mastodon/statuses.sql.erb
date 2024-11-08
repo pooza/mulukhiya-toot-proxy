@@ -27,9 +27,7 @@ WHERE (statuses.reblog_of_id IS null)
   <% end %>
   AND (accounts.silenced_at IS null)
   AND (accounts.suspended_at IS null)
-  <% unless params[:self].to_i.zero? %>
-    AND (accounts.id = '<%= params[:account_id] %>')
-  <% end %>
+  AND (accounts.id = '<%= params[:account_id] %>')
 ORDER BY
   statuses.id DESC
 LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>

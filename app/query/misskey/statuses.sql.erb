@@ -15,6 +15,7 @@ WHERE (note."renoteId" IS null)
   )
   AND ("user"."isSuspended" = false)
   AND ("user"."isDeleted" = false)
+  AND ("user".id = '<%= params[:account_id] %>')
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
       AND (concat_ws(E'\t', note.text, note.cw) LIKE '%<%= keyword %>%')
@@ -23,9 +24,6 @@ WHERE (note."renoteId" IS null)
       AND (coalesce(note.text, '') NOT LIKE '%<%= keyword %>%')
       AND (coalesce(note.cw, '') NOT LIKE '%<%= keyword %>%')
     <% end %>
-  <% end %>
-  <% unless params[:self].to_i.zero? %>
-    AND ("user".id = '<%= params[:account_id] %>')
   <% end %>
 ORDER BY
   note.id DESC
