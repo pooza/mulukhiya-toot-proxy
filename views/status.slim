@@ -36,13 +36,8 @@ html lang='ja'
           nav.footer-navigations v-if='status.is_taggable && account.username==status.account.username'
             h4
               i class='fa fa-tag'
-              | タグづけ
-            - if controller.delete_and_tagging?
-              ul
-                li
-                  i class='fa fa-tag'
-                  a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
             - if controller.update_status?
+              | タグづけ
               .tag v-for='tag in status.footer_tags'
                 | {{tag.name}}
                 a href='javascript:void(0)' v-if='tag.is_deletable' @click='deleteTag(status.id, tag.name)'
@@ -51,6 +46,11 @@ html lang='ja'
                 | 新規タグを追加
                 a href='javascript:void(0)' @click='createTag(status.id)'
                   i class='fa fa-pencil'
+            - if controller.delete_and_tagging?
+              ul
+                li
+                  i class='fa fa-tag'
+                  a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
           nav.footer-navigations v-if='(status.is_nowplaying || status.is_poipiku) && (account.username==status.account.username)'
             h4
               i class='fa fa-bolt'
