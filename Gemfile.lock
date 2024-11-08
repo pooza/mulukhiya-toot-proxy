@@ -302,7 +302,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.3.8)
+    rexml (3.3.9)
     ricecream (0.2.1)
     rspotify (2.12.4)
       addressable (~> 2.8.0)
