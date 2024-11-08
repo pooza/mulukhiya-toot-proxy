@@ -49,7 +49,7 @@ html lang='ja'
             - if controller.delete_and_tagging?
               ul
                 li
-                  i class='fa fa-tag'
+                  i class='fa-solid fa-delete-left'
                   a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
           nav.footer-navigations v-if='(status.is_nowplaying || status.is_poipiku) && (account.username==status.account.username)'
             h4
