@@ -278,6 +278,7 @@ mastodon:
     account_timeline: true
     annict: true
     announcement: true
+    delete_and_tagging: true
     favorite_tags: true
     feed: true
     filter: true
