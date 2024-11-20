@@ -22,10 +22,6 @@ html lang='ja'
                 .control
                   i class='fa fa-magnifying-glass'
                   input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
-                .control
-                  label
-                    input type='checkbox' v-model='query_params.status_list.self' @change='onInputStatusList'
-                    | 自分の#{controller.status_label}のみ
                 .link-description = "#{controller.status_label}の一覧を取得します。"
                 .field-update-button-container
                   button @click='delay(getStatuses)' 実行
