@@ -54,6 +54,11 @@ calckey:
   features:
     reaction: true
   sns_type: misskey
+cherrypick:
+  display_name: CherryPick
+  features:
+    reaction: true
+  sns_type: misskey
 cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
@@ -73,6 +78,11 @@ feed:
     limit: 100
   tag:
     limit: 100
+Firefish:
+  display_name: firefish
+  features:
+    reaction: true
+  sns_type: misskey
 handler:
   animation_image_format_convert:
     disable: true
@@ -237,6 +247,11 @@ http:
     seconds: 1
   timeout:
     seconds: 30
+iceshrimp:
+  display_name: Iceshrimp
+  features:
+    reaction: true
+  sns_type: misskey
 itunes:
   country: jp
   hosts:
@@ -933,6 +948,11 @@ ruby:
     install: false
   did_you_mean: true
   jit: false
+sharkey:
+  display_name: Sharkey
+  features:
+    reaction: true
+  sns_type: misskey
 sidekiq:
   auth:
     password: null
