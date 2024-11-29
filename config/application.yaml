@@ -1,3 +1,6 @@
+akkoma:
+  display_name: Akkoma
+  sns_type: mastodon
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
