@@ -38,12 +38,12 @@ annict:
     scopes:
       default:
         - read
+  timeout: 5
   urls:
     api:
       graphql: https://api.annict.com/graphql
       rest: https://api.annict.com
     default: https://annict.com
-  timeout: 5
   works: []
 api:
   cache:
@@ -78,8 +78,8 @@ feed:
     limit: 100
   tag:
     limit: 100
-Firefish:
-  display_name: firefish
+firefish:
+  display_name: Firefish
   features:
     reaction: true
   sns_type: misskey
