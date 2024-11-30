@@ -20,7 +20,7 @@ module Mulukhiya
     end
 
     def logger
-      @logger ||= loggable? ? Logger.new : ::Logger.new('/dev/null')
+      @logger ||= loggable? ? Logger.new : ::Logger.new(File::NULL)
       return @logger
     end
 
