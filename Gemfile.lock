@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: 9c67ef9d1804a92c84d68d410c92748fbcc96ccf
+  revision: a4aaa85ee2b2cae8db3a092c01c57e04167a9ca6
   specs:
     faye-websocket (0.11.3)
       eventmachine (>= 0.12.0)
@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: bb33644b31340e82ab1816ead7690b7c6f5cad66
+  revision: d88eaf4916bad3ce14a2f9a0cf2d49aea066cb5c
   specs:
     ginseng-core (1.14.5)
       activesupport (>= 7.0.7.1)
@@ -86,9 +86,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (8.0.0.1)
-      actionview (= 8.0.0.1)
-      activesupport (= 8.0.0.1)
+    actionpack (8.0.1)
+      actionview (= 8.0.1)
+      activesupport (= 8.0.1)
       nokogiri (>= 1.8.5)
       rack (>= 2.2.4)
       rack-session (>= 1.0.1)
@@ -96,13 +96,13 @@ GEM
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
       useragent (~> 0.16)
-    actionview (8.0.0.1)
-      activesupport (= 8.0.0.1)
+    actionview (8.0.1)
+      activesupport (= 8.0.1)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (8.0.0.1)
+    activesupport (8.0.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -206,7 +206,7 @@ GEM
     jwt (2.9.3)
       base64
     language_server-protocol (3.17.0.3)
-    logger (1.6.2)
+    logger (1.6.3)
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -244,12 +244,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.17.1)
+    nokogiri (1.17.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.17.1-aarch64-linux)
+    nokogiri (1.17.2-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.17.1-x86_64-linux)
+    nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -295,7 +295,7 @@ GEM
       gli (~> 2.21.0)
       json
       rainbow (>= 3.1.1, < 4.0)
-    rails-html-sanitizer (1.6.1)
+    rails-html-sanitizer (1.6.2)
       loofah (~> 2.21)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
@@ -307,7 +307,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.3.9)
+    rexml (3.4.0)
     ricecream (0.2.1)
     rspotify (2.12.4)
       addressable (~> 2.8.0)
@@ -315,7 +315,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.1)
       rexml
-    rubocop (1.69.1)
+    rubocop (1.69.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -325,7 +325,7 @@ GEM
       rubocop-ast (>= 1.36.2, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.36.2)
+    rubocop-ast (1.37.0)
       parser (>= 3.3.1.0)
     rubocop-minitest (0.36.0)
       rubocop (>= 1.61, < 2.0)
@@ -378,7 +378,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.1)
     syslog (0.2.0)
     temple (0.10.3)
-    test-unit (3.6.4)
+    test-unit (3.6.5)
       power_assert
     tilt (2.1.0)
     time (0.4.1)
