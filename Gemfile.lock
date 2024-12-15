@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: 9c67ef9d1804a92c84d68d410c92748fbcc96ccf
+  revision: a4aaa85ee2b2cae8db3a092c01c57e04167a9ca6
   specs:
     faye-websocket (0.11.3)
       eventmachine (>= 0.12.0)
@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: bb33644b31340e82ab1816ead7690b7c6f5cad66
+  revision: d88eaf4916bad3ce14a2f9a0cf2d49aea066cb5c
   specs:
     ginseng-core (1.14.5)
       activesupport (>= 7.0.7.1)
@@ -86,9 +86,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (8.0.0)
-      actionview (= 8.0.0)
-      activesupport (= 8.0.0)
+    actionpack (8.0.1)
+      actionview (= 8.0.1)
+      activesupport (= 8.0.1)
       nokogiri (>= 1.8.5)
       rack (>= 2.2.4)
       rack-session (>= 1.0.1)
@@ -96,13 +96,13 @@ GEM
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
       useragent (~> 0.16)
-    actionview (8.0.0)
-      activesupport (= 8.0.0)
+    actionview (8.0.1)
+      activesupport (= 8.0.1)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (8.0.0)
+    activesupport (8.0.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -129,7 +129,7 @@ GEM
     crass (1.0.6)
     csv (3.3.0)
     daemon-spawn (0.4.2)
-    date (3.4.0)
+    date (3.4.1)
     domain_name (0.6.20240107)
     drb (2.2.1)
     dry-configurable (1.2.0)
@@ -171,10 +171,10 @@ GEM
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
-    etc (1.4.4)
+    etc (1.4.5)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.12.1)
+    faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -191,7 +191,7 @@ GEM
       raabro (~> 1.4)
     gli (2.21.5)
     hashie (5.0.0)
-    http-cookie (1.0.7)
+    http-cookie (1.0.8)
       domain_name (~> 0.5)
     httparty (0.22.0)
       csv
@@ -199,13 +199,14 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    json (2.8.2)
-    json-schema (5.1.0)
+    json (2.9.0)
+    json-schema (5.1.1)
       addressable (~> 2.8)
+      bigdecimal (~> 3.1)
     jwt (2.9.3)
       base64
     language_server-protocol (3.17.0.3)
-    logger (1.6.1)
+    logger (1.6.3)
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -218,11 +219,11 @@ GEM
     mime-types (3.6.0)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.1105)
+    mime-types-data (3.2024.1203)
     mini_magick (5.0.1)
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
-    minitest (5.25.1)
+    minitest (5.25.4)
     mongo (2.21.0)
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
@@ -230,7 +231,7 @@ GEM
       bigdecimal (~> 3.1)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
-    net-http (0.5.0)
+    net-http (0.6.0)
       uri
     net-imap (0.5.1)
       date
@@ -243,12 +244,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.16.7)
+    nokogiri (1.17.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.7-aarch64-linux)
+    nokogiri (1.17.2-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.16.7-x86_64-linux)
+    nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -272,7 +273,7 @@ GEM
     pg (1.5.9)
     power_assert (2.0.4)
     public_suffix (6.0.1)
-    puma (6.4.3)
+    puma (6.5.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
@@ -294,19 +295,19 @@ GEM
       gli (~> 2.21.0)
       json
       rainbow (>= 3.1.1, < 4.0)
-    rails-html-sanitizer (1.6.0)
+    rails-html-sanitizer (1.6.2)
       loofah (~> 2.21)
-      nokogiri (~> 1.14)
+      nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
     rake (13.2.1)
-    redis-client (0.22.2)
+    redis-client (0.23.0)
       connection_pool
-    regexp_parser (2.9.2)
+    regexp_parser (2.9.3)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.3.9)
+    rexml (3.4.0)
     ricecream (0.2.1)
     rspotify (2.12.4)
       addressable (~> 2.8.0)
@@ -314,17 +315,17 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.1)
       rexml
-    rubocop (1.68.0)
+    rubocop (1.69.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 2.4, < 3.0)
-      rubocop-ast (>= 1.32.2, < 2.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.36.2, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.36.1)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.37.0)
       parser (>= 3.3.1.0)
     rubocop-minitest (0.36.0)
       rubocop (>= 1.61, < 2.0)
@@ -345,10 +346,10 @@ GEM
       nokogiri (>= 1.12.0)
     sassc (2.4.0)
       ffi (~> 1.9)
-    securerandom (0.3.2)
-    sequel (5.86.0)
+    securerandom (0.4.0)
+    sequel (5.87.0)
       bigdecimal
-    set (1.1.0)
+    set (1.1.1)
     sidekiq (7.2.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
@@ -375,9 +376,9 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
-    syslog (0.1.2)
+    syslog (0.2.0)
     temple (0.10.3)
-    test-unit (3.6.2)
+    test-unit (3.6.5)
       power_assert
     tilt (2.1.0)
     time (0.4.1)
@@ -387,9 +388,11 @@ GEM
     trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (2.6.0)
+    unicode-display_width (3.1.2)
+      unicode-emoji (~> 4.0, >= 4.0.4)
+    unicode-emoji (4.0.4)
     uri (1.0.2)
-    useragent (0.16.10)
+    useragent (0.16.11)
     version_gem (1.1.4)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
@@ -437,7 +440,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.3.5p100
+   ruby 3.3.6p108
 
 BUNDLED WITH
    2.5.23

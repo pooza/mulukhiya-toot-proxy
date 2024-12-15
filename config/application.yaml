@@ -1,3 +1,6 @@
+akkoma:
+  display_name: Akkoma
+  sns_type: mastodon
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
@@ -38,12 +41,12 @@ annict:
     scopes:
       default:
         - read
+  timeout: 5
   urls:
     api:
       graphql: https://api.annict.com/graphql
       rest: https://api.annict.com
     default: https://annict.com
-  timeout: 5
   works: []
 api:
   cache:
@@ -51,6 +54,11 @@ api:
   custom: []
 calckey:
   display_name: Calckey
+  features:
+    reaction: true
+  sns_type: misskey
+cherrypick:
+  display_name: CherryPick
   features:
     reaction: true
   sns_type: misskey
@@ -73,6 +81,11 @@ feed:
     limit: 100
   tag:
     limit: 100
+firefish:
+  display_name: Firefish
+  features:
+    reaction: true
+  sns_type: misskey
 handler:
   animation_image_format_convert:
     disable: true
@@ -237,6 +250,11 @@ http:
     seconds: 1
   timeout:
     seconds: 30
+iceshrimp:
+  display_name: Iceshrimp
+  features:
+    reaction: true
+  sns_type: misskey
 itunes:
   country: jp
   hosts:
@@ -732,7 +750,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.33.4
+  version: 4.34.0
 parser:
   note:
     fields:
@@ -933,6 +951,11 @@ ruby:
     install: false
   did_you_mean: true
   jit: false
+sharkey:
+  display_name: Sharkey
+  features:
+    reaction: true
+  sns_type: misskey
 sidekiq:
   auth:
     password: null
@@ -1014,7 +1037,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.5.2/css/all.css
+      - https://use.fontawesome.com/releases/v6.7.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   episode:
@@ -1045,7 +1068,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.5.2/css/all.css
+      - https://use.fontawesome.com/releases/v6.7.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:
