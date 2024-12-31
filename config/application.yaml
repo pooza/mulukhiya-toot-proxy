@@ -167,10 +167,6 @@ handler:
       audio: audio
       image: image
       video: video
-  mfmize:
-    disable: true
-    experimental: true
-    max_length: 100
   peer_tube_url_nowplaying:
     tagging: false
     timeout: 10
@@ -495,7 +491,6 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - mfmize
       - dictionary_tag
       - remote_tag
       - removal_rule_tag
@@ -513,7 +508,6 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -542,7 +536,6 @@ meisskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -652,7 +645,6 @@ misskey:
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
       - peer_tube_url_nowplaying
-      - mfmize
       - spoiler
       - default_tag
       - dictionary_tag
@@ -677,7 +669,6 @@ misskey:
       - shortened_url
       - url_normalize
       - canonical_url
-      - mfmize
       - itunes_url_nowplaying
       - spotify_url_nowplaying
       - you_tube_url_nowplaying
