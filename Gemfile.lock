@@ -241,7 +241,6 @@ GEM
     net-protocol (0.2.2)
       timeout
     net-smtp (0.5.0)
-      net-protocol
     netrc (0.11.0)
     nio4r (2.7.4)
     nokogiri (1.18.1)
@@ -350,11 +349,11 @@ GEM
     sequel (5.87.0)
       bigdecimal
     set (1.1.1)
-    sidekiq (7.2.4)
-      concurrent-ruby (< 2)
+    sidekiq (7.3.7)
       connection_pool (>= 2.3.0)
+      logger
       rack (>= 2.2.4)
-      redis-client (>= 0.19.0)
+      redis-client (>= 0.22.2)
     sidekiq-scheduler (5.0.6)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 6, < 8)
@@ -432,7 +431,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
-  sidekiq (~> 7.2.4)
+  sidekiq (~> 7.3.7)
   sidekiq-scheduler (~> 5.0.0)
   slim_lint
   test-unit
@@ -440,7 +439,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.3.6p108
+   ruby 3.4.1p0
 
 BUNDLED WITH
    2.6.2
