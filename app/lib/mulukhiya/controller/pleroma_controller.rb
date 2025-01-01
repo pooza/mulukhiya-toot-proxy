@@ -25,20 +25,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/:version/pleroma/chats/:chat_id/messages' do
-      Event.new(:pre_chat, {reporter:, sns:}).dispatch(params)
-      reporter.response = sns.say(params)
-      Event.new(:post_chat, {reporter:, sns:}).dispatch(params)
-      @renderer.message = reporter.response.parsed_response
-      @renderer.status = reporter.response.code
-      return @renderer.to_s
-    rescue Ginseng::GatewayError => e
-      e.alert
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
-      return @renderer.to_s
-    end
-
     post '/api/:version/media' do
       filename = params[:name]
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)

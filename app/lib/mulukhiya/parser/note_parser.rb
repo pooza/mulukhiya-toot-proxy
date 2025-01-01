@@ -33,23 +33,5 @@ module Mulukhiya
       e.log(text:)
       return service.max_post_text_length
     end
-
-    def mfmize
-      temp = text.dup
-      matches = text.scan(/\[.*?\]\(.*?\)/)
-      matches.each_with_index do |match, i|
-        temp.gsub!(match, "____#{i}____")
-      end
-      handler = Handler.create(:mfmize)
-      uris.select {|v| v.to_s.start_with?('http')}.each do |uri|
-        label = uri.host + uri.path
-        label = uri.host if handler.handler_config(:max_length) < label.length
-        temp.gsub!(uri.to_s, "[#{label}](#{uri})")
-      end
-      matches.each_with_index do |match, i|
-        temp.gsub!("____#{i}____", match)
-      end
-      return temp
-    end
   end
 end

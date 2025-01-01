@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '~>3.3.0'
+ruby '~>3.4.1'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
@@ -13,7 +13,7 @@ gem 'mini_magick'
 gem 'optparse'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>7.2.4' # CVE-2024-32887
+gem 'sidekiq', '~>7.3.7'
 gem 'sidekiq-scheduler', '~>5.0.0'
 gem 'yamllint'
 

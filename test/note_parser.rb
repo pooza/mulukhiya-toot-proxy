@@ -13,11 +13,5 @@ module Mulukhiya
 
       assert_kind_of(Integer, parser.default_max_length)
     end
-
-    def test_mfmize
-      parser = NoteParser.new('[YouTube](https://www.youtube.com) and [Google](https://google.com) https://www.amazon.co.jp https://annict.com/@pooza')
-
-      assert_equal('[YouTube](https://www.youtube.com) and [Google](https://google.com) [www.amazon.co.jp](https://www.amazon.co.jp) [annict.com/@pooza](https://annict.com/@pooza)', parser.mfmize)
-    end
   end
 end
