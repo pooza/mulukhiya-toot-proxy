@@ -466,8 +466,6 @@ meisskey:
       - result_notification
     post_boost:
       - result_notification
-    post_chat:
-      - result_notification
     post_fav:
       - result_notification
     post_reaction:
@@ -481,22 +479,6 @@ meisskey:
       - result_notification
     post_webhook:
       - result_notification
-    pre_chat:
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - dictionary_tag
-      - remote_tag
-      - removal_rule_tag
-      - tagging
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
@@ -817,8 +799,6 @@ pleroma:
       - result_notification
     post_boost:
       - result_notification
-    post_chat:
-      - result_notification
     post_fav:
       - result_notification
     post_reaction:
@@ -832,22 +812,6 @@ pleroma:
       - result_notification
     post_webhook:
       - result_notification
-    pre_chat:
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - dictionary_tag
-      - remote_tag
-      - removal_rule_tag
-      - tagging
     pre_toot:
       - user_config_command
       - lemmy_clipping_command

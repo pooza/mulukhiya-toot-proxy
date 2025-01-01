@@ -27,16 +27,6 @@ module Mulukhiya
       return handle_post_toot(payload, params)
     end
 
-    def handle_pre_chat(payload, params = {})
-      @text_field = chat_field
-      return handle_pre_toot(payload, params)
-    end
-
-    def handle_post_chat(payload, params = {})
-      @text_field = chat_field
-      return handle_post_toot(payload, params)
-    end
-
     def handle_pre_upload(payload, params = {})
     end
 
