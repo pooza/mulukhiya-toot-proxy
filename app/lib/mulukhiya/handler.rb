@@ -159,7 +159,8 @@ module Mulukhiya
       @payload = payload
       @status = payload[text_field] || payload[text_field.to_sym] || ''
       @status = payload['text'] || payload[:text] || '' unless @status.present?
-      @status.gsub!(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2') if @status.present?
+      return unless @status.present?
+      @status = @status.gsub(/^#(nowplaying)[[:space:]]+(.*)$/i, '#\\1 \\2')
     end
 
     def flatten_payload
