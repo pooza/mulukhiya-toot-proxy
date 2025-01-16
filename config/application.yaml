@@ -75,7 +75,7 @@ fedibird:
   sns_type: mastodon
 feed:
   cache:
-    ttl: 600
+    ttl: 300
   custom: []
   media:
     limit: 100
