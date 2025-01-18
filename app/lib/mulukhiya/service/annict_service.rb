@@ -311,7 +311,7 @@ module Mulukhiya
     end
 
     def bad?(values)
-      return (values[:ratingOverallState] || values[:ratingState]).upcase == 'BAD'
+      return (values[:ratingOverallState] || values[:ratingState]).to_s.upcase == 'BAD'
     end
 
     def crawlable?(activity, params)
