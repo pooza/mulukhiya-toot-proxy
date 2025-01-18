@@ -164,7 +164,7 @@ module Mulukhiya
       }
 
       assert_equal({
-        'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。 （ネタバレ）',
+        'spoiler_text' => 'すごいあにめ 第25回「神回」を視聴。（ネタバレ）',
         'text' => "ネタバレ感想！すごい！\nすごいアニメの神回だった！\nhttps://annict.com/works/111/episodes/112\n#すごいあにめ #25話 #神回\n",
       }, @service.create_payload(record).raw)
 
@@ -243,7 +243,7 @@ module Mulukhiya
       }
 
       assert_equal({
-        'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。 （ネタバレ）',
+        'spoiler_text' => '「すごいあにめTHE MOVIE」を視聴。（ネタバレ）',
         'text' => "ネタバレ感想\n超楽しい！\nすばらしい劇場版だった！\nhttps://annict.com/works/112/records\n#すごいあにめTHE_MOVIE\n",
       }, @service.create_payload(review).raw)
     end

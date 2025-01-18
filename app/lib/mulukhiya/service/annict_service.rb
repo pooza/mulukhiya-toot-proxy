@@ -90,9 +90,13 @@ module Mulukhiya
       title_template = Template.new("annict/#{type}_title")
       title_template[type] = values
       body = {text: [title_template.to_s, body_template.to_s].join}
-      if body_template.to_s.match?(config['/spoiler/pattern'])
+      if spoiler?(body_template) || bad?(values)
         body[:text] = body_template.to_s.lstrip
-        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
+        body[:spoiler_text] = [
+          title_template.to_s.tr("\n", ' ').strip,
+          spoiler?(body_template) ? config['/annict/review/suffixes/spoiler'] : '',
+          bad?(values) ? config['/annict/review/suffixes/bad'] : '',
+        ].join
       end
       return SlackWebhookPayload.new(body)
     end
@@ -301,6 +305,14 @@ module Mulukhiya
     end
 
     private
+
+    def spoiler?(str)
+      return str.to_s.match?(config['/spoiler/pattern'])
+    end
+
+    def bad?(values)
+      return (values[:ratingOverallState] || values[:ratingState]).to_s.upcase == 'BAD'
+    end
 
     def crawlable?(activity, params)
       keywords = self.class.keywords

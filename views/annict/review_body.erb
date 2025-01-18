@@ -3,4 +3,9 @@
 <%= params.dig(:review, :body).ellipsize(controller_class.max_length - 200) %>
 <% end -%>
 <%= Mulukhiya::AnnictService.create_review_uri(params.dig(:review, :work, :annictId)) %>
-<%= params.dig(:review, :work, :title).to_hashtag %>
+<%=
+  [
+    params.dig(:review, :work, :title),
+    params.dig(:review, :ratingOverallState)
+  ].select(&:present?).map(&:to_hashtag).join(' ')
+%>

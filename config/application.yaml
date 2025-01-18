@@ -41,6 +41,10 @@ annict:
     scopes:
       default:
         - read
+  review:
+    suffixes:
+      bad: '（評価:良くない）'
+      spoiler: '（ネタバレ）'
   timeout: 5
   urls:
     api:
@@ -75,7 +79,7 @@ fedibird:
   sns_type: mastodon
 feed:
   cache:
-    ttl: 600
+    ttl: 300
   custom: []
   media:
     limit: 100
@@ -733,7 +737,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.34.1
+  version: 4.35.0
 parser:
   note:
     fields:

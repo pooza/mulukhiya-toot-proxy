@@ -20,6 +20,7 @@ query {
               title
             }
             comment
+            ratingState
             createdAt
           }
           ... on Review {
@@ -29,6 +30,7 @@ query {
               title
             }
             body
+            ratingOverallState
             createdAt
           }
         }
