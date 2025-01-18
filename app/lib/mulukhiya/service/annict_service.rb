@@ -90,9 +90,13 @@ module Mulukhiya
       title_template = Template.new("annict/#{type}_title")
       title_template[type] = values
       body = {text: [title_template.to_s, body_template.to_s].join}
-      if body_template.to_s.match?(config['/spoiler/pattern'])
+      is_spoiler = body_template.to_s.match?(config['/spoiler/pattern'])
+      is_bad = values[:ratingState] == 'BAD'
+      if is_spoiler || is_bad
         body[:text] = body_template.to_s.lstrip
-        body[:spoiler_text] = "#{title_template.to_s.tr("\n", ' ').strip} （ネタバレ）"
+        body[:spoiler_text] = title_template.to_s.tr("\n", ' ').strip
+        body[:spoiler_text] += '（ネタバレ）' if is_spoiler
+        body[:spoiler_text] += '（評価:良くない）' if is_bad
       end
       return SlackWebhookPayload.new(body)
     end

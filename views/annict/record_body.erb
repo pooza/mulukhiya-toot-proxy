@@ -16,5 +16,6 @@
     params.dig(:record, :episode, :work, :title),
     Mulukhiya::AnnictService.create_episode_number_text(params.dig(:record, :episode, :numberText)),
     subtitle,
+    params.dig(:record, :ratingState),
   ].select(&:present?).map(&:to_hashtag).join(' ')
 %>
