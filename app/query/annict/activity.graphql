@@ -30,6 +30,7 @@ query {
               title
             }
             body
+            ratingOverallState
             createdAt
           }
         }

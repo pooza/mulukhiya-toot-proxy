@@ -41,6 +41,10 @@ annict:
     scopes:
       default:
         - read
+  review:
+    suffixes:
+      bad: '（評価:良くない）'
+      spoiler: '（ネタバレ）'
   timeout: 5
   urls:
     api:
