@@ -2,7 +2,7 @@ module Mulukhiya
   class ShortenedURLHandler < URLHandler
     def rewrite(uri)
       source = Ginseng::URI.parse(uri.to_s)
-      dest = source.dup
+      dest = source.clone
       while domains.member?(dest.host)
         response = http.get(dest, {follow_redirects: false})
         break unless location = response.headers['location']

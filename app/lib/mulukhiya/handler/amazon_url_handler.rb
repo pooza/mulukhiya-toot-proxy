@@ -2,7 +2,7 @@ module Mulukhiya
   class AmazonURLHandler < URLHandler
     def rewrite(uri)
       source = AmazonURI.parse(uri.to_s)
-      dest = source.dup
+      dest = source.clone
       dest = dest.shorten
       @source = @status.sub(source.to_s, dest.to_s)
       sns.account.config.update(amazon: {affiliate: nil})
