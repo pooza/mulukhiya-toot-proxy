@@ -7,7 +7,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       lines = status_lines.clone
-      lines.clone.reverse_each do |line|
+      lines.reverse_each do |line|
         break unless tags_line?(line)
         tags.merge(lines.pop.strip.split(/[[:blank:]]+/))
       end
