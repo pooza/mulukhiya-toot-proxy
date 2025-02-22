@@ -21,7 +21,9 @@ module Mulukhiya
 
     def create_status(params)
       template = Template.new('reaction.md')
-      params[:payload][:reaction].gsub!('@.', '') if params[:payload][:reaction].start_with?(':')
+      if params[:payload][:reaction].start_with?(':')
+        params[:payload][:reaction] = params[:payload][:reaction].gsub('@.', '')
+      end
       template[:payload] = params[:payload]
       template[:receipt] = params[:receipt]
       return template.to_s

@@ -23,7 +23,7 @@ module Mulukhiya
         next if short?(k)
         next unless text.match?(v[:pattern])
         tags.merge(v[:words])
-        text.gsub!(v[:pattern], '')
+        text = text.gsub(v[:pattern], '')
       end
       return tags
     end

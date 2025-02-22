@@ -65,7 +65,7 @@ module Mulukhiya
         'あぁ', 'いぃ', 'うぅ', 'えぇ', 'おぉ', 'やゃ', 'ゆゅ', 'よょ',
         'アァ', 'イィ', 'ウゥ', 'エェ', 'オォ', 'ヤャ', 'ユュ', 'ヨョ'
       ].each do |v|
-        pattern.gsub!(Regexp.new("[#{v}]"), "[#{v}]")
+        pattern = pattern.gsub(Regexp.new("[#{v}]"), "[#{v}]")
       end
       return Regexp.new(pattern)
     end

@@ -3,9 +3,9 @@
 ._*
 Thumbs.db
 Desktop.ini
-.fuse*
 *.log
-.sass-cache
+*.bak
+test*
 dist
 *.code-workspace
 .vscode

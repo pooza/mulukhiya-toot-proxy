@@ -1,8 +1,9 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-minitest
-  - rubocop-sequel
   - rubocop-rake
+require:
+  - rubocop-sequel
 
 AllCops:
   AllowSymlinksInCacheRootDirectory: true
