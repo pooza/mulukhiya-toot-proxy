@@ -2,7 +2,6 @@ plugins:
   - rubocop-performance
   - rubocop-minitest
   - rubocop-rake
-require:
   - rubocop-sequel
 
 AllCops:
