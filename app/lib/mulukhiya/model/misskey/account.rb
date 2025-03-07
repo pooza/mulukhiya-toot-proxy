@@ -74,7 +74,6 @@ module Mulukhiya
       alias attachments attachment
 
       def admin?
-        return true if isRoot
         return true if roles.any?(&:admin?)
         return false
       end
