@@ -77,7 +77,7 @@ module Mulukhiya
       rescue => e
         e.alert(dic: dic.to_h)
       end
-      return result
+      return result.to_a
     end
 
     def merge(wordsets)
