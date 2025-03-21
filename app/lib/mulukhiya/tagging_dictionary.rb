@@ -69,16 +69,13 @@ module Mulukhiya
     end
 
     def fetch
-      result = []
-      RemoteDictionary.all.map do |dic|
-        Thread.new do
-          words = dic.parse
-          logger.info(dic: dic.to_h.merge(words: words.count))
-          result.push(words)
-        rescue => e
-          e.alert(dic: dic.to_h)
-        end
-      end.each(&:join)
+      Parallel.each(RemoteDictionary.all, in_threads: Parallel.processor_count) do |dic|
+        words = dic.parse
+        logger.info(dic: dic.to_h.merge(words: words.count))
+        result.push(words)
+      rescue => e
+        e.alert(dic: dic.to_h)
+      end
       return result
     end
 

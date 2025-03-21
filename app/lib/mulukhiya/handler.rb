@@ -223,10 +223,12 @@ module Mulukhiya
       return enum_for(__method__) unless block
       reporter = Reporter.new
       sns = sns_class.new
-      handlers = []
-      all_names.map do |name|
-        Thread.new {handlers.push(create(name, {reporter:, sns:}))}
-      end.each(&:join)
+      handlers = Concurrent::Array.new
+      Parallel.each(all_names, in_threads: Parallel.processor_count) do |name|
+        handlers.push(create(name, {reporter:, sns:}))
+      rescue => e
+        e.log
+      end
       handlers.compact.sort_by(&:underscore).each(&block)
     end
 
@@ -246,8 +248,8 @@ module Mulukhiya
     private
 
     def initialize(params = {})
-      @result = []
-      @errors = []
+      @result = Concurrent::Array.new
+      @errors = Concurrent::Array.new
       @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @break = false
