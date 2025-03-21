@@ -422,7 +422,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  concurrent-ruby
   dry-validation
   fastimage
   faye-websocket!
