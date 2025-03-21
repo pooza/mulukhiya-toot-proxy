@@ -11,6 +11,7 @@ gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tu
 gem 'marcel'
 gem 'mini_magick'
 gem 'optparse'
+gem 'parallel'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'sidekiq', '~>7.3.7'

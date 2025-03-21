@@ -435,6 +435,7 @@ DEPENDENCIES
   mini_magick
   mongo
   optparse
+  parallel
   rack-test
   rails-erb-lint
   ricecream
