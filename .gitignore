@@ -5,6 +5,7 @@ Thumbs.db
 Desktop.ini
 *.log
 *.bak
+*.swp
 test*
 dist
 *.code-workspace
