@@ -69,7 +69,7 @@ module Mulukhiya
     end
 
     def fetch
-      @result = Concurrent::Array.new
+      @result = []
       Parallel.each(RemoteDictionary.all, in_threads: Parallel.processor_count) do |dic|
         words = dic.parse
         logger.info(dic: dic.to_h.merge(words: words.count))
@@ -77,7 +77,7 @@ module Mulukhiya
       rescue => e
         e.alert(dic: dic.to_h)
       end
-      return result.to_a
+      return result
     end
 
     def merge(wordsets)

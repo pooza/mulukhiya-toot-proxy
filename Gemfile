@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 ruby '~>3.4.1'
-gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'fastimage'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
