@@ -2,7 +2,7 @@ module Mulukhiya
   class MecabRemoteDictionaryTest < TestCase
     def setup
       @dic = RemoteDictionary.create(
-        'url' => 'https://script.google.com/macros/s/AKfycbws9aCXxNQt3khdJ9bEt1ADeV7HzZV_Idg-DvN5t_X3nnca0nc/exec',
+        'url' => 'https://precure.ml/api/dic/v1/dic.json',
         'type' => 'mecab',
       )
     end

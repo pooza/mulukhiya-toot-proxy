@@ -422,6 +422,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  concurrent-ruby
   dry-validation
   fastimage
   faye-websocket!
@@ -435,6 +436,7 @@ DEPENDENCIES
   mini_magick
   mongo
   optparse
+  parallel
   rack-test
   rails-erb-lint
   ricecream

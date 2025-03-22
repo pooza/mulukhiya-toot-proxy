@@ -1,14 +1,14 @@
 module Mulukhiya
-  class RelativeRemoteDictionaryTest < TestCase
+  class RelatedRemoteDictionaryTest < TestCase
     def setup
       @dic = RemoteDictionary.create(
-        'url' => 'https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec',
-        'type' => 'relative',
+        'url' => 'https://precure.ml/api/dic/v1/precure.json',
+        'type' => 'related',
       )
     end
 
     def test_create
-      assert_kind_of(RelativeRemoteDictionary, @dic)
+      assert_kind_of(RelatedRemoteDictionary, @dic)
     end
 
     def test_parse

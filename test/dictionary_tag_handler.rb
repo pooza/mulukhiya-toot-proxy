@@ -5,11 +5,11 @@ module Mulukhiya
       config['/handler/dictionary_tag/word/min_kanji'] = 2
       config['/agent/accts'] = ['@pooza']
       config['/handler/dictionary_tag/dics'] = [
-        {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'relative'},
-        {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'relative'},
-        {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'relative'},
+        {'url' => 'https://precure.ml/api/dic/v1/precure.json', 'type' => 'related'},
+        {'url' => 'https://precure.ml/api/dic/v1/singer.json', 'type' => 'related'},
+        {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'related'},
         {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
-        {'url' => 'https://script.google.com/macros/s/AKfycbxXt73nNsHZ5gUtc0WQEu9xR4zuwmfaDiwEObbOUBSokWyi-qCEVkLlEjPTe-iSvAKPmQ/exec', 'type' => 'relative', 'strict' => true},
+        {'url' => 'https://mstdn.delmulin.com/api/dic/v1/emoji.json', 'type' => 'related', 'strict' => true},
       ]
       TaggingDictionary.new.refresh
 

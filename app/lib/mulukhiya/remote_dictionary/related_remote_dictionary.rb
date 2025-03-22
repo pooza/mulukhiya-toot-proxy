@@ -1,5 +1,5 @@
 module Mulukhiya
-  class RelativeRemoteDictionary < RemoteDictionary
+  class RelatedRemoteDictionary < RemoteDictionary
     def parse
       return fetch.to_h do |k, words|
         words = Array(words).map {|v| create_key(v)}
