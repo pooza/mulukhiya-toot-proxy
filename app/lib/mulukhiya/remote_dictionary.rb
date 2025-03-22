@@ -42,6 +42,7 @@ module Mulukhiya
 
     def self.create(params)
       params['type'] ||= 'multi_field'
+      params['type'] = 'related' if params['type'] == 'relative'
       return "Mulukhiya::#{params['type'].camelize}RemoteDictionary".constantize.new(params)
     rescue => e
       e.log
