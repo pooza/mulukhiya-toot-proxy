@@ -15,7 +15,7 @@ properties:
         type:
           enum:
             - multi_field
-            - relative
+            - related
             - mecab
           type: string
         url:
