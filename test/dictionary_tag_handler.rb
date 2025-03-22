@@ -29,7 +29,7 @@ module Mulukhiya
 
       @handler.handle_pre_toot(status_field => ':maam_g:')
 
-      assert_equal(@handler.addition_tags, Set['マァム'])
+      assert_equal(@handler.addition_tags, Set['マァム', 'maam_g'])
     end
 
     def test_handle_pre_toot_with_poll
