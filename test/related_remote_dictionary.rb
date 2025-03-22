@@ -2,7 +2,7 @@ module Mulukhiya
   class RelatedRemoteDictionaryTest < TestCase
     def setup
       @dic = RemoteDictionary.create(
-        'url' => 'https://script.google.com/macros/s/AKfycbwn4nqKhBwH3aDYd7bJ698-GWRJqpktpAdH11ramlBK87ym3ME/exec',
+        'url' => 'https://precure.ml/api/dic/v1/precure.json',
         'type' => 'related',
       )
     end
