@@ -10,7 +10,7 @@ module Mulukhiya
         {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'related'},
         {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
         {'url' => 'https://precure.ml/api/dic/v1/emoji.json', 'type' => 'related', 'strict' => true},
-        {'url' => 'https://mstdn.delmulin.com/api/dic/v1/emoji.json', 'type' => 'related'},
+        {'url' => 'https://mstdn.delmulin.com/api/dic/v1/emoji.json', 'type' => 'related', 'strict' => true},
       ]
       TaggingDictionary.new.refresh
 
@@ -29,7 +29,7 @@ module Mulukhiya
 
       @handler.handle_pre_toot(status_field => ':maam_g:')
 
-      assert_equal(@handler.addition_tags, Set['マァム', 'maam_g'])
+      assert_equal(@handler.addition_tags, Set['マァム'])
     end
 
     def test_handle_pre_toot_with_poll
