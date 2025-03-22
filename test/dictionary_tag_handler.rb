@@ -10,6 +10,7 @@ module Mulukhiya
         {'url' => 'https://precure.ml/api/dic/v1/series.json', 'type' => 'related'},
         {'url' => 'https://precure.ml/api/dic/v2/fairy.json'},
         {'url' => 'https://precure.ml/api/dic/v1/emoji.json', 'type' => 'related', 'strict' => true},
+        {'url' => 'https://mstdn.delmulin.com/api/dic/v1/emoji.json', 'type' => 'related'},
       ]
       TaggingDictionary.new.refresh
 
