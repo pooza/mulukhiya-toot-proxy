@@ -75,7 +75,7 @@ module Mulukhiya
         logger.info(dic: dic.to_h.merge(words: words.count))
         result.push(words)
       rescue => e
-        e.alert(dic: dic.to_h)
+        e.log(dic: dic.to_h)
       end
       return result
     end
