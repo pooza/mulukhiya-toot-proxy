@@ -227,7 +227,7 @@ module Mulukhiya
       Parallel.each(all_names, in_threads: Parallel.processor_count) do |name|
         handlers.push(create(name, {reporter:, sns:}))
       rescue => e
-        e.log
+        e.log(name:)
       end
       handlers.compact.sort_by(&:underscore).each(&block)
     end
