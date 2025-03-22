@@ -69,7 +69,7 @@ module Mulukhiya
     end
 
     def fetch
-      result = []
+      result = Concurrent::Array.new
       Parallel.each(RemoteDictionary.all, in_threads: Parallel.processor_count) do |dic|
         words = dic.parse
         logger.info(dic: dic.to_h.merge(words: words.count))

@@ -8,7 +8,7 @@ module Mulukhiya
 
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
-      payload[attachment_field] ||= []
+      payload[attachment_field] = Concurrent::Array.new(payload[attachment_field] || [])
       in_threads = Parallel.processor_count
       Parallel.each((payload['attachments'] || []), in_threads:) do |attachment|
         next unless uri = Ginseng::URI.parse(attachment['image_url'])

@@ -248,8 +248,8 @@ module Mulukhiya
     private
 
     def initialize(params = {})
-      @result = []
-      @errors = []
+      @result = Concurrent::Array.new
+      @errors = Concurrent::Array.new
       @sns = params[:sns] || sns_class.new
       @reporter = params[:reporter] || Reporter.new
       @break = false
