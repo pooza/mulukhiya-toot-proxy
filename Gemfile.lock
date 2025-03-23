@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 9fc72cd64c6948faef2e41d9f625e33217e4e2c7
+  revision: 2bc6b29e4e7411f4dc869e296c3d6c9f7418c947
   specs:
-    ginseng-core (1.14.7)
+    ginseng-core (1.15.0)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -29,7 +29,7 @@ GIT
       multi_json
       net-protocol
       net-smtp
-      nokogiri (>= 1.18.3)
+      nokogiri (>= 1.18.4)
       optparse
       rake
       rest-client
