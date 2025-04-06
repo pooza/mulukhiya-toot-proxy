@@ -390,7 +390,7 @@ GEM
     syslog (0.3.0)
       logger
     temple (0.10.3)
-    test-unit (3.6.7)
+    test-unit (3.6.8)
       power_assert
     tilt (2.1.0)
     time (0.4.1)
