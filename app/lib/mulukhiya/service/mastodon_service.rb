@@ -8,6 +8,16 @@ module Mulukhiya
 
     alias toot post
 
+    def repost_status(status, body, params = {})
+      status = status_class[status] unless status.is_a?(status_class)
+      values = status.payload
+      body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
+      body = values.merge(body.deep_symbolize_keys)
+      response = post(body.compact, params)
+      delete_status(status.id, params)
+      return response
+    end
+
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super
