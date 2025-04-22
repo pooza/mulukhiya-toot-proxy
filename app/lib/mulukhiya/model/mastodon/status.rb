@@ -48,6 +48,12 @@ module Mulukhiya
         return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
 
+      def payload
+        payload = super
+        payload[:media_ids] = attachments.map {|v| v.id.to_s}.to_a if attachments.present?
+        return payload
+      end
+
       def to_md
         return uri.to_md
       rescue => e

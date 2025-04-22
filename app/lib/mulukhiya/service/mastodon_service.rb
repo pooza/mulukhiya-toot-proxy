@@ -14,8 +14,8 @@ module Mulukhiya
       body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
       body[:visibility] = status.visibility_name
       body = values.merge(body.deep_symbolize_keys)
-      response = post(body.compact, params)
       delete_status(status.id, params)
+      response = post(body.compact, params)
       return response
     end
 
