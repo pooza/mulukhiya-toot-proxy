@@ -50,7 +50,7 @@ module Mulukhiya
 
       def payload
         payload = super
-        bayload[visibility_field.to_sym] = visibility_name
+        payload[visibility_field.to_sym] = visibility_name
         if attachments.present?
           payload[attachment_field.to_sym] = attachments.map {|v| v.id.to_s}.to_a
         end
