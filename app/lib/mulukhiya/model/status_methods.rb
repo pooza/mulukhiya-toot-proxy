@@ -59,7 +59,6 @@ module Mulukhiya
         visibility_field.to_sym,
       )
       payload[status_field.to_sym] = text
-      payload[attachment_field.to_sym] = attachments.map(&:id).to_a
       return payload
     end
 

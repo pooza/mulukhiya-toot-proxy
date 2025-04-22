@@ -50,7 +50,10 @@ module Mulukhiya
 
       def payload
         payload = super
-        payload[:media_ids] = attachments.map {|v| v.id.to_s}.to_a if attachments.present?
+        bayload[visibility_field.to_sym] = visibility_name
+        if attachments.present?
+          payload[attachment_field.to_sym] = attachments.map {|v| v.id.to_s}.to_a
+        end
         return payload
       end
 

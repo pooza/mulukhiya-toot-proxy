@@ -30,7 +30,7 @@ html lang='ja'
             | タグづけ
           - if controller.repost?
             .alert タグづけを実行する前に、この#{controller.status_label}は一旦削除されます。
-            .alert タグ付けの実行後に、この#{controller.status_label}にアンケートがあれば削除されます。
+            .alert タグづけの実行後に、この#{controller.status_label}にアンケートがあれば削除されます。
           - else
             .alert この#{controller.status_label}にアンケートがあれば削除されます。
           .tag v-for='tag in status.footer_tags'
@@ -46,7 +46,7 @@ html lang='ja'
               i class='fa fa-cloud-arrow-up'
               | 更新
         nav.footer-navigations v-else=''
-          .alert #{controller.visibility_name(:public)}ではない#{controller.status_label}はタグ付けできません。
+          .alert #{controller.visibility_name(:public)}ではない#{controller.status_label}はタグづけできません。
         nav.footer-navigations v-if='status.is_nowplaying || status.is_poipiku'
           h4
             i class='fa fa-bolt'
