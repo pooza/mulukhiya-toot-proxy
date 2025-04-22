@@ -56,13 +56,7 @@ module Mulukhiya
       alias visibility_name visibility
 
       def payload
-        payload = values.slice(
-          reply_to_field.to_sym,
-          spoiler_field.to_sym,
-          visibility_field.to_sym,
-          poll_field.to_sym => poll&.choices,
-        )
-        payload[status_field.to_sym] = text
+        payload = super
         payload[attachment_field.to_sym] = attachments.map(&:id).to_a
         return payload
       end

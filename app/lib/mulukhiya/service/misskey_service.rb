@@ -8,18 +8,11 @@ module Mulukhiya
 
     alias note post
 
-    def update_status(status, body, params = {})
-      return repost_status(status, body, params)
-    end
-
-    def repost_status(status, body, params = {})
+    def repost(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
       body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
       body = values.merge(body.deep_symbolize_keys)
-      if poll = status.poll
-        body[:poll] = {choices: poll.choices}
-      end
       body[:renoteId] = status.renoteId
       response = post(body.compact, params)
       delete_status(status.id, params)

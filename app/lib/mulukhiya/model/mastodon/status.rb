@@ -48,6 +48,15 @@ module Mulukhiya
         return Time.parse(created_at.strftime('%Y/%m/%d %H:%M:%S GMT')).getlocal
       end
 
+      def payload
+        payload = super
+        payload[visibility_field.to_sym] = visibility_name
+        if attachments.present?
+          payload[attachment_field.to_sym] = attachments.map {|v| v.id.to_s}.to_a
+        end
+        return payload
+      end
+
       def to_md
         return uri.to_md
       rescue => e

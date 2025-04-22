@@ -10,7 +10,7 @@ module Mulukhiya
       payload.deep_stringify_keys!
       payload[attachment_field] = Concurrent::Array.new(payload[attachment_field] || [])
       in_threads = Parallel.processor_count
-      Parallel.each((payload['attachments'] || []), in_threads:) do |attachment|
+      Parallel.each(payload['attachments'] || [], in_threads:) do |attachment|
         next unless uri = Ginseng::URI.parse(attachment['image_url'])
         next if sns.max_media_attachments <= payload[attachment_field].count
         payload[attachment_field].push(upload(uri))

@@ -48,10 +48,6 @@ module Mulukhiya
       assert_boolean(controller_class.livecure?)
     end
 
-    def test_update_status?
-      assert_boolean(controller_class.update_status?)
-    end
-
     def test_account_timeline?
       assert_boolean(controller_class.account_timeline?)
     end

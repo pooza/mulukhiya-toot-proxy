@@ -8,10 +8,6 @@ module Mulukhiya
 
     alias toot post
 
-    def update_status(status, body, params = {})
-      return repost_status(status, body, params)
-    end
-
     def search_status_id(status)
       case status
       in Pleroma::Status

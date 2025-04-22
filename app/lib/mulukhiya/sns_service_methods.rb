@@ -2,16 +2,6 @@ module Mulukhiya
   module SNSServiceMethods
     include SNSMethods
 
-    def repost_status(status, body, params = {})
-      status = status_class[status] unless status.is_a?(status_class)
-      values = status.payload
-      body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)
-      body = values.merge(body.deep_symbolize_keys)
-      response = post(body.compact, params)
-      delete_status(status.id, params)
-      return response
-    end
-
     def upload(path, params = {})
       path = path.path if [File, Tempfile].map {|c| path.is_a?(c)}.any?
       if filename = params[:filename]

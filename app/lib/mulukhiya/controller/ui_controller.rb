@@ -17,9 +17,7 @@ module Mulukhiya
     end
 
     get '/app/status/:id' do
-      if !controller_class.update_status? && !controller_class.delete_and_tagging?
-        raise Ginseng::NotFoundError, 'Not Found'
-      end
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.repost?
       @renderer = SlimRenderer.new
       @renderer.template = 'status_detail'
       @renderer[:id] = params[:id]

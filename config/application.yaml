@@ -301,8 +301,8 @@ mastodon:
     filter: true
     futured_tag: true
     media_catalog: true
+    repost: true
     streaming: true
-    update_status: true
     webhook: true
   handlers:
     alert:
@@ -585,12 +585,12 @@ misskey:
     account_timeline: true
     annict: true
     announcement: true
-    delete_and_tagging: true
     favorite_tags: true
     feed: true
     futured_tag: true
     media_catalog: true
     reaction: true
+    repost: true
     streaming: true
     webhook: true
   handlers:
@@ -737,7 +737,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.35.6
+  version: 4.36.0
 parser:
   note:
     fields:
@@ -998,7 +998,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.7/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/axios@1.8/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
       - /mulukhiya/script/mulukhiya_lib
@@ -1006,7 +1006,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.7.2/css/all.css
+      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   episode:
@@ -1029,7 +1029,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.js
       - https://cdn.jsdelivr.net/npm/vue-slide-up-down@2/dist/vue-slide-up-down.umd.js
       - https://cdn.jsdelivr.net/npm/v-tooltip@2.1/dist/v-tooltip.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.7/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/axios@1.8/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
       - /mulukhiya/script/mulukhiya_lib
@@ -1037,7 +1037,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
       - https://cdn.jsdelivr.net/npm/vuejs-dialog@1.4/dist/vuejs-dialog.min.css
-      - https://use.fontawesome.com/releases/v6.7.2/css/all.css
+      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:

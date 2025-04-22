@@ -8,10 +8,6 @@ module Mulukhiya
 
     alias note post
 
-    def update_status(status, body, params = {})
-      return repost_status(status, body, params)
-    end
-
     def oauth_client(type = :default)
       return nil unless scopes = MeisskeyController.oauth_scopes(type)
       body = {

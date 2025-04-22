@@ -16,15 +16,6 @@ module Mulukhiya
       assert_not_nil(account.recent_status)
     end
 
-    def test_update_status
-      text = "1#{@status.text}"
-      r = @service.update_status(@status, text, {
-        headers: {'X-Mulukhiya-Purpose' => 'test'},
-      })
-
-      assert(text.start_with?(TootParser.new(r['content']).body))
-    end
-
     def test_filters
       assert_kind_of(HTTParty::Response, @service.filters)
 
