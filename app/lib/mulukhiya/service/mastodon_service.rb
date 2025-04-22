@@ -8,7 +8,7 @@ module Mulukhiya
 
     alias toot post
 
-    def repost_status(status, body, params = {})
+    def repost(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
       body = {status_field.to_sym => body.to_s} unless body.is_a?(Hash)

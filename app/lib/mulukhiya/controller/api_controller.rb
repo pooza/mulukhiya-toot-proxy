@@ -261,9 +261,7 @@ module Mulukhiya
           '',
           status.parser.footer_tags.map(&:to_hashtag).join(' '),
         ].join("\n")
-        @renderer.message = sns.repost_status(status.id, body, {
-          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
-        })
+        @renderer.message = sns.repost(status, body)
       end
       return @renderer.to_s
     rescue => e
@@ -283,9 +281,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        @renderer.message = sns.repost_status(status, NowplayingHandler.trim(body), {
-          headers: {'X-Mulukhiya-Purpose' => "#{request.request_method} #{request.fullpath}"},
-        })
+        @renderer.message = sns.repost(status, NowplayingHandler.trim(body))
       end
       return @renderer.to_s
     rescue => e
