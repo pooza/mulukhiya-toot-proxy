@@ -10,57 +10,6 @@ html lang='ja'
       == slim.render 'fragment/message'
       h2 API
       ul.links
-        - if controller.update_status?
-          li v-if='account.username'
-            h3 @click='toggleVisibility("status")' = controller.status_label
-            vue-slide-up-down :active='layout.details.status'
-              .endpoint-container
-                .link GET {{endpoints.status_list}}
-                .control
-                  i class='fa fa-file'
-                  input type='number' placeholder='ページ番号' v-model.trim='query_params.status_list.page' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
-                .control
-                  i class='fa fa-magnifying-glass'
-                  input type='search' placeholder='検索フレーズ' v-model.trim='query_params.status_list.q' @input='onInputStatusList' @keydown.enter='delay(getStatuses)'
-                .link-description = "#{controller.status_label}の一覧を取得します。"
-                .field-update-button-container
-                  button @click='delay(getStatuses)' 実行
-                  pre.result v-if='result.status_list' {{result.status_list}}
-              .endpoint-container
-                .link GET {{endpoints.status_detail}}
-                .control
-                  i class='fa fa-id-badge'
-                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_detail.id' @input='onInputStatusDetail' @keydown.enter='delay(getStatus)'
-                .link-description = "#{controller.status_label}を1件、取得します。"
-                .field-update-button-container
-                  button @click='delay(getStatus)' :disabled='!query_params.status_detail.id' 実行
-                  pre.result v-if='result.status_detail' {{result.status_detail}}
-              .endpoint-container
-                .link POST /mulukhiya/api/status/tag
-                .control
-                  i class='fa fa-id-badge'
-                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_create_tag.id'
-                .control
-                  i class='fa fa-tag'
-                  input type='text' placeholder='タグ名' v-model.trim='query_params.status_create_tag.tag'
-                pre.payload v-if='query_params.status_create_tag' {{query_params.status_create_tag}}
-                .link-description = "#{controller.status_label}の本文末尾にハッシュタグを追加します。"
-                .field-update-button-container
-                  button @click='createTag' :disabled='!query_params.status_create_tag.id || !query_params.status_create_tag.tag' 実行
-                  pre.result v-if='result.status_create_tag' {{result.status_create_tag}}
-              .endpoint-container
-                .link DELETE /mulukhiya/api/status/tag
-                .control
-                  i class='fa fa-id-badge'
-                  input type='number' placeholder='#{controller.status_label}ID' v-model.trim='query_params.status_delete_tag.id'
-                .control
-                  i class='fa fa-tag'
-                  input type='text' placeholder='タグ名' v-model.trim='query_params.status_delete_tag.tag'
-                pre.payload v-if='query_params.status_delete_tag' {{query_params.status_delete_tag}}
-                .link-description = "#{controller.status_label}の本文末尾からハッシュタグを削除します。"
-                .field-update-button-container
-                  button @click='deleteTag' :disabled='!query_params.status_delete_tag.id || !query_params.status_delete_tag.tag' 実行
-                  pre.result v-if='result.status_delete_tag' {{result.status_delete_tag}}
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ

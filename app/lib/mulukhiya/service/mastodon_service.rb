@@ -8,22 +8,6 @@ module Mulukhiya
 
     alias toot post
 
-    def update_status(status, payload, params = {})
-      status = status_class[status] unless status.is_a?(status_class)
-      payload = {status: payload.to_s} unless payload.is_a?(Hash)
-      payload[:spoiler_text] ||= status.spoiler_text
-      payload[:visibility] ||= status.visibility_name
-      if status.poll
-        # payload[:poll] = {options: status.poll.options}
-        payload.delete(:media_ids)
-      else
-        payload[:media_ids] = status.attachments.map {|v| v.id.to_s}
-        payload.delete(:poll)
-      end
-      super(status.id, payload, params)
-      return status.to_h.merge(account: status.account.to_h.slice(:username, :display_name))
-    end
-
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super

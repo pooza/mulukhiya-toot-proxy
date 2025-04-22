@@ -30,12 +30,11 @@ html lang='ja'
             | ナウプレ操作
           ul
             li
-              - unless controller.update_status?
-                .alert この#{controller.status_label}は一旦削除されます。
-                .alert この#{controller.status_label}にアンケートがあれば削除されます。
+              .alert この#{controller.status_label}は一旦削除されます。
+              .alert この#{controller.status_label}にアンケートがあれば削除されます。
               i class='fa fa-trash'
               a href='javascript:void(0)' @click='deleteNowplaying(status.id)' 誤判定のナウプレを削除
-      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
+      .hidden ref='repost' v-show='false' = controller.repost?
     javascript:
       'use strict'
       Vue.use(VTooltip, {delay: 0, autoHide: true})

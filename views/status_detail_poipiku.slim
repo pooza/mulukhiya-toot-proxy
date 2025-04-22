@@ -42,7 +42,7 @@ html lang='ja'
                 label v-if='status.is_taggable'
                   input type='checkbox' v-model='input.fanart'
                   | #{config['/handler/poipiku_image/fanart_tag'].to_hashtag}タグを追加
-      .hidden ref='delete_and_tagging' v-show='false' = controller.delete_and_tagging?
+      .hidden ref='repost' v-show='false' = controller.repost?
     javascript:
       'use strict'
       Vue.use(VTooltip, {delay: 0, autoHide: true})
@@ -77,15 +77,5 @@ html lang='ja'
                 }
               }).catch(e => Vue.alert(this.$dialog, e))
           },
-          addFanartTag (id) {
-            const tag = 'fanart'
-            if (this.isDeleteAndTaggingMode()) {
-            } else {
-              Vue.createTag(this.status.id, tag)
-                .then(e => {this.status = e})
-                .catch(e => Vue.alert(this.$dialog, e))
-            }
-          },
-          isDeleteAndTaggingMode () {return this.$refs.delete_and_tagging.innerText.trim() == 'true'},
         },
       })

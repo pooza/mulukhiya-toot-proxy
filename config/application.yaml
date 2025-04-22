@@ -301,8 +301,8 @@ mastodon:
     filter: true
     futured_tag: true
     media_catalog: true
+    repost: true
     streaming: true
-    update_status: true
     webhook: true
   handlers:
     alert:
@@ -585,12 +585,12 @@ misskey:
     account_timeline: true
     annict: true
     announcement: true
-    delete_and_tagging: true
     favorite_tags: true
     feed: true
     futured_tag: true
     media_catalog: true
     reaction: true
+    repost: true
     streaming: true
     webhook: true
   handlers:

@@ -57,16 +57,12 @@ module Mulukhiya
         return config["/#{name}/features/streaming"] == true rescue false
       end
 
-      def update_status?
-        return config["/#{name}/features/update_status"] == true rescue false
-      end
-
       def account_timeline?
         return config["/#{name}/features/account_timeline"] == true rescue false
       end
 
-      def delete_and_tagging?
-        return config["/#{name}/features/delete_and_tagging"] == true rescue false
+      def repost?
+        return config["/#{name}/features/repost"] == true rescue false
       end
 
       def reaction?
