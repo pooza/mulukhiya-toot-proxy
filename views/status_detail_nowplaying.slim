@@ -34,7 +34,6 @@ html lang='ja'
               .alert この#{controller.status_label}にアンケートがあれば削除されます。
               i class='fa fa-trash'
               a href='javascript:void(0)' @click='deleteNowplaying(status.id)' 誤判定のナウプレを削除
-      .hidden ref='repost' v-show='false' = controller.repost?
     javascript:
       'use strict'
       Vue.use(VTooltip, {delay: 0, autoHide: true})

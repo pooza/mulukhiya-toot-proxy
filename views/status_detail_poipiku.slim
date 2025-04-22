@@ -42,7 +42,6 @@ html lang='ja'
                 label v-if='status.is_taggable'
                   input type='checkbox' v-model='input.fanart'
                   | #{config['/handler/poipiku_image/fanart_tag'].to_hashtag}タグを追加
-      .hidden ref='repost' v-show='false' = controller.repost?
     javascript:
       'use strict'
       Vue.use(VTooltip, {delay: 0, autoHide: true})
