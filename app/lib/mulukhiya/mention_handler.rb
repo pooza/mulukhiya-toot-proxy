@@ -37,7 +37,7 @@ module Mulukhiya
       unless @template
         prefix = underscore.sub(/_mention$/, '')
         @template = Template.new(
-          File.join('mention', (config["/agent/info/#{prefix}/template"] || prefix)),
+          File.join('mention', config["/agent/info/#{prefix}/template"] || prefix),
         )
       end
       return @template

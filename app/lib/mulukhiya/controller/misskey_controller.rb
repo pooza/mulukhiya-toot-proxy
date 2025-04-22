@@ -7,7 +7,7 @@ module Mulukhiya
       params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.note(params)
-      Event.new((renote? ? :post_boost : :post_toot), {reporter:, sns:}).dispatch(params)
+      Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
