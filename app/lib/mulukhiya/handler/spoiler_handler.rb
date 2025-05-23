@@ -6,6 +6,7 @@ module Mulukhiya
       subject = payload[spoiler_field]
       return unless subject&.match?(pattern)
       subject = subject.sub(Regexp.new("^#{shortcode} *"), '')
+      tags.concat(parser_class.new(subject).tags)
       payload[spoiler_field] = "#{shortcode} #{subject}"
       result.push(subject:)
     end
