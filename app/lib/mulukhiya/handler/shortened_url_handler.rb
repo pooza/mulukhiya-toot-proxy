@@ -8,7 +8,7 @@ module Mulukhiya
         break unless location = response.headers['location']
         dest = Ginseng::URI.parse(location)
       end
-      @source = @status.sub(source.to_s, dest.to_s)
+      @status = @status.sub(source.to_s, dest.to_s)
       return dest
     end
 
