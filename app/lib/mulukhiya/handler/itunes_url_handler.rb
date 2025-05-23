@@ -3,7 +3,7 @@ module Mulukhiya
     def rewrite(uri)
       source = ItunesURI.parse(uri.to_s)
       dest = source.shorten
-      @source = @status.sub(source.to_s, dest.to_s)
+      @status = @status.sub(source.to_s, dest.to_s)
       return dest
     end
 
