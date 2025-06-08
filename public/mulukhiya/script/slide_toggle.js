@@ -2,11 +2,7 @@ window.SlideUpDown = {
   name: 'SlideUpDown',
   props: ['active'],
   template: `
-    <transition
-      @before-enter="beforeEnter"
-      @enter="enter"
-      @leave="leave"
-    >
+    <transition @before-enter="beforeEnter" @enter="enter" @leave="leave">
       <div v-show="active" ref="inner">
         <slot></slot>
       </div>
