@@ -1,4 +1,4 @@
-const MulukhiyaLib = {
+window.MulukhiyaLib = {
   install(app, options) {
     const globals = app.config.globalProperties
     globals = {methods: {}}
@@ -177,5 +177,3 @@ const MulukhiyaLib = {
     }
   }
 }
-
-export default MulukhiyaLib;
