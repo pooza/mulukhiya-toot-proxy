@@ -9,11 +9,11 @@ module Mulukhiya
     end
 
     def test_auth
-      assert_false(SidekiqDaemon.auth('', ''))
-      assert_false(SidekiqDaemon.auth('admin', ''))
-      assert_false(SidekiqDaemon.auth('', 'aaa'))
-      assert_false(SidekiqDaemon.auth('admi', 'aaa'))
-      assert(SidekiqDaemon.auth('admin', 'aaa'))
+      assert_false(SidekiqDaemon.auth?('', ''))
+      assert_false(SidekiqDaemon.auth?('admin', ''))
+      assert_false(SidekiqDaemon.auth?('', 'aaa'))
+      assert_false(SidekiqDaemon.auth?('admi', 'aaa'))
+      assert(SidekiqDaemon.auth?('admin', 'aaa'))
     end
 
     def test_command

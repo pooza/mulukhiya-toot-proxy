@@ -35,7 +35,7 @@ module Mulukhiya
       return username.present? && password.present?
     end
 
-    def self.auth(username, password)
+    def self.auth?(username, password)
       return true unless basic_auth?
       return false unless username == self.username
       return false unless password == self.password
