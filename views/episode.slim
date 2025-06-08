@@ -69,7 +69,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      const app = this.methods.createApp({
+      const app = Vue.createApp({
         data () {
           return {
             account: {is_admin: false, username: null},
