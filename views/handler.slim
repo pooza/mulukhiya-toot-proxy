@@ -15,7 +15,7 @@ html lang='ja'
       - Mulukhiya::Event.all do |event|
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
-          vue-slide-up-down :active='layout.details.#{event.name}'
+          slide-up-down :active='layout.details.#{event.name}'
             .clearfix class='indented'
               - event.all_handlers.sort_by(&:underscore).each do |handler|
                 .handler-container :class="{disabled: handlers.#{handler.underscore}}"
@@ -38,7 +38,7 @@ html lang='ja'
       Vue.use(VTooltip, {delay: 0, autoHide: true})
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      Vue.component('slide-up-down', window.SlideUpDown)
       new Vue({
         el: '#app',
         data: {

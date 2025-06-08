@@ -25,7 +25,7 @@ html lang='ja'
             li.param v-if='work.officialSiteUrl'
               i class='fa fa-globe'
               a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
-        vue-slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
+        slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
           .episode-container
             ul.episodes v-if='episodes[work.annictId]?.length'
               li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
@@ -69,7 +69,7 @@ html lang='ja'
     javascript:
       'use strict'
       Vue.use(MulukhiyaLib)
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      Vue.component('slide-up-down', window.SlideUpDown)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
       new Vue({
         el: '#app',

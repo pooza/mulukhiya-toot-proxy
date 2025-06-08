@@ -15,7 +15,7 @@ html lang='ja'
           pre v-if='result' {{result}}
       section.config v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
-        vue-slide-up-down :active='layout.details.tags'
+        slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
           .inline-field-container
@@ -28,7 +28,7 @@ html lang='ja'
       - if controller.filter? && controller.livecure?
         section.config v-if='account.username && layout.sections.livecure'
           h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
-          vue-slide-up-down :active='layout.details.livecure'
+          slide-up-down :active='layout.details.livecure'
             .inline-field-container
               label
                 input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
@@ -36,7 +36,7 @@ html lang='ja'
               button @click='updateLivecure' 更新
       section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
-        vue-slide-up-down :active='layout.details.lemmy'
+        slide-up-down :active='layout.details.lemmy'
           ol
             li Lemmyサービスの認証情報（URL、ユーザーID、パスワード）を入力してください。
             li 認証ボタンを押下。
@@ -61,7 +61,7 @@ html lang='ja'
                 button.alert @click='unauthLemmy' 認証を解除
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
-        vue-slide-up-down :active='layout.details.annict'
+        slide-up-down :active='layout.details.annict'
           ol
             li
               | アカウントを持っていない場合は、
@@ -91,7 +91,7 @@ html lang='ja'
               button @click='updateAnnict' 更新
       section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
-        vue-slide-up-down :active='layout.details.webhook'
+        slide-up-down :active='layout.details.webhook'
           .field-container
             h4 公開範囲
             v-select :options='options.visibility' v-model='form.webhook.visibility'
@@ -100,7 +100,7 @@ html lang='ja'
       - if sns
         section.config v-if='account.username'
           h3 @click='toggleVisibility("notify")' 通知
-          vue-slide-up-down :active='layout.details.notify'
+          slide-up-down :active='layout.details.notify'
             .inline-field-container
               label.alert
                 input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
@@ -112,7 +112,7 @@ html lang='ja'
       Vue.use(VTooltip, {delay: 0, autoHide: true})
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      Vue.component('slide-up-down', window.SlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',

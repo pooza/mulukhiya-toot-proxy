@@ -13,7 +13,7 @@ html lang='ja'
         - if controller.announcement?
           li v-if='account.is_admin'
             h3 @click='toggleVisibility("announcement")' お知らせ
-            vue-slide-up-down :active='layout.details.announcement'
+            slide-up-down :active='layout.details.announcement'
               .endpoint-container
                 .role admin
                 .link POST /mulukhiya/api/announcement/update
@@ -27,7 +27,7 @@ html lang='ja'
                   button @click='updateAnnouncement' 実行
         li
           h3 @click='toggleVisibility("media")' メディア
-          vue-slide-up-down :active='layout.details.media'
+          slide-up-down :active='layout.details.media'
             .endpoint-container
               .link GET {{endpoints.media_list}}
               .control
@@ -65,7 +65,7 @@ html lang='ja'
         - if controller.livecure?
           li
             h3 @click='toggleVisibility("program")' 実況番組表
-            vue-slide-up-down :active='layout.details.program'
+            slide-up-down :active='layout.details.program'
               .endpoint-container
                 .link GET /mulukhiya/api/program
                 .link-description 実況番組表を表示します。
@@ -88,7 +88,7 @@ html lang='ja'
         - if controller.lemmy?
           li v-if='account.username'
             h3 @click='toggleVisibility("lemmy")' Lemmy
-            vue-slide-up-down :active='layout.details.lemmy'
+            slide-up-down :active='layout.details.lemmy'
               .endpoint-container
                 .link GET {{endpoints.lemmy_communities}}
                 .link-description 参加しているLemmyコミュニティを返します。
@@ -98,7 +98,7 @@ html lang='ja'
         - if controller.favorite_tags?
           li
             h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
-            vue-slide-up-down :active='layout.details.favorite_tags'
+            slide-up-down :active='layout.details.favorite_tags'
               .endpoint-container
                 .link GET /mulukhiya/api/tagging/favorites
                 .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
@@ -107,7 +107,7 @@ html lang='ja'
                   pre.result v-if='result.favorite_tags' {{result.favorite_tags}}
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
-          vue-slide-up-down :active='layout.details.tagging_dic'
+          slide-up-down :active='layout.details.tagging_dic'
             .endpoint-container
               .link POST /mulukhiya/api/tagging/tag/search
               .control
@@ -140,7 +140,7 @@ html lang='ja'
                 pre.result v-if='result.episode_tags' {{result.episode_tags}}
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
-          vue-slide-up-down :active='layout.details.tagging_usertag'
+          slide-up-down :active='layout.details.tagging_usertag'
             .endpoint-container
               .role admin
               .link POST /mulukhiya/api/tagging/usertag/clear
@@ -155,7 +155,7 @@ html lang='ja'
         - if controller.feed?
           li v-if='account.username'
             h3 @click='toggleVisibility("feed")' フィード
-            vue-slide-up-down :active='layout.details.feed'
+            slide-up-down :active='layout.details.feed'
               .endpoint-container
                 .link GET /mulukhiya/api/feed/list
                 .link-description フィードの一覧を返します。
@@ -175,7 +175,7 @@ html lang='ja'
                   button @click='updateCustomFeeds' 実行
         li
           h3 @click='toggleVisibility("health")' 動作状況
-          vue-slide-up-down :active='layout.details.health'
+          slide-up-down :active='layout.details.health'
             .endpoint-container
               .link GET /mulukhiya/api/health
               .link-description モロヘイヤの動作状況を表示します。
@@ -186,7 +186,7 @@ html lang='ja'
         - if Mulukhiya::CustomAPI.present?
           li
             h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
-            vue-slide-up-down :active='layout.details.custom'
+            slide-up-down :active='layout.details.custom'
               - Mulukhiya::CustomAPI.all do |api|
                 .endpoint-container
                   .link GET {{endpoints.#{api.id}}}
@@ -200,7 +200,7 @@ html lang='ja'
                     pre.result v-if='result.#{api.id}' {{result.#{api.id}}}
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("handler")' ハンドラ
-          vue-slide-up-down :active='layout.details.handler'
+          slide-up-down :active='layout.details.handler'
             .endpoint-container
               .role admin
               .link GET {{endpoints.handler_list}}
@@ -210,7 +210,7 @@ html lang='ja'
                 pre.result v-if='result.handler_list' {{result.handler_list}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
-          vue-slide-up-down :active='layout.details.about'
+          slide-up-down :active='layout.details.about'
             .endpoint-container
               .link GET /mulukhiya/api/about
               .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
@@ -222,7 +222,7 @@ html lang='ja'
       'use strict'
       Vue.use(MulukhiyaLib)
       Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
+      Vue.component('slide-up-down', window.SlideUpDown)
       Vue.component('v-select', VueSelect.VueSelect)
       new Vue({
         el: '#app',
