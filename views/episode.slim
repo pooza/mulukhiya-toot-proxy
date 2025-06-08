@@ -27,7 +27,7 @@ html lang='ja'
             v-bind:placement="'bottom'"
             v-on:mouseenter="prefetchEpisodes(work.annictId)"
             v-on:click="toggleEpisodes(work.annictId)"
-            {{work.title}}
+            | {{work.title}}
           ul.params class='clearfix'
             li.param v-if='work.seasonYear'
               i class='fa fa-calendar'
