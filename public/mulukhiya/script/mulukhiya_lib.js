@@ -1,7 +1,7 @@
 window.MulukhiyaLib = {
   install(app, options) {
     const globals = app.config.globalProperties
-    globals = {methods: {}}
+    globals.methods = {}
 
     globals.methods.createURL = (href, params = {}) => {
       const url = new URL(href, location.href)
