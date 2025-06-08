@@ -25,8 +25,8 @@ html lang='ja'
             v-bind:id="'work-title-' + work.annictId"
             v-tooltip="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')"
             v-bind:placement="'bottom'"
-            @mouseenter="prefetchEpisodes(work.annictId)"
-            @click="toggleEpisodes(work.annictId)"
+            v-on:mouseenter="prefetchEpisodes(work.annictId)"
+            v-on:click="toggleEpisodes(work.annictId)"
             {{work.title}}
           ul.params class='clearfix'
             li.param v-if='work.seasonYear'
@@ -62,7 +62,7 @@ html lang='ja'
                     class='fas fa-clipboard'
                     v-tooltip="'クリップボードにコピー'"
                     v-bind:placement="'right'"
-                    @click='notifyCommandToot()'
+                    v-on:click='notifyCommandToot()'
                     v-bind:data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
@@ -85,7 +85,7 @@ html lang='ja'
                     class='fas fa-clipboard'
                     v-tooltip="'クリップボードにコピー'"
                     v-bind:placement="'right'"
-                    @click='notifyCommandToot()'
+                    v-on:click='notifyCommandToot()'
                     v-bind:data-clipboard-target="'#episode-command-' + work.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
