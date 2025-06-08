@@ -16,8 +16,8 @@ html lang='ja'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
         h3
-          i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" :placement="'right'" data-clipboard-target="'#work-title-' + work.annictId"
-          span :id="'work-title-' + work.annictId" v-tooltip="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" :placement="'bottom'" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
+          i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' data-clipboard-target="'#work-title-' + work.annictId"
+          span :id="'work-title-' + work.annictId" v-tooltip="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" placement='bottom' @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
             | {{work.title}}
           ul.params class='clearfix'
             li.param v-if='work.seasonYear'
@@ -33,15 +33,15 @@ html lang='ja'
                 strong.number-text
                   | {{episode.numberText}}
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" :placement="'right'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
                   span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
                     | {{episode.title}}
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" :placement="'right'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                     | {{episode.hashtag}}
                 .link-container v-if='episode.command_toot'
-                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" :placement="'right'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
@@ -51,11 +51,11 @@ html lang='ja'
             ul.episodes v-else=''
               li.episode
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" :placement="'right'" :data-clipboard-target="'#episode-hashtag-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-hashtag-' + work.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
                     | {{work.hashtag}}
                 .link-container v-if='work.command_toot'
-                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" :placement="'right'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
                 .bubble-container v-if='work.hashtag_url'
