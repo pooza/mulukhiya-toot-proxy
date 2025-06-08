@@ -69,7 +69,7 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      const app = Vue.createApp({
+      const app = this.methods.createApp({
         data () {
           return {
             account: {is_admin: false, username: null},
@@ -81,10 +81,10 @@ html lang='ja'
           }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
-              this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
+              this.account = this.methods.createAccountInfo(e)
+              this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => alert(e.message))
           this.getWorks()
           new ClipboardJS('.episode i');
@@ -95,14 +95,14 @@ html lang='ja'
           },
           prefetchEpisodes (id) {
             if (!this.episodes[id]) {
-              Vue.getEpisodes(id).then(e => {
+              this.methods.getEpisodes(id).then(e => {
                 this.episodes[id] = e
               })
             }
           },
           getWorks () {
             setTimeout(() => {
-              Vue.getWorks({q: this.keyword})
+              this.methods.getWorks({q: this.keyword})
                 .then(e => {
                   this.works = e
                   this.works.map(w => this.layout[w.annictId] = false)
