@@ -8,7 +8,7 @@ window.MulukhiyaLib = {
       params = params || {}
       params.query = params.query || {}
       params.query.token = params.token || globals.methods.getToken()
-      Object.keys(params.query).forEach(k => url.searchParams.set(k, params.query[k]))
+      Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
     }
 
