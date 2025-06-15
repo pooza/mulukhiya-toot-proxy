@@ -155,7 +155,7 @@ GEM
       dry-logic (~> 1.5)
       dry-types (~> 1.8)
       zeitwerk (~> 2.6)
-    dry-types (1.8.2)
+    dry-types (1.8.3)
       bigdecimal (~> 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
@@ -204,7 +204,7 @@ GEM
     json-schema (5.1.1)
       addressable (~> 2.8)
       bigdecimal (~> 3.1)
-    jwt (2.10.1)
+    jwt (3.0.0)
       base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
@@ -221,7 +221,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0603)
+    mime-types-data (3.2025.0610)
     mini_magick (5.2.0)
       benchmark
       logger
@@ -323,7 +323,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.1)
       rexml
-    rubocop (1.76.0)
+    rubocop (1.76.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -334,7 +334,7 @@ GEM
       rubocop-ast (>= 1.45.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.45.0)
+    rubocop-ast (1.45.1)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
     rubocop-minitest (0.38.1)
