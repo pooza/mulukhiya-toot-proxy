@@ -18,34 +18,34 @@ html lang='ja'
         h3
           i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' data-clipboard-target="'#work-title-' + work.annictId"
           span :id="'work-title-' + work.annictId" v-tooltip="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" placement='bottom' @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
-            | {{work.title}}
+            | {{work?.title}}
           ul.params class='clearfix'
-            li.param v-if='work.seasonYear'
+            li.param v-if='work?.seasonYear'
               i class='fa fa-calendar'
-              | {{work.seasonYear}}年
-            li.param v-if='work.officialSiteUrl'
+              | {{work?.seasonYear}}年
+            li.param v-if='work?.officialSiteUrl'
               i class='fa fa-globe'
-              a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' 公式サイト
+              a :href='work?.officialSiteUrl' target='_blank' rel='noreferrer' 公式サイト
         slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
           .episode-container
             ul.episodes v-if='episodes[work.annictId]?.length'
-              li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
+              li.episode v-for='episode in episodes[work.annictId]' v-if='episode?.title'
                 strong.number-text
-                  | {{episode.numberText}}
+                  | {{episode?.numberText}}
                 .link-container
                   i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
                   span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
-                    | {{episode.title}}
+                    | {{episode?.title}}
                 .link-container
                   i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
-                    | {{episode.hashtag}}
-                .link-container v-if='episode.command_toot'
+                    | {{episode?.hashtag}}
+                .link-container v-if='episode?.command_toot'
                   i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
-                  textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
-                .bubble-container v-if='episode.hashtag_url'
-                  a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
+                  textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode?.command_toot}}
+                .bubble-container v-if='episode?.hashtag_url'
+                  a :href='episode?.hashtag_url' target='_blank' rel='noreferrer' v-if='episode?.hashtag_url'
                     i class='fas fa-comment'
                   | タイムライン
             ul.episodes v-else=''
@@ -53,17 +53,17 @@ html lang='ja'
                 .link-container
                   i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' :data-clipboard-target="'#episode-hashtag-' + work.annictId"
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
-                    | {{work.hashtag}}
-                .link-container v-if='work.command_toot'
+                    | {{work?.hashtag}}
+                .link-container v-if='work?.command_toot'
                   i class='fas fa-clipboard' v-tooltip="'クリップボードにコピー'" placement='right' @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId"
                   | 実況コマンド
-                  textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
-                .bubble-container v-if='work.hashtag_url'
-                  a :href='work.hashtag_url' target='_blank' rel='noreferrer' v-if='work.hashtag_url'
+                  textarea :id="'episode-command-' + work.annictId" {{work?.command_toot}}
+                .bubble-container v-if='work?.hashtag_url'
+                  a :href='work?.hashtag_url' target='_blank' rel='noreferrer' v-if='work?.hashtag_url'
                     i class='fas fa-comment'
                   | タイムライン
-                .bubble-container v-if='work.command_url'
-                  a :href='work.command_url' target='_blank' rel='noreferrer' v-if='work.command_url'
+                .bubble-container v-if='work?.command_url'
+                  a :href='work?.command_url' target='_blank' rel='noreferrer' v-if='work?.command_url'
                     i class='fas fa-microphone'
                   | 実況開始
     == slim.render 'fragment/footer'
