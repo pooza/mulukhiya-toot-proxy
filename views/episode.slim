@@ -29,7 +29,7 @@ html lang='ja'
         slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
           .episode-container
             ul.episodes v-if='episodes[work.annictId]?.length'
-              li.episode v-for='episode in episodes[work.annictId]' v-if='episode?.title'
+              li.episode v-for='episode in episodes[work.annictId]'
                 strong.number-text
                   | {{episode?.numberText}}
                 .link-container
