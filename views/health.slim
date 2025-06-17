@@ -16,24 +16,26 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          result: {status: 503},
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            result: {status: 503},
+          }
         },
         mounted () {
-          Vue.getConfig()
-            .then(e => {this.account = Vue.createAccountInfo(e)})
-            .catch(e => Vue.alert(this.$dialog, e))
+          this.methods.getConfig()
+            .then(e => {this.account = this.methods.createAccountInfo(e)})
+            .catch(e => alert(e.message))
           this.load()
         },
         methods: {
           load () {
-            Vue.getHealth().then(e => {this.result = e})
+            this.methods.getHealth().then(e => {this.result = e})
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')
