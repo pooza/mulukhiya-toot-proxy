@@ -918,30 +918,25 @@ code
 .slide-up-down
   overflow: hidden
 
-.tooltip
-  display: block !important
-  z-index: 10000
-  font:
-    family: $sans-serif
-    size: 0.5em
-  padding: 2px
-  margin: 4px
-  background:
-    color: white
-  border:
-    style: solid
-    color: back
-    width: 1px
-    radius: 4px
-  opacity: 0.9
-.tooltip[aria-hidden='true']
-  visibility: hidden
-  opacity: 0
-  transition: opacity .15s, visibility .15s
-.tooltip[aria-hidden='false']
-  visibility: visible
-  opacity: 1
-  transition: opacity .15s
+.tippy-box[data-theme~='mulukhiya']
+  background-color: rgba(72, 72, 72, 0.95)
+  color: white
+  font-size: 13px
+  padding: 6px 10px
+  border-radius: 4px
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3)
+
+.tippy-box[data-theme~='mulukhiya'][data-placement^='top'] > .tippy-arrow::before
+  border-top-color: rgba(72, 72, 72, 0.95)
+
+.tippy-box[data-theme~='mulukhiya'][data-placement^='bottom'] > .tippy-arrow::before
+  border-bottom-color: rgba(72, 72, 72, 0.95)
+
+.tippy-box[data-theme~='mulukhiya'][data-placement^='left'] > .tippy-arrow::before
+  border-left-color: rgba(72, 72, 72, 0.95)
+
+.tippy-box[data-theme~='mulukhiya'][data-placement^='right'] > .tippy-arrow::before
+  border-right-color: rgba(72, 72, 72, 0.95)
 
 .clearfix::after
   content: ""

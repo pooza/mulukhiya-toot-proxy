@@ -5,6 +5,7 @@ window.VTooltip = {
     tippy(el, {
       content: binding.value,
       placement,
+      theme: 'mulukhiya',
     });
   },
   updated(el, binding) {
