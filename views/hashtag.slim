@@ -55,35 +55,33 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          disabled_tags: [],
-          keyword: null,
-          dic_entries: {},
-          fav_entries: [],
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            disabled_tags: [],
+            keyword: null,
+            dic_entries: {},
+            fav_entries: [],
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
-              this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => Vue.alert(this.$dialog, e))
-          Vue.getFavoriteTags()
+              this.account = this.methods.createAccountInfo(e)
+              this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
+            }).catch(e => alert(e.message))
+          this.methods.getFavoriteTags()
             .then(e => {this.fav_entries = e})
-            .catch(e => Vue.alert(this.$dialog, e))
+            .catch(e => alert(e.message))
         },
         methods: {
           search () {
             this.dic_entries = {}
             if (this.keyword == '') {return}
-            Vue.searchTags(this.keyword)
+            this.methods.searchTags(this.keyword)
               .then(e => {this.dic_entries = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           isDisabledTag (tag) {
             this.disabled_tags = this.disabled_tags || []
@@ -100,7 +98,11 @@ html lang='ja'
               this.disabled_tags = Array.from(new Set(this.disabled_tags))
             }
             command.tagging.tags.disabled = this.tags
-            Vue.updateConfig(command)
+            this.methods.updateConfig(command)
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

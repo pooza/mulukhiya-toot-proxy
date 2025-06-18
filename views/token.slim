@@ -46,7 +46,8 @@ html lang='ja'
           .description
             a href=params[:oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
-            - if env.misskey_type?
+          - if env.misskey_type?
+            .description
               | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
               | 形式の文字列）が
@@ -64,7 +65,8 @@ html lang='ja'
           .description
             a href=params[:infobot_oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
-            - if env.misskey_type?
+          - if env.misskey_type?
+            .description
               | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
               | 形式の文字列）が
