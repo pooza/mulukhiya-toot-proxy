@@ -994,7 +994,7 @@ webui:
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js
-      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.umd.js
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.js
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.js
@@ -1026,7 +1026,7 @@ webui:
   production:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js
-      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.umd.js
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.min.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.min.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.min.js
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.min.js
