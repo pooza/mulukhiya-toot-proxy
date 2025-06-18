@@ -994,7 +994,7 @@ webui:
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js
-      - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.js
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.umd.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.js
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.js
@@ -1005,7 +1005,7 @@ webui:
       - /mulukhiya/script/slide_toggle
       - /mulukhiya/script/v_tooltip
     stylesheets:
-      - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.css
       - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
@@ -1026,7 +1026,7 @@ webui:
   production:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js
-      - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.min.js
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.umd.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.min.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.min.js
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.min.js
@@ -1037,7 +1037,7 @@ webui:
       - /mulukhiya/script/slide_toggle
       - /mulukhiya/script/v_tooltip
     stylesheets:
-      - https://cdn.jsdelivr.net/npm/vue-select@3.20/dist/vue-select.css
+      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.min.css
       - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
