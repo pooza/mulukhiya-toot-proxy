@@ -47,11 +47,11 @@ html lang='ja'
             a href=params[:oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
             - if env.misskey_type?
-              | （認証後の、URL末尾の
+              | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列が
+              | 形式の文字列）が
               strong 認証コード
-              | です）
+              | です。
           .auth-form
             input type='password' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
@@ -65,11 +65,11 @@ html lang='ja'
             a href=params[:infobot_oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
             - if env.misskey_type?
-              | （認証後の、URL末尾の
+              | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列が
+              | 形式の文字列）が
               strong 認証コード
-              | です）
+              | です。
           .auth-form
             input type='password' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
