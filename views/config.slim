@@ -161,7 +161,7 @@ html lang='ja'
               this.lemmy.communities = e
               Object.keys(this.lemmy.communities)
                 .map(k => {
-                  this.options.lemmy_communities ||= []
+                  this.options.lemmy_communities.splice(0)
                   this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
               this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
@@ -235,7 +235,7 @@ html lang='ja'
             this.methods.getLemmyCommunities()
               .then(e => {
                 this.lemmy.communities = e
-                this.options.lemmy_communities ||= []
+                this.options.lemmy_communities.splice(0)
                 Object.keys(this.lemmy.communities)
                   .map(k => {
                     this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
@@ -248,7 +248,7 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.lemmy = false
-                this.lemmy.communities = {}
+                Object.keys(this.lemmy.communities).forEach(k => delete this.lemmy.communities[k])
                 this.options.lemmy_communities = null
               }).catch(e => alert(e.message))
           },

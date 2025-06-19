@@ -83,7 +83,7 @@ html lang='ja'
         methods: {
           searchMedias () {
             this.page = 0
-            this.medias = []
+            this.medias.splice(0)
             this.last_page = false
             setTimeout(this.appendMedias, 500)
           },

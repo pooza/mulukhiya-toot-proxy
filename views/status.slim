@@ -61,58 +61,60 @@ html lang='ja'
         article.status #{controller.display_name}は一覧表示に対応していません。
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          statuses: {},
-          suggested_keywords: Vue.getSuggestedKeywords(),
-          self: true,
-          page: 0,
-          keyword: null,
-          last_page: false,
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            statuses: {},
+            suggested_keywords: this.methods.getSuggestedKeywords(),
+            self: true,
+            page: 0,
+            keyword: null,
+            last_page: false,
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
+              this.account = this.methods.createAccountInfo(e)
               if (this.account.username) {this.appendStatuses()}
-            }).catch(e => Vue.alert(this.$dialog, e))
+            }).catch(e => alert(e.message))
         },
         methods: {
           createTag (id) {
             this.$dialog
               .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
-              .then(e => Vue.createTag(id, e.data))
-              .then(e => Vue.set(this.statuses, e.id, e))
-              .catch(e => Vue.alert(this.$dialog, e))
+              .then(e => this.methods.createTag(id, e.data))
+              .then(e => this.statuses[e.id] = e)
+              .catch(e => alert(e.message))
           },
           deleteTag (id, tag) {
-            Vue.deleteTag(id, tag)
-              .then(e => Vue.set(this.statuses, e.id, e))
-              .catch(e => Vue.alert(this.$dialog, e))
+            this.methods.deleteTag(id, tag)
+              .then(e => this.statuses[e.id] = e)
+              .catch(e => alert(e.message))
           },
           searchStatuses () {
             this.page = 0
-            this.statuses = {}
+            Object.keys(this.statuses).forEach(k => delete this.statuses[k])
             this.last_page = false
             setTimeout(this.appendStatuses, 500)
           },
           appendStatuses () {
             this.page ++
-            Vue.getStatuses({page: this.page, q: this.keyword, self: this.self})
+            this.methods.getStatuses({page: this.page, q: this.keyword, self: this.self})
               .then(e => {
-                this.suggested_keywords = Vue.getSuggestedKeywords()
+                this.suggested_keywords = this.methods.getSuggestedKeywords()
                 if (0 < e.length) {
-                  e.map(v => {Vue.set(this.statuses, v.id, v)})
+                  e.map(v => this.statuses[v.id] = v)
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('#{controller.status_label}はこれ以上ありません。')
+                  alert(`#{controller.status_label}はこれ以上ありません。`)
                 }
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => alert(e.message))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

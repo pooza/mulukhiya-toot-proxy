@@ -220,99 +220,96 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      Vue.component('slide-up-down', window.SlideUpDown)
-      Vue.component('v-select', VueSelect.VueSelect)
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          config: {},
-          entries: {},
-          endpoints: {
-            media_list: '/mulukhiya/api/media?page=1&only_person=0',
-            lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(Vue.getToken())}`,
-            status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(Vue.getToken())}`,
-            status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(Vue.getToken())}`,
-            handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(Vue.getToken())}`,
-          },
-          choices: {},
-          query_params: {
-            media_list: {page: 1, q: null, only_person: false, token: Vue.getToken()},
-            status_list: {page: 1, q: null, self: true, token: Vue.getToken()},
-            status_detail: {id: null, token: Vue.getToken()},
-            handler_list: {token: Vue.getToken()},
-            status_create_tag: {id: null, tag: null, token: Vue.getToken()},
-            status_delete_tag: {id: null, tag: null, token: Vue.getToken()},
-            lemmy_communities: {token: Vue.getToken()},
-            announcement_update: {token: Vue.getToken()},
-            media_file_clear: {token: Vue.getToken()},
-            media_metadata_clear: {token: Vue.getToken()},
-            media_catalog_update: {token: Vue.getToken()},
-            program_update: {token: Vue.getToken()},
-            tagging_tag_search: {q: null},
-            tagging_dic_update: {token: Vue.getToken()},
-            tagging_usertag_clear: {token: Vue.getToken()},
-            feed_update: {token: Vue.getToken()},
-          },
-          result: {
-            search_tag: null,
-            favorite_tags: null,
-            lemmy_communities: null,
-            media_list: null,
-            program_list: null,
-            work_list: null,
-            episode_tags: null,
-            feed_list: null,
-            status_list: null,
-            status_detail: null,
-            status_create_tag: null,
-            status_delete_tag: null,
-            handler_list: null,
-            health: null,
-            about: null,
-          },
-          layout: {
-            details: {
-              announcement: false,
-              media: false,
-              program: false,
-              favorite_tags: false,
-              lemmy: false,
-              tagging_dic: false,
-              tagging_usertag: false,
-              feed: false,
-              health: false,
-              handler: false,
-              custom: false,
-              about: false,
-              status: false,
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            config: {},
+            entries: {},
+            endpoints: {
+              media_list: '/mulukhiya/api/media?page=1&only_person=0',
+              lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(this.methods.getToken())}`,
+              status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
+              status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
+              handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(this.methods.getToken())}`,
             },
-          },
+            choices: {},
+            query_params: {
+              media_list: {page: 1, q: null, only_person: false, token: this.methods.getToken()},
+              status_list: {page: 1, q: null, self: true, token: this.methods.getToken()},
+              status_detail: {id: null, token: this.methods.getToken()},
+              handler_list: {token: this.methods.getToken()},
+              status_create_tag: {id: null, tag: null, token: this.methods.getToken()},
+              status_delete_tag: {id: null, tag: null, token: this.methods.getToken()},
+              lemmy_communities: {token: this.methods.getToken()},
+              announcement_update: {token: this.methods.getToken()},
+              media_file_clear: {token: this.methods.getToken()},
+              media_metadata_clear: {token: this.methods.getToken()},
+              media_catalog_update: {token: this.methods.getToken()},
+              program_update: {token: this.methods.getToken()},
+              tagging_tag_search: {q: null},
+              tagging_dic_update: {token: this.methods.getToken()},
+              tagging_usertag_clear: {token: this.methods.getToken()},
+              feed_update: {token: this.methods.getToken()},
+            },
+            result: {
+              search_tag: null,
+              favorite_tags: null,
+              lemmy_communities: null,
+              media_list: null,
+              program_list: null,
+              work_list: null,
+              episode_tags: null,
+              feed_list: null,
+              status_list: null,
+              status_detail: null,
+              status_create_tag: null,
+              status_delete_tag: null,
+              handler_list: null,
+              health: null,
+              about: null,
+            },
+            layout: {
+              details: {
+                announcement: false,
+                media: false,
+                program: false,
+                favorite_tags: false,
+                lemmy: false,
+                tagging_dic: false,
+                tagging_usertag: false,
+                feed: false,
+                health: false,
+                handler: false,
+                custom: false,
+                about: false,
+                status: false,
+              },
+            },
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
+              this.account = this.methods.createAccountInfo(e)
               this.config = e.config
-              if (Vue.getToken()) {
-                this.endpoints.media_list += `&token=${encodeURIComponent(Vue.getToken())}`
+              if (this.methods.getToken()) {
+                this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
               }
-            }).catch(e => Vue.alert(this.$dialog, e))
+            }).catch(e => alert(e.message))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
             entry.args.map(key => {params[key] = ''})
-            Vue.set(this.entries, entry.id, entry)
+            this.entries[entry.id] = entry
             if (entry.choices) {
               Object.keys(entry.choices).map(k => {
                 axios.get(entry.choices[k])
-                  .then(e => Vue.set(this.choices, `${entry.id}_${k}`, e.data))
-                  .catch(e => Vue.alert(this.$dialog, e))
+                  .then(e => this.choices[`${entry.id}_${k}`] = e.data)
+                  .catch(e => alert(e.message))
               })
             }
-            Vue.set(this.query_params, entry.id, params)
-            Vue.set(this.endpoints, entry.id, `${entry.fullpath}`)
+            this.query_params[entry.id] = params
+            this.endpoints[entry.id] = `${entry.fullpath}`
           })
         },
         methods: {
@@ -324,7 +321,7 @@ html lang='ja'
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
             }
-            if (Vue.getToken()) {url.searchParams.set('token', Vue.getToken())}
+            if (this.methods.getToken()) {url.searchParams.set('token', this.methods.getToken())}
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
           onInputStatusList () {
@@ -335,13 +332,13 @@ html lang='ja'
               url.searchParams.set('q', this.query_params.status_list.q)
             }
             url.searchParams.set('self', this.query_params.status_list.self ? 1 : 0)
-            url.searchParams.set('token', Vue.getToken())
+            url.searchParams.set('token', this.methods.getToken())
             this.endpoints.status_list = `${url.pathname}${url.search}`
           },
           onInputStatusDetail () {
             const url = new URL('/mulukhiya/api/status/:id', location.href)
             url.pathname = url.pathname.replace(':id', this.query_params.status_detail.id)
-            url.searchParams.set('token', Vue.getToken())
+            url.searchParams.set('token', this.methods.getToken())
             this.endpoints.status_detail = `${url.pathname}${url.search}`
           },
           onInputCustomAPI (id, key) {
@@ -350,7 +347,7 @@ html lang='ja'
             Object.keys(this.query_params[id]).map(k => {
               endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
             })
-            Vue.set(this.endpoints, id, endpoint)
+            this.endpoints[id] = endpoint
           },
           toggleVisibility (name) {
             this.layout.details[name] = !this.layout.details[name]
@@ -359,134 +356,138 @@ html lang='ja'
             setTimeout(proc, 500)
           },
           updateAnnouncement () {
-            Vue.updateAnnouncement()
+            this.methods.updateAnnouncement()
               .then(e => {this.layout.details['announcement'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getMedias () {
             this.result.media_list = null
-            Vue.getMedias(this.query_params.media_list)
+            this.methods.getMedias(this.query_params.media_list)
               .then(e => {this.result.media_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           clearMediaFiles () {
-            Vue.clearMediaFiles()
+            this.methods.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           clearMediaMetadata () {
-            Vue.clearMediaMetadata()
+            this.methods.clearMediaMetadata()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           updateMediaCatalog () {
-            Vue.updateMediaCatalog()
+            this.methods.updateMediaCatalog()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           updatePrograms () {
-            Vue.updatePrograms()
+            this.methods.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getPrograms () {
             this.result.program_list = null
-            Vue.getPrograms()
+            this.methods.getPrograms()
               .then(e => {this.result.program_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getEpisodeTags () {
             this.result.episode_tags = null
-            Vue.getEpisodeTags()
+            this.methods.getEpisodeTags()
               .then(e => {this.result.episode_tags = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getFavoriteTags () {
             this.result.favorite_tags = null
-            Vue.getFavoriteTags()
+            this.methods.getFavoriteTags()
               .then(e => {this.result.favorite_tags = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getLemmyCommunities () {
             this.result.lemmy_communities = null
-            Vue.getLemmyCommunities()
+            this.methods.getLemmyCommunities()
               .then(e => {this.result.lemmy_communities = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           updateTaggingDictionary () {
-            Vue.updateTaggingDictionary()
+            this.methods.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           clearUserTags () {
-            Vue.clearUserTags()
+            this.methods.clearUserTags()
               .then(e => {this.layout.details['tagging_usertag'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getFeeds () {
             this.result.feed_list = null
-            Vue.getFeeds()
+            this.methods.getFeeds()
               .then(e => {this.result.feed_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           updateCustomFeeds () {
-            Vue.updateCustomFeeds()
+            this.methods.updateCustomFeeds()
               .then(e => {this.layout.details['feed'] = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           searchTags () {
             this.result.search_tag = null
-            Vue.searchTags(this.query_params.tagging_tag_search.q)
+            this.methods.searchTags(this.query_params.tagging_tag_search.q)
               .then(e => {this.result.search_tag = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getStatuses () {
             this.result.status_list = null
-            Vue.getStatuses(this.query_params.status_list)
+            this.methods.getStatuses(this.query_params.status_list)
               .then(e => {this.result.status_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getStatus () {
             this.result.status_detail = null
-            Vue.getStatus(this.query_params.status_detail.id)
+            this.methods.getStatus(this.query_params.status_detail.id)
               .then(e => {this.result.status_detail = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           createTag () {
             this.result.status_create_tag = null
-            Vue.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
+            this.methods.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
               .then(e => {this.result.status_create_tag = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           deleteTag () {
             this.result.status_delete_tag = null
-            Vue.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
+            this.methods.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
               .then(e => {this.result.status_delete_tag = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getHandlers () {
             this.result.handler_list = null
-            Vue.getHandlers()
+            this.methods.getHandlers()
               .then(e => {this.result.handler_list = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           getHealth () {
             this.result.health = null
-            Vue.getHealth()
+            this.methods.getHealth()
               .then(e => {this.result.health = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
           execCustomAPI (id) {
-            Vue.set(this.result, id, null)
-            Vue.execGET(this.endpoints[id])
-              .then(e => Vue.set(this.result, id, e))
-              .catch(e => Vue.alert(this.$dialog, e))
+            this.result[id] = null
+            this.methods.execGET(this.endpoints[id])
+              .then(e => this.result[id] = e)
+              .catch(e => alert(e.message))
           },
           getAbout () {
             this.result.about = null
-            Vue.getAbout()
+            this.methods.getAbout()
               .then(e => {this.result.about = e})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => alert(e.message))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

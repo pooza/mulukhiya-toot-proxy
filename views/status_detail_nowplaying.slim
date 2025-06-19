@@ -36,28 +36,26 @@ html lang='ja'
               a href='javascript:void(0)' @click='deleteNowplaying(status.id)' 誤判定のナウプレを削除
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          status: {},
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            status: {},
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
+              this.account = this.methods.createAccountInfo(e)
               return (new URL(location.href)).pathname.split('/').slice(-2)[0]
-            }).then(id => Vue.getStatus(id))
+            }).then(id => this.methods.getStatus(id))
             .then(e => {this.status = e})
-            .catch(e => Vue.alert(this.$dialog, e))
+            .catch(e => alert(e))
         },
         methods: {
           deleteNowplaying (id) {
             this.$dialog.confirm({body: '誤判定のナウプレを削除します。'},{okText: '削除'})
-              .then(e => Vue.deleteNowplaying(id))
+              .then(e => this.methods.deleteNowplaying(id))
               .then(e => {
                 if (e.id) {
                   location.href = `/mulukhiya/app/status/${e.id}/nowplaying`
@@ -66,7 +64,11 @@ html lang='ja'
                 } else {
                   location.href = '/mulukhiya/app/status'
                 }
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => alert(e))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

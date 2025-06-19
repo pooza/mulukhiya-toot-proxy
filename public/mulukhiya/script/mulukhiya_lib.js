@@ -20,10 +20,6 @@ window.MulukhiyaLib = {
       text: JSON.stringify(values),
     })
 
-    globals.methods.alert = (e) => {
-      alert(globals.methods.createErrorMessage(e))
-    }
-
     globals.methods.createErrorMessage = e => {
       const errors = globals.methods.dig(e, 'response', 'data', 'errors')
       if (errors) {
