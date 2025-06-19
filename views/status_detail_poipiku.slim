@@ -59,7 +59,7 @@ html lang='ja'
               return (new URL(location.href)).pathname.split('/').slice(-2)[0]
             }).then(id => this.methods.getStatus(id))
             .then(e => {this.status = e})
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           attachPoipikuImage (id) {
@@ -72,7 +72,7 @@ html lang='ja'
                 } else {
                   location.href = '/mulukhiya/app/status'
                 }
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

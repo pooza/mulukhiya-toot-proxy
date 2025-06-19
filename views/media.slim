@@ -72,7 +72,7 @@ html lang='ja'
         mounted () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.appendMedias()
         },
         methods: {
@@ -91,9 +91,16 @@ html lang='ja'
                   this.medias = this.medias.concat(e)
                 } else {
                   this.last_page = true
-                  alert('メディアはこれ以上ありません。')
+                  Swal.fire({
+                    title: 'メディアはこれ以上ありません。',
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timer: 2000,
+                  })
                 }
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

@@ -85,7 +85,7 @@ html lang='ja'
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => alert(e.message))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.getWorks()
           new ClipboardJS('.episode i');
         },
@@ -106,11 +106,18 @@ html lang='ja'
                 .then(e => {
                   this.works = e
                   this.works.map(w => this.layout[w.annictId] = false)
-                }).catch(e => alert(e.message))
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             }, 500)
           },
           notifyCommandToot () {
-            alert('実況コマンドをクリップボードにコピーしました。')
+            Swal.fire({
+              title: '実況コマンドをクリップボードにコピーしました。',
+              toast: true,
+              position: 'top-end',
+              icon: 'info',
+              showConfirmButton: false,
+              timer: 2000,
+            })
           },
         },
       })

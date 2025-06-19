@@ -78,7 +78,7 @@ html lang='ja'
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               if (this.account.username) {this.appendStatuses()}
-            }).catch(e => alert(e.message))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           createTag (id) {
@@ -86,12 +86,12 @@ html lang='ja'
               .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
               .then(e => this.methods.createTag(id, e.data))
               .then(e => this.statuses[e.id] = e)
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteTag (id, tag) {
             this.methods.deleteTag(id, tag)
               .then(e => this.statuses[e.id] = e)
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           searchStatuses () {
             this.page = 0
@@ -108,9 +108,16 @@ html lang='ja'
                   e.map(v => this.statuses[v.id] = v)
                 } else {
                   this.last_page = true
-                  alert(`#{controller.status_label}はこれ以上ありません。`)
+                  Swal.fire({
+                    title: `#{controller.status_label}はこれ以上ありません。`,
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timer: 2000,
+                  })
                 }
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

@@ -65,10 +65,10 @@ html lang='ja'
         mounted () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.methods.getHandlers()
             .then(e => e.map(v => this.handlers[v.name] = v.disable))
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           toggleVisibility (name) {
@@ -78,12 +78,12 @@ html lang='ja'
             this.$dialog.confirm({body: 'Pumaを再起動します。'}, {okText: '再起動'})
               .then(e => this.methods.restartPuma())
               .then(e => {this.restartable = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           onChangeHandler (e) {
             this.methods.toggleHandler(e.target.value, e.target.checked)
               .then(e => {this.restartable = true})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

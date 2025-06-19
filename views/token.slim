@@ -120,7 +120,7 @@ html lang='ja'
             .then(e => {
               this.accounts = e
               this.all_tokens = this.getAllTokens()
-            }).catch(e => alert(e.message))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           new ClipboardJS('.token i');
         },
         methods: {
@@ -129,7 +129,7 @@ html lang='ja'
               .then(e => {
                 this.account = account
                 this.token = account.token
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           registerTokens () {
             Promise.all(this.input.token.trim().split("\n").map(token => this.methods.registerToken(token)))
@@ -139,7 +139,7 @@ html lang='ja'
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
                 this.input.token = null
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteAccount (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバーからは削除されません）`}, {okText: '削除'})
@@ -150,7 +150,7 @@ html lang='ja'
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           authMastodon (authcode, type = 'default') {
             this.methods.authMastodon(authcode, type)
@@ -166,19 +166,19 @@ html lang='ja'
                   this.$dialog.confirm({body: '今登録したトークンを、お知らせボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
                     .then(this.methods.setInfoToken(this.token))
                     .then(e => {this.restartable = true})
-                    .catch(e => alert(e.message))
+                    .catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
                 if (this.account.is_test_bot) {
                   this.$dialog.confirm({body: '今登録したトークンを、テストボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
                     .then(this.methods.setTestToken(this.token))
                     .then(e => {this.restartable = true})
-                    .catch(e => alert(e.message))
+                    .catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
                 return this.methods.getAccounts()
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           authMisskey (authcode, type = 'default') {
             this.methods.authMisskey(authcode, type)
@@ -194,7 +194,7 @@ html lang='ja'
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getAllTokens () {
             return this.accounts.map(v => v.token).join("\n")
@@ -206,7 +206,7 @@ html lang='ja'
             this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
               .then(e => this.methods.restartPuma())
               .then(e => {this.restartable = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

@@ -75,7 +75,7 @@ html lang='ja'
               return (new URL(location.href)).pathname.split('/').slice(-1)[0]
             }).then(id => this.methods.getStatus(id))
             .then(e => {this.status = e})
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           createTag () {
@@ -85,7 +85,7 @@ html lang='ja'
                 const tag = e.data.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
                 if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
                 this.status.footer_tags.push({name: tag, is_deletable: true})
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteTag (tag) {
             this.status.footer_tags = this.status.footer_tags.filter(v => {
@@ -97,7 +97,7 @@ html lang='ja'
               .then(e => {
                 this.status = e
                 window.close()
-              }).catch(e => alert(e.message))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

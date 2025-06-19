@@ -1000,6 +1000,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle
@@ -1032,6 +1033,7 @@ webui:
       - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle

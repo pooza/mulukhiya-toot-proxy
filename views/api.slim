@@ -303,7 +303,7 @@ html lang='ja'
               if (this.methods.getToken()) {
                 this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
               }
-            }).catch(e => alert(e.message))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
             entry.args.map(key => {params[key] = ''})
@@ -312,7 +312,7 @@ html lang='ja'
               Object.keys(entry.choices).map(k => {
                 axios.get(entry.choices[k])
                   .then(e => this.choices[`${entry.id}_${k}`] = e.data)
-                  .catch(e => alert(e.message))
+                  .catch(e => Swal.fire({text: e.message, icon: 'error'}))
               })
             }
             this.query_params[entry.id] = params
@@ -364,132 +364,132 @@ html lang='ja'
           updateAnnouncement () {
             this.methods.updateAnnouncement()
               .then(e => {this.layout.details['announcement'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getMedias () {
             this.result.media_list = null
             this.methods.getMedias(this.query_params.media_list)
               .then(e => {this.result.media_list = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           clearMediaFiles () {
             this.methods.clearMediaFiles()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           clearMediaMetadata () {
             this.methods.clearMediaMetadata()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateMediaCatalog () {
             this.methods.updateMediaCatalog()
               .then(e => {this.layout.details['media'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updatePrograms () {
             this.methods.updatePrograms()
               .then(e => {this.layout.details['program'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getPrograms () {
             this.result.program_list = null
             this.methods.getPrograms()
               .then(e => {this.result.program_list = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getEpisodeTags () {
             this.result.episode_tags = null
             this.methods.getEpisodeTags()
               .then(e => {this.result.episode_tags = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getFavoriteTags () {
             this.result.favorite_tags = null
             this.methods.getFavoriteTags()
               .then(e => {this.result.favorite_tags = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getLemmyCommunities () {
             this.result.lemmy_communities = null
             this.methods.getLemmyCommunities()
               .then(e => {this.result.lemmy_communities = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateTaggingDictionary () {
             this.methods.updateTaggingDictionary()
               .then(e => {this.layout.details['tagging_dic'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           clearUserTags () {
             this.methods.clearUserTags()
               .then(e => {this.layout.details['tagging_usertag'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getFeeds () {
             this.result.feed_list = null
             this.methods.getFeeds()
               .then(e => {this.result.feed_list = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateCustomFeeds () {
             this.methods.updateCustomFeeds()
               .then(e => {this.layout.details['feed'] = false})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           searchTags () {
             this.result.search_tag = null
             this.methods.searchTags(this.query_params.tagging_tag_search.q)
               .then(e => {this.result.search_tag = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getStatuses () {
             this.result.status_list = null
             this.methods.getStatuses(this.query_params.status_list)
               .then(e => {this.result.status_list = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getStatus () {
             this.result.status_detail = null
             this.methods.getStatus(this.query_params.status_detail.id)
               .then(e => {this.result.status_detail = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           createTag () {
             this.result.status_create_tag = null
             this.methods.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
               .then(e => {this.result.status_create_tag = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteTag () {
             this.result.status_delete_tag = null
             this.methods.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
               .then(e => {this.result.status_delete_tag = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getHandlers () {
             this.result.handler_list = null
             this.methods.getHandlers()
               .then(e => {this.result.handler_list = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getHealth () {
             this.result.health = null
             this.methods.getHealth()
               .then(e => {this.result.health = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           execCustomAPI (id) {
             this.result[id] = null
             this.methods.execGET(this.endpoints[id])
               .then(e => this.result[id] = e)
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getAbout () {
             this.result.about = null
             this.methods.getAbout()
               .then(e => {this.result.about = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

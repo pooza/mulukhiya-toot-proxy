@@ -70,10 +70,10 @@ html lang='ja'
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => alert(e.message))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.methods.getFavoriteTags()
             .then(e => {this.fav_entries = e})
-            .catch(e => alert(e.message))
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           search () {
@@ -81,7 +81,7 @@ html lang='ja'
             if (this.keyword == '') {return}
             this.methods.searchTags(this.keyword)
               .then(e => {this.dic_entries = e})
-              .catch(e => alert(e.message))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           isDisabledTag (tag) {
             this.disabled_tags = this.disabled_tags || []
