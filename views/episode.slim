@@ -16,7 +16,7 @@ html lang='ja'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
         h3
-          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" data-clipboard-target="'#work-title-' + work.annictId"
+          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
           span :id="'work-title-' + work.annictId" v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
             | {{work.title}}
           ul.params class='clearfix'
@@ -41,7 +41,7 @@ html lang='ja'
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                     | {{episode.hashtag}}
                 .link-container v-if='episode.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
@@ -55,7 +55,7 @@ html lang='ja'
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
                     | {{work.hashtag}}
                 .link-container v-if='work.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
                 .bubble-container v-if='work.hashtag_url'
@@ -109,9 +109,9 @@ html lang='ja'
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             }, 500)
           },
-          notifyCommandToot () {
+          notifyCopy () {
             Swal.fire({
-              title: '実況コマンドをクリップボードにコピーしました。',
+              title: 'クリップボードにコピーしました。',
               toast: true,
               position: 'top-end',
               icon: 'info',
