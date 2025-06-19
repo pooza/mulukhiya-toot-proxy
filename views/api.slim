@@ -43,7 +43,8 @@ html lang='ja'
               .link-description 最近#{controller.status_label}されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='delay(getMedias)' 実行
-                pre.result v-if='result.media_list' {{result.media_list}}
+                pre.result
+                  | {{result.media_list}}
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/media/file/clear
@@ -71,7 +72,8 @@ html lang='ja'
                 .link-description 実況番組表を表示します。
                 .field-update-button-container
                   button @click='getPrograms' 実行
-                  pre.result v-if='result.program_list' {{result.program_list}}
+                  pre.result
+                    | {{result.program_list}}
               .endpoint-container v-if='account.is_admin'
                 .link POST /mulukhiya/api/program/update
                 pre.payload v-if='query_params.program_update' {{query_params.program_update}}
@@ -94,7 +96,8 @@ html lang='ja'
                 .link-description 参加しているLemmyコミュニティを返します。
                 .field-update-button-container
                   button @click='getLemmyCommunities' 実行
-                  pre.result v-if='result.lemmy_communities' {{result.lemmy_communities}}
+                  pre.result
+                    | {{result.lemmy_communities}}
         - if controller.favorite_tags?
           li
             h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
@@ -104,7 +107,8 @@ html lang='ja'
                 .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
                 .field-update-button-container
                   button @click='getFavoriteTags' 実行
-                  pre.result v-if='result.favorite_tags' {{result.favorite_tags}}
+                  pre.result
+                    | {{result.favorite_tags}}
         li
           h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
           slide-up-down :active='layout.details.tagging_dic'
@@ -117,7 +121,8 @@ html lang='ja'
               .link-description ハッシュタグ辞書から、該当するパターンを検索します。
               .field-update-button-container
                 button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
-                pre.result v-if='result.search_tag' {{result.search_tag}}
+                pre.result
+                  | {{result.search_tag}}
             .endpoint-container v-if='account.is_admin'
               .role admin
               .link POST /mulukhiya/api/tagging/dic/update
@@ -137,7 +142,8 @@ html lang='ja'
               .link-description エピソードのハッシュタグ辞書を返します。
               .field-update-button-container
                 button @click='getEpisodeTags' 実行
-                pre.result v-if='result.episode_tags' {{result.episode_tags}}
+                pre.result
+                  | {{result.episode_tags}}
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
           slide-up-down :active='layout.details.tagging_usertag'
@@ -161,7 +167,8 @@ html lang='ja'
                 .link-description フィードの一覧を返します。
                 .field-update-button-container
                   button @click='getFeeds' 実行
-                  pre.result v-if='result.feed_list' {{result.feed_list}}
+                  pre.result
+                    | {{result.feed_list}}
               .endpoint-container v-if='account.is_admin'
                 .role admin
                 .link POST /mulukhiya/api/feed/update
@@ -181,7 +188,8 @@ html lang='ja'
               .link-description モロヘイヤの動作状況を表示します。
               .field-update-button-container
                 button @click='getHealth' 実行
-                pre.result v-if='result.health' {{result.health}}
+                pre.result
+                  | {{result.health}}
         .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.to_json
         - if Mulukhiya::CustomAPI.present?
           li
@@ -197,7 +205,8 @@ html lang='ja'
                   .link-description = api.description
                   .field-update-button-container
                     button @click='execCustomAPI("#{api.id}")' 実行
-                    pre.result v-if='result.#{api.id}' {{result.#{api.id}}}
+                    pre.result
+                      | {{result.#{api.id}}}
         li v-if='account.is_admin'
           h3 @click='toggleVisibility("handler")' ハンドラ
           slide-up-down :active='layout.details.handler'
@@ -207,7 +216,8 @@ html lang='ja'
               .link-description ハンドラの有効/無効設定を返します。
               .field-update-button-container
                 button @click='getHandlers' 実行
-                pre.result v-if='result.handler_list' {{result.handler_list}}
+                pre.result
+                  | {{result.handler_list}}
         li
           h3 @click='toggleVisibility("about")' パッケージ情報
           slide-up-down :active='layout.details.about'
@@ -216,7 +226,8 @@ html lang='ja'
               .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
               .field-update-button-container
                 button @click='getAbout' 実行
-                pre.result v-if='result.about' {{result.about}}
+                pre.result
+                  | {{result.about}}
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
