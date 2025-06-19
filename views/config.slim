@@ -172,7 +172,7 @@ html lang='ja'
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
                 .map(program => ({
-                  code: program.key,
+                  value: program.key,
                   label: program.minutes ? `${this.methods.createProgramTags(program).join(', ')} (${program.minutes}分)` : this.methods.createProgramTags(program).join(', '),
                 }))
               this.options.program.unshift({label: '(固定タグのクリア)'})
@@ -229,7 +229,7 @@ html lang='ja'
             if (this.form.lemmy.url) {command.lemmy.url = this.form.lemmy.url}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
             if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
-            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community.code)}
+            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community)}
             this.updateConfig(command)
             this.form.lemmy.password = null
             this.methods.getLemmyCommunities()
@@ -271,8 +271,8 @@ html lang='ja'
           },
           updateWebhook () {
             const command = {webhook: {visibility: null}}
-            if (this.form.webhook.visibility.code != 'public') {
-              command.webhook.visibility = this.form.webhook.visibility.code
+            if (this.form.webhook.visibility != 'public') {
+              command.webhook.visibility = this.form.webhook.visibility
             }
             this.updateConfig(command)
           },
