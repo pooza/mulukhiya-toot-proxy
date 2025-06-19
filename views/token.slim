@@ -18,7 +18,8 @@ html lang='ja'
           h4
             a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
             span.alert v-else='' 壊れたトークン
-            .role v-for='role in current_account.roles' v-if='role.is_visible' = '{{role.name}}'
+            template v-for='role in current_account.roles'
+              .role v-if='role?.is_visible' = '{{role.name}}'
             .role v-if='current_account.is_test_bot' test bot
             .role v-if='current_account.is_info_bot' info bot
             .role v-if='isLoggedIn(current_account)' logged in
@@ -46,12 +47,13 @@ html lang='ja'
           .description
             a href=params[:oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
-            - if env.misskey_type?
-              | （認証後の、URL末尾の
+          - if env.misskey_type?
+            .description
+              | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列が
+              | 形式の文字列）が
               strong 認証コード
-              | です）
+              | です。
           .auth-form
             input type='password' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
@@ -64,12 +66,13 @@ html lang='ja'
           .description
             a href=params[:infobot_oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
             | して下の欄に入力、認証ボタンを押下してください。
-            - if env.misskey_type?
-              | （認証後の、URL末尾の
+          - if env.misskey_type?
+            .description
+              | 認証後の、URL末尾のUUID（
               code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列が
+              | 形式の文字列）が
               strong 認証コード
-              | です）
+              | です。
           .auth-form
             input type='password' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
             - if env.mastodon_type?
@@ -94,106 +97,104 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          accounts: [],
-          tokens: [],
-          all_tokens: null,
-          token: Vue.getToken(),
-          restartable: false,
-          input: {
-            authcode: null,
-            infobot_authcode: null,
-            token: null,
-          },
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            accounts: [],
+            tokens: [],
+            all_tokens: null,
+            token: this.methods.getToken(),
+            restartable: false,
+            input: {
+              authcode: null,
+              infobot_authcode: null,
+              token: null,
+            },
+          }
         },
         mounted () {
-          Vue.getConfig()
-            .then(e => {this.account = Vue.createAccountInfo(e)})
-            .then(e => Vue.getAccounts())
+          this.methods.getConfig()
+            .then(e => {this.account = this.methods.createAccountInfo(e)})
+            .then(e => this.methods.getAccounts())
             .then(e => {
               this.accounts = e
               this.all_tokens = this.getAllTokens()
-            }).catch(e => Vue.alert(this.$dialog, e))
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           new ClipboardJS('.token i');
         },
         methods: {
           switchAccount (account) {
-            Vue.switchAccount(account)
+            this.methods.switchAccount(account)
               .then(e => {
                 this.account = account
                 this.token = account.token
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           registerTokens () {
-            Promise.all(this.input.token.trim().split("\n").map(token => Vue.registerToken(token)))
+            Promise.all(this.input.token.trim().split("\n").map(token => this.methods.registerToken(token)))
               .then(e => {this.account = e[0]})
-              .then(e => Vue.getAccounts())
+              .then(e => this.methods.getAccounts())
               .then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
                 this.input.token = null
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteAccount (account) {
             this.$dialog.confirm({body: `@${account.username}のトークンを一覧から削除します。（サーバーからは削除されません）`}, {okText: '削除'})
-              .then(e => Vue.deleteToken(account.token))
+              .then(e => this.methods.deleteToken(account.token))
               .then(e => {
                 this.tokens = e
-                return Vue.getAccounts()
+                return this.methods.getAccounts()
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           authMastodon (authcode, type = 'default') {
-            Vue.authMastodon(authcode, type)
+            this.methods.authMastodon(authcode, type)
               .then(e => {
                 this.input.authcode = null
                 this.input.infobot_authcode = null
                 this.token = e.access_token_crypt
-                return Vue.registerToken(this.token)
+                return this.methods.registerToken(this.token)
               }).then(e => {
-                Vue.setToken(this.token)
+                this.methods.setToken(this.token)
                 this.account = e
                 if (this.account.is_info_bot) {
                   this.$dialog.confirm({body: '今登録したトークンを、お知らせボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
-                    .then(Vue.setInfoToken(this.token))
+                    .then(this.methods.setInfoToken(this.token))
                     .then(e => {this.restartable = true})
-                    .catch(e => Vue.alert(this.$dialog, e))
+                    .catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
                 if (this.account.is_test_bot) {
                   this.$dialog.confirm({body: '今登録したトークンを、テストボットとして設定ファイルに登録しますか？'}, {okText: '登録'})
-                    .then(Vue.setTestToken(this.token))
+                    .then(this.methods.setTestToken(this.token))
                     .then(e => {this.restartable = true})
-                    .catch(e => Vue.alert(this.$dialog, e))
+                    .catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
-                return Vue.getAccounts()
+                return this.methods.getAccounts()
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           authMisskey (authcode, type = 'default') {
-            Vue.authMisskey(authcode, type)
+            this.methods.authMisskey(authcode, type)
               .then(e => {
                 this.input.authcode = null
                 this.input.infobot_authcode = null
                 this.token = e.access_token_crypt
-                return Vue.registerToken(this.token)
+                return this.methods.registerToken(this.token)
               }).then(e => {
-                Vue.setToken(this.token)
+                this.methods.setToken(this.token)
                 this.account = e
-                return Vue.getAccounts()
+                return this.methods.getAccounts()
               }).then(e => {
                 this.accounts = e
                 this.all_tokens = this.getAllTokens()
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getAllTokens () {
             return this.accounts.map(v => v.token).join("\n")
@@ -203,9 +204,13 @@ html lang='ja'
           },
           restartPuma () {
             this.$dialog.confirm({body: 'Pumaを再起動します。'},{okText: '再起動'})
-              .then(e => Vue.restartPuma())
+              .then(e => this.methods.restartPuma())
               .then(e => {this.restartable = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

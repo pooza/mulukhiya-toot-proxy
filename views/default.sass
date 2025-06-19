@@ -319,8 +319,7 @@ ul.links
     pre.result
       margin: 1em
       opacity: 0.9
-      max:
-        height: 10em
+      height: 10em
       overflow:
         y: scroll
       text:
@@ -915,30 +914,29 @@ code
 .alert
   color: red
 
-.tooltip
-  display: block !important
-  z-index: 10000
-  font:
-    family: $sans-serif
-    size: 0.5em
-  padding: 2px
-  margin: 4px
-  background:
-    color: white
+.slide-up-down
+  overflow: hidden
+
+.tippy-box[data-theme~='mulukhiya']
+  background-color: white
+  color: dimgray
+  font-size: 0.6em
+  padding: 2px 6px
   border:
     style: solid
-    color: back
+    color: darkgray
     width: 1px
-    radius: 4px
+    radius: 6px
   opacity: 0.9
-.tooltip[aria-hidden='true']
-  visibility: hidden
-  opacity: 0
-  transition: opacity .15s, visibility .15s
-.tooltip[aria-hidden='false']
-  visibility: visible
-  opacity: 1
-  transition: opacity .15s
+.tippy-box[data-theme~='mulukhiya'] .tippy-arrow
+  display: none
+
+.swal2-toast
+  font-size: 0.8em
+  border-radius: 6px
+
+.swal2-title
+  background: transparent
 
 .clearfix::after
   content: ""

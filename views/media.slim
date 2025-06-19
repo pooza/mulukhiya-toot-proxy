@@ -20,10 +20,6 @@ html lang='ja'
           datalist id='suggested_keywords'
             option v-for='keyword in suggested_keywords' {{keyword}}
           button.small @click='searchMedias' 検索
-        .control
-          label
-            input type='checkbox' v-model='only_person'
-            | ボットからの#{controller.status_label}を除く
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
@@ -62,45 +58,53 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          medias: [],
-          suggested_keywords: Vue.getSuggestedKeywords(),
-          page: 0,
-          keyword: null,
-          only_person: false,
-          last_page: false,
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            medias: [],
+            suggested_keywords: this.methods.getSuggestedKeywords(),
+            page: 0,
+            keyword: null,
+            last_page: false,
+          }
         },
         mounted () {
-          Vue.getConfig()
-            .then(e => {this.account = Vue.createAccountInfo(e)})
-            .catch(e => Vue.alert(this.$dialog, e))
+          this.methods.getConfig()
+            .then(e => {this.account = this.methods.createAccountInfo(e)})
+            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.appendMedias()
         },
         methods: {
           searchMedias () {
             this.page = 0
-            this.medias = []
+            this.medias.splice(0)
             this.last_page = false
             setTimeout(this.appendMedias, 500)
           },
           appendMedias () {
             this.page ++
-            Vue.getMedias({page: this.page, q: this.keyword, only_person: this.only_person})
+            this.methods.getMedias({page: this.page, q: this.keyword})
               .then(e => {
-                this.suggested_keywords = Vue.getSuggestedKeywords()
+                this.suggested_keywords = this.methods.getSuggestedKeywords()
                 if (0 < e.length) {
                   this.medias = this.medias.concat(e)
                 } else {
                   this.last_page = true
-                  this.$dialog.alert('メディアはこれ以上ありません。')
+                  Swal.fire({
+                    title: 'メディアはこれ以上ありません。',
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timer: 2000,
+                  })
                 }
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')

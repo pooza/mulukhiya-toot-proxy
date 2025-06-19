@@ -15,20 +15,20 @@ html lang='ja'
           pre v-if='result' {{result}}
       section.config v-if='account.username'
         h3 @click='toggleVisibility("tags")' 固定タグ
-        vue-slide-up-down :active='layout.details.tags'
+        slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'
           .inline-field-container
             input.short type='number' placeholder='期限(分)' v-model.number='form.program.minutes'
           - if controller.livecure?
             .field-container
-              v-select :options='options.program' @input='onChangeTags' v-model='form.program.tags'
+              multiselect :options='options.program' label='label' track-by='value' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
       - if controller.filter? && controller.livecure?
         section.config v-if='account.username && layout.sections.livecure'
           h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
-          vue-slide-up-down :active='layout.details.livecure'
+          slide-up-down :active='layout.details.livecure'
             .inline-field-container
               label
                 input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
@@ -36,7 +36,7 @@ html lang='ja'
               button @click='updateLivecure' 更新
       section.config v-if='account.username && layout.sections.lemmy'
         h3 @click='toggleVisibility("lemmy")' Lemmy
-        vue-slide-up-down :active='layout.details.lemmy'
+        slide-up-down :active='layout.details.lemmy'
           ol
             li Lemmyサービスの認証情報（URL、ユーザーID、パスワード）を入力してください。
             li 認証ボタンを押下。
@@ -55,13 +55,13 @@ html lang='ja'
             h4 コミュニティ
             .alert v-if='!form.lemmy.community' コミュニティが未設定です。
             .post-auth
-              v-select :options='options.lemmy_communities' v-model='form.lemmy.community'
+              multiselect :options='options.lemmy_communities' label='label' track-by='value' v-model='form.lemmy.community'
               .field-update-button-container
                 button @click='updateLemmy' 更新
                 button.alert @click='unauthLemmy' 認証を解除
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
-        vue-slide-up-down :active='layout.details.annict'
+        slide-up-down :active='layout.details.annict'
           ol
             li
               | アカウントを持っていない場合は、
@@ -91,16 +91,16 @@ html lang='ja'
               button @click='updateAnnict' 更新
       section.config v-if='account.username'
         h3 @click='toggleVisibility("webhook")' Slack互換webhook
-        vue-slide-up-down :active='layout.details.webhook'
+        slide-up-down :active='layout.details.webhook'
           .field-container
             h4 公開範囲
-            v-select :options='options.visibility' v-model='form.webhook.visibility'
+            multiselect :options="options.visibility" label="label" track-by="value" v-model="form.webhook.visibility"
           .field-update-button-container
             button @click='updateWebhook' 更新
       - if sns
         section.config v-if='account.username'
           h3 @click='toggleVisibility("notify")' 通知
-          vue-slide-up-down :active='layout.details.notify'
+          slide-up-down :active='layout.details.notify'
             .inline-field-container
               label.alert
                 input type='checkbox' v-model='form.notify.verbose' 冗長な通知（管理者・開発者向け）
@@ -109,75 +109,71 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(VTooltip, {delay: 0, autoHide: true})
-      Vue.use(MulukhiyaLib)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
-      Vue.component('v-select', VueSelect.VueSelect)
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          config: null,
-          result: null,
-          programs: [],
-          lemmy: {
-            communities: {},
-          },
-          form: {
-            notify: {verbose: null},
-            livecure: false,
-            annict: {auth_code: null, theme_works_only: false},
-            program: {minutes: null, tags: null},
-            tags: '',
-            webhook: {token: null, visibility: null},
-            lemmy: {url: null, user: null, passwrd: null, community: null},
-          },
-          options: {
-            program: [],
-            visibility: [],
-            lemmy_communities: [],
-          },
-          layout: {
-            sections: {
-              livecure: #{controller.livecure?},
-              lemmy: #{controller.lemmy?},
-              annict: #{controller.annict?},
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            config: null,
+            result: null,
+            programs: [],
+            lemmy: {
+              communities: {},
             },
-            details: {
-              lemmy: false,
-              tags: false,
+            form: {
+              notify: {verbose: null},
               livecure: false,
-              webhook: false,
-              notify: false,
-              annict: false,
+              annict: {auth_code: null, theme_works_only: false},
+              program: {minutes: null, tags: null},
+              tags: '',
+              webhook: {token: null, visibility: null},
+              lemmy: {url: null, user: null, passwrd: null, community: null},
             },
-          },
+            options: {
+              program: [],
+              visibility: [],
+              lemmy_communities: [],
+            },
+            layout: {
+              sections: {
+                livecure: #{controller.livecure?},
+                lemmy: #{controller.lemmy?},
+                annict: #{controller.annict?},
+              },
+              details: {
+                lemmy: false,
+                tags: false,
+                livecure: false,
+                webhook: false,
+                notify: false,
+                annict: false,
+              },
+            },
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
               this.updateForm(e)
-              this.account = Vue.createAccountInfo(e)
+              this.account = this.methods.createAccountInfo(e)
               this.config = e.config
-              return Vue.getLemmyCommunities()
+              return this.methods.getLemmyCommunities()
             }).then(e => {
               this.lemmy.communities = e
               Object.keys(this.lemmy.communities)
                 .map(k => {
-                  this.options.lemmy_communities ||= []
-                  this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]})
+                  this.options.lemmy_communities.splice(0)
+                  this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
-              this.form.lemmy.community = this.lemmy.communities[Vue.dig(this.config, 'lemmy', 'community')]
-            }).catch(e => Vue.alert(this.$dialog, e))
-          Vue.getPrograms()
+              this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+          this.methods.getPrograms()
             .then(e => {
               this.programs = e
               this.options.program = Object.values(e)
                 .filter(program => program.enable)
                 .map(program => ({
-                  code: program.key,
-                  label: program.minutes ? `${Vue.createProgramTags(program).join(', ')} (${program.minutes}分)` : Vue.createProgramTags(program).join(', '),
+                  value: program.key,
+                  label: program.minutes ? `${this.methods.createProgramTags(program).join(', ')} (${program.minutes}分)` : this.methods.createProgramTags(program).join(', '),
                 }))
               this.options.program.unshift({label: '(固定タグのクリア)'})
             })
@@ -185,14 +181,14 @@ html lang='ja'
         methods: {
           updateForm (data) {
             this.result = jsyaml.dump(data.config)
-            this.form.webhook.visibility = Vue.dig(data, 'config', 'webhook', 'visibility') || 'public'
-            this.form.lemmy.url = Vue.dig(data, 'config', 'lemmy', 'url')
-            this.form.lemmy.user = Vue.dig(data, 'config', 'lemmy', 'user')
-            this.form.lemmy.community = this.lemmy.communities[Vue.dig(data, 'config', 'lemmy', 'community')]
-            this.form.annict.theme_works_only = Vue.dig(data, 'config', 'annict', 'theme_works_only') == true
-            this.form.notify.verbose = Vue.dig(data, 'config', 'notify', 'verbose') == true
-            if (Vue.dig(data, 'config', 'tagging', 'user_tags')) {
-              this.form.tags = Vue.dig(data, 'config', 'tagging', 'user_tags').join("\n")
+            this.form.webhook.visibility = this.methods.dig(data, 'config', 'webhook', 'visibility') || 'public'
+            this.form.lemmy.url = this.methods.dig(data, 'config', 'lemmy', 'url')
+            this.form.lemmy.user = this.methods.dig(data, 'config', 'lemmy', 'user')
+            this.form.lemmy.community = this.lemmy.communities[this.methods.dig(data, 'config', 'lemmy', 'community')]
+            this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
+            this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
+            if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
+              this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
             }
             if (data.filters) {
               if (Array.isArray(data.filters)) {
@@ -200,23 +196,25 @@ html lang='ja'
               }
             }
             if (data.visibility_names) {
-              this.options.visibility = []
+              this.options.visibility.splice(0)
               Object.keys(data.visibility_names).map(k => {
                 const v = data.visibility_names[k]
-                this.options.visibility.push({label: k == v ? k : `${v} (${k})`, code: v})
+                if (!this.options.visibility.find(o => o.value == v)) {
+                  this.options.visibility.push({label: k == v ? k : `${v} (${k})`, value: v})
+                }
               })
             }
           },
           updateConfig (command) {
-            return Vue.updateConfig(command)
+            return this.methods.updateConfig(command)
               .then(e => {
                 this.updateForm(e)
                 return e
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           onChangeTags (e) {
             if (e.code) {
-              this.form.tags = Vue.createProgramTags(this.programs[e.code]).join("\n")
+              this.form.tags = this.methods.createProgramTags(this.programs[e.code]).join("\n")
               this.form.program.minutes = this.programs[e.code].minutes
             } else {
               this.form.tags = null
@@ -231,16 +229,16 @@ html lang='ja'
             if (this.form.lemmy.url) {command.lemmy.url = this.form.lemmy.url}
             if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
             if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
-            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community.code)}
+            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community)}
             this.updateConfig(command)
             this.form.lemmy.password = null
-            Vue.getLemmyCommunities()
+            this.methods.getLemmyCommunities()
               .then(e => {
                 this.lemmy.communities = e
-                this.options.lemmy_communities ||= []
+                this.options.lemmy_communities.splice(0)
                 Object.keys(this.lemmy.communities)
                   .map(k => {
-                    this.options.lemmy_communities.push({code: k, label: this.lemmy.communities[k]})
+                    this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                   })
               })
           },
@@ -250,9 +248,9 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.lemmy = false
-                this.lemmy.communities = {}
+                Object.keys(this.lemmy.communities).forEach(k => delete this.lemmy.communities[k])
                 this.options.lemmy_communities = null
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateTags () {
             const command = {tagging: {user_tags: null, minutes: null}}
@@ -267,14 +265,14 @@ html lang='ja'
             this.updateConfig(command)
           },
           updateLivecure () {
-            Vue.updateLivecureFlag(this.form.livecure)
+            this.methods.updateLivecureFlag(this.form.livecure)
               .then(e => {this.layout.details.livecure = false})
-              .catch(e => Vue.alert(this.$dialog, e))
+              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateWebhook () {
             const command = {webhook: {visibility: null}}
-            if (this.form.webhook.visibility.code != 'public') {
-              command.webhook.visibility = this.form.webhook.visibility.code
+            if (this.form.webhook.visibility != 'public') {
+              command.webhook.visibility = this.form.webhook.visibility
             }
             this.updateConfig(command)
           },
@@ -284,12 +282,12 @@ html lang='ja'
             this.updateConfig(command)
           },
           authAnnict () {
-            Vue.authAnnict(this.form.annict.auth_code)
+            this.methods.authAnnict(this.form.annict.auth_code)
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.form.annict.auth_code = null
                 this.layout.details.annict = false
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateAnnict () {
             const command = {annict: {theme_works_only: null}}
@@ -302,7 +300,12 @@ html lang='ja'
               .then(e => {
                 this.result = jsyaml.dump(e.config)
                 this.layout.details.annict = false
-              }).catch(e => Vue.alert(this.$dialog, e))
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip)
+      app.component('multiselect', window.VueformMultiselect)
+      app.mount('#app')

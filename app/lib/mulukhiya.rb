@@ -46,7 +46,7 @@ module Mulukhiya
     require 'sidekiq-scheduler/web'
     if SidekiqDaemon.basic_auth?
       Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|
-        SidekiqDaemon.auth(username, password)
+        SidekiqDaemon.auth?(username, password)
       end
     end
     Sidekiq::Web.use(Rack::Session::Cookie, {

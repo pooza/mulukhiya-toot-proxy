@@ -1,83 +1,79 @@
-const MulukhiyaLib = {
-  install (Vue, options) {
-    Vue.createURL = (href, params) => {
+window.MulukhiyaLib = {
+  install(app, options) {
+    const globals = app.config.globalProperties
+    globals.methods = {}
+
+    globals.methods.createURL = (href, params = {}) => {
       const url = new URL(href, location.href)
       params = params || {}
       params.query = params.query || {}
-      params.query.token = params.token || Vue.getToken()
+      params.query.token = params.token || globals.methods.getToken()
       Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
     }
 
-    Vue.createPath = href => (new URL(href)).pathname
+    globals.methods.createPath = href => (new URL(href)).pathname
 
-    Vue.createPayload = values => {
-      return {
-        token: Vue.getToken(),
-        status: JSON.stringify(values),
-        text: JSON.stringify(values),
+    globals.methods.createPayload = values => ({
+      token: globals.methods.getToken(),
+      status: JSON.stringify(values),
+      text: JSON.stringify(values),
+    })
+
+    globals.methods.createErrorMessage = e => {
+      const errors = globals.methods.dig(e, 'response', 'data', 'errors')
+      if (errors) {
+        return Object.entries(errors).map(([k, v]) => `${k}: ${v.join()}`).join('\n')
       }
+      return globals.methods.dig(e, 'response', 'data', 'error')
+        || globals.methods.dig(e, 'response', 'data', 'message')
+        || globals.methods.dig(e, 'message') || e
     }
 
-    Vue.alert = (dialog, e) => {
-      if (e) {dialog.alert(Vue.createErrorMessage(e))}
-    }
-
-    Vue.createErrorMessage = e => {
-      let errors
-      if (errors = Vue.dig(e, 'response', 'data', 'errors')) {
-        return Object.keys(errors).map(k => `${k}: ${errors[k].join()}`).join("\n")
-      }
-      return Vue.dig(e, 'response', 'data', 'error')
-        || Vue.dig(e, 'response', 'data', 'message')
-        || Vue.dig(e, 'message')
-        || e
-    }
-
-    Vue.dig = (target, ...keys) => {
+    globals.methods.dig = (target, ...keys) => {
       let digged = target
       for (const key of keys) {
-        if (typeof digged === 'undefined' || digged === null) {return undefined}
-        digged = (typeof key === 'function') ? key(digged) : digged[key]
+        if (typeof digged === 'undefined' || digged === null) return undefined
+        digged = typeof key === 'function' ? key(digged) : digged[key]
       }
       return digged
     }
 
-    Vue.authMastodon = async (code, type = 'default') => {
+    globals.methods.authMastodon = async (code, type = 'default') => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/mastodon/auth', {token: Vue.getToken(), code: code, type: type})
+      return axios.post('/mulukhiya/api/mastodon/auth', {token: globals.methods.getToken(), code: code, type: type})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.authMisskey = async (code, type = 'default') => {
+    globals.methods.authMisskey = async (code, type = 'default') => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/misskey/auth', {token: Vue.getToken(), code: code, type: type})
+      return axios.post('/mulukhiya/api/misskey/auth', {token: globals.methods.getToken(), code: code, type: type})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getConfig = async () => {
+    globals.methods.getConfig = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config'))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/config'))
         .then(e => e.data)
-        .catch(e => ({account: {}, error: Vue.createErrorMessage(e)}))
+        .catch(e => ({account: {}, error: globals.methods.createErrorMessage(e)}))
         .finally(e => indicator.hide())
     }
 
-    Vue.updateConfig = async command => {
+    globals.methods.updateConfig = async command => {
       command.command = 'user_config'
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/config/update', Vue.createPayload(command))
+      return axios.post('/mulukhiya/api/config/update', globals.methods.createPayload(command))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.updateLivecureFlag = async flag => {
+    globals.methods.updateLivecureFlag = async flag => {
       const command = {
         command: 'filter',
         tag: '実況',
@@ -85,76 +81,74 @@ const MulukhiyaLib = {
       }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/filter/add', Vue.createPayload(command))
+      return axios.post('/mulukhiya/api/filter/add', globals.methods.createPayload(command))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getSuggestedKeywords = () => {
+    globals.methods.getSuggestedKeywords = () => {
       return JSON.parse(localStorage.getItem('mulukhiya_suggested_keywords') || '[]')
     }
 
-    Vue.registerSuggestedKeyword = keyword => {
-      let keywords = Vue.getSuggestedKeywords()
+    globals.methods.registerSuggestedKeyword = keyword => {
+      let keywords = globals.methods.getSuggestedKeywords()
       keywords.unshift(keyword)
       keywords = Array.from(new Set(keywords.filter(v => (v != null)))).slice(0, 9)
       localStorage.setItem('mulukhiya_suggested_keywords', JSON.stringify(keywords))
     }
 
-    Vue.getToken = () => {
-      return localStorage.getItem('mulukhiya_token')
-    }
+    globals.methods.getToken = () => localStorage.getItem('mulukhiya_token')
 
-    Vue.setToken = token => {
+    globals.methods.setToken = token => {
       localStorage.setItem('mulukhiya_token', token)
     }
 
-    Vue.getTokens = () => {
+    globals.methods.getTokens = () => {
       let tokens = JSON.parse(localStorage.getItem('mulukhiya_all_tokens') || '[]')
-      tokens.unshift(Vue.getToken())
-      return Vue.setTokens(tokens)
+      tokens.unshift(globals.methods.getToken())
+      return globals.methods.setTokens(tokens)
     }
 
-    Vue.setTokens = tokens => {
+    globals.methods.setTokens = tokens => {
       tokens = Array.from(new Set(tokens.filter(v => (v != null))))
       localStorage.setItem('mulukhiya_all_tokens', JSON.stringify(tokens))
       return tokens
     }
 
-    Vue.registerToken = async token => {
+    globals.methods.registerToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: token}))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: token}))
         .then(e => {
-          const tokens = Vue.getTokens()
+          const tokens = globals.methods.getTokens()
           tokens.push(token)
-          Vue.setTokens(tokens)
-          Vue.setToken(token)
-          Vue.updateConfig({})
+          globals.methods.setTokens(tokens)
+          globals.methods.setToken(token)
+          globals.methods.updateConfig({})
           return e.data.account
         }).finally(e => indicator.hide())
     }
 
-    Vue.deleteToken = async token => {
-      return Vue.setTokens(Vue.getTokens().filter(v => v != token))
+    globals.methods.deleteToken = async token => {
+      return globals.methods.setTokens(globals.methods.getTokens().filter(v => v != token))
     }
 
-    Vue.getAccounts = async () => {
+    globals.methods.getAccounts = async () => {
       const accounts = []
-      const tokens = Vue.getTokens()
+      const tokens = globals.methods.getTokens()
       const indicator = new ActivityIndicator()
       indicator.show()
       indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
-        return axios.get(Vue.createURL('/mulukhiya/api/config', {token: t}))
-          .then(e => accounts.push(Vue.createAccountInfo(e.data, t)))
-          .catch(e => accounts.push({token: t, error: Vue.createErrorMessage(e)}))
+        return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: t}))
+          .then(e => accounts.push(globals.methods.createAccountInfo(e.data, t)))
+          .catch(e => accounts.push({token: t, error: globals.methods.createErrorMessage(e)}))
           .finally(e => indicator.increment)
       })).then(e => accounts)
       .finally(e => indicator.hide())
     }
 
-    Vue.createAccountInfo = (data, token_crypted) => {
+    globals.methods.createAccountInfo = (data, token_crypted) => {
       return {
         username: data.account.username,
         token: token_crypted,
@@ -168,33 +162,33 @@ const MulukhiyaLib = {
       }
     }
 
-    Vue.switchAccount = async account => {
+    globals.methods.switchAccount = async account => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/config', {token: account.token}))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: account.token}))
         .then(e => {
-          Vue.setToken(account.token)
+          globals.methods.setToken(account.token)
           return e.data
         }).finally(e => indicator.hide())
     }
 
-    Vue.getFeeds = async () => {
+    globals.methods.getFeeds = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/feed/list'))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/feed/list'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.updateCustomFeeds = async () => {
+    globals.methods.updateCustomFeeds = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/feed/update', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/feed/update', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getPrograms = async () => {
+    globals.methods.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/program')
@@ -202,15 +196,15 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.updatePrograms = async () => {
+    globals.methods.updatePrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/program/update', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/program/update', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.createProgramTags = program => {
+    globals.methods.createProgramTags = program => {
       const tags = []
       if (program) {
         tags.push(program.series)
@@ -223,16 +217,16 @@ const MulukhiyaLib = {
       return tags
     }
 
-    Vue.getWorks = async params => {
+    globals.methods.getWorks = async params => {
       const indicator = new ActivityIndicator()
       indicator.show()
       if (!params.q) {params = {}}
-      return axios.get(Vue.createURL(`/mulukhiya/api/program/works`, {query: params}))
+      return axios.get(globals.methods.createURL(`/mulukhiya/api/program/works`, {query: params}))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getEpisodeTags = async () => {
+    globals.methods.getEpisodeTags = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/tagging/dic/annict/episodes')
@@ -240,7 +234,7 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getEpisodes = async id => {
+    globals.methods.getEpisodes = async id => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(`/mulukhiya/api/program/works/${id}/episodes`)
@@ -248,7 +242,7 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.searchTags = async keyword => {
+    globals.methods.searchTags = async keyword => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.post('/mulukhiya/api/tagging/tag/search', {q: keyword})
@@ -256,127 +250,127 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getFavoriteTags = async () => {
+    globals.methods.getFavoriteTags = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/tagging/favorites'))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/tagging/favorites'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.updateTaggingDictionary = async () => {
+    globals.methods.updateTaggingDictionary = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/tagging/dic/update', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/tagging/dic/update', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.clearUserTags = async () => {
+    globals.methods.clearUserTags = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/tagging/usertag/clear', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/tagging/usertag/clear', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getMedias = async params => {
+    globals.methods.getMedias = async params => {
       params.page = Number(params.page || 1)
       params.only_person = params.only_person ? 1 : 0
       if (params.q) {
-        Vue.registerSuggestedKeyword(params.q)
+        globals.methods.registerSuggestedKeyword(params.q)
       } else {
         delete params.q
       }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/media', {query: params}))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/media', {query: params}))
         .then(e => e.data)
         .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.clearMediaFiles = async () => {
+    globals.methods.clearMediaFiles = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/media/file/clear', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/media/file/clear', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.clearMediaMetadata = async () => {
+    globals.methods.clearMediaMetadata = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/media/metadata/clear', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/media/metadata/clear', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getStatuses = async params => {
+    globals.methods.getStatuses = async params => {
       params.page = Number(params.page || 1)
       params.self = params.self ? 1 : 0
       if (params.q) {
-        Vue.registerSuggestedKeyword(params.q)
+        globals.methods.registerSuggestedKeyword(params.q)
       } else {
         delete params.q
       }
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/status/list', {query: params}))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/status/list', {query: params}))
         .then(e => e.data)
         .catch(e => e.response.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getStatus = async id => {
+    globals.methods.getStatus = async id => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL(`/mulukhiya/api/status/${id}`))
+      return axios.get(globals.methods.createURL(`/mulukhiya/api/status/${id}`))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.createTag = async (id, tag) => {
+    globals.methods.createTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/status/tag', {token: Vue.getToken(), id: id, tag: tag})
+      return axios.post('/mulukhiya/api/status/tag', {token: globals.methods.getToken(), id: id, tag: tag})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.updateTags = async (id, tags) => {
+    globals.methods.updateTags = async (id, tags) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/status/tags', {token: Vue.getToken(), id: id, tags: tags})
+      return axios.post('/mulukhiya/api/status/tags', {token: globals.methods.getToken(), id: id, tags: tags})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.deleteTag = async (id, tag) => {
+    globals.methods.deleteTag = async (id, tag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.delete('/mulukhiya/api/status/tag', {data: {token: Vue.getToken(), id: id, tag: tag}})
+      return axios.delete('/mulukhiya/api/status/tag', {data: {token: globals.methods.getToken(), id: id, tag: tag}})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.deleteNowplaying = async id => {
+    globals.methods.deleteNowplaying = async id => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.delete('/mulukhiya/api/status/nowplaying', {data: {token: Vue.getToken(), id: id}})
+      return axios.delete('/mulukhiya/api/status/nowplaying', {data: {token: globals.methods.getToken(), id: id}})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.attachPoipikuImage = async (id, fanart) => {
+    globals.methods.attachPoipikuImage = async (id, fanart) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.put('/mulukhiya/api/status/poipiku', {token: Vue.getToken(), id: id, fanart: fanart})
+      return axios.put('/mulukhiya/api/status/poipiku', {token: globals.methods.getToken(), id: id, fanart: fanart})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getHealth = async () => {
+    globals.methods.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/health')
@@ -385,7 +379,7 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.getAbout = async () => {
+    globals.methods.getAbout = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get('/mulukhiya/api/about')
@@ -393,71 +387,71 @@ const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    Vue.updateAnnouncement = async () => {
+    globals.methods.updateAnnouncement = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/announcement/update', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/announcement/update', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getLemmyCommunities = async () => {
+    globals.methods.getLemmyCommunities = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/lemmy/communities'))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/lemmy/communities'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.authAnnict = async code => {
+    globals.methods.authAnnict = async code => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/annict/auth', {token: Vue.getToken(), code: code})
+      return axios.post('/mulukhiya/api/annict/auth', {token: globals.methods.getToken(), code: code})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.getHandlers = async () => {
+    globals.methods.getHandlers = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(Vue.createURL('/mulukhiya/api/admin/handler/list'))
+      return axios.get(globals.methods.createURL('/mulukhiya/api/admin/handler/list'))
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.restartPuma = async () => {
+    globals.methods.restartPuma = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/admin/puma/restart', {token: Vue.getToken()})
+      return axios.post('/mulukhiya/api/admin/puma/restart', {token: globals.methods.getToken()})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.toggleHandler = async (handler, flag) => {
+    globals.methods.toggleHandler = async (handler, flag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/admin/handler/config', {token: Vue.getToken(), handler: handler, flag: flag})
+      return axios.post('/mulukhiya/api/admin/handler/config', {token: globals.methods.getToken(), handler: handler, flag: flag})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.setInfoToken = async token => {
+    globals.methods.setInfoToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/admin/agent/config', {token: Vue.getToken(), info_token: token})
+      return axios.post('/mulukhiya/api/admin/agent/config', {token: globals.methods.getToken(), info_token: token})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.setTestToken = async token => {
+    globals.methods.setTestToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.post('/mulukhiya/api/admin/agent/config', {token: Vue.getToken(), test_token: token})
+      return axios.post('/mulukhiya/api/admin/agent/config', {token: globals.methods.getToken(), test_token: token})
         .then(e => e.data)
         .finally(e => indicator.hide())
     }
 
-    Vue.execGET = async path => {
+    globals.methods.execGET = async path => {
       const indicator = new ActivityIndicator()
       indicator.show()
       return axios.get(path)

@@ -17,18 +17,19 @@ html lang='ja'
       article.episode v-for='work in works'
         h3
           i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
-          span :id="'work-title-' + work.annictId" v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @click='getEpisodes(work.annictId)' {{work.title}}
+          span :id="'work-title-' + work.annictId" v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
+            | {{work.title}}
           ul.params class='clearfix'
             li.param v-if='work.seasonYear'
               i class='fa fa-calendar'
               | {{work.seasonYear}}年
             li.param v-if='work.officialSiteUrl'
               i class='fa fa-globe'
-              a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' v-if='work.officialSiteUrl' 公式サイト
-        vue-slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
+              a :href='work.officialSiteUrl' target='_blank' rel='noreferrer' 公式サイト
+        slide-up-down :active="layout[work.annictId] && episodes[work.annictId]"
           .episode-container
             ul.episodes v-if='episodes[work.annictId]?.length'
-              li.episode v-for='episode in episodes[work.annictId]' v-if='episode.title'
+              li.episode v-for='episode in episodes[work.annictId]'
                 strong.number-text
                   | {{episode.numberText}}
                 .link-container
@@ -40,7 +41,7 @@ html lang='ja'
                   span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
                     | {{episode.hashtag}}
                 .link-container v-if='episode.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
@@ -54,7 +55,7 @@ html lang='ja'
                   span.hashtag :id="'episode-hashtag-' + work.annictId"
                     | {{work.hashtag}}
                 .link-container v-if='work.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCommandToot()' :data-clipboard-target="'#episode-command-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId"
                   | 実況コマンド
                   textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
                 .bubble-container v-if='work.hashtag_url'
@@ -68,46 +69,59 @@ html lang='ja'
     == slim.render 'fragment/footer'
     javascript:
       'use strict'
-      Vue.use(MulukhiyaLib)
-      Vue.component('vue-slide-up-down', VueSlideUpDown)
-      Vue.use(window.VuejsDialog.main.default, {okText: '了解', cancelText: 'キャンセル'})
-      new Vue({
-        el: '#app',
-        data: {
-          account: {is_admin: false, username: null},
-          all_works: [],
-          works: [],
-          episodes: {},
-          keyword: null,
-          layout: {},
+      const app = Vue.createApp({
+        data () {
+          return {
+            account: {is_admin: false, username: null},
+            all_works: [],
+            works: [],
+            episodes: {},
+            keyword: null,
+            layout: {},
+          }
         },
         mounted () {
-          Vue.getConfig()
+          this.methods.getConfig()
             .then(e => {
-              this.account = Vue.createAccountInfo(e)
-              this.disabled_tags = Vue.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => Vue.alert(this.$dialog, e))
+              this.account = this.methods.createAccountInfo(e)
+              this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.getWorks()
           new ClipboardJS('.episode i');
         },
         methods: {
-          getEpisodes (id) {
+          toggleEpisodes (id) {
             this.layout[id] = !this.layout[id]
-            if (this.layout[id] && !this.episodes[id]) {
-              Vue.getEpisodes(id).then(e => Vue.set(this.episodes, id, e))
+          },
+          prefetchEpisodes (id) {
+            if (!this.episodes[id]) {
+              this.methods.getEpisodes(id).then(e => {
+                this.episodes[id] = e
+              })
             }
           },
           getWorks () {
             setTimeout(() => {
-              Vue.getWorks({q: this.keyword})
+              this.methods.getWorks({q: this.keyword})
                 .then(e => {
                   this.works = e
-                  this.works.map(w => Vue.set(this.layout, w.annictId, false))
-                }).catch(e => Vue.alert(this.$dialog, e))
+                  this.works.map(w => this.layout[w.annictId] = false)
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             }, 500)
           },
-          notifyCommandToot () {
-            Vue.alert(this.$dialog, '実況コマンドをクリップボードにコピーしました。')
+          notifyCopy () {
+            Swal.fire({
+              title: 'クリップボードにコピーしました。',
+              toast: true,
+              position: 'top-end',
+              icon: 'info',
+              showConfirmButton: false,
+              timer: 2000,
+            })
           },
         },
       })
+      app.use(window.MulukhiyaLib)
+      app.component('slide-up-down', window.SlideUpDown)
+      app.directive('tooltip', window.VTooltip);
+      app.mount('#app')
