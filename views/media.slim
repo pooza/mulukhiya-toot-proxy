@@ -20,10 +20,6 @@ html lang='ja'
           datalist id='suggested_keywords'
             option v-for='keyword in suggested_keywords' {{keyword}}
           button.small @click='searchMedias' 検索
-        .control
-          label
-            input type='checkbox' v-model='only_person'
-            | ボットからの#{controller.status_label}を除く
       ul class='medias clearfix'
         li.media v-for='media in medias'
           .media-container
@@ -70,7 +66,6 @@ html lang='ja'
             suggested_keywords: this.methods.getSuggestedKeywords(),
             page: 0,
             keyword: null,
-            only_person: false,
             last_page: false,
           }
         },
@@ -89,7 +84,7 @@ html lang='ja'
           },
           appendMedias () {
             this.page ++
-            this.methods.getMedias({page: this.page, q: this.keyword, only_person: this.only_person})
+            this.methods.getMedias({page: this.page, q: this.keyword})
               .then(e => {
                 this.suggested_keywords = this.methods.getSuggestedKeywords()
                 if (0 < e.length) {

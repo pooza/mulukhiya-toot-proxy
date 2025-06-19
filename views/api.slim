@@ -36,10 +36,6 @@ html lang='ja'
               .control
                 i class='fa fa-magnifying-glass'
                 input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
-              .control
-                label
-                  input type='checkbox' v-model='query_params.media_list.only_person' @input='onInputMediaList'
-                  | ボットからの#{controller.status_label}を除く
               .link-description 最近#{controller.status_label}されたメディアファイルを表示します。
               .field-update-button-container
                 button @click='delay(getMedias)' 実行
@@ -238,7 +234,7 @@ html lang='ja'
             config: {},
             entries: {},
             endpoints: {
-              media_list: '/mulukhiya/api/media?page=1&only_person=0',
+              media_list: '/mulukhiya/api/media?page=1',
               lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(this.methods.getToken())}`,
               status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
               status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
@@ -246,7 +242,7 @@ html lang='ja'
             },
             choices: {},
             query_params: {
-              media_list: {page: 1, q: null, only_person: false, token: this.methods.getToken()},
+              media_list: {page: 1, q: null, token: this.methods.getToken()},
               status_list: {page: 1, q: null, self: true, token: this.methods.getToken()},
               status_detail: {id: null, token: this.methods.getToken()},
               handler_list: {token: this.methods.getToken()},
@@ -327,7 +323,6 @@ html lang='ja'
           onInputMediaList () {
             const url = new URL('/mulukhiya/api/media', location.href)
             url.searchParams.set('page', this.query_params.media_list.page)
-            url.searchParams.set('only_person', this.query_params.media_list.only_person ? 1 : 0)
             url.searchParams.delete('q')
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
