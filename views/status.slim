@@ -17,43 +17,44 @@ html lang='ja'
             datalist id='suggested_keywords'
               option v-for='keyword in suggested_keywords' {{keyword}}
             button.small @click='searchStatuses' 検索
-        article.status v-for='(status, id) in statuses' v-if='account.username'
-          .visibility
-            i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
-          .header
-            i class='fa fa-id-badge'
-            a :href='status.webui_url' = '{{status.id}}'
-          .header
-            i class='fa fa-calendar'
-            | {{status.created_at}}
-          .header v-if='status.spoiler_text'
-            i class='fa fa-circle-exclamation'
-            | {{status.spoiler_text}}
-          .header
-            i class='fas fa-user'
-            | {{status.account.display_name}} {{status.account.acct}}
-          pre.body v-if='status.body' = '{{status.body}}'
-          nav.footer-navigations v-if='status.is_taggable && account.username==status.account.username'
-            h4
-              i class='fa fa-tag'
-              | タグづけ
-            - if controller.repost?
+        template v-if='account.username'
+          article.status v-for='(status, id) in statuses'
+            .visibility
+              i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
+            .header
+              i class='fa fa-id-badge'
+              a :href='status.webui_url' = '{{status.id}}'
+            .header
+              i class='fa fa-calendar'
+              | {{status.created_at}}
+            .header v-if='status.spoiler_text'
+              i class='fa fa-circle-exclamation'
+              | {{status.spoiler_text}}
+            .header
+              i class='fas fa-user'
+              | {{status.account.display_name}} {{status.account.acct}}
+            pre.body v-if='status.body' = '{{status.body}}'
+            nav.footer-navigations v-if='status.is_taggable && account.username==status.account.username'
+              h4
+                i class='fa fa-tag'
+                | タグづけ
+              - if controller.repost?
+                ul
+                  li
+                    i class='fa-solid fa-delete-left'
+                    a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
+            nav.footer-navigations v-if='(status.is_nowplaying || status.is_poipiku) && (account.username==status.account.username)'
+              h4
+                i class='fa fa-bolt'
+                | その他の操作
               ul
-                li
-                  i class='fa-solid fa-delete-left'
-                  a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
-          nav.footer-navigations v-if='(status.is_nowplaying || status.is_poipiku) && (account.username==status.account.username)'
-            h4
-              i class='fa fa-bolt'
-              | その他の操作
-            ul
-              li v-if='status.is_nowplaying'
-                i class='fa fa-music'
-                a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
-              - if controller.poipiku?
-                li v-if='status.is_poipiku'
-                  i class='fa fa-image'
-                  a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
+                li v-if='status.is_nowplaying'
+                  i class='fa fa-music'
+                  a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
+                - if controller.poipiku?
+                  li v-if='status.is_poipiku'
+                    i class='fa fa-image'
+                    a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else
