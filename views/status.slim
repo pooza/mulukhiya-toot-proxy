@@ -81,18 +81,6 @@ html lang='ja'
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
-          createTag (id) {
-            this.$dialog
-              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
-              .then(e => this.methods.createTag(id, e.data))
-              .then(e => this.statuses[e.id] = e)
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          deleteTag (id, tag) {
-            this.methods.deleteTag(id, tag)
-              .then(e => this.statuses[e.id] = e)
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
           searchStatuses () {
             this.page = 0
             Object.keys(this.statuses).forEach(k => delete this.statuses[k])

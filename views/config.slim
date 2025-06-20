@@ -243,14 +243,23 @@ html lang='ja'
               })
           },
           unauthLemmy () {
-            this.$dialog.confirm({body: 'Lemmyの認証を解除します。'}, {okText: '解除'})
-              .then(e => this.updateConfig({lemmy: null}))
-              .then(e => {
-                this.result = jsyaml.dump(e.config)
-                this.layout.details.lemmy = false
-                Object.keys(this.lemmy.communities).forEach(k => delete this.lemmy.communities[k])
-                this.options.lemmy_communities = null
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            Swal.fire({
+              title: 'Lemmy認証の解除',
+              text: 'Lemmyの認証を解除します。',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '解除',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (!result.isConfirmed) return
+              this.updateConfig({lemmy: null})
+                .then(e => {
+                  this.result = jsyaml.dump(e.config)
+                  this.layout.details.lemmy = false
+                  Object.keys(this.lemmy.communities).forEach(k => delete this.lemmy.communities[k])
+                  this.options.lemmy_communities = null
+                })
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateTags () {
             const command = {tagging: {user_tags: null, minutes: null}}
@@ -295,12 +304,21 @@ html lang='ja'
             this.updateConfig(command)
           },
           unauthAnnict () {
-            this.$dialog.confirm({body: 'Annictの認証を解除します。'}, {okText: '解除'})
-              .then(e => this.updateConfig({annict: null}))
-              .then(e => {
-                this.result = jsyaml.dump(e.config)
-                this.layout.details.annict = false
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            Swal.fire({
+              title: 'Annict認証の解除',
+              text: 'Annictの認証を解除します。',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '解除',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (!result.isConfirmed) return
+              this.updateConfig({annict: null})
+                .then(e => {
+                  this.result = jsyaml.dump(e.config)
+                  this.layout.details.annict = false
+                })
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })

@@ -79,13 +79,20 @@ html lang='ja'
         },
         methods: {
           createTag () {
-            this.$dialog
-              .prompt({title: '新規タグを作成'}, {promptHelp: 'タグの名前を入力して、作成ボタンを押下してください。', okText: '作成'})
-              .then(e => {
-                const tag = e.data.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
+            Swal.fire({
+              title: 'タグの名前を入力して、作成ボタンを押下してください。',
+              input: 'text',
+              inputPlaceholder: 'タグの名前',
+              showCancelButton: true,
+              confirmButtonText: '作成',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                const tag = result.value.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
                 if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
                 this.status.footer_tags.push({name: tag, is_deletable: true})
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+              }
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           deleteTag (tag) {
             this.status.footer_tags = this.status.footer_tags.filter(v => {

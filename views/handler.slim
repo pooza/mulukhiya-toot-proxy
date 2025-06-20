@@ -75,10 +75,17 @@ html lang='ja'
             this.layout.details[name] = !this.layout.details[name]
           },
           restartPuma () {
-            this.$dialog.confirm({body: 'Pumaを再起動します。'}, {okText: '再起動'})
-              .then(e => this.methods.restartPuma())
-              .then(e => {this.restartable = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            Swal.fire({
+              title: 'Pumaの再起動',
+              text: 'Pumaを再起動します。',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '再起動',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (!result.isConfirmed) return
+              this.methods.restartPuma().then(e => {this.restartable = false})
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           onChangeHandler (e) {
             this.methods.toggleHandler(e.target.value, e.target.checked)

@@ -54,17 +54,26 @@ html lang='ja'
         },
         methods: {
           deleteNowplaying (id) {
-            this.$dialog.confirm({body: '誤判定のナウプレを削除します。'},{okText: '削除'})
-              .then(e => this.methods.deleteNowplaying(id))
-              .then(e => {
-                if (e.id) {
-                  location.href = `/mulukhiya/app/status/${e.id}/nowplaying`
-                } else if (e.createdNote) {
-                  location.href = `/mulukhiya/app/status/${e.createdNote.id}/nowplaying`
-                } else {
-                  location.href = '/mulukhiya/app/status'
-                }
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            Swal.fire({
+              title: 'ナウプレの削除',
+              text: '誤判定のナウプレを削除します。',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '削除',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (!result.isConfirmed) return
+              this.methods.deleteNowplaying(id)
+                .then(e => {
+                  if (e.id) {
+                    location.href = `/mulukhiya/app/status/${e.id}/nowplaying`
+                  } else if (e.createdNote) {
+                    location.href = `/mulukhiya/app/status/${e.createdNote.id}/nowplaying`
+                  } else {
+                    location.href = '/mulukhiya/app/status'
+                  }
+                })
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },
       })
