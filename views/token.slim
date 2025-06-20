@@ -19,7 +19,7 @@ html lang='ja'
             a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
             span.alert v-else='' 壊れたトークン
             template v-for='role in current_account.roles'
-              .role v-if='role?.is_visible' = '{{role.name}}'
+              .role v-if='role.is_visible' = '{{role.name}}'
             .role v-if='current_account.is_test_bot' test bot
             .role v-if='current_account.is_info_bot' info bot
             .role v-if='isLoggedIn(current_account)' logged in
@@ -124,7 +124,7 @@ html lang='ja'
         },
         mounted () {
           new ClipboardJS('.token i')
-        }
+        },
         methods: {
           switchAccount (account) {
             this.methods.switchAccount(account)

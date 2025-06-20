@@ -6,7 +6,7 @@
   .message v-if='account.username'
     | login: @{{account.username}}
     template v-for='role in account.roles'
-      .role v-if='role?.is_visible' = '{{role.name}}'
+      .role v-if='role.is_visible' = '{{role.name}}'
     .role v-if='account.is_test_bot' test bot
     .role v-if='account.is_info_bot' info bot
     a href='/mulukhiya/app/token'
