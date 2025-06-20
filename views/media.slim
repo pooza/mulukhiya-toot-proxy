@@ -63,13 +63,14 @@ html lang='ja'
           return {
             account: {is_admin: false, username: null},
             medias: [],
-            suggested_keywords: this.methods.getSuggestedKeywords(),
+            suggested_keywords: [],
             page: 0,
             keyword: null,
             last_page: false,
           }
         },
         async created () {
+          this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
           this.appendMedias()
