@@ -16,7 +16,7 @@ html lang='ja'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
           h4
-            a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" = '@{{current_account.username}}'
+            a href='javascript:void(0)' @click='switchAccount(current_account)' v-if='current_account.username' v-tooltip.right="'このアカウントでログイン'" @{{current_account.username}}
             span.alert v-else='' 壊れたトークン
             template v-for='role in current_account.roles'
               .role v-if='role.is_visible' = '{{role.name}}'

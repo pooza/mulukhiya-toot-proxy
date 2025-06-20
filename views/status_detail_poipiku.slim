@@ -13,7 +13,7 @@ html lang='ja'
           i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
         .header
           i class='fa fa-id-badge'
-          a :href='status.webui_url' = '{{status.id}}'
+          a :href='status.webui_url' {{status.id}}
         .header
           i class='fa fa-calendar'
           | {{status.created_at}}
@@ -23,7 +23,7 @@ html lang='ja'
         .header
           i class='fas fa-user'
           | {{status.account.display_name}} {{status.account.acct}}
-        pre.body v-if='status.body' = '{{status.body}}'
+        pre.body v-if='status.body' {{status.body}}
         - if controller.poipiku?
           nav.footer-navigations v-if='status.is_poipiku'
             h4
