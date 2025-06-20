@@ -23,7 +23,7 @@ html lang='ja'
         .header
           i class='fas fa-user'
           | {{status.account.display_name}} {{status.account.acct}}
-        pre.body v-if='status.body' = '{{status.body}}'
+        pre.body v-if='status.body' {{status.body}}
         nav.footer-navigations v-if='status.is_taggable'
           h4
             i class='fa fa-tag'
@@ -64,18 +64,17 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             status: {},
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               return (new URL(location.href)).pathname.split('/').slice(-1)[0]
             }).then(id => this.methods.getStatus(id))
             .then(e => {this.status = e})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           createTag () {
@@ -110,5 +109,5 @@ html lang='ja'
       })
       app.use(window.MulukhiyaLib)
       app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip);
+      app.directive('tooltip', window.VTooltip)
       app.mount('#app')

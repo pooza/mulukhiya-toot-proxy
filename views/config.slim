@@ -112,7 +112,7 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             config: null,
             result: null,
             programs: [],
@@ -150,7 +150,7 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.updateForm(e)
@@ -165,7 +165,7 @@ html lang='ja'
                   this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
               this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
           this.methods.getPrograms()
             .then(e => {
               this.programs = e
@@ -287,7 +287,7 @@ html lang='ja'
           },
           updateNotify () {
             const command = {notify: {verbose: null}}
-            if (this.form.notify.verbose) {command.notify.verbose = true}
+            if (this.form.notify.verbose) command.notify.verbose = true
             this.updateConfig(command)
           },
           authAnnict () {
@@ -300,7 +300,7 @@ html lang='ja'
           },
           updateAnnict () {
             const command = {annict: {theme_works_only: null}}
-            if (this.form.annict.theme_works_only) {command.annict.theme_works_only = true}
+            if (this.form.annict.theme_works_only) command.annict.theme_works_only = true
             this.updateConfig(command)
           },
           unauthAnnict () {

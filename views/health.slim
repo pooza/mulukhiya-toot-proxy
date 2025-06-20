@@ -19,14 +19,12 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             result: {status: 503},
           }
         },
-        mounted () {
-          this.methods.getConfig()
-            .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+        async created () {
+          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
           this.load()
         },
         methods: {
@@ -37,5 +35,5 @@ html lang='ja'
       })
       app.use(window.MulukhiyaLib)
       app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip);
+      app.directive('tooltip', window.VTooltip)
       app.mount('#app')

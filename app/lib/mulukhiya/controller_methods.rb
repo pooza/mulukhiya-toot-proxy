@@ -82,7 +82,7 @@ module Mulukhiya
       end
 
       def livecure?
-        return false unless config['/program/urls'].count.positive?
+        return false unless config['/program/urls'].any?
         return true
       rescue Ginseng::ConfigError
         return false

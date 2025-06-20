@@ -195,9 +195,7 @@ html lang='ja'
                 .endpoint-container
                   .link GET {{endpoints.#{api.id}}}
                   - api.args.each do |arg|
-                    v-select :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' v-if='choices.#{api.id}_#{arg}'
-                    .control
-                      input type='text' placeholder='#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' @keydown.enter='execCustomAPI("#{api.id}")' v-else=''
+                    multiselect :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' label="label" track-by="value"
                   .link-description = api.description
                   .field-update-button-container
                     button @click='execCustomAPI("#{api.id}")' 実行
@@ -230,7 +228,7 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             config: {},
             entries: {},
             endpoints: {
@@ -295,7 +293,7 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
@@ -303,16 +301,20 @@ html lang='ja'
               if (this.methods.getToken()) {
                 this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
               }
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
+        },
+        async mounted () {
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
             entry.args.map(key => {params[key] = ''})
             this.entries[entry.id] = entry
             if (entry.choices) {
               Object.keys(entry.choices).map(k => {
-                axios.get(entry.choices[k])
-                  .then(e => this.choices[`${entry.id}_${k}`] = e.data)
-                  .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+                axios.get(entry.choices[k]).then(e => {
+                  this.choices[`${entry.id}_${k}`] = e.data.map((label, value) => {
+                    return {label, value}
+                  })
+                })
               })
             }
             this.query_params[entry.id] = params
@@ -327,7 +329,7 @@ html lang='ja'
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
             }
-            if (this.methods.getToken()) {url.searchParams.set('token', this.methods.getToken())}
+            if (this.methods.getToken()) url.searchParams.set('token', this.methods.getToken())
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
           onInputStatusList () {
@@ -495,5 +497,6 @@ html lang='ja'
       })
       app.use(window.MulukhiyaLib)
       app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip);
+      app.directive('tooltip', window.VTooltip)
+      app.component('multiselect', window.VueformMultiselect)
       app.mount('#app')
