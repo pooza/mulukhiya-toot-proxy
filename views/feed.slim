@@ -34,15 +34,13 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             feeds: [],
           }
         },
         async created () {
-          this.methods.getConfig()
-            .then(e => {this.account = this.methods.createAccountInfo(e)})
-          this.methods.getFeeds()
-            .then(e => {this.feeds = e})
+          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+          this.methods.getFeeds().then(e => {this.feeds = e})
         },
       })
       app.use(window.MulukhiyaLib)

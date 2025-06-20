@@ -19,13 +19,12 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             result: {status: 503},
           }
         },
         async created () {
-          this.methods.getConfig()
-            .then(e => {this.account = this.methods.createAccountInfo(e)})
+          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
           this.load()
         },
         methods: {

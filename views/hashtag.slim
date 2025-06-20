@@ -58,7 +58,7 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             disabled_tags: [],
             keyword: null,
             dic_entries: {},
@@ -71,8 +71,7 @@ html lang='ja'
               this.account = this.methods.createAccountInfo(e)
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
             })
-          this.methods.getFavoriteTags()
-            .then(e => {this.fav_entries = e})
+          this.methods.getFavoriteTags().then(e => {this.fav_entries = e})
         },
         methods: {
           search () {

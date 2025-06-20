@@ -61,7 +61,7 @@ html lang='ja'
       const app = Vue.createApp({
         data () {
           return {
-            account: {is_admin: false, username: null},
+            account: {},
             medias: [],
             suggested_keywords: [],
             page: 0,
@@ -71,8 +71,7 @@ html lang='ja'
         },
         async created () {
           this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
-          this.methods.getConfig()
-            .then(e => {this.account = this.methods.createAccountInfo(e)})
+          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
           this.appendMedias()
         },
         methods: {
