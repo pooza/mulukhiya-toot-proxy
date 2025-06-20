@@ -325,7 +325,7 @@ html lang='ja'
             if (this.query_params.media_list.q) {
               url.searchParams.set('q', this.query_params.media_list.q)
             }
-            if (this.methods.getToken()) {url.searchParams.set('token', this.methods.getToken())}
+            if (this.methods.getToken()) url.searchParams.set('token', this.methods.getToken())
             this.endpoints.media_list = `${url.pathname}${url.search}`
           },
           onInputStatusList () {

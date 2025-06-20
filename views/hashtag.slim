@@ -77,7 +77,7 @@ html lang='ja'
         methods: {
           search () {
             Object.keys(this.dic_entries).forEach(k => delete this.dic_entries[k])
-            if (this.keyword == '') {return}
+            if (this.keyword == '') return
             this.methods.searchTags(this.keyword)
               .then(e => {this.dic_entries = e})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
@@ -91,7 +91,7 @@ html lang='ja'
             this.disabled_tags = this.disabled_tags || []
             if (flag) {
               this.disabled_tags = this.disabled_tags.filter(v => (v != tag))
-              if (this.disabled_tags.length == 0) {this.disabled_tags = null}
+              if (this.disabled_tags.length == 0) this.disabled_tags = null
             } else {
               this.disabled_tags.push(tag)
               this.disabled_tags = Array.from(new Set(this.disabled_tags))
