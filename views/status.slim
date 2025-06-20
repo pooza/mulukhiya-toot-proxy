@@ -73,12 +73,12 @@ html lang='ja'
             last_page: false,
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
-              if (this.account.username) {this.appendStatuses()}
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+              if (this.account.username) this.appendStatuses()
+            })
         },
         methods: {
           searchStatuses () {

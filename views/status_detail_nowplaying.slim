@@ -43,14 +43,13 @@ html lang='ja'
             status: {},
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               return (new URL(location.href)).pathname.split('/').slice(-2)[0]
             }).then(id => this.methods.getStatus(id))
             .then(e => {this.status = e})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           deleteNowplaying (id) {

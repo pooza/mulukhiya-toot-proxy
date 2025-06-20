@@ -150,7 +150,7 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.updateForm(e)
@@ -165,7 +165,7 @@ html lang='ja'
                   this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
               this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
           this.methods.getPrograms()
             .then(e => {
               this.programs = e

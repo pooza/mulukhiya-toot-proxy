@@ -113,16 +113,18 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
             .then(e => this.methods.getAccounts())
             .then(e => {
               this.accounts = e
               this.all_tokens = this.getAllTokens()
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          new ClipboardJS('.token i')
+            })
         },
+        mounted () {
+          new ClipboardJS('.token i')
+        }
         methods: {
           switchAccount (account) {
             this.methods.switchAccount(account)

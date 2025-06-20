@@ -23,10 +23,9 @@ html lang='ja'
             result: {status: 503},
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.load()
         },
         methods: {

@@ -36,10 +36,9 @@ html lang='ja'
             account: {is_admin: false, username: null},
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
       })
       app.use(window.MulukhiyaLib)

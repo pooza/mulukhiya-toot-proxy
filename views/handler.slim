@@ -62,13 +62,11 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.methods.getHandlers()
             .then(e => e.map(v => this.handlers[v.name] = v.disable))
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           toggleVisibility (name) {

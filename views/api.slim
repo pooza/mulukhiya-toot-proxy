@@ -295,7 +295,7 @@ html lang='ja'
             },
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
@@ -303,16 +303,14 @@ html lang='ja'
               if (this.methods.getToken()) {
                 this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
               }
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
           JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
             const params = {}
             entry.args.map(key => {params[key] = ''})
             this.entries[entry.id] = entry
             if (entry.choices) {
               Object.keys(entry.choices).map(k => {
-                axios.get(entry.choices[k])
-                  .then(e => this.choices[`${entry.id}_${k}`] = e.data)
-                  .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+                axios.get(entry.choices[k]).then(e => this.choices[`${entry.id}_${k}`] = e.data)
               })
             }
             this.query_params[entry.id] = params

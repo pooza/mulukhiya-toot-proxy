@@ -38,13 +38,11 @@ html lang='ja'
             feeds: [],
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {this.account = this.methods.createAccountInfo(e)})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.methods.getFeeds()
             .then(e => {this.feeds = e})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
       })
       app.use(window.MulukhiyaLib)

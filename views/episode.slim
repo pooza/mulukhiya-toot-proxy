@@ -80,13 +80,15 @@ html lang='ja'
             layout: {},
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
           this.getWorks()
+        },
+        mounted () {
           new ClipboardJS('.episode i')
         },
         methods: {

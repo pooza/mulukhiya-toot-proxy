@@ -65,15 +65,14 @@ html lang='ja'
             fav_entries: [],
           }
         },
-        mounted () {
+        async created () {
           this.methods.getConfig()
             .then(e => {
               this.account = this.methods.createAccountInfo(e)
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            })
           this.methods.getFavoriteTags()
             .then(e => {this.fav_entries = e})
-            .catch(e => Swal.fire({text: e.message, icon: 'error'}))
         },
         methods: {
           search () {
