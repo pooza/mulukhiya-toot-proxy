@@ -121,7 +121,7 @@ html lang='ja'
               this.accounts = e
               this.all_tokens = this.getAllTokens()
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          new ClipboardJS('.token i');
+          new ClipboardJS('.token i')
         },
         methods: {
           switchAccount (account) {
@@ -238,5 +238,5 @@ html lang='ja'
       })
       app.use(window.MulukhiyaLib)
       app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip);
+      app.directive('tooltip', window.VTooltip)
       app.mount('#app')

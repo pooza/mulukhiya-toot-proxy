@@ -87,7 +87,7 @@ html lang='ja'
               this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           this.getWorks()
-          new ClipboardJS('.episode i');
+          new ClipboardJS('.episode i')
         },
         methods: {
           toggleEpisodes (id) {
@@ -123,5 +123,5 @@ html lang='ja'
       })
       app.use(window.MulukhiyaLib)
       app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip);
+      app.directive('tooltip', window.VTooltip)
       app.mount('#app')
