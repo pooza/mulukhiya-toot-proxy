@@ -15,8 +15,8 @@ gem 'optparse'
 gem 'parallel'
 gem 'rspotify'
 gem 'ruby-progressbar'
-gem 'sidekiq', '~>7.3.7'
-gem 'sidekiq-scheduler', '~>5.0.0'
+gem 'sidekiq', '~>8.0.5'
+gem 'sidekiq-scheduler', '~>6.0.1'
 gem 'yamllint'
 
 group :postgres do
