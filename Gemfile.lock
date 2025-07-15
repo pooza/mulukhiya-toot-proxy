@@ -228,7 +228,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.25.5)
-    mongo (2.21.1)
+    mongo (2.21.2)
       base64
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
