@@ -1,10 +1,12 @@
 module Mulukhiya
   class PiefedClipper < LemmyClipper
-    API_VERSION = 'alpha'.freeze
+    def api_version
+      return config['/piefed/api/version']
+    end
 
     def login
       return if @jwt
-      response = http.post("/api/#{API_VERSION}/user/login", {
+      response = http.post("/api/#{api_version}/user/login", {
         body: {username:, password:},
       })
       @jwt = response['jwt']
@@ -22,11 +24,11 @@ module Mulukhiya
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
         data[:url] = uri.to_s
-        data[:title] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:title] ||= uri.subject.ellipsize(config['/piefed/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
       data[:title] = data[:title].gsub(/[\r\n[:blank:]]/, ' ')
-      return http.post("/api/#{API_VERSION}/post", {
+      return http.post("/api/#{api_version}/post", {
         body: data,
         headers: {'Authorization' => "Bearer #{@jwt}"},
       })
@@ -35,7 +37,7 @@ module Mulukhiya
     def communities
       login unless @jwt
       uri = self.uri.clone
-      uri.path = "/api/#{API_VERSION}/community/list"
+      uri.path = "/api/#{api_version}/community/list"
       uri.query_values = {
         type_: 'Subscribed',
       }

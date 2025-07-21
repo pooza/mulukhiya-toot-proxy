@@ -268,6 +268,8 @@ itunes:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
 lemmy:
+  api:
+    version: v3
   communities:
     limit: 50
   hosts:
@@ -781,6 +783,8 @@ peer_tube:
       - /w/
       - /videos/watch/
 piefed:
+  api:
+    version: alpla
   hosts:
     default: pf.korako.me
   subject:
