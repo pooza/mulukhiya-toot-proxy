@@ -12,6 +12,26 @@ module Mulukhiya
       raise Ginseng::AuthError, e.message, e.backtrace
     end
 
+    def clip(body)
+      login unless @jwt
+      body ||= {}
+      body.deep_symbolize_keys!
+      raise Ginseng::RequestError, 'invalid community' unless @params[:community]
+      data = {community_id: @params[:community], name: body[:name]&.to_s}
+      if uri = create_status_uri(body[:url])
+        raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
+        raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
+        data[:url] = uri.to_s
+        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:body] ||= "via: #{uri}"
+      end
+      data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
+      return http.post("/api/#{API_VERSION}/post", {
+        body: data,
+        headers: {'Authorization' => "Bearer #{@jwt}"},
+      })
+    end
+
     def communities
       login unless @jwt
       uri = self.uri.clone
