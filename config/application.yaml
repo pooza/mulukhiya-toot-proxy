@@ -784,7 +784,7 @@ peer_tube:
       - /videos/watch/
 piefed:
   api:
-    version: alpla
+    version: alpha
   hosts:
     default: pf.korako.me
   subject:
