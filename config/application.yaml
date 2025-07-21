@@ -268,6 +268,8 @@ itunes:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
 lemmy:
+  api:
+    version: v3
   communities:
     limit: 50
   hosts:
@@ -319,6 +321,7 @@ mastodon:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -330,6 +333,7 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -342,6 +346,7 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -425,6 +430,8 @@ mastodon:
     spoiler_text: null
   streaming:
     verify_peer: true
+  theme:
+    color: '#777777'
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -467,6 +474,7 @@ meisskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -478,6 +486,7 @@ meisskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -486,6 +495,7 @@ meisskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -608,6 +618,7 @@ misskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -619,6 +630,7 @@ misskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -627,6 +639,7 @@ misskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -737,7 +750,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.37.2
+  version: 4.38.0
 parser:
   note:
     fields:
@@ -769,6 +782,13 @@ peer_tube:
     video:
       - /w/
       - /videos/watch/
+piefed:
+  api:
+    version: alpha
+  hosts:
+    default: pf.korako.me
+  subject:
+    max_length: 50
 pleroma:
   attachment:
     limit: 4
@@ -800,6 +820,7 @@ pleroma:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -811,6 +832,7 @@ pleroma:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -819,6 +841,7 @@ pleroma:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying

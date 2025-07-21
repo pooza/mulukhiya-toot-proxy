@@ -37,6 +37,10 @@ module Mulukhiya
         return Handler.search(/lemmy/).present?
       end
 
+      def piefed?
+        return Handler.search(/piefed/).present?
+      end
+
       def poipiku?
         return Handler.search(/poipiku/).present?
       end

@@ -441,6 +441,18 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/piefed/communities' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.piefed?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = sns.account.piefed&.communities || {}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/feed/list' do
       tags = TagContainer.new
       tags.merge(TagContainer.default_tags)

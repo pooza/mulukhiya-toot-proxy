@@ -403,6 +403,14 @@ window.MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.getPiefedCommunities = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get(globals.methods.createURL('/mulukhiya/api/piefed/communities'))
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.authAnnict = async code => {
       const indicator = new ActivityIndicator()
       indicator.show()
