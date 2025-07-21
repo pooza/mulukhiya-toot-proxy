@@ -4,9 +4,11 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
-    def info
-      return nodeinfo.merge(metadata: {themeColor: theme_color})
+    def nodeinfo
+      return super.merge(metadata: {themeColor: theme_color})
     end
+
+    alias info nodeinfo
 
     alias toot post
 
