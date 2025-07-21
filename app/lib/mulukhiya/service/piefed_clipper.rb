@@ -22,7 +22,7 @@ module Mulukhiya
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
         data[:url] = uri.to_s
-        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:title] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
       data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
