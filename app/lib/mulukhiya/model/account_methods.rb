@@ -62,6 +62,20 @@ module Mulukhiya
       return nil
     end
 
+    def piefed
+      return nil unless [:url, :user, :password].all? {|k| user_config["/piefed/#{k}"]}
+      @piefed ||= LemmyClipper.new(
+        url: user_config['/piefed/url'],
+        user: user_config['/piefed/user'],
+        password: user_config['/piefed/password'],
+        community: user_config['/piefed/community'],
+      )
+      return @piefed
+    rescue => e
+      e.log(acct: acct.to_s)
+      return nil
+    end
+
     def annict
       return nil unless [:token].all? {|k| user_config["/annict/#{k}"]}
       @annict ||= AnnictService.new(user_config['/annict/token'], guest: bot?)

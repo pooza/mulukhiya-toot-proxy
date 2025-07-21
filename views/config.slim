@@ -59,6 +59,31 @@ html lang='ja'
               .field-update-button-container
                 button @click='updateLemmy' 更新
                 button.alert @click='unauthLemmy' 認証を解除
+      section.config v-if='account.username && layout.sections.piefed'
+        h3 @click='toggleVisibility("piefed")' PieFed
+        slide-up-down :active='layout.details.piefed'
+          ol
+            li PieFedサービスの認証情報（URL、ユーザーID、パスワード）を入力してください。
+            li 認証ボタンを押下。
+            li ブックマークを投稿するコミュニティを選択してください。
+            li 更新ボタンを押下。
+          .inline-field-container
+            h4 URL
+            input placeholder='PieFedサービスのURL（https://#{config['/piefed/hosts/default']} など）' v-model.trim='form.piefed.url'
+          .inline-field-container
+            h4 ユーザーID
+            input placeholder='PieFedサービスのユーザーID（またはメールアドレス）' v-model.trim='form.piefed.user'
+          .inline-field-container
+            h4 パスワード
+            input type='password' placeholder='PieFedサービスのパスワード（保存時に暗号化されます）' v-model.trim='form.piefed.password'
+          .field-container
+            h4 コミュニティ
+            .alert v-if='!form.piefed.community' コミュニティが未設定です。
+            .post-auth
+              multiselect :options='options.piefed_communities' label='label' track-by='value' v-model='form.piefed.community'
+              .field-update-button-container
+                button @click='updatePiefed' 更新
+                button.alert @click='unauthPiefed' 認証を解除
       section.config v-if='account.username && layout.sections.annict'
         h3 @click='toggleVisibility("annict")' Annict
         slide-up-down :active='layout.details.annict'
@@ -119,6 +144,9 @@ html lang='ja'
             lemmy: {
               communities: {},
             },
+            piefed: {
+              communities: {},
+            },
             form: {
               notify: {verbose: null},
               livecure: false,
@@ -126,21 +154,25 @@ html lang='ja'
               program: {minutes: null, tags: null},
               tags: '',
               webhook: {token: null, visibility: null},
-              lemmy: {url: null, user: null, passwrd: null, community: null},
+              lemmy: {url: null, user: null, password: null, community: null},
+              piefed: {url: null, user: null, password: null, community: null},
             },
             options: {
               program: [],
               visibility: [],
               lemmy_communities: [],
+              piefed_communities: [],
             },
             layout: {
               sections: {
                 livecure: #{controller.livecure?},
                 lemmy: #{controller.lemmy?},
+                piefed: #{controller.piefed?},
                 annict: #{controller.annict?},
               },
               details: {
                 lemmy: false,
+                piefed: false,
                 tags: false,
                 livecure: false,
                 webhook: false,
@@ -165,6 +197,17 @@ html lang='ja'
                   this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
               this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
+            }).then(e => {
+              return this.methods.getPiefedCommunities()
+            }).then(e => {
+              console.log(e)
+              this.piefed.communities = e
+              Object.keys(this.piefed.communities)
+                .map(k => {
+                  this.options.piefed_communities.splice(0)
+                  this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
+                })
+              this.form.piefed.community = this.piefed.communities[this.methods.dig(this.config, 'piefed', 'community')]
             })
           this.methods.getPrograms()
             .then(e => {
@@ -185,6 +228,9 @@ html lang='ja'
             this.form.lemmy.url = this.methods.dig(data, 'config', 'lemmy', 'url')
             this.form.lemmy.user = this.methods.dig(data, 'config', 'lemmy', 'user')
             this.form.lemmy.community = this.lemmy.communities[this.methods.dig(data, 'config', 'lemmy', 'community')]
+            this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
+            this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
+            this.form.piefed.community = this.piefed.communities[this.methods.dig(data, 'config', 'piefed', 'community')]
             this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
             this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
             if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
@@ -258,6 +304,43 @@ html lang='ja'
                   this.layout.details.lemmy = false
                   Object.keys(this.lemmy.communities).forEach(k => delete this.lemmy.communities[k])
                   this.options.lemmy_communities = null
+                })
+            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+          },
+          updatePiefed () {
+            const command = {piefed: {url: null, user: null, community: null, host: null}}
+            if (this.form.piefed.url) {command.piefed.url = this.form.piefed.url}
+            if (this.form.piefed.user) {command.piefed.user = this.form.piefed.user}
+            if (this.form.piefed.password) {command.piefed.password = this.form.piefed.password}
+            if (this.form.piefed.community) {command.piefed.community = Number(this.form.piefed.community)}
+            this.updateConfig(command)
+            this.form.piefed.password = null
+            this.methods.getPiefedCommunities()
+              .then(e => {
+                this.piefed.communities = e
+                this.options.piefed_communities.splice(0)
+                Object.keys(this.piefed.communities)
+                  .map(k => {
+                    this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
+                  })
+              })
+          },
+          unauthPiefed () {
+            Swal.fire({
+              title: 'PieFed認証の解除',
+              text: 'PieFedの認証を解除します。',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '解除',
+              cancelButtonText: 'キャンセル',
+            }).then((result) => {
+              if (!result.isConfirmed) return
+              this.updateConfig({piefed: null})
+                .then(e => {
+                  this.result = jsyaml.dump(e.config)
+                  this.layout.details.piefed = false
+                  Object.keys(this.piefed.communities).forEach(k => delete this.piefed.communities[k])
+                  this.options.piefed_communities = null
                 })
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
