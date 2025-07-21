@@ -779,8 +779,6 @@ peer_tube:
       - /w/
       - /videos/watch/
 piefed:
-  communities:
-    limit: 50
   hosts:
     default: pf.korako.me
   subject:
