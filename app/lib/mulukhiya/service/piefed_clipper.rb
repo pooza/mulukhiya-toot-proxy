@@ -1,5 +1,5 @@
 module Mulukhiya
-  class PiefedClipper < piefedClipper
+  class PiefedClipper < LemmyClipper
     API_VERSION = 'alpha'.freeze
 
     def login
