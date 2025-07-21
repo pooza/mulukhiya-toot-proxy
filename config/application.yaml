@@ -319,6 +319,7 @@ mastodon:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -330,6 +331,7 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -342,6 +344,7 @@ mastodon:
       - user_config_command
       - filter_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -467,6 +470,7 @@ meisskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -478,6 +482,7 @@ meisskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -486,6 +491,7 @@ meisskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -608,6 +614,7 @@ misskey:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -619,6 +626,7 @@ misskey:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -627,6 +635,7 @@ misskey:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying
@@ -769,6 +778,13 @@ peer_tube:
     video:
       - /w/
       - /videos/watch/
+piefed:
+  communities:
+    limit: 50
+  hosts:
+    default: pf.korako.me
+  subject:
+    max_length: 50
 pleroma:
   attachment:
     limit: 4
@@ -800,6 +816,7 @@ pleroma:
       - welcome_mention
     post_bookmark:
       - lemmy_bookmark
+      - piefed_bookmark
       - result_notification
     post_boost:
       - result_notification
@@ -811,6 +828,7 @@ pleroma:
     post_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - result_notification
     post_upload:
       - result_notification
@@ -819,6 +837,7 @@ pleroma:
     pre_toot:
       - user_config_command
       - lemmy_clipping_command
+      - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
       - spotify_nowplaying

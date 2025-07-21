@@ -9,6 +9,7 @@ module Mulukhiya
       @http = HTTP.new
       @http.base_uri = uri
       logger.info(clipper: self.class.to_s, method: __method__, url: uri.to_s)
+      @api_version = 'v3'
     end
 
     def uri
@@ -26,7 +27,7 @@ module Mulukhiya
 
     def login
       return if @jwt
-      response = http.post('/api/v3/user/login', {
+      response = http.post("/api/#{@api_version}/user/login", {
         body: {
           username_or_email: username,
           password:,
@@ -51,7 +52,7 @@ module Mulukhiya
         data[:body] ||= "via: #{uri}"
       end
       data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
-      return http.post('/api/v3/post', {
+      return http.post("/api/#{@api_version}/post", {
         body: data,
         headers: {'Authorization' => "Bearer #{@jwt}"},
       })
@@ -60,7 +61,7 @@ module Mulukhiya
     def communities
       login unless @jwt
       uri = self.uri.clone
-      uri.path = '/api/v3/community/list'
+      uri.path = "/api/#{@api_version}/community/list"
       uri.query_values = {
         limit: config['/lemmy/communities/limit'],
         type_: 'Subscribed',
