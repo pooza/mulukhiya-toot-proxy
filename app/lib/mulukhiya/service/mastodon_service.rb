@@ -4,9 +4,15 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
-    alias info nodeinfo
+    def info
+      return info.merge(metadata: {themeColor: theme_color})
+    end
 
     alias toot post
+
+    def theme_color
+      return config['/mastodon/theme/color']
+    end
 
     def repost(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)

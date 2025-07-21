@@ -428,6 +428,8 @@ mastodon:
     spoiler_text: null
   streaming:
     verify_peer: true
+  theme:
+    color: '#777777'
   url: https://mstdn.example.com/
 media:
   metadata:
