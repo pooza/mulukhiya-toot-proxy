@@ -1,6 +1,6 @@
 module Mulukhiya
   class PiefedClipper < piefedClipper
-    API_VERSION = 'alpha'
+    API_VERSION = 'alpha'.freeze
 
     def login
       return if @jwt

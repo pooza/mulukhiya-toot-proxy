@@ -3,7 +3,8 @@ module Mulukhiya
     include Package
     include SNSMethods
     attr_reader :http
-    API_VERSION = 'v3'
+
+    API_VERSION = 'v3'.freeze
 
     def initialize(params = {})
       @params = params.deep_symbolize_keys
