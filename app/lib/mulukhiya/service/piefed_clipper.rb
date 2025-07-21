@@ -1,13 +1,10 @@
 module Mulukhiya
   class PiefedClipper < piefedClipper
-    def initialize(params = {})
-      super
-      @api_version = 'alpha'
-    end
+    API_VERSION = 'alpha'
 
     def login
       return if @jwt
-      response = http.post("/api/#{@api_version}/user/login", {
+      response = http.post("/api/#{API_VERSION}/user/login", {
         body: {username:, password:},
       })
       @jwt = response['jwt']

@@ -3,13 +3,13 @@ module Mulukhiya
     include Package
     include SNSMethods
     attr_reader :http
+    API_VERSION = 'v3'
 
     def initialize(params = {})
       @params = params.deep_symbolize_keys
       @http = HTTP.new
       @http.base_uri = uri
       logger.info(clipper: self.class.to_s, method: __method__, url: uri.to_s)
-      @api_version = 'v3'
     end
 
     def uri
@@ -27,7 +27,7 @@ module Mulukhiya
 
     def login
       return if @jwt
-      response = http.post("/api/#{@api_version}/user/login", {
+      response = http.post("/api/#{API_VERSION}/user/login", {
         body: {
           username_or_email: username,
           password:,
@@ -52,7 +52,7 @@ module Mulukhiya
         data[:body] ||= "via: #{uri}"
       end
       data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
-      return http.post("/api/#{@api_version}/post", {
+      return http.post("/api/#{API_VERSION}/post", {
         body: data,
         headers: {'Authorization' => "Bearer #{@jwt}"},
       })
@@ -61,7 +61,7 @@ module Mulukhiya
     def communities
       login unless @jwt
       uri = self.uri.clone
-      uri.path = "/api/#{@api_version}/community/list"
+      uri.path = "/api/#{API_VERSION}/community/list"
       uri.query_values = {
         limit: config['/lemmy/communities/limit'],
         type_: 'Subscribed',
