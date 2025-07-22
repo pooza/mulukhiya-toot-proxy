@@ -200,7 +200,6 @@ html lang='ja'
             }).then(e => {
               return this.methods.getPiefedCommunities()
             }).then(e => {
-              console.log(e)
               this.piefed.communities = e
               Object.keys(this.piefed.communities)
                 .map(k => {
