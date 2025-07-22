@@ -129,7 +129,7 @@ html lang='ja'
         methods: {
           switchAccount (account) {
             this.methods.switchAccount(account)
-              .then(e => {
+              .then(_ => {
                 this.account = account
                 this.token = account.token
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
@@ -152,7 +152,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '削除',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
               this.methods.deleteToken(account.token)
                 .then(e => this.methods.getAccounts())
@@ -178,9 +178,9 @@ html lang='ja'
                     showCancelButton: true,
                     confirmButtonText: '更新',
                     cancelButtonText: 'キャンセル',
-                  }).then((result) => {
+                  }).then(result => {
                     if (!result.isConfirmed) return
-                    this.methods.setInfoToken(this.token).then(e => {this.restartable = true})
+                    this.methods.setInfoToken(this.token).then(_ => {this.restartable = true})
                   }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
                 if (this.account.is_test_bot) {
@@ -191,9 +191,9 @@ html lang='ja'
                     showCancelButton: true,
                     confirmButtonText: '更新',
                     cancelButtonText: 'キャンセル',
-                  }).then((result) => {
+                  }).then(result => {
                     if (!result.isConfirmed) return
-                    this.methods.setTestToken(this.token).then(e => {this.restartable = true})
+                    this.methods.setTestToken(this.token).then(_ => {this.restartable = true})
                   }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
                 }
                 return this.methods.getAccounts()
@@ -232,9 +232,9 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '再起動',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
-              this.methods.restartPuma().then(e => {this.restartable = false})
+              this.methods.restartPuma().then(_ => {this.restartable = false})
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },

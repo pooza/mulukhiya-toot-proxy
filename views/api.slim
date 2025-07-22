@@ -365,7 +365,7 @@ html lang='ja'
           },
           updateAnnouncement () {
             this.methods.updateAnnouncement()
-              .then(e => {this.layout.details['announcement'] = false})
+              .then(_ => {this.layout.details['announcement'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getMedias () {
@@ -376,22 +376,22 @@ html lang='ja'
           },
           clearMediaFiles () {
             this.methods.clearMediaFiles()
-              .then(e => {this.layout.details['media'] = false})
+              .then(_ => {this.layout.details['media'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           clearMediaMetadata () {
             this.methods.clearMediaMetadata()
-              .then(e => {this.layout.details['media'] = false})
+              .then(_ => {this.layout.details['media'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateMediaCatalog () {
             this.methods.updateMediaCatalog()
-              .then(e => {this.layout.details['media'] = false})
+              .then(_ => {this.layout.details['media'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updatePrograms () {
             this.methods.updatePrograms()
-              .then(e => {this.layout.details['program'] = false})
+              .then(_ => {this.layout.details['program'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getPrograms () {
@@ -420,12 +420,12 @@ html lang='ja'
           },
           updateTaggingDictionary () {
             this.methods.updateTaggingDictionary()
-              .then(e => {this.layout.details['tagging_dic'] = false})
+              .then(_ => {this.layout.details['tagging_dic'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           clearUserTags () {
             this.methods.clearUserTags()
-              .then(e => {this.layout.details['tagging_usertag'] = false})
+              .then(_ => {this.layout.details['tagging_usertag'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           getFeeds () {
@@ -436,7 +436,7 @@ html lang='ja'
           },
           updateCustomFeeds () {
             this.methods.updateCustomFeeds()
-              .then(e => {this.layout.details['feed'] = false})
+              .then(_ => {this.layout.details['feed'] = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           searchTags () {
