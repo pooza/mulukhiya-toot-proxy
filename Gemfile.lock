@@ -175,7 +175,7 @@ GEM
     etc (1.4.6)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.13.2)
+    faraday (2.13.3)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -363,7 +363,7 @@ GEM
     sequel (5.94.0)
       bigdecimal
     set (1.1.2)
-    sidekiq (8.0.5)
+    sidekiq (8.0.6)
       connection_pool (>= 2.5.0)
       json (>= 2.9.0)
       logger (>= 1.6.2)
@@ -460,4 +460,4 @@ RUBY VERSION
    ruby 3.4.4p34
 
 BUNDLED WITH
-   2.7.0
+   2.7.1
