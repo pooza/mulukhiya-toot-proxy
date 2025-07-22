@@ -915,6 +915,8 @@ pleroma:
     spoiler_text: null
   streaming:
     verify_peer: true
+  theme:
+    color: '#777777'
   url: https://pleroma.example.com/
 poipiku:
   urls:
