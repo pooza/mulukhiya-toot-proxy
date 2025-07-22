@@ -75,7 +75,7 @@ html lang='ja'
         },
         methods: {
           search () {
-            Object.keys(this.dic_entries).forEach(k => delete this.dic_entries[k])
+            Object.keys(this.dic_entries).map(k => delete this.dic_entries[k])
             if (this.keyword == '') return
             this.methods.searchTags(this.keyword)
               .then(e => {this.dic_entries = e})

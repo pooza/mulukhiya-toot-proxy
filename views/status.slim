@@ -84,7 +84,7 @@ html lang='ja'
         methods: {
           searchStatuses () {
             this.page = 0
-            Object.keys(this.statuses).forEach(k => delete this.statuses[k])
+            Object.keys(this.statuses).map(k => delete this.statuses[k])
             this.last_page = false
             setTimeout(this.appendStatuses, 500)
           },

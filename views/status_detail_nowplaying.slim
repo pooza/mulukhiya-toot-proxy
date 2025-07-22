@@ -60,7 +60,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '削除',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
               this.methods.deleteNowplaying(id)
                 .then(e => {

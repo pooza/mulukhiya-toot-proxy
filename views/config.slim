@@ -197,7 +197,7 @@ html lang='ja'
                   this.options.lemmy_communities.push({value: k, label: this.lemmy.communities[k]})
                 })
               this.form.lemmy.community = this.lemmy.communities[this.methods.dig(this.config, 'lemmy', 'community')]
-            }).then(e => {
+            }).then(_ => {
               return this.methods.getPiefedCommunities()
             }).then(e => {
               this.piefed.communities = e
@@ -271,10 +271,10 @@ html lang='ja'
           },
           updateLemmy () {
             const command = {lemmy: {url: null, user: null, community: null, host: null}}
-            if (this.form.lemmy.url) {command.lemmy.url = this.form.lemmy.url}
-            if (this.form.lemmy.user) {command.lemmy.user = this.form.lemmy.user}
-            if (this.form.lemmy.password) {command.lemmy.password = this.form.lemmy.password}
-            if (this.form.lemmy.community) {command.lemmy.community = Number(this.form.lemmy.community)}
+            if (this.form.lemmy.url) command.lemmy.url = this.form.lemmy.url
+            if (this.form.lemmy.user) command.lemmy.user = this.form.lemmy.user
+            if (this.form.lemmy.password) command.lemmy.password = this.form.lemmy.password
+            if (this.form.lemmy.community) command.lemmy.community = Number(this.form.lemmy.community)
             this.updateConfig(command)
             this.form.lemmy.password = null
             this.methods.getLemmyCommunities()
@@ -295,7 +295,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '解除',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
               this.updateConfig({lemmy: null})
                 .then(e => {
@@ -308,10 +308,10 @@ html lang='ja'
           },
           updatePiefed () {
             const command = {piefed: {url: null, user: null, community: null, host: null}}
-            if (this.form.piefed.url) {command.piefed.url = this.form.piefed.url}
-            if (this.form.piefed.user) {command.piefed.user = this.form.piefed.user}
-            if (this.form.piefed.password) {command.piefed.password = this.form.piefed.password}
-            if (this.form.piefed.community) {command.piefed.community = Number(this.form.piefed.community)}
+            if (this.form.piefed.url) command.piefed.url = this.form.piefed.url
+            if (this.form.piefed.user) command.piefed.user = this.form.piefed.user
+            if (this.form.piefed.password) command.piefed.password = this.form.piefed.password
+            if (this.form.piefed.community) command.piefed.community = Number(this.form.piefed.community)
             this.updateConfig(command)
             this.form.piefed.password = null
             this.methods.getPiefedCommunities()
@@ -332,7 +332,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '解除',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
               this.updateConfig({piefed: null})
                 .then(e => {
@@ -357,7 +357,7 @@ html lang='ja'
           },
           updateLivecure () {
             this.methods.updateLivecureFlag(this.form.livecure)
-              .then(e => {this.layout.details.livecure = false})
+              .then(_ => {this.layout.details.livecure = false})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateWebhook () {
@@ -393,7 +393,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '解除',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
               this.updateConfig({annict: null})
                 .then(e => {
