@@ -1,10 +1,10 @@
 GIT
   remote: https://github.com/pooza/faye-websocket-ruby.git
-  revision: a4aaa85ee2b2cae8db3a092c01c57e04167a9ca6
+  revision: c56dc67819acdc38236e274a50ba278e223c65c9
   specs:
-    faye-websocket (0.11.3)
+    faye-websocket (0.12.0)
       eventmachine (>= 0.12.0)
-      websocket-driver (>= 0.5.1)
+      websocket-driver (>= 0.8.0)
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
