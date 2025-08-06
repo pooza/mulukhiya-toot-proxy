@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 7b6a6a07502bee949be8c2da0ee8ef622d877309
+  revision: 340799deedd990b1126a8b69bdfd3401475572b8
   specs:
-    ginseng-core (1.15.3)
+    ginseng-core (1.15.6)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       bundler (~> 2.0)
@@ -29,7 +29,7 @@ GIT
       multi_json
       net-protocol
       net-smtp
-      nokogiri (>= 1.18.8)
+      nokogiri (>= 1.18.9)
       optparse
       rake
       rest-client
@@ -221,7 +221,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0715)
+    mime-types-data (3.2025.0805)
     mini_magick (5.3.0)
       logger
     mini_mime (1.1.5)
