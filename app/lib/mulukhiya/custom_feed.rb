@@ -2,6 +2,7 @@ module Mulukhiya
   class CustomFeed
     include Package
     include SNSMethods
+
     attr_reader :params
 
     def initialize(params = {})

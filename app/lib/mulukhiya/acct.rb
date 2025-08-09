@@ -1,6 +1,7 @@
 module Mulukhiya
   class Acct < Ginseng::Fediverse::Acct
     include Package
+
     attr_accessor :host
 
     def domain_name

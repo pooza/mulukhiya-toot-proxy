@@ -2,6 +2,7 @@ module Mulukhiya
   class SearchRule
     include Package
     include SNSMethods
+
     attr_reader :text
 
     def initialize(text)

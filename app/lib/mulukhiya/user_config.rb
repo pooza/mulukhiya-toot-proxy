@@ -38,7 +38,7 @@ module Mulukhiya
     end
 
     def token=(token)
-      token = (token.decrypt rescue token)
+      token = token.decrypt rescue token
       update(
         webhook: {token: nil},
         mulukhiya: {token: token.encrypt},
@@ -72,7 +72,7 @@ module Mulukhiya
         arg.each do |k, v|
           next if v.to_s.empty?
           if config['/user_config/encrypt_fields'].member?(k)
-            plain = (v.decrypt rescue v.to_s)
+            plain = v.decrypt rescue v.to_s
             arg[k] = plain.encrypt
           else
             arg[k] = encrypt(v)
