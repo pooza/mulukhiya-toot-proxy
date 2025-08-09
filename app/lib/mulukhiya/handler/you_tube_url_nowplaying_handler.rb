@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def create_uri(keyword)
-      return YouTubeURI.parse(keyword)
+      return YouTubeVideoURI.parse(keyword)
     end
   end
 end
