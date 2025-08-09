@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include StatusMethods
       include SNSMethods
+
       attr_reader :id
 
       def initialize(id)

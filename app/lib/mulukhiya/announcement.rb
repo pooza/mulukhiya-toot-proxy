@@ -2,6 +2,7 @@ module Mulukhiya
   class Announcement
     include Package
     include SNSMethods
+
     attr_reader :storage, :sns
 
     def initialize

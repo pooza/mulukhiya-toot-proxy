@@ -2,6 +2,7 @@ module Mulukhiya
   class TagFeedRenderer < Ginseng::Web::RSS20FeedRenderer
     include Package
     include SNSMethods
+
     attr_accessor :limit
     attr_reader :tag
 

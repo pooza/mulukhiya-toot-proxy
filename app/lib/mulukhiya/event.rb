@@ -1,6 +1,7 @@
 module Mulukhiya
   class Event
     include Package
+
     attr_reader :label, :params
 
     def initialize(label, params = {})

@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AccountMethods
       include SNSMethods
+
       one_to_one :account_profile, key: :userId
       one_to_many :attachment, key: :userId
       many_to_many :roles, left_key: :userId, right_key: :roleId, join_table: :role_assignment
@@ -90,7 +91,7 @@ module Mulukhiya
           acct = Acct.new(acct.to_s) unless acct.is_a?(Acct)
           return first(username: acct.username, host: acct.domain)
         in {token: token}
-          return nil unless token = (token.decrypt rescue token)
+          return nil unless token = token.decrypt rescue token
           return first(key) || AccessToken.first(hash: token)&.account
         else
           return first(key)

@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AccessTokenMethods
       include SNSMethods
+
       many_to_one :account, key: :userId
       many_to_one :application, key: :appId
 

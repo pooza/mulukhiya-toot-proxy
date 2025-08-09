@@ -2,6 +2,7 @@ module Mulukhiya
   module Meisskey
     class HashTag < MongoCollection
       include HashTagMethods
+
       attr_writer :raw_name
 
       def name

@@ -2,6 +2,7 @@ module Mulukhiya
   class MongoCollection
     include Package
     include SNSMethods
+
     attr_reader :id
 
     def initialize(id)

@@ -2,6 +2,7 @@ module Mulukhiya
   class Webhook
     include Package
     include SNSMethods
+
     attr_reader :sns, :reporter
 
     def digest

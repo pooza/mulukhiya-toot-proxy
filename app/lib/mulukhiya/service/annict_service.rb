@@ -2,10 +2,11 @@ module Mulukhiya
   class AnnictService
     include Package
     include SNSMethods
+
     attr_reader :timestamps, :sns
 
     def initialize(token = nil, guest: true)
-      @token = (token.decrypt rescue token)
+      @token = token.decrypt rescue token
       @guest = guest
       @timestamps = AnnictTimestampStorage.new
       @sns = sns_class.new

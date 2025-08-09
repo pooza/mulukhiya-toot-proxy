@@ -3,7 +3,7 @@ module Mulukhiya
     def disable?
       return true unless controller_class.annict?
       return true unless AnnictService.config?
-      return true unless (account.annict rescue nil)
+      return true unless account.annict rescue nil
       return super
     end
 

@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AccountMethods
       include SNSMethods
+
       one_to_one :user
       one_to_many :attachment, key: :account_id
       attr_accessor :token
@@ -94,7 +95,7 @@ module Mulukhiya
       def self.get(key)
         case key
         in {token: token}
-          return nil unless token = (key[:token].decrypt rescue key[:token])
+          return nil unless token = key[:token].decrypt rescue key[:token]
           return nil unless row = Postgres.first(:token_owner, {token:})
           return nil unless account = self[row[:id]]
           account.token = token

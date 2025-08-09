@@ -2,7 +2,7 @@ module Mulukhiya
   class LemmyClippingCommandHandlerTest < TestCase
     def disable?
       return true unless controller_class.lemmy?
-      return true unless (account.lemmy.login rescue nil)
+      return true unless account.lemmy.login rescue nil
       return super
     end
 

@@ -2,6 +2,7 @@ module Mulukhiya
   class LemmyClipper
     include Package
     include SNSMethods
+
     attr_reader :http
 
     def initialize(params = {})

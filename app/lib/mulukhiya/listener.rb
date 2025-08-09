@@ -4,6 +4,7 @@ module Mulukhiya
   class Listener
     include Package
     include SNSMethods
+
     attr_reader :client, :uri, :sns
 
     def verify_peer?

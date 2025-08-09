@@ -1,6 +1,7 @@
 module Mulukhiya
   class StaticMediaRenderer < Ginseng::Web::Renderer
     include Package
+
     attr_reader :name
 
     def name=(name)

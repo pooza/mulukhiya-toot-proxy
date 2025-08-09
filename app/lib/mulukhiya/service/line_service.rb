@@ -5,7 +5,7 @@ module Mulukhiya
     def initialize(params = {})
       super rescue nil
       @id = params[:id] || LineService.id
-      @token = (params[:token].decrypt rescue params[:token]) || LineService.token
+      @token = params[:token].decrypt rescue params[:token] || LineService.token
     end
 
     def self.id

@@ -2,6 +2,7 @@ module Mulukhiya
   class Handler # rubocop:disable Metrics/ClassLength
     include Package
     include SNSMethods
+
     attr_reader :reporter, :event, :sns, :errors, :result, :payload, :text_field
 
     def name
@@ -72,8 +73,8 @@ module Mulukhiya
     end
 
     def handler_config(key)
-      value = (config["/handler/#{underscore}/#{key}"] rescue nil)
-      value = (config["/handler/default/#{key}"] rescue nil) if value.nil?
+      value = config["/handler/#{underscore}/#{key}"] rescue nil
+      value = config["/handler/default/#{key}"] rescue nil if value.nil?
       return value
     end
 
