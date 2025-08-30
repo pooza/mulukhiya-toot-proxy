@@ -72,7 +72,6 @@ module Mulukhiya
     def trim!(fuzz = '20%')
       command = CommandLine.new(['mogrify', '-fuzz', fuzz, '-trim', '+repage', path])
       command.exec
-      @size_info = nil
     end
 
     def convert_type(type)
@@ -90,22 +89,6 @@ module Mulukhiya
       file = ImageFile.new(dest)
       return file if file.type == type
       return nil
-    end
-
-    def size_info
-      unless @size_info
-        if animated?
-          image = Vips::Image.new_from_file(path, n: -1)
-          @size_info = {
-            width: image.width,
-            height: (image.get('page-height') rescue image.height),
-          }
-        else
-          image = Vips::Image.new_from_file(path)
-          @size_info = {width: image.width, height: image.height}
-        end
-      end
-      return @size_info
     end
 
     private
