@@ -14,61 +14,47 @@ module Mulukhiya
 
     alias to_h values
 
+    def image
+      return transform_icc(Vips::Image.new_from_file(path))
+    end
+
+    def pages
+      return transform_icc(Vips::Image.new_from_file(path, n: -1))
+    end
+
     def width
-      return size_info[:width]
+      return image.width
     end
 
     def height
-      return size_info[:height]
+      return image.height
     end
 
     def type
-      return @type if @type
-      if Environment.mastodon?
-        command = CommandLine.new(['file', '-b', '--mime', path])
-        command.exec
-        @type ||= command.stdout.split(';').first if command.status.zero?
-      end
-      @type ||= super
-      @type ||= detail_info.match(/\s+Mime\stype:\s*(.*)$/i)[1]
-      return @type
-    rescue => e
-      e.log(file: path)
-      return @type = super
+      return MIMEType.type(".#{image.get('vips-loader').sub(/load$/, '')}")
+    rescue
+      return MIMEType::DEFAULT
     end
 
     def mediatype
-      @mediatype ||= super
-      @mediatype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/}i)[1]
-      return @mediatype
-    rescue NoMethodError
-      return nil
+      return type.split('/').first
     end
 
     def subtype
-      @subtype ||= super
-      @subtype ||= detail_info.match(%r{\s+Mime\stype:\s*(.*)/(.*)}i)[2]
-      return @subtype
-    rescue => e
-      e.log(file: path)
-      return nil
+      return type.split('/').last
     end
 
     def alpha?
       return false unless image?
-      command = CommandLine.new(['identify', '-format', '%[channels]', path])
-      command.exec
-      return /rgba/i.match?(command.stdout)
+      return true if image.bands == 4 && image.interpretation == :srgb
+      return true if image.bands == 2 && image.interpretation == :b_w
+      return false
     end
 
     def animated?
       return false unless image?
-      command = CommandLine.new(['identify', path])
-      command.exec
-      return true if 1 < command.stdout.each_line.count
-      command = CommandLine.new(['ffprobe', path])
-      command.exec
-      return true if command.stderr.match?(/Stream .* Video: apng/)
+      return 1 < pages.get('n-pages')
+    rescue
       return false
     end
 
@@ -77,9 +63,9 @@ module Mulukhiya
     end
 
     def resize(pixel)
-      dest = create_dest_path(f: __method__, p: pixel, type: subtype)
-      command = CommandLine.new(['convert', '-resize', "#{pixel}x#{pixel}", path, dest])
-      command.exec unless File.exist?(dest)
+      dest = create_dest_path(f: __method__, p: pixel, type: type)
+      resized = image.resize(pixel.to_f / long_side)
+      resized.write_to_file(dest)
       return ImageFile.new(dest)
     end
 
@@ -87,72 +73,50 @@ module Mulukhiya
       command = CommandLine.new(['mogrify', '-fuzz', fuzz, '-trim', '+repage', path])
       command.exec
       @size_info = nil
-      @detail_info = nil
     end
 
     def convert_type(type)
       return convert_animation_type(type) if animated?
       dest = create_dest_path(f: __method__, type:)
-      command = CommandLine.new(['convert', path, dest])
-      command.exec unless File.exist?(dest)
-      if command.status&.positive?
-        message = command.stderr.split(/[\n`]/).first
-        raise "#{self.type} allowed by the security policy?" if message.include?('security policy')
-        raise message
-      end
-      unless File.exist?(dest)
-        finder = Ginseng::FileFinder.new
-        finder.dir = File.dirname(dest)
-        finder.patterns.push("#{File.basename(dest, '.*')}-*#{File.extname(dest)}")
-        dest = finder.exec.max
-      end
+      image = Vips::Image.new_from_file(path)
+      image.write_to_file(dest)
       return ImageFile.new(dest)
     end
 
     def convert_animation_type(type = 'image/gif')
       return unless animated?
       dest = create_dest_path(f: __method__, extname: MIMEType.extname(type))
-      case self.type
-      when 'image/png'
-        command = CommandLine.new(['ffmpeg', '-i', path, dest])
-        command.exec
-      when 'image/webp'
-        command = CommandLine.new(['convert', path, dest])
-        command.exec
-      end
+      pages.write_to_file(dest)
       file = ImageFile.new(dest)
       return file if file.type == type
       return nil
-    rescue => e
-      e.log(file: path)
-      return nil
-    end
-
-    def detail_info
-      unless @detail_info
-        command = CommandLine.new(['identify', '-verbose', path])
-        command.exec
-        @detail_info = command.stdout
-      end
-      return @detail_info
     end
 
     def size_info
       unless @size_info
-        size = FastImage.size(path)
-        if size.present?
-          @size_info = {width: size[0], height: size[1]}
+        if animated?
+          image = Vips::Image.new_from_file(path, n: -1)
+          @size_info = {
+            width: image.width,
+            height: (image.get('page-height') rescue image.height),
+          }
         else
-          command = CommandLine.new(['identify', '-format', '%[width]x%[height]', path])
-          command.exec
-          size = command.stdout.split('x')
-          @size_info = {width: size[0].to_i, height: size[1].to_i}
+          image = Vips::Image.new_from_file(path)
+          @size_info = {width: image.width, height: image.height}
         end
       end
       return @size_info
-    rescue => e
-      e.log(file: path)
-      return nil
+    end
+
+    private
+
+    def transform_icc(image)
+      if image.get_typeof('icc-profile-data').zero?
+        image.colourspace(:srgb)
+      else
+        image.icc_transform(icc_path, embedded: true, intent: :relative)
+      end
+      return image
     end
   end
 end

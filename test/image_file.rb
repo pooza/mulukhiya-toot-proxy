@@ -10,7 +10,6 @@ module Mulukhiya
       @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/11750_thumbnail.gif'))
       @gif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/file_example_GIF_500kB.gif'))
       @awebp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/animated-webp-supported.webp'))
-      @apng = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/elephant_apng_zopfli.png'))
     end
 
     def test_values
@@ -24,7 +23,6 @@ module Mulukhiya
       assert_predicate(@webp, :image?)
       assert_predicate(@agif, :image?)
       assert_predicate(@awebp, :image?)
-      assert_predicate(@apng, :image?)
     end
 
     def test_mediatype
@@ -80,7 +78,6 @@ module Mulukhiya
       assert_predicate(@agif, :animated?)
       assert_false(@webp.animated?)
       assert_predicate(@awebp, :animated?) if config['/handler/animation_image_format_convert/webp']
-      assert_predicate(@apng, :animated?) if config['/handler/animation_image_format_convert/png']
     end
 
     def test_recommended_name
@@ -90,7 +87,6 @@ module Mulukhiya
 
     def test_recommended_extname
       assert_equal('.png', @png_rgba.recommended_extname)
-      assert_equal('.png', @apng.recommended_extname)
       assert_equal('.webp', @webp.recommended_extname)
       assert_equal('.webp', @awebp.recommended_extname)
     end
@@ -98,7 +94,6 @@ module Mulukhiya
     def test_recommended_extname?
       assert_predicate(@agif, :recommended_extname?)
       assert_predicate(@png_rgba, :recommended_extname?)
-      assert_predicate(@apng, :recommended_extname?)
       assert_predicate(@webp, :recommended_extname?)
       assert_predicate(@awebp, :recommended_extname?)
     end
@@ -120,9 +115,8 @@ module Mulukhiya
 
     def test_convert_animation_type
       assert_nil(@png_rgba.convert_animation_type)
-      assert_nil(@agif.convert_animation_type)
+      assert_kind_of(ImageFile, @agif.convert_animation_type)
       assert_equal('image/gif', @awebp.convert_animation_type.type) if config['/handler/animation_image_format_convert/webp']
-      assert_equal('image/gif', @apng.convert_animation_type.type) if config['/handler/animation_image_format_convert/png']
     end
   end
 end

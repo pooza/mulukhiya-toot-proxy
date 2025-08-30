@@ -181,7 +181,6 @@ GEM
       logger
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
-    fastimage (2.4.0)
     ffi (1.17.2)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-x86_64-linux-gnu)
@@ -351,6 +350,9 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1, < 2)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.2.5)
+      ffi (~> 1.12)
+      logger
     ruby2_keywords (0.0.5)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
@@ -426,7 +428,6 @@ PLATFORMS
 DEPENDENCIES
   concurrent-ruby
   dry-validation
-  fastimage
   faye-websocket!
   ginseng-core!
   ginseng-fediverse!
@@ -448,6 +449,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-sequel
   ruby-progressbar
+  ruby-vips
   sidekiq (~> 8.0.5)
   sidekiq-scheduler (~> 6.0.1)
   slim_lint
