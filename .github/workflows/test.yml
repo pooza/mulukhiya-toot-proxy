@@ -24,13 +24,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.4
+          ruby-version: 3.4.5
       - name: apt install
         run: |
           sudo apt update
           sudo apt install ffmpeg
           sudo apt install libpq-dev
           sudo apt install libidn11-dev
+          sudo apt install libvips-dev
       - name: bundle install
         run: |
           gem install bundler -v '~>2.0'

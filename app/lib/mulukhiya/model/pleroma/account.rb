@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AccountMethods
       include SNSMethods
+
       attr_accessor :token
 
       def to_h
@@ -91,7 +92,7 @@ module Mulukhiya
           nickname ||= acct.to_s.sub(/^@/, '')
           return first(nickname:)
         in {token: token}
-          return nil unless token = (token.decrypt rescue token)
+          return nil unless token = token.decrypt rescue token
           return nil unless account = AccessToken.first(token:)&.account
           account.token = token
           return account

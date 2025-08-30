@@ -78,14 +78,14 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '再起動',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (!result.isConfirmed) return
-              this.methods.restartPuma().then(e => {this.restartable = false})
+              this.methods.restartPuma().then(_ => {this.restartable = false})
             }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           onChangeHandler (e) {
             this.methods.toggleHandler(e.target.value, e.target.checked)
-              .then(e => {this.restartable = true})
+              .then(_ => {this.restartable = true})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
         },

@@ -1,6 +1,3 @@
-akkoma:
-  display_name: Akkoma
-  sns_type: mastodon
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
@@ -14,6 +11,9 @@ agent:
   test:
     token: null
     username: test
+akkoma:
+  display_name: Akkoma
+  sns_type: mastodon
 amazon:
   patterns:
     - pattern: /dp/([[:alnum:]]+)
@@ -43,8 +43,8 @@ annict:
         - read
   review:
     suffixes:
-      bad: '（評価:良くない）'
-      spoiler: '（ネタバレ）'
+      bad: （評価:良くない）
+      spoiler: （ネタバレ）
   timeout: 5
   urls:
     api:
@@ -152,15 +152,6 @@ handler:
   line_alert:
     id: null
     token: null
-  long_text_image:
-    columns: 20
-    disable: true
-    experimental: true
-    font_file: public/mulukhiya/font/HackGen-Regular.ttf
-    font_size: 30
-    image_file: public/mulukhiya/media/background.png
-    rows: 30
-    text_length: 140
   mail_alert:
     sendmail_bin: /usr/sbin/sendmail
     to: null
@@ -750,7 +741,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.38.0
+  version: 4.38.1
 parser:
   note:
     fields:
@@ -915,6 +906,8 @@ pleroma:
     spoiler_text: null
   streaming:
     verify_peer: true
+  theme:
+    color: '#777777'
   url: https://pleroma.example.com/
 poipiku:
   urls:

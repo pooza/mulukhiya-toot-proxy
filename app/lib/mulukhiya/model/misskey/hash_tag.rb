@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include HashTagMethods
       include SNSMethods
+
       attr_writer :raw_name
 
       def to_h

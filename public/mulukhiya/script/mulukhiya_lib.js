@@ -208,11 +208,11 @@ window.MulukhiyaLib = {
       const tags = []
       if (program) {
         tags.push(program.series)
-        if (program.episode) {tags.push(`${program.episode}${program.episode_suffix || '話'}`)}
-        if (program.subtitle) {tags.push(`「${program.subtitle}」`)}
-        if (program.air) {tags.push('エア番組')}
-        if (program.livecure) {tags.push('実況')}
-        if (program.extra_tags) {tags.concat(program.extra_tags)}
+        if (program.episode) tags.push(`${program.episode}${program.episode_suffix || '話'}`)
+        if (program.subtitle) tags.push(`「${program.subtitle}」`)
+        if (program.air) tags.push('エア番組')
+        if (program.livecure) tags.push('実況')
+        if (program.extra_tags) tags.concat(program.extra_tags)
       }
       return tags
     }
@@ -220,7 +220,7 @@ window.MulukhiyaLib = {
     globals.methods.getWorks = async params => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      if (!params.q) {params = {}}
+      if (!params.q) params = {}
       return axios.get(globals.methods.createURL(`/mulukhiya/api/program/works`, {query: params}))
         .then(e => e.data)
         .finally(e => indicator.hide())

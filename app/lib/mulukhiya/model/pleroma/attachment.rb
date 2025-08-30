@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AttachmentMethods
       include SNSMethods
+
       attr_accessor :account, :date
 
       def name

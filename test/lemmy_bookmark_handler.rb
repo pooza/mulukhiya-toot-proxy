@@ -2,7 +2,7 @@ module Mulukhiya
   class LemmyBookmarkHandlerTest < TestCase
     def disable?
       return true unless controller_class.lemmy?
-      return true unless (account.lemmy.login rescue nil)
+      return true unless account.lemmy.login rescue nil
       return super
     end
 

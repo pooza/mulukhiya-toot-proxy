@@ -2,6 +2,7 @@ module Mulukhiya
   class CustomAPI
     include Package
     include SNSMethods
+
     attr_reader :params
 
     def initialize(params = {})

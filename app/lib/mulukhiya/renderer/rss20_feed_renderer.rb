@@ -2,6 +2,7 @@ module Mulukhiya
   class RSS20FeedRenderer < Ginseng::Web::RSS20FeedRenderer
     include Package
     include SNSMethods
+
     attr_accessor :command, :render_storage, :metadata_storage
 
     def initialize(channel = {})

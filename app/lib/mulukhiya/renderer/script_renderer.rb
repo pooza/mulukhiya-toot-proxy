@@ -1,6 +1,7 @@
 module Mulukhiya
   class ScriptRenderer < Ginseng::Web::ScriptRenderer
     include Package
+
     attr_reader :name
 
     def dir

@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include StatusMethods
       include SNSMethods
+
       one_to_many :attachment
       one_to_one :poll
       many_to_one :account

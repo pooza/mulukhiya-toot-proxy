@@ -4,6 +4,7 @@ module Mulukhiya
       include Package
       include AttachmentMethods
       include SNSMethods
+
       many_to_one :status
 
       alias name file_file_name

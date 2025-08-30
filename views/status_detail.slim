@@ -85,7 +85,7 @@ html lang='ja'
               showCancelButton: true,
               confirmButtonText: '作成',
               cancelButtonText: 'キャンセル',
-            }).then((result) => {
+            }).then(result => {
               if (result.isConfirmed) {
                 const tag = result.value.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
                 if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
