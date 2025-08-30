@@ -100,5 +100,9 @@ module Mulukhiya
       end
       return image
     end
+
+    def icc_path
+      return File.join(Environment.dir, 'config/color/srgb.icc')
+    end
   end
 end

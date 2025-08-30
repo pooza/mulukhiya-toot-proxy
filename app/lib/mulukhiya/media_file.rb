@@ -146,10 +146,6 @@ module Mulukhiya
       return streams.find {|v| v['codec_type'] == 'audio'}
     end
 
-    def icc_path
-      return File.join(Environment.dir, 'config/color/srgb.icc')
-    end
-
     def self.download(uri)
       path = File.join(
         Environment.dir,
