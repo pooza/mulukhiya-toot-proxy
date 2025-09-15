@@ -80,9 +80,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-youtube.git
-  revision: 27d149637eb1cf43ef8e1a5e38d1a3cc0e479f2c
+  revision: 453a25139a2de765c6f9ad03d450f5053bddfcba
   specs:
-    ginseng-youtube (2.0.0)
+    ginseng-youtube (2.0.1)
 
 GEM
   remote: https://rubygems.org/
