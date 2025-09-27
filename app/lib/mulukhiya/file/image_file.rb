@@ -77,7 +77,6 @@ module Mulukhiya
     def convert_type(type)
       return convert_animation_type(type) if animated?
       dest = create_dest_path(f: __method__, type:)
-      image = Vips::Image.new_from_file(path)
       image.write_to_file(dest)
       return ImageFile.new(dest)
     end
@@ -100,6 +99,10 @@ module Mulukhiya
         image.icc_transform(icc_path, embedded: true, intent: :relative)
       end
       return image
+    end
+
+    def icc_path
+      return File.join(Environment.dir, 'config/color/srgb.icc')
     end
   end
 end
