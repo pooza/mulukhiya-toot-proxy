@@ -190,10 +190,6 @@ module Mulukhiya
         return config["/#{name}/attachment/types/audio"] rescue nil
       end
 
-      def default_animation_image_type
-        return config["/#{name}/attachment/types/animation_image"] rescue nil
-      end
-
       def visibility_name(name)
         return parser_class.visibility_name(name)
       end

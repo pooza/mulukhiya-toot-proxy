@@ -77,7 +77,7 @@ module Mulukhiya
       assert_false(@png_rgba.animated?)
       assert_predicate(@agif, :animated?)
       assert_false(@webp.animated?)
-      assert_predicate(@awebp, :animated?) if config['/handler/animation_image_format_convert/webp']
+      assert_predicate(@awebp, :animated?)
     end
 
     def test_recommended_name
@@ -116,7 +116,7 @@ module Mulukhiya
     def test_convert_animation_type
       assert_nil(@png_rgba.convert_animation_type)
       assert_kind_of(ImageFile, @agif.convert_animation_type)
-      assert_equal('image/gif', @awebp.convert_animation_type.type) if config['/handler/animation_image_format_convert/webp']
+      assert_equal('image/gif', @awebp.convert_animation_type.type)
     end
   end
 end

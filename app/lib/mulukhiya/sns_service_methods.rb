@@ -14,7 +14,6 @@ module Mulukhiya
         FileUtils.copy(path, dest)
         path = dest
       end
-      params.fetch(:trim_times, 0).times {ImageFile.new(path).trim!}
       return super
     ensure
       FileUtils.rm_rf(dir) if dir
