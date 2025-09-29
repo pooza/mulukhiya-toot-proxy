@@ -3,8 +3,6 @@ properties:
     properties:
       types:
         properties:
-          animation_image:
-            type: string
           audio:
             type: string
           image:

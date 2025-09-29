@@ -91,12 +91,6 @@ firefish:
     reaction: true
   sns_type: misskey
 handler:
-  animation_image_format_convert:
-    disable: true
-    experimental: true
-    png: true
-    timeout: 10
-    webp: false
   announcement_mention:
     pattern: お[知し]らせ
   audio_format_convert:
@@ -279,7 +273,6 @@ logger:
 mastodon:
   attachment:
     types:
-      animation_image: image/webp
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -365,7 +358,6 @@ mastodon:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -432,7 +424,6 @@ meisskey:
   attachment:
     limit: 8
     types:
-      animation_image: image/webp
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -511,7 +502,6 @@ meisskey:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -574,7 +564,6 @@ misskey:
   attachment:
     limit: 16
     types:
-      animation_image: image/webp
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -655,7 +644,6 @@ misskey:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -784,7 +772,6 @@ pleroma:
   attachment:
     limit: 4
     types:
-      animation_image: image/webp
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -858,7 +845,6 @@ pleroma:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
