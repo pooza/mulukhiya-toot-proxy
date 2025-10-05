@@ -38,7 +38,8 @@ module Mulukhiya
 
     def self.probe_video(src)
       return CommandLine.new([
-        'ffprobe', '-v', 'error', '-select_streams', 'v:0',
+        'ffprobe', '-v', 'error',
+        '-select_streams', 'v:0',
         '-show_entries', 'stream=codec_name,pix_fmt,width,height,duration,avg_frame_rate',
         '-of', 'json',
         src
@@ -47,7 +48,8 @@ module Mulukhiya
 
     def self.probe_audio(src)
       return CommandLine.new([
-        'ffprobe', '-v', 'error', '-select_streams', 'a:0',
+        'ffprobe', '-v', 'error',
+        '-select_streams', 'a:0',
         '-show_entries', 'stream=codec_name,duration,sample_rate,channels,bit_rate',
         '-of', 'json',
         src
@@ -56,7 +58,8 @@ module Mulukhiya
 
     def self.probe_container(src)
       return CommandLine.new([
-        'ffprobe', '-v', 'error', '-show_entries', 'format=duration,bit_rate,format_name',
+        'ffprobe', '-v', 'error',
+        '-show_entries', 'format=duration,bit_rate,format_name',
         '-of', 'json',
         src
       ])
