@@ -1,6 +1,6 @@
 module Mulukhiya
   class FFmpegCommandBuilder
-    def remux_video(src, dest)
+    def self.remux_video(src, dest)
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
         '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
@@ -9,7 +9,7 @@ module Mulukhiya
       ])
     end
 
-    def transcode_video(src, dest, crf: 22, preset: 'veryfast')
+    def self.transcode_video(src, dest, crf: 22, preset: 'veryfast')
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
         '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
@@ -21,14 +21,14 @@ module Mulukhiya
       ])
     end
 
-    def remux_audio(src, dest)
+    def self.remux_audio(src, dest)
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
         '-map', '0:a:0', '-c', 'copy', '-map_metadata', '0', '-id3v2_version', '3', dest
       ])
     end
 
-    def transcode_audio(src, dest, bitrate_k: 192)
+    def self.transcode_audio(src, dest, bitrate_k: 192)
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
         '-map', '0:a:0', '-c:a', 'libmp3lame', '-b:a', "#{bitrate_k}k",
@@ -36,35 +36,28 @@ module Mulukhiya
       ])
     end
 
-    def probe_video(src)
+    def self.probe_video(src)
       return CommandLine.new([
         'ffprobe', '-v', 'error', '-select_streams', 'v:0',
-        '-show_entries', 'stream=codec_name,pix_fmt,width,height,avg_frame_rate', '-of', 'json',
-        src
-      ])
-    end
-
-    def probe_audio(src)
-      return CommandLine.new([
-        'ffprobe', '-v', 'error', '-select_streams', 'a:0',
-        '-show_entries', 'stream=codec_name,sample_rate,channels,bit_rate', '-of', 'json',
-        src
-      ])
-    end
-
-    def probe_container(src)
-      return CommandLine.new([
-        'ffprobe', '-v', 'error', '-show_entries', 'format=duration,bit_rate,format_name',
+        '-show_entries', 'stream=codec_name,pix_fmt,width,height,duration,avg_frame_rate',
         '-of', 'json',
         src
       ])
     end
 
-    def probe_streams(src)
+    def self.probe_audio(src)
       return CommandLine.new([
-        'ffprobe', '-v', 'error',
-        '-print_format', 'json',
-        '-show_streams',
+        'ffprobe', '-v', 'error', '-select_streams', 'a:0',
+        '-show_entries', 'stream=codec_name,duration,sample_rate,channels,bit_rate',
+        '-of', 'json',
+        src
+      ])
+    end
+
+    def self.probe_container(src)
+      return CommandLine.new([
+        'ffprobe', '-v', 'error', '-show_entries', 'format=duration,bit_rate,format_name',
+        '-of', 'json',
         src
       ])
     end

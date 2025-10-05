@@ -124,21 +124,31 @@ module Mulukhiya
       )
     end
 
-    def streams
-      unless @streams
-        command = FFmpegCommandBuilder.probe_streams(path)
-        command.exec
-        @streams = JSON.parse(command.stdout)['streams']
-      end
-      return @streams
-    end
-
     def video_stream
-      return streams.find {|v| v['codec_type'] == 'video'}
+      unless @video
+        command = FFmpegCommandBuilder.probe_video(path)
+        command.exec
+        @video = JSON.parse(command.stdout)['streams'].first
+      end
+      return @video
     end
 
     def audio_stream
-      return streams.find {|v| v['codec_type'] == 'audio'}
+      unless @audio
+        command = FFmpegCommandBuilder.probe_audio(path)
+        command.exec
+        @audio = JSON.parse(command.stdout)['streams'].first
+      end
+      return @audio
+    end
+
+    def container
+      unless @container
+        command = FFmpegCommandBuilder.probe_container(path)
+        command.exec
+        @container = JSON.parse(command.stdout)
+      end
+      return @container
     end
 
     def self.download(uri)
