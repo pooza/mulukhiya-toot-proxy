@@ -85,6 +85,14 @@ feed:
     limit: 100
   tag:
     limit: 100
+ffmpeg:
+  audio:
+    bitrate_k: 192
+  crf: 22
+  log:
+    sample_ratio: 0.01
+  preset: veryfast
+  timeout: 600
 firefish:
   display_name: Firefish
   features:

@@ -126,12 +126,7 @@ module Mulukhiya
 
     def streams
       unless @streams
-        command = CommandLine.new([
-          'ffprobe', '-v', 'quiet',
-          '-print_format', 'json',
-          '-show_streams',
-          path
-        ])
+        command = FFmpegCommandBuilder.probe_streams(path)
         command.exec
         @streams = JSON.parse(command.stdout)['streams']
       end

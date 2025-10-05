@@ -7,6 +7,7 @@ inflections:
   custom_api: CustomAPI
   custom_api_render_storage: CustomAPIRenderStorage
   http: HTTP
+  ffmpeg_command_builder: FFmpegCommandBuilder
   itunes_uri: ItunesURI
   itunes_url_handler: ItunesURLHandler
   itunes_url_nowplaying_handler: ItunesURLNowplayingHandler
