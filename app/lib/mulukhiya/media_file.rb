@@ -105,10 +105,7 @@ module Mulukhiya
     end
 
     def convert_type(type)
-      dest = create_dest_path(f: __method__, type:)
-      command = CommandLine.new(['ffmpeg', '-y', '-i', path, dest])
-      command.exec unless File.exist?(dest)
-      return self.class.new(dest)
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
     alias convert_format convert_type
@@ -124,26 +121,31 @@ module Mulukhiya
       )
     end
 
-    def streams
-      unless @streams
-        command = CommandLine.new([
-          'ffprobe', '-v', 'quiet',
-          '-print_format', 'json',
-          '-show_streams',
-          path
-        ])
-        command.exec
-        @streams = JSON.parse(command.stdout)['streams']
-      end
-      return @streams
-    end
-
     def video_stream
-      return streams.find {|v| v['codec_type'] == 'video'}
+      unless @video
+        command = FFmpegCommandBuilder.probe_video(path)
+        command.exec
+        @video = JSON.parse(command.stdout)['streams'].first
+      end
+      return @video
     end
 
     def audio_stream
-      return streams.find {|v| v['codec_type'] == 'audio'}
+      unless @audio
+        command = FFmpegCommandBuilder.probe_audio(path)
+        command.exec
+        @audio = JSON.parse(command.stdout)['streams'].first
+      end
+      return @audio
+    end
+
+    def container
+      unless @container
+        command = FFmpegCommandBuilder.probe_container(path)
+        command.exec
+        @container = JSON.parse(command.stdout)
+      end
+      return @container
     end
 
     def self.download(uri)

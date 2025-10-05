@@ -69,13 +69,8 @@ module Mulukhiya
       return ImageFile.new(dest)
     end
 
-    def trim!(fuzz = '20%')
-      command = CommandLine.new(['mogrify', '-fuzz', fuzz, '-trim', '+repage', path])
-      command.exec
-    end
-
     def convert_type(type)
-      return convert_animation_type(type) if animated?
+      return convert_animation_type if animated?
       dest = create_dest_path(f: __method__, type:)
       image.write_to_file(dest)
       return ImageFile.new(dest)

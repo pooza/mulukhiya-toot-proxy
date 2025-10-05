@@ -85,18 +85,20 @@ feed:
     limit: 100
   tag:
     limit: 100
+ffmpeg:
+  audio:
+    bitrate_k: 192
+  crf: 22
+  log:
+    sample_ratio: 0.01
+  preset: veryfast
+  timeout: 600
 firefish:
   display_name: Firefish
   features:
     reaction: true
   sns_type: misskey
 handler:
-  animation_image_format_convert:
-    disable: true
-    experimental: true
-    png: true
-    timeout: 10
-    webp: false
   announcement_mention:
     pattern: お[知し]らせ
   audio_format_convert:
@@ -279,7 +281,6 @@ logger:
 mastodon:
   attachment:
     types:
-      animation_image: image/gif
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -365,7 +366,6 @@ mastodon:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -432,7 +432,6 @@ meisskey:
   attachment:
     limit: 8
     types:
-      animation_image: null
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -511,7 +510,6 @@ meisskey:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -574,7 +572,6 @@ misskey:
   attachment:
     limit: 16
     types:
-      animation_image: null
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -655,7 +652,6 @@ misskey:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
@@ -741,7 +737,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.38.1
+  version: 4.39.0
 parser:
   note:
     fields:
@@ -784,7 +780,6 @@ pleroma:
   attachment:
     limit: 4
     types:
-      animation_image: null
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
@@ -858,7 +853,6 @@ pleroma:
       - invalid_command
     pre_upload:
       - image_format_convert
-      - animation_image_format_convert
       - audio_format_convert
       - video_format_convert
       - image_resize
