@@ -88,7 +88,7 @@ feed:
 ffmpeg:
   audio:
     bitrate: 192 # kbps
-  crf: 23
+  crf: 22
   preset: veryfast
 firefish:
   display_name: Firefish
