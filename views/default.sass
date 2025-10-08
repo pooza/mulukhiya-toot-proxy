@@ -491,11 +491,13 @@ section.disabled h3::after
 
 nav.search-form-container
   margin: 0em 1em
-  input[type='search']
-    width: calc(100% - 8em)
-  label
-    font:
-      size: 0.8em
+  .control
+    display: flex
+    label
+      font:
+        size: 0.8em
+    input[type='search']
+      flex-grow: 1
 
 article.status
   margin: 1em
