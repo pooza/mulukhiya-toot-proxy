@@ -284,8 +284,8 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.3)
-    rack-protection (4.2.1)
+    rack (3.1.18)
+    rack-protection (4.1.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
@@ -376,11 +376,11 @@ GEM
     sidekiq-scheduler (6.0.1)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 7.3, < 9)
-    sinatra (4.2.1)
+    sinatra (4.1.1)
       logger (>= 1.6.0)
       mustermann (~> 3.0)
       rack (>= 3.0.0, < 4)
-      rack-protection (= 4.2.1)
+      rack-protection (= 4.1.1)
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     slim (5.2.1)
@@ -441,6 +441,7 @@ DEPENDENCIES
   mongo
   optparse
   parallel
+  rack (~> 3.1.0)
   rack-test
   rails-erb-lint
   ricecream
@@ -454,6 +455,7 @@ DEPENDENCIES
   ruby-vips
   sidekiq (~> 8.0.5)
   sidekiq-scheduler (~> 6.0.1)
+  sinatra (~> 4.1.0)
   slim_lint
   test-unit
   timecop
