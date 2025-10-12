@@ -453,7 +453,6 @@ DEPENDENCIES
   ruby-vips
   sidekiq (~> 8.0.5)
   sidekiq-scheduler (~> 6.0.1)
-  sinatra
   slim_lint
   test-unit
   timecop

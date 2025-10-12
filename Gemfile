@@ -16,7 +16,6 @@ gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
 gem 'sidekiq', '~>8.0.5'
 gem 'sidekiq-scheduler', '~>6.0.1'
-gem 'sinatra'
 gem 'yamllint'
 
 group :postgres do
