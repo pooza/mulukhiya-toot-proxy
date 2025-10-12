@@ -87,12 +87,9 @@ feed:
     limit: 100
 ffmpeg:
   audio:
-    bitrate_k: 192
+    bitrate: 192 # kbps
   crf: 22
-  log:
-    sample_ratio: 0.01
   preset: veryfast
-  timeout: 600
 firefish:
   display_name: Firefish
   features:
@@ -737,7 +734,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.39.0
+  version: 4.39.3
 parser:
   note:
     fields:
@@ -1007,10 +1004,10 @@ webui:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.js
-      - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/axios@1.12/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.25
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle
@@ -1040,10 +1037,10 @@ webui:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.min.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.min.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/axios@1.12/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.25
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle
