@@ -65,16 +65,16 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ecb1636b8ca0cfb5f6072b35f4660e39160ff473
+  revision: 0f54fa9707df3ed72d0280b82f744c6b2d1aa1fd
   specs:
-    ginseng-web (1.3.40)
+    ginseng-web (1.3.42)
       erb
       puma (>= 6.4.3)
-      rack (>= 3.2.2)
+      rack (>= 3.2.3)
       rack-session (>= 2.1.1)
       rss
       sassc
-      sinatra (>= 4.1.0)
+      sinatra (>= 4.2.0)
       slim
       tilt (~> 2.1.0)
 
@@ -121,7 +121,7 @@ GEM
     ast (2.4.3)
     base64 (0.3.0)
     benchmark (0.4.1)
-    bigdecimal (3.3.0)
+    bigdecimal (3.3.1)
     bson (5.1.1)
     builder (3.3.0)
     cgi (0.5.0)
@@ -168,7 +168,7 @@ GEM
       dry-initializer (~> 3.2)
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
-    erb (5.0.3)
+    erb (5.1.1)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
@@ -277,14 +277,14 @@ GEM
     pg (1.6.2-aarch64-linux)
     pg (1.6.2-x86_64-linux)
     power_assert (2.0.5)
-    prism (1.5.1)
+    prism (1.5.2)
     public_suffix (6.0.2)
     puma (7.0.4)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.2)
-    rack-protection (4.1.1)
+    rack (3.2.3)
+    rack-protection (4.2.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
@@ -375,11 +375,11 @@ GEM
     sidekiq-scheduler (6.0.1)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 7.3, < 9)
-    sinatra (4.1.1)
+    sinatra (4.2.1)
       logger (>= 1.6.0)
       mustermann (~> 3.0)
       rack (>= 3.0.0, < 4)
-      rack-protection (= 4.1.1)
+      rack-protection (= 4.2.1)
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     slim (5.2.1)
@@ -453,7 +453,7 @@ DEPENDENCIES
   ruby-vips
   sidekiq (~> 8.0.5)
   sidekiq-scheduler (~> 6.0.1)
-  sinatra (~> 4.1.0)
+  sinatra
   slim_lint
   test-unit
   timecop
