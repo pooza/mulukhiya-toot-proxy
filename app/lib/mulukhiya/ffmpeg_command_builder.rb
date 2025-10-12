@@ -1,7 +1,5 @@
 module Mulukhiya
   class FFmpegCommandBuilder
-    include Package
-
     def self.remux_video(src, dest)
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
@@ -11,9 +9,7 @@ module Mulukhiya
       ])
     end
 
-    def self.transcode_video(src, dest, crf: nil, preset: nil)
-      crf ||= config['/ffmpeg/crf']
-      preset ||= config['/ffmpeg/preset']
+    def self.transcode_video(src, dest, crf: 22, preset: 'veryfast')
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
         '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
@@ -32,11 +28,10 @@ module Mulukhiya
       ])
     end
 
-    def self.transcode_audio(src, dest, bitrate: nil)
-      bitrate ||= config['/ffmpeg/audio/bitrate']
+    def self.transcode_audio(src, dest, bitrate_k: 192)
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
-        '-map', '0:a:0', '-c:a', 'libmp3lame', '-b:a', "#{bitrate}k",
+        '-map', '0:a:0', '-c:a', 'libmp3lame', '-b:a', "#{bitrate_k}k",
         '-map_metadata', '0', '-id3v2_version', '3', dest
       ])
     end
