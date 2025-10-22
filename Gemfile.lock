@@ -277,7 +277,7 @@ GEM
     pg (1.6.2-aarch64-linux)
     pg (1.6.2-x86_64-linux)
     power_assert (2.0.5)
-    prism (1.5.2)
+    prism (1.6.0)
     public_suffix (6.0.2)
     puma (7.0.4)
       nio4r (~> 2.0)
@@ -322,7 +322,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.1)
       rexml
-    rubocop (1.81.1)
+    rubocop (1.81.6)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
