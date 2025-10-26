@@ -22,11 +22,8 @@ module Mulukhiya
       @headers = request.env.select {|k, _v| k.start_with?('HTTP_')}.transform_keys do |k|
         k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).tr('_', '-')
       end
-      if request.media_type == 'application/json'
-        @params = JSON.parse(@body).deep_symbolize_keys
-      else
-        @params = params.deep_symbolize_keys
-      end
+      @params = params.deep_symbolize_keys
+      @params.merge!(JSON.parse(@body).deep_symbolize_keys) if request.media_type == 'application/json'
       @sns.token = token
       logger.info(request: {
         method: request.request_method,
@@ -53,7 +50,6 @@ module Mulukhiya
     end
 
     error do |e|
-      e.package = Package.full_name
       @renderer = Ginseng::Web::JSONRenderer.new
       @renderer.status = e.status
       @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
