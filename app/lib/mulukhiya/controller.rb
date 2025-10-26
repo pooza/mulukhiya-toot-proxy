@@ -23,7 +23,9 @@ module Mulukhiya
         k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).tr('_', '-')
       end
       @params = params.deep_symbolize_keys
-      @params.merge!(JSON.parse(@body).deep_symbolize_keys) if request.media_type == 'application/json'
+      if request.media_type == 'application/json'
+        @params.merge!(JSON.parse(@body).deep_symbolize_keys)
+      end
       @sns.token = token
       logger.info(request: {
         method: request.request_method,
