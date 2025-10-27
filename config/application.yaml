@@ -109,6 +109,9 @@ handler:
         - facebook.com
         - toei-anim.co.jp
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
+  channel_notification:
+    disable: true
+    channels: []
   default:
     experimental: false
     timeout: 5
@@ -580,6 +583,7 @@ misskey:
     account_timeline: true
     annict: true
     announcement: true
+    channel: true
     favorite_tags: true
     feed: true
     futured_tag: true
@@ -616,6 +620,7 @@ misskey:
       - user_config_command
       - lemmy_clipping_command
       - piefed_clipping_command
+      - channel_notification
       - result_notification
     post_upload:
       - result_notification

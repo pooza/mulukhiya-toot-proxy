@@ -77,6 +77,10 @@ module Mulukhiya
         return config["/#{name}/features/futured_tag"] == true rescue false
       end
 
+      def channel?
+        return config["/#{name}/features/channel"] == true rescue false
+      end
+
       def annict?
         return false unless config["/#{name.underscore}/features/annict"] == true
         return false unless AnnictService.config?
