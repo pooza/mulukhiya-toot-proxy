@@ -8,6 +8,11 @@ module Mulukhiya
         return values.deep_symbolize_keys
       end
 
+      def uri
+        @uri ||= sns_class.new.create_uri("/channels/#{id}")
+        return @uri
+      end
+
       alias archived? isArchived
 
       alias sensitive? isSensitive
