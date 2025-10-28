@@ -22,7 +22,7 @@ module Mulukhiya
       params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym] if quote?
       params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
-      reporter.response = sns.create_draft(params)
+      reporter.response = sns.draft(params)
       Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
