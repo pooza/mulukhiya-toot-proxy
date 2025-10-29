@@ -48,20 +48,6 @@ module Mulukhiya
       return nil
     end
 
-    def lemmy
-      return nil unless [:url, :user, :password].all? {|k| user_config["/lemmy/#{k}"]}
-      @lemmy ||= LemmyClipper.new(
-        url: user_config['/lemmy/url'],
-        user: user_config['/lemmy/user'],
-        password: user_config['/lemmy/password'],
-        community: user_config['/lemmy/community'],
-      )
-      return @lemmy
-    rescue => e
-      e.log(acct: acct.to_s)
-      return nil
-    end
-
     def piefed
       return nil unless [:url, :user, :password].all? {|k| user_config["/piefed/#{k}"]}
       @piefed ||= PiefedClipper.new(

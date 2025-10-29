@@ -260,15 +260,6 @@ itunes:
   urls:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
-lemmy:
-  api:
-    version: v3
-  communities:
-    limit: 50
-  hosts:
-    default: lm.korako.me
-  subject:
-    max_length: 50
 line:
   id: null
   token: null
@@ -312,7 +303,6 @@ mastodon:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -324,7 +314,6 @@ mastodon:
     post_toot:
       - user_config_command
       - filter_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -337,7 +326,6 @@ mastodon:
     pre_toot:
       - user_config_command
       - filter_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -463,7 +451,6 @@ meisskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -475,7 +462,6 @@ meisskey:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -484,7 +470,6 @@ meisskey:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -606,7 +591,6 @@ misskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -618,7 +602,6 @@ misskey:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - channel_notification
       - result_notification
@@ -628,7 +611,6 @@ misskey:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -807,7 +789,6 @@ pleroma:
     mention:
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -819,7 +800,6 @@ pleroma:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -828,7 +808,6 @@ pleroma:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying

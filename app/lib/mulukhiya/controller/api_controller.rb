@@ -429,18 +429,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    get '/lemmy/communities' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.lemmy?
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      @renderer.message = sns.account.lemmy&.communities || {}
-      return @renderer.to_s
-    rescue => e
-      e.log
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     get '/piefed/communities' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.piefed?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

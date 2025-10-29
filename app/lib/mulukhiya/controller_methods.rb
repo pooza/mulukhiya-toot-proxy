@@ -33,10 +33,6 @@ module Mulukhiya
         return config["/#{name}/oauth/callback/enable"] == true rescue false
       end
 
-      def lemmy?
-        return Handler.search(/lemmy/).present?
-      end
-
       def piefed?
         return Handler.search(/piefed/).present?
       end

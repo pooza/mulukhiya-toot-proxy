@@ -34,7 +34,7 @@
 また、
 
 - アニメ視聴記録サービス[Annict](https://annict.com/)から視聴記録を取得し、投稿する。
-- ブックマークされた公開投稿を、[Lemmy](https://join.lemmy.ml/)に転送。
+- ブックマークされた公開投稿を、[PieFed](https://join.piefed.social)に転送。
 - 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
 - ハッシュタグのRSSフィード。
 - カスタムRSSフィード。

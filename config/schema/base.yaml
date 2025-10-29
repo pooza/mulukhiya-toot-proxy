@@ -154,7 +154,7 @@ properties:
     required:
       - api
     type: object
-  lemmy:
+  piefed:
     properties:
       communities:
         properties:
