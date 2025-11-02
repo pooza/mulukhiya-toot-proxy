@@ -154,8 +154,21 @@ properties:
     required:
       - api
     type: object
+  peer_tube:
+    properties:
+      hosts:
+        properties:
+          default:
+            format: hostname
+            type: string
+        type: object
+    type: object
   piefed:
     properties:
+      api:
+        properties:
+          version:
+            type: string
       communities:
         properties:
           limit:
@@ -168,20 +181,11 @@ properties:
             format: hostname
             type: string
         type: object
-      root_cert_file:
-        format: ^/
-        type: string
-      verify_peer:
-        type: boolean
-    type: object
-  peer_tube:
-    properties:
-      hosts:
+      subject:
         properties:
-          default:
-            format: hostname
-            type: string
-        type: object
+          max_length:
+            minimum: 0
+            type: integer
     type: object
   postgres:
     properties:

@@ -11,7 +11,7 @@ module Mulukhiya
       ])
     end
 
-    def self.transcode_video(src, dest, crf: nil, preset: nil)
+    def self.transcode_video(src, dest, crf = nil, preset = nil)
       crf ||= config['/ffmpeg/crf']
       preset ||= config['/ffmpeg/preset']
       return CommandLine.new([
@@ -32,7 +32,7 @@ module Mulukhiya
       ])
     end
 
-    def self.transcode_audio(src, dest, bitrate: nil)
+    def self.transcode_audio(src, dest, bitrate = nil)
       bitrate ||= config['/ffmpeg/audio/bitrate']
       return CommandLine.new([
         'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
