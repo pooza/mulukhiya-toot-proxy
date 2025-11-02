@@ -33,10 +33,6 @@ module Mulukhiya
         return config["/#{name}/oauth/callback/enable"] == true rescue false
       end
 
-      def lemmy?
-        return Handler.search(/lemmy/).present?
-      end
-
       def piefed?
         return Handler.search(/piefed/).present?
       end
@@ -75,6 +71,10 @@ module Mulukhiya
 
       def futured_tag?
         return config["/#{name}/features/futured_tag"] == true rescue false
+      end
+
+      def channel?
+        return config["/#{name}/features/channel"] == true rescue false
       end
 
       def annict?

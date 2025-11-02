@@ -21,35 +21,35 @@ module Mulukhiya
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', lemmy: {url: 111}).errors
+      errors = @contract.call(command: 'user_config', piefed: {url: 111}).errors
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', lemmy: {url: 'https://lm.korako.me'}).errors
+      errors = @contract.call(command: 'user_config', piefed: {url: 'https://lm.korako.me'}).errors
 
       assert_empty(errors)
 
-      errors = @contract.call(command: 'user_config', lemmy: {user: 111}).errors
+      errors = @contract.call(command: 'user_config', piefed: {user: 111}).errors
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', lemmy: {user: 'pooza@b-shock.org'}).errors
+      errors = @contract.call(command: 'user_config', piefed: {user: 'pooza@b-shock.org'}).errors
 
       assert_empty(errors)
 
-      errors = @contract.call(command: 'user_config', lemmy: {password: 111}).errors
+      errors = @contract.call(command: 'user_config', piefed: {password: 111}).errors
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', lemmy: {password: 'you_pass_word'}).errors
+      errors = @contract.call(command: 'user_config', piefed: {password: 'you_pass_word'}).errors
 
       assert_empty(errors)
 
-      errors = @contract.call(command: 'user_config', lemmy: {community: 'community_name'}).errors
+      errors = @contract.call(command: 'user_config', piefed: {community: 'community_name'}).errors
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', lemmy: {community: 111}).errors
+      errors = @contract.call(command: 'user_config', piefed: {community: 111}).errors
 
       assert_empty(errors)
 

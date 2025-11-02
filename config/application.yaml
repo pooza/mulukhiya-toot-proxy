@@ -109,6 +109,9 @@ handler:
         - facebook.com
         - toei-anim.co.jp
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
+  channel_notification:
+    disable: true
+    channels: []
   default:
     experimental: false
     timeout: 5
@@ -257,15 +260,6 @@ itunes:
   urls:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
-lemmy:
-  api:
-    version: v3
-  communities:
-    limit: 50
-  hosts:
-    default: lm.korako.me
-  subject:
-    max_length: 50
 line:
   id: null
   token: null
@@ -309,7 +303,6 @@ mastodon:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -321,7 +314,6 @@ mastodon:
     post_toot:
       - user_config_command
       - filter_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -334,7 +326,6 @@ mastodon:
     pre_toot:
       - user_config_command
       - filter_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -460,7 +451,6 @@ meisskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -472,7 +462,6 @@ meisskey:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -481,7 +470,6 @@ meisskey:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -580,6 +568,7 @@ misskey:
     account_timeline: true
     annict: true
     announcement: true
+    channel: true
     favorite_tags: true
     feed: true
     futured_tag: true
@@ -602,7 +591,6 @@ misskey:
       - announcement_mention
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -614,8 +602,8 @@ misskey:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
+      - channel_notification
       - result_notification
     post_upload:
       - result_notification
@@ -623,7 +611,6 @@ misskey:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -734,7 +721,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.39.1
+  version: 4.40.0
 parser:
   note:
     fields:
@@ -802,7 +789,6 @@ pleroma:
     mention:
       - welcome_mention
     post_bookmark:
-      - lemmy_bookmark
       - piefed_bookmark
       - result_notification
     post_boost:
@@ -814,7 +800,6 @@ pleroma:
       - result_notification
     post_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -823,7 +808,6 @@ pleroma:
       - result_notification
     pre_toot:
       - user_config_command
-      - lemmy_clipping_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -1004,10 +988,10 @@ webui:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.js
-      - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.js
+      - https://cdn.jsdelivr.net/npm/axios@1.13/dist/axios.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle
@@ -1015,7 +999,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.css
-      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.css
+      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   episode:
@@ -1037,10 +1021,10 @@ webui:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.min.js
       - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.min.js
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.9/dist/axios.min.js
+      - https://cdn.jsdelivr.net/npm/axios@1.13/dist/axios.min.js
       - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.22
+      - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
       - /mulukhiya/script/mulukhiya_lib
       - /mulukhiya/script/activity_indicator
       - /mulukhiya/script/slide_toggle
@@ -1048,7 +1032,7 @@ webui:
     stylesheets:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.min.css
-      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css
+      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:
