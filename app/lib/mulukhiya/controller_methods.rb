@@ -77,6 +77,10 @@ module Mulukhiya
         return config["/#{name}/features/channel"] == true rescue false
       end
 
+      def decoration?
+        return config["/#{name}/features/decoration"] == true rescue false
+      end
+
       def annict?
         return false unless config["/#{name.underscore}/features/annict"] == true
         return false unless AnnictService.config?

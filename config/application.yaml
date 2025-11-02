@@ -569,6 +569,7 @@ misskey:
     annict: true
     announcement: true
     channel: true
+    decoration: true
     favorite_tags: true
     feed: true
     futured_tag: true
@@ -952,6 +953,9 @@ sidekiq:
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
+    user_decoration_initialize:
+      class: Mulukhiya::UserDecorationInitializeWorker
+      cron: 3 3 * * *
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)
