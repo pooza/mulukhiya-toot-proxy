@@ -40,9 +40,9 @@ module Mulukhiya
       account.avatar_decorations do |entry|
         next unless decoration = decoration_class[entry[:id]]
         next unless decoration.livecure?
-        @sns.update_account(account, {
+        account.update(
           avatar_decorations: account.avatar_decorations.delete_if {|v| v[:id] == decoration.id},
-        })
+        )
         log(acct: account.acct.to_s, decoration: decoration.to_h, message: 'removed')
       rescue => e
         e.log(account: account.acct.to_s, decoration_id: entry[:id])

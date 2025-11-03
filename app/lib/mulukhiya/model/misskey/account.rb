@@ -81,6 +81,12 @@ module Mulukhiya
         return []
       end
 
+      def update(params = {})
+        info_agent_service.update_account(self, params)
+      rescue => e
+        e.log(acct: acct.to_s)
+      end
+
       def admin?
         return true if roles.any?(&:admin?)
         return false
