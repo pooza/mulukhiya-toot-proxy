@@ -9,7 +9,7 @@ module Mulukhiya
 
     def initialize_params(params)
       super
-      @sns = sns_class.new
+      @sns = info_agent_service
     end
 
     def perform(params = {})
@@ -37,7 +37,16 @@ module Mulukhiya
     end
 
     def clear_user_decorations(account)
-      log(acct: account.acct.to_s, message: 'initialized')
+      account.avatar_decorations do |entry|
+        next unless decoration = decoration_class[entry[:id]]
+        next unless decoration.livecure?
+        @sns.update_account(account, {
+          avatar_decorations: account.avatar_decorations.delete_if {|v| v[:id] == decoration.id},
+        })
+        log(acct: account.acct.to_s, decoration: decoration.to_h, message: 'removed')
+      rescue => e
+        e.log(account: account.acct.to_s, decoration_id: entry[:id])
+      end
     rescue => e
       e.log
     end

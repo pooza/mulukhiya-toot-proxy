@@ -74,6 +74,13 @@ module Mulukhiya
 
       alias attachments attachment
 
+      def avatar_decorations
+        return JSON.parse(avatarDecorations).deep_symbolize_keys || []
+      rescue => e
+        e.log(acct: acct.to_s)
+        return []
+      end
+
       def admin?
         return true if roles.any?(&:admin?)
         return false

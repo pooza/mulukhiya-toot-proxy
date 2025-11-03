@@ -33,6 +33,9 @@ module Mulukhiya
       return response
     end
 
+    def update_account(account, params = {})
+    end
+
     def oauth_client(type = :default)
       return nil unless scopes = MisskeyController.oauth_scopes(type)
       body = {
