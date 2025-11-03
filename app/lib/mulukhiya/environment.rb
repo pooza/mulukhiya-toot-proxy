@@ -156,6 +156,12 @@ module Mulukhiya
       return nil
     end
 
+    def self.decoration_class
+      return "Mulukhiya::#{controller_name.camelize}::Decoration".constantize
+    rescue NameError
+      return nil
+    end
+
     def self.sns_service_class
       return "Mulukhiya::#{controller_name.camelize}Service".constantize
     rescue NameError
