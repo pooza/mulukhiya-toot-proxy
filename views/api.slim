@@ -83,17 +83,17 @@ html lang='ja'
                     a href=url target='_blank' rel='noreferrer' = url.ellipsize(64)
                 .field-update-button-container
                   button @click='updatePrograms' 実行
-        - if controller.lemmy?
+        - if controller.piefed?
           li v-if='account.username'
-            h3 @click='toggleVisibility("lemmy")' Lemmy
-            slide-up-down :active='layout.details.lemmy'
+            h3 @click='toggleVisibility("piefed")' PieFed
+            slide-up-down :active='layout.details.piefed'
               .endpoint-container
-                .link GET {{endpoints.lemmy_communities}}
-                .link-description 参加しているLemmyコミュニティを返します。
+                .link GET {{endpoints.piefed_communities}}
+                .link-description 参加しているPieFedコミュニティを返します。
                 .field-update-button-container
-                  button @click='getLemmyCommunities' 実行
+                  button @click='getPiefedCommunities' 実行
                   pre.result
-                    | {{result.lemmy_communities}}
+                    | {{result.piefed_communities}}
         - if controller.favorite_tags?
           li
             h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
@@ -233,7 +233,7 @@ html lang='ja'
             entries: {},
             endpoints: {
               media_list: '/mulukhiya/api/media?page=1',
-              lemmy_communities: `/mulukhiya/api/lemmy/communities?token=${encodeURIComponent(this.methods.getToken())}`,
+              piefed_communities: `/mulukhiya/api/piefed/communities?token=${encodeURIComponent(this.methods.getToken())}`,
               status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
               status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
               handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(this.methods.getToken())}`,
@@ -246,7 +246,7 @@ html lang='ja'
               handler_list: {token: this.methods.getToken()},
               status_create_tag: {id: null, tag: null, token: this.methods.getToken()},
               status_delete_tag: {id: null, tag: null, token: this.methods.getToken()},
-              lemmy_communities: {token: this.methods.getToken()},
+              piefed_communities: {token: this.methods.getToken()},
               announcement_update: {token: this.methods.getToken()},
               media_file_clear: {token: this.methods.getToken()},
               media_metadata_clear: {token: this.methods.getToken()},
@@ -260,7 +260,7 @@ html lang='ja'
             result: {
               search_tag: null,
               favorite_tags: null,
-              lemmy_communities: null,
+              piefed_communities: null,
               media_list: null,
               program_list: null,
               work_list: null,
@@ -280,7 +280,7 @@ html lang='ja'
                 media: false,
                 program: false,
                 favorite_tags: false,
-                lemmy: false,
+                piefed: false,
                 tagging_dic: false,
                 tagging_usertag: false,
                 feed: false,
@@ -412,10 +412,10 @@ html lang='ja'
               .then(e => {this.result.favorite_tags = e})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
-          getLemmyCommunities () {
-            this.result.lemmy_communities = null
-            this.methods.getLemmyCommunities()
-              .then(e => {this.result.lemmy_communities = e})
+          getPiefedCommunities () {
+            this.result.piefed_communities = null
+            this.methods.getPiefedCommunities()
+              .then(e => {this.result.piefed_communities = e})
               .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateTaggingDictionary () {

@@ -108,10 +108,6 @@ module Mulukhiya
       assert_boolean(controller_class.poipiku?)
     end
 
-    def test_lemmy?
-      assert_boolean(controller_class.lemmy?)
-    end
-
     def test_max_length
       assert_kind_of(Integer, controller_class.max_length)
     end

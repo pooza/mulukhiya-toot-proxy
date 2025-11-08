@@ -9,12 +9,6 @@ module Mulukhiya
       required(:annict).maybe(:hash).schema do
         optional(:token).maybe(:string)
       end
-      required(:lemmy).maybe(:hash).schema do
-        optional(:url).maybe(:string)
-        optional(:user).maybe(:string)
-        optional(:password).maybe(:string)
-        optional(:community).maybe(:integer).value(gt?: 0)
-      end
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
       end
@@ -37,7 +31,7 @@ module Mulukhiya
       values['webhook'] ||= {}
       values['notify'] ||= {}
       values['annict'] ||= {}
-      values['lemmy'] ||= {}
+      values['piefed'] ||= {}
       values['tagging'] ||= {}
       values['tagging']['user_tags'] ||= []
       values['tagging']['tags'] ||= {}

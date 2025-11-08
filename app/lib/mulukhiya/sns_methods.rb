@@ -76,6 +76,14 @@ module Mulukhiya
       return Environment.poll_class
     end
 
+    def channel_class
+      return Environment.channel_class
+    end
+
+    def decoration_class
+      return Environment.decoration_class
+    end
+
     def create_status_uri(src)
       dest = TootURI.parse(src.to_s)
       dest = NoteURI.parse(dest) unless dest&.valid?

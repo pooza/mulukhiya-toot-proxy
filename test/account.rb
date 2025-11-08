@@ -99,10 +99,6 @@ module Mulukhiya
       assert_kind_of([Webhook, NilClass], account.webhook)
     end
 
-    def test_lemmy
-      assert_kind_of([LemmyClipper, NilClass], account.lemmy)
-    end
-
     def test_disable?
       Event.new(:pre_toot).handlers do |handler|
         assert_boolean(account.disable?(handler))

@@ -8,6 +8,20 @@ module Mulukhiya
 
     alias note post
 
+    def draft(body, params = {})
+      body = {text: body.to_s} unless body.is_a?(Hash)
+      body = body.deep_symbolize_keys
+      body[:replyId] = params.dig(:reply, :id) if params[:reply]
+      body.delete(:text) unless body[:text].present?
+      body.delete(:cw) unless body[:cw].present?
+      body.delete(:fileIds) unless body[:fileIds].present?
+      body[:i] ||= token
+      return http.post('/api/notes/drafts/create', {
+        body: body.compact,
+        headers: create_headers(params[:headers]),
+      })
+    end
+
     def repost(status, body, params = {})
       status = status_class[status] unless status.is_a?(status_class)
       values = status.payload
@@ -17,6 +31,9 @@ module Mulukhiya
       response = post(body.compact, params)
       delete_status(status.id, params)
       return response
+    end
+
+    def update_account(account, params = {})
     end
 
     def oauth_client(type = :default)

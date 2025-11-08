@@ -1,0 +1,7 @@
+SELECT
+  u.id,
+  u."avatarDecorations"
+FROM "user" u
+WHERE u.host IS NULL
+  AND u."isDeleted" = FALSE
+  AND u."avatarDecorations" <> '[]'
