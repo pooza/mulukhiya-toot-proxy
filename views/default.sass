@@ -179,19 +179,20 @@ nav.tokens
     .field
       display: block
       color: dimgray
+      display: flex
+      gap: 0.5em
       font:
         size: 0.8em
         weight: normal
       .title
         display: inline-block
         vertical-align: top
-        width: 6em
         font:
           weight: bold
           family: $sans-serif
       .value
         display: inline-block
-        width: calc(100% - 7em)
+        flex-grow: 1
         font:
           family: $serif
       .scope
@@ -493,6 +494,7 @@ nav.search-form-container
   margin: 0em 1em
   .control
     display: flex
+    gap: 0.5em
     align-items: center
     label
       font:
@@ -578,6 +580,7 @@ article.episode
     family: $serif
   h3
     display: flex
+    gap: 0.5em
     cursor: pointer
     align-items: center
     span
@@ -645,7 +648,7 @@ textarea
     family: $monospace
   margin: 0.5em
   padding: 0.5em
-  width: calc(100% - 4em)
+  width: calc(100% - 2em)
   height: 6em
 
 textarea.short
@@ -658,7 +661,7 @@ input
 input[type='search']
   font:
     family: $monospace
-  width: calc(100% - 6em)
+  width: calc(100% - 8em)
   padding: 0 0.5em
 
 input[type='number']
@@ -853,11 +856,13 @@ a:hover
       size: 0.8em
 
 .inline-field-container
+  display: flex
+  gap: 0.5em
   margin:
     left: 1em
   h4
     display: inline-block
-    width: 10em
+    width: 8em
   p.alert
     margin:
       left: 15em
@@ -872,7 +877,8 @@ a:hover
     display: inline-block
     margin: 0 0.5em
     padding: 0 0.5em
-    width: calc(100% - 15em)
+    height: 1.5em
+    flex-grow: 1
     font:
       family: $monospace
   input.short
@@ -880,8 +886,10 @@ a:hover
   input[type="checkbox"]
     margin:
       left: 0.5em
-    width: 1.5em
+    flex-shrink: 1
   label
+    display: flex
+    gap: 0.5em
     font:
       size: 0.8em
   .v-select
