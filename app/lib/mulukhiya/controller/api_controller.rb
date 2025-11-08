@@ -385,7 +385,7 @@ module Mulukhiya
           num = "#{matches[0]}話"
         end
         [episode['title'], [num].compact]
-      end
+      end.delete_if {|_, v| v.empty?}
       return @renderer.to_s
     rescue => e
       e.log
