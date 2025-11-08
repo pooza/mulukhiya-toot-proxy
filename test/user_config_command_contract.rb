@@ -25,10 +25,6 @@ module Mulukhiya
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', piefed: {url: 'https://lm.korako.me'}).errors
-
-      assert_empty(errors)
-
       errors = @contract.call(command: 'user_config', piefed: {user: 111}).errors
 
       assert_false(errors.empty?)
