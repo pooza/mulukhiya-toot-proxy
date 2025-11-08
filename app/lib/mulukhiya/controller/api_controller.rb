@@ -380,12 +380,15 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless annict = account_class.info_account.annict
       episodes = annict.episodes(annict.works.map {|v| v['annictId'].to_i})
-      @renderer.message = episodes.to_h do |episode|
-        if (num = episode['numberText']) && (matches = num.match(/[0-9]+/))
-          num = "#{matches[0]}話"
+      @renderer.message = episodes.filter_map do |e|
+        title = e['title'].to_s.strip
+        next if title.empty?
+        if (m = e['numberText'].to_s[/\d+/])
+          [title, ["#{m}話"]]
+        else
+          [title, []]
         end
-        [episode['title'], [num].compact]
-      end.delete_if {|_, v| v.empty?}
+      end.to_h
       return @renderer.to_s
     rescue => e
       e.log
