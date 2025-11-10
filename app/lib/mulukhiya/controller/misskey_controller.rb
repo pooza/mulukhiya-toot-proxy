@@ -88,6 +88,8 @@ module Mulukhiya
     end
 
     def token
+      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
+      return @headers['HTTP_AUTHORIZATION'].split(/\s+/).last if @headers['HTTP_AUTHORIZATION']
       return params[:i]
     end
   end
