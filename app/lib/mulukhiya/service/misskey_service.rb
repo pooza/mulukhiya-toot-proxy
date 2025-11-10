@@ -71,6 +71,12 @@ module Mulukhiya
       )
     end
 
+    def create_headers(headers = {})
+      dest = super
+      dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}
+      return dest
+    end
+
     def self.parse_aid(aid)
       return Time.at((aid[0..7].to_i(36) / 1000) + 946_684_800, in: 'UTC').getlocal
     end

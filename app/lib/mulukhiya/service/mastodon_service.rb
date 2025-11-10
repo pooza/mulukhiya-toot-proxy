@@ -70,6 +70,12 @@ module Mulukhiya
       return uri
     end
 
+    def create_headers(headers = {})
+      dest = super
+      dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}
+      return dest
+    end
+
     def notify(account, message, options = {})
       options.deep_symbolize_keys!
       message = [account.acct.to_s, message].join("\n")
