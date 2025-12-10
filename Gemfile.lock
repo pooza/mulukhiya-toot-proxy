@@ -8,12 +8,11 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 072cda9f5d7412ce0b005887ded5b92eae3c2ecd
+  revision: 920b00afc681b6303b23ece839b288620ca6ac1c
   specs:
-    ginseng-core (1.15.7)
+    ginseng-core (1.15.8)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
-      bundler (~> 2.0)
       cgi (>= 0.4.2)
       csv
       daemon-spawn
@@ -117,20 +116,20 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     base64 (0.3.0)
     bigdecimal (3.3.1)
     bson (5.2.0)
     builder (3.3.0)
-    cgi (0.5.0)
+    cgi (0.5.1)
     concurrent-ruby (1.3.5)
-    connection_pool (2.5.4)
+    connection_pool (3.0.2)
     crass (1.0.6)
     csv (3.3.5)
     daemon-spawn (0.4.2)
-    date (3.5.0)
+    date (3.5.1)
     domain_name (0.6.20240107)
     drb (2.2.3)
     dry-configurable (1.3.0)
@@ -168,7 +167,7 @@ GEM
       dry-initializer (~> 3.2)
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
-    erb (5.1.3)
+    erb (6.0.0)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
@@ -199,7 +198,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    json (2.16.0)
+    json (2.17.1)
     json-schema (6.0.0)
       addressable (~> 2.8)
       bigdecimal (~> 3.1)
@@ -224,11 +223,11 @@ GEM
     mime-types-data (3.2025.0924)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.26.1)
+    minitest (5.26.2)
     mongo (2.21.3)
       base64
       bson (>= 4.14.1, < 6.0.0)
-    multi_json (1.17.0)
+    multi_json (1.18.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     mustermann (3.0.4)
@@ -279,7 +278,7 @@ GEM
     pg (1.6.2-x86_64-linux)
     power_assert (3.0.1)
     prism (1.6.0)
-    public_suffix (6.0.2)
+    public_suffix (7.0.0)
     puma (7.1.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
@@ -402,7 +401,7 @@ GEM
     time (0.4.1)
       date
     timecop (0.9.10)
-    timeout (0.4.4)
+    timeout (0.5.0)
     trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
