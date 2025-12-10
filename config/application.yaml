@@ -126,10 +126,6 @@ handler:
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   filter_command:
     minutes: 300
-  hexo_announce:
-    category: お知らせ
-    comments: false
-    dir: null
   image_copyright:
     message: ※画像有 著作権表示 参照のこと
     tag: null
@@ -293,7 +289,6 @@ mastodon:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
@@ -441,7 +436,6 @@ meisskey:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
@@ -575,7 +569,6 @@ misskey:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
