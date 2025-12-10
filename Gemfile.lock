@@ -224,7 +224,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.26.2)
-    mongo (2.21.3)
+    mongo (2.22.0)
       base64
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.18.0)
@@ -232,8 +232,8 @@ GEM
       bigdecimal (~> 3.1)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
-    net-http (0.7.0)
-      uri
+    net-http (0.8.0)
+      uri (>= 0.11.1)
     net-imap (0.5.12)
       date
       net-protocol
@@ -307,7 +307,7 @@ GEM
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
     rake (13.3.1)
-    redis-client (0.26.1)
+    redis-client (0.26.2)
       connection_pool
     regexp_parser (2.11.3)
     rest-client (2.0.2)
@@ -363,7 +363,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sequel (5.98.0)
+    sequel (5.99.0)
       bigdecimal
     set (1.1.2)
     sidekiq (8.0.10)
@@ -395,7 +395,7 @@ GEM
     syslog (0.3.0)
       logger
     temple (0.10.4)
-    test-unit (3.7.1)
+    test-unit (3.7.3)
       power_assert
     tilt (2.1.0)
     time (0.4.1)
@@ -461,7 +461,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-   ruby 3.4.7p58
+  ruby 3.4.7
 
 BUNDLED WITH
-   2.7.2
+  4.0.1
