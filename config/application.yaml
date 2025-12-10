@@ -134,9 +134,6 @@ handler:
     message: ※画像有 著作権表示 参照のこと
     tag: null
     url: null
-  image_format_convert:
-    alpha: true
-    gif: true
   image_resize:
     pixel: 1920
   invalid_command:
@@ -464,8 +461,6 @@ meisskey:
       - user_config_command
       - piefed_clipping_command
       - result_notification
-    post_upload:
-      - result_notification
     post_webhook:
       - result_notification
     pre_toot:
@@ -493,11 +488,6 @@ meisskey:
       - image_copyright
       - tagging
       - invalid_command
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
@@ -606,8 +596,6 @@ misskey:
       - piefed_clipping_command
       - channel_notification
       - result_notification
-    post_upload:
-      - result_notification
     post_webhook:
       - result_notification
     pre_toot:
@@ -635,11 +623,6 @@ misskey:
       - image_copyright
       - tagging
       - invalid_command
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
