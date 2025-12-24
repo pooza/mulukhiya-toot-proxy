@@ -30,6 +30,10 @@ module Mulukhiya
       return Mulukhiya.dir
     end
 
+    def self.jit_enabled
+      return config['/ruby/jit'] == true
+    end
+
     def self.domain_name
       return Ginseng::URI.parse(config["/#{controller_name}/url"]).host
     end

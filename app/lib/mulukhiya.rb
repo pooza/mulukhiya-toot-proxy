@@ -72,7 +72,5 @@ module Mulukhiya
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
-  if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && config['/ruby/jit'] && !RubyVM::YJIT.enabled?
-    RubyVM::YJIT.enable
-  end
+  RubyVM::YJIT.enable if defined?(RubyVM::YJIT)
 end
