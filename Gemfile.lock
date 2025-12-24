@@ -189,7 +189,8 @@ GEM
       et-orbi (~> 1.4)
       raabro (~> 1.4)
     gli (2.21.5)
-    hashie (5.0.0)
+    hashie (5.1.0)
+      logger
     http-cookie (1.1.0)
       domain_name (~> 0.5)
     httparty (0.23.2)
@@ -229,8 +230,8 @@ GEM
       base64
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.18.0)
-    multi_xml (0.7.2)
-      bigdecimal (~> 3.1)
+    multi_xml (0.8.0)
+      bigdecimal (>= 3.1, < 5)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
     net-http (0.9.1)
@@ -396,7 +397,7 @@ GEM
     syslog (0.3.0)
       logger
     temple (0.10.4)
-    test-unit (3.7.5)
+    test-unit (3.7.6)
       power_assert
     tilt (2.1.0)
     time (0.4.2)
