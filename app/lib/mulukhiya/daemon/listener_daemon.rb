@@ -13,7 +13,6 @@ module Mulukhiya
       return [
         "#{self.class} #{Package.version}",
         # "Streaming API URL: #{info_agent_service.streaming_uri}",
-        ('Ruby YJIT: Ready' if jit_ready?),
       ].compact.join("\n")
     end
 
