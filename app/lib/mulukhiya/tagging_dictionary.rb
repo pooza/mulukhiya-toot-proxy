@@ -40,7 +40,7 @@ module Mulukhiya
       rescue => e
         e.log(k:)
       end
-      return chunks.sort_by {|k, _| k.length}.to_h.values
+      return chunks.sort_by {|k, _| k}.values
     end
 
     def concat(values)
