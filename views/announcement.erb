@@ -1,0 +1,21 @@
+<% if params[:header] -%>
+---
+title: <%= params[:title] || params[:body].each_line.first.split(/\s+/).first.strip %>
+date: <%= Date.today.strftime %>
+categories: <%= params[:category] %>
+tags:
+<% Mulukhiya::TaggingDictionary.new.matches(params[:title].to_s + params[:body].to_s).each do |word| -%>
+  - <%= word.to_hashtag_base %>
+<% end -%>
+comments: <%= config['/handler/hexo_announce/comments'].to_s %>
+---
+
+<% end -%>
+<% if params[:title] -%>
+<%= params[:title] %>
+
+<% end -%>
+<%= params[:body] %>
+<% if params[:image_url] -%>
+<%= params[:image_url] %>
+<% end -%>
