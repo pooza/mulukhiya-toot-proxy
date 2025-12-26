@@ -21,34 +21,6 @@ module Mulukhiya
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(command: 'user_config', piefed: {url: 111}).errors.messages
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', piefed: {user: 111}).errors.messages
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', piefed: {user: 'pooza@b-shock.org'}).errors.messages
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', piefed: {password: 111}).errors.messages
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', piefed: {password: 'you_pass_word'}).errors.messages
-
-      assert_empty(errors)
-
-      errors = @contract.call(command: 'user_config', piefed: {community: 'community_name'}).errors.messages
-
-      assert_false(errors.empty?)
-
-      errors = @contract.call(command: 'user_config', piefed: {community: 111}).errors.messages
-
-      assert_empty(errors)
-
       errors = @contract.call(command: 'user_config', tagging: nil).errors.messages
 
       assert_empty(errors)
