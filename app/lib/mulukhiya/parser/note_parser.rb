@@ -18,7 +18,7 @@ module Mulukhiya
       return enum_for(__method__) unless block
       # MFM対応として、スペースだけでなく、閉じ括弧もURLの終端と見なす。
       return text.scan(%r{https?://[^()[:space:]]+}) do |link|
-        yield URI.parse(link.gsub(/[[:cntrl:]]/, ''))
+        yield Ginseng::URI.parse(link.gsub(/[[:cntrl:]]/, ''))
       end
     end
 
