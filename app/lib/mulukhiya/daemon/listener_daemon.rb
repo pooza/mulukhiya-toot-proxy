@@ -12,8 +12,8 @@ module Mulukhiya
     def motd
       return [
         "#{self.class} #{Package.version}",
-        ('Ruby YJIT: Ready' if defined?(RubyVM::YJIT)),
         # "Streaming API URL: #{info_agent_service.streaming_uri}",
+        ('Ruby YJIT: Ready' if defined?(RubyVM::YJIT)),
       ].compact.join("\n")
     end
 
