@@ -15,6 +15,7 @@ module Mulukhiya
       return [
         `sidekiq -V`.chomp,
         "Redis DSN: #{config['/sidekiq/redis/dsn']}",
+        ('Ruby YJIT: Ready' if defined?(RubyVM::YJIT)),
       ].compact.join("\n")
     end
 
