@@ -33,12 +33,12 @@ module Mulukhiya
 
     def chunks
       chunks = Concurrent::Hash.new
-      Parallel.each(keys, in_threads: Parallel.processor_count) do |key|
+      Parallel.each(keys, in_threads: Parallel.processor_count) do |k|
         next if short?(k)
         chunks[k.length] ||= Concurrent::Hash.new
-        chunks[k.length][key] = self[key]
+        chunks[k.length][k] = self[k]
       rescue => e
-        e.log(key:)
+        e.log(k:)
       end
       return chunks.sort_by {|k, _| k.length}.to_h.values
     end
