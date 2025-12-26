@@ -18,7 +18,7 @@ module Mulukhiya
       return @params['/strict'] || false
     rescue => e
       e.log(dic: uri.to_s)
-      rescue false
+      return false
     end
   end
 end
