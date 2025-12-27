@@ -242,8 +242,6 @@ properties:
         type: object
       did_you_mean:
         type: boolean
-      jit:
-        type: boolean
     type: object
   sidekiq:
     properties:

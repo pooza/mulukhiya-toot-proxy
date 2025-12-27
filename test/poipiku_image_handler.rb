@@ -1,5 +1,10 @@
 module Mulukhiya
   class PoipikuImageHandlerTest < TestCase
+    def disable?
+      return true unless Event.syms.member?(:pre_upload)
+      return super
+    end
+
     def setup
       @handler = Handler.create(:poipiku_image)
     end

@@ -34,21 +34,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    post '/api/drive/files/create' do
-      filename = params[:name]
-      Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
-      reporter.response = sns.upload(params.dig(:file, :tempfile), {filename:})
-      Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
-      @renderer.message = JSON.parse(reporter.response.body)
-      @renderer.status = reporter.response.code
-      return @renderer.to_s
-    rescue Ginseng::GatewayError => e
-      e.alert
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
-      return @renderer.to_s
-    end
-
     post '/api/notes/favorites/create' do
       reporter.response = sns.fav(params[:noteId])
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)

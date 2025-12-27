@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def test_image_uri
-      assert_equal(Ginseng::URI.parse('https://img.poipiku.com/user_img03/008066049/008819854_DlZlDWaDH.jpeg_640.jpg'), @uri.image_uri)
+      assert_equal(Ginseng::URI.parse('https://cdn.poipiku.com/008066049/008819854_DlZlDWaDH.jpeg_640.jpg'), @uri.image_uri)
     end
   end
 end

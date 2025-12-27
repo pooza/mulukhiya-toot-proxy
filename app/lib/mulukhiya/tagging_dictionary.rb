@@ -18,14 +18,17 @@ module Mulukhiya
 
     def matches(source)
       text = source.dup
-      tags = TagContainer.new
-      reverse_each do |k, v|
-        next if short?(k)
-        next unless text.match?(v[:pattern])
-        tags.merge(v[:words])
-        text = text.gsub(v[:pattern], '')
+      tags = Concurrent::Array.new
+      chunks.reverse_each do |chunk|
+        Parallel.each(chunk, in_threads: Parallel.processor_count) do |entry|
+          next unless text.match?(entry[:pattern])
+          tags.concat(entry[:words])
+          text = text.gsub(entry[:pattern], '')
+        rescue => e
+          e.log(entry:)
+        end
       end
-      return tags
+      return TagContainer.new(tags.uniq)
     end
 
     def concat(values)
@@ -90,6 +93,18 @@ module Mulukhiya
         end
       end
       return result.sort_by {|k, _| k.length}.to_h
+    end
+
+    def chunks
+      chunks = Concurrent::Hash.new
+      Parallel.each(keys, in_threads: Parallel.processor_count) do |k|
+        next if short?(k)
+        chunks[k.length] ||= Concurrent::Array.new
+        chunks[k.length].push(self[k])
+      rescue => e
+        e.log(k:)
+      end
+      return {}.merge(chunks).values
     end
   end
 end

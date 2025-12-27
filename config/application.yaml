@@ -126,17 +126,10 @@ handler:
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
   filter_command:
     minutes: 300
-  hexo_announce:
-    category: お知らせ
-    comments: false
-    dir: null
   image_copyright:
     message: ※画像有 著作権表示 参照のこと
     tag: null
     url: null
-  image_format_convert:
-    alpha: true
-    gif: true
   image_resize:
     pixel: 1920
   invalid_command:
@@ -296,7 +289,6 @@ mastodon:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
@@ -444,7 +436,6 @@ meisskey:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
@@ -463,8 +454,6 @@ meisskey:
     post_toot:
       - user_config_command
       - piefed_clipping_command
-      - result_notification
-    post_upload:
       - result_notification
     post_webhook:
       - result_notification
@@ -493,11 +482,6 @@ meisskey:
       - image_copyright
       - tagging
       - invalid_command
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
@@ -585,7 +569,6 @@ misskey:
       - mail_alert
     announce:
       - post_announce
-      - hexo_announce
     follow:
       - welcome_mention
     mention:
@@ -605,8 +588,6 @@ misskey:
       - user_config_command
       - piefed_clipping_command
       - channel_notification
-      - result_notification
-    post_upload:
       - result_notification
     post_webhook:
       - result_notification
@@ -635,11 +616,6 @@ misskey:
       - image_copyright
       - tagging
       - invalid_command
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
     pre_webhook:
       - itunes_nowplaying
       - spotify_nowplaying
@@ -722,7 +698,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.40.1
+  version: 4.41.0
 parser:
   note:
     fields:
@@ -911,7 +887,6 @@ ruby:
   bundler:
     install: false
   did_you_mean: true
-  jit: false
 sharkey:
   display_name: Sharkey
   features:

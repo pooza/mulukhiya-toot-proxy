@@ -25,7 +25,6 @@ module Mulukhiya
     end
 
     error do |e|
-      e.package = Package.full_name
       @renderer = default_renderer_class.new
       @renderer.status = e.status
       @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
