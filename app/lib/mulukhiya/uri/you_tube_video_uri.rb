@@ -30,7 +30,8 @@ module Mulukhiya
     alias track_name title
 
     def artists
-      return [artist].to_set
+      return [artist].to_set if artist
+      return nil
     rescue => e
       e.log(uri: to_s)
       return nil
