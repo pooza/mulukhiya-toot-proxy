@@ -104,7 +104,7 @@ module Mulukhiya
       rescue => e
         e.log(k:)
       end
-      return chunks.to_a
+      return chunks.to_h.values
     end
   end
 end
