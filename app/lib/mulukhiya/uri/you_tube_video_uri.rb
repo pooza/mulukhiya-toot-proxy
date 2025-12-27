@@ -10,6 +10,13 @@ module Mulukhiya
       return false
     end
 
+    def title
+      return data.dig('snippet', 'title')
+    rescue => e
+      e.log(uri: to_s)
+      return nil
+    end
+
     def album_name
       return nil
     end
@@ -23,7 +30,9 @@ module Mulukhiya
     alias track_name title
 
     def artists
-      return [artist].to_set if artist
+      return [artist].to_set
+    rescue => e
+      e.log(uri: to_s)
       return nil
     end
   end
