@@ -20,7 +20,7 @@ module Mulukhiya
       text = source.dup
       tags = Concurrent::Array.new
       chunks.reverse_each do |chunk|
-        Parallel.each(chunk, in_threads: Parallel.processor_count) do |entry|
+        Parallel.each(chunk, in_threads: Parallel.processor_count * 2) do |entry|
           next unless text.match?(entry[:pattern])
           tags.concat(entry[:words])
           text = text.gsub(entry[:pattern], '')
@@ -97,7 +97,7 @@ module Mulukhiya
 
     def chunks
       chunks = Concurrent::Hash.new
-      Parallel.each(keys, in_threads: Parallel.processor_count) do |k|
+      Parallel.each(keys, in_threads: Parallel.processor_count * 2) do |k|
         next if short?(k)
         chunks[k.length] ||= Concurrent::Array.new
         chunks[k.length].push(self[k])
