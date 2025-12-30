@@ -12,7 +12,7 @@ module Mulukhiya
     def motd
       return [
         "#{self.class} #{Package.version}",
-        ('Ruby YJIT: Ready' if defined?(RubyVM::YJIT)),
+        ('Ruby YJIT: Ready' if Environment.jit?),
       ].compact.join("\n")
     end
 
