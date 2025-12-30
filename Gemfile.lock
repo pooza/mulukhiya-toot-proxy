@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 920b00afc681b6303b23ece839b288620ca6ac1c
+  revision: 46767bd32087f8acc71f6db3b2fa4127edc14b68
   specs:
-    ginseng-core (1.15.8)
+    ginseng-core (1.15.9)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       cgi (>= 0.4.2)
@@ -22,7 +22,7 @@ GIT
       facets
       fileutils (~> 1.7.0)
       find
-      httparty (>= 0.21.0)
+      httparty (>= 0.24.0)
       json-schema
       mail
       multi_json
@@ -193,7 +193,7 @@ GEM
       logger
     http-cookie (1.1.0)
       domain_name (~> 0.5)
-    httparty (0.23.2)
+    httparty (0.24.0)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -247,12 +247,12 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.5)
-    nokogiri (1.18.10)
+    nokogiri (1.19.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.18.10-aarch64-linux-gnu)
+    nokogiri (1.19.0-aarch64-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.18.10-x86_64-linux-gnu)
+    nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     oauth2 (2.0.18)
       faraday (>= 0.17.3, < 4.0)
