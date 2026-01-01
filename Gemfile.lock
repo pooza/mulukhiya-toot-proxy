@@ -365,7 +365,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sequel (5.99.0)
+    sequel (5.100.0)
       bigdecimal
     set (1.1.2)
     sidekiq (8.0.10)
@@ -397,7 +397,7 @@ GEM
     syslog (0.3.0)
       logger
     temple (0.10.4)
-    test-unit (3.7.6)
+    test-unit (3.7.7)
       power_assert
     tilt (2.1.0)
     time (0.4.2)
