@@ -13,7 +13,9 @@ module Mulukhiya
       return [
         `puma -V`.chomp,
         "Root URL: #{root_uri}",
-        "Redis DSN: #{config['/user_config/redis/dsn']}",
+        ("PostgreSQL DSN: #{secure_dsn(config['/postgres/dsn'])}" rescue nil),
+        ("MongoDB DSN: #{secure_dsn(config['/mongo/dsn'])}" rescue nil),
+        ("Redis DSN: #{secure_dsn(config['/user_config/redis/dsn'])}" rescue nil),
         ('Ruby YJIT: Ready' if Environment.jit?),
       ].compact.join("\n")
     end
@@ -40,6 +42,12 @@ module Mulukhiya
 
     def initializer_path
       return File.join(Environment.dir, 'app/initializer/puma.rb')
+    end
+
+    def secure_dsn(dsn)
+      dsn = Ginseng::URI.parse(dsn) unless dsn.is_a?(Ginseng::URI)
+      dsn.password = '***' if dsn.password
+      return dsn.to_s
     end
   end
 end
