@@ -7,16 +7,17 @@ module Mulukhiya
     def addition_tags
       text = flatten_payload
       dic = TaggingDictionary.new
-      tags = TagContainer.new
-      all.select {|v| text.match?(v[:pattern])}.each do |remote|
-        tags.merge(remote[:tags])
+      tags = Concurrent::Array.new
+      Parallel.each(all, in_threads: Parallel.processor_count) do |remote|
+        next unless text.match?(remote[:pattern])
+        tags.concat(remote[:tags])
         service = Ginseng::Fediverse::MulukhiyaService.new(remote[:url])
         next if sns.uri.host == service.base_uri.host
-        tags.merge(service.search_hashtags(text).reject {|v| dic.short?(v)})
+        tags.concat(service.search_hashtags(text).reject {|v| dic.short?(v)})
       rescue => e
         e.log(remote:)
       end
-      return tags
+      return TagContainer.new(tags.uniq)
     end
 
     def all(&block)
