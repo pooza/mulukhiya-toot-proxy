@@ -36,15 +36,20 @@ module Mulukhiya
 
     def communities
       login unless @jwt
+      communities = []
       uri = self.uri.clone
       uri.path = "/api/#{api_version}/community/list"
-      uri.query_values = {
-        type_: 'Subscribed',
-      }
-      communities = http.get(uri, {
-        headers: {'Authorization' => "Bearer #{@jwt}"},
-      })['communities'].map(&:deep_symbolize_keys)
-      return communities.to_h {|v| [v.dig(:community, :id), v.dig(:community, :title)]}
+      config['/piefed/community/types'].each do |type_|
+        page = 1
+        loop do
+          uri.query_values = {type_:, page:}
+          response = http.get(uri, {headers: {'Authorization' => "Bearer #{@jwt}"}})
+          communities.concat(response['communities'])
+          break unless response['next_page']
+          page += 1
+        end
+      end
+      return communities.to_h {|v| [v.dig('community', 'id').to_i, v.dig('community', 'title')]}
     end
   end
 end

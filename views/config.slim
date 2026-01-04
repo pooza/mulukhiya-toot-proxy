@@ -151,20 +151,19 @@ html lang='ja'
           }
         },
         async created () {
-          this.methods.getConfig()
+          this.methods.getPiefedCommunities()
             .then(e => {
+              this.piefed.communities = e
+              this.options.piefed_communities.splice(0)
+              Object.keys(this.piefed.communities)
+                .map(k => {
+                  this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
+                })
+              return this.methods.getConfig()
+            }).then(e => {
               this.updateForm(e)
               this.account = this.methods.createAccountInfo(e)
               this.config = e.config
-              return this.methods.getPiefedCommunities()
-            }).then(e => {
-              this.piefed.communities = e
-              Object.keys(this.piefed.communities)
-                .map(k => {
-                  this.options.piefed_communities.splice(0)
-                  this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
-                })
-              this.form.piefed.community = this.piefed.communities[this.methods.dig(this.config, 'piefed', 'community')]
             })
           this.methods.getPrograms()
             .then(e => {
@@ -184,7 +183,7 @@ html lang='ja'
             this.form.webhook.visibility = this.methods.dig(data, 'config', 'webhook', 'visibility') || 'public'
             this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
             this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
-            this.form.piefed.community = this.piefed.communities[this.methods.dig(data, 'config', 'piefed', 'community')]
+            this.form.piefed.community = this.methods.dig(data, 'config', 'piefed', 'community')
             this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
             this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
             if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
@@ -232,15 +231,6 @@ html lang='ja'
             if (this.form.piefed.community) command.piefed.community = Number(this.form.piefed.community)
             this.updateConfig(command)
             this.form.piefed.password = null
-            this.methods.getPiefedCommunities()
-              .then(e => {
-                this.piefed.communities = e
-                this.options.piefed_communities.splice(0)
-                Object.keys(this.piefed.communities)
-                  .map(k => {
-                    this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
-                  })
-              })
           },
           unauthPiefed () {
             Swal.fire({
