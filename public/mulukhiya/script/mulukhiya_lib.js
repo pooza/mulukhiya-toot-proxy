@@ -400,6 +400,7 @@ window.MulukhiyaLib = {
       indicator.show()
       return axios.get(globals.methods.createURL('/mulukhiya/api/piefed/communities'))
         .then(e => e.data)
+        .catch(e => [])
         .finally(e => indicator.hide())
     }
 
