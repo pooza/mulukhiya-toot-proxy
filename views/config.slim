@@ -159,12 +159,14 @@ html lang='ja'
               return this.methods.getPiefedCommunities()
             }).then(e => {
               this.piefed.communities = e
+              this.options.piefed_communities.splice(0)
               Object.keys(this.piefed.communities)
                 .map(k => {
-                  this.options.piefed_communities.splice(0)
                   this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
+                  if (k == this.methods.dig(this.config, 'piefed', 'community')) {
+                    this.form.piefed.community = this.piefed.communities[k]
+                  }
                 })
-              this.form.piefed.community = this.piefed.communities[this.methods.dig(this.config, 'piefed', 'community')]
             })
           this.methods.getPrograms()
             .then(e => {
