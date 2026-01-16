@@ -2,12 +2,17 @@
 $LOAD_PATH.unshift(File.join(File.expand_path('..', __dir__), 'app/lib'))
 
 require 'mulukhiya'
+require 'optparse'
 module Mulukhiya
   warn Package.full_name
   warn File.basename(__FILE__)
   warn ''
   raise '/crypt/password が未設定です。' unless Crypt.config?
-  password = ARGV.getopts('', 'text:')['text'] || ARGV.first
+  options = {}
+  OptionParser.new do |opt|
+    opt.on('--text=TEXT', '復号する文字列') {|v| options[:text] = v}
+  end.parse!
+  password = options[:text] || ARGV.first
   raise '文字列を指定してください。' unless password.present?
   puts password.decrypt
 rescue => e
