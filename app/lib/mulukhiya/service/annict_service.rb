@@ -51,8 +51,9 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
+      return unless entries = entries.map {|v| v.dig('episodes', 'nodes')}
       all = Concurrent::Array.new
-      Parallel.each(entries.map {|v| v.dig('episodes', 'nodes')}, in_threads: Parallel.processor_count) do |episodes|
+      Parallel.each(entries, in_threads: Parallel.processor_count) do |episodes|
         episodes.each do |episode|
           next unless subtitle = episode['title']
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?

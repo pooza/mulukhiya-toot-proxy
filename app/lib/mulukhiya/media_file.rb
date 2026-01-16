@@ -161,7 +161,8 @@ module Mulukhiya
     def self.purge
       worker = Worker.create(:media_cleaning)
       time = worker.worker_config(:hours).hours.ago
-      Parallel.each(all.select {|f| File.new(f).mtime < time}, in_threads: Parallel.processor_count * 2) do |path|
+      paths = all.select {|f| File.new(f).mtime < time}
+      Parallel.each(paths, in_threads: Parallel.processor_count * 2) do |path|
         FileUtils.rm_rf(path)
         logger.info(class: to_s, method: __method__, path:)
       rescue => e
