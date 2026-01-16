@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '~>3.4.1'
+ruby '>= 3.4.1', '< 5.0'
 gem 'concurrent-ruby'
 gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
