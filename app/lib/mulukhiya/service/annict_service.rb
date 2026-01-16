@@ -52,21 +52,12 @@ module Mulukhiya
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
       return unless entries = entries.map {|v| v.dig('episodes', 'nodes')}
+      work_title = entries.first['title']
       all = Concurrent::Array.new
       Parallel.each(entries, in_threads: Parallel.processor_count) do |episodes|
         episodes.each do |episode|
-          next unless subtitle = episode['title']
-          episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          all.push(episode.merge(
-            'hashtag' => episode['title'].to_hashtag,
-            'hashtag_uri' => sns.create_tag_uri(episode['title']),
-            'command_toot' => self.class.create_command_toot(
-              title: entries.first['title'],
-              subtitle: episode['title'],
-              number_text: episode['numberText'],
-              minutes: config['/webui/episode/minutes'],
-            ),
-          ))
+          next unless episode['title']
+          all.push(build_episode_info(episode, work_title))
         end
       end
       return all.to_a
@@ -323,6 +314,22 @@ module Mulukhiya
       return true unless account = params[:account]
       return true unless account.user_config['/annict/theme_works_only']
       return keywords.any? {|v| activity.to_json.include?(v)}
+    end
+
+    def build_episode_info(episode, work_title)
+      title = episode['title']
+      title = self.class.trim_ruby(title) if self.class.subtitle_trim_ruby?
+      return episode.merge(
+        'title' => title,
+        'hashtag' => title.to_hashtag,
+        'hashtag_uri' => sns.create_tag_uri(title),
+        'command_toot' => self.class.create_command_toot(
+          title: work_title,
+          subtitle: title,
+          number_text: episode['numberText'],
+          minutes: config['/webui/episode/minutes'],
+        ),
+      )
     end
 
     def query(template, variables = nil)
