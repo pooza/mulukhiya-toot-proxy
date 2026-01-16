@@ -14,7 +14,7 @@ module Mulukhiya
         clear_user_tags(account_class[id])
       else
         log(mode: 'all')
-        UserConfigStorage.tag_owners.each do |account|
+        Parallel.each(UserConfigStorage.tag_owners, in_threads: Parallel.processor_count * 2) do |account|
           clear_user_tags(account)
         end
       end

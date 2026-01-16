@@ -10,12 +10,16 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if parser.command?
-      parser.uris.select {|v| rewritable?(v)}.each do |uri|
+      results = Concurrent::Array.new
+      errs = Concurrent::Array.new
+      Parallel.each(parser.uris.select {|v| rewritable?(v)}, in_threads: Parallel.processor_count * 2) do |uri|
         rewrited = rewrite(uri)
-        result.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
+        results.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
       rescue => e
-        errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
+        errs.push(class: e.class.to_s, message: e.message, url: uri.to_s)
       end
+      results.each {|r| result.push(r)}
+      errs.each {|e| errors.push(e)}
       parser.text = payload[text_field] = @status
     end
 

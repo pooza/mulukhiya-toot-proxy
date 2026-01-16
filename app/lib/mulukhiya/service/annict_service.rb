@@ -51,8 +51,8 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      all = []
-      entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
+      all = Concurrent::Array.new
+      Parallel.each(entries.map {|v| v.dig('episodes', 'nodes')}, in_threads: Parallel.processor_count) do |episodes|
         episodes.each do |episode|
           next unless subtitle = episode['title']
           episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
@@ -68,7 +68,7 @@ module Mulukhiya
           ))
         end
       end
-      return all
+      return all.to_a
     end
 
     def crawl(params = {})
@@ -287,8 +287,9 @@ module Mulukhiya
     def self.crawl_all(params = {})
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
-      results = {}
-      accounts.each do |account|
+      mutex = Mutex.new
+      results = Concurrent::Hash.new
+      Parallel.each(accounts, in_threads: Parallel.processor_count * 2) do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(
           webhook: account.webhook,
           account:,
@@ -296,7 +297,7 @@ module Mulukhiya
       rescue => e
         e.log(acct: account.acct.to_s)
       ensure
-        bar&.increment
+        mutex.synchronize {bar&.increment}
       end
       bar&.finish
       return unless Environment.rake?

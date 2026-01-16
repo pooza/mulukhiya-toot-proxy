@@ -21,11 +21,12 @@ module Mulukhiya
       http.base_uri = "https://#{acct.host}"
       headers = {'X-Mulukhiya' => Package.full_name}
       r = http.get('/.well-known/nodeinfo', {headers:}).parsed_response
-      r = http.get(r['links'].first['href'], {headers:}).parsed_response
-      software = r.dig('software', 'name')
+      nodeinfo_url = r['links'].first['href']
+      nodeinfo_future = Concurrent::Future.execute {http.get(nodeinfo_url, {headers:}).parsed_response}
+      instance_future = Concurrent::Future.execute {http.get('/api/v1/instance').parsed_response['fedibird_capabilities'] || []}
+      software = nodeinfo_future.value.dig('software', 'name')
       return true if config["/#{software.underscore}/features/reaction"] rescue nil
-      capabilities = http.get('/api/v1/instance').parsed_response['fedibird_capabilities'] || []
-      return true if capabilities.member?('emoji_reaction')
+      return true if instance_future.value.member?('emoji_reaction')
       return false
     rescue => e
       e.log(acct: acct.to_s)
