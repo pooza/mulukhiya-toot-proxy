@@ -37,7 +37,7 @@ module Mulukhiya
       return [nil, nil] unless location
       next_uri = normalize_location(dest, location)
       return [nil, nil] unless next_uri&.host
-      return [next_uri, response.status.to_i]
+      return [next_uri, response.code.to_i]
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: dest.to_s)
       return [nil, nil]
