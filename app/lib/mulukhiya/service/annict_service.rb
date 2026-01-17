@@ -51,16 +51,21 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      return unless entries = entries.map {|v| v.dig('episodes', 'nodes')}
-      work_title = entries.first['title']
-      all = Concurrent::Array.new
-      Parallel.each(entries, in_threads: Parallel.processor_count) do |episodes|
-        episodes.each do |episode|
-          next unless episode['title']
-          all.push(build_episode_info(episode, work_title))
-        end
-      end
-      return all.to_a
+      all_episodes = entries.flat_map {|v| v.dig('episodes', 'nodes')}
+      return Parallel.map(all_episodes, in_threads: Parallel.processor_count * 2) do |episode|
+        next unless subtitle = episode['title']
+        episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+        episode.merge(
+          'hashtag' => episode['title'].to_hashtag,
+          'hashtag_uri' => sns.create_tag_uri(episode['title']),
+          'command_toot' => self.class.create_command_toot(
+            title: entries.first['title'],
+            subtitle: episode['title'],
+            number_text: episode['numberText'],
+            minutes: config['/webui/episode/minutes'],
+          ),
+        )
+      end.compact
     end
 
     def crawl(params = {})
@@ -279,9 +284,8 @@ module Mulukhiya
     def self.crawl_all(params = {})
       return unless controller_class.annict?
       bar = ProgressBar.create(total: accounts.count)
-      mutex = Mutex.new
-      results = Concurrent::Hash.new
-      Parallel.each(accounts, in_threads: Parallel.processor_count * 2) do |account|
+      results = {}
+      accounts.each do |account|
         results[account.acct.to_s] = account.annict.crawl(params.merge(
           webhook: account.webhook,
           account:,
@@ -289,7 +293,7 @@ module Mulukhiya
       rescue => e
         e.log(acct: account.acct.to_s)
       ensure
-        mutex.synchronize {bar&.increment}
+        bar&.increment
       end
       bar&.finish
       return unless Environment.rake?
@@ -314,22 +318,6 @@ module Mulukhiya
       return true unless account = params[:account]
       return true unless account.user_config['/annict/theme_works_only']
       return keywords.any? {|v| activity.to_json.include?(v)}
-    end
-
-    def build_episode_info(episode, work_title)
-      title = episode['title']
-      title = self.class.trim_ruby(title) if self.class.subtitle_trim_ruby?
-      return episode.merge(
-        'title' => title,
-        'hashtag' => title.to_hashtag,
-        'hashtag_uri' => sns.create_tag_uri(title),
-        'command_toot' => self.class.create_command_toot(
-          title: work_title,
-          subtitle: title,
-          number_text: episode['numberText'],
-          minutes: config['/webui/episode/minutes'],
-        ),
-      )
     end
 
     def query(template, variables = nil)
