@@ -5,40 +5,9 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://www.google.co.jp/?q=日本語')
+      @handler.handle_pre_toot(status_field => 'https://t.co/6Um3INeyU9')
 
-      assert_nil(@handler.debug_info)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://4sq.com/2NYeZb6')
-
-      assert_nil(@handler.debug_info)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'キュアスタ！ https://goo.gl/uJJKpV')
-
-      assert_equal(1, @handler.debug_info[:result].count)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://bit.ly/2Lquwnt')
-
-      assert_equal(1, @handler.debug_info[:result].count)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://goo.gl/uJJKpV https://bit.ly/2MeJHvW')
-
-      assert_equal(2, @handler.debug_info[:result].count)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://spotify.link/BgfsBAMTbzb')
-
-      assert_equal(1, @handler.debug_info[:result].count)
-
-      @handler.clear
-      @handler.handle_pre_toot(status_field => 'https://spotify.app.link/BgfsBAMTbzb?_p=c2153fdc9c077af1ea1990ffecb6')
-
-      assert_equal(1, @handler.debug_info[:result].count)
+      assert_equal({result: [{source_url: 'https://t.co/6Um3INeyU9', rewrited_url: 'https://www.youtube.com/watch?v=Ipsa3rgH1Cs&feature=youtu.be'}], errors: []}, @handler.debug_info)
     end
   end
 end

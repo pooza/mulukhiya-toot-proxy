@@ -13,6 +13,7 @@ module Mulukhiya
       rewritable_uris = parser.uris.select {|v| rewritable?(v)}
       Parallel.each(rewritable_uris, in_threads: Parallel.processor_count * 2) do |uri|
         rewrited = rewrite(uri)
+        next if uri.to_s == rewrited.to_s
         result.push(source_url: uri.to_s, rewrited_url: rewrited.to_s)
       rescue => e
         errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)

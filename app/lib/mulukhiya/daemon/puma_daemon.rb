@@ -47,7 +47,7 @@ module Mulukhiya
     def secure_dsn(dsn)
       dsn = Ginseng::URI.parse(dsn) unless dsn.is_a?(Ginseng::URI)
       dsn.password = '***' if dsn.password
-      return dsn.to_s
+      return dsn
     end
   end
 end
