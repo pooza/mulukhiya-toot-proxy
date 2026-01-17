@@ -51,24 +51,21 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      all = []
-      entries.map {|v| v.dig('episodes', 'nodes')}.each do |episodes|
-        episodes.each do |episode|
-          next unless subtitle = episode['title']
-          episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-          all.push(episode.merge(
-            'hashtag' => episode['title'].to_hashtag,
-            'hashtag_uri' => sns.create_tag_uri(episode['title']),
-            'command_toot' => self.class.create_command_toot(
-              title: entries.first['title'],
-              subtitle: episode['title'],
-              number_text: episode['numberText'],
-              minutes: config['/webui/episode/minutes'],
-            ),
-          ))
-        end
-      end
-      return all
+      all_episodes = entries.flat_map {|v| v.dig('episodes', 'nodes')}
+      return Parallel.map(all_episodes, in_threads: Parallel.processor_count * 2) do |episode|
+        next unless subtitle = episode['title']
+        episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+        episode.merge(
+          'hashtag' => episode['title'].to_hashtag,
+          'hashtag_uri' => sns.create_tag_uri(episode['title']),
+          'command_toot' => self.class.create_command_toot(
+            title: entries.first['title'],
+            subtitle: episode['title'],
+            number_text: episode['numberText'],
+            minutes: config['/webui/episode/minutes'],
+          ),
+        )
+      end.compact
     end
 
     def crawl(params = {})
