@@ -179,27 +179,6 @@ handler:
     rules: []
   result_notification:
     spoiler_text: 実行結果
-  shortened_url:
-    domains:
-      - t.co
-      - goo.gl
-      - bit.ly
-      - ow.ly
-      - amzn.to
-      - amzn.asia
-      - youtu.be
-      - git.io
-      - spoti.fi
-      - spotify.link
-      - spotify.app.link
-      - apple.co
-      - fb.me
-      - r10.to
-      - 00m.in
-      - bit.do
-      - tiny.cc
-      - is.gd
-      - cutt.ly
   slack_alert:
     hooks: []
   spotify_image:

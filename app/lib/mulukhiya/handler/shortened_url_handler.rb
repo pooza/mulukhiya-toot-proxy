@@ -13,15 +13,7 @@ module Mulukhiya
     end
 
     def rewritable?(uri)
-      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
-      return domains.member?(uri.host)
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
-      return false
-    end
-
-    def domains
-      return handler_config(:domains) || []
+      return true
     end
 
     private
@@ -29,16 +21,13 @@ module Mulukhiya
     def resolve_redirects(source)
       dest = source.clone
       redirects = 0
-
       while redirects < MAX_REDIRECTS
         next_uri, status = fetch_redirect(dest)
         break unless next_uri
         break unless follow_redirect?(dest, next_uri, status)
-
         dest = next_uri
         redirects += 1
       end
-
       return dest
     end
 
@@ -46,10 +35,8 @@ module Mulukhiya
       response = http.get(dest, {follow_redirects: false})
       location = response.headers['location']
       return [nil, nil] unless location
-
       next_uri = normalize_location(dest, location)
       return [nil, nil] unless next_uri&.host
-
       return [next_uri, response.status.to_i]
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: dest.to_s)
@@ -58,7 +45,6 @@ module Mulukhiya
 
     def follow_redirect?(current_uri, next_uri, status)
       return true if twitter?(current_uri)
-
       return true if permanent_redirect?(status)
       return false unless redirect_status?(status)
       return cross_domain?(current_uri, next_uri)
@@ -73,7 +59,7 @@ module Mulukhiya
     end
 
     def permanent_redirect?(status)
-      return status == 301 || status == 308
+      return [301, 308].include?(status)
     end
 
     def redirect_status?(status)
@@ -87,14 +73,10 @@ module Mulukhiya
     def normalize_location(base_uri, location)
       loc = location.to_s.strip
       return nil if loc.empty?
-
       return parse_scheme_relative(base_uri, loc) if scheme_relative?(loc)
-
       parsed = parse_absolute(loc)
       return parsed if parsed&.host
-
       return parse_absolute_path(base_uri, loc) if absolute_path?(loc)
-
       return parse_relative_path(base_uri, loc)
     end
 
