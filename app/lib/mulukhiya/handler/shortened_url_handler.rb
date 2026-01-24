@@ -31,13 +31,12 @@ module Mulukhiya
       return dest
     end
 
-    def fetch_redirect(dest)
-      response = http.get(dest, {follow_redirects: false})
-      location = response.headers['location']
-      return [nil, nil] unless location
-      next_uri = normalize_location(dest, location)
-      return [nil, nil] unless next_uri&.host
-      return [next_uri, response.code.to_i]
+    def fetch_redirect(src)
+      response = http.get(src, {follow_redirects: false})
+      return [nil, nil] unless location = response.headers['location']
+      dest = normalize_location(src, location)
+      return [nil, nil] unless dest&.host
+      return [dest, response.code.to_i]
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: dest.to_s)
       return [nil, nil]
