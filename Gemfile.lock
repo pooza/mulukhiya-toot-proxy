@@ -281,7 +281,7 @@ GEM
     power_assert (3.0.1)
     prism (1.8.0)
     public_suffix (7.0.2)
-    puma (7.1.0)
+    puma (7.2.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
