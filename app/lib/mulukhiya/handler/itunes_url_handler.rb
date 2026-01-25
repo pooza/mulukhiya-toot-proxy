@@ -8,7 +8,7 @@ module Mulukhiya
     end
 
     def rewritable?(uri)
-      uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
+      uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesTrackURI)
       return uri.shortenable?
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)

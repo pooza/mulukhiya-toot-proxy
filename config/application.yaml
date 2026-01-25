@@ -110,8 +110,8 @@ handler:
         - toei-anim.co.jp
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   channel_notification:
-    disable: true
     channels: []
+    disable: true
   default:
     experimental: false
     timeout: 5
@@ -227,8 +227,9 @@ itunes:
     - itunes.apple.com
   lang: ja_jp
   patterns:
-    - pattern: /album/.*?/?([[:digit:]]+)$
-      shortenable: true
+    album: /album/.*?/?([[:digit:]]+)$
+    song: /song/.*?/?([[:digit:]]+)$
+    track: /album/.*?/?([[:digit:]]+)$
   urls:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
@@ -908,12 +909,12 @@ sidekiq:
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
-    user_tag_initialize:
-      class: Mulukhiya::UserTagInitializeWorker
-      cron: 2 3 * * *
     user_decoration_initialize:
       class: Mulukhiya::UserDecorationInitializeWorker
       cron: 3 3 * * *
+    user_tag_initialize:
+      class: Mulukhiya::UserTagInitializeWorker
+      cron: 2 3 * * *
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)

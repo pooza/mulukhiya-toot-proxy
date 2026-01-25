@@ -1,7 +1,7 @@
 module Mulukhiya
   class ItunesImageHandler < ImageHandler
     def updatable?(uri)
-      uri = ItunesURI.parse(uri.to_s) unless uri.is_a?(ItunesURI)
+      uri = ItunesTrackURI.parse(uri.to_s) unless uri.is_a?(ItunesTrackURI)
       return false unless uri.itunes?
       return false unless @image_uris[uri.to_s] = uri.image_uri
       return true
