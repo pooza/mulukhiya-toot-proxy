@@ -29,7 +29,7 @@ module Mulukhiya
     end
 
     def album
-      return nil unless vali?
+      return nil unless valid?
       @album ||= @service.lookup(album_id)
       return @album
     end
@@ -81,7 +81,7 @@ module Mulukhiya
     end
 
     def image_uri
-      return nil unless vali?
+      return nil unless valid?
       unless @image_uri
         values = @service.lookup(track_id || album_id)
         @image_uri = Ginseng::URI.parse(values['artworkUrl100'].sub('100x100', pixel_size))
