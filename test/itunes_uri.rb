@@ -7,9 +7,9 @@ module Mulukhiya
     end
 
     def test_parse
-      assert_instance_of(ItunesTrackURI, ItunesURI.parse(@track_url))
-      assert_instance_of(ItunesAlbumURI, ItunesURI.parse(@album_url))
-      assert_instance_of(ItunesSongURI, ItunesURI.parse(@song_url))
+      assert_instance_of(ItunesTrackURI, ItunesURI.create(@track_url))
+      assert_instance_of(ItunesAlbumURI, ItunesURI.create(@album_url))
+      assert_instance_of(ItunesSongURI, ItunesURI.create(@song_url))
     end
   end
 end
