@@ -7,8 +7,7 @@ module Mulukhiya
     end
 
     def track
-      return nil unless itunes?
-      return nil unless song_id
+      return nil unless valid?
       @track ||= @service.lookup(song_id)
       return @track
     end

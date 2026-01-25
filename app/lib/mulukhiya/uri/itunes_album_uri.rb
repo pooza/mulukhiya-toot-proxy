@@ -6,8 +6,6 @@ module Mulukhiya
       return true
     end
 
-    alias shortenable? valid?
-
     def shorten
       return self unless shortenable?
       dest = clone

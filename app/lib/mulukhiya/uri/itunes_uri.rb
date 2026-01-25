@@ -12,6 +12,10 @@ module Mulukhiya
       return true
     end
 
+    def shortenable?
+      return valid?
+    end
+
     def itunes?
       return absolute? && config['/itunes/hosts'].member?(host)
     end
@@ -25,8 +29,7 @@ module Mulukhiya
     end
 
     def album
-      return nil unless itunes?
-      return nil unless album_id
+      return nil unless vali?
       @album ||= @service.lookup(album_id)
       return @album
     end
@@ -48,8 +51,7 @@ module Mulukhiya
     end
 
     def track
-      return nil unless itunes?
-      return nil unless track_id
+      return nil unless valid?
       @track ||= @service.lookup(track_id)
       return @track
     end
@@ -79,8 +81,7 @@ module Mulukhiya
     end
 
     def image_uri
-      return nil unless itunes?
-      return nil unless album_id
+      return nil unless vali?
       unless @image_uri
         values = @service.lookup(track_id || album_id)
         @image_uri = Ginseng::URI.parse(values['artworkUrl100'].sub('100x100', pixel_size))
