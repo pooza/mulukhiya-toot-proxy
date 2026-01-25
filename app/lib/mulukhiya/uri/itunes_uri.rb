@@ -7,6 +7,11 @@ module Mulukhiya
       @service = ItunesService.new
     end
 
+    def valid?
+      return false unless itunes?
+      return true
+    end
+
     def itunes?
       return absolute? && config['/itunes/hosts'].member?(host)
     end
@@ -88,6 +93,7 @@ module Mulukhiya
         uri = "Mulukhiya::Itunes#{type.to_s.capitalize}URI".constantize.parse(url)
         return uri if uri.valid?
       end
+      return parse(url)
     end
 
     def self.types

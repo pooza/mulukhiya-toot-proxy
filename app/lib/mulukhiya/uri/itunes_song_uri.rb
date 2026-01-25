@@ -6,6 +6,13 @@ module Mulukhiya
       return true
     end
 
+    def track
+      return nil unless itunes?
+      return nil unless song_id
+      @track ||= @service.lookup(song_id)
+      return @track
+    end
+
     def song_id
       return nil unless matches = path.match(ItunesURI.pattern(:song))
       return matches[1].to_i
