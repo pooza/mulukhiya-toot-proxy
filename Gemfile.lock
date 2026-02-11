@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: c066e8e801783bbb4240d97d660bdd889c652fa0
+  revision: 80891c47bdca2915b44b1aeb5546189fa1e5bdef
   specs:
-    ginseng-core (1.15.11)
+    ginseng-core (1.15.13)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       cgi (>= 0.4.2)
@@ -154,7 +154,7 @@ GEM
       dry-logic (~> 1.6)
       dry-types (~> 1.8)
       zeitwerk (~> 2.6)
-    dry-types (1.9.0)
+    dry-types (1.9.1)
       bigdecimal (>= 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
@@ -174,7 +174,7 @@ GEM
     etc (1.4.6)
     eventmachine (1.2.7)
     facets (3.1.0)
-    faraday (2.14.0)
+    faraday (2.14.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -199,7 +199,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.18.0)
+    json (2.18.1)
     json-schema (6.1.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -221,12 +221,12 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0113)
+    mime-types-data (3.2026.0203)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.1)
       prism (~> 1.5)
-    mongo (2.22.0)
+    mongo (2.23.0)
       base64
       bson (>= 4.14.1, < 6.0.0)
     multi_json (1.19.1)
@@ -279,7 +279,7 @@ GEM
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-x86_64-linux)
     power_assert (3.0.1)
-    prism (1.8.0)
+    prism (1.9.0)
     public_suffix (7.0.2)
     puma (7.2.0)
       nio4r (~> 2.0)
@@ -309,7 +309,7 @@ GEM
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
     rake (13.3.1)
-    redis-client (0.26.3)
+    redis-client (0.26.4)
       connection_pool
     regexp_parser (2.11.3)
     rest-client (2.0.2)
@@ -324,7 +324,7 @@ GEM
       rest-client (~> 2.0.2)
     rss (0.3.2)
       rexml
-    rubocop (1.82.1)
+    rubocop (1.84.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -332,7 +332,7 @@ GEM
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 2.9.3, < 3.0)
-      rubocop-ast (>= 1.48.0, < 2.0)
+      rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.49.0)
@@ -365,7 +365,7 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sequel (5.100.0)
+    sequel (5.101.0)
       bigdecimal
     set (1.1.2)
     sidekiq (8.0.10)
@@ -387,14 +387,14 @@ GEM
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    slim_lint (0.33.0)
+    slim_lint (0.34.0)
       rexml (~> 3.2)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
-    syslog (0.3.0)
+    syslog (0.4.0)
       logger
     temple (0.10.4)
     test-unit (3.7.7)
@@ -464,4 +464,4 @@ RUBY VERSION
   ruby 3.4.8
 
 BUNDLED WITH
-  4.0.4
+  4.0.6
