@@ -78,7 +78,7 @@ module Mulukhiya
       key = params.merge(args:)
       unless storage[key]
         command = create_command(args)
-        command.exec
+        Bundler.with_unbundled_env {command.exec}
         raise Ginseng::RequestError, command.stderr unless command.status.zero?
         storage[key] = command.response
       end
