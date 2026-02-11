@@ -8,9 +8,9 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: c066e8e801783bbb4240d97d660bdd889c652fa0
+  revision: 80891c47bdca2915b44b1aeb5546189fa1e5bdef
   specs:
-    ginseng-core (1.15.11)
+    ginseng-core (1.15.13)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       cgi (>= 0.4.2)
@@ -199,7 +199,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.18.0)
+    json (2.18.1)
     json-schema (6.1.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -221,7 +221,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0113)
+    mime-types-data (3.2026.0203)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.1)
@@ -279,7 +279,7 @@ GEM
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-x86_64-linux)
     power_assert (3.0.1)
-    prism (1.8.0)
+    prism (1.9.0)
     public_suffix (7.0.2)
     puma (7.1.0)
       nio4r (~> 2.0)
@@ -394,7 +394,7 @@ GEM
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
-    syslog (0.3.0)
+    syslog (0.4.0)
       logger
     temple (0.10.4)
     test-unit (3.7.7)
