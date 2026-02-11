@@ -182,6 +182,7 @@ GEM
       net-http (~> 0.5)
     ffi (1.17.3)
     ffi (1.17.3-aarch64-linux-gnu)
+    ffi (1.17.3-arm64-darwin)
     ffi (1.17.3-x86_64-linux-gnu)
     fileutils (1.7.3)
     find (0.2.0)
@@ -252,6 +253,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.0-aarch64-linux-gnu)
       racc (~> 1.4)
+    nokogiri (1.19.0-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     oauth2 (2.0.18)
@@ -277,6 +280,7 @@ GEM
       racc
     pg (1.6.3)
     pg (1.6.3-aarch64-linux)
+    pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-linux)
     power_assert (3.0.1)
     prism (1.9.0)
@@ -425,6 +429,7 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  arm64-darwin-25
   x86_64-freebsd-14
   x86_64-linux
 
