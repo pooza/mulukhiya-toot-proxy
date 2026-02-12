@@ -49,10 +49,6 @@ module Mulukhiya
         return config["/#{name}/features/announcement"] == true rescue false
       end
 
-      def filter?
-        return config["/#{name}/features/filter"] == true rescue false
-      end
-
       def streaming?
         return config["/#{name}/features/streaming"] == true rescue false
       end

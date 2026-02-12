@@ -20,7 +20,6 @@ module Mulukhiya
         account: sns.account.to_h,
         config: sns.account.user_config.to_h,
         webhook: {url: sns.account.webhook.uri.to_s},
-        filters: sns.filters&.parsed_response,
         token: sns.access_token.to_h.except(:account),
         visibility_names: parser_class.visibility_names,
       }
@@ -36,20 +35,6 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       Handler.create(:user_config_command).handle_toot(params, {sns:})
       @renderer.message = {config: sns.account.user_config.to_h}
-      return @renderer.to_s
-    rescue => e
-      e.alert
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
-    post '/filter/add' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.filter?
-      raise Ginseng::NotFoundError, 'Not Found' unless handler = Handler.create(:filter_command)
-      handler.handle_toot(params, {sns:})
-      @renderer.message = {filters: sns.filters}
       return @renderer.to_s
     rescue => e
       e.alert

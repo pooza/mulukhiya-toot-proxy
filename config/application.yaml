@@ -124,8 +124,6 @@ handler:
       min: 2
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
-  filter_command:
-    minutes: 300
   image_copyright:
     message: ※画像有 著作権表示 参照のこと
     tag: null
@@ -256,7 +254,6 @@ mastodon:
     announcement: true
     favorite_tags: true
     feed: true
-    filter: true
     futured_tag: true
     media_catalog: true
     repost: true
@@ -285,7 +282,6 @@ mastodon:
       - result_notification
     post_toot:
       - user_config_command
-      - filter_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -297,7 +293,6 @@ mastodon:
       - image_resize
     pre_toot:
       - user_config_command
-      - filter_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -360,8 +355,6 @@ mastodon:
       default:
         - write:statuses
         - write:media
-        - read:filters
-        - write:filters
         - read:search
       infobot:
         - read

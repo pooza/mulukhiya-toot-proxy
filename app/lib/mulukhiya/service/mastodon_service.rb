@@ -36,13 +36,6 @@ module Mulukhiya
       return super
     end
 
-    def register_filter(params = {})
-      params.deep_symbolize_keys!
-      params[:account_id] = account.id
-      params[:phrase] ||= params[:tag]&.to_hashtag
-      super
-    end
-
     def oauth_client(type = :default)
       return nil unless scopes = MastodonController.oauth_scopes(type)
       body = {
