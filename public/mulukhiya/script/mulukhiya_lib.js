@@ -73,19 +73,6 @@ window.MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.updateLivecureFlag = async flag => {
-      const command = {
-        command: 'filter',
-        tag: '実況',
-        action: flag ? 'register' : 'unregister',
-      }
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.post('/mulukhiya/api/filter/add', globals.methods.createPayload(command))
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
-
     globals.methods.getSuggestedKeywords = () => {
       return JSON.parse(localStorage.getItem('mulukhiya_suggested_keywords') || '[]')
     }

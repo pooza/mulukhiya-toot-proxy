@@ -25,15 +25,6 @@ html lang='ja'
               multiselect :options='options.program' label='label' track-by='value' @input='onChangeTags' v-model='form.program.tags'
           .field-update-button-container
             button @click='updateTags' 更新
-      - if controller.filter? && controller.livecure?
-        section.config v-if='account.username && layout.sections.livecure'
-          h3 @click='toggleVisibility("livecure")' = "実況#{controller.status_label}"
-          slide-up-down :active='layout.details.livecure'
-            .inline-field-container
-              label
-                input type='checkbox' v-model='form.livecure' = "実況#{controller.status_label}を隠す"
-            .field-update-button-container
-              button @click='updateLivecure' 更新
       section.config v-if='account.username && layout.sections.piefed'
         h3 @click='toggleVisibility("piefed")' PieFed
         slide-up-down :active='layout.details.piefed'
@@ -121,7 +112,6 @@ html lang='ja'
             },
             form: {
               notify: {verbose: null},
-              livecure: false,
               annict: {auth_code: null, theme_works_only: false},
               program: {minutes: null, tags: null},
               tags: '',
@@ -135,14 +125,12 @@ html lang='ja'
             },
             layout: {
               sections: {
-                livecure: #{controller.livecure?},
                 piefed: #{controller.piefed?},
                 annict: #{controller.annict?},
               },
               details: {
                 piefed: false,
                 tags: false,
-                livecure: false,
                 webhook: false,
                 notify: false,
                 annict: false,
@@ -188,11 +176,6 @@ html lang='ja'
             this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
             if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
               this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
-            }
-            if (data.filters) {
-              if (Array.isArray(data.filters)) {
-                data.filters.filter(f => {f.phrase == '#実況'}).map(f => {this.form.livecure = true})
-              }
             }
             if (data.visibility_names) {
               this.options.visibility.splice(0)
@@ -262,11 +245,6 @@ html lang='ja'
               command.tagging.minutes = null
             }
             this.updateConfig(command)
-          },
-          updateLivecure () {
-            this.methods.updateLivecureFlag(this.form.livecure)
-              .then(_ => {this.layout.details.livecure = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
           },
           updateWebhook () {
             const command = {webhook: {visibility: null}}

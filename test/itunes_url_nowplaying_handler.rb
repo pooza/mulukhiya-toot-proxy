@@ -36,6 +36,15 @@ module Mulukhiya
         title: '「キラキラ☆プリキュアアラモード」後期主題歌シングルED:シュビドゥビ☆スイーツタイム/挿入歌:勇気が君を待ってる - EP',
         artists: Set['歌:宮本佳那子/駒形友梨'],
       }])
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => "#nowplaying https://music.apple.com/jp/song/%E7%AC%91%E9%A1%94%E3%81%AE%E3%83%A6%E3%83%8B%E3%82%BE%E3%83%B3/1789469289\n")
+
+      assert_equal(@handler.debug_info[:result], [{
+        url: 'https://music.apple.com/jp/song/%E7%AC%91%E9%A1%94%E3%81%AE%E3%83%A6%E3%83%8B%E3%82%BE%E3%83%B3/1789469289',
+        title: '笑顔のユニゾン♪',
+        artists: Set['キュアアイドル(CV:松岡美里)、キミとアイドルプリキュア♪'],
+      }])
     end
 
     def test_push
