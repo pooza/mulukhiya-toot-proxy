@@ -28,10 +28,6 @@ module Mulukhiya
       return handle_post_toot(payload, params)
     end
 
-    def handle_pre_draft(payload, params = {})
-      return handle_pre_toot(payload, params)
-    end
-
     def handle_pre_upload(payload, params = {})
     end
 

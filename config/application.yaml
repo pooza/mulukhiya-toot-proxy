@@ -564,10 +564,6 @@ misskey:
       - result_notification
     post_webhook:
       - result_notification
-    pre_draft:
-      - default_tag
-      - removal_rule_tag
-      - tagging
     pre_toot:
       - user_config_command
       - piefed_clipping_command
