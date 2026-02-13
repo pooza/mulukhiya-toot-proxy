@@ -35,18 +35,5 @@ module Mulukhiya
       dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}
       return dest
     end
-
-    def notify(account, message, options = {})
-      options.deep_symbolize_keys!
-      message = [account.acct.to_s, message].join("\n")
-      reply_to = options.dig(:response, :createdNote, :id) || options.dig(:response, :id)
-      return post(
-        MeisskeyController.status_field => message.ellipsize(max_post_text_length),
-        MeisskeyController.spoiler_field => options[:spoiler_text],
-        MeisskeyController.visible_users_field => [account.id],
-        MeisskeyController.visibility_field => MeisskeyController.visibility_name(:direct),
-        MeisskeyController.reply_to_field => reply_to,
-      )
-    end
   end
 end

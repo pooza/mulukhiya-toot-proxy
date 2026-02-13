@@ -64,6 +64,22 @@ module Mulukhiya
       return @redis
     end
 
+    def notify(account, message, options = {})
+      options.deep_symbolize_keys!
+      message = [account.acct.to_s, message].join("\n")
+      reply_to = options.dig(:response, :createdNote, :id) || options.dig(:response, :id)
+      body = {
+        controller_class.status_field => message.ellipsize(max_post_text_length),
+        controller_class.spoiler_field => options[:spoiler_text],
+        controller_class.visibility_field => controller_class.visibility_name(:direct),
+        controller_class.reply_to_field => reply_to,
+      }
+      if controller_class.visible_users_field
+        body[controller_class.visible_users_field] = [account.id]
+      end
+      return post(body)
+    end
+
     def default_token
       return account_class.test_token
     end

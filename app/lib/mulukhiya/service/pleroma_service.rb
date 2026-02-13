@@ -52,16 +52,5 @@ module Mulukhiya
       dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}
       return dest
     end
-
-    def notify(account, message, options = {})
-      options.deep_symbolize_keys!
-      message = [account.acct.to_s, message].join("\n")
-      return post(
-        PleromaController.status_field => message.ellipsize(max_post_text_length),
-        PleromaController.spoiler_field => options[:spoiler_text],
-        PleromaController.visibility_field => PleromaController.visibility_name(:direct),
-        PleromaController.reply_to_field => options.dig(:response, :id),
-      )
-    end
   end
 end

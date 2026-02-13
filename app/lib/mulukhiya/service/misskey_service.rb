@@ -72,19 +72,6 @@ module Mulukhiya
       return Ginseng::URI.parse(response['url'])
     end
 
-    def notify(account, message, options = {})
-      options.deep_symbolize_keys!
-      message = [account.acct.to_s, message].join("\n")
-      reply_to = options.dig(:response, :createdNote, :id) || options.dig(:response, :id)
-      return post(
-        MisskeyController.status_field => message.ellipsize(max_post_text_length),
-        MisskeyController.spoiler_field => options[:spoiler_text],
-        MisskeyController.visible_users_field => [account.id],
-        MisskeyController.visibility_field => MisskeyController.visibility_name(:direct),
-        MisskeyController.reply_to_field => reply_to,
-      )
-    end
-
     def create_headers(headers = {})
       dest = super
       dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}

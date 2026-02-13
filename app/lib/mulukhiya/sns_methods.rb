@@ -44,6 +44,10 @@ module Mulukhiya
       return controller_class.chat_field
     end
 
+    def visible_users_field
+      return controller_class.visible_users_field
+    end
+
     def status_key
       return controller_class.status_key
     end
