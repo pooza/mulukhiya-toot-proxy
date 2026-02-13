@@ -12,7 +12,7 @@
 ## ブランチ戦略
 
 | ブランチ | バージョン | 目的 |
-|---------|-----------|------|
+| --- | --- | --- |
 | `master` | 4.x | Pleroma/Meisskeyユーザーの継続サポート |
 | `develop` | 5.0開発 | アーキテクチャ刷新（Mastodon系/Misskey系の2系統） |
 
@@ -48,6 +48,7 @@ git diff Gemfile.lock
 ## CI
 
 GitHub Actions (`.github/workflows/test.yml`):
+
 - PostgreSQL 15 + Redis 7
 - `bundle exec rake lint` (rubocop, slim_lint, erb_lint等)
 - 依存: ffmpeg, libpq-dev, libidn11-dev, libvips-dev
@@ -86,9 +87,38 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 - stable（使用中）: rack ~> 3.1.14 / Sinatra ~> 4.1.0
 - main: rack >= 3.2.3 / Sinatra >= 4.2.0（Sinatraクラス削除済みのため使用不可）
 
+## 関連リポジトリ
+
+MastodonとMisskeyのソースコードがローカルに並列配置される。
+パスはセッション開始時にユーザーから指示される。
+
+用途:
+
+- SNS側のAPI仕様確認、設定ファイルの参照
+- モロヘイヤとの結合動作確認
+- 必要に応じてSNS側のコード修正
+
+## 開発サーバー
+
+SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジトリには含めない）。
+エイリアス名はセッション開始時にユーザーから指示される。
+
+| 種別     | 台数 | OS       |
+|----------|------|----------|
+| Mastodon | 3    | FreeBSD  |
+| Misskey  | 1    | Ubuntu   |
+
+リモート側の操作（git pull、マイグレーション、サービス再起動等）も可能。
+
 ## コーディング規約
 
 - rubocop, slim_lint, erb_lint に準拠
 - テスト: test-unit (Mulukhiya::TestCase 基底クラス)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
 - ハンドラー設定: `handler_config(:key)` (5.0で記法統一予定)
+
+### RuboCopに含まれない個人規約
+
+以下はユーザーから都度指示される。指示があり次第ここに追記する。
+
+- メソッド末尾でも `return` を省略しない（暗黙のreturnを使わない）
