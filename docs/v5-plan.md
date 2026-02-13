@@ -431,7 +431,7 @@ test/
 - [x] [#4025](https://github.com/pooza/mulukhiya-toot-proxy/issues/4025) (P1): `notify()` をSNSServiceMethodsに統合
 - [ ] [#4042](https://github.com/pooza/mulukhiya-toot-proxy/issues/4042) (P3): OAuth処理の共通化（エンドポイント差分を設定で吸収）
 - [ ] [#4043](https://github.com/pooza/mulukhiya-toot-proxy/issues/4043) (P3): ハンドラーパイプライン解決ロジックの実装（Event クラス改修）
-- [ ] [#4035](https://github.com/pooza/mulukhiya-toot-proxy/issues/4035) (P2): ハンドラーの要不要の洗い出し（利用実績・重複・形骸化の調査）
+- [x] [#4035](https://github.com/pooza/mulukhiya-toot-proxy/issues/4035) (P2): ハンドラーの要不要の洗い出し（利用実績・重複・形骸化の調査）
 - [ ] [#4044](https://github.com/pooza/mulukhiya-toot-proxy/issues/4044) (P3): 不要ハンドラーの削除・統合（#4035の結果に基づく）
 
 ### 設定ツリー
@@ -444,7 +444,7 @@ test/
 
 ### フロントエンド
 
-- [ ] [#4036](https://github.com/pooza/mulukhiya-toot-proxy/issues/4036) (P2): ESMビルドが存在しないライブラリの洗い出し
+- [x] [#4036](https://github.com/pooza/mulukhiya-toot-proxy/issues/4036) (P2): ESMビルドが存在しないライブラリの洗い出し
 - [ ] [#4049](https://github.com/pooza/mulukhiya-toot-proxy/issues/4049) (P3): importmap設定の導入（config/application.yaml + fragment/assets.slim）
 - [ ] [#4050](https://github.com/pooza/mulukhiya-toot-proxy/issues/4050) (P3): MulukhiyaLib の ESM化
 - [ ] [#4051](https://github.com/pooza/mulukhiya-toot-proxy/issues/4051) (P3): SlideUpDown, VTooltip 等のローカルコンポーネントのESM化
@@ -461,8 +461,8 @@ test/
 ### テスト
 
 - [x] [#4029](https://github.com/pooza/mulukhiya-toot-proxy/issues/4029) (P1): 存在確認のみのテスト（kind_of?/assert_boolean）を洗い出し、一覧化
-- [ ] [#4037](https://github.com/pooza/mulukhiya-toot-proxy/issues/4037) (P2): 不適切なテストの振る舞い検証への書き換え
-- [ ] [#4038](https://github.com/pooza/mulukhiya-toot-proxy/issues/4038) (P2): 外部サービスモック基盤の導入（フィクスチャデータ整備）
+- [x] [#4037](https://github.com/pooza/mulukhiya-toot-proxy/issues/4037) (P2): 不適切なテストの振る舞い検証への書き換え
+- [x] [#4038](https://github.com/pooza/mulukhiya-toot-proxy/issues/4038) (P2): 外部サービスモック基盤の導入（フィクスチャデータ整備）
 - [ ] [#4056](https://github.com/pooza/mulukhiya-toot-proxy/issues/4056) (P3): テストディレクトリ構造の再編（unit/integration/contract/external）
 - [ ] [#4057](https://github.com/pooza/mulukhiya-toot-proxy/issues/4057) (P3): 未テストハンドラーへのテスト追加
 - [ ] [#4058](https://github.com/pooza/mulukhiya-toot-proxy/issues/4058) (P3): Mastodon/Misskeyサービスの振る舞いテスト追加（モック使用）
