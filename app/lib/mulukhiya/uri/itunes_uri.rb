@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def shortenable?
-      return valid?
+      return valid? && id.present?
     end
 
     def itunes?
