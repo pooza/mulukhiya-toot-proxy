@@ -18,7 +18,7 @@ module Mulukhiya
     end
 
     def self.normalize_rules
-      return new.handler_config('normalize/rules') || []
+      return new.handler_config(:normalize, :rules) || []
     end
 
     private

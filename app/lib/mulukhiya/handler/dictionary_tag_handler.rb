@@ -10,15 +10,15 @@ module Mulukhiya
     end
 
     def without_kanji_pattern
-      return handler_config('word/without_kanji_pattern')
+      return handler_config(:word, :without_kanji_pattern)
     end
 
     def minimum_length
-      return handler_config('word/min')
+      return handler_config(:word, :min)
     end
 
     def minimum_length_kanji
-      return handler_config('word/min_kanji')
+      return handler_config(:word, :min_kanji)
     end
 
     def all(&block)

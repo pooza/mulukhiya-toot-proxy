@@ -14,7 +14,7 @@ module Mulukhiya
     def all(&block)
       return enum_for(__method__) unless block
       return if disable?
-      return [:image, :video, :audio].to_h {|k| [k, handler_config("tags/#{k}")]}.each(&block)
+      return [:image, :video, :audio].to_h {|k| [k, handler_config(:tags, k)]}.each(&block)
     end
 
     private

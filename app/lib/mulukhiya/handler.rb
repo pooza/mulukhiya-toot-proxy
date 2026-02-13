@@ -76,9 +76,10 @@ module Mulukhiya
       return handle_post_toot(payload, params)
     end
 
-    def handler_config(key)
-      value = config["/handler/#{underscore}/#{key}"] rescue nil
-      value = config["/handler/default/#{key}"] rescue nil if value.nil?
+    def handler_config(*keys)
+      path = keys.map(&:to_s).join('/')
+      value = config["/handler/#{underscore}/#{path}"] rescue nil
+      value = config["/handler/default/#{path}"] rescue nil if value.nil?
       return value
     end
 
