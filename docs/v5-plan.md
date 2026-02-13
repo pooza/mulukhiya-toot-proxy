@@ -413,8 +413,8 @@ test/
 
 ### 基盤・ブランチ戦略
 
-- [ ] [#4030](https://github.com/pooza/mulukhiya-toot-proxy/issues/4030) (P2): 5.0開発ブランチの作成とCI設定
-- [ ] [#4024](https://github.com/pooza/mulukhiya-toot-proxy/issues/4024) (P1): 4.x系メンテナンスブランチの運用ルール策定
+- [x] [#4030](https://github.com/pooza/mulukhiya-toot-proxy/issues/4030) (P2): 5.0開発ブランチの作成とCI設定
+- [x] [#4024](https://github.com/pooza/mulukhiya-toot-proxy/issues/4024) (P1): 4.x系メンテナンスブランチの運用ルール策定
 
 ### SNS整理
 
@@ -428,7 +428,7 @@ test/
 ### アーキテクチャ
 
 - [ ] [#4041](https://github.com/pooza/mulukhiya-toot-proxy/issues/4041) (P3): ハンドラーパイプラインのベース＋オーバーライド構造への移行
-- [ ] [#4025](https://github.com/pooza/mulukhiya-toot-proxy/issues/4025) (P1): `notify()` をSNSServiceMethodsに統合
+- [x] [#4025](https://github.com/pooza/mulukhiya-toot-proxy/issues/4025) (P1): `notify()` をSNSServiceMethodsに統合
 - [ ] [#4042](https://github.com/pooza/mulukhiya-toot-proxy/issues/4042) (P3): OAuth処理の共通化（エンドポイント差分を設定で吸収）
 - [ ] [#4043](https://github.com/pooza/mulukhiya-toot-proxy/issues/4043) (P3): ハンドラーパイプライン解決ロジックの実装（Event クラス改修）
 - [ ] [#4035](https://github.com/pooza/mulukhiya-toot-proxy/issues/4035) (P2): ハンドラーの要不要の洗い出し（利用実績・重複・形骸化の調査）
@@ -439,7 +439,7 @@ test/
 - [ ] [#4045](https://github.com/pooza/mulukhiya-toot-proxy/issues/4045) (P3): handler_config のキー記法統一
 - [ ] [#4046](https://github.com/pooza/mulukhiya-toot-proxy/issues/4046) (P3): 外部サービス設定の構造統一（`service:` 配下に集約）
 - [ ] [#4047](https://github.com/pooza/mulukhiya-toot-proxy/issues/4047) (P3): 機能フラグの分類（capabilities / features / data）
-- [ ] [#4026](https://github.com/pooza/mulukhiya-toot-proxy/issues/4026) (P1): 全ハンドラーのスキーマ追加・タイポ修正
+- [x] [#4026](https://github.com/pooza/mulukhiya-toot-proxy/issues/4026) (P1): 全ハンドラーのスキーマ追加・タイポ修正
 - [ ] [#4048](https://github.com/pooza/mulukhiya-toot-proxy/issues/4048) (P3): 起動時スキーマバリデーションの強化
 
 ### フロントエンド
@@ -452,15 +452,15 @@ test/
 
 ### rack / Sidekiq
 
-- [ ] [#4027](https://github.com/pooza/mulukhiya-toot-proxy/issues/4027) (P1): 投稿前トークン整合性チェックの実装（4.xバックポート対象）
-- [ ] [#4028](https://github.com/pooza/mulukhiya-toot-proxy/issues/4028) (P1): 投稿後アカウントID検証の実装（4.xバックポート対象）
+- [x] [#4027](https://github.com/pooza/mulukhiya-toot-proxy/issues/4027) (P1): 投稿前トークン整合性チェックの実装（4.xバックポート対象）
+- [x] [#4028](https://github.com/pooza/mulukhiya-toot-proxy/issues/4028) (P1): 投稿後アカウントID検証の実装（4.xバックポート対象）
 - [ ] [#4053](https://github.com/pooza/mulukhiya-toot-proxy/issues/4053) (P3): ginseng-web stableブランチのrack 3.2対応改修
 - [ ] [#4054](https://github.com/pooza/mulukhiya-toot-proxy/issues/4054) (P3): Sidekiq 8.1系への依存更新
 - [ ] [#4055](https://github.com/pooza/mulukhiya-toot-proxy/issues/4055) (P3): rack 3.2環境での同時アクセス再現テスト
 
 ### テスト
 
-- [ ] [#4029](https://github.com/pooza/mulukhiya-toot-proxy/issues/4029) (P1): 存在確認のみのテスト（kind_of?/assert_boolean）を洗い出し、一覧化
+- [x] [#4029](https://github.com/pooza/mulukhiya-toot-proxy/issues/4029) (P1): 存在確認のみのテスト（kind_of?/assert_boolean）を洗い出し、一覧化
 - [ ] [#4037](https://github.com/pooza/mulukhiya-toot-proxy/issues/4037) (P2): 不適切なテストの振る舞い検証への書き換え
 - [ ] [#4038](https://github.com/pooza/mulukhiya-toot-proxy/issues/4038) (P2): 外部サービスモック基盤の導入（フィクスチャデータ整備）
 - [ ] [#4056](https://github.com/pooza/mulukhiya-toot-proxy/issues/4056) (P3): テストディレクトリ構造の再編（unit/integration/contract/external）
