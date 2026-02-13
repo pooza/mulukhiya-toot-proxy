@@ -34,4 +34,5 @@ group :development do
   gem 'slim_lint'
   gem 'test-unit'
   gem 'timecop'
+  gem 'webmock'
 end

@@ -1,16 +1,19 @@
 require 'sidekiq/testing'
 require 'rack/test'
 require 'timecop'
+require 'webmock'
 
 module Mulukhiya
   class TestCase < Ginseng::TestCase
     include Package
     include SNSMethods
+    include WebMock::API
 
     def teardown
       config.reload
       @handler&.clear
       Timecop.return
+      WebMock.reset!
     end
 
     def account
@@ -31,6 +34,18 @@ module Mulukhiya
     def http
       @http ||= HTTP.new
       return @http
+    end
+
+    def fixture(name)
+      return File.read(File.join(self.class.fixture_dir, name))
+    end
+
+    def json_fixture(name)
+      return JSON.parse(fixture(name))
+    end
+
+    def self.fixture_dir
+      return File.join(dir, 'fixture')
     end
 
     def self.load(cases = nil)
