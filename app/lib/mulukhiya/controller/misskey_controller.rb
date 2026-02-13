@@ -40,7 +40,6 @@ module Mulukhiya
           params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym]
         end
         params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
-        Event.new(:pre_draft, {reporter:, sns:}).dispatch(params) unless renote?
       end
       reporter.response = sns.update_draft(params)
       if params[:text].present?
