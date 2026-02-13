@@ -463,7 +463,7 @@ test/
 - [x] [#4029](https://github.com/pooza/mulukhiya-toot-proxy/issues/4029) (P1): 存在確認のみのテスト（kind_of?/assert_boolean）を洗い出し、一覧化
 - [x] [#4037](https://github.com/pooza/mulukhiya-toot-proxy/issues/4037) (P2): 不適切なテストの振る舞い検証への書き換え
 - [x] [#4038](https://github.com/pooza/mulukhiya-toot-proxy/issues/4038) (P2): 外部サービスモック基盤の導入（フィクスチャデータ整備）
-- [ ] [#4056](https://github.com/pooza/mulukhiya-toot-proxy/issues/4056) (P3): テストディレクトリ構造の再編（unit/integration/contract/external）
+- [x] [#4056](https://github.com/pooza/mulukhiya-toot-proxy/issues/4056) (P3): テストディレクトリ構造の再編（unit/integration/contract/external）
 - [ ] [#4057](https://github.com/pooza/mulukhiya-toot-proxy/issues/4057) (P3): 未テストハンドラーへのテスト追加
 - [ ] [#4058](https://github.com/pooza/mulukhiya-toot-proxy/issues/4058) (P3): Mastodon/Misskeyサービスの振る舞いテスト追加（モック使用）
 - [ ] [#4059](https://github.com/pooza/mulukhiya-toot-proxy/issues/4059) (P3): エラーパステスト追加（不正トークン、タイムアウト、不正入力）
