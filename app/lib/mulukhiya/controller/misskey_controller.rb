@@ -35,11 +35,17 @@ module Mulukhiya
     end
 
     post '/api/notes/drafts/update' do
-      params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym] if quote?
-      params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
-      Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
+      if params[:text].present?
+        if quote?
+          params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym]
+        end
+        params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
+        Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
+      end
       reporter.response = sns.update_draft(params)
-      Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
+      if params[:text].present?
+        Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
+      end
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
