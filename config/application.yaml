@@ -633,6 +633,21 @@ websocket:
   retry:
     seconds: 5
 webui:
+  importmap:
+    development:
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
+      '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
+      axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
+      js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
+      tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
+      vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js
+    production:
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
+      '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
+      axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
+      js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
+      tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
+      vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.js
   development:
     scripts:
       - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js

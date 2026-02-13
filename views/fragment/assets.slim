@@ -1,3 +1,6 @@
+- if importmap
+  script type='importmap'
+    == JSON.generate({imports: importmap})
 - scripts.each do |f|
   script src=f
 - stylesheets.each do |f|
