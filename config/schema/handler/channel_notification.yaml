@@ -1,0 +1,19 @@
+properties:
+  channels:
+    items:
+      properties:
+        name:
+          type: string
+        notify_to:
+          type: string
+      required:
+        - name
+        - notify_to
+      type: object
+    type: array
+  disabled:
+    type: boolean
+  timeout:
+    minimum: 1
+    type: integer
+type: object

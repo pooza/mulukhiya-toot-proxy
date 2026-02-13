@@ -1,0 +1,9 @@
+properties:
+  disabled:
+    type: boolean
+  spoiler_text:
+    type: string
+  timeout:
+    minimum: 1
+    type: integer
+type: object

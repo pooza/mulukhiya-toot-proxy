@@ -1,0 +1,10 @@
+properties:
+  disabled:
+    type: boolean
+  pixel:
+    minimum: 200
+    type: integer
+  timeout:
+    minimum: 1
+    type: integer
+type: object
