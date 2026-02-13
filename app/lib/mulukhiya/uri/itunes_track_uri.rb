@@ -10,7 +10,7 @@ module Mulukhiya
     def shorten
       return self unless shortenable?
       dest = clone
-      dest.host = config['/itunes/hosts'].first
+      dest.host = config['/service/itunes/hosts'].first
       dest.album_id = album_id
       dest.track_id = track_id
       return dest
@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def album_id=(id)
-      self.path = "/#{config['/itunes/country']}/album/#{id}"
+      self.path = "/#{config['/service/itunes/country']}/album/#{id}"
       self.fragment = nil
     end
 

@@ -1,7 +1,7 @@
 module Mulukhiya
   class PeerTubeServiceTest < TestCase
     def setup
-      @service = PeerTubeService.new(config['/peer_tube/hosts'].first)
+      @service = PeerTubeService.new(config['/service/peer_tube/hosts'].first)
     end
 
     def test_lookup

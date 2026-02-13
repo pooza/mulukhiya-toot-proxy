@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     def itunes?
-      return absolute? && config['/itunes/hosts'].member?(host)
+      return absolute? && config['/service/itunes/hosts'].member?(host)
     end
 
     def id
@@ -106,7 +106,7 @@ module Mulukhiya
     end
 
     def self.pattern(type = :track)
-      return Regexp.new(config["/itunes/patterns/#{type}"])
+      return Regexp.new(config["/service/itunes/patterns/#{type}"])
     end
 
     private

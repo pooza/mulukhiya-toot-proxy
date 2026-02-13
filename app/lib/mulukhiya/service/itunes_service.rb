@@ -44,22 +44,22 @@ module Mulukhiya
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesURI.create(config['/itunes/urls/search'])
+      uri = ItunesURI.create(config['/service/itunes/urls/search'])
       uri.query_values = {
         term: keyword,
         media: category,
-        country: config['/itunes/country'],
-        lang: config['/itunes/lang'],
+        country: config['/service/itunes/country'],
+        lang: config['/service/itunes/lang'],
       }
       return uri
     end
 
     def create_lookup_uri(id)
-      uri = ItunesURI.create(config['/itunes/urls/lookup'])
+      uri = ItunesURI.create(config['/service/itunes/urls/lookup'])
       uri.query_values = {
         id:,
-        country: config['/itunes/country'],
-        lang: config['/itunes/lang'],
+        country: config['/service/itunes/country'],
+        lang: config['/service/itunes/lang'],
       }
       return uri
     end

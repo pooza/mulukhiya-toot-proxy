@@ -5,7 +5,8 @@ module Mulukhiya
     def shortenable?
       return false unless amazon?
       return false unless asin.present?
-      return false unless entry = config['/amazon/patterns'].find {|v| path.match(v['pattern'])}
+      patterns = config['/service/amazon/patterns']
+      return false unless entry = patterns.find {|v| path.match(v['pattern'])}
       return entry['shortenable']
     end
 
@@ -16,7 +17,7 @@ module Mulukhiya
     alias valid? amazon?
 
     def asin
-      config['/amazon/patterns'].each do |entry|
+      config['/service/amazon/patterns'].each do |entry|
         next unless matches = path.match(entry['pattern'])
         return matches[1]
       end

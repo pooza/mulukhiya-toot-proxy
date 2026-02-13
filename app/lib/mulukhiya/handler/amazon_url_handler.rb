@@ -11,7 +11,7 @@ module Mulukhiya
 
     def affiliate?
       return false if sns.account.user_config['/amazon/affiliate'] == false
-      return false unless config['/amazon/affiliate']
+      return false unless config['/service/amazon/affiliate']
       return true
     rescue => e
       errors.push(class: e.class.to_s, message: e.message)

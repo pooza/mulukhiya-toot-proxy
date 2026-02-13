@@ -8,7 +8,7 @@ module Mulukhiya
     end
 
     def lookup(id)
-      return @http.get(File.join(config['/peer_tube/urls/api/video'], id)).parsed_response
+      return @http.get(File.join(config['/service/peer_tube/urls/api/video'], id)).parsed_response
     end
   end
 end

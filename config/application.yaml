@@ -14,44 +14,6 @@ agent:
 akkoma:
   display_name: Akkoma
   sns_type: mastodon
-amazon:
-  patterns:
-    - pattern: /dp/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /gp/product/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /o/ASIN/([[:alnum:]]+)
-      shortenable: true
-    - pattern: /gp/video/detail/([[:alnum:]]+)
-      shortenable: true
-  urls:
-    jp: https://www.amazon.co.jp/
-annict:
-  browser:
-    viewer:
-      works: false
-  episodes:
-    ruby:
-      pattern: '[(（][あ-んア-ン・ー]+[)）]'
-      trim: true
-  oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
-    scopes:
-      default:
-        - read
-  review:
-    suffixes:
-      bad: （評価:良くない）
-      spoiler: （ネタバレ）
-  timeout: 5
-  urls:
-    api:
-      graphql: https://api.annict.com/graphql
-      rest: https://api.annict.com
-    default: https://annict.com
-  works: []
 api:
   cache:
     ttl: 86400
@@ -331,24 +293,6 @@ iceshrimp:
     reaction: true
   display_name: Iceshrimp
   sns_type: misskey
-itunes:
-  country: jp
-  hosts:
-    - music.apple.com
-    - itunes.apple.com
-  lang: ja_jp
-  patterns:
-    album: /album/.*?/?([[:digit:]]+)$
-    song: /song/.*?/?([[:digit:]]+)$
-    track: /album/.*?/?([[:digit:]]+)$
-  urls:
-    lookup: https://itunes.apple.com/lookup
-    search: https://itunes.apple.com/search
-line:
-  id: null
-  token: null
-  urls:
-    api: https://api.line.me
 logger:
   mask_fields:
     - password
@@ -513,29 +457,6 @@ parser:
       reply_to: in_reply_to_id
       spoiler: spoiler_text
       visibility: visibility
-peer_tube:
-  hosts:
-    - fedimovie.com
-  urls:
-    api:
-      video: /api/v1/videos/
-    video:
-      - /w/
-      - /videos/watch/
-piefed:
-  api:
-    version: alpha
-  community:
-    types:
-      - Subscribed
-      - Moderating
-  hosts:
-    default: pf.korako.me
-  subject:
-    max_length: 50
-poipiku:
-  urls:
-    root: https://poipiku.com/
 postgres:
   dsn: null
   query_log: false
@@ -559,6 +480,104 @@ ruby:
   bundler:
     install: false
   did_you_mean: true
+service:
+  amazon:
+    patterns:
+      - pattern: /dp/([[:alnum:]]+)
+        shortenable: true
+      - pattern: /gp/product/([[:alnum:]]+)
+        shortenable: true
+      - pattern: /exec/obidos/ASIN/([[:alnum:]]+)
+        shortenable: true
+      - pattern: /o/ASIN/([[:alnum:]]+)
+        shortenable: true
+      - pattern: /gp/video/detail/([[:alnum:]]+)
+        shortenable: true
+    urls:
+      jp: https://www.amazon.co.jp/
+  annict:
+    browser:
+      viewer:
+        works: false
+    episodes:
+      ruby:
+        pattern: '[(（][あ-んア-ン・ー]+[)）]'
+        trim: true
+    oauth:
+      redirect_uri: urn:ietf:wg:oauth:2.0:oob
+      scopes:
+        default:
+          - read
+    review:
+      suffixes:
+        bad: （評価:良くない）
+        spoiler: （ネタバレ）
+    timeout: 5
+    urls:
+      api:
+        graphql: https://api.annict.com/graphql
+        rest: https://api.annict.com
+      default: https://annict.com
+    works: []
+  itunes:
+    country: jp
+    hosts:
+      - music.apple.com
+      - itunes.apple.com
+    lang: ja_jp
+    patterns:
+      album: /album/.*?/?([[:digit:]]+)$
+      song: /song/.*?/?([[:digit:]]+)$
+      track: /album/.*?/?([[:digit:]]+)$
+    urls:
+      lookup: https://itunes.apple.com/lookup
+      search: https://itunes.apple.com/search
+  lemmy:
+    api:
+      version: v3
+    communities:
+      limit: 50
+    subject:
+      max_length: 200
+  line:
+    id: null
+    token: null
+    urls:
+      api: https://api.line.me
+  peer_tube:
+    hosts:
+      - fedimovie.com
+    urls:
+      api:
+        video: /api/v1/videos/
+      video:
+        - /w/
+        - /videos/watch/
+  piefed:
+    api:
+      version: alpha
+    community:
+      types:
+        - Subscribed
+        - Moderating
+    hosts:
+      default: pf.korako.me
+    subject:
+      max_length: 50
+  poipiku:
+    urls:
+      root: https://poipiku.com/
+  spotify:
+    language: ja,en-US;q=0.9,en;q=0.8
+    patterns:
+      - pattern: /track/([[:alnum:]]+)
+        type: track
+      - pattern: /album/([[:alnum:]]+)
+        type: album
+    retry:
+      seconds: 1
+    urls:
+      track: https://open.spotify.com/
 sharkey:
   capabilities:
     reaction: true
@@ -606,17 +625,6 @@ sidekiq:
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)
-spotify:
-  language: ja,en-US;q=0.9,en;q=0.8
-  patterns:
-    - pattern: /track/([[:alnum:]]+)
-      type: track
-    - pattern: /album/([[:alnum:]]+)
-      type: album
-  retry:
-    seconds: 1
-  urls:
-    track: https://open.spotify.com/
 user_config:
   encrypt_fields:
     - token

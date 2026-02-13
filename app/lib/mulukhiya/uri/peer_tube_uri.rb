@@ -3,14 +3,14 @@ module Mulukhiya
     include Package
 
     def id
-      return nil unless config['/peer_tube/urls/video'].any? {|v| path.start_with?(v)}
+      return nil unless config['/service/peer_tube/urls/video'].any? {|v| path.start_with?(v)}
       return path.split('/').last
     rescue
       return nil
     end
 
     def data
-      return nil unless config['/peer_tube/hosts'].member?(host)
+      return nil unless config['/service/peer_tube/hosts'].member?(host)
       return nil unless id
       @data ||= service.lookup(id)
       return @data

@@ -1,7 +1,7 @@
 module Mulukhiya
   class PiefedClipper < LemmyClipper
     def api_version
-      return config['/piefed/api/version']
+      return config['/service/piefed/api/version']
     end
 
     def login
@@ -24,7 +24,7 @@ module Mulukhiya
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
         data[:url] = uri.to_s
-        data[:title] ||= uri.subject.ellipsize(config['/piefed/subject/max_length'])
+        data[:title] ||= uri.subject.ellipsize(config['/service/piefed/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
       data[:title] = data[:title].gsub(/[\r\n[:blank:]]/, ' ')
@@ -39,7 +39,7 @@ module Mulukhiya
       communities = []
       uri = self.uri.clone
       uri.path = "/api/#{api_version}/community/list"
-      config['/piefed/community/types'].each do |type_|
+      config['/service/piefed/community/types'].each do |type_|
         page = 1
         loop do
           uri.query_values = {type_:, page:}

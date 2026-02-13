@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def api_version
-      return config['/lemmy/api/version']
+      return config['/service/lemmy/api/version']
     end
 
     def uri
@@ -52,7 +52,7 @@ module Mulukhiya
         raise Ginseng::RequestError, "URI #{uri} invalid" unless uri.valid?
         raise Ginseng::RequestError, "URI #{uri} not public" unless uri.public?
         data[:url] = uri.to_s
-        data[:name] ||= uri.subject.ellipsize(config['/lemmy/subject/max_length'])
+        data[:name] ||= uri.subject.ellipsize(config['/service/lemmy/subject/max_length'])
         data[:body] ||= "via: #{uri}"
       end
       data[:name] = data[:name].gsub(/[\r\n[:blank:]]/, ' ')
@@ -67,7 +67,7 @@ module Mulukhiya
       uri = self.uri.clone
       uri.path = "/api/#{api_version}/community/list"
       uri.query_values = {
-        limit: config['/lemmy/communities/limit'],
+        limit: config['/service/lemmy/communities/limit'],
         type_: 'Subscribed',
         sort: 'New',
         page: 1,

@@ -18,7 +18,7 @@ module Mulukhiya
 
     def viewers_works?
       return false if guest?
-      return false unless config['/annict/browser/viewer/works']
+      return false unless config['/service/annict/browser/viewer/works']
       return true
     end
 
@@ -92,8 +92,8 @@ module Mulukhiya
         body[:text] = body_template.to_s.lstrip
         body[:spoiler_text] = [
           title_template.to_s.tr("\n", ' ').strip,
-          spoiler?(body_template) ? config['/annict/review/suffixes/spoiler'] : '',
-          bad?(values) ? config['/annict/review/suffixes/bad'] : '',
+          spoiler?(body_template) ? config['/service/annict/review/suffixes/spoiler'] : '',
+          bad?(values) ? config['/service/annict/review/suffixes/bad'] : '',
         ].join
       end
       return SlackWebhookPayload.new(body)
@@ -127,7 +127,7 @@ module Mulukhiya
     def rest_service
       unless @rest_service
         @rest_service = HTTP.new
-        @rest_service.base_uri = config['/annict/urls/api/rest']
+        @rest_service.base_uri = config['/service/annict/urls/api/rest']
       end
       return @rest_service
     end
@@ -135,7 +135,7 @@ module Mulukhiya
     def graphql_service
       unless @graphql_service
         @graphql_service = HTTP.new
-        @graphql_service.base_uri = config['/annict/urls/api/graphql']
+        @graphql_service.base_uri = config['/service/annict/urls/api/graphql']
       end
       return @graphql_service
     end
@@ -143,7 +143,7 @@ module Mulukhiya
     def service
       unless @service
         @service = HTTP.new
-        @service.base_uri = config['/annict/urls/default']
+        @service.base_uri = config['/service/annict/urls/default']
       end
       return @service
     end
@@ -153,7 +153,7 @@ module Mulukhiya
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
-          'redirect_uri' => config['/annict/oauth/redirect_uri'],
+          'redirect_uri' => config['/service/annict/oauth/redirect_uri'],
           'client_id' => self.class.client_id,
           'client_secret' => self.class.client_secret,
           'code' => code,
@@ -166,7 +166,7 @@ module Mulukhiya
       uri.query_values = {
         client_id: self.class.client_id,
         response_type: 'code',
-        redirect_uri: config['/annict/oauth/redirect_uri'],
+        redirect_uri: config['/service/annict/oauth/redirect_uri'],
         scope: self.class.oauth_scopes.join(' '),
       }
       return uri
@@ -199,11 +199,11 @@ module Mulukhiya
     end
 
     def self.subtitle_trim_ruby?
-      return config['/annict/episodes/ruby/trim'] == true
+      return config['/service/annict/episodes/ruby/trim'] == true
     end
 
     def self.ruby_pattern
-      return Regexp.new(config['/annict/episodes/ruby/pattern'])
+      return Regexp.new(config['/service/annict/episodes/ruby/pattern'])
     end
 
     def self.trim_ruby(title)
@@ -211,23 +211,23 @@ module Mulukhiya
     end
 
     def self.oauth_scopes(key = 'default')
-      return config["/annict/oauth/scopes/#{key}"]
+      return config["/service/annict/oauth/scopes/#{key}"]
     end
 
     def self.client_id
-      return config['/annict/oauth/client/id'] rescue nil
+      return config['/service/annict/oauth/client/id'] rescue nil
     end
 
     def self.client_secret
-      return config['/annict/oauth/client/secret'].decrypt
+      return config['/service/annict/oauth/client/secret'].decrypt
     rescue Ginseng::ConfigError
       return nil
     rescue
-      return config['/annict/oauth/client/secret']
+      return config['/service/annict/oauth/client/secret']
     end
 
     def self.keywords
-      return config['/annict/works'] || []
+      return config['/service/annict/works'] || []
     rescue
       return []
     end
@@ -316,7 +316,7 @@ module Mulukhiya
       keywords = self.class.keywords
       return true unless keywords.present?
       return true unless account = params[:account]
-      return true unless account.user_config['/annict/theme_works_only']
+      return true unless account.user_config['/service/annict/theme_works_only']
       return keywords.any? {|v| activity.to_json.include?(v)}
     end
 
@@ -324,11 +324,11 @@ module Mulukhiya
       query = File.read(File.join(Environment.dir, 'app/query/annict', "#{template}.graphql"))
       variables&.deep_stringify_keys!
       body = {query:, variables:}.compact
-      endpoint = Ginseng::URI.parse(config['/annict/urls/api/graphql'])
+      endpoint = Ginseng::URI.parse(config['/service/annict/urls/api/graphql'])
       response = graphql_service.post(endpoint.path, {
         body: body.to_json,
         headers: {Authorization: "Bearer #{@token}"},
-        timeout: config['/annict/timeout'],
+        timeout: config['/service/annict/timeout'],
       }).parsed_response
       @account = self.class.create_viewer_info(response.dig('data', 'viewer')) unless guest?
       return response

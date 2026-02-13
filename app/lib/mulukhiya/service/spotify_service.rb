@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
 
     def initialize
-      ENV['ACCEPT_LANGUAGE'] ||= config['/spotify/language']
+      ENV['ACCEPT_LANGUAGE'] ||= config['/service/spotify/language']
       RSpotify.authenticate(SpotifyService.client_id, SpotifyService.client_secret)
     end
 
@@ -16,7 +16,7 @@ module Mulukhiya
       cnt += 1
       e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(config['/spotify/retry/seconds'])
+      sleep(config['/service/spotify/retry/seconds'])
       retry
     end
 
@@ -28,7 +28,7 @@ module Mulukhiya
       cnt += 1
       e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(config['/spotify/retry/seconds'])
+      sleep(config['/service/spotify/retry/seconds'])
       retry
     end
 
@@ -40,7 +40,7 @@ module Mulukhiya
       cnt += 1
       e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(config['/spotify/retry/seconds'])
+      sleep(config['/service/spotify/retry/seconds'])
       retry
     end
 
@@ -52,12 +52,12 @@ module Mulukhiya
       cnt += 1
       e.log(count: cnt)
       raise Ginseng::GatewayError, e.message, e.backtrace unless cnt < retry_limit
-      sleep(config['/spotify/retry/seconds'])
+      sleep(config['/service/spotify/retry/seconds'])
       retry
     end
 
     def create_track_uri(track)
-      return nil unless uri = SpotifyURI.parse(config['/spotify/urls/track'])
+      return nil unless uri = SpotifyURI.parse(config['/service/spotify/urls/track'])
       uri.track_id = track.id
       return nil unless uri.absolute?
       return uri
@@ -76,15 +76,15 @@ module Mulukhiya
     end
 
     def self.client_id
-      return config['/spotify/client/id'] rescue nil
+      return config['/service/spotify/client/id'] rescue nil
     end
 
     def self.client_secret
-      return config['/spotify/client/secret'].decrypt
+      return config['/service/spotify/client/secret'].decrypt
     rescue Ginseng::ConfigError
       return nil
     rescue
-      return config['/spotify/client/secret']
+      return config['/service/spotify/client/secret']
     end
 
     def self.config?
