@@ -207,6 +207,119 @@ handler:
   you_tube_url_nowplaying:
     tagging: false
     timeout: 10
+  pipeline:
+    base:
+      alert:
+        - slack_alert
+        - line_alert
+        - mail_alert
+      announce:
+        - post_announce
+      follow:
+        - welcome_mention
+      mention:
+        - announcement_mention
+        - welcome_mention
+      post_bookmark:
+        - piefed_bookmark
+        - result_notification
+      post_boost:
+        - result_notification
+      post_fav:
+        - result_notification
+      post_toot:
+        - user_config_command
+        - piefed_clipping_command
+        - result_notification
+      post_webhook:
+        - result_notification
+      pre_toot:
+        - user_config_command
+        - piefed_clipping_command
+        - mention_visibility
+        - itunes_nowplaying
+        - spotify_nowplaying
+        - itunes_image
+        - spotify_image
+        - you_tube_image
+        - shortened_url
+        - url_normalize
+        - canonical_url
+        - itunes_url
+        - amazon_url
+        - itunes_url_nowplaying
+        - spotify_url_nowplaying
+        - you_tube_url_nowplaying
+        - peer_tube_url_nowplaying
+        - spoiler
+        - default_tag
+        - dictionary_tag
+        - media_tag
+        - user_tag
+        - remote_tag
+        - removal_rule_tag
+        - image_copyright
+        - tagging
+        - invalid_command
+      pre_webhook:
+        - itunes_nowplaying
+        - spotify_nowplaying
+        - itunes_image
+        - spotify_image
+        - you_tube_image
+        - poipiku_image
+        - webhook_image
+        - shortened_url
+        - url_normalize
+        - canonical_url
+        - itunes_url
+        - amazon_url
+        - itunes_url_nowplaying
+        - spotify_url_nowplaying
+        - you_tube_url_nowplaying
+        - peer_tube_url_nowplaying
+        - spoiler
+        - default_tag
+        - dictionary_tag
+        - media_tag
+        - remote_tag
+        - removal_rule_tag
+        - image_copyright
+        - tagging
+    mastodon:
+      post_thumbnail:
+        - result_notification
+      post_upload:
+        - result_notification
+      pre_thumbnail:
+        - image_format_convert
+        - image_resize
+      pre_upload:
+        - image_format_convert
+        - audio_format_convert
+        - video_format_convert
+        - image_resize
+    misskey:
+      post_reaction:
+        - reply_reaction
+        - result_notification
+      post_toot:
+        append:
+          - channel_notification
+      pre_draft:
+        - default_tag
+        - removal_rule_tag
+        - tagging
+      pre_toot:
+        remove:
+          - itunes_image
+          - spotify_image
+          - you_tube_image
+      pre_webhook:
+        remove:
+          - itunes_image
+          - spotify_image
+          - you_tube_image
 http:
   retry:
     limit: 3
@@ -259,96 +372,6 @@ mastodon:
     repost: true
     streaming: true
     webhook: true
-  handlers:
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-    announce:
-      - post_announce
-    follow:
-      - welcome_mention
-    mention:
-      - announcement_mention
-      - welcome_mention
-    post_bookmark:
-      - piefed_bookmark
-      - result_notification
-    post_boost:
-      - result_notification
-    post_fav:
-      - result_notification
-    post_thumbnail:
-      - result_notification
-    post_toot:
-      - user_config_command
-      - piefed_clipping_command
-      - result_notification
-    post_upload:
-      - result_notification
-    post_webhook:
-      - result_notification
-    pre_thumbnail:
-      - image_format_convert
-      - image_resize
-    pre_toot:
-      - user_config_command
-      - piefed_clipping_command
-      - mention_visibility
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - itunes_image
-      - spotify_image
-      - you_tube_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - spoiler
-      - default_tag
-      - dictionary_tag
-      - media_tag
-      - user_tag
-      - remote_tag
-      - removal_rule_tag
-      - image_copyright
-      - tagging
-      - invalid_command
-    pre_upload:
-      - image_format_convert
-      - audio_format_convert
-      - video_format_convert
-      - image_resize
-    pre_webhook:
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - itunes_image
-      - spotify_image
-      - you_tube_image
-      - poipiku_image
-      - webhook_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - spoiler
-      - default_tag
-      - dictionary_tag
-      - media_tag
-      - remote_tag
-      - removal_rule_tag
-      - image_copyright
-      - tagging
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
     scopes:
@@ -406,86 +429,6 @@ misskey:
     repost: true
     streaming: true
     webhook: true
-  handlers:
-    alert:
-      - slack_alert
-      - line_alert
-      - mail_alert
-    announce:
-      - post_announce
-    follow:
-      - welcome_mention
-    mention:
-      - announcement_mention
-      - welcome_mention
-    post_bookmark:
-      - piefed_bookmark
-      - result_notification
-    post_boost:
-      - result_notification
-    post_fav:
-      - result_notification
-    post_reaction:
-      - reply_reaction
-      - result_notification
-    post_toot:
-      - user_config_command
-      - piefed_clipping_command
-      - channel_notification
-      - result_notification
-    post_webhook:
-      - result_notification
-    pre_draft:
-      - default_tag
-      - removal_rule_tag
-      - tagging
-    pre_toot:
-      - user_config_command
-      - piefed_clipping_command
-      - mention_visibility
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - spoiler
-      - default_tag
-      - dictionary_tag
-      - media_tag
-      - user_tag
-      - remote_tag
-      - removal_rule_tag
-      - image_copyright
-      - tagging
-      - invalid_command
-    pre_webhook:
-      - itunes_nowplaying
-      - spotify_nowplaying
-      - poipiku_image
-      - webhook_image
-      - shortened_url
-      - url_normalize
-      - canonical_url
-      - itunes_url
-      - amazon_url
-      - itunes_url_nowplaying
-      - spotify_url_nowplaying
-      - you_tube_url_nowplaying
-      - peer_tube_url_nowplaying
-      - spoiler
-      - default_tag
-      - dictionary_tag
-      - media_tag
-      - remote_tag
-      - removal_rule_tag
-      - image_copyright
-      - tagging
   oauth:
     scopes:
       default:

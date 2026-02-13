@@ -23,7 +23,7 @@ module Mulukhiya
 
     def handler_names(&block)
       return enum_for(__method__) unless block
-      config["/#{Environment.controller_name}/handlers/#{label}"]
+      resolve_pipeline
         .reject {|name| config.disable?(Handler.create(name))}
         .each(&block)
     end
@@ -35,7 +35,7 @@ module Mulukhiya
 
     def all_handler_names(&block)
       return enum_for(__method__) unless block
-      config["/#{Environment.controller_name}/handlers/#{label}"]
+      resolve_pipeline
         .sort_by(&:underscore)
         .each(&block)
     end
@@ -73,7 +73,25 @@ module Mulukhiya
     end
 
     def self.syms
-      return config.keys("/#{Environment.controller_name}/handlers").to_set(&:to_sym)
+      base_events = config.keys('/handler/pipeline/base') rescue []
+      sns_events = config.keys("/handler/pipeline/#{Environment.controller_name}") rescue []
+      return (base_events + sns_events).to_set(&:to_sym)
+    end
+
+    private
+
+    def resolve_pipeline
+      base = config["/handler/pipeline/base/#{label}"] rescue nil
+      sns_config = config["/handler/pipeline/#{Environment.controller_name}/#{label}"] rescue nil
+      return base if base.is_a?(Array) && sns_config.nil?
+      return sns_config if sns_config.is_a?(Array)
+      if base.is_a?(Array) && sns_config.is_a?(Hash)
+        result = base.dup
+        Array(sns_config['remove']).each {|h| result.delete(h)}
+        result.concat(Array(sns_config['append']))
+        return result
+      end
+      return []
     end
   end
 end

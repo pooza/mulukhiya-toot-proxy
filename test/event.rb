@@ -30,5 +30,19 @@ module Mulukhiya
         assert_kind_of(Symbol, sym)
       end
     end
+
+    def test_resolve_pipeline
+      names = @event.all_handler_names.to_a
+
+      assert_predicate(names, :present?, 'Pipeline should resolve handlers')
+    end
+
+    def test_syms_coverage
+      syms = Event.syms
+
+      assert(syms.member?(:pre_toot))
+      assert(syms.member?(:post_toot))
+      assert(syms.member?(:alert))
+    end
   end
 end
