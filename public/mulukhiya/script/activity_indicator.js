@@ -1,4 +1,4 @@
-class ActivityIndicator {
+export class ActivityIndicator {
   constructor () {
     this.progress = document.createElement('progress')
     this.container = document.createElement('div')

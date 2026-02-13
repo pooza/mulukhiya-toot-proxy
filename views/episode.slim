@@ -67,63 +67,67 @@ html lang='ja'
                     i class='fas fa-microphone'
                   | 実況開始
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            all_works: [],
-            works: [],
-            episodes: {},
-            keyword: null,
-            layout: {},
-          }
-        },
-        async created () {
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
-            })
-          this.getWorks()
-        },
-        async mounted () {
-          new ClipboardJS('.episode i')
-        },
-        methods: {
-          toggleEpisodes (id) {
-            this.layout[id] = !this.layout[id]
-          },
-          prefetchEpisodes (id) {
-            if (!this.episodes[id]) {
-              this.methods.getEpisodes(id).then(e => {
-                this.episodes[id] = e
-              })
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              all_works: [],
+              works: [],
+              episodes: {},
+              keyword: null,
+              layout: {},
             }
           },
-          getWorks () {
-            setTimeout(() => {
-              this.methods.getWorks({q: this.keyword})
-                .then(e => {
-                  this.works = e
-                  this.works.map(w => this.layout[w.annictId] = false)
-                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            }, 500)
+          async created () {
+            this.methods.getConfig()
+              .then(e => {
+                this.account = this.methods.createAccountInfo(e)
+                this.disabled_tags = this.methods.dig(e, 'config', 'tagging', 'tags', 'disabled')
+              })
+            this.getWorks()
           },
-          notifyCopy () {
-            Swal.fire({
-              title: 'クリップボードにコピーしました。',
-              toast: true,
-              position: 'top-end',
-              icon: 'info',
-              showConfirmButton: false,
-              timer: 2000,
-            })
+          async mounted () {
+            new ClipboardJS('.episode i')
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          methods: {
+            toggleEpisodes (id) {
+              this.layout[id] = !this.layout[id]
+            },
+            prefetchEpisodes (id) {
+              if (!this.episodes[id]) {
+                this.methods.getEpisodes(id).then(e => {
+                  this.episodes[id] = e
+                })
+              }
+            },
+            getWorks () {
+              setTimeout(() => {
+                this.methods.getWorks({q: this.keyword})
+                  .then(e => {
+                    this.works = e
+                    this.works.map(w => this.layout[w.annictId] = false)
+                  }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+              }, 500)
+            },
+            notifyCopy () {
+              Swal.fire({
+                title: 'クリップボードにコピーしました。',
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                showConfirmButton: false,
+                timer: 2000,
+              })
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

@@ -42,40 +42,44 @@ html lang='ja'
                 label v-if='status.is_taggable'
                   input type='checkbox' v-model='input.fanart'
                   | #{config['/handler/poipiku_image/fanart_tag'].to_hashtag}タグを追加
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            status: {},
-            input: {fanart: false},
-          }
-        },
-        async created () {
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              return (new URL(location.href)).pathname.split('/').slice(-2)[0]
-            }).then(id => this.methods.getStatus(id))
-            .then(e => {this.status = e})
-        },
-        methods: {
-          attachPoipikuImage (id) {
-            this.methods.attachPoipikuImage(id, this.input.fanart)
-              .then(e => {
-                if (e.id) {
-                  location.href = `/mulukhiya/app/status/${e.id}`
-                } else if (e.createdNote) {
-                  location.href = `/mulukhiya/app/status/${e.createdNote.id}`
-                } else {
-                  location.href = '/mulukhiya/app/status'
-                }
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              status: {},
+              input: {fanart: false},
+            }
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          async created () {
+            this.methods.getConfig()
+              .then(e => {
+                this.account = this.methods.createAccountInfo(e)
+                return (new URL(location.href)).pathname.split('/').slice(-2)[0]
+              }).then(id => this.methods.getStatus(id))
+              .then(e => {this.status = e})
+          },
+          methods: {
+            attachPoipikuImage (id) {
+              this.methods.attachPoipikuImage(id, this.input.fanart)
+                .then(e => {
+                  if (e.id) {
+                    location.href = `/mulukhiya/app/status/${e.id}`
+                  } else if (e.createdNote) {
+                    location.href = `/mulukhiya/app/status/${e.createdNote.id}`
+                  } else {
+                    location.href = '/mulukhiya/app/status'
+                  }
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

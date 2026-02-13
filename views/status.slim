@@ -59,58 +59,62 @@ html lang='ja'
           a @click='appendStatuses' 続きを読む…
       - else
         article.status #{controller.display_name}は一覧表示に対応していません。
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            statuses: {},
-            suggested_keywords: [],
-            self: true,
-            page: 0,
-            keyword: null,
-            last_page: false,
-          }
-        },
-        async created () {
-          this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              if (this.account.username) this.appendStatuses()
-            })
-        },
-        methods: {
-          searchStatuses () {
-            this.page = 0
-            Object.keys(this.statuses).map(k => delete this.statuses[k])
-            this.last_page = false
-            setTimeout(this.appendStatuses, 500)
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              statuses: {},
+              suggested_keywords: [],
+              self: true,
+              page: 0,
+              keyword: null,
+              last_page: false,
+            }
           },
-          appendStatuses () {
-            this.page ++
-            this.methods.getStatuses({page: this.page, q: this.keyword, self: this.self})
+          async created () {
+            this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
+            this.methods.getConfig()
               .then(e => {
-                this.suggested_keywords = this.methods.getSuggestedKeywords()
-                if (0 < e.length) {
-                  e.map(v => this.statuses[v.id] = v)
-                } else {
-                  this.last_page = true
-                  Swal.fire({
-                    title: `#{controller.status_label}はこれ以上ありません。`,
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    timer: 2000,
-                  })
-                }
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+                this.account = this.methods.createAccountInfo(e)
+                if (this.account.username) this.appendStatuses()
+              })
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          methods: {
+            searchStatuses () {
+              this.page = 0
+              Object.keys(this.statuses).map(k => delete this.statuses[k])
+              this.last_page = false
+              setTimeout(this.appendStatuses, 500)
+            },
+            appendStatuses () {
+              this.page ++
+              this.methods.getStatuses({page: this.page, q: this.keyword, self: this.self})
+                .then(e => {
+                  this.suggested_keywords = this.methods.getSuggestedKeywords()
+                  if (0 < e.length) {
+                    e.map(v => this.statuses[v.id] = v)
+                  } else {
+                    this.last_page = true
+                    Swal.fire({
+                      title: `#{controller.status_label}はこれ以上ありません。`,
+                      toast: true,
+                      position: 'top-end',
+                      icon: 'info',
+                      showConfirmButton: false,
+                      timer: 2000,
+                    })
+                  }
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

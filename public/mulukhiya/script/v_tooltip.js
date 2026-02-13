@@ -1,4 +1,6 @@
-window.VTooltip = {
+import tippy from 'tippy.js'
+
+export const VTooltip = {
   mounted(el, binding) {
     const modifiers = binding.modifiers || {};
     const placement = Object.keys(modifiers)[0] || 'top';

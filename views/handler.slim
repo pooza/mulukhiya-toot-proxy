@@ -33,64 +33,68 @@ html lang='ja'
                     a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'
                       | このハンドラの説明
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            handlers: {},
-            restartable: false,
-            layout: {
-              details: {
-                alert: false,
-                announce: false,
-                follow: false,
-                mention: false,
-                post_bookmark: false,
-                post_boost: false,
-                post_fav: false,
-                post_thumbnail: false,
-                post_toot: false,
-                post_upload: false,
-                post_webhook: false,
-                pre_thumbnail: false,
-                pre_toot: true,
-                pre_upload: true,
-                pre_webhook: false,
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              handlers: {},
+              restartable: false,
+              layout: {
+                details: {
+                  alert: false,
+                  announce: false,
+                  follow: false,
+                  mention: false,
+                  post_bookmark: false,
+                  post_boost: false,
+                  post_fav: false,
+                  post_thumbnail: false,
+                  post_toot: false,
+                  post_upload: false,
+                  post_webhook: false,
+                  pre_thumbnail: false,
+                  pre_toot: true,
+                  pre_upload: true,
+                  pre_webhook: false,
+                },
               },
+            }
+          },
+          async created () {
+            this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+            this.methods.getHandlers().then(e => e.map(v => this.handlers[v.name] = v.disable))
+          },
+          methods: {
+            toggleVisibility (name) {
+              this.layout.details[name] = !this.layout.details[name]
             },
-          }
-        },
-        async created () {
-          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
-          this.methods.getHandlers().then(e => e.map(v => this.handlers[v.name] = v.disable))
-        },
-        methods: {
-          toggleVisibility (name) {
-            this.layout.details[name] = !this.layout.details[name]
+            restartPuma () {
+              Swal.fire({
+                title: 'Pumaの再起動',
+                text: 'Pumaを再起動します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '再起動',
+                cancelButtonText: 'キャンセル',
+              }).then(result => {
+                if (!result.isConfirmed) return
+                this.methods.restartPuma().then(_ => {this.restartable = false})
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            onChangeHandler (e) {
+              this.methods.toggleHandler(e.target.value, e.target.checked)
+                .then(_ => {this.restartable = true})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
           },
-          restartPuma () {
-            Swal.fire({
-              title: 'Pumaの再起動',
-              text: 'Pumaを再起動します。',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: '再起動',
-              cancelButtonText: 'キャンセル',
-            }).then(result => {
-              if (!result.isConfirmed) return
-              this.methods.restartPuma().then(_ => {this.restartable = false})
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          onChangeHandler (e) {
-            this.methods.toggleHandler(e.target.value, e.target.checked)
-              .then(_ => {this.restartable = true})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

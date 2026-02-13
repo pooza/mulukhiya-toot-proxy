@@ -223,280 +223,286 @@ html lang='ja'
                 pre.result
                   | {{result.about}}
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            config: {},
-            entries: {},
-            endpoints: {
-              media_list: '/mulukhiya/api/media?page=1',
-              piefed_communities: `/mulukhiya/api/piefed/communities?token=${encodeURIComponent(this.methods.getToken())}`,
-              status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
-              status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
-              handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(this.methods.getToken())}`,
-            },
-            choices: {},
-            query_params: {
-              media_list: {page: 1, q: null, token: this.methods.getToken()},
-              status_list: {page: 1, q: null, self: true, token: this.methods.getToken()},
-              status_detail: {id: null, token: this.methods.getToken()},
-              handler_list: {token: this.methods.getToken()},
-              status_create_tag: {id: null, tag: null, token: this.methods.getToken()},
-              status_delete_tag: {id: null, tag: null, token: this.methods.getToken()},
-              piefed_communities: {token: this.methods.getToken()},
-              announcement_update: {token: this.methods.getToken()},
-              media_file_clear: {token: this.methods.getToken()},
-              media_metadata_clear: {token: this.methods.getToken()},
-              media_catalog_update: {token: this.methods.getToken()},
-              program_update: {token: this.methods.getToken()},
-              tagging_tag_search: {q: null},
-              tagging_dic_update: {token: this.methods.getToken()},
-              tagging_usertag_clear: {token: this.methods.getToken()},
-              feed_update: {token: this.methods.getToken()},
-            },
-            result: {
-              search_tag: null,
-              favorite_tags: null,
-              piefed_communities: null,
-              media_list: null,
-              program_list: null,
-              work_list: null,
-              episode_tags: null,
-              feed_list: null,
-              status_list: null,
-              status_detail: null,
-              status_create_tag: null,
-              status_delete_tag: null,
-              handler_list: null,
-              health: null,
-              about: null,
-            },
-            layout: {
-              details: {
-                announcement: false,
-                media: false,
-                program: false,
-                favorite_tags: false,
-                piefed: false,
-                tagging_dic: false,
-                tagging_usertag: false,
-                feed: false,
-                health: false,
-                handler: false,
-                custom: false,
-                about: false,
-                status: false,
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        import Multiselect from '@vueform/multiselect'
+        import axios from 'axios'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              config: {},
+              entries: {},
+              endpoints: {
+                media_list: '/mulukhiya/api/media?page=1',
+                piefed_communities: `/mulukhiya/api/piefed/communities?token=${encodeURIComponent(this.methods.getToken())}`,
+                status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
+                status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
+                handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(this.methods.getToken())}`,
               },
-            },
-          }
-        },
-        async created () {
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              this.config = e.config
-              if (this.methods.getToken()) {
-                this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
-              }
-            })
-        },
-        async mounted () {
-          JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
-            const params = {}
-            entry.args.map(key => {params[key] = ''})
-            this.entries[entry.id] = entry
-            if (entry.choices) {
-              Object.keys(entry.choices).map(k => {
-                axios.get(entry.choices[k]).then(e => {
-                  this.choices[`${entry.id}_${k}`] = e.data.map((label, value) => {
-                    return {label, value}
+              choices: {},
+              query_params: {
+                media_list: {page: 1, q: null, token: this.methods.getToken()},
+                status_list: {page: 1, q: null, self: true, token: this.methods.getToken()},
+                status_detail: {id: null, token: this.methods.getToken()},
+                handler_list: {token: this.methods.getToken()},
+                status_create_tag: {id: null, tag: null, token: this.methods.getToken()},
+                status_delete_tag: {id: null, tag: null, token: this.methods.getToken()},
+                piefed_communities: {token: this.methods.getToken()},
+                announcement_update: {token: this.methods.getToken()},
+                media_file_clear: {token: this.methods.getToken()},
+                media_metadata_clear: {token: this.methods.getToken()},
+                media_catalog_update: {token: this.methods.getToken()},
+                program_update: {token: this.methods.getToken()},
+                tagging_tag_search: {q: null},
+                tagging_dic_update: {token: this.methods.getToken()},
+                tagging_usertag_clear: {token: this.methods.getToken()},
+                feed_update: {token: this.methods.getToken()},
+              },
+              result: {
+                search_tag: null,
+                favorite_tags: null,
+                piefed_communities: null,
+                media_list: null,
+                program_list: null,
+                work_list: null,
+                episode_tags: null,
+                feed_list: null,
+                status_list: null,
+                status_detail: null,
+                status_create_tag: null,
+                status_delete_tag: null,
+                handler_list: null,
+                health: null,
+                about: null,
+              },
+              layout: {
+                details: {
+                  announcement: false,
+                  media: false,
+                  program: false,
+                  favorite_tags: false,
+                  piefed: false,
+                  tagging_dic: false,
+                  tagging_usertag: false,
+                  feed: false,
+                  health: false,
+                  handler: false,
+                  custom: false,
+                  about: false,
+                  status: false,
+                },
+              },
+            }
+          },
+          async created () {
+            this.methods.getConfig()
+              .then(e => {
+                this.account = this.methods.createAccountInfo(e)
+                this.config = e.config
+                if (this.methods.getToken()) {
+                  this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
+                }
+              })
+          },
+          async mounted () {
+            JSON.parse(this.$refs.custom_api_entries.innerText).map(entry => {
+              const params = {}
+              entry.args.map(key => {params[key] = ''})
+              this.entries[entry.id] = entry
+              if (entry.choices) {
+                Object.keys(entry.choices).map(k => {
+                  axios.get(entry.choices[k]).then(e => {
+                    this.choices[`${entry.id}_${k}`] = e.data.map((label, value) => {
+                      return {label, value}
+                    })
                   })
                 })
-              })
-            }
-            this.query_params[entry.id] = params
-            this.endpoints[entry.id] = `${entry.fullpath}`
-          })
-        },
-        methods: {
-          onInputMediaList () {
-            const url = new URL('/mulukhiya/api/media', location.href)
-            url.searchParams.set('page', this.query_params.media_list.page)
-            url.searchParams.delete('q')
-            if (this.query_params.media_list.q) {
-              url.searchParams.set('q', this.query_params.media_list.q)
-            }
-            if (this.methods.getToken()) url.searchParams.set('token', this.methods.getToken())
-            this.endpoints.media_list = `${url.pathname}${url.search}`
-          },
-          onInputStatusList () {
-            const url = new URL('/mulukhiya/api/status/list', location.href)
-            url.searchParams.set('page', this.query_params.status_list.page)
-            url.searchParams.delete('q')
-            if (this.query_params.status_list.q) {
-              url.searchParams.set('q', this.query_params.status_list.q)
-            }
-            url.searchParams.set('self', this.query_params.status_list.self ? 1 : 0)
-            url.searchParams.set('token', this.methods.getToken())
-            this.endpoints.status_list = `${url.pathname}${url.search}`
-          },
-          onInputStatusDetail () {
-            const url = new URL('/mulukhiya/api/status/:id', location.href)
-            url.pathname = url.pathname.replace(':id', this.query_params.status_detail.id)
-            url.searchParams.set('token', this.methods.getToken())
-            this.endpoints.status_detail = `${url.pathname}${url.search}`
-          },
-          onInputCustomAPI (id, key) {
-            let endpoint = `/mulukhiya/api/${this.entries[id].path}`
-            this.query_params[id][key] = event.target.value || event.target.innerText
-            Object.keys(this.query_params[id]).map(k => {
-              endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
+              }
+              this.query_params[entry.id] = params
+              this.endpoints[entry.id] = `${entry.fullpath}`
             })
-            this.endpoints[id] = endpoint
           },
-          toggleVisibility (name) {
-            this.layout.details[name] = !this.layout.details[name]
+          methods: {
+            onInputMediaList () {
+              const url = new URL('/mulukhiya/api/media', location.href)
+              url.searchParams.set('page', this.query_params.media_list.page)
+              url.searchParams.delete('q')
+              if (this.query_params.media_list.q) {
+                url.searchParams.set('q', this.query_params.media_list.q)
+              }
+              if (this.methods.getToken()) url.searchParams.set('token', this.methods.getToken())
+              this.endpoints.media_list = `${url.pathname}${url.search}`
+            },
+            onInputStatusList () {
+              const url = new URL('/mulukhiya/api/status/list', location.href)
+              url.searchParams.set('page', this.query_params.status_list.page)
+              url.searchParams.delete('q')
+              if (this.query_params.status_list.q) {
+                url.searchParams.set('q', this.query_params.status_list.q)
+              }
+              url.searchParams.set('self', this.query_params.status_list.self ? 1 : 0)
+              url.searchParams.set('token', this.methods.getToken())
+              this.endpoints.status_list = `${url.pathname}${url.search}`
+            },
+            onInputStatusDetail () {
+              const url = new URL('/mulukhiya/api/status/:id', location.href)
+              url.pathname = url.pathname.replace(':id', this.query_params.status_detail.id)
+              url.searchParams.set('token', this.methods.getToken())
+              this.endpoints.status_detail = `${url.pathname}${url.search}`
+            },
+            onInputCustomAPI (id, key) {
+              let endpoint = `/mulukhiya/api/${this.entries[id].path}`
+              this.query_params[id][key] = event.target.value || event.target.innerText
+              Object.keys(this.query_params[id]).map(k => {
+                endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
+              })
+              this.endpoints[id] = endpoint
+            },
+            toggleVisibility (name) {
+              this.layout.details[name] = !this.layout.details[name]
+            },
+            delay (proc) {
+              setTimeout(proc, 500)
+            },
+            updateAnnouncement () {
+              this.methods.updateAnnouncement()
+                .then(_ => {this.layout.details['announcement'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getMedias () {
+              this.result.media_list = null
+              this.methods.getMedias(this.query_params.media_list)
+                .then(e => {this.result.media_list = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            clearMediaFiles () {
+              this.methods.clearMediaFiles()
+                .then(_ => {this.layout.details['media'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            clearMediaMetadata () {
+              this.methods.clearMediaMetadata()
+                .then(_ => {this.layout.details['media'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            updateMediaCatalog () {
+              this.methods.updateMediaCatalog()
+                .then(_ => {this.layout.details['media'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            updatePrograms () {
+              this.methods.updatePrograms()
+                .then(_ => {this.layout.details['program'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getPrograms () {
+              this.result.program_list = null
+              this.methods.getPrograms()
+                .then(e => {this.result.program_list = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getEpisodeTags () {
+              this.result.episode_tags = null
+              this.methods.getEpisodeTags()
+                .then(e => {this.result.episode_tags = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getFavoriteTags () {
+              this.result.favorite_tags = null
+              this.methods.getFavoriteTags()
+                .then(e => {this.result.favorite_tags = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getPiefedCommunities () {
+              this.result.piefed_communities = null
+              this.methods.getPiefedCommunities()
+                .then(e => {this.result.piefed_communities = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            updateTaggingDictionary () {
+              this.methods.updateTaggingDictionary()
+                .then(_ => {this.layout.details['tagging_dic'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            clearUserTags () {
+              this.methods.clearUserTags()
+                .then(_ => {this.layout.details['tagging_usertag'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getFeeds () {
+              this.result.feed_list = null
+              this.methods.getFeeds()
+                .then(e => {this.result.feed_list = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            updateCustomFeeds () {
+              this.methods.updateCustomFeeds()
+                .then(_ => {this.layout.details['feed'] = false})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            searchTags () {
+              this.result.search_tag = null
+              this.methods.searchTags(this.query_params.tagging_tag_search.q)
+                .then(e => {this.result.search_tag = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getStatuses () {
+              this.result.status_list = null
+              this.methods.getStatuses(this.query_params.status_list)
+                .then(e => {this.result.status_list = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getStatus () {
+              this.result.status_detail = null
+              this.methods.getStatus(this.query_params.status_detail.id)
+                .then(e => {this.result.status_detail = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            createTag () {
+              this.result.status_create_tag = null
+              this.methods.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
+                .then(e => {this.result.status_create_tag = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            deleteTag () {
+              this.result.status_delete_tag = null
+              this.methods.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
+                .then(e => {this.result.status_delete_tag = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getHandlers () {
+              this.result.handler_list = null
+              this.methods.getHandlers()
+                .then(e => {this.result.handler_list = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getHealth () {
+              this.result.health = null
+              this.methods.getHealth()
+                .then(e => {this.result.health = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            execCustomAPI (id) {
+              this.result[id] = null
+              this.methods.execGET(this.endpoints[id])
+                .then(e => this.result[id] = e)
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            getAbout () {
+              this.result.about = null
+              this.methods.getAbout()
+                .then(e => {this.result.about = e})
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
           },
-          delay (proc) {
-            setTimeout(proc, 500)
-          },
-          updateAnnouncement () {
-            this.methods.updateAnnouncement()
-              .then(_ => {this.layout.details['announcement'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getMedias () {
-            this.result.media_list = null
-            this.methods.getMedias(this.query_params.media_list)
-              .then(e => {this.result.media_list = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          clearMediaFiles () {
-            this.methods.clearMediaFiles()
-              .then(_ => {this.layout.details['media'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          clearMediaMetadata () {
-            this.methods.clearMediaMetadata()
-              .then(_ => {this.layout.details['media'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updateMediaCatalog () {
-            this.methods.updateMediaCatalog()
-              .then(_ => {this.layout.details['media'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updatePrograms () {
-            this.methods.updatePrograms()
-              .then(_ => {this.layout.details['program'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getPrograms () {
-            this.result.program_list = null
-            this.methods.getPrograms()
-              .then(e => {this.result.program_list = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getEpisodeTags () {
-            this.result.episode_tags = null
-            this.methods.getEpisodeTags()
-              .then(e => {this.result.episode_tags = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getFavoriteTags () {
-            this.result.favorite_tags = null
-            this.methods.getFavoriteTags()
-              .then(e => {this.result.favorite_tags = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getPiefedCommunities () {
-            this.result.piefed_communities = null
-            this.methods.getPiefedCommunities()
-              .then(e => {this.result.piefed_communities = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updateTaggingDictionary () {
-            this.methods.updateTaggingDictionary()
-              .then(_ => {this.layout.details['tagging_dic'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          clearUserTags () {
-            this.methods.clearUserTags()
-              .then(_ => {this.layout.details['tagging_usertag'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getFeeds () {
-            this.result.feed_list = null
-            this.methods.getFeeds()
-              .then(e => {this.result.feed_list = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updateCustomFeeds () {
-            this.methods.updateCustomFeeds()
-              .then(_ => {this.layout.details['feed'] = false})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          searchTags () {
-            this.result.search_tag = null
-            this.methods.searchTags(this.query_params.tagging_tag_search.q)
-              .then(e => {this.result.search_tag = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getStatuses () {
-            this.result.status_list = null
-            this.methods.getStatuses(this.query_params.status_list)
-              .then(e => {this.result.status_list = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getStatus () {
-            this.result.status_detail = null
-            this.methods.getStatus(this.query_params.status_detail.id)
-              .then(e => {this.result.status_detail = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          createTag () {
-            this.result.status_create_tag = null
-            this.methods.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
-              .then(e => {this.result.status_create_tag = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          deleteTag () {
-            this.result.status_delete_tag = null
-            this.methods.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
-              .then(e => {this.result.status_delete_tag = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getHandlers () {
-            this.result.handler_list = null
-            this.methods.getHandlers()
-              .then(e => {this.result.handler_list = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getHealth () {
-            this.result.health = null
-            this.methods.getHealth()
-              .then(e => {this.result.health = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          execCustomAPI (id) {
-            this.result[id] = null
-            this.methods.execGET(this.endpoints[id])
-              .then(e => this.result[id] = e)
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          getAbout () {
-            this.result.about = null
-            this.methods.getAbout()
-              .then(e => {this.result.about = e})
-              .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.component('multiselect', window.VueformMultiselect)
-      app.mount('#app')
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.component('multiselect', Multiselect)
+        app.mount('#app')

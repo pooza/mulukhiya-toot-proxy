@@ -34,49 +34,53 @@ html lang='ja'
               .alert この#{controller.status_label}にアンケートがあれば削除されます。
               i class='fa fa-trash'
               a href='javascript:void(0)' @click='deleteNowplaying(status.id)' 誤判定のナウプレを削除
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            status: {},
-          }
-        },
-        async created () {
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              return (new URL(location.href)).pathname.split('/').slice(-2)[0]
-            }).then(id => this.methods.getStatus(id))
-            .then(e => {this.status = e})
-        },
-        methods: {
-          deleteNowplaying (id) {
-            Swal.fire({
-              title: 'ナウプレの削除',
-              text: '誤判定のナウプレを削除します。',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: '削除',
-              cancelButtonText: 'キャンセル',
-            }).then(result => {
-              if (!result.isConfirmed) return
-              this.methods.deleteNowplaying(id)
-                .then(e => {
-                  if (e.id) {
-                    location.href = `/mulukhiya/app/status/${e.id}/nowplaying`
-                  } else if (e.createdNote) {
-                    location.href = `/mulukhiya/app/status/${e.createdNote.id}/nowplaying`
-                  } else {
-                    location.href = '/mulukhiya/app/status'
-                  }
-                })
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              status: {},
+            }
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          async created () {
+            this.methods.getConfig()
+              .then(e => {
+                this.account = this.methods.createAccountInfo(e)
+                return (new URL(location.href)).pathname.split('/').slice(-2)[0]
+              }).then(id => this.methods.getStatus(id))
+              .then(e => {this.status = e})
+          },
+          methods: {
+            deleteNowplaying (id) {
+              Swal.fire({
+                title: 'ナウプレの削除',
+                text: '誤判定のナウプレを削除します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '削除',
+                cancelButtonText: 'キャンセル',
+              }).then(result => {
+                if (!result.isConfirmed) return
+                this.methods.deleteNowplaying(id)
+                  .then(e => {
+                    if (e.id) {
+                      location.href = `/mulukhiya/app/status/${e.id}/nowplaying`
+                    } else if (e.createdNote) {
+                      location.href = `/mulukhiya/app/status/${e.createdNote.id}/nowplaying`
+                    } else {
+                      location.href = '/mulukhiya/app/status'
+                    }
+                  })
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

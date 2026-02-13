@@ -59,55 +59,59 @@ html lang='ja'
               li v-if='status.is_poipiku'
                 i class='fa fa-image'
                 a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            status: {},
-          }
-        },
-        async created () {
-          this.methods.getConfig()
-            .then(e => {
-              this.account = this.methods.createAccountInfo(e)
-              return (new URL(location.href)).pathname.split('/').slice(-1)[0]
-            }).then(id => this.methods.getStatus(id))
-            .then(e => {this.status = e})
-        },
-        methods: {
-          createTag () {
-            Swal.fire({
-              title: 'タグの名前を入力して、作成ボタンを押下してください。',
-              input: 'text',
-              inputPlaceholder: 'タグの名前',
-              showCancelButton: true,
-              confirmButtonText: '作成',
-              cancelButtonText: 'キャンセル',
-            }).then(result => {
-              if (result.isConfirmed) {
-                const tag = result.value.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
-                if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
-                this.status.footer_tags.push({name: tag, is_deletable: true})
-              }
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              status: {},
+            }
           },
-          deleteTag (tag) {
-            this.status.footer_tags = this.status.footer_tags.filter(v => {
-              return v.name.replace(/^#/, '') != tag
-            })
-          },
-          updateTags () {
-            this.methods.updateTags(this.status.id, this.status.footer_tags.map(v => v.name))
+          async created () {
+            this.methods.getConfig()
               .then(e => {
-                this.status = e
-                window.close()
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+                this.account = this.methods.createAccountInfo(e)
+                return (new URL(location.href)).pathname.split('/').slice(-1)[0]
+              }).then(id => this.methods.getStatus(id))
+              .then(e => {this.status = e})
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          methods: {
+            createTag () {
+              Swal.fire({
+                title: 'タグの名前を入力して、作成ボタンを押下してください。',
+                input: 'text',
+                inputPlaceholder: 'タグの名前',
+                showCancelButton: true,
+                confirmButtonText: '作成',
+                cancelButtonText: 'キャンセル',
+              }).then(result => {
+                if (result.isConfirmed) {
+                  const tag = result.value.replace(/[ -/:-@[-`{-~]+/g, '_').replace(/(^_+|_+$)/g, '')
+                  if (this.status.footer_tags.map(v => v.name.replace(/^#/, '')).includes(tag)) return
+                  this.status.footer_tags.push({name: tag, is_deletable: true})
+                }
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            deleteTag (tag) {
+              this.status.footer_tags = this.status.footer_tags.filter(v => {
+                return v.name.replace(/^#/, '') != tag
+              })
+            },
+            updateTags () {
+              this.methods.updateTags(this.status.id, this.status.footer_tags.map(v => v.name))
+                .then(e => {
+                  this.status = e
+                  window.close()
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

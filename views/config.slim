@@ -98,200 +98,206 @@ html lang='ja'
             .field-update-button-container
               button @click='updateNotify' 更新
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            config: null,
-            result: null,
-            programs: [],
-            piefed: {
-              communities: {},
-            },
-            form: {
-              notify: {verbose: null},
-              annict: {auth_code: null, theme_works_only: false},
-              program: {minutes: null, tags: null},
-              tags: '',
-              webhook: {token: null, visibility: null},
-              piefed: {url: null, user: null, password: null, community: null},
-            },
-            options: {
-              program: [],
-              visibility: [],
-              piefed_communities: [],
-            },
-            layout: {
-              sections: {
-                piefed: #{controller.piefed?},
-                annict: #{controller.annict?},
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        import jsyaml from 'js-yaml'
+        import Multiselect from '@vueform/multiselect'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              config: null,
+              result: null,
+              programs: [],
+              piefed: {
+                communities: {},
               },
-              details: {
-                piefed: false,
-                tags: false,
-                webhook: false,
-                notify: false,
-                annict: false,
+              form: {
+                notify: {verbose: null},
+                annict: {auth_code: null, theme_works_only: false},
+                program: {minutes: null, tags: null},
+                tags: '',
+                webhook: {token: null, visibility: null},
+                piefed: {url: null, user: null, password: null, community: null},
               },
-            },
-          }
-        },
-        async created () {
-          this.methods.getPiefedCommunities()
-            .then(e => {
-              this.piefed.communities = e
-              this.options.piefed_communities.splice(0)
-              Object.keys(this.piefed.communities)
-                .map(k => {
-                  this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
-                })
-              return this.methods.getConfig()
-            }).then(e => {
-              this.updateForm(e)
-              this.account = this.methods.createAccountInfo(e)
-              this.config = e.config
-            })
-          this.methods.getPrograms()
-            .then(e => {
-              this.programs = e
-              this.options.program = Object.values(e)
-                .filter(program => program.enable)
-                .map(program => ({
-                  value: program.key,
-                  label: program.minutes ? `${this.methods.createProgramTags(program).join(', ')} (${program.minutes}分)` : this.methods.createProgramTags(program).join(', '),
-                }))
-              this.options.program.unshift({label: '(固定タグのクリア)'})
-            })
-        },
-        methods: {
-          updateForm (data) {
-            this.result = jsyaml.dump(data.config)
-            this.form.webhook.visibility = this.methods.dig(data, 'config', 'webhook', 'visibility') || 'public'
-            this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
-            this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
-            this.form.piefed.community = this.methods.dig(data, 'config', 'piefed', 'community')
-            this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
-            this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
-            if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
-              this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
-            }
-            if (data.visibility_names) {
-              this.options.visibility.splice(0)
-              Object.keys(data.visibility_names).map(k => {
-                const v = data.visibility_names[k]
-                if (!this.options.visibility.find(o => o.value == v)) {
-                  this.options.visibility.push({label: k == v ? k : `${v} (${k})`, value: v})
-                }
-              })
+              options: {
+                program: [],
+                visibility: [],
+                piefed_communities: [],
+              },
+              layout: {
+                sections: {
+                  piefed: #{controller.piefed?},
+                  annict: #{controller.annict?},
+                },
+                details: {
+                  piefed: false,
+                  tags: false,
+                  webhook: false,
+                  notify: false,
+                  annict: false,
+                },
+              },
             }
           },
-          updateConfig (command) {
-            return this.methods.updateConfig(command)
+          async created () {
+            this.methods.getPiefedCommunities()
               .then(e => {
+                this.piefed.communities = e
+                this.options.piefed_communities.splice(0)
+                Object.keys(this.piefed.communities)
+                  .map(k => {
+                    this.options.piefed_communities.push({value: k, label: this.piefed.communities[k]})
+                  })
+                return this.methods.getConfig()
+              }).then(e => {
                 this.updateForm(e)
-                return e
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          onChangeTags (e) {
-            if (e.code) {
-              this.form.tags = this.methods.createProgramTags(this.programs[e.code]).join("\n")
-              this.form.program.minutes = this.programs[e.code].minutes
-            } else {
-              this.form.tags = null
-              this.form.program.minutes = null
-            }
-          },
-          toggleVisibility (name) {
-            this.layout.details[name] = !this.layout.details[name]
-          },
-          updatePiefed () {
-            const command = {piefed: {url: null, user: null, community: null, host: null}}
-            if (this.form.piefed.url) command.piefed.url = this.form.piefed.url
-            if (this.form.piefed.user) command.piefed.user = this.form.piefed.user
-            if (this.form.piefed.password) command.piefed.password = this.form.piefed.password
-            if (this.form.piefed.community) command.piefed.community = Number(this.form.piefed.community)
-            this.updateConfig(command)
-            this.form.piefed.password = null
-          },
-          unauthPiefed () {
-            Swal.fire({
-              title: 'PieFed認証の解除',
-              text: 'PieFedの認証を解除します。',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: '解除',
-              cancelButtonText: 'キャンセル',
-            }).then(result => {
-              if (!result.isConfirmed) return
-              this.updateConfig({piefed: null})
-                .then(e => {
-                  this.result = jsyaml.dump(e.config)
-                  this.layout.details.piefed = false
-                  Object.keys(this.piefed.communities).forEach(k => delete this.piefed.communities[k])
-                  this.options.piefed_communities = null
-                })
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updateTags () {
-            const command = {tagging: {user_tags: null, minutes: null}}
-            if (this.form.tags) {
-              command.tagging.user_tags = this.form.tags.split("\n")
-              if (this.form.program.minutes) {
-                command.tagging.minutes = this.form.program.minutes
-              }
-            } else {
-              command.tagging.minutes = null
-            }
-            this.updateConfig(command)
-          },
-          updateWebhook () {
-            const command = {webhook: {visibility: null}}
-            if (this.form.webhook.visibility != 'public') {
-              command.webhook.visibility = this.form.webhook.visibility
-            }
-            this.updateConfig(command)
-          },
-          updateNotify () {
-            const command = {notify: {verbose: null}}
-            if (this.form.notify.verbose) command.notify.verbose = true
-            this.updateConfig(command)
-          },
-          authAnnict () {
-            this.methods.authAnnict(this.form.annict.auth_code)
+                this.account = this.methods.createAccountInfo(e)
+                this.config = e.config
+              })
+            this.methods.getPrograms()
               .then(e => {
-                this.result = jsyaml.dump(e.config)
-                this.form.annict.auth_code = null
-                this.layout.details.annict = false
+                this.programs = e
+                this.options.program = Object.values(e)
+                  .filter(program => program.enable)
+                  .map(program => ({
+                    value: program.key,
+                    label: program.minutes ? `${this.methods.createProgramTags(program).join(', ')} (${program.minutes}分)` : this.methods.createProgramTags(program).join(', '),
+                  }))
+                this.options.program.unshift({label: '(固定タグのクリア)'})
+              })
+          },
+          methods: {
+            updateForm (data) {
+              this.result = jsyaml.dump(data.config)
+              this.form.webhook.visibility = this.methods.dig(data, 'config', 'webhook', 'visibility') || 'public'
+              this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
+              this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
+              this.form.piefed.community = this.methods.dig(data, 'config', 'piefed', 'community')
+              this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
+              this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
+              if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
+                this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
+              }
+              if (data.visibility_names) {
+                this.options.visibility.splice(0)
+                Object.keys(data.visibility_names).map(k => {
+                  const v = data.visibility_names[k]
+                  if (!this.options.visibility.find(o => o.value == v)) {
+                    this.options.visibility.push({label: k == v ? k : `${v} (${k})`, value: v})
+                  }
+                })
+              }
+            },
+            updateConfig (command) {
+              return this.methods.updateConfig(command)
+                .then(e => {
+                  this.updateForm(e)
+                  return e
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            onChangeTags (e) {
+              if (e.code) {
+                this.form.tags = this.methods.createProgramTags(this.programs[e.code]).join("\n")
+                this.form.program.minutes = this.programs[e.code].minutes
+              } else {
+                this.form.tags = null
+                this.form.program.minutes = null
+              }
+            },
+            toggleVisibility (name) {
+              this.layout.details[name] = !this.layout.details[name]
+            },
+            updatePiefed () {
+              const command = {piefed: {url: null, user: null, community: null, host: null}}
+              if (this.form.piefed.url) command.piefed.url = this.form.piefed.url
+              if (this.form.piefed.user) command.piefed.user = this.form.piefed.user
+              if (this.form.piefed.password) command.piefed.password = this.form.piefed.password
+              if (this.form.piefed.community) command.piefed.community = Number(this.form.piefed.community)
+              this.updateConfig(command)
+              this.form.piefed.password = null
+            },
+            unauthPiefed () {
+              Swal.fire({
+                title: 'PieFed認証の解除',
+                text: 'PieFedの認証を解除します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '解除',
+                cancelButtonText: 'キャンセル',
+              }).then(result => {
+                if (!result.isConfirmed) return
+                this.updateConfig({piefed: null})
+                  .then(e => {
+                    this.result = jsyaml.dump(e.config)
+                    this.layout.details.piefed = false
+                    Object.keys(this.piefed.communities).forEach(k => delete this.piefed.communities[k])
+                    this.options.piefed_communities = null
+                  })
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-          },
-          updateAnnict () {
-            const command = {annict: {theme_works_only: null}}
-            if (this.form.annict.theme_works_only) command.annict.theme_works_only = true
-            this.updateConfig(command)
-          },
-          unauthAnnict () {
-            Swal.fire({
-              title: 'Annict認証の解除',
-              text: 'Annictの認証を解除します。',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: '解除',
-              cancelButtonText: 'キャンセル',
-            }).then(result => {
-              if (!result.isConfirmed) return
-              this.updateConfig({annict: null})
+            },
+            updateTags () {
+              const command = {tagging: {user_tags: null, minutes: null}}
+              if (this.form.tags) {
+                command.tagging.user_tags = this.form.tags.split("\n")
+                if (this.form.program.minutes) {
+                  command.tagging.minutes = this.form.program.minutes
+                }
+              } else {
+                command.tagging.minutes = null
+              }
+              this.updateConfig(command)
+            },
+            updateWebhook () {
+              const command = {webhook: {visibility: null}}
+              if (this.form.webhook.visibility != 'public') {
+                command.webhook.visibility = this.form.webhook.visibility
+              }
+              this.updateConfig(command)
+            },
+            updateNotify () {
+              const command = {notify: {verbose: null}}
+              if (this.form.notify.verbose) command.notify.verbose = true
+              this.updateConfig(command)
+            },
+            authAnnict () {
+              this.methods.authAnnict(this.form.annict.auth_code)
                 .then(e => {
                   this.result = jsyaml.dump(e.config)
+                  this.form.annict.auth_code = null
                   this.layout.details.annict = false
-                })
-            }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            updateAnnict () {
+              const command = {annict: {theme_works_only: null}}
+              if (this.form.annict.theme_works_only) command.annict.theme_works_only = true
+              this.updateConfig(command)
+            },
+            unauthAnnict () {
+              Swal.fire({
+                title: 'Annict認証の解除',
+                text: 'Annictの認証を解除します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '解除',
+                cancelButtonText: 'キャンセル',
+              }).then(result => {
+                if (!result.isConfirmed) return
+                this.updateConfig({annict: null})
+                  .then(e => {
+                    this.result = jsyaml.dump(e.config)
+                    this.layout.details.annict = false
+                  })
+              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.component('multiselect', window.VueformMultiselect)
-      app.mount('#app')
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.component('multiselect', Multiselect)
+        app.mount('#app')

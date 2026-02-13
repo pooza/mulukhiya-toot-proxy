@@ -56,54 +56,58 @@ html lang='ja'
       nav.appender-container v-if='!last_page'
         a @click='appendMedias' 続きを読む…
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            medias: [],
-            suggested_keywords: [],
-            page: 0,
-            keyword: null,
-            last_page: false,
-          }
-        },
-        async created () {
-          this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
-          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
-          this.appendMedias()
-        },
-        methods: {
-          searchMedias () {
-            this.page = 0
-            this.medias.splice(0)
-            this.last_page = false
-            setTimeout(this.appendMedias, 500)
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              medias: [],
+              suggested_keywords: [],
+              page: 0,
+              keyword: null,
+              last_page: false,
+            }
           },
-          appendMedias () {
-            this.page ++
-            this.methods.getMedias({page: this.page, q: this.keyword})
-              .then(e => {
-                this.suggested_keywords = this.methods.getSuggestedKeywords()
-                if (0 < e.length) {
-                  this.medias = this.medias.concat(e)
-                } else {
-                  this.last_page = true
-                  Swal.fire({
-                    title: 'メディアはこれ以上ありません。',
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    timer: 2000,
-                  })
-                }
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+          async created () {
+            this.suggested_keywords.concat(this.methods.getSuggestedKeywords())
+            this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+            this.appendMedias()
           },
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+          methods: {
+            searchMedias () {
+              this.page = 0
+              this.medias.splice(0)
+              this.last_page = false
+              setTimeout(this.appendMedias, 500)
+            },
+            appendMedias () {
+              this.page ++
+              this.methods.getMedias({page: this.page, q: this.keyword})
+                .then(e => {
+                  this.suggested_keywords = this.methods.getSuggestedKeywords()
+                  if (0 < e.length) {
+                    this.medias = this.medias.concat(e)
+                  } else {
+                    this.last_page = true
+                    Swal.fire({
+                      title: 'メディアはこれ以上ありません。',
+                      toast: true,
+                      position: 'top-end',
+                      icon: 'info',
+                      showConfirmButton: false,
+                      timer: 2000,
+                    })
+                  }
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

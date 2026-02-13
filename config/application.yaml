@@ -637,31 +637,29 @@ webui:
     development:
       '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
+      activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
+      mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
+      slide_toggle: /mulukhiya/script/slide_toggle
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
+      v_tooltip: /mulukhiya/script/v_tooltip
       vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js
     production:
       '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
+      activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
+      mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
+      slide_toggle: /mulukhiya/script/slide_toggle
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
+      v_tooltip: /mulukhiya/script/v_tooltip
       vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.js
   development:
     scripts:
-      - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js
-      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.js
-      - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.js
-      - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.js
-      - https://cdn.jsdelivr.net/npm/axios@1.13/dist/axios.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
       - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
-      - /mulukhiya/script/mulukhiya_lib
-      - /mulukhiya/script/activity_indicator
-      - /mulukhiya/script/slide_toggle
-      - /mulukhiya/script/v_tooltip
     stylesheets:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.css
@@ -683,18 +681,8 @@ webui:
     viewport: width=1000
   production:
     scripts:
-      - https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js
-      - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.global.min.js
-      - https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/umd/popper.min.js
-      - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.umd.min.js
-      - https://cdn.jsdelivr.net/npm/axios@1.13/dist/axios.min.js
-      - https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.min.js
       - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
       - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
-      - /mulukhiya/script/mulukhiya_lib
-      - /mulukhiya/script/activity_indicator
-      - /mulukhiya/script/slide_toggle
-      - /mulukhiya/script/v_tooltip
     stylesheets:
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.min.css

@@ -29,21 +29,25 @@ html lang='ja'
             .link
               a :href='feed.feed_url' target='_blank' rel='noreferrer' {{feed.feed_url}}
     == slim.render 'fragment/footer'
-    javascript:
-      'use strict'
-      const app = Vue.createApp({
-        data () {
-          return {
-            account: {},
-            feeds: [],
-          }
-        },
-        async created () {
-          this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
-          this.methods.getFeeds().then(e => {this.feeds = e})
-        },
-      })
-      app.use(window.MulukhiyaLib)
-      app.component('slide-up-down', window.SlideUpDown)
-      app.directive('tooltip', window.VTooltip)
-      app.mount('#app')
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              feeds: [],
+            }
+          },
+          async created () {
+            this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+            this.methods.getFeeds().then(e => {this.feeds = e})
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

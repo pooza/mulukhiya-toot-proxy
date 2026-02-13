@@ -1,4 +1,7 @@
-window.MulukhiyaLib = {
+import axios from 'axios'
+import { ActivityIndicator } from 'activity_indicator'
+
+export const MulukhiyaLib = {
   install(app, options) {
     const globals = app.config.globalProperties
     globals.methods = {}

@@ -1,4 +1,4 @@
-window.SlideUpDown = {
+export const SlideUpDown = {
   name: 'SlideUpDown',
   props: ['active'],
   template: `
