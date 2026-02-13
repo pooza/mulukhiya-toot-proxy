@@ -11,6 +11,41 @@ properties:
             type: string
         type: object
     type: object
+  capabilities:
+    properties:
+      channel:
+        type: boolean
+      decoration:
+        type: boolean
+      reaction:
+        type: boolean
+      repost:
+        type: boolean
+      streaming:
+        type: boolean
+    type: object
+  data:
+    properties:
+      account_timeline:
+        type: boolean
+      favorite_tags:
+        type: boolean
+      futured_tag:
+        type: boolean
+      media_catalog:
+        type: boolean
+    type: object
+  features:
+    properties:
+      annict:
+        type: boolean
+      announcement:
+        type: boolean
+      feed:
+        type: boolean
+      webhook:
+        type: boolean
+    type: object
   status:
     properties:
       label:

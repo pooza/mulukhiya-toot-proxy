@@ -57,14 +57,14 @@ api:
     ttl: 86400
   custom: []
 calckey:
-  display_name: Calckey
-  features:
+  capabilities:
     reaction: true
+  display_name: Calckey
   sns_type: misskey
 cherrypick:
-  display_name: CherryPick
-  features:
+  capabilities:
     reaction: true
+  display_name: CherryPick
   sns_type: misskey
 cli:
   progress_bar:
@@ -91,9 +91,9 @@ ffmpeg:
   crf: 22
   preset: veryfast
 firefish:
-  display_name: Firefish
-  features:
+  capabilities:
     reaction: true
+  display_name: Firefish
   sns_type: misskey
 handler:
   announcement_mention:
@@ -327,9 +327,9 @@ http:
   timeout:
     seconds: 30
 iceshrimp:
-  display_name: Iceshrimp
-  features:
+  capabilities:
     reaction: true
+  display_name: Iceshrimp
   sns_type: misskey
 itunes:
   country: jp
@@ -359,18 +359,20 @@ mastodon:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
+  capabilities:
+    repost: true
+    streaming: true
+  data:
+    account_timeline: true
+    favorite_tags: true
+    futured_tag: true
+    media_catalog: true
   dbms: postgres
   display_name: Mastodon
   features:
-    account_timeline: true
     annict: true
     announcement: true
-    favorite_tags: true
     feed: true
-    futured_tag: true
-    media_catalog: true
-    repost: true
-    streaming: true
     webhook: true
   oauth:
     redirect_uri: urn:ietf:wg:oauth:2.0:oob
@@ -411,23 +413,25 @@ misskey:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
-  chat:
-    field: text
-  dbms: postgres
-  display_name: Misskey
-  features:
-    account_timeline: true
-    annict: true
-    announcement: true
+  capabilities:
     channel: true
     decoration: true
-    favorite_tags: true
-    feed: true
-    futured_tag: true
-    media_catalog: true
     reaction: true
     repost: true
     streaming: true
+  chat:
+    field: text
+  data:
+    account_timeline: true
+    favorite_tags: true
+    futured_tag: true
+    media_catalog: true
+  dbms: postgres
+  display_name: Misskey
+  features:
+    annict: true
+    announcement: true
+    feed: true
     webhook: true
   oauth:
     scopes:
@@ -556,9 +560,9 @@ ruby:
     install: false
   did_you_mean: true
 sharkey:
-  display_name: Sharkey
-  features:
+  capabilities:
     reaction: true
+  display_name: Sharkey
   sns_type: misskey
 sidekiq:
   auth:

@@ -23,7 +23,7 @@ module Mulukhiya
       r = http.get('/.well-known/nodeinfo', {headers:}).parsed_response
       r = http.get(r['links'].first['href'], {headers:}).parsed_response
       software = r.dig('software', 'name')
-      return true if config["/#{software.underscore}/features/reaction"] rescue nil
+      return true if config["/#{software.underscore}/capabilities/reaction"] rescue nil
       capabilities = http.get('/api/v1/instance').parsed_response['fedibird_capabilities'] || []
       return true if capabilities.member?('emoji_reaction')
       return false

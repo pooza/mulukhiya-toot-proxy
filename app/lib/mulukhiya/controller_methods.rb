@@ -18,15 +18,15 @@ module Mulukhiya
       end
 
       def media_catalog?
-        return config["/#{name}/features/media_catalog"] == true rescue false
+        return config["/#{name}/data/media_catalog"] == true rescue false
       end
 
       def favorite_tags?
-        return config["/#{name}/features/favorite_tags"] == true rescue false
+        return config["/#{name}/data/favorite_tags"] == true rescue false
       end
 
       def feed?
-        return config["/#{name}/features/feed"] rescue false
+        return config["/#{name}/features/feed"] == true rescue false
       end
 
       def oauth_callback?
@@ -50,31 +50,31 @@ module Mulukhiya
       end
 
       def streaming?
-        return config["/#{name}/features/streaming"] == true rescue false
+        return config["/#{name}/capabilities/streaming"] == true rescue false
       end
 
       def account_timeline?
-        return config["/#{name}/features/account_timeline"] == true rescue false
+        return config["/#{name}/data/account_timeline"] == true rescue false
       end
 
       def repost?
-        return config["/#{name}/features/repost"] == true rescue false
+        return config["/#{name}/capabilities/repost"] == true rescue false
       end
 
       def reaction?
-        return config["/#{name}/features/reaction"] == true rescue false
+        return config["/#{name}/capabilities/reaction"] == true rescue false
       end
 
       def futured_tag?
-        return config["/#{name}/features/futured_tag"] == true rescue false
+        return config["/#{name}/data/futured_tag"] == true rescue false
       end
 
       def channel?
-        return config["/#{name}/features/channel"] == true rescue false
+        return config["/#{name}/capabilities/channel"] == true rescue false
       end
 
       def decoration?
-        return config["/#{name}/features/decoration"] == true rescue false
+        return config["/#{name}/capabilities/decoration"] == true rescue false
       end
 
       def annict?
