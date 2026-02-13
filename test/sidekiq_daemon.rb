@@ -25,7 +25,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      assert_boolean(SidekiqDaemon.disable?)
+      assert_false(SidekiqDaemon.disable?)
     end
   end
 end

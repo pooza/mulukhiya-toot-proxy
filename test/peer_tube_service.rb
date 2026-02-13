@@ -9,7 +9,10 @@ module Mulukhiya
         @service.lookup('iKu2ASqiBm796yuzqdx9Z')
       end
 
-      assert_kind_of(Hash, @service.lookup('taaJ1Sh8b5JvHUZeFD1Jzk'))
+      result = @service.lookup('taaJ1Sh8b5JvHUZeFD1Jzk')
+
+      assert_kind_of(Hash, result)
+      assert_predicate(result, :present?)
     end
   end
 end

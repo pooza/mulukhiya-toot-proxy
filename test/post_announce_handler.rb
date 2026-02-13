@@ -7,8 +7,10 @@ module Mulukhiya
 
     def test_handle_announce
       @handler.handle_announce({content: 'お知らせです。'}, {sns: info_agent_service})
+      result = @handler.debug_info[:result]
 
-      assert_kind_of(Array, @handler.debug_info[:result])
+      assert_kind_of(Array, result)
+      assert_predicate(result, :present?)
     end
   end
 end

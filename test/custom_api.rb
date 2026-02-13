@@ -74,6 +74,7 @@ module Mulukhiya
     def test_args?
       CustomAPI.all do |api|
         assert_boolean(api.args?)
+        assert_equal(api.args.present?, api.args?)
       end
     end
 

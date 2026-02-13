@@ -7,7 +7,16 @@ module Mulukhiya
     end
 
     def test_values
-      assert_kind_of(Hash, @mp3.values)
+      values = @mp3.values
+
+      assert_kind_of(Hash, values)
+      assert_include(values, :type)
+      assert_include(values, :mediatype)
+      assert_include(values, :subtype)
+      assert_include(values, :duration)
+      assert_include(values, :size)
+      assert_include(values, :length)
+      assert_equal(values[:size], values[:length])
     end
 
     def test_audio?

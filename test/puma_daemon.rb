@@ -18,7 +18,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      assert_boolean(PumaDaemon.disable?)
+      assert_false(PumaDaemon.disable?)
     end
   end
 end

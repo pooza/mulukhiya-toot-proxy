@@ -6,6 +6,9 @@ module Mulukhiya
 
     def test_types
       assert_kind_of(Hash, @mime.types)
+      assert_predicate(@mime.types, :present?)
+      assert_equal('audio/mpeg', @mime.types['.mp3'])
+      assert_equal('video/mp4', @mime.types['.mp4'])
     end
 
     def test_type
@@ -22,6 +25,9 @@ module Mulukhiya
 
     def test_extnames
       assert_kind_of(Hash, @mime.extnames)
+      assert_predicate(@mime.extnames, :present?)
+      assert_equal('.mp3', @mime.extnames['audio/mpeg'])
+      assert_equal('.mp4', @mime.extnames['video/mp4'])
     end
 
     def test_extname

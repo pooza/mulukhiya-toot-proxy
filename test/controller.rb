@@ -1,7 +1,11 @@
 module Mulukhiya
   class ControllerTest < TestCase
     def test_name
-      assert_kind_of(String, controller_class.name)
+      name = controller_class.name
+
+      assert_kind_of(String, name)
+      assert_predicate(name, :present?)
+      assert_include(['mastodon', 'misskey'], Environment.controller_name)
     end
 
     def test_display_name

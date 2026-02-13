@@ -5,7 +5,11 @@ module Mulukhiya
     end
 
     def test_template
-      assert_kind_of(Template, @handler.template)
+      template = @handler.template
+
+      assert_kind_of(Template, template)
+      assert_respond_to(template, :to_s)
+      assert_predicate(template.to_s, :present?)
     end
 
     def test_respondable?

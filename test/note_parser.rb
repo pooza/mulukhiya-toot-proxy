@@ -10,8 +10,10 @@ module Mulukhiya
 
     def test_default_max_length
       parser = NoteParser.new('さぁデリシャススマイル・フルパワーで')
+      length = parser.default_max_length
 
-      assert_kind_of(Integer, parser.default_max_length)
+      assert_kind_of(Integer, length)
+      assert_predicate(length, :positive?)
     end
   end
 end

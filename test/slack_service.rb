@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def test_config?
-      assert_boolean(SlackService.config?)
+      assert_predicate(SlackService, :config?)
     end
 
     def test_all

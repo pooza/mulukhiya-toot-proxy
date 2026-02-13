@@ -10,7 +10,10 @@ module Mulukhiya
     end
 
     def test_default_max_length
-      assert_kind_of(Integer, @parser.default_max_length)
+      length = @parser.default_max_length
+
+      assert_kind_of(Integer, length)
+      assert_predicate(length, :positive?)
     end
   end
 end

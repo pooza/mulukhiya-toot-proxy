@@ -6,8 +6,11 @@ module Mulukhiya
     end
 
     def test_to_s
-      assert_kind_of(String, @renderer.to_s)
-      assert_predicate(@renderer.to_s, :present?)
+      output = @renderer.to_s
+
+      assert_kind_of(String, output)
+      assert_predicate(output, :present?)
+      assert_match(/<script\b/, output)
     end
   end
 end

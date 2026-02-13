@@ -11,7 +11,10 @@ module Mulukhiya
     end
 
     def test_verify_peer?
+      expected = config["/#{Environment.controller_name}/streaming/verify_peer"]
+
       assert_boolean(@listener.verify_peer?)
+      assert_equal(expected, @listener.verify_peer?)
     end
 
     def test_root_cert_file

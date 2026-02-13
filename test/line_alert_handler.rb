@@ -5,11 +5,14 @@ module Mulukhiya
     end
 
     def test_handle_alert
-      raise Ginseng::AuthError, '認証エラーが起きたテイのテスト。'
+      message = '認証エラーが起きたテイのテスト。'
+      raise Ginseng::AuthError, message
     rescue Ginseng::AuthError => e
       @handler.handle_alert(e)
 
       assert_kind_of(Ginseng::AuthError, @handler.error)
+      assert_same(e, @handler.error)
+      assert_equal(message, @handler.error.message)
     end
   end
 end

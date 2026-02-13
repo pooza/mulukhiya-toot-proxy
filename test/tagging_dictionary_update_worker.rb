@@ -5,7 +5,10 @@ module Mulukhiya
     end
 
     def test_perform
-      assert_kind_of(Hash, @worker.perform)
+      result = @worker.perform
+
+      assert_kind_of(Hash, result)
+      assert_respond_to(result, :matches)
     end
   end
 end

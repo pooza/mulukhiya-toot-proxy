@@ -7,9 +7,24 @@ module Mulukhiya
     end
 
     def test_parse
-      assert_instance_of(ItunesTrackURI, ItunesURI.create(@track_url))
-      assert_instance_of(ItunesAlbumURI, ItunesURI.create(@album_url))
-      assert_instance_of(ItunesSongURI, ItunesURI.create(@song_url))
+      track = ItunesURI.create(@track_url)
+
+      assert_instance_of(ItunesTrackURI, track)
+      assert_predicate(track, :valid?)
+      assert_equal(1_789_469_284, track.album_id)
+      assert_equal(1_789_469_289, track.track_id)
+
+      album = ItunesURI.create(@album_url)
+
+      assert_instance_of(ItunesAlbumURI, album)
+      assert_predicate(album, :valid?)
+      assert_equal(1_789_469_284, album.album_id)
+
+      song = ItunesURI.create(@song_url)
+
+      assert_instance_of(ItunesSongURI, song)
+      assert_predicate(song, :valid?)
+      assert_equal(1_789_469_289, song.song_id)
     end
   end
 end

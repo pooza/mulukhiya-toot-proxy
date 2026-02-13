@@ -19,7 +19,7 @@ module Mulukhiya
     end
 
     def test_disable?
-      assert_boolean(ListenerDaemon.disable?)
+      assert_false(ListenerDaemon.disable?)
     end
   end
 end
