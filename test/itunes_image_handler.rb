@@ -17,6 +17,10 @@ module Mulukhiya
       @handler.clear
       @handler.handle_pre_toot(status_field => 'https://music.apple.com/jp/album/%E3%82%B7%E3%83%A5%E3%83%92-%E3%83%88-%E3%82%A5%E3%83%92-%E3%82%B9%E3%82%A4%E3%83%BC%E3%83%84%E3%82%BF%E3%82%A4%E3%83%A0/1299587212')
       assert_predicate(@handler.debug_info[:result], :present?) if @handler.debug_info
+
+      @handler.clear
+      @handler.handle_pre_toot(status_field => 'https://music.apple.com/jp/song/%E7%AC%91%E9%A1%94%E3%81%AE%E3%83%A6%E3%83%8B%E3%82%BE%E3%83%B3/1789469289')
+      assert_predicate(@handler.debug_info[:result], :present?) if @handler.debug_info
     end
   end
 end
