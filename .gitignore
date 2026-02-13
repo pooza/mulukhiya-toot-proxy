@@ -9,4 +9,5 @@ Desktop.ini
 dist
 *.code-workspace
 .vscode
+.claude
 2

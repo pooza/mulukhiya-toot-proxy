@@ -8,7 +8,7 @@ properties:
           properties:
             normalized:
               type: string
-            sourse:
+            source:
               type: string
           required:
             - source

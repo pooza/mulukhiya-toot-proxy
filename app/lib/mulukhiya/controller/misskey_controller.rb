@@ -3,10 +3,12 @@ module Mulukhiya
     include ControllerMethods
 
     post '/api/notes/create' do
+      verify_token_integrity!
       params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym] if quote?
       params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.note(params)
+      verify_account_integrity!(reporter.response)
       Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
@@ -19,10 +21,12 @@ module Mulukhiya
     end
 
     post '/api/notes/drafts/create' do
+      verify_token_integrity!
       params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym] if quote?
       params[visibility_field] = self.class.visibility_name(:unlisted) if channel?
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params) unless renote?
       reporter.response = sns.draft(params)
+      verify_account_integrity!(reporter.response)
       Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
@@ -35,6 +39,7 @@ module Mulukhiya
     end
 
     post '/api/notes/drafts/update' do
+      verify_token_integrity!
       if params[:text].present?
         if quote?
           params[visibility_field] = status_class[params[:renoteId]][visibility_field.to_sym]
@@ -43,6 +48,7 @@ module Mulukhiya
         Event.new(:pre_draft, {reporter:, sns:}).dispatch(params) unless renote?
       end
       reporter.response = sns.update_draft(params)
+      verify_account_integrity!(reporter.response)
       if params[:text].present?
         Event.new(renote? ? :post_boost : :post_toot, {reporter:, sns:}).dispatch(params)
       end
@@ -57,6 +63,7 @@ module Mulukhiya
     end
 
     post '/api/notes/favorites/create' do
+      verify_token_integrity!
       reporter.response = sns.fav(params[:noteId])
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response || {}
@@ -70,6 +77,7 @@ module Mulukhiya
     end
 
     post '/api/notes/reactions/create' do
+      verify_token_integrity!
       reporter.response = sns.reaction(params[:noteId], params[:reaction])
       Event.new(:post_reaction, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response || {}

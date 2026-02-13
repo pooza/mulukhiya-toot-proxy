@@ -46,6 +46,33 @@ module Mulukhiya
       return params[:version].sub(/^v/, '').to_i
     end
 
+    def verify_token_integrity!
+      expected = token
+      return unless expected
+      return if sns.token == expected
+      logger.error(
+        event: 'token_mismatch',
+        expected: expected.first(8),
+        actual: sns.token&.first(8),
+        path: request.path,
+      )
+      raise Ginseng::AuthError, 'Token integrity check failed'
+    end
+
+    def verify_account_integrity!(response)
+      return unless response&.parsed_response.is_a?(Hash)
+      posted_id = response.parsed_response.dig('account', 'id') \
+        || response.parsed_response.dig('createdNote', 'user', 'id')
+      return unless posted_id
+      return if posted_id.to_s == sns.account&.id.to_s
+      logger.error(
+        event: 'account_mismatch_detected',
+        expected_account: sns.account&.id,
+        posted_as: posted_id,
+        path: request.path,
+      )
+    end
+
     private
 
     def path_prefix

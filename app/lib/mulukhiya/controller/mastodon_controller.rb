@@ -3,9 +3,11 @@ module Mulukhiya
     include ControllerMethods
 
     post '/api/:version/statuses' do
+      verify_token_integrity!
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.toot(params)
+      verify_account_integrity!(reporter.response)
       Event.new(:post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.message['tags']&.select! {|v| tags.member?(v['name'])}
@@ -19,6 +21,7 @@ module Mulukhiya
     end
 
     post '/api/:version/media' do
+      verify_token_integrity!
       filename = params[:name]
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile), {
@@ -37,6 +40,7 @@ module Mulukhiya
     end
 
     put '/api/:version/media/:id' do
+      verify_token_integrity!
       Event.new(:pre_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
       reporter.response = sns.update_media(params[:id], params)
       Event.new(:post_thumbnail, {reporter:, sns:}).dispatch(params) if params[:thumbnail]
@@ -51,7 +55,9 @@ module Mulukhiya
     end
 
     post '/api/:version/statuses/:id/favourite' do
+      verify_token_integrity!
       reporter.response = sns.fav(params[:id])
+      verify_account_integrity!(reporter.response)
       Event.new(:post_fav, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
@@ -64,7 +70,9 @@ module Mulukhiya
     end
 
     post '/api/:version/statuses/:id/reblog' do
+      verify_token_integrity!
       reporter.response = sns.boost(params[:id])
+      verify_account_integrity!(reporter.response)
       Event.new(:post_boost, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
@@ -77,7 +85,9 @@ module Mulukhiya
     end
 
     post '/api/:version/statuses/:id/bookmark' do
+      verify_token_integrity!
       reporter.response = sns.bookmark(params[:id])
+      verify_account_integrity!(reporter.response)
       Event.new(:post_bookmark, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
