@@ -22,10 +22,6 @@ group :postgres do
   gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
 end
 
-group :mongo do
-  gem 'mongo'
-end
-
 group :development do
   gem 'rack-test'
   gem 'rails-erb-lint'

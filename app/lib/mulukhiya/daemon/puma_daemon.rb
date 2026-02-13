@@ -14,7 +14,6 @@ module Mulukhiya
         `puma -V`.chomp,
         "Root URL: #{root_uri}",
         ("PostgreSQL DSN: #{secure_dsn(config['/postgres/dsn'])}" rescue nil),
-        ("MongoDB DSN: #{secure_dsn(config['/mongo/dsn'])}" rescue nil),
         ("Redis DSN: #{secure_dsn(config['/user_config/redis/dsn'])}" rescue nil),
         ('Ruby YJIT: Ready' if Environment.jit?),
       ].compact.join("\n")

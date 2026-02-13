@@ -88,10 +88,6 @@ module Mulukhiya
       return dbms_name == 'postgres'
     end
 
-    def self.mongo?
-      return dbms_name == 'mongo'
-    end
-
     def self.parser_name
       return controller_class&.parser_name
     end

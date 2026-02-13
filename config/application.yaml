@@ -523,9 +523,6 @@ misskey:
   streaming:
     verify_peer: true
   url: https://misskey.example.com/
-mongo:
-  dsn: null
-  query_log: false
 nowplaying:
   album:
     prefix: 'Album:'
