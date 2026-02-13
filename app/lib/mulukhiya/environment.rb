@@ -64,10 +64,6 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
-    def self.pleroma?
-      return controller_name == 'pleroma'
-    end
-
     def self.controller_type
       return config["/#{controller_name}/sns_type"]
     end

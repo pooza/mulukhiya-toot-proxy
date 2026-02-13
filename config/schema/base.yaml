@@ -93,7 +93,6 @@ properties:
     enum:
       - mastodon
       - misskey
-      - pleroma
     type: string
   crypt:
     properties:

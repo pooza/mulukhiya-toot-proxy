@@ -1,7 +1,0 @@
-SELECT
-  id,
-  data
-FROM
-  objects
-WHERE (data->'url'->0->>'href' = '<%= params[:uri] %>')
-  AND (data->>'mediaType' IS NOT null)
