@@ -445,7 +445,7 @@ test/
 ### フロントエンド
 
 - [x] [#4036](https://github.com/pooza/mulukhiya-toot-proxy/issues/4036) (P2): ESMビルドが存在しないライブラリの洗い出し
-- [ ] [#4049](https://github.com/pooza/mulukhiya-toot-proxy/issues/4049) (P3): importmap設定の導入（config/application.yaml + fragment/assets.slim）
+- [x] [#4049](https://github.com/pooza/mulukhiya-toot-proxy/issues/4049) (P3): importmap設定の導入（config/application.yaml + fragment/assets.slim）
 - [ ] [#4050](https://github.com/pooza/mulukhiya-toot-proxy/issues/4050) (P3): MulukhiyaLib の ESM化
 - [ ] [#4051](https://github.com/pooza/mulukhiya-toot-proxy/issues/4051) (P3): SlideUpDown, VTooltip 等のローカルコンポーネントのESM化
 - [ ] [#4052](https://github.com/pooza/mulukhiya-toot-proxy/issues/4052) (P3): 各ビュー（config, home, api等）の `type="module"` 化
