@@ -1,0 +1,9 @@
+properties:
+  disabled:
+    type: boolean
+  fanart_tag:
+    type: string
+  timeout:
+    minimum: 1
+    type: integer
+type: object

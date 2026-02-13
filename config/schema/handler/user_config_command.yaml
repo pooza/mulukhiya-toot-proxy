@@ -1,0 +1,9 @@
+properties:
+  disabled:
+    type: boolean
+  timeout:
+    minimum: 1
+    type: integer
+  toggleable:
+    type: boolean
+type: object
