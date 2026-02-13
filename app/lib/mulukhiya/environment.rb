@@ -64,10 +64,6 @@ module Mulukhiya
       return controller_name == 'misskey'
     end
 
-    def self.meisskey?
-      return controller_name == 'meisskey'
-    end
-
     def self.pleroma?
       return controller_name == 'pleroma'
     end

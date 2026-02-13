@@ -94,7 +94,6 @@ properties:
       - mastodon
       - misskey
       - pleroma
-      - meisskey
     type: string
   crypt:
     properties:
