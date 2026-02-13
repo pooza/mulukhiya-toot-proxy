@@ -48,7 +48,7 @@ module Mulukhiya
 
     def update(keyword)
       return unless uri = @uris[keyword]
-      push("#{track_prefix} #{uri.track_name.escape_toot}") if uri.track?
+      push("#{track_prefix} #{uri.track_name.escape_toot}") if uri.track_name
       push("#{album_prefix} #{uri.album_name.escape_toot}") if uri.album_name
       push("#{artist_prefix} #{uri.artists.map(&:escape_toot).join(', ')}")
       tags.merge(uri.artists) if handler_config(:tagging)
