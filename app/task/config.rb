@@ -12,6 +12,8 @@ module Mulukhiya
         exit 1
       else
         result[:handlers] = Handler.names.to_a.sort
+        schemas = Dir.glob(File.join(dir, 'config/schema/handler/*.yaml')).length - 1
+        result[:schema_coverage] = "#{schemas}/#{Handler.all_names.length}"
         result[:config] = 'OK'
         puts result.to_yaml
       end

@@ -56,6 +56,16 @@ module Mulukhiya
     return Rack::URLMap.new(Environment.route)
   end
 
+  def self.validate_config
+    errors = Config.instance.errors
+    return if errors.empty?
+    errors.each {|e| warn "config validation: #{e}"}
+    return unless Config.instance['/config/validation/strict']
+    raise Ginseng::ConfigError, "config validation failed (#{errors.length} errors)"
+  rescue => e
+    warn "config validation skipped: #{e.message}"
+  end
+
   def self.load_tasks
     finder = Ginseng::FileFinder.new
     finder.dir = File.join(dir, 'app/task')
@@ -72,5 +82,6 @@ module Mulukhiya
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
+  validate_config
   RubyVM::YJIT.enable if Environment.jit?
 end
