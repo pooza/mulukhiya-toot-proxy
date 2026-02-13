@@ -478,3 +478,14 @@ test/
 
 - [ ] [#4062](https://github.com/pooza/mulukhiya-toot-proxy/issues/4062) (P4): ginseng-*系gemのRuby 4.0互換性調査・テスト
 - [ ] [#4063](https://github.com/pooza/mulukhiya-toot-proxy/issues/4063) (P4): Ruby 4.0リリース後の対応（.ruby-version更新、CI追加）
+
+### 新機能・過去Issue対応
+
+- [ ] [#3350](https://github.com/pooza/mulukhiya-toot-proxy/issues/3350) (P2): 新規登録時webhook対応（ウェルカムメッセージ送信。現行の強制フォロー＋バッチを置き換え）
+- [ ] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (P2): アンケート公開範囲の制御（範囲外サーバーからの投票をブロック）
+- [ ] [#4067](https://github.com/pooza/mulukhiya-toot-proxy/issues/4067) (P2): ChannelNotificationHandlerの通知方法見直し（投稿者トークン問題の回避、仕様要検討）
+- [ ] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ
+- [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3): Misskey実況デコレーションの自動剥がし（admin API権限の課題あり）
+- [ ] [#3877](https://github.com/pooza/mulukhiya-toot-proxy/issues/3877) (P3): Mastodon形式タグづけ復活（ActivityPub Update使用、Mastodon系限定）
+- [ ] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS等の軽量フレームワーク導入＋SASS差分整理）
+- [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P4): Annict `records/:id` 形式URL対応（Annict側の実装待ち）
