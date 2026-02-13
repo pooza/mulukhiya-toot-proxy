@@ -466,7 +466,7 @@ test/
 - [x] [#4056](https://github.com/pooza/mulukhiya-toot-proxy/issues/4056) (P3): テストディレクトリ構造の再編（unit/integration/contract/external）
 - [x] [#4057](https://github.com/pooza/mulukhiya-toot-proxy/issues/4057) (P3): 未テストハンドラーへのテスト追加
 - [x] [#4058](https://github.com/pooza/mulukhiya-toot-proxy/issues/4058) (P3): Mastodon/Misskeyサービスの振る舞いテスト追加（モック使用）
-- [ ] [#4059](https://github.com/pooza/mulukhiya-toot-proxy/issues/4059) (P3): エラーパステスト追加（不正トークン、タイムアウト、不正入力）
+- [x] [#4059](https://github.com/pooza/mulukhiya-toot-proxy/issues/4059) (P3): エラーパステスト追加（不正トークン、タイムアウト、不正入力）
 - [ ] [#4060](https://github.com/pooza/mulukhiya-toot-proxy/issues/4060) (P3): インテグレーションテストの再設計・実装（アーキテクチャ確定後）
 - [ ] [#4061](https://github.com/pooza/mulukhiya-toot-proxy/issues/4061) (P3): rack 3.2同時アクセス再現テスト（#4055と連動）
 
