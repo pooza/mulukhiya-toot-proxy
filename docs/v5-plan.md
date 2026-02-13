@@ -438,7 +438,7 @@ test/
 
 - [x] [#4045](https://github.com/pooza/mulukhiya-toot-proxy/issues/4045) (P3): handler_config のキー記法統一
 - [ ] [#4046](https://github.com/pooza/mulukhiya-toot-proxy/issues/4046) (P3): 外部サービス設定の構造統一（`service:` 配下に集約）
-- [ ] [#4047](https://github.com/pooza/mulukhiya-toot-proxy/issues/4047) (P3): 機能フラグの分類（capabilities / features / data）
+- [x] [#4047](https://github.com/pooza/mulukhiya-toot-proxy/issues/4047) (P3): 機能フラグの分類（capabilities / features / data）
 - [x] [#4026](https://github.com/pooza/mulukhiya-toot-proxy/issues/4026) (P1): 全ハンドラーのスキーマ追加・タイポ修正
 - [x] [#4048](https://github.com/pooza/mulukhiya-toot-proxy/issues/4048) (P3): 起動時スキーマバリデーションの強化
 
