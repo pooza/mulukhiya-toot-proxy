@@ -40,7 +40,7 @@ Layout/LineEndStringConcatenationIndentation:
   EnforcedStyle: indented
 Layout/LineLength:
   Exclude:
-    - test/*
+    - test/**/*
   Max: 100
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
@@ -60,41 +60,41 @@ Lint/UnusedMethodArgument:
   Enabled: false
 Metrics/AbcSize:
   Exclude:
-    - test/*
+    - test/**/*
   Max: 30
 Metrics/BlockLength:
   Exclude:
-    - test/*
+    - test/**/*
     - '**/contract/*'
     - '**/controller/*'
     - app/task/**/*.rb
     - '*.gemspec'
 Metrics/ClassLength:
   Exclude:
-    - test/*
+    - test/**/*
     - '**/contract/*'
     - '**/controller/*'
     - '**/service/*'
   Max: 200
 Metrics/CyclomaticComplexity:
   Exclude:
-    - test/*
+    - test/**/*
     - '**/contract/*'
   Max: 10
 Metrics/MethodLength:
   Exclude:
-    - test/*
+    - test/**/*
   Max: 20
 Metrics/ModuleLength:
   Exclude:
-    - test/*
+    - test/**/*
     - '**/contract/*'
     - '**/controller/*'
     - '**/service/*'
   Max: 200
 Metrics/PerceivedComplexity:
   Exclude:
-    - test/*
+    - test/**/*
     - '**/contract/*'
   Max: 10
 Minitest/MultipleAssertions:
@@ -136,10 +136,10 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Style/IdenticalConditionalBranches:
   Exclude:
-    - test/*
+    - test/**/*
 Style/IfUnlessModifier:
   Exclude:
-    - test/*
+    - test/**/*
 Style/RedundantReturn:
   Enabled: false
 Style/RescueModifier:

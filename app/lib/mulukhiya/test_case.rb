@@ -51,28 +51,29 @@ module Mulukhiya
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!
-      names(cases).each do |name|
+      file_map(cases).each do |name, path|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
         raise 'disabled' if name.end_with?('_worker') && Worker.create(name).disable?
         puts "+ case: #{name}" if Environment.test?
-        require File.join(dir, "#{name}.rb")
+        require path
       rescue => e
         puts "- case: #{name} (#{e.message})" if Environment.test?
       end
     end
 
     def self.names(cases = nil)
-      if cases
-        names = cases.split(',').map(&:underscore)
-          .map {|v| [v, "#{v}_test", v.sub(/_test$/, '')]}.flatten
-          .select {|v| File.exist?(File.join(dir, "#{v}.rb"))}.compact
-      else
-        finder = Ginseng::FileFinder.new
-        finder.dir = dir
-        finder.patterns.push('*.rb')
-        names = finder.exec.map {|v| File.basename(v, '.rb')}
-      end
-      return names.to_set
+      return file_map(cases).keys.to_set
+    end
+
+    def self.file_map(cases = nil)
+      finder = Ginseng::FileFinder.new
+      finder.dir = dir
+      finder.patterns.push('*.rb')
+      all = finder.exec.to_h {|path| [File.basename(path, '.rb'), path]}
+      return all unless cases
+      targets = cases.split(',').map(&:underscore)
+        .map {|v| [v, "#{v}_test", v.sub(/_test$/, '')]}.flatten.compact
+      return all.slice(*targets)
     end
 
     def self.dir
