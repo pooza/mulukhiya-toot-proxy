@@ -24,10 +24,6 @@ module Mulukhiya
       assert_boolean(controller_class.announcement?)
     end
 
-    def test_filter?
-      assert_boolean(controller_class.filter?)
-    end
-
     def test_streaming?
       assert_boolean(controller_class.streaming?)
     end

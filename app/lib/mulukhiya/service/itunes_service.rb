@@ -25,8 +25,8 @@ module Mulukhiya
     end
 
     def create_track_uri(track)
-      return nil unless uri = ItunesURI.parse(track['collectionViewUrl'])
-      return nil unless uri.absolute?
+      return nil unless uri = ItunesURI.create(track['collectionViewUrl'])
+      return nil unless uri.valid?
       return uri
     end
 
@@ -44,7 +44,7 @@ module Mulukhiya
     end
 
     def create_search_uri(keyword, category)
-      uri = ItunesURI.parse(config['/itunes/urls/search'])
+      uri = ItunesURI.create(config['/itunes/urls/search'])
       uri.query_values = {
         term: keyword,
         media: category,
@@ -55,7 +55,7 @@ module Mulukhiya
     end
 
     def create_lookup_uri(id)
-      uri = ItunesURI.parse(config['/itunes/urls/lookup'])
+      uri = ItunesURI.create(config['/itunes/urls/lookup'])
       uri.query_values = {
         id:,
         country: config['/itunes/country'],

@@ -40,7 +40,7 @@ module Mulukhiya
       return true if uri.query_values.present?
       return true if handler_config('ignore/domains').any? {|domain| uri.host.end_with?(domain)}
       return true if AmazonURI.parse(uri.to_s).valid?
-      return true if ItunesURI.parse(uri.to_s).valid?
+      return true if ItunesURI.create(uri.to_s).valid?
       return false
     end
   end

@@ -110,8 +110,8 @@ handler:
         - toei-anim.co.jp
     useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   channel_notification:
-    disable: true
     channels: []
+    disable: true
   default:
     experimental: false
     timeout: 5
@@ -124,8 +124,6 @@ handler:
       min: 2
       min_kanji: 2
       without_kanji_pattern: '[0-9a-zA-Zあ-んア-ン]'
-  filter_command:
-    minutes: 300
   image_copyright:
     message: ※画像有 著作権表示 参照のこと
     tag: null
@@ -227,8 +225,9 @@ itunes:
     - itunes.apple.com
   lang: ja_jp
   patterns:
-    - pattern: /album/.*?/?([[:digit:]]+)$
-      shortenable: true
+    album: /album/.*?/?([[:digit:]]+)$
+    song: /song/.*?/?([[:digit:]]+)$
+    track: /album/.*?/?([[:digit:]]+)$
   urls:
     lookup: https://itunes.apple.com/lookup
     search: https://itunes.apple.com/search
@@ -255,7 +254,6 @@ mastodon:
     announcement: true
     favorite_tags: true
     feed: true
-    filter: true
     futured_tag: true
     media_catalog: true
     repost: true
@@ -284,7 +282,6 @@ mastodon:
       - result_notification
     post_toot:
       - user_config_command
-      - filter_command
       - piefed_clipping_command
       - result_notification
     post_upload:
@@ -296,7 +293,6 @@ mastodon:
       - image_resize
     pre_toot:
       - user_config_command
-      - filter_command
       - piefed_clipping_command
       - mention_visibility
       - itunes_nowplaying
@@ -359,8 +355,6 @@ mastodon:
       default:
         - write:statuses
         - write:media
-        - read:filters
-        - write:filters
         - read:search
       infobot:
         - read
@@ -570,6 +564,10 @@ misskey:
       - result_notification
     post_webhook:
       - result_notification
+    pre_draft:
+      - default_tag
+      - removal_rule_tag
+      - tagging
     pre_toot:
       - user_config_command
       - piefed_clipping_command
@@ -677,7 +675,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 4.41.5
+  version: 4.42.0
 parser:
   note:
     fields:
@@ -908,12 +906,12 @@ sidekiq:
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
-    user_tag_initialize:
-      class: Mulukhiya::UserTagInitializeWorker
-      cron: 2 3 * * *
     user_decoration_initialize:
       class: Mulukhiya::UserDecorationInitializeWorker
       cron: 3 3 * * *
+    user_tag_initialize:
+      class: Mulukhiya::UserTagInitializeWorker
+      cron: 2 3 * * *
 spoiler:
   emoji: netabare
   pattern: (ねた|ネタ)(ばれ|バレ)
