@@ -92,7 +92,7 @@ GitHub Actions (`.github/workflows/test.yml`):
 app/lib/mulukhiya/
   controller/     # SNS別コントローラ (Mastodon, Misskey, +α)
   service/        # SNS別サービスクライアント
-  model/          # SNS別モデル (mastodon/, misskey/, pleroma/, meisskey/)
+  model/          # SNS別モデル (mastodon/, misskey/)
   handler/        # 投稿処理ハンドラー (41以上)
   listener/       # WebSocketリスナー
   storage/        # Redis/DB永続化

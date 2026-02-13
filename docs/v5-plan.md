@@ -418,12 +418,12 @@ test/
 
 ### SNS整理
 
-- [ ] [#4031](https://github.com/pooza/mulukhiya-toot-proxy/issues/4031) (P2): Meisskeyコントローラ/サービス/リスナー/モデルの除去
-- [ ] [#4032](https://github.com/pooza/mulukhiya-toot-proxy/issues/4032) (P2): MongoDB依存の完全除去（MongoCollection, MongoDSN, ginseng-mongo gem）
-- [ ] [#4033](https://github.com/pooza/mulukhiya-toot-proxy/issues/4033) (P2): Pleromaコントローラ/サービス/リスナー/モデルの除去
-- [ ] [#4034](https://github.com/pooza/mulukhiya-toot-proxy/issues/4034) (P2): application.yaml から `pleroma:`, `meisskey:` セクションの除去
-- [ ] [#4039](https://github.com/pooza/mulukhiya-toot-proxy/issues/4039) (P3): Pleroma/Meisskey関連テストの除去
-- [ ] [#4040](https://github.com/pooza/mulukhiya-toot-proxy/issues/4040) (P3): Environment クラスから `pleroma?`, `meisskey?` 等の除去・整理
+- [x] [#4031](https://github.com/pooza/mulukhiya-toot-proxy/issues/4031) (P2): Meisskeyコントローラ/サービス/リスナー/モデルの除去
+- [x] [#4032](https://github.com/pooza/mulukhiya-toot-proxy/issues/4032) (P2): MongoDB依存の完全除去（MongoCollection, MongoDSN, ginseng-mongo gem）
+- [x] [#4033](https://github.com/pooza/mulukhiya-toot-proxy/issues/4033) (P2): Pleromaコントローラ/サービス/リスナー/モデルの除去
+- [x] [#4034](https://github.com/pooza/mulukhiya-toot-proxy/issues/4034) (P2): application.yaml から `pleroma:`, `meisskey:` セクションの除去
+- [x] [#4039](https://github.com/pooza/mulukhiya-toot-proxy/issues/4039) (P3): Pleroma/Meisskey関連テストの除去
+- [x] [#4040](https://github.com/pooza/mulukhiya-toot-proxy/issues/4040) (P3): Environment クラスから `pleroma?`, `meisskey?` 等の除去・整理
 
 ### アーキテクチャ
 
