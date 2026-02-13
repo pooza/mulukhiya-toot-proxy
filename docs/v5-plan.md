@@ -470,6 +470,10 @@ test/
 - [ ] [#4060](https://github.com/pooza/mulukhiya-toot-proxy/issues/4060) (P3): インテグレーションテストの再設計・実装（アーキテクチャ確定後）
 - [ ] [#4061](https://github.com/pooza/mulukhiya-toot-proxy/issues/4061) (P3): rack 3.2同時アクセス再現テスト（#4055と連動）
 
+### ginseng gem メンテナンス
+
+- [ ] [#4066](https://github.com/pooza/mulukhiya-toot-proxy/issues/4066) (P4): ginseng-*系gemへの汎用拡張返却監査（v5作業完了後に実施）
+
 ### Ruby 4.0
 
 - [ ] [#4062](https://github.com/pooza/mulukhiya-toot-proxy/issues/4062) (P4): ginseng-*系gemのRuby 4.0互換性調査・テスト
