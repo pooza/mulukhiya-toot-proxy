@@ -80,13 +80,24 @@ module Mulukhiya
       }
     end
 
+    def oauth_token_endpoint
+      if (metadata = oauth_server_metadata) && metadata['token_endpoint']
+        return URI.parse(metadata['token_endpoint']).path
+      end
+      return '/oauth/token'
+    end
+
     def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
-      return oauth2_auth(
-        code,
-        redirect_uri:,
-        code_verifier:,
-        client_id: oauth_client_id,
-      )
+      return http.post(oauth_token_endpoint, {
+        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body: {
+          'grant_type' => 'authorization_code',
+          'code' => code,
+          'redirect_uri' => redirect_uri,
+          'code_verifier' => code_verifier,
+          'client_id' => oauth_client_id,
+        },
+      })
     end
 
     def create_headers(headers = {})
