@@ -1,93 +1,40 @@
+# === http context に追加 ===
+map $http_x_mulukhiya $mulukhiya_backend {
+  default http://localhost:3008;
+  "~.+"   http://localhost:3000;
+}
+map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
+  "~^PUT:$"  http://localhost:3008;
+  default    http://localhost:3000;
+}
+map "${request_method}:${http_x_mulukhiya}" $status_put_backend {
+  "~^PUT:$"  reject;
+  default    http://localhost:3000;
+}
+
+# === server context に追加 ===
+
 location ~ ^/api/v[0-9]+/(statuses|media)$ {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
-  if ($http_x_mulukhiya != '') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($http_x_mulukhiya = '') {
-    proxy_pass http://localhost:3008;
-  }
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $mulukhiya_backend;
 }
 location ~ ^/api/v[0-9]+/statuses/[0-9]+/(favourite|reblog|bookmark)$ {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
-  if ($http_x_mulukhiya != '') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($http_x_mulukhiya = '') {
-    proxy_pass http://localhost:3008;
-  }
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $mulukhiya_backend;
 }
 location ~ ^/api/v[0-9]+/media/[0-9]+$ {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
-  set $test "${request_method}${http_x_mulukhiya}";
-  if ($test ~* '^PUT.+') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($test = 'PUT') {
-    proxy_pass http://localhost:3008;
-  }
-  if ($test ~* '^(GET|POST)') {
-    proxy_pass http://localhost:3000;
-  }
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $media_put_backend;
 }
 location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
+  include /path/to/mulukhiya_proxy.conf;
   if ($http_x_mulukhiya_purpose != '') {
     proxy_pass http://localhost:3008;
   }
-  set $test "${request_method}${http_x_mulukhiya}";
-  if ($test ~* '^PUT.+') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($test = 'PUT') {
+  if ($status_put_backend = reject) {
     return 405;
   }
-  if ($test ~* '^(GET|POST|DELETE)') {
-    proxy_pass http://localhost:3000;
-  }
+  proxy_pass $status_put_backend;
 }
 location = /api/v1/timelines/public {
   if ($arg_local !~* ^(true|t|1|on)$) {
@@ -98,37 +45,10 @@ location = /api/v1/timelines/public {
   }
 }
 location ^~ /mulukhiya {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
+  include /path/to/mulukhiya_proxy.conf;
   proxy_pass http://localhost:3008;
 }
 location ^~ /nodeinfo {
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-  proxy_set_header Proxy "";
-  proxy_pass_header Server;
-  proxy_buffering on;
-  proxy_redirect off;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection $connection_upgrade;
-  tcp_nodelay on;
-  if ($http_x_mulukhiya != '') {
-    proxy_pass http://localhost:3000;
-  }
-  if ($http_x_mulukhiya = '') {
-    proxy_pass http://localhost:3008;
-  }
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass $mulukhiya_backend;
 }
