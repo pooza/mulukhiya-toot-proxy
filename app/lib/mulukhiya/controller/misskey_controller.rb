@@ -62,6 +62,21 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/api/drive/files/create' do
+      verify_token_integrity!
+      Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
+      reporter.response = sns.upload(params.dig(:file, :tempfile))
+      Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
+      @renderer.message = reporter.response.parsed_response
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
+    end
+
     post '/api/notes/favorites/create' do
       verify_token_integrity!
       reporter.response = sns.fav(params[:noteId])

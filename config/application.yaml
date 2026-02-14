@@ -249,7 +249,6 @@ handler:
         - removal_rule_tag
         - image_copyright
         - tagging
-    mastodon:
       post_thumbnail:
         - result_notification
       post_upload:
