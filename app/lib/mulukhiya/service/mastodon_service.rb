@@ -41,7 +41,7 @@ module Mulukhiya
       body = {
         client_name: MastodonController.oauth_client_name(type),
         website: config['/package/url'],
-        redirect_uris: config['/mastodon/oauth/redirect_uri'],
+        redirect_uris: oauth_callback_uri,
         scopes: scopes.join(' '),
       }
       unless client = oauth_client_storage[body]
@@ -52,15 +52,34 @@ module Mulukhiya
     end
 
     def oauth_uri(type = :default)
+      return oauth_uri_with_pkce(type)
+    end
+
+    def oauth_authorize_endpoint
+      return '/oauth/authorize'
+    end
+
+    def oauth_authorize_params(type = :default)
       return nil unless oauth_client(type)
-      uri = create_uri('/oauth/authorize')
-      uri.query_values = {
+      return {
         client_id: oauth_client(type)['client_id'],
-        response_type: 'code',
-        redirect_uri: config['/mastodon/oauth/redirect_uri'],
         scope: MastodonController.oauth_scopes(type).join(' '),
       }
-      return uri
+    end
+
+    def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
+      return nil unless oauth_client(type)
+      return http.post('/oauth/token', {
+        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
+        body: {
+          'grant_type' => 'authorization_code',
+          'code' => code,
+          'redirect_uri' => redirect_uri,
+          'client_id' => oauth_client(type)['client_id'],
+          'client_secret' => oauth_client(type)['client_secret'],
+          'code_verifier' => code_verifier,
+        },
+      })
     end
 
     def create_headers(headers = {})

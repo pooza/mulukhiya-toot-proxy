@@ -44,41 +44,13 @@ html lang='ja'
         .token
           h4 新しいトークンを登録
           .description #{controller.display_name}で認証を行って、新しいトークンを登録します。
-          .description
-            a href=params[:oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
-            | して下の欄に入力、認証ボタンを押下してください。
-          - if env.misskey_type?
-            .description
-              | 認証後の、URL末尾のUUID（
-              code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列）が
-              strong 認証コード
-              | です。
           .auth-form
-            input type='password' v-model.trim='input.authcode' placeholder='#{controller.display_name}の認証コード'
-            - if env.mastodon_type?
-              button :disabled='!input.authcode' @click='authMastodon(input.authcode)' 認証
-            - elsif env.misskey_type?
-              button :disabled='!input.authcode' @click='authMisskey(input.authcode)' 認証
+            a.button href=params[:oauth_url] #{controller.display_name}で認証
         .token v-if='account.is_info_bot'
           h4 お知らせボット用のトークンを登録
           .description #{controller.display_name}で認証を行って、お知らせボット用の新しいトークンを登録します。
-          .description
-            a href=params[:infobot_oauth_url] target='_blank' rel='noreferrer' 認証コードを取得
-            | して下の欄に入力、認証ボタンを押下してください。
-          - if env.misskey_type?
-            .description
-              | 認証後の、URL末尾のUUID（
-              code xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-              | 形式の文字列）が
-              strong 認証コード
-              | です。
           .auth-form
-            input type='password' v-model.trim='input.infobot_authcode' placeholder='#{controller.display_name}の認証コード'
-            - if env.mastodon_type?
-              button :disabled='!input.infobot_authcode' @click='authMastodon(input.infobot_authcode, "infobot")' 認証
-            - elsif env.misskey_type?
-              button :disabled='!input.infobot_authcode' @click='authMisskey(input.infobot_authcode, "infobot")' 認証
+            a.button href=params[:infobot_oauth_url] お知らせボット用の認証
         .token v-if='account.username'
           h4 トークンをまとめて登録
           .description トークンを改行区切りで入力して、登録ボタンを押下してください。
@@ -111,8 +83,6 @@ html lang='ja'
               token: null,
               restartable: false,
               input: {
-                authcode: null,
-                infobot_authcode: null,
                 token: null,
               },
             }
@@ -163,64 +133,6 @@ html lang='ja'
                   .then(e => this.accounts = e)
                   .then(_ => this.all_tokens = this.getAllTokens())
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            authMastodon (authcode, type = 'default') {
-              this.methods.authMastodon(authcode, type)
-                .then(e => {
-                  this.input.authcode = null
-                  this.input.infobot_authcode = null
-                  this.token = e.access_token_crypt
-                  return this.methods.registerToken(this.token)
-                }).then(e => {
-                  this.methods.setToken(this.token)
-                  this.account = e
-                  if (this.account.is_info_bot) {
-                    Swal.fire({
-                      title: 'お知らせボットのトークンを更新',
-                      text: '今登録したトークンを、お知らせボットとして設定ファイルに登録しますか？',
-                      icon: 'warning',
-                      showCancelButton: true,
-                      confirmButtonText: '更新',
-                      cancelButtonText: 'キャンセル',
-                    }).then(result => {
-                      if (!result.isConfirmed) return
-                      this.methods.setInfoToken(this.token).then(_ => {this.restartable = true})
-                    }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-                  }
-                  if (this.account.is_test_bot) {
-                    Swal.fire({
-                      title: 'テストボットのトークンを更新',
-                      text: '今登録したトークンを、テストボットとして設定ファイルに登録しますか？',
-                      icon: 'warning',
-                      showCancelButton: true,
-                      confirmButtonText: '更新',
-                      cancelButtonText: 'キャンセル',
-                    }).then(result => {
-                      if (!result.isConfirmed) return
-                      this.methods.setTestToken(this.token).then(_ => {this.restartable = true})
-                    }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-                  }
-                  return this.methods.getAccounts()
-                }).then(e => {
-                  this.accounts = e
-                  this.all_tokens = this.getAllTokens()
-                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            authMisskey (authcode, type = 'default') {
-              this.methods.authMisskey(authcode, type)
-                .then(e => {
-                  this.input.authcode = null
-                  this.input.infobot_authcode = null
-                  this.token = e.access_token_crypt
-                  return this.methods.registerToken(this.token)
-                }).then(e => {
-                  this.methods.setToken(this.token)
-                  this.account = e
-                  return this.methods.getAccounts()
-                }).then(e => {
-                  this.accounts = e
-                  this.all_tokens = this.getAllTokens()
-                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             getAllTokens () {
               return this.accounts.map(v => v.token).join("\n")

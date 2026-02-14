@@ -50,26 +50,36 @@ module Mulukhiya
     def update_account(account, params = {})
     end
 
-    def oauth_client(type = :default)
-      return nil unless scopes = MisskeyController.oauth_scopes(type)
-      body = {
-        name: MisskeyController.oauth_client_name(type),
-        description: config['/package/description'],
-        permission: scopes,
-      }
-      unless client = oauth_client_storage[body]
-        client = http.post('/api/app/create', {body:}).body
-        oauth_client_storage[body] = client
-      end
-      return JSON.parse(client)
+    def oauth_client_id
+      return create_uri('/mulukhiya/app/home').to_s
     end
 
     def oauth_uri(type = :default)
-      return nil unless oauth_client(type)
-      response = http.post('/api/auth/session/generate', {
-        body: {appSecret: oauth_client(type)['secret']},
-      })
-      return Ginseng::URI.parse(response['url'])
+      return oauth_uri_with_pkce(type)
+    end
+
+    def oauth_authorize_endpoint
+      metadata = oauth_server_metadata
+      return metadata['authorization_endpoint'] if metadata
+      return '/oauth/authorize'
+    end
+
+    def oauth_authorize_params(type = :default)
+      scopes = MisskeyController.oauth_scopes(type)
+      return nil if scopes.empty?
+      return {
+        client_id: oauth_client_id,
+        scope: scopes.join(' '),
+      }
+    end
+
+    def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
+      return oauth2_auth(
+        code,
+        redirect_uri:,
+        code_verifier:,
+        client_id: oauth_client_id,
+      )
     end
 
     def create_headers(headers = {})

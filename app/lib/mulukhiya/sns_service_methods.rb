@@ -56,6 +56,49 @@ module Mulukhiya
       return @oauth_client_storage
     end
 
+    def oauth_callback_uri
+      return create_uri('/mulukhiya/oauth/callback').to_s
+    end
+
+    def oauth_uri_with_pkce(type = :default)
+      state_data = OAuthHelper.create_oauth_state(
+        type: type.to_s,
+        sns_type: controller_class.name,
+      )
+      uri = create_uri(oauth_authorize_endpoint)
+      uri.query_values = oauth_authorize_params(type).merge(
+        response_type: 'code',
+        code_challenge: state_data[:code_challenge],
+        code_challenge_method: 'S256',
+        state: state_data[:state],
+        redirect_uri: oauth_callback_uri,
+      )
+      return uri
+    end
+
+    def auth_with_pkce(code, state)
+      state_data = OAuthHelper.consume_oauth_state(state)
+      raise Ginseng::AuthError, 'Invalid OAuth state' unless state_data
+      return oauth_token_request(
+        code,
+        code_verifier: state_data[:code_verifier],
+        redirect_uri: oauth_callback_uri,
+        type: state_data[:type]&.to_sym || :default,
+      )
+    end
+
+    def oauth_authorize_endpoint
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def oauth_authorize_params(type = :default)
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
+    def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
+      raise Ginseng::ImplementError, "'#{__method__}' not implemented"
+    end
+
     def create_command_toot(params)
     end
 

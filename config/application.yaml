@@ -319,7 +319,8 @@ mastodon:
     feed: true
     webhook: true
   oauth:
-    redirect_uri: urn:ietf:wg:oauth:2.0:oob
+    callback:
+      enable: true
     scopes:
       default:
         - write:statuses
@@ -378,6 +379,8 @@ misskey:
     feed: true
     webhook: true
   oauth:
+    callback:
+      enable: true
     scopes:
       default:
         - write:notes

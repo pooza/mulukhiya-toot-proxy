@@ -1,0 +1,18 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'トークンの管理', href: '/mulukhiya/app/token'}, {label: '認証エラー'}]}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 認証エラー
+      .description 認証処理中にエラーが発生しました。
+      .field
+        .title エラー
+        .value.alert = params[:error]
+      p
+        a href='/mulukhiya/app/token' トークンの管理に戻る
+    == slim.render 'fragment/footer'

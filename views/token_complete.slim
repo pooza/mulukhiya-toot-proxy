@@ -1,0 +1,50 @@
+doctype html
+html lang='ja'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'トークンの管理', href: '/mulukhiya/app/token'}, {label: '認証完了'}]}
+    main#app class=env.type
+      == slim.render 'fragment/message'
+      h2 認証完了
+      .description v-if='registered' トークンの登録が完了しました。
+      .description v-else='' トークンを登録しています...
+      nav.tokens v-if='account.username'
+        .token
+          .field
+            .title アカウント
+            .value @{{account.username}}
+      p
+        a href='/mulukhiya/app/token' トークンの管理に戻る
+    == slim.render 'fragment/footer'
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              registered: false,
+            }
+          },
+          async created () {
+            const params = new URLSearchParams(window.location.search)
+            const token = params.get('token')
+            if (token) {
+              this.methods.registerToken(token)
+                .then(e => {
+                  this.account = e
+                  this.registered = true
+                }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            }
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')
