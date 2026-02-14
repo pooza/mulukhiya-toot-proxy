@@ -65,24 +65,31 @@
 
 **方針**: ベースパイプライン＋SNS固有オーバーライドの構造にする。
 
+**実装済み**:
+
+- baseパイプラインが全ハンドラの実行順の正本。SNS別設定は`exclude`で不要なものを除外するだけ
+- 実行有無はハンドラ自身の`disable?`/`convertable?`で判断（設定には書かない）
+- `pre_upload`/`post_upload`等もbase共通に移動。MisskeyControllerに`/api/drive/files/create`エンドポイントを追加
+- nginxサンプル設定を`map`+`include`でリファクタ。meisskeyサンプルは削除
+
 ```yaml
-# 案
 handler:
   pipeline:
     base:
       pre_toot:
-        - image_format_convert
-        - image_resize
         - url_normalize
-        # ... 共通ハンドラー
-    mastodon:
-      pre_toot:
-        exclude:
-          - misskey_only_handler
+        # ... 共通ハンドラー（実行順の正本）
+      pre_upload:
+        - image_format_convert
+        - audio_format_convert
+        - video_format_convert
+        - image_resize
     misskey:
       pre_toot:
         exclude:
-          - mastodon_only_handler
+          - itunes_image
+          - spotify_image
+          - you_tube_image
 ```
 
 ### 2.2 サービス層の共通化
