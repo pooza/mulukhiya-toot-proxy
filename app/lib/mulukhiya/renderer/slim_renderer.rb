@@ -19,7 +19,7 @@ module Mulukhiya
         slim: SlimRenderer,
         scripts: config["/webui/#{Environment.type}/scripts"],
         stylesheets: config["/webui/#{Environment.type}/stylesheets"],
-        importmap: config["/webui/importmap/#{Environment.type}"],
+        importmap: config.raw.dig('application', 'webui', 'importmap', Environment.type),
         metadata: config.raw.dig('application', 'webui', 'metadata'),
       )
     end
