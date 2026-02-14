@@ -646,7 +646,7 @@ websocket:
 webui:
   importmap:
     development:
-      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/esm/popper.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
@@ -657,7 +657,7 @@ webui:
       v_tooltip: /mulukhiya/script/v_tooltip
       vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js
     production:
-      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/lib/index.js
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/esm/popper.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
