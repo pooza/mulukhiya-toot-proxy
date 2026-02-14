@@ -17,6 +17,8 @@ inflections:
   mime_type: MIMEType
   note_uri: NoteURI
   oauth_client_storage: OAuthClientStorage
+  oauth_helper: OAuthHelper
+  oauth_state_storage: OAuthStateStorage
   peer_tube_uri: PeerTubeURI
   peer_tube_url_nowplaying_handler: PeerTubeURLNowplayingHandler
   poipiku_uri: PoipikuURI
