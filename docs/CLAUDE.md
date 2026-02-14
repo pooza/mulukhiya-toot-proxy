@@ -75,7 +75,7 @@ git diff Gemfile.lock
 
 ## 重要なドキュメント
 
-- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4063）、優先度付き
+- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4070＋過去Issue）、優先度付き
 - [rack-upgrade-discussion.md](rack-upgrade-discussion.md) — rack 3.2問題の詳細記録（致命的バグの経緯）
 
 ## CI
