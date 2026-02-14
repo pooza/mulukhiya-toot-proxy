@@ -10,4 +10,5 @@ dist
 *.code-workspace
 .vscode
 .claude
+tmp/
 2
