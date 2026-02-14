@@ -77,14 +77,12 @@ handler:
         # ... 共通ハンドラー
     mastodon:
       pre_toot:
-        append:
-          - mastodon_specific_handler
-        remove:
+        exclude:
           - misskey_only_handler
     misskey:
       pre_toot:
-        append:
-          - channel_notification
+        exclude:
+          - mastodon_only_handler
 ```
 
 ### 2.2 サービス層の共通化

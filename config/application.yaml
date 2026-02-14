@@ -192,6 +192,7 @@ handler:
       post_toot:
         - user_config_command
         - piefed_clipping_command
+        - channel_notification
         - result_notification
       post_webhook:
         - result_notification
@@ -265,20 +266,17 @@ handler:
       post_reaction:
         - reply_reaction
         - result_notification
-      post_toot:
-        append:
-          - channel_notification
       pre_draft:
         - default_tag
         - removal_rule_tag
         - tagging
       pre_toot:
-        remove:
+        exclude:
           - itunes_image
           - spotify_image
           - you_tube_image
       pre_webhook:
-        remove:
+        exclude:
           - itunes_image
           - spotify_image
           - you_tube_image

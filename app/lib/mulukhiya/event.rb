@@ -87,8 +87,7 @@ module Mulukhiya
       return sns_config if sns_config.is_a?(Array)
       if base.is_a?(Array) && sns_config.is_a?(Hash)
         result = base.dup
-        Array(sns_config['remove']).each {|h| result.delete(h)}
-        result.concat(Array(sns_config['append']))
+        Array(sns_config['exclude']).each {|h| result.delete(h)}
         return result
       end
       return []
