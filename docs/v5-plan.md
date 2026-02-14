@@ -487,7 +487,7 @@ test/
 ### 新機能・過去Issue対応
 
 - [ ] [#3350](https://github.com/pooza/mulukhiya-toot-proxy/issues/3350) (P2): 新規登録時webhook対応（ウェルカムメッセージ送信。現行の強制フォロー＋バッチを置き換え）
-- [ ] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (P2): アンケート公開範囲の制御（範囲外サーバーからの投票をブロック）
+- [x] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (~~P2~~ クローズ): アンケート公開範囲の制御 → プロキシ層での実現が困難なため見送り
 - [ ] [#4067](https://github.com/pooza/mulukhiya-toot-proxy/issues/4067) (P2): ChannelNotificationHandlerの通知方法見直し（投稿者トークン問題の回避、仕様要検討）
 - [ ] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ
 - [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3): Misskey実況デコレーションの自動剥がし（admin API権限の課題あり）

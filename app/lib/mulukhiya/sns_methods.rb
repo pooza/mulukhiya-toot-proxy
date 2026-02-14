@@ -100,7 +100,7 @@ module Mulukhiya
       options[:accounts] ||= []
       options[:accounts].push(@sns.account) if @sns&.account
       options[:accounts].each do |account|
-        return info_agent_service.notify(account, message, options.deep_symbolize_keys)
+        info_agent_service.notify(account, message, options.deep_symbolize_keys)
       rescue => e
         e.log(message:, acct: account.acct.to_s)
       end

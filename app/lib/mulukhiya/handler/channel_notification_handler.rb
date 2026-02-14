@@ -10,8 +10,10 @@ module Mulukhiya
       return unless id = payload[:channelId]
       return unless channel = channel_class[id]
       return unless entry = search_entry(channel.name)
-      return unless notify_to = account_class.get(acct: entry[:notify_to])
-      notify(create_body(channel:, payload:), {accounts: [notify_to, sns.account]})
+      body = create_body(channel:, payload:)
+      notify_to_accounts(entry).each do |account|
+        info_agent_service.notify(account, body)
+      end
     rescue => e
       e.log
     end
@@ -21,6 +23,11 @@ module Mulukhiya
     rescue => e
       e.log
       return []
+    end
+
+    def notify_to_accounts(entry)
+      accts = Array(entry[:notify_to])
+      return accts.filter_map {|acct| account_class.get(acct:)}
     end
 
     private

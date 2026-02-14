@@ -5,7 +5,9 @@ properties:
         name:
           type: string
         notify_to:
-          type: string
+          items:
+            type: string
+          type: array
       required:
         - name
         - notify_to
