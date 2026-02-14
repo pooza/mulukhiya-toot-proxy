@@ -62,15 +62,6 @@ handler:
     pattern: お[知し]らせ
   audio_format_convert:
     timeout: 30
-  canonical_url:
-    disable: true
-    experimental: true
-    ignore:
-      domains:
-        - instagram.com
-        - facebook.com
-        - toei-anim.co.jp
-    useragent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100
   channel_notification:
     channels: []
     disable: true
@@ -96,7 +87,6 @@ handler:
     toggleable: false
   itunes_image:
     disable: true
-    experimental: true
     pixel: 480
     timeout: 10
   itunes_nowplaying:
@@ -112,7 +102,6 @@ handler:
     to: null
   media_tag:
     disable: true
-    experimental: true
     tags:
       audio: audio
       image: image
@@ -143,7 +132,6 @@ handler:
     hooks: []
   spotify_image:
     disable: true
-    experimental: true
     timeout: 10
   spotify_nowplaying:
     timeout: 10
@@ -164,7 +152,6 @@ handler:
     timeout: 10
   you_tube_image:
     disable: true
-    experimental: true
     timeout: 10
   you_tube_url_nowplaying:
     tagging: false
@@ -207,7 +194,6 @@ handler:
         - you_tube_image
         - shortened_url
         - url_normalize
-        - canonical_url
         - itunes_url
         - amazon_url
         - itunes_url_nowplaying
@@ -234,7 +220,6 @@ handler:
         - webhook_image
         - shortened_url
         - url_normalize
-        - canonical_url
         - itunes_url
         - amazon_url
         - itunes_url_nowplaying

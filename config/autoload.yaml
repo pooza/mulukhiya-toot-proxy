@@ -2,7 +2,6 @@ inflections:
   amazon_uri: AmazonURI
   amazon_url_handler: AmazonURLHandler
   api_controller: APIController
-  canonical_url_handler: CanonicalURLHandler
   css_renderer: CSSRenderer
   custom_api: CustomAPI
   custom_api_render_storage: CustomAPIRenderStorage
