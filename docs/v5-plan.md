@@ -434,7 +434,7 @@ test/
 
 - [x] [#4041](https://github.com/pooza/mulukhiya-toot-proxy/issues/4041) (P3): ハンドラーパイプラインのベース＋オーバーライド構造への移行
 - [x] [#4025](https://github.com/pooza/mulukhiya-toot-proxy/issues/4025) (P1): `notify()` をSNSServiceMethodsに統合
-- [x] [#4042](https://github.com/pooza/mulukhiya-toot-proxy/issues/4042) (P3): OAuth処理の共通化（Mastodon/Misskey検証完了。残課題: infobot認証後のlocal.yaml更新フロー接続）
+- [ ] [#4042](https://github.com/pooza/mulukhiya-toot-proxy/issues/4042) (P3): OAuth処理の共通化（Mastodon/Misskey検証完了。残課題: infobot認証後のlocal.yaml更新フロー接続）
 - [x] [#4043](https://github.com/pooza/mulukhiya-toot-proxy/issues/4043) (P3): ハンドラーパイプライン解決ロジックの実装（Event クラス改修）
 - [x] [#4035](https://github.com/pooza/mulukhiya-toot-proxy/issues/4035) (P2): ハンドラーの要不要の洗い出し（利用実績・重複・形骸化の調査）
 - [x] [#4044](https://github.com/pooza/mulukhiya-toot-proxy/issues/4044) (P3): 不要ハンドラーの削除・統合（#4035の結果に基づく）

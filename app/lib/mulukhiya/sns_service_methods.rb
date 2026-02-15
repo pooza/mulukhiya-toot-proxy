@@ -79,12 +79,14 @@ module Mulukhiya
     def auth_with_pkce(code, state)
       state_data = OAuthHelper.consume_oauth_state(state)
       raise Ginseng::AuthError, 'Invalid OAuth state' unless state_data
-      return oauth_token_request(
+      type = state_data[:type]&.to_sym || :default
+      response = oauth_token_request(
         code,
         code_verifier: state_data[:code_verifier],
         redirect_uri: oauth_callback_uri,
-        type: state_data[:type]&.to_sym || :default,
+        type:,
       )
+      return {response:, type:}
     end
 
     def oauth_authorize_endpoint

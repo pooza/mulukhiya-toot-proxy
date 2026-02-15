@@ -19,11 +19,15 @@ module Mulukhiya
     get '/oauth/callback' do
       raise Ginseng::AuthError, 'Missing state' unless params[:state]
       raise Ginseng::AuthError, 'Missing code' unless params[:code]
-      token_response = sns.auth_with_pkce(params[:code], params[:state])
-      raise Ginseng::AuthError, 'Token exchange failed' unless token_response
-      parsed = token_response.parsed_response
+      result = sns.auth_with_pkce(params[:code], params[:state])
+      raise Ginseng::AuthError, 'Token exchange failed' unless result[:response]
+      parsed = result[:response].parsed_response
       access_token = parsed['access_token'] || parsed['accessToken']
       raise Ginseng::AuthError, 'No access token in response' unless access_token
+      if result[:type] == :infobot
+        config.update_file(agent: {info: {token: access_token.encrypt}})
+        config.reload
+      end
       token_crypt = access_token.encrypt
       @renderer.status = 302
       redirect_url = "/mulukhiya/app/token_complete?token=#{Rack::Utils.escape(token_crypt)}"
