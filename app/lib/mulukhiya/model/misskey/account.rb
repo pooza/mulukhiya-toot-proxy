@@ -15,7 +15,7 @@ module Mulukhiya
 
       def display_name
         return name if name.present?
-        return acct.to_s
+        return username
       end
 
       def host
