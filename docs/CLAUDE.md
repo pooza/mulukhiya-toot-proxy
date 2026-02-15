@@ -75,8 +75,9 @@ git diff Gemfile.lock
 
 ## 重要なドキュメント
 
-- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4070＋過去Issue）、優先度付き
+- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4072＋過去Issue）、優先度付き
 - [rack-upgrade-discussion.md](rack-upgrade-discussion.md) — rack 3.2問題の詳細記録（致命的バグの経緯）
+- [webhook-setup.md](webhook-setup.md) — admin webhook設定ガイド（ウェルカムDM機能）
 
 ## CI
 

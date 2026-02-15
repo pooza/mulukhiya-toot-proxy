@@ -494,8 +494,12 @@ test/
 - [ ] [#3877](https://github.com/pooza/mulukhiya-toot-proxy/issues/3877) (P3): Mastodon形式タグづけ復活（ActivityPub Update使用、Mastodon系限定）
 - [ ] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS等の軽量フレームワーク導入＋SASS差分整理）
 - [ ] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（ホスト統一・importmap移行・バージョンポリシー・更新手順ドキュメント化）
-- [x] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（スコープ一本化、認証ボタン統合、info_bot自動検出、admin:read除外。ステージング検証待ち）
+- [x] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（スコープ一本化、認証ボタン統合、info_bot自動検出、admin:read除外。Mastodon/Misskey検証完了）
 - [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P4): Annict `records/:id` 形式URL対応（Annict側の実装待ち）
+
+### ドキュメント
+
+- [ ] [#4072](https://github.com/pooza/mulukhiya-toot-proxy/issues/4072): 5.0アップグレードガイドの作成（`docs/webhook-setup.md` 先行作成済み）
 
 ### 外部プロジェクトへの貢献（余裕があれば）
 
