@@ -137,7 +137,6 @@ module Mulukhiya
     end
 
     def default_scopes
-      return controller_class.oauth_scopes(:infobot) if info?
       return controller_class.oauth_scopes
     end
 

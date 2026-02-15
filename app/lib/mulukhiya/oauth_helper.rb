@@ -15,11 +15,11 @@ module Mulukhiya
       return SecureRandom.urlsafe_base64(32)
     end
 
-    def self.create_oauth_state(type:, sns_type:)
+    def self.create_oauth_state(sns_type:)
       code_verifier = generate_code_verifier
       code_challenge = generate_code_challenge(code_verifier)
       state = generate_state
-      storage.set(state, {code_verifier:, type:, sns_type:})
+      storage.set(state, {code_verifier:, sns_type:})
       return {state:, code_challenge:}
     end
 

@@ -10,7 +10,6 @@ module Mulukhiya
       @renderer = SlimRenderer.new
       @renderer.template = params[:page]
       @renderer[:oauth_url] = sns.oauth_uri
-      @renderer[:infobot_oauth_url] = sns.oauth_uri(:infobot)
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404
@@ -20,11 +19,11 @@ module Mulukhiya
       raise Ginseng::AuthError, 'Missing state' unless params[:state]
       raise Ginseng::AuthError, 'Missing code' unless params[:code]
       result = sns.auth_with_pkce(params[:code], params[:state])
-      raise Ginseng::AuthError, 'Token exchange failed' unless result[:response]
-      parsed = result[:response].parsed_response
+      raise Ginseng::AuthError, 'Token exchange failed' unless result
+      parsed = result.parsed_response
       access_token = parsed['access_token'] || parsed['accessToken']
       raise Ginseng::AuthError, 'No access token in response' unless access_token
-      if result[:type] == :infobot
+      if info_bot_token?(access_token)
         config.update_file(agent: {info: {token: access_token.encrypt}})
         config.reload
       end
@@ -104,6 +103,15 @@ module Mulukhiya
       return params[:token].decrypt
     rescue
       return params[:token]
+    end
+
+    def info_bot_token?(access_token)
+      info_username = config['/agent/info/username']
+      return false unless info_username
+      account = Environment.account_class.get(token: access_token)
+      return account&.username == info_username
+    rescue
+      return false
     end
 
     def self.media_copyright

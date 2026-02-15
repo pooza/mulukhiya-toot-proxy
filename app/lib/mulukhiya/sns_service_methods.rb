@@ -47,8 +47,8 @@ module Mulukhiya
       return @access_token
     end
 
-    def clear_oauth_client(type = :default)
-      oauth_client_storage.unlink(type || :default)
+    def clear_oauth_client
+      oauth_client_storage.clear
     end
 
     def oauth_client_storage
@@ -60,13 +60,12 @@ module Mulukhiya
       return create_uri('/mulukhiya/oauth/callback').to_s
     end
 
-    def oauth_uri_with_pkce(type = :default)
+    def oauth_uri_with_pkce
       state_data = OAuthHelper.create_oauth_state(
-        type: type.to_s,
         sns_type: controller_class.name,
       )
       uri = create_uri(oauth_authorize_endpoint)
-      uri.query_values = oauth_authorize_params(type).merge(
+      uri.query_values = oauth_authorize_params.merge(
         response_type: 'code',
         code_challenge: state_data[:code_challenge],
         code_challenge_method: 'S256',
@@ -79,14 +78,11 @@ module Mulukhiya
     def auth_with_pkce(code, state)
       state_data = OAuthHelper.consume_oauth_state(state)
       raise Ginseng::AuthError, 'Invalid OAuth state' unless state_data
-      type = state_data[:type]&.to_sym || :default
-      response = oauth_token_request(
+      return oauth_token_request(
         code,
         code_verifier: state_data[:code_verifier],
         redirect_uri: oauth_callback_uri,
-        type:,
       )
-      return {response:, type:}
     end
 
     def oauth_authorize_endpoint

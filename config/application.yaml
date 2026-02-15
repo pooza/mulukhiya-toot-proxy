@@ -307,15 +307,9 @@ mastodon:
     callback:
       enable: true
     scopes:
-      default:
-        - write:statuses
-        - write:media
-        - read:search
-      infobot:
-        - read
-        - write:statuses
-        - write:media
-        - admin:read
+      - read
+      - write:statuses
+      - write:media
     webui:
       url: /settings/applications
   sns_type: mastodon
@@ -367,29 +361,10 @@ misskey:
     callback:
       enable: true
     scopes:
-      default:
-        - write:notes
-        - write:drive
-        - read:drive
-        - read:account
-      infobot:
-        - write:drive
-        - write:following
-        - write:messaging
-        - write:notes
-        - read:account
-        - read:blocks
-        - read:channels
-        - read:drive
-        - read:favorites
-        - read:following
-        - read:messaging
-        - read:mutes
-        - read:notifications
-        - read:page-likes
-        - read:pages
-        - read:reactions
-        - read:user-groups
+      - write:notes
+      - write:drive
+      - read:account
+      - read:drive
     webui:
       url: /settings/api
   sns_type: misskey

@@ -31,7 +31,7 @@ module Mulukhiya
     end
 
     def test_create_and_consume_oauth_state
-      result = OAuthHelper.create_oauth_state(type: 'default', sns_type: 'mastodon')
+      result = OAuthHelper.create_oauth_state(sns_type: 'mastodon')
 
       assert_kind_of(Hash, result)
       assert_predicate(result[:state], :present?)
@@ -41,12 +41,11 @@ module Mulukhiya
 
       assert_kind_of(Hash, consumed)
       assert_predicate(consumed[:code_verifier], :present?)
-      assert_equal('default', consumed[:type])
       assert_equal('mastodon', consumed[:sns_type])
     end
 
     def test_consume_oauth_state_one_time
-      result = OAuthHelper.create_oauth_state(type: 'infobot', sns_type: 'misskey')
+      result = OAuthHelper.create_oauth_state(sns_type: 'misskey')
       consumed = OAuthHelper.consume_oauth_state(result[:state])
 
       assert_not_nil(consumed)

@@ -36,10 +36,10 @@ module Mulukhiya
       return super
     end
 
-    def oauth_client(type = :default)
-      return nil unless scopes = MastodonController.oauth_scopes(type)
+    def oauth_client
+      return nil unless scopes = MastodonController.oauth_scopes
       body = {
-        client_name: MastodonController.oauth_client_name(type),
+        client_name: MastodonController.oauth_client_name,
         website: config['/package/url'],
         redirect_uris: oauth_callback_uri,
         scopes: scopes.join(' '),
@@ -51,32 +51,32 @@ module Mulukhiya
       return JSON.parse(client)
     end
 
-    def oauth_uri(type = :default)
-      return oauth_uri_with_pkce(type)
+    def oauth_uri
+      return oauth_uri_with_pkce
     end
 
     def oauth_authorize_endpoint
       return '/oauth/authorize'
     end
 
-    def oauth_authorize_params(type = :default)
-      return nil unless oauth_client(type)
+    def oauth_authorize_params
+      return nil unless oauth_client
       return {
-        client_id: oauth_client(type)['client_id'],
-        scope: MastodonController.oauth_scopes(type).join(' '),
+        client_id: oauth_client['client_id'],
+        scope: MastodonController.oauth_scopes.join(' '),
       }
     end
 
-    def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
-      return nil unless oauth_client(type)
+    def oauth_token_request(code, code_verifier:, redirect_uri:)
+      return nil unless oauth_client
       return http.post('/oauth/token', {
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {
           'grant_type' => 'authorization_code',
           'code' => code,
           'redirect_uri' => redirect_uri,
-          'client_id' => oauth_client(type)['client_id'],
-          'client_secret' => oauth_client(type)['client_secret'],
+          'client_id' => oauth_client['client_id'],
+          'client_secret' => oauth_client['client_secret'],
           'code_verifier' => code_verifier,
         },
       })

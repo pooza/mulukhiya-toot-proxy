@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def scopes_valid?
-      return [:default, :infobot].map {|v| controller_class.oauth_scopes(v)}.member?(scopes)
+      return controller_class.oauth_scopes == scopes
     end
 
     def to_h

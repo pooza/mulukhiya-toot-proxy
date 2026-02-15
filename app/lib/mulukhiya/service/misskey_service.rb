@@ -54,8 +54,8 @@ module Mulukhiya
       return create_uri('/mulukhiya/app/home').to_s
     end
 
-    def oauth_uri(type = :default)
-      return oauth_uri_with_pkce(type)
+    def oauth_uri
+      return oauth_uri_with_pkce
     end
 
     def oauth_server_metadata
@@ -71,8 +71,8 @@ module Mulukhiya
       return '/oauth/authorize'
     end
 
-    def oauth_authorize_params(type = :default)
-      scopes = MisskeyController.oauth_scopes(type)
+    def oauth_authorize_params
+      scopes = MisskeyController.oauth_scopes
       return nil if scopes.empty?
       return {
         client_id: oauth_client_id,
@@ -87,7 +87,7 @@ module Mulukhiya
       return '/oauth/token'
     end
 
-    def oauth_token_request(code, code_verifier:, redirect_uri:, type: :default)
+    def oauth_token_request(code, code_verifier:, redirect_uri:)
       return http.post(oauth_token_endpoint, {
         headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
         body: {

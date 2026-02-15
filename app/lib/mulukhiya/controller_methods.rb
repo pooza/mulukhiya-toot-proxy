@@ -116,18 +116,15 @@ module Mulukhiya
         return Ginseng::URI.parse(config["/#{name.underscore}/oauth/webui/url"]) rescue nil
       end
 
-      def oauth_scopes(type = :default)
-        return config["/#{name}/oauth/scopes/#{type}"].to_set
+      def oauth_scopes
+        return config["/#{name}/oauth/scopes"].to_set
       rescue
         return Set[]
       end
 
-      def oauth_client_name(type = :default)
-        return nil unless oauth_scopes(type)
-        type = type.to_sym
-        name = [Package.name]
-        name.push("(#{type})") unless type == :default
-        return name.join(' ')
+      def oauth_client_name
+        return nil unless oauth_scopes.present?
+        return Package.name
       end
 
       def status_field
