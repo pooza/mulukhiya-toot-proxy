@@ -496,3 +496,7 @@ test/
 - [ ] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（ホスト統一・importmap移行・バージョンポリシー・更新手順ドキュメント化）
 - [ ] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（ボット自体は維持、権限管理の簡素化）
 - [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P4): Annict `records/:id` 形式URL対応（Annict側の実装待ち）
+
+### 外部プロジェクトへの貢献（余裕があれば）
+
+- [ ] Misskey本家PR: `visibility: specified` のノートで `visibleUserIds` に含まれないユーザーへのメンション通知を抑制する。DM本文中の `@user` がメンションとして解釈され、宛先外ユーザーに `(非公開)` 通知が届く問題。モロヘイヤ側は `display_name` 使用で回避済み（`3c4bc8d6`）
