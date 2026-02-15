@@ -35,7 +35,7 @@ module Mulukhiya
     def create_body(params)
       body = []
       body.push("Channel: #{params[:channel].uri}")
-      body.push("From: #{sns.account.acct}")
+      body.push("From: #{sns.account.display_name}")
       params.dig(:payload, :text).each_line do |line|
         body.push("> #{line.chomp}")
       end
