@@ -6,6 +6,8 @@ agent:
       template: announcement
     token: null
     username: info
+    webhook:
+      secret: null
     welcome:
       template: welcome
   test:
@@ -164,7 +166,8 @@ handler:
         - mail_alert
       announce:
         - post_announce
-      follow:
+      follow: []
+      user_created:
         - welcome_mention
       mention:
         - announcement_mention

@@ -62,6 +62,9 @@ module Mulukhiya
     def handle_follow(payload, params = {})
     end
 
+    def handle_user_created(payload, params = {})
+    end
+
     def handle_mention(payload, params = {})
     end
 
