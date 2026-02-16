@@ -496,7 +496,7 @@ test/
 - [ ] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（ホスト統一・importmap移行・バージョンポリシー・更新手順ドキュメント化）
 - [x] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（スコープ一本化、認証ボタン統合、info_bot自動検出、admin:read除外。Mastodon/Misskey検証完了）
 - [ ] [#4073](https://github.com/pooza/mulukhiya-toot-proxy/issues/4073) (P3): テーマカラー取得とフロントエンドアクセントカラー適用（Misskey: /api/meta自動取得、Mastodon: API無し→手動設定。デフォルト値をMastodon `#6364FF`/Misskey `#86b300` に変更。#4068関連）
-- [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P1): Annict `/@:username/records/:record_id` 形式URL対応（実装完了 `0a8550e4`、ステージング検証待ち。4.xバックポート対象）
+- [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P1→**スコープアウト**): Annict `/@:username/records/:record_id` 形式URL対応。GraphQL APIの `Record.annictId` がURL用IDと一致しない（`episode_records.id` vs `records.id`）ためAPI側の対応待ち。実装をrevertし旧形式（`/works/:work_id/episodes/:episode_id`）に戻した
 
 ### ドキュメント
 

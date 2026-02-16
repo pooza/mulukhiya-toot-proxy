@@ -98,7 +98,7 @@ module Mulukhiya
     end
 
     def test_create_record_uri
-      assert_equal('https://annict.com/@shimbaco/records/7714528', AnnictService.create_record_uri('shimbaco', 7_714_528).to_s)
+      assert_equal('https://annict.com/works/7879/episodes/138263', AnnictService.create_record_uri(7879, 138_263).to_s)
     end
 
     def test_create_review_uri
