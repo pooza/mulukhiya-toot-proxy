@@ -82,6 +82,7 @@ module Mulukhiya
 
     def create_payload(values)
       values.deep_symbolize_keys!
+      values[:viewer_username] = account[:username]
       type = values[:__typename].underscore.to_sym
       body_template = Template.new("annict/#{type}_body")
       body_template[type] = values
@@ -238,8 +239,8 @@ module Mulukhiya
       return true
     end
 
-    def self.create_record_uri(work_id, episode_id)
-      return new.service.create_uri("/works/#{work_id}/episodes/#{episode_id}")
+    def self.create_record_uri(username, record_id)
+      return new.service.create_uri("/@#{username}/records/#{record_id}")
     end
 
     def self.create_review_uri(work_id)

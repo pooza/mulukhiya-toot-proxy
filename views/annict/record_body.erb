@@ -4,8 +4,8 @@
 <% end -%>
 <%=
   Mulukhiya::AnnictService.create_record_uri(
-    params.dig(:record, :episode, :work, :annictId),
-    params.dig(:record, :episode, :annictId),
+    params.dig(:record, :viewer_username),
+    params.dig(:record, :annictId),
   )
 %>
 <%=
