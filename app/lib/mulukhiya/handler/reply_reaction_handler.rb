@@ -12,9 +12,10 @@ module Mulukhiya
       return unless status = status_class[payload[status_key]]
       return unless receipt = status.account
       return if receipt.reactionable? && !Environment.test?
+      visibility = bridge_account?(receipt) ? :public : :unlisted
       sns.post({
         status_field => create_status(payload:, receipt:),
-        visibility_field => controller_class.visibility_name(:unlisted),
+        visibility_field => controller_class.visibility_name(visibility),
       }, {reply: status.to_h})
       result.push(reply: status.id, reaction: payload[:reaction])
     end
@@ -27,6 +28,14 @@ module Mulukhiya
       template[:payload] = params[:payload]
       template[:receipt] = params[:receipt]
       return template.to_s
+    end
+
+    def bridge_account?(account)
+      return bridge_domains.member?(account.domain)
+    end
+
+    def bridge_domains
+      return handler_config(:bridge_domains) || []
     end
   end
 end
