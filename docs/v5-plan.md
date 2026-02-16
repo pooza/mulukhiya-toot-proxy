@@ -489,7 +489,7 @@ test/
 - [ ] [#3350](https://github.com/pooza/mulukhiya-toot-proxy/issues/3350) (P2): 新規登録時webhook対応（実装完了 `3a3b002f`、ステージング検証待ち）
 - [x] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (~~P2~~ クローズ): アンケート公開範囲の制御 → プロキシ層での実現が困難なため見送り
 - [x] [#4067](https://github.com/pooza/mulukhiya-toot-proxy/issues/4067) (P2): ChannelNotificationHandlerの通知方法見直し（info_agent_service直接呼び出し、display_nameでメンション回避、ステージング検証完了）
-- [ ] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ（ブリッジドメイン `bsky.brid.gy` で判定、ReplyReactionHandlerのvisibility制御）
+- [x] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ（ブリッジドメイン `bsky.brid.gy` で判定、ReplyReactionHandlerのvisibility制御。実験的機能、実地検証未実施）
 - [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3): Misskey実況デコレーションの自動剥がし（`/api/i/update`＋各ユーザートークン方式。`write:account`スコープ追加が必要。認証済みユーザーのみ対象）
 - [ ] [#3877](https://github.com/pooza/mulukhiya-toot-proxy/issues/3877) (P3): Mastodon形式タグづけ復活（ActivityPub Update使用、Mastodon系限定）— 5.0.0スコープ外、5.x以降で対応
 - [ ] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS等の軽量フレームワーク導入＋SASS差分整理）
