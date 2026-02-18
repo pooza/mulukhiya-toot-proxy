@@ -18,7 +18,6 @@ module Mulukhiya
       return unless sns = params[:sns]
       return unless account = resolve_account(payload)
       return if account.bot?
-      sns.follow(account.id) rescue nil
       sns.notify(account, create_body(params))
       result.push(account: account.acct.to_s)
     end
