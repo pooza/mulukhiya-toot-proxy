@@ -1,5 +1,5 @@
 module Mulukhiya
-  class Controller < Ginseng::Web::Sinatra
+  class Controller < Sinatra::Base
     include Package
     include SNSMethods
 
@@ -9,12 +9,33 @@ module Mulukhiya
     enable :method_override
 
     before do
+      @renderer = default_renderer_class.new
+      @body = request.body.read.to_s
+      @headers = request.env.select {|k, _v| k.start_with?('HTTP_')}.transform_keys do |k|
+        k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).tr('_', '-')
+      end
+      begin
+        @params = JSON.parse(@body).with_indifferent_access
+      rescue StandardError
+        @params = params.with_indifferent_access
+      end
+      logger.info(request: {
+        method: request.request_method,
+        path: request.path,
+        params: @params,
+        remote: request.ip,
+      })
       @reporter = Reporter.new
       @sns = sns_class.new
       @sns.token = token
     rescue => e
       e.log
-      @sns.token = nil
+      @sns&.token = nil
+    end
+
+    after do
+      status @renderer.status
+      content_type @renderer.type
     end
 
     not_found do
@@ -74,6 +95,10 @@ module Mulukhiya
     end
 
     private
+
+    def default_renderer_class
+      return Ginseng::Web::JSONRenderer
+    end
 
     def path_prefix
       return '' if Environment.test?
