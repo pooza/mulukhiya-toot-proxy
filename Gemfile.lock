@@ -372,12 +372,12 @@ GEM
     sequel (5.101.0)
       bigdecimal
     set (1.1.2)
-    sidekiq (8.0.10)
-      connection_pool (>= 2.5.0)
-      json (>= 2.9.0)
-      logger (>= 1.6.2)
-      rack (>= 3.1.0)
-      redis-client (>= 0.23.2)
+    sidekiq (8.1.1)
+      connection_pool (>= 3.0.0)
+      json (>= 2.16.0)
+      logger (>= 1.7.0)
+      rack (>= 3.2.0)
+      redis-client (>= 0.26.0)
     sidekiq-scheduler (6.0.1)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 7.3, < 9)
@@ -461,7 +461,7 @@ DEPENDENCIES
   rubocop-sequel
   ruby-progressbar
   ruby-vips
-  sidekiq (~> 8.0.5)
+  sidekiq (~> 8.1)
   sidekiq-scheduler (~> 6.0.1)
   slim_lint
   test-unit
