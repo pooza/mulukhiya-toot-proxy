@@ -160,7 +160,7 @@ module Mulukhiya
       end
 
       def visible_users_field
-        return config["/parser/#{parser_name}/fields/visible_users"]
+        return config["/parser/#{parser_name}/fields/visible_users"] rescue nil
       end
 
       def status_key
