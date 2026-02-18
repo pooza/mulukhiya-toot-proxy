@@ -2,9 +2,8 @@ module Mulukhiya
   class WebhookController < Controller
     post '/admin' do
       raise Ginseng::ServiceUnavailableError, 'Info agent not configured' unless info_agent_service
-      raw_body = request.body.read
-      verify_admin_webhook!(raw_body)
-      admin_payload = JSON.parse(raw_body)
+      verify_admin_webhook!(@body)
+      admin_payload = JSON.parse(@body)
       event = detect_admin_event(admin_payload)
       raise Ginseng::NotFoundError, 'Unknown event' unless event
       reporter = Event.new(event, {sns: info_agent_service}).dispatch(admin_payload)
