@@ -64,13 +64,13 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: ea462017ac182ecd554ef38a04c7f45c66a613ed
+  revision: 05df79caaccfd5728e760d5773da3a7ccb106961
   branch: stable
   specs:
-    ginseng-web (1.3.43)
+    ginseng-web (1.3.45)
       erb
       puma (>= 6.4.3)
-      rack (~> 3.1.14)
+      rack (>= 3.1.14)
       rack-session (>= 2.1.1)
       rss
       sassc
@@ -289,7 +289,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.1.20)
+    rack (3.2.5)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
