@@ -2,7 +2,7 @@ module Mulukhiya
   class WelcomeMentionHandler < MentionHandler
     def disable?
       return true unless info_agent_service
-      return false if event == :user_created
+      return false if event == :user_approved
       return super
     end
 
@@ -14,7 +14,7 @@ module Mulukhiya
       result.push(sender: sender.acct.to_s)
     end
 
-    def handle_user_created(payload, params = {})
+    def handle_user_approved(payload, params = {})
       return unless sns = params[:sns]
       return unless account = resolve_account(payload)
       return if account.bot?

@@ -76,7 +76,7 @@ module Mulukhiya
     end
 
     def detect_admin_event(payload)
-      return :user_created if payload['event'] == 'account.created'
+      return :user_approved if payload['event'] == 'account.approved'
       return :user_created if payload['type'] == 'userCreated'
       return nil
     end

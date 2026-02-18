@@ -170,7 +170,7 @@ handler:
       announce:
         - post_announce
       follow: []
-      user_created:
+      user_approved:
         - welcome_mention
       mention:
         - announcement_mention
