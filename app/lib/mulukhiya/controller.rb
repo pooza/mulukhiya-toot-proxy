@@ -1,3 +1,5 @@
+require 'sinatra/base'
+
 module Mulukhiya
   class Controller < Sinatra::Base
     include Package
