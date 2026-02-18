@@ -105,7 +105,7 @@ config/
   schema/           # JSONスキーマ (handler/, base.yaml)
   route.yaml        # Rackルーティング
 views/              # Slim テンプレート + インラインVue.js
-test/               # test-unit ベースのテスト (121ファイル)
+test/               # test-unit ベースのテスト (128ファイル)
 ```
 
 ## リリース運用
@@ -152,6 +152,7 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 
 - rubocop, slim_lint, erb_lint に準拠
 - テスト: test-unit (Mulukhiya::TestCase 基底クラス)
+- モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
 - ハンドラー設定: `handler_config(:key)` (5.0で記法統一予定)
 
