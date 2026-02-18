@@ -1,7 +1,7 @@
 module Mulukhiya
   class MisskeyServiceTest < TestCase
     def setup
-      WebMock.enable!
+      WebMock.disable_net_connect!
       @service = MisskeyService.new('https://misskey.test', 'test_token_abc123')
     end
 
@@ -37,6 +37,24 @@ module Mulukhiya
       @service.update_draft({draftId: 'test_draft_001', text: '更新テスト'})
 
       assert_requested(:post, %r{misskey\.test/api/notes/drafts/update})
+    end
+
+    def test_theme_color_from_api
+      stub_request(:post, %r{misskey\.test/api/meta})
+        .to_return(status: 200, body: '{"themeColor":"#86b300"}', headers: {'Content-Type' => 'application/json'})
+
+      color = @service.theme_color
+
+      assert_equal('#86b300', color)
+    end
+
+    def test_theme_color_fallback
+      stub_request(:post, %r{misskey\.test/api/meta})
+        .to_return(status: 500, body: '{}')
+
+      color = @service.theme_color
+
+      assert_equal(config['/misskey/theme/color'], color)
     end
   end
 end

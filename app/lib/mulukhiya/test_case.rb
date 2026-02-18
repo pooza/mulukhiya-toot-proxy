@@ -1,19 +1,19 @@
 require 'sidekiq/testing'
 require 'rack/test'
 require 'timecop'
-require 'webmock'
+require 'webmock/test_unit'
+WebMock.allow_net_connect!
 
 module Mulukhiya
   class TestCase < Ginseng::TestCase
     include Package
     include SNSMethods
-    include WebMock::API
 
     def teardown
       config.reload
       @handler&.clear
       Timecop.return
-      WebMock.reset!
+      WebMock.allow_net_connect!
     end
 
     def account

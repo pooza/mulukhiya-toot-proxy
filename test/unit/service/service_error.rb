@@ -1,7 +1,7 @@
 module Mulukhiya
   class ServiceErrorTest < TestCase
     def setup
-      WebMock.enable!
+      WebMock.disable_net_connect!
     end
 
     def test_mastodon_unauthorized
