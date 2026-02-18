@@ -459,9 +459,9 @@ test/
 
 - [x] [#4027](https://github.com/pooza/mulukhiya-toot-proxy/issues/4027) (P1): 投稿前トークン整合性チェックの実装（4.xバックポート対象）
 - [x] [#4028](https://github.com/pooza/mulukhiya-toot-proxy/issues/4028) (P1): 投稿後アカウントID検証の実装（4.xバックポート対象）
-- [ ] [#4053](https://github.com/pooza/mulukhiya-toot-proxy/issues/4053) (P3): ginseng-web stableブランチのrack 3.2対応改修
-- [ ] [#4054](https://github.com/pooza/mulukhiya-toot-proxy/issues/4054) (P3): Sidekiq 8.1系への依存更新
-- [ ] [#4055](https://github.com/pooza/mulukhiya-toot-proxy/issues/4055) (P3): rack 3.2環境での同時アクセス再現テスト
+- [x] [#4053](https://github.com/pooza/mulukhiya-toot-proxy/issues/4053) (P3): ginseng-web stableブランチのrack 3.2対応改修
+- [x] [#4054](https://github.com/pooza/mulukhiya-toot-proxy/issues/4054) (P3): Sidekiq 8.1系への依存更新
+- [ ] [#4055](https://github.com/pooza/mulukhiya-toot-proxy/issues/4055) (P3): rack 3.2環境での同時アクセス再現テスト（ステージング検証待ち）
 
 ### テスト
 

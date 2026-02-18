@@ -4,7 +4,7 @@
 
 通称「モロヘイヤ」。各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。
 
-- **技術スタック**: Ruby 3.4 / Sinatra 4.1 (via ginseng-web) / Sidekiq 8.0 / Puma / Vue 3
+- **技術スタック**: Ruby 3.4 / Sinatra 4.1 / Sidekiq 8.1 / Puma / Vue 3
 - **DB**: PostgreSQL (Sequel ORM) / Redis
 - **テンプレート**: Slim / SASS
 - **ginseng-\*系gem**: 自作フレームワーク。必要に応じて全て更新してよい
@@ -117,13 +117,15 @@ test/               # test-unit ベースのテスト (128ファイル)
 ### rack 3.2問題
 
 rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信される」致命的問題が発生した（2025-10-12〜10-26）。
-原因未特定のためrack 3.1.xに固定中。5.0で防御策込みで再検証予定。
+防御策（トークン整合性チェック・アカウントID検証）実装済み。rack 3.2.5 + Sinatra 4.1.1 に更新済み（#4053, #4054）。
+ステージングでの同時アクセス再現テスト（#4055）が残タスク。
 詳細は [rack-upgrade-discussion.md](rack-upgrade-discussion.md) を参照。
 
-### ginseng-web ブランチ
+### ginseng-web
 
-- stable（使用中）: rack ~> 3.1.14 / Sinatra ~> 4.1.0
-- main: rack >= 3.2.3 / Sinatra >= 4.2.0（Sinatraクラス削除済みのため使用不可）
+- `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45）
+- Controller は `Sinatra::Base` を直接継承
+- stable: rack >= 3.1.14 / Sinatra ~> 4.1.0
 
 ## 関連リポジトリ
 
