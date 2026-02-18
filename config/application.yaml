@@ -313,6 +313,7 @@ mastodon:
       - read
       - write:statuses
       - write:media
+      - write:follows
     webui:
       url: /settings/applications
   sns_type: mastodon
