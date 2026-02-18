@@ -1,3 +1,4 @@
 *.erb
 !announcement.erb
 !welcome.erb
+!welcome_delmulin.erb
