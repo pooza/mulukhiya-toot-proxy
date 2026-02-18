@@ -486,7 +486,7 @@ test/
 
 ### 新機能・過去Issue対応
 
-- [ ] [#3350](https://github.com/pooza/mulukhiya-toot-proxy/issues/3350) (P2): 新規登録時webhook対応（実装完了 `3a3b002f`、ステージング検証待ち）
+- [x] [#3350](https://github.com/pooza/mulukhiya-toot-proxy/issues/3350) (P2): 新規登録時webhook対応（Mastodon: `account.approved`、Misskey: `userCreated`→共に`user_approved`イベント。dev04/dev23検証完了）
 - [x] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (~~P2~~ クローズ): アンケート公開範囲の制御 → プロキシ層での実現が困難なため見送り
 - [x] [#4067](https://github.com/pooza/mulukhiya-toot-proxy/issues/4067) (P2): ChannelNotificationHandlerの通知方法見直し（info_agent_service直接呼び出し、display_nameでメンション回避、ステージング検証完了）
 - [x] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ（ブリッジドメイン `bsky.brid.gy` で判定、ReplyReactionHandlerのvisibility制御。実験的機能、検証はリクエスト元ユーザーに委任）
@@ -495,7 +495,7 @@ test/
 - [ ] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS等の軽量フレームワーク導入＋SASS差分整理）
 - [ ] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（ホスト統一・importmap移行・バージョンポリシー・更新手順ドキュメント化）
 - [x] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（スコープ一本化、認証ボタン統合、info_bot自動検出、admin:read除外。Mastodon/Misskey検証完了）
-- [x] [#4073](https://github.com/pooza/mulukhiya-toot-proxy/issues/4073) (P3): テーマカラー取得・アクセントカラー適用（Misskey: /api/meta自動取得+フォールバック、Mastodon: 設定値。CSS custom properties `--accent-color`/`--accent-bg` で動的注入。デフォルト値 Mastodon `#6364FF`/Misskey `#86b300`。ステージング検証待ち）
+- [x] [#4073](https://github.com/pooza/mulukhiya-toot-proxy/issues/4073) (P3): テーマカラー取得・アクセントカラー適用（Misskey: /api/meta自動取得+フォールバック、Mastodon: 設定値。CSS custom properties `--accent-color`/`--accent-bg` で動的注入。デフォルト値 Mastodon `#6364FF`/Misskey `#86b300`。ステージング検証完了）
 - [ ] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P1→**スコープアウト**): Annict `/@:username/records/:record_id` 形式URL対応。GraphQL APIの `Record.annictId` がURL用IDと一致しない（`episode_records.id` vs `records.id`）ためAPI側の対応待ち。実装をrevertし旧形式（`/works/:work_id/episodes/:episode_id`）に戻した
 
 ### ドキュメント
