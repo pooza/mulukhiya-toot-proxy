@@ -4,9 +4,18 @@ module Mulukhiya
     include SNSMethods
     include SNSServiceMethods
 
+    def nodeinfo
+      return super.merge(metadata: {themeColor: theme_color})
+    end
+
     alias info nodeinfo
 
     alias note post
+
+    def theme_color
+      @theme_color ||= fetch_meta_theme_color || config['/misskey/theme/color']
+      return @theme_color
+    end
 
     def draft(body, params = {})
       body = {text: body.to_s} unless body.is_a?(Hash)
@@ -108,6 +117,15 @@ module Mulukhiya
 
     def self.parse_aid(aid)
       return Time.at((aid[0..7].to_i(36) / 1000) + 946_684_800, in: 'UTC').getlocal
+    end
+
+    private
+
+    def fetch_meta_theme_color
+      response = http.post('/api/meta', {body: {}})
+      return response.parsed_response&.dig('themeColor')
+    rescue
+      return nil
     end
   end
 end

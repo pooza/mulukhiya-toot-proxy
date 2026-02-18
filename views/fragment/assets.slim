@@ -5,3 +5,9 @@
   script src=f
 - stylesheets.each do |f|
   link rel='stylesheet' href=f
+style
+  | :root {
+  |   --accent-color: #{sns.theme_color};
+  |   --accent-bg: color-mix(in srgb,
+  |     #{sns.theme_color} 12%, white);
+  | }

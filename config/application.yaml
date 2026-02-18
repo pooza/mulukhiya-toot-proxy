@@ -327,7 +327,7 @@ mastodon:
   streaming:
     verify_peer: true
   theme:
-    color: '#777777'
+    color: '#6364FF'
   url: https://mstdn.example.com/
 media:
   metadata:
@@ -379,6 +379,8 @@ misskey:
     spoiler_text: null
   streaming:
     verify_peer: true
+  theme:
+    color: '#86b300'
   url: https://misskey.example.com/
 nowplaying:
   album:
