@@ -470,7 +470,7 @@ DEPENDENCIES
   yamllint
 
 RUBY VERSION
-  ruby 3.4.8
+  ruby 4.0.1
 
 BUNDLED WITH
   4.0.6
