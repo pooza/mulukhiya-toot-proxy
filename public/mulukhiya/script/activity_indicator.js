@@ -1,12 +1,14 @@
 export class ActivityIndicator {
   constructor () {
     this.progress = document.createElement('progress')
+    this.progress.style.width = '200px'
     this.container = document.createElement('div')
     this.container.style.display = 'none'
     this.container.style.padding = '0.5em 1em'
     this.container.style.position = 'fixed'
     this.container.style.left = '50%'
     this.container.style.top = '50%'
+    this.container.style.transform = 'translate(-50%, -50%)'
     this.container.style.zIndex = 9999
     this.container.style.backgroundColor = '#fff'
     this.container.style.textAlign = 'center'
@@ -21,10 +23,6 @@ export class ActivityIndicator {
 
   show () {
     this.container.style.display = 'block'
-    this.container.style.width = (this.progress.clientWidth + 8) + 'px'
-    this.container.style.height = (this.progress.clientHeight + 8) + 'px'
-    this.container.style.marginLeft = (-0.5 * this.progress.offsetWidth) + 'px'
-    this.container.style.marginTop = (-0.5 * this.progress.offsetHeight) + 'px'
   }
 
   hide () {
