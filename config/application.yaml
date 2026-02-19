@@ -613,35 +613,36 @@ websocket:
 webui:
   importmap:
     development:
-      '@popperjs/core': https://esm.sh/@popperjs/core@2.11
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/esm/popper.min.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
       slide_toggle: /mulukhiya/script/slide_toggle
-      tippy.js: https://esm.sh/tippy.js@6.3.7
+      sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
+      tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
       v_tooltip: /mulukhiya/script/v_tooltip
-      vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js
+      vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.js
     production:
-      '@popperjs/core': https://esm.sh/@popperjs/core@2.11
+      '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/dist/esm/popper.min.js
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
       slide_toggle: /mulukhiya/script/slide_toggle
-      tippy.js: https://esm.sh/tippy.js@6.3.7
+      sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
+      tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.esm.js
       v_tooltip: /mulukhiya/script/v_tooltip
-      vue: https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.prod.js
+      vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.prod.js
   development:
-    scripts:
-      - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
+    scripts: []
     stylesheets:
+      - https://cdn.jsdelivr.net/npm/@picocss/pico@2.1/css/pico.css
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.css
-      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.css
+      - https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0/css/all.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   episode:
@@ -658,13 +659,12 @@ webui:
     robots: noindex,nofollow
     viewport: width=1000
   production:
-    scripts:
-      - https://cdn.jsdelivr.net/npm/clipboard@2.0/dist/clipboard.min.js
-      - https://cdn.jsdelivr.net/npm/sweetalert2@11.26
+    scripts: []
     stylesheets:
+      - https://cdn.jsdelivr.net/npm/@picocss/pico@2.1/css/pico.min.css
       - https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/themes/default.css
       - https://cdn.jsdelivr.net/npm/tippy.js@6.3/dist/tippy.min.css
-      - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css
+      - https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0/css/all.min.css
       - https://fonts.googleapis.com/css?family=Francois+One|Inconsolata&display=swap
       - /mulukhiya/style/default
   status:

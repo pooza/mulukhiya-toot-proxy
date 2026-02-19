@@ -32,13 +32,13 @@ html lang='ja'
           .field
             .title トークン
             .value
-              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#token-' + current_account.username"
-              code :id='"token-" + current_account.username' v-if='current_account.token' {{current_account.token}}
+              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(current_account.token)"
+              code v-if='current_account.token' {{current_account.token}}
           .field
             .title webhook
             .value
-              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#webhook-' + current_account.username"
-              code :id='"webhook-" + current_account.username' v-if='current_account.webhook' {{current_account.webhook}}
+              i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(current_account.webhook)"
+              code v-if='current_account.webhook' {{current_account.webhook}}
       nav.tokens
         h3 トークンの登録
         .token
@@ -68,6 +68,7 @@ html lang='ja'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import Swal from 'sweetalert2'
         const app = createApp({
           data () {
             return {
@@ -92,10 +93,12 @@ html lang='ja'
                 this.all_tokens = this.getAllTokens()
               })
           },
-          async mounted () {
-            new ClipboardJS('.token i')
-          },
           methods: {
+            copyToClipboard (text) {
+              navigator.clipboard.writeText(text)
+                .then(() => Swal.fire({title: 'クリップボードにコピーしました。', toast: true, position: 'top-end', icon: 'info', showConfirmButton: false, timer: 2000}))
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
             switchAccount (account) {
               this.methods.switchAccount(account)
                 .then(_ => {

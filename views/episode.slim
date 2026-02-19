@@ -16,8 +16,8 @@ html lang='ja'
           button.small @click='getWorks' 検索
       article.episode v-for='work in works'
         h3
-          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#work-title-' + work.annictId"
-          span :id="'work-title-' + work.annictId" v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
+          i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(work.title)"
+          span v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
             | {{work.title}}
           ul.params class='clearfix'
             li.param v-if='work.seasonYear'
@@ -33,17 +33,16 @@ html lang='ja'
                 strong.number-text
                   | {{episode.numberText}}
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-title-' + work.annictId + '-' + episode.annictId"
-                  span.title :id="'episode-title-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(episode.title)"
+                  span.title
                     | {{episode.title}}
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId + '-' + episode.annictId"
-                  span.hashtag :id="'episode-hashtag-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(episode.hashtag)"
+                  span.hashtag
                     | {{episode.hashtag}}
                 .link-container v-if='episode.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId + '-' + episode.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(episode.command_toot)"
                   | 実況コマンド
-                  textarea :id="'episode-command-' + work.annictId + '-' + episode.annictId" {{episode.command_toot}}
                 .bubble-container v-if='episode.hashtag_url'
                   a :href='episode.hashtag_url' target='_blank' rel='noreferrer' v-if='episode.hashtag_url'
                     i class='fas fa-comment'
@@ -51,13 +50,12 @@ html lang='ja'
             ul.episodes v-else=''
               li.episode
                 .link-container
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" :data-clipboard-target="'#episode-hashtag-' + work.annictId"
-                  span.hashtag :id="'episode-hashtag-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(work.hashtag)"
+                  span.hashtag
                     | {{work.hashtag}}
                 .link-container v-if='work.command_toot'
-                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click='notifyCopy' :data-clipboard-target="'#episode-command-' + work.annictId"
+                  i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(work.command_toot)"
                   | 実況コマンド
-                  textarea :id="'episode-command-' + work.annictId" {{work.command_toot}}
                 .bubble-container v-if='work.hashtag_url'
                   a :href='work.hashtag_url' target='_blank' rel='noreferrer' v-if='work.hashtag_url'
                     i class='fas fa-comment'
@@ -73,6 +71,7 @@ html lang='ja'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import Swal from 'sweetalert2'
         const app = createApp({
           data () {
             return {
@@ -92,10 +91,12 @@ html lang='ja'
               })
             this.getWorks()
           },
-          async mounted () {
-            new ClipboardJS('.episode i')
-          },
           methods: {
+            copyToClipboard (text) {
+              navigator.clipboard.writeText(text)
+                .then(() => Swal.fire({title: 'クリップボードにコピーしました。', toast: true, position: 'top-end', icon: 'info', showConfirmButton: false, timer: 2000}))
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
             toggleEpisodes (id) {
               this.layout[id] = !this.layout[id]
             },
@@ -114,16 +115,6 @@ html lang='ja'
                     this.works.map(w => this.layout[w.annictId] = false)
                   }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
               }, 500)
-            },
-            notifyCopy () {
-              Swal.fire({
-                title: 'クリップボードにコピーしました。',
-                toast: true,
-                position: 'top-end',
-                icon: 'info',
-                showConfirmButton: false,
-                timer: 2000,
-              })
             },
           },
         })
