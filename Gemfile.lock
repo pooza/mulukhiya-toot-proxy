@@ -428,7 +428,7 @@ GEM
     yajl-ruby (1.4.3)
     yamllint (0.0.9)
       trollop (~> 2)
-    zeitwerk (2.7.4)
+    zeitwerk (2.7.5)
     zlib (3.2.2)
 
 PLATFORMS
