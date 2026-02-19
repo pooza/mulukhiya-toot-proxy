@@ -18,7 +18,7 @@ html lang='ja' data-theme='light'
               option v-for='keyword in suggested_keywords' {{keyword}}
             button.small @click='searchStatuses' 検索
         template v-if='account.username'
-          article.status v-for='(status, id) in statuses'
+          .status v-for='(status, id) in statuses'
             .visibility
               i :class="'fa fa-' + status.visibility_icon" v-tooltip.left='status.visibility_name'
             .header
@@ -58,7 +58,7 @@ html lang='ja' data-theme='light'
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else
-        article.status #{controller.display_name}は一覧表示に対応していません。
+        .status #{controller.display_name}は一覧表示に対応していません。
     script type='module'
       |
         import { createApp } from 'vue'

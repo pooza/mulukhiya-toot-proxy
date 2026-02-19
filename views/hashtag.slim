@@ -20,7 +20,7 @@ html lang='ja' data-theme='light'
           i class='fa fa-magnifying-glass'
           input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
           button.small :disabled='!keyword' @click='search' 検索
-        article :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
+        div :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
           h4
             | {{entry.word}}
             span.alert v-if='entry.short' 未使用
@@ -37,7 +37,7 @@ html lang='ja' data-theme='light'
       - if controller.favorite_tags?
         section.fav-entries
           h3 プロフィールに含まれるタグ
-          article.tag-entry v-for='(v, tag) in fav_entries'
+          .tag-entry v-for='(v, tag) in fav_entries'
             a :href='v.url' target='_blank' rel='noreferrer' = '#{{tag}}'
             span.count v-if='v.count' {{v.count}}
       section.remote-dics

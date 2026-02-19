@@ -14,7 +14,7 @@ html lang='ja' data-theme='light'
           i class='fa fa-magnifying-glass'
           input type='search' placeholder='作品名検索フレーズ' v-model.trim='keyword' @keydown.enter='getWorks'
           button.small @click='getWorks' 検索
-      article.episode v-for='work in works'
+      .episode v-for='work in works'
         h3
           i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(work.title)"
           span v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
