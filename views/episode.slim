@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'エピソードブラウザ'}]}
-    main#app class=env.type
+    main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h2 エピソードブラウザ
       nav.search-form-container v-if='account.username'

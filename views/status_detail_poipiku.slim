@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: controller.status_label, href: '/mulukhiya/app/status'}, {label: params[:id], href: "/mulukhiya/app/status/#{params[:id]}"}, {label: 'ポイピク'}]}
-    main#app class=env.type
+    main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       article.status v-if='status.id'
         .visibility

@@ -6,13 +6,19 @@ $monospace: Inconsolata, monospace
 
 // Pico CSS overrides
 \:root
+  color-scheme: light
   --pico-font-family: #{$serif}
   --pico-font-size: 100%
   --pico-border-radius: 6px
   --pico-background-color: #fff
+  --pico-color: #333
   --pico-primary: var(--accent-color)
   --pico-primary-hover: var(--accent-color)
   --pico-primary-background: var(--accent-bg)
+
+// Vue FOUC防止
+[v-cloak]
+  display: none
 
 body
   font:

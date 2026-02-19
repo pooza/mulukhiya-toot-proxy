@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'API'}]}
-    main#app class=env.type
+    main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h2 API
       ul.links

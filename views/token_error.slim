@@ -6,7 +6,7 @@ html lang='ja'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'トークンの管理', href: '/mulukhiya/app/token'}, {label: '認証エラー'}]}
-    main#app class=env.type
+    main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h2 認証エラー
       .description 認証処理中にエラーが発生しました。
