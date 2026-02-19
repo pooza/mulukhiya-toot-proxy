@@ -143,3 +143,52 @@ FreeBSD の rc.d スクリプトは 4.x から3サービス分割（`mulukhiya-p
 ### daemon-spawn 直接管理
 
 systemd を使わずに daemon-spawn で直接管理するための `mulukhiya-daemon.sh` を `config/sample/ubuntu/`、`config/sample/rhel/` に追加した。Docker 環境等で利用できる。
+
+## フロントエンド・CDN の変更
+
+### CDN ホスト統一（#4069）
+
+4.x では CDN ホストが jsDelivr, cdnjs, esm.sh の3つに分散していた。5.0 では **jsDelivr に一本化** した（Google Fonts のみ据え置き）。
+
+| ライブラリ | 4.x CDN | 5.0 CDN |
+|-----------|---------|---------|
+| Font Awesome | cdnjs | jsDelivr |
+| @popperjs/core | esm.sh | jsDelivr |
+| tippy.js | esm.sh | jsDelivr |
+| その他 | jsDelivr | jsDelivr（変更なし） |
+
+### CDN バージョン指定ポリシー
+
+jsDelivr のアセットは **minor バージョン** で指定するルールに統一した。
+
+```text
+# 良い例（minor指定）
+https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.js
+https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
+
+# 避ける例
+https://cdn.jsdelivr.net/npm/vue@3/...        # major のみ — 破壊的変更を受ける
+https://cdn.jsdelivr.net/npm/vue@3.5.13/...   # patch 固定 — セキュリティ修正が入らない
+```
+
+バージョンを更新する際は、ステージング環境でブラウザの DevTools を確認し、コンソールエラーがないことを検証すること。
+
+### SweetAlert2 の importmap 移行
+
+4.x では SweetAlert2 をグローバルスクリプト（`<script>` タグ）で読み込んでいた。5.0 では ESM ビルドを importmap 経由で読み込むように変更した。
+
+各ビューの `<script type="module">` ブロック内で `import Swal from 'sweetalert2'` としてインポートする。
+
+### clipboard.js の廃止
+
+clipboard.js（グローバルスクリプト）を廃止し、ブラウザネイティブの `navigator.clipboard` API に置き換えた。Vue の `methods` 内で `navigator.clipboard.writeText()` を使用する。
+
+### Pico CSS の導入（#4068）
+
+CSS フレームワークとして [Pico CSS](https://picocss.com/) v2 を導入した。class-less フレームワークのため、既存の HTML 構造との互換性が高い。
+
+`default.sass` は Pico CSS の後に読み込まれ、プロジェクト固有のスタイル（テーマカラー、背景画像、独自レイアウト等）のみをオーバーライドとして保持する。Pico CSS の custom properties は `--pico-*` プレフィックスで上書き可能。
+
+### local.yaml への影響
+
+フロントエンドの変更による `local.yaml` の修正は不要。CDN URL やスタイルシートの設定は `config/application.yaml` で管理されており、`local.yaml` でオーバーライドしない限り自動的に新しい設定が使用される。

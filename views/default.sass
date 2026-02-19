@@ -1,16 +1,25 @@
+// mulukhiya-toot-proxy custom styles (Pico CSS overrides + project-specific)
+
 $serif: serif
 $sans-serif: 'Francois One', sans-serif
 $monospace: Inconsolata, monospace
 
+// Pico CSS overrides
+\:root
+  --pico-font-family: #{$serif}
+  --pico-font-size: 100%
+  --pico-border-radius: 6px
+  --pico-primary: var(--accent-color)
+  --pico-primary-hover: var(--accent-color)
+  --pico-primary-background: var(--accent-bg)
+
 body
   font:
-    size: 1.2em
     family: $serif
   background:
     image: url(/mulukhiya/media/logo.jpg)
     repeat: no-repeat
     position: top right
-  -webkit-text-size-adjust: 100%
 
 h1,h2,h3,h4,h5,h6
   margin: 0.5em
@@ -45,9 +54,6 @@ h3
       width: 0.5em
   padding:
     left: 0.5em
-
-p
-  margin: 0 0.5em
 
 header
   background:
@@ -164,11 +170,6 @@ nav.tokens
       background:
         color: var(--accent-color)
     input
-      border:
-        width: 1px
-        style: solid
-        color: black
-        radius: 6px
       display: inline-block
       width: 20em
     button
@@ -177,10 +178,9 @@ nav.tokens
       padding: 0 1em
       margin: 0 1em
     .field
-      display: block
-      color: dimgray
       display: flex
       gap: 0.5em
+      color: dimgray
       font:
         size: 0.8em
         weight: normal
@@ -218,6 +218,7 @@ nav.tokens
 
 main
   margin: auto
+  max-width: none
   border:
     width: 2px
     style: solid
@@ -228,8 +229,6 @@ main
     color: white
   opacity: 0.9
   p
-    font:
-      size: 1em
     margin:
       left: 1em
 
@@ -238,14 +237,6 @@ main.development
     color: mistyrose
 
 pre
-  border:
-    width: 1px
-    style: solid
-    color: black
-    radius: 6px
-  margin: 0 1em
-  padding: 0.5em
-  overflow: auto
   font:
     family: $monospace
 
@@ -614,12 +605,6 @@ article.episode
         text:
           align: right
         margin: 0 0.5em
-    textarea
-      display: inline-block
-      height: 0
-      width: 0
-      margin: 0
-      opacity: 0
     .link-container
       display: inline-block
       font:
@@ -637,67 +622,21 @@ article.episode
       border:
         radius: 3px
 
-textarea
-  border:
-    width: 1px
-    style: solid
-    color: black
-    radius: 6px
-  font:
-    size: 0.8em
-    family: $monospace
-  margin: 0.5em
-  padding: 0.5em
-  width: calc(100% - 2em)
-  height: 6em
-
 textarea.short
   height: 2em
 
-input
-  font:
-    size: 1em
-
-input[type='search']
+input[type='search'],input[type='number'],input[type='text'],input[type='password']
   font:
     family: $monospace
-  width: calc(100% - 8em)
-  padding: 0 0.5em
-
-input[type='number']
-  font:
-    family: $monospace
-  width: 10em
-  padding: 0 0.5em
-
-input[type='text']
-  font:
-    family: $monospace
-  width: calc(100% - 8em)
-  padding: 0 0.5em
-
-input[type='password']
-  font:
-    family: $monospace
-  width: calc(100% - 8em)
-  padding: 0 0.5em
 
 button
   font:
-    size: 1.2em
     family: $sans-serif
     weight: bold
   border:
-    width: 1px
-    style: solid
     color: var(--accent-color)
-    radius: 6px
   background:
     color: var(--accent-bg)
-  padding: 6px 30px
-  cursor: pointer
-
-a
   cursor: pointer
 
 button.small
@@ -725,8 +664,6 @@ a
 
 a:visited
   color: royalblue
-  text:
-    decoration: none
 
 a:hover
   color: navy
@@ -869,11 +806,6 @@ a:hover
     font:
       size: 0.8em
   input
-    border:
-      width: 1px
-      style: solid
-      color: black
-      radius: 6px
     display: inline-block
     margin: 0 0.5em
     padding: 0 0.5em
