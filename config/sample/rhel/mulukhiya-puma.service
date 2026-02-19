@@ -1,0 +1,17 @@
+[Unit]
+Description=mulukhiya-toot-proxy (puma)
+After=network.target
+
+[Service]
+Type=forking
+User=__username__
+WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
+ExecStart=/bin/bash -lc 'bundle exec rake mulukhiya:puma:start'
+ExecStop=/bin/bash -lc 'bundle exec rake mulukhiya:puma:stop'
+TimeoutSec=15
+SuccessExitStatus=KILL
+Restart=always
+Environment="LD_PRELOAD=/usr/lib64/libjemalloc.so"
+
+[Install]
+WantedBy=multi-user.target

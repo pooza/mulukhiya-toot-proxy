@@ -1,14 +1,15 @@
 [Unit]
-Description=mulukhiya-toot-proxy
+Description=mulukhiya-toot-proxy (sidekiq)
 After=network.target
 
 [Service]
 Type=forking
 User=__username__
 WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
-ExecStart=/bin/bash -lc 'bundle exec rake start'
-ExecStop=/bin/bash -lc 'bundle exec rake stop'
+ExecStart=/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:start'
+ExecStop=/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:stop'
 TimeoutSec=15
+SuccessExitStatus=KILL
 Restart=always
 Environment="LD_PRELOAD=/usr/lib64/libjemalloc.so"
 

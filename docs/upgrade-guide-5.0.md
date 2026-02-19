@@ -93,3 +93,53 @@ location ^~ /mulukhiya/sidekiq {
 ### map 変数によるバックエンド振り分け（4.x から変更なし）
 
 `$mulukhiya_backend`, `$media_put_backend`, `$status_put_backend` の map 定義は 4.x と同一。変更不要。
+
+## 起動スクリプトの変更
+
+### systemd（Ubuntu/RHEL）: 3サービス分割
+
+4.x では1つの systemd ユニット（`mulukhiya-toot-proxy.service`）で `rake start`/`stop` を呼び、puma/sidekiq/listener を一括管理していた。
+
+5.0 では puma/sidekiq/listener をそれぞれ独立した systemd ユニットに分割した:
+
+| 4.x | 5.0 |
+|-----|-----|
+| `mulukhiya-toot-proxy.service` | `mulukhiya-puma.service` |
+| （同上） | `mulukhiya-sidekiq.service` |
+| （同上） | `mulukhiya-listener.service` |
+
+サンプルは `config/sample/ubuntu/`、`config/sample/rhel/` を参照。
+
+#### 移行手順
+
+```bash
+# 旧サービスの停止・無効化
+sudo systemctl stop mulukhiya-toot-proxy
+sudo systemctl disable mulukhiya-toot-proxy
+sudo rm /etc/systemd/system/mulukhiya-toot-proxy.service
+
+# 新サービスの配置（Ubuntu の例）
+sudo cp config/sample/ubuntu/mulukhiya-{puma,sidekiq,listener}.service /etc/systemd/system/
+# __username__ とパスをサイトに合わせて編集
+sudo vi /etc/systemd/system/mulukhiya-puma.service
+sudo vi /etc/systemd/system/mulukhiya-sidekiq.service
+sudo vi /etc/systemd/system/mulukhiya-listener.service
+
+# 有効化・起動
+sudo systemctl daemon-reload
+sudo systemctl enable mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
+sudo systemctl start mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
+```
+
+#### 注意事項
+
+- **rbenv/asdf 等を使用している場合**: `ExecStart` のシェルが rbenv の初期化を読み込めることを確認すること。サンプルは `/bin/bash -lc` を使用しているが、rbenv の設定が `.zshenv` 等にある場合は `/bin/zsh -c` に変更する必要がある
+- **jemalloc**: RHEL サンプルには `Environment="LD_PRELOAD=/usr/lib64/libjemalloc.so"` が含まれる。Ubuntu サンプルには含まれないため、使用する場合は手動で追加すること
+
+### FreeBSD（rc.d）: 変更なし
+
+FreeBSD の rc.d スクリプトは 4.x から3サービス分割（`mulukhiya-puma`/`mulukhiya-sidekiq`/`mulukhiya-listener`）であり、5.0 での変更はない。
+
+### daemon-spawn 直接管理
+
+systemd を使わずに daemon-spawn で直接管理するための `mulukhiya-daemon.sh` を `config/sample/ubuntu/`、`config/sample/rhel/` に追加した。Docker 環境等で利用できる。
