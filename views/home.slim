@@ -9,7 +9,7 @@ html lang='ja' data-theme='light'
     main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h1 = package.name
-      nav class='menu clearfix'
+      nav.menu
         - if controller.feed?
           a href='/mulukhiya/app/feed' フィード
         - if controller.media_catalog?

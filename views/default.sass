@@ -92,7 +92,7 @@ body > footer
 
 nav.breadcrumbs
   display: block
-  margin: 6px 0
+  margin: 0.5em
   border:
     width: 1px
     style: solid
@@ -124,12 +124,13 @@ nav.breadcrumbs
       content: '▹'
 
 nav.menu
+  display: flex
+  flex-wrap: wrap
+  gap: 0.5em
   a
     display: block
-    float: left
     width: 12em
     height: calc(1em + 18px)
-    margin: 0.5em 1em
     padding: 0.5em 1em
     border:
       width: 1px
@@ -232,7 +233,7 @@ nav.tokens
       size: 0.8em
 
 main
-  margin: auto
+  margin: 0.5em
   max-width: none
   border:
     width: 2px
