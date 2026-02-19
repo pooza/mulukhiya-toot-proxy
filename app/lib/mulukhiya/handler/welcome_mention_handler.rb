@@ -25,7 +25,9 @@ module Mulukhiya
     private
 
     def resolve_account(payload)
-      account_id = payload.dig('object', 'id') || payload.dig('body', 'user', 'id') || payload.dig('body', 'id')
+      account_id = payload.dig('object', 'id') ||
+        payload.dig('body', 'user', 'id') ||
+        payload.dig('body', 'id')
       return nil unless account_id
       return account_class[account_id]
     rescue => e
