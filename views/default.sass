@@ -9,6 +9,7 @@ $monospace: Inconsolata, monospace
   --pico-font-family: #{$serif}
   --pico-font-size: 100%
   --pico-border-radius: 6px
+  --pico-background-color: #fff
   --pico-primary: var(--accent-color)
   --pico-primary-hover: var(--accent-color)
   --pico-primary-background: var(--accent-bg)
@@ -65,6 +66,9 @@ header
   color: white
   text:
     align: right
+  display: block
+  padding: 0.2em 0.5em
+  margin: 0
 
 footer
   font:
@@ -82,11 +86,13 @@ footer
 nav.breadcrumbs
   margin: 6px 0
   border:
-    width: 0
+    width: 1px
+    style: solid
+    color: var(--accent-color)
     radius: 6px
   padding: 6px
   background:
-    color: var(--accent-color)
+    color: var(--accent-bg)
   opacity: 0.9
   ul
     margin: 0
@@ -671,10 +677,11 @@ a:hover
     decoration: underline
 
 .message-container
+  display: block
   border:
     width: 0
     radius: 6px
-  padding: 0
+  padding: 0.2em 0.5em
   margin: 0.5em
   background:
     color: lightgray
@@ -684,6 +691,7 @@ a:hover
   i
     float: right
   .message
+    display: block
     margin: 0 0.5em
 
 .role
