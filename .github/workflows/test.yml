@@ -32,6 +32,8 @@ jobs:
           sudo apt install libpq-dev
           sudo apt install libidn11-dev
           sudo apt install libvips-dev
+      - name: Fix gem directory permissions
+        run: chmod -R o-w "$(gem environment gemdir)"
       - name: bundle install
         run: |
           gem install bundler -v '~>2.0'
