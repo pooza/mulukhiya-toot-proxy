@@ -477,12 +477,12 @@ test/
 
 ### ginseng gem メンテナンス
 
-- [ ] [#4066](https://github.com/pooza/mulukhiya-toot-proxy/issues/4066) (P4): ginseng-*系gemへの汎用拡張返却監査（v5作業完了後に実施）
+- [ ] [#4066](https://github.com/pooza/mulukhiya-toot-proxy/issues/4066) (P3): ginseng-*系gemへの汎用拡張返却監査（5.0.0実装完了後、#4072の前に実施）
 
 ### Ruby 4.0
 
-- [ ] [#4062](https://github.com/pooza/mulukhiya-toot-proxy/issues/4062) (P4): ginseng-*系gemのRuby 4.0互換性調査・テスト
-- [ ] [#4063](https://github.com/pooza/mulukhiya-toot-proxy/issues/4063) (P4): Ruby 4.0リリース後の対応（.ruby-version更新、CI追加）
+- [x] [#4062](https://github.com/pooza/mulukhiya-toot-proxy/issues/4062) (P4): ginseng-*系gemのRuby 4.0互換性調査・テスト（Ruby 4.0対応完了、ostruct gem追加）
+- [x] [#4063](https://github.com/pooza/mulukhiya-toot-proxy/issues/4063) (P4): Ruby 4.0リリース後の対応（.ruby-version更新、CI追加）
 
 ### 新機能・過去Issue対応
 
@@ -498,9 +498,14 @@ test/
 - [x] [#4073](https://github.com/pooza/mulukhiya-toot-proxy/issues/4073) (P3): テーマカラー取得・アクセントカラー適用（Misskey: /api/meta自動取得+フォールバック、Mastodon: 設定値。CSS custom properties `--accent-color`/`--accent-bg` で動的注入。デフォルト値 Mastodon `#6364FF`/Misskey `#86b300`。ステージング検証完了）
 - [x] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P1→**スコープアウト**): Annict `/@:username/records/:record_id` 形式URL対応。GraphQL APIの `Record.annictId` がURL用IDと一致しない（`episode_records.id` vs `records.id`）ためAPI側の対応待ち。実装をrevertし旧形式（`/works/:work_id/episodes/:episode_id`）に戻した
 
+### アーキテクチャ（追加）
+
+- [x] [#4075](https://github.com/pooza/mulukhiya-toot-proxy/issues/4075) (P3→**スコープアウト**): with_indifferent_access の整理・シンボルキー統一 — 5.0.0スコープ外、5.1.0で対応
+
 ### ドキュメント
 
 - [ ] [#4072](https://github.com/pooza/mulukhiya-toot-proxy/issues/4072): 5.0アップグレードガイドの作成（`docs/webhook-setup.md` 先行作成済み）
+- [x] [#4077](https://github.com/pooza/mulukhiya-toot-proxy/issues/4077): Sidekiqダッシュボードのnginxアクセス制限（ドキュメント追加）
 
 ### 外部プロジェクトへの貢献（余裕があれば）
 
