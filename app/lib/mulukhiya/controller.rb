@@ -106,5 +106,19 @@ module Mulukhiya
       return '' if Environment.test?
       return "/mulukhiya/#{name}"
     end
+
+    def token_echo_response
+      raise Ginseng::NotFoundError, 'Not Found' unless config['/diag/enable']
+      t = token
+      return {
+        token_prefix: t&.first(8),
+        token_length: t&.length,
+        sns_token_prefix: sns.token&.first(8),
+        sns_token_length: sns.token&.length,
+        match: t.present? && t == sns.token,
+        thread_id: Thread.current.object_id,
+        timestamp: Time.now.iso8601(6),
+      }
+    end
   end
 end

@@ -34,6 +34,8 @@ cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
 controller: mastodon
+diag:
+  enable: false
 crypt:
   encoder: base64
   password: mulukhiya

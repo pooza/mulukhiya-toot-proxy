@@ -99,6 +99,11 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/api/v1/mulukhiya/diag' do
+      @renderer.message = token_echo_response
+      return @renderer.to_s
+    end
+
     def token
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return @headers['HTTP_AUTHORIZATION'].split(/\s+/).last if @headers['HTTP_AUTHORIZATION']

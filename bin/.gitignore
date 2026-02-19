@@ -6,3 +6,5 @@
 !puma_daemon.rb
 !sidekiq_daemon.rb
 !test.rb
+!diag/
+!diag/**
