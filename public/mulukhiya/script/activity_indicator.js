@@ -2,6 +2,7 @@ export class ActivityIndicator {
   constructor () {
     this.progress = document.createElement('progress')
     this.progress.style.width = '200px'
+    this.progress.style.margin = '0'
     this.container = document.createElement('div')
     this.container.style.display = 'none'
     this.container.style.padding = '0.5em 1em'
