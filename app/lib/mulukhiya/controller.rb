@@ -84,8 +84,8 @@ module Mulukhiya
 
     def verify_account_integrity!(response)
       return unless response&.parsed_response.is_a?(Hash)
-      posted_id = response.parsed_response.dig('account', 'id') \
-        || response.parsed_response.dig('createdNote', 'user', 'id')
+      posted_id = response.parsed_response.dig('account', 'id') ||
+        response.parsed_response.dig('createdNote', 'user', 'id')
       return unless posted_id
       return if posted_id.to_s == sns.account&.id.to_s
       logger.error(

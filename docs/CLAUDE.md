@@ -4,7 +4,7 @@
 
 通称「モロヘイヤ」。各種ActivityPub対応インスタンスへの投稿に対して、内容の更新等を行うプロキシ。
 
-- **技術スタック**: Ruby 3.4 / Sinatra 4.1 / Sidekiq 8.1 / Puma / Vue 3
+- **技術スタック**: Ruby 4.0 / Sinatra 4.1 / Sidekiq 8.1 / Puma / Vue 3
 - **DB**: PostgreSQL (Sequel ORM) / Redis
 - **テンプレート**: Slim / SASS
 - **ginseng-\*系gem**: 自作フレームワーク。必要に応じて全て更新してよい
