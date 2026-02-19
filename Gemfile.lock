@@ -274,6 +274,7 @@ GEM
       oauth2 (>= 2.0.2, < 3)
       omniauth (~> 2.0)
     optparse (0.8.1)
+    ostruct (0.6.3)
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -449,6 +450,7 @@ DEPENDENCIES
   ginseng-youtube!
   marcel
   optparse
+  ostruct
   parallel
   rack-test
   rails-erb-lint

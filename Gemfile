@@ -5,8 +5,8 @@ gem 'dry-validation'
 gem 'faye-websocket', github: 'pooza/faye-websocket-ruby'
 gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng'
 gem 'ginseng-fediverse', github: 'pooza/ginseng-fediverse', require: 'ginseng/fediverse'
-gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-postgres', github: 'pooza/ginseng-postgres'
+gem 'ginseng-redis', github: 'pooza/ginseng-redis', require: 'ginseng/redis'
 gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'stable', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', require: 'ginseng/you_tube'
 gem 'marcel'
@@ -20,6 +20,7 @@ gem 'sidekiq-scheduler', '~>6.0.1'
 gem 'yamllint'
 
 group :development do
+  gem 'ostruct' # gli < 2.22の未宣言依存
   gem 'rack-test'
   gem 'rails-erb-lint'
   gem 'ricecream'
