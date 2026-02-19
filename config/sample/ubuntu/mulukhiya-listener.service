@@ -1,0 +1,16 @@
+[Unit]
+Description=mulukhiya-toot-proxy (listener)
+After=network.target
+
+[Service]
+Type=forking
+User=__username__
+WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
+ExecStart=/bin/bash -lc 'bundle exec rake mulukhiya:listener:start'
+ExecStop=/bin/bash -lc 'bundle exec rake mulukhiya:listener:stop'
+TimeoutSec=15
+SuccessExitStatus=KILL
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
