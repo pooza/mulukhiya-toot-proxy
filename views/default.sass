@@ -56,7 +56,7 @@ h3
   padding:
     left: 0.5em
 
-header
+body > header
   background:
     image: url(/mulukhiya/media/icon-24x24.png)
     repeat: no-repeat
@@ -70,12 +70,13 @@ header
   padding: 0.2em 0.5em
   margin: 0
 
-footer
+body > footer
   font:
     family: $sans-serif
     size: 0.8em
   text:
     align: center
+  padding: 0.5em
   a
     color: dimgray
   a:visited
@@ -84,6 +85,7 @@ footer
     color: black
 
 nav.breadcrumbs
+  display: block
   margin: 6px 0
   border:
     width: 1px
@@ -95,6 +97,7 @@ nav.breadcrumbs
     color: var(--accent-bg)
   opacity: 0.9
   ul
+    display: block
     margin: 0
     line:
       height: 0.9em
