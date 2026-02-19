@@ -65,3 +65,31 @@ puts "annict?: #{Mulukhiya::Environment.controller_class.annict?}"
 puts "spotify config?: #{!Mulukhiya::SpotifyService.client_id.nil?}"
 '
 ```
+
+## nginx 設定の変更
+
+### Sidekiq ダッシュボードのアクセス制限（5.0 で追加）
+
+Sidekiq ダッシュボードは `/mulukhiya/sidekiq` で公開される。
+5.0 では、管理者以外のアクセスを防ぐために nginx 側でのアクセス制限を推奨する。
+
+以下の location ブロックを server context に追加する（既存の `location ^~ /mulukhiya` の後）:
+
+```nginx
+location ^~ /mulukhiya/sidekiq {
+  allow YOUR_IP_OR_CIDR;
+  deny all;
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass http://localhost:3008;
+}
+```
+
+**注意事項**:
+
+- `YOUR_IP_OR_CIDR` には管理者のIPアドレスまたはCIDRを指定する。複数行の `allow` を並べて複数のネットワークを許可可能
+- LAN 内からドメイン経由でアクセスする場合、ヘアピン NAT によりクライアントの `$remote_addr` がグローバル IP になることがある。その場合はグローバル IP も `allow` に追加する
+- サンプル設定: `config/sample/mastodon/mulukhiya.nginx`, `config/sample/misskey/mulukhiya.nginx`
+
+### map 変数によるバックエンド振り分け（4.x から変更なし）
+
+`$mulukhiya_backend`, `$media_put_backend`, `$status_put_backend` の map 定義は 4.x と同一。変更不要。

@@ -48,6 +48,12 @@ location ^~ /mulukhiya {
   include /path/to/mulukhiya_proxy.conf;
   proxy_pass http://localhost:3008;
 }
+location ^~ /mulukhiya/sidekiq {
+  allow YOUR_IP_OR_CIDR;
+  deny all;
+  include /path/to/mulukhiya_proxy.conf;
+  proxy_pass http://localhost:3008;
+}
 location ^~ /nodeinfo {
   include /path/to/mulukhiya_proxy.conf;
   proxy_pass $mulukhiya_backend;
