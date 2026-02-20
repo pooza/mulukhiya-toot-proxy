@@ -409,7 +409,6 @@ GEM
       date
     timecop (0.9.10)
     timeout (0.6.0)
-    trollop (2.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.2.0)
@@ -427,8 +426,6 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
-    yamllint (0.0.9)
-      trollop (~> 2)
     zeitwerk (2.7.5)
     zlib (3.2.2)
 
@@ -469,7 +466,6 @@ DEPENDENCIES
   test-unit
   timecop
   webmock
-  yamllint
 
 RUBY VERSION
   ruby 4.0.1

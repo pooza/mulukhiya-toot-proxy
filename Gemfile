@@ -17,8 +17,6 @@ gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
 gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
-gem 'yamllint'
-
 group :development do
   gem 'ostruct' # gli < 2.22の未宣言依存
   gem 'rack-test'
