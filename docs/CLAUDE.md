@@ -75,7 +75,7 @@ git diff Gemfile.lock
 
 ## 重要なドキュメント
 
-- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4073＋過去Issue）、優先度付き
+- [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4079＋過去Issue）、優先度付き
 - [rack-upgrade-discussion.md](rack-upgrade-discussion.md) — rack 3.2問題の詳細記録（致命的バグの経緯）
 - [webhook-setup.md](webhook-setup.md) — admin webhook設定ガイド（ウェルカムDM機能）
 
@@ -96,7 +96,7 @@ app/lib/mulukhiya/
   controller/     # SNS別コントローラ (Mastodon, Misskey, +α)
   service/        # SNS別サービスクライアント
   model/          # SNS別モデル (mastodon/, misskey/)
-  handler/        # 投稿処理ハンドラー (41以上)
+  handler/        # 投稿処理ハンドラー (42)
   listener/       # WebSocketリスナー
   storage/        # Redis/DB永続化
   uri/            # URI解析
@@ -107,7 +107,16 @@ config/
   schema/           # JSONスキーマ (handler/, base.yaml)
   route.yaml        # Rackルーティング
 views/              # Slim テンプレート + インラインVue.js
-test/               # test-unit ベースのテスト (128ファイル)
+test/
+  unit/handler/   # ハンドラーテスト (44)
+  unit/worker/    # ワーカーテスト (3)
+  unit/service/   # サービステスト (9)
+  unit/uri/       # URIテスト (11)
+  unit/model/     # モデルテスト (12)
+  unit/daemon/    # デーモンテスト (3)
+  unit/lib/       # その他ユーティリティテスト (35)
+  contract/       # バリデーションテスト (11)
+  fixture/        # テストフィクスチャ
 ```
 
 ## リリース運用
@@ -129,6 +138,24 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 - `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45）
 - Controller は `Sinatra::Base` を直接継承
 - stable: rack >= 3.1.14 / Sinatra ~> 4.1.0
+
+## v5.0 設定構造の概要
+
+`config/application.yaml` の主要な構造（詳細は [v5-plan.md](v5-plan.md) を参照）:
+
+```yaml
+mastodon:
+  capabilities:   # SNS固有の能力 (streaming, reaction, channel, decoration, repost)
+  features:       # 機能フラグ (webhook, feed, announcement, annict)
+  data:           # データアクセスパターン (account_timeline, favorite_tags, futured_tag, media_catalog)
+service:          # 外部サービス設定 (amazon, annict, itunes, line, lemmy, peer_tube, piefed, poipiku, spotify)
+handler:
+  pipeline:
+    base:         # 共通ハンドラーリスト（Mastodonスーパーセット、実行順の正本）
+    misskey:      # Misskey固有オーバーライド (exclude: [...])
+webui:
+  importmap:      # CDN ESMモジュールのURL管理
+```
 
 ## 関連リポジトリ
 
@@ -153,13 +180,20 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 
 リモート側の操作（git pull、マイグレーション、サービス再起動等）も可能。
 
+## push前の必須手順
+
+1. `bundle exec rubocop`（lint通ること）
+2. `bundle update`（依存更新後も動作すること）
+3. `bundle exec rake lint`（更新後のlintも通ること）
+4. その上で push
+
 ## コーディング規約
 
 - rubocop, slim_lint, erb_lint に準拠
 - テスト: test-unit (Mulukhiya::TestCase 基底クラス)
 - モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
-- ハンドラー設定: `handler_config(:key)` (5.0で記法統一予定)
+- ハンドラー設定: `handler_config(:key)` (5.0でシンボル記法に統一完了、ネストはYAML構造で表現)
 
 ### テスト作成ガイド
 
