@@ -492,8 +492,8 @@ test/
 - [x] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ（ブリッジドメイン `bsky.brid.gy` で判定、ReplyReactionHandlerのvisibility制御。実験的機能、検証はリクエスト元ユーザーに委任）
 - [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3): Misskey実況デコレーションの自動剥がし（`/api/i/update`＋各ユーザートークン方式。`write:account`スコープ追加が必要。認証済みユーザーのみ対象）
 - [x] [#3877](https://github.com/pooza/mulukhiya-toot-proxy/issues/3877) (P3→**スコープアウト**): Mastodon形式タグづけ復活（ActivityPub Update使用、Mastodon系限定）— 5.0.0スコープ外、5.x以降で対応
-- [ ] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS等の軽量フレームワーク導入＋SASS差分整理）
-- [ ] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（ホスト統一・importmap移行・バージョンポリシー・更新手順ドキュメント化）
+- [x] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS導入、全ページCSS競合修正、font-size統一、未使用CSS削除。ステージング検証完了）
+- [x] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（jsDelivrに統一、バージョンポリシー統一、SweetAlert2 importmap化、clipboard.js除去。ステージング検証完了）
 - [x] [#4070](https://github.com/pooza/mulukhiya-toot-proxy/issues/4070) (P3): OAuthスコープのdefault/infobot統合（スコープ一本化、認証ボタン統合、info_bot自動検出、admin:read除外。Mastodon/Misskey検証完了）
 - [x] [#4073](https://github.com/pooza/mulukhiya-toot-proxy/issues/4073) (P3): テーマカラー取得・アクセントカラー適用（Misskey: /api/meta自動取得+フォールバック、Mastodon: 設定値。CSS custom properties `--accent-color`/`--accent-bg` で動的注入。デフォルト値 Mastodon `#6364FF`/Misskey `#86b300`。ステージング検証完了）
 - [x] [#3157](https://github.com/pooza/mulukhiya-toot-proxy/issues/3157) (P1→**スコープアウト**): Annict `/@:username/records/:record_id` 形式URL対応。GraphQL APIの `Record.annictId` がURL用IDと一致しない（`episode_records.id` vs `records.id`）ためAPI側の対応待ち。実装をrevertし旧形式（`/works/:work_id/episodes/:episode_id`）に戻した
