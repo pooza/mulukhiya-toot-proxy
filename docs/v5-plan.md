@@ -505,6 +505,7 @@ test/
 ### ドキュメント
 
 - [ ] [#4072](https://github.com/pooza/mulukhiya-toot-proxy/issues/4072): 5.0アップグレードガイドの作成（`docs/webhook-setup.md` 先行作成済み）
+  - テーマ色の設定手順を記載すること（Mastodonは `config['/mastodon/theme/color']` で手動設定、MisskeyはAPIから自動取得）
 - [x] [#4077](https://github.com/pooza/mulukhiya-toot-proxy/issues/4077): Sidekiqダッシュボードのnginxアクセス制限（ドキュメント追加）
 
 ### 外部プロジェクトへの貢献（余裕があれば）
