@@ -37,12 +37,14 @@ module Mulukhiya
     def test_default_tags
       tags = TagContainer.default_tags
       return unless tags.present?
+
       assert_equal(tags, Set['美食丼', 'b-shock-don'])
     end
 
     def test_remote_default_tags
       tags = TagContainer.remote_default_tags
       return unless tags.present?
+
       assert_equal(tags, Set['precure_fun', 'delmulin'])
     end
   end
