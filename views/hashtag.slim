@@ -17,9 +17,10 @@ html lang='ja' data-theme='light'
           | 件
           .role admin
         nav.search-form-container
-          i class='fa fa-magnifying-glass'
-          input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
-          button.small :disabled='!keyword' @click='search' 検索
+          .control
+            i class='fa fa-magnifying-glass'
+            input type='search' placeholder='検索フレーズ' v-model.trim='keyword' @keydown.enter='search'
+            button.small :disabled='!keyword' @click='search' 検索
         div :class='{"tag-entry":true, "disabled":isDisabledTag(entry.word)}' v-for='entry in dic_entries'
           h4
             | {{entry.word}}
