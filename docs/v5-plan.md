@@ -500,7 +500,8 @@ test/
 
 ### アーキテクチャ（追加）
 
-- [x] [#4075](https://github.com/pooza/mulukhiya-toot-proxy/issues/4075) (P3→**スコープアウト**): with_indifferent_access の整理・シンボルキー統一 — 5.0.0スコープ外、5.1.0で対応
+- [x] [#4075](https://github.com/pooza/mulukhiya-toot-proxy/issues/4075) (P3→**5.1.0**): with_indifferent_access の整理・シンボルキー統一
+- [x] [#4079](https://github.com/pooza/mulukhiya-toot-proxy/issues/4079) (P3→**5.1.0**): デーモン起動プロセスの簡素化
 
 ### ドキュメント
 

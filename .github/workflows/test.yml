@@ -6,6 +6,9 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        controller: [mastodon, misskey]
     services:
       postgres:
         image: postgres:15
@@ -34,6 +37,9 @@ jobs:
           sudo apt install libvips-dev
       - name: Fix gem directory permissions
         run: chmod -R o-w "$(gem environment gemdir)"
+      - name: Create CI config
+        run: |
+          echo "controller: ${{ matrix.controller }}" > config/local.yaml
       - name: bundle install
         run: |
           gem install bundler -v '~>2.0'
@@ -44,3 +50,6 @@ jobs:
       - name: Run lint
         run: |
           bundle exec rake lint
+      - name: Run test (${{ matrix.controller }})
+        run: |
+          bundle exec rake test

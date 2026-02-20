@@ -1,5 +1,10 @@
 module Mulukhiya
   class AttachmentTest < TestCase
+    def disable?
+      return true unless Environment.dbms_class&.config?
+      return super
+    end
+
     def setup
       @attachment = attachment_class[attachment_class.catalog.first[:id]]
     end

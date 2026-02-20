@@ -1,5 +1,10 @@
 module Mulukhiya
   class StatusTest < TestCase
+    def disable?
+      return true unless account
+      return super
+    end
+
     def setup
       @status = account.recent_status
     end
