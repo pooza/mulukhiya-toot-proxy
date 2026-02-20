@@ -18,7 +18,8 @@ html lang='ja' data-theme='light'
           a href='/mulukhiya/app/status' v-if='account.username' = controller.status_label
         a href='/mulukhiya/app/hashtag' ハッシュタグ
         a href='/mulukhiya/app/episode' エピソードブラウザ
-        a href='/mulukhiya/app/api' API
+        - if Mulukhiya::CustomAPI.present?
+          a href='/mulukhiya/app/api' 独自機能
         a href='/mulukhiya/app/health' 動作状況
         a href='/mulukhiya/app/config' v-if='account.username' 環境設定
         a href='/mulukhiya/app/handler' v-if='account.is_admin'

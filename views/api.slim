@@ -5,223 +5,25 @@ html lang='ja' data-theme='light'
     == slim.render 'fragment/assets'
   body
     == slim.render 'fragment/header'
-    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: 'API'}]}
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: '独自機能'}]}
     main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
-      h2 API
+      h2 #{sns.node_name}の独自機能
+      .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.to_json
       ul.links
-        - if controller.announcement?
-          li v-if='account.is_admin'
-            h3 @click='toggleVisibility("announcement")' お知らせ
-            slide-up-down :active='layout.details.announcement'
-              .endpoint-container
-                .role admin
-                .link POST /mulukhiya/api/announcement/update
-                pre.payload v-if='query_params.announcement_update' {{query_params.announcement_update}}
-                - if config.keys('/sidekiq/schedule/announcement').member?('every')
-                  .link-description
-                    | スケジュール
-                    code #{config['/sidekiq/schedule/announcement/every']}
-                .link-description お知らせの更新を行います。
-                .field-update-button-container
-                  button @click='updateAnnouncement' 実行
-        li
-          h3 @click='toggleVisibility("media")' メディア
-          slide-up-down :active='layout.details.media'
-            .endpoint-container
-              .link GET {{endpoints.media_list}}
-              .control
-                i class='fa fa-file'
-                input type='number' placeholder='ページ番号' v-model.trim='query_params.media_list.page' @input='onInputMediaList' @keydown.enter='delay(getMedias)'
-              .control
-                i class='fa fa-magnifying-glass'
-                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.media_list.q' @input='onInputMediaList' @keydown.enter='delay(getMedias)' v-if='account.username'
-              .link-description 最近#{controller.status_label}されたメディアファイルを表示します。
-              .field-update-button-container
-                button @click='delay(getMedias)' 実行
-                pre.result
-                  | {{result.media_list}}
-            .endpoint-container v-if='account.is_admin'
-              .role admin
-              .link POST /mulukhiya/api/media/file/clear
-              pre.payload v-if='query_params.media_file_clear' {{query_params.media_file_clear}}
-              - if config.keys('/sidekiq/schedule/media_cleaning').member?('cron')
-                .link-description
-                  | スケジュール
-                  code #{config['/sidekiq/schedule/media_cleaning/cron']}
-              .link-description メディアファイル変換結果をクリアします。
-              .field-update-button-container
-                button @click='clearMediaFiles' 実行
-            .endpoint-container v-if='account.is_admin'
-              .role admin
-              .link POST /mulukhiya/api/media/metadata/clear
-              pre.payload v-if='query_params.media_metadata_clear' {{query_params.media_metadata_clear}}
-              .link-description メディアファイルのメタデータをクリアします。
-              .field-update-button-container
-                button @click='clearMediaMetadata' 実行
-        - if controller.livecure?
+        - Mulukhiya::CustomAPI.all do |api|
           li
-            h3 @click='toggleVisibility("program")' 実況番組表
-            slide-up-down :active='layout.details.program'
+            h3 @click='toggleVisibility("#{api.id}")' = api.description
+            slide-up-down :active='layout.details.#{api.id}'
               .endpoint-container
-                .link GET /mulukhiya/api/program
-                .link-description 実況番組表を表示します。
+                .link GET {{endpoints.#{api.id}}}
+                - api.args.each do |arg|
+                  multiselect :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' label="label" track-by="value"
+                .link-description = api.description
                 .field-update-button-container
-                  button @click='getPrograms' 実行
+                  button @click='execCustomAPI("#{api.id}")' 実行
                   pre.result
-                    | {{result.program_list}}
-              .endpoint-container v-if='account.is_admin'
-                .link POST /mulukhiya/api/program/update
-                pre.payload v-if='query_params.program_update' {{query_params.program_update}}
-                - if config.keys('/sidekiq/schedule/program_update').member?('every')
-                  .link-description
-                    | スケジュール
-                    code #{config['/sidekiq/schedule/program_update/every']}
-                .link-description 以下の実況番組表を取得し、キャッシュを更新します。
-                - config['/program/urls'].each do |url|
-                  .link
-                    a href=url target='_blank' rel='noreferrer' = url.ellipsize(64)
-                .field-update-button-container
-                  button @click='updatePrograms' 実行
-        - if controller.piefed?
-          li v-if='account.username'
-            h3 @click='toggleVisibility("piefed")' PieFed
-            slide-up-down :active='layout.details.piefed'
-              .endpoint-container
-                .link GET {{endpoints.piefed_communities}}
-                .link-description 参加しているPieFedコミュニティを返します。
-                .field-update-button-container
-                  button @click='getPiefedCommunities' 実行
-                  pre.result
-                    | {{result.piefed_communities}}
-        - if controller.favorite_tags?
-          li
-            h3 @click='toggleVisibility("favorite_tags")' プロフィールに含まれるタグ
-            slide-up-down :active='layout.details.favorite_tags'
-              .endpoint-container
-                .link GET /mulukhiya/api/tagging/favorites
-                .link-description プロフィールでよく使われているハッシュタグの一覧を返します。
-                .field-update-button-container
-                  button @click='getFavoriteTags' 実行
-                  pre.result
-                    | {{result.favorite_tags}}
-        li
-          h3 @click='toggleVisibility("tagging_dic")' ハッシュタグ辞書
-          slide-up-down :active='layout.details.tagging_dic'
-            .endpoint-container
-              .link POST /mulukhiya/api/tagging/tag/search
-              .control
-                i class='fa fa-magnifying-glass'
-                input type='search' placeholder='検索フレーズ' v-model.trim='query_params.tagging_tag_search.q' @keydown.enter='searchTags'
-              pre.payload v-if='query_params.tagging_tag_search' {{query_params.tagging_tag_search}}
-              .link-description ハッシュタグ辞書から、該当するパターンを検索します。
-              .field-update-button-container
-                button :disabled='!query_params.tagging_tag_search.q' @click='searchTags' 実行
-                pre.result
-                  | {{result.search_tag}}
-            .endpoint-container v-if='account.is_admin'
-              .role admin
-              .link POST /mulukhiya/api/tagging/dic/update
-              pre.payload v-if='query_params.tagging_dic_update' {{query_params.tagging_dic_update}}
-              - if config.keys('/sidekiq/schedule/tagging_dictionary_update').member?('every')
-                .link-description
-                  | スケジュール
-                  code #{config['/sidekiq/schedule/tagging_dictionary_update/every']}
-              .link-description 以下のハッシュタグ辞書を取得し、キャッシュを更新します。
-              - config['/handler/dictionary_tag/dics'].each do |dic|
-                .link
-                  a href=dic['url'] target='_blank' rel='noreferrer' = dic['url'].ellipsize(64)
-              .field-update-button-container
-                button @click='updateTaggingDictionary' 実行
-            .endpoint-container
-              .link GET /mulukhiya/api/tagging/dic/annict/episodes
-              .link-description エピソードのハッシュタグ辞書を返します。
-              .field-update-button-container
-                button @click='getEpisodeTags' 実行
-                pre.result
-                  | {{result.episode_tags}}
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("tagging_usertag")' 固定タグ
-          slide-up-down :active='layout.details.tagging_usertag'
-            .endpoint-container
-              .role admin
-              .link POST /mulukhiya/api/tagging/usertag/clear
-              pre.payload v-if='query_params.tagging_usertag_clear' {{query_params.tagging_usertag_clear}}
-              - if config.keys('/sidekiq/schedule/user_tag_initialize').member?('cron')
-                .link-description
-                  | スケジュール
-                  code #{config['/sidekiq/schedule/user_tag_initialize/cron']}
-              .link-description インスタンス内全ユーザーの固定タグ設定をクリアします。
-              .field-update-button-container
-                button @click='clearUserTags' 実行
-        - if controller.feed?
-          li v-if='account.username'
-            h3 @click='toggleVisibility("feed")' フィード
-            slide-up-down :active='layout.details.feed'
-              .endpoint-container
-                .link GET /mulukhiya/api/feed/list
-                .link-description フィードの一覧を返します。
-                .field-update-button-container
-                  button @click='getFeeds' 実行
-                  pre.result
-                    | {{result.feed_list}}
-              .endpoint-container v-if='account.is_admin'
-                .role admin
-                .link POST /mulukhiya/api/feed/update
-                pre.payload v-if='query_params.feed_update' {{query_params.feed_update}}
-                - if config.keys('/sidekiq/schedule/feed_update').member?('every')
-                  .link-description
-                    | スケジュール
-                    code #{config['/sidekiq/schedule/feed_update/every']}
-                .link-description カスタムフィードの更新を行います。
-                .field-update-button-container
-                  button @click='updateCustomFeeds' 実行
-        li
-          h3 @click='toggleVisibility("health")' 動作状況
-          slide-up-down :active='layout.details.health'
-            .endpoint-container
-              .link GET /mulukhiya/api/health
-              .link-description モロヘイヤの動作状況を表示します。
-              .field-update-button-container
-                button @click='getHealth' 実行
-                pre.result
-                  | {{result.health}}
-        .hidden ref='custom_api_entries' v-show='false' = Mulukhiya::CustomAPI.to_json
-        - if Mulukhiya::CustomAPI.present?
-          li
-            h3 @click='toggleVisibility("custom")' #{sns.node_name}の独自機能
-            slide-up-down :active='layout.details.custom'
-              - Mulukhiya::CustomAPI.all do |api|
-                .endpoint-container
-                  .link GET {{endpoints.#{api.id}}}
-                  - api.args.each do |arg|
-                    multiselect :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' label="label" track-by="value"
-                  .link-description = api.description
-                  .field-update-button-container
-                    button @click='execCustomAPI("#{api.id}")' 実行
-                    pre.result
-                      | {{result.#{api.id}}}
-        li v-if='account.is_admin'
-          h3 @click='toggleVisibility("handler")' ハンドラ
-          slide-up-down :active='layout.details.handler'
-            .endpoint-container
-              .role admin
-              .link GET {{endpoints.handler_list}}
-              .link-description ハンドラの有効/無効設定を返します。
-              .field-update-button-container
-                button @click='getHandlers' 実行
-                pre.result
-                  | {{result.handler_list}}
-        li
-          h3 @click='toggleVisibility("about")' パッケージ情報
-          slide-up-down :active='layout.details.about'
-            .endpoint-container
-              .link GET /mulukhiya/api/about
-              .link-description モロヘイヤのバージョン等、パッケージ情報を表示します。
-              .field-update-button-container
-                button @click='getAbout' 実行
-                pre.result
-                  | {{result.about}}
+                    | {{result.#{api.id}}}
     == slim.render 'fragment/footer'
     script type='module'
       |
@@ -236,67 +38,13 @@ html lang='ja' data-theme='light'
           data () {
             return {
               account: {},
-              config: {},
               entries: {},
-              endpoints: {
-                media_list: '/mulukhiya/api/media?page=1',
-                piefed_communities: `/mulukhiya/api/piefed/communities?token=${encodeURIComponent(this.methods.getToken())}`,
-                status_list: `/mulukhiya/api/status/list?page=1&self=1&token=${encodeURIComponent(this.methods.getToken())}`,
-                status_detail: `/mulukhiya/api/status/:id?token=${encodeURIComponent(this.methods.getToken())}`,
-                handler_list: `/mulukhiya/api/admin/handler/list?token=${encodeURIComponent(this.methods.getToken())}`,
-              },
+              endpoints: {},
               choices: {},
-              query_params: {
-                media_list: {page: 1, q: null, token: this.methods.getToken()},
-                status_list: {page: 1, q: null, self: true, token: this.methods.getToken()},
-                status_detail: {id: null, token: this.methods.getToken()},
-                handler_list: {token: this.methods.getToken()},
-                status_create_tag: {id: null, tag: null, token: this.methods.getToken()},
-                status_delete_tag: {id: null, tag: null, token: this.methods.getToken()},
-                piefed_communities: {token: this.methods.getToken()},
-                announcement_update: {token: this.methods.getToken()},
-                media_file_clear: {token: this.methods.getToken()},
-                media_metadata_clear: {token: this.methods.getToken()},
-                media_catalog_update: {token: this.methods.getToken()},
-                program_update: {token: this.methods.getToken()},
-                tagging_tag_search: {q: null},
-                tagging_dic_update: {token: this.methods.getToken()},
-                tagging_usertag_clear: {token: this.methods.getToken()},
-                feed_update: {token: this.methods.getToken()},
-              },
-              result: {
-                search_tag: null,
-                favorite_tags: null,
-                piefed_communities: null,
-                media_list: null,
-                program_list: null,
-                work_list: null,
-                episode_tags: null,
-                feed_list: null,
-                status_list: null,
-                status_detail: null,
-                status_create_tag: null,
-                status_delete_tag: null,
-                handler_list: null,
-                health: null,
-                about: null,
-              },
+              query_params: {},
+              result: {},
               layout: {
-                details: {
-                  announcement: false,
-                  media: false,
-                  program: false,
-                  favorite_tags: false,
-                  piefed: false,
-                  tagging_dic: false,
-                  tagging_usertag: false,
-                  feed: false,
-                  health: false,
-                  handler: false,
-                  custom: false,
-                  about: false,
-                  status: false,
-                },
+                details: {},
               },
             }
           },
@@ -304,10 +52,6 @@ html lang='ja' data-theme='light'
             this.methods.getConfig()
               .then(e => {
                 this.account = this.methods.createAccountInfo(e)
-                this.config = e.config
-                if (this.methods.getToken()) {
-                  this.endpoints.media_list += `&token=${encodeURIComponent(this.methods.getToken())}`
-                }
               })
           },
           async mounted () {
@@ -326,36 +70,10 @@ html lang='ja' data-theme='light'
               }
               this.query_params[entry.id] = params
               this.endpoints[entry.id] = `${entry.fullpath}`
+              this.layout.details[entry.id] = false
             })
           },
           methods: {
-            onInputMediaList () {
-              const url = new URL('/mulukhiya/api/media', location.href)
-              url.searchParams.set('page', this.query_params.media_list.page)
-              url.searchParams.delete('q')
-              if (this.query_params.media_list.q) {
-                url.searchParams.set('q', this.query_params.media_list.q)
-              }
-              if (this.methods.getToken()) url.searchParams.set('token', this.methods.getToken())
-              this.endpoints.media_list = `${url.pathname}${url.search}`
-            },
-            onInputStatusList () {
-              const url = new URL('/mulukhiya/api/status/list', location.href)
-              url.searchParams.set('page', this.query_params.status_list.page)
-              url.searchParams.delete('q')
-              if (this.query_params.status_list.q) {
-                url.searchParams.set('q', this.query_params.status_list.q)
-              }
-              url.searchParams.set('self', this.query_params.status_list.self ? 1 : 0)
-              url.searchParams.set('token', this.methods.getToken())
-              this.endpoints.status_list = `${url.pathname}${url.search}`
-            },
-            onInputStatusDetail () {
-              const url = new URL('/mulukhiya/api/status/:id', location.href)
-              url.pathname = url.pathname.replace(':id', this.query_params.status_detail.id)
-              url.searchParams.set('token', this.methods.getToken())
-              this.endpoints.status_detail = `${url.pathname}${url.search}`
-            },
             onInputCustomAPI (id, key) {
               let endpoint = `/mulukhiya/api/${this.entries[id].path}`
               this.query_params[id][key] = event.target.value || event.target.innerText
@@ -367,137 +85,10 @@ html lang='ja' data-theme='light'
             toggleVisibility (name) {
               this.layout.details[name] = !this.layout.details[name]
             },
-            delay (proc) {
-              setTimeout(proc, 500)
-            },
-            updateAnnouncement () {
-              this.methods.updateAnnouncement()
-                .then(_ => {this.layout.details['announcement'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getMedias () {
-              this.result.media_list = null
-              this.methods.getMedias(this.query_params.media_list)
-                .then(e => {this.result.media_list = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            clearMediaFiles () {
-              this.methods.clearMediaFiles()
-                .then(_ => {this.layout.details['media'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            clearMediaMetadata () {
-              this.methods.clearMediaMetadata()
-                .then(_ => {this.layout.details['media'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            updateMediaCatalog () {
-              this.methods.updateMediaCatalog()
-                .then(_ => {this.layout.details['media'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            updatePrograms () {
-              this.methods.updatePrograms()
-                .then(_ => {this.layout.details['program'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getPrograms () {
-              this.result.program_list = null
-              this.methods.getPrograms()
-                .then(e => {this.result.program_list = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getEpisodeTags () {
-              this.result.episode_tags = null
-              this.methods.getEpisodeTags()
-                .then(e => {this.result.episode_tags = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getFavoriteTags () {
-              this.result.favorite_tags = null
-              this.methods.getFavoriteTags()
-                .then(e => {this.result.favorite_tags = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getPiefedCommunities () {
-              this.result.piefed_communities = null
-              this.methods.getPiefedCommunities()
-                .then(e => {this.result.piefed_communities = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            updateTaggingDictionary () {
-              this.methods.updateTaggingDictionary()
-                .then(_ => {this.layout.details['tagging_dic'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            clearUserTags () {
-              this.methods.clearUserTags()
-                .then(_ => {this.layout.details['tagging_usertag'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getFeeds () {
-              this.result.feed_list = null
-              this.methods.getFeeds()
-                .then(e => {this.result.feed_list = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            updateCustomFeeds () {
-              this.methods.updateCustomFeeds()
-                .then(_ => {this.layout.details['feed'] = false})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            searchTags () {
-              this.result.search_tag = null
-              this.methods.searchTags(this.query_params.tagging_tag_search.q)
-                .then(e => {this.result.search_tag = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getStatuses () {
-              this.result.status_list = null
-              this.methods.getStatuses(this.query_params.status_list)
-                .then(e => {this.result.status_list = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getStatus () {
-              this.result.status_detail = null
-              this.methods.getStatus(this.query_params.status_detail.id)
-                .then(e => {this.result.status_detail = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            createTag () {
-              this.result.status_create_tag = null
-              this.methods.createTag(this.query_params.status_create_tag.id, this.query_params.status_create_tag.tag)
-                .then(e => {this.result.status_create_tag = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            deleteTag () {
-              this.result.status_delete_tag = null
-              this.methods.deleteTag(this.query_params.status_delete_tag.id, this.query_params.status_delete_tag.tag)
-                .then(e => {this.result.status_delete_tag = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getHandlers () {
-              this.result.handler_list = null
-              this.methods.getHandlers()
-                .then(e => {this.result.handler_list = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getHealth () {
-              this.result.health = null
-              this.methods.getHealth()
-                .then(e => {this.result.health = e})
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
             execCustomAPI (id) {
               this.result[id] = null
               this.methods.execGET(this.endpoints[id])
                 .then(e => this.result[id] = e)
-                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
-            },
-            getAbout () {
-              this.result.about = null
-              this.methods.getAbout()
-                .then(e => {this.result.about = e})
                 .catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
           },
