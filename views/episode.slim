@@ -19,7 +19,7 @@ html lang='ja' data-theme='light'
           i class='fas fa-clipboard' v-tooltip.right="'クリップボードにコピー'" @click="copyToClipboard(work.title)"
           span v-tooltip.bottom="'エピソードを' + (layout[work.annictId] ? '閉じる' : '開く')" @mouseenter="prefetchEpisodes(work.annictId)" @click="toggleEpisodes(work.annictId)"
             | {{work.title}}
-          ul.params class='clearfix'
+          ul.params
             li.param v-if='work.seasonYear'
               i class='fa fa-calendar'
               | {{work.seasonYear}}年

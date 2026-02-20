@@ -46,21 +46,12 @@ h1
   line:
     height: 2em
 
-h2:before
-  content: '■ '
-
 h3
   border:
     bottom:
       style: solid
       color: darkgray
       width: 1px
-    left:
-      style: solid
-      color: darkgray
-      width: 0.5em
-  padding:
-    left: 0.5em
 
 body > header
   background:
@@ -169,14 +160,17 @@ nav.tokens
     text:
       decoration: none
     h4
-      margin: 0 0 0.5em 0
+      margin: 0.5em 0
+      display: flex
+      align-items: center
       border:
         bottom:
           width: 1px
           style: solid
           color: var(--accent-color)
       i
-        float: right
+        margin:
+          left: 1em
     a:hover
       text:
         decoration: none
@@ -190,11 +184,9 @@ nav.tokens
     input
       display: inline-block
       width: 20em
-    button
-      padding: 0 1em
-      margin: 0 1em
     .field
       display: flex
+      align-items: center
       gap: 0.5em
       color: dimgray
       font:
@@ -211,6 +203,9 @@ nav.tokens
         flex-grow: 1
         font:
           family: $serif
+        code
+          background:
+            color: transparent
       .scope
         display: inline-block
         font:
@@ -264,11 +259,12 @@ section.config
   li
     font:
       size: 0.875em
+  h3
+    cursor: pointer
   h3:hover
     background:
-      color: aliceblue
+      color: var(--accent-bg)
     opacity: 0.9
-    cursor: pointer
   .indented
     display: flex
     flex-wrap: wrap
@@ -281,11 +277,12 @@ section.config
 ul.links
   list:
     style: none
+  h3
+    cursor: pointer
   h3:hover
     background:
-      color: aliceblue
+      color: var(--accent-bg)
     opacity: 0.9
-    cursor: pointer
   .endpoint-container
     list-style: none
     margin: 0.5em
@@ -414,10 +411,9 @@ ul.copyright
     family: $sans-serif
   margin: 0 1em
 nav.appender-container
-  text:
-    align: center
   font:
     family: $sans-serif
+  justify-content: center
 
 section
   margin: 0 1em
@@ -514,17 +510,16 @@ nav.search-form-container
     display: flex
     gap: 0.5em
     align-items: center
+    justify-content: center
     label
       font:
         size: 0.875em
     input[type='search']
       flex-grow: 1
-      padding: 0.3em 0.5em
+      padding: 0.5em
       margin: 0
     button
       white-space: nowrap
-      padding: 0.3em 1em
-      margin: 0
 
 .status
   margin: 1em
@@ -591,7 +586,6 @@ nav.search-form-container
       family: $serif
 
 .work-entry
-  margin: 0.5em 1em
   padding: 0.5em 1em
   font:
     family: $serif
@@ -602,12 +596,14 @@ nav.search-form-container
     align-items: center
     span
       flex-grow: 1
+  h3:hover
+    background:
+      color: var(--accent-bg)
+    opacity: 0.9
   button
     font:
       size: 0.875em
       weight: normal
-    padding: 0 0.5em
-    margin: 0 0.5em
   ul.params
     margin: 0 1em
     li.param
@@ -663,10 +659,8 @@ button
   background:
     color: var(--accent-bg)
   cursor: pointer
-
-button.small
-  padding: 0 1em
-  margin: 1px 2px
+  padding: 0.5em 1em
+  margin: 0 1em
 
 button:hover
   background:
@@ -870,7 +864,6 @@ a:hover
     vertical-align: top
   button
     width: 158px
-    margin: 0 1em
     font:
       size: 0.875em
   .alert
@@ -908,8 +901,3 @@ code
 
 .swal2-title
   background: transparent
-
-.clearfix::after
-  content: ""
-  display: block
-  clear: both
