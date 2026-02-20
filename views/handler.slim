@@ -16,7 +16,7 @@ html lang='ja' data-theme='light'
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
           slide-up-down :active='layout.details.#{event.name}'
-            .clearfix class='indented'
+            .indented
               - event.all_handlers.sort_by(&:underscore).each do |handler|
                 .handler-container :class="{disabled: handlers.#{handler.underscore}}"
                   h4
