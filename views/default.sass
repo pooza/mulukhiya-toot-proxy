@@ -70,9 +70,9 @@ body > header
   font:
     family: $sans-serif
   color: white
-  text:
-    align: right
-  display: block
+  display: flex
+  align-items: center
+  justify-content: flex-end
   padding: 0.2em 0.5em
   margin: 0
 
@@ -103,10 +103,10 @@ nav.breadcrumbs
     color: var(--accent-bg)
   opacity: 0.9
   ul
-    display: block
+    display: flex
+    align-items: center
+    flex-wrap: wrap
     margin: 0
-    line:
-      height: 0.9em
     padding: 0
     li
       font:
@@ -285,6 +285,7 @@ ul.links
     opacity: 0.9
     cursor: pointer
   .endpoint-container
+    list-style: none
     margin: 0.5em
     padding: 0.5em
     font:
@@ -709,11 +710,14 @@ a:hover
   opacity: 0.9
   font:
     family: $sans-serif
-  i
-    float: right
   .message
-    display: block
+    display: flex
+    align-items: center
+    flex-wrap: wrap
+    gap: 0.2em
     margin: 0 0.5em
+    a:last-child
+      margin-left: auto
 
 .role
   display: inline-block
