@@ -83,11 +83,11 @@ git diff Gemfile.lock
 
 GitHub Actions (`.github/workflows/test.yml`):
 
-- Redis 7 サービスコンテナ
+- Redis 7 サービスコンテナ（PostgreSQLは不使用: CIではDB依存テストを行わない方針）
 - matrix strategy: `controller: [mastodon, misskey]` の2並列
 - `bundle exec rake lint` (rubocop, slim_lint, erb_lint等)
 - `bundle exec rake test` (test-unit、DB依存テストは自動スキップ)
-- 依存: ffmpeg, libpq-dev, libidn11-dev, libvips-dev
+- 依存: ffmpeg, libidn11-dev, libvips-dev
 
 ## ディレクトリ構成（主要）
 

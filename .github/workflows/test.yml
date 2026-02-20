@@ -10,15 +10,6 @@ jobs:
       matrix:
         controller: [mastodon, misskey]
     services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: test
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
         image: redis:7
         ports:
@@ -32,7 +23,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ffmpeg
-          sudo apt install libpq-dev
           sudo apt install libidn11-dev
           sudo apt install libvips-dev
       - name: Fix gem directory permissions
