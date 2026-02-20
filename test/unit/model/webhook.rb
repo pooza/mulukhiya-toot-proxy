@@ -1,6 +1,7 @@
 module Mulukhiya
   class WebhookTest < TestCase
     def disable?
+      return true unless Environment.dbms_class&.config?
       return true unless controller_class.webhook?
       return true unless account.webhook rescue nil
       return super

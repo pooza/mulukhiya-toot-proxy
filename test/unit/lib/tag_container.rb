@@ -1,6 +1,14 @@
 module Mulukhiya
   class TagContainerTest < TestCase
+    def disable?
+      return true unless Environment.dbms_class&.config?
+      return super
+    rescue
+      return true
+    end
+
     def setup
+      return if disable?
       config['/handler/default_tag/tags'] = ['美食丼', 'b-shock-don']
       config['/handler/tagging/normalize/rules'] = [
         {'source' => 'ふたりはプリキュア_Max_Heart', 'normalized' => 'ふたりはプリキュアMax_Heart'},

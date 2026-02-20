@@ -1,6 +1,7 @@
 module Mulukhiya
   class AnnouncementTest < TestCase
     def disable?
+      return true unless Environment.dbms_class&.config?
       return true unless controller_class.announcement?
       return super
     end
