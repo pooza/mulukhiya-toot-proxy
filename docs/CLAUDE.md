@@ -83,8 +83,10 @@ git diff Gemfile.lock
 
 GitHub Actions (`.github/workflows/test.yml`):
 
-- PostgreSQL 15 + Redis 7
+- Redis 7 サービスコンテナ
+- matrix strategy: `controller: [mastodon, misskey]` の2並列
 - `bundle exec rake lint` (rubocop, slim_lint, erb_lint等)
+- `bundle exec rake test` (test-unit、DB依存テストは自動スキップ)
 - 依存: ffmpeg, libpq-dev, libidn11-dev, libvips-dev
 
 ## ディレクトリ構成（主要）
@@ -118,7 +120,8 @@ test/               # test-unit ベースのテスト (128ファイル)
 
 rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信される」致命的問題が発生した（2025-10-12〜10-26）。
 防御策（トークン整合性チェック・アカウントID検証）実装済み。rack 3.2.5 + Sinatra 4.1.1 に更新済み（#4053, #4054）。
-ステージングでの同時アクセス再現テスト（#4055）が残タスク。
+ステージングでの同時アクセス再現テスト（#4055）完了済み（成功率100%）。
+診断スクリプト: `bin/diag/concurrent_token_test.rb`。
 詳細は [rack-upgrade-discussion.md](rack-upgrade-discussion.md) を参照。
 
 ### ginseng-web
@@ -157,6 +160,47 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 - モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
 - ハンドラー設定: `handler_config(:key)` (5.0で記法統一予定)
+
+### テスト作成ガイド
+
+テストは `Mulukhiya::TestCase`（`Ginseng::TestCase` 継承）を基底クラスとする。
+
+#### disable? パターン
+
+test-unitのライフサイクルは `setup` → `run_test` → `teardown`。
+`disable?` が `true` を返すと `run_test` はスキップされるが、**`setup` は常に実行される**。
+DB接続や外部サービスに依存する `setup` では、冒頭に `return if disable?` を追加すること。
+
+```ruby
+def disable?
+  return true unless Environment.dbms_class&.config?  # DB未接続ならスキップ
+  return true unless test_token                        # トークン未設定ならスキップ
+  return super
+end
+
+def setup
+  return if disable?  # setupも保護する
+  @model = SomeModel.new
+end
+```
+
+#### CI環境でのスキップ条件
+
+CIでは `config/local.yaml` に `controller: mastodon|misskey` のみ設定される。
+以下は未設定のため、該当チェックでテストが自動スキップされる:
+
+- `Environment.dbms_class&.config?` → PostgreSQL DSN未設定
+- `test_token` → OAuthトークン未設定
+- `account` → トークン経由のアカウント取得不可
+
+#### Handler経由の間接DB依存
+
+一見DB無関係なクラスも、Handler初期化チェーンを通じてDB接続を要求する場合がある:
+
+`TagContainer.new` → `normalize` → `TaggingHandler` → `Handler#initialize` → `SNSService` → `account_class` → `Sequel::Model` → DB必須
+
+このようなケースでは `disable?` に `Environment.dbms_class&.config?` チェックを入れるか、
+`rescue` で例外を捕捉して `true` を返す。
 
 ### RuboCopに含まれない個人規約
 
