@@ -6,7 +6,7 @@ updates:
     interval: daily
     time: '03:00'
     timezone: 'Asia/Tokyo'
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 0
   target-branch: master
   versioning-strategy: lockfile-only
 - package-ecosystem: bundler
@@ -15,6 +15,6 @@ updates:
     interval: daily
     time: '03:00'
     timezone: 'Asia/Tokyo'
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 0
   target-branch: develop
   versioning-strategy: lockfile-only

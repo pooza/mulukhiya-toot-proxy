@@ -123,6 +123,17 @@ test/
 
 - セキュリティアップデート（gem のパッチ更新等）は、実質的に影響がなくてもリリースノートに記載する
 
+### Dependabot運用
+
+- `open-pull-requests-limit: 0` により、通常のバージョン更新PRは作成しない
+- セキュリティアラートのPRのみ自動生成される
+- 通常のgem更新は手動 `bundle update` で管理する
+- セキュリティPRへの対応:
+  - `bundle update` で既に対応済み → PRをCloseし「Already included via bundle update in commit xxxxx」とコメント
+  - 未対応 → PRをマージ
+- セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
+- 5.0リリースで develop→main 昇格時に `target-branch` も変更すること
+
 ## 既知の注意事項
 
 ### rack 3.2問題
