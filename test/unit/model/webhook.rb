@@ -7,6 +7,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @test_hook = account.webhook
       @payloads = {
         image: SlackWebhookPayload.new(

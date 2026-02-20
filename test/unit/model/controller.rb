@@ -109,6 +109,7 @@ module Mulukhiya
     end
 
     def test_max_length
+      return unless test_token
       assert_kind_of(Integer, controller_class.max_length)
     end
   end

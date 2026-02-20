@@ -8,6 +8,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       config['/service/annict/episodes/ruby/trim'] = true
       @service = account.annict
     end

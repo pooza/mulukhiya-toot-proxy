@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @renderer = MediaFeedRenderer.new
     end
 

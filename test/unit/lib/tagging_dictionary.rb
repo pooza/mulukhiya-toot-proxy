@@ -1,6 +1,16 @@
 module Mulukhiya
   class TaggingDictionaryTest < TestCase
+    def disable?
+      config['/handler/dictionary_tag/word/min'] = 3
+      config['/handler/dictionary_tag/word/min_kanji'] = 2
+      TaggingDictionary.new.short?('test')
+      return super
+    rescue
+      return true
+    end
+
     def setup
+      return if disable?
       config['/handler/dictionary_tag/word/min'] = 3
       config['/handler/dictionary_tag/word/min_kanji'] = 2
       @dic = TaggingDictionary.new

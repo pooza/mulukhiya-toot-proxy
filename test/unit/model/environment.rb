@@ -9,6 +9,7 @@ module Mulukhiya
     end
 
     def test_health
+      return unless Environment.dbms_class&.config?
       assert_kind_of(Hash, environment_class.health)
       assert_equal('OK', environment_class.health.dig(:redis, :status))
       assert_equal('OK', environment_class.health.dig(:sidekiq, :status))

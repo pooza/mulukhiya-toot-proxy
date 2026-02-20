@@ -7,6 +7,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @renderer = TagFeedRenderer.new
       @renderer.tag = DefaultTagHandler.tags.first
     end

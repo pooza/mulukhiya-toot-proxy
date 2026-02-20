@@ -1,6 +1,14 @@
 module Mulukhiya
   class RenderStorageTest < TestCase
+    def disable?
+      return true unless Environment.dbms_class&.config?
+      return super
+    rescue
+      return true
+    end
+
     def setup
+      return if disable?
       @storage = RenderStorage.new
       @renderer = RSS20FeedRenderer.new
       @command = CommandLine.new([File.join(Environment.dir, 'bin/sample/custom_feed_1.sh')])

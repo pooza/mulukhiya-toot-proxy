@@ -2,7 +2,13 @@ require 'securerandom'
 
 module Mulukhiya
   class UserConfigTest < TestCase
+    def disable?
+      return true unless account
+      return super
+    end
+
     def setup
+      return if disable?
       @user_config = UserConfig.new(account.id)
       @key1 = SecureRandom.hex(16)
       @key2 = SecureRandom.hex(16)

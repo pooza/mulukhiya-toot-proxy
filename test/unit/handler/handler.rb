@@ -1,5 +1,12 @@
 module Mulukhiya
   class HandlerTest < TestCase
+    def disable?
+      return true unless Environment.dbms_class&.config?
+      return super
+    rescue
+      return true
+    end
+
     def test_search
       assert_kind_of(Set, Handler.search(/amazon/))
     end

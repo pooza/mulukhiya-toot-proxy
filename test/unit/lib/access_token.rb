@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @token = sns_class.new.access_token
     end
 

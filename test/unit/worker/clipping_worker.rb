@@ -1,6 +1,12 @@
 module Mulukhiya
   class ClippingWorkerTest < TestCase
+    def disable?
+      return true unless test_token
+      return super
+    end
+
     def setup
+      return if disable?
       @worker = Worker.create(:clipping)
     end
 

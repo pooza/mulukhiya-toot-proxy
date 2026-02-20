@@ -1,6 +1,12 @@
 module Mulukhiya
   class SNSServiceTest < TestCase
+    def disable?
+      return true unless test_token
+      return super
+    end
+
     def setup
+      return if disable?
       @sns = sns_class.new
     end
 

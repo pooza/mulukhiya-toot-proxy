@@ -7,6 +7,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @listener = Environment.listener_class.new
     end
 

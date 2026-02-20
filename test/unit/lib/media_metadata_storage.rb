@@ -1,6 +1,12 @@
 module Mulukhiya
   class MediaMetadataStorageTest < TestCase
+    def disable?
+      return true unless test_token
+      return super
+    end
+
     def setup
+      return if disable?
       @storage = MediaMetadataStorage.new
       @uri = Ginseng::URI.parse('https://images-na.ssl-images-amazon.com/images/I/519zZO6YAVL.jpg')
     end

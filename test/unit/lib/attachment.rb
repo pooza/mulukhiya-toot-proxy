@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @attachment = attachment_class[attachment_class.catalog.first[:id]]
     end
 

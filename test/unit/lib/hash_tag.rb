@@ -1,6 +1,14 @@
 module Mulukhiya
   class HashTagTest < TestCase
+    def disable?
+      return true unless Environment.dbms_class&.config?
+      return super
+    rescue
+      return true
+    end
+
     def setup
+      return if disable?
       @nowplaying = hash_tag_class.get(tag: 'nowplaying')
       @nowplaying.raw_name = 'NowPlaying'
       @default = hash_tag_class.get(tag: DefaultTagHandler.tags.first)

@@ -2,6 +2,7 @@ module Mulukhiya
   class NoteParserTest < TestCase
     def disable?
       return true unless Environment.note?
+      return true unless test_token
       return super
     end
 
