@@ -348,10 +348,11 @@ ul.links
         family: $monospace
 
 ul.medias
+  display: flex
+  flex-wrap: wrap
   list:
     style: none
-  padding:
-    inline-start: 0
+  padding: 0
   margin: 0 1em
   li.media
     border:
@@ -363,10 +364,8 @@ ul.medias
       color: white
     opacity: 0.9
     padding: 0.5em
-    float: left
     width: 16em
     height: 20em
-    display: block
     margin: 0.5em
     .media-container
       overflow-y: auto

@@ -20,7 +20,7 @@ html lang='ja' data-theme='light'
           datalist id='suggested_keywords'
             option v-for='keyword in suggested_keywords' {{keyword}}
           button.small @click='searchMedias' 検索
-      ul class='medias clearfix'
+      ul.medias
         li.media v-for='media in medias'
           .media-container
             a :href='media.url' target='_blank' rel='noreferrer' v-if='media.thumbnail_url && media.mediatype=="image"'
