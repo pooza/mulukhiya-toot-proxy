@@ -13,8 +13,8 @@
 
 | ブランチ | バージョン | 目的 |
 | --- | --- | --- |
-| `master` | 4.x | Pleroma/Meisskeyユーザーの継続サポート |
-| `develop` | 5.0開発 | アーキテクチャ刷新（Mastodon系/Misskey系の2系統） |
+| `main` | 5.x (デフォルト) | アーキテクチャ刷新（Mastodon系/Misskey系の2系統） |
+| `v4` | 4.x | Pleroma/Meisskeyユーザーの継続サポート |
 
 ### 4.x系メンテナンス方針
 
@@ -34,7 +34,7 @@
 
 #### バックポート判断基準
 
-5.0（develop）の変更を4.x（master）にバックポートする場合、以下を全て満たすこと:
+5.x（main）の変更を4.x（v4）にバックポートする場合、以下を全て満たすこと:
 
 1. **影響範囲が小さい**: 変更ファイルが少なく、既存機能への副作用が限定的
 2. **即効性がある**: セキュリティ修正、ユーザーに直接恩恵のあるバグ修正
@@ -45,21 +45,19 @@ v5-plan.md でP1に分類されたIssueがバックポート対象の目安。
 
 ### ブランチ命名規則
 
-| 用途 | パターン | 例 |
-|------|---------|-----|
-| 4.xリリース作業 | `dev/{version}` | `dev/4.35.7` |
-| 5.0開発 | `develop` | — |
-| 5.0のIssue作業（必要時） | `feature/{issue}` | `feature/4031-remove-meisskey` |
+| 用途                      | パターン          | 例                                |
+|---------------------------|-------------------|-----------------------------------|
+| 4.xリリース作業           | `dev/{version}`   | `dev/4.35.7`                      |
+| 5.xのIssue作業（必要時）  | `feature/{issue}` | `feature/4031-remove-meisskey`    |
 
-- 通常は `develop` ブランチで直接作業する
+- 通常は `main` ブランチで直接作業する
 - 大規模な変更や並行作業が必要な場合のみ feature ブランチを作成する
-- master への統合は PR 経由で行う
 
 ### 4.x系の更新確認手順
 
 ```bash
 # 1. masterブランチで作業
-git checkout master
+git checkout v4
 
 # 2. bundle update
 bundle update
@@ -132,7 +130,7 @@ test/
   - `bundle update` で既に対応済み → PRをCloseし「Already included via bundle update in commit xxxxx」とコメント
   - 未対応 → PRをマージ
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
-- 5.0リリースで develop→main 昇格時に `target-branch` も変更すること
+- `target-branch`: v4（4.x向け）と main（5.x向け）の2エントリ
 
 ## 既知の注意事項
 
