@@ -10,6 +10,34 @@
 - [Mastodon](https://github.com/tootsuite/mastodon)
 - [Misskey](https://github.com/syuilo/misskey)
 
+## ブランチ
+
+| ブランチ | バージョン | 状態 |
+| --- | --- | --- |
+| `main` | 5.x | 開発中（デフォルト） |
+| `v4` | 4.x | メンテナンス |
+
+旧ブランチ名（`master` / `develop`）からリネーム済み（2026-02-22）。
+既存の環境では一度だけブランチの切り替えが必要。以降は従来通り `git pull && bundle install` で更新できる。
+
+### 4.x系を利用中の場合（旧 master）
+
+```bash
+git branch -m master v4
+git fetch origin
+git branch -u origin/v4 v4
+```
+
+### 5.x系に移行する場合（旧 develop）
+
+```bash
+git branch -m develop main
+git fetch origin
+git branch -u origin/main main
+```
+
+5.xへの移行には追加の設定変更が必要。[アップグレードガイド](docs/upgrade-guide-5.0.md)を参照。
+
 ## モロヘイヤに出来ること
 
 投稿本文に対して、

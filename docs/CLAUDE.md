@@ -56,7 +56,7 @@ v5-plan.md でP1に分類されたIssueがバックポート対象の目安。
 ### 4.x系の更新確認手順
 
 ```bash
-# 1. masterブランチで作業
+# 1. v4ブランチで作業
 git checkout v4
 
 # 2. bundle update

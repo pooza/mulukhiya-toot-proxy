@@ -2,6 +2,27 @@
 
 **ステータス**: RC（追記があれば随時更新）
 
+## ブランチの移行
+
+5.0リリースに伴い、ブランチ名を変更した（2026-02-22）。
+
+| 旧ブランチ | 新ブランチ | 用途 |
+| --- | --- | --- |
+| `master` | `v4` | 4.x メンテナンス |
+| `develop` | `main` | 5.x（デフォルト） |
+
+### 移行手順
+
+```bash
+git branch -m develop main
+git fetch origin
+git branch -u origin/main main
+git pull
+bundle install
+```
+
+以降は従来通り `git pull && bundle install` で更新できる。
+
 ## local.yaml の設定パス変更
 
 ### `service:` 配下への移動
@@ -130,7 +151,7 @@ location ^~ /mulukhiya/sidekiq {
 
 サンプルは `config/sample/ubuntu/`、`config/sample/rhel/` を参照。
 
-#### 移行手順
+#### systemd 移行手順
 
 ```bash
 # 旧サービスの停止・無効化
