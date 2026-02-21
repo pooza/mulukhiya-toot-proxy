@@ -36,18 +36,6 @@ module Mulukhiya
       return @http
     end
 
-    def fixture(name)
-      return File.read(File.join(self.class.fixture_dir, name))
-    end
-
-    def json_fixture(name)
-      return JSON.parse(fixture(name))
-    end
-
-    def self.fixture_dir
-      return File.join(dir, 'fixture')
-    end
-
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       Sidekiq::Testing.fake!

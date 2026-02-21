@@ -22,12 +22,6 @@ module Mulukhiya
       end
     end
 
-    alias tags hashtags
-
-    def to_sanitized
-      return NoteParser.sanitize(text.dup)
-    end
-
     def default_max_length
       length = service.max_post_text_length
       length -= [:default_tag, :user_tag]
