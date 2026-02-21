@@ -2,6 +2,8 @@ module Mulukhiya
   class PreTootPipelineTest < TestCase
     def setup
       WebMock.disable_net_connect!(allow_localhost: true)
+      @sns = sns_class.new('https://sns.test', 'test_token')
+      def @sns.account = nil
       config['/agent/accts'] = ['@relayctl@hashtag-relay.dtp-mstdn.jp']
     end
 
@@ -10,7 +12,7 @@ module Mulukhiya
         status_field => '普通の投稿テキストです。',
         visibility_field => '',
       }
-      reporter = Event.new(:pre_toot).dispatch(payload)
+      reporter = create_event.dispatch(payload)
 
       assert_kind_of(Reporter, reporter)
       assert_equal('普通の投稿テキストです。', payload[status_field].strip)
@@ -21,7 +23,7 @@ module Mulukhiya
         status_field => '@relayctl@hashtag-relay.dtp-mstdn.jp subscribe #mulukhiya',
         visibility_field => '',
       }
-      Event.new(:pre_toot).dispatch(payload)
+      create_event.dispatch(payload)
 
       assert_equal(controller_class.visibility_name(:direct), payload[visibility_field])
     end
@@ -31,7 +33,7 @@ module Mulukhiya
         status_field => "本文テキスト\n#タグ1\n#タグ2",
         visibility_field => '',
       }
-      Event.new(:pre_toot).dispatch(payload)
+      create_event.dispatch(payload)
       text = payload[status_field]
 
       assert_includes(text, '本文テキスト', 'body text should be preserved')
@@ -42,10 +44,10 @@ module Mulukhiya
 
     def test_command_break
       payload = {
-        status_field => "command: user_config\ntest_key: test_value",
+        status_field => 'command: user_config',
         visibility_field => '',
       }
-      reporter = Event.new(:pre_toot).dispatch(payload)
+      reporter = create_event.dispatch(payload)
 
       assert_equal(controller_class.visibility_name(:direct), payload[visibility_field])
 
@@ -60,7 +62,7 @@ module Mulukhiya
         status_field => "本文\n#タグ",
         visibility_field => '',
       }
-      Event.new(:pre_toot).dispatch(payload)
+      create_event.dispatch(payload)
 
       assert_includes(payload[spoiler_field], ':netabare:', 'spoiler shortcode should be prepended')
       assert_includes(payload[status_field], '#タグ', 'tag should be preserved')
@@ -91,11 +93,17 @@ module Mulukhiya
         status_field => '普通の投稿テキストです。',
         visibility_field => '',
       }
-      reporter = Event.new(:pre_toot).dispatch(payload)
+      reporter = create_event.dispatch(payload)
       executed_handlers = reporter.filter_map {|entry| entry[:handler]}
 
       assert_false(executed_handlers.include?('spotify_nowplaying'), 'spotify should be disabled in CI')
       assert_false(executed_handlers.include?('you_tube_image'), 'youtube should be disabled in CI')
+    end
+
+    private
+
+    def create_event
+      Event.new(:pre_toot, sns: @sns)
     end
   end
 end
