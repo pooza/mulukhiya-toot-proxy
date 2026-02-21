@@ -14,14 +14,6 @@ module Mulukhiya
       text.scan(NoteParser.acct_pattern).map(&:first).map {|v| Acct.new(v)}.each(&block)
     end
 
-    def uris(&block)
-      return enum_for(__method__) unless block
-      # MFM対応として、スペースだけでなく、閉じ括弧もURLの終端と見なす。
-      return text.scan(%r{https?://[^()[:space:]]+}) do |link|
-        yield Ginseng::URI.parse(link.gsub(/[[:cntrl:]]/, ''))
-      end
-    end
-
     def default_max_length
       length = service.max_post_text_length
       length -= [:default_tag, :user_tag]
