@@ -148,7 +148,8 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 
 - `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45）
 - Controller は `Sinatra::Base` を直接継承
-- stable: rack >= 3.1.14 / Sinatra ~> 4.1.0
+- rack >= 3.1.14 / Sinatra ~> 4.1.0
+- デフォルトブランチ: main（2026-02-22にstableからリネーム済み。他のginseng-*も全てmainに統一済み）
 
 ## v5.0 設定構造の概要
 
