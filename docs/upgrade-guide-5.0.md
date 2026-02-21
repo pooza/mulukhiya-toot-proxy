@@ -1,5 +1,7 @@
 # mulukhiya-toot-proxy 5.0 アップグレードガイド
 
+**ステータス**: RC（追記があれば随時更新）
+
 ## local.yaml の設定パス変更
 
 ### `service:` 配下への移動
