@@ -1,7 +1,5 @@
 # mulukhiya-toot-proxy 5.0 アップグレードガイド
 
-**ステータス**: 作成中（#4072）
-
 ## local.yaml の設定パス変更
 
 ### `service:` 配下への移動
@@ -9,7 +7,7 @@
 以下の外部サービス設定が、4.xではトップレベルだったものが5.0では `service:` 配下に移動した。
 
 | 設定 | 4.x パス | 5.0 パス |
-|------|---------|---------|
+| ---- | -------- | -------- |
 | Annict OAuth | `/annict/oauth/client/id` | `/service/annict/oauth/client/id` |
 | Annict OAuth | `/annict/oauth/client/secret` | `/service/annict/oauth/client/secret` |
 | Annict works | `/annict/works` | `/service/annict/works` |
@@ -66,6 +64,26 @@ puts "spotify config?: #{!Mulukhiya::SpotifyService.client_id.nil?}"
 '
 ```
 
+## テーマカラーの設定
+
+5.0ではUIのヘッダー背景色がSNSインスタンスのテーマカラーに連動する。
+
+### Mastodon
+
+`local.yaml` に手動で設定する:
+
+```yaml
+mastodon:
+  theme:
+    color: '#563ACC'  # インスタンスのテーマカラーを指定
+```
+
+Mastodon本体にはテーマカラーをAPIで取得する手段がないため、管理画面の「サイトの外観」で設定している色を手動で転記する。
+
+### Misskey
+
+設定不要。MisskeyはメタAPI（`/api/meta`）からテーマカラーを自動取得する。フォールバックとして `local.yaml` に `/misskey/theme/color` を設定することも可能。
+
 ## nginx 設定の変更
 
 ### Sidekiq ダッシュボードのアクセス制限（5.0 で追加）
@@ -103,7 +121,7 @@ location ^~ /mulukhiya/sidekiq {
 5.0 では puma/sidekiq/listener をそれぞれ独立した systemd ユニットに分割した:
 
 | 4.x | 5.0 |
-|-----|-----|
+| --- | --- |
 | `mulukhiya-toot-proxy.service` | `mulukhiya-puma.service` |
 | （同上） | `mulukhiya-sidekiq.service` |
 | （同上） | `mulukhiya-listener.service` |
@@ -144,6 +162,96 @@ FreeBSD の rc.d スクリプトは 4.x から3サービス分割（`mulukhiya-p
 
 systemd を使わずに daemon-spawn で直接管理するための `mulukhiya-daemon.sh` を `config/sample/ubuntu/`、`config/sample/rhel/` に追加した。Docker 環境等で利用できる。
 
+## 新機能: Webhook / ウェルカムDM
+
+新規ユーザー登録時にinfo_botからウェルカムDMを自動送信する機能を追加した（#3350）。
+SNS側のadmin webhookとモロヘイヤを連携させて動作する。
+
+### 動作フロー
+
+```text
+新規ユーザーがSNSに登録
+  ↓
+SNS → POST /mulukhiya/webhook/admin（署名付き）
+  ↓ 署名検証
+  ↓ イベント判定（account.created / userCreated → :user_created）
+WelcomeMentionHandler
+  ↓ ボットアカウント除外
+info_bot → 新規ユーザーへDM送信
+```
+
+### 前提条件
+
+- info_botアカウントがSNS上に存在すること
+- info_botのトークンがモロヘイヤに登録済みであること（トークン管理画面でOAuth認証、または `local.yaml` に直接設定）
+
+### モロヘイヤ側の設定
+
+`local.yaml` に以下を追加:
+
+```yaml
+agent:
+  info:
+    username: info    # info_botのユーザー名
+    token: （暗号化済みトークン。OAuth認証で自動設定される）
+    webhook:
+      secret: （任意の文字列。SNS側と同じ値を設定する）
+```
+
+設定後、Pumaを再起動して反映させる。
+
+#### secretについて
+
+- 任意の文字列を決めて設定する（十分な長さの乱数文字列を推奨）
+- SNS側のwebhook登録時に同じ値を入力する
+- Mastodon/Misskeyで別々の値にしてもよいが、同一サーバーでは1つのsecretを共有する
+
+### Mastodon での webhook 登録
+
+| 項目 | 値 |
+| ---- | -- |
+| 設定場所 | Preferences > Administration > Webhooks > Add endpoint |
+| Endpoint URL | `https://{ホスト}/mulukhiya/webhook/admin` |
+| Events | `account.created` にチェック |
+| Secret | `local.yaml` の `/agent/info/webhook/secret` と同じ値 |
+
+Mastodonは `X-Hub-Signature` ヘッダーでSHA256 HMACを送信する。モロヘイヤはこのヘッダーを検証して、不正なリクエストを拒否する。
+
+### Misskey での webhook 登録
+
+| 項目 | 値 |
+| ---- | -- |
+| 設定場所 | コントロールパネル > Webhook > 作成 |
+| URL | `https://{ホスト}/mulukhiya/webhook/admin` |
+| Secret | `local.yaml` の `/agent/info/webhook/secret` と同じ値 |
+| On | `userCreated` にチェック |
+
+Misskeyは `X-Misskey-Hook-Secret` ヘッダーでsecretを平文送信する。モロヘイヤはこのヘッダーを検証して、不正なリクエストを拒否する。
+
+### ウェルカムメッセージのカスタマイズ
+
+テンプレートは `views/mention/welcome.erb` で定義されている。デフォルトは:
+
+```text
+{インスタンス名}へようこそ。
+```
+
+- 可視性: direct（非公開DM）
+- 送信者: info_bot
+- ボットアカウントで登録した場合はDMを送信しない
+
+テンプレートを編集することで、メッセージの内容をカスタマイズできる。
+
+### トラブルシューティング
+
+| 症状 | 原因 | 対処 |
+| ---- | ---- | ---- |
+| 503 Info agent not configured | info_botトークンが未設定 | トークン管理画面でinfo_botアカウントで認証するか、`local.yaml` に手動設定 |
+| 401/403 Invalid signature/secret | secret不一致 | SNS側とモロヘイヤの `local.yaml` で同じsecretを設定しているか確認 |
+| 401 Missing webhook signature | 署名ヘッダーなし | SNS側のwebhook設定でsecretが入力されているか確認 |
+| 404 Unknown event | 誤ったイベント選択 | Mastodon: `account.created` / Misskey: `userCreated` を選択 |
+| DMが届かない（エラーなし） | ハンドラが無効 | `streaming` 機能が有効か確認。info_botトークンの権限を確認 |
+
 ## フロントエンド・CDN の変更
 
 ### CDN ホスト統一（#4069）
@@ -151,7 +259,7 @@ systemd を使わずに daemon-spawn で直接管理するための `mulukhiya-d
 4.x では CDN ホストが jsDelivr, cdnjs, esm.sh の3つに分散していた。5.0 では **jsDelivr に一本化** した（Google Fonts のみ据え置き）。
 
 | ライブラリ | 4.x CDN | 5.0 CDN |
-|-----------|---------|---------|
+| ---------- | ------- | ------- |
 | Font Awesome | cdnjs | jsDelivr |
 | @popperjs/core | esm.sh | jsDelivr |
 | tippy.js | esm.sh | jsDelivr |
@@ -192,3 +300,9 @@ CSS フレームワークとして [Pico CSS](https://picocss.com/) v2 を導入
 ### local.yaml への影響
 
 フロントエンドの変更による `local.yaml` の修正は不要。CDN URL やスタイルシートの設定は `config/application.yaml` で管理されており、`local.yaml` でオーバーライドしない限り自動的に新しい設定が使用される。
+
+## 廃止予定
+
+### `/crypt/salt`（5.x で廃止予定）
+
+`/crypt/salt` 設定は現在 webhook 署名検証でのみ参照されている（`Crypt.password` へのフォールバックあり）。5.x で廃止予定のため、新規設定では使用しないこと。既存の設定は当面そのままで問題ない。

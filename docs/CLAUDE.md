@@ -76,8 +76,8 @@ git diff Gemfile.lock
 ## 重要なドキュメント
 
 - [v5-plan.md](v5-plan.md) — 5.0計画、Issue一覧（#4024〜#4079＋過去Issue）、優先度付き
-- [rack-upgrade-discussion.md](rack-upgrade-discussion.md) — rack 3.2問題の詳細記録（致命的バグの経緯）
-- [webhook-setup.md](webhook-setup.md) — admin webhook設定ガイド（ウェルカムDM機能）
+- [upgrade-guide-5.0.md](upgrade-guide-5.0.md) — 5.0アップグレードガイド（設定移行・webhook・テーマカラー等）
+- [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) — rack 3.2トークン汚染インシデントの記録
 
 ## CI
 
@@ -142,7 +142,7 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 防御策（トークン整合性チェック・アカウントID検証）実装済み。rack 3.2.5 + Sinatra 4.1.1 に更新済み（#4053, #4054）。
 ステージングでの同時アクセス再現テスト（#4055）完了済み（成功率100%）。
 診断スクリプト: `bin/diag/concurrent_token_test.rb`。
-詳細は [rack-upgrade-discussion.md](rack-upgrade-discussion.md) を参照。
+詳細は [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) を参照。
 
 ### ginseng-web
 
