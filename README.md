@@ -38,43 +38,101 @@ git branch -u origin/main main
 
 5.xへの移行には追加の設定変更が必要。[アップグレードガイド](docs/upgrade-guide-5.0.md)を参照。
 
-## モロヘイヤに出来ること
+## 導入前提
+
+- Ruby >= 4.0.1
+- PostgreSQL（SNS側のDB参照用）
+- Redis 7+
+- nginx（リバースプロキシ）
+- libvips（画像処理）
+- ffmpeg（メディア変換）
+
+## アーキテクチャ
+
+クライアントからの投稿リクエストをインターセプトし、ハンドラパイプラインで加工してからSNS APIに転送する。
+
+```mermaid
+sequenceDiagram
+    participant C as クライアント
+    participant N as nginx
+    participant M as mulukhiya
+    participant S as SNS
+
+    C->>N: POST /api/v1/statuses
+    N->>N: X-Mulukhiya ヘッダ判定
+    N->>M: プロキシ転送 (port 3008)
+    M->>M: トークン検証
+    M->>M: pre_toot ハンドラパイプライン
+    Note right of M: 本文加工・タグ追加・URL処理等
+    M->>S: 加工済みリクエストを転送
+    S-->>M: 投稿結果
+    M->>M: アカウント整合性検証
+    M->>M: post_toot ハンドラパイプライン
+    Note right of M: 通知・転送等
+    M-->>N: レスポンス
+    N-->>C: レスポンス
+```
+
+- nginxがURLパターン（`/api/v1/statuses`, `/api/v1/media` 等）でリクエストをmulukhiyaに振り分け
+- **pre_toot**: 投稿前にハンドラが本文・メディアを加工（URL正規化、NowPlaying、タグ付け等）
+- **post_toot**: 投稿後にハンドラが後処理を実行（通知送信、PieFed転送等）
+- `X-Mulukhiya`ヘッダによるループ防止（mulukhiyaからSNSへの転送時にnginxが直接SNSにルーティング）
+
+## 機能の概略
 
 投稿本文に対して、
 
-- 各種短縮URLを戻し、本来のリンク先を明らかにする。
-- 日本語を含んだURLを適切にエンコードし、クリックできるようにする。
-- Amazonの商品URLからノイズを除去する。
-- ハッシュタグ `#nowplaying` を含んでいたら、曲情報やサムネイルを挿入。
-- サーバーのテーマと関係あるワードを含んでいたら、ハッシュタグを追加。
-- アニメ実況支援。実況中の番組と関連したハッシュタグを追加。
-- デフォルトハッシュタグを追加。
+- 各種短縮URLを戻し、本来のリンク先を明らかにする
+- 日本語を含んだURLを適切にエンコードし、クリックできるようにする
+- Amazonの商品URLからノイズを除去する
+- ハッシュタグ `#nowplaying` を含んでいたら、曲情報やサムネイルを挿入
+- サーバーのテーマと関係あるワードを含んでいたら、ハッシュタグを追加
+- アニメ実況支援。実況中の番組と関連したハッシュタグを追加
+- デフォルトハッシュタグを追加
 
 アップロードされたメディアファイルについて、
 
-- 画像ファイルを上限ピクセルまで縮小。
-- WebPに変換し、ファイルサイズを小さくする。
-- サーバーが本来受け付けないメディアファイルを変換。
-- メディアタイプに応じた `#image` `#video` `#audio` 等のタグを本文に挿入。
+- 画像ファイルを上限ピクセルまで縮小
+- WebPに変換し、ファイルサイズを小さくする
+- サーバーが本来受け付けないメディアファイルを変換
+- メディアタイプに応じた `#image` `#video` `#audio` 等のタグを本文に挿入
 
-また、
+その他、
 
-- アニメ視聴記録サービス[Annict](https://annict.com/)から視聴記録を取得し、投稿する。
-- ブックマークされた公開投稿を、[PieFed](https://join.piefed.social)に転送。
-- 平易なPOSTで投稿を行えるwebhook。（Slack Incoming Webhook下位互換）
-- ハッシュタグのRSSフィード。
-- カスタムRSSフィード。
-- 新規登録者へのウェルカムメッセージ。
-- お知らせの念押し投稿。
+- webhook（Slack Incoming Webhook下位互換）
+- 新規登録者へのウェルカムメッセージ
+- ハッシュタグのRSSフィード / カスタムRSSフィード
+- お知らせの念押し投稿
+- [Annict](https://annict.com/)からの視聴記録取得・投稿
+- ブックマークされた公開投稿の[PieFed](https://join.piefed.social)転送
 
-等々。
+## セットアップ
 
-## モロヘイヤをつくった経緯
+```bash
+git clone https://github.com/pooza/mulukhiya-toot-proxy.git
+cd mulukhiya-toot-proxy
+bundle install
+cp config/sample/mastodon/local.yaml config/local.yaml  # Misskeyの場合は misskey/
+vi config/local.yaml  # SNSのURL、PostgreSQL DSN等を設定
+```
 
-プリキュアファン向けのMastodonサーバー「[キュアスタ！](https://precure.ml)」で、
-ずっと前に「AmazonのURL、もっと短くならない〜？」って言われてたのを思い出して作りました。
+- nginx設定: `config/sample/{mastodon,misskey}/mulukhiya.nginx`
+- サービス起動スクリプト: `config/sample/{ubuntu,rhel,freebsd}/`
+- 設定の詳細: `config/sample/README.md`
 
-プリキュアに加え、今はドラゴンクエストダイの大冒険のファンの為のサーバー
-「[デルムリン丼](https://mstdn.delmulin.com)」「[ダイスキー](https://misskey.delmulin.com)」も運営しています。
-「利用の条件」というほど強制力のあるお願いではないけど、プリキュアやダイ大にもし興味あったら
-覗いてください。みんな喜びます。
+## ディレクトリ構成
+
+```text
+app/lib/mulukhiya/
+  controller/     # SNS別コントローラ (Mastodon, Misskey)
+  handler/        # 投稿処理ハンドラ
+  service/        # SNS APIクライアント
+  listener/       # WebSocket/Streamingリスナー
+  model/          # SNS別モデル
+  worker/         # Sidekiqワーカー
+config/
+  application.yaml  # メイン設定
+  sample/           # サンプル設定・起動スクリプト
+views/              # Slimテンプレート + Vue.js
+test/               # テスト
+```
