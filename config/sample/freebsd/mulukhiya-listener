@@ -26,12 +26,12 @@ stop_cmd=${name}_stop
 
 mulukhiya_listener_start() {
   cd $mulukhiya_path
-  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:listener:start'
+  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:listener:start' &
 }
 
 mulukhiya_listener_stop() {
   cd $mulukhiya_path
-  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:listener:stop'
+  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:listener:stop' &
 }
 
 run_rc_command "$1"
