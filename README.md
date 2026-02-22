@@ -47,6 +47,28 @@ git branch -u origin/main main
 - libvips（画像処理）
 - ffmpeg（メディア変換）
 
+### OS別パッケージ
+
+#### FreeBSD
+
+```bash
+pkg install ruby vips ffmpeg redis postgresql16-client nginx jemalloc
+```
+
+#### RHEL / AlmaLinux / Rocky Linux
+
+```bash
+sudo dnf install -y epel-release
+sudo dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm
+sudo dnf install -y gcc make redhat-rpm-config vips-devel libidn-devel postgresql-devel ffmpeg redis jemalloc
+```
+
+#### Debian / Ubuntu
+
+```bash
+sudo apt install gcc make libvips-dev libidn11-dev libpq-dev ffmpeg redis-server nginx
+```
+
 ## アーキテクチャ
 
 クライアントからの投稿リクエストをインターセプトし、ハンドラパイプラインで加工してからSNS APIに転送する。
