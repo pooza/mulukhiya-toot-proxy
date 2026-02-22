@@ -196,7 +196,7 @@ sidekiq:
 ### 前提
 
 - お知らせボットのアカウントが SNS 上に存在すること
-  - [お知らせボット]([/pooza/mulukhiya-toot-proxy/wiki/エージェントボット](https://github.com/pooza/mulukhiya-toot-proxy/wiki/エージェントボット)#お知らせボット)
+  - [お知らせボット](https://github.com/pooza/mulukhiya-toot-proxy/wiki/エージェントボット#お知らせボット)
 - お知らせボットのトークンがモロヘイヤに登録済みであること（トークン管理画面で OAuth 認証）
 
 ### Mastodon の場合
