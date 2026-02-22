@@ -244,6 +244,8 @@ main
   p
     margin:
       left: 1em
+  li
+    list-style: none
 
 main.development
   background:
@@ -435,20 +437,20 @@ section
 section.fav-entries
   .tag-entry
     display: inline-block
-    margin:
-      bottom: 0.5em
+    color: darkslategray
+    margin: 1px 2px
+    padding: 2px 0.5em
     border:
-      width: 0
+      width: 1px
       style: solid
-      color: transparent
+      color: darkslategray
       radius: 3px
-    background:
-      color: papayawhip
     span
       padding: 0 0.5em
-    a
+    a, a:visited
       font:
         family: $sans-serif
+      color: darkslategray
 
 section.tagging-dictionary
   .total
@@ -540,7 +542,7 @@ nav.search-form-container
         left: 0.5em
   nav.footer-navigations
     display: flex
-    flex-direction: column
+    flex-wrap: wrap
     font:
       family: $sans-serif
     .tag
@@ -559,8 +561,10 @@ nav.search-form-container
     .tag::before
       content: '#'
     h4
+      flex-basis: 100%
       margin: 0.3em 0
     ul
+      flex-basis: 100%
       margin: 0
       padding: 0 1em
       li
@@ -570,6 +574,7 @@ nav.search-form-container
         font:
           weight: normal
     .alert
+      flex-basis: 100%
       font:
         family: $serif
   pre.body
@@ -689,12 +694,14 @@ a:hover
 .message-container
   display: block
   border:
-    width: 0
+    width: 1px
+    style: solid
+    color: var(--accent-color)
     radius: 6px
   padding: 0.2em 0.5em
   margin: 0.5em
   background:
-    color: lightgray
+    color: var(--accent-bg)
   opacity: 0.9
   font:
     family: $sans-serif
