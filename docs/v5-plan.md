@@ -472,12 +472,12 @@ test/
 - [x] [#4057](https://github.com/pooza/mulukhiya-toot-proxy/issues/4057) (P3): 未テストハンドラーへのテスト追加
 - [x] [#4058](https://github.com/pooza/mulukhiya-toot-proxy/issues/4058) (P3): Mastodon/Misskeyサービスの振る舞いテスト追加（モック使用）
 - [x] [#4059](https://github.com/pooza/mulukhiya-toot-proxy/issues/4059) (P3): エラーパステスト追加（不正トークン、タイムアウト、不正入力）
-- [ ] [#4060](https://github.com/pooza/mulukhiya-toot-proxy/issues/4060) (P3): インテグレーションテストの再設計・実装（アーキテクチャ確定後）
+- [x] [#4060](https://github.com/pooza/mulukhiya-toot-proxy/issues/4060) (P3): インテグレーションテストの再設計・実装（アーキテクチャ確定後）
 - [x] [#4061](https://github.com/pooza/mulukhiya-toot-proxy/issues/4061) (P3): rack 3.2同時アクセス再現テスト（#4055と連動）
 
 ### ginseng gem メンテナンス
 
-- [ ] [#4066](https://github.com/pooza/mulukhiya-toot-proxy/issues/4066) (P3): ginseng-*系gemへの汎用拡張返却監査（5.0.0実装完了後、#4072の前に実施）
+- [x] [#4066](https://github.com/pooza/mulukhiya-toot-proxy/issues/4066) (P3): ginseng-*系gemへの汎用拡張返却監査（5.0.0実装完了後、#4072の前に実施）
 
 ### Ruby 4.0
 
@@ -490,7 +490,7 @@ test/
 - [x] [#3740](https://github.com/pooza/mulukhiya-toot-proxy/issues/3740) (~~P2~~ クローズ): アンケート公開範囲の制御 → プロキシ層での実現が困難なため見送り
 - [x] [#4067](https://github.com/pooza/mulukhiya-toot-proxy/issues/4067) (P2): ChannelNotificationHandlerの通知方法見直し（info_agent_service直接呼び出し、display_nameでメンション回避、ステージング検証完了）
 - [x] [#3839](https://github.com/pooza/mulukhiya-toot-proxy/issues/3839) (P3): BlueSkyブリッジアカウント宛てリアクション通知の公開範囲引き上げ（ブリッジドメイン `bsky.brid.gy` で判定、ReplyReactionHandlerのvisibility制御。実験的機能、検証はリクエスト元ユーザーに委任）
-- [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3): Misskey実況デコレーションの自動剥がし（`/api/i/update`＋各ユーザートークン方式。`write:account`スコープ追加が必要。認証済みユーザーのみ対象）
+- [ ] [#3943](https://github.com/pooza/mulukhiya-toot-proxy/issues/3943) (P3→**5.0.1**): Misskey実況デコレーションの自動剥がし（`/api/i/update`＋各ユーザートークン方式。`write:account`スコープ追加が必要。認証済みユーザーのみ対象）
 - [x] [#3877](https://github.com/pooza/mulukhiya-toot-proxy/issues/3877) (P3→**スコープアウト**): Mastodon形式タグづけ復活（ActivityPub Update使用、Mastodon系限定）— 5.0.0スコープ外、5.x以降で対応
 - [x] [#4068](https://github.com/pooza/mulukhiya-toot-proxy/issues/4068) (P3): CSS設計の見直し（Pico CSS導入、全ページCSS競合修正、font-size統一、未使用CSS削除。ステージング検証完了）
 - [x] [#4069](https://github.com/pooza/mulukhiya-toot-proxy/issues/4069) (P3): CDN利用の見直し（jsDelivrに統一、バージョンポリシー統一、SweetAlert2 importmap化、clipboard.js除去。ステージング検証完了）
@@ -510,7 +510,7 @@ test/
 
 ### ドキュメント
 
-- [ ] [#4072](https://github.com/pooza/mulukhiya-toot-proxy/issues/4072): 5.0アップグレードガイドの作成（`docs/webhook-setup.md` 先行作成済み）
+- [x] [#4072](https://github.com/pooza/mulukhiya-toot-proxy/issues/4072): 5.0アップグレードガイドの作成（`docs/webhook-setup.md` 先行作成済み）
   - テーマ色の設定手順を記載すること（Mastodonは `config['/mastodon/theme/color']` で手動設定、MisskeyはAPIから自動取得）
 - [x] [#4077](https://github.com/pooza/mulukhiya-toot-proxy/issues/4077): Sidekiqダッシュボードのnginxアクセス制限（ドキュメント追加）
 
