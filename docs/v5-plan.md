@@ -502,6 +502,7 @@ test/
 
 - [x] [#4075](https://github.com/pooza/mulukhiya-toot-proxy/issues/4075) (P3→**5.1.0**): with_indifferent_access の整理・シンボルキー統一
 - [x] [#4079](https://github.com/pooza/mulukhiya-toot-proxy/issues/4079) (P3→**5.1.0**): デーモン起動プロセスの簡素化
+- [ ] [#4083](https://github.com/pooza/mulukhiya-toot-proxy/issues/4083) (P3→**5.1.0**): `/crypt/salt` 設定キーの廃止（`Crypt.password` のみに統一。移行注意: webhook URLが変わるためアップグレードガイドへの記載が必要）
 
 ### テスト（5.1.0追加）
 

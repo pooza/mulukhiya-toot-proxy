@@ -11,6 +11,7 @@ ExecStop=/bin/bash -lc 'bundle exec rake mulukhiya:puma:stop'
 TimeoutSec=15
 SuccessExitStatus=KILL
 Restart=always
+Environment="LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"
 
 [Install]
 WantedBy=multi-user.target

@@ -123,7 +123,7 @@ sudo systemctl start mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
 ```
 
 - rbenv を使っている場合: サンプルの `ExecStart` は `/bin/bash -lc` でシェルを起動する。rbenv の初期化が `.bashrc` または `.bash_profile` に書かれていることを確認する
-- RHEL サンプルには jemalloc の `LD_PRELOAD` が含まれる。Ubuntu で jemalloc を使う場合は手動で追加する
+- jemalloc の `LD_PRELOAD` 設定が Ubuntu / RHEL サンプル両方に含まれている。jemalloc がインストールされていない場合は `apt install libjemalloc2`（Ubuntu）/ `dnf install jemalloc`（RHEL）で導入する
 
 ### FreeBSD
 
@@ -153,7 +153,9 @@ mastodon:
 
 ## 6. Sidekiq ダッシュボードのアクセス制限
 
-Sidekiq ダッシュボード（`/mulukhiya/sidekiq`）への外部アクセスを制限する。
+Sidekiq ダッシュボード（`/mulukhiya/sidekiq`）は認証なしで誰でも閲覧できる。**IP 制限または BASIC 認証（あるいは両方）を必ず設定すること。**
+
+### 方法 A: nginx で IP 制限（固定 IP がある場合・推奨）
 
 nginx の server context に以下を追加する（既存の `location ^~ /mulukhiya` より前に配置）:
 
@@ -168,6 +170,20 @@ location ^~ /mulukhiya/sidekiq {
 
 - `YOUR_IP_OR_CIDR` を管理者の IP アドレスまたは CIDR に書き換える。`allow` 行は複数記述できる
 - サンプル: `config/sample/mastodon/mulukhiya.nginx`, `config/sample/misskey/mulukhiya.nginx`
+
+### 方法 B: BASIC 認証（固定 IP がない場合）
+
+`local.yaml` に以下を追加する:
+
+```yaml
+sidekiq:
+  auth:
+    password: your_password  # 任意の文字列
+```
+
+- ユーザー名のデフォルトは `admin`。変更したい場合は `sidekiq.auth.user` も設定する
+- パスワードは `crypt.password` で暗号化された値も使用可能
+- 設定後、Puma を再起動する
 
 ## 7. ウェルカム DM の設定
 

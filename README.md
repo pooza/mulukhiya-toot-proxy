@@ -118,7 +118,7 @@ vi config/local.yaml  # SNSのURL、PostgreSQL DSN等を設定
 
 - nginx設定: `config/sample/{mastodon,misskey}/mulukhiya.nginx`
 - サービス起動スクリプト: `config/sample/{ubuntu,rhel,freebsd}/`
-- 設定の詳細: `config/sample/README.md`
+- 設定の詳細: [config/sample/README.md](config/sample/README.md)
 
 ## ディレクトリ構成
 
