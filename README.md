@@ -52,7 +52,7 @@ git branch -u origin/main main
 #### FreeBSD
 
 ```bash
-pkg install ruby vips ffmpeg redis postgresql16-client nginx jemalloc
+pkg install ruby vips ffmpeg redis postgresql16-client nginx
 ```
 
 #### RHEL / AlmaLinux / Rocky Linux
