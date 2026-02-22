@@ -26,12 +26,12 @@ stop_cmd=${name}_stop
 
 mulukhiya_puma_start() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:puma:start'
+  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:puma:start'
 }
 
 mulukhiya_puma_stop() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:puma:stop'
+  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:puma:stop'
 }
 
 run_rc_command "$1"

@@ -26,12 +26,12 @@ stop_cmd=${name}_stop
 
 mulukhiya_sidekiq_start() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:start'
+  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:start'
 }
 
 mulukhiya_sidekiq_stop() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:stop'
+  timeout 15 sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec rake mulukhiya:sidekiq:stop'
 }
 
 run_rc_command "$1"
