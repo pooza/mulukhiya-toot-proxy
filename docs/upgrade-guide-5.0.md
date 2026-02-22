@@ -125,7 +125,8 @@ sudo systemctl start mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
 
 - rbenv を使っている場合: サンプルの `ExecStart` は `/bin/bash -lc` でシェルを起動する。
   - rbenv の初期化が `.bashrc` または `.bash_profile` に書かれていることを確認する
-- jemalloc の `LD_PRELOAD` 設定が Ubuntu / RHEL サンプル両方に含まれている。jemalloc がインストールされていない場合は `apt install libjemalloc2`（Ubuntu）/ `dnf install jemalloc`（RHEL）で導入する
+- jemalloc の `LD_PRELOAD` 設定が Ubuntu / RHEL サンプル両方に含まれている。
+  - jemalloc がインストールされていない場合は `apt install libjemalloc2`（Ubuntu）/ `dnf install jemalloc`（RHEL）で導入する
 
 ### FreeBSD
 
@@ -185,7 +186,7 @@ sidekiq:
 ```
 
 - ユーザー名のデフォルトは `admin`。変更したい場合は `/sidekiq/auth/user` も設定する
-- パスワードは [crypt.rb](/pooza/mulukhiya-toot-proxy/wiki/コマンドラインツール#cryptrb) で暗号化された値を推奨。
+- パスワードは [crypt.rb](https://github.com/pooza/mulukhiya-toot-proxy/wiki/コマンドラインツール#cryptrb) で暗号化された値を推奨。
 - 設定後、Puma を再起動する
 
 ## 7. ウェルカム DM の設定
@@ -195,7 +196,7 @@ sidekiq:
 ### 前提
 
 - お知らせボットのアカウントが SNS 上に存在すること
-  - [お知らせボット](/pooza/mulukhiya-toot-proxy/wiki/エージェントボット#お知らせボット)
+  - [お知らせボット]([/pooza/mulukhiya-toot-proxy/wiki/エージェントボット](https://github.com/pooza/mulukhiya-toot-proxy/wiki/エージェントボット)#お知らせボット)
 - お知らせボットのトークンがモロヘイヤに登録済みであること（トークン管理画面で OAuth 認証）
 
 ### Mastodon の場合
