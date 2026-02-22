@@ -415,6 +415,8 @@ nav.appender-container
   font:
     family: $sans-serif
   justify-content: center
+  a
+    cursor: pointer
 
 section
   margin: 0 1em
@@ -543,13 +545,14 @@ nav.search-form-container
   nav.footer-navigations
     display: flex
     flex-wrap: wrap
+    justify-content: flex-start
+    align-items: center
     font:
       family: $sans-serif
     .tag
       display: inline-block
       color: darkslategray
       margin: 1px 2px
-      padding: 2px 0.5em
       border:
         width: 1px
         style: solid
