@@ -150,7 +150,7 @@ test/
   - `bundle update` で既に対応済み → PRをCloseし「Already included via bundle update in commit xxxxx」とコメント
   - 未対応 → PRをマージ
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
-- `target-branch`: v4（4.x向け）と main（5.x向け）の2エントリ
+- `target-branch`: v4（4.x向け）と develop（5.x向け）の2エントリ
 
 ## 既知の注意事項
 
