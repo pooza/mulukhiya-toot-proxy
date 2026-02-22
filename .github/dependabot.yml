@@ -16,5 +16,5 @@ updates:
     time: '03:00'
     timezone: 'Asia/Tokyo'
   open-pull-requests-limit: 0
-  target-branch: main
+  target-branch: develop
   versioning-strategy: lockfile-only
