@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 6d8df8d193dc07f5a8e166d0bbe0f8c70c49544e
+  revision: 96815baa96349228b5517a8f10780f2381caa171
   specs:
     ginseng-core (1.15.16)
       activesupport (>= 7.0.7.1)
@@ -43,7 +43,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: a5d0a1d2bea6a6e49f0905d4d3e191a2cab6f661
+  revision: a61a221baf78da63ef1d7deb8ab115c186859a2e
   specs:
     ginseng-fediverse (1.8.18)
 
@@ -168,7 +168,7 @@ GEM
       dry-initializer (~> 3.2)
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
-    erb (6.0.1)
+    erb (6.0.2)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
@@ -227,7 +227,8 @@ GEM
     mime-types-data (3.2026.0203)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (6.0.1)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
     multi_json (1.19.1)
     multi_xml (0.8.1)
