@@ -596,6 +596,16 @@ user_config:
     - token
     - password
     - secret
+  valid_keys:
+    - webhook
+    - mulukhiya
+    - handler
+    - tagging
+    - notify
+    - annict
+    - service
+    - amazon
+    - piefed
   redis:
     dsn: redis://localhost:6379/1
 webhook:

@@ -53,6 +53,16 @@ module Mulukhiya
       update(tagging: {user_tags: nil})
     end
 
+    def clean
+      data = raw
+      removed = clean_top_keys(data) + clean_handlers(data)
+      if removed.present?
+        @storage.set(@account.id, data)
+        @values = @storage[@account.id]
+      end
+      return removed
+    end
+
     alias to_h raw
 
     def disable?(handler)
@@ -83,6 +93,30 @@ module Mulukhiya
     end
 
     private
+
+    def clean_top_keys(data)
+      valid = config['/user_config/valid_keys']
+      removed = []
+      data.each_key do |key|
+        next if valid.member?(key)
+        data.delete(key)
+        removed.push("/#{key}")
+      end
+      return removed
+    end
+
+    def clean_handlers(data)
+      return [] unless data['handler'].is_a?(Hash)
+      valid = Handler.all_names.map(&:underscore)
+      removed = []
+      data['handler'].each_key do |name|
+        next if valid.member?(name)
+        data['handler'].delete(name)
+        removed.push("/handler/#{name}")
+      end
+      data.delete('handler') if data['handler'].empty?
+      return removed
+    end
 
     def handle_user_tags(values)
       return unless handler = Handler.create(:user_tag)
