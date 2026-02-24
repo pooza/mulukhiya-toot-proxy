@@ -604,7 +604,6 @@ user_config:
     - notify
     - annict
     - service
-    - amazon
     - piefed
   redis:
     dsn: redis://localhost:6379/1
