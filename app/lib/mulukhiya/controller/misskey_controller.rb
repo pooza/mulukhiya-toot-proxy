@@ -67,7 +67,7 @@ module Mulukhiya
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
       reporter.response = sns.upload(params.dig(:file, :tempfile))
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
-      @renderer.message = reporter.response.parsed_response
+      @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
