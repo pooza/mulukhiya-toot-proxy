@@ -114,6 +114,7 @@ html lang='ja' data-theme='light'
                   this.accounts = e
                   this.all_tokens = this.getAllTokens()
                   this.input.token = null
+                  this.restartable = true
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             deleteAccount (account) {
