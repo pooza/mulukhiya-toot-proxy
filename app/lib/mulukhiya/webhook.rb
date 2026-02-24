@@ -60,7 +60,7 @@ module Mulukhiya
       return {
         sns: uri.to_s,
         token:,
-        salt: (config['/crypt/salt'] rescue Crypt.password),
+        salt: Crypt.password,
       }.to_json.sha256
     end
 

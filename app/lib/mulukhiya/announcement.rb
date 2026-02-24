@@ -18,7 +18,7 @@ module Mulukhiya
       rescue => e
         e.log(announcement:)
       ensure
-        sleep(Worker.create(:announcement).worker_config('interval/seconds'))
+        sleep(Worker.create(:announcement).worker_config(:interval, :seconds))
       end
       save(response)
     end

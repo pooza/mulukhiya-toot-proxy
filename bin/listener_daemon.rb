@@ -4,6 +4,9 @@ ENV['RAKE'] = nil
 
 require 'mulukhiya'
 module Mulukhiya
-  exit 1 if ListenerDaemon.disable?
+  if ListenerDaemon.disable?
+    warn "#{ListenerDaemon.name}: disabled, skipping"
+    exit 0
+  end
   ListenerDaemon.spawn!(singleton: true)
 end

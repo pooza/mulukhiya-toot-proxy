@@ -12,9 +12,10 @@ module Mulukhiya
       return self.class.to_s.split('::').last.sub(/Worker$/, '').underscore
     end
 
-    def worker_config(key)
-      value = config["/worker/#{underscore}/#{key}"] rescue nil
-      value = config["/worker/default/#{key}"] rescue nil if value.nil?
+    def worker_config(*keys)
+      path = keys.map(&:to_s).join('/')
+      value = config["/worker/#{underscore}/#{path}"] rescue nil
+      value = config["/worker/default/#{path}"] rescue nil if value.nil?
       return value
     end
 
