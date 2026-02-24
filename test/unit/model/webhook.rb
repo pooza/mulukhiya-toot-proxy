@@ -51,7 +51,7 @@ module Mulukhiya
 
     def test_visibility
       Webhook.all do |hook|
-        assert(parser_class.visibility_names.values.member?(hook.visibility))
+        assert_includes(parser_class.visibility_names.values, hook.visibility)
       end
     end
 
@@ -88,7 +88,7 @@ module Mulukhiya
       status = JSON.parse(command.stdout)
 
       assert_kind_of(Hash, status)
-      assert(['id', 'account', 'createdNote'].member?(status.keys.first))
+      assert_includes(['id', 'account', 'createdNote'], status.keys.first)
     end
   end
 end

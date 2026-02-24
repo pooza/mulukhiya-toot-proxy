@@ -123,7 +123,7 @@ module Mulukhiya
       return unless @status
 
       assert_kind_of(String, @status.visibility_name)
-      assert(@status.parser.class.visibility_names.values.member?(@status.visibility_name))
+      assert_includes(@status.parser.class.visibility_names.values, @status.visibility_name)
     end
 
     def test_visibility_icon
