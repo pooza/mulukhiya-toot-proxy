@@ -15,7 +15,7 @@ module Mulukhiya
         service = Ginseng::Fediverse::MulukhiyaService.new(remote[:url])
         next if sns.uri.host == service.base_uri.host
         remote_tags = service.search_hashtags(text)
-        tags.concat(remote_tags.reject {|v| dic.short?(v) || local_tags.member?(v)})
+        tags.concat(remote_tags.reject {|v| dic.short?(v) || local_tags.member?(v) || dic.key?(v)})
       rescue => e
         e.log(remote:)
       end
