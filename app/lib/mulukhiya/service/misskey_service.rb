@@ -56,9 +56,6 @@ module Mulukhiya
       return response
     end
 
-    def update_account(account, params = {})
-    end
-
     def oauth_client_id
       return create_uri('/mulukhiya/app/home').to_s
     end

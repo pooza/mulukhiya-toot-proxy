@@ -344,7 +344,6 @@ misskey:
       video: video/mp4
   capabilities:
     channel: true
-    decoration: true
     reaction: true
     repost: true
     streaming: true
@@ -586,9 +585,6 @@ sidekiq:
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
-    user_decoration_initialize:
-      class: Mulukhiya::UserDecorationInitializeWorker
-      cron: 3 3 * * *
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
