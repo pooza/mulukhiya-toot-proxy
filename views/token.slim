@@ -10,8 +10,10 @@ html lang='ja' data-theme='light'
       == slim.render 'fragment/message'
       h2 トークンの管理
       .field-update-button-container v-if='restartable'
-        button @click='restartPuma' 再起動
-        p.alert 再起動している間（数十秒程度）は操作できなくなります。
+        button v-if='account.is_admin' @click='restartPuma' 再起動
+        p.alert トークンの更新を反映するには再起動が必要です。
+        p.alert v-if='account.is_admin' 再起動している間（数十秒程度）は操作できなくなります。
+        p.alert v-else='' 管理者に再起動を依頼してください。
       nav.tokens v-if='accounts.length'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'

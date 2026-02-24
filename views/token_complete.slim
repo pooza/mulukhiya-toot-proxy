@@ -10,8 +10,10 @@ html lang='ja' data-theme='light'
       == slim.render 'fragment/message'
       h2 認証完了
       .field-update-button-container v-if='restartable'
-        button @click='restartPuma' 再起動
-        p.alert トークンの更新を反映するには再起動が必要です。再起動している間（数十秒程度）は操作できなくなります。
+        button v-if='account.is_admin' @click='restartPuma' 再起動
+        p.alert トークンの更新を反映するには再起動が必要です。
+        p.alert v-if='account.is_admin' 再起動している間（数十秒程度）は操作できなくなります。
+        p.alert v-else='' 管理者に再起動を依頼してください。
       .description v-if='registered' トークンの登録が完了しました。
       .description v-else='' トークンを登録しています...
       nav.tokens v-if='account.username'
