@@ -179,7 +179,7 @@ html lang='ja' data-theme='light'
               this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
               this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
               this.form.piefed.community = this.methods.dig(data, 'config', 'piefed', 'community')
-              this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'annict', 'theme_works_only') == true
+              this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'service', 'annict', 'theme_works_only') == true
               this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
               if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
                 this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
@@ -274,8 +274,8 @@ html lang='ja' data-theme='light'
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             updateAnnict () {
-              const command = {annict: {theme_works_only: null}}
-              if (this.form.annict.theme_works_only) command.annict.theme_works_only = true
+              const command = {service: {annict: {theme_works_only: null}}}
+              if (this.form.annict.theme_works_only) command.service.annict.theme_works_only = true
               this.updateConfig(command)
             },
             unauthAnnict () {
@@ -288,7 +288,7 @@ html lang='ja' data-theme='light'
                 cancelButtonText: 'キャンセル',
               }).then(result => {
                 if (!result.isConfirmed) return
-                this.updateConfig({annict: null})
+                this.updateConfig({service: {annict: null}})
                   .then(e => {
                     this.result = jsyaml.dump(e.config)
                     this.layout.details.annict = false

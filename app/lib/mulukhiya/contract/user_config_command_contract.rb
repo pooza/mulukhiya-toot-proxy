@@ -6,9 +6,13 @@ module Mulukhiya
         optional(:token).maybe(:string)
         optional(:visibility).maybe(:string)
       end
-      required(:annict).maybe(:hash).schema do
-        optional(:token).maybe(:string)
+      required(:service).maybe(:hash).schema do
+        optional(:annict).maybe(:hash).schema do
+          optional(:token).maybe(:string)
+          optional(:theme_works_only).maybe(:bool)
+        end
       end
+      required(:annict).maybe(:hash)
       required(:notify).maybe(:hash).schema do
         optional(:verbose).maybe(:bool)
       end
@@ -30,6 +34,7 @@ module Mulukhiya
       values['tags'] ||= []
       values['webhook'] ||= {}
       values['notify'] ||= {}
+      values['service'] ||= {}
       values['annict'] ||= {}
       values['piefed'] ||= {}
       values['tagging'] ||= {}
