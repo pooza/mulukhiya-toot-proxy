@@ -3,6 +3,11 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    def start(args)
+      save_config
+      Environment.listener_class.start
+    end
+
     def command
       return CommandLine.new([
         File.join(Environment.dir, 'bin/listener_worker.rb'),
@@ -24,7 +29,7 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new(['rake', 'mulukhiya:listener:restart']).exec
+      CommandLine.new([File.join(Environment.dir, 'bin/listener_daemon.rb'), 'restart']).exec
     end
 
     def self.health

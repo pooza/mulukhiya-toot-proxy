@@ -34,7 +34,7 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new(['rake', 'mulukhiya:puma:restart']).exec
+      CommandLine.new([File.join(Environment.dir, 'bin/puma_daemon.rb'), 'restart']).exec
     end
 
     private
