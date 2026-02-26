@@ -62,7 +62,20 @@ html lang='ja' data-theme='light'
                 cancelButtonText: 'キャンセル',
               }).then(result => {
                 if (!result.isConfirmed) return
-                this.methods.restartPuma().then(_ => {this.restartable = false})
+                this.methods.restartPuma().then(_ => {
+                  this.restartable = false
+                  Swal.fire({
+                    title: '再起動中',
+                    text: 'しばらくお待ちください...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading(),
+                  })
+                  this.methods.waitForHealth().then(_ => {
+                    Swal.fire({title: '再起動完了', icon: 'success', timer: 2000, showConfirmButton: false})
+                      .then(_ => location.reload())
+                  }).catch(e => Swal.fire({title: '再起動エラー', text: e.message, icon: 'error'}))
+                })
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
           },

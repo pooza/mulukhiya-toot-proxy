@@ -418,6 +418,19 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.waitForHealth = (intervalMs = 3000, timeoutMs = 60000) => {
+      return new Promise((resolve, reject) => {
+        const start = Date.now()
+        const poll = () => {
+          if (Date.now() - start > timeoutMs) return reject(new Error('タイムアウト'))
+          axios.get(globals.methods.createURL('/mulukhiya/api/health'))
+            .then(e => resolve(e.data))
+            .catch(() => setTimeout(poll, intervalMs))
+        }
+        setTimeout(poll, intervalMs)
+      })
+    }
+
     globals.methods.toggleHandler = async (handler, flag) => {
       const indicator = new ActivityIndicator()
       indicator.show()
