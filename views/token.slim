@@ -10,10 +10,7 @@ html lang='ja' data-theme='light'
       == slim.render 'fragment/message'
       h2 トークンの管理
       .field-update-button-container v-if='restartable'
-        button v-if='account.is_admin' @click='restartPuma' 再起動
-        p.alert トークンの更新を反映するには再起動が必要です。
-        p.alert v-if='account.is_admin' 再起動している間（数十秒程度）は操作できなくなります。
-        p.alert v-else='' 管理者に再起動を依頼してください。
+        p.alert トークンの更新を反映するには再起動が必要です。管理者に再起動を依頼してください。
       nav.tokens v-if='accounts.length'
         h3 登録済みのトークン
         .token :class='{loggedin:isLoggedIn(current_account)}' v-for='current_account in accounts'
@@ -140,32 +137,6 @@ html lang='ja' data-theme='light'
             },
             isLoggedIn (account) {
               return account.token == this.token
-            },
-            restartPuma () {
-              Swal.fire({
-                title: 'Pumaの再起動',
-                text: 'Pumaを再起動します。',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '再起動',
-                cancelButtonText: 'キャンセル',
-              }).then(result => {
-                if (!result.isConfirmed) return
-                this.methods.restartPuma().then(_ => {
-                  this.restartable = false
-                  Swal.fire({
-                    title: '再起動中',
-                    text: 'しばらくお待ちください...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => Swal.showLoading(),
-                  })
-                  this.methods.waitForHealth().then(_ => {
-                    Swal.fire({title: '再起動完了', icon: 'success', timer: 2000, showConfirmButton: false})
-                      .then(_ => location.reload())
-                  }).catch(e => Swal.fire({title: '再起動エラー', text: e.message, icon: 'error'}))
-                })
-              }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
           },
         })
