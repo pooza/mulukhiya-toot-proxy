@@ -13,7 +13,7 @@ module Mulukhiya
     end
 
     def worker_config(*keys)
-      path = keys.map(&:to_s).join('/')
+      path = keys.join('/')
       value = config["/worker/#{underscore}/#{path}"] rescue nil
       value = config["/worker/default/#{path}"] rescue nil if value.nil?
       return value

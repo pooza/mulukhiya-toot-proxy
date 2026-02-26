@@ -14,7 +14,7 @@ module Mulukhiya
 
     def validate
       return contract.call(parser.params).errors.to_h do |error|
-        ["/#{error.path.map(&:to_s).join('/')}", error.text]
+        ["/#{error.path.join('/')}", error.text]
       end
     end
 
