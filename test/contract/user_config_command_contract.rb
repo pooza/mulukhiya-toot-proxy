@@ -5,11 +5,11 @@ module Mulukhiya
     end
 
     def test_call
-      errors = @contract.call(command: 'user_config', annict: {token: 'aaa'}).errors.messages
+      errors = @contract.call(command: 'user_config', service: {annict: {token: 'aaa'}}).errors.messages
 
       assert_empty(errors)
 
-      errors = @contract.call(command: 'user_config', annict: {token: 222}).errors.messages
+      errors = @contract.call(command: 'user_config', service: {annict: {token: 222}}).errors.messages
 
       assert_false(errors.empty?)
 
