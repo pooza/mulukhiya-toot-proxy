@@ -1,8 +1,9 @@
 module Mulukhiya
   class MisskeyListener < Listener
     def receive(message)
-      payload = JSON.parse(message.data)['body']
-      method_name = create_method_name(payload['type'])
+      data = JSON.parse(message.data)
+      payload = data['body']
+      method_name = create_method_name(payload['type'] || data['type'])
       return send(method_name.to_sym, payload)
     rescue NoMethodError
       log(method: method_name, message: 'method unimplemented')
