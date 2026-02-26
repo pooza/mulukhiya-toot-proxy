@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
+PIDFile=/home/__username__/path/to/mulukhiya-toot-proxy/tmp/pids/SidekiqDaemon.pid
 User=__username__
 WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
 ExecStart=/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb start'
