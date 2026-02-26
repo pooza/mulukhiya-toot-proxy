@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def args
-      return params[:command].select {|v| v.is_a?(Symbol)}
+      return params[:command].grep(Symbol)
     end
 
     def args?

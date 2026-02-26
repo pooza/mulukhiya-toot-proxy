@@ -80,7 +80,7 @@ module Mulukhiya
     end
 
     def handler_config(*keys)
-      path = keys.map(&:to_s).join('/')
+      path = keys.join('/')
       value = config["/handler/#{underscore}/#{path}"] rescue nil
       value = config["/handler/default/#{path}"] rescue nil if value.nil?
       return value

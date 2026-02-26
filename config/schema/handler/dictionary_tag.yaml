@@ -12,6 +12,8 @@ properties:
           type: object
         name:
           type: string
+        strict:
+          type: boolean
         type:
           enum:
             - multi_field
@@ -43,6 +45,4 @@ properties:
         format: regex
         type: string
     type: object
-required:
-  - dics
 type: object

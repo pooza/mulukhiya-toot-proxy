@@ -257,7 +257,7 @@ module Mulukhiya
       storage = UserConfigStorage.new
       storage.all_keys
         .map {|key| key.split(':').last}
-        .select {|id| storage[id]['/annict/token']}
+        .select {|id| annict_token?(storage[id])}
         .filter_map {|id| Environment.account_class[id] rescue nil}
         .select(&:webhook)
         .select(&:annict)
@@ -300,6 +300,10 @@ module Mulukhiya
       results.each do |acct, result|
         puts({acct:, result:}.to_yaml)
       end
+    end
+
+    def self.annict_token?(config)
+      return config['/service/annict/token'] || config['/annict/token']
     end
 
     private

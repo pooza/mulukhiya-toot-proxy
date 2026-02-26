@@ -9,6 +9,8 @@ html lang='ja' data-theme='light'
     main#app v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h2 認証完了
+      .field-update-button-container v-if='restartable'
+        p.alert トークンの更新を反映するには再起動が必要です。管理者に再起動を依頼してください。
       .description v-if='registered' トークンの登録が完了しました。
       .description v-else='' トークンを登録しています...
       nav.tokens v-if='account.username'
@@ -31,6 +33,7 @@ html lang='ja' data-theme='light'
             return {
               account: {},
               registered: false,
+              restartable: false,
             }
           },
           async created () {
@@ -41,9 +44,11 @@ html lang='ja' data-theme='light'
                 .then(e => {
                   this.account = e
                   this.registered = true
+                  this.restartable = true
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             }
           },
+          methods: {},
         })
         app.use(MulukhiyaLib)
         app.component('slide-up-down', SlideUpDown)

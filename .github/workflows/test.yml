@@ -32,7 +32,7 @@ jobs:
           echo "controller: ${{ matrix.controller }}" > config/local.yaml
       - name: bundle install
         run: |
-          gem install bundler -v '~>2.0'
+          gem install bundler
           bundle install --jobs 4 --retry 3
           bundle exec rake bundle:update
           git diff

@@ -4,6 +4,9 @@ ENV['RAKE'] = nil
 
 require 'mulukhiya'
 module Mulukhiya
-  exit 1 if PumaDaemon.disable?
+  if PumaDaemon.disable?
+    warn "#{PumaDaemon.name}: disabled, skipping"
+    exit 0
+  end
   PumaDaemon.spawn!(singleton: true)
 end

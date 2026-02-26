@@ -47,7 +47,7 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new(['rake', 'mulukhiya:sidekiq:restart']).exec
+      CommandLine.new([File.join(Environment.dir, 'bin/sidekiq_daemon.rb'), 'restart']).exec
     end
 
     def self.health
@@ -68,10 +68,6 @@ module Mulukhiya
 
     def initializer_path
       return File.join(Environment.dir, 'app/initializer/sidekiq.rb')
-    end
-
-    def create_log_entry(line)
-      return {daemon: app_name}.merge(JSON.parse(line)) rescue super
     end
   end
 end

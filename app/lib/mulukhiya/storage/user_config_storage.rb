@@ -37,6 +37,18 @@ module Mulukhiya
       bar&.finish
     end
 
+    def self.clean
+      bar = ProgressBar.create(total: accounts.count)
+      accounts do |account|
+        removed = account.user_config.clean
+        next unless removed.present?
+        logger.info(account: account.acct.to_s, removed:)
+      ensure
+        bar&.increment
+      end
+      bar&.finish
+    end
+
     def self.tag_owners(&block)
       return enum_for(__method__) unless block
       accounts.select {|v| v.user_config['/tagging/user_tags'].present?}.each(&block)

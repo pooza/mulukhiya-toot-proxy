@@ -15,8 +15,6 @@ properties:
     properties:
       channel:
         type: boolean
-      decoration:
-        type: boolean
       reaction:
         type: boolean
       repost:

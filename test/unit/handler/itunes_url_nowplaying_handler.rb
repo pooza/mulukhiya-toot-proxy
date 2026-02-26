@@ -51,8 +51,8 @@ module Mulukhiya
       @handler.handle_pre_toot(status_field => "シュビドゥビ☆スイーツタイム\n#nowplaying https://music.apple.com/jp/album//1352845788?i=1352845804\n")
       lines = @handler.payload[status_field].each_line.to_a.map(&:chomp)
 
-      assert(lines.member?('シュビドゥビ☆スイーツタイム'))
-      assert(lines.member?('Artist: 宮本佳那子'))
+      assert_includes(lines, 'シュビドゥビ☆スイーツタイム')
+      assert_includes(lines, 'Artist: 宮本佳那子')
     end
   end
 end

@@ -40,9 +40,9 @@ module Mulukhiya
     def test_syms_coverage
       syms = Event.syms
 
-      assert(syms.member?(:pre_toot))
-      assert(syms.member?(:post_toot))
-      assert(syms.member?(:alert))
+      assert_includes(syms, :pre_toot)
+      assert_includes(syms, :post_toot)
+      assert_includes(syms, :alert)
     end
   end
 end

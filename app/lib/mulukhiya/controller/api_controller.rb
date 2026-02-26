@@ -312,7 +312,7 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         response = AnnictService.new.auth(params[:code])
-        sns.account.user_config.update(annict: {token: response['access_token']})
+        sns.account.user_config.update(service: {annict: {token: response['access_token']}})
         sns.account.annict.clear
         sns.account.annict.updated_at = Time.now
         @renderer.status = response.code
@@ -498,10 +498,7 @@ module Mulukhiya
 
     post '/admin/puma/restart' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
-      Sidekiq.set_schedule('puma_daemon_restart', {
-        at: config['/puma/restart/seconds'].seconds.after,
-        class: 'Mulukhiya::PumaDaemonRestartWorker',
-      })
+      PumaDaemonRestartWorker.perform_in(config['/puma/restart/seconds'], {})
       return @renderer.to_s
     rescue => e
       e.log

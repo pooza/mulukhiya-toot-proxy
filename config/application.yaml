@@ -344,7 +344,6 @@ misskey:
       video: video/mp4
   capabilities:
     channel: true
-    decoration: true
     reaction: true
     repost: true
     streaming: true
@@ -404,7 +403,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.0.2
+  version: 5.1.0
 parser:
   note:
     fields:
@@ -586,9 +585,6 @@ sidekiq:
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
-    user_decoration_initialize:
-      class: Mulukhiya::UserDecorationInitializeWorker
-      cron: 3 3 * * *
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
@@ -600,6 +596,15 @@ user_config:
     - token
     - password
     - secret
+  valid_keys:
+    - webhook
+    - mulukhiya
+    - handler
+    - tagging
+    - notify
+    - annict
+    - service
+    - piefed
   redis:
     dsn: redis://localhost:6379/1
 webhook:

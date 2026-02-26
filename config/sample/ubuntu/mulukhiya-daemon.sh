@@ -23,14 +23,14 @@ run_cmd() {
 
 case "$1" in
   start)
-    run_cmd 'bundle exec rake mulukhiya:puma:start'
-    run_cmd 'bundle exec rake mulukhiya:sidekiq:start'
-    run_cmd 'bundle exec rake mulukhiya:listener:start'
+    run_cmd 'bundle exec bin/puma_daemon.rb start'
+    run_cmd 'bundle exec bin/sidekiq_daemon.rb start'
+    run_cmd 'bundle exec bin/listener_daemon.rb start'
     ;;
   stop)
-    run_cmd 'bundle exec rake mulukhiya:listener:stop'
-    run_cmd 'bundle exec rake mulukhiya:sidekiq:stop'
-    run_cmd 'bundle exec rake mulukhiya:puma:stop'
+    run_cmd 'bundle exec bin/listener_daemon.rb stop'
+    run_cmd 'bundle exec bin/sidekiq_daemon.rb stop'
+    run_cmd 'bundle exec bin/puma_daemon.rb stop'
     ;;
   restart)
     "$0" stop

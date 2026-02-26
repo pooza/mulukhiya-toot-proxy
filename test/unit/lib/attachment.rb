@@ -18,7 +18,7 @@ module Mulukhiya
       return unless @attachment
       h = @attachment.to_h
 
-      assert(h.key?(:id))
+      assert_includes(h, :id)
       assert_kind_of(Hash, h)
       assert_kind_of([String, NilClass], h[:created_at])
       assert_kind_of([Float, NilClass], h[:duration])

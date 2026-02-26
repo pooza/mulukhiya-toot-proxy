@@ -23,19 +23,19 @@ module Mulukhiya
     end
 
     def test_video_stream
-      files.filter_map {|f| MediaFile.new(f).file}.select {|f| f.is_a?(VideoFile)}.each do |f|
+      files.filter_map {|f| MediaFile.new(f).file}.grep(VideoFile).each do |f|
         assert_kind_of(Hash, f.video_stream)
       end
     end
 
     def test_audio_stream
-      files.filter_map {|f| MediaFile.new(f).file}.select {|f| f.is_a?(AudioFile)}.each do |f|
+      files.filter_map {|f| MediaFile.new(f).file}.grep(AudioFile).each do |f|
         assert_kind_of(Hash, f.audio_stream)
       end
     end
 
     def test_container
-      files.filter_map {|f| MediaFile.new(f).file}.reject {|f| f.is_a?(ImageFile)}.each do |f|
+      files.filter_map {|f| MediaFile.new(f).file}.grep_v(ImageFile).each do |f|
         assert_kind_of(Hash, f.container)
       end
     end

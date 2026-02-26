@@ -31,17 +31,6 @@ module Mulukhiya
       self.fragment = nil
     end
 
-    def associate_tag
-      return query_values['tag'] rescue nil
-    end
-
-    def associate_tag=(tag)
-      values = query_values || {}
-      values['tag'] = tag
-      values = nil unless values.present?
-      self.query_values = values
-    end
-
     def shorten
       return self unless shortenable?
       dest = clone

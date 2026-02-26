@@ -5,17 +5,7 @@ module Mulukhiya
       dest = source.clone
       dest = dest.shorten
       @status = @status.sub(source.to_s, dest.to_s)
-      sns.account.config.update(amazon: {affiliate: nil})
       return dest
-    end
-
-    def affiliate?
-      return false if sns.account.user_config['/amazon/affiliate'] == false
-      return false unless config['/service/amazon/affiliate']
-      return true
-    rescue => e
-      errors.push(class: e.class.to_s, message: e.message)
-      return true
     end
 
     def rewritable?(uri)

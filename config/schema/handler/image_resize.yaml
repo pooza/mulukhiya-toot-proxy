@@ -7,6 +7,4 @@ properties:
   timeout:
     minimum: 1
     type: integer
-required:
-  - pixel
 type: object

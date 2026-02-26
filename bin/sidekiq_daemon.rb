@@ -4,6 +4,9 @@ ENV['RAKE'] = nil
 
 require 'mulukhiya'
 module Mulukhiya
-  exit 1 if SidekiqDaemon.disable?
+  if SidekiqDaemon.disable?
+    warn "#{SidekiqDaemon.name}: disabled, skipping"
+    exit 0
+  end
   SidekiqDaemon.spawn!(singleton: true)
 end
