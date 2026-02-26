@@ -18,6 +18,11 @@ module Mulukhiya
       Event.new(:follow, {sns:}).dispatch(payload)
     end
 
+    def handle_announcement_created(payload)
+      sleep(Worker.create(:announcement).worker_config(:interval, :seconds))
+      AnnouncementWorker.perform_async
+    end
+
     def self.sender(payload)
       return Environment.account_class[
         payload.dig('body', 'user', 'id') || payload.dig('body', 'id'),
