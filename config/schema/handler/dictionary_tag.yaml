@@ -45,6 +45,4 @@ properties:
         format: regex
         type: string
     type: object
-required:
-  - dics
 type: object

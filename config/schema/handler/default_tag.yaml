@@ -8,6 +8,4 @@ properties:
   timeout:
     minimum: 1
     type: integer
-required:
-  - tags
 type: object
