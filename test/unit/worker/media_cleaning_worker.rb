@@ -18,7 +18,7 @@ module Mulukhiya
 
       @worker.perform
 
-      refute_path_exists(path)
+      refute(File.exist?(path))
     end
   end
 end
