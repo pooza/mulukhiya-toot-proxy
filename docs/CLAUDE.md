@@ -88,6 +88,32 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 5.2.0 リリース計画
+
+Issue＋マイルストーンで管理。3リポジトリにまたがるリリース。
+
+### 目玉機能
+
+- **#4096 実況デコレーションの時限付き自動解除** — 番組終了後にアバターデコレーションを自動で剥がす（Misskey `i/update`）
+  - mulukhiya 側: Contract / UserConfig / DecorationInitializeWorker 新設 / MisskeyService
+  - Misskey 側: [pooza/misskey#404](https://github.com/pooza/misskey/issues/404) — TagsetWidget で `decoration.minutes` を追加送信
+
+### 基盤改善（ginseng-core）
+
+- **#4094 HTTPクライアント統一** — RestClient → HTTParty に統一し rest-client 依存を削除
+- **#4101 CommandLine.exec タイムアウト** — `Open3.capture3` にタイムアウトオプションを追加
+
+### 品質向上
+
+- **#4082 Sidekiqワーカーへのテスト追加** — 未テスト 7 Worker にテスト追加（カバレッジ 30%→100%）
+- **#4099 Worker個別のコンテキストログ追加** — 8 Worker に業務上有用なログを追加
+- ~~#4103 テストの外部API依存の解消~~ （完了）
+
+### インフラ検証
+
+- **#4105 FreeBSD rc.d 起動ブロックの原因切り分け** — ステージング（dev04等）で検証
+  - 切り分けの結果 Mastodon 側が原因の場合 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900) で対応
+
 ## 重要なドキュメント
 
 - [v5-plan.md](v5-plan.md) — 5.0計画の記録（全完了。5.1以降はIssue＋マイルストーンで管理）
