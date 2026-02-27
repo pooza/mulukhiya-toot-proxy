@@ -10,6 +10,7 @@ module Mulukhiya
 
     def perform(params = {})
       CustomFeed.all(&:update)
+      log(feeds: CustomFeed.count)
     end
   end
 end

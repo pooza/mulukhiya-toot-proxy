@@ -9,6 +9,7 @@ module Mulukhiya
 
     def perform(params = {})
       Program.instance.update
+      log(programs: Program.instance.count)
     end
   end
 end
