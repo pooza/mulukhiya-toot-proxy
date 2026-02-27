@@ -100,22 +100,22 @@ Issue＋マイルストーンで管理。3リポジトリにまたがるリリ�
 
 ### 基盤改善（ginseng-core）
 
-- **#4094 HTTPクライアント統一** — RestClient → HTTParty に統一し rest-client 依存を削除
-- **#4101 CommandLine.exec タイムアウト** — `Open3.capture3` にタイムアウトオプションを追加
+- ~~#4094 HTTPクライアント統一~~ （完了）
+- ~~#4101 CommandLine.exec タイムアウト~~ （完了）
 
 ### 品質向上
 
-- **#4082 Sidekiqワーカーへのテスト追加** — 未テスト 7 Worker にテスト追加（カバレッジ 30%→100%）
-- **#4099 Worker個別のコンテキストログ追加** — 8 Worker に業務上有用なログを追加
+- ~~#4082 Sidekiqワーカーへのテスト追加~~ （完了）
+- ~~#4099 Worker個別のコンテキストログ追加~~ （完了）
 - ~~#4103 テストの外部API依存の解消~~ （完了）
 
 ### インフラ検証
 
-- **#4105 FreeBSD rc.d 起動ブロックの原因切り分け** — ステージング（dev04等）で検証
-  - 切り分けの結果 Mastodon 側が原因の場合 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900) で対応
+- ~~#4105 FreeBSD rc.d 起動ブロックの原因切り分け~~ （完了 — Mastodon streaming が主犯と判明、[pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900) に引き継ぎ）
 
 ## 重要なドキュメント
 
+- [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) — ユーザー向けドキュメントの正本（5.0対応済み）
 - [v5-plan.md](v5-plan.md) — 5.0計画の記録（全完了。5.1以降はIssue＋マイルストーンで管理）
 - [upgrade-guide-5.0.md](upgrade-guide-5.0.md) — Wikiの[4.x → 5.0 アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)へのリダイレクト
 - [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) — rack 3.2トークン汚染インシデントの記録
