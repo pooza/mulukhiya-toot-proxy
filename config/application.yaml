@@ -34,6 +34,10 @@ cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
 controller: mastodon
+daemon:
+  restart:
+    timeout:
+      seconds: 60
 diag:
   enable: false
 crypt:
