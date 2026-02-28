@@ -102,6 +102,8 @@ Metrics/PerceivedComplexity:
   Max: 10
 Minitest/MultipleAssertions:
   Enabled: false
+Minitest/RefutePathExists:
+  Enabled: false
 Minitest/ReturnInTestMethod:
   Enabled: false
 Minitest/TestFileName:

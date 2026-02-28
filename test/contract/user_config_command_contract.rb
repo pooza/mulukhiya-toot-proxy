@@ -60,6 +60,30 @@ module Mulukhiya
       errors = @contract.call(command: 'user_config', tagging: {tags: {disabled: ['tag1', 'tag2']}}).errors.messages
 
       assert_empty(errors)
+
+      errors = @contract.call(command: 'user_config', decoration: nil).errors.messages
+
+      assert_empty(errors)
+
+      errors = @contract.call(command: 'user_config', decoration: {id: 'abc123'}).errors.messages
+
+      assert_empty(errors)
+
+      errors = @contract.call(command: 'user_config', decoration: {id: 123}).errors.messages
+
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', decoration: {minutes: 30}).errors.messages
+
+      assert_empty(errors)
+
+      errors = @contract.call(command: 'user_config', decoration: {minutes: 'hoge'}).errors.messages
+
+      assert_false(errors.empty?)
+
+      errors = @contract.call(command: 'user_config', decoration: {id: 'abc123', minutes: 30}).errors.messages
+
+      assert_empty(errors)
     end
   end
 end

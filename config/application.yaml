@@ -34,6 +34,10 @@ cli:
   progress_bar:
     format: '%c/%C (%p%%)| %B'
 controller: mastodon
+daemon:
+  restart:
+    timeout:
+      seconds: 60
 diag:
   enable: false
 crypt:
@@ -344,6 +348,7 @@ misskey:
       video: video/mp4
   capabilities:
     channel: true
+    decoration: true
     reaction: true
     repost: true
     streaming: true
@@ -585,6 +590,9 @@ sidekiq:
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
+    decoration_initialize:
+      class: Mulukhiya::DecorationInitializeWorker
+      cron: 2 3 * * *
     user_tag_initialize:
       class: Mulukhiya::UserTagInitializeWorker
       cron: 2 3 * * *
@@ -601,6 +609,7 @@ user_config:
     - mulukhiya
     - handler
     - tagging
+    - decoration
     - notify
     - annict
     - service
@@ -683,6 +692,9 @@ worker:
     federate: false
   media_cleaning:
     hours: 1
+  decoration_initialize:
+    extra_minutes: 2
+    message: デコレーションを復元しました。
   user_tag_initialize:
     message: 固定タグをクリアしました。
 youtube:

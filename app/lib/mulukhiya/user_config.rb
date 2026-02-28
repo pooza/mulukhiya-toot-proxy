@@ -24,6 +24,7 @@ module Mulukhiya
     def update(values)
       values.deep_stringify_keys!
       handle_user_tags(values)
+      handle_decorations(values)
       values = encrypt(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
@@ -131,6 +132,21 @@ module Mulukhiya
       elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
         Sidekiq.remove_schedule("user_tag_initialize_#{@account.username}")
       end
+    end
+
+    def handle_decorations(values)
+      flatten = values.key_flatten
+      return unless minutes = flatten['/decoration/minutes']
+      decoration_id = self['/decoration/id']
+      return unless decoration_id
+      extra = config['/worker/decoration_initialize/extra_minutes'] rescue 2
+      DecorationApplyWorker.perform_async({account_id: @account.id})
+      Sidekiq.set_schedule("decoration_initialize_#{@account.username}", {
+        at: (minutes + extra).to_i.minutes.after,
+        class: 'Mulukhiya::DecorationInitializeWorker',
+        args: [{account_id: @account.id}],
+      })
+      values['decoration']['minutes'] = nil
     end
   end
 end

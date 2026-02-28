@@ -47,7 +47,8 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new([File.join(Environment.dir, 'bin/sidekiq_daemon.rb'), 'restart']).exec
+      CommandLine.new([File.join(Environment.dir, 'bin/sidekiq_daemon.rb'), 'restart'])
+        .exec(timeout: config['/daemon/restart/timeout/seconds'])
     end
 
     def self.health
