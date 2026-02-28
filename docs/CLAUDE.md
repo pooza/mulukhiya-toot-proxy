@@ -88,6 +88,12 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.2.1（2026-03-01）
+
+緊急パッチリリース。全8サーバーデプロイ済み。
+
+- **#4106 Webhook URL が無効になる不具合の修正** — 5.2.0 で `Webhook.create_digest` の salt 取得を `/crypt/salt` → `Crypt.password` に変更したが、両者が異なる値のサーバーで digest が変化し Webhook が 404 になった。`/crypt/salt` 優先にリバート
+
 ## リリース済み: 5.2.0（2026-02-28）
 
 全7 Issue クローズ。全8サーバーデプロイ済み。
@@ -186,6 +192,12 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 ステージングでの同時アクセス再現テスト（#4055）完了済み（成功率100%）。
 診断スクリプト: `bin/diag/concurrent_token_test.rb`。
 詳細は [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) を参照。
+
+### Webhook digest の安定性
+
+`Webhook.create_digest` は Webhook URL の一部となる digest を生成する。入力は SNS の URI、OAuth トークン、`/crypt/salt`（フォールバック: `/crypt/password`）の3要素。
+これらの値や生成ロジックを変更すると Webhook URL が変化し、外部連携（tomato-shrieker 等）が 404 になる。
+5.2.0 で `/crypt/salt` 廃止により発生（#4106、5.2.1 で修正）。この領域の変更は慎重に行うこと。
 
 ### ginseng-web
 
