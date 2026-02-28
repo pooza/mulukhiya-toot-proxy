@@ -88,30 +88,19 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 5.2.0 リリース計画
+## リリース済み: 5.2.0（2026-02-28）
 
-Issue＋マイルストーンで管理。3リポジトリにまたがるリリース。
-
-### 目玉機能
+全7 Issue クローズ。全8サーバーデプロイ済み。
 
 - **#4096 実況デコレーションの時限付き自動解除** — 番組終了後にアバターデコレーションを自動で剥がす（Misskey `i/update`）
-  - mulukhiya 側: Contract / UserConfig / DecorationInitializeWorker 新設 / MisskeyService
-  - Misskey 側: [pooza/misskey#404](https://github.com/pooza/misskey/issues/404) — TagsetWidget で `decoration.minutes` を追加送信
-
-### 基盤改善（ginseng-core）
-
-- ~~#4094 HTTPクライアント統一~~ （完了）
-- ~~#4101 CommandLine.exec タイムアウト~~ （完了）
-
-### 品質向上
-
-- ~~#4082 Sidekiqワーカーへのテスト追加~~ （完了）
-- ~~#4099 Worker個別のコンテキストログ追加~~ （完了）
-- ~~#4103 テストの外部API依存の解消~~ （完了）
-
-### インフラ検証
-
-- ~~#4105 FreeBSD rc.d 起動ブロックの原因切り分け~~ （完了 — Mastodon streaming が主犯と判明、[pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900) に引き継ぎ）
+  - Misskey 側: [pooza/misskey#404](https://github.com/pooza/misskey/issues/404) もクローズ（TagsetWidget で `decoration.minutes` を追加送信）
+  - 検証時に発見した問題と対策:
+    - トークン競合: `UserConfigCommandHandler` で token 保存を update より前に移動（async worker が古いトークンを読む問題）
+    - API body sanitization: `DecorationApplyWorker` で `avatarDecorations` の各要素を valid_keys のみに slice（レスポンス専用フィールドの混入防止）
+    - Misskey ロール設定: ベースロールのデコレーション上限を +1 する必要あり（追加で1枠使うため）
+- #4094 HTTPクライアント統一、#4101 CommandLine.exec タイムアウト
+- #4082 Sidekiqワーカーテスト、#4099 Worker個別コンテキストログ、#4103 テストの外部API依存解消
+- #4105 FreeBSD rc.d 起動ブロック原因切り分け（Mastodon streaming が主犯 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900)）
 
 ## 重要なドキュメント
 
@@ -233,6 +222,15 @@ MastodonとMisskeyのソースコードがローカルに並列配置される�
 - SNS側のAPI仕様確認、設定ファイルの参照
 - モロヘイヤとの結合動作確認
 - 必要に応じてSNS側のコード修正
+
+### capsicum
+
+[capsicum](https://github.com/pooza/capsicum) はFlutterベースのMastodon / Misskey クライアント。
+モロヘイヤ導入済みサーバーでは拡張機能が利用可能になる設計。
+
+- Issue相互参照: `pooza/capsicum#XXXX`
+- API仕様: [docs/api.md](api.md) — capsicumが利用するモロヘイヤ固有エンドポイントのリファレンス
+- API変更時: [docs/api.md](api.md) を更新し、破壊的変更がある場合は capsicum リポジトリに Issue を起票する
 
 ## 開発サーバー
 
