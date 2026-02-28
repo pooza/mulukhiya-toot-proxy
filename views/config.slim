@@ -23,6 +23,10 @@ html lang='ja' data-theme='light'
           - if controller.livecure?
             .field-container
               multiselect :options='options.program' label='label' track-by='value' @input='onChangeTags' v-model='form.program.tags'
+          - if controller.decoration?
+            .field-container
+              h4 実況用デコレーション
+              multiselect :options='options.decoration' label='label' track-by='value' v-model='form.decoration.id' placeholder='デコレーションを選択'
           .field-update-button-container
             button @click='updateTags' 更新
       section.config v-if='account.username && layout.sections.piefed'
@@ -122,16 +126,19 @@ html lang='ja' data-theme='light'
                 annict: {auth_code: null, theme_works_only: false},
                 program: {minutes: null, tags: null},
                 tags: '',
+                decoration: {id: null},
                 webhook: {token: null, visibility: null},
                 piefed: {url: null, user: null, password: null, community: null},
               },
               options: {
                 program: [],
+                decoration: [],
                 visibility: [],
                 piefed_communities: [],
               },
               layout: {
                 sections: {
+                  decoration: #{controller.decoration?},
                   piefed: #{controller.piefed?},
                   annict: #{controller.annict?},
                 },
@@ -171,6 +178,13 @@ html lang='ja' data-theme='light'
                   }))
                 this.options.program.unshift({label: '(固定タグのクリア)'})
               })
+            if (this.layout.sections.decoration) {
+              this.methods.getDecorations()
+                .then(e => {
+                  this.options.decoration = e.map(d => ({value: d.id, label: d.name || d.id}))
+                  this.options.decoration.unshift({label: '(なし)', value: null})
+                })
+            }
           },
           methods: {
             updateForm (data) {
@@ -184,6 +198,7 @@ html lang='ja' data-theme='light'
               if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
                 this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
               }
+              this.form.decoration.id = this.methods.dig(data, 'config', 'decoration', 'id') || null
               if (data.visibility_names) {
                 this.options.visibility.splice(0)
                 Object.keys(data.visibility_names).map(k => {
@@ -242,7 +257,7 @@ html lang='ja' data-theme='light'
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             updateTags () {
-              const command = {tagging: {user_tags: null, minutes: null}}
+              const command = {tagging: {user_tags: null, minutes: null}, decoration: {id: null}}
               if (this.form.tags) {
                 command.tagging.user_tags = this.form.tags.split("\n")
                 if (this.form.program.minutes) {
@@ -250,6 +265,12 @@ html lang='ja' data-theme='light'
                 }
               } else {
                 command.tagging.minutes = null
+              }
+              if (this.form.decoration.id) {
+                command.decoration.id = this.form.decoration.id
+                if (this.form.program.minutes) {
+                  command.decoration.minutes = this.form.program.minutes
+                }
               }
               this.updateConfig(command)
             },

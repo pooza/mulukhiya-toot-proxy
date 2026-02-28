@@ -11,6 +11,7 @@ module Mulukhiya
         raise Ginseng::ConfigError "Piefed undefined (Account #{params[:account_id]})"
       end
       piefed.clip(url: create_status_uri(params[:uri]))
+      log(account_id: params[:account_id], message: 'clipped')
     end
   end
 end

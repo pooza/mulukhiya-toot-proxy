@@ -8,7 +8,10 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      TaggingDictionary.new.refresh
+      dictionary = TaggingDictionary.new
+      dictionary.refresh
+      log(entries: dictionary.size)
+      return dictionary
     end
   end
 end
