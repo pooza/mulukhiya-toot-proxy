@@ -223,6 +223,15 @@ MastodonとMisskeyのソースコードがローカルに並列配置される�
 - モロヘイヤとの結合動作確認
 - 必要に応じてSNS側のコード修正
 
+### capsicum
+
+[capsicum](https://github.com/pooza/capsicum) はFlutterベースのMastodon / Misskey クライアント。
+モロヘイヤ導入済みサーバーでは拡張機能が利用可能になる設計。
+
+- Issue相互参照: `pooza/capsicum#XXXX`
+- API仕様: [docs/api.md](api.md) — capsicumが利用するモロヘイヤ固有エンドポイントのリファレンス
+- API変更時: [docs/api.md](api.md) を更新し、破壊的変更がある場合は capsicum リポジトリに Issue を起票する
+
 ## 開発サーバー
 
 SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジトリには含めない）。
