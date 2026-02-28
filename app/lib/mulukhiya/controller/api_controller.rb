@@ -82,6 +82,18 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/decoration/list' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
+      sns.token ||= sns.default_token
+      @renderer.message = sns.fetch_avatar_decorations
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       sns.token ||= sns.default_token

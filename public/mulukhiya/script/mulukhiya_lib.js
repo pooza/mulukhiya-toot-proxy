@@ -178,6 +178,15 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.getDecorations = async () => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.get('/mulukhiya/api/decoration/list')
+        .then(e => e.data)
+        .catch(e => [])
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.getPrograms = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

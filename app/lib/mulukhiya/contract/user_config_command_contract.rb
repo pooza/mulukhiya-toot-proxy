@@ -23,6 +23,10 @@ module Mulukhiya
         end
         optional(:minutes).maybe(:integer).value(gt?: 0)
       end
+      required(:decoration).maybe(:hash).schema do
+        optional(:id).maybe(:string)
+        optional(:minutes).maybe(:integer).value(gt?: 0)
+      end
     end
 
     rule(:command) do
@@ -41,6 +45,7 @@ module Mulukhiya
       values['tagging']['user_tags'] ||= []
       values['tagging']['tags'] ||= {}
       values['tagging']['tags']['disabled'] ||= []
+      values['decoration'] ||= {}
       return super
     end
   end

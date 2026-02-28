@@ -106,6 +106,30 @@ module Mulukhiya
       })
     end
 
+    def fetch_avatar_decorations
+      response = http.post('/api/get-avatar-decorations', {
+        body: {},
+        headers: create_headers,
+      })
+      return response.parsed_response
+    end
+
+    def fetch_account_detail
+      return http.post('/api/i', {
+        body: {i: token},
+        headers: create_headers,
+      }).parsed_response
+    end
+
+    def update_account(params = {})
+      body = params.deep_symbolize_keys
+      body[:i] ||= token
+      return http.post('/api/i/update', {
+        body: body.compact,
+        headers: create_headers,
+      })
+    end
+
     def create_headers(headers = {})
       dest = super
       dest.delete_if {|k, _| k.to_s.downcase == 'cookie'}
