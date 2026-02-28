@@ -8,7 +8,9 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      Announcement.new.announce
+      announcement = Announcement.new
+      announcement.announce
+      log(cached: announcement.count)
     end
   end
 end

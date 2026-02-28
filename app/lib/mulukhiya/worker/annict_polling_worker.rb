@@ -8,6 +8,7 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      log(accounts: AnnictService.accounts.count)
       AnnictService.crawl_all
     end
   end

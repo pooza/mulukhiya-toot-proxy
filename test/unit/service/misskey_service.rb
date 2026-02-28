@@ -56,5 +56,34 @@ module Mulukhiya
 
       assert_equal(config['/misskey/theme/color'], color)
     end
+
+    def test_fetch_avatar_decorations
+      stub_request(:post, %r{misskey\.test/api/get-avatar-decorations})
+        .to_return(status: 200, body: '[{"id":"deco1","name":"実況1","description":"","url":"https://example.com/1.png","roleIdsThatCanBeUsedThisDecoration":[]}]', headers: {'Content-Type' => 'application/json'})
+
+      result = @service.fetch_avatar_decorations
+
+      assert_kind_of(Array, result)
+      assert_equal('deco1', result.first['id'])
+    end
+
+    def test_fetch_account_detail
+      stub_request(:post, %r{misskey\.test/api/i$})
+        .to_return(status: 200, body: '{"id":"user1","avatarDecorations":[{"id":"deco1"}]}', headers: {'Content-Type' => 'application/json'})
+
+      result = @service.fetch_account_detail
+
+      assert_kind_of(Hash, result)
+      assert_equal([{'id' => 'deco1'}], result['avatarDecorations'])
+    end
+
+    def test_update_account
+      stub_request(:post, %r{misskey\.test/api/i/update})
+        .to_return(status: 200, body: '{"id":"user1","avatarDecorations":[]}', headers: {'Content-Type' => 'application/json'})
+
+      @service.update_account(avatarDecorations: [])
+
+      assert_requested(:post, %r{misskey\.test/api/i/update})
+    end
   end
 end

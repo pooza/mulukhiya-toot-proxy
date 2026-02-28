@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 96a3e2e9fc7e7e3d8b5fea49521796f7b8e938e4
+  revision: a351144456e7b79114cb6c9af47ef88583c58e89
   branch: main
   specs:
-    ginseng-core (1.15.17)
+    ginseng-core (1.15.19)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.8.0)
       cgi (>= 0.4.2)
@@ -32,7 +32,6 @@ GIT
       nokogiri (>= 1.18.9)
       optparse
       rake
-      rest-client
       sanitize (>= 6.0.2)
       securerandom
       set
@@ -44,10 +43,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: b94d0879cb488f8177d52ea548892aa91338c5c7
+  revision: bdde7c3e8e4edc2a55561a0f8af9b1a754ff9e7f
   branch: main
   specs:
-    ginseng-fediverse (1.8.19)
+    ginseng-fediverse (1.8.20)
 
 GIT
   remote: https://github.com/pooza/ginseng-postgres.git
@@ -121,7 +120,7 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.8)
+    addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     base64 (0.3.0)
