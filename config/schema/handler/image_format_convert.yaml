@@ -1,9 +1,5 @@
 properties:
-  aplha:
-    type: boolean
   disabled:
-    type: boolean
-  gif:
     type: boolean
   timeout:
     minimum: 1
