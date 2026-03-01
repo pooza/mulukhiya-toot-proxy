@@ -88,6 +88,10 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 開発中: 5.3.0
+
+- **#4113 `/mulukhiya/api/about` のレスポンス拡張（capsicum 対応）** — `status.label`（投稿の呼称）、`status.max_length`（文字数上限）、`theme.color`（テーマ色）、`capabilities`、`features`、`handlers`（有効ハンドラー名一覧）を追加。`config.about` は nodeinfo にもコピーされるため軽量に保ち、HTTP 取得が必要な theme と生成コストのある handlers はルート側でのみ追加
+
 ## リリース済み: 5.2.1（2026-03-01）
 
 緊急パッチリリース。全8サーバーデプロイ済み。
