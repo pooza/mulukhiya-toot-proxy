@@ -108,6 +108,12 @@ git diff Gemfile.lock
 - #4082 Sidekiqワーカーテスト、#4099 Worker個別コンテキストログ、#4103 テストの外部API依存解消
 - #4105 FreeBSD rc.d 起動ブロック原因切り分け（Mastodon streaming が主犯 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900)）
 
+## 情報の記載先ルール
+
+- **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
+- **プロジェクト共有すべき知見** → `docs/CLAUDE.md` や `docs/v5-plan.md` など git 管理下のファイルに記載
+- **インフラ情報** → `pooza/chubo2` リポジトリの `docs/infra-note.md` に記載
+
 ## 重要なドキュメント
 
 - [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) — ユーザー向けドキュメントの正本（5.0対応済み）
@@ -123,6 +129,7 @@ GitHub Actions (`.github/workflows/test.yml`):
 - matrix strategy: `controller: [mastodon, misskey]` の2並列
 - `bundle exec rake lint` (rubocop, slim_lint, erb_lint等)
 - `bundle exec rake test` (test-unit、DB依存テストは自動スキップ)
+- 個別テスト実行: `bin/test.rb ケース名`
 - 依存: ffmpeg, libidn11-dev, libvips-dev
 
 ## ディレクトリ構成（主要）
