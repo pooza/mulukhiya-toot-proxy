@@ -91,8 +91,44 @@ SNSServiceMethods#nodeinfo
 4. **本番デプロイ後の確認項目にレスポンスタイムの比較を含める**: ステータスコードだけでなく、v5.2.1 との応答速度比較で異常を検出できた
 5. **ステージング環境のネットワーク構成を本番に近づける**: ステージングで再現できなかった問題が本番で発生した
 
+## 後続障害: リスナーデーモン停止 + monit リスタートループ (2026-03-02 08:00頃)
+
+### 発端
+
+v5.2.1 切り戻し後、お知らせボットの即時投稿が美食丼・デルムリン丼で動作しないことに気づき調査を開始。キュアスタ！のみ即時投稿が動作していた。
+
+### 発見した問題
+
+1. **リスナーデーモンの WebSocket ゾンビ化**: 3サーバーとも元のリスナープロセス（05:22起動）が CPU 95〜105% でスピンしていた。nodeinfo インシデント時に Mastodon streaming の WebSocket 接続が無通知で切断され、リトライループが空回りしていた
+2. **Mastodon streaming 全停止**: 3サーバーとも `mastodon-streaming`（node プロセス）が停止しており、リスナーの WebSocket 接続が 502 で拒否されていた
+3. **daemon-spawn の PID 管理不具合**: サーバーの ginseng-core が 1.15.19（daemon-spawn ベース）のまま。rc.d の `daemon(8)` と daemon-spawn の二重デーモン化で PID ファイルが書かれず、monit がリスナーを追跡できなかった
+4. **monit リスタートループ**: monit がリスナー停止を検知 → restart → PID 書かれない → 失敗判定 → 再 restart の無限ループ。孤児プロセスが各サーバー6〜9個蓄積
+5. **美食丼が develop（5.3.0）のまま**: main リセット後の `git pull` が行われておらず、nodeinfo 循環呼び出し問題が残存。リスナー起動時に `SystemStackError: stack level too deep` で即死
+
+### 対処
+
+1. monit 停止 → 孤児リスナープロセスを全 kill（SIGTERM 無効で SIGKILL 必要）
+2. 全サーバーを main（v5.2.1）に統一（`git fetch && git reset --hard origin/main`）
+3. ginseng-core を 1.15.19 → 1.15.21 に更新（daemon-spawn 依存除去）
+4. Mastodon streaming を手動起動（#4105 の rc.d ブロック問題あり）
+5. Puma・Sidekiq・Listener を起動し、PID ファイルの正常書き込みを確認
+6. monit 起動、リスタートループが発生しないことを確認
+7. 全サーバーの `/mulukhiya/api/health` が 200 OK を確認
+
+### 追加の教訓
+
+1. **切り戻し後の streaming 確認**: v5.2.1 への切り戻し時に Mastodon streaming の再起動が漏れていた。切り戻し手順にストリーミングサービスの確認を含めるべき
+2. **ginseng-core の Gemfile.lock 更新**: main/develop ともに Gemfile.lock が古いまま放置されていた。daemon-spawn 廃止（#4098）後に `bundle update ginseng-core` + Gemfile.lock のコミットが必要だった
+3. **monit の PID 監視の脆弱性**: PID ファイルの有無だけでなく、プロセスの実質的な死活（WebSocket 接続状態、最終イベント受信時刻等）を検知すべき（#4123）
+4. **SIGTERM で死なないプロセスへの備え**: WebSocket リトライループがスピンすると SIGTERM が処理されない。EventMachine ループ内でのシグナル処理改善が必要
+
+### 残課題
+
+- [#4123 rc.d の daemon(8) 経由で ListenerDaemon の PID ファイルが書かれない](https://github.com/pooza/mulukhiya-toot-proxy/issues/4123)
+
 ## 関連
 
 - [#4121 nodeinfo 依存の見直し](https://github.com/pooza/mulukhiya-toot-proxy/issues/4121)
+- [#4123 rc.d の daemon(8) 経由で PID ファイルが書かれない](https://github.com/pooza/mulukhiya-toot-proxy/issues/4123)
 - [chubo2#6 ステージング nginx に mulukhiya_backend map を設定](https://github.com/pooza/chubo2/issues/6)
 - [chubo2#7 monit HTTP インターフェースの設定](https://github.com/pooza/chubo2/issues/7)
