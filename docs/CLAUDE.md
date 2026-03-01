@@ -252,7 +252,7 @@ MastodonとMisskeyのソースコードがローカルに並列配置される�
 - API仕様: [docs/api.md](api.md) — capsicumが利用するモロヘイヤ固有エンドポイントのリファレンス
 - API変更時: [docs/api.md](api.md) を更新し、破壊的変更がある場合は capsicum リポジトリに Issue を起票する
 
-## 開発サーバー
+## 開発サーバー・インフラ
 
 SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジトリには含めない）。
 エイリアス名はセッション開始時にユーザーから指示される。
@@ -263,6 +263,8 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 | Misskey  | 1    | Ubuntu   |
 
 リモート側の操作（git pull、マイグレーション、サービス再起動等）も可能。
+
+サーバー構成・SSH接続・デプロイ手順・チューニング設定等の詳細は [pooza/chubo2 インフラノート](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) を参照。
 
 ## push前の必須手順
 
