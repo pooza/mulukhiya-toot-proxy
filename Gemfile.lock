@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: a351144456e7b79114cb6c9af47ef88583c58e89
+  revision: a9b6c8d21a5f3b541cf685bbb1150caa7e3914bd
   branch: main
   specs:
     ginseng-core (1.15.19)
@@ -16,7 +16,6 @@ GIT
       addressable (>= 2.8.0)
       cgi (>= 0.4.2)
       csv
-      daemon-spawn
       date (>= 3.2.1)
       erb
       etc
@@ -134,7 +133,6 @@ GEM
       rexml
     crass (1.0.6)
     csv (3.3.5)
-    daemon-spawn (0.4.2)
     date (3.5.1)
     domain_name (0.6.20240107)
     drb (2.2.3)

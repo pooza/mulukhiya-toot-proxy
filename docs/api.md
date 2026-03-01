@@ -217,7 +217,7 @@ URL 正規化、短縮 URL 展開、NowPlaying 検出（iTunes/Spotify/YouTube�
 - **認証**: 不要
 - **パラメータ**: なし
 
-**レスポンス例**:
+**レスポンス例**（Mastodon）:
 
 ```json
 {
@@ -227,11 +227,30 @@ URL 正規化、短縮 URL 展開、NowPlaying 検出（iTunes/Spotify/YouTube�
     "email": ["author@example.com"],
     "license": "MIT",
     "url": "https://github.com/pooza/mulukhiya-toot-proxy",
-    "version": "5.1.0"
+    "version": "5.2.1"
   },
   "config": {
     "controller": "mastodon",
-    "status": {"max_length": 500}
+    "status": {
+      "label": "投稿",
+      "max_length": 2400,
+      "spoiler": {"text": null, "emoji": null, "shortcode": null},
+      "default_hashtag": "precure_fun"
+    },
+    "theme": {
+      "color": "#6364FF"
+    },
+    "capabilities": {
+      "repost": true,
+      "streaming": true
+    },
+    "features": {
+      "annict": true,
+      "announcement": true,
+      "feed": true,
+      "webhook": true
+    },
+    "handlers": ["amazon_image", "default_tag", "itunes_music_nowplaying", "..."]
   }
 }
 ```

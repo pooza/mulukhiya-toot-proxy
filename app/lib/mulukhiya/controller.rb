@@ -17,9 +17,9 @@ module Mulukhiya
         k.sub(/^HTTP_/, '').downcase.gsub(/(^|_)\w/, &:upcase).tr('_', '-')
       end
       begin
-        @params = JSON.parse(@body).with_indifferent_access
+        @params = Sinatra::IndifferentHash[JSON.parse(@body)]
       rescue StandardError
-        @params = params.with_indifferent_access
+        @params = Sinatra::IndifferentHash[params]
       end
       logger.info(request: {
         method: request.request_method,

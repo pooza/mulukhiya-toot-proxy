@@ -88,6 +88,16 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 開発中: 5.3.0
+
+- **#4113 `/mulukhiya/api/about` のレスポンス拡張（capsicum 対応）** — `status.label`（投稿の呼称）、`status.max_length`（文字数上限）、`theme.color`（テーマ色）、`capabilities`、`features`、`handlers`（有効ハンドラー名一覧）を追加。`config.about` は nodeinfo にもコピーされるため軽量に保ち、HTTP 取得が必要な theme と生成コストのある handlers はルート側でのみ追加
+
+## リリース済み: 5.2.1（2026-03-01）
+
+緊急パッチリリース。全8サーバーデプロイ済み。
+
+- **#4106 Webhook URL が無効になる不具合の修正** — 5.2.0 で `Webhook.create_digest` の salt 取得を `/crypt/salt` → `Crypt.password` に変更したが、両者が異なる値のサーバーで digest が変化し Webhook が 404 になった。`/crypt/salt` 優先にリバート
+
 ## リリース済み: 5.2.0（2026-02-28）
 
 全7 Issue クローズ。全8サーバーデプロイ済み。
@@ -101,6 +111,12 @@ git diff Gemfile.lock
 - #4094 HTTPクライアント統一、#4101 CommandLine.exec タイムアウト
 - #4082 Sidekiqワーカーテスト、#4099 Worker個別コンテキストログ、#4103 テストの外部API依存解消
 - #4105 FreeBSD rc.d 起動ブロック原因切り分け（Mastodon streaming が主犯 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900)）
+
+## 情報の記載先ルール
+
+- **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
+- **プロジェクト共有すべき知見** → `docs/CLAUDE.md` や `docs/v5-plan.md` など git 管理下のファイルに記載
+- **インフラ情報** → `pooza/chubo2` リポジトリの `docs/infra-note.md` に記載
 
 ## 重要なドキュメント
 
@@ -117,6 +133,7 @@ GitHub Actions (`.github/workflows/test.yml`):
 - matrix strategy: `controller: [mastodon, misskey]` の2並列
 - `bundle exec rake lint` (rubocop, slim_lint, erb_lint等)
 - `bundle exec rake test` (test-unit、DB依存テストは自動スキップ)
+- 個別テスト実行: `bin/test.rb ケース名`
 - 依存: ffmpeg, libidn11-dev, libvips-dev
 
 ## ディレクトリ構成（主要）
@@ -139,10 +156,10 @@ config/
 views/              # Slim テンプレート + インラインVue.js
 test/
   unit/handler/   # ハンドラーテスト (44)
-  unit/worker/    # ワーカーテスト (3)
+  unit/worker/    # ワーカーテスト (12)
   unit/service/   # サービステスト (9)
   unit/uri/       # URIテスト (11)
-  unit/model/     # モデルテスト (12)
+  unit/model/     # モデルテスト (13)
   unit/daemon/    # デーモンテスト (3)
   unit/lib/       # その他ユーティリティテスト (35)
   contract/       # バリデーションテスト (11)
@@ -187,12 +204,44 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 診断スクリプト: `bin/diag/concurrent_token_test.rb`。
 詳細は [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) を参照。
 
+### Webhook digest の安定性
+
+`Webhook.create_digest` は Webhook URL の一部となる digest を生成する。入力は SNS の URI、OAuth トークン、`/crypt/salt`（フォールバック: `/crypt/password`）の3要素。
+これらの値や生成ロジックを変更すると Webhook URL が変化し、外部連携（tomato-shrieker 等）が 404 になる。
+5.2.0 で `/crypt/salt` 廃止により発生（#4106、5.2.1 で修正）。この領域の変更は慎重に行うこと。
+
+### デーモン管理
+
+daemon-spawn gem は廃止済み（#4098）。`Ginseng::Daemon` はスタンドアロンクラスとしてフォアグラウンド実行する。デーモン化は OS の init システムに委任する。
+
+- **FreeBSD (rc.d)**: `daemon(8)` でバックグラウンド化。stop は `bin/xxx_daemon.rb stop`（PID ファイル経由で TERM 送信）
+- **Ubuntu (systemd)**: `Type=simple`、`ExecStop=/bin/kill -TERM $MAINPID`
+- **デプロイ時**: rc.d スクリプト / systemd unit の更新が必要（[config/sample/](../config/sample/) 参照）
+
 ### ginseng-web
 
 - `Ginseng::Web::Sinatra` ラッパークラスは廃止済み（v1.3.45）
 - Controller は `Sinatra::Base` を直接継承
 - rack >= 3.1.14 / Sinatra ~> 4.1.0
 - デフォルトブランチ: main（2026-02-22にstableからリネーム済み。他のginseng-*も全てmainに統一済み）
+
+### 番組表システム（Program）
+
+キュアスタ！等で稼働する番組表機能。Mastodon 側にも改造があり、以下のフローで更新される:
+
+1. Mastodon（WebUI）→ POST `/mulukhiya/api/program/update`（モロヘイヤに更新要求）
+2. モロヘイヤ `ProgramUpdateWorker`（Sidekiq）→ GAS エンドポイントから最新データ取得 → Redis 更新
+3. Mastodon → GET `/mulukhiya/api/program`（更新後のデータ取得）→ 自身の番組表表示を更新
+
+- **データソース**: `/program/urls` に設定した外部 URL（GAS 等）から JSON を取得。302 リダイレクトは HTTParty が自動追従
+- **スケジューラ**: Sidekiq Scheduler で毎分 `ProgramUpdateWorker` を実行
+- **有効条件**: `livecure?` → `/program/urls` が空でないこと
+
+番組表が更新されない場合の切り分け:
+
+1. **Sidekiq が稼働しているか** — `ProgramUpdateWorker` は Sidekiq 経由で実行されるため、Sidekiq 停止時はスケジュール実行も POST 経由のジョブも処理されない
+2. **GAS エンドポイントが応答するか** — サーバーから `curl -sL` で `/program/urls` の URL を直接取得して確認
+3. **Redis のキャッシュが古くないか** — `GET /mulukhiya/api/program` のレスポンスと GAS の最新データを比較
 
 ## v5.0 設定構造の概要
 
@@ -232,7 +281,7 @@ MastodonとMisskeyのソースコードがローカルに並列配置される�
 - API仕様: [docs/api.md](api.md) — capsicumが利用するモロヘイヤ固有エンドポイントのリファレンス
 - API変更時: [docs/api.md](api.md) を更新し、破壊的変更がある場合は capsicum リポジトリに Issue を起票する
 
-## 開発サーバー
+## 開発サーバー・インフラ
 
 SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジトリには含めない）。
 エイリアス名はセッション開始時にユーザーから指示される。
@@ -243,6 +292,8 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 | Misskey  | 1    | Ubuntu   |
 
 リモート側の操作（git pull、マイグレーション、サービス再起動等）も可能。
+
+サーバー構成・SSH接続・デプロイ手順・チューニング設定等の詳細は [pooza/chubo2 インフラノート](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) を参照。
 
 ## push前の必須手順
 
