@@ -18,14 +18,14 @@ FreeBSD rc.d スクリプト。
 
 ### ubuntu/
 
-Ubuntu 向け systemd ユニットと daemon-spawn 管理スクリプト。
+Ubuntu 向け systemd ユニットと 直接管理スクリプト。
 
 | ファイル | 用途 |
 |---------|------|
 | `mulukhiya-puma.service` | systemd: Puma |
 | `mulukhiya-sidekiq.service` | systemd: Sidekiq |
 | `mulukhiya-listener.service` | systemd: Listener |
-| `mulukhiya-daemon.sh` | daemon-spawn 直接管理 (systemd 不使用時) |
+| `mulukhiya-daemon.sh` | 直接管理 (systemd 不使用時) |
 
 systemd ユニットは `/etc/systemd/system/` に配置し、`__username__` とパスを編集する。
 
@@ -38,7 +38,7 @@ RHEL/CentOS 向け。Ubuntu 版との違いは jemalloc のパス (`/usr/lib64/l
 | `mulukhiya-puma.service` | systemd: Puma |
 | `mulukhiya-sidekiq.service` | systemd: Sidekiq |
 | `mulukhiya-listener.service` | systemd: Listener |
-| `mulukhiya-daemon.sh` | daemon-spawn 直接管理 (systemd 不使用時) |
+| `mulukhiya-daemon.sh` | 直接管理 (systemd 不使用時) |
 
 **注意**: RHEL 環境でのステージング検証は未実施。
 

@@ -13,13 +13,17 @@ module Mulukhiya
 
         desc "start #{daemon}"
         task start: Environment.pre_start_tasks do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
+          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} restart"
         rescue => e
           warn "#{e.class} #{daemon}:start #{e.message}"
         end
 
         desc "restart #{daemon}"
-        task restart: [:stop, :start]
+        task restart: Environment.pre_start_tasks do
+          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} restart"
+        rescue => e
+          warn "#{e.class} #{daemon}:restart #{e.message}"
+        end
       end
     end
   end
