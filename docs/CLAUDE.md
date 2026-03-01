@@ -214,6 +214,24 @@ daemon-spawn gem は廃止済み（#4098）。`Ginseng::Daemon` はスタンド�
 - rack >= 3.1.14 / Sinatra ~> 4.1.0
 - デフォルトブランチ: main（2026-02-22にstableからリネーム済み。他のginseng-*も全てmainに統一済み）
 
+### 番組表システム（Program）
+
+キュアスタ！等で稼働する番組表機能。Mastodon 側にも改造があり、以下のフローで更新される:
+
+1. Mastodon（WebUI）→ POST `/mulukhiya/api/program/update`（モロヘイヤに更新要求）
+2. モロヘイヤ `ProgramUpdateWorker`（Sidekiq）→ GAS エンドポイントから最新データ取得 → Redis 更新
+3. Mastodon → GET `/mulukhiya/api/program`（更新後のデータ取得）→ 自身の番組表表示を更新
+
+- **データソース**: `/program/urls` に設定した外部 URL（GAS 等）から JSON を取得。302 リダイレクトは HTTParty が自動追従
+- **スケジューラ**: Sidekiq Scheduler で毎分 `ProgramUpdateWorker` を実行
+- **有効条件**: `livecure?` → `/program/urls` が空でないこと
+
+番組表が更新されない場合の切り分け:
+
+1. **Sidekiq が稼働しているか** — `ProgramUpdateWorker` は Sidekiq 経由で実行されるため、Sidekiq 停止時はスケジュール実行も POST 経由のジョブも処理されない
+2. **GAS エンドポイントが応答するか** — サーバーから `curl -sL` で `/program/urls` の URL を直接取得して確認
+3. **Redis のキャッシュが古くないか** — `GET /mulukhiya/api/program` のレスポンスと GAS の最新データを比較
+
 ## v5.0 設定構造の概要
 
 `config/application.yaml` の主要な構造（詳細は [v5-plan.md](v5-plan.md) を参照）:
