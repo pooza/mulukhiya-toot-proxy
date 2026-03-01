@@ -17,7 +17,7 @@ module Mulukhiya
     end
 
     post '/:digest' do
-      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      verify_webhook!
       if payload.errors.present?
         @renderer.status = 422
         @renderer.message = payload.errors
@@ -35,7 +35,7 @@ module Mulukhiya
     end
 
     get '/:digest' do
-      raise Ginseng::NotFoundError, 'Not Found' unless webhook
+      verify_webhook!
       @renderer.message = {message: 'OK'}
       return @renderer.to_s
     rescue => e
@@ -46,7 +46,6 @@ module Mulukhiya
     end
 
     def webhook
-      return nil unless controller_class.webhook?
       @webhook ||= Webhook.create(params[:digest])
       return @webhook
     end
@@ -57,6 +56,15 @@ module Mulukhiya
     end
 
     private
+
+    def verify_webhook!
+      unless controller_class.webhook?
+        raise Ginseng::ServiceUnavailableError, 'Webhook is not enabled'
+      end
+      return if webhook
+      raise Ginseng::NotFoundError,
+        "Webhook not found (digest: #{params[:digest][0, 12]}...)"
+    end
 
     def verify_admin_webhook!(raw_body)
       secret = config['/agent/info/webhook/secret']
