@@ -130,6 +130,7 @@ git diff Gemfile.lock
 - [v5-plan.md](v5-plan.md) — 5.0計画の記録（全完了。5.1以降はIssue＋マイルストーンで管理）
 - [upgrade-guide-5.0.md](upgrade-guide-5.0.md) — Wikiの[4.x → 5.0 アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)へのリダイレクト
 - [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) — rack 3.2トークン汚染インシデントの記録
+- [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) — nodeinfo循環呼び出しによる本番全面停止の記録
 
 ## CI
 
