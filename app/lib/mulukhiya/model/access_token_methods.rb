@@ -36,6 +36,7 @@ module Mulukhiya
         return enum_for(__method__) unless block
         Postgres.exec(:webhook_tokens)
           .map {|row| row[:id]}
+          .lazy
           .filter_map {|id| Environment.access_token_class[id] rescue nil}
           .select(&:valid?)
           .map(&:to_h)

@@ -1,9 +1,9 @@
 #!/bin/bash
-# mulukhiya-toot-proxy daemon management script (daemon-spawn)
+# mulukhiya-toot-proxy daemon management script
 # Usage: mulukhiya-daemon.sh {start|stop|restart}
 #
-# This script manages puma/sidekiq/listener daemons directly
-# via daemon-spawn, without systemd.
+# This script manages puma/sidekiq/listener daemons directly,
+# without systemd.
 #
 # Configuration:
 #   MULUKHIYA_PATH - path to mulukhiya-toot-proxy
@@ -23,9 +23,9 @@ run_cmd() {
 
 case "$1" in
   start)
-    run_cmd 'bundle exec bin/puma_daemon.rb start'
-    run_cmd 'bundle exec bin/sidekiq_daemon.rb start'
-    run_cmd 'bundle exec bin/listener_daemon.rb start'
+    run_cmd 'bundle exec bin/puma_daemon.rb restart'
+    run_cmd 'bundle exec bin/sidekiq_daemon.rb restart'
+    run_cmd 'bundle exec bin/listener_daemon.rb restart'
     ;;
   stop)
     run_cmd 'bundle exec bin/listener_daemon.rb stop'

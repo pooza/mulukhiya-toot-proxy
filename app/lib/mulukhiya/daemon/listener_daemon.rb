@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def start(args)
+    def start(args = [])
       save_config
       Environment.listener_class.start
     end

@@ -8,5 +8,5 @@ module Mulukhiya
     warn "#{ListenerDaemon.name}: disabled, skipping"
     exit 0
   end
-  ListenerDaemon.spawn!(singleton: true)
+  ListenerDaemon.spawn!
 end

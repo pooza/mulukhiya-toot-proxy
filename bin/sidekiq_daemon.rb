@@ -8,5 +8,5 @@ module Mulukhiya
     warn "#{SidekiqDaemon.name}: disabled, skipping"
     exit 0
   end
-  SidekiqDaemon.spawn!(singleton: true)
+  SidekiqDaemon.spawn!
 end
