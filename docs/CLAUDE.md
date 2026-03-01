@@ -145,10 +145,10 @@ config/
 views/              # Slim テンプレート + インラインVue.js
 test/
   unit/handler/   # ハンドラーテスト (44)
-  unit/worker/    # ワーカーテスト (3)
+  unit/worker/    # ワーカーテスト (12)
   unit/service/   # サービステスト (9)
   unit/uri/       # URIテスト (11)
-  unit/model/     # モデルテスト (12)
+  unit/model/     # モデルテスト (13)
   unit/daemon/    # デーモンテスト (3)
   unit/lib/       # その他ユーティリティテスト (35)
   contract/       # バリデーションテスト (11)
@@ -198,6 +198,14 @@ rack 3.2 + Sinatra 4.2 で「異なるアカウントの投稿として送信さ
 `Webhook.create_digest` は Webhook URL の一部となる digest を生成する。入力は SNS の URI、OAuth トークン、`/crypt/salt`（フォールバック: `/crypt/password`）の3要素。
 これらの値や生成ロジックを変更すると Webhook URL が変化し、外部連携（tomato-shrieker 等）が 404 になる。
 5.2.0 で `/crypt/salt` 廃止により発生（#4106、5.2.1 で修正）。この領域の変更は慎重に行うこと。
+
+### デーモン管理
+
+daemon-spawn gem は廃止済み（#4098）。`Ginseng::Daemon` はスタンドアロンクラスとしてフォアグラウンド実行する。デーモン化は OS の init システムに委任する。
+
+- **FreeBSD (rc.d)**: `daemon(8)` でバックグラウンド化。stop は `bin/xxx_daemon.rb stop`（PID ファイル経由で TERM 送信）
+- **Ubuntu (systemd)**: `Type=simple`、`ExecStop=/bin/kill -TERM $MAINPID`
+- **デプロイ時**: rc.d スクリプト / systemd unit の更新が必要（[config/sample/](../config/sample/) 参照）
 
 ### ginseng-web
 
