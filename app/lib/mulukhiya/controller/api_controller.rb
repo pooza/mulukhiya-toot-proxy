@@ -2,7 +2,10 @@ module Mulukhiya
   class APIController < Controller
     get '/about' do
       sns.token ||= sns.default_token
-      @renderer.message = config.about
+      about = config.about
+      about[:config][:theme] = {color: sns.theme_color}
+      about[:config][:handlers] = Handler.all.reject(&:disable?).map(&:underscore)
+      @renderer.message = about
       return @renderer.to_s
     end
 
