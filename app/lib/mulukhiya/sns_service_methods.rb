@@ -35,6 +35,9 @@ module Mulukhiya
 
     def nodeinfo
       return super.merge(mulukhiya: config.about)
+    rescue => e
+      e.log
+      return {}
     end
 
     def account

@@ -6,6 +6,9 @@ module Mulukhiya
 
     def nodeinfo
       return super.merge(metadata: {themeColor: theme_color})
+    rescue => e
+      e.log
+      return {}
     end
 
     alias info nodeinfo
