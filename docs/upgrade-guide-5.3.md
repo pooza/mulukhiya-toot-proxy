@@ -40,6 +40,20 @@ sudo service mulukhiya-sidekiq restart
 sudo service mulukhiya-listener restart
 ```
 
+### 起動ログについて
+
+サービスマネージャ経由の起動では、以前 `rake start` でターミナルに表示されていた内容（スキーマチェック結果、motd 等）は表示されない。起動ログは syslog で確認する。
+
+```bash
+# FreeBSD
+tail -f /var/log/messages | grep mulukhiya
+
+# Ubuntu
+journalctl -u mulukhiya-puma -u mulukhiya-sidekiq -u mulukhiya-listener -f
+```
+
+また、再起動時に ListenerDaemon の stop メッセージが複数回出力されることがあるが、これはプロセスグループへのシグナル伝播による正常な動作であり、不具合ではない。
+
 ## 3. 起動後の確認
 
 ### ヘルスチェック
@@ -50,20 +64,12 @@ curl -s http://localhost:3008/mulukhiya/api/health | python3 -m json.tool
 
 すべてのステータスが `OK`、HTTP ステータスが `200` であることを確認する。
 
-### ゾンビプロセスの確認
+### プロセスの確認
 
-再起動後、古いプロセスが残っていないか確認する。特に listener は WebSocket リトライループ中に SIGTERM を処理できず、ゾンビ化することがある。
-
-```bash
-# 高 CPU のプロセスがないか確認
-ps aux | grep mulukhiya | grep -v grep
-```
-
-CPU 使用率が異常に高い（90%以上）プロセスが残っている場合は、`kill -9` で強制終了してからサービスを再起動する。
+再起動後、各デーモンが1プロセスずつ動いていることを確認する。
 
 ```bash
-kill -9 <PID>
-# その後、上記の systemctl restart / service restart を実行
+ps aux | grep -E 'puma_daemon|sidekiq_daemon|listener_daemon' | grep -v grep
 ```
 
 ### nodeinfo キャッシュの確認

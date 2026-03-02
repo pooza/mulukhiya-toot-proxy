@@ -33,7 +33,7 @@ mulukhiya_sidekiq_start() {
 mulukhiya_sidekiq_stop() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb stop' 2>/dev/null
-  pkill -u $mulukhiya_user -f 'sidekiq_daemon.rb' 2>/dev/null
+  pkill -9 -u $mulukhiya_user -f 'sidekiq_daemon.rb' 2>/dev/null
   sleep 2
 }
 

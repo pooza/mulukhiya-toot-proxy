@@ -589,6 +589,9 @@ sidekiq:
     program_update:
       class: Mulukhiya::ProgramUpdateWorker
       every: 1m
+    startup_notification:
+      class: Mulukhiya::StartupNotificationWorker
+      every: 5m
     tagging_dictionary_update:
       class: Mulukhiya::TaggingDictionaryUpdateWorker
       every: 10m
