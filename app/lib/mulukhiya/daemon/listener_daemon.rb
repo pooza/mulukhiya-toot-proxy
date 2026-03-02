@@ -3,7 +3,7 @@ module Mulukhiya
     include Package
     include SNSMethods
 
-    def start(args)
+    def start(args = [])
       save_config
       Environment.listener_class.start
     end
@@ -34,8 +34,16 @@ module Mulukhiya
     end
 
     def self.health
-      pid = File.read(File.join(Environment.dir, 'tmp/pids/ListenerDaemon.pid')).to_i
-      raise "PID '#{pid}' was dead" unless Process.alive?(pid)
+      pid_path = File.join(Environment.dir, 'tmp/pids/ListenerDaemon.pid')
+      if File.exist?(pid_path)
+        pid = File.read(pid_path).to_i
+        raise "PID '#{pid}' was dead" unless Process.alive?(pid)
+        return {status: 'OK'}
+      end
+      unless system('pgrep', '-f', 'listener_daemon.rb',
+        out: File::NULL, err: File::NULL)
+        raise 'listener process not found'
+      end
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}

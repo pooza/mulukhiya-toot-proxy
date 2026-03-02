@@ -56,6 +56,11 @@ module Mulukhiya
       ])
     end
 
+    # digestはWebhook URLの一部となるため、入力値や生成ロジックの変更は
+    # 外部連携（tomato-shrieker等）を破壊する。
+    # /crypt/salt は #4083 で廃止済みだが、本番サーバーの過半数で
+    # /crypt/salt と /crypt/password が異なる値を持っており、
+    # Crypt.password に統一すると digest が変化する。(#4106)
     def self.create_digest(uri, token)
       return {
         sns: uri.to_s,
@@ -66,8 +71,8 @@ module Mulukhiya
 
     def self.create(key)
       return new(key) if key.is_a?(UserConfig)
-      return nil unless entry = controller_class.webhook_entries.find {|v| v[:digest] == key}
-      return entry[:account].webhook
+      token = find_token_by_digest(key)
+      return token&.account&.webhook
     rescue => e
       e.log(key: key.to_s)
       return nil
@@ -75,7 +80,16 @@ module Mulukhiya
 
     def self.all(&block)
       return enum_for(__method__) unless block
-      controller_class.webhook_entries.filter_map {|v| create(v[:digest])}.each(&block)
+      controller_class.webhook_entries.filter_map {|v| v[:account]&.webhook}.each(&block)
+    end
+
+    def self.find_token_by_digest(digest)
+      Postgres.exec(:webhook_tokens).each do |row|
+        token = Environment.access_token_class[row[:id]] rescue next
+        next unless token.valid?
+        return token if token.webhook_digest == digest
+      end
+      return nil
     end
 
     private

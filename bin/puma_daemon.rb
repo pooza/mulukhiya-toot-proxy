@@ -8,5 +8,5 @@ module Mulukhiya
     warn "#{PumaDaemon.name}: disabled, skipping"
     exit 0
   end
-  PumaDaemon.spawn!(singleton: true)
+  PumaDaemon.spawn!
 end

@@ -26,12 +26,15 @@ stop_cmd=${name}_stop
 
 mulukhiya_sidekiq_start() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb start'
+  sudo -u $mulukhiya_user /usr/sbin/daemon \
+    /usr/local/bin/bash -lc "cd ${mulukhiya_path} && bundle exec bin/sidekiq_daemon.rb start"
 }
 
 mulukhiya_sidekiq_stop() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb stop'
+  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb stop' 2>/dev/null
+  pkill -9 -u $mulukhiya_user -f 'sidekiq_daemon.rb' 2>/dev/null
+  sleep 2
 }
 
 run_rc_command "$1"

@@ -167,5 +167,15 @@ module Mulukhiya
 
       assert_nil(account_class.info_account)
     end
+
+    def test_admins
+      admins = account_class.admins
+
+      assert_kind_of(Array, admins)
+      admins.each do |admin|
+        assert_kind_of(account_class, admin)
+        assert_predicate(admin, :admin?)
+      end
+    end
   end
 end

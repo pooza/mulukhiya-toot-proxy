@@ -1,31 +1,57 @@
 module Mulukhiya
   extend Rake::DSL
 
+  WIKI_URL = 'https://github.com/pooza/mulukhiya-toot-proxy/wiki/5.2.x-→-5.3-アップグレードガイド'.freeze
+
+  DAEMON_DEPRECATION_ALL = <<~MSG.freeze
+    ❗rake %{action} は v5.3 で廃止されました❗
+
+    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動やゾンビ化の原因となるためです。
+    詳細: %{url}
+
+    代わりに以下を実行してください:
+
+    FreeBSD (rc.d):
+    sudo service mulukhiya-puma %{action}
+    sudo service mulukhiya-sidekiq %{action}
+    sudo service mulukhiya-listener %{action}
+
+    Ubuntu / Debian / RHEL系 (systemd):
+    sudo systemctl %{action} mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
+  MSG
+
+  DAEMON_DEPRECATION_SINGLE = <<~MSG.freeze
+    ❗rake mulukhiya:%{daemon}:%{action} は v5.3 で廃止されました❗
+
+    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動やゾンビ化の原因となるためです。
+    詳細: %{url}
+
+    代わりに以下を実行してください:
+
+    FreeBSD (rc.d):
+    sudo service mulukhiya-%{daemon} %{action}
+
+    Ubuntu / Debian / RHEL系 (systemd):
+    sudo systemctl %{action} mulukhiya-%{daemon}
+  MSG
+
   namespace :mulukhiya do
     [:listener, :puma, :sidekiq].freeze.each do |daemon|
       namespace daemon do
-        desc "stop #{daemon}"
-        task :stop do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} stop"
-        rescue => e
-          warn "#{e.class} #{daemon}:stop #{e.message}"
+        [:start, :stop, :restart].freeze.each do |action|
+          desc "#{action} #{daemon} (deprecated)"
+          task action do
+            abort DAEMON_DEPRECATION_SINGLE % {daemon: daemon, action: action, url: WIKI_URL}
+          end
         end
-
-        desc "start #{daemon}"
-        task start: Environment.pre_start_tasks do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} start"
-        rescue => e
-          warn "#{e.class} #{daemon}:start #{e.message}"
-        end
-
-        desc "restart #{daemon}"
-        task restart: [:stop, :start]
       end
     end
   end
 
   [:start, :stop, :restart].freeze.each do |action|
-    desc "#{action} all"
-    multitask action => Environment.task_prefixes.map {|v| "#{v}:#{action}"}
+    desc "#{action} all (deprecated)"
+    task action do
+      abort DAEMON_DEPRECATION_ALL % {action: action, url: WIKI_URL}
+    end
   end
 end
