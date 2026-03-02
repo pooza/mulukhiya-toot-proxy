@@ -1,35 +1,35 @@
 module Mulukhiya
   extend Rake::DSL
 
+  DAEMON_DEPRECATION = <<~MSG.freeze
+    rake %{action} は廃止されました。サービスマネージャ経由で操作してください。
+
+    Ubuntu/RHEL:
+      sudo systemctl %{action} mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
+
+    FreeBSD:
+      sudo service mulukhiya-puma %{action}
+      sudo service mulukhiya-sidekiq %{action}
+      sudo service mulukhiya-listener %{action}
+  MSG
+
   namespace :mulukhiya do
     [:listener, :puma, :sidekiq].freeze.each do |daemon|
       namespace daemon do
-        desc "stop #{daemon}"
-        task :stop do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} stop"
-        rescue => e
-          warn "#{e.class} #{daemon}:stop #{e.message}"
-        end
-
-        desc "start #{daemon}"
-        task start: Environment.pre_start_tasks do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} restart"
-        rescue => e
-          warn "#{e.class} #{daemon}:start #{e.message}"
-        end
-
-        desc "restart #{daemon}"
-        task restart: Environment.pre_start_tasks do
-          sh "#{File.join(Environment.dir, 'bin', "#{daemon}_daemon.rb")} restart"
-        rescue => e
-          warn "#{e.class} #{daemon}:restart #{e.message}"
+        [:start, :stop, :restart].freeze.each do |action|
+          desc "#{action} #{daemon} (deprecated)"
+          task action do
+            abort DAEMON_DEPRECATION % {action: action}
+          end
         end
       end
     end
   end
 
   [:start, :stop, :restart].freeze.each do |action|
-    desc "#{action} all"
-    multitask action => Environment.task_prefixes.map {|v| "#{v}:#{action}"}
+    desc "#{action} all (deprecated)"
+    task action do
+      abort DAEMON_DEPRECATION % {action: action}
+    end
   end
 end
