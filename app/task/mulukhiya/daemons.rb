@@ -4,33 +4,35 @@ module Mulukhiya
   WIKI_URL = 'https://github.com/pooza/mulukhiya-toot-proxy/wiki/5.2.x-→-5.3-アップグレードガイド'.freeze
 
   DAEMON_DEPRECATION_ALL = <<~MSG.freeze
-    rake %{action} は v5.3 で廃止されました。
-    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動や
-    ゾンビ化の原因となるためです。詳細: %{url}
+    ❗rake %{action} は v5.3 で廃止されました❗
+
+    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動やゾンビ化の原因となるためです。
+    詳細: %{url}
 
     代わりに以下を実行してください:
 
-    Ubuntu/RHEL (systemd):
-      sudo systemctl %{action} mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
-
     FreeBSD (rc.d):
-      sudo service mulukhiya-puma %{action}
-      sudo service mulukhiya-sidekiq %{action}
-      sudo service mulukhiya-listener %{action}
+    sudo service mulukhiya-puma %{action}
+    sudo service mulukhiya-sidekiq %{action}
+    sudo service mulukhiya-listener %{action}
+
+    Ubuntu / Debian / RHEL系 (systemd):
+    sudo systemctl %{action} mulukhiya-puma mulukhiya-sidekiq mulukhiya-listener
   MSG
 
   DAEMON_DEPRECATION_SINGLE = <<~MSG.freeze
-    rake mulukhiya:%{daemon}:%{action} は v5.3 で廃止されました。
-    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動や
-    ゾンビ化の原因となるためです。詳細: %{url}
+    ❗rake mulukhiya:%{daemon}:%{action} は v5.3 で廃止されました❗
+
+    サービスマネージャ（systemd / rc.d）と競合し、プロセスの二重起動やゾンビ化の原因となるためです。
+    詳細: %{url}
 
     代わりに以下を実行してください:
 
-    Ubuntu/RHEL (systemd):
-      sudo systemctl %{action} mulukhiya-%{daemon}
-
     FreeBSD (rc.d):
-      sudo service mulukhiya-%{daemon} %{action}
+    sudo service mulukhiya-%{daemon} %{action}
+
+    Ubuntu / Debian / RHEL系 (systemd):
+    sudo systemctl %{action} mulukhiya-%{daemon}
   MSG
 
   namespace :mulukhiya do
