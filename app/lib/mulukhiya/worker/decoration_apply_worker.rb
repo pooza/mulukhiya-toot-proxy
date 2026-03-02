@@ -23,7 +23,9 @@ module Mulukhiya
         account.user_config.update(decoration: {saved_state: current['avatarDecorations'] || []})
       end
       current_decorations = service.fetch_account_detail['avatarDecorations'] || []
-      new_decorations = current_decorations.reject {|d| d['id'] == decoration_id}
+      valid_keys = ['id', 'angle', 'flipH', 'offsetX', 'offsetY']
+      new_decorations = current_decorations.map {|d| d.slice(*valid_keys).compact}
+      new_decorations.reject! {|d| d['id'] == decoration_id}
       new_decorations.push({'id' => decoration_id})
       service.update_account(avatarDecorations: new_decorations)
       log(acct: account.acct.to_s, decoration_id:, message: 'applied')

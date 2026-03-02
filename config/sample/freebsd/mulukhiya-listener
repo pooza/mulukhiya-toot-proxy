@@ -26,7 +26,8 @@ stop_cmd=${name}_stop
 
 mulukhiya_listener_start() {
   cd $mulukhiya_path
-  sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/listener_daemon.rb start'
+  sudo -u $mulukhiya_user /usr/sbin/daemon \
+    /usr/local/bin/bash -lc "cd ${mulukhiya_path} && bundle exec bin/listener_daemon.rb start"
 }
 
 mulukhiya_listener_stop() {

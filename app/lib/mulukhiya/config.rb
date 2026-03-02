@@ -22,11 +22,18 @@ module Mulukhiya
     end
 
     def about
+      controller = Environment.controller_class
+      name = Environment.controller_name
       return {
         package: raw.dig('application', 'package'),
         config: {
           controller: self['/controller'],
-          status: Environment.status_class.default,
+          status: Environment.status_class.default.merge(
+            label: controller.status_label,
+            max_length: controller.max_length,
+          ),
+          capabilities: (self["/#{name}/capabilities"] rescue {}),
+          features: (self["/#{name}/features"] rescue {}),
         },
       }
     end

@@ -1,8 +1,6 @@
 properties:
   disabled:
     type: boolean
-  experimental:
-    type: boolean
   timeout:
     minimum: 1
     type: integer

@@ -3,14 +3,12 @@ Description=mulukhiya-toot-proxy (sidekiq)
 After=network.target
 
 [Service]
-Type=forking
-PIDFile=/home/__username__/path/to/mulukhiya-toot-proxy/tmp/pids/SidekiqDaemon.pid
+Type=simple
 User=__username__
 WorkingDirectory=/home/__username__/path/to/mulukhiya-toot-proxy
 ExecStart=/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb start'
-ExecStop=/bin/bash -lc 'bundle exec bin/sidekiq_daemon.rb stop'
-TimeoutSec=15
-SuccessExitStatus=KILL
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=15
 Restart=always
 Environment="LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"
 
