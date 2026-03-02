@@ -97,6 +97,7 @@ git diff Gemfile.lock
   3. `breadcrumbs.slim` が毎リクエスト `sns.node_name` → nodeinfo HTTP 呼び出し。`before` フィルタで毎回 `sns_class.new` するためインスタンスメモ化が効かない
   4. mulukhiya → Mastodon の通信がパブリック IP アドレス経由のため Rack::Attack の localhost safelist が無効
   - main ブランチは v5.2.1 にリセット済み。循環呼び出し解消（nodeinfo キャッシュ）が再リリースの前提条件
+  - **ステージング検証完了** (2026-03-02): zugoga.b-shock.co.jp（Linode VPS、本番同等のネットワーク構成）で develop ブランチを検証。nodeinfo キャッシュ後 0.10s、循環呼び出し解消、PID ファイル正常、streaming 正常。詳細は [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) の「ステージング検証: zugoga」セクション参照
 - **#4123 ListenerDaemon.health の PID ファイル非依存化** — FreeBSD の daemon(8) が PID ファイルを永続化しない問題。`pgrep -f listener_daemon.rb` フォールバックを追加。併せて rc.d の stop に `pkill -9` フォールバックを追加し、ゾンビプロセスの残留を防止
 - **#4125 起動通知 DM** — サービスマネージャ経由の起動で標準出力が見えなくなったため、お知らせボットから管理者にヘルスチェック結果 + スキーマチェック結果を DM 通知。Sidekiq PID ベースで重複防止。`AccountMethods.admins` クラスメソッド新設（ロールベースの管理者取得）
 

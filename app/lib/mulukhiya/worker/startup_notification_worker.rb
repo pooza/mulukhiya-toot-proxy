@@ -26,7 +26,7 @@ module Mulukhiya
     end
 
     def sidekiq_pid
-      return Sidekiq::ProcessSet.new.first&.[]('pid').to_s
+      return Process.pid.to_s
     end
 
     def create_message(health)
