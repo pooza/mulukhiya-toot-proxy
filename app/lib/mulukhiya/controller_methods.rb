@@ -42,7 +42,7 @@ module Mulukhiya
       end
 
       def max_length
-        return parser_class.new.max_length
+        return sns_class.new.max_post_text_length
       end
 
       def announcement?

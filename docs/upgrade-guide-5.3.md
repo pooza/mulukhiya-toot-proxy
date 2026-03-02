@@ -59,7 +59,7 @@ journalctl -u mulukhiya-puma -u mulukhiya-sidekiq -u mulukhiya-listener -f
 ### ヘルスチェック
 
 ```bash
-curl -s http://localhost:3008/mulukhiya/api/health | python3 -m json.tool
+curl -s http://localhost:3008/mulukhiya/api/health | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(STDIN.read))'
 ```
 
 すべてのステータスが `OK`、HTTP ステータスが `200` であることを確認する。
@@ -87,5 +87,5 @@ ps aux | grep -E 'puma_daemon|sidekiq_daemon|listener_daemon' | grep -v grep
 `/mulukhiya/api/about` が正常なレスポンスを返し、`max_length` に値が入っていれば正常に動作している。
 
 ```bash
-curl -s http://localhost:3008/mulukhiya/api/about | python3 -m json.tool | head -20
+curl -s http://localhost:3008/mulukhiya/api/about | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(STDIN.read))'
 ```
