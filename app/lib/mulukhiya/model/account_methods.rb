@@ -212,6 +212,11 @@ module Mulukhiya
         e.log
         return nil
       end
+
+      def admins
+        col = Environment.account_class.columns.include?(:domain) ? :domain : :host
+        return Environment.account_class.where(col => nil).all.select(&:admin?)
+      end
     end
   end
 end
