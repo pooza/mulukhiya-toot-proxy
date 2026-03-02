@@ -27,7 +27,7 @@ stop_cmd=${name}_stop
 mulukhiya_puma_start() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/sbin/daemon \
-    /usr/local/bin/bash -lc "cd ${mulukhiya_path} && bundle exec bin/puma_daemon.rb start"
+    /usr/local/bin/bash -lc "cd ${mulukhiya_path} && RACK_ENV=production bundle exec bin/puma_daemon.rb start"
 }
 
 mulukhiya_puma_stop() {

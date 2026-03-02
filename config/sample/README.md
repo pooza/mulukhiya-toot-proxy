@@ -14,7 +14,15 @@ FreeBSD rc.d スクリプト。
 | `mulukhiya-sidekiq` | Sidekiq (ジョブワーカー) |
 | `mulukhiya-listener` | Listener (WebSocket/Streaming) |
 
-`/usr/local/etc/rc.d/` に配置し、`/etc/rc.conf` に `mulukhiya_enable="YES"` 等を設定する。
+`/usr/local/etc/rc.d/` に配置し、`/etc/rc.conf` に以下を設定する。
+
+```sh
+mulukhiya_enable="YES"
+mulukhiya_path="/home/mastodon/repos/mulukhiya-toot-proxy"
+mulukhiya_user="mastodon"
+```
+
+**注意**: Sinatra 4.1 以降、development 環境では `HostAuthorization` により localhost 以外のホストからのアクセスがブロックされる。mulukhiya-puma の起動時に `RACK_ENV=production` を設定すること。
 
 ### ubuntu/
 
@@ -51,6 +59,8 @@ Mastodon インスタンス向けの設定。
 | `local.yaml` | mulukhiya 設定ファイル |
 | `mulukhiya.nginx` | nginx server context に追加する location ブロック |
 | `mulukhiya_proxy.conf` | nginx proxy パラメータ (include 用) |
+
+`local.yaml` の配置先は `/usr/local/etc/mulukhiya-toot-proxy/local.yaml` (FreeBSD) または `/etc/mulukhiya-toot-proxy/local.yaml`。
 
 ### misskey/
 
