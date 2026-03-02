@@ -39,5 +39,18 @@ module Mulukhiya
       assert_match(/ステータス: 異常/, message)
       assert_match(/streaming: NG/, message)
     end
+
+    def test_create_message_schema_ok
+      health = {
+        redis: {status: 'OK'},
+        sidekiq: {status: 'OK', queues: 0, retry: 0},
+        streaming: {status: 'OK'},
+        postgres: {status: 'OK'},
+        status: 200,
+      }
+      message = @worker.send(:create_message, health)
+
+      refute_match(/スキーマエラー/, message)
+    end
   end
 end
