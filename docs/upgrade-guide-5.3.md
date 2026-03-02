@@ -72,6 +72,14 @@ curl -s http://localhost:3008/mulukhiya/api/health | python3 -m json.tool
 ps aux | grep -E 'puma_daemon|sidekiq_daemon|listener_daemon' | grep -v grep
 ```
 
+### 起動通知 DM
+
+起動後、お知らせボットから管理者アカウントに起動状況（ヘルスチェック結果）が DM で通知される。Sidekiq のスケジューラで 5 分間隔で実行されるため、DM が届くまで最大 5 分程度かかる。
+
+- 管理者の判定はロールベース（管理権限を持つロールが割り当てられたローカルアカウント）
+- 同一 Sidekiq プロセスでは 1 回のみ通知される（再起動すると再通知）
+- お知らせボット（`/agent/info/token`）が未設定の場合は動作しない
+
 ### nodeinfo キャッシュの確認
 
 5.3 では nodeinfo を Redis にキャッシュする仕組みが導入された。Sidekiq の `NodeinfoUpdateWorker` が 5 分ごとにキャッシュを更新する。追加の設定は不要。

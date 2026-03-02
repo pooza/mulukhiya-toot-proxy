@@ -41,6 +41,12 @@ module Mulukhiya
       else
         lines << "ステータス: 異常 (#{health[:status]})"
       end
+      schema_errors = config.errors
+      if schema_errors.present?
+        lines << ''
+        lines << 'スキーマエラー:'
+        schema_errors.each {|e| lines << "- #{e}"}
+      end
       return lines.join("\n")
     end
 
