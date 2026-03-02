@@ -91,6 +91,12 @@ git diff Gemfile.lock
 ## 開発中: 5.3.0
 
 - **#4113 `/mulukhiya/api/about` のレスポンス拡張（capsicum 対応）** — `status.label`（投稿の呼称）、`status.max_length`（文字数上限）、`theme.color`（テーマ色）、`capabilities`、`features`、`handlers`（有効ハンドラー名一覧）を追加。`config.about` は nodeinfo にもコピーされるため軽量に保ち、HTTP 取得が必要な theme と生成コストのある handlers はルート側でのみ追加
+- **#4121 nodeinfo 依存の見直し** — v5.3.0 を2度デプロイし2度切り戻した。判明した問題:
+  1. `/about` の `Handler.all` が並列ハンドラ生成で nodeinfo リクエスト嵐 → Mastodon 429（修正済み: `Handler.all_names` に変更）
+  2. nodeinfo に rescue 追加 → `nodeinfo → config.about → max_post_text_length → nodeinfo` の循環呼び出しが無限ループ化しハング。rescue なしでは例外伝播で循環が中断されていた
+  3. `breadcrumbs.slim` が毎リクエスト `sns.node_name` → nodeinfo HTTP 呼び出し。`before` フィルタで毎回 `sns_class.new` するためインスタンスメモ化が効かない
+  4. mulukhiya → Mastodon の通信がパブリック IP アドレス経由のため Rack::Attack の localhost safelist が無効
+  - main ブランチは v5.2.1 にリセット済み。循環呼び出し解消（nodeinfo キャッシュ）が再リリースの前提条件
 
 ## リリース済み: 5.2.1（2026-03-01）
 
@@ -124,6 +130,7 @@ git diff Gemfile.lock
 - [v5-plan.md](v5-plan.md) — 5.0計画の記録（全完了。5.1以降はIssue＋マイルストーンで管理）
 - [upgrade-guide-5.0.md](upgrade-guide-5.0.md) — Wikiの[4.x → 5.0 アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)へのリダイレクト
 - [postmortem-2025-10-rack32.md](postmortem-2025-10-rack32.md) — rack 3.2トークン汚染インシデントの記録
+- [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) — nodeinfo循環呼び出しによる本番全面停止の記録
 
 ## CI
 

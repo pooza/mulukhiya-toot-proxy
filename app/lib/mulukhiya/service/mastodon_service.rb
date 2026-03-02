@@ -5,7 +5,11 @@ module Mulukhiya
     include SNSServiceMethods
 
     def nodeinfo
+      return NodeInfo.instance.data if NodeInfo.instance.cached?
       return super.merge(metadata: {themeColor: theme_color})
+    rescue => e
+      e.log
+      return {}
     end
 
     alias info nodeinfo
