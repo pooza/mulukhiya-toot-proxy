@@ -33,7 +33,7 @@ mulukhiya_listener_start() {
 mulukhiya_listener_stop() {
   cd $mulukhiya_path
   sudo -u $mulukhiya_user /usr/local/bin/bash -lc 'bundle exec bin/listener_daemon.rb stop' 2>/dev/null
-  pkill -u $mulukhiya_user -f 'listener_daemon.rb' 2>/dev/null
+  pkill -9 -u $mulukhiya_user -f 'listener_daemon.rb' 2>/dev/null
   sleep 2
 }
 
