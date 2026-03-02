@@ -4,7 +4,7 @@ module Mulukhiya
       sns.token ||= sns.default_token
       about = config.about
       about[:config][:theme] = {color: sns.theme_color}
-      about[:config][:handlers] = Handler.all_names
+      about[:config][:handlers] = (Handler.all_names || [])
         .reject {|name| config["/handler/#{name}/disable"] == true rescue false}
         .sort.to_a
       @renderer.message = about
