@@ -34,7 +34,8 @@ module Mulukhiya
     end
 
     def nodeinfo
-      return super.merge(mulukhiya: config.about)
+      return NodeInfo.instance.data if NodeInfo.instance.cached?
+      return super
     rescue => e
       e.log
       return {}
