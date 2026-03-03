@@ -32,8 +32,8 @@ module Mulukhiya
             label: controller.status_label,
             max_length: controller.max_length,
           ),
-          capabilities: (self["/#{name}/capabilities"] rescue {}),
-          features: (self["/#{name}/features"] rescue {}),
+          capabilities: self["/#{name}/capabilities"],
+          features: self["/#{name}/features"],
         },
       }
     end

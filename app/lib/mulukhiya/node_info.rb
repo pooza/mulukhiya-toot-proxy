@@ -12,7 +12,6 @@ module Mulukhiya
         raw['metadata'] ||= {}
         raw['metadata']['themeColor'] = service.theme_color
       end
-      redis['nodeinfo'] = raw.to_json
       result = raw.merge('mulukhiya' => config.about)
       redis['nodeinfo'] = result.to_json
     rescue => e
