@@ -32,16 +32,10 @@ module Mulukhiya
             label: controller.status_label,
             max_length: controller.max_length,
           ),
-          capabilities: sub_hash("/#{name}/capabilities"),
-          features: sub_hash("/#{name}/features"),
+          capabilities: self["/#{name}/capabilities"],
+          features: self["/#{name}/features"],
         },
       }
-    end
-
-    private
-
-    def sub_hash(prefix)
-      return keys(prefix).to_h {|k| [k, self["#{prefix}/#{k}"]]}
     end
   end
 end
