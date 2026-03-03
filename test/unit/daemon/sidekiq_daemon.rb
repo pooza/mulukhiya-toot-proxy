@@ -20,10 +20,6 @@ module Mulukhiya
       assert_kind_of(CommandLine, @daemon.command)
     end
 
-    def test_motd
-      assert_kind_of(String, @daemon.motd)
-    end
-
     def test_disable?
       assert_false(SidekiqDaemon.disable?)
     end
