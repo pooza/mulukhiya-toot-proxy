@@ -130,7 +130,7 @@ html lang='ja' data-theme='light'
               this.methods.updateHandlerParams(name, values)
                 .then(_ => {
                   this.restartable = true
-                  Swal.fire({title: '保存しました', icon: 'success', timer: 2000, showConfirmButton: false})
+                  Swal.fire({title: '保存しました', text: '反映には再起動が必要です。', icon: 'success', timer: 3000, showConfirmButton: false})
                 })
                 .catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
