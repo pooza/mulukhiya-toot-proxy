@@ -41,7 +41,7 @@ module Mulukhiya
 
       def alert(values = {})
         log(values)
-        Event.new(:alert).dispatch(self)
+        return Event.new(:alert).dispatch(self)
       end
 
       def source_class

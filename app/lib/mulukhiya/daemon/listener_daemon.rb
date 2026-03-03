@@ -5,7 +5,7 @@ module Mulukhiya
 
     def start(args = [])
       save_config
-      Environment.listener_class.start
+      return Environment.listener_class.start
     end
 
     def command
@@ -22,8 +22,8 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new([File.join(Environment.dir, 'bin/listener_daemon.rb'), 'restart'])
-        .exec(timeout: config['/daemon/restart/timeout/seconds'])
+      return CommandLine.new([File.join(Environment.dir, 'bin/listener_daemon.rb'), 'restart'])
+          .exec(timeout: config['/daemon/restart/timeout/seconds'])
     end
 
     def self.health
