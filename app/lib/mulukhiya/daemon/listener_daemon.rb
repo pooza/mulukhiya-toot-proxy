@@ -14,13 +14,6 @@ module Mulukhiya
       ])
     end
 
-    def motd
-      return [
-        "#{self.class} #{Package.version}",
-        ('Ruby YJIT: Ready' if Environment.jit?),
-      ].compact.join("\n")
-    end
-
     def self.disable?
       return true unless Environment.dbms_class&.config?
       return true unless Environment.account_class.info_token
