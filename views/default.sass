@@ -770,7 +770,7 @@ a:hover
 
 .handler-container
   width: 16em
-  height: 5em
+  min-height: 5em
   border:
     width: 1px
     style: solid
@@ -801,6 +801,40 @@ a:hover
     margin: 0 0.5em
     font:
       size: 0.875em
+  .handler-params
+    margin:
+      top: 0.3em
+    padding:
+      top: 0.3em
+    border:
+      top:
+        style: dotted
+        color: darkgray
+        width: 1px
+    .param-field
+      margin: 0.2em 0
+      label.param-label
+        display: block
+        font:
+          size: 0.75em
+          weight: bold
+      label.param-checkbox
+        font:
+          size: 0.875em
+      input[type="text"], input[type="number"]
+        width: 90%
+        font:
+          size: 0.875em
+      textarea
+        width: 90%
+        font:
+          size: 0.75em
+    .field-update-button-container
+      margin:
+        top: 0.3em
+      button
+        font:
+          size: 0.75em
 
 .field-container
   margin:

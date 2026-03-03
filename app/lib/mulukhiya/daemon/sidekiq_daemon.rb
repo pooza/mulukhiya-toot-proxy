@@ -11,14 +11,6 @@ module Mulukhiya
       ])
     end
 
-    def motd
-      return [
-        `sidekiq -V`.chomp,
-        "Redis DSN: #{config['/sidekiq/redis/dsn']}",
-        ('Ruby YJIT: Ready' if Environment.jit?),
-      ].compact.join("\n")
-    end
-
     def self.username
       return config['/sidekiq/auth/user'] rescue nil
     end
