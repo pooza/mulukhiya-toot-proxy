@@ -88,18 +88,27 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.3.0
+## 開発中: 5.4.0
 
-- **#4113 `/mulukhiya/api/about` のレスポンス拡張（capsicum 対応）** — `status.label`（投稿の呼称）、`status.max_length`（文字数上限）、`theme.color`（テーマ色）、`capabilities`、`features`、`handlers`（有効ハンドラー名一覧）を追加。`config.about` は nodeinfo にもコピーされるため軽量に保ち、HTTP 取得が必要な theme と生成コストのある handlers はルート側でのみ追加
-- **#4121 nodeinfo 依存の見直し** — v5.3.0 を2度デプロイし2度切り戻した。判明した問題:
-  1. `/about` の `Handler.all` が並列ハンドラ生成で nodeinfo リクエスト嵐 → Mastodon 429（修正済み: `Handler.all_names` に変更）
-  2. nodeinfo に rescue 追加 → `nodeinfo → config.about → max_post_text_length → nodeinfo` の循環呼び出しが無限ループ化しハング。rescue なしでは例外伝播で循環が中断されていた
-  3. `breadcrumbs.slim` が毎リクエスト `sns.node_name` → nodeinfo HTTP 呼び出し。`before` フィルタで毎回 `sns_class.new` するためインスタンスメモ化が効かない
-  4. mulukhiya → Mastodon の通信がパブリック IP アドレス経由のため Rack::Attack の localhost safelist が無効
-  - main ブランチは v5.2.1 にリセット済み。循環呼び出し解消（nodeinfo キャッシュ）が再リリースの前提条件
-  - **ステージング検証完了** (2026-03-02): zugoga.b-shock.co.jp（Linode VPS、本番同等のネットワーク構成）で develop ブランチを検証。nodeinfo キャッシュ後 0.10s、循環呼び出し解消、PID ファイル正常、streaming 正常。詳細は [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) の「ステージング検証: zugoga」セクション参照
-- **#4123 ListenerDaemon.health の PID ファイル非依存化** — FreeBSD の daemon(8) が PID ファイルを永続化しない問題。`pgrep -f listener_daemon.rb` フォールバックを追加。併せて rc.d の stop に `pkill -9` フォールバックを追加し、ゾンビプロセスの残留を防止
-- **#4125 起動通知 DM** — サービスマネージャ経由の起動で標準出力が見えなくなったため、お知らせボットから管理者にヘルスチェック結果 + スキーマチェック結果を DM 通知。Sidekiq PID ベースで重複防止。`AccountMethods.admins` クラスメソッド新設（ロールベースの管理者取得）
+- **#4129 メディアカタログ: Misskey 環境でステータス URL が不正**
+- #4127 CI ログの Sequel::Error メッセージを抑制する
+- #4126 起動時の標準出力メッセージを廃止
+- #4115 WebUI: 軽量ハンドラーパラメータの編集機能
+
+## リリース済み: 5.3.0（2026-03-02）
+
+全12 Issue クローズ。nodeinfo 循環呼び出し問題を解消した重要リリース。ステージング検証（zugoga）完了後にリリース。
+
+- **#4121 nodeinfo 依存の見直し** — nodeinfo を Redis にキャッシュし、循環呼び出し・429 エラー・WebUI のレスポンス低下を解消。詳細は [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) を参照
+- **#4098 daemon-spawn gem 廃止** — プロセス管理を OS の init システムに委任。`rake start/stop/restart` を廃止しサービスマネージャへ誘導
+- **#4113 `/mulukhiya/api/about` のレスポンス拡張（capsicum 対応）** — `status.label`、`status.max_length`、`theme.color`、`capabilities`、`features`、`handlers` を追加
+- **#4125 起動通知 DM** — お知らせボットから管理者へヘルスチェック結果 + スキーマチェック結果を DM 通知
+- **#4123 ListenerDaemon.health の PID ファイル非依存化** — `pgrep` フォールバック追加。rc.d の stop に `pkill -9` フォールバック追加
+- #4102 WebUI での設定編集機能の拡充
+- #4119 FreeBSD rc.d: listener restart 時にログが流れ続ける問題の修正
+- #4075 `with_indifferent_access` を `Sinatra::IndifferentHash` に統一
+- #4108 Webhook.create の digest 照合を効率化、#4109 エラーレスポンス改善
+- #4114 未使用ハンドラースキーマ・パラメータの削除、#4110 Webhook digest 回帰テスト追加
 
 ## リリース済み: 5.2.1（2026-03-01）
 
@@ -126,6 +135,7 @@ git diff Gemfile.lock
 - **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
 - **プロジェクト共有すべき知見** → `docs/CLAUDE.md` や `docs/v5-plan.md` など git 管理下のファイルに記載
 - **インフラ情報** → `pooza/chubo2` リポジトリの `docs/infra-note.md` に記載
+- **進捗の同期** → `MEMORY.md` だけでなく `docs/CLAUDE.md` も更新すること。特にリリース済みバージョンの反映（「開発中」→「リリース済み」への変更、次バージョンのセクション追加）を忘れないこと。インフラノート（`pooza/chubo2` の `docs/infra-note.md`）やそのリポジトリの Issue も進捗確認の対象に含めること
 
 ## 重要なドキュメント
 
