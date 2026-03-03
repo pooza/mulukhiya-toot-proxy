@@ -32,6 +32,22 @@ html lang='ja' data-theme='light'
                   .description
                     a href='https://github.com/pooza/mulukhiya-toot-proxy/wiki/#{handler.name}' target='_blank' rel='noreferrer'
                       | このハンドラの説明
+                    template v-if="handlerSchemas['#{handler.underscore}']"
+                      = ' '
+                      a @click.prevent="toggleParams('#{handler.underscore}')" href='#'
+                        i.fa.fa-cog
+                        |  設定
+                  slide-up-down :active="expandedHandler === '#{handler.underscore}'" v-if="handlerSchemas['#{handler.underscore}']"
+                    .handler-params
+                      .param-field v-for="(prop, key) in handlerSchemas['#{handler.underscore}']" :key='key'
+                        label.param-label {{key}}
+                        input v-if="prop.type === 'integer'" type='number' v-model.number="handlerParams['#{handler.underscore}'][key]" :min='prop.minimum' :max='prop.maximum'
+                        label.param-checkbox v-else-if="prop.type === 'boolean'"
+                          input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key]"
+                        input v-else-if="prop.type === 'string'" type='text' v-model.trim="handlerParams['#{handler.underscore}'][key]"
+                        textarea v-else='' v-model="handlerParams['#{handler.underscore}'][key]" rows='3'
+                      .field-update-button-container
+                        button @click="saveHandlerParams('#{handler.underscore}')" 保存
     == slim.render 'fragment/footer'
     script type='module'
       |
@@ -40,11 +56,15 @@ html lang='ja' data-theme='light'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
         import Swal from 'sweetalert2'
+        import jsyaml from 'js-yaml'
         const app = createApp({
           data () {
             return {
               account: {},
               handlers: {},
+              handlerSchemas: {},
+              handlerParams: {},
+              expandedHandler: null,
               restartable: false,
               layout: {
                 details: {
@@ -69,11 +89,49 @@ html lang='ja' data-theme='light'
           },
           async created () {
             this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
-            this.methods.getHandlers().then(e => e.map(v => this.handlers[v.name] = v.disable))
+            this.methods.getHandlers().then(e => e.map(v => {
+              this.handlers[v.name] = v.disable
+              if (v.schema && Object.keys(v.schema).length > 0) {
+                this.handlerSchemas[v.name] = v.schema
+                const params = v.params || {}
+                for (const [key, prop] of Object.entries(v.schema)) {
+                  if (params[key] === null || params[key] === undefined) {
+                    if (prop.type === 'integer') params[key] = prop.minimum || 0
+                    else if (prop.type === 'boolean') params[key] = false
+                    else params[key] = ''
+                  } else if (prop.type === 'array' && Array.isArray(params[key])) {
+                    params[key] = params[key].join('\n')
+                  } else if (prop.type === 'object' && typeof params[key] === 'object') {
+                    params[key] = jsyaml.dump(params[key]).trim()
+                  }
+                }
+                this.handlerParams[v.name] = params
+              }
+            }))
           },
           methods: {
             toggleVisibility (name) {
               this.layout.details[name] = !this.layout.details[name]
+            },
+            toggleParams (name) {
+              this.expandedHandler = this.expandedHandler === name ? null : name
+            },
+            saveHandlerParams (name) {
+              const values = {...this.handlerParams[name]}
+              const schema = this.handlerSchemas[name]
+              for (const [key, prop] of Object.entries(schema)) {
+                if (prop.type === 'array' && typeof values[key] === 'string') {
+                  values[key] = values[key].split('\n').map(s => s.trim()).filter(s => s)
+                } else if (prop.type === 'object' && typeof values[key] === 'string') {
+                  try { values[key] = jsyaml.load(values[key]) } catch (_) {}
+                }
+              }
+              this.methods.updateHandlerParams(name, values)
+                .then(_ => {
+                  this.restartable = true
+                  Swal.fire({title: '保存しました', icon: 'success', timer: 2000, showConfirmButton: false})
+                })
+                .catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             restartPuma () {
               Swal.fire({

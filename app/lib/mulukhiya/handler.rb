@@ -129,6 +129,24 @@ module Mulukhiya
       return Config.load_file('schema/handler/default')
     end
 
+    def editable_schema
+      props = schema['properties'] || {}
+      return props.except('disabled', 'timeout', 'toggleable', 'experimental')
+    end
+
+    def editable_params
+      return editable_schema.to_h {|key, _| [key, handler_config(key.to_sym)]}
+    end
+
+    def validate_params(values)
+      props = editable_schema
+      return values.to_h do |key, value|
+        key = key.to_s
+        raise "Unknown parameter '#{key}'" unless props.key?(key)
+        [key, coerce_value(value, props[key])]
+      end
+    end
+
     def clear
       @result.clear
       @errors.clear
@@ -255,6 +273,30 @@ module Mulukhiya
     end
 
     private
+
+    def coerce_value(value, prop)
+      case prop['type']
+      when 'integer'
+        coerce_integer(value, prop)
+      when 'boolean'
+        [true, 'true'].include?(value)
+      when 'string'
+        value.to_s
+      when 'array'
+        value.is_a?(Array) ? value : Array(value)
+      when 'object'
+        value.is_a?(Hash) ? value : {}
+      else
+        value
+      end
+    end
+
+    def coerce_integer(value, prop)
+      v = value.to_i
+      v = [v, prop['minimum']].max if prop['minimum']
+      v = [v, prop['maximum']].min if prop['maximum']
+      v
+    end
 
     def initialize(params = {})
       @result = Concurrent::Array.new
