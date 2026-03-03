@@ -129,7 +129,12 @@ module Mulukhiya
       return Config.load_file('schema/handler/default')
     end
 
+    EXCLUDED_EDITABLE_HANDLERS = [
+      'dictionary_tag', 'remote_tag', 'removal_rule_tag', 'tagging', 'user_tag'
+    ].freeze
+
     def editable_schema
+      return {} if EXCLUDED_EDITABLE_HANDLERS.include?(underscore)
       props = schema['properties'] || {}
       return props.except('disabled', 'timeout', 'toggleable', 'experimental')
     end
