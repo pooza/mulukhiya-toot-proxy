@@ -40,7 +40,8 @@ html lang='ja' data-theme='light'
                   slide-up-down :active="expandedHandler === '#{handler.underscore}'" v-if="handlerSchemas['#{handler.underscore}']"
                     .handler-params
                       .param-field v-for="(prop, key) in handlerSchemas['#{handler.underscore}']" :key='key'
-                        label.param-label {{key}}
+                        label.param-label
+                          | {{key}}
                         input v-if="prop.type === 'integer'" type='number' v-model.number="handlerParams['#{handler.underscore}'][key]" :min='prop.minimum' :max='prop.maximum'
                         label.param-checkbox v-else-if="prop.type === 'boolean'"
                           input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key]"
