@@ -5,20 +5,13 @@ module Mulukhiya
 
     def start(args = [])
       save_config
-      Environment.listener_class.start
+      return Environment.listener_class.start
     end
 
     def command
       return CommandLine.new([
         File.join(Environment.dir, 'bin/listener_worker.rb'),
       ])
-    end
-
-    def motd
-      return [
-        "#{self.class} #{Package.version}",
-        ('Ruby YJIT: Ready' if Environment.jit?),
-      ].compact.join("\n")
     end
 
     def self.disable?
@@ -29,8 +22,8 @@ module Mulukhiya
     end
 
     def self.restart
-      CommandLine.new([File.join(Environment.dir, 'bin/listener_daemon.rb'), 'restart'])
-        .exec(timeout: config['/daemon/restart/timeout/seconds'])
+      return CommandLine.new([File.join(Environment.dir, 'bin/listener_daemon.rb'), 'restart'])
+          .exec(timeout: config['/daemon/restart/timeout/seconds'])
     end
 
     def self.health

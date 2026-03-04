@@ -41,7 +41,8 @@ module Mulukhiya
           self[row[:id]].to_h.merge(
             status: {
               body: row[:status_text],
-              public_url: Status.create_uri(:public, row).to_s,
+              public_url: Status.create_uri(:public, row.except(:id)).to_s,
+              webui_url: Status.create_uri(:webui, row.except(:id)).to_s,
             },
             account: row.slice(:username, :display_name),
           )

@@ -474,7 +474,12 @@ module Mulukhiya
     get '/admin/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       @renderer.message = Handler.all.map do |handler|
-        {name: handler.underscore, disable: config.disable?(handler)}
+        {
+          name: handler.underscore,
+          disable: config.disable?(handler),
+          schema: handler.editable_schema,
+          params: handler.editable_params,
+        }
       end
       return @renderer.to_s
     rescue => e
@@ -486,7 +491,13 @@ module Mulukhiya
 
     post '/admin/handler/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
-      config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
+      if params.key?(:flag)
+        config.update_file(handler: {params[:handler] => {disable: params[:flag]}})
+      elsif params.key?(:values)
+        handler = Handler.create(params[:handler])
+        validated = handler.validate_params(params[:values])
+        config.update_file(handler: {params[:handler] => validated})
+      end
       return @renderer.to_s
     rescue => e
       e.log
