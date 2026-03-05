@@ -90,6 +90,7 @@ git diff Gemfile.lock
 
 ## 開発中: 5.5.0
 
+- **#4134 Misskey: アップロード時にセンシティブ・説明が保存されない** — MisskeyController とginseng-fediverse で comment/isSensitive/name をAPIに転送。dev23 検証済み
 - #4116 WebUI: 中程度のハンドラーパラメータ編集（オブジェクト・小規模配列）
 - #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
 - #4131 フロントエンド JS のブラウザテスト基盤導入
