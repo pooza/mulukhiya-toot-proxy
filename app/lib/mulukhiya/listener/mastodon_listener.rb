@@ -15,16 +15,16 @@ module Mulukhiya
     end
 
     def handle_mention_notification(payload)
-      Event.new(:mention, {sns:}).dispatch(payload)
+      return Event.new(:mention, {sns:}).dispatch(payload)
     end
 
     def handle_follow_notification(payload)
-      Event.new(:follow, {sns:}).dispatch(payload)
+      return Event.new(:follow, {sns:}).dispatch(payload)
     end
 
     def handle_announcement(payload)
       sleep(Worker.create(:announcement).worker_config(:interval, :seconds))
-      AnnouncementWorker.perform_async
+      return AnnouncementWorker.perform_async
     end
 
     def self.sender(payload)

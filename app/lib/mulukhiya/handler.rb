@@ -286,7 +286,7 @@ module Mulukhiya
       when 'boolean'
         [true, 'true'].include?(value)
       when 'string'
-        value.to_s
+        value.to_s.presence
       when 'array'
         value.is_a?(Array) ? value : Array(value)
       when 'object'
