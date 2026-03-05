@@ -448,6 +448,14 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.updateHandlerParams = async (handler, values) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/admin/handler/config', {token: globals.methods.getToken(), handler: handler, values: values})
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.setInfoToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()

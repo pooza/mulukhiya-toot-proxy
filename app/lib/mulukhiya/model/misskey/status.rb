@@ -80,6 +80,8 @@ module Mulukhiya
         case type.to_sym
         in :public
           return service.create_uri("/notes/#{params[:id]}")
+        in :webui
+          return service.create_uri("/mulukhiya/app/status/#{params[:id]}")
         end
       end
     end

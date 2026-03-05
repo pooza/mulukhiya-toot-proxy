@@ -34,13 +34,14 @@ module Mulukhiya
 
     class ::StandardError
       def log(values = {})
+        return if is_a?(Sequel::Error) && !Environment.dbms_class&.config?
         Logger.new.error({error: self}.merge(values))
         warn(to_h.to_yaml) if Environment.test? && Environment.development?
       end
 
       def alert(values = {})
         log(values)
-        Event.new(:alert).dispatch(self)
+        return Event.new(:alert).dispatch(self)
       end
 
       def source_class

@@ -65,7 +65,11 @@ module Mulukhiya
     post '/api/drive/files/create' do
       verify_token_integrity!
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
-      reporter.response = sns.upload(params.dig(:file, :tempfile))
+      upload_params = {}
+      upload_params[:name] = params[:name] if params[:name]
+      upload_params[:comment] = params[:comment] if params[:comment]
+      upload_params[:isSensitive] = params[:isSensitive] unless params[:isSensitive].nil?
+      reporter.response = sns.upload(params.dig(:file, :tempfile), upload_params)
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code

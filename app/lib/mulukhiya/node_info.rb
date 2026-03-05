@@ -13,7 +13,7 @@ module Mulukhiya
         raw['metadata']['themeColor'] = service.theme_color
       end
       result = raw.merge('mulukhiya' => config.about)
-      redis['nodeinfo'] = result.to_json
+      return redis['nodeinfo'] = result.to_json
     rescue => e
       e.log
     end
