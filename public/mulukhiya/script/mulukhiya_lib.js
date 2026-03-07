@@ -329,14 +329,6 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.createTag = async (id, tag) => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.post('/mulukhiya/api/status/tag', {token: globals.methods.getToken(), id: id, tag: tag})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
-
     globals.methods.updateTags = async (id, tags) => {
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -345,13 +337,6 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.deleteTag = async (id, tag) => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.delete('/mulukhiya/api/status/tag', {data: {token: globals.methods.getToken(), id: id, tag: tag}})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
 
     globals.methods.deleteNowplaying = async id => {
       const indicator = new ActivityIndicator()

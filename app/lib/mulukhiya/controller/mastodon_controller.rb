@@ -24,10 +24,9 @@ module Mulukhiya
       verify_token_integrity!
       filename = params[:name]
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
-      reporter.response = sns.upload(params.dig(:file, :tempfile), {
-        version: api_version,
-        filename:,
-      })
+      upload_params = {version: api_version, filename:}
+      upload_params[:description] = params[:description] if params[:description]
+      reporter.response = sns.upload(params.dig(:file, :tempfile), upload_params)
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
