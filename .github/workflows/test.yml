@@ -29,7 +29,7 @@ jobs:
         run: chmod -R o-w "$(gem environment gemdir)"
       - name: Create CI config
         run: |
-          printf "controller: ${{ matrix.controller }}\ncrypt:\n  password: ci_dummy_password\n${{ matrix.controller }}:\n  url: https://ci.example.com\npostgres:\n  dsn: postgres://localhost/ci\n" > config/local.yaml
+          printf "controller: ${{ matrix.controller }}\ncrypt:\n  password: ci_dummy_password\n${{ matrix.controller }}:\n  url: https://ci.example.com\n" > config/local.yaml
       - name: bundle install
         run: |
           gem install bundler
