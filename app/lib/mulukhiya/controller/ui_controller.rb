@@ -7,6 +7,9 @@ module Mulukhiya
     end
 
     get '/app/:page' do
+      if params[:page] == 'test' && !config['/diag/enable']
+        raise Ginseng::NotFoundError, 'Not Found'
+      end
       @renderer = SlimRenderer.new
       @renderer.template = params[:page]
       @renderer[:oauth_url] = sns.oauth_uri

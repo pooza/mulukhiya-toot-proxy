@@ -1,0 +1,18 @@
+doctype html
+html lang='ja' data-theme='light'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+    link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/mocha@11/mocha.css'
+    script src='https://cdn.jsdelivr.net/npm/mocha@11/mocha.js'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'テスト'}]}
+    main
+      #mocha
+    == slim.render 'fragment/footer'
+    script type='module'
+      |
+        mocha.setup('bdd')
+        await import('/mulukhiya/script/test/mulukhiya_lib_test.js')
+        mocha.run()
