@@ -95,7 +95,7 @@ git diff Gemfile.lock
 - **#4116 WebUI: 中程度のハンドラーパラメータ編集** — object型（media_tag.tags）の子プロパティ展開とobject配列型（tagging.normalize.rules）の追加/削除UIを実装
 - **#4132 WebUI: ハンドラー設定パネルがイベントセクションを突き抜ける** — slide-up-downのenterアニメーション完了後にheight:autoを設定し、ネスト時の高さ追従を修正
 - **#4133 WebUI: ハンドラーが含まれないイベントを非表示にする** — event.all_handlersが空のイベントセクションをスキップ
-- #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
+- **#4124 リスナーの WebSocket 死活監視と異常時の安全な停止** — self.startを基底クラスに統合、指数バックオフ（最大60s）、SIGTERM/SIGINTハンドリング、最大リトライ回数での自発的exit、最終イベント時刻のRedis記録とヘルスチェック
 - #4131 フロントエンド JS のブラウザテスト基盤導入
 
 ## 計画中: 5.6.0（open 1 / closed 0）
