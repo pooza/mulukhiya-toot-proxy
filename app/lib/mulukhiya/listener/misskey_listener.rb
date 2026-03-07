@@ -32,29 +32,6 @@ module Mulukhiya
       e.log
     end
 
-    def self.start
-      EM.run do
-        listener = MisskeyListener.new
-
-        listener.client.on :close do
-          raise 'An unintended disconnection has occurred.'
-        end
-
-        listener.client.on :error do |e|
-          raise Ginseng::GatewayError, (e.message rescue e.to_s)
-        end
-
-        listener.client.on :message do |message|
-          listener.receive(message)
-        end
-      end
-    rescue => e
-      @client = nil
-      e.log
-      sleep(config['/websocket/retry/seconds'])
-      retry
-    end
-
     private
 
     def initialize

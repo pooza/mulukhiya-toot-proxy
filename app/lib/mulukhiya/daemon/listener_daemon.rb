@@ -31,11 +31,17 @@ module Mulukhiya
       if File.exist?(pid_path)
         pid = File.read(pid_path).to_i
         raise "PID '#{pid}' was dead" unless Process.alive?(pid)
-        return {status: 'OK'}
+      else
+        unless system('pgrep', '-f', 'listener_daemon.rb',
+          out: File::NULL, err: File::NULL)
+          raise 'listener process not found'
+        end
       end
-      unless system('pgrep', '-f', 'listener_daemon.rb',
-        out: File::NULL, err: File::NULL)
-        raise 'listener process not found'
+      timestamp = Redis.new.get('listener:last_event')&.to_i
+      if timestamp
+        stale = Time.now.to_i - timestamp
+        threshold = config['/websocket/health/stale_seconds']
+        raise "No events for #{stale}s (threshold: #{threshold}s)" if stale > threshold
       end
       return {status: 'OK'}
     rescue => e
