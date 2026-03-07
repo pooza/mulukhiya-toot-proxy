@@ -88,15 +88,19 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.5.0
+## 開発中: 5.5.0（open 2 / closed 5）
 
 - **#4134 Misskey: アップロード時にセンシティブ・説明が保存されない** — MisskeyController とginseng-fediverse で comment/isSensitive/name をAPIに転送。dev23 検証済み
 - **#4136 Mastodon: アップロード時にalt textが保存されない** — MastodonController とginseng-fediverse で description をAPIに転送。dev04 検証済み
 - **#4116 WebUI: 中程度のハンドラーパラメータ編集** — object型（media_tag.tags）の子プロパティ展開とobject配列型（tagging.normalize.rules）の追加/削除UIを実装
-- #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
-- #4131 フロントエンド JS のブラウザテスト基盤導入
 - **#4132 WebUI: ハンドラー設定パネルがイベントセクションを突き抜ける** — slide-up-downのenterアニメーション完了後にheight:autoを設定し、ネスト時の高さ追従を修正
 - **#4133 WebUI: ハンドラーが含まれないイベントを非表示にする** — event.all_handlersが空のイベントセクションをスキップ
+- #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
+- #4131 フロントエンド JS のブラウザテスト基盤導入
+
+## 計画中: 5.6.0（open 1 / closed 0）
+
+- #4137 ナウプレ系ハンドラーの tagging パラメータを廃止 — デフォルト `false` で全サーバー未使用。`DictionaryTagHandler` がカバーしており不要
 
 ## リリース済み: 5.4.0（2026-03-04）
 
