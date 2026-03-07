@@ -47,6 +47,29 @@ html lang='ja' data-theme='light'
                         label.param-checkbox v-else-if="prop.type === 'boolean'"
                           input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key]"
                         input v-else-if="prop.type === 'string'" type='text' v-model.trim="handlerParams['#{handler.underscore}'][key]"
+                        template v-else-if="prop.type === 'object' && prop.properties"
+                          .object-fields
+                            template v-for="(subProp, subKey) in prop.properties" :key='subKey'
+                              template v-if="subProp.type === 'array' && subProp.items && subProp.items.properties"
+                                .array-field
+                                  label.param-label
+                                    | {{subKey}}
+                                  .array-item v-for="(item, idx) in handlerParams['#{handler.underscore}'][key][subKey]" :key='idx'
+                                    .array-item-fields
+                                      .param-field v-for="(itemProp, itemKey) in subProp.items.properties" :key='itemKey'
+                                        label.param-label
+                                          | {{itemKey}}
+                                        input type='text' v-model.trim="item[itemKey]"
+                                    button.btn-remove @click="removeArrayItem('#{handler.underscore}', key, subKey, idx)" ✕
+                                  button.btn-add @click="addArrayItem('#{handler.underscore}', key, subKey, prop)"
+                                    | + 追加
+                              .param-field v-else=''
+                                label.param-label
+                                  | {{subKey}}
+                                input v-if="subProp.type === 'string'" type='text' v-model.trim="handlerParams['#{handler.underscore}'][key][subKey]"
+                                input v-else-if="subProp.type === 'integer'" type='number' v-model.number="handlerParams['#{handler.underscore}'][key][subKey]" :min='subProp.minimum' :max='subProp.maximum'
+                                label.param-checkbox v-else-if="subProp.type === 'boolean'"
+                                  input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key][subKey]"
                         textarea v-else='' v-model="handlerParams['#{handler.underscore}'][key]" rows='3'
                       .field-update-button-container
                         button @click="saveHandlerParams('#{handler.underscore}')" 保存
@@ -100,7 +123,10 @@ html lang='ja' data-theme='light'
                   if (params[key] === null || params[key] === undefined) {
                     if (prop.type === 'integer') params[key] = prop.minimum || 0
                     else if (prop.type === 'boolean') params[key] = false
+                    else if (prop.type === 'object' && prop.properties) params[key] = this.initObject(prop)
                     else params[key] = ''
+                  } else if (prop.type === 'object' && prop.properties) {
+                    params[key] = this.initObjectValue(params[key], prop)
                   } else if (prop.type === 'array' && Array.isArray(params[key])) {
                     params[key] = params[key].join('\n')
                   } else if (prop.type === 'object' && typeof params[key] === 'object') {
@@ -122,7 +148,9 @@ html lang='ja' data-theme='light'
               const values = {...this.handlerParams[name]}
               const schema = this.handlerSchemas[name]
               for (const [key, prop] of Object.entries(schema)) {
-                if (prop.type === 'array' && typeof values[key] === 'string') {
+                if (prop.type === 'object' && prop.properties) {
+                  // structured object — send as-is
+                } else if (prop.type === 'array' && typeof values[key] === 'string') {
                   values[key] = values[key].split('\n').map(s => s.trim()).filter(s => s)
                 } else if (prop.type === 'object' && typeof values[key] === 'string') {
                   try { values[key] = jsyaml.load(values[key]) } catch (_) {}
@@ -160,6 +188,37 @@ html lang='ja' data-theme='light'
                   }).catch(e => Swal.fire({title: '再起動エラー', text: e.message, icon: 'error'}))
                 })
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
+            },
+            initObject (prop) {
+              const obj = {}
+              for (const [k, sub] of Object.entries(prop.properties)) {
+                if (sub.type === 'array') obj[k] = []
+                else if (sub.type === 'integer') obj[k] = sub.minimum || 0
+                else if (sub.type === 'boolean') obj[k] = false
+                else obj[k] = ''
+              }
+              return obj
+            },
+            initObjectValue (val, prop) {
+              const obj = val || {}
+              for (const [k, sub] of Object.entries(prop.properties)) {
+                if (obj[k] === null || obj[k] === undefined) {
+                  if (sub.type === 'array') obj[k] = []
+                  else if (sub.type === 'integer') obj[k] = sub.minimum || 0
+                  else if (sub.type === 'boolean') obj[k] = false
+                  else obj[k] = ''
+                }
+              }
+              return obj
+            },
+            addArrayItem (handler, key, subKey, prop) {
+              const items = prop.properties[subKey].items
+              const row = {}
+              for (const k of Object.keys(items.properties)) { row[k] = '' }
+              this.handlerParams[handler][key][subKey].push(row)
+            },
+            removeArrayItem (handler, key, subKey, idx) {
+              this.handlerParams[handler][key][subKey].splice(idx, 1)
             },
             onChangeHandler (e) {
               this.methods.toggleHandler(e.target.value, e.target.checked)
