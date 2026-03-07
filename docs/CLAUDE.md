@@ -92,7 +92,7 @@ git diff Gemfile.lock
 
 - **#4134 Misskey: アップロード時にセンシティブ・説明が保存されない** — MisskeyController とginseng-fediverse で comment/isSensitive/name をAPIに転送。dev23 検証済み
 - **#4136 Mastodon: アップロード時にalt textが保存されない** — MastodonController とginseng-fediverse で description をAPIに転送。dev04 検証済み
-- #4116 WebUI: 中程度のハンドラーパラメータ編集（オブジェクト・小規模配列）
+- **#4116 WebUI: 中程度のハンドラーパラメータ編集** — object型（media_tag.tags）の子プロパティ展開とobject配列型（tagging.normalize.rules）の追加/削除UIを実装
 - #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
 - #4131 フロントエンド JS のブラウザテスト基盤導入
 - **#4132 WebUI: ハンドラー設定パネルがイベントセクションを突き抜ける** — slide-up-downのenterアニメーション完了後にheight:autoを設定し、ネスト時の高さ追従を修正
