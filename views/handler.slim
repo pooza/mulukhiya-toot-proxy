@@ -13,6 +13,7 @@ html lang='ja' data-theme='light'
         button @click='restartPuma' 再起動
         p.alert 再起動している間（数十秒程度）は操作できなくなります。
       - Mulukhiya::Event.all do |event|
+        - next unless event.all_handlers.any?
         section.config v-if='account.is_admin'
           h3 @click='toggleVisibility("#{event.name}")' = "#{event.name} イベント"
           slide-up-down :active='layout.details.#{event.name}'
