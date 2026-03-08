@@ -94,6 +94,15 @@ module Mulukhiya
       @renderer.status = 404
     end
 
+    get '/script/test/:name' do
+      raise Ginseng::NotFoundError, 'Not Found' unless config['/diag/enable']
+      @renderer = ScriptRenderer.new
+      @renderer.name = "test/#{params[:name]}"
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    end
+
     get '/script/:name' do
       @renderer = ScriptRenderer.new
       @renderer.name = params[:name]
