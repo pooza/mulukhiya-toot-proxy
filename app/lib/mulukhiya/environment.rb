@@ -189,7 +189,6 @@ module Mulukhiya
         redis: Redis.health,
         sidekiq: SidekiqDaemon.health,
       }
-      values[:streaming] = ListenerDaemon.health if daemon_classes.member?(ListenerDaemon)
       values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
       values[:status] ||= 200
