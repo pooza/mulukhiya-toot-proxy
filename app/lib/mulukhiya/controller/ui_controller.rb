@@ -7,6 +7,9 @@ module Mulukhiya
     end
 
     get '/app/:page' do
+      if params[:page] == 'test' && !config['/diag/enable']
+        raise Ginseng::NotFoundError, 'Not Found'
+      end
       @renderer = SlimRenderer.new
       @renderer.template = params[:page]
       @renderer[:oauth_url] = sns.oauth_uri
@@ -86,6 +89,15 @@ module Mulukhiya
     get '/style/:name' do
       @renderer = CSSRenderer.new
       @renderer.template = params[:name]
+      return @renderer.to_s
+    rescue Ginseng::RenderError, Ginseng::NotFoundError
+      @renderer.status = 404
+    end
+
+    get '/script/test/:name' do
+      raise Ginseng::NotFoundError, 'Not Found' unless config['/diag/enable']
+      @renderer = ScriptRenderer.new
+      @renderer.name = "test/#{params[:name]}"
       return @renderer.to_s
     rescue Ginseng::RenderError, Ginseng::NotFoundError
       @renderer.status = 404

@@ -15,7 +15,8 @@ module Mulukhiya
           :handler => Handler.all_schema,
         )
         @schema[:required].push('controller') unless Environment.controller_name == 'mastodon'
-        @schema[:required].push(Environment.controller_name, Environment.dbms_name)
+        @schema[:required].push(Environment.controller_name)
+        @schema[:required].push(Environment.dbms_name) if Environment.dbms_class&.config?
         @schema.deep_stringify_keys!
       end
       return @schema

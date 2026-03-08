@@ -88,15 +88,30 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 予定: 5.5.0
+## 開発中: 5.5.0（open 2 / closed 5）
 
-- #4116 WebUI: 中程度のハンドラーパラメータ編集（オブジェクト・小規模配列）
-- #4124 リスナーの WebSocket 死活監視と異常時の安全な停止
+- **#4134 Misskey: アップロード時にセンシティブ・説明が保存されない** — MisskeyController とginseng-fediverse で comment/isSensitive/name をAPIに転送。dev23 検証済み
+- **#4136 Mastodon: アップロード時にalt textが保存されない** — MastodonController とginseng-fediverse で description をAPIに転送。dev04 検証済み
+- **#4116 WebUI: 中程度のハンドラーパラメータ編集** — object型（media_tag.tags）の子プロパティ展開とobject配列型（tagging.normalize.rules）の追加/削除UIを実装
+- **#4132 WebUI: ハンドラー設定パネルがイベントセクションを突き抜ける** — slide-up-downのenterアニメーション完了後にheight:autoを設定し、ネスト時の高さ追従を修正
+- **#4133 WebUI: ハンドラーが含まれないイベントを非表示にする** — event.all_handlersが空のイベントセクションをスキップ
+- **#4124 リスナーの WebSocket 死活監視と異常時の安全な停止** — self.startを基底クラスに統合、指数バックオフ（最大60s）、SIGTERM/SIGINTハンドリング、最大リトライ回数での自発的exit、最終イベント時刻のRedis記録とヘルスチェック
 - #4131 フロントエンド JS のブラウザテスト基盤導入
 
-## 開発中: 5.4.0
+## 計画中: 5.6.0（open 2 / closed 0）
 
-全 Issue 実装済み。ステージング検証後にリリース予定。
+- #4137 ナウプレ系ハンドラーの tagging パラメータを廃止 — デフォルト `false` で全サーバー未使用。`DictionaryTagHandler` がカバーしており不要
+- #4139 アップロード時のペイロード調整をginseng-fediverseに移動 — コントローラで行っているアップロードパラメータの組み立てをサービスクライアント層の責務に移す
+
+## リリース済み: 5.4.0（2026-03-04）
+
+全5 Issue クローズ。WebUI ハンドラーパラメータ編集機能の追加と `/about` API の修正。
+
+- **#4115 WebUI: 軽量ハンドラーパラメータの編集機能** — boolean・数値・文字列などの単純なパラメータを WebUI から直接編集可能に
+- **#4128 `/about` の capabilities・features が空になる問題を修正**
+- **#4129 メディアカタログ: Misskey 環境でステータス URL が不正になる問題を修正**
+- #4126 起動時の標準出力メッセージを廃止
+- #4127 CI ログの Sequel::Error メッセージを抑制
 
 ## リリース済み: 5.3.0（2026-03-02）
 

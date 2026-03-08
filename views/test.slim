@@ -1,0 +1,21 @@
+doctype html
+html lang='ja' data-theme='light'
+  head
+    == slim.render 'fragment/metadata'
+    link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/mocha@11/mocha.css'
+    script src='https://cdn.jsdelivr.net/npm/mocha@11/mocha.js'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    - crumbs = [{label: 'テスト', href: '/mulukhiya/app/test'}]
+    - crumbs << {label: params[:grep]} if params[:grep]
+    == slim.render 'fragment/breadcrumbs', {entries: crumbs}
+    main
+      #mocha
+    == slim.render 'fragment/footer'
+    script type='module'
+      |
+        mocha.setup('bdd')
+        await import('/mulukhiya/script/test/mulukhiya_lib_test.js')
+        await import('/mulukhiya/script/test/handler_form_test.js')
+        mocha.run()
