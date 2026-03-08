@@ -15,6 +15,7 @@ module Mulukhiya
     end
 
     def default_max_length
+      return unless service
       length = service.max_post_text_length
       length -= [:default_tag, :user_tag]
         .filter_map {|name| Handler.create(name)}
@@ -25,7 +26,7 @@ module Mulukhiya
       return length
     rescue => e
       e.log(text:)
-      return service.max_post_text_length
+      return service&.max_post_text_length
     end
   end
 end

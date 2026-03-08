@@ -407,7 +407,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.4.0
+  version: 5.5.1
 parser:
   note:
     fields:
@@ -629,6 +629,10 @@ websocket:
   keepalive: 15
   retry:
     seconds: 5
+    max_seconds: 60
+    max_count: 20
+  health:
+    stale_seconds: 600
 webui:
   importmap:
     development:
@@ -636,6 +640,8 @@ webui:
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
+      chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
       slide_toggle: /mulukhiya/script/slide_toggle
@@ -648,6 +654,8 @@ webui:
       '@vueform/multiselect': https://cdn.jsdelivr.net/npm/@vueform/multiselect@2.6/dist/multiselect.mjs
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
+      chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
       slide_toggle: /mulukhiya/script/slide_toggle

@@ -20,7 +20,10 @@ export const SlideUpDown = {
         el.style.height = h
         el.style.opacity = '1'
       })
-      setTimeout(done, 300)
+      setTimeout(() => {
+        el.style.height = 'auto'
+        done()
+      }, 300)
     },
     leave(el, done) {
       el.style.transition = 'height 0.3s ease, opacity 0.3s ease'

@@ -29,6 +29,75 @@ module Mulukhiya
       logger.info({listener: underscore}.merge(message))
     end
 
+    def self.start
+      @stopping = false
+      @retry_count = 0
+      setup_signal_handlers
+      run_event_loop
+    rescue => e
+      return if @stopping
+      handle_retry(e)
+      return if @stopping
+      retry
+    end
+
+    def self.run_event_loop
+      EM.run do
+        listener = new
+        listener.client.on :close do
+          raise 'An unintended disconnection has occurred.'
+        end
+        listener.client.on :error do |e|
+          raise Ginseng::GatewayError, (e.message rescue e.to_s)
+        end
+        listener.client.on :message do |message|
+          @retry_count = 0
+          touch_last_event
+          listener.receive(message)
+        end
+      end
+    end
+
+    def self.handle_retry(err)
+      @client = nil
+      err.log
+      @retry_count += 1
+      if @retry_count >= config['/websocket/retry/max_count']
+        logger.error(message: 'Max retries exceeded', count: @retry_count)
+        exit 1
+      end
+      logger.info(message: 'Retrying', count: @retry_count, delay: retry_delay)
+      interruptible_sleep(retry_delay)
+    end
+
+    def self.setup_signal_handlers
+      ['TERM', 'INT'].each do |sig|
+        Signal.trap(sig) do
+          @stopping = true
+          EM.stop if EM.reactor_running?
+        end
+      end
+    end
+
+    def self.retry_delay
+      base = config['/websocket/retry/seconds']
+      max = config['/websocket/retry/max_seconds']
+      return [base * (2**(@retry_count - 1)), max].min
+    end
+
+    def self.interruptible_sleep(seconds)
+      seconds.to_i.times do
+        return if @stopping
+        sleep(1)
+      end
+    end
+
+    def self.touch_last_event
+      Redis.new.set('listener:last_event', Time.now.to_i)
+    rescue
+      nil
+    end
+
     private
 
     def initialize
