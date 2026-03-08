@@ -15,6 +15,9 @@ $monospace: Inconsolata, monospace
   --pico-primary: var(--accent-color)
   --pico-primary-hover: var(--accent-color)
   --pico-primary-background: var(--accent-bg)
+  // Mocha ダークモード無効化
+  --mocha-bg-color: #fff
+  --mocha-color: #000
 
 // Vue FOUC防止
 [v-cloak]
@@ -983,12 +986,6 @@ code
   background: transparent
 
 // Mocha テストランナー
-nav.test-nav
-  margin: 0 0.5em
-  font:
-    family: $sans-serif
-    size: 0.875em
-
 #mocha
   font:
     family: $serif
