@@ -9,6 +9,8 @@ html lang='ja' data-theme='light'
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'テスト'}]}
     main
+      nav.test-nav
+        a href='/mulukhiya/app/test' 全テスト一覧
       #mocha
     == slim.render 'fragment/footer'
     script type='module'

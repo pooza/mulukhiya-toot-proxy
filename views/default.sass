@@ -983,32 +983,75 @@ code
   background: transparent
 
 // Mocha テストランナー
+nav.test-nav
+  margin: 0 0.5em
+  font:
+    family: $sans-serif
+    size: 0.875em
+
 #mocha
   font:
     family: $serif
-  h2
+  h1, h2
     font:
       family: $sans-serif
       size: 1.2em
     margin: 0.5em
     border: none
+    background:
+      image: none
+    text:
+      align: left
+    line:
+      height: normal
   li
     list-style: disc
   a
     color: royalblue
-  .test.pass
-    color: #080
-  .test.fail
-    color: #c00
-  button.replay
+  a.replay
     display: inline
     background: transparent
     border: none
     padding: 0
     margin: 0
     font:
-      size: 0.875em
+      size: 0.75em
     color: dimgray
     width: auto
+    text:
+      decoration: none
+  a.replay:hover
+    color: black
+  .test.pass
+    color: #080
+  .test.fail
+    color: #c00
   .progress
     display: none
+  #mocha-stats
+    position: fixed
+    top: auto
+    bottom: 0
+    right: 0
+    margin: 0
+    padding: 0.3em 1em
+    background:
+      color: white
+    border:
+      top:
+        style: solid
+        width: 1px
+        color: darkgray
+      left:
+        style: solid
+        width: 1px
+        color: darkgray
+      radius: 6px 0 0 0
+    font:
+      family: $sans-serif
+      size: 0.75em
+    opacity: 0.9
+    li
+      display: inline-block
+      list-style: none
+      margin: 0 0.5em
