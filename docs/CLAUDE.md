@@ -228,6 +228,21 @@ test/
 - パッチリリース（5.0.x 等）は致命的な不具合時のみ
 - 通常の機能追加・改善はマイナーバージョン（5.1.0 等）でまとめてリリース
 
+### ホットフィックス手順
+
+緊急パッチリリースの手順。通常リリースと異なり、develop → main マージではなく main に直接コミットする場合がある。
+
+1. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
+2. **コミット・プッシュ**: develop（またはmain）にコミットしてプッシュ
+3. **mainへマージ**: developで作業した場合は main へPRを作成しマージ
+4. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
+5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
+6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
+
+バージョンが記載されている場所:
+
+- **`config/application.yaml`** `/mulukhiya/version` — **唯一の正本**。`/mulukhiya/api/about` 等で参照される
+
 ### マイルストーン管理
 
 - 1マイルストーンあたり10件前後で区切る
