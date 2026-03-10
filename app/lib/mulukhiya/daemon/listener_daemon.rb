@@ -37,15 +37,17 @@ module Mulukhiya
           raise 'listener process not found'
         end
       end
-      timestamp = Redis.new.get('listener:last_event')&.to_i
-      if timestamp
-        stale = Time.now.to_i - timestamp
-        threshold = config['/websocket/health/stale_seconds']
-        raise "No events for #{stale}s (threshold: #{threshold}s)" if stale > threshold
-      end
+      check_streaming_endpoint if Environment.mastodon?
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}
+    end
+
+    def self.check_streaming_endpoint
+      uri = Ginseng::URI.parse(config['/mastodon/url'])
+      uri.path = '/api/v1/streaming/health'
+      response = HTTP.new.get(uri)
+      raise "streaming returned #{response.code}" unless response.code == 200
     end
   end
 end

@@ -100,7 +100,6 @@ handler:
   itunes_nowplaying:
     timeout: 10
   itunes_url_nowplaying:
-    tagging: false
     timeout: 10
   line_alert:
     id: null
@@ -115,7 +114,6 @@ handler:
       image: image
       video: video
   peer_tube_url_nowplaying:
-    tagging: false
     timeout: 10
   poipiku_image:
     timeout: 10
@@ -146,7 +144,6 @@ handler:
   spotify_nowplaying:
     timeout: 10
   spotify_url_nowplaying:
-    tagging: true
     timeout: 10
   tagging:
     normalize:
@@ -164,7 +161,6 @@ handler:
     disable: true
     timeout: 10
   you_tube_url_nowplaying:
-    tagging: false
     timeout: 10
   pipeline:
     base:
@@ -505,13 +501,6 @@ service:
     urls:
       lookup: https://itunes.apple.com/lookup
       search: https://itunes.apple.com/search
-  lemmy:
-    api:
-      version: v3
-    communities:
-      limit: 50
-    subject:
-      max_length: 200
   line:
     id: null
     token: null
@@ -631,8 +620,6 @@ websocket:
     seconds: 5
     max_seconds: 60
     max_count: 20
-  health:
-    stale_seconds: 600
 webui:
   importmap:
     development:
