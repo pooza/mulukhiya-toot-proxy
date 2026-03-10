@@ -90,7 +90,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/data/media_catalog` | `/media` |
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
-| `/{controller}/features/annict` | `/annict/auth`, `/tagging/dic/annict/episodes` |
+| `/{controller}/features/annict` | `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
 
 ## モロヘイヤ検出プロトコル
 
@@ -508,6 +508,87 @@ NowPlaying 情報を除去して再投稿する。
 - **認証**: オプショナル
 - **前提条件**: `/program/urls` が設定されていること（未設定時は 404）
 - **パラメータ**: なし
+
+#### GET /mulukhiya/api/program/works
+
+Annict 作品をキーワード検索する。
+
+- **認証**: オプショナル（ユーザーの Annict トークンがあれば使用、なければお知らせボットの Annict トークンにフォールバック。いずれもない場合 401）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `q` | string | 任意 | 検索キーワード（スペース区切りで複数指定可）。省略時は `config/application.yaml` の `/annict/works` に設定済みのキーワードで検索 |
+
+**レスポンス例**:
+
+```json
+[
+  {
+    "annictId": 9569,
+    "title": "わんだふるぷりきゅあ！",
+    "seasonYear": 2024,
+    "officialSiteUrl": "https://www.toei-anim.co.jp/tv/precure/",
+    "hashtag": "わんだふるぷりきゅあ",
+    "hashtag_url": "https://mstdn.example.com/tags/わんだふるぷりきゅあ",
+    "command_toot": "/np わんだふるぷりきゅあ！"
+  }
+]
+```
+
+| フィールド | 型 | 説明 |
+|-----------|-----|------|
+| `annictId` | integer | Annict 作品 ID |
+| `title` | string | 作品タイトル |
+| `seasonYear` | integer | 放送年 |
+| `officialSiteUrl` | string \| null | 公式サイト URL |
+| `hashtag` | string | 作品タイトルから生成されたハッシュタグ |
+| `hashtag_url` | string | SNS 上のハッシュタグ URL |
+| `command_toot` | string | NowPlaying 投稿用コマンド文字列 |
+| `viewerStatusState` | string | 視聴ステータス（ユーザーの Annict トークン使用時のみ） |
+
+#### GET /mulukhiya/api/program/works/:id/episodes
+
+指定した作品のエピソード一覧を取得する。
+
+- **認証**: 不要（お知らせボットの Annict トークンを使用。未設定の場合 401）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
+- **注意**: capsicum 等のクライアントからはモロヘイヤの Bearer トークン認証不要。Annict の別トークンも不要（サーバー側のお知らせボットが Annict API にアクセスする）
+
+**パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `:id` | integer | 必須 | Annict 作品 ID（URL パス） |
+
+**レスポンス例**:
+
+```json
+[
+  {
+    "annictId": 291706,
+    "numberText": "第1話",
+    "title": "こむぎとまゆ",
+    "hashtag": "こむぎとまゆ",
+    "hashtag_uri": "https://mstdn.example.com/tags/こむぎとまゆ",
+    "url": "https://annict.com/works/9569/episodes/291706",
+    "hashtag_url": "https://mstdn.example.com/tags/こむぎとまゆ",
+    "command_toot": "/np わんだふるぷりきゅあ！ 第1話「こむぎとまゆ」"
+  }
+]
+```
+
+| フィールド | 型 | 説明 |
+|-----------|-----|------|
+| `annictId` | integer | Annict エピソード ID |
+| `numberText` | string | 話数テキスト（「第1話」等） |
+| `title` | string | サブタイトル |
+| `hashtag` | string | サブタイトルから生成されたハッシュタグ |
+| `hashtag_uri` | string | SNS 上のハッシュタグ URI（内部表現） |
+| `url` | string | Annict 上のエピソードページ URL |
+| `hashtag_url` | string | SNS 上のハッシュタグ URL |
+| `command_toot` | string | NowPlaying 投稿用コマンド文字列（タイトル・話数・サブタイトル含む） |
 
 #### Webhook
 
