@@ -620,8 +620,6 @@ websocket:
     seconds: 5
     max_seconds: 60
     max_count: 20
-  health:
-    stale_seconds: 600
 webui:
   importmap:
     development:
