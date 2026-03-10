@@ -22,11 +22,12 @@ module Mulukhiya
 
     post '/api/:version/media' do
       verify_token_integrity!
-      filename = params[:name]
       Event.new(:pre_upload, {reporter:, sns:}).dispatch(params)
-      upload_params = {version: api_version, filename:}
-      upload_params[:description] = params[:description] if params[:description]
-      reporter.response = sns.upload(params.dig(:file, :tempfile), upload_params)
+      reporter.response = sns.upload(params.dig(:file, :tempfile), {
+        version: api_version,
+        filename: params[:name],
+        description: params[:description],
+      }.compact)
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)
       @renderer.status = reporter.response.code
