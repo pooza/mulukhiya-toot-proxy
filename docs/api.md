@@ -91,7 +91,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/data/media_catalog` | `/media` |
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
-| `/{controller}/features/annict` | `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
+| `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
 
 ## モロヘイヤ検出プロトコル
 
@@ -615,16 +615,28 @@ capsicum のエピソードブラウザが利用する。
 
 #### 認証フロー
 
-1. クライアントが Annict の認可 URL をブラウザで開く:
-
-```
-https://annict.com/oauth/authorize?client_id={client_id}&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=read
-```
-
-2. ユーザーが Annict 上で認可すると、認可コードが画面に表示される（OOB 方式）
-3. クライアントが `POST /mulukhiya/api/annict/auth` に認可コードを送信
+1. クライアントが `GET /mulukhiya/api/annict/oauth_uri` で認可 URL を取得する
+2. 取得した URL をブラウザで開く
+3. ユーザーが Annict 上で認可すると、認可コードが画面に表示される（OOB 方式）
+4. クライアントが `POST /mulukhiya/api/annict/auth` に認可コードを送信
 4. モロヘイヤがコードをアクセストークンに交換し、ユーザー設定に保存
 5. 以降の Annict 関連エンドポイントは保存済みトークンを使用
+
+#### GET /mulukhiya/api/annict/oauth_uri
+
+Annict の OAuth 認可 URL を取得する。クライアントはこの URL をブラウザで開き、ユーザーに認可を求める。
+
+- **認証**: 不要
+- **前提条件**: `/{controller}/features/annict` が `true`
+- **パラメータ**: なし
+
+**レスポンス例**:
+
+```json
+{
+  "oauth_uri": "https://annict.com/oauth/authorize?client_id=...&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=read"
+}
+```
 
 #### POST /mulukhiya/api/annict/auth
 
