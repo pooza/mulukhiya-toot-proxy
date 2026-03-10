@@ -320,6 +320,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/annict/oauth_uri' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/annict/auth' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
