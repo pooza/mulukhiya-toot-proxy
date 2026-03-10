@@ -501,13 +501,6 @@ service:
     urls:
       lookup: https://itunes.apple.com/lookup
       search: https://itunes.apple.com/search
-  lemmy:
-    api:
-      version: v3
-    communities:
-      limit: 50
-    subject:
-      max_length: 200
   line:
     id: null
     token: null
