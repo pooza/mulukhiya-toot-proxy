@@ -1,7 +1,32 @@
 module Mulukhiya
-  class PiefedClipper < LemmyClipper
+  class PiefedClipper
+    include Package
+    include SNSMethods
+
+    attr_reader :http
+
+    def initialize(params = {})
+      @params = params.deep_symbolize_keys
+      @http = HTTP.new
+      @http.base_uri = uri
+      logger.info(clipper: self.class.to_s, method: __method__, url: uri.to_s)
+    end
+
     def api_version
       return config['/service/piefed/api/version']
+    end
+
+    def uri
+      @uri ||= Ginseng::URI.parse("https://#{Ginseng::URI.parse(@params[:url]).host}")
+      return @uri
+    end
+
+    def username
+      return @params[:user]
+    end
+
+    def password
+      return @params[:password].decrypt rescue @params[:password]
     end
 
     def login
