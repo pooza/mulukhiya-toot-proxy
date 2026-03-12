@@ -270,6 +270,16 @@ test/
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
 - `target-branch`: v4（4.x向け）と develop（5.x向け）の2エントリ
 
+### Codexレビュー確認
+
+PRマージ後にCodex（chatgpt-codex-connector[bot]）のレビューコメントが遅れて届くことがある。セッション開始時に最近マージされたPRのレビューコメントを確認し、未対応の有益な指摘があれば対応すること。
+
+```bash
+# 最近マージされたPRのCodexレビューコメントを確認
+gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments \
+  --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | {body: .body[:200], path: .path}'
+```
+
 ## 既知の注意事項
 
 ### rack 3.2問題
