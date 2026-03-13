@@ -82,7 +82,7 @@ describe('config_form', () => {
       const options = extractVisibilityOptions(data)
       assert.equal(options.length, 2)
       assert.equal(options[0].value, 'public')
-      assert.equal(options[0].label, '公開 (public)')
+      assert.equal(options[0].label, 'public (公開)')
       assert.equal(options[1].value, 'unlisted')
     })
 
@@ -177,7 +177,7 @@ describe('config_form', () => {
       const form = {tags: 'tag1', program: {minutes: null}, decoration: {id: null}}
       const cmd = buildTagsCommand(form)
       assert.deepEqual(cmd.tagging.user_tags, ['tag1'])
-      assert.isUndefined(cmd.tagging.minutes)
+      assert.isNull(cmd.tagging.minutes)
     })
   })
 
