@@ -611,7 +611,7 @@ capsicum のエピソードブラウザが利用する。
 
 - `/{controller}/features/annict` が `true` であること（`GET /about` の `config.features.annict` で確認可能）
 - `AnnictService.config?` が `true`（`/service/annict/oauth/client/id` と `/service/annict/oauth/client/secret` が設定済み）
-- 各エンドポイントの利用には、ユーザーごとの Annict OAuth トークンが必要（SNS の Bearer トークンとは別）
+- 作品検索（`GET /program/works`）はユーザーの Annict トークンがなくてもお知らせボットのトークンで動作する。エピソード取得（`GET /program/works/:id/episodes`、`GET /tagging/dic/annict/episodes`）はお知らせボットのトークンのみ使用する。ユーザーの Annict OAuth が必要なのは `POST /annict/auth`（トークン取得）と、`GET /program/works` で視聴ステータスを取得する場合のみ
 
 #### 認証フロー
 
@@ -670,67 +670,23 @@ Annict の OAuth 認可コードをアクセストークンに交換し、ユー
 
 #### GET /mulukhiya/api/program/works
 
-Annict の作品をキーワード検索する。
+Annict の作品をキーワード検索する。パラメータ・レスポンスの詳細は上記 P4 セクションを参照。
 
-- **認証**: 必須（Annict トークン。未認証時は 401）
-- **前提条件**: `/{controller}/features/annict` が `true`
-- **パラメータ**:
-
-| 名前 | 型 | 必須 | 説明 |
-|------|-----|------|------|
-| `q` | string | 任意 | 検索キーワード（省略時はサーバー設定のデフォルト作品リスト） |
-
-**レスポンス例**:
-
-```json
-[
-  {
-    "annictId": 7879,
-    "title": "わんだふるぷりきゅあ！",
-    "seasonYear": 2024,
-    "officialSiteUrl": "https://www.toei-anim.co.jp/tv/wonderfulprecure/",
-    "hashtag": "#precure",
-    "hashtag_url": "https://mstdn.example.com/tags/precure",
-    "command_toot": "command: user_config\ntagging:\n  user_tags:\n    - わんだふるぷりきゅあ！\n    - 実況\n    - エア番組"
-  }
-]
-```
+- **認証**: オプショナル（ユーザーの Annict トークンがあれば使用、なければお知らせボットの Annict トークンにフォールバック。いずれもない場合 401）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 
 #### GET /mulukhiya/api/program/works/:id/episodes
 
-指定した作品のエピソード一覧を取得する。
+指定した作品のエピソード一覧を取得する。パラメータ・レスポンスの詳細は上記 P4 セクションを参照。
 
-- **認証**: 必須（Annict トークン。未認証時は 401）
-- **前提条件**: `/{controller}/features/annict` が `true`
-- **パラメータ**:
-
-| 名前 | 型 | 必須 | 説明 |
-|------|-----|------|------|
-| `id` | integer | 必須 | Annict 作品 ID（パスパラメータ） |
-
-**レスポンス例**:
-
-```json
-[
-  {
-    "annictId": 138263,
-    "numberText": "第24話",
-    "title": "みんなの絆！わんだふる〜！",
-    "hashtag": "#precure",
-    "hashtag_uri": "https://mstdn.example.com/tags/precure",
-    "url": "https://annict.com/works/7879/episodes/138263",
-    "command_toot": "command: user_config\ntagging:\n  user_tags:\n    - わんだふるぷりきゅあ！\n    - 実況\n    - エア番組\n    - 24話\n    - みんなの絆！わんだふる〜！\n  minutes: 30"
-  }
-]
-```
-
-**備考**: エピソードは話数の降順（最新話が先頭）で返される。
+- **認証**: 不要（お知らせボットの Annict トークンを使用。未設定の場合 401）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ Annict OAuth が設定済みであること
 
 #### GET /mulukhiya/api/tagging/dic/annict/episodes
 
-ユーザーが視聴中の全作品のエピソードを辞書形式で取得する。タグ付け補完に使用する。
+お知らせボットが視聴中の全作品のエピソードを辞書形式で取得する。タグ付け補完に使用する。
 
-- **認証**: 必須（Annict トークン。未認証時は 401）
+- **認証**: 不要（お知らせボットの Annict トークンを使用。未設定の場合 401）
 - **前提条件**: `/{controller}/features/annict` が `true`
 - **パラメータ**: なし
 
