@@ -77,6 +77,10 @@ module Mulukhiya
         return config["/#{name}/capabilities/decoration"] == true rescue false
       end
 
+      def local_post?
+        return config["/#{name}/capabilities/local_post"] == true rescue false
+      end
+
       def annict?
         return false unless config["/#{name.underscore}/features/annict"] == true
         return false unless AnnictService.config?

@@ -31,6 +31,7 @@ html lang='ja' data-theme='light'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import { buildEndpointURL } from 'webui_utils'
         import Multiselect from '@vueform/multiselect'
         import axios from 'axios'
         import Swal from 'sweetalert2'
@@ -75,12 +76,11 @@ html lang='ja' data-theme='light'
           },
           methods: {
             onInputCustomAPI (id, key) {
-              let endpoint = `/mulukhiya/api/${this.entries[id].path}`
               this.query_params[id][key] = event.target.value || event.target.innerText
-              Object.keys(this.query_params[id]).map(k => {
-                endpoint = endpoint.replace(`:${k}`, this.query_params[id][k])
-              })
-              this.endpoints[id] = endpoint
+              this.endpoints[id] = buildEndpointURL(
+                `/mulukhiya/api/${this.entries[id].path}`,
+                this.query_params[id],
+              )
             },
             toggleVisibility (name) {
               this.layout.details[name] = !this.layout.details[name]

@@ -88,21 +88,30 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.6.0（open 3 / closed 4）
+## 予定: 5.8.0
 
 - #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
-- #4140 config.slim のフォーム処理ロジックを外部 JS に抽出 — #4131 後続。データ変換ロジックの抽出とブラウザテスト追加
-- #4141 テンプレート内 JS の段階的なモジュール抽出 — 各テンプレートから純粋関数を外部モジュールへ段階的に移行
-- #4148 capsicum エピソードブラウザ向け API ドキュメント・機能検出の整備
-- ~~#4137 ナウプレ系ハンドラーの tagging パラメータを廃止~~
-- ~~#4139 アップロード時のペイロード調整をginseng-fediverseに移動~~
-- ~~#4143 ヘルスチェックにストリーミングプロセスの死活監視を追加~~
-- ~~#4145 Lemmy対応を廃止し、PiefedClipperを自立化~~
+- #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
+- #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
 
 ## 予定: 5.7.0
 
-- #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
-- #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
+- **#4152 docs/api.md: Annict連携セクションの認証要件を実装に合わせて修正** — Codexレビュー（PR #4149）の指摘に対応。P4セクションとの重複記述を解消
+- **#4153 Misskey: 内部DMにlocalOnlyフラグを設定する** — コマンドトゥート、お知らせボット通知DM、ボットメンション時のDM強制変更でlocalOnly: trueを設定。capabilities/local_postで判定
+- **#4154 Sentry.ioによるエラートラッキングの導入** — sentry-ruby + sentry-sidekiq。既存のalertメソッドにSentry.capture_exceptionを統合。DSNはconfig/local.yamlの/sentry/dsnで設定（デプロイ時にSentryプロジェクト作成 → chubo2#13）
+- #4140 config.slim のフォーム処理ロジックを外部 JS に抽出 — #4131 後続。データ変換ロジックの抽出とブラウザテスト追加
+- #4141 テンプレート内 JS の段階的なモジュール抽出 — 各テンプレートから純粋関数を外部モジュールへ段階的に移行
+
+## リリース済み: 5.6.0（2026-03-11）
+
+全5 Issue クローズ。Lemmy 対応廃止、ストリーミング死活監視の再導入、capsicum エピソードブラウザ向け API 整備。
+
+- **#4143 ヘルスチェックにストリーミングプロセスの死活監視を追加** — `/api/v1/streaming/health` への直接チェックに変更し、小規模サーバーでの誤検知を防止
+- **#4145 Lemmy対応を廃止し、PiefedClipperを自立化** — LemmyClipper を削除し、PiefedClipper を独立化
+- **#4150 `GET /annict/oauth_uri` エンドポイントを追加** — capsicum のエピソードブラウザから Annict OAuth 認可を開始するためのエンドポイント
+- #4137 ナウプレ系ハンドラーの tagging パラメータを廃止
+- #4139 アップロード時のペイロード調整をginseng-fediverseに移動
+- #4148 capsicum エピソードブラウザ向け API ドキュメントの整備
 
 ## リリース済み: 5.5.1（2026-03-08）
 
@@ -241,6 +250,7 @@ test/
 4. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
 5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
 6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
+7. **Wiki 確認**: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認する（設定変更、API追加、廃止機能など）
 
 バージョンが記載されている場所:
 
@@ -251,6 +261,7 @@ test/
 - 1マイルストーンあたり10件前後で区切る
 - 優先度の低いIssueは次のマイナーバージョンへ送る
 - 計画書は作成せず、Issue＋マイルストーンで管理する
+- セキュリティレビュー（[#4156](https://github.com/pooza/mulukhiya-toot-proxy/issues/4156)）は各マイルストーンの Issue をすべて消化した後、リリース直前に毎度実施する
 
 ### リリースノート
 
@@ -266,6 +277,18 @@ test/
   - 未対応 → PRをマージ
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
 - `target-branch`: v4（4.x向け）と develop（5.x向け）の2エントリ
+
+### Codexレビュー確認
+
+PRマージ後にCodex（chatgpt-codex-connector[bot]）のレビューコメントが遅れて届くことがある。セッション開始時に最近マージされたPRのレビューコメントを確認し、未対応の有益な指摘があれば対応すること。
+
+対応後はCodexのコメントに返信し、対応内容（コミットハッシュやIssue番号等）を記載する。
+
+```bash
+# 最近マージされたPRのCodexレビューコメントを確認
+gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments \
+  --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | {body: .body[:200], path: .path}'
+```
 
 ## 既知の注意事項
 
@@ -378,6 +401,7 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 ## コーディング規約
 
 - rubocop, slim_lint, erb_lint に準拠
+- 機能追加・バグ修正には対応するテストを書くこと（CIで実行可能な範囲で。DB依存・外部API依存のテストは無理に書かなくてよい）
 - テスト: test-unit (Mulukhiya::TestCase 基底クラス)
 - モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
