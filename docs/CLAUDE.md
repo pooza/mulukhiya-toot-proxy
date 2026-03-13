@@ -93,14 +93,18 @@ git diff Gemfile.lock
 - #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
 - #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
 - #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
+- #4157 Sentry: before_sendフィルタによる秘匿情報スクラビング — #4156 セキュリティレビューの指摘対応
+- #4158 bundler-auditの導入とCI統合 — #4156 セキュリティレビューの指摘対応
 
-## 予定: 5.7.0
+## リリース済み: 5.7.0（2026-03-14）
 
-- **#4152 docs/api.md: Annict連携セクションの認証要件を実装に合わせて修正** — Codexレビュー（PR #4149）の指摘に対応。P4セクションとの重複記述を解消
-- **#4153 Misskey: 内部DMにlocalOnlyフラグを設定する** — コマンドトゥート、お知らせボット通知DM、ボットメンション時のDM強制変更でlocalOnly: trueを設定。capabilities/local_postで判定
-- **#4154 Sentry.ioによるエラートラッキングの導入** — sentry-ruby + sentry-sidekiq。既存のalertメソッドにSentry.capture_exceptionを統合。DSNはconfig/local.yamlの/sentry/dsnで設定（デプロイ時にSentryプロジェクト作成 → chubo2#13）
-- #4140 config.slim のフォーム処理ロジックを外部 JS に抽出 — #4131 後続。データ変換ロジックの抽出とブラウザテスト追加
-- #4141 テンプレート内 JS の段階的なモジュール抽出 — 各テンプレートから純粋関数を外部モジュールへ段階的に移行
+全5 Issue クローズ。Sentry エラートラッキング導入、Misskey localOnly フラグ、フロントエンド JS モジュール抽出。セキュリティレビュー（#4156）実施済み。
+
+- **#4154 Sentry.ioによるエラートラッキングの導入** — sentry-ruby + sentry-sidekiq。既存のalertメソッドにSentry.capture_exceptionを統合。DSNはconfig/local.yamlの`/sentry/dsn`で設定
+- **#4153 Misskey: 内部DMにlocalOnlyフラグを設定する** — コマンドトゥート、お知らせボット通知DM、ボットメンション時のDM強制変更でlocalOnly: trueを設定
+- **#4140 config.slimのフォーム処理ロジックを外部JSに抽出** — config_form.jsに10個の純粋関数を抽出、27テストケース追加
+- **#4141 テンプレート内JSの段階的なモジュール抽出** — webui_utils.jsに6個の純粋関数を抽出、18テストケース追加
+- #4152 Annict連携セクションの認証要件をドキュメントで修正
 
 ## リリース済み: 5.6.0（2026-03-11）
 
