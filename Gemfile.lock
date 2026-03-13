@@ -376,6 +376,13 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
+    sentry-ruby (6.4.1)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      logger
+    sentry-sidekiq (6.4.1)
+      sentry-ruby (~> 6.4.1)
+      sidekiq (>= 5.0)
     sequel (5.102.0)
       bigdecimal
     set (1.1.2)
@@ -466,6 +473,8 @@ DEPENDENCIES
   rubocop-sequel
   ruby-progressbar
   ruby-vips
+  sentry-ruby
+  sentry-sidekiq
   sidekiq (~> 8.1)
   sidekiq-scheduler (~> 6.0.1)
   slim_lint
