@@ -446,6 +446,9 @@ redis:
   retry:
     limit: 3
     seconds: 1
+sentry:
+  dsn: null
+  traces_sample_rate: 0
 ruby:
   bundler:
     install: false
