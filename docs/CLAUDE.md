@@ -250,6 +250,7 @@ test/
 4. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
 5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
 6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
+7. **Wiki 確認**: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認する（設定変更、API追加、廃止機能など）
 
 バージョンが記載されている場所:
 
