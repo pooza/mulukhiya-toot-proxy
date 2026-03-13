@@ -9,6 +9,7 @@ module Mulukhiya
       return if parser.command?
       parser.accts.select(&:agent?).each do |acct|
         payload[visibility_field] = controller_class.visibility_name(:direct)
+        payload['localOnly'] = true if controller_class.local_post?
         result.push(acct: acct.to_s)
       end
     rescue => e

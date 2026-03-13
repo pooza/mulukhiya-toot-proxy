@@ -344,6 +344,7 @@ misskey:
   capabilities:
     channel: true
     decoration: true
+    local_post: true
     reaction: true
     repost: true
     streaming: true
