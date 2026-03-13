@@ -67,6 +67,7 @@ html lang='ja' data-theme='light'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import { tokensToString, parseTokens } from 'webui_utils'
         import Swal from 'sweetalert2'
         const app = createApp({
           data () {
@@ -106,7 +107,7 @@ html lang='ja' data-theme='light'
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             registerTokens () {
-              Promise.all(this.input.token.trim().split("\n").map(token => this.methods.registerToken(token)))
+              Promise.all(parseTokens(this.input.token).map(token => this.methods.registerToken(token)))
                 .then(e => {this.account = e[0]})
                 .then(e => this.methods.getAccounts())
                 .then(e => {
@@ -133,7 +134,7 @@ html lang='ja' data-theme='light'
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             getAllTokens () {
-              return this.accounts.map(v => v.token).join("\n")
+              return tokensToString(this.accounts)
             },
             isLoggedIn (account) {
               return account.token == this.token
