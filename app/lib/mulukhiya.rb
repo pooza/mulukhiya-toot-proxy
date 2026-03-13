@@ -30,6 +30,19 @@ module Mulukhiya
     end
   end
 
+  def self.setup_sentry
+    dsn = Config.instance['/sentry/dsn']
+    return unless dsn
+    Sentry.init do |config|
+      config.dsn = dsn
+      config.release = Package.version
+      config.environment = Environment.type
+      config.traces_sample_rate = Config.instance['/sentry/traces_sample_rate'] || 0
+    end
+  rescue => e
+    warn "Sentry initialization skipped: #{e.message}"
+  end
+
   def self.setup_debug
     Ricecream.disable
     return unless Environment.development?
@@ -79,6 +92,7 @@ module Mulukhiya
   Bundler.require
   loader.setup
   setup_sidekiq
+  setup_sentry
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect

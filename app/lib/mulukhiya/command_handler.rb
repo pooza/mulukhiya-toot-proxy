@@ -23,6 +23,7 @@ module Mulukhiya
       return unless parser.command_name == command_name
       raise Ginseng::ValidateError, validate if validate.present?
       payload[visibility_field] = controller_class.visibility_name(:direct)
+      payload['localOnly'] = true if controller_class.local_post?
       payload.delete(spoiler_field)
       payload.delete(attachment_field)
       payload.delete(poll_field)

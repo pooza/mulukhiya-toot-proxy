@@ -60,6 +60,7 @@ html lang='ja' data-theme='light'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import { isDisabledTag as _isDisabledTag, toggleTagStatus, buildTagStatusCommand } from 'webui_utils'
         import Swal from 'sweetalert2'
         const app = createApp({
           data () {
@@ -88,21 +89,11 @@ html lang='ja' data-theme='light'
                 .catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             isDisabledTag (tag) {
-              this.disabled_tags = this.disabled_tags || []
-              return this.disabled_tags.includes(tag)
+              return _isDisabledTag(this.disabled_tags, tag)
             },
             setTagStatus (tag, flag) {
-              const command = {tagging: {tags: {disabled: []}}}
-              this.disabled_tags = this.disabled_tags || []
-              if (flag) {
-                this.disabled_tags = this.disabled_tags.filter(v => (v != tag))
-                if (this.disabled_tags.length == 0) this.disabled_tags = null
-              } else {
-                this.disabled_tags.push(tag)
-                this.disabled_tags = Array.from(new Set(this.disabled_tags))
-              }
-              command.tagging.tags.disabled = this.tags
-              this.methods.updateConfig(command)
+              this.disabled_tags = toggleTagStatus(this.disabled_tags, tag, flag)
+              this.methods.updateConfig(buildTagStatusCommand(this.disabled_tags))
             },
           },
         })

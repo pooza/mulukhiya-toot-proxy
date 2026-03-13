@@ -15,6 +15,8 @@ gem 'parallel'
 gem 'rspotify'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
+gem 'sentry-ruby'
+gem 'sentry-sidekiq'
 gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
 group :development do

@@ -118,7 +118,8 @@ module Mulukhiya
         controller_class.spoiler_field => options[:spoiler_text],
         controller_class.visibility_field => controller_class.visibility_name(:direct),
         controller_class.reply_to_field => reply_to,
-      }
+        'localOnly' => (true if controller_class.local_post?),
+      }.compact
       if controller_class.visible_users_field
         body[controller_class.visible_users_field] = [account.id]
       end
