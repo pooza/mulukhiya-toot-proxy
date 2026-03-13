@@ -398,6 +398,7 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 ## コーディング規約
 
 - rubocop, slim_lint, erb_lint に準拠
+- 機能追加・バグ修正には対応するテストを書くこと（CIで実行可能な範囲で。DB依存・外部API依存のテストは無理に書かなくてよい）
 - テスト: test-unit (Mulukhiya::TestCase 基底クラス)
 - モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
 - 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
