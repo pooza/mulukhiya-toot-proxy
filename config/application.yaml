@@ -632,6 +632,7 @@ webui:
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      config_form: /mulukhiya/script/config_form
       handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
@@ -639,6 +640,7 @@ webui:
       sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/+esm
       v_tooltip: /mulukhiya/script/v_tooltip
+      webui_utils: /mulukhiya/script/webui_utils
       vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.js
     production:
       '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/+esm
@@ -646,6 +648,7 @@ webui:
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      config_form: /mulukhiya/script/config_form
       handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
@@ -653,6 +656,7 @@ webui:
       sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/+esm
       v_tooltip: /mulukhiya/script/v_tooltip
+      webui_utils: /mulukhiya/script/webui_utils
       vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.prod.js
   development:
     scripts: []

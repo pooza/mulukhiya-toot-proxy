@@ -18,4 +18,6 @@ html lang='ja' data-theme='light'
         mocha.setup('bdd')
         await import('/mulukhiya/script/test/mulukhiya_lib_test.js')
         await import('/mulukhiya/script/test/handler_form_test.js')
+        await import('/mulukhiya/script/test/config_form_test.js')
+        await import('/mulukhiya/script/test/webui_utils_test.js')
         mocha.run()
