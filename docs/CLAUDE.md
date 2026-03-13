@@ -281,6 +281,8 @@ test/
 
 PRマージ後にCodex（chatgpt-codex-connector[bot]）のレビューコメントが遅れて届くことがある。セッション開始時に最近マージされたPRのレビューコメントを確認し、未対応の有益な指摘があれば対応すること。
 
+対応後はCodexのコメントに返信し、対応内容（コミットハッシュやIssue番号等）を記載する。
+
 ```bash
 # 最近マージされたPRのCodexレビューコメントを確認
 gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments \
