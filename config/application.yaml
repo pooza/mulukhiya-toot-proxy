@@ -451,6 +451,10 @@ redis:
 sentry:
   dsn: null
   traces_sample_rate: 0
+  scrub_patterns:
+    - '[a-zA-Z0-9_\-]{20,}'
+    - '/home/[^\s]+'
+    - '/Users/[^\s]+'
 ruby:
   bundler:
     install: false
