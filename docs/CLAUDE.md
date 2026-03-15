@@ -182,6 +182,51 @@ git diff Gemfile.lock
 - #4082 Sidekiqワーカーテスト、#4099 Worker個別コンテキストログ、#4103 テストの外部API依存解消
 - #4105 FreeBSD rc.d 起動ブロック原因切り分け（Mastodon streaming が主犯 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900)）
 
+## セッション開始時の同期手順
+
+会話の最初に「進捗を同期してください」等の指示があった場合、以下の手順を実行する。
+
+### 1. プロジェクトガイドの読み込み
+
+- `docs/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
+- `MEMORY.md` は自動ロードされるので、両者の整合性を意識する
+
+### 2. ローカルの状態確認
+
+- `git log --oneline -10` — 直近のコミット履歴
+- `gh issue list --state open` — open Issue一覧
+- `gh pr list --state open` — open PR一覧
+
+### 3. Dependabotセキュリティアラート
+
+- `gh api repos/pooza/mulukhiya-toot-proxy/dependabot/alerts` で open アラートを確認
+- 0件なら対応不要、あれば提案
+
+### 4. Codexレビューコメントの確認
+
+- 最近マージされたPR（`gh pr list --state merged --limit 5`）を取得
+- 各PRに対して `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments` でCodex（`chatgpt-codex-connector[bot]`）のコメントを確認
+- 未返信のコメントがあれば内容を確認し、対応が必要か判断
+
+### 5. 外部リポジトリの同期確認（chubo2）
+
+- `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
+- `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
+- `gh issue list --state open` で open Issue の変動を確認
+
+### 6. マイルストーンの状態確認
+
+- `docs/CLAUDE.md` と MEMORY.md に記載された次期マイルストーンの Issue が、実際の GitHub 上の状態（open/closed）と一致しているか確認
+- クローズ済みの Issue があれば MEMORY.md から除外し、`docs/CLAUDE.md` も必要に応じて更新
+
+### 7. MEMORY.md の更新
+
+- 上記で検出した差分（Issue 状態、リリース日の誤り、件数のズレ等）を反映
+
+### 8. 同期結果の報告
+
+- 現在のブランチ・状態、マイルストーンの状況、各確認項目の結果をまとめて報告する
+
 ## 情報の記載先ルール
 
 - **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
