@@ -8,7 +8,7 @@ map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
   default    http://localhost:3000;
 }
 map "${request_method}:${http_x_mulukhiya}" $status_put_backend {
-  "~^PUT:$"  reject;
+  "~^PUT:$"  http://localhost:3008;
   default    http://localhost:3000;
 }
 
@@ -28,12 +28,6 @@ location ~ ^/api/v[0-9]+/media/[0-9]+$ {
 }
 location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
   include /path/to/mulukhiya_proxy.conf;
-  if ($http_x_mulukhiya_purpose != '') {
-    proxy_pass http://localhost:3008;
-  }
-  if ($status_put_backend = reject) {
-    return 405;
-  }
   proxy_pass $status_put_backend;
 }
 location = /api/v1/timelines/public {
