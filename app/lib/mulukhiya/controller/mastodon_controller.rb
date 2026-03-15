@@ -58,7 +58,7 @@ module Mulukhiya
       verify_token_integrity!
       purpose = request.env['HTTP_X_MULUKHIYA_PURPOSE']
       body = case purpose
-             when nil, ''
+             when nil, '', 'media_update'
                {media_attributes: params[:media_attributes]}.compact
              when 'tag'
                {status: params[:status], media_attributes: params[:media_attributes]}.compact
