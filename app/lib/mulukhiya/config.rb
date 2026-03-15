@@ -31,6 +31,7 @@ module Mulukhiya
           controller: self['/controller'],
           status: Environment.status_class.default.merge(
             label: controller.status_label,
+            reblog_label: controller.reblog_label,
             max_length: controller.max_length,
           ),
           capabilities: sub_hash("/#{name}/capabilities"),
