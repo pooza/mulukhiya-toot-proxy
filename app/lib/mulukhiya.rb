@@ -38,9 +38,21 @@ module Mulukhiya
       config.release = Package.version
       config.environment = Environment.type
       config.traces_sample_rate = Config.instance['/sentry/traces_sample_rate'] || 0
+      config.before_send = method(:scrub_sentry_event)
     end
   rescue => e
     warn "Sentry initialization skipped: #{e.message}"
+  end
+
+  def self.scrub_sentry_event(event, _hint)
+    patterns = (Config.instance['/sentry/scrub_patterns'] || []).map {|p| Regexp.new(p)}
+    return event if patterns.empty?
+    event.exception&.values&.each do |ex| # rubocop:disable Style/HashEachMethods
+      patterns.each do |pattern|
+        ex.value = ex.value&.gsub(pattern, '[FILTERED]')
+      end
+    end
+    return event
   end
 
   def self.setup_debug

@@ -175,6 +175,10 @@ module Mulukhiya
         return config["/#{name}/status/label"]
       end
 
+      def reblog_label
+        return config["/#{name}/status/reblog_label"]
+      end
+
       def status_delete_limit
         return config["/#{name}/status/delete/limit"] rescue nil
       end
