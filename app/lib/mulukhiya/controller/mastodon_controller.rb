@@ -56,9 +56,23 @@ module Mulukhiya
 
     put '/api/:version/statuses/:id' do
       verify_token_integrity!
-      reporter.response = sns.update_status(params[:id], params, {headers: @headers})
+      purpose = request.env['HTTP_X_MULUKHIYA_PURPOSE']
+      body = case purpose
+             when nil, ''
+               {media_attributes: params[:media_attributes]}.compact
+             when 'tag'
+               {status: params[:status], media_attributes: params[:media_attributes]}.compact
+             else
+               raise Ginseng::ValidateError, "unknown purpose: #{purpose}"
+             end
+      raise Ginseng::ValidateError, 'media_attributes is required' if body.empty?
+      reporter.response = sns.update_status(params[:id], body, {headers: @headers})
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {error: e.message}
+      @renderer.status = 422
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
       e.alert unless e.source_status == 401
