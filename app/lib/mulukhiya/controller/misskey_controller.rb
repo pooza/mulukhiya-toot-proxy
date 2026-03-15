@@ -14,7 +14,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -32,7 +32,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -56,7 +56,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -75,7 +75,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -89,7 +89,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -103,7 +103,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
