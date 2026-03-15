@@ -323,6 +323,7 @@ mastodon:
       limit: 30
     key: id
     label: 投稿
+    reblog_label: ブースト
     parser: toot
     spoiler_text: null
   streaming:
@@ -377,6 +378,7 @@ misskey:
     default_max_length: 3000
     key: noteId
     label: ノート
+    reblog_label: リノート
     parser: note
     spoiler_text: null
   streaming:
@@ -404,7 +406,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.7.0
+  version: 5.8.0
 parser:
   note:
     fields:
@@ -449,6 +451,10 @@ redis:
 sentry:
   dsn: null
   traces_sample_rate: 0
+  scrub_patterns:
+    - '[a-zA-Z0-9_\-]{20,}'
+    - '/home/[^\s]+'
+    - '/Users/[^\s]+'
 ruby:
   bundler:
     install: false

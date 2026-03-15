@@ -14,7 +14,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -33,7 +33,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -48,7 +48,35 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
+    end
+
+    put '/api/:version/statuses/:id' do
+      verify_token_integrity!
+      purpose = request.env['HTTP_X_MULUKHIYA_PURPOSE']
+      body = case purpose
+             when nil, '', 'media_update'
+               source = sns.fetch_status_source(params[:id], {headers: @headers})
+               {status: source['text'], media_attributes: params[:media_attributes]}.compact
+             when 'tag'
+               {status: params[:status], media_attributes: params[:media_attributes]}.compact
+             else
+               raise Ginseng::ValidateError, "unknown purpose: #{purpose}"
+             end
+      raise Ginseng::ValidateError, 'media_attributes is required' if body.empty?
+      reporter.response = sns.update_status(params[:id], body, {headers: @headers})
+      @renderer.message = reporter.response.parsed_response
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::ValidateError => e
+      @renderer.message = {error: e.message}
+      @renderer.status = 422
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -63,7 +91,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -78,7 +106,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s
@@ -93,7 +121,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert
+      e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
       return @renderer.to_s

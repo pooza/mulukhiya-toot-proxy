@@ -88,19 +88,36 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 予定: 5.8.0
+## 予定: 5.8.0 — セキュリティレビュー対応（リリース待ち）
 
-- #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
+全Issue クローズ済み。ステージング全4台（dev04/dev15/dev22/dev23）デプロイ・動作確認済み。リリース作業のみ残。
+
+- ~~#4155 Wiki: Sentry.ioの設定項目をドキュメントに追加~~ — クローズ済み
+- ~~#4157 Sentry: before_sendフィルタによる秘匿情報スクラビング~~ — クローズ済み
+- ~~#4158 bundler-auditの導入とCI統合~~ — クローズ済み。sinatra CVE-2025-61921 は rack 3.2問題のため ignore 設定
+- ~~#4156 セキュリティレビュー~~ — クローズ済み
+- ~~#4159 フロントJSテストのアサーション修正~~ — クローズ済み
+- ~~#4161 about APIでブースト/リノートのカスタムラベルを返す~~ — クローズ済み
+
+## 予定: 5.9.0 — アーキテクチャ整理
+
 - #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
 - #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
 
-## 予定: 5.7.0
+## 予定: 5.10.0 — WebUI拡張
 
-- **#4152 docs/api.md: Annict連携セクションの認証要件を実装に合わせて修正** — Codexレビュー（PR #4149）の指摘に対応。P4セクションとの重複記述を解消
-- **#4153 Misskey: 内部DMにlocalOnlyフラグを設定する** — コマンドトゥート、お知らせボット通知DM、ボットメンション時のDM強制変更でlocalOnly: trueを設定。capabilities/local_postで判定
-- **#4154 Sentry.ioによるエラートラッキングの導入** — sentry-ruby + sentry-sidekiq。既存のalertメソッドにSentry.capture_exceptionを統合。DSNはconfig/local.yamlの/sentry/dsnで設定（デプロイ時にSentryプロジェクト作成 → chubo2#13）
-- #4140 config.slim のフォーム処理ロジックを外部 JS に抽出 — #4131 後続。データ変換ロジックの抽出とブラウザテスト追加
-- #4141 テンプレート内 JS の段階的なモジュール抽出 — 各テンプレートから純粋関数を外部モジュールへ段階的に移行
+- #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
+- #4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出
+
+## リリース済み: 5.7.0（2026-03-14）
+
+全5 Issue クローズ。Sentry エラートラッキング導入、Misskey localOnly フラグ、フロントエンド JS モジュール抽出。セキュリティレビュー（#4156）実施済み。
+
+- **#4154 Sentry.ioによるエラートラッキングの導入** — sentry-ruby + sentry-sidekiq。既存のalertメソッドにSentry.capture_exceptionを統合。DSNはconfig/local.yamlの`/sentry/dsn`で設定
+- **#4153 Misskey: 内部DMにlocalOnlyフラグを設定する** — コマンドトゥート、お知らせボット通知DM、ボットメンション時のDM強制変更でlocalOnly: trueを設定
+- **#4140 config.slimのフォーム処理ロジックを外部JSに抽出** — config_form.jsに10個の純粋関数を抽出、27テストケース追加
+- **#4141 テンプレート内JSの段階的なモジュール抽出** — webui_utils.jsに6個の純粋関数を抽出、18テストケース追加
+- #4152 Annict連携セクションの認証要件をドキュメントで修正
 
 ## リリース済み: 5.6.0（2026-03-11）
 
@@ -176,6 +193,53 @@ git diff Gemfile.lock
 - #4094 HTTPクライアント統一、#4101 CommandLine.exec タイムアウト
 - #4082 Sidekiqワーカーテスト、#4099 Worker個別コンテキストログ、#4103 テストの外部API依存解消
 - #4105 FreeBSD rc.d 起動ブロック原因切り分け（Mastodon streaming が主犯 → [pooza/mastodon#900](https://github.com/pooza/mastodon/issues/900)）
+
+## セッション開始時の同期手順
+
+会話の最初に「進捗を同期してください」等の指示があった場合、以下の手順を実行する。
+
+### 1. プロジェクトガイドの読み込み
+
+- `docs/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
+- `MEMORY.md` は自動ロードされるので、両者の整合性を意識する
+
+### 2. リモートとの同期・状態確認
+
+- `git fetch origin` — **最初に必ず実行**。リモートが正本であり、ローカルの状態を信用しない
+- `git log HEAD..origin/develop --oneline` — リモートに未取り込みのコミットがないか確認。差分があればpullを検討
+- `git log --oneline -10` — 直近のコミット履歴
+- `gh issue list --state open` — open Issue一覧
+- `gh pr list --state open` — open PR一覧
+
+### 3. Dependabotセキュリティアラート
+
+- `gh api repos/pooza/mulukhiya-toot-proxy/dependabot/alerts` で open アラートを確認
+- 0件なら対応不要、あれば提案
+
+### 4. Codexレビューコメントの確認
+
+- 最近マージされたPR（`gh pr list --state merged --limit 5`）を取得
+- 各PRに対して `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments` でCodex（`chatgpt-codex-connector[bot]`）のコメントを確認
+- 未返信のコメントがあれば内容を確認し、対応が必要か判断
+
+### 5. 外部リポジトリの同期確認（chubo2）
+
+- `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
+- `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
+- `gh issue list --state open` で open Issue の変動を確認
+
+### 6. マイルストーンの状態確認
+
+- `docs/CLAUDE.md` と MEMORY.md に記載された次期マイルストーンの Issue が、実際の GitHub 上の状態（open/closed）と一致しているか確認
+- クローズ済みの Issue があれば MEMORY.md から除外し、`docs/CLAUDE.md` も必要に応じて更新
+
+### 7. MEMORY.md の更新
+
+- 上記で検出した差分（Issue 状態、リリース日の誤り、件数のズレ等）を反映
+
+### 8. 同期結果の報告
+
+- 現在のブランチ・状態、マイルストーンの状況、各確認項目の結果をまとめて報告する
 
 ## 情報の記載先ルール
 
@@ -258,7 +322,7 @@ test/
 
 ### マイルストーン管理
 
-- 1マイルストーンあたり10件前後で区切る
+- 1マイルストーンあたり10件前後で区切る（平均的なボリュームのIssueを基準とし、粒度の大きなIssueがある場合は件数を減らして調整する）
 - 優先度の低いIssueは次のマイナーバージョンへ送る
 - 計画書は作成せず、Issue＋マイルストーンで管理する
 - セキュリティレビュー（[#4156](https://github.com/pooza/mulukhiya-toot-proxy/issues/4156)）は各マイルストーンの Issue をすべて消化した後、リリース直前に毎度実施する
@@ -277,6 +341,7 @@ test/
   - 未対応 → PRをマージ
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
 - `target-branch`: v4（4.x向け）と develop（5.x向け）の2エントリ
+- **bundler-audit**: `rake lint` に統合済み。RubyGems ソースの gem の既知脆弱性を自動スキャンする。`ginseng-*` 系 gem は git ソースのため対象外。`ginseng-*` の依存 gem に脆弱性がある場合は、該当 gem のリポジトリで `bundle update` して対応する
 
 ### Codexレビュー確認
 
