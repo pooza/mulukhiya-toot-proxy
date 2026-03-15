@@ -54,6 +54,19 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    put '/api/:version/statuses/:id' do
+      verify_token_integrity!
+      reporter.response = sns.update_status(params[:id], params, {headers: @headers})
+      @renderer.message = reporter.response.parsed_response
+      @renderer.status = reporter.response.code
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.alert unless e.source_status == 401
+      @renderer.message = {error: e.message}
+      @renderer.status = e.source_status
+      return @renderer.to_s
+    end
+
     post '/api/:version/statuses/:id/favourite' do
       verify_token_integrity!
       reporter.response = sns.fav(params[:id])
