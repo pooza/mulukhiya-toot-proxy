@@ -339,6 +339,7 @@ test/
   - 未対応 → PRをマージ
 - セキュリティアラートはリリース時の Gemfile.lock 更新で自動クローズされる
 - `target-branch`: v4（4.x向け）と develop（5.x向け）の2エントリ
+- **bundler-audit**: `rake lint` に統合済み。RubyGems ソースの gem の既知脆弱性を自動スキャンする。`ginseng-*` 系 gem は git ソースのため対象外。`ginseng-*` の依存 gem に脆弱性がある場合は、該当 gem のリポジトリで `bundle update` して対応する
 
 ### Codexレビュー確認
 

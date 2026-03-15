@@ -20,6 +20,7 @@ gem 'sentry-sidekiq'
 gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
 group :development do
+  gem 'bundler-audit'
   gem 'ostruct' # gli < 2.22の未宣言依存
   gem 'rack-test'
   gem 'rails-erb-lint'
