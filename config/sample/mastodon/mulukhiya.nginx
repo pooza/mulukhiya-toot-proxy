@@ -7,9 +7,10 @@ map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
   "~^PUT:$"  http://localhost:3008;
   default    http://localhost:3000;
 }
-map "${request_method}:${http_x_mulukhiya}" $status_put_backend {
-  "~^PUT:$"  http://localhost:3008;
-  default    http://localhost:3000;
+map "${request_method}:${http_x_mulukhiya}:${http_x_mulukhiya_purpose}" $status_put_backend {
+  "~^PUT::.+"  http://localhost:3008;
+  "~^PUT::$"   reject;
+  default      http://localhost:3000;
 }
 
 # === server context に追加 ===
@@ -27,6 +28,9 @@ location ~ ^/api/v[0-9]+/media/[0-9]+$ {
   proxy_pass $media_put_backend;
 }
 location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
+  if ($status_put_backend = reject) {
+    return 405;
+  }
   include /path/to/mulukhiya_proxy.conf;
   proxy_pass $status_put_backend;
 }
