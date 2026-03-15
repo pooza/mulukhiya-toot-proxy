@@ -60,7 +60,8 @@ module Mulukhiya
       body = case purpose
              when nil, '', 'media_update'
                original = sns.fetch_status(params[:id], {headers: @headers})
-               {status: original['text'], media_attributes: params[:media_attributes]}.compact
+               media_ids = original['media_attachments']&.map {|m| m['id']}
+               {status: original['text'], media_ids: media_ids, media_attributes: params[:media_attributes]}.compact
              when 'tag'
                {status: params[:status], media_attributes: params[:media_attributes]}.compact
              else
