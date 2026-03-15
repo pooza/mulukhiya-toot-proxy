@@ -191,8 +191,10 @@ git diff Gemfile.lock
 - `docs/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
 - `MEMORY.md` は自動ロードされるので、両者の整合性を意識する
 
-### 2. ローカルの状態確認
+### 2. リモートとの同期・状態確認
 
+- `git fetch origin` — **最初に必ず実行**。リモートが正本であり、ローカルの状態を信用しない
+- `git log HEAD..origin/develop --oneline` — リモートに未取り込みのコミットがないか確認。差分があればpullを検討
 - `git log --oneline -10` — 直近のコミット履歴
 - `gh issue list --state open` — open Issue一覧
 - `gh pr list --state open` — open PR一覧
