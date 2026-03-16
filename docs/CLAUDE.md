@@ -223,22 +223,27 @@ git diff Gemfile.lock
 - 各PRに対して `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments` でCodex（`chatgpt-codex-connector[bot]`）のコメントを確認
 - 未返信のコメントがあれば内容を確認し、対応が必要か判断
 
-### 5. 外部リポジトリの同期確認（chubo2）
+### 5. Sentry の新規イシュー確認
+
+- Sentry のプロジェクトダッシュボードで未確認のイシューを確認する
+- 新規イシューがあれば内容を確認し、対応が必要か判断する（対応が必要なら GitHub Issue を起票）
+
+### 6. 外部リポジトリの同期確認（chubo2）
 
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
 - `gh issue list --state open` で open Issue の変動を確認
 
-### 6. マイルストーンの状態確認
+### 7. マイルストーンの状態確認
 
 - `docs/CLAUDE.md` と MEMORY.md に記載された次期マイルストーンの Issue が、実際の GitHub 上の状態（open/closed）と一致しているか確認
 - クローズ済みの Issue があれば MEMORY.md から除外し、`docs/CLAUDE.md` も必要に応じて更新
 
-### 7. MEMORY.md の更新
+### 8. MEMORY.md の更新
 
 - 上記で検出した差分（Issue 状態、リリース日の誤り、件数のズレ等）を反映
 
-### 8. 同期結果の報告
+### 9. 同期結果の報告
 
 - 現在のブランチ・状態、マイルストーンの状況、各確認項目の結果をまとめて報告する
 
