@@ -60,6 +60,10 @@
 
 v5-plan.md でP1に分類されたIssueがバックポート対象の目安。
 
+#### メンテナンスのタイミング
+
+Dependabotセキュリティアラートが発生したときに、セキュリティ対応と合わせて溜まった小修正のバックポートもまとめて行う。
+
 ### ブランチ命名規則
 
 | 用途                      | パターン          | 例                                |
@@ -225,8 +229,12 @@ git diff Gemfile.lock
 
 ### 5. Sentry の新規イシュー確認
 
-- Sentry のプロジェクトダッシュボードで未確認のイシューを確認する
-- 新規イシューがあれば内容を確認し、対応が必要か判断する（対応が必要なら GitHub Issue を起票）
+- `sentry-cli issues list` で未解決イシューを確認する（`~/.sentryclirc` に認証トークンとデフォルトプロジェクトが設定済み）
+- 各イシューの過去コメント（対応経緯）を確認する: `curl -sH "Authorization: Bearer $TOKEN" https://sentry.io/api/0/issues/{issue_id}/comments/ | python3 -m json.tool`
+- 新規・未解決のイシューがあれば内容を確認し、対応が必要か判断する（対応が必要なら GitHub Issue を起票）
+- 判断結果や対応経緯はコメントとして記録する: `curl -sX POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"text":"コメント内容"}' https://sentry.io/api/0/issues/{issue_id}/comments/`
+- `$TOKEN` は `~/.sentryclirc` の `[auth]` セクションから取得する
+- Sentry 未導入のプロジェクトではこのステップをスキップする
 
 ### 6. 外部リポジトリの同期確認（chubo2）
 
