@@ -108,6 +108,7 @@ git diff Gemfile.lock
 
 - #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
 - #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
+- #4164 GroupTagHandler — PieFed community-hashtag-map.json 連携。ステージング検証中（dev04/dev23）
 
 ## 予定: 5.10.0 — WebUI拡張
 
