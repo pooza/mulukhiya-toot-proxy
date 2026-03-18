@@ -79,6 +79,10 @@ handler:
     toggleable: true
   default_tag:
     tags: []
+  group_tag:
+    sources:
+      - https://pf.korako.me/plugins/community-hashtag-map.json
+    cache_ttl: 3600
   dictionary_tag:
     dics: []
     word:
@@ -213,6 +217,7 @@ handler:
         - media_tag
         - user_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
@@ -238,6 +243,7 @@ handler:
         - dictionary_tag
         - media_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
