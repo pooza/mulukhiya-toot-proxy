@@ -104,11 +104,16 @@ git diff Gemfile.lock
 - #4155 Wiki: Sentry.ioの設定項目をドキュメントに追加
 - #4156 セキュリティレビュー実施済み
 
-## 予定: 5.9.0 — アーキテクチャ整理
+## リリース済み: 5.9.0（2026-03-20）
 
-- #4144 カスタムAPIを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す。設計意図は [custom-api-redesign.md](custom-api-redesign.md) を参照
-- ~~#4146 PieFed対応をginseng-piefedに切り出し~~ — 完了。ginseng-piefed gem を新規作成、tomato-shrieker への PR (#1408) も作成済み
-- ~~#4164 GroupTagHandler~~ — 完了。ステージング検証完了（dev04/dev23）。Redis#exists? → key? のバグ修正済み
+全4 Issue クローズ。カスタムAPI独立デーモン化、PieFed gem切り出し、GroupTagHandler、セキュリティ対応。全4台デプロイ済み。
+
+- **#4144 カスタムAPIを独立デーモンに分離** — Bundler二重管理・Open3.capture3の不安定さを解消。cure-api v3.0.0として独立HTTPサーバーに移行。設計意図は [custom-api-redesign.md](custom-api-redesign.md) を参照
+- **#4146 PieFed対応をginseng-piefedに切り出し** — ginseng-piefed gem を新規作成
+- **#4164 GroupTagHandler** — PieFed community-hashtag-map 連携によるグループタグ自動付与
+- **CVE-2026-33210** json gem format string injection 対応済み
+- ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
+- CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
 ## 予定: 5.10.0 — WebUI拡張
 
