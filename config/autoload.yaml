@@ -3,8 +3,6 @@ inflections:
   amazon_url_handler: AmazonURLHandler
   api_controller: APIController
   css_renderer: CSSRenderer
-  custom_api: CustomAPI
-  custom_api_render_storage: CustomAPIRenderStorage
   ffmpeg_command_builder: FFmpegCommandBuilder
   http: HTTP
   itunes_album_uri: ItunesAlbumURI

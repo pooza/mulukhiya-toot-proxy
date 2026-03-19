@@ -48,6 +48,13 @@ GIT
     ginseng-fediverse (1.8.21)
 
 GIT
+  remote: https://github.com/pooza/ginseng-piefed.git
+  revision: 125e86e3a426c68b0d1cf4d35b8f9d705d93bb0a
+  branch: main
+  specs:
+    ginseng-piefed (0.1.0)
+
+GIT
   remote: https://github.com/pooza/ginseng-postgres.git
   revision: 92a453b5cd3b061f3fc389af4e9d75ef1f8f0aa7
   branch: main
@@ -459,6 +466,7 @@ DEPENDENCIES
   faye-websocket!
   ginseng-core!
   ginseng-fediverse!
+  ginseng-piefed!
   ginseng-postgres!
   ginseng-redis!
   ginseng-web!

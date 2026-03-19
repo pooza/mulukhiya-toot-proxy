@@ -546,18 +546,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    CustomAPI.all do |api|
-      get api.path do
-        @renderer = api.create_renderer(params)
-        return @renderer.to_s
-      rescue => e
-        e.log
-        @renderer.status = e.status
-        @renderer.message = {error: e.message}
-        return @renderer.to_s
-      end
-    end
-
     def token
       return params[:token].decrypt
     rescue
