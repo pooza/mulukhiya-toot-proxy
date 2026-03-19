@@ -16,7 +16,8 @@ html lang='ja' data-theme='light'
             h3 @click='toggleVisibility("#{api.id}")' = api.description
             slide-up-down :active='layout.details.#{api.id}'
               .endpoint-container
-                .link GET {{endpoints.#{api.id}}}
+                .link GET
+                  a :href='endpoints.#{api.id}' target='_blank' {{endpoints.#{api.id}}}
                 - api.args.each do |arg|
                   multiselect :options='choices.#{api.id}_#{arg}' @input='onInputCustomAPI("#{api.id}", "#{arg}")' label="label" track-by="value"
                 .link-description = api.description
