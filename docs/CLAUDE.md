@@ -107,8 +107,8 @@ git diff Gemfile.lock
 ## 予定: 5.9.0 — アーキテクチャ整理
 
 - #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
-- #4146 PieFed対応をginseng-piefedに切り出し — tomato-shriekerとの共有が動機。#4145 完了が前提
-- #4164 GroupTagHandler — PieFed community-hashtag-map.json 連携。ステージング検証完了（dev04/dev23）。Redis#exists? → key? のバグ修正済み
+- ~~#4146 PieFed対応をginseng-piefedに切り出し~~ — 完了。ginseng-piefed gem を新規作成、tomato-shrieker への PR (#1408) も作成済み
+- ~~#4164 GroupTagHandler~~ — 完了。ステージング検証完了（dev04/dev23）。Redis#exists? → key? のバグ修正済み
 
 ## 予定: 5.10.0 — WebUI拡張
 
