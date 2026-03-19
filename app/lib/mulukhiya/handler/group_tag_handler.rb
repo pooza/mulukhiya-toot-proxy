@@ -57,7 +57,7 @@ module Mulukhiya
     end
 
     def cache_valid?
-      return redis.exists?(CACHE_KEY)
+      return redis.key?(CACHE_KEY)
     end
 
     def cache_ttl
