@@ -50,7 +50,7 @@ module Mulukhiya
 
     def piefed
       return nil unless [:url, :user, :password].all? {|k| user_config["/piefed/#{k}"]}
-      @piefed ||= PiefedClipper.new(
+      @piefed ||= Ginseng::Piefed::Service.new(
         url: user_config['/piefed/url'],
         user: user_config['/piefed/user'],
         password: user_config['/piefed/password'],

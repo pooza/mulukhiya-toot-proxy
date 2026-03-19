@@ -531,17 +531,6 @@ service:
       video:
         - /w/
         - /videos/watch/
-  piefed:
-    api:
-      version: alpha
-    community:
-      types:
-        - Subscribed
-        - Moderating
-    hosts:
-      default: pf.korako.me
-    subject:
-      max_length: 50
   poipiku:
     urls:
       root: https://poipiku.com/
