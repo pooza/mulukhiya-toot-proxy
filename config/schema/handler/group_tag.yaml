@@ -1,0 +1,15 @@
+properties:
+  disabled:
+    type: boolean
+  sources:
+    items:
+      format: uri
+      type: string
+    type: array
+  cache_ttl:
+    minimum: 60
+    type: integer
+  timeout:
+    minimum: 1
+    type: integer
+type: object

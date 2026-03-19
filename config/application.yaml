@@ -79,6 +79,10 @@ handler:
     toggleable: true
   default_tag:
     tags: []
+  group_tag:
+    sources:
+      - https://pf.korako.me/plugins/community-hashtag-map.json
+    cache_ttl: 3600
   dictionary_tag:
     dics: []
     word:
@@ -213,6 +217,7 @@ handler:
         - media_tag
         - user_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
@@ -238,6 +243,7 @@ handler:
         - dictionary_tag
         - media_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
@@ -406,7 +412,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.8.0
+  version: 5.9.0
 parser:
   note:
     fields:
@@ -525,17 +531,6 @@ service:
       video:
         - /w/
         - /videos/watch/
-  piefed:
-    api:
-      version: alpha
-    community:
-      types:
-        - Subscribed
-        - Moderating
-    hosts:
-      default: pf.korako.me
-    subject:
-      max_length: 50
   poipiku:
     urls:
       root: https://poipiku.com/
