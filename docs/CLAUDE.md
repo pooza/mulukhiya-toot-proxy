@@ -104,11 +104,16 @@ git diff Gemfile.lock
 - #4155 Wiki: Sentry.ioの設定項目をドキュメントに追加
 - #4156 セキュリティレビュー実施済み
 
-## 予定: 5.9.0 — アーキテクチャ整理
+## リリース済み: 5.9.0（2026-03-20）
 
-- #4144 カスタムAPIを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す。設計意図は [custom-api-redesign.md](custom-api-redesign.md) を参照
-- ~~#4146 PieFed対応をginseng-piefedに切り出し~~ — 完了。ginseng-piefed gem を新規作成、tomato-shrieker への PR (#1408) も作成済み
-- ~~#4164 GroupTagHandler~~ — 完了。ステージング検証完了（dev04/dev23）。Redis#exists? → key? のバグ修正済み
+全4 Issue クローズ。カスタムAPI独立デーモン化、PieFed gem切り出し、GroupTagHandler、セキュリティ対応。全4台デプロイ済み。
+
+- **#4144 カスタムAPIを独立デーモンに分離** — Bundler二重管理・Open3.capture3の不安定さを解消。cure-api v3.0.0として独立HTTPサーバーに移行。設計意図は [custom-api-redesign.md](custom-api-redesign.md) を参照
+- **#4146 PieFed対応をginseng-piefedに切り出し** — ginseng-piefed gem を新規作成
+- **#4164 GroupTagHandler** — PieFed community-hashtag-map 連携によるグループタグ自動付与
+- **CVE-2026-33210** json gem format string injection 対応済み
+- ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
+- CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
 ## 予定: 5.10.0 — WebUI拡張
 
@@ -319,6 +324,20 @@ test/
 - パッチリリース（5.0.x 等）は致命的な不具合時のみ
 - 通常の機能追加・改善はマイナーバージョン（5.1.0 等）でまとめてリリース
 
+### 通常リリース手順
+
+1. **マイルストーンのIssueをすべて消化**
+2. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
+3. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
+4. **リリースPR作成**: `develop` → `main` へPRを作成
+5. **CI通過を確認してマージ**
+6. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
+7. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
+8. **リリース後の更新**:
+   - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加
+   - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）
+   - MEMORY.md: リリース履歴・インフラセクションを同期
+
 ### ホットフィックス手順
 
 緊急パッチリリースの手順。通常リリースと異なり、develop → main マージではなく main に直接コミットする場合がある。
@@ -340,7 +359,6 @@ test/
 - 1マイルストーンあたり10件前後で区切る（平均的なボリュームのIssueを基準とし、粒度の大きなIssueがある場合は件数を減らして調整する）
 - 優先度の低いIssueは次のマイナーバージョンへ送る
 - 計画書は作成せず、Issue＋マイルストーンで管理する
-- セキュリティレビュー（[#4156](https://github.com/pooza/mulukhiya-toot-proxy/issues/4156)）は各マイルストーンの Issue をすべて消化した後、リリース直前に毎度実施する
 
 ### リリースノート
 
