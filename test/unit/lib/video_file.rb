@@ -2,6 +2,7 @@ module Mulukhiya
   class VideoFileTest < TestCase
     def setup
       @mp4 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
+      @hevc = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hevc_sample.mp4'))
       @mkv = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mkv'))
       @jpeg = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/logo.jpg'))
       @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
@@ -58,11 +59,24 @@ module Mulukhiya
       assert_in_delta(@mp4.duration, 14.32)
     end
 
+    def test_video_codec
+      assert_equal('h264', @mp4.video_codec)
+      assert_equal('hevc', @hevc.video_codec)
+    end
+
     def test_convert_type
       converted = @mp4.convert_type('video/mp4')
 
       assert_kind_of(VideoFile, converted)
       assert_equal('video/mp4', converted.type)
+    end
+
+    def test_transcode_hevc
+      converted = @hevc.transcode('video/mp4')
+
+      assert_kind_of(VideoFile, converted)
+      assert_equal('video/mp4', converted.type)
+      assert_equal('h264', converted.video_codec)
     end
   end
 end

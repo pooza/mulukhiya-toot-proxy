@@ -36,11 +36,19 @@ module Mulukhiya
           ),
           capabilities: sub_hash("/#{name}/capabilities"),
           features: sub_hash("/#{name}/features"),
+          admin_role_ids: admin_role_ids,
         },
       }
     end
 
     private
+
+    def admin_role_ids
+      return [] unless Environment.dbms_class&.config?
+      return Mastodon::Role.where { permissions.sql_number & 1 > 0 }.select_map(:id).map(&:to_s)
+    rescue
+      return []
+    end
 
     def sub_hash(prefix)
       return keys(prefix).to_h {|k| [k, self["#{prefix}/#{k}"]]}

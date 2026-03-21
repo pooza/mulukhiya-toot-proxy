@@ -104,16 +104,27 @@ git diff Gemfile.lock
 - #4155 Wiki: Sentry.ioの設定項目をドキュメントに追加
 - #4156 セキュリティレビュー実施済み
 
-## 予定: 5.9.0 — アーキテクチャ整理
+## リリース済み: 5.9.1（2026-03-21）
 
-- #4144 カスタムAPI/カスタムフィードを独立デーモンに分離 — Bundler二重管理・Open3.capture3の不安定さを解消。元の独立デーモン形式に戻す
-- ~~#4146 PieFed対応をginseng-piefedに切り出し~~ — 完了。ginseng-piefed gem を新規作成、tomato-shrieker への PR (#1408) も作成済み
-- ~~#4164 GroupTagHandler~~ — 完了。ステージング検証完了（dev04/dev23）。Redis#exists? → key? のバグ修正済み
+- **#4167 GroupTagHandler: 空タグ修正** — `db_display_name` が空文字列を返す場合に `#` のみが付加される不具合を修正
 
-## 予定: 5.10.0 — WebUI拡張
+## リリース済み: 5.9.0（2026-03-20）
 
+全4 Issue クローズ。カスタムAPI独立デーモン化、PieFed gem切り出し、GroupTagHandler、セキュリティ対応。全4台デプロイ済み。
+
+- **#4144 カスタムAPIを独立デーモンに分離** — Bundler二重管理・Open3.capture3の不安定さを解消。cure-api v3.0.0として独立HTTPサーバーに移行。設計意図は [custom-api-redesign.md](custom-api-redesign.md) を参照
+- **#4146 PieFed対応をginseng-piefedに切り出し** — ginseng-piefed gem を新規作成
+- **#4164 GroupTagHandler** — PieFed community-hashtag-map 連携によるグループタグ自動付与
+- **CVE-2026-33210** json gem format string injection 対応済み
+- ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
+- CIでGroupTagHandlerの外部HTTPリクエストを抑制
+
+## 開発中: 5.10.0 — HEVC対応・WebUI拡張・監視強化
+
+- **#4171 HEVC動画のアップロード422修正** — VideoFormatConvertHandlerにコーデック互換性チェックを追加。H.265 mp4をlibx264でトランスコードしてからMastodonに送信。ステージング検証待ち
 - #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
 - #4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出
+- #4168 ヘルスステータス変更時に再通知する
 
 ## リリース済み: 5.7.0（2026-03-14）
 
@@ -319,6 +330,21 @@ test/
 - パッチリリース（5.0.x 等）は致命的な不具合時のみ
 - 通常の機能追加・改善はマイナーバージョン（5.1.0 等）でまとめてリリース
 
+### 通常リリース手順
+
+1. **マイルストーンのIssueをすべて消化**
+2. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
+3. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
+4. **リリースPR作成**: `develop` → `main` へPRを作成
+5. **CI通過を確認してマージ**
+6. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
+7. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
+8. **リリース後の更新**:
+   - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加
+   - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）
+   - インフラノート（`pooza/chubo2` の `docs/infra-note.md`）: 作業履歴セクションにデプロイ記録を追記（デプロイ日・バージョン・主な変更内容・特記事項）
+   - MEMORY.md: リリース履歴・インフラセクションを同期
+
 ### ホットフィックス手順
 
 緊急パッチリリースの手順。通常リリースと異なり、develop → main マージではなく main に直接コミットする場合がある。
@@ -330,6 +356,7 @@ test/
 5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
 6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
 7. **Wiki 確認**: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認する（設定変更、API追加、廃止機能など）
+8. **インフラノート更新**: `pooza/chubo2` の `docs/infra-note.md` 作業履歴セクションにデプロイ記録を追記
 
 バージョンが記載されている場所:
 
@@ -340,11 +367,11 @@ test/
 - 1マイルストーンあたり10件前後で区切る（平均的なボリュームのIssueを基準とし、粒度の大きなIssueがある場合は件数を減らして調整する）
 - 優先度の低いIssueは次のマイナーバージョンへ送る
 - 計画書は作成せず、Issue＋マイルストーンで管理する
-- セキュリティレビュー（[#4156](https://github.com/pooza/mulukhiya-toot-proxy/issues/4156)）は各マイルストーンの Issue をすべて消化した後、リリース直前に毎度実施する
 
 ### リリースノート
 
 - セキュリティアップデート（gem のパッチ更新等）は、実質的に影響がなくてもリリースノートに記載する
+- 「アップグレード手順」には[更新手順](https://github.com/pooza/mulukhiya-toot-proxy/wiki/%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86)Wikiへのリンクを毎回含める。加えて4.x系ユーザー向け[アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)へのリンクも当分含める
 
 ### Dependabot運用
 

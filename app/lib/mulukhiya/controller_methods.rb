@@ -195,6 +195,10 @@ module Mulukhiya
         return config["/#{name}/attachment/types/audio"] rescue nil
       end
 
+      def video_codecs
+        return config["/#{name}/attachment/video_codecs"] rescue nil
+      end
+
       def visibility_name(name)
         return parser_class.visibility_name(name)
       end
