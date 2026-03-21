@@ -26,6 +26,20 @@ module Mulukhiya
       return self.class.new(dest)
     end
 
+    def transcode(type)
+      dest = create_dest_path(f: __method__, type:)
+      command = FFmpegCommandBuilder.transcode_video(path, dest)
+      command.exec
+      return self.class.new(dest)
+    end
+
+    def video_codec
+      return video_stream.fetch('codec_name')
+    rescue => e
+      e.log(file: path)
+      return nil
+    end
+
     def width
       return video_stream.fetch('width').to_i
     rescue => e

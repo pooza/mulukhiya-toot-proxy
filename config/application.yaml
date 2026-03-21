@@ -298,6 +298,8 @@ mastodon:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
+    video_codecs:
+      - h264
   capabilities:
     repost: true
     streaming: true
@@ -348,6 +350,8 @@ misskey:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
+    video_codecs:
+      - h264
   capabilities:
     channel: true
     decoration: true

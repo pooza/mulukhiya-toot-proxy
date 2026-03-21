@@ -1,16 +1,16 @@
 module Mulukhiya
   class VideoFormatConvertHandler < MediaConvertHandler
     def convert
-      return file.convert_type(type)
+      return compatible_codec? ? file.convert_type(type) : file.transcode(type)
     ensure
-      result.push(source: {type: file.type})
+      result.push(source: {type: file.type, video_codec: file.video_codec})
     end
 
     def convertable?
       return false unless file
       return false unless file.video?
-      return false if file.type == type
-      return true
+      return true unless file.type == type
+      return !compatible_codec?
     end
 
     def type
@@ -19,6 +19,14 @@ module Mulukhiya
 
     def media_class
       return VideoFile
+    end
+
+    private
+
+    def compatible_codec?
+      codecs = controller_class.video_codecs
+      return true unless codecs
+      return codecs.include?(file.video_codec)
     end
   end
 end
