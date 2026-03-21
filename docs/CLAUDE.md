@@ -119,8 +119,9 @@ git diff Gemfile.lock
 - ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
 - CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
-## 予定: 5.10.0 — WebUI拡張・監視強化
+## 開発中: 5.10.0 — HEVC対応・WebUI拡張・監視強化
 
+- **#4171 HEVC動画のアップロード422修正** — VideoFormatConvertHandlerにコーデック互換性チェックを追加。H.265 mp4をlibx264でトランスコードしてからMastodonに送信。ステージング検証待ち
 - #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
 - #4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出
 - #4168 ヘルスステータス変更時に再通知する
