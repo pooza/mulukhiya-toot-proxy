@@ -45,7 +45,7 @@ module Mulukhiya
 
     def admin_role_ids
       return [] unless Environment.dbms_class&.config?
-      return Mastodon::Role.where {permissions.sql_number & 1 > 0}.select_map(:id).map(&:to_s)
+      return Mastodon::Role.where {(permissions.sql_number & 1).positive?}.select_map(:id).map(&:to_s)
     rescue
       return []
     end
