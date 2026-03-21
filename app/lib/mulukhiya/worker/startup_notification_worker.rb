@@ -46,7 +46,7 @@ module Mulukhiya
     end
 
     def extract_status(health)
-      return health.except(:status).to_h {|k, v| [k, v[:status]]}
+      return health.except(:status).transform_values {|v| v[:status]}
     end
 
     def previous_status
