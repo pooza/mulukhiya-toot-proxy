@@ -45,9 +45,9 @@ module Mulukhiya
 
     def admin_role_ids
       return [] unless Environment.dbms_class&.config?
-      # rubocop:disable Layout/LineLength
+      # rubocop:disable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces
       return Mastodon::Role.where { (permissions.sql_number & 1) > 0 }.select_map(:id).map(&:to_s)
-      # rubocop:enable Layout/LineLength
+      # rubocop:enable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces
     rescue
       return []
     end
