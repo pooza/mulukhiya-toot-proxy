@@ -45,6 +45,9 @@ module Mulukhiya
 
     def admin_role_ids
       return [] unless Environment.dbms_class&.config?
+      if Environment.misskey?
+        return Misskey::Role.where(isAdministrator: true).select_map(:id).map(&:to_s)
+      end
       # rubocop:disable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces
       return Mastodon::Role.where { (permissions.sql_number & 1) > 0 }.select_map(:id).map(&:to_s)
       # rubocop:enable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces

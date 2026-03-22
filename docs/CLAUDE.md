@@ -19,6 +19,10 @@
 
 `DefaultTagHandler` は実装としてはシンプルだが、コミュニティ運用の基盤を支える重要なハンドラー。
 
+## tomato-shrieker との連携
+
+詳細は [tomato-shrieker-integration.md](tomato-shrieker-integration.md) を参照。Webhook digest の生成要素・連携フロー・インシデント履歴をまとめている。
+
 ## ブランチ戦略
 
 | ブランチ | バージョン | 目的 |
