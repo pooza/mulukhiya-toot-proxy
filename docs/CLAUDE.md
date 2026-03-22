@@ -104,6 +104,10 @@ git diff Gemfile.lock
 - #4155 Wiki: Sentry.ioの設定項目をドキュメントに追加
 - #4156 セキュリティレビュー実施済み
 
+## リリース済み: 5.9.1（2026-03-21）
+
+- **#4167 GroupTagHandler: 空タグ修正** — `db_display_name` が空文字列を返す場合に `#` のみが付加される不具合を修正
+
 ## リリース済み: 5.9.0（2026-03-20）
 
 全4 Issue クローズ。カスタムAPI独立デーモン化、PieFed gem切り出し、GroupTagHandler、セキュリティ対応。全4台デプロイ済み。
@@ -115,10 +119,12 @@ git diff Gemfile.lock
 - ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
 - CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
-## 予定: 5.10.0 — WebUI拡張
+## 開発中: 5.10.0 — HEVC対応・WebUI拡張・監視強化
 
+- **#4171 HEVC動画のアップロード422修正** — VideoFormatConvertHandlerにコーデック互換性チェックを追加。H.265 mp4をlibx264でトランスコードしてからMastodonに送信。ステージング検証待ち
 - #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
 - #4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出
+- #4168 ヘルスステータス変更時に再通知する
 
 ## リリース済み: 5.7.0（2026-03-14）
 
@@ -336,6 +342,7 @@ test/
 8. **リリース後の更新**:
    - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加
    - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）
+   - インフラノート（`pooza/chubo2` の `docs/infra-note.md`）: 作業履歴セクションにデプロイ記録を追記（デプロイ日・バージョン・主な変更内容・特記事項）
    - MEMORY.md: リリース履歴・インフラセクションを同期
 
 ### ホットフィックス手順
@@ -349,6 +356,7 @@ test/
 5. **本番デプロイ**: 全サーバーにデプロイ（monit停止 → restart → monit開始）
 6. **docs/CLAUDE.md 更新**: リリース済みセクションに追記
 7. **Wiki 確認**: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認する（設定変更、API追加、廃止機能など）
+8. **インフラノート更新**: `pooza/chubo2` の `docs/infra-note.md` 作業履歴セクションにデプロイ記録を追記
 
 バージョンが記載されている場所:
 
@@ -363,6 +371,7 @@ test/
 ### リリースノート
 
 - セキュリティアップデート（gem のパッチ更新等）は、実質的に影響がなくてもリリースノートに記載する
+- 「アップグレード手順」には[更新手順](https://github.com/pooza/mulukhiya-toot-proxy/wiki/%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86)Wikiへのリンクを毎回含める。加えて4.x系ユーザー向け[アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)へのリンクも当分含める
 
 ### Dependabot運用
 

@@ -82,7 +82,52 @@ capsicum は任意の Mastodon / Misskey サーバーに接続するため、モ
 
 モロヘイヤ側の `docs/CLAUDE.md` の「関連リポジトリ」セクションに capsicum を追加してほしい。
 
-## 5. 今後の API 変更時の連携
+## 5. 管理者ロール情報の提供 API
+
+### 背景
+
+Mastodon の公開 API では、ユーザーのロールに `permissions` フィールドが含まれない（セキュリティ上の制約）。そのため、クライアントアプリから他ユーザーが管理者かどうかを判定する手段がない。
+
+capsicum では管理者ロールに `:sabacan:` カスタム絵文字を表示する機能を実装したが、現状は `verify_credentials`（ログインユーザー自身のロール）から管理者ロール ID を学習する方式のため、ログインユーザーが管理者でない場合は判定できない。
+
+モロヘイヤは DB に直接アクセスできるため、`user_roles` テーブルの `permissions` を参照して管理者ロール ID を返す API を提供してほしい。
+
+### 実装方針
+
+専用エンドポイントは設けず、既存の `GET /mulukhiya/api/about` レスポンスに `admin_role_ids` フィールドを追加する。capsicum はモロヘイヤ検出時に既にこのエンドポイントを呼んでいるため、追加リクエストが不要。
+
+- 認証: 不要（`/about` は認証なしで利用可能）
+- レスポンス例（`config` 内に追加）:
+
+```json
+{
+  "config": {
+    "admin_role_ids": ["3"],
+    ...
+  }
+}
+```
+
+- DB 未接続時（Misskey 等）やエラー時は空配列 `[]` を返す
+- Misskey は `isAdministrator` フィールドがあるため不要だが、空配列が返るだけなので capsicum 側で分岐不要
+
+### 実装詳細
+
+- `Config#about` の `config:` ハッシュに `admin_role_ids` を追加
+- `Config#admin_role_ids`（private）: `Mastodon::Role` の `user_roles` テーブルから `permissions` ビット 0（管理者）が立っているロール ID を文字列配列で返す
+- ガード: `Environment.dbms_class&.config?` で DB 未接続を判定、rescue で例外も空配列にフォールバック
+
+### capsicum 側の利用方法
+
+1. モロヘイヤ検出時に管理者ロール ID を取得・キャッシュ
+2. ユーザーのロール表示時にロール ID を照合して `isAdmin` を判定
+3. モロヘイヤ未導入サーバーでは `verify_credentials` フォールバック（現行方式）
+
+### 関連
+
+- `pooza/capsicum#159`
+
+## 6. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 
