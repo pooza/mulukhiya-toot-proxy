@@ -119,6 +119,14 @@ git diff Gemfile.lock
 - ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
 - CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
+## 開発中: 5.10.1（ホットフィックス）
+
+Codexレビュー指摘3件の修正。
+
+- **fix: Config#admin_role_ids が空配列を返す** — `positive?`（Ruby Numeric）はSequel DSLではなく正しいSQLに変換されなかった。`> 0` に修正（#4172）
+- **fix: StartupNotificationWorker の通知前ステータス保存** — `notify_if_changed` で通知前に `save_status` していたため、通知失敗時にステータスが更新済みになる不整合を修正（#4170 P1）
+- **fix: GroupTagHandler#db_display_name のアクセサ経由参照** — Sequelモデルの生カラム値 `account[:display_name]` を直接参照するよう修正（#4169 P2）
+
 ## リリース済み: 5.10.0（2026-03-22）
 
 全3 Issue クローズ。HEVC動画対応、about API拡張、ヘルスステータス変更通知。
