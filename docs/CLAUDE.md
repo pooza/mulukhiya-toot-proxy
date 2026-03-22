@@ -119,12 +119,23 @@ git diff Gemfile.lock
 - ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
 - CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
-## 開発中: 5.10.0 — HEVC対応・WebUI拡張・監視強化
+## 開発中: 5.10.1（ホットフィックス）
 
-- **#4171 HEVC動画のアップロード422修正** — VideoFormatConvertHandlerにコーデック互換性チェックを追加。H.265 mp4をlibx264でトランスコードしてからMastodonに送信。ステージング検証待ち
-- #4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理） — オブジェクト配列や深いネスト構造を持つパラメータの一覧管理UI
-- #4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出
-- #4168 ヘルスステータス変更時に再通知する
+Codexレビュー指摘3件の修正。
+
+- **fix: Config#admin_role_ids が空配列を返す** — `positive?`（Ruby Numeric）はSequel DSLではなく正しいSQLに変換されなかった。`> 0` に修正（#4172）
+- **fix: StartupNotificationWorker の通知前ステータス保存** — `notify_if_changed` で通知前に `save_status` していたため、通知失敗時にステータスが更新済みになる不整合を修正（#4170 P1）
+- **fix: GroupTagHandler#db_display_name のアクセサ経由参照** — Sequelモデルの生カラム値 `account[:display_name]` を直接参照するよう修正（#4169 P2）
+
+## リリース済み: 5.10.0（2026-03-22）
+
+全3 Issue クローズ。HEVC動画対応、about API拡張、ヘルスステータス変更通知。
+
+- **#4168 ヘルスステータス変更時に再通知** — 前回のヘルスステータスをRedisに保存し、5分ごとのチェックで変更（OK→NG、NG→OK）を検出した場合にinfo_botから管理者へ再通知
+- **#4172 about APIで管理者ロールIDを返す** — `GET /mulukhiya/api/about` の `config` に `admin_role_ids` フィールドを追加。capsicumの管理者バッジ表示に利用（pooza/capsicum#159）
+- **#4171 HEVC動画のアップロード422修正** — VideoFormatConvertHandlerにコーデック互換性チェックを追加。H.265 mp4をlibx264でトランスコードしてからMastodonに送信
+- GroupTagHandler#db_display_nameをアクセサ経由に戻す
+- bundle update (nokogiri 1.19.2, mcp 0.9.0)
 
 ## リリース済み: 5.7.0（2026-03-14）
 
