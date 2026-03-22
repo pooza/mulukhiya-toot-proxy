@@ -72,7 +72,7 @@ module Mulukhiya
       account = account_class.get(acct: acct)
       return nil unless account
       return nil unless account.actor_type == 'Group'
-      return account.display_name.presence
+      return account[:display_name].presence
     rescue
       return nil
     end

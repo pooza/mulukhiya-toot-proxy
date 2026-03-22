@@ -33,7 +33,6 @@ module Mulukhiya
       previous = previous_status
       current = extract_status(health)
       return if previous == current
-      save_status(current)
       notify_all(health, create_change_message(health, previous))
     end
 
