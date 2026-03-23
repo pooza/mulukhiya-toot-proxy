@@ -60,6 +60,8 @@ ffmpeg:
     bitrate: 192 # kbps
   crf: 22
   preset: veryfast
+  probe:
+    timeout: 30
 firefish:
   capabilities:
     reaction: true

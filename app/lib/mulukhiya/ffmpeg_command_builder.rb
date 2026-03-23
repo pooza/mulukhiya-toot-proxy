@@ -4,8 +4,8 @@ module Mulukhiya
 
     def self.remux_video(src, dest)
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
-        '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
+        'ffmpeg', '-y', '-i', src,
+        '-map', '0:v:0', '-map', '0:a:0?',
         '-c', 'copy', '-movflags', '+faststart',
         '-map_metadata', '0', '-map_chapters', '0', dest
       ])
@@ -15,19 +15,18 @@ module Mulukhiya
       crf ||= config['/ffmpeg/crf']
       preset ||= config['/ffmpeg/preset']
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
-        '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
+        'ffmpeg', '-y', '-i', src,
+        '-map', '0:v:0', '-map', '0:a:0?',
         '-c:v', 'libx264', '-preset', preset, '-crf', crf.to_s,
         '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.1', '-g', '120',
         '-c:a', 'aac', '-b:a', '160k', '-ar', '48000', '-ac', '2',
-        '-c:s', 'mov_text',
         '-movflags', '+faststart', '-map_metadata', '0', '-map_chapters', '0', dest
       ])
     end
 
     def self.remux_audio(src, dest)
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
+        'ffmpeg', '-y', '-i', src,
         '-map', '0:a:0', '-c', 'copy', '-map_metadata', '0', '-id3v2_version', '3', dest
       ])
     end
@@ -35,7 +34,7 @@ module Mulukhiya
     def self.transcode_audio(src, dest, bitrate = nil)
       bitrate ||= config['/ffmpeg/audio/bitrate']
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
+        'ffmpeg', '-y', '-i', src,
         '-map', '0:a:0', '-c:a', 'libmp3lame', '-b:a', "#{bitrate}k",
         '-map_metadata', '0', '-id3v2_version', '3', dest
       ])
