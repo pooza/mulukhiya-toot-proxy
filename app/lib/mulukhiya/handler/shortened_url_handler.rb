@@ -28,7 +28,7 @@ module Mulukhiya
       while redirects < MAX_REDIRECTS
         next_uri, status = fetch_redirect(dest)
         break unless next_uri
-        break unless follow_redirect?(dest, next_uri, status)
+        break unless (status / 100) == 3
         dest = next_uri
         redirects += 1
       end
@@ -44,33 +44,6 @@ module Mulukhiya
     rescue => e
       errors.push(class: e.class.to_s, message: e.message, url: dest.to_s)
       return [nil, nil]
-    end
-
-    def follow_redirect?(current_uri, next_uri, status)
-      return true if twitter?(current_uri)
-      return true if permanent_redirect?(status)
-      return false unless redirect_status?(status)
-      return cross_domain?(current_uri, next_uri)
-    end
-
-    def twitter?(uri)
-      return tco?(uri)
-    end
-
-    def tco?(uri)
-      return uri.host.to_s.downcase == 't.co'
-    end
-
-    def permanent_redirect?(status)
-      return [301, 308].include?(status)
-    end
-
-    def redirect_status?(status)
-      return (status / 100) == 3
-    end
-
-    def cross_domain?(current_uri, next_uri)
-      return next_uri.host != current_uri.host
     end
 
     def domains
