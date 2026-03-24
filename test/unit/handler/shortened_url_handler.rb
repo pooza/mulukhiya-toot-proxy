@@ -9,5 +9,12 @@ module Mulukhiya
 
       assert_equal({result: [{source_url: 'https://t.co/6Um3INeyU9', rewrited_url: 'https://www.youtube.com/watch?v=Ipsa3rgH1Cs&feature=youtu.be'}], errors: []}, @handler.debug_info)
     end
+
+    def test_skip_non_whitelisted_url
+      url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      @handler.handle_pre_toot(status_field => url)
+
+      assert_equal({result: [], errors: []}, @handler.debug_info)
+    end
   end
 end

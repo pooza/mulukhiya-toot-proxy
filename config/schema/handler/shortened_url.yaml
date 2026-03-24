@@ -1,6 +1,10 @@
 properties:
   disabled:
     type: boolean
+  domains:
+    items:
+      type: string
+    type: array
   timeout:
     minimum: 1
     type: integer

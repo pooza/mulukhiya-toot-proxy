@@ -140,6 +140,15 @@ handler:
   reply_reaction:
     bridge_domains:
       - bsky.brid.gy
+  shortened_url:
+    domains:
+      - t.co
+      - bit.ly
+      - ow.ly
+      - amzn.to
+      - amzn.asia
+      - youtu.be
+      - spoti.fi
   result_notification:
     spoiler_text: 実行結果
   slack_alert:

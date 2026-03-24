@@ -13,7 +13,11 @@ module Mulukhiya
     end
 
     def rewritable?(uri)
-      return true
+      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
+      return domains.member?(uri.host)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
+      return false
     end
 
     private
@@ -67,6 +71,10 @@ module Mulukhiya
 
     def cross_domain?(current_uri, next_uri)
       return next_uri.host != current_uri.host
+    end
+
+    def domains
+      return handler_config(:domains) || []
     end
 
     def normalize_location(base_uri, location)
