@@ -124,7 +124,7 @@ module Mulukhiya
     def video_stream
       unless @video
         command = FFmpegCommandBuilder.probe_video(path)
-        command.exec
+        command.exec(timeout: probe_timeout)
         @video = JSON.parse(command.stdout)['streams'].first
       end
       return @video
@@ -133,7 +133,7 @@ module Mulukhiya
     def audio_stream
       unless @audio
         command = FFmpegCommandBuilder.probe_audio(path)
-        command.exec
+        command.exec(timeout: probe_timeout)
         @audio = JSON.parse(command.stdout)['streams'].first
       end
       return @audio
@@ -142,10 +142,16 @@ module Mulukhiya
     def container
       unless @container
         command = FFmpegCommandBuilder.probe_container(path)
-        command.exec
+        command.exec(timeout: probe_timeout)
         @container = JSON.parse(command.stdout)
       end
       return @container
+    end
+
+    def probe_timeout
+      return Config.instance['/ffmpeg/probe/timeout']
+    rescue
+      return 30
     end
 
     def self.download(uri)

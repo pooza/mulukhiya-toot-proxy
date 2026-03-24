@@ -37,14 +37,31 @@ module Mulukhiya
           capabilities: sub_hash("/#{name}/capabilities"),
           features: sub_hash("/#{name}/features"),
           admin_role_ids: admin_role_ids,
+          info_bot: info_bot_profile,
         },
       }
     end
 
     private
 
+    def info_bot_profile
+      account = Environment.account_class&.info_account
+      return nil unless account
+      return {
+        username: account.username,
+        acct: account.acct.to_s,
+        url: account.uri.to_s,
+        display_name: account.display_name,
+      }
+    rescue
+      return nil
+    end
+
     def admin_role_ids
       return [] unless Environment.dbms_class&.config?
+      if Environment.misskey?
+        return Misskey::Role.where(isAdministrator: true).select_map(:id).map(&:to_s)
+      end
       # rubocop:disable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces
       return Mastodon::Role.where { (permissions.sql_number & 1) > 0 }.select_map(:id).map(&:to_s)
       # rubocop:enable Style/BitwisePredicate, Style/NumericPredicate, Layout/SpaceInsideBlockBraces

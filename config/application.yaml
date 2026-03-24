@@ -60,6 +60,8 @@ ffmpeg:
     bitrate: 192 # kbps
   crf: 22
   preset: veryfast
+  probe:
+    timeout: 30
 firefish:
   capabilities:
     reaction: true
@@ -416,7 +418,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.10.1
+  version: 5.11.0
 parser:
   note:
     fields:

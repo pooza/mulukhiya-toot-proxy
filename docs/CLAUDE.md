@@ -19,6 +19,10 @@
 
 `DefaultTagHandler` は実装としてはシンプルだが、コミュニティ運用の基盤を支える重要なハンドラー。
 
+## tomato-shrieker との連携
+
+詳細は [tomato-shrieker-integration.md](tomato-shrieker-integration.md) を参照。Webhook digest の生成要素・連携フロー・インシデント履歴をまとめている。
+
 ## ブランチ戦略
 
 | ブランチ | バージョン | 目的 |
@@ -119,7 +123,7 @@ git diff Gemfile.lock
 - ginseng-piefed 0.1.1: Service#logger/config未定義バグを修正
 - CIでGroupTagHandlerの外部HTTPリクエストを抑制
 
-## 開発中: 5.10.1（ホットフィックス）
+## リリース済み: 5.10.1（2026-03-22）
 
 Codexレビュー指摘3件の修正。
 

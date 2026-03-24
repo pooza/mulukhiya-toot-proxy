@@ -18,18 +18,21 @@ module Mulukhiya
     def convert_type(type)
       dest = create_dest_path(f: __method__, type:)
       command = FFmpegCommandBuilder.remux_video(path, dest)
-      command.exec
+      command.exec(timeout: ffmpeg_timeout)
       unless command.status.zero?
+        log_ffmpeg_error(command, 'remux')
         command = FFmpegCommandBuilder.transcode_video(path, dest)
-        command.exec
+        command.exec(timeout: ffmpeg_timeout)
       end
+      raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
       return self.class.new(dest)
     end
 
     def transcode(type)
       dest = create_dest_path(f: __method__, type:)
       command = FFmpegCommandBuilder.transcode_video(path, dest)
-      command.exec
+      command.exec(timeout: ffmpeg_timeout)
+      raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
       return self.class.new(dest)
     end
 
@@ -61,6 +64,24 @@ module Mulukhiya
     rescue => e
       e.log(file: path)
       return nil
+    end
+
+    private
+
+    def ffmpeg_timeout
+      return Config.instance['/handler/video_format_convert/timeout']
+    rescue
+      return 90
+    end
+
+    def log_ffmpeg_error(command, phase)
+      logger.error(
+        class: self.class.to_s,
+        phase:,
+        status: command.status,
+        stderr: command.stderr&.then {|s| s.lines.last(5).join},
+        file: path,
+      )
     end
   end
 end
