@@ -147,7 +147,6 @@ handler:
       - ow.ly
       - amzn.to
       - amzn.asia
-      - youtu.be
       - spoti.fi
   result_notification:
     spoiler_text: 実行結果
