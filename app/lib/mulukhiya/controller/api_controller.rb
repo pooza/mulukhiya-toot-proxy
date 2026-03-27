@@ -301,14 +301,19 @@ module Mulukhiya
         @renderer.message = {errors:}
       else
         saved_params = entry[:params].deep_stringify_keys
-        parser = parser_class.new(saved_params[status_field])
+        original_body = saved_params[status_field]
+        parser = parser_class.new(original_body)
         body = [
           parser.body,
           '',
           params[:tags].map(&:to_hashtag).join(' '),
         ].join("\n")
         saved_params[status_field] = body
-        sns.delete_scheduled_status(params[:id])
+        delete_response = sns.delete_scheduled_status(params[:id])
+        unless delete_response.code.between?(200, 299)
+          message = delete_response.parsed_response&.dig('error') || 'delete failed'
+          raise Ginseng::GatewayError, message
+        end
         response = sns.toot(saved_params.merge(
           'scheduled_at' => entry[:scheduled_at],
         ).compact)
@@ -329,6 +334,7 @@ module Mulukhiya
             tags: params[:tags],
           }
         else
+          saved_params[status_field] = original_body
           sns.toot(saved_params.merge('scheduled_at' => entry[:scheduled_at]).compact)
           message = response.parsed_response['error'] || 'recreate failed'
           raise Ginseng::GatewayError, message
