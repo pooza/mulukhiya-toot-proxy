@@ -13,6 +13,10 @@ module Mulukhiya
       return true
     end
 
+    def type
+      return nil
+    end
+
     def pixel
       return handler_config(:pixel)
     end

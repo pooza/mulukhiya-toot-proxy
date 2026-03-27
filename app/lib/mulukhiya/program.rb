@@ -5,7 +5,7 @@ module Mulukhiya
 
     def update
       return redis['program'] = uris.inject({}) do |programs, v|
-        programs.merge(@http.get(v).to_h)
+        programs.merge(@http.get(v).parsed_response)
       end.to_json
     end
 
