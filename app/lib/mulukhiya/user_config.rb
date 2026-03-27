@@ -131,6 +131,7 @@ module Mulukhiya
         values['tagging']['minutes'] = nil
       elsif flatten.key?('/tagging/user_tags') && flatten['/tagging/user_tags'].empty?
         Sidekiq.remove_schedule("user_tag_initialize_#{@account.username}")
+        restore_decoration_if_saved
       end
     end
 
@@ -147,6 +148,15 @@ module Mulukhiya
         args: [{account_id: @account.id}],
       })
       values['decoration']['minutes'] = nil
+    end
+
+    def restore_decoration_if_saved
+      return unless Environment.misskey_type?
+      return unless self['/decoration/saved_state'].present?
+      Sidekiq.remove_schedule("decoration_initialize_#{@account.username}")
+      DecorationInitializeWorker.new.restore_decoration(@account)
+    rescue => e
+      e.log
     end
   end
 end
