@@ -96,6 +96,31 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 開発中: 5.12.0
+
+全4 Issue 実装完了。dev04ステージング検証済み。
+
+- **#4188 エピソードブラウザのコマンドトゥートにデコレーション解除を含める**
+- **#4187 デコレーション復元APIの追加とタグセット解除時の連動**
+- **#4186 予約投稿のタグ編集API** — ScheduledStatusStorage（Redis TTL付き）、ScheduledStatusSaveHandler（post_toot）、PUT /scheduled_status/:id/tags
+- **#4184 VideoFormatConvertHandlerテスト基盤整備とエッジケース対応**
+  - pix_fmtチェック追加（yuv420p以外はtranscode）
+  - video_codec nilガード
+  - .m4vのMIME判定確認（video/mp4として正常認識）
+
+### ステージング検証で発見・修正した追加コミット
+
+- **fix: daemon環境でのOpen3 Broken pipe対策**（b24ce39d） — daemon(8)経由のPumaプロセスで$stdoutパイプが破損し、Open3.capture3がEPIPEで失敗。puma.rbで$stdout/$stderrを/dev/nullにリオープン
+- **fix: メディア変換後のContent-Typeとファイル名を更新**（2b152f2b） — remux/transcode後にpayloadのtypeとfilenameが元のままで、Mastodon側のPostProcessMediaWorkerがファイル名拡張子の不整合でエラー
+- **fix: 音声なし動画にサイレント音声トラックを追加**（d60a57d1） — **要検証: 下記S3問題の解決後に音声なし動画をサイレントトラックなしで再テストし、不要ならrevertすること**。Mastodonが音声なし動画をgifv判定する回避策だが、根本原因はS3マルチパートダウンロードだった可能性あり
+
+### 残作業
+
+1. **本番Mastodon 3台に`S3_FORCE_SINGLE_REQUEST=true`適用**（手順はchubo2インフラノートに記載済み）
+2. **サイレントトラック追加（d60a57d1）の要否判定**: S3問題解決済みのdev04で、サイレントトラックをrevertした状態で音声なし動画をアップロードし、gifv判定されても正常にreprocessできるか確認。不要ならrevert
+3. **dev23ステージング検証**（Ruby 4.0.2インストール済みなら）
+4. **本番デプロイ + リリース**
+
 ## リリース済み: 5.8.0（2026-03-16）
 
 全7 Issue/PR クローズ。セキュリティレビュー対応、reblog_labelカスタマイズ、投稿編集APIパススルー（実験的）。
