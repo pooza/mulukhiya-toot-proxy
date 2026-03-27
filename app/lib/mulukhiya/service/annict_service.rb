@@ -266,7 +266,7 @@ module Mulukhiya
     end
 
     def self.create_command_toot(params = {})
-      return {
+      command = {
         command: 'user_config',
         tagging: {
           user_tags: [
@@ -278,7 +278,11 @@ module Mulukhiya
           ].compact,
           minutes: params[:minutes],
         }.deep_compact,
-      }.to_yaml
+      }
+      if Environment.misskey_type? && params[:minutes]
+        command[:decoration] = {minutes: params[:minutes]}
+      end
+      return command.to_yaml
     end
 
     def self.crawl_all(params = {})
