@@ -96,6 +96,32 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 開発中: 5.12.0
+
+全5 Issue 実装完了。dev04ステージング検証済み。Codexレビュー対応済み。セキュリティレビュー済み。
+
+- **#4188 エピソードブラウザのコマンドトゥートにデコレーション解除を含める**
+- **#4187 デコレーション復元APIの追加とタグセット解除時の連動**
+- **#4186 予約投稿のタグ編集API** — ScheduledStatusStorage（Redis TTL付き）、ScheduledStatusSaveHandler（post_tootパイプライン先頭に登録）、PUT /scheduled_status/:id/tags
+- **#4185 ShortenedURLHandler: youtu.be削除とt.co特別扱い** — youtu.beをホワイトリストから除外、t.coはホワイトリストに依存せずハードコードで常に展開対象
+- **#4184 VideoFormatConvertHandlerテスト基盤整備とエッジケース対応**
+  - pix_fmtチェック追加（yuv420p以外はtranscode）
+  - video_codec nilガード
+  - .m4vのMIME判定確認（video/mp4として正常認識）
+
+### ステージング検証で発見・修正した追加コミット
+
+- **fix: daemon環境でのOpen3 Broken pipe対策**（b24ce39d） — daemon(8)経由のPumaプロセスで$stdoutパイプが破損し、Open3.capture3がEPIPEで失敗。puma.rbでflush時のEPIPE検出により/dev/nullにリオープン（Codexレビューで改善: systemd/コンテナのログを維持）
+- **fix: メディア変換後のContent-Typeとファイル名を更新**（2b152f2b） — remux/transcode後にpayloadのtypeとfilenameが元のままで、Mastodon側のPostProcessMediaWorkerがファイル名拡張子の不整合でエラー
+- **fix: 音声なし動画にサイレント音声トラックを追加**（d60a57d1） — Mastodonが音声なし動画をgifv判定する回避策。1kbps無音AACのため実用上のファイルサイズ増加は無視できる（5分動画で約37KB）。残す判断で確定
+- **fix: Codexレビュー指摘3件を修正**（490ed387） — delete_scheduled_statusのレスポンス検証追加、ロールバック時の元パラメータ復元、puma.rbのEPIPE検出限定化
+
+### 残作業
+
+1. **本番Mastodon 3台の`.env.production`に`S3_FORCE_SINGLE_REQUEST=true`追加** — Mastodon側の再起動が必要。S3マルチパートダウンロードで動画が破損する問題の対策
+2. **dev23ステージング検証**（Ruby 4.0.2インストール済みなら）
+3. **本番デプロイ + リリース**
+
 ## リリース済み: 5.8.0（2026-03-16）
 
 全7 Issue/PR クローズ。セキュリティレビュー対応、reblog_labelカスタマイズ、投稿編集APIパススルー（実験的）。

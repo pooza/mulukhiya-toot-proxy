@@ -99,6 +99,21 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/decoration/restore' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      saved = sns.account.user_config['/decoration/saved_state']
+      raise Ginseng::NotFoundError, 'Not Found' unless saved.present?
+      DecorationInitializeWorker.new.restore_decoration(sns.account)
+      @renderer.message = {config: sns.account.user_config.to_h}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       sns.token ||= sns.default_token
@@ -265,6 +280,71 @@ module Mulukhiya
         ].join("\n")
         @renderer.message = sns.repost(status, body)
       end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/scheduled_status/:id/tags' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.mastodon_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      storage = ScheduledStatusStorage.new
+      entry = storage.get(params[:id])
+      raise Ginseng::NotFoundError, 'Not Found' unless entry
+      raise Ginseng::AuthError, 'Unauthorized' unless entry[:account_id] == sns.account.id
+      errors = ScheduledStatusTagsContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        saved_params = entry[:params].deep_stringify_keys
+        original_body = saved_params[status_field]
+        parser = parser_class.new(original_body)
+        body = [
+          parser.body,
+          '',
+          params[:tags].map(&:to_hashtag).join(' '),
+        ].join("\n")
+        saved_params[status_field] = body
+        delete_response = sns.delete_scheduled_status(params[:id])
+        unless delete_response.code.between?(200, 299)
+          message = delete_response.parsed_response&.dig('error') || 'delete failed'
+          raise Ginseng::GatewayError, message
+        end
+        response = sns.toot(saved_params.merge(
+          'scheduled_at' => entry[:scheduled_at],
+        ).compact)
+        if response.code.between?(200, 299)
+          new_entry = response.parsed_response
+          storage.unlink(params[:id])
+          margin = ScheduledStatusSaveHandler::MARGIN
+          expires_in = (Time.parse(new_entry['scheduled_at']) - Time.now).to_i
+          ttl = [expires_in + margin, margin].max
+          storage.set(new_entry['id'], {
+            account_id: sns.account.id,
+            params: saved_params,
+            scheduled_at: new_entry['scheduled_at'],
+          }, ttl:)
+          @renderer.message = {
+            id: new_entry['id'],
+            scheduled_at: new_entry['scheduled_at'],
+            tags: params[:tags],
+          }
+        else
+          saved_params[status_field] = original_body
+          sns.toot(saved_params.merge('scheduled_at' => entry[:scheduled_at]).compact)
+          message = response.parsed_response['error'] || 'recreate failed'
+          raise Ginseng::GatewayError, message
+        end
+      end
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.log
+      @renderer.status = e.respond_to?(:source_status) ? e.source_status : 502
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     rescue => e
       e.log
