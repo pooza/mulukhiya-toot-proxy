@@ -43,6 +43,13 @@ module Mulukhiya
       return nil
     end
 
+    def pix_fmt
+      return video_stream.fetch('pix_fmt')
+    rescue => e
+      e.log(file: path)
+      return nil
+    end
+
     def width
       return video_stream.fetch('width').to_i
     rescue => e

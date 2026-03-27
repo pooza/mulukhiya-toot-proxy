@@ -2,11 +2,13 @@ module Mulukhiya
   class VideoFileTest < TestCase
     def setup
       @mp4 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.mp4'))
+      @mp4_yuv420 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264_420.mp4'))
       @hevc = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hevc.mp4'))
       @mkv = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.mkv'))
       @mov = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.mov'))
       @hevc_mov = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hevc.mov'))
       @noaudio = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/noaudio.mp4'))
+      @m4v = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.m4v'))
       @jpeg = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/logo.jpg'))
       @mp3 = VideoFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
     end
@@ -99,6 +101,23 @@ module Mulukhiya
     def test_noaudio
       assert_predicate(@noaudio, :video?)
       assert_equal('h264', @noaudio.video_codec)
+    end
+
+    def test_pix_fmt
+      assert_equal('yuv444p', @mp4.pix_fmt)
+      assert_equal('yuv420p', @mp4_yuv420.pix_fmt)
+    end
+
+    def test_m4v
+      assert_predicate(@m4v, :video?)
+      assert_equal('video/mp4', @m4v.type)
+      assert_equal('h264', @m4v.video_codec)
+    end
+
+    def test_transcode_yuv444p
+      converted = @mp4.transcode('video/mp4')
+
+      assert_equal('yuv420p', converted.pix_fmt)
     end
   end
 end
