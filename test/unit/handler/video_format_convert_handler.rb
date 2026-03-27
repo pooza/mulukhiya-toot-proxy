@@ -68,6 +68,7 @@ module Mulukhiya
       converted = @handler.convert
 
       assert_kind_of(VideoFile, converted)
+      assert_predicate(converted, :audio?)
     end
 
     private

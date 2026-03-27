@@ -17,11 +17,11 @@ module Mulukhiya
 
     def convert_type(type)
       dest = create_dest_path(f: __method__, type:)
-      command = FFmpegCommandBuilder.remux_video(path, dest)
+      command = FFmpegCommandBuilder.remux_video(path, dest, audio: audio?)
       command.exec(timeout: ffmpeg_timeout)
       unless command.status.zero?
         log_ffmpeg_error(command, 'remux')
-        command = FFmpegCommandBuilder.transcode_video(path, dest)
+        command = FFmpegCommandBuilder.transcode_video(path, dest, audio: audio?)
         command.exec(timeout: ffmpeg_timeout)
       end
       raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
@@ -30,10 +30,16 @@ module Mulukhiya
 
     def transcode(type)
       dest = create_dest_path(f: __method__, type:)
-      command = FFmpegCommandBuilder.transcode_video(path, dest)
+      command = FFmpegCommandBuilder.transcode_video(path, dest, audio: audio?)
       command.exec(timeout: ffmpeg_timeout)
       raise "ffmpeg failed: #{command.stderr}" unless command.status.zero?
       return self.class.new(dest)
+    end
+
+    def audio?
+      return audio_stream.present?
+    rescue
+      return false
     end
 
     def video_codec
