@@ -1,6 +1,6 @@
 [Unit]
 Description=mulukhiya-toot-proxy (sidekiq)
-After=network.target
+After=network.target redis.service
 
 [Service]
 Type=simple

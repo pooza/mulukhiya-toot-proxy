@@ -102,6 +102,7 @@ module Mulukhiya
   Dir.chdir(dir)
   ENV['BUNDLE_GEMFILE'] = File.join(dir, 'Gemfile')
   Bundler.require
+  JSON::Validator.use_multi_json = false
   loader.setup
   setup_sidekiq
   setup_sentry
