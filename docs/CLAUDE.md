@@ -96,6 +96,24 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## 開発中: 5.13.0
+
+WebUI 管理者向けハンドラー設定の拡充と、ユーザー向けハンドラー設定の共通基盤整備。
+
+- **#4194 ハンドラーに label / description メタデータを追加** — スキーマ YAML にトップレベルで `label`（表示名）と `description`（説明文）を追加。管理者/ユーザー向け WebUI、capsicum の共通基盤
+- **#4191 rc.d スクリプトに redis 依存を追加** — FreeBSD rc.d の `REQUIRE` に `redis` を追加、Ubuntu/RHEL systemd の `After` に `redis-server.service` / `redis.service` を追加（VPS 再起動時の起動順序問題）
+- **#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）**
+- **#4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出**
+- fix: json-schema gem の MultiJSON 非推奨警告を `JSON::Validator.use_multi_json = false` で抑制
+
+### 次期マイルストーン候補（5.14.0 以降）
+
+ユーザー向けハンドラー設定 API & WebUI（capsicum 連携）:
+
+- #4195 ユーザー向けハンドラー一覧 API (`GET /handler/list`)
+- #4196 ユーザー向けハンドラートグル API (`POST /handler/config`)
+- #4197 WebUI: ユーザー向けハンドラートグル画面（config.slim に統合）
+
 ## リリース済み: 5.12.1（2026-03-28）
 
 ホットフィックス。Sentry で検出された本番障害 2 件を修正。全4台デプロイ済み。

@@ -183,15 +183,14 @@ GET /mulukhiya/api/handler/list
 - グローバルに無効化されたハンドラーは一覧に含めない（ユーザーには見せない）
 - `toggleable: false` のハンドラーも一覧に含める（capsicum 側でスイッチを無効化して表示する）
 
-### 6.2 ユーザー設定更新（既存エンドポイントの利用）
+### 6.2 ユーザー向けハンドラートグルエンドポイント（新規）
 
-ハンドラーの有効/無効切替は、既存の `POST /mulukhiya/api/config/update` を利用する想定。
+admin の `POST /admin/handler/config` と対称的な専用エンドポイントを新設する。
 
-capsicum からの呼びやすさとして、以下の JSON ボディ形式にも対応してほしい:
-
-```
-POST /mulukhiya/api/config/update
+```http
+POST /mulukhiya/api/handler/config
 Content-Type: application/json
+Authorization: Bearer <user_token>
 
 {
   "handler": "default_tag",
@@ -199,13 +198,15 @@ Content-Type: application/json
 }
 ```
 
-既存のコマンド形式（`handler.default_tag.disable=true`）との併存で構わない。
+- `UserConfig` に `/handler/{name}/disable` を保存（既存の仕組みを利用）
+- `toggleable: false` のハンドラーに対してはエラーを返す
 
 ### 6.3 モロヘイヤ側で必要な作業
 
-1. 各ハンドラーに `label`（表示名）と `description`（説明文）のメタデータを追加
-2. `GET /mulukhiya/api/handler/list`（ユーザー認証）エンドポイントの新設
-3. （任意）`POST /config/update` の JSON ボディ対応
+1. 各ハンドラーに `label`（表示名）と `description`（説明文）のメタデータを追加 → #4194
+2. `GET /mulukhiya/api/handler/list`（ユーザー認証）エンドポイントの新設 → #4195
+3. `POST /mulukhiya/api/handler/config`（ユーザー認証）エンドポイントの新設 → #4196
+4. WebUI: ユーザー向けハンドラートグル画面（config.slim に統合） → #4197
 
 ### 6.4 capsicum 側の実装予定
 
@@ -216,6 +217,7 @@ Content-Type: application/json
 ### 関連
 
 - capsicum 側: `pooza/capsicum#188`（サーバー情報画面の新設）で導線を確保予定
+- モロヘイヤ側: #4194, #4195, #4196, #4197
 
 ## 7. 今後の API 変更時の連携
 
