@@ -1,3 +1,5 @@
+label: 画像著作権表示
+description: 画像付き投稿に著作権表示メッセージを追加します
 properties:
   disabled:
     type: boolean

@@ -1,3 +1,5 @@
+label: チャンネル通知
+description: チャンネル投稿を指定アカウントに通知します
 properties:
   channels:
     items:

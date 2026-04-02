@@ -89,6 +89,8 @@ module Mulukhiya
     def to_h
       return {
         name: underscore,
+        label:,
+        description:,
         timeout:,
         is_disable: disable?,
         is_verbose: verbose?,
@@ -121,6 +123,14 @@ module Mulukhiya
     def debug_info
       return {result:, errors:} if result.present? || errors.present?
       return nil
+    end
+
+    def label
+      return schema['label']
+    end
+
+    def description
+      return schema['description']
     end
 
     def schema

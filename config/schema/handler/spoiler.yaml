@@ -1,3 +1,5 @@
+label: スポイラー
+description: 閲覧注意テキストの処理と正規化を行います
 properties:
   disabled:
     type: boolean

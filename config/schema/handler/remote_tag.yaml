@@ -1,3 +1,5 @@
+label: リモートタグ
+description: リモートサービスから取得したハッシュタグを付与します
 properties:
   disabled:
     type: boolean

@@ -1,3 +1,5 @@
+label: グループタグ
+description: メンション先のグループアカウントに基づいてハッシュタグを付与します
 properties:
   disabled:
     type: boolean

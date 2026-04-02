@@ -1,3 +1,5 @@
+label: アナウンスメンション
+description: 特定パターンのメンションをアナウンスとして通知します
 properties:
   disabled:
     type: boolean

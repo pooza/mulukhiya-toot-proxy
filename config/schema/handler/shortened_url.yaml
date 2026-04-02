@@ -1,3 +1,5 @@
+label: 短縮URL展開
+description: 短縮URLをリダイレクト先の元URLに展開します
 properties:
   disabled:
     type: boolean

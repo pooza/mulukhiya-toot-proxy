@@ -1,3 +1,5 @@
+label: iTunes URL NowPlaying
+description: iTunes URLをNowPlaying形式に変換します
 properties:
   disabled:
     type: boolean

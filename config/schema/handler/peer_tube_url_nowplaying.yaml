@@ -1,3 +1,5 @@
+label: PeerTube NowPlaying
+description: PeerTube URLをNowPlaying形式に変換します
 properties:
   disabled:
     type: boolean

@@ -1,3 +1,5 @@
+label: Poipiku画像取得
+description: Poipiku投稿から画像を取得して添付します
 properties:
   disabled:
     type: boolean

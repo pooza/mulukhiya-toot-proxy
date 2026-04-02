@@ -1,3 +1,5 @@
+label: PieFedクリッピング
+description: コマンドでPieFedクリッピングを作成します
 properties:
   disabled:
     type: boolean
