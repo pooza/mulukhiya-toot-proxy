@@ -3,16 +3,25 @@ module Mulukhiya
     include Package
 
     def initialize(strings = [])
-      strings = strings.to_a.map do |v|
+      strings = strings.to_a.filter_map do |v|
         case v
         in String
-          v.sub(/^#/, '')
+          v.sub(/^#/, '').presence
         else
           v
         end
       end
       super
     end
+
+    def add(word)
+      normalized = normalize(word.to_s)
+      return self if normalized.empty?
+      @tags = nil
+      return Set.instance_method(:add).bind_call(self, normalized)
+    end
+
+    alias push add
 
     def normalize(word)
       if rule = TaggingHandler.normalize_rules.find {|v| v['source'] == word.to_hashtag_base}
