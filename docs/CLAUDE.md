@@ -100,8 +100,9 @@ git diff Gemfile.lock
 
 WebUI 管理者向けハンドラー設定の拡充と、ユーザー向けハンドラー設定の共通基盤整備。
 
-- **#4194 ハンドラーに label / description メタデータを追加** — スキーマ YAML にトップレベルで `label`（表示名）と `description`（説明文）を追加。管理者/ユーザー向け WebUI、capsicum の共通基盤
-- **#4191 rc.d スクリプトに redis 依存を追加** — FreeBSD rc.d の `REQUIRE` に `redis` を追加、Ubuntu/RHEL systemd の `After` に `redis-server.service` / `redis.service` を追加（VPS 再起動時の起動順序問題）
+- ~~#4194 ハンドラーに label / description メタデータを追加~~ — 完了。全44スキーマYAML + Handler#label, #description アクセサ
+- ~~#4199 文章の末尾に `#` が加えられる~~ — 完了。TagContainer で空タグ・nil値をフィルタ。ginseng-fediverse v1.8.22 で gem 側も修正
+- ~~#4191 rc.d スクリプトに redis 依存を追加~~ — 完了
 - **#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）**
 - **#4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出**
 - fix: json-schema gem の MultiJSON 非推奨警告を `JSON::Validator.use_multi_json = false` で抑制
