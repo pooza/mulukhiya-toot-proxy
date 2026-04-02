@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: fdacd784886291f3c4be8c13aea847cf6502b4fb
+  revision: a9a168441a84aff8b01b19d664c4d6a6d031d20f
   branch: main
   specs:
-    ginseng-fediverse (1.8.21)
+    ginseng-fediverse (1.8.22)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -187,7 +187,7 @@ GEM
       tzinfo
     etc (1.4.6)
     eventmachine (1.2.7)
-    facets (3.1.0)
+    facets (3.2.0)
     faraday (2.14.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -237,10 +237,10 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0317)
+    mime-types-data (3.2026.0331)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (6.0.2)
+    minitest (6.0.3)
       drb (~> 2.0)
       prism (~> 1.5)
     multi_json (1.19.1)
@@ -288,7 +288,7 @@ GEM
       omniauth (~> 2.0)
     optparse (0.8.1)
     ostruct (0.6.3)
-    parallel (1.27.0)
+    parallel (1.28.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
@@ -303,7 +303,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.5)
+    rack (3.2.6)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
@@ -390,7 +390,7 @@ GEM
     sentry-sidekiq (6.5.0)
       sentry-ruby (~> 6.5.0)
       sidekiq (>= 5.0)
-    sequel (5.102.0)
+    sequel (5.103.0)
       bigdecimal
     set (1.1.2)
     sidekiq (8.1.2)
