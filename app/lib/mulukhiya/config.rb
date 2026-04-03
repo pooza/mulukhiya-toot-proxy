@@ -57,6 +57,7 @@ module Mulukhiya
     def detect_unknown_keys(data, sch, prefix = '')
       return [] unless data.is_a?(Hash)
       props = sch['properties'] || {}
+      return [] if props.empty?
       data.flat_map do |key, value|
         path = prefix.empty? ? key.to_s : "#{prefix}.#{key}"
         if props.key?(key.to_s)

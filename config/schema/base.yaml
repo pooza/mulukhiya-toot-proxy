@@ -2,12 +2,26 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 properties:
   agent:
     properties:
+      accts:
+        items:
+          type: string
+        type: array
       info:
         properties:
+          announcement:
+            properties:
+              template:
+                type: string
+            type: object
           token:
             type: string
           username:
             type: string
+          webhook:
+            properties:
+              secret:
+                type: string
+            type: object
           welcome:
             properties:
               template:
@@ -94,6 +108,11 @@ properties:
       - mastodon
       - misskey
     type: string
+  diag:
+    properties:
+      enable:
+        type: boolean
+    type: object
   crypt:
     properties:
       encoder:
@@ -240,6 +259,8 @@ properties:
         type: object
       did_you_mean:
         type: boolean
+      jit:
+        type: boolean
     type: object
   sidekiq:
     properties:
@@ -266,6 +287,8 @@ properties:
         type: object
       schedule:
         type: object
+    type: object
+  service:
     type: object
   spoiler:
     properties:

@@ -279,12 +279,13 @@ module Mulukhiya
     end
 
     def self.all_schema
-      return {
-        type: 'object',
-        properties: Event.all.inject({}) do |props, e|
-          props.merge(e.handlers.to_h {|v| [v.underscore, v.schema]}.deep_symbolize_keys)
-        end,
-      }
+      dir = File.join(Mulukhiya.dir, 'config/schema/handler')
+      schemas = Dir.glob(File.join(dir, '*.yaml')).each_with_object({}) do |path, props|
+        name = File.basename(path, '.yaml')
+        next if name == 'default'
+        props[name.to_sym] = Config.load_file("schema/handler/#{name}").deep_symbolize_keys
+      end
+      return {type: 'object', properties: schemas}
     end
 
     private
