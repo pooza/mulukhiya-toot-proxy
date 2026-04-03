@@ -404,6 +404,11 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.getConfigAudit = async () => {
+      return axios.get(globals.methods.createURL('/mulukhiya/api/admin/config/audit'))
+        .then(e => e.data)
+    }
+
     globals.methods.restartPuma = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

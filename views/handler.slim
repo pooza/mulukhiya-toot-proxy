@@ -12,6 +12,19 @@ html lang='ja' data-theme='light'
       .field-update-button-container v-if='restartable'
         button @click='restartPuma' 再起動
         p.alert 再起動している間（数十秒程度）は操作できなくなります。
+      section.config v-if='account.is_admin && (audit.errors.length > 0 || audit.unknown_keys.length > 0)'
+        h3 @click='toggleVisibility("audit")' 設定監査
+        slide-up-down :active='layout.details.audit'
+          .indented
+            template v-if='audit.errors.length > 0'
+              h4 バリデーションエラー
+              ul
+                li.alert v-for='err in audit.errors' {{err}}
+            template v-if='audit.unknown_keys.length > 0'
+              h4 不明な設定キー
+              p スキーマに定義されていないキーが local.yaml に含まれています。不要であれば削除を検討してください。
+              ul
+                li.alert v-for='key in audit.unknown_keys' {{key}}
       - Mulukhiya::Event.all do |event|
         - next unless event.all_handlers.any?
         section.config v-if='account.is_admin'
@@ -125,8 +138,10 @@ html lang='ja' data-theme='light'
               handlerParams: {},
               expandedHandler: null,
               restartable: false,
+              audit: {errors: [], unknown_keys: []},
               layout: {
                 details: {
+                  audit: true,
                   alert: false,
                   announce: false,
                   follow: false,
@@ -155,6 +170,7 @@ html lang='ja' data-theme='light'
                 this.handlerParams[v.name] = normalizeParams(v.params || {}, v.schema)
               }
             }))
+            this.methods.getConfigAudit().then(e => {this.audit = e}).catch(_ => {})
           },
           methods: {
             toggleVisibility (name) {

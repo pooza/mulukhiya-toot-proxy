@@ -43,7 +43,29 @@ module Mulukhiya
       }
     end
 
+    def audit
+      local = raw['local']
+      return {errors: [], unknown_keys: []} unless local.is_a?(Hash)
+      return {
+        errors: errors,
+        unknown_keys: detect_unknown_keys(local, schema),
+      }
+    end
+
     private
+
+    def detect_unknown_keys(data, sch, prefix = '')
+      return [] unless data.is_a?(Hash)
+      props = sch['properties'] || {}
+      data.flat_map do |key, value|
+        path = prefix.empty? ? key.to_s : "#{prefix}.#{key}"
+        if props.key?(key.to_s)
+          detect_unknown_keys(value, props[key.to_s], path)
+        else
+          [path]
+        end
+      end
+    end
 
     def info_bot_profile
       account = Environment.account_class&.info_account
