@@ -94,9 +94,9 @@ module Mulukhiya
       if row
         value = row[:value]
         value = JSON.parse(value) if value.is_a?(String)
-        palettes = value.select { |_k, v| v.is_a?(Hash) && v.key?('name') }.values
+        palettes = value.select {|_k, v| v.is_a?(Hash) && v.key?('name')}.values
         @renderer.message = {
-          palettes: palettes.map { |p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []} },
+          palettes: palettes.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
           palette_for_reaction: value['emojiPaletteForReaction'],
           palette_for_main: value['emojiPaletteForMain'],
         }
