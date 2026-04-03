@@ -36,7 +36,9 @@ html lang='ja' data-theme='light'
                   h4
                     - if handler.experimental?
                       i class='fa fa-flask' v-tooltip.right="'実験的機能'"
-                    = handler.underscore
+                    = handler.label || handler.underscore
+                  - if handler.description
+                    p.handler-description = handler.description
                   label
                     - if handler.toggleable?
                       input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value=handler.underscore
