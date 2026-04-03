@@ -140,7 +140,7 @@ module Mulukhiya
     end
 
     EXCLUDED_EDITABLE_HANDLERS = [
-      'group_tag', 'remote_tag', 'user_tag'
+      'group_tag', 'remote_tag', 'removal_rule_tag', 'user_tag'
     ].freeze
 
     def editable_schema

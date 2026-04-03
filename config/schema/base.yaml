@@ -275,6 +275,9 @@ properties:
         format: regex
         type: string
     type: object
+  status_url:
+    format: uri
+    type: string
   spotify:
     properties:
       client:
