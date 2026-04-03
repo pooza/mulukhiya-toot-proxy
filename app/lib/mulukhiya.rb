@@ -110,5 +110,5 @@ module Mulukhiya
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
   validate_config
-  RubyVM::YJIT.enable if Environment.jit?
+  RubyVM::YJIT.enable if defined?(RubyVM::YJIT)
 end

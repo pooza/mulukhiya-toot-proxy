@@ -1,6 +1,8 @@
 label: デフォルト
 description: 全ハンドラーの共通既定値
 properties:
+  disable:
+    type: boolean
   disabled:
     type: boolean
   timeout:

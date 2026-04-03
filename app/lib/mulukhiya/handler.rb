@@ -140,7 +140,7 @@ module Mulukhiya
     end
 
     EXCLUDED_EDITABLE_HANDLERS = [
-      'dictionary_tag', 'group_tag', 'remote_tag', 'removal_rule_tag', 'user_tag'
+      'group_tag', 'remote_tag', 'removal_rule_tag', 'user_tag'
     ].freeze
 
     def editable_schema
@@ -279,12 +279,19 @@ module Mulukhiya
     end
 
     def self.all_schema
-      return {
-        type: 'object',
-        properties: Event.all.inject({}) do |props, e|
-          props.merge(e.handlers.to_h {|v| [v.underscore, v.schema]}.deep_symbolize_keys)
-        end,
-      }
+      dir = File.join(Mulukhiya.dir, 'config/schema/handler')
+      defaults = Config.load_file('schema/handler/default').deep_symbolize_keys
+      schemas = {}
+      Dir.glob(File.join(dir, '*.yaml')).each do |path|
+        name = File.basename(path, '.yaml')
+        sch = Config.load_file("schema/handler/#{name}").deep_symbolize_keys
+        unless name == 'default'
+          sch[:properties] = (defaults[:properties] || {}).merge(sch[:properties] || {})
+        end
+        sch.delete(:required)
+        schemas[name.to_sym] = sch
+      end
+      return {type: 'object', properties: schemas}
     end
 
     private
@@ -298,11 +305,37 @@ module Mulukhiya
       when 'string'
         value.to_s.presence
       when 'array'
-        value.is_a?(Array) ? value : Array(value)
+        coerce_array(value, prop)
       when 'object'
-        value.is_a?(Hash) ? value : {}
+        coerce_hash(value, prop)
       else
         value
+      end
+    end
+
+    def coerce_array(value, prop)
+      arr = value.is_a?(Array) ? value : Array(value)
+      if (items = prop['items']) && items['properties']
+        arr.map {|item| coerce_object(item, items)}
+      else
+        arr
+      end
+    end
+
+    def coerce_hash(value, prop)
+      if prop['properties'] && value.is_a?(Hash)
+        coerce_object(value, prop)
+      else
+        value.is_a?(Hash) ? value : {}
+      end
+    end
+
+    def coerce_object(value, schema)
+      props = schema['properties'] || {}
+      hash = value.is_a?(Hash) ? value : {}
+      hash.to_h do |k, v|
+        k = k.to_s
+        [k, props.key?(k) ? coerce_value(v, props[k]) : v]
       end
     end
 

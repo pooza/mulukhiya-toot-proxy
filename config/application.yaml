@@ -427,7 +427,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.13.0
+  version: 5.14.0
 parser:
   note:
     fields:
@@ -477,8 +477,6 @@ sentry:
     - '/home/[^\s]+'
     - '/Users/[^\s]+'
 ruby:
-  bundler:
-    install: false
   did_you_mean: true
 service:
   amazon:

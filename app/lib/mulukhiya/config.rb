@@ -38,11 +38,35 @@ module Mulukhiya
           features: sub_hash("/#{name}/features"),
           admin_role_ids: admin_role_ids,
           info_bot: info_bot_profile,
+          status_url: self['/status_url'],
         },
       }
     end
 
+    def audit
+      local = raw['local']
+      return {errors: [], unknown_keys: []} unless local.is_a?(Hash)
+      return {
+        errors: errors,
+        unknown_keys: detect_unknown_keys(local, schema),
+      }
+    end
+
     private
+
+    def detect_unknown_keys(data, sch, prefix = '')
+      return [] unless data.is_a?(Hash)
+      props = sch['properties'] || {}
+      return [] if props.empty?
+      data.flat_map do |key, value|
+        path = "#{prefix}/#{key}"
+        if props.key?(key.to_s)
+          detect_unknown_keys(value, props[key.to_s], path)
+        else
+          [path]
+        end
+      end
+    end
 
     def info_bot_profile
       account = Environment.account_class&.info_account
