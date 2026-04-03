@@ -98,13 +98,13 @@ git diff Gemfile.lock
 
 ## 開発中: 5.14.0
 
+- **#4202 Misskey ユーザー絵文字パレット取得 API (`GET /mulukhiya/api/emoji/palettes`)**
 - **#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）**
 - **#4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出**
 
 ### 次期マイルストーン候補（5.15.0 以降）
 
-ユーザー向けハンドラー設定 API & WebUI（capsicum 連携）:
-
+- #4198 リモートアカウントの isCat 判定 API
 - #4195 ユーザー向けハンドラー一覧 API (`GET /handler/list`)
 - #4196 ユーザー向けハンドラートグル API (`POST /handler/config`)
 - #4197 WebUI: ユーザー向けハンドラートグル画面（config.slim に統合）
