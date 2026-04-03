@@ -38,7 +38,7 @@ module Mulukhiya
           features: sub_hash("/#{name}/features"),
           admin_role_ids: admin_role_ids,
           info_bot: info_bot_profile,
-          status_url: self['/status_url'],
+          status_url: (self['/status_url'] rescue nil),
         },
       }
     end
