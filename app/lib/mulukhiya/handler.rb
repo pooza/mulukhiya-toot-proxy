@@ -280,10 +280,14 @@ module Mulukhiya
 
     def self.all_schema
       dir = File.join(Mulukhiya.dir, 'config/schema/handler')
+      defaults = Config.load_file('schema/handler/default').deep_symbolize_keys
       schemas = Dir.glob(File.join(dir, '*.yaml')).each_with_object({}) do |path, props|
         name = File.basename(path, '.yaml')
         next if name == 'default'
-        props[name.to_sym] = Config.load_file("schema/handler/#{name}").deep_symbolize_keys
+        sch = Config.load_file("schema/handler/#{name}").deep_symbolize_keys
+        sch[:properties] = (defaults[:properties] || {}).merge(sch[:properties] || {})
+        sch.delete(:required)
+        props[name.to_sym] = sch
       end
       return {type: 'object', properties: schemas}
     end
