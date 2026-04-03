@@ -288,6 +288,21 @@ properties:
       schedule:
         type: object
     type: object
+  sentry:
+    properties:
+      dsn:
+        format: uri
+        type: string
+      scrub_patterns:
+        items:
+          format: regex
+          type: string
+        type: array
+      traces_sample_rate:
+        maximum: 1
+        minimum: 0
+        type: number
+    type: object
   service:
     type: object
   spoiler:
