@@ -1,3 +1,5 @@
+label: iTunes NowPlaying
+description: NowPlayingタグからiTunesの楽曲リンクを挿入します
 properties:
   disabled:
     type: boolean

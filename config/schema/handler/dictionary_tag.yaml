@@ -1,3 +1,5 @@
+label: 辞書タグ
+description: 本文中のキーワードに基づいてハッシュタグを自動付与します
 properties:
   dics:
     items:

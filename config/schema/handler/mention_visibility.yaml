@@ -1,3 +1,5 @@
+label: メンション公開範囲
+description: エージェントへのメンションをダイレクトに設定します
 properties:
   disabled:
     type: boolean

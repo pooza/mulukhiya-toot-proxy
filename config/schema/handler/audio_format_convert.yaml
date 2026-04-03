@@ -1,3 +1,5 @@
+label: 音声フォーマット変換
+description: アップロードされた音声ファイルを既定のフォーマットに変換します
 properties:
   disabled:
     type: boolean

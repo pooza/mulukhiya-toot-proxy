@@ -1,3 +1,5 @@
+label: デフォルト
+description: 全ハンドラーの共通既定値
 properties:
   disabled:
     type: boolean

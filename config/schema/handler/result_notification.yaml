@@ -1,3 +1,5 @@
+label: 処理結果通知
+description: 投稿処理の結果を通知します
 properties:
   disabled:
     type: boolean

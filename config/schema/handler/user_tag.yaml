@@ -1,3 +1,5 @@
+label: ユーザータグ
+description: ユーザーが設定したハッシュタグを付与します
 properties:
   disabled:
     type: boolean

@@ -1,3 +1,5 @@
+label: YouTube NowPlaying
+description: YouTube URLをNowPlaying形式に変換します
 properties:
   disabled:
     type: boolean
