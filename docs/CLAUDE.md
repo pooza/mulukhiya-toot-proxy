@@ -96,24 +96,28 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 開発中: 5.13.0
+## 開発中: 5.14.0
 
-WebUI 管理者向けハンドラー設定の拡充と、ユーザー向けハンドラー設定の共通基盤整備。
-
-- ~~#4194 ハンドラーに label / description メタデータを追加~~ — 完了。全44スキーマYAML + Handler#label, #description アクセサ
-- ~~#4199 文章の末尾に `#` が加えられる~~ — 完了。TagContainer で空タグ・nil値をフィルタ。ginseng-fediverse v1.8.22 で gem 側も修正
-- ~~#4191 rc.d スクリプトに redis 依存を追加~~ — 完了
 - **#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）**
 - **#4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出**
-- fix: json-schema gem の MultiJSON 非推奨警告を `JSON::Validator.use_multi_json = false` で抑制
 
-### 次期マイルストーン候補（5.14.0 以降）
+### 次期マイルストーン候補（5.15.0 以降）
 
 ユーザー向けハンドラー設定 API & WebUI（capsicum 連携）:
 
 - #4195 ユーザー向けハンドラー一覧 API (`GET /handler/list`)
 - #4196 ユーザー向けハンドラートグル API (`POST /handler/config`)
 - #4197 WebUI: ユーザー向けハンドラートグル画面（config.slim に統合）
+
+## リリース済み: 5.13.0（2026-04-03）
+
+rack セキュリティ修正（CVE 13件）とハンドラーメタデータ・TagContainer修正。
+
+- **セキュリティ: rack 3.2.6** — CVE-2026-34829 (High: 無制限チャンクアップロード)、CVE-2026-34827 (High: multipart DoS)、CVE-2026-34785 (High: Static ファイル露出) 他 Medium 9件、Low 1件を修正
+- **#4194 ハンドラーに label / description メタデータを追加** — 全44スキーマYAML + Handler#label, #description アクセサ
+- **#4199 文章の末尾に `#` が加えられる** — TagContainer で空タグ・nil値をフィルタ。ginseng-fediverse v1.8.22 で gem 側も修正
+- **#4191 rc.d スクリプトに redis 依存を追加**
+- fix: json-schema gem の MultiJSON 非推奨警告を抑制
 
 ## リリース済み: 5.12.1（2026-03-28）
 
