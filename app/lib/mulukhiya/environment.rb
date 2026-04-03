@@ -169,9 +169,7 @@ module Mulukhiya
     end
 
     def self.pre_start_tasks
-      tasks = ['config:lint']
-      tasks.push('mulukhiya:feed:bundler') if config['/ruby/bundler/install']
-      return tasks
+      return ['config:lint']
     end
 
     def self.route

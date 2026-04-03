@@ -477,8 +477,6 @@ sentry:
     - '/home/[^\s]+'
     - '/Users/[^\s]+'
 ruby:
-  bundler:
-    install: false
   did_you_mean: true
 service:
   amazon:
