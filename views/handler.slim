@@ -16,11 +16,11 @@ html lang='ja' data-theme='light'
         h3 @click='toggleVisibility("audit")' 設定監査
         slide-up-down :active='layout.details.audit'
           .indented
-            template v-if='audit.errors.length > 0'
+            div v-if='audit.errors.length > 0'
               h4 バリデーションエラー
               ul
                 li.alert v-for='err in audit.errors' {{err}}
-            template v-if='audit.unknown_keys.length > 0'
+            div v-if='audit.unknown_keys.length > 0'
               h4 不明な設定キー
               p スキーマに定義されていないキーが local.yaml に含まれています。不要であれば削除を検討してください。
               ul
