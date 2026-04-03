@@ -59,7 +59,7 @@ module Mulukhiya
       props = sch['properties'] || {}
       return [] if props.empty?
       data.flat_map do |key, value|
-        path = prefix.empty? ? key.to_s : "#{prefix}.#{key}"
+        path = "#{prefix}/#{key}"
         if props.key?(key.to_s)
           detect_unknown_keys(value, props[key.to_s], path)
         else
