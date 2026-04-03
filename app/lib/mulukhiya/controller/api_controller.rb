@@ -87,6 +87,30 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/emoji/palettes' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      row = Postgres.first(:emoji_palettes, {account_id: sns.account.id})
+      if row
+        value = row[:value]
+        value = JSON.parse(value) if value.is_a?(String)
+        palettes = value.select { |_k, v| v.is_a?(Hash) && v.key?('name') }.values
+        @renderer.message = {
+          palettes: palettes.map { |p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []} },
+          palette_for_reaction: value['emojiPaletteForReaction'],
+          palette_for_main: value['emojiPaletteForMain'],
+        }
+      else
+        @renderer.message = {palettes: [], palette_for_reaction: nil, palette_for_main: nil}
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/decoration/list' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
       sns.token ||= sns.default_token
