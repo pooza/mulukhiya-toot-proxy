@@ -9,6 +9,11 @@ module Mulukhiya
         .sort.to_a
       @renderer.message = about
       return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
     end
 
     get '/health' do
