@@ -98,10 +98,10 @@ git diff Gemfile.lock
 
 ## 開発中: 5.14.0
 
-- **#4203 GET /mulukhiya/api/about のレスポンスにステータスページ URL を追加**
-- **#4202 Misskey ユーザー絵文字パレット取得 API (`GET /mulukhiya/api/emoji/palettes`)**
-- **#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）**
-- **#4118 WebUI: サービス連携・システム設定の編集と不要設定の自動検出**
+- ~~#4203 GET /mulukhiya/api/about のレスポンスにステータスページ URL を追加~~
+- ~~#4202 Misskey ユーザー絵文字パレット取得 API (`GET /mulukhiya/api/emoji/palettes`)~~
+- ~~#4117 WebUI: 複雑なハンドラーパラメータ編集（CRUD一覧管理）~~
+- ~~#4118 設定監査API・不要キー検出UI（スコープ縮小: 不要キー検出に注力）~~
 
 ### 次期マイルストーン候補（5.15.0 以降）
 
