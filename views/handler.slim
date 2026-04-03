@@ -37,6 +37,7 @@ html lang='ja' data-theme='light'
                     - if handler.experimental?
                       i class='fa fa-flask' v-tooltip.right="'実験的機能'"
                     = handler.label || handler.underscore
+                    small = " (#{handler.underscore})"
                   - if handler.description
                     p.handler-description = handler.description
                   label
