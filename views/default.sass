@@ -835,38 +835,38 @@ a:hover
     .object-fields
       margin:
         left: 1em
-      .array-field
+    .array-field
+      margin: 0.5em 0
+      .array-item
+        display: flex
+        align-items: flex-start
+        gap: 0.3em
         margin: 0.5em 0
-        .array-item
-          display: flex
-          align-items: flex-start
-          gap: 0.3em
-          margin: 0.3em 0
-          padding: 0.3em
-          border:
-            style: solid
-            color: #ddd
-            width: 1px
-            radius: 4px
-          .array-item-fields
-            flex: 1
-          .btn-remove
-            flex-shrink: 0
-            font:
-              size: 0.75em
-            cursor: pointer
-        .btn-add
-          margin:
-            top: 0.3em
-          font:
-            size: 0.75em
-          cursor: pointer
+        padding: 0.5em
+        border:
+          style: solid
+          color: #bbb
+          width: 1px
+          radius: 4px
+        background:
+          color: #fafafa
+        .array-item-fields
+          flex: 1
+    .btn-remove, .btn-add
+      font:
+        size: 0.75em
+      padding: 0.1em 0.5em
+      cursor: pointer
+    .btn-add
+      margin:
+        top: 0.3em
     .field-update-button-container
       margin:
         top: 0.3em
       button
         font:
           size: 0.75em
+        padding: 0.1em 0.5em
 
 .field-container
   margin:

@@ -84,39 +84,40 @@ html lang='ja' data-theme='light'
                                 label.param-checkbox v-else-if="subProp.type === 'boolean'"
                                   input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key][subKey]"
                         template v-else-if="prop.type === 'array' && prop.items && prop.items.properties"
-                          .array-field
-                            .array-item v-for="(item, idx) in handlerParams['#{handler.underscore}'][key]" :key='idx'
-                              .array-item-fields
-                                template v-for="(itemProp, itemKey) in prop.items.properties" :key='itemKey'
-                                  .param-field v-if='itemProp.enum'
-                                    label.param-label
-                                      | {{itemKey}}
-                                    select v-model="item[itemKey]"
-                                      option v-for='opt in itemProp.enum' :key='opt' :value='opt' {{opt}}
-                                  .param-field v-else-if="itemProp.type === 'boolean'"
-                                    label.param-checkbox
-                                      input type='checkbox' v-model="item[itemKey]"
-                                      |  {{itemKey}}
-                                  .param-field v-else-if="itemProp.type === 'object' && itemProp.properties"
-                                    label.param-label
-                                      | {{itemKey}}
-                                    .object-fields
-                                      .param-field v-for="(sp, sk) in itemProp.properties" :key='sk'
-                                        label.param-label
-                                          | {{sk}}
-                                        input type='text' v-model.trim="item[itemKey][sk]"
-                                  .param-field v-else-if="itemProp.type === 'array'"
-                                    label.param-label
-                                      | {{itemKey}}
-                                    textarea v-model="item[itemKey]" rows='2'
-                                  .param-field v-else=''
-                                    label.param-label
-                                      | {{itemKey}}
-                                    input v-if="itemProp.type === 'integer'" type='number' v-model.number="item[itemKey]" :min='itemProp.minimum' :max='itemProp.maximum'
-                                    input v-else='' type='text' v-model.trim="item[itemKey]"
-                              button.btn-remove @click="removeTopArrayItem('#{handler.underscore}', key, idx)" ✕
-                            button.btn-add @click="addTopArrayItem('#{handler.underscore}', key, prop)"
-                              | + 追加
+                          .object-fields
+                            .array-field
+                              .array-item v-for="(item, idx) in handlerParams['#{handler.underscore}'][key]" :key='idx'
+                                .array-item-fields
+                                  template v-for="(itemProp, itemKey) in prop.items.properties" :key='itemKey'
+                                    .param-field v-if='itemProp.enum'
+                                      label.param-label
+                                        | {{itemKey}}
+                                      select v-model="item[itemKey]"
+                                        option v-for='opt in itemProp.enum' :key='opt' :value='opt' {{opt}}
+                                    .param-field v-else-if="itemProp.type === 'boolean'"
+                                      label.param-checkbox
+                                        input type='checkbox' v-model="item[itemKey]"
+                                        |  {{itemKey}}
+                                    .param-field v-else-if="itemProp.type === 'object' && itemProp.properties"
+                                      label.param-label
+                                        | {{itemKey}}
+                                      .object-fields
+                                        .param-field v-for="(sp, sk) in itemProp.properties" :key='sk'
+                                          label.param-label
+                                            | {{sk}}
+                                          input type='text' v-model.trim="item[itemKey][sk]"
+                                    .param-field v-else-if="itemProp.type === 'array'"
+                                      label.param-label
+                                        | {{itemKey}}
+                                      textarea v-model="item[itemKey]" rows='2'
+                                    .param-field v-else=''
+                                      label.param-label
+                                        | {{itemKey}}
+                                      input v-if="itemProp.type === 'integer'" type='number' v-model.number="item[itemKey]" :min='itemProp.minimum' :max='itemProp.maximum'
+                                      input v-else='' type='text' v-model.trim="item[itemKey]"
+                                button.btn-remove @click="removeTopArrayItem('#{handler.underscore}', key, idx)" ✕
+                              button.btn-add @click="addTopArrayItem('#{handler.underscore}', key, prop)"
+                                | + 追加
                         textarea v-else='' v-model="handlerParams['#{handler.underscore}'][key]" rows='3'
                       .field-update-button-container
                         button @click="saveHandlerParams('#{handler.underscore}')" 保存
