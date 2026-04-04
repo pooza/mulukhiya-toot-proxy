@@ -14,20 +14,6 @@ properties:
           type: string
       type: object
     type: array
-  tags:
-    properties:
-      rules:
-        items:
-          properties:
-            removal_tags:
-              items:
-                type: string
-              type: array
-            search:
-              type: string
-          type: object
-        type: array
-    type: object
   timeout:
     minimum: 1
     type: integer
