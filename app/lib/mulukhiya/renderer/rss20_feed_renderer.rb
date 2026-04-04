@@ -18,7 +18,7 @@ module Mulukhiya
     def cache
       raise Ginseng::NotFoundError, 'Not Found' unless command
       command.exec
-      raise command.stderr unless command.status.zero?
+      raise Ginseng::ApplicationError, "CustomFeed command failed (exit #{command.status}): #{command.stderr}" unless command.status.zero?
       self.entries = JSON.parse(command.stdout)
       render_storage[command] = feed.to_s
     end
