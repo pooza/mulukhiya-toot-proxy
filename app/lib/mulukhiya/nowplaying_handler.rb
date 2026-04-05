@@ -65,7 +65,9 @@ module Mulukhiya
         .grep_v(Regexp.new("^#{config['/nowplaying/track/prefix']} "))
         .reject do |line|
           uri = Ginseng::URI.parse(line)
-          uri.absolute? && uri.host && config['/nowplaying/domains'].any? {|d| uri.host.end_with?(d)}
+          uri.absolute? && uri.host && config['/nowplaying/domains'].any? do |d|
+            uri.host.end_with?(d)
+          end
         end
       return lines.join("\n")
     end

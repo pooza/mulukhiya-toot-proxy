@@ -3,7 +3,7 @@ module Mulukhiya
     DEFAULT_TTL = 86_400
 
     def get(acct)
-      return nil unless entry = super(acct)
+      return nil unless entry = super
       return JSON.parse(entry)
     rescue => e
       e.log(acct:)

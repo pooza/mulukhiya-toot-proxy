@@ -718,9 +718,14 @@ module Mulukhiya
         "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
         {headers: {'Accept' => 'application/jrd+json'}},
       ).parsed_response
-      actor_uri = webfinger['links']&.find {|l| l['type'] == 'application/activity+json'}&.dig('href')
+      actor_uri = webfinger['links']&.find do |l|
+        l['type'] == 'application/activity+json'
+      end&.dig('href')
       return nil unless actor_uri
-      return http.get(actor_uri, {headers: {'Accept' => 'application/activity+json'}}).parsed_response
+      return http.get(
+        actor_uri,
+        {headers: {'Accept' => 'application/activity+json'}},
+      ).parsed_response
     rescue
       return nil
     end
