@@ -98,7 +98,6 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.15.0
 
-- #4198 リモートアカウントの isCat 判定 API
 - #4206 設定監査: 配列内オブジェクトの不明キー検出
 - #4210 メディアカタログ API: ページネーションメタデータの追加
 - #4211 メディアカタログ API: N+1 クエリの解消
@@ -117,6 +116,7 @@ git diff Gemfile.lock
 
 ## 開発中の修正（5.15.0 に含まれる予定）
 
+- **#4198 リモートアカウントのisCat判定API** — `POST /mulukhiya/api/account/is_cat` でWebFinger→ActivityPub Actor取得、Redisキャッシュ付き
 - **#4217 RemoteTagHandler: リモート辞書キーとローカル辞書キーの重複でタグが欠落する** — `dic.key?(v)` フィルタを削除し `local_tags.member?(v)` のみに
 - **#4215 RSS20FeedRenderer#cache: 例外型を明示** — rescue節で例外型を明示しデバッグ容易に
 - **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
