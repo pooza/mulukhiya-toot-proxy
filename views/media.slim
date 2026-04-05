@@ -91,8 +91,10 @@ html lang='ja' data-theme='light'
               this.methods.getMedias({page: this.page, q: this.keyword})
                 .then(e => {
                   this.suggested_keywords = this.methods.getSuggestedKeywords()
-                  if (0 < e.length) {
-                    this.medias = this.medias.concat(e)
+                  const items = e.items || e
+                  if (0 < items.length) {
+                    this.medias = this.medias.concat(items)
+                    if (e.has_next === false) this.last_page = true
                   } else {
                     this.last_page = true
                     Swal.fire({

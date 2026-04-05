@@ -57,7 +57,10 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.exec(:media_catalog, params).filter_map do |row|
+        fetch_params = params.merge(limit: params[:limit] + 1)
+        rows = Postgres.exec(:media_catalog, fetch_params)
+        has_next = rows.size > params[:limit]
+        items = rows.first(params[:limit]).filter_map do |row|
           next unless attachment = self[row[:id]]
           attachment.to_h.merge(
             account: row.slice(:username, :display_name),
@@ -68,6 +71,7 @@ module Mulukhiya
             },
           )
         end
+        return {items:, page: params[:page], has_next:}
       end
 
       def self.feed(&block)

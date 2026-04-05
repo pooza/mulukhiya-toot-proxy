@@ -37,7 +37,10 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.exec(:media_catalog, params).map do |row|
+        fetch_params = params.merge(limit: params[:limit] + 1)
+        rows = Postgres.exec(:media_catalog, fetch_params)
+        has_next = rows.size > params[:limit]
+        items = rows.first(params[:limit]).map do |row|
           self[row[:id]].to_h.merge(
             status: {
               body: row[:status_text],
@@ -47,6 +50,7 @@ module Mulukhiya
             account: row.slice(:username, :display_name),
           )
         end
+        return {items:, page: params[:page], has_next:}
       end
 
       def self.feed(&block)
