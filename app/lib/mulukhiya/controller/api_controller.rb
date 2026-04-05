@@ -676,7 +676,7 @@ module Mulukhiya
       end
       storage = IsCatStorage.new
       http = HTTP.new
-      result = {}
+      result = Concurrent::Hash.new
       Parallel.each(params[:accts].uniq, in_threads: Parallel.processor_count) do |acct_str|
         acct = Ginseng::Fediverse::Acct.new(acct_str)
         cached = storage.get(acct_str)
@@ -714,6 +714,7 @@ module Mulukhiya
     private
 
     def fetch_actor(http, acct)
+      return nil unless valid_remote_host?(acct.host)
       webfinger = http.get(
         "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
         {headers: {'Accept' => 'application/jrd+json'}},
@@ -722,12 +723,28 @@ module Mulukhiya
         l['type'] == 'application/activity+json'
       end&.dig('href')
       return nil unless actor_uri
+      actor_host = Ginseng::URI.parse(actor_uri)&.host
+      return nil unless valid_remote_host?(actor_host)
       return http.get(
         actor_uri,
         {headers: {'Accept' => 'application/activity+json'}},
       ).parsed_response
     rescue
       return nil
+    end
+
+    def valid_remote_host?(host)
+      return false unless host.present?
+      return false unless host.include?('.')
+      return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
+      return false if host.match?(/\A\[.*\]\z/)
+      addrs = Addrinfo.getaddrinfo(host, nil, nil, :STREAM).map(&:ip_address)
+      addrs.none? do |ip|
+        addr = IPAddr.new(ip)
+        addr.private? || addr.loopback? || addr.link_local?
+      end
+    rescue
+      return false
     end
   end
 end
