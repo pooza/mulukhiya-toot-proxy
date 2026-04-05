@@ -117,6 +117,7 @@ git diff Gemfile.lock
 
 ## 開発中の修正（5.15.0 に含まれる予定）
 
+- **#4217 RemoteTagHandler: リモート辞書キーとローカル辞書キーの重複でタグが欠落する** — `dic.key?(v)` フィルタを削除し `local_tags.member?(v)` のみに
 - **#4215 RSS20FeedRenderer#cache: 例外型を明示** — rescue節で例外型を明示しデバッグ容易に
 - **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
 - **#4209 NowplayingHandler.trim: uri.hostがnilの場合のNoMethodError** — nilガード追加
