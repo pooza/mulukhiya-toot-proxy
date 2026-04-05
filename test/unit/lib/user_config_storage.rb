@@ -4,6 +4,7 @@ module Mulukhiya
   class UserConfigStorageTest < TestCase
     def disable?
       return true unless Environment.dbms_class&.config?
+      return true unless Redis.health[:status] == 'OK'
       return super
     rescue
       return true

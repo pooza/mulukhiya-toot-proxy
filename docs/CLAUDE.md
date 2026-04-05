@@ -96,15 +96,48 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 次期マイルストーン候補（5.15.0 以降）
+## 次期マイルストーン: 5.15.0
 
-- #4206 設定監査: 配列内オブジェクトの不明キー検出
-- #4198 リモートアカウントの isCat 判定 API
-- #4195 ユーザー向けハンドラー一覧 API (`GET /handler/list`)
-- #4196 ユーザー向けハンドラートグル API (`POST /handler/config`)
-- #4197 WebUI: ユーザー向けハンドラートグル画面（config.slim に統合）
+（全タスク完了 — リリース準備可）
 
-## リリース済み: 5.13.0（2026-04-03）
+### on-hold（マイルストーン外）
+
+- #4207 APIController リファクタ
+- #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
+- #3877 Mastodon形式「タグづけ」復活
+
+### マイルストーン未設定
+
+- #4213 メディアカタログ API: LIKE 検索のパフォーマンス（N+1解消後に着手）
+- #3157 Annict record URL（API制約で断念済み）
+
+## 開発中の修正（5.15.0 に含まれる予定）
+
+- **#4211 メディアカタログAPI: N+1クエリの解消** — catalog/feedのself[row[:id]]をwhere(id: ids)の一括取得に変更
+- **#4212 メディアカタログAPI: Misskey版SQLパフォーマンス改善** — 冗長なGROUP BY削除、LIMIT/OFFSETをキーワードフィルタ後の外側クエリに移動
+- **#4206 設定監査: 配列内オブジェクトの不明キー検出** — `detect_unknown_keys` で配列ノードの場合にスキーマの `items` を参照して各要素に再帰
+- **#4210 メディアカタログAPI: ページネーションメタデータ** — レスポンスを `{items, page, has_next}` 形式に変更。LIMIT+1件取得で次ページ判定。WebUI対応済み。capsicum側も要対応（pooza/capsicum#71）
+- **#4198 リモートアカウントのisCat判定API** — `POST /mulukhiya/api/account/is_cat` でWebFinger→ActivityPub Actor取得、Redisキャッシュ付き
+- **#4217 RemoteTagHandler: リモート辞書キーとローカル辞書キーの重複でタグが欠落する** — `dic.key?(v)` フィルタを削除し `local_tags.member?(v)` のみに
+- **#4215 RSS20FeedRenderer#cache: 例外型を明示** — rescue節で例外型を明示しデバッグ容易に
+- **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
+- **#4209 NowplayingHandler.trim: uri.hostがnilの場合のNoMethodError** — nilガード追加
+- fix: removal_rule_tagスキーマの重複パス(tags.rules)を削除
+- test: IsCatContract・IsCatStorageのテスト追加、Storage系テストにRedis接続チェック追加
+
+## リリース手順の進捗: 5.15.0
+
+- [x] マイルストーン全タスク完了（#4206, #4209, #4210, #4211, #4212, #4214, #4215, #4217, #4198）
+- [x] PR #4216 をドラフトからオープンに変更
+- [ ] Codex レビュー待ち
+- [ ] セキュリティレビュー（bundler-audit等）
+- [ ] リリース（develop → main マージ、タグ作成）
+- [ ] ステージングデプロイ・検証
+- [ ] 本番デプロイ
+
+## リリース済み: 5.14.1（2026-04-04）
+
+- fix: about APIで`/status_url`未設定時に500エラーになる問題を修正
 
 ## リリース済み: 5.14.0（2026-04-04）
 

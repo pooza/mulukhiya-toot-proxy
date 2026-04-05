@@ -7,7 +7,7 @@ module Mulukhiya
 
     def setup
       return if disable?
-      @attachment = attachment_class[attachment_class.catalog.first[:id]]
+      @attachment = attachment_class[attachment_class.catalog[:items].first[:id]]
     end
 
     test 'テスト用メディアファイルの有無' do
@@ -102,9 +102,17 @@ module Mulukhiya
 
     def test_catalog
       return unless @attachment
+      result = attachment_class.catalog
 
-      assert_kind_of(Hash, attachment_class.catalog.first)
-      assert_kind_of(Hash, attachment_class.catalog(only_person: 1).first)
+      assert_kind_of(Hash, result)
+      assert_kind_of(Array, result[:items])
+      assert_kind_of(Hash, result[:items].first)
+      assert_equal(1, result[:page])
+      assert_includes([true, false], result[:has_next])
+
+      result = attachment_class.catalog(only_person: 1)
+
+      assert_kind_of(Hash, result[:items].first)
     end
   end
 end

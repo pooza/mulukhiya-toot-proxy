@@ -61,11 +61,13 @@ module Mulukhiya
     def self.trim(body)
       lines = body.each_line
         .grep_v(Regexp.new("^#{config['/nowplaying/album/prefix']} "))
-        .grep_v(Regexp.new("^#{config['/nowplaying/artist/prefix']}: "))
-        .grep_v(Regexp.new("^#{config['/nowplaying/track/prefix']}: "))
+        .grep_v(Regexp.new("^#{config['/nowplaying/artist/prefix']} "))
+        .grep_v(Regexp.new("^#{config['/nowplaying/track/prefix']} "))
         .reject do |line|
           uri = Ginseng::URI.parse(line)
-          uri.absolute? && uri.host && config['/nowplaying/domains'].any? {|d| uri.host.end_with?(d)}
+          uri.absolute? && uri.host && config['/nowplaying/domains'].any? do |d|
+            uri.host.end_with?(d)
+          end
         end
       return lines.join("\n")
     end
