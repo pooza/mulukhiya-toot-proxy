@@ -55,6 +55,12 @@ module Mulukhiya
     private
 
     def detect_unknown_keys(data, sch, prefix = '')
+      if data.is_a?(Array)
+        item_sch = sch['items'] || {}
+        return data.each_with_index.flat_map do |element, i|
+          detect_unknown_keys(element, item_sch, "#{prefix}[#{i}]")
+        end
+      end
       return [] unless data.is_a?(Hash)
       props = sch['properties'] || {}
       return [] if props.empty?
