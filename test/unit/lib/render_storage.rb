@@ -2,6 +2,7 @@ module Mulukhiya
   class RenderStorageTest < TestCase
     def disable?
       return true unless Environment.dbms_class&.config?
+      return true unless Redis.health[:status] == 'OK'
       return super
     rescue
       return true
