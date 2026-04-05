@@ -32,13 +32,8 @@ FROM
       <% if test_account %>
         AND ("user".id <> '<%= test_account.id %>')
       <% end %>
-    GROUP BY
-      note_id,
-      file_id,
-      "user".id
     ORDER BY
       note.id DESC
-    LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
   ) AS note_file ON drive_file.id = note_file.file_id
 WHERE (drive_file."userHost" IS null)
   <% if params[:rule] %>
@@ -53,3 +48,4 @@ WHERE (drive_file."userHost" IS null)
   <% end %>
 ORDER BY
   note_file.note_id DESC
+LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
