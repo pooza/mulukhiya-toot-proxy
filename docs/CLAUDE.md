@@ -98,22 +98,29 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.15.0
 
-- #4207 APIController リファクタ
-- #4206 設定監査: 配列内オブジェクトの不明キー検出
 - #4198 リモートアカウントの isCat 判定 API
-- #4195 ユーザー向けハンドラー一覧 API (`GET /handler/list`)
-- #4196 ユーザー向けハンドラートグル API (`POST /handler/config`)
-- #4197 WebUI: ユーザー向けハンドラートグル画面（config.slim に統合）
-
-### マイルストーン未設定（open）
-
-- #4213 メディアカタログ API: LIKE 検索のパフォーマンス
-- #4212 メディアカタログ API: Misskey 版 SQL のパフォーマンス改善
-- #4211 メディアカタログ API: N+1 クエリの解消
+- #4206 設定監査: 配列内オブジェクトの不明キー検出
 - #4210 メディアカタログ API: ページネーションメタデータの追加
-- #4209 NowplayingHandler.trim: uri.host が nil の場合に NoMethodError
+- #4211 メディアカタログ API: N+1 クエリの解消
+- #4212 メディアカタログ API: Misskey 版 SQL のパフォーマンス改善
+
+### on-hold（マイルストーン外）
+
+- #4207 APIController リファクタ
+- #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
 - #3877 Mastodon形式「タグづけ」復活
+
+### マイルストーン未設定
+
+- #4213 メディアカタログ API: LIKE 検索のパフォーマンス（N+1解消後に着手）
 - #3157 Annict record URL（API制約で断念済み）
+
+## 開発中の修正（5.15.0 に含まれる予定）
+
+- **#4215 RSS20FeedRenderer#cache: 例外型を明示** — rescue節で例外型を明示しデバッグ容易に
+- **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
+- **#4209 NowplayingHandler.trim: uri.hostがnilの場合のNoMethodError** — nilガード追加
+- fix: removal_rule_tagスキーマの重複パス(tags.rules)を削除
 
 ## リリース済み: 5.14.1（2026-04-04）
 
