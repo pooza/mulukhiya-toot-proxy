@@ -687,7 +687,7 @@ module Mulukhiya
         actor = fetch_actor(http, acct)
         is_cat = actor&.dig('isCat')
         result[acct_str] = is_cat
-        storage.set(acct_str, {is_cat:})
+        storage.set(acct_str, {is_cat:}) unless actor.nil?
       rescue => e
         e.log(acct: acct_str)
         result[acct_str] = nil
