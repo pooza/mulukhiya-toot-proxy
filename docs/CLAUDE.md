@@ -123,6 +123,17 @@ git diff Gemfile.lock
 - **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
 - **#4209 NowplayingHandler.trim: uri.hostがnilの場合のNoMethodError** — nilガード追加
 - fix: removal_rule_tagスキーマの重複パス(tags.rules)を削除
+- test: IsCatContract・IsCatStorageのテスト追加、Storage系テストにRedis接続チェック追加
+
+## リリース手順の進捗: 5.15.0
+
+- [x] マイルストーン全タスク完了（#4206, #4209, #4210, #4211, #4212, #4214, #4215, #4217, #4198）
+- [x] PR #4216 をドラフトからオープンに変更
+- [ ] Codex レビュー待ち
+- [ ] セキュリティレビュー（bundler-audit等）
+- [ ] リリース（develop → main マージ、タグ作成）
+- [ ] ステージングデプロイ・検証
+- [ ] 本番デプロイ
 
 ## リリース済み: 5.14.1（2026-04-04）
 
