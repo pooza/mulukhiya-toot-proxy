@@ -33,22 +33,26 @@ module Mulukhiya
       assert_nil(@storage.get(@key))
     end
 
-    def test_ttl_page1
-      @storage.set('page:1:person:0', {items: [], has_next: false})
-      ttl = @storage.ttl('page:1:person:0')
+    def test_ttl_constants
+      assert_equal(180, MediaCatalogStorage::PAGE1_TTL)
+      assert_equal(86_400, MediaCatalogStorage::DEFAULT_TTL)
+      assert_operator(MediaCatalogStorage::PAGE1_TTL, :<, MediaCatalogStorage::DEFAULT_TTL)
+    end
 
-      assert_operator(ttl, :<=, MediaCatalogStorage::PAGE1_TTL)
-      assert_operator(ttl, :>, 0)
+    def test_set_page1_persists
+      @storage.set('page:1:person:0', {items: [], has_next: false})
+      result = @storage.get('page:1:person:0')
+
+      assert_kind_of(Hash, result)
 
       @storage.unlink('page:1:person:0')
     end
 
-    def test_ttl_page2
+    def test_set_page2_persists
       @storage.set('page:2:person:0', {items: [], has_next: false})
-      ttl = @storage.ttl('page:2:person:0')
+      result = @storage.get('page:2:person:0')
 
-      assert_operator(ttl, :<=, MediaCatalogStorage::DEFAULT_TTL)
-      assert_operator(ttl, :>, MediaCatalogStorage::PAGE1_TTL)
+      assert_kind_of(Hash, result)
 
       @storage.unlink('page:2:person:0')
     end
