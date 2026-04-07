@@ -107,10 +107,21 @@ module Mulukhiya
           metadata = entry[0] if entry[0].is_a?(Hash)
           palettes = entry[1] if entry[1].is_a?(Array)
         end
+        # Fetch palette assignments from backups scope
+        palette_for_reaction = nil
+        palette_for_main = nil
+        backup_row = Postgres.first(:emoji_palette_assignments, {account_id: sns.account.id})
+        if backup_row
+          backup = backup_row[:value]
+          backup = JSON.parse(backup) if backup.is_a?(String)
+          prefs = backup['preferences'] || {}
+          palette_for_reaction = prefs['emojiPaletteForReaction']&.dig(0, 1) rescue nil
+          palette_for_main = prefs['emojiPaletteForMain']&.dig(0, 1) rescue nil
+        end
         @renderer.message = {
           palettes: palettes.select {|p| p.is_a?(Hash)}.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
-          palette_for_reaction: metadata['emojiPaletteForReaction'],
-          palette_for_main: metadata['emojiPaletteForMain'],
+          palette_for_reaction: palette_for_reaction,
+          palette_for_main: palette_for_main,
         }
       else
         @renderer.message = {palettes: [], palette_for_reaction: nil, palette_for_main: nil}
