@@ -3,7 +3,7 @@ module Mulukhiya
 
   namespace :bundle do
     desc 'install gems'
-    task install: ['mulukhiya:api:bundler', 'mulukhiya:feed:bundler'] do
+    task install: ['mulukhiya:feed:bundler'] do
       sh 'gem install bundler -v "~>2.0"'
       sh 'bundle install --jobs 4 --retry 3'
     end

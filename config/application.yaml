@@ -60,6 +60,8 @@ ffmpeg:
     bitrate: 192 # kbps
   crf: 22
   preset: veryfast
+  probe:
+    timeout: 30
 firefish:
   capabilities:
     reaction: true
@@ -79,6 +81,10 @@ handler:
     toggleable: true
   default_tag:
     tags: []
+  group_tag:
+    sources:
+      - https://pf.korako.me/plugins/community-hashtag-map.json
+    cache_ttl: 3600
   dictionary_tag:
     dics: []
     word:
@@ -134,6 +140,14 @@ handler:
   reply_reaction:
     bridge_domains:
       - bsky.brid.gy
+  shortened_url:
+    domains:
+      - t.co
+      - bit.ly
+      - ow.ly
+      - amzn.to
+      - amzn.asia
+      - spoti.fi
   result_notification:
     spoiler_text: 実行結果
   slack_alert:
@@ -184,6 +198,7 @@ handler:
       post_fav:
         - result_notification
       post_toot:
+        - scheduled_status_save
         - user_config_command
         - piefed_clipping_command
         - channel_notification
@@ -213,6 +228,7 @@ handler:
         - media_tag
         - user_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
@@ -238,6 +254,7 @@ handler:
         - dictionary_tag
         - media_tag
         - remote_tag
+        - group_tag
         - removal_rule_tag
         - image_copyright
         - tagging
@@ -292,6 +309,8 @@ mastodon:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
+    video_codecs:
+      - h264
   capabilities:
     repost: true
     streaming: true
@@ -323,6 +342,7 @@ mastodon:
       limit: 30
     key: id
     label: 投稿
+    reblog_label: ブースト
     parser: toot
     spoiler_text: null
   streaming:
@@ -341,9 +361,12 @@ misskey:
       audio: audio/mpeg
       image: image/webp
       video: video/mp4
+    video_codecs:
+      - h264
   capabilities:
     channel: true
     decoration: true
+    local_post: true
     reaction: true
     repost: true
     streaming: true
@@ -376,6 +399,7 @@ misskey:
     default_max_length: 3000
     key: noteId
     label: ノート
+    reblog_label: リノート
     parser: note
     spoiler_text: null
   streaming:
@@ -403,7 +427,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.6.0
+  version: 5.15.0
 parser:
   note:
     fields:
@@ -445,9 +469,14 @@ redis:
   retry:
     limit: 3
     seconds: 1
+sentry:
+  dsn: null
+  traces_sample_rate: 0
+  scrub_patterns:
+    - '[a-zA-Z0-9_\-]{20,}'
+    - '/home/[^\s]+'
+    - '/Users/[^\s]+'
 ruby:
-  bundler:
-    install: false
   did_you_mean: true
 service:
   amazon:
@@ -515,17 +544,6 @@ service:
       video:
         - /w/
         - /videos/watch/
-  piefed:
-    api:
-      version: alpha
-    community:
-      types:
-        - Subscribed
-        - Moderating
-    hosts:
-      default: pf.korako.me
-    subject:
-      max_length: 50
   poipiku:
     urls:
       root: https://poipiku.com/
@@ -628,6 +646,7 @@ webui:
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      config_form: /mulukhiya/script/config_form
       handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
@@ -635,6 +654,7 @@ webui:
       sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/+esm
       v_tooltip: /mulukhiya/script/v_tooltip
+      webui_utils: /mulukhiya/script/webui_utils
       vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.js
     production:
       '@popperjs/core': https://cdn.jsdelivr.net/npm/@popperjs/core@2.11/+esm
@@ -642,6 +662,7 @@ webui:
       activity_indicator: /mulukhiya/script/activity_indicator
       axios: https://cdn.jsdelivr.net/npm/axios@1.13/dist/esm/axios.js
       chai: https://cdn.jsdelivr.net/npm/chai@5/+esm
+      config_form: /mulukhiya/script/config_form
       handler_form: /mulukhiya/script/handler_form
       js-yaml: https://cdn.jsdelivr.net/npm/js-yaml@4.1/dist/js-yaml.mjs
       mulukhiya_lib: /mulukhiya/script/mulukhiya_lib
@@ -649,6 +670,7 @@ webui:
       sweetalert2: https://cdn.jsdelivr.net/npm/sweetalert2@11.26/dist/sweetalert2.esm.all.min.js
       tippy.js: https://cdn.jsdelivr.net/npm/tippy.js@6.3/+esm
       v_tooltip: /mulukhiya/script/v_tooltip
+      webui_utils: /mulukhiya/script/webui_utils
       vue: https://cdn.jsdelivr.net/npm/vue@3.5/dist/vue.esm-browser.prod.js
   development:
     scripts: []

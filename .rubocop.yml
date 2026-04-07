@@ -27,6 +27,8 @@ Layout/ArrayAlignment:
   EnforcedStyle: with_fixed_indentation
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
 Layout/EndOfLine:
   EnforcedStyle: lf
 Layout/FirstArgumentIndentation:
@@ -124,6 +126,8 @@ Sequel:
     - '**/model/**/*.rb'
     - app/migration/**/*.rb
 Sequel/ConcurrentIndex:
+  Enabled: false
+Sequel/IrreversibleMigration:
   Enabled: false
 Style/AsciiComments:
   Enabled: false

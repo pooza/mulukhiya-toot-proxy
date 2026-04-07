@@ -19,8 +19,13 @@ module Mulukhiya
     end
 
     get '/oauth/callback' do
-      raise Ginseng::AuthError, 'Missing state' unless params[:state]
-      raise Ginseng::AuthError, 'Missing code' unless params[:code]
+      unless params[:state] && params[:code]
+        @renderer = SlimRenderer.new
+        @renderer.template = 'token_error'
+        @renderer[:error] = 'Missing required OAuth parameters'
+        @renderer.status = 400
+        return @renderer.to_s
+      end
       result = sns.auth_with_pkce(params[:code], params[:state])
       raise Ginseng::AuthError, 'Token exchange failed' unless result
       parsed = result.parsed_response

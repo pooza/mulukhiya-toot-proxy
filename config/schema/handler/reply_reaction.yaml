@@ -1,3 +1,5 @@
+label: リプライリアクション
+description: 絵文字リアクションをリプライとして投稿します
 properties:
   disabled:
     type: boolean

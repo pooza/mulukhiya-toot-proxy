@@ -772,7 +772,7 @@ a:hover
     margin: 0.2em
 
 .handler-container
-  width: 16em
+  width: 32em
   min-height: 5em
   border:
     width: 1px
@@ -791,6 +791,11 @@ a:hover
         style: solid
         color: darkgray
         width: 1px
+  .handler-description
+    margin: 0.2em 1em
+    font:
+      size: 0.75em
+    color: #666
   label
     display: inline-block
     font:
@@ -826,49 +831,58 @@ a:hover
           size: 0.875em
       input[type="text"], input[type="number"]
         width: 90%
+        padding: 0 0.3em
+        line-height: 1.2
+        box-sizing: border-box
+        height: 1.6em
+      select
+        width: 90%
+        padding: 0.1em 0.3em
         font:
           size: 0.875em
       textarea
         width: 90%
+        padding: 0.1em 0.3em
         font:
           size: 0.75em
     .object-fields
       margin:
         left: 1em
-      .array-field
+    .array-field
+      margin: 0.5em 0
+      .array-item
+        display: flex
+        align-items: flex-start
+        gap: 0.3em
         margin: 0.5em 0
-        .array-item
-          display: flex
-          align-items: flex-start
-          gap: 0.3em
-          margin: 0.3em 0
-          padding: 0.3em
-          border:
-            style: solid
-            color: #ddd
-            width: 1px
-            radius: 4px
-          .array-item-fields
-            flex: 1
-          .btn-remove
-            flex-shrink: 0
-            padding: 0.2em 0.5em
-            font:
-              size: 0.75em
-            cursor: pointer
-        .btn-add
-          margin:
-            top: 0.3em
-          padding: 0.2em 0.8em
-          font:
-            size: 0.75em
-          cursor: pointer
+        padding: 0.5em
+        border:
+          style: solid
+          color: #bbb
+          width: 1px
+          radius: 4px
+        background:
+          color: #fafafa
+        .array-item-fields
+          flex: 1
+    .btn-remove, .btn-add
+      font:
+        size: 0.75em
+      padding: 0.1em 0.5em
+      margin: 0
+      cursor: pointer
+    .btn-remove
+      align-self: flex-start
+    .btn-add
+      margin:
+        top: 0.3em
     .field-update-button-container
       margin:
         top: 0.3em
       button
         font:
           size: 0.75em
+        padding: 0.1em 0.5em
 
 .field-container
   margin:

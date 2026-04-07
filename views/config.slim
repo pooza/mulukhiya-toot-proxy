@@ -39,7 +39,7 @@ html lang='ja' data-theme='light'
             li 更新ボタンを押下。
           .inline-field-container
             h4 URL
-            input placeholder='PieFedサービスのURL（https://#{config['/service/piefed/hosts/default']} など）' v-model.trim='form.piefed.url'
+            input placeholder='PieFedサービスのURL（https://#{Ginseng::Piefed::Config.instance['/piefed/hosts/default']} など）' v-model.trim='form.piefed.url'
           .inline-field-container
             h4 ユーザーID
             input placeholder='PieFedサービスのユーザーID（またはメールアドレス）' v-model.trim='form.piefed.user'
@@ -108,6 +108,17 @@ html lang='ja' data-theme='light'
         import { MulukhiyaLib } from 'mulukhiya_lib'
         import { SlideUpDown } from 'slide_toggle'
         import { VTooltip } from 'v_tooltip'
+        import {
+          extractFormValues,
+          extractVisibilityOptions,
+          buildProgramOptions,
+          convertProgramToTags,
+          buildTagsCommand,
+          buildPiefedCommand,
+          buildWebhookCommand,
+          buildNotifyCommand,
+          buildAnnictCommand,
+        } from 'config_form'
         import jsyaml from 'js-yaml'
         import Multiselect from '@vueform/multiselect'
         import Swal from 'sweetalert2'
@@ -163,20 +174,14 @@ html lang='ja' data-theme='light'
                   })
                 return this.methods.getConfig()
               }).then(e => {
-                this.updateForm(e)
+                this.applyForm(e)
                 this.account = this.methods.createAccountInfo(e)
                 this.config = e.config
               })
             this.methods.getPrograms()
               .then(e => {
                 this.programs = e
-                this.options.program = Object.values(e)
-                  .filter(program => program.enable)
-                  .map(program => ({
-                    value: program.key,
-                    label: program.minutes ? `${this.methods.createProgramTags(program).join(', ')} (${program.minutes}分)` : this.methods.createProgramTags(program).join(', '),
-                  }))
-                this.options.program.unshift({label: '(固定タグのクリア)'})
+                this.options.program = buildProgramOptions(e, this.methods.createProgramTags)
               })
             if (this.layout.sections.decoration) {
               this.methods.getDecorations()
@@ -187,54 +192,40 @@ html lang='ja' data-theme='light'
             }
           },
           methods: {
-            updateForm (data) {
+            applyForm (data) {
               this.result = jsyaml.dump(data.config)
-              this.form.webhook.visibility = this.methods.dig(data, 'config', 'webhook', 'visibility') || 'public'
-              this.form.piefed.url = this.methods.dig(data, 'config', 'piefed', 'url')
-              this.form.piefed.user = this.methods.dig(data, 'config', 'piefed', 'user')
-              this.form.piefed.community = this.methods.dig(data, 'config', 'piefed', 'community')
-              this.form.annict.theme_works_only = this.methods.dig(data, 'config', 'service', 'annict', 'theme_works_only') == true
-              this.form.notify.verbose = this.methods.dig(data, 'config', 'notify', 'verbose') == true
-              if (this.methods.dig(data, 'config', 'tagging', 'user_tags')) {
-                this.form.tags = this.methods.dig(data, 'config', 'tagging', 'user_tags').join("\n")
-              }
-              this.form.decoration.id = this.methods.dig(data, 'config', 'decoration', 'id') || null
-              if (data.visibility_names) {
+              const values = extractFormValues(data)
+              this.form.webhook.visibility = values.webhook.visibility
+              this.form.piefed.url = values.piefed.url
+              this.form.piefed.user = values.piefed.user
+              this.form.piefed.community = values.piefed.community
+              this.form.annict.theme_works_only = values.annict.theme_works_only
+              this.form.notify.verbose = values.notify.verbose
+              this.form.tags = values.tags
+              this.form.decoration.id = values.decoration.id
+              const visOpts = extractVisibilityOptions(data)
+              if (visOpts.length) {
                 this.options.visibility.splice(0)
-                Object.keys(data.visibility_names).map(k => {
-                  const v = data.visibility_names[k]
-                  if (!this.options.visibility.find(o => o.value == v)) {
-                    this.options.visibility.push({label: k == v ? k : `${v} (${k})`, value: v})
-                  }
-                })
+                visOpts.map(o => this.options.visibility.push(o))
               }
             },
             updateConfig (command) {
               return this.methods.updateConfig(command)
                 .then(e => {
-                  this.updateForm(e)
+                  this.applyForm(e)
                   return e
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             onChangeTags (e) {
-              if (e.code) {
-                this.form.tags = this.methods.createProgramTags(this.programs[e.code]).join("\n")
-                this.form.program.minutes = this.programs[e.code].minutes
-              } else {
-                this.form.tags = null
-                this.form.program.minutes = null
-              }
+              const result = convertProgramToTags(e, this.programs, this.methods.createProgramTags)
+              this.form.tags = result.tags
+              this.form.program.minutes = result.minutes
             },
             toggleVisibility (name) {
               this.layout.details[name] = !this.layout.details[name]
             },
             updatePiefed () {
-              const command = {piefed: {url: null, user: null, community: null, host: null}}
-              if (this.form.piefed.url) command.piefed.url = this.form.piefed.url
-              if (this.form.piefed.user) command.piefed.user = this.form.piefed.user
-              if (this.form.piefed.password) command.piefed.password = this.form.piefed.password
-              if (this.form.piefed.community) command.piefed.community = Number(this.form.piefed.community)
-              this.updateConfig(command)
+              this.updateConfig(buildPiefedCommand(this.form))
               this.form.piefed.password = null
             },
             unauthPiefed () {
@@ -257,34 +248,13 @@ html lang='ja' data-theme='light'
               }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             updateTags () {
-              const command = {tagging: {user_tags: null, minutes: null}, decoration: {id: null}}
-              if (this.form.tags) {
-                command.tagging.user_tags = this.form.tags.split("\n")
-                if (this.form.program.minutes) {
-                  command.tagging.minutes = this.form.program.minutes
-                }
-              } else {
-                command.tagging.minutes = null
-              }
-              if (this.form.decoration.id) {
-                command.decoration.id = this.form.decoration.id
-                if (this.form.program.minutes) {
-                  command.decoration.minutes = this.form.program.minutes
-                }
-              }
-              this.updateConfig(command)
+              this.updateConfig(buildTagsCommand(this.form))
             },
             updateWebhook () {
-              const command = {webhook: {visibility: null}}
-              if (this.form.webhook.visibility != 'public') {
-                command.webhook.visibility = this.form.webhook.visibility
-              }
-              this.updateConfig(command)
+              this.updateConfig(buildWebhookCommand(this.form))
             },
             updateNotify () {
-              const command = {notify: {verbose: null}}
-              if (this.form.notify.verbose) command.notify.verbose = true
-              this.updateConfig(command)
+              this.updateConfig(buildNotifyCommand(this.form))
             },
             authAnnict () {
               this.methods.authAnnict(this.form.annict.auth_code)
@@ -295,9 +265,7 @@ html lang='ja' data-theme='light'
                 }).catch(e => Swal.fire({text: e.message, icon: 'error'}))
             },
             updateAnnict () {
-              const command = {service: {annict: {theme_works_only: null}}}
-              if (this.form.annict.theme_works_only) command.service.annict.theme_works_only = true
-              this.updateConfig(command)
+              this.updateConfig(buildAnnictCommand(this.form))
             },
             unauthAnnict () {
               Swal.fire({

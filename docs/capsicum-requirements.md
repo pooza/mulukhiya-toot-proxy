@@ -82,7 +82,144 @@ capsicum は任意の Mastodon / Misskey サーバーに接続するため、モ
 
 モロヘイヤ側の `docs/CLAUDE.md` の「関連リポジトリ」セクションに capsicum を追加してほしい。
 
-## 5. 今後の API 変更時の連携
+## 5. 管理者ロール情報の提供 API
+
+### 背景
+
+Mastodon の公開 API では、ユーザーのロールに `permissions` フィールドが含まれない（セキュリティ上の制約）。そのため、クライアントアプリから他ユーザーが管理者かどうかを判定する手段がない。
+
+capsicum では管理者ロールに `:sabacan:` カスタム絵文字を表示する機能を実装したが、現状は `verify_credentials`（ログインユーザー自身のロール）から管理者ロール ID を学習する方式のため、ログインユーザーが管理者でない場合は判定できない。
+
+モロヘイヤは DB に直接アクセスできるため、`user_roles` テーブルの `permissions` を参照して管理者ロール ID を返す API を提供してほしい。
+
+### 実装方針
+
+専用エンドポイントは設けず、既存の `GET /mulukhiya/api/about` レスポンスに `admin_role_ids` フィールドを追加する。capsicum はモロヘイヤ検出時に既にこのエンドポイントを呼んでいるため、追加リクエストが不要。
+
+- 認証: 不要（`/about` は認証なしで利用可能）
+- レスポンス例（`config` 内に追加）:
+
+```json
+{
+  "config": {
+    "admin_role_ids": ["3"],
+    ...
+  }
+}
+```
+
+- DB 未接続時（Misskey 等）やエラー時は空配列 `[]` を返す
+- Misskey は `isAdministrator` フィールドがあるため不要だが、空配列が返るだけなので capsicum 側で分岐不要
+
+### 実装詳細
+
+- `Config#about` の `config:` ハッシュに `admin_role_ids` を追加
+- `Config#admin_role_ids`（private）: `Mastodon::Role` の `user_roles` テーブルから `permissions` ビット 0（管理者）が立っているロール ID を文字列配列で返す
+- ガード: `Environment.dbms_class&.config?` で DB 未接続を判定、rescue で例外も空配列にフォールバック
+
+### capsicum 側の利用方法
+
+1. モロヘイヤ検出時に管理者ロール ID を取得・キャッシュ
+2. ユーザーのロール表示時にロール ID を照合して `isAdmin` を判定
+3. モロヘイヤ未導入サーバーでは `verify_credentials` フォールバック（現行方式）
+
+### 関連
+
+- `pooza/capsicum#159`
+
+## 6. ユーザー向けハンドラー設定 API
+
+### 背景
+
+モロヘイヤには「ユーザー判断で利用しないハンドラーを選ぶ」機能が計画されている。管理者向けの `GET /admin/handler/list` と `POST /admin/handler/config` は実装済みだが、一般ユーザーがハンドラーを一覧・切替する API が不足している。
+
+capsicum ではハンドラー設定画面（トグルスイッチのリスト）を実装予定。そのために以下の API が必要。
+
+### 6.1 ユーザー向けハンドラー一覧エンドポイント（新規）
+
+```
+GET /mulukhiya/api/handler/list
+```
+
+- **認証**: ユーザートークン（Bearer）
+- **目的**: ログインユーザーに関連するハンドラーの一覧と、ユーザーレベルの有効/無効状態を返す
+
+**レスポンスに必要なフィールド**:
+
+```json
+[
+  {
+    "name": "default_tag",
+    "label": "デフォルトタグ",
+    "description": "投稿にデフォルトのハッシュタグを付与します",
+    "toggleable": true,
+    "disabled": false
+  },
+  {
+    "name": "itunes_music_nowplaying",
+    "label": "iTunes NowPlaying",
+    "description": "Apple Music / iTunes の楽曲リンクから NowPlaying 情報を生成します",
+    "toggleable": true,
+    "disabled": true
+  },
+  {
+    "name": "dictionary_tag",
+    "label": "辞書タグ",
+    "description": "辞書に登録された単語に基づいてタグを付与します",
+    "toggleable": false,
+    "disabled": false
+  }
+]
+```
+
+| フィールド | 型 | 説明 |
+|-----------|------|------|
+| `name` | string | ハンドラー識別子（既存の underscore 名） |
+| `label` | string | **新規**。UI 表示用の短い名前 |
+| `description` | string | **新規**。ハンドラーが何をするかの説明文 |
+| `toggleable` | boolean | ユーザーが切替可能か |
+| `disabled` | boolean | 現在のユーザー設定での無効状態 |
+
+- グローバルに無効化されたハンドラーは一覧に含めない（ユーザーには見せない）
+- `toggleable: false` のハンドラーも一覧に含める（capsicum 側でスイッチを無効化して表示する）
+
+### 6.2 ユーザー向けハンドラートグルエンドポイント（新規）
+
+admin の `POST /admin/handler/config` と対称的な専用エンドポイントを新設する。
+
+```http
+POST /mulukhiya/api/handler/config
+Content-Type: application/json
+Authorization: Bearer <user_token>
+
+{
+  "handler": "default_tag",
+  "disable": true
+}
+```
+
+- `UserConfig` に `/handler/{name}/disable` を保存（既存の仕組みを利用）
+- `toggleable: false` のハンドラーに対してはエラーを返す
+
+### 6.3 モロヘイヤ側で必要な作業
+
+1. 各ハンドラーに `label`（表示名）と `description`（説明文）のメタデータを追加 → #4194
+2. `GET /mulukhiya/api/handler/list`（ユーザー認証）エンドポイントの新設 → #4195
+3. `POST /mulukhiya/api/handler/config`（ユーザー認証）エンドポイントの新設 → #4196
+4. WebUI: ユーザー向けハンドラートグル画面（config.slim に統合） → #4197
+
+### 6.4 capsicum 側の実装予定
+
+1. `MulukhiyaService` に `getHandlerList()` / `updateHandlerDisable()` メソッドを追加
+2. ハンドラー設定画面の UI を実装（トグルスイッチリスト）
+3. モロヘイヤ連携セクション（サーバー情報画面等）に導線を配置
+
+### 関連
+
+- capsicum 側: `pooza/capsicum#188`（サーバー情報画面の新設）で導線を確保予定
+- モロヘイヤ側: #4194, #4195, #4196, #4197
+
+## 7. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 

@@ -12,6 +12,19 @@ html lang='ja' data-theme='light'
       .field-update-button-container v-if='restartable'
         button @click='restartPuma' 再起動
         p.alert 再起動している間（数十秒程度）は操作できなくなります。
+      section.config v-if='account.is_admin && (audit.errors.length > 0 || audit.unknown_keys.length > 0)'
+        h3 @click='toggleVisibility("audit")' 設定監査
+        slide-up-down :active='layout.details.audit'
+          .indented
+            div v-if='audit.errors.length > 0'
+              h4 バリデーションエラー
+              ul
+                li.alert v-for='err in audit.errors' {{err}}
+            div v-if='audit.unknown_keys.length > 0'
+              h4 不明な設定キー
+              p スキーマに定義されていないキーが local.yaml に含まれています。不要であれば削除を検討してください。
+              ul
+                li.alert v-for='key in audit.unknown_keys' {{key}}
       - Mulukhiya::Event.all do |event|
         - next unless event.all_handlers.any?
         section.config v-if='account.is_admin'
@@ -23,7 +36,10 @@ html lang='ja' data-theme='light'
                   h4
                     - if handler.experimental?
                       i class='fa fa-flask' v-tooltip.right="'実験的機能'"
-                    = handler.underscore
+                    = handler.label || handler.underscore
+                    small = " (#{handler.underscore})"
+                  - if handler.description
+                    p.handler-description = handler.description
                   label
                     - if handler.toggleable?
                       input type='checkbox' v-model='handlers.#{handler.underscore}' @change='onChangeHandler' value=handler.underscore
@@ -70,6 +86,41 @@ html lang='ja' data-theme='light'
                                 input v-else-if="subProp.type === 'integer'" type='number' v-model.number="handlerParams['#{handler.underscore}'][key][subKey]" :min='subProp.minimum' :max='subProp.maximum'
                                 label.param-checkbox v-else-if="subProp.type === 'boolean'"
                                   input type='checkbox' v-model="handlerParams['#{handler.underscore}'][key][subKey]"
+                        template v-else-if="prop.type === 'array' && prop.items && prop.items.properties"
+                          .object-fields
+                            .array-field
+                              .array-item v-for="(item, idx) in handlerParams['#{handler.underscore}'][key]" :key='idx'
+                                .array-item-fields
+                                  template v-for="(itemProp, itemKey) in prop.items.properties" :key='itemKey'
+                                    .param-field v-if='itemProp.enum'
+                                      label.param-label
+                                        | {{itemKey}}
+                                      select v-model="item[itemKey]"
+                                        option v-for='opt in itemProp.enum' :key='opt' :value='opt' {{opt}}
+                                    .param-field v-else-if="itemProp.type === 'boolean'"
+                                      label.param-checkbox
+                                        input type='checkbox' v-model="item[itemKey]"
+                                        |  {{itemKey}}
+                                    .param-field v-else-if="itemProp.type === 'object' && itemProp.properties"
+                                      label.param-label
+                                        | {{itemKey}}
+                                      .object-fields
+                                        .param-field v-for="(sp, sk) in itemProp.properties" :key='sk'
+                                          label.param-label
+                                            | {{sk}}
+                                          input type='text' v-model.trim="item[itemKey][sk]"
+                                    .param-field v-else-if="itemProp.type === 'array'"
+                                      label.param-label
+                                        | {{itemKey}}
+                                      textarea v-model="item[itemKey]" rows='2'
+                                    .param-field v-else=''
+                                      label.param-label
+                                        | {{itemKey}}
+                                      input v-if="itemProp.type === 'integer'" type='number' v-model.number="item[itemKey]" :min='itemProp.minimum' :max='itemProp.maximum'
+                                      input v-else='' type='text' v-model.trim="item[itemKey]"
+                                button.btn-remove @click="removeTopArrayItem('#{handler.underscore}', key, idx)" ✕
+                              button.btn-add @click="addTopArrayItem('#{handler.underscore}', key, prop)"
+                                | + 追加
                         textarea v-else='' v-model="handlerParams['#{handler.underscore}'][key]" rows='3'
                       .field-update-button-container
                         button @click="saveHandlerParams('#{handler.underscore}')" 保存
@@ -91,8 +142,10 @@ html lang='ja' data-theme='light'
               handlerParams: {},
               expandedHandler: null,
               restartable: false,
+              audit: {errors: [], unknown_keys: []},
               layout: {
                 details: {
+                  audit: true,
                   alert: false,
                   announce: false,
                   follow: false,
@@ -121,6 +174,7 @@ html lang='ja' data-theme='light'
                 this.handlerParams[v.name] = normalizeParams(v.params || {}, v.schema)
               }
             }))
+            this.methods.getConfigAudit().then(e => {this.audit = e}).catch(_ => {})
           },
           methods: {
             toggleVisibility (name) {
@@ -169,6 +223,12 @@ html lang='ja' data-theme='light'
             },
             removeArrayItem (handler, key, subKey, idx) {
               this.handlerParams[handler][key][subKey].splice(idx, 1)
+            },
+            addTopArrayItem (handler, key, prop) {
+              this.handlerParams[handler][key].push(createArrayItem(prop.items))
+            },
+            removeTopArrayItem (handler, key, idx) {
+              this.handlerParams[handler][key].splice(idx, 1)
             },
             onChangeHandler (e) {
               this.methods.toggleHandler(e.target.value, e.target.checked)

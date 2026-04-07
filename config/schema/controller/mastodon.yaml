@@ -3,6 +3,8 @@ properties:
     properties:
       types:
         properties:
+          animation_image:
+            type: string
           audio:
             type: string
           image:
@@ -43,6 +45,8 @@ properties:
   status:
     properties:
       label:
+        type: string
+      reblog_label:
         type: string
       spoiler_text:
         type: string

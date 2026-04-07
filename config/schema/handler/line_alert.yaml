@@ -1,3 +1,5 @@
+label: LINEアラート
+description: エラー発生時にLINEへアラートを送信します
 properties:
   disabled:
     type: boolean

@@ -1,3 +1,5 @@
+label: Spotify画像取得
+description: Spotify URLからアルバムアートを取得して添付します
 properties:
   disabled:
     type: boolean

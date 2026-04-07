@@ -57,8 +57,17 @@ module Mulukhiya
       def self.catalog(params = {})
         params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
-        return Postgres.exec(:media_catalog, params).filter_map do |row|
-          next unless attachment = self[row[:id]]
+        rows = Postgres.exec(:media_catalog, params.merge(limit: params[:limit] + 1))
+        has_next = rows.size > params[:limit]
+        page_rows = rows.first(params[:limit])
+        items = build_catalog_items(page_rows)
+        return {items:, page: params[:page], has_next:}
+      end
+
+      def self.build_catalog_items(rows)
+        attachments = where(id: rows.map {|r| r[:id]}).to_h {|a| [a.id, a]}
+        return rows.filter_map do |row|
+          next unless attachment = attachments[row[:id]]
           attachment.to_h.merge(
             account: row.slice(:username, :display_name),
             status: {
@@ -72,11 +81,10 @@ module Mulukhiya
 
       def self.feed(&block)
         return enum_for(__method__) unless block
-        Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
-          .map {|row| row[:id]}
-          .filter_map {|id| self[id] rescue nil}
-          .map(&:feed_entry)
-          .each(&block)
+        rows = Postgres.exec(:media_catalog, {page: 1, limit: MediaFeedRenderer.limit})
+        ids = rows.map {|row| row[:id]}
+        attachments = where(id: ids).to_h {|a| [a.id, a]}
+        ids.filter_map {|id| attachments[id]&.feed_entry}.each(&block)
       end
     end
   end

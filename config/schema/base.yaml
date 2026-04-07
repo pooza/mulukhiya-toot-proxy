@@ -2,12 +2,26 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 properties:
   agent:
     properties:
+      accts:
+        items:
+          type: string
+        type: array
       info:
         properties:
+          announcement:
+            properties:
+              template:
+                type: string
+            type: object
           token:
             type: string
           username:
             type: string
+          webhook:
+            properties:
+              secret:
+                type: string
+            type: object
           welcome:
             properties:
               template:
@@ -94,6 +108,11 @@ properties:
       - mastodon
       - misskey
     type: string
+  diag:
+    properties:
+      enable:
+        type: boolean
+    type: object
   crypt:
     properties:
       encoder:
@@ -233,11 +252,6 @@ properties:
     type: object
   ruby:
     properties:
-      bundler:
-        properties:
-          install:
-            type: boolean
-        type: object
       did_you_mean:
         type: boolean
     type: object
@@ -267,6 +281,23 @@ properties:
       schedule:
         type: object
     type: object
+  sentry:
+    properties:
+      dsn:
+        format: uri
+        type: string
+      scrub_patterns:
+        items:
+          format: regex
+          type: string
+        type: array
+      traces_sample_rate:
+        maximum: 1
+        minimum: 0
+        type: number
+    type: object
+  service:
+    type: object
   spoiler:
     properties:
       emoji:
@@ -275,6 +306,9 @@ properties:
         format: regex
         type: string
     type: object
+  status_url:
+    format: uri
+    type: string
   spotify:
     properties:
       client:

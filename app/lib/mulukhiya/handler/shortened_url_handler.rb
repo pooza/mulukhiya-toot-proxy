@@ -13,7 +13,12 @@ module Mulukhiya
     end
 
     def rewritable?(uri)
-      return true
+      uri = Ginseng::URI.parse(uri.to_s) unless uri.is_a?(Ginseng::URI)
+      return true if uri.host == 't.co' # TwitterのURL短縮サービスは常にリダイレクト
+      return domains.member?(uri.host)
+    rescue => e
+      errors.push(class: e.class.to_s, message: e.message, url: uri.to_s)
+      return false
     end
 
     private
@@ -24,7 +29,7 @@ module Mulukhiya
       while redirects < MAX_REDIRECTS
         next_uri, status = fetch_redirect(dest)
         break unless next_uri
-        break unless follow_redirect?(dest, next_uri, status)
+        break unless (status / 100) == 3
         dest = next_uri
         redirects += 1
       end
@@ -42,31 +47,8 @@ module Mulukhiya
       return [nil, nil]
     end
 
-    def follow_redirect?(current_uri, next_uri, status)
-      return true if twitter?(current_uri)
-      return true if permanent_redirect?(status)
-      return false unless redirect_status?(status)
-      return cross_domain?(current_uri, next_uri)
-    end
-
-    def twitter?(uri)
-      return tco?(uri)
-    end
-
-    def tco?(uri)
-      return uri.host.to_s.downcase == 't.co'
-    end
-
-    def permanent_redirect?(status)
-      return [301, 308].include?(status)
-    end
-
-    def redirect_status?(status)
-      return (status / 100) == 3
-    end
-
-    def cross_domain?(current_uri, next_uri)
-      return next_uri.host != current_uri.host
+    def domains
+      return handler_config(:domains) || []
     end
 
     def normalize_location(base_uri, location)

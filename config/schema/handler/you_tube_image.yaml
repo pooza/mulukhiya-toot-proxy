@@ -1,3 +1,5 @@
+label: YouTube画像取得
+description: YouTube動画からサムネイル画像を取得して添付します
 properties:
   disabled:
     type: boolean

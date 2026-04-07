@@ -1,10 +1,10 @@
-# カスタムAPI / カスタムフィード 設計見直し
+# カスタムAPI 設計見直し
 
 ## 背景
 
 ### 現在の仕組み
 
-`local.yaml` の `/api/custom` および `/feed/custom` にエンドポイントを定義し、外部プロジェクトのコマンドを `Open3.capture3` で実行して結果を返す仕組み。
+`local.yaml` の `/api/custom` にエンドポイントを定義し、外部プロジェクトのコマンドを `Open3.capture3` で実行して結果を返す仕組み。
 
 #### 関連ファイル
 
@@ -36,7 +36,6 @@ mulukhiya-rubicure はもともと**独立したデーモン**として動作し
 ### 利用状況
 
 - **カスタムAPI** (`/api/custom`): 1名のみ使用（キュアスタ！）
-- **カスタムフィード** (`/feed/custom`): 2名が使用。変更時は事前確認が必要
 
 ## 方針: 独立デーモンに戻す
 
@@ -56,7 +55,10 @@ mulukhiya-rubicure はもともと**独立したデーモン**として動作し
 - `custom_api.rb`, `command_line.rb`, `custom_api_render_storage.rb` の廃止または大幅簡素化
 - `api_controller.rb` の動的ルーティング生成部分の削除
 - `local.yaml` の `/api/custom` 設定の廃止
-- カスタムフィード（`/feed/custom`）も同様の仕組み。合わせて検討
+
+### カスタムフィードについて
+
+カスタムフィード（`/feed/custom`）はモロヘイヤ内で完結しており、Open3やBundler環境切り替えの問題がないため、本設計見直しの対象外。
 
 ---
 

@@ -8,6 +8,7 @@ module Mulukhiya
       return unless @dest = convert
       payload[image_field][:org_tempfile] ||= payload.dig(image_field, :tempfile)
       payload[image_field][:tempfile] = @dest
+      update_metadata(payload)
     rescue => e
       e.alert
       errors.push(class: e.class.to_s, message: e.message, file: file.path)
@@ -44,6 +45,16 @@ module Mulukhiya
     def initialize(params = {})
       super
       @image_field = :file
+    end
+
+    def update_metadata(payload)
+      return unless type
+      dest_file = media_class.new(@dest.path)
+      payload[image_field][:type] = dest_file.type
+      return unless payload[image_field][:filename]
+      extname = dest_file.recommended_extname || File.extname(@dest.path)
+      basename = File.basename(payload[image_field][:filename], '.*')
+      payload[image_field][:filename] = "#{basename}#{extname}"
     end
   end
 end

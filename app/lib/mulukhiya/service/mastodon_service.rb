@@ -30,6 +30,12 @@ module Mulukhiya
       return response
     end
 
+    def delete_scheduled_status(id)
+      return http.delete("/api/v1/scheduled_statuses/#{id}", {
+        headers: create_headers,
+      })
+    end
+
     def search_status_id(status)
       status = status.id if status.is_a?(status_class)
       return super

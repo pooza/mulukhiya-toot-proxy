@@ -8,13 +8,13 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      return if notified?
       health = Environment.health
-      account_class.admins.each do |account|
-        info_agent_service.notify(account, create_message(health))
+      if notified?
+        notify_if_changed(health)
+      else
+        notify_all(health, create_startup_message(health))
+        redis['startup_notified_pid'] = sidekiq_pid
       end
-      redis['startup_notified_pid'] = sidekiq_pid
-      log(status: health[:status], admins: account_class.admins.count)
     rescue => e
       e.log
     end
@@ -29,9 +29,65 @@ module Mulukhiya
       return Process.pid.to_s
     end
 
-    def create_message(health)
+    def notify_if_changed(health)
+      previous = previous_status
+      current = extract_status(health)
+      return if previous == current
+      notify_all(health, create_change_message(health, previous))
+    end
+
+    def notify_all(health, message)
+      account_class.admins.each do |account|
+        info_agent_service.notify(account, message)
+      end
+      save_status(extract_status(health))
+      log(status: health[:status], admins: account_class.admins.count)
+    end
+
+    def extract_status(health)
+      return health.except(:status).transform_values {|v| v[:status]}
+    end
+
+    def previous_status
+      raw = redis['health_status']
+      return nil unless raw
+      return JSON.parse(raw).symbolize_keys
+    rescue
+      return nil
+    end
+
+    def save_status(status)
+      redis['health_status'] = status.to_json
+    end
+
+    def create_startup_message(health)
       lines = ["モロヘイヤ v#{Package.version} 起動完了"]
+      lines.concat(status_lines(health))
+      return lines.join("\n")
+    end
+
+    def create_change_message(health, previous)
+      lines = ['ヘルスステータス変更']
       lines << ''
+      health.except(:status).each do |key, value|
+        prev = previous&.dig(key)
+        if prev && prev != value[:status]
+          lines << "#{key}: #{prev} → #{value[:status]}"
+        else
+          lines << "#{key}: #{value[:status]}"
+        end
+      end
+      lines << ''
+      if health[:status] == 200
+        lines << 'ステータス: 正常'
+      else
+        lines << "ステータス: 異常 (#{health[:status]})"
+      end
+      return lines.join("\n")
+    end
+
+    def status_lines(health)
+      lines = ['']
       health.except(:status).each do |key, value|
         lines << "#{key}: #{value[:status]}"
       end
@@ -47,7 +103,7 @@ module Mulukhiya
         lines << 'スキーマエラー:'
         schema_errors.each {|e| lines << "- #{e}"}
       end
-      return lines.join("\n")
+      return lines
     end
 
     def redis

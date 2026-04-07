@@ -4,7 +4,7 @@ module Mulukhiya
       @png_rgba = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/ribbon08-009.png'))
       @png_rgb = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/logo.png'))
       @mp3 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
-      @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
+      @mp4 = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.mp4'))
       @webp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/4.sm-1.webp'))
       @invalid_webp = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/本当はwebp画像.png'))
       @agif = ImageFile.new(File.join(Environment.dir, 'public/mulukhiya/media/11750_thumbnail.gif'))

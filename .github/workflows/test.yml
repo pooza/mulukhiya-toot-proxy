@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 4.0.1
+          ruby-version: 4.0.2
       - name: apt install
         run: |
           sudo apt update
@@ -29,7 +29,7 @@ jobs:
         run: chmod -R o-w "$(gem environment gemdir)"
       - name: Create CI config
         run: |
-          printf "controller: ${{ matrix.controller }}\ncrypt:\n  password: ci_dummy_password\n${{ matrix.controller }}:\n  url: https://ci.example.com\n" > config/local.yaml
+          printf "controller: ${{ matrix.controller }}\ncrypt:\n  password: ci_dummy_password\n${{ matrix.controller }}:\n  url: https://ci.example.com\nhandler:\n  group_tag:\n    sources: []\n" > config/local.yaml
       - name: bundle install
         run: |
           gem install bundler

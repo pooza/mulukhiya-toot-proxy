@@ -3,7 +3,7 @@ module Mulukhiya
     def setup
       @mp3 = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/hugttocatch.mp3'))
       @png = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/ribbon08-009.png'))
-      @mp4 = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/poyke.mp4'))
+      @mp4 = AudioFile.new(File.join(Environment.dir, 'public/mulukhiya/media/h264.mp4'))
     end
 
     def test_values

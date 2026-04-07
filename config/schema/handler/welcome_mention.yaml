@@ -1,3 +1,5 @@
+label: ウェルカムメンション
+description: 新規フォロワーや承認ユーザーにウェルカムメッセージを送信します
 properties:
   disabled:
     type: boolean

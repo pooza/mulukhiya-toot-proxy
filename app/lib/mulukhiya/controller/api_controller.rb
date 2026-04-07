@@ -9,6 +9,11 @@ module Mulukhiya
         .sort.to_a
       @renderer.message = about
       return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
     end
 
     get '/health' do
@@ -87,10 +92,49 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/emoji/palettes' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      row = Postgres.first(:emoji_palettes, {account_id: sns.account.id})
+      if row
+        value = row[:value]
+        value = JSON.parse(value) if value.is_a?(String)
+        palettes = value.select {|_k, v| v.is_a?(Hash) && v.key?('name')}.values
+        @renderer.message = {
+          palettes: palettes.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
+          palette_for_reaction: value['emojiPaletteForReaction'],
+          palette_for_main: value['emojiPaletteForMain'],
+        }
+      else
+        @renderer.message = {palettes: [], palette_for_reaction: nil, palette_for_main: nil}
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/decoration/list' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
       sns.token ||= sns.default_token
       @renderer.message = sns.fetch_avatar_decorations
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/decoration/restore' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.decoration?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      saved = sns.account.user_config['/decoration/saved_state']
+      raise Ginseng::NotFoundError, 'Not Found' unless saved.present?
+      DecorationInitializeWorker.new.restore_decoration(sns.account)
+      @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
       e.log
@@ -265,6 +309,71 @@ module Mulukhiya
         ].join("\n")
         @renderer.message = sns.repost(status, body)
       end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/scheduled_status/:id/tags' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.mastodon_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      storage = ScheduledStatusStorage.new
+      entry = storage.get(params[:id])
+      raise Ginseng::NotFoundError, 'Not Found' unless entry
+      raise Ginseng::AuthError, 'Unauthorized' unless entry[:account_id] == sns.account.id
+      errors = ScheduledStatusTagsContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        saved_params = entry[:params].deep_stringify_keys
+        original_body = saved_params[status_field]
+        parser = parser_class.new(original_body)
+        body = [
+          parser.body,
+          '',
+          params[:tags].map(&:to_hashtag).join(' '),
+        ].join("\n")
+        saved_params[status_field] = body
+        delete_response = sns.delete_scheduled_status(params[:id])
+        unless delete_response.code.between?(200, 299)
+          message = delete_response.parsed_response&.dig('error') || 'delete failed'
+          raise Ginseng::GatewayError, message
+        end
+        response = sns.toot(saved_params.merge(
+          'scheduled_at' => entry[:scheduled_at],
+        ).compact)
+        if response.code.between?(200, 299)
+          new_entry = response.parsed_response
+          storage.unlink(params[:id])
+          margin = ScheduledStatusSaveHandler::MARGIN
+          expires_in = (Time.parse(new_entry['scheduled_at']) - Time.now).to_i
+          ttl = [expires_in + margin, margin].max
+          storage.set(new_entry['id'], {
+            account_id: sns.account.id,
+            params: saved_params,
+            scheduled_at: new_entry['scheduled_at'],
+          }, ttl:)
+          @renderer.message = {
+            id: new_entry['id'],
+            scheduled_at: new_entry['scheduled_at'],
+            tags: params[:tags],
+          }
+        else
+          saved_params[status_field] = original_body
+          sns.toot(saved_params.merge('scheduled_at' => entry[:scheduled_at]).compact)
+          message = response.parsed_response['error'] || 'recreate failed'
+          raise Ginseng::GatewayError, message
+        end
+      end
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.log
+      @renderer.status = e.respond_to?(:source_status) ? e.source_status : 502
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     rescue => e
       e.log
@@ -517,6 +626,17 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/admin/config/audit' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      @renderer.message = config.audit
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/admin/agent/config' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
       if params[:info_token]
@@ -546,16 +666,39 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    CustomAPI.all do |api|
-      get api.path do
-        @renderer = api.create_renderer(params)
-        return @renderer.to_s
-      rescue => e
-        e.log
-        @renderer.status = e.status
-        @renderer.message = {error: e.message}
+    post '/account/is_cat' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = IsCatContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
         return @renderer.to_s
       end
+      storage = IsCatStorage.new
+      http = HTTP.new
+      result = Concurrent::Hash.new
+      Parallel.each(params[:accts].uniq, in_threads: Parallel.processor_count) do |acct_str|
+        acct = Ginseng::Fediverse::Acct.new(acct_str)
+        cached = storage.get(acct_str)
+        if cached
+          result[acct_str] = cached['is_cat']
+          next
+        end
+        actor = fetch_actor(http, acct)
+        is_cat = actor&.dig('isCat')
+        result[acct_str] = is_cat
+        storage.set(acct_str, {is_cat:}) unless actor.nil?
+      rescue => e
+        e.log(acct: acct_str)
+        result[acct_str] = nil
+      end
+      @renderer.message = result
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
     end
 
     def token
@@ -566,6 +709,42 @@ module Mulukhiya
 
     def self.default_type
       return 'application/json; charset=UTF-8'
+    end
+
+    private
+
+    def fetch_actor(http, acct)
+      return nil unless valid_remote_host?(acct.host)
+      webfinger = http.get(
+        "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
+        {headers: {'Accept' => 'application/jrd+json'}},
+      ).parsed_response
+      actor_uri = webfinger['links']&.find do |l|
+        l['type'] == 'application/activity+json'
+      end&.dig('href')
+      return nil unless actor_uri
+      actor_host = Ginseng::URI.parse(actor_uri)&.host
+      return nil unless valid_remote_host?(actor_host)
+      return http.get(
+        actor_uri,
+        {headers: {'Accept' => 'application/activity+json'}},
+      ).parsed_response
+    rescue
+      return nil
+    end
+
+    def valid_remote_host?(host)
+      return false unless host.present?
+      return false unless host.include?('.')
+      return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
+      return false if host.match?(/\A\[.*\]\z/)
+      addrs = Addrinfo.getaddrinfo(host, nil, nil, :STREAM).map(&:ip_address)
+      addrs.none? do |ip|
+        addr = IPAddr.new(ip)
+        addr.private? || addr.loopback? || addr.link_local?
+      end
+    rescue
+      return false
     end
   end
 end

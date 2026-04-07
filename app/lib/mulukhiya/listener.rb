@@ -33,12 +33,14 @@ module Mulukhiya
       @stopping = false
       @retry_count = 0
       setup_signal_handlers
-      run_event_loop
-    rescue => e
-      return if @stopping
-      handle_retry(e)
-      return if @stopping
-      retry
+      begin
+        run_event_loop
+      rescue => e
+        return if @stopping
+        handle_retry(e)
+        return if @stopping
+        retry
+      end
     end
 
     def self.run_event_loop

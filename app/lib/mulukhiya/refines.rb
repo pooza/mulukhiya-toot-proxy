@@ -41,6 +41,7 @@ module Mulukhiya
 
       def alert(values = {})
         log(values)
+        Sentry.capture_exception(self) if Sentry.initialized?
         return Event.new(:alert).dispatch(self)
       end
 

@@ -1,3 +1,5 @@
+label: URL正規化
+description: 投稿中のURLを正規形に変換します
 properties:
   disabled:
     type: boolean

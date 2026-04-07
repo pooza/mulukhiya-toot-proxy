@@ -2,6 +2,7 @@ module Mulukhiya
   class MediaMetadataStorageTest < TestCase
     def disable?
       return true unless test_token
+      return true unless Redis.health[:status] == 'OK'
       return super
     end
 

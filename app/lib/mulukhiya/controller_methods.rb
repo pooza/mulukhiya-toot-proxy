@@ -77,6 +77,10 @@ module Mulukhiya
         return config["/#{name}/capabilities/decoration"] == true rescue false
       end
 
+      def local_post?
+        return config["/#{name}/capabilities/local_post"] == true rescue false
+      end
+
       def annict?
         return false unless config["/#{name.underscore}/features/annict"] == true
         return false unless AnnictService.config?
@@ -171,6 +175,10 @@ module Mulukhiya
         return config["/#{name}/status/label"]
       end
 
+      def reblog_label
+        return config["/#{name}/status/reblog_label"]
+      end
+
       def status_delete_limit
         return config["/#{name}/status/delete/limit"] rescue nil
       end
@@ -185,6 +193,10 @@ module Mulukhiya
 
       def default_audio_type
         return config["/#{name}/attachment/types/audio"] rescue nil
+      end
+
+      def video_codecs
+        return config["/#{name}/attachment/video_codecs"] rescue nil
       end
 
       def visibility_name(name)

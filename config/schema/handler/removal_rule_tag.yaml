@@ -1,20 +1,19 @@
+label: タグ除去ルール
+description: パターンマッチに基づいてハッシュタグを除去します
 properties:
   disabled:
     type: boolean
-  tags:
-    properties:
-      rules:
-        items:
-          properties:
-            removal_tags:
-              items:
-                type: string
-              type: array
-            search:
-              type: string
-          type: object
-        type: array
-    type: object
+  rules:
+    items:
+      properties:
+        removal_tags:
+          items:
+            type: string
+          type: array
+        search:
+          type: string
+      type: object
+    type: array
   timeout:
     minimum: 1
     type: integer

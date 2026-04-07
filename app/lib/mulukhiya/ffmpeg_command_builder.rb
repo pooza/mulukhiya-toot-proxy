@@ -2,32 +2,40 @@ module Mulukhiya
   class FFmpegCommandBuilder
     include Package
 
-    def self.remux_video(src, dest)
-      return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
-        '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
-        '-c', 'copy', '-movflags', '+faststart',
-        '-map_metadata', '0', '-map_chapters', '0', dest
-      ])
+    def self.remux_video(src, dest, audio: true)
+      args = ['ffmpeg', '-y', '-i', src]
+      args.concat(silent_audio_input) unless audio
+      args.push('-map', '0:v:0')
+      args.concat(audio ? ['-map', '0:a:0?'] : ['-map', '1:a:0', '-shortest'])
+      args.push('-c', 'copy')
+      args.push('-c:a', 'aac', '-b:a', '1k', '-ar', '48000', '-ac', '2') unless audio
+      args.push('-movflags', '+faststart', '-map_metadata', '0', '-map_chapters', '0', dest)
+      return CommandLine.new(args)
     end
 
-    def self.transcode_video(src, dest, crf = nil, preset = nil)
+    def self.transcode_video(src, dest, crf: nil, preset: nil, audio: true)
       crf ||= config['/ffmpeg/crf']
       preset ||= config['/ffmpeg/preset']
-      return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
-        '-map', '0:v:0', '-map', '0:a:0?', '-map', '0:s?',
+      args = ['ffmpeg', '-y', '-i', src]
+      args.concat(silent_audio_input) unless audio
+      args.push('-map', '0:v:0')
+      args.concat(audio ? ['-map', '0:a:0?'] : ['-map', '1:a:0', '-shortest'])
+      args.push(
         '-c:v', 'libx264', '-preset', preset, '-crf', crf.to_s,
         '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.1', '-g', '120',
         '-c:a', 'aac', '-b:a', '160k', '-ar', '48000', '-ac', '2',
-        '-c:s', 'mov_text',
         '-movflags', '+faststart', '-map_metadata', '0', '-map_chapters', '0', dest
-      ])
+      )
+      return CommandLine.new(args)
+    end
+
+    def self.silent_audio_input
+      ['-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo']
     end
 
     def self.remux_audio(src, dest)
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
+        'ffmpeg', '-y', '-i', src,
         '-map', '0:a:0', '-c', 'copy', '-map_metadata', '0', '-id3v2_version', '3', dest
       ])
     end
@@ -35,7 +43,7 @@ module Mulukhiya
     def self.transcode_audio(src, dest, bitrate = nil)
       bitrate ||= config['/ffmpeg/audio/bitrate']
       return CommandLine.new([
-        'ffmpeg', '-y', '-err_detect', 'explode', '-i', src,
+        'ffmpeg', '-y', '-i', src,
         '-map', '0:a:0', '-c:a', 'libmp3lame', '-b:a', "#{bitrate}k",
         '-map_metadata', '0', '-id3v2_version', '3', dest
       ])

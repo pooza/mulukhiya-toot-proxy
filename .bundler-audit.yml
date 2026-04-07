@@ -1,0 +1,6 @@
+---
+ignore:
+  # Sinatra ReDoS (ETag header) - sinatra 4.2.0で修正だが、
+  # rack 3.2 + Sinatra 4.2.0でトークン汚染インシデント発生のため
+  # sinatra 4.1.1に固定中。docs/postmortem-2025-10-rack32.md 参照
+  - GHSA-mr3q-g2mv-mr4q
