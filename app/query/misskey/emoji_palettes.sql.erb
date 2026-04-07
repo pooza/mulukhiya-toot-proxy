@@ -2,5 +2,5 @@ SELECT value
 FROM registry_item
 WHERE "userId" = '<%= params[:account_id] %>'
   AND key = 'emojiPalettes'
-  AND scope = ARRAY['client', 'preferences', 'sync']
+  AND scope = ARRAY['client', 'preferences', 'sync']::varchar[]
   AND domain IS NULL
