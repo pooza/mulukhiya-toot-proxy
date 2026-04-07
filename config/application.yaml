@@ -305,6 +305,7 @@ logger:
     - secret
 mastodon:
   attachment:
+    base_url: null
     types:
       audio: audio/mpeg
       image: image/webp
