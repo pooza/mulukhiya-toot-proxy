@@ -26,7 +26,7 @@ module Mulukhiya
 
       assert_kind_of(Hash, result)
       assert_equal(1, result[:items].size)
-      assert_equal(false, result[:has_next])
+      refute(result[:has_next])
 
       @storage.unlink(@key)
 

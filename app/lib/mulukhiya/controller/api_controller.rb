@@ -100,11 +100,9 @@ module Mulukhiya
         value = row[:value]
         value = JSON.parse(value) if value.is_a?(String)
         # value is [[{server, emojiPaletteForReaction?, ...}, [palettes...]]]
-        metadata = {}
         palettes = []
         if value.is_a?(Array) && value.first.is_a?(Array)
           entry = value.first
-          metadata = entry[0] if entry[0].is_a?(Hash)
           palettes = entry[1] if entry[1].is_a?(Array)
         end
         # Fetch palette assignments from backups scope
@@ -119,7 +117,9 @@ module Mulukhiya
           palette_for_main = prefs['emojiPaletteForMain']&.dig(0, 1) rescue nil
         end
         @renderer.message = {
-          palettes: palettes.select {|p| p.is_a?(Hash)}.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
+          palettes: palettes.grep(Hash).map do |p|
+            {id: p['id'], name: p['name'], emojis: p['emojis'] || []}
+          end,
           palette_for_reaction: palette_for_reaction,
           palette_for_main: palette_for_main,
         }
