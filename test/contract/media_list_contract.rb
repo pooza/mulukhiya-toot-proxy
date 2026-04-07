@@ -40,6 +40,14 @@ module Mulukhiya
       errors = @contract.call(q: 'キュアホワイトうどん').errors
 
       assert_empty(errors)
+
+      errors = @contract.call(cursor: '12345').errors
+
+      assert_empty(errors)
+
+      errors = @contract.call(cursor: 123).errors
+
+      assert_false(errors.empty?)
     end
   end
 end

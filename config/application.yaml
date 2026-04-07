@@ -427,7 +427,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.15.0
+  version: 5.16.0
 parser:
   note:
     fields:
@@ -587,6 +587,9 @@ sidekiq:
     feed_update:
       class: Mulukhiya::FeedUpdateWorker
       every: 5m
+    media_catalog_update:
+      class: Mulukhiya::MediaCatalogUpdateWorker
+      every: 3m
     media_cleaning:
       class: Mulukhiya::MediaCleaningWorker
       every: 10m
@@ -712,6 +715,8 @@ worker:
       seconds: 1
   default:
     federate: false
+  media_catalog_update:
+    pages: 3
   media_cleaning:
     hours: 1
   decoration_initialize:

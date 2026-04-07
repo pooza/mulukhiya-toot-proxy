@@ -96,44 +96,44 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 次期マイルストーン: 5.15.0
+## 次期マイルストーン: 5.16.0
 
-（全タスク完了 — リリース準備可）
+メディアカタログ集中改善。
 
-### on-hold（マイルストーン外）
+- **#4219 メディアカタログ: ステータスURLが不正になる環境がある** — S3_ALIAS_HOST環境でドメイン・パスが不正。`/mastodon/attachment/base_url` 設定を追加
+- **#4220 メディアカタログ: 大規模インスタンスでのクエリパフォーマンス改善** — Redisキャッシュ+Sidekiq定期ジョブ+カーソルページング
+- **#4221 emoji/palettes API: scopeカラムのARRAYリテラル型不一致** — capsicumから修正済み・動作確認完了
 
-- #4207 APIController リファクタ
+### on-hold
+
 - #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
 - #3877 Mastodon形式「タグづけ」復活
 
+### 5.17.0
+
+- #4207 APIController リファクタ（小粒なものと合わせて）
+
 ### マイルストーン未設定
 
-- #4213 メディアカタログ API: LIKE 検索のパフォーマンス（N+1解消後に着手）
 - #3157 Annict record URL（API制約で断念済み）
 
-## 開発中の修正（5.15.0 に含まれる予定）
+## リリース済み: 5.15.0（2026-04-06）
+
+メディアカタログ API パフォーマンス改善、リモート isCat 判定 API、各種バグ修正。
 
 - **#4211 メディアカタログAPI: N+1クエリの解消** — catalog/feedのself[row[:id]]をwhere(id: ids)の一括取得に変更
 - **#4212 メディアカタログAPI: Misskey版SQLパフォーマンス改善** — 冗長なGROUP BY削除、LIMIT/OFFSETをキーワードフィルタ後の外側クエリに移動
-- **#4206 設定監査: 配列内オブジェクトの不明キー検出** — `detect_unknown_keys` で配列ノードの場合にスキーマの `items` を参照して各要素に再帰
 - **#4210 メディアカタログAPI: ページネーションメタデータ** — レスポンスを `{items, page, has_next}` 形式に変更。LIMIT+1件取得で次ページ判定。WebUI対応済み。capsicum側も要対応（pooza/capsicum#71）
+- **#4206 設定監査: 配列内オブジェクトの不明キー検出** — `detect_unknown_keys` で配列ノードの場合にスキーマの `items` を参照して各要素に再帰
 - **#4198 リモートアカウントのisCat判定API** — `POST /mulukhiya/api/account/is_cat` でWebFinger→ActivityPub Actor取得、Redisキャッシュ付き
-- **#4217 RemoteTagHandler: リモート辞書キーとローカル辞書キーの重複でタグが欠落する** — `dic.key?(v)` フィルタを削除し `local_tags.member?(v)` のみに
-- **#4215 RSS20FeedRenderer#cache: 例外型を明示** — rescue節で例外型を明示しデバッグ容易に
+- **#4217 RemoteTagHandler: リモートタグ欠落修正** — `dic.key?` フィルタを削除し `local_tags.member?` のみに
+- **#4215 RSS20FeedRenderer#cache: 例外型を明示**
 - **#4214 NowplayingHandler.trim: Artist/Title行が削除されない** — trimロジックのバグを修正
 - **#4209 NowplayingHandler.trim: uri.hostがnilの場合のNoMethodError** — nilガード追加
 - fix: removal_rule_tagスキーマの重複パス(tags.rules)を削除
+- fix: isCat APIでactor取得失敗時にnilをキャッシュしない
+- fix: isCat APIのセキュリティ改善（SSRF防止・スレッド安全性・配列上限）
 - test: IsCatContract・IsCatStorageのテスト追加、Storage系テストにRedis接続チェック追加
-
-## リリース手順の進捗: 5.15.0
-
-- [x] マイルストーン全タスク完了（#4206, #4209, #4210, #4211, #4212, #4214, #4215, #4217, #4198）
-- [x] PR #4216 をドラフトからオープンに変更
-- [ ] Codex レビュー待ち
-- [ ] セキュリティレビュー（bundler-audit等）
-- [ ] リリース（develop → main マージ、タグ作成）
-- [ ] ステージングデプロイ・検証
-- [ ] 本番デプロイ
 
 ## リリース済み: 5.14.1（2026-04-04）
 

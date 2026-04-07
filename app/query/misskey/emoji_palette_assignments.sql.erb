@@ -1,0 +1,7 @@
+SELECT value
+FROM registry_item
+WHERE "userId" = '<%= params[:account_id] %>'
+  AND scope = ARRAY['client', 'preferences', 'backups']::varchar[]
+  AND domain IS NULL
+ORDER BY key DESC
+LIMIT 1

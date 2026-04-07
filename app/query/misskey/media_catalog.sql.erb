@@ -38,14 +38,20 @@ FROM
 WHERE (drive_file."userHost" IS null)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', note_file.text, note_file.cw, drive_file.name) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', note_file.text, note_file.cw, drive_file.name) LIKE '%<%= escape(keyword) %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(note_file.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(note_file.cw, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(drive_file.name, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(note_file.text, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(note_file.cw, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(drive_file.name, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
+  <% end %>
+  <% if params[:cursor] %>
+    AND (note_file.note_id < '<%= params[:cursor] %>')
   <% end %>
 ORDER BY
   note_file.note_id DESC
-LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+LIMIT <%= params[:limit] %>
+<% unless params[:cursor] %>
+  OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+<% end %>
