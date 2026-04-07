@@ -99,11 +99,18 @@ module Mulukhiya
       if row
         value = row[:value]
         value = JSON.parse(value) if value.is_a?(String)
-        palettes = value.select {|_k, v| v.is_a?(Hash) && v.key?('name')}.values
+        # value is [[{server, emojiPaletteForReaction?, ...}, [palettes...]]]
+        metadata = {}
+        palettes = []
+        if value.is_a?(Array) && value.first.is_a?(Array)
+          entry = value.first
+          metadata = entry[0] if entry[0].is_a?(Hash)
+          palettes = entry[1] if entry[1].is_a?(Array)
+        end
         @renderer.message = {
-          palettes: palettes.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
-          palette_for_reaction: value['emojiPaletteForReaction'],
-          palette_for_main: value['emojiPaletteForMain'],
+          palettes: palettes.select {|p| p.is_a?(Hash)}.map {|p| {id: p['id'], name: p['name'], emojis: p['emojis'] || []}},
+          palette_for_reaction: metadata['emojiPaletteForReaction'],
+          palette_for_main: metadata['emojiPaletteForMain'],
         }
       else
         @renderer.message = {palettes: [], palette_for_reaction: nil, palette_for_main: nil}
