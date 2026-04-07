@@ -1,6 +1,9 @@
 properties:
   attachment:
     properties:
+      base_url:
+        format: uri
+        type: string
       types:
         properties:
           animation_image:
