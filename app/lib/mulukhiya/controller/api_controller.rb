@@ -226,7 +226,7 @@ module Mulukhiya
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
-      params[:page] = (params[:page] || 1).to_i
+      params[:page] = (params[:page] || 1).to_i unless params[:cursor]
       params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
       params.delete(:q) unless params[:q].present?
       params.delete(:q) unless sns.account

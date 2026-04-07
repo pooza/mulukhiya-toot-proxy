@@ -46,6 +46,12 @@ WHERE (drive_file."userHost" IS null)
       AND (coalesce(drive_file.name, '') NOT LIKE '%<%= keyword %>%')
     <% end %>
   <% end %>
+  <% if params[:cursor] %>
+    AND (note_file.note_id < '<%= params[:cursor] %>')
+  <% end %>
 ORDER BY
   note_file.note_id DESC
-LIMIT <%= params[:limit] %> OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+LIMIT <%= params[:limit] %>
+<% unless params[:cursor] %>
+  OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+<% end %>

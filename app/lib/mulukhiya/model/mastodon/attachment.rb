@@ -57,13 +57,29 @@ module Mulukhiya
       end
 
       def self.catalog(params = {})
-        params[:page] ||= 1
         params[:limit] ||= config['/webui/media/catalog/limit']
+        unless params[:rule] || params[:skip_cache]
+          cached = catalog_from_cache(params)
+          return cached if cached
+        end
         rows = Postgres.exec(:media_catalog, params.merge(limit: params[:limit] + 1))
         has_next = rows.size > params[:limit]
         page_rows = rows.first(params[:limit])
         items = build_catalog_items(page_rows)
-        return {items:, page: params[:page], has_next:}
+        result = {items:, has_next:}
+        result[:next_cursor] = page_rows.last[:id].to_s if has_next && page_rows.last
+        result[:page] = params[:page] if params[:page]
+        return result
+      end
+
+      def self.catalog_from_cache(params)
+        return nil if params[:cursor]
+        page = params[:page] || 1
+        only_person = params[:only_person] || 0
+        return MediaCatalogStorage.new.get("page:#{page}:person:#{only_person}")
+      rescue => e
+        e.log
+        return nil
       end
 
       def self.build_catalog_items(rows)
