@@ -43,14 +43,14 @@ module Mulukhiya
 
       def path(size = :original)
         id_partition = id.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1/')
-        if config['/mastodon/attachment/base_url']
+        if (config['/mastodon/attachment/base_url'] rescue nil)
           return File.join('/media_attachments/files', id_partition, size.to_s, filename)
         end
         return File.join('/media/media_attachments/files', id_partition, size.to_s, filename)
       end
 
       def create_uri(size = :original)
-        if (base_url = config['/mastodon/attachment/base_url'])
+        if (base_url = config['/mastodon/attachment/base_url'] rescue nil)
           return Ginseng::URI.parse("#{base_url}#{path(size)}")
         end
         return MastodonService.new.create_uri(path(size))
