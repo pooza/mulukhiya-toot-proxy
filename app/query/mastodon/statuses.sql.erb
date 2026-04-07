@@ -13,11 +13,11 @@ WHERE (statuses.reblog_of_id IS null)
   AND (statuses.local = true)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text) LIKE '%<%= escape(keyword) %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(statuses.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.text, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
   <% end %>
   AND (accounts.silenced_at IS null)

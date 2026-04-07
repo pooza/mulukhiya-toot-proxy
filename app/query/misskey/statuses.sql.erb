@@ -13,11 +13,11 @@ WHERE (note."renoteId" IS null)
   AND ("user".id = '<%= params[:account_id] %>')
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', note.text, note.cw) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', note.text, note.cw) LIKE '%<%= escape(keyword) %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(note.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(note.cw, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(note.text, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(note.cw, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
   <% end %>
 ORDER BY

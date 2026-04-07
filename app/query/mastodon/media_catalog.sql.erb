@@ -21,12 +21,12 @@ WHERE (statuses.local = true)
   AND (statuses.deleted_at IS null)
   <% if params[:rule] %>
     <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text, attachments.description) LIKE '%<%= keyword %>%')
+      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text, attachments.description) LIKE '%<%= escape(keyword) %>%')
     <% end %>
     <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(statuses.text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= keyword %>%')
-      AND (coalesce(attachments.description, '') NOT LIKE '%<%= keyword %>%')
+      AND (coalesce(statuses.text, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= escape(keyword) %>%')
+      AND (coalesce(attachments.description, '') NOT LIKE '%<%= escape(keyword) %>%')
     <% end %>
   <% end %>
   <% unless params[:only_person].to_i.zero? %>
