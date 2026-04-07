@@ -38,7 +38,7 @@ WHERE (statuses.local = true)
     AND (accounts.id <> '<%= test_account.id %>')
   <% end %>
   <% if params[:cursor] %>
-    AND (attachments.id < <%= escape(params[:cursor]) %>)
+    AND (attachments.id < <%= params[:cursor] %>)
   <% end %>
 ORDER BY
   attachments.id DESC
