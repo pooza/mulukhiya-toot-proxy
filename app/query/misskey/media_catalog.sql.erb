@@ -47,7 +47,7 @@ WHERE (drive_file."userHost" IS null)
     <% end %>
   <% end %>
   <% if params[:cursor] %>
-    AND (note_file.note_id < '<%= params[:cursor] %>')
+    AND (note_file.note_id < '<%= escape(params[:cursor]) %>')
   <% end %>
 ORDER BY
   note_file.note_id DESC
