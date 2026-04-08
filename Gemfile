@@ -13,7 +13,7 @@ gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require:
 gem 'marcel'
 gem 'optparse'
 gem 'parallel'
-gem 'rspotify'
+gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
 gem 'sentry-ruby'
