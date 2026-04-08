@@ -64,6 +64,12 @@ module Mulukhiya
       return word.length < @handler.minimum_length_kanji
     end
 
+    def strict_key?(word)
+      key = word.nfkc
+      return false unless key?(key)
+      return !self[key][:words]&.include?(key)
+    end
+
     private
 
     def redis
