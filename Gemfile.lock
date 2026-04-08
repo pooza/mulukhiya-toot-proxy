@@ -94,6 +94,16 @@ GIT
   specs:
     ginseng-youtube (2.0.1)
 
+GIT
+  remote: https://github.com/pooza/rspotify.git
+  revision: efed89cd3c97be6b4a09be4953749892c2184b21
+  branch: master.pooza
+  specs:
+    rspotify (2.11.0)
+      addressable (>= 2.8)
+      omniauth-oauth2 (>= 1.6)
+      rest-client (~> 2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -207,6 +217,7 @@ GEM
     hashdiff (1.2.1)
     hashie (5.1.0)
       logger
+    http-accept (1.7.0)
     http-cookie (1.1.4)
       domain_name (~> 0.5)
     httparty (0.24.2)
@@ -234,7 +245,10 @@ GEM
       net-pop
       net-smtp
     marcel (1.1.0)
-    mime-types (2.99.3)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0407)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.3)
@@ -327,15 +341,13 @@ GEM
     redis-client (0.28.0)
       connection_pool
     regexp_parser (2.12.0)
-    rest-client (1.8.0)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rexml (3.4.4)
     ricecream (0.2.1)
-    rspotify (1.15.4)
-      omniauth-oauth2 (~> 1.1)
-      rest-client (~> 1.7)
     rss (0.3.2)
       rexml
     rubocop (1.86.0)
@@ -471,7 +483,7 @@ DEPENDENCIES
   rack-test
   rails-erb-lint
   ricecream
-  rspotify
+  rspotify!
   rubocop
   rubocop-minitest
   rubocop-performance
