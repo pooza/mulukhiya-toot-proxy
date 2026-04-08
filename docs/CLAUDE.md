@@ -110,6 +110,13 @@ git diff Gemfile.lock
 
 - #3157 Annict record URL（API制約で断念済み）
 
+## リリース済み: 5.16.1（2026-04-09）
+
+ホットフィックス。絵文字ショートコードのタグ化退行修正と gem 互換性修正。
+
+- **#4224 RemoteTagHandler: 絵文字ショートコードがタグとして復活する退行を修正** — `strict_key?` で strict 辞書由来キーのみ除外し、#4089 と #4217 を両立
+- **rspotify fork 参照に切替（Ruby 4.0 互換）** — mime-types 2.99.3 の SyntaxError を解消
+
 ## リリース済み: 5.16.0（2026-04-07）
 
 メディアカタログ集中改善。
