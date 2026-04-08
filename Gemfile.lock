@@ -8,12 +8,12 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 0671e02cb74dac53ff0693703acc52eb26a20878
+  revision: 3e4897e9431b92e7e23571547cfef69aad71600d
   branch: main
   specs:
-    ginseng-core (1.15.21)
+    ginseng-core (1.15.22)
       activesupport (>= 7.0.7.1)
-      addressable (>= 2.8.0)
+      addressable (>= 2.9.0)
       cgi (>= 0.4.2)
       csv
       date (>= 3.2.1)
@@ -126,7 +126,7 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.10)
+    addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     base64 (0.3.0)
@@ -234,10 +234,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.1.0)
-    mime-types (3.7.0)
-      logger
-      mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0407)
+    mime-types (2.99.3)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.3)
@@ -330,16 +327,15 @@ GEM
     redis-client (0.28.0)
       connection_pool
     regexp_parser (2.12.0)
-    rest-client (2.0.2)
+    rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
     rexml (3.4.4)
     ricecream (0.2.1)
-    rspotify (2.12.4)
-      addressable (~> 2.8.0)
-      omniauth-oauth2 (>= 1.6)
-      rest-client (~> 2.0.2)
+    rspotify (1.15.4)
+      omniauth-oauth2 (~> 1.1)
+      rest-client (~> 1.7)
     rss (0.3.2)
       rexml
     rubocop (1.86.0)
