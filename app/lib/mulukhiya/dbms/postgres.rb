@@ -29,7 +29,8 @@ module Mulukhiya
     end
 
     def self.health
-      Environment.account_class.get(token: Environment.account_class.info_token)
+      return {status: 'OK', skipped: true} unless config?
+      instance.connection.fetch('SELECT 1 AS ok').first
       return {status: 'OK'}
     rescue => e
       return {error: e.message, status: 'NG'}
