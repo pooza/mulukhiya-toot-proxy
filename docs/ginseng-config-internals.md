@@ -95,4 +95,4 @@ raw.dig('mastodon', 'capabilities')  # => nil（'mastodon' はファイル名で
 
 ### nodeinfo 循環呼び出しに注意
 
-nodeinfo 取得が Config アクセスのトリガーになり、さらに Config アクセスが nodeinfo を呼ぶ循環が起きうる。詳細は [postmortem-2026-03-nodeinfo.md](postmortem-2026-03-nodeinfo.md) を参照。
+nodeinfo 取得が Config アクセスのトリガーになり、さらに Config アクセスが nodeinfo を呼ぶ循環が起きうる。詳細は [postmortem-2026-03-nodeinfo.md](archive/postmortem-2026-03-nodeinfo.md) を参照。
