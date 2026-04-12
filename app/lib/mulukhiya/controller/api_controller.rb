@@ -720,6 +720,7 @@ module Mulukhiya
     end
 
     def token
+      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return params[:token].decrypt
     rescue
       return params[:token]
