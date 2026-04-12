@@ -98,8 +98,11 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.17.0
 
-- #4207 APIController リファクタ（小粒なものと合わせて）
+- #4228 Postgres.healthがMastodon API応答に依存していた問題を修正（修正済み・develop反映済み）
+- #4223 GET /emoji/palettes のトークン受け渡しをPOSTボディに変更（security）
+- #4226 メディアカタログ API レスポンス形式をドキュメントに反映（documentation）
 - #4222 メディアカタログキャッシュの管理rakeタスク
+- #4207 APIController リファクタ
 
 ### on-hold
 
