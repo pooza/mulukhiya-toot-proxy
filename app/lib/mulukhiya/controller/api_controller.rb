@@ -690,7 +690,9 @@ module Mulukhiya
     end
 
     def token
-      return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
+      if (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
+        return Regexp.last_match(1)
+      end
       return params[:token].decrypt
     rescue
       return params[:token]
