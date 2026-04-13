@@ -96,14 +96,9 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 次期マイルストーン: 5.17.0
+## 次期マイルストーン: 5.18.0
 
-- #4228 Postgres.healthがMastodon API応答に依存していた問題を修正（修正済み・develop反映済み）
-- #4223 GET /emoji/palettes のトークン受け渡しをPOSTボディに変更（security、修正済み・develop反映済み）
-- #4226 メディアカタログ API レスポンス形式をドキュメントに反映（documentation、対応済み・develop反映済み）
-- #4222 メディアカタログキャッシュの管理rakeタスク
-- #4207 APIController リファクタ
-- #4232 お知らせbotがPostgresダウンを誤報する: Sequel プール枯渇 (PoolTimeout) を検出
+未定。
 
 ### on-hold
 
@@ -111,10 +106,26 @@ git diff Gemfile.lock
 - #3877 Mastodon形式「タグづけ」復活
 - #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
+- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
+- #4233 APIController: 残る長大エンドポイントの段階的リファクタ
+- #4240/#4241 puma 8.0 / parallel 2.0 への更新検証
 
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
+
+## リリース済み: 5.17.0（2026-04-14）
+
+Postgres ヘルスチェック・接続プール・API 認証の改善。
+
+- **#4228 fix: Postgres.health が Mastodon API 応答に依存していた問題を修正** — `SELECT 1` を直接実行。goatdeam の PostgreSQL 停止誤報を解消
+- **#4232 feat: Postgres 接続プールサイズ・タイムアウトを設定可能にする** — `/postgres/pool/{size,timeout}` を local.yaml で上書き可能に。zugoga の Sequel::PoolTimeout 対策
+- **#4223 fix: APIController で Authorization: Bearer ヘッダー認証に対応（security）** — GET クエリにトークンが漏れる問題を修正
+- **#4238 fix: Authorization ヘッダが Bearer 形式の場合のみトークンとして採用**
+- **#4207 refactor: /emoji/palettes の実装を MisskeyService に移設** — APIController を 42行 → 9行に縮小
+- **#4222 feat: メディアカタログキャッシュの管理 rake タスクを追加**
+- **#4226 docs: メディアカタログ API のレスポンス形式をドキュメントに反映**
+- **#4240/#4241 chore: puma/parallel をピン留めし bundle update 巻き込みを回避**
 
 ## リリース済み: 5.16.1（2026-04-09）
 
