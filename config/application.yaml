@@ -452,6 +452,9 @@ parser:
       visibility: visibility
 postgres:
   dsn: null
+  pool:
+    size: 4
+    timeout: 5
   query_log: false
   slow_query:
     seconds: 3
