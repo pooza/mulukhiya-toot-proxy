@@ -99,15 +99,18 @@ git diff Gemfile.lock
 ## 次期マイルストーン: 5.17.0
 
 - #4228 Postgres.healthがMastodon API応答に依存していた問題を修正（修正済み・develop反映済み）
-- #4223 GET /emoji/palettes のトークン受け渡しをPOSTボディに変更（security）
-- #4226 メディアカタログ API レスポンス形式をドキュメントに反映（documentation）
+- #4223 GET /emoji/palettes のトークン受け渡しをPOSTボディに変更（security、修正済み・develop反映済み）
+- #4226 メディアカタログ API レスポンス形式をドキュメントに反映（documentation、対応済み・develop反映済み）
 - #4222 メディアカタログキャッシュの管理rakeタスク
 - #4207 APIController リファクタ
+- #4232 お知らせbotがPostgresダウンを誤報する: Sequel プール枯渇 (PoolTimeout) を検出
 
 ### on-hold
 
 - #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
 - #3877 Mastodon形式「タグづけ」復活
+- #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）
+- #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
 
 ### マイルストーン未設定
 
