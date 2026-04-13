@@ -395,6 +395,18 @@ webui:
   importmap:      # CDN ESMモジュールのURL管理
 ```
 
+### user_config 更新時の注意
+
+- `UserConfigStorage#update` は `deep_merge` + `deep_compact` で Redis に保存する
+- 値を `null` で送るとそのキーは `deep_compact` で消える。認証解除など「ユーザー設定の削除」操作で利用する想定
+- 4.x→5.0 で `service:` 配下に移動した外部サービス設定（annict, spotify, amazon, itunes, line, peer_tube, piefed, poipiku 等）はフォールバック付き。削除操作では新旧両方のパスに `null` を送る必要がある（#4088 で対応済み）
+
+### ハンドラスキーマと required
+
+- `application.yaml` にデフォルト値があるキーには、ハンドラスキーマで `required` を付けない
+- 理由: `local.yaml` で部分上書きする運用のため、required を付けると未上書きキーを持つ正常な設定が validation エラーになる
+- スキーマを追加する際はまず `application.yaml` にデフォルトがあるかを確認する
+
 ## 関連リポジトリ
 
 MastodonとMisskeyのソースコードがローカルに並列配置される。
