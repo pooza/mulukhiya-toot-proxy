@@ -85,5 +85,33 @@ module Mulukhiya
 
       assert_requested(:post, %r{misskey\.test/api/i/update})
     end
+
+    def test_parse_emoji_palette_entries_with_string
+      raw = [
+        [
+          {'server' => 'misskey.test'},
+          [
+            {'id' => 'p1', 'name' => 'パレ1', 'emojis' => ['smile', 'heart']},
+            {'id' => 'p2', 'name' => 'パレ2'},
+            'noise',
+          ],
+        ],
+      ].to_json
+
+      entries = @service.send(:parse_emoji_palette_entries, raw)
+
+      assert_equal(2, entries.size)
+      assert_equal({id: 'p1', name: 'パレ1', emojis: ['smile', 'heart']}, entries[0])
+      assert_equal({id: 'p2', name: 'パレ2', emojis: []}, entries[1])
+    end
+
+    def test_parse_emoji_palette_entries_with_nil
+      assert_equal([], @service.send(:parse_emoji_palette_entries, nil))
+    end
+
+    def test_parse_emoji_palette_entries_with_malformed
+      assert_equal([], @service.send(:parse_emoji_palette_entries, '{}'))
+      assert_equal([], @service.send(:parse_emoji_palette_entries, '[]'))
+    end
   end
 end
