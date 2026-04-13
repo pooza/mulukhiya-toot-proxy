@@ -209,6 +209,17 @@ properties:
       dsn:
         format: uri
         type: string
+      pool:
+        properties:
+          size:
+            minimum: 1
+            maximum: 64
+            type: integer
+          timeout:
+            minimum: 1
+            maximum: 60
+            type: integer
+        type: object
       query_log:
         type: boolean
       slow_query:

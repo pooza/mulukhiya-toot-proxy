@@ -118,6 +118,16 @@ module Mulukhiya
       return response.parsed_response
     end
 
+    def emoji_palettes(account)
+      row = Postgres.first(:emoji_palettes, {account_id: account.id})
+      assignments = emoji_palette_assignments_for(account)
+      return {
+        palettes: parse_emoji_palette_entries(row&.dig(:value)),
+        palette_for_reaction: assignments['emojiPaletteForReaction'],
+        palette_for_main: assignments['emojiPaletteForMain'],
+      }
+    end
+
     def fetch_account_detail
       return http.post('/api/i', {
         body: {i: token},
@@ -151,6 +161,28 @@ module Mulukhiya
       return response.parsed_response&.dig('themeColor')
     rescue
       return nil
+    end
+
+    def parse_emoji_palette_entries(value)
+      value = JSON.parse(value) if value.is_a?(String)
+      return [] unless value.is_a?(Array) && value.first.is_a?(Array) && value.first[1].is_a?(Array)
+      return value.first[1].grep(Hash).map do |p|
+        {id: p['id'], name: p['name'], emojis: p['emojis'] || []}
+      end
+    end
+
+    def emoji_palette_assignments_for(account)
+      row = Postgres.first(:emoji_palette_assignments, {account_id: account.id})
+      return {} unless row
+      value = row[:value]
+      value = JSON.parse(value) if value.is_a?(String)
+      prefs = value['preferences'] || {}
+      return {
+        'emojiPaletteForReaction' => prefs['emojiPaletteForReaction']&.dig(0, 1),
+        'emojiPaletteForMain' => prefs['emojiPaletteForMain']&.dig(0, 1),
+      }
+    rescue
+      return {}
     end
   end
 end

@@ -95,37 +95,7 @@ module Mulukhiya
     get '/emoji/palettes' do
       raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      row = Postgres.first(:emoji_palettes, {account_id: sns.account.id})
-      if row
-        value = row[:value]
-        value = JSON.parse(value) if value.is_a?(String)
-        # value is [[{server, emojiPaletteForReaction?, ...}, [palettes...]]]
-        palettes = []
-        if value.is_a?(Array) && value.first.is_a?(Array)
-          entry = value.first
-          palettes = entry[1] if entry[1].is_a?(Array)
-        end
-        # Fetch palette assignments from backups scope
-        palette_for_reaction = nil
-        palette_for_main = nil
-        backup_row = Postgres.first(:emoji_palette_assignments, {account_id: sns.account.id})
-        if backup_row
-          backup = backup_row[:value]
-          backup = JSON.parse(backup) if backup.is_a?(String)
-          prefs = backup['preferences'] || {}
-          palette_for_reaction = prefs['emojiPaletteForReaction']&.dig(0, 1) rescue nil
-          palette_for_main = prefs['emojiPaletteForMain']&.dig(0, 1) rescue nil
-        end
-        @renderer.message = {
-          palettes: palettes.grep(Hash).map do |p|
-            {id: p['id'], name: p['name'], emojis: p['emojis'] || []}
-          end,
-          palette_for_reaction: palette_for_reaction,
-          palette_for_main: palette_for_main,
-        }
-      else
-        @renderer.message = {palettes: [], palette_for_reaction: nil, palette_for_main: nil}
-      end
+      @renderer.message = sns.emoji_palettes(sns.account)
       return @renderer.to_s
     rescue => e
       e.log
@@ -720,6 +690,9 @@ module Mulukhiya
     end
 
     def token
+      if (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
+        return Regexp.last_match(1)
+      end
       return params[:token].decrypt
     rescue
       return params[:token]

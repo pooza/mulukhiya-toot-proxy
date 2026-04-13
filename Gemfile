@@ -12,7 +12,8 @@ gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main', require: 'ginsen
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require: 'ginseng/you_tube'
 gem 'marcel'
 gem 'optparse'
-gem 'parallel'
+gem 'parallel', '~> 1.28' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4241
+gem 'puma', '~> 7.2' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4240
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'
@@ -22,7 +23,7 @@ gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
 group :development do
   gem 'bundler-audit'
-  gem 'ostruct' # gli < 2.22の未宣言依存
+  gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'
   gem 'ricecream'
