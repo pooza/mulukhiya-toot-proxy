@@ -257,8 +257,7 @@ GEM
     multi_json (1.20.1)
     multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
-    mustermann (3.0.4)
-      ruby2_keywords (~> 0.0.1)
+    mustermann (3.1.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.3)
@@ -382,7 +381,6 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
-    ruby2_keywords (0.0.5)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
     sanitize (7.0.0)
