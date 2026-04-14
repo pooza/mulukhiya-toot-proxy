@@ -42,7 +42,7 @@ diag:
   enable: false
 crypt:
   encoder: base64
-  password: mulukhiya
+  password: null
 environment: development
 fedibird:
   display_name: Fedibird

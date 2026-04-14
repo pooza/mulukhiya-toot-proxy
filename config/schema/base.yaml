@@ -250,7 +250,9 @@ properties:
         type: integer
       restart:
         properties:
-          seconds: integer
+          seconds:
+            minimum: 0
+            type: integer
         required:
           - seconds
         type: object
@@ -258,7 +260,7 @@ properties:
         minimum: 1
         type: integer
       workers:
-        minimum: 1
+        minimum: 0
         type: integer
     type: object
   ruby:
@@ -385,7 +387,6 @@ properties:
         type: object
     type: object
 required:
-  - controller
   - crypt
 title: Local config
 type: object
