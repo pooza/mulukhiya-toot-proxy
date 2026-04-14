@@ -453,7 +453,7 @@ parser:
 postgres:
   dsn: null
   pool:
-    size: 4
+    size: 10
     timeout: 5
   query_log: false
   slow_query:
