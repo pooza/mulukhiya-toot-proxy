@@ -98,7 +98,17 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.18.0
 
-未定。
+### 完了済み
+
+- **#4245 fix: base.yaml の top-level required を merged 検証前提に見直し**（757fe48a） — ginseng-core #477 追随。`crypt.password` を application.yaml で null 化、top-level required から `controller` 除去、既存スキーマバグ（`puma.restart.seconds` の不正記法、`puma.workers.minimum: 1`）を併せて修正。ginseng-core 1.15.22 → 1.15.24
+- **#4243 fix: postgres.pool.size の既定値を 4 → 10 に引き上げ**（2e647f51） — Sidekiq 8.x の concurrency 5 に対して余裕を持たせ `Sequel::PoolTimeout` を回避
+
+### 残課題
+
+- #4244 Postgres.health に WARN 分類とヒステリシス導入
+- #4240 puma 8.0 への更新検証
+- #4241 parallel 2.0 への更新検証
+- #4235 番組表フェーズ1: 永続 YAML ストア導入・Program クラス差し替え（大規模）
 
 ### on-hold
 
@@ -108,7 +118,6 @@ git diff Gemfile.lock
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
 - #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
 - #4233 APIController: 残る長大エンドポイントの段階的リファクタ
-- #4240/#4241 puma 8.0 / parallel 2.0 への更新検証
 
 ### マイルストーン未設定
 
