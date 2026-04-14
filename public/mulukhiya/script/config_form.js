@@ -52,7 +52,7 @@ export function buildProgramOptions (programs, createProgramTags) {
         ? `${createProgramTags(program).join(', ')} (${program.minutes}分)`
         : createProgramTags(program).join(', '),
     }))
-  options.unshift({label: '(固定タグのクリア)'})
+  options.unshift({label: '(タグセットのクリア)'})
   return options
 }
 

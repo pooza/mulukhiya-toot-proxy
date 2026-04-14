@@ -726,6 +726,6 @@ worker:
     extra_minutes: 2
     message: デコレーションを復元しました。
   user_tag_initialize:
-    message: 固定タグをクリアしました。
+    message: タグセットをクリアしました。
 youtube:
   url: https://www.googleapis.com/
