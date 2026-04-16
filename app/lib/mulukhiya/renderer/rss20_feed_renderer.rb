@@ -19,7 +19,7 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless command
       command.exec
       unless command.status.zero?
-        raise Ginseng::ApplicationError,
+        raise Ginseng::Error,
           "CustomFeed command failed (exit #{command.status}): #{command.stderr}"
       end
       self.entries = JSON.parse(command.stdout)
