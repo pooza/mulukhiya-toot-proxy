@@ -17,6 +17,11 @@ module Mulukhiya
       assert_equal('is_cat', @storage.prefix)
     end
 
+    def test_ttl
+      assert_kind_of(Integer, @storage.ttl)
+      assert_operator(@storage.ttl, :>, 0)
+    end
+
     def test_get_set
       assert_nil(@storage.get(@key))
 

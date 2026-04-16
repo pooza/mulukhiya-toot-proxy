@@ -1,5 +1,23 @@
 $schema: http://json-schema.org/draft-04/hyper-schema
 properties:
+  account:
+    properties:
+      is_cat:
+        properties:
+          cache:
+            properties:
+              ttl:
+                minimum: 0
+                type: integer
+            required:
+              - ttl
+            type: object
+        required:
+          - cache
+        type: object
+    required:
+      - is_cat
+    type: object
   agent:
     properties:
       accts:
