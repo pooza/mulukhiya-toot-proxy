@@ -32,6 +32,8 @@ module Mulukhiya
       return {status: 'OK', skipped: true} unless config?
       instance.connection.fetch('SELECT 1 AS ok').first
       return {status: 'OK'}
+    rescue Sequel::PoolTimeout => e
+      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}
     rescue => e
       return {error: e.message, status: 'NG'}
     end
