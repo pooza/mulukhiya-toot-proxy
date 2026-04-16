@@ -106,11 +106,12 @@ git diff Gemfile.lock
 - **fix: Misskey メディアカタログの next_cursor を note_id ベースに修正**（8a70912c） — カーソルページングで `drive_file.id` を返していたが SQL のフィルタは `note_file.note_id` で不整合。Codex レビュー指摘
 - **fix: Ginseng::ApplicationError を Ginseng::Error に修正**（6abd7c13） — ginseng-core に存在しない定数。FeedUpdateWorker で NameError（Sentry MULUKHIYA-TOOT-PROXY-10）
 
+- **#4241 chore: parallel 2.0 へ更新**（226a8757） — 破壊的変更の影響なし
+- **#4240 chore: puma 8.0 へ更新**（54b8dc24） — IPv6 デフォルトバインド変更に対し明示的に `tcp://0.0.0.0` を bind
+
 ### 残課題
 
 - #4244 Postgres.health に WARN 分類とヒステリシス導入
-- #4240 puma 8.0 への更新検証
-- #4241 parallel 2.0 への更新検証
 - #4235 番組表フェーズ1: 永続 YAML ストア導入・Program クラス差し替え（大規模）
 
 ### on-hold
