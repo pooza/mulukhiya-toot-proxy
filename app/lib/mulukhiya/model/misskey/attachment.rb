@@ -45,7 +45,7 @@ module Mulukhiya
         page_rows = rows.first(params[:limit])
         items = build_catalog_items(page_rows)
         result = {items:, has_next:}
-        result[:next_cursor] = page_rows.last[:id].to_s if has_next && page_rows.last
+        result[:next_cursor] = page_rows.last[:status_id].to_s if has_next && page_rows.last
         result[:page] = params[:page] if params[:page]
         return result
       end
