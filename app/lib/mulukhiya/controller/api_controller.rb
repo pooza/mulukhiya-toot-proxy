@@ -708,7 +708,7 @@ module Mulukhiya
       return nil unless valid_remote_host?(acct.host)
       webfinger = http.get(
         "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
-        {headers: {'Accept' => 'application/jrd+json'}},
+        {headers: {'Accept' => 'application/jrd+json'}, format: :json},
       ).parsed_response
       actor_uri = webfinger['links']&.find do |l|
         l['type'] == 'application/activity+json'
@@ -718,7 +718,7 @@ module Mulukhiya
       return nil unless valid_remote_host?(actor_host)
       return http.get(
         actor_uri,
-        {headers: {'Accept' => 'application/activity+json'}},
+        {headers: {'Accept' => 'application/activity+json'}, format: :json},
       ).parsed_response
     rescue
       return nil
