@@ -102,6 +102,9 @@ git diff Gemfile.lock
 
 - **#4245 fix: base.yaml の top-level required を merged 検証前提に見直し**（757fe48a） — ginseng-core #477 追随。`crypt.password` を application.yaml で null 化、top-level required から `controller` 除去、既存スキーマバグ（`puma.restart.seconds` の不正記法、`puma.workers.minimum: 1`）を併せて修正。ginseng-core 1.15.22 → 1.15.24
 - **#4243 fix: postgres.pool.size の既定値を 4 → 10 に引き上げ**（2e647f51） — Sidekiq 8.x の concurrency 5 に対して余裕を持たせ `Sequel::PoolTimeout` を回避
+- **#4247 fix: fetch_actor が ActivityPub レスポンスをパースできていなかった**（3d9fc35e） — HTTParty が `application/jrd+json` / `application/activity+json` を JSON パースしない問題。`format: :json` を明示して修正。api.md にエンドポイント説明を追記（af9f2988）
+- **fix: Misskey メディアカタログの next_cursor を note_id ベースに修正**（8a70912c） — カーソルページングで `drive_file.id` を返していたが SQL のフィルタは `note_file.note_id` で不整合。Codex レビュー指摘
+- **fix: Ginseng::ApplicationError を Ginseng::Error に修正**（6abd7c13） — ginseng-core に存在しない定数。FeedUpdateWorker で NameError（Sentry MULUKHIYA-TOOT-PROXY-10）
 
 ### 残課題
 
