@@ -708,18 +708,21 @@ module Mulukhiya
       return nil unless valid_remote_host?(acct.host)
       webfinger = http.get(
         "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
-        {headers: {'Accept' => 'application/jrd+json'}, format: :json},
+        {headers: {'Accept' => 'application/jrd+json'}},
       ).parsed_response
+      webfinger = JSON.parse(webfinger) if webfinger.is_a?(String)
       actor_uri = webfinger['links']&.find do |l|
         l['type'] == 'application/activity+json'
       end&.dig('href')
       return nil unless actor_uri
       actor_host = Ginseng::URI.parse(actor_uri)&.host
       return nil unless valid_remote_host?(actor_host)
-      return http.get(
+      body = http.get(
         actor_uri,
-        {headers: {'Accept' => 'application/activity+json'}, format: :json},
+        {headers: {'Accept' => 'application/activity+json'}},
       ).parsed_response
+      body = JSON.parse(body) if body.is_a?(String)
+      return body
     rescue
       return nil
     end
