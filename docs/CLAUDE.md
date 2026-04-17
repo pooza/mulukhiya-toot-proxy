@@ -112,10 +112,11 @@ git diff Gemfile.lock
 - **#4244 feat: Postgres.health に WARN 分類、通知にヒステリシス導入**（e9e136dc） — プール枯渇を WARN として区別し、StartupNotificationWorker に連続 NG 判定（ヒステリシス）を導入。スポット誤報を抑制
 - **#4248 feat: is_cat キャッシュの TTL を設定可能にし、デフォルトを 6 時間に短縮**（f4c5dece） — `/account/is_cat/cache/ttl` で設定可能に。#4247 修正デプロイ後の null キャッシュ滞留を短縮
 - **#4249 feat: is_cat キャッシュ管理の rake タスクを追加**（43d02a0d） — `rake mulukhiya:is_cat:clear` / `:status` を media_catalog と同パターンで実装
+- **#4235 feat: 番組表の永続 YAML ストア導入・Program クラス差し替え**（4ab39e09） — `var/program.yaml` を Single Source of Truth とし Redis は読みキャッシュに。外部 URL pull 機構は維持、既存 API 契約は変更なし。rake タスク `:status` / `:clear` を追加
 
 ### 残課題
 
-- #4235 番組表フェーズ1: 永続 YAML ストア導入・Program クラス差し替え（大規模）
+（なし — リリース準備可能）
 
 ### on-hold
 
