@@ -111,7 +111,7 @@ describe('config_form', () => {
       }
       const options = buildProgramOptions(programs, mockCreateProgramTags)
       assert.equal(options.length, 2)
-      assert.equal(options[0].label, '(固定タグのクリア)')
+      assert.equal(options[0].label, '(タグセットのクリア)')
       assert.include(options[1].label, 'プリキュア')
       assert.include(options[1].label, '30分')
     })

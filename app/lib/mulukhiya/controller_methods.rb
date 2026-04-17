@@ -90,6 +90,7 @@ module Mulukhiya
       end
 
       def livecure?
+        return true if Program.instance.yaml_exist?
         return false unless config['/program/urls'].any?
         return true
       rescue Ginseng::ConfigError

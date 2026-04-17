@@ -11,4 +11,5 @@ dist
 .vscode
 .claude
 tmp/
+var/*.yaml
 2

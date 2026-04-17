@@ -12,8 +12,8 @@ gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main', require: 'ginsen
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require: 'ginseng/you_tube'
 gem 'marcel'
 gem 'optparse'
-gem 'parallel', '~> 1.28' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4241
-gem 'puma', '~> 7.2' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4240
+gem 'parallel', '~> 2.0'
+gem 'puma', '~> 8.0'
 gem 'rspotify', github: 'pooza/rspotify', branch: 'master.pooza'
 gem 'ruby-progressbar'
 gem 'ruby-vips', require: 'vips'

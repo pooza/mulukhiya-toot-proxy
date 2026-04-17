@@ -1,3 +1,7 @@
+account:
+  is_cat:
+    cache:
+      ttl: 21600
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
@@ -42,7 +46,7 @@ diag:
   enable: false
 crypt:
   encoder: base64
-  password: mulukhiya
+  password: null
 environment: development
 fedibird:
   display_name: Fedibird
@@ -427,7 +431,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.17.0
+  version: 5.18.0
 parser:
   note:
     fields:
@@ -453,7 +457,7 @@ parser:
 postgres:
   dsn: null
   pool:
-    size: 4
+    size: 10
     timeout: 5
   query_log: false
   slow_query:
@@ -726,6 +730,6 @@ worker:
     extra_minutes: 2
     message: デコレーションを復元しました。
   user_tag_initialize:
-    message: 固定タグをクリアしました。
+    message: タグセットをクリアしました。
 youtube:
   url: https://www.googleapis.com/

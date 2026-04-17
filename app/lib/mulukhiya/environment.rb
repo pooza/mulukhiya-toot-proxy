@@ -187,7 +187,7 @@ module Mulukhiya
       }
       values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:streaming] = ListenerDaemon.health if daemon_classes.member?(ListenerDaemon)
-      values[:status] = 503 if values.values.any? {|v| v[:status] != 'OK'}
+      values[:status] = 503 if values.values.any? {|v| v[:status] == 'NG'}
       values[:status] ||= 200
       return values
     end

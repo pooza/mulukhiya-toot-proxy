@@ -706,22 +706,22 @@ module Mulukhiya
 
     def fetch_actor(http, acct)
       return nil unless valid_remote_host?(acct.host)
-      webfinger = http.get(
-        "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}",
-        {headers: {'Accept' => 'application/jrd+json'}},
-      ).parsed_response
+      url = "https://#{acct.host}/.well-known/webfinger?resource=acct:#{acct}"
+      webfinger = fetch_json(http, url, 'application/jrd+json')
       actor_uri = webfinger['links']&.find do |l|
         l['type'] == 'application/activity+json'
       end&.dig('href')
       return nil unless actor_uri
       actor_host = Ginseng::URI.parse(actor_uri)&.host
       return nil unless valid_remote_host?(actor_host)
-      return http.get(
-        actor_uri,
-        {headers: {'Accept' => 'application/activity+json'}},
-      ).parsed_response
+      return fetch_json(http, actor_uri, 'application/activity+json')
     rescue
       return nil
+    end
+
+    def fetch_json(http, url, accept)
+      response = http.get(url, {headers: {'Accept' => accept}}).parsed_response
+      return response.is_a?(String) ? JSON.parse(response) : response
     end
 
     def valid_remote_host?(host)

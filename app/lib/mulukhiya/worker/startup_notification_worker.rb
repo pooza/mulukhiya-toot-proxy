@@ -2,6 +2,8 @@ module Mulukhiya
   class StartupNotificationWorker < Worker
     sidekiq_options retry: false
 
+    FAIL_THRESHOLD = 2
+
     def disable?
       return true unless info_agent_service
       return super
@@ -9,10 +11,17 @@ module Mulukhiya
 
     def perform(params = {})
       health = Environment.health
+      observed = extract_status(health)
       if notified?
-        notify_if_changed(health)
+        reported = previous_status || {}
+        new_reported = apply_hysteresis(observed, reported)
+        return if reported == new_reported
+        send_notification(health, create_change_message(new_reported, reported))
+        save_status(new_reported)
       else
-        notify_all(health, create_startup_message(health))
+        send_notification(health, create_startup_message(health))
+        observed.each_key {|key| reset_ng_count(key)}
+        save_status(observed)
         redis['startup_notified_pid'] = sidekiq_pid
       end
     rescue => e
@@ -29,18 +38,34 @@ module Mulukhiya
       return Process.pid.to_s
     end
 
-    def notify_if_changed(health)
-      previous = previous_status
-      current = extract_status(health)
-      return if previous == current
-      notify_all(health, create_change_message(health, previous))
+    def apply_hysteresis(observed, reported)
+      return observed.to_h do |key, status|
+        if status == 'NG'
+          count = bump_ng_count(key)
+          [key, count >= FAIL_THRESHOLD ? 'NG' : (reported[key] || 'OK')]
+        else
+          reset_ng_count(key)
+          [key, status]
+        end
+      end
     end
 
-    def notify_all(health, message)
+    def bump_ng_count(key)
+      return redis.incr(ng_count_key(key)).to_i
+    end
+
+    def reset_ng_count(key)
+      redis.del(ng_count_key(key))
+    end
+
+    def ng_count_key(key)
+      return "health_ng_count:#{key}"
+    end
+
+    def send_notification(health, message)
       account_class.admins.each do |account|
         info_agent_service.notify(account, message)
       end
-      save_status(extract_status(health))
       log(status: health[:status], admins: account_class.admins.count)
     end
 
@@ -66,23 +91,19 @@ module Mulukhiya
       return lines.join("\n")
     end
 
-    def create_change_message(health, previous)
+    def create_change_message(new_reported, reported)
       lines = ['ヘルスステータス変更']
       lines << ''
-      health.except(:status).each do |key, value|
-        prev = previous&.dig(key)
-        if prev && prev != value[:status]
-          lines << "#{key}: #{prev} → #{value[:status]}"
+      new_reported.each do |key, status|
+        prev = reported[key]
+        if prev && prev != status
+          lines << "#{key}: #{prev} → #{status}"
         else
-          lines << "#{key}: #{value[:status]}"
+          lines << "#{key}: #{status}"
         end
       end
       lines << ''
-      if health[:status] == 200
-        lines << 'ステータス: 正常'
-      else
-        lines << "ステータス: 異常 (#{health[:status]})"
-      end
+      lines << overall_status_line(new_reported)
       return lines.join("\n")
     end
 
@@ -104,6 +125,11 @@ module Mulukhiya
         schema_errors.each {|e| lines << "- #{e}"}
       end
       return lines
+    end
+
+    def overall_status_line(status_map)
+      return 'ステータス: 異常 (503)' if status_map.values.any?('NG')
+      return 'ステータス: 正常'
     end
 
     def redis

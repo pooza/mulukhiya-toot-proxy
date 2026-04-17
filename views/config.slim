@@ -14,7 +14,7 @@ html lang='ja' data-theme='light'
         .result-container
           pre v-if='result' {{result}}
       section.config v-if='account.username'
-        h3 @click='toggleVisibility("tags")' 固定タグ
+        h3 @click='toggleVisibility("tags")' タグセット
         slide-up-down :active='layout.details.tags'
           .field-container
             textarea placeholder='タグ化する文字列を改行区切りで' v-model.trim='form.tags'

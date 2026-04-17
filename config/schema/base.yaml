@@ -1,5 +1,23 @@
 $schema: http://json-schema.org/draft-04/hyper-schema
 properties:
+  account:
+    properties:
+      is_cat:
+        properties:
+          cache:
+            properties:
+              ttl:
+                minimum: 0
+                type: integer
+            required:
+              - ttl
+            type: object
+        required:
+          - cache
+        type: object
+    required:
+      - is_cat
+    type: object
   agent:
     properties:
       accts:
@@ -250,7 +268,9 @@ properties:
         type: integer
       restart:
         properties:
-          seconds: integer
+          seconds:
+            minimum: 0
+            type: integer
         required:
           - seconds
         type: object
@@ -258,7 +278,7 @@ properties:
         minimum: 1
         type: integer
       workers:
-        minimum: 1
+        minimum: 0
         type: integer
     type: object
   ruby:
@@ -385,7 +405,6 @@ properties:
         type: object
     type: object
 required:
-  - controller
   - crypt
 title: Local config
 type: object
