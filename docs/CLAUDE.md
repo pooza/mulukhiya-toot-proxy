@@ -109,9 +109,12 @@ git diff Gemfile.lock
 - **#4241 chore: parallel 2.0 へ更新**（226a8757） — 破壊的変更の影響なし
 - **#4240 chore: puma 8.0 へ更新**（54b8dc24） — IPv6 デフォルトバインド変更に対し明示的に `tcp://0.0.0.0` を bind
 
+- **#4244 feat: Postgres.health に WARN 分類、通知にヒステリシス導入**（e9e136dc） — プール枯渇を WARN として区別し、StartupNotificationWorker に連続 NG 判定（ヒステリシス）を導入。スポット誤報を抑制
+- **#4248 feat: is_cat キャッシュの TTL を設定可能にし、デフォルトを 6 時間に短縮**（f4c5dece） — `/account/is_cat/cache/ttl` で設定可能に。#4247 修正デプロイ後の null キャッシュ滞留を短縮
+
 ### 残課題
 
-- #4244 Postgres.health に WARN 分類とヒステリシス導入
+- #4249 is_cat キャッシュ管理の rake タスクを追加（低優先度）
 - #4235 番組表フェーズ1: 永続 YAML ストア導入・Program クラス差し替え（大規模）
 
 ### on-hold
@@ -122,6 +125,10 @@ git diff Gemfile.lock
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
 - #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
 - #4233 APIController: 残る長大エンドポイントの段階的リファクタ
+
+## 次々期マイルストーン: 5.19.0
+
+- #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）
 
 ### マイルストーン未設定
 
