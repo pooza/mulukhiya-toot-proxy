@@ -7,6 +7,7 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
 
     def update
+      return nil unless uris.any?
       return save(fetch_remote)
     end
 
@@ -78,7 +79,7 @@ module Mulukhiya
     def write_yaml(programs)
       dir = File.dirname(YAML_PATH)
       FileUtils.mkdir_p(dir)
-      tmp = File.join(dir, ".program.yaml.#{Process.pid}")
+      tmp = File.join(dir, ".program.yaml.#{Process.pid}.#{Thread.current.object_id}")
       File.write(tmp, programs.to_yaml)
       File.rename(tmp, YAML_PATH)
     end
