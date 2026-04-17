@@ -6,6 +6,7 @@ module Mulukhiya
     end
 
     def setup
+      return if disable?
       @program = Program.instance
     end
 
@@ -19,6 +20,20 @@ module Mulukhiya
 
     def test_update
       @program.update
+
+      assert_predicate(@program, :yaml_exist?)
+    end
+
+    def test_save
+      data = {'test_program' => {'series' => 'TestSeries', 'enable' => true}}
+      @program.save(data)
+
+      assert_predicate(@program, :yaml_exist?)
+      loaded = YAML.safe_load_file(Program::YAML_PATH, permitted_classes: [Symbol])
+
+      assert_equal('TestSeries', loaded['test_program']['series'])
+    ensure
+      @program.update
     end
 
     def test_data
@@ -31,6 +46,16 @@ module Mulukhiya
 
     def test_to_yaml
       assert_kind_of(Psych::Nodes::Document, YAML.parse(@program.to_yaml))
+    end
+
+    def test_yaml_exist
+      assert_boolean(@program.yaml_exist?)
+    end
+
+    def test_invalidate_cache
+      @program.invalidate_cache
+
+      assert_kind_of(Hash, @program.data)
     end
   end
 end

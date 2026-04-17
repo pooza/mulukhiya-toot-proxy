@@ -12,6 +12,20 @@ module Mulukhiya
       task :show do
         puts Program.instance.to_yaml
       end
+
+      desc 'show program status'
+      task :status do
+        program = Program.instance
+        puts "YAML path: #{Program::YAML_PATH}"
+        puts "YAML exists: #{program.yaml_exist?}"
+        puts "Program count: #{program.count}"
+      end
+
+      desc 'clear program cache'
+      task :clear do
+        Program.instance.invalidate_cache
+        puts 'Program cache cleared.'
+      end
     end
   end
 end
