@@ -1,7 +1,7 @@
 account:
   is_cat:
     cache:
-      ttl: 21600
+      ttl: 3600
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
@@ -431,7 +431,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.18.0
+  version: 5.19.0
 parser:
   note:
     fields:

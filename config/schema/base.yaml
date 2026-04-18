@@ -295,8 +295,6 @@ properties:
             type: string
           user:
             type: string
-        required:
-          - password
         type: object
       concurrency:
         minimum: 1
@@ -385,9 +383,6 @@ properties:
               url:
                 format: uri
                 type: string
-            required:
-              - message
-              - url
             type: object
         type: object
       status:
