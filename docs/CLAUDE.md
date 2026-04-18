@@ -99,6 +99,10 @@ git diff Gemfile.lock
 ## 次期マイルストーン: 5.19.0
 
 - #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）
+- #4251 fix: スキーマバリデーションで未設定の任意項目が required エラーになる（5.18.0 #4245 の取り残し）
+- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
+- #4236 フェーズ2: 番組表エディタの実装（親: #4234 番組表リニューアル、前提: #4235）
+- #4253 refactor: POST /tagging/tag/search を TagSearchService に移設（親: #4233 段階的リファクタ）
 
 ### on-hold
 
@@ -106,7 +110,6 @@ git diff Gemfile.lock
 - #3877 Mastodon形式「タグづけ」復活
 - #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
-- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
 - #4233 APIController: 残る長大エンドポイントの段階的リファクタ
 
 ### マイルストーン未設定
