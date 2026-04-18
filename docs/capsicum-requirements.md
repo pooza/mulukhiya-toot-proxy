@@ -219,7 +219,76 @@ Authorization: Bearer <user_token>
 - capsicum 側: `pooza/capsicum#188`（サーバー情報画面の新設）で導線を確保予定
 - モロヘイヤ側: #4194, #4195, #4196, #4197
 
-## 7. 今後の API 変更時の連携
+## 7. リモートユーザーの isCat 判定 API
+
+### 背景
+
+Misskey の `isCat` フラグは ActivityPub actor に含まれるが、Mastodon API には存在しない。capsicum は Mastodon サーバーにログインしている場合でも、リモート Misskey ユーザーの猫耳を表示したい。
+
+モロヘイヤは既に `POST /mulukhiya/api/account/is_cat` を実装済み。本セクションは capsicum が期待する仕様を明文化するもの。
+
+### エンドポイント
+
+```
+POST /mulukhiya/api/account/is_cat
+```
+
+- **認証**: 必須（Bearer トークンまたは `token` パラメータ）
+- **Content-Type**: `application/json`
+
+### リクエスト
+
+```json
+{
+  "token": "<sns_access_token>",
+  "accts": ["pooza@misskey.delmulin.com", "user@example.com"]
+}
+```
+
+| フィールド | 型 | 必須 | 説明 |
+|-----------|------|------|------|
+| `token` | string | 任意 | SNS アクセストークン（Bearer ヘッダの代替） |
+| `accts` | string[] | 必須 | `user@host` 形式の acct 配列（1〜50件） |
+
+### レスポンス
+
+```json
+{
+  "pooza@misskey.delmulin.com": true,
+  "user@example.com": false
+}
+```
+
+| 値 | 意味 |
+|----|------|
+| `true` | ActivityPub actor の `isCat` が `true` |
+| `false` | ActivityPub actor の `isCat` が `false` または未設定 |
+
+**注意**: capsicum は `null` を `false` として扱うが、可能な限り `true` / `false` の boolean を返すことが望ましい。actor の取得に失敗した場合は `null` を返してよいが、actor が取得できたにもかかわらず `isCat` フィールドが存在しない場合は `false` を返す。
+
+### 処理フロー（期待）
+
+1. acct から WebFinger で actor URI を解決
+2. `Accept: application/activity+json` で actor を GET
+3. actor JSON のトップレベル `isCat` フィールドを取得
+4. `isCat` が `true` → `true`、`false` / 未設定 / actor 取得失敗 → `false`（取得失敗時のみ `null` 許容）
+5. 結果を Redis キャッシュ（TTL 24h）
+
+### capsicum 側の利用方法
+
+1. タイムライン取得後、投稿者の acct をバッチで送信
+2. `true` が返った acct のユーザーに猫耳を表示
+3. capsicum 側でもメモリキャッシュし、同一セッション内の再問い合わせを抑制
+
+### 現在の問題（2026-04-17 確認）
+
+API は到達・認証成功しているが、`pooza@misskey.delmulin.com`（`isCat: true` を設定済み）に対して `null` が返る。サーバーからの `curl` で ActivityPub actor を直接取得すると `"isCat": true` が確認できるため、`fetch_actor` の結果から `isCat` を抽出する処理に問題がある可能性。
+
+### 関連
+
+- `pooza/capsicum#148`（isCat 対応）
+
+## 8. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 
