@@ -1,7 +1,7 @@
 account:
   is_cat:
     cache:
-      ttl: 21600
+      ttl: 3600
 agent:
   accts:
     - '@relayctl@hashtag-relay.dtp-mstdn.jp'
