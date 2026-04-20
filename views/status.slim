@@ -43,7 +43,7 @@ html lang='ja' data-theme='light'
                   li
                     i class='fa-solid fa-delete-left'
                     a :href="'/mulukhiya/app/status/' + status.id" 削除してタグづけ
-            nav.footer-navigations v-if='(status.is_nowplaying || status.is_poipiku) && (account.username==status.account.username)'
+            nav.footer-navigations v-if='status.is_nowplaying && (account.username==status.account.username)'
               h4
                 i class='fa fa-bolt'
                 | その他の操作
@@ -51,10 +51,6 @@ html lang='ja' data-theme='light'
                 li v-if='status.is_nowplaying'
                   i class='fa fa-music'
                   a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/nowplaying'" ナウプレ
-                - if controller.poipiku?
-                  li v-if='status.is_poipiku'
-                    i class='fa fa-image'
-                    a :href="'/mulukhiya/app/status/' + (status.id || '(null)') + '/poipiku'" ポイピク
         nav.appender-container v-if='!last_page && account.username'
           a @click='appendStatuses' 続きを読む…
       - else

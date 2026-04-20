@@ -390,33 +390,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    put '/status/poipiku' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
-      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account.webhook
-      errors = StatusContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors:}
-      else
-        parser = parser_class.new(status.text)
-        tags = parser.tags.clone
-        tags.push(config['/handler/poipiku_image/fanart_tag']) if params[:fanart]
-        @renderer.message = sns.account.webhook.post(
-          text: [parser.body, tags.to_s].join("\n"),
-          visibility: status.visibility_name,
-        ).response
-        sns.delete_status(status.id)
-      end
-      return @renderer.to_s
-    rescue => e
-      e.log
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     get '/annict/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}

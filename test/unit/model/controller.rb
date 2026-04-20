@@ -104,10 +104,6 @@ module Mulukhiya
       assert_kind_of(String, controller_class.status_label)
     end
 
-    def test_poipiku?
-      assert_boolean(controller_class.poipiku?)
-    end
-
     def test_max_length
       return unless test_token
 

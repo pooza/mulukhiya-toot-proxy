@@ -418,7 +418,7 @@ mastodon:
   capabilities:   # SNS固有の能力 (streaming, reaction, channel, decoration, repost)
   features:       # 機能フラグ (webhook, feed, announcement, annict)
   data:           # データアクセスパターン (account_timeline, favorite_tags, futured_tag, media_catalog)
-service:          # 外部サービス設定 (amazon, annict, itunes, line, lemmy, peer_tube, piefed, poipiku, spotify)
+service:          # 外部サービス設定 (amazon, annict, itunes, line, lemmy, peer_tube, piefed, spotify)
 handler:
   pipeline:
     base:         # 共通ハンドラーリスト（Mastodonスーパーセット、実行順の正本）
@@ -431,7 +431,7 @@ webui:
 
 - `UserConfigStorage#update` は `deep_merge` + `deep_compact` で Redis に保存する
 - 値を `null` で送るとそのキーは `deep_compact` で消える。認証解除など「ユーザー設定の削除」操作で利用する想定
-- 4.x→5.0 で `service:` 配下に移動した外部サービス設定（annict, spotify, amazon, itunes, line, peer_tube, piefed, poipiku 等）はフォールバック付き。削除操作では新旧両方のパスに `null` を送る必要がある（#4088 で対応済み）
+- 4.x→5.0 で `service:` 配下に移動した外部サービス設定（annict, spotify, amazon, itunes, line, peer_tube, piefed 等）はフォールバック付き。削除操作では新旧両方のパスに `null` を送る必要がある（#4088 で対応済み）
 
 ### ハンドラスキーマと required
 
