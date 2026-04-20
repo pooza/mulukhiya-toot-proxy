@@ -346,14 +346,6 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.attachPoipikuImage = async (id, fanart) => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.put('/mulukhiya/api/status/poipiku', {token: globals.methods.getToken(), id: id, fanart: fanart})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
-
     globals.methods.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()

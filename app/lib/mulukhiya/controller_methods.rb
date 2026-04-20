@@ -37,10 +37,6 @@ module Mulukhiya
         return Handler.search(/piefed/).present?
       end
 
-      def poipiku?
-        return Handler.search(/poipiku/).present?
-      end
-
       def max_length
         return sns_class.new.max_post_text_length
       end

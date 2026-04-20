@@ -125,8 +125,6 @@ handler:
       video: video
   peer_tube_url_nowplaying:
     timeout: 10
-  poipiku_image:
-    timeout: 10
   remote_tag:
     services:
       - pattern: (プリキュア|ぷりきゅあ|キュアスタ|きゅあすきー|precure)
@@ -243,7 +241,6 @@ handler:
         - itunes_image
         - spotify_image
         - you_tube_image
-        - poipiku_image
         - webhook_image
         - shortened_url
         - url_normalize
@@ -551,9 +548,6 @@ service:
       video:
         - /w/
         - /videos/watch/
-  poipiku:
-    urls:
-      root: https://poipiku.com/
   spotify:
     language: ja,en-US;q=0.9,en;q=0.8
     patterns:
