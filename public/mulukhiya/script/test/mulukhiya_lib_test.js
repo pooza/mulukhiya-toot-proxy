@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import axios from 'axios'
 import { createMethods, mockAxios, clearMocks } from './test_helper.js'
 
 describe('MulukhiyaLib', () => {
@@ -54,16 +55,29 @@ describe('MulukhiyaLib', () => {
       assert.include(url, 'page=2')
     })
 
-    it('トークンを自動付加', () => {
+    it('トークンを URL に付加しない', () => {
       methods.setToken('test-token-123')
       const url = methods.createURL('/mulukhiya/api/config')
-      assert.include(url, 'token=test-token-123')
+      assert.notInclude(url, 'token=')
+    })
+  })
+
+  describe('authHeader', () => {
+    it('現在のトークンから Bearer ヘッダを生成', () => {
+      methods.setToken('current-token')
+      assert.deepEqual(methods.authHeader(), {Authorization: 'Bearer current-token'})
     })
 
     it('明示トークンを優先', () => {
       methods.setToken('default-token')
-      const url = methods.createURL('/mulukhiya/api/config', { token: 'override-token' })
-      assert.include(url, 'token=override-token')
+      assert.deepEqual(methods.authHeader('override'), {Authorization: 'Bearer override'})
+    })
+  })
+
+  describe('setToken', () => {
+    it('axios デフォルトヘッダに Authorization を設定', () => {
+      methods.setToken('abc')
+      assert.equal(axios.defaults.headers.common.Authorization, 'Bearer abc')
     })
   })
 
