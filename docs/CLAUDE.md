@@ -98,11 +98,17 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.19.0
 
-- #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）
-- #4251 fix: スキーマバリデーションで未設定の任意項目が required エラーになる（5.18.0 #4245 の取り残し）
-- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
+capsicum v1.19 通知完成スコープに間に合わせるため、#4254 着弾と同時に早期リリースする方針。#4236（番組表エディタ フェーズ 2）は 5.20.0 へ送った。
+
+- #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）✅
+- #4251 fix: スキーマバリデーションで未設定の任意項目が required エラーになる（5.18.0 #4245 の取り残し）✅
+- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行 ✅
+- #4253 refactor: POST /tagging/tag/search を TagSearchService に移設（親: #4233 段階的リファクタ）✅
+- #4254 Misskey Web Push 登録プロキシ API の実装（capsicum プッシュ通知のため、pooza/capsicum#352 関連。なるはや希望）
+
+## 次々期マイルストーン: 5.20.0
+
 - #4236 フェーズ2: 番組表エディタの実装（親: #4234 番組表リニューアル、前提: #4235）
-- #4253 refactor: POST /tagging/tag/search を TagSearchService に移設（親: #4233 段階的リファクタ）
 
 ### on-hold
 
