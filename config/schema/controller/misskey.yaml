@@ -44,6 +44,16 @@ properties:
       webhook:
         type: boolean
     type: object
+  redis:
+    properties:
+      dsn:
+        format: uri
+        type: string
+      prefix:
+        type:
+          - string
+          - 'null'
+    type: object
   status:
     properties:
       label:
