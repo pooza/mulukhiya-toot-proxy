@@ -21,19 +21,18 @@ module Mulukhiya
       key.failure('空欄です。') if value.empty?
     end
 
+    RESERVED_TLDS = %w[local internal lan test localhost example invalid onion].freeze
+
     def self.public_http_uri?(uri_string)
       uri = Ginseng::URI.parse(uri_string)
       return false unless uri.scheme == 'https'
-      host = uri.host
+      host = uri.host.to_s.downcase
       return false unless host.present?
       return false unless host.include?('.')
       return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
       return false if host.match?(/\A\[.*\]\z/)
-      addrs = Addrinfo.getaddrinfo(host, nil, nil, :STREAM).map(&:ip_address)
-      return addrs.none? do |ip|
-        addr = IPAddr.new(ip)
-        addr.private? || addr.loopback? || addr.link_local?
-      end
+      return false if RESERVED_TLDS.include?(host.split('.').last)
+      return true
     rescue
       return false
     end

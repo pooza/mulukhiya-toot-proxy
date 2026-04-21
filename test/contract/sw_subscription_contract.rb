@@ -74,6 +74,12 @@ module Mulukhiya
       assert_false(errors.empty?)
     end
 
+    def test_ssrf_guard_reserved_tld
+      errors = @contract.call(@valid.merge(endpoint: 'https://server.local/push')).errors
+
+      assert_false(errors.empty?)
+    end
+
     def test_public_http_uri_accepts_example_com
       assert_true(SwSubscriptionContract.public_http_uri?('https://example.com/push'))
     end
