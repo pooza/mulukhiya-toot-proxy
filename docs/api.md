@@ -353,7 +353,7 @@ Web Push 通知用 Service Worker サブスクリプションを登録する。M
 
 - `state`: `subscribed`（新規登録）または `already-subscribed`（同一内容が登録済み）
 - 既存の `sw_subscription` と完全一致する行があれば冪等に `already-subscribed` を返す
-- 登録時は Misskey Redis（`/misskey/redis/dsn`）の `kvcache:userSwSubscriptions:{userId}` を無効化する
+- 登録時は Misskey Redis（`/misskey/redis/dsn`）の `{prefix}:kvcache:userSwSubscriptions:{userId}` を無効化する。`prefix` は `/misskey/redis/prefix` の明示値が優先、未設定なら `/misskey/url` のホスト名が使われる（Misskey 本家の既定挙動に合わせる）
 
 **クライアント側の要件**:
 

@@ -49,6 +49,10 @@ properties:
       dsn:
         format: uri
         type: string
+      prefix:
+        type:
+          - string
+          - 'null'
     type: object
   status:
     properties:

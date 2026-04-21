@@ -200,10 +200,19 @@ module Mulukhiya
     private
 
     def invalidate_sw_subscription_cache(user_id)
-      Ginseng::Redis::Service.new(url: config['/misskey/redis/dsn'])
-        .del("kvcache:userSwSubscriptions:#{user_id}")
+      key = "kvcache:userSwSubscriptions:#{user_id}"
+      prefix = sns_redis_prefix
+      key = "#{prefix}:#{key}" if prefix
+      Ginseng::Redis::Service.new(url: config['/misskey/redis/dsn']).del(key)
     rescue => e
       e.log(user_id:)
+    end
+
+    def sns_redis_prefix
+      return config['/misskey/redis/prefix'] if config['/misskey/redis/prefix']
+      return Ginseng::URI.parse(config['/misskey/url']).host
+    rescue
+      return nil
     end
 
     def fetch_meta_theme_color
