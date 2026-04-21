@@ -30,7 +30,7 @@ module Mulukhiya
     end
 
     def test_create_aid_uniqueness
-      aids = 1000.times.map {MisskeyService.create_aid}
+      aids = Array.new(1000) {MisskeyService.create_aid}
 
       assert_equal(1000, aids.uniq.size)
     end

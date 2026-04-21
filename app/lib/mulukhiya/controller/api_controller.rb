@@ -95,7 +95,9 @@ module Mulukhiya
     post '/sw/register' do
       raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::AuthError, 'Permission denied' unless sns.access_token&.scopes&.include?('write:account')
+      unless sns.access_token&.scopes&.include?('write:account')
+        raise Ginseng::AuthError, 'Permission denied'
+      end
       errors = SwSubscriptionContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
@@ -105,7 +107,7 @@ module Mulukhiya
       result = sns.register_sw_subscription(sns.account, params)
       subscription = result[:subscription]
       @renderer.message = {
-        state: result[:state].to_s.gsub('_', '-'),
+        state: result[:state].to_s.tr('_', '-'),
         userId: subscription.userId,
         endpoint: subscription.endpoint,
         sendReadMessage: subscription.sendReadMessage,
@@ -121,7 +123,9 @@ module Mulukhiya
     post '/sw/unregister' do
       raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::AuthError, 'Permission denied' unless sns.access_token&.scopes&.include?('write:account')
+      unless sns.access_token&.scopes&.include?('write:account')
+        raise Ginseng::AuthError, 'Permission denied'
+      end
       errors = SwSubscriptionContract.new.exec(params)
       if errors.present?
         @renderer.status = 422

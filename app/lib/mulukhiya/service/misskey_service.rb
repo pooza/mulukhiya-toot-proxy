@@ -173,10 +173,10 @@ module Mulukhiya
         auth: params[:auth],
         publickey: params[:publickey],
       )
-      return false unless row
+      return nil unless row
       row.delete
       invalidate_sw_subscription_cache(account.id)
-      return true
+      return row
     end
 
     def self.parse_aid(aid)
@@ -190,12 +190,11 @@ module Mulukhiya
       counter = @aid_mutex.synchronize do
         @aid_counter = ((@aid_counter || -1) + 1) % (36**4)
       end
-      return format(
-        '%<time>08s%<node>s%<counter>04s',
+      return '%{time}%{node}%{counter}' % {
         time: ms.to_s(36).rjust(8, '0'),
         node: @aid_node,
         counter: counter.to_s(36).rjust(4, '0'),
-      )
+      }
     end
 
     private
