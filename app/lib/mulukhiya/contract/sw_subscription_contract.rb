@@ -10,9 +10,7 @@ module Mulukhiya
     rule(:endpoint) do
       key.failure('空欄です。') if value.empty?
       key.failure('https:// で始まる URL を指定してください。') unless value.start_with?('https://')
-      unless SwSubscriptionContract.public_http_uri?(value)
-        key.failure('公開ホストの URL を指定してください。')
-      end
+      key.failure('公開ホストの URL を指定してください。') unless SwSubscriptionContract.public_http_uri?(value)
     end
 
     rule(:auth) do
