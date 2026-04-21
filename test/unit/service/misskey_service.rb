@@ -14,6 +14,27 @@ module Mulukhiya
       assert_equal(1, result.getutc.day)
     end
 
+    def test_create_aid_format
+      aid = MisskeyService.create_aid
+
+      assert_equal(16, aid.length)
+      assert_match(/\A[0-9a-z]{16}\z/, aid)
+    end
+
+    def test_create_aid_roundtrip
+      time = Time.parse('2026-04-22T00:00:00Z')
+      aid = MisskeyService.create_aid(time)
+      parsed = MisskeyService.parse_aid(aid)
+
+      assert_in_delta(time.to_f, parsed.to_f, 1.0)
+    end
+
+    def test_create_aid_uniqueness
+      aids = 1000.times.map {MisskeyService.create_aid}
+
+      assert_equal(1000, aids.uniq.size)
+    end
+
     def test_create_headers
       headers = @service.create_headers({'Cookie' => 'session=abc123'})
 

@@ -380,6 +380,8 @@ misskey:
     media_catalog: true
   dbms: postgres
   display_name: Misskey
+  redis:
+    dsn: redis://localhost:6379/0
   features:
     annict: true
     announcement: true
