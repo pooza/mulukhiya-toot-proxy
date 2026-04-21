@@ -382,7 +382,6 @@ misskey:
   display_name: Misskey
   redis:
     dsn: redis://localhost:6379/0
-    prefix: null
   features:
     annict: true
     announcement: true

@@ -209,10 +209,9 @@ module Mulukhiya
     end
 
     def sns_redis_prefix
-      return config['/misskey/redis/prefix'] if config['/misskey/redis/prefix']
-      return Ginseng::URI.parse(config['/misskey/url']).host
-    rescue
-      return nil
+      explicit = config['/misskey/redis/prefix'] rescue nil
+      return explicit if explicit
+      return Ginseng::URI.parse(config['/misskey/url']).host rescue nil
     end
 
     def fetch_meta_theme_color
