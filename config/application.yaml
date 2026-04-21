@@ -302,8 +302,11 @@ iceshrimp:
   sns_type: misskey
 logger:
   mask_fields:
+    - auth
     - password
+    - publickey
     - secret
+    - token
 mastodon:
   attachment:
     types:
@@ -479,7 +482,7 @@ sentry:
   dsn: null
   traces_sample_rate: 0
   scrub_patterns:
-    - '[a-zA-Z0-9_\-]{20,}'
+    - '[A-Za-z0-9+/=_\-]{20,}'
     - '/home/[^\s]+'
     - '/Users/[^\s]+'
 ruby:
