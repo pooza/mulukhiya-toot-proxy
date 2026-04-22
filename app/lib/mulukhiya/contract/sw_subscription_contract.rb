@@ -21,7 +21,10 @@ module Mulukhiya
       key.failure('空欄です。') if value.empty?
     end
 
-    RESERVED_TLDS = ['local', 'internal', 'lan', 'test', 'localhost', 'example', 'invalid', 'onion'].freeze
+    RESERVED_TLDS = [
+      'local', 'internal', 'lan', 'test',
+      'localhost', 'example', 'invalid', 'onion',
+    ].freeze
 
     def self.public_http_uri?(uri_string)
       uri = Ginseng::URI.parse(uri_string)
