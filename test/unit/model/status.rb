@@ -86,12 +86,6 @@ module Mulukhiya
       assert_boolean(@status.nowplaying?)
     end
 
-    def test_poipiku?
-      return false unless @status
-
-      assert_boolean(@status.poipiku?)
-    end
-
     def test_taggable?
       return false unless @status
 

@@ -96,27 +96,19 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 次期マイルストーン: 5.18.0
+## 次期マイルストーン: 5.19.0
 
-### 完了済み
+capsicum v1.19 通知完成スコープに間に合わせるため、#4254 着弾と同時に早期リリースする方針。#4236（番組表エディタ フェーズ 2）は 5.20.0 へ送った。
 
-- **#4245 fix: base.yaml の top-level required を merged 検証前提に見直し**（757fe48a） — ginseng-core #477 追随。`crypt.password` を application.yaml で null 化、top-level required から `controller` 除去、既存スキーマバグ（`puma.restart.seconds` の不正記法、`puma.workers.minimum: 1`）を併せて修正。ginseng-core 1.15.22 → 1.15.24
-- **#4243 fix: postgres.pool.size の既定値を 4 → 10 に引き上げ**（2e647f51） — Sidekiq 8.x の concurrency 5 に対して余裕を持たせ `Sequel::PoolTimeout` を回避
-- **#4247 fix: fetch_actor が ActivityPub レスポンスをパースできていなかった**（3d9fc35e） — HTTParty が `application/jrd+json` / `application/activity+json` を JSON パースしない問題。`format: :json` を明示して修正。api.md にエンドポイント説明を追記（af9f2988）
-- **fix: Misskey メディアカタログの next_cursor を note_id ベースに修正**（8a70912c） — カーソルページングで `drive_file.id` を返していたが SQL のフィルタは `note_file.note_id` で不整合。Codex レビュー指摘
-- **fix: Ginseng::ApplicationError を Ginseng::Error に修正**（6abd7c13） — ginseng-core に存在しない定数。FeedUpdateWorker で NameError（Sentry MULUKHIYA-TOOT-PROXY-10）
+- #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）✅
+- #4251 fix: スキーマバリデーションで未設定の任意項目が required エラーになる（5.18.0 #4245 の取り残し）✅
+- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行 ✅
+- #4253 refactor: POST /tagging/tag/search を TagSearchService に移設（親: #4233 段階的リファクタ）✅
+- #4254 Misskey Web Push 登録プロキシ API の実装（capsicum プッシュ通知のため、pooza/capsicum#352 関連。なるはや希望）✅
 
-- **#4241 chore: parallel 2.0 へ更新**（226a8757） — 破壊的変更の影響なし
-- **#4240 chore: puma 8.0 へ更新**（54b8dc24） — IPv6 デフォルトバインド変更に対し明示的に `tcp://0.0.0.0` を bind
+## 次々期マイルストーン: 5.20.0
 
-- **#4244 feat: Postgres.health に WARN 分類、通知にヒステリシス導入**（e9e136dc） — プール枯渇を WARN として区別し、StartupNotificationWorker に連続 NG 判定（ヒステリシス）を導入。スポット誤報を抑制
-- **#4248 feat: is_cat キャッシュの TTL を設定可能にし、デフォルトを 6 時間に短縮**（f4c5dece） — `/account/is_cat/cache/ttl` で設定可能に。#4247 修正デプロイ後の null キャッシュ滞留を短縮
-- **#4249 feat: is_cat キャッシュ管理の rake タスクを追加**（43d02a0d） — `rake mulukhiya:is_cat:clear` / `:status` を media_catalog と同パターンで実装
-- **#4235 feat: 番組表の永続 YAML ストア導入・Program クラス差し替え**（4ab39e09） — `var/program.yaml` を Single Source of Truth とし Redis は読みキャッシュに。外部 URL pull 機構は維持、既存 API 契約は変更なし。rake タスク `:status` / `:clear` を追加
-
-### 残課題
-
-（なし — リリース準備可能）
+- #4236 フェーズ2: 番組表エディタの実装（親: #4234 番組表リニューアル、前提: #4235）
 
 ### on-hold
 
@@ -124,16 +116,27 @@ git diff Gemfile.lock
 - #3877 Mastodon形式「タグづけ」復活
 - #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
-- #4230 WebUI: GETリクエストのトークン送信をAuthorizationヘッダーに移行
 - #4233 APIController: 残る長大エンドポイントの段階的リファクタ
-
-## 次々期マイルストーン: 5.19.0
-
-- #4250 ポイピク (Poipiku) 対応機能の全廃止（利用終了+権利的グレー。削除のみで低リスク）
 
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
+
+## リリース済み: 5.18.0（2026-04-17）
+
+番組表永続化・Postgres ヘルスチェック改善・is_cat キャッシュ制御・puma/parallel メジャー更新。
+
+- **#4235 feat: 番組表の永続 YAML ストア導入・Program クラス差し替え** — `var/program.yaml` を Single Source of Truth とし Redis は読みキャッシュに。外部 URL pull 機構は維持、既存 API 契約は変更なし
+- **#4244 feat: Postgres.health に WARN 分類、通知にヒステリシス導入** — プール枯渇を WARN として区別し、スポット誤報を抑制
+- **#4248 feat: is_cat キャッシュの TTL を設定可能にし、デフォルトを 6 時間に短縮**
+- **#4249 feat: is_cat キャッシュ管理の rake タスクを追加**
+- **#4245 fix: base.yaml の top-level required を merged 検証前提に見直し** — ginseng-core #477 追随
+- **#4243 fix: postgres.pool.size の既定値を 4 → 10 に引き上げ** — Sequel::PoolTimeout を回避
+- **#4247 fix: fetch_actor が ActivityPub レスポンスをパースできていなかった**
+- **fix: Misskey メディアカタログの next_cursor を note_id ベースに修正**（Codex レビュー指摘）
+- **fix: Ginseng::ApplicationError を Ginseng::Error に修正**（Sentry MULUKHIYA-TOOT-PROXY-10）
+- **#4241 chore: parallel 2.0 へ更新**
+- **#4240 chore: puma 8.0 へ更新** — 明示的に `tcp://0.0.0.0` を bind
 
 ## リリース済み: 5.17.0（2026-04-14）
 
@@ -192,7 +195,11 @@ Postgres ヘルスチェック・接続プール・API 認証の改善。
 
 - 最近マージされたPR（`gh pr list --state merged --limit 5`）を取得
 - 各PRに対して `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments` でCodex（`chatgpt-codex-connector[bot]`）のコメントを確認
-- 未返信のコメントがあれば内容を確認し、対応が必要か判断
+- 各コメントについて以下を判定する:
+  1. **未返信** → 指摘内容を確認し、対応が必要か判断。必要なら修正コミットまたは Issue 起票、返信してリアクション付与
+  2. **返信済みだがリアクション未付与** → 修正コミットの存在を確認し、+1 リアクションを付与
+  3. **返信済み・リアクション済み** → 完了。報告不要
+- 判定方法: `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments --jq` で全コメントを取得し、Codex コメントの `id` に対する `in_reply_to_id` を持つ返信の有無、および Codex コメントへのリアクション（`reactions`）を確認する
 
 ### 5. Sentry の新規イシュー確認
 
@@ -299,17 +306,40 @@ test/
 ### 通常リリース手順
 
 1. **マイルストーンのIssueをすべて消化**
-2. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
-3. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
-4. **リリースPR作成**: `develop` → `main` へPRを作成
-5. **CI通過を確認してマージ**
-6. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
-7. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
-8. **リリース後の更新**:
+2. **リリース前レビュー**: 下記「リリース前レビュー」の 5 観点並列レビューを実施。必修（赤）のみ本リリースで対応し、残り（黄・緑）は Issue 起票して次リリース以降へ
+3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
+4. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version`（410行目付近）を更新
+5. **リリースPR作成**: `develop` → `main` へPRを作成
+6. **CI通過を確認してマージ**
+7. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`
+8. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
+9. **リリース後の更新**:
    - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加
    - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）
    - インフラノート（`pooza/chubo2` の `docs/infra-note.md`）: 作業履歴セクションにデプロイ記録を追記（デプロイ日・バージョン・主な変更内容・特記事項）
    - MEMORY.md: リリース履歴・インフラセクションを同期
+
+### リリース前レビュー
+
+各マイルストーンの Issue が消化済みになった後、バージョンバンプに入る前に実施する。**単一のセキュリティレビューだけでは実用上の問題が取りこぼされる**ため、以下 5 観点を独立したサブエージェントで並列に走らせ、指摘を合流させる。
+
+| 観点 | 焦点 |
+| --- | --- |
+| セキュリティ | `/security-review` スキル。認証・Bearer トークン取り扱い・シークレット scrub・入力検証 |
+| API 契約 | モロヘイヤ固有エンドポイント（`/mulukhiya/api/*`）、Mastodon/Misskey 本家 API 呼び出しの正確性、ginseng-fediverse interface 整合、`docs/api.md` との齟齬 |
+| 並行性・ライフサイクル | Sidekiq worker、Sequel 接続プール、Redis 接続、listener の WebSocket 再接続、systemd 前提の daemon 駆動 |
+| エラー処理・観測性 | Sentry 計装、`Ginseng::Error` の scrub、`/health` 応答の WARN/NG 判定、ログ出力の個人情報漏洩チェック |
+| コーディングスタイル・規約整合性 | rubocop / slim_lint / erb_lint、`handler_config(:key)` 記法、設定のスラッシュ記法、廃止語（「インスタンス」→「サーバー」など） |
+
+対象範囲は `v<前リリース>..develop` の差分。Codex（`chatgpt-codex-connector[bot]`）は PR ready 時に走るので併走させ、重複しない指摘だけを拾う。
+
+指摘は以下の基準で分類し、必要最小限のみ本リリースで対応、残りは Issue 起票して次リリース以降に送る:
+
+- **赤（必修）**: データ破損・セキュリティ・ユーザー可視の機能不全
+- **黄（余力があれば）**: 単一の edge case、観測性ギャップ
+- **緑（送り）**: 将来の拡張時に顕在化しうる構造改善
+
+capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点でセキュリティ単独では見つからなかった実害バグを複数検出した実績がある（[pooza/capsicum #325](https://github.com/pooza/capsicum/issues/325) の enrichNotifications unread フラグ欠落など）。Codex 停滞時の保険としても機能する。
 
 ### ホットフィックス手順
 
@@ -355,13 +385,18 @@ test/
 
 PRマージ後にCodex（chatgpt-codex-connector[bot]）のレビューコメントが遅れて届くことがある。セッション開始時に最近マージされたPRのレビューコメントを確認し、未対応の有益な指摘があれば対応すること。
 
-対応後はCodexのコメントに返信し、対応内容（コミットハッシュやIssue番号等）を記載する。
+対応後はCodexのコメントに**返信とリアクションの両方を付与する**: 返信で対応内容（コミットハッシュやIssue番号等）を明記し、コメントに `+1` リアクションを付ける。**両方揃って「完了」**。片方だけではセッション同期時に未完了と判定される。
 
 ```bash
 # 最近マージされたPRのCodexレビューコメントを確認
 gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments \
-  --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | {body: .body[:200], path: .path}'
+  --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | {id, body: .body[:200], path: .path, reactions: .reactions.total_count}'
+
+# リアクション付与（対応済み確定時）
+gh api repos/pooza/mulukhiya-toot-proxy/pulls/comments/{comment_id}/reactions -X POST -f content=+1
 ```
+
+Codex が一時的に停滞して自動指摘が出ないことがある。その場合は前述「リリース前レビュー」の 5 観点並列レビューが代替・補完として機能する。
 
 ## 既知の注意事項
 
@@ -421,7 +456,7 @@ mastodon:
   capabilities:   # SNS固有の能力 (streaming, reaction, channel, decoration, repost)
   features:       # 機能フラグ (webhook, feed, announcement, annict)
   data:           # データアクセスパターン (account_timeline, favorite_tags, futured_tag, media_catalog)
-service:          # 外部サービス設定 (amazon, annict, itunes, line, lemmy, peer_tube, piefed, poipiku, spotify)
+service:          # 外部サービス設定 (amazon, annict, itunes, line, lemmy, peer_tube, piefed, spotify)
 handler:
   pipeline:
     base:         # 共通ハンドラーリスト（Mastodonスーパーセット、実行順の正本）
@@ -434,7 +469,7 @@ webui:
 
 - `UserConfigStorage#update` は `deep_merge` + `deep_compact` で Redis に保存する
 - 値を `null` で送るとそのキーは `deep_compact` で消える。認証解除など「ユーザー設定の削除」操作で利用する想定
-- 4.x→5.0 で `service:` 配下に移動した外部サービス設定（annict, spotify, amazon, itunes, line, peer_tube, piefed, poipiku 等）はフォールバック付き。削除操作では新旧両方のパスに `null` を送る必要がある（#4088 で対応済み）
+- 4.x→5.0 で `service:` 配下に移動した外部サービス設定（annict, spotify, amazon, itunes, line, peer_tube, piefed 等）はフォールバック付き。削除操作では新旧両方のパスに `null` を送る必要がある（#4088 で対応済み）
 
 ### ハンドラスキーマと required
 

@@ -24,7 +24,7 @@ module Mulukhiya
       logger.info(request: {
         method: request.request_method,
         path: request.path,
-        params: @params,
+        params: @params.deep_dup,
         remote: request.ip,
       })
       @reporter = Reporter.new

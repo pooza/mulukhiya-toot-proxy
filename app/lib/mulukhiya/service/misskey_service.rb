@@ -150,11 +150,81 @@ module Mulukhiya
       return dest
     end
 
+    def register_sw_subscription(account, params)
+      row = {
+        userId: account.id,
+        endpoint: params[:endpoint],
+        auth: params[:auth],
+        publickey: params[:publickey],
+        sendReadMessage: params[:sendReadMessage] == true,
+      }
+      existing = Misskey::SwSubscription.first(row)
+      return {subscription: existing, state: :already_subscribed} if existing
+      row[:id] = self.class.create_aid
+      subscription = Misskey::SwSubscription.create(row)
+      invalidate_sw_subscription_cache(account.id)
+      return {subscription:, state: :subscribed}
+    end
+
+    def unregister_sw_subscription(account, params)
+      row = Misskey::SwSubscription.first(
+        userId: account.id,
+        endpoint: params[:endpoint],
+        auth: params[:auth],
+        publickey: params[:publickey],
+      )
+      return nil unless row
+      row.delete
+      invalidate_sw_subscription_cache(account.id)
+      return row
+    end
+
     def self.parse_aid(aid)
       return Time.at((aid[0..7].to_i(36) / 1000) + 946_684_800, in: 'UTC').getlocal
     end
 
+    def self.create_aid(time = Time.now)
+      @aid_mutex ||= Mutex.new
+      @aid_node ||= SecureRandom.random_number(36**4).to_s(36).rjust(4, '0')
+      ms = ((time.to_f * 1000).to_i - 946_684_800_000)
+      counter = @aid_mutex.synchronize do
+        @aid_counter = ((@aid_counter || -1) + 1) % (36**4)
+      end
+      return '%{time}%{node}%{counter}' % {
+        time: ms.to_s(36).rjust(8, '0'),
+        node: @aid_node,
+        counter: counter.to_s(36).rjust(4, '0'),
+      }
+    end
+
+    def self.sns_redis
+      @sns_redis ||= Ginseng::Redis::Service.new(url: Config.instance['/misskey/redis/dsn'])
+      return @sns_redis
+    end
+
+    def self.sns_redis_health
+      sns_redis.get('1')
+      return {status: 'OK'}
+    rescue => e
+      return {error: e.message, status: 'NG'}
+    end
+
     private
+
+    def invalidate_sw_subscription_cache(user_id)
+      key = "kvcache:userSwSubscriptions:#{user_id}"
+      prefix = sns_redis_prefix
+      key = "#{prefix}:#{key}" if prefix
+      self.class.sns_redis.del(key)
+    rescue => e
+      e.alert(user_id:)
+    end
+
+    def sns_redis_prefix
+      explicit = config['/misskey/redis/prefix'] rescue nil
+      return explicit if explicit
+      return Ginseng::URI.parse(config['/misskey/url']).host rescue nil
+    end
 
     def fetch_meta_theme_color
       response = http.post('/api/meta', {body: {}})

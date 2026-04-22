@@ -10,10 +10,13 @@ export const MulukhiyaLib = {
       const url = new URL(href, location.href)
       params = params || {}
       params.query = params.query || {}
-      params.query.token = params.token || globals.methods.getToken()
       Object.keys(params.query).map(k => url.searchParams.set(k, params.query[k]))
       return url.href
     }
+
+    globals.methods.authHeader = token => ({
+      Authorization: `Bearer ${token || globals.methods.getToken()}`,
+    })
 
     globals.methods.createPath = href => (new URL(href)).pathname
 
@@ -91,6 +94,7 @@ export const MulukhiyaLib = {
 
     globals.methods.setToken = token => {
       localStorage.setItem('mulukhiya_token', token)
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
     }
 
     globals.methods.getTokens = () => {
@@ -108,7 +112,7 @@ export const MulukhiyaLib = {
     globals.methods.registerToken = async token => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: token}))
+      return axios.get('/mulukhiya/api/config', {headers: globals.methods.authHeader(token)})
         .then(e => {
           const tokens = globals.methods.getTokens()
           tokens.push(token)
@@ -130,7 +134,7 @@ export const MulukhiyaLib = {
       indicator.show()
       indicator.setMax(tokens.length)
       return Promise.all(tokens.map(t => {
-        return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: t}))
+        return axios.get('/mulukhiya/api/config', {headers: globals.methods.authHeader(t)})
           .then(e => accounts.push(globals.methods.createAccountInfo(e.data, t)))
           .catch(e => accounts.push({token: t, error: globals.methods.createErrorMessage(e)}))
           .finally(e => indicator.increment)
@@ -155,7 +159,7 @@ export const MulukhiyaLib = {
     globals.methods.switchAccount = async account => {
       const indicator = new ActivityIndicator()
       indicator.show()
-      return axios.get(globals.methods.createURL('/mulukhiya/api/config', {token: account.token}))
+      return axios.get('/mulukhiya/api/config', {headers: globals.methods.authHeader(account.token)})
         .then(e => {
           globals.methods.setToken(account.token)
           return e.data
@@ -346,14 +350,6 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
-    globals.methods.attachPoipikuImage = async (id, fanart) => {
-      const indicator = new ActivityIndicator()
-      indicator.show()
-      return axios.put('/mulukhiya/api/status/poipiku', {token: globals.methods.getToken(), id: id, fanart: fanart})
-        .then(e => e.data)
-        .finally(e => indicator.hide())
-    }
-
     globals.methods.getHealth = async () => {
       const indicator = new ActivityIndicator()
       indicator.show()
@@ -468,6 +464,11 @@ export const MulukhiyaLib = {
       return axios.get(path)
         .then(e => e.data)
         .finally(e => indicator.hide())
+    }
+
+    const bootstrapToken = globals.methods.getToken()
+    if (bootstrapToken) {
+      axios.defaults.headers.common.Authorization = `Bearer ${bootstrapToken}`
     }
   }
 }

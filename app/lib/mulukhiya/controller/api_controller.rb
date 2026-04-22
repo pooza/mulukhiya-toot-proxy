@@ -92,6 +92,56 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/sw/register' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      unless sns.access_token&.scopes&.include?('write:account')
+        raise Ginseng::AuthError, 'Permission denied'
+      end
+      errors = SwSubscriptionContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      result = sns.register_sw_subscription(sns.account, params)
+      subscription = result[:subscription]
+      @renderer.message = {
+        state: result[:state].to_s.tr('_', '-'),
+        userId: subscription.userId,
+        endpoint: subscription.endpoint,
+        sendReadMessage: subscription.sendReadMessage,
+      }
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/sw/unregister' do
+      raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      unless sns.access_token&.scopes&.include?('write:account')
+        raise Ginseng::AuthError, 'Permission denied'
+      end
+      errors = SwSubscriptionContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      removed = sns.unregister_sw_subscription(sns.account, params)
+      @renderer.message = {state: removed ? 'unsubscribed' : 'not-subscribed'}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/emoji/palettes' do
       raise Ginseng::NotFoundError, 'Not Found' unless Environment.misskey_type?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
@@ -390,33 +440,6 @@ module Mulukhiya
       return @renderer.to_s
     end
 
-    put '/status/poipiku' do
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
-      raise Ginseng::NotFoundError, 'Not Found' unless status = status_class[params[:id]]
-      raise Ginseng::AuthError, 'Unauthorized' unless status.updatable_by?(sns.account)
-      raise Ginseng::AuthError, 'Unauthorized' unless sns.account.webhook
-      errors = StatusContract.new.exec(params)
-      if errors.present?
-        @renderer.status = 422
-        @renderer.message = {errors:}
-      else
-        parser = parser_class.new(status.text)
-        tags = parser.tags.clone
-        tags.push(config['/handler/poipiku_image/fanart_tag']) if params[:fanart]
-        @renderer.message = sns.account.webhook.post(
-          text: [parser.body, tags.to_s].join("\n"),
-          visibility: status.visibility_name,
-        ).response
-        sns.delete_status(status.id)
-      end
-      return @renderer.to_s
-    rescue => e
-      e.log
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
-    end
-
     get '/annict/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}
@@ -508,26 +531,18 @@ module Mulukhiya
     end
 
     post '/tagging/tag/search' do
-      tags = {}
       errors = TagSearchContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        dic = TaggingDictionary.new
-        dic.cache.each do |entry|
-          word = entry.shift
-          next unless params[:q].match?(entry.first[:regexp])
-          tags[word] = entry.first
-          tags[word][:word] = word
-          tags[word][:short] = dic.short?(word)
-          tags[word][:words].unshift(word)
-          tags[word][:tags] = TagContainer.new(tags.dig(word, :words)).create_tags
-        rescue => e
-          e.log(entry:)
-        end
-        @renderer.message = tags
+        @renderer.message = TagSearchService.new.search(params[:q])
       end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
       return @renderer.to_s
     end
 

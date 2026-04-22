@@ -18,7 +18,6 @@ inflections:
   oauth_state_storage: OAuthStateStorage
   peer_tube_uri: PeerTubeURI
   peer_tube_url_nowplaying_handler: PeerTubeURLNowplayingHandler
-  poipiku_uri: PoipikuURI
   rss20_feed_renderer: RSS20FeedRenderer
   shortened_url_handler: ShortenedURLHandler
   sns_methods: SNSMethods
