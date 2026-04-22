@@ -22,8 +22,14 @@ module Mulukhiya
     end
 
     RESERVED_TLDS = [
-      'local', 'internal', 'lan', 'test',
-      'localhost', 'example', 'invalid', 'onion',
+      'local',
+      'internal',
+      'lan',
+      'test',
+      'localhost',
+      'example',
+      'invalid',
+      'onion',
     ].freeze
 
     def self.public_http_uri?(uri_string)
