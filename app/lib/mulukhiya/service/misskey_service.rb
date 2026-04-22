@@ -156,11 +156,11 @@ module Mulukhiya
         endpoint: params[:endpoint],
         auth: params[:auth],
         publickey: params[:publickey],
+        sendReadMessage: params[:sendReadMessage] == true,
       }
       existing = Misskey::SwSubscription.first(row)
       return {subscription: existing, state: :already_subscribed} if existing
       row[:id] = self.class.create_aid
-      row[:sendReadMessage] = params[:sendReadMessage] == true
       subscription = Misskey::SwSubscription.create(row)
       invalidate_sw_subscription_cache(account.id)
       return {subscription:, state: :subscribed}
@@ -197,15 +197,27 @@ module Mulukhiya
       }
     end
 
+    def self.sns_redis
+      @sns_redis ||= Ginseng::Redis::Service.new(url: Config.instance['/misskey/redis/dsn'])
+      return @sns_redis
+    end
+
+    def self.sns_redis_health
+      sns_redis.get('1')
+      return {status: 'OK'}
+    rescue => e
+      return {error: e.message, status: 'NG'}
+    end
+
     private
 
     def invalidate_sw_subscription_cache(user_id)
       key = "kvcache:userSwSubscriptions:#{user_id}"
       prefix = sns_redis_prefix
       key = "#{prefix}:#{key}" if prefix
-      Ginseng::Redis::Service.new(url: config['/misskey/redis/dsn']).del(key)
+      self.class.sns_redis.del(key)
     rescue => e
-      e.log(user_id:)
+      e.alert(user_id:)
     end
 
     def sns_redis_prefix
