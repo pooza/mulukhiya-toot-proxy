@@ -102,6 +102,7 @@ git diff Gemfile.lock
 - #4256 feat: /sw/register にレート制限を導入（5.19.0 リリース前レビュー R4 の送り）
 - #4257 docs: 認証エラーの HTTP ステータス表記を 401 → 403 に修正（R5 の送り）
 - #4259 feat: /sw/register の SSRF 検査強化（R3 の送り、DNS 解決 or allowlist）
+- #4262 fix: register_sw_subscription の存在チェックから sendReadMessage を除外（5.19.0 Codex P2 の送り、冪等性）
 
 ## 次々期マイルストーン: 5.21.0
 
