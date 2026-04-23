@@ -706,7 +706,9 @@ module Mulukhiya
 
     def token
       if (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
-        return Regexp.last_match(1)
+        bearer = Regexp.last_match(1)
+        plain = bearer.decrypt rescue bearer
+        return plain
       end
       return params[:token].decrypt
     rescue
