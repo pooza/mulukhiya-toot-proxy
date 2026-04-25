@@ -100,7 +100,6 @@ git diff Gemfile.lock
 
 - #4236 フェーズ2: 番組表エディタの実装（親: #4234 番組表リニューアル、前提: #4235）
 - #4256 feat: /sw/register にレート制限を導入（5.19.0 リリース前レビュー R4 の送り）
-- #4257 docs: 認証エラーの HTTP ステータス表記を 401 → 403 に修正（R5 の送り）
 - #4259 feat: /sw/register の SSRF 検査強化（R3 の送り、DNS 解決 or allowlist）
 - #4262 fix: register_sw_subscription の存在チェックから sendReadMessage を除外（5.19.0 Codex P2 の送り、冪等性）
 
@@ -119,6 +118,7 @@ git diff Gemfile.lock
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
+- #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 
 ## リリース済み: 5.19.1（2026-04-23）
 
