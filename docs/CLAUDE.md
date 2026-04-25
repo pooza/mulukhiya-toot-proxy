@@ -109,6 +109,7 @@ git diff Gemfile.lock
 
 ## 隙間: 5.22.0
 
+- #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 - #4265 大容量メディアアップロードで Mastodon 本家が 413 を返す問題の調査・対応検討（Sentry MULUKHIYA-TOOT-PROXY-1T、ダイスキーで観測・他サーバー共通）
 
 ### on-hold
@@ -122,7 +123,6 @@ git diff Gemfile.lock
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
-- #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 
 ## リリース済み: 5.19.1（2026-04-23）
 
