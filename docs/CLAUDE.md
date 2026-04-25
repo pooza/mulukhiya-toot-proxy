@@ -107,6 +107,10 @@ git diff Gemfile.lock
 
 - #4258 APIController: params[:token] フォールバック完全廃止（capsicum プリセットサーバー全台 5.18+ 確認済み、2026-04-22）
 
+## 隙間: 5.22.0
+
+- #4265 大容量メディアアップロードで Mastodon 本家が 413 を返す問題の調査・対応検討（Sentry MULUKHIYA-TOOT-PROXY-1T、ダイスキーで観測・他サーバー共通）
+
 ### on-hold
 
 - #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
