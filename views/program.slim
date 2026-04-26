@@ -89,17 +89,6 @@ html lang='ja' data-theme='light'
               label
                 span Annict Episode ID
                 input.short type='number' v-model.number='form.values.annict_episode_id' min='0'
-            .inline-field-container
-              label
-                span source_type
-                select v-model='form.values.source_type'
-                  option value='' (未設定)
-                  option value='annict' annict
-                  option value='youtube' youtube
-                  option value='manual' manual
-              label.grow
-                span source_url
-                input type='url' v-model.trim='form.values.source_url'
             .field-update-button-container
               button @click='submitForm' 保存
               button.cancel @click='cancelForm' キャンセル
