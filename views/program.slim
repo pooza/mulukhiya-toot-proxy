@@ -1,0 +1,288 @@
+doctype html
+html lang='ja' data-theme='light'
+  head
+    == slim.render 'fragment/metadata'
+    == slim.render 'fragment/assets'
+  body
+    == slim.render 'fragment/header'
+    == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: '番組表エディタ'}]}
+    main#app v-cloak='' class=env.type
+      == slim.render 'fragment/message'
+      h2 番組表エディタ
+      p.alert v-if='!account.is_admin' 管理者のみ利用できます。
+      section v-if='account.is_admin'
+        .field-update-button-container
+          button @click='openAdd' v-if='!form.open'
+            i class='fa fa-plus'
+            |  新規追加
+        section.config v-if='form.open'
+          h3 {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
+          .indented
+            .annict-search v-if='!form.editKey'
+              h4 Annict 検索（任意）
+              .inline-field-container
+                input type='search' placeholder='作品名検索フレーズ' v-model.trim='annict.keyword' @keydown.enter.prevent='searchAnnictWorks'
+                button.small @click='searchAnnictWorks' 検索
+              .indented v-if='annict.works.length'
+                ul.annict-works
+                  li v-for='work in annict.works' :key='work.annictId'
+                    button.small @click='selectAnnictWork(work)'
+                      | {{work.title}}
+                      small v-if='work.seasonYear'  ({{work.seasonYear}}年)
+              .indented v-if='annict.episodes.length'
+                h5 エピソードを選択
+                ul.annict-episodes
+                  li v-for='episode in annict.episodes' :key='episode.id'
+                    button.small @click='selectAnnictEpisode(episode)'
+                      | {{episode.numberText}}
+                      small  {{episode.title}}
+            .field-container
+              label
+                span キー (識別子)
+                input type='text' v-model.trim='form.values.key' :disabled='form.editKey' placeholder='neppy など'
+            .field-container
+              label
+                span 作品名 (series)
+                input type='text' v-model.trim='form.values.series' placeholder='作品名'
+            .inline-field-container
+              label
+                span 話数 (episode)
+                input.short type='number' v-model.number='form.values.episode' min='0'
+              label
+                span 話数表記 (episode_suffix)
+                input.short type='text' v-model.trim='form.values.episode_suffix' placeholder='話'
+              label
+                span 放送時間 (minutes)
+                input.short type='number' v-model.number='form.values.minutes' min='0'
+            .field-container
+              label
+                span サブタイトル (subtitle)
+                input type='text' v-model.trim='form.values.subtitle'
+            .field-container
+              label
+                span 放送日時 (air)
+                input type='datetime-local' v-model='form.values.air'
+            .inline-field-container
+              label
+                input type='checkbox' v-model='form.values.livecure'
+                |  実況対象 (livecure)
+              label
+                input type='checkbox' v-model='form.values.enable'
+                |  有効 (enable)
+            .field-container
+              label
+                span 追加タグ (extra_tags、カンマ区切り)
+                input type='text' v-model.trim='form.extraTagsText' placeholder='タグ1, タグ2'
+            .inline-field-container
+              label
+                span Annict Work ID
+                input.short type='number' v-model.number='form.values.annict_work_id' min='0'
+              label
+                span Annict Episode ID
+                input.short type='number' v-model.number='form.values.annict_episode_id' min='0'
+            .inline-field-container
+              label
+                span source_type
+                select v-model='form.values.source_type'
+                  option value='' (未設定)
+                  option value='annict' annict
+                  option value='youtube' youtube
+                  option value='manual' manual
+              label.grow
+                span source_url
+                input type='url' v-model.trim='form.values.source_url'
+            .field-update-button-container
+              button @click='submitForm' 保存
+              button.cancel @click='cancelForm' キャンセル
+        section
+          h3 番組表エントリ ({{Object.keys(entries).length}} 件)
+          p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
+          table.program-entries v-if='Object.keys(entries).length'
+            thead
+              tr
+                th キー
+                th 作品 / 話数
+                th 放送
+                th フラグ
+                th 操作
+            tbody
+              tr v-for='(entry, key) in entries' :key='key'
+                td.key-cell
+                  code {{key}}
+                td
+                  strong {{entry.series}}
+                  br
+                  small
+                    span v-if='entry.episode' 第{{entry.episode}}{{entry.episode_suffix || '話'}}
+                    span v-if='entry.subtitle'  「{{entry.subtitle}}」
+                td
+                  small {{formatAir(entry.air)}}
+                  br v-if='entry.minutes'
+                  small v-if='entry.minutes' {{entry.minutes}}分
+                td
+                  span.tag.livecure v-if='entry.livecure' 実況
+                  span.tag.disabled v-if='entry.enable === false' 無効
+                  span.tag.annict v-if='entry.annict_work_id' Annict
+                td.actions
+                  button.small @click='incrementEpisode(key)' v-tooltip.top="'episode +1'"
+                    i class='fa fa-plus'
+                  button.small @click='openEdit(key)' v-tooltip.top="'編集'"
+                    i class='fa fa-pencil'
+                  button.small.danger @click='deleteEntry(key)' v-tooltip.top="'削除'"
+                    i class='fa fa-trash'
+    == slim.render 'fragment/footer'
+    script type='module'
+      |
+        import { createApp } from 'vue'
+        import { MulukhiyaLib } from 'mulukhiya_lib'
+        import { SlideUpDown } from 'slide_toggle'
+        import { VTooltip } from 'v_tooltip'
+        import Swal from 'sweetalert2'
+        const app = createApp({
+          data () {
+            return {
+              account: {},
+              entries: {},
+              annict: {keyword: null, works: [], episodes: []},
+              form: {
+                open: false,
+                editKey: null,
+                extraTagsText: '',
+                values: {
+                  key: '', series: '', episode: null, episode_suffix: '',
+                  minutes: null, subtitle: '', air: '',
+                  livecure: false, enable: true,
+                  annict_work_id: null, annict_episode_id: null,
+                  source_type: '', source_url: '',
+                },
+              },
+            }
+          },
+          async created () {
+            this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+            this.loadEntries()
+          },
+          methods: {
+            createEmptyValues () {
+              return {
+                key: '',
+                series: '',
+                episode: null,
+                episode_suffix: '',
+                minutes: null,
+                subtitle: '',
+                air: '',
+                livecure: false,
+                enable: true,
+                annict_work_id: null,
+                annict_episode_id: null,
+                source_type: '',
+                source_url: '',
+              }
+            },
+            loadEntries () {
+              this.methods.getPrograms()
+                .then(e => {this.entries = e || {}})
+                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            formatAir (air) {
+              if (!air) return ''
+              const d = new Date(air)
+              if (Number.isNaN(d.getTime())) return air
+              return d.toLocaleString('ja-JP', {month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit'})
+            },
+            openAdd () {
+              this.form.editKey = null
+              this.form.values = this.createEmptyValues()
+              this.form.extraTagsText = ''
+              this.annict.works = []
+              this.annict.episodes = []
+              this.annict.keyword = null
+              this.form.open = true
+            },
+            openEdit (key) {
+              const entry = this.entries[key]
+              if (!entry) return
+              this.form.editKey = key
+              this.form.values = Object.assign(this.createEmptyValues(), entry)
+              this.form.values.key = key
+              this.form.extraTagsText = (entry.extra_tags || []).join(', ')
+              this.form.open = true
+            },
+            cancelForm () {
+              this.form.open = false
+            },
+            buildPayload () {
+              const v = Object.assign({}, this.form.values)
+              const extraTags = this.form.extraTagsText.split(',').map(s => s.trim()).filter(Boolean)
+              if (extraTags.length) v.extra_tags = extraTags
+              else delete v.extra_tags
+              if (!v.source_type) delete v.source_type
+              if (!v.source_url) delete v.source_url
+              if (!v.subtitle) delete v.subtitle
+              if (!v.episode_suffix) delete v.episode_suffix
+              if (v.episode === null) delete v.episode
+              if (v.minutes === null) delete v.minutes
+              if (v.annict_work_id === null) delete v.annict_work_id
+              if (v.annict_episode_id === null) delete v.annict_episode_id
+              return v
+            },
+            submitForm () {
+              const payload = this.buildPayload()
+              const promise = this.form.editKey
+                ? this.methods.updateProgramEntry(this.form.editKey, payload)
+                : this.methods.addProgramEntry(payload)
+              promise
+                .then(_ => {
+                  Swal.fire({title: '保存しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  this.form.open = false
+                  this.loadEntries()
+                })
+                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            deleteEntry (key) {
+              Swal.fire({title: `エントリ '${key}' を削除しますか？`, icon: 'warning', showCancelButton: true, confirmButtonText: '削除', cancelButtonText: 'キャンセル'})
+                .then(result => {
+                  if (!result.isConfirmed) return
+                  this.methods.deleteProgramEntry(key)
+                    .then(_ => {
+                      Swal.fire({title: '削除しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                      this.loadEntries()
+                    })
+                    .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                })
+            },
+            incrementEpisode (key) {
+              this.methods.incrementProgramEpisode(key)
+                .then(_ => {
+                  Swal.fire({title: 'episode を +1 しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  this.loadEntries()
+                })
+                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            searchAnnictWorks () {
+              if (!this.annict.keyword) return
+              this.methods.getWorks({q: this.annict.keyword})
+                .then(works => {this.annict.works = works})
+                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            selectAnnictWork (work) {
+              this.form.values.series = work.title
+              this.form.values.annict_work_id = work.annictId
+              this.form.values.source_type = 'annict'
+              this.methods.getEpisodes(work.annictId)
+                .then(episodes => {this.annict.episodes = episodes})
+                .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            selectAnnictEpisode (episode) {
+              this.form.values.subtitle = episode.title || ''
+              this.form.values.annict_episode_id = episode.id
+              const match = String(episode.numberText || '').match(/(\d+)/)
+              if (match) this.form.values.episode = parseInt(match[1], 10)
+            },
+          },
+        })
+        app.use(MulukhiyaLib)
+        app.component('slide-up-down', SlideUpDown)
+        app.directive('tooltip', VTooltip)
+        app.mount('#app')

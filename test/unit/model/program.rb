@@ -57,5 +57,95 @@ module Mulukhiya
 
       assert_kind_of(Hash, @program.data)
     end
+
+    def test_add_entry_creates_new_entry
+      key = "test_add_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'TestSeries', 'episode' => 1)
+
+      assert_equal('TestSeries', entry['series'])
+      assert_equal(1, entry['episode'])
+      assert_includes(@program.data.keys, key)
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_add_entry_rejects_duplicate
+      key = "test_dup_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A'})
+
+      assert_raise(Ginseng::ValidateError) do
+        @program.add_entry(key, 'series' => 'B')
+      end
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_update_entry_merges_attributes
+      key = "test_update_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 1})
+      entry = @program.update_entry(key, 'episode' => 5)
+
+      assert_equal('A', entry['series'])
+      assert_equal(5, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_update_entry_raises_when_missing
+      original = @program.data
+
+      assert_raise(Ginseng::NotFoundError) do
+        @program.update_entry('does_not_exist', 'series' => 'X')
+      end
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_delete_entry_removes_key
+      key = "test_delete_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A'})
+      removed = @program.delete_entry(key)
+
+      assert_equal('A', removed['series'])
+      assert_not_includes(@program.data.keys, key)
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_delete_entry_returns_nil_when_missing
+      original = @program.data
+
+      assert_nil(@program.delete_entry('does_not_exist'))
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_increment_episode
+      key = "test_inc_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 3, 'annict_episode_id' => 100})
+      entry = @program.increment_episode(key)
+
+      assert_equal(4, entry['episode'])
+      assert_nil(entry['annict_episode_id'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_increment_episode_starts_from_zero
+      key = "test_inc0_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A'})
+      entry = @program.increment_episode(key)
+
+      assert_equal(1, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
   end
 end

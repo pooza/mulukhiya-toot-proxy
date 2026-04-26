@@ -20,6 +20,45 @@ module Mulukhiya
       return cached_data || load_from_yaml
     end
 
+    def add_entry(key, attributes)
+      key = key.to_s
+      raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
+      programs = data
+      raise Ginseng::ValidateError, "キー '#{key}' は既に存在します。" if programs.key?(key)
+      programs[key] = attributes.transform_keys(&:to_s)
+      save(programs)
+      return programs[key]
+    end
+
+    def update_entry(key, attributes)
+      key = key.to_s
+      programs = data
+      raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
+      programs[key].merge!(attributes.transform_keys(&:to_s))
+      save(programs)
+      return programs[key]
+    end
+
+    def delete_entry(key)
+      key = key.to_s
+      programs = data
+      return nil unless programs.key?(key)
+      entry = programs.delete(key)
+      save(programs)
+      return entry
+    end
+
+    def increment_episode(key)
+      key = key.to_s
+      programs = data
+      raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
+      entry = programs[key]
+      entry['episode'] = (entry['episode'] || 0).to_i + 1
+      entry['annict_episode_id'] = nil
+      save(programs)
+      return entry
+    end
+
     def redis
       @redis ||= Redis.new
       return @redis
