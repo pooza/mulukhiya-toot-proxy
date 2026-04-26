@@ -23,7 +23,7 @@ html lang='ja' data-theme='light'
               h4 Annict 検索（任意）
               .inline-field-container
                 input type='search' placeholder='作品名検索フレーズ' v-model.trim='annict.keyword' @keydown.enter.prevent='searchAnnictWorks'
-                button.small @click='searchAnnictWorks' 検索
+                button @click='searchAnnictWorks' 検索
               .indented v-if='annict.works.length'
                 ul.annict-works
                   li v-for='work in annict.works' :key='work.annictId'

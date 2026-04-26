@@ -924,14 +924,22 @@ a:hover
       left: 15em
     font:
       size: 0.875em
-  input
+  input, select
     display: inline-block
     margin: 0 0.5em
     padding: 0 0.5em
     height: 1.5em
+    line-height: 1.5em
+    box-sizing: border-box
     flex-grow: 1
     font:
       family: $monospace
+  input[type='number']
+    -moz-appearance: textfield
+    appearance: textfield
+  input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button
+    -webkit-appearance: none
+    margin: 0
   input.short
     width: 10em
   input[type="checkbox"]
@@ -946,6 +954,21 @@ a:hover
   .v-select
     display: inline-block
     margin: 0
+
+.annict-search
+  ul.annict-works, ul.annict-episodes
+    list:
+      style: none
+    display: flex
+    flex:
+      wrap: wrap
+    gap: 0.3em
+    padding: 0
+    margin: 0.5em 0
+    li
+      list:
+        style: none
+      margin: 0
 
 .multiselect-clear
   background: transparent
