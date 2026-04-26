@@ -91,5 +91,40 @@ module Mulukhiya
     def test_public_http_uri_rejects_localhost
       assert_false(SwSubscriptionContract.public_http_uri?('https://localhost/'))
     end
+
+    def test_allowed_host_passes_when_list_empty
+      with_allowed_hosts([]) do
+        assert_true(SwSubscriptionContract.allowed_host?('https://example.com/push'))
+      end
+    end
+
+    def test_allowed_host_blocks_unlisted_host
+      with_allowed_hosts(['relay.capsicum.example']) do
+        assert_false(SwSubscriptionContract.allowed_host?('https://example.com/push'))
+      end
+    end
+
+    def test_allowed_host_passes_for_listed_host
+      with_allowed_hosts(['relay.capsicum.example']) do
+        assert_true(SwSubscriptionContract.allowed_host?('https://relay.capsicum.example/push'))
+      end
+    end
+
+    def test_allowed_host_case_insensitive
+      with_allowed_hosts(['Relay.Capsicum.Example']) do
+        assert_true(SwSubscriptionContract.allowed_host?('https://relay.capsicum.example/push'))
+      end
+    end
+
+    private
+
+    def with_allowed_hosts(hosts)
+      key = '/misskey/sw_subscription/allowed_hosts'
+      original = Config.instance[key]
+      Config.instance[key] = hosts
+      yield
+    ensure
+      Config.instance[key] = original
+    end
   end
 end

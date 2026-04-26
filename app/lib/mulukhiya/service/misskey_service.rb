@@ -151,19 +151,24 @@ module Mulukhiya
     end
 
     def register_sw_subscription(account, params)
-      row = {
+      key = {
         userId: account.id,
         endpoint: params[:endpoint],
         auth: params[:auth],
         publickey: params[:publickey],
-        sendReadMessage: params[:sendReadMessage] == true,
       }
-      existing = Misskey::SwSubscription.first(row)
-      return {subscription: existing, state: :already_subscribed} if existing
-      row[:id] = self.class.create_aid
-      subscription = Misskey::SwSubscription.create(row)
+      send_read_message = params[:sendReadMessage] == true
+      existing = Misskey::SwSubscription.first(key)
+      state = existing ? :already_subscribed : :subscribed
+      subscription = existing || Misskey::SwSubscription.create(key.merge(
+        id: self.class.create_aid,
+        sendReadMessage: send_read_message,
+      ))
+      if existing && existing.sendReadMessage != send_read_message
+        subscription.update(sendReadMessage: send_read_message)
+      end
       invalidate_sw_subscription_cache(account.id)
-      return {subscription:, state: :subscribed}
+      return {subscription:, state:}
     end
 
     def unregister_sw_subscription(account, params)
