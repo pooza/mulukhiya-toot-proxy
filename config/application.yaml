@@ -411,6 +411,7 @@ misskey:
   streaming:
     verify_peer: true
   sw_subscription:
+    allowed_hosts: []
     rate_limit:
       max: 30
       window: 3600

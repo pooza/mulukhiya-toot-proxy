@@ -355,6 +355,7 @@ Web Push 通知用 Service Worker サブスクリプションを登録する。M
 - 既存判定は `userId` / `endpoint` / `auth` / `publickey` の 4 要素で行う。同一サブスクリプションへの再登録で `sendReadMessage` だけ異なる場合は既存行を UPDATE して `already-subscribed` を返す（冪等性を担保）
 - 登録時は Misskey Redis（`/misskey/redis/dsn`）の `{prefix}:kvcache:userSwSubscriptions:{userId}` を無効化する。`prefix` は `/misskey/redis/prefix` の明示値が優先、未設定なら `/misskey/url` のホスト名が使われる（Misskey 本家の既定挙動に合わせる）
 - **レート制限**: ユーザー単位で `/misskey/sw_subscription/rate_limit/window`（既定 3600 秒）あたり `/misskey/sw_subscription/rate_limit/max`（既定 30 回）を超えた登録要求は `429 Too Many Requests` を返す
+- **ホスト allowlist**: `/misskey/sw_subscription/allowed_hosts` に許可ホストを設定すると、リスト外の `endpoint` ホストは 422 で拒否する。既定は空配列＝制限なし。capsicum 等の特定リレーサーバーに固定する運用で SSRF 攻撃面を限定できる
 
 **クライアント側の要件**:
 

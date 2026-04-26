@@ -11,6 +11,7 @@ module Mulukhiya
       key.failure('空欄です。') if value.empty?
       key.failure('https:// で始まる URL を指定してください。') unless value.start_with?('https://')
       key.failure('公開ホストの URL を指定してください。') unless SwSubscriptionContract.public_http_uri?(value)
+      key.failure('許可されたホストの URL を指定してください。') unless SwSubscriptionContract.allowed_host?(value)
     end
 
     rule(:auth) do
@@ -42,6 +43,16 @@ module Mulukhiya
       return false if host.match?(/\A\[.*\]\z/)
       return false if RESERVED_TLDS.include?(host.split('.').last)
       return true
+    rescue
+      return false
+    end
+
+    def self.allowed_host?(uri_string)
+      allowed = Config.instance['/misskey/sw_subscription/allowed_hosts'] || []
+      return true if allowed.empty?
+      uri = Ginseng::URI.parse(uri_string)
+      host = uri.host.to_s.downcase
+      return allowed.map {|h| h.to_s.downcase}.include?(host)
     rescue
       return false
     end
