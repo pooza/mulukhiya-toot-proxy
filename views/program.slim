@@ -268,6 +268,7 @@ html lang='ja' data-theme='light'
             },
             searchAnnictWorks () {
               if (!this.annict.keyword) return
+              this.annict.episodes = []
               this.methods.getWorks({q: this.annict.keyword})
                 .then(works => {this.annict.works = works})
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
