@@ -34,7 +34,7 @@ html lang='ja' data-theme='light'
               .indented v-if='annict.episodes.length'
                 h5 エピソードを選択
                 ul.annict-episodes
-                  li v-for='episode in annict.episodes' :key='episode.id'
+                  li v-for='episode in annict.episodes' :key='episode.annictId'
                     button.small @click='selectAnnictEpisode(episode)'
                       | {{episode.numberText}}
                       small
@@ -164,7 +164,7 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: null, subtitle: '',
+                  minutes: 30, subtitle: '',
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                   source_type: '', source_url: '',
@@ -183,7 +183,7 @@ html lang='ja' data-theme='light'
                 series: '',
                 episode: null,
                 episode_suffix: '',
-                minutes: null,
+                minutes: 30,
                 subtitle: '',
                 air: false,
                 livecure: true,
@@ -285,7 +285,7 @@ html lang='ja' data-theme='light'
             },
             selectAnnictEpisode (episode) {
               this.form.values.subtitle = episode.title || ''
-              this.form.values.annict_episode_id = episode.id
+              this.form.values.annict_episode_id = episode.annictId
               const match = String(episode.numberText || '').match(/(\d+)/)
               if (match) this.form.values.episode = parseInt(match[1], 10)
             },
