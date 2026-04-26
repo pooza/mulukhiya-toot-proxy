@@ -410,6 +410,10 @@ misskey:
     spoiler_text: null
   streaming:
     verify_peer: true
+  sw_subscription:
+    rate_limit:
+      max: 30
+      window: 3600
   theme:
     color: '#86b300'
   url: https://misskey.example.com/

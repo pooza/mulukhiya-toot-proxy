@@ -104,6 +104,14 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
+      limit_max = config['/misskey/sw_subscription/rate_limit/max']
+      limit_window = config['/misskey/sw_subscription/rate_limit/window']
+      count = RateLimitStorage.new.increment("sw_register:#{sns.account.id}", window: limit_window)
+      if count > limit_max
+        @renderer.status = 429
+        @renderer.message = {error: 'Too Many Requests'}
+        return @renderer.to_s
+      end
       result = sns.register_sw_subscription(sns.account, params)
       subscription = result[:subscription]
       @renderer.message = {
