@@ -147,5 +147,22 @@ module Mulukhiya
     ensure
       @program.save(original) if original
     end
+
+    def test_generate_key_returns_12_chars_hex
+      key = @program.generate_key('series' => 'TestSeries')
+
+      assert_match(/\A[0-9a-f]{12}\z/, key)
+    end
+
+    def test_generate_key_avoids_collision
+      original = @program.data
+      existing = @program.generate_key('series' => 'X')
+      @program.save(existing => {'series' => 'X'})
+      generated = @program.generate_key('series' => 'X')
+
+      assert_not_equal(existing, generated)
+    ensure
+      @program.save(original) if original
+    end
   end
 end

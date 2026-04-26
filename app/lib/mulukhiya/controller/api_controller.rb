@@ -611,13 +611,9 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      key = params[:key].to_s
-      if key.empty?
-        @renderer.status = 422
-        @renderer.message = {errors: {key: ['空欄です。']}}
-        return @renderer.to_s
-      end
       attributes = params.to_h.except(:key, 'key')
+      key = params[:key].to_s
+      key = Program.instance.generate_key(attributes) if key.empty?
       entry = Program.instance.add_entry(key, attributes)
       @renderer.message = {key:, entry:}
       return @renderer.to_s

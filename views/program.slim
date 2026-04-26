@@ -39,10 +39,16 @@ html lang='ja' data-theme='light'
                       | {{episode.numberText}}
                       small
                         | {{episode.title}}
-            .field-container
+            .field-container v-if='form.editKey'
               label
                 span キー (識別子)
-                input type='text' v-model.trim='form.values.key' :disabled='form.editKey' placeholder='neppy など'
+                code.key-readonly
+                  | {{form.editKey}}
+            .field-container v-else=''
+              label
+                span キー (識別子)
+                small 空欄で自動生成（登録内容のハッシュから一意キーを生成）
+                input type='text' v-model.trim='form.values.key' placeholder='省略可（自動生成）'
             .field-container
               label
                 span 作品名 (series)
@@ -73,8 +79,9 @@ html lang='ja' data-theme='light'
                 |  有効 (enable)
             .field-container
               label
-                span 追加タグ (extra_tags、改行区切り)
-                textarea v-model='form.extraTagsText' rows='3' placeholder='タグ1\nタグ2'
+                span 追加タグ (extra_tags)
+                small 改行区切りでタグを列挙（タグ先頭の # は省略）
+                textarea v-model='form.extraTagsText' rows='3'
             .inline-field-container
               label
                 span Annict Work ID

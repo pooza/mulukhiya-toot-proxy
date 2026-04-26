@@ -30,6 +30,20 @@ module Mulukhiya
       return programs[key]
     end
 
+    def generate_key(attributes = {})
+      programs = data
+      loop do
+        base = [
+          attributes[:series] || attributes['series'],
+          attributes[:episode] || attributes['episode'],
+          Time.now.to_f,
+          SecureRandom.hex(4),
+        ].join('|')
+        key = Digest::SHA256.hexdigest(base)[0, 12]
+        return key unless programs.key?(key)
+      end
+    end
+
     def update_entry(key, attributes)
       key = key.to_s
       programs = data
