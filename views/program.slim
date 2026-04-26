@@ -19,7 +19,7 @@ html lang='ja' data-theme='light'
           h3
             | {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
           .indented
-            .annict-search v-if='!form.editKey'
+            .annict-search
               h4 Annict 検索（任意）
               .inline-field-container
                 input type='search' placeholder='作品名検索フレーズ' v-model.trim='annict.keyword' @keydown.enter.prevent='searchAnnictWorks'
@@ -215,7 +215,15 @@ html lang='ja' data-theme='light'
               this.form.values = Object.assign(this.createEmptyValues(), entry)
               this.form.values.key = key
               this.form.extraTagsText = (entry.extra_tags || []).join('\n')
+              this.annict.works = []
+              this.annict.episodes = []
+              this.annict.keyword = null
               this.form.open = true
+              if (entry.annict_work_id) {
+                this.methods.getEpisodes(entry.annict_work_id)
+                  .then(episodes => {this.annict.episodes = episodes})
+                  .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+              }
             },
             cancelForm () {
               this.form.open = false
