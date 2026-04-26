@@ -730,6 +730,73 @@ NowPlaying 情報を除去して再投稿する。
 - **前提条件**: `/program/urls` が設定されていること（未設定時は 404）
 - **パラメータ**: なし
 
+##### 設定キー
+
+- `/program/urls`: マルチインスタンス共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
+- `/program/auto_update`: `true` (既定) の場合 `ProgramUpdateWorker` が 1 分ごとに `/program/urls` から pull して YAML を上書きする。**番組表エディタを使うサーバーでは `false` に設定して上書きを防ぐ**こと
+
+#### POST /mulukhiya/api/admin/program/entry
+
+番組表エントリを追加する。
+
+- **認証**: 必要（管理者のみ）
+- **前提条件**: `livecure?` が `true` の controller のみ（未対応サーバーでは 404）
+- **リクエストボディ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `key` | string | 任意 | エントリ識別子（既存と重複不可）。省略時はサーバが内容ハッシュ + ランダム要素から 12 桁の一意キーを自動生成 |
+| `series` | string | 必須 | 作品名 |
+| `episode` | integer | 任意 | 話数 |
+| `episode_suffix` | string | 任意 | 話数表記（既定「話」） |
+| `subtitle` | string | 任意 | サブタイトル |
+| `minutes` | integer | 任意 | 放送時間（分） |
+| `air` | boolean | 任意 | エア番組（実在しない／TV 放送のない番組）フラグ。`true` で「エア番組」タグが付与される |
+| `livecure` | boolean | 任意 | 実況対象フラグ |
+| `enable` | boolean | 任意 | 有効フラグ |
+| `extra_tags` | string[] | 任意 | 追加タグ |
+| `annict_work_id` | integer | 任意 | Annict 作品 ID |
+| `annict_episode_id` | integer | 任意 | Annict エピソード ID |
+| `source_type` | string | 任意 | `annict` / `youtube` / `manual`。フェーズ3〜4 のメタデータで現状未使用 |
+| `source_url` | string | 任意 | ソース URL（YouTube URL 等）。`source_type` と同じく現状未使用 |
+
+- **レスポンス**: `{key, entry}` の JSON
+- **エラー**: 既存キー重複時は 422
+
+#### PUT /mulukhiya/api/admin/program/entry/:key
+
+既存番組表エントリを更新する（部分更新）。
+
+- **認証**: 必要（管理者のみ）
+- **前提条件**: `livecure?` が `true`
+- **パスパラメータ**: `key` (string) - エントリ識別子
+- **リクエストボディ**: `POST /admin/program/entry` と同じ。`key` は無視される
+- **レスポンス**: `{key, entry}`
+- **エラー**: 該当エントリなしの場合 404
+
+#### DELETE /mulukhiya/api/admin/program/entry/:key
+
+番組表エントリを削除する。
+
+- **認証**: 必要（管理者のみ）
+- **前提条件**: `livecure?` が `true`
+- **パスパラメータ**: `key` (string)
+- **レスポンス**: `{key, entry}` (削除した内容を返す)
+- **エラー**: 該当エントリなしの場合 404
+
+#### POST /mulukhiya/api/admin/program/entry/:key/episode/increment
+
+エントリの `episode` を +1 する。`annict_work_id` が設定済みなら Annict
+から該当話数のエピソードを自動取得し、`annict_episode_id` と `subtitle`
+を更新する。Annict が未設定または該当エピソードが見つからない場合は
+`annict_episode_id` のみクリアする（subtitle は手動更新）。
+
+- **認証**: 必要（管理者のみ）
+- **前提条件**: `livecure?` が `true`
+- **パスパラメータ**: `key` (string)
+- **レスポンス**: `{key, entry}` (更新後)
+- **エラー**: 該当エントリなしの場合 404
+
 #### GET /mulukhiya/api/program/works
 
 Annict 作品をキーワード検索する。

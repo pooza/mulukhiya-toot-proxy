@@ -207,6 +207,38 @@ export const MulukhiyaLib = {
         .finally(e => indicator.hide())
     }
 
+    globals.methods.addProgramEntry = async values => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post('/mulukhiya/api/admin/program/entry', values)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    globals.methods.updateProgramEntry = async (key, values) => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.put(`/mulukhiya/api/admin/program/entry/${encodeURIComponent(key)}`, values)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    globals.methods.deleteProgramEntry = async key => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.delete(`/mulukhiya/api/admin/program/entry/${encodeURIComponent(key)}`)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
+    globals.methods.incrementProgramEpisode = async key => {
+      const indicator = new ActivityIndicator()
+      indicator.show()
+      return axios.post(`/mulukhiya/api/admin/program/entry/${encodeURIComponent(key)}/episode/increment`)
+        .then(e => e.data)
+        .finally(e => indicator.hide())
+    }
+
     globals.methods.createProgramTags = program => {
       const tags = []
       if (program) {
