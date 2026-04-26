@@ -16,7 +16,8 @@ html lang='ja' data-theme='light'
             i class='fa fa-plus'
             |  新規追加
         section.config v-if='form.open'
-          h3 {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
+          h3
+            | {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
           .indented
             .annict-search v-if='!form.editKey'
               h4 Annict 検索（任意）
@@ -28,14 +29,16 @@ html lang='ja' data-theme='light'
                   li v-for='work in annict.works' :key='work.annictId'
                     button.small @click='selectAnnictWork(work)'
                       | {{work.title}}
-                      small v-if='work.seasonYear'  ({{work.seasonYear}}年)
+                      small v-if='work.seasonYear'
+                        | ({{work.seasonYear}}年)
               .indented v-if='annict.episodes.length'
                 h5 エピソードを選択
                 ul.annict-episodes
                   li v-for='episode in annict.episodes' :key='episode.id'
                     button.small @click='selectAnnictEpisode(episode)'
                       | {{episode.numberText}}
-                      small  {{episode.title}}
+                      small
+                        | {{episode.title}}
             .field-container
               label
                 span キー (識別子)
@@ -95,7 +98,8 @@ html lang='ja' data-theme='light'
               button @click='submitForm' 保存
               button.cancel @click='cancelForm' キャンセル
         section
-          h3 番組表エントリ ({{Object.keys(entries).length}} 件)
+          h3
+            | 番組表エントリ ({{Object.keys(entries).length}} 件)
           p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
           table.program-entries v-if='Object.keys(entries).length'
             thead
@@ -108,17 +112,23 @@ html lang='ja' data-theme='light'
             tbody
               tr v-for='(entry, key) in entries' :key='key'
                 td.key-cell
-                  code {{key}}
+                  code
+                    | {{key}}
                 td
-                  strong {{entry.series}}
+                  strong
+                    | {{entry.series}}
                   br
                   small
-                    span v-if='entry.episode' 第{{entry.episode}}{{entry.episode_suffix || '話'}}
-                    span v-if='entry.subtitle'  「{{entry.subtitle}}」
+                    span v-if='entry.episode'
+                      | 第{{entry.episode}}{{entry.episode_suffix || '話'}}
+                    span v-if='entry.subtitle'
+                      | 「{{entry.subtitle}}」
                 td
-                  small {{formatAir(entry.air)}}
+                  small
+                    | {{formatAir(entry.air)}}
                   br v-if='entry.minutes'
-                  small v-if='entry.minutes' {{entry.minutes}}分
+                  small v-if='entry.minutes'
+                    | {{entry.minutes}}分
                 td
                   span.tag.livecure v-if='entry.livecure' 実況
                   span.tag.disabled v-if='entry.enable === false' 無効
