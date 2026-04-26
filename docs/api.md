@@ -786,7 +786,10 @@ NowPlaying 情報を除去して再投稿する。
 
 #### POST /mulukhiya/api/admin/program/entry/:key/episode/increment
 
-エントリの `episode` を +1 する。`annict_episode_id` は同時にクリアされる（次話の Annict 紐付けは手動再設定）。
+エントリの `episode` を +1 する。`annict_work_id` が設定済みなら Annict
+から該当話数のエピソードを自動取得し、`annict_episode_id` と `subtitle`
+を更新する。Annict が未設定または該当エピソードが見つからない場合は
+`annict_episode_id` のみクリアする（subtitle は手動更新）。
 
 - **認証**: 必要（管理者のみ）
 - **前提条件**: `livecure?` が `true`

@@ -661,7 +661,8 @@ module Mulukhiya
     post '/admin/program/entry/:key/episode/increment' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      entry = Program.instance.increment_episode(params[:key])
+      annict = sns.account&.annict || account_class.info_account&.annict
+      entry = Program.instance.increment_episode(params[:key], annict: annict)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e

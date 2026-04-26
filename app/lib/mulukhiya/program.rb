@@ -68,13 +68,20 @@ module Mulukhiya
       return entry
     end
 
-    def increment_episode(key)
+    def increment_episode(key, annict: nil)
       key = key.to_s
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
       entry = programs[key]
       entry['episode'] = (entry['episode'] || 0).to_i + 1
       entry['annict_episode_id'] = nil
+      if annict && entry['annict_work_id']
+        next_ep = next_annict_episode(annict, entry['annict_work_id'], entry['episode'])
+        if next_ep
+          entry['annict_episode_id'] = next_ep['annictId']
+          entry['subtitle'] = next_ep['title'] if next_ep['title']
+        end
+      end
       save(programs)
       return entry
     end
@@ -110,6 +117,18 @@ module Mulukhiya
 
     def initialize
       @http = HTTP.new
+    end
+
+    def next_annict_episode(annict, work_id, episode_number)
+      episodes = annict.episodes([work_id.to_i]) || []
+      target = episode_number.to_i
+      episodes.find do |ep|
+        match = ep['numberText'].to_s.match(/(\d+)/)
+        match && match[1].to_i == target
+      end
+    rescue => e
+      logger.error(error: e.class.name, message: e.message)
+      return nil
     end
 
     def fetch_remote
