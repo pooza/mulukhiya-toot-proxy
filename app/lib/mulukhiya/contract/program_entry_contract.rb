@@ -7,7 +7,7 @@ module Mulukhiya
       optional(:episode).value(:integer)
       optional(:episode_suffix).value(:string)
       optional(:subtitle).value(:string)
-      required(:air).value(:string)
+      optional(:air).value(:bool)
       optional(:livecure).value(:bool)
       optional(:enable).value(:bool)
       optional(:extra_tags).array(:string)
@@ -18,10 +18,6 @@ module Mulukhiya
     end
 
     rule(:series) do
-      key.failure('空欄です。') if value.to_s.empty?
-    end
-
-    rule(:air) do
       key.failure('空欄です。') if value.to_s.empty?
     end
   end

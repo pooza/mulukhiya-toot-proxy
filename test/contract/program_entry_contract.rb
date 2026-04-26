@@ -4,7 +4,6 @@ module Mulukhiya
       @contract = ProgramEntryContract.new
       @valid = {
         series: 'テスト作品',
-        air: '2026-04-26T20:00:00+09:00',
       }
     end
 
@@ -21,6 +20,7 @@ module Mulukhiya
         episode_suffix: '話',
         minutes: 30,
         subtitle: 'サブタイトル',
+        air: false,
         livecure: true,
         enable: true,
         extra_tags: ['tag1', 'tag2'],
@@ -39,12 +39,6 @@ module Mulukhiya
       assert_false(errors.empty?)
     end
 
-    def test_missing_air
-      errors = @contract.call(@valid.except(:air)).errors
-
-      assert_false(errors.empty?)
-    end
-
     def test_empty_series
       errors = @contract.call(@valid.merge(series: '')).errors
 
@@ -53,6 +47,12 @@ module Mulukhiya
 
     def test_episode_must_be_integer
       errors = @contract.call(@valid.merge(episode: 'not-a-number')).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_air_must_be_bool
+      errors = @contract.call(@valid.merge(air: 'string')).errors
 
       assert_false(errors.empty?)
     end

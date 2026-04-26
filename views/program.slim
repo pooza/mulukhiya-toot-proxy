@@ -61,11 +61,10 @@ html lang='ja' data-theme='light'
               label
                 span サブタイトル (subtitle)
                 input type='text' v-model.trim='form.values.subtitle'
-            .field-container
-              label
-                span 放送日時 (air)
-                input type='datetime-local' v-model='form.values.air'
             .inline-field-container
+              label
+                input type='checkbox' v-model='form.values.air'
+                |  エア番組 (air)
               label
                 input type='checkbox' v-model='form.values.livecure'
                 |  実況対象 (livecure)
@@ -74,8 +73,8 @@ html lang='ja' data-theme='light'
                 |  有効 (enable)
             .field-container
               label
-                span 追加タグ (extra_tags、カンマ区切り)
-                input type='text' v-model.trim='form.extraTagsText' placeholder='タグ1, タグ2'
+                span 追加タグ (extra_tags、改行区切り)
+                textarea v-model='form.extraTagsText' rows='3' placeholder='タグ1\nタグ2'
             .inline-field-container
               label
                 span Annict Work ID
@@ -106,7 +105,7 @@ html lang='ja' data-theme='light'
               tr
                 th キー
                 th 作品 / 話数
-                th 放送
+                th 放送時間
                 th フラグ
                 th 操作
             tbody
@@ -124,12 +123,10 @@ html lang='ja' data-theme='light'
                     span v-if='entry.subtitle'
                       | 「{{entry.subtitle}}」
                 td
-                  small
-                    | {{formatAir(entry.air)}}
-                  br v-if='entry.minutes'
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
                 td
+                  span.tag.air v-if='entry.air' エア
                   span.tag.livecure v-if='entry.livecure' 実況
                   span.tag.disabled v-if='entry.enable === false' 無効
                   span.tag.annict v-if='entry.annict_work_id' Annict
@@ -160,8 +157,8 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: null, subtitle: '', air: '',
-                  livecure: false, enable: true,
+                  minutes: null, subtitle: '',
+                  air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                   source_type: '', source_url: '',
                 },
@@ -181,8 +178,8 @@ html lang='ja' data-theme='light'
                 episode_suffix: '',
                 minutes: null,
                 subtitle: '',
-                air: '',
-                livecure: false,
+                air: false,
+                livecure: true,
                 enable: true,
                 annict_work_id: null,
                 annict_episode_id: null,
@@ -194,12 +191,6 @@ html lang='ja' data-theme='light'
               this.methods.getPrograms()
                 .then(e => {this.entries = e || {}})
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
-            },
-            formatAir (air) {
-              if (!air) return ''
-              const d = new Date(air)
-              if (Number.isNaN(d.getTime())) return air
-              return d.toLocaleString('ja-JP', {month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit'})
             },
             openAdd () {
               this.form.editKey = null
@@ -216,7 +207,7 @@ html lang='ja' data-theme='light'
               this.form.editKey = key
               this.form.values = Object.assign(this.createEmptyValues(), entry)
               this.form.values.key = key
-              this.form.extraTagsText = (entry.extra_tags || []).join(', ')
+              this.form.extraTagsText = (entry.extra_tags || []).join('\n')
               this.form.open = true
             },
             cancelForm () {
@@ -224,7 +215,8 @@ html lang='ja' data-theme='light'
             },
             buildPayload () {
               const v = Object.assign({}, this.form.values)
-              const extraTags = this.form.extraTagsText.split(',').map(s => s.trim()).filter(Boolean)
+              const extraTags = this.form.extraTagsText
+                .split(/\r?\n/).map(s => s.trim()).filter(Boolean)
               if (extraTags.length) v.extra_tags = extraTags
               else delete v.extra_tags
               if (!v.source_type) delete v.source_type

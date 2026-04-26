@@ -742,18 +742,18 @@ NowPlaying 情報を除去して再投稿する。
 |------|-----|------|------|
 | `key` | string | 必須 | エントリ識別子（既存と重複不可） |
 | `series` | string | 必須 | 作品名 |
-| `air` | string | 必須 | 放送日時（ISO8601） |
 | `episode` | integer | 任意 | 話数 |
 | `episode_suffix` | string | 任意 | 話数表記（既定「話」） |
 | `subtitle` | string | 任意 | サブタイトル |
 | `minutes` | integer | 任意 | 放送時間（分） |
+| `air` | boolean | 任意 | エア番組（実在しない／TV 放送のない番組）フラグ。`true` で「エア番組」タグが付与される |
 | `livecure` | boolean | 任意 | 実況対象フラグ |
 | `enable` | boolean | 任意 | 有効フラグ |
 | `extra_tags` | string[] | 任意 | 追加タグ |
 | `annict_work_id` | integer | 任意 | Annict 作品 ID |
 | `annict_episode_id` | integer | 任意 | Annict エピソード ID |
-| `source_type` | string | 任意 | `annict` / `youtube` / `manual` |
-| `source_url` | string | 任意 | ソース URL |
+| `source_type` | string | 任意 | `annict` / `youtube` / `manual`。フェーズ3〜4 のメタデータで現状未使用 |
+| `source_url` | string | 任意 | ソース URL（YouTube URL 等）。`source_type` と同じく現状未使用 |
 
 - **レスポンス**: `{key, entry}` の JSON
 - **エラー**: 既存キー重複時は 422
