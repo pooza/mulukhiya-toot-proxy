@@ -7,8 +7,13 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
 
     def update
+      return nil unless auto_update?
       return nil unless uris.any?
       return save(fetch_remote)
+    end
+
+    def auto_update?
+      return config['/program/auto_update'] != false
     end
 
     def save(programs)
@@ -34,6 +39,7 @@ module Mulukhiya
       programs = data
       loop do
         base = [
+          Environment.domain_name,
           attributes[:series] || attributes['series'],
           attributes[:episode] || attributes['episode'],
           Time.now.to_f,

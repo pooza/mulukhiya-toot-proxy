@@ -164,5 +164,9 @@ module Mulukhiya
     ensure
       @program.save(original) if original
     end
+
+    def test_auto_update_default_true
+      assert_true(@program.auto_update?)
+    end
   end
 end

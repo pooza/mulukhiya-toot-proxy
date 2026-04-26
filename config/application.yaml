@@ -470,6 +470,7 @@ postgres:
   slow_query:
     seconds: 3
 program:
+  auto_update: true
   urls: []
 puma:
   pidfile: tmp/pids/puma.pid

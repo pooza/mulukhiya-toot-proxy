@@ -730,6 +730,11 @@ NowPlaying 情報を除去して再投稿する。
 - **前提条件**: `/program/urls` が設定されていること（未設定時は 404）
 - **パラメータ**: なし
 
+##### 設定キー
+
+- `/program/urls`: マルチインスタンス共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
+- `/program/auto_update`: `true` (既定) の場合 `ProgramUpdateWorker` が 1 分ごとに `/program/urls` から pull して YAML を上書きする。**番組表エディタを使うサーバーでは `false` に設定して上書きを防ぐ**こと
+
 #### POST /mulukhiya/api/admin/program/entry
 
 番組表エントリを追加する。
