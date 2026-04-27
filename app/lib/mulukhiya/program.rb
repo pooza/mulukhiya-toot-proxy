@@ -122,12 +122,12 @@ module Mulukhiya
     def next_annict_episode(annict, work_id, episode_number)
       episodes = annict.episodes([work_id.to_i]) || []
       target = episode_number.to_i
-      episodes.find do |ep|
+      return episodes.find do |ep|
         match = ep['numberText'].to_s.match(/(\d+)/)
         match && match[1].to_i == target
       end
     rescue => e
-      logger.error(error: e.class.name, message: e.message)
+      e.alert
       return nil
     end
 

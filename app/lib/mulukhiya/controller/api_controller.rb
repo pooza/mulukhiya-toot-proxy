@@ -618,7 +618,7 @@ module Mulukhiya
       @renderer.message = {key:, entry:}
       return @renderer.to_s
     rescue => e
-      e.log
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -638,7 +638,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.log
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -652,7 +652,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.log
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -666,7 +666,7 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.log
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

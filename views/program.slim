@@ -132,7 +132,7 @@ html lang='ja' data-theme='light'
                 td
                   span.tag.livecure v-if='entry.livecure' ✔
                 td
-                  span.tag.disabled v-if='entry.enable' ✔
+                  span.tag.enable v-if='entry.enable' ✔
                 td.actions
                   button.small.danger @click.stop='deleteEntry(key)' v-tooltip.top="'削除'"
                     i class='fa fa-trash'
