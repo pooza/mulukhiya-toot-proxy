@@ -96,19 +96,13 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
-## 次期マイルストーン: 5.20.0
-
-- #4236 フェーズ2: 番組表エディタの実装（親: #4234 番組表リニューアル、前提: #4235）
-- #4256 feat: /sw/register にレート制限を導入（5.19.0 リリース前レビュー R4 の送り）
-- #4259 feat: /sw/register の SSRF 検査強化（R3 の送り、DNS 解決 or allowlist）
-- #4262 fix: register_sw_subscription の存在チェックから sendReadMessage を除外（5.19.0 Codex P2 の送り、冪等性）
-
-## 次々期マイルストーン: 5.21.0
+## 次期マイルストーン: 5.21.0
 
 - #4237 フェーズ3: エピソードブラウザのコピペ依存廃止、旧スプレッドシート運用停止（親: #4234 番組表リニューアル、前提: #4236）
 - #4258 APIController: params[:token] フォールバック完全廃止（capsicum プリセットサーバー全台 5.18+ 確認済み、2026-04-22）
+- #4269〜#4280 5.20.0 リリース前レビュー（5 観点並列）の赤・黄送り（12 件、番組表エディタ DoS 緩和 / Program SSoT 排他制御 / SSRF DNS 解決検証 / 観測性・表記揺れ等）
 
-## 隙間: 5.22.0
+## 次々期マイルストーン: 5.22.0
 
 - #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 - #4265 大容量メディアアップロードで Mastodon 本家が 413 を返す問題の調査・対応検討（Sentry MULUKHIYA-TOOT-PROXY-1T、ダイスキーで観測・他サーバー共通）
@@ -124,6 +118,18 @@ git diff Gemfile.lock
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
+
+## リリース済み: 5.20.0（2026-04-28）
+
+番組表エディタ実装（フェーズ2）、/sw/register 強化、リリース前レビュー赤対応。
+
+- **#4236 feat: 番組表エディタ（フェーズ2）の実装** — admin 限定 CRUD UI、Annict 検索連携で `series` / `subtitle` / `episode` / `annict_work_id` / `annict_episode_id` を自動補完。`var/program.yaml` を Single Source of Truth とする
+- **#4256 feat: POST /mulukhiya/api/sw/register にレート制限を導入** — `RateLimitStorage` 新規追加、アカウント単位で window 内回数制限（5.19.0 リリース前レビュー R4 の送り）
+- **#4259 feat: /sw/register に endpoint ホスト allowlist を追加** — `config['/sw/register/allowed_hosts']` で許可ホストを設定可能（空 = 無制限）（5.19.0 R3 の送り）
+- **#4262 fix: register_sw_subscription の存在チェックから sendReadMessage を除外** — 5.19.0 Codex P2 の送り、冪等性
+- **リリース前レビュー赤対応** — `/admin/program/entry` 4 ルートの `e.log` → `e.alert` 昇格、`Program#next_annict_episode` の独自 logger を `e.alert` に統一、`views/program.slim` 有効列の命名修正
+- **bundle update** — nokogiri 1.19.3
+- **積み残し**: 5 観点並列レビューの赤・黄を Issue 化（#4269〜#4280、12 件）→ 5.21.0 で対応
 
 ## リリース済み: 5.19.1（2026-04-23）
 
