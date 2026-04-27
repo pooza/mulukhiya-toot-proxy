@@ -18,81 +18,82 @@ html lang='ja' data-theme='light'
         section.config v-if='form.open'
           h3
             | {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
-          .indented
-            .annict-search
-              h4 Annict 検索（任意）
-              .inline-field-container
-                input type='search' placeholder='作品名検索フレーズ' v-model.trim='annict.keyword' @keydown.enter.prevent='searchAnnictWorks'
-                button @click='searchAnnictWorks' 検索
-              .indented v-if='annict.works.length'
-                ul.annict-works
-                  li v-for='work in annict.works' :key='work.annictId'
-                    button.option @click='selectAnnictWork(work)'
-                      | {{work.title}}
-                      small v-if='work.seasonYear'
-                        | ({{work.seasonYear}}年)
-              .indented v-if='annict.episodes.length'
-                h5 エピソードを選択
-                ul.annict-episodes
-                  li v-for='episode in annict.episodes' :key='episode.annictId'
-                    button.option @click='selectAnnictEpisode(episode)'
-                      | {{episode.numberText}}
-                      small
-                        | {{episode.title}}
-            .field-container v-if='form.editKey'
-              label
-                span キー (識別子)
-                code.key-readonly
-                  | {{form.editKey}}
-            .field-container v-else=''
-              label
-                span キー (識別子)
-                small 空欄で自動生成（登録内容のハッシュから一意キーを生成）
-                input type='text' v-model.trim='form.values.key' placeholder='省略可（自動生成）'
+          .annict-search
             .field-container
-              label
-                span 作品名 (series)
-                input type='text' v-model.trim='form.values.series' placeholder='作品名'
-            .inline-field-container
-              label
-                span 話数 (episode)
-                input.short type='number' v-model.number='form.values.episode' min='0'
-              label
-                span 話数表記 (episode_suffix)
-                input.short type='text' v-model.trim='form.values.episode_suffix' placeholder='話'
-              label
-                span 放送時間 (minutes)
-                input.short type='number' v-model.number='form.values.minutes' min='0'
-            .field-container
-              label
-                span サブタイトル (subtitle)
-                input type='text' v-model.trim='form.values.subtitle'
-            .inline-field-container
-              label
-                input type='checkbox' v-model='form.values.air'
-                |  エア番組 (air)
-              label
-                input type='checkbox' v-model='form.values.livecure'
-                |  実況対象 (livecure)
-              label
-                input type='checkbox' v-model='form.values.enable'
-                |  有効 (enable)
-            .field-container
-              label
-                span 追加タグ (extra_tags)
-                small 改行区切りでタグを列挙（タグ先頭の # は省略）
-                textarea v-model='form.extraTagsText' rows='3'
-            .inline-field-container
-              label
-                span Annict Work ID
-                input.short type='number' v-model.number='form.values.annict_work_id' min='0'
-              label
-                span Annict Episode ID
-                input.short type='number' v-model.number='form.values.annict_episode_id' min='0'
-            .field-update-button-container
-              button @click='submitForm' 保存
-              button.cancel @click='cancelForm' キャンセル
+              input type='search' placeholder='作品名検索フレーズ' v-model.trim='annict.keyword' @keydown.enter.prevent='searchAnnictWorks'
+              button @click='searchAnnictWorks' 検索
+            .indented v-if='annict.works.length'
+              h4 作品を選択
+              ul.annict-works
+                li v-for='work in annict.works' :key='work.annictId'
+                  button.option @click='selectAnnictWork(work)'
+                    | {{work.title}}
+                    small v-if='work.seasonYear'
+                      | ({{work.seasonYear}}年)
+            .indented v-if='annict.episodes.length'
+              h4 エピソードを選択
+              ul.annict-episodes
+                li v-for='episode in annict.episodes' :key='episode.annictId'
+                  button.option @click='selectAnnictEpisode(episode)'
+                    | {{episode.numberText}}
+                    small
+                      | {{episode.title}}
+          .field-container v-if='form.editKey'
+            label
+              span キー (識別子)
+              code.key-readonly
+                | {{form.editKey}}
+          .field-container v-else=''
+            label
+              span 識別子
+              input type='text' v-model.trim='form.values.key' placeholder='省略可（自動生成）'
+          .field-container
+            label
+              span 作品
+              input type='text' v-model.trim='form.values.series'
+          .field-container
+            label
+              span 話数
+              input type='number' v-model.number='form.values.episode' min='0'
+          .field-container
+            label
+              span 話数表記
+              input type='text' v-model.trim='form.values.episode_suffix' placeholder='話'
+          .field-container
+            label
+              span 放送時間
+              input type='number' v-model.number='form.values.minutes' min='0' placeholder='30'
+          .field-container
+            label
+              span サブタイトル
+              input type='text' v-model.trim='form.values.subtitle'
+          .field-container
+            label
+              span 追加タグ
+              textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
+          .field-container
+            label
+              span Annict Work ID
+              input type='number' v-model.number='form.values.annict_work_id' min='0'
+          .field-container
+            label
+              span Annict Episode ID
+              input type='number' v-model.number='form.values.annict_episode_id' min='0'
+          .inline-field-container
+            label
+              input type='checkbox' v-model='form.values.air'
+              |  エア番組 (air)
+            label
+              input type='checkbox' v-model='form.values.livecure'
+              |  実況対象 (livecure)
+            label
+              input type='checkbox' v-model='form.values.enable'
+              |  有効 (enable)
+          .field-update-button-container
+            button @click='submitForm' 保存
+            button.cancel @click='cancelForm' キャンセル
         section
+          h3 エントリ一覧
           p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
           table.program-entries v-if='Object.keys(entries).length'
             thead
