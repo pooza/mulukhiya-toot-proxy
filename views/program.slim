@@ -159,12 +159,11 @@ html lang='ja' data-theme='light'
                   minutes: 30, subtitle: '',
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
-                  source_type: '', source_url: '',
                 },
               },
             }
           },
-          async created () {
+          created () {
             this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
             this.loadEntries()
           },
@@ -182,8 +181,6 @@ html lang='ja' data-theme='light'
                 enable: true,
                 annict_work_id: null,
                 annict_episode_id: null,
-                source_type: '',
-                source_url: '',
               }
             },
             loadEntries () {
@@ -226,8 +223,6 @@ html lang='ja' data-theme='light'
                 .split(/\r?\n/).map(s => s.trim()).filter(Boolean)
               if (extraTags.length) v.extra_tags = extraTags
               else delete v.extra_tags
-              if (!v.source_type) delete v.source_type
-              if (!v.source_url) delete v.source_url
               if (!v.subtitle) delete v.subtitle
               if (!v.episode_suffix) delete v.episode_suffix
               if (v.episode === null) delete v.episode
