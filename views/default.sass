@@ -513,6 +513,21 @@ section.disabled h3::after
   button.small
     font:
       size: 0.6em
+  button.option
+    margin: 0
+  input[type='search']
+    width: 10em
+  table.program-entries
+    tbody
+      tr
+        &.clickable
+          cursor: pointer
+        &.disabled td
+          background-color: rgba(0, 0, 0, 0.08) !important
+        &:hover td
+          background-color: rgba(0, 0, 0, 0.14) !important
+    td.actions
+      text-align: right
 
 nav.search-form-container
   display: block

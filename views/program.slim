@@ -27,7 +27,7 @@ html lang='ja' data-theme='light'
               .indented v-if='annict.works.length'
                 ul.annict-works
                   li v-for='work in annict.works' :key='work.annictId'
-                    button.small @click='selectAnnictWork(work)'
+                    button.option @click='selectAnnictWork(work)'
                       | {{work.title}}
                       small v-if='work.seasonYear'
                         | ({{work.seasonYear}}年)
@@ -35,7 +35,7 @@ html lang='ja' data-theme='light'
                 h5 エピソードを選択
                 ul.annict-episodes
                   li v-for='episode in annict.episodes' :key='episode.annictId'
-                    button.small @click='selectAnnictEpisode(episode)'
+                    button.option @click='selectAnnictEpisode(episode)'
                       | {{episode.numberText}}
                       small
                         | {{episode.title}}
@@ -104,21 +104,21 @@ html lang='ja' data-theme='light'
                 th エア番組
                 th 実況
                 th 有効
-                th 操作
+                th
             tbody
-              tr v-for='(entry, key) in entries' :key='key'
+              tr v-for='(entry, key) in entries' :key='key' :class="{disabled: !entry.enable, clickable: true}" @click='openEdit(key)'
                 td
-                  span v-if='entry.annict_work_id'
+                  code v-if='entry.annict_work_id'
                     | {{entry.annict_work_id}}
                   span
                     | {{entry.series}}
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click='incrementEpisode(key)' v-tooltip.top="'episode +1'"
+                  button.small @click.stop='incrementEpisode(key)' v-tooltip.top="'次回'"
                     i class='fa fa-plus'
                 td
-                  span v-if='entry.annict_episode_id'
+                  code v-if='entry.annict_episode_id'
                     | {{entry.annict_episode_id}}
                   span
                     | {{entry.subtitle}}
@@ -132,9 +132,7 @@ html lang='ja' data-theme='light'
                 td
                   span.tag.disabled v-if='entry.enable' ✔
                 td.actions
-                  button.small @click='openEdit(key)' v-tooltip.top="'編集'"
-                    i class='fa fa-pencil'
-                  button.small.danger @click='deleteEntry(key)' v-tooltip.top="'削除'"
+                  button.small.danger @click.stop='deleteEntry(key)' v-tooltip.top="'削除'"
                     i class='fa fa-trash'
     == slim.render 'fragment/footer'
     script type='module'
