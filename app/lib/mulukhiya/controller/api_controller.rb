@@ -104,6 +104,14 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
+      limit_max = config['/misskey/sw_subscription/rate_limit/max']
+      limit_window = config['/misskey/sw_subscription/rate_limit/window']
+      count = RateLimitStorage.new.increment("sw_register:#{sns.account.id}", window: limit_window)
+      if count > limit_max
+        @renderer.status = 429
+        @renderer.message = {error: 'Too Many Requests'}
+        return @renderer.to_s
+      end
       result = sns.register_sw_subscription(sns.account, params)
       subscription = result[:subscription]
       @renderer.message = {
@@ -589,6 +597,76 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/admin/program/entry' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      errors = ProgramEntryContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      attributes = params.to_h.except(:key, 'key')
+      key = params[:key].to_s
+      key = Program.instance.generate_key(attributes) if key.empty?
+      entry = Program.instance.add_entry(key, attributes)
+      @renderer.message = {key:, entry:}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/admin/program/entry/:key' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      errors = ProgramEntryContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      attributes = params.to_h.except(:key, 'key')
+      entry = Program.instance.update_entry(params[:key], attributes)
+      @renderer.message = {key: params[:key], entry:}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    delete '/admin/program/entry/:key' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      entry = Program.instance.delete_entry(params[:key])
+      raise Ginseng::NotFoundError, "キー '#{params[:key]}' が見つかりません。" unless entry
+      @renderer.message = {key: params[:key], entry:}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/admin/program/entry/:key/episode/increment' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      annict = sns.account&.annict || account_class.info_account&.annict
+      entry = Program.instance.increment_episode(params[:key], annict: annict)
+      @renderer.message = {key: params[:key], entry:}
+      return @renderer.to_s
+    rescue => e
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
