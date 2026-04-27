@@ -520,27 +520,45 @@ section.disabled h3::after
       style: solid
       color: gray
       radius: 6px
+    .field-container
+      margin: 0
   button.small
     font:
       size: 0.6em
   button.option
     margin: 0
+    small
+      font:
+        weight: normal
+        family: $serif
   input[type='text']
     width: 30em
-    padding: 0 1em
+    padding: 0 0.5em
     margin: 0
-  inputinput[type='number']
+    height: 2em
+  input[type='number']
     width: 10em
-    padding: 0 1em
+    padding: 0 0.5em
     margin: 0
+    height: 2em
   input[type='search']
     width: 30em
     padding: 0 0.5em
     padding-left: 3em
     margin: 0
+    height: 2em
+  input[type='checkbox']
+    margin: 0
   textarea
     width: 40em
+    height: 10em
+    margin: 0
+  .inline-field-container
+    margin:
+      top: 1em
   .field-container
+    margin:
+      top: 1em
     label
       width: 10em
       font:

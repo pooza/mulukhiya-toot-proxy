@@ -28,8 +28,9 @@ html lang='ja' data-theme='light'
                 li v-for='work in annict.works' :key='work.annictId'
                   button.option @click='selectAnnictWork(work)'
                     | {{work.title}}
+                    | &nbsp;
                     small v-if='work.seasonYear'
-                      | ({{work.seasonYear}}年)
+                      | {{work.seasonYear}}
             .indented v-if='annict.episodes.length'
               h4 エピソードを選択
               ul.annict-episodes
@@ -40,7 +41,7 @@ html lang='ja' data-theme='light'
                       | {{episode.title}}
           .field-container v-if='form.editKey'
             label
-              span キー (識別子)
+              span 識別子
               code.key-readonly
                 | {{form.editKey}}
           .field-container v-else=''
@@ -53,6 +54,10 @@ html lang='ja' data-theme='light'
               input type='text' v-model.trim='form.values.series'
           .field-container
             label
+              span Annict Work ID
+              input type='number' v-model.number='form.values.annict_work_id' min='0'
+          .field-container
+            label
               span 話数
               input type='number' v-model.number='form.values.episode' min='0'
           .field-container
@@ -61,34 +66,30 @@ html lang='ja' data-theme='light'
               input type='text' v-model.trim='form.values.episode_suffix' placeholder='話'
           .field-container
             label
-              span 放送時間
-              input type='number' v-model.number='form.values.minutes' min='0' placeholder='30'
-          .field-container
-            label
               span サブタイトル
               input type='text' v-model.trim='form.values.subtitle'
           .field-container
             label
-              span 追加タグ
-              textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
-          .field-container
-            label
-              span Annict Work ID
-              input type='number' v-model.number='form.values.annict_work_id' min='0'
-          .field-container
-            label
               span Annict Episode ID
               input type='number' v-model.number='form.values.annict_episode_id' min='0'
+          .field-container
+            label
+              span 放送時間
+              input type='number' v-model.number='form.values.minutes' min='0' placeholder='30'
+          .field-container
+            label
+              span 追加タグ
+              textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
           .inline-field-container
             label
               input type='checkbox' v-model='form.values.air'
-              |  エア番組 (air)
+              |  エア番組
             label
               input type='checkbox' v-model='form.values.livecure'
-              |  実況対象 (livecure)
+              |  実況対象
             label
               input type='checkbox' v-model='form.values.enable'
-              |  有効 (enable)
+              |  有効
           .field-update-button-container
             button @click='submitForm' 保存
             button.cancel @click='cancelForm' キャンセル
@@ -263,7 +264,7 @@ html lang='ja' data-theme='light'
             incrementEpisode (key) {
               this.methods.incrementProgramEpisode(key)
                 .then(_ => {
-                  Swal.fire({title: 'episode を +1 しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  Swal.fire({title: '話数を+1しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
