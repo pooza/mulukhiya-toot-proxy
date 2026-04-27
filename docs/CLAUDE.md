@@ -9,6 +9,20 @@
 - **テンプレート**: Slim / SASS
 - **ginseng-\*系gem**: 自作フレームワーク。必要に応じて全て更新してよい
 
+## 設計方針: 本体改造の最小化
+
+モロヘイヤの存在意義は「Mastodon / Misskey 本体への改造を減らす」こと。姉妹サーバーを含む本体側へのパッチを避けて、プロキシ層でふるまいを足す設計。
+
+**理由**: 本体 upstream のバージョンアップや fork 切り替え時の摩擦を最小化するため。パッチが増えるほど upgrade 工数と衝突リスクが膨らむ。
+
+**判断基準**:
+
+- 設計・実装の判断基準として常に「これは本体に手を入れずに実現できるか？」を優先する
+- 本体側 DB スキーマ変更（UNIQUE 制約追加、カラム追加等）は原則として行わない
+- モロヘイヤが本体より厳しい制約を勝手にかける選択も避ける（upgrade 整合が崩れる）
+- TOCTOU レース等、本体と同じ race を抱えている場合はむしろ「本体と揃っている」ことをもって受容する（例: Misskey `/api/sw/register` の SELECT-then-INSERT、5.19.0 R8 判断）
+- 例外として PGroonga 採用（pooza/mastodon, pooza/misskey 双方に起票済み）は検討対象。緊急ではないため折を見て実施予定
+
 ## 姉妹サーバーとコミュニティ設計
 
 モロヘイヤは複数の SNS サーバーで稼働しており、一部は「姉妹サーバー」の関係にある。
@@ -18,6 +32,12 @@
 - **姉妹関係**: デルムリン丼 ↔ ダイスキー（同一管理者）、キュアスタ！ ↔ 外部管理のダイスキー（異なる管理者）
 
 `DefaultTagHandler` は実装としてはシンプルだが、コミュニティ運用の基盤を支える重要なハンドラー。
+
+## カスタムフィードの残置（cure-api との切り分け）
+
+cure-api 独立化（#4144）でカスタム API（`/api/custom`）は完全削除されたが、**カスタムフィード**（`/feed/custom`、`custom_feed.rb` + `command_line.rb`）はモロヘイヤ側に残置されている。利用者は2名。`Open3.capture3` を使うが Bundler 環境切替が無いため EPIPE 系の問題は起きていない。
+
+cure-api 側を触るときに「カスタムフィードも一緒に整理」と思い込まないこと。両者は名前が似ているが完全に別系統。
 
 ## tomato-shrieker との連携
 
@@ -98,26 +118,68 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.21.0
 
+テーマ: 番組表フェーズ3 達成 + 番組表エディタ品質確保 + 急ぎ修正（10 件）
+
+### フェーズ3 本体
+
 - #4237 フェーズ3: エピソードブラウザのコピペ依存廃止、旧スプレッドシート運用停止（親: #4234 番組表リニューアル、前提: #4236）
+
+### 番組表系・リスク高
+
+- #4270 ProgramEntryContract に長さ・パターン制約を追加（DoS 緩和）
+- #4273 Program update_cache 失敗時に invalidate_cache でフェイルセーフ（YAML/Redis 乖離防止）
+
+### 番組表系・即効
+
+- #4274 PUT /admin/program/entry/:key を部分更新できるようにする
+- #4275 /program/works/:id/episodes の `url` が常に空文字
+- #4276 ProgramEntryContract のホワイトリスト経由で任意キーを除外
+- #4282 番組表エディタで optional フィールドを空にしてもクリアできない（PR #4266 Codex P2 送り）
+
+### 独立だが急ぎ
+
 - #4258 APIController: params[:token] フォールバック完全廃止（capsicum プリセットサーバー全台 5.18+ 確認済み、2026-04-22）
-- #4269〜#4280 5.20.0 リリース前レビュー（5 観点並列）の赤・黄送り（12 件、番組表エディタ DoS 緩和 / Program SSoT 排他制御 / SSRF DNS 解決検証 / 観測性・表記揺れ等）
+- #4267 Sinatra error ハンドラが Ginseng::Error 以外で落ちて 500 が無ログになる問題の改善
+- #4268 連合しない投稿（チャンネル / localOnly）にタグ付与ハンドラがスキップされない（bug, misskey）
 
 ## 次々期マイルストーン: 5.22.0
 
+テーマ: 5.20 レビュー黄送りの掃き出し + APIController リファクタ再開（10 件）
+
 - #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 - #4265 大容量メディアアップロードで Mastodon 本家が 413 を返す問題の調査・対応検討（Sentry MULUKHIYA-TOOT-PROXY-1T、ダイスキーで観測・他サーバー共通）
+- #4269 logger.mask_fields に endpoint を追加（Push 配信先 URL のログ漏れ対策）
+- #4271 /sw/register SSRF allowlist に DNS 解決検証 / IDN 対策を追加
+- #4272 auto_update 有効時は番組表エディタを参照専用にする
+- #4277 RateLimitStorage#increment の TTL 取り残しを防ぐ
+- #4278 番組表エディタの重複キー登録を 409 Conflict で返す（ginseng-core 改修要）
+- #4279 Program#fetch_remote にレスポンスサイズ・スキーマ検証を追加
+- #4280 docs/api.md の表記揺れ修正（インスタンス→サーバー）
+- #4283 refactor: GET /media を MediaCatalogQueryService に移設（#4233 の 1 件目）
+
+## ロードマップ仮置き
+
+Issue #4233 の APIController 段階的リファクタは「1〜2 マイルストーンに 1 件」の方針でサブ Issue 化済み。残ペースで進める想定:
+
+- 5.22.0: #4283 GET /media（最小 24 行、着手済み割当）
+- 5.23 or 5.24: #4284 POST /status/tags（中規模 26 行）
+- 5.25 以降: #4285 PUT /scheduled_status/:id/tags（最大 64 行、ロールバック含む）
+
+番組表フェーズ4（#4227, capsicum 感想投稿）はフェーズ3 完了後に on-hold 解除して 5.23+ で着手検討。
 
 ### on-hold
 
 - #4195/#4196/#4197 ユーザー向けハンドラートグル（API+UI）
 - #3877 Mastodon形式「タグづけ」復活
-- #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）
+- #4227 Annict 視聴記録・感想投稿 API の追加（capsicum エピソードブラウザからの中継）※ #4237 フェーズ3 完了後に解除検討
 - #4229 ostruct gem: gli 2.22+ で runtime 依存解消後に Gemfile から削除（gli / rails-erb-lint の更新待ち）
-- #4233 APIController: 残る長大エンドポイントの段階的リファクタ
+- #4233 APIController: 残る長大エンドポイントの段階的リファクタ（メタ Issue。サブ #4283/#4284/#4285）
 
 ### マイルストーン未設定
 
 - #3157 Annict record URL（API制約で断念済み）
+- #4284 POST /status/tags リファクタ（#4233 の 2 件目）
+- #4285 PUT /scheduled_status/:id/tags リファクタ（#4233 の 3 件目、最大）
 
 ## リリース済み: 5.20.0（2026-04-28）
 
