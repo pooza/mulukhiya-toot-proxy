@@ -509,6 +509,76 @@ section.disabled h3::after
     color: firebrick
     radius: 3px
 
+.program-editor
+  h3, h4
+    margin-top: 1em
+  .annict-search
+    margin: 1em
+    padding: 1em
+    border:
+      width: 1px
+      style: solid
+      color: gray
+      radius: 6px
+    .field-container
+      margin: 0
+  button.small
+    font:
+      size: 0.6em
+  button.option
+    margin: 0
+    small
+      font:
+        weight: normal
+        family: $serif
+  input[type='text']
+    width: 30em
+    padding: 0 0.5em
+    margin: 0
+    height: 2em
+  input[type='number']
+    width: 10em
+    padding: 0 0.5em
+    margin: 0
+    height: 2em
+  input[type='search']
+    width: 30em
+    padding: 0 0.5em
+    padding-left: 3em
+    margin: 0
+    height: 2em
+  input[type='checkbox']
+    margin: 0
+  textarea
+    width: 40em
+    height: 10em
+    margin: 0
+  .inline-field-container
+    margin:
+      top: 1em
+  .field-container
+    margin:
+      top: 1em
+    label
+      width: 10em
+      font:
+        family: $sans-serif
+  code
+    margin-right: 0.5em
+  .annict-search .indented
+    display: block
+  table.program-entries
+    tbody
+      tr
+        &.clickable
+          cursor: pointer
+        &.disabled td
+          background-color: rgba(0, 0, 0, 0.08) !important
+        &:hover td
+          background-color: papayawhip !important
+    td.actions
+      text-align: right
+
 nav.search-form-container
   display: block
   margin: 0em 1em
@@ -924,14 +994,22 @@ a:hover
       left: 15em
     font:
       size: 0.875em
-  input
+  input, select
     display: inline-block
     margin: 0 0.5em
     padding: 0 0.5em
     height: 1.5em
+    line-height: 1.5em
+    box-sizing: border-box
     flex-grow: 1
     font:
       family: $monospace
+  input[type='number']
+    -moz-appearance: textfield
+    appearance: textfield
+  input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button
+    -webkit-appearance: none
+    margin: 0
   input.short
     width: 10em
   input[type="checkbox"]
@@ -946,6 +1024,21 @@ a:hover
   .v-select
     display: inline-block
     margin: 0
+
+.annict-search
+  ul.annict-works, ul.annict-episodes
+    list:
+      style: none
+    display: flex
+    flex:
+      wrap: wrap
+    gap: 0.3em
+    padding: 0
+    margin: 0.5em 0
+    li
+      list:
+        style: none
+      margin: 0
 
 .multiselect-clear
   background: transparent
