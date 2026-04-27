@@ -6,7 +6,7 @@ html lang='ja' data-theme='light'
   body
     == slim.render 'fragment/header'
     == slim.render 'fragment/breadcrumbs', {entries: [{label: 'モロヘイヤHOME', href: '/mulukhiya'}, {label: '番組表エディタ'}]}
-    main#app v-cloak='' class=env.type
+    main#app.program-editor v-cloak='' class=env.type
       == slim.render 'fragment/message'
       h2 番組表エディタ
       p.alert v-if='!account.is_admin' 管理者のみ利用できます。
