@@ -93,42 +93,45 @@ html lang='ja' data-theme='light'
               button @click='submitForm' 保存
               button.cancel @click='cancelForm' キャンセル
         section
-          h3
-            | 番組表エントリ ({{Object.keys(entries).length}} 件)
           p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
           table.program-entries v-if='Object.keys(entries).length'
             thead
               tr
-                th キー
-                th 作品 / 話数
+                th 作品
+                th 話数
+                th サブタイトル
                 th 放送時間
-                th フラグ
+                th エア番組
+                th 実況
+                th 有効
                 th 操作
             tbody
               tr v-for='(entry, key) in entries' :key='key'
-                td.key-cell
-                  code
-                    | {{key}}
                 td
-                  strong
+                  span v-if='entry.annict_work_id'
+                    | {{entry.annict_work_id}}
+                  span
                     | {{entry.series}}
-                  br
-                  small
-                    span v-if='entry.episode'
-                      | 第{{entry.episode}}{{entry.episode_suffix || '話'}}
-                    span v-if='entry.subtitle'
-                      | 「{{entry.subtitle}}」
+                td
+                  span v-if='entry.episode'
+                    | {{entry.episode}}{{entry.episode_suffix || '話'}}
+                  button.small @click='incrementEpisode(key)' v-tooltip.top="'episode +1'"
+                    i class='fa fa-plus'
+                td
+                  span v-if='entry.annict_episode_id'
+                    | {{entry.annict_episode_id}}
+                  span
+                    | {{entry.subtitle}}
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
                 td
-                  span.tag.air v-if='entry.air' エア
-                  span.tag.livecure v-if='entry.livecure' 実況
-                  span.tag.disabled v-if='entry.enable === false' 無効
-                  span.tag.annict v-if='entry.annict_work_id' Annict
+                  span.tag.air v-if='entry.air' ✔
+                td
+                  span.tag.livecure v-if='entry.livecure' ✔
+                td
+                  span.tag.disabled v-if='entry.enable' ✔
                 td.actions
-                  button.small @click='incrementEpisode(key)' v-tooltip.top="'episode +1'"
-                    i class='fa fa-plus'
                   button.small @click='openEdit(key)' v-tooltip.top="'編集'"
                     i class='fa fa-pencil'
                   button.small.danger @click='deleteEntry(key)' v-tooltip.top="'削除'"
