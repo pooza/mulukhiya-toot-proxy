@@ -19,10 +19,28 @@ module Mulukhiya
       assert_false(@handler.executable?)
     end
 
+    def test_skips_when_channel_post_string_key
+      @handler.handle_pre_toot(
+        status_field => "つよく、やさしく、美しく。\n#キュアマーメイド",
+        'channelId' => 'channel-123',
+      )
+
+      assert_false(@handler.executable?)
+    end
+
     def test_skips_when_local_only
       @handler.handle_pre_toot(
         status_field => "つよく、やさしく、美しく。\n#キュアマーメイド",
         'localOnly' => true,
+      )
+
+      assert_false(@handler.executable?)
+    end
+
+    def test_skips_when_local_only_symbol_key
+      @handler.handle_pre_toot(
+        status_field => "つよく、やさしく、美しく。\n#キュアマーメイド",
+        :localOnly => true,
       )
 
       assert_false(@handler.executable?)
