@@ -157,7 +157,7 @@ git diff Gemfile.lock
 
 ## 次々期マイルストーン: 5.22.0
 
-テーマ: 5.20 レビュー黄送りの掃き出し + APIController リファクタ再開（10 件）
+テーマ: 5.20 レビュー黄送りの掃き出し + APIController リファクタ再開 + 番組表エディタ拡張（12 件）
 
 - #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override の検討（cure-api v3.0.2/v3.0.3 同等）
 - #4265 大容量メディアアップロードで Mastodon 本家が 413 を返す問題の調査・対応検討（Sentry MULUKHIYA-TOOT-PROXY-1T、ダイスキーで観測・他サーバー共通）
@@ -169,6 +169,8 @@ git diff Gemfile.lock
 - #4279 Program#fetch_remote にレスポンスサイズ・スキーマ検証を追加
 - #4280 docs/api.md の表記揺れ修正（インスタンス→サーバー）
 - #4283 refactor: GET /media を MediaCatalogQueryService に移設（#4233 の 1 件目）
+- #4286 番組表エディタに開始時刻欄を追加し、当日のまとめをクリップボードへコピーする（毎朝の挨拶投稿の手作業削減）
+- #4287 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4286 依存）
 
 ## ロードマップ仮置き
 
