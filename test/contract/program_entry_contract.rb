@@ -78,5 +78,47 @@ module Mulukhiya
 
       assert_equal(schema_keys, ProgramEntryContract::PARAMS_KEYS.to_set)
     end
+
+    def test_series_max_length
+      errors = @contract.call(@valid.merge(series: 'a' * 201)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_subtitle_max_length
+      errors = @contract.call(@valid.merge(subtitle: 'a' * 201)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_key_format_rejects_invalid_chars
+      errors = @contract.call(@valid.merge(key: 'invalid key!')).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_key_format_accepts_alphanumeric
+      errors = @contract.call(@valid.merge(key: 'abc-123_XYZ')).errors
+
+      assert_empty(errors)
+    end
+
+    def test_key_max_length
+      errors = @contract.call(@valid.merge(key: 'a' * 65)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_max_count
+      errors = @contract.call(@valid.merge(extra_tags: Array.new(33, 'tag'))).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_element_max_length
+      errors = @contract.call(@valid.merge(extra_tags: ['a' * 65])).errors
+
+      assert_false(errors.empty?)
+    end
   end
 end

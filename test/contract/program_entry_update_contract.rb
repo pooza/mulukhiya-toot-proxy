@@ -61,5 +61,23 @@ module Mulukhiya
 
       assert_false(errors.empty?)
     end
+
+    def test_series_max_length
+      errors = @contract.call(series: 'a' * 201).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_subtitle_max_length
+      errors = @contract.call(subtitle: 'a' * 201).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_max_count
+      errors = @contract.call(extra_tags: Array.new(33, 'tag')).errors
+
+      assert_false(errors.empty?)
+    end
   end
 end
