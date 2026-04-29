@@ -627,7 +627,7 @@ module Mulukhiya
     put '/admin/program/entry/:key' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      errors = ProgramEntryContract.new.exec(params)
+      errors = ProgramEntryUpdateContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
