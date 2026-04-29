@@ -51,6 +51,7 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
+      return [] if entries.empty?
       all_episodes = entries.flat_map do |work|
         work.dig('episodes', 'nodes').map {|ep| ep.merge('work_annict_id' => work['annictId'])}
       end
