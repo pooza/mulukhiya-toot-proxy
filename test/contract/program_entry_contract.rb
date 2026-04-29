@@ -56,5 +56,21 @@ module Mulukhiya
 
       assert_false(errors.empty?)
     end
+
+    def test_clearable_optionals_accept_nil
+      errors = @contract.call(@valid.merge(
+        minutes: nil,
+        episode: nil,
+        episode_suffix: nil,
+        subtitle: nil,
+        extra_tags: nil,
+        annict_work_id: nil,
+        annict_episode_id: nil,
+        source_type: nil,
+        source_url: nil,
+      )).errors
+
+      assert_empty(errors)
+    end
   end
 end

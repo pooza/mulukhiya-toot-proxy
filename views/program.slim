@@ -221,14 +221,13 @@ html lang='ja' data-theme='light'
               const v = Object.assign({}, this.form.values)
               const extraTags = this.form.extraTagsText
                 .split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-              if (extraTags.length) v.extra_tags = extraTags
-              else delete v.extra_tags
-              if (!v.subtitle) delete v.subtitle
-              if (!v.episode_suffix) delete v.episode_suffix
-              if (v.episode === null) delete v.episode
-              if (v.minutes === null) delete v.minutes
-              if (v.annict_work_id === null) delete v.annict_work_id
-              if (v.annict_episode_id === null) delete v.annict_episode_id
+              v.extra_tags = extraTags.length ? extraTags : null
+              if (!v.subtitle) v.subtitle = null
+              if (!v.episode_suffix) v.episode_suffix = null
+              if (!Number.isFinite(v.episode)) v.episode = null
+              if (!Number.isFinite(v.minutes)) v.minutes = null
+              if (!Number.isFinite(v.annict_work_id)) v.annict_work_id = null
+              if (!Number.isFinite(v.annict_episode_id)) v.annict_episode_id = null
               return v
             },
             submitForm () {
