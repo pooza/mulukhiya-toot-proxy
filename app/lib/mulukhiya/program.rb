@@ -158,6 +158,10 @@ module Mulukhiya
 
     def update_cache(programs)
       return redis[REDIS_KEY] = programs.to_json
+    rescue => e
+      invalidate_cache rescue nil
+      e.alert
+      return nil
     end
 
     def write_yaml(programs)
