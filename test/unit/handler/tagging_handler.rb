@@ -40,5 +40,23 @@ module Mulukhiya
 
       assert_equal(":nyatoran_anime: :pegitan_anime: :rabirin_anime:\n\n", @handler.payload[status_field])
     end
+
+    def test_skips_when_channel_post
+      @handler.clear
+      original = "本文\n本文\n#1行目\n#2行目"
+      @handler.tags.merge(['additional_tag'])
+      @handler.handle_pre_toot(status_field => original, :channelId => 'channel-123')
+
+      assert_equal(original, @handler.payload[status_field])
+    end
+
+    def test_skips_when_local_only
+      @handler.clear
+      original = "本文\n本文\n#1行目\n#2行目"
+      @handler.tags.merge(['additional_tag'])
+      @handler.handle_pre_toot(status_field => original, 'localOnly' => true)
+
+      assert_equal(original, @handler.payload[status_field])
+    end
   end
 end
