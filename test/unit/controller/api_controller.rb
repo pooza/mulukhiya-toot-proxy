@@ -20,17 +20,17 @@ module Mulukhiya
       assert_equal(@plain, @controller.token)
     end
 
-    def test_token_body_decrypts_encrypted
+    def test_token_ignores_body_token_when_no_bearer
+      set_request(body: {token: @plain})
+
+      assert_nil(@controller.token)
+    end
+
+    def test_token_ignores_body_encrypted_when_no_bearer
       encrypted = @plain.encrypt
       set_request(body: {token: encrypted})
 
-      assert_equal(@plain, @controller.token)
-    end
-
-    def test_token_body_passes_plain_through
-      set_request(body: {token: @plain})
-
-      assert_equal(@plain, @controller.token)
+      assert_nil(@controller.token)
     end
 
     def test_token_returns_nil_when_absent

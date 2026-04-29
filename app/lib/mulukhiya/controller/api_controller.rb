@@ -783,14 +783,9 @@ module Mulukhiya
     end
 
     def token
-      if (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
-        bearer = Regexp.last_match(1)
-        plain = bearer.decrypt rescue bearer
-        return plain
-      end
-      return params[:token].decrypt
-    rescue
-      return params[:token]
+      return nil unless (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
+      bearer = Regexp.last_match(1)
+      return bearer.decrypt rescue bearer
     end
 
     def self.default_type
