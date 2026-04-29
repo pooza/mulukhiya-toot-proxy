@@ -1,7 +1,7 @@
 module Mulukhiya
   class ProgramEntryUpdateContract < Contract
     params do
-      optional(:key).value(:string, max_size?: ProgramEntryContract::MAX_KEY_SIZE)
+      optional(:key).value(:string)
       optional(:series).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:minutes).maybe(:integer)
       optional(:episode).maybe(:integer)
@@ -15,11 +15,6 @@ module Mulukhiya
       optional(:annict_episode_id).maybe(:integer)
       optional(:source_type).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:source_url).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
-    end
-
-    rule(:key) do
-      next if value.to_s.empty?
-      key.failure('英数字・アンダースコア・ハイフンのみ使用できます。') unless ProgramEntryContract::KEY_FORMAT.match?(value)
     end
 
     rule(:series) do
