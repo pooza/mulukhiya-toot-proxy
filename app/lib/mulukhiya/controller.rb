@@ -49,9 +49,21 @@ module Mulukhiya
 
     error do |e|
       @renderer = default_renderer_class.new
-      @renderer.status = e.status
-      @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-      e.alert
+      if e.is_a?(Ginseng::Error)
+        @renderer.status = e.status
+        @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
+        e.alert
+      else
+        @renderer.status = 500
+        @renderer.message = {error: "#{e.class.name}: #{e.message}"}
+        logger.error(
+          error: e.class.name,
+          message: e.message,
+          path: request.path,
+          backtrace: e.backtrace&.first(10),
+        )
+        Sentry.capture_exception(e) if Sentry.initialized?
+      end
       return @renderer.to_s
     end
 
