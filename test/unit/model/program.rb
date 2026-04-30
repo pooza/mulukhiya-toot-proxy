@@ -194,5 +194,28 @@ module Mulukhiya
     def test_auto_update_default_true
       assert_true(@program.auto_update?)
     end
+
+    def test_update_cache_invalidates_on_redis_write_failure
+      original = @program.data
+      @program.save({'sentinel' => {'series' => 'sentinel'}})
+
+      failing_redis = Object.new
+      unlinks = []
+      failing_redis.define_singleton_method(:[]=) {|_k, _v| raise 'simulated redis failure'}
+      failing_redis.define_singleton_method(:unlink) do |k|
+        unlinks << k
+        1
+      end
+      original_redis = @program.instance_variable_get(:@redis)
+      @program.instance_variable_set(:@redis, failing_redis)
+
+      result = @program.send(:update_cache, {'after' => {'series' => 'after'}})
+
+      assert_nil(result)
+      assert_equal([Program::REDIS_KEY], unlinks)
+    ensure
+      @program.instance_variable_set(:@redis, original_redis)
+      @program.save(original) if original
+    end
   end
 end
