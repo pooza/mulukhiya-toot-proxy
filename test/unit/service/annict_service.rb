@@ -54,6 +54,9 @@ module Mulukhiya
         assert_kind_of(String, episode['title'])
         assert_kind_of(String, episode['hashtag'])
         assert_kind_of(Ginseng::URI, episode['hashtag_uri'])
+        assert_kind_of(Ginseng::URI, episode['url'])
+        assert_predicate(episode['url'], :absolute?)
+        assert_match(%r{/works/#{id}/episodes/\d+\z}, episode['url'].to_s)
         assert_kind_of(String, episode['command_toot'])
       end
     end
@@ -100,6 +103,15 @@ module Mulukhiya
 
     def test_create_record_uri
       assert_equal('https://annict.com/works/7879/episodes/138263', AnnictService.create_record_uri(7879, 138_263).to_s)
+    end
+
+    def test_create_episode_uri
+      assert_equal(
+        'https://annict.com/works/7879/episodes/138263',
+        AnnictService.create_episode_uri(7879, 138_263).to_s,
+      )
+      assert_nil(AnnictService.create_episode_uri(nil, 138_263))
+      assert_nil(AnnictService.create_episode_uri(7879, nil))
     end
 
     def test_create_review_uri
