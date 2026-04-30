@@ -69,6 +69,7 @@ module Mulukhiya
         name: params[:name],
         comment: params[:comment],
         isSensitive: params[:isSensitive],
+        folderId: params[:folderId],
       }.compact)
       Event.new(:post_upload, {reporter:, sns:}).dispatch(params)
       @renderer.message = JSON.parse(reporter.response.body)

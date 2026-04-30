@@ -2,6 +2,35 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.17.0（2026-04-14）
+
+Postgres ヘルスチェック・接続プール・API 認証の改善。
+
+- **#4228 fix: Postgres.health が Mastodon API 応答に依存していた問題を修正** — `SELECT 1` を直接実行。goatdeam の PostgreSQL 停止誤報を解消
+- **#4232 feat: Postgres 接続プールサイズ・タイムアウトを設定可能にする** — `/postgres/pool/{size,timeout}` を local.yaml で上書き可能に。zugoga の Sequel::PoolTimeout 対策
+- **#4223 fix: APIController で Authorization: Bearer ヘッダー認証に対応（security）** — GET クエリにトークンが漏れる問題を修正
+- **#4238 fix: Authorization ヘッダが Bearer 形式の場合のみトークンとして採用**
+- **#4207 refactor: /emoji/palettes の実装を MisskeyService に移設** — APIController を 42行 → 9行に縮小
+- **#4222 feat: メディアカタログキャッシュの管理 rake タスクを追加**
+- **#4226 docs: メディアカタログ API のレスポンス形式をドキュメントに反映**
+- **#4240/#4241 chore: puma/parallel をピン留めし bundle update 巻き込みを回避**
+
+## リリース済み: 5.16.1（2026-04-09）
+
+ホットフィックス。絵文字ショートコードのタグ化退行修正と gem 互換性修正。
+
+- **#4224 RemoteTagHandler: 絵文字ショートコードがタグとして復活する退行を修正** — `strict_key?` で strict 辞書由来キーのみ除外し、#4089 と #4217 を両立
+- **rspotify fork 参照に切替（Ruby 4.0 互換）** — mime-types 2.99.3 の SyntaxError を解消
+
+## リリース済み: 5.16.0（2026-04-07）
+
+メディアカタログ集中改善。
+
+- **#4219 メディアカタログ: ステータスURLが不正になる環境がある** — S3_ALIAS_HOST環境でドメイン・パスが不正。`/mastodon/attachment/base_url` 設定を追加
+- **#4220 メディアカタログ: 大規模インスタンスでのクエリパフォーマンス改善** — Redisキャッシュ+Sidekiq定期ジョブ+カーソルページング
+- **#4221 emoji/palettes API: scopeカラムのARRAYリテラル型不一致** — capsicumから修正済み・動作確認完了
+- **ginseng-postgres#96 SQLインジェクション対策** — QueryTemplate#escape追加、全テンプレート適用
+
 ## リリース済み: 5.15.0（2026-04-06）
 
 メディアカタログ API パフォーマンス改善、リモート isCat 判定 API、各種バグ修正。

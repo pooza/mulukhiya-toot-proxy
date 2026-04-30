@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: a9a168441a84aff8b01b19d664c4d6a6d031d20f
+  revision: 5bd07e3047b6067909bb7137302d1a7c10385daf
   branch: main
   specs:
-    ginseng-fediverse (1.8.22)
+    ginseng-fediverse (1.8.23)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -500,7 +500,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-  ruby 4.0.2
+  ruby 4.0.3
 
 BUNDLED WITH
   4.0.10
