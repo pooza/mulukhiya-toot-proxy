@@ -30,7 +30,7 @@ module Mulukhiya
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
       raise Ginseng::ValidateError, "キー '#{key}' は既に存在します。" if programs.key?(key)
-      programs[key] = attributes.transform_keys(&:to_s)
+      programs[key] = attributes.transform_keys(&:to_s).compact
       save(programs)
       return programs[key]
     end
@@ -54,7 +54,13 @@ module Mulukhiya
       key = key.to_s
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
-      programs[key].merge!(attributes.transform_keys(&:to_s))
+      attributes.each do |k, v|
+        if v.nil?
+          programs[key].delete(k.to_s)
+        else
+          programs[key][k.to_s] = v
+        end
+      end
       save(programs)
       return programs[key]
     end
