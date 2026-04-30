@@ -72,5 +72,11 @@ module Mulukhiya
 
       assert_empty(errors)
     end
+
+    def test_params_keys_match_schema_definition
+      schema_keys = ProgramEntryContract.schema.key_map.map(&:name).to_set(&:to_sym)
+
+      assert_equal(schema_keys, ProgramEntryContract::PARAMS_KEYS.to_set)
+    end
   end
 end

@@ -1,5 +1,11 @@
 module Mulukhiya
   class ProgramEntryContract < Contract
+    PARAMS_KEYS = [
+      :key, :series, :minutes, :episode, :episode_suffix, :subtitle,
+      :air, :livecure, :enable, :extra_tags,
+      :annict_work_id, :annict_episode_id, :source_type, :source_url
+    ].freeze
+
     params do
       optional(:key).value(:string)
       required(:series).value(:string)
