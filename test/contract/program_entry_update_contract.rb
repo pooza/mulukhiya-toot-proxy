@@ -61,5 +61,38 @@ module Mulukhiya
 
       assert_false(errors.empty?)
     end
+
+    def test_series_max_length
+      errors = @contract.call(series: 'a' * 201).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_subtitle_max_length
+      errors = @contract.call(subtitle: 'a' * 201).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_max_count
+      errors = @contract.call(extra_tags: Array.new(33, 'tag')).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_legacy_key_passes_for_update
+      # PUT は URL :key (route 識別子) で既存エントリを指す。Code path 上は
+      # body の :key は controller 側で除外されるが、Sinatra の params は
+      # URL :key を含むため contract も通過させる必要がある。
+      errors = @contract.call(key: 'legacy/key with spaces and$pecial:chars', episode: 5).errors
+
+      assert_empty(errors)
+    end
+
+    def test_legacy_long_key_passes_for_update
+      errors = @contract.call(key: 'a' * 200, episode: 5).errors
+
+      assert_empty(errors)
+    end
   end
 end
