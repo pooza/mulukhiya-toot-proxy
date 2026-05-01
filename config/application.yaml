@@ -601,7 +601,7 @@ sidekiq:
       every: 5m
     media_catalog_update:
       class: Mulukhiya::MediaCatalogUpdateWorker
-      every: 3m
+      every: 30m
     media_cleaning:
       class: Mulukhiya::MediaCleaningWorker
       every: 10m
