@@ -2,6 +2,22 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.18.0（2026-04-17）
+
+番組表永続化・Postgres ヘルスチェック改善・is_cat キャッシュ制御・puma/parallel メジャー更新。
+
+- **#4235 feat: 番組表の永続 YAML ストア導入・Program クラス差し替え** — `var/program.yaml` を Single Source of Truth とし Redis は読みキャッシュに。外部 URL pull 機構は維持、既存 API 契約は変更なし
+- **#4244 feat: Postgres.health に WARN 分類、通知にヒステリシス導入** — プール枯渇を WARN として区別し、スポット誤報を抑制
+- **#4248 feat: is_cat キャッシュの TTL を設定可能にし、デフォルトを 6 時間に短縮**
+- **#4249 feat: is_cat キャッシュ管理の rake タスクを追加**
+- **#4245 fix: base.yaml の top-level required を merged 検証前提に見直し** — ginseng-core #477 追随
+- **#4243 fix: postgres.pool.size の既定値を 4 → 10 に引き上げ** — Sequel::PoolTimeout を回避
+- **#4247 fix: fetch_actor が ActivityPub レスポンスをパースできていなかった**
+- **fix: Misskey メディアカタログの next_cursor を note_id ベースに修正**（Codex レビュー指摘）
+- **fix: Ginseng::ApplicationError を Ginseng::Error に修正**（Sentry MULUKHIYA-TOOT-PROXY-10）
+- **#4241 chore: parallel 2.0 へ更新**
+- **#4240 chore: puma 8.0 へ更新** — 明示的に `tcp://0.0.0.0` を bind
+
 ## リリース済み: 5.17.0（2026-04-14）
 
 Postgres ヘルスチェック・接続プール・API 認証の改善。
