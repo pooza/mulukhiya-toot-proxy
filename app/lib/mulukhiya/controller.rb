@@ -55,13 +55,8 @@ module Mulukhiya
         e.alert
       else
         @renderer.status = 500
-        @renderer.message = {error: "#{e.class.name}: #{e.message}"}
-        logger.error(
-          error: e.class.name,
-          message: e.message,
-          path: request.path,
-          backtrace: e.backtrace&.first(10),
-        )
+        @renderer.message = {error: 'Internal Server Error'}
+        e.log(path: request.path)
         Sentry.capture_exception(e) if Sentry.initialized?
       end
       return @renderer.to_s
