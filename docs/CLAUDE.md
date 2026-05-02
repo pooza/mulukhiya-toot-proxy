@@ -157,7 +157,7 @@ git diff Gemfile.lock
 
 ## 次々期マイルストーン: 5.22.0
 
-テーマ: **番組表リニューアル フェーズ4 達成**（Annict 感想投稿 API） + 5.21 レビュー黄送りの掃き出し + 番組表エディタ品質強化（18 件 / 28 重み）
+テーマ: **番組表リニューアル フェーズ4 達成**（Annict 感想投稿 API） + 5.21 レビュー黄送りの掃き出し + 番組表エディタ品質強化（15 件 / 25 重み）
 
 ### 主軸: 番組表リニューアル フェーズ4
 
@@ -187,17 +187,14 @@ git diff Gemfile.lock
 ### リファクタ・整理
 
 - #4283 refactor: GET /media を MediaCatalogQueryService に移設（#4233 の 1 件目、size:S）
-- #4313 ProgramEntryUpdateContract の params 抽出順序整理（size:S）
-- #4316 Program#update_cache の rescue 整理と文脈付与（size:S）
 
 ### docs・機能
 
 - #4269 logger.mask_fields に endpoint を追加（Push URL ログ漏れ対策、size:S）
-- #4280 docs/api.md の表記揺れ修正（インスタンス→サーバー、size:S）
 
 ## 次々々期マイルストーン: 5.23.0
 
-テーマ: 調査系 + 番組表エディタ拡張 + 表記改善（8 件 / 16 重み）
+テーマ: 調査系 + 番組表エディタ拡張 + 表記改善・小掃除（11 件 / 19 重み）
 
 ### 調査・運用検証
 
@@ -210,8 +207,14 @@ git diff Gemfile.lock
 - #4286 番組表エディタに開始時刻欄を追加 + 当日まとめクリップボードコピー（毎朝の挨拶投稿の手作業削減、size:M）
 - #4287 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4286 依存、size:M）
 
-### 表記改善・整理（5.21 黄送り）
+### リファクタ・観測性（5.22 から繰越）
 
+- #4313 ProgramEntryUpdateContract の params 抽出順序整理（size:S）
+- #4316 Program#update_cache の rescue 整理と文脈付与（size:S）
+
+### docs・表記改善（5.21 黄送り + 5.22 から繰越）
+
+- #4280 docs/api.md の表記揺れ修正（インスタンス→サーバー、size:S）
 - #4314 docs/api.md に ProgramEntryContract 上限値・null セマンティクス補記（size:S）
 - #4318 ProgramEntryContract のエラーメッセージにフィールド名（size:S）
 - #4319 tagging_handler.rb / program.rb の暗黙 return 修正（size:S）
