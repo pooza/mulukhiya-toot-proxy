@@ -40,6 +40,22 @@ module Mulukhiya
       assert_kind_of(Hash, @program.data)
     end
 
+    def test_data_normalizes_extra_tags_to_array
+      key_missing = "test_extra_missing_#{Time.now.to_i}"
+      key_present = "test_extra_present_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(
+        key_missing => {'series' => 'A'},
+        key_present => {'series' => 'B', 'extra_tags' => ['tag1', 'tag2']},
+      )
+      data = @program.data
+
+      assert_equal([], data[key_missing]['extra_tags'])
+      assert_equal(['tag1', 'tag2'], data[key_present]['extra_tags'])
+    ensure
+      @program.save(original) if original
+    end
+
     def test_count
       assert_predicate(@program.count, :positive?)
     end

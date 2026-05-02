@@ -22,7 +22,10 @@ module Mulukhiya
     end
 
     def data
-      return cached_data || load_from_yaml
+      raw = cached_data || load_from_yaml
+      return raw.transform_values do |entry|
+        entry.merge('extra_tags' => entry['extra_tags'] || [])
+      end
     end
 
     def add_entry(key, attributes)
