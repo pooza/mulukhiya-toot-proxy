@@ -6,6 +6,17 @@ module Mulukhiya
 
     def handle_pre_toot(payload, params = {})
       self.payload = payload
+      return if non_federated_payload?
+      rebuild_status_with_tags
+    end
+
+    def self.normalize_rules
+      return new.handler_config(:normalize, :rules) || []
+    end
+
+    private
+
+    def rebuild_status_with_tags
       lines = status_lines.clone
       lines.clone.reverse_each do |line|
         break unless tags_line?(line)
@@ -16,12 +27,6 @@ module Mulukhiya
       lines.push(tags.create_tags.join(' '))
       parser.text = payload[text_field] = lines.join("\n")
     end
-
-    def self.normalize_rules
-      return new.handler_config(:normalize, :rules) || []
-    end
-
-    private
 
     def tags_line?(line)
       return /^[[:blank:]]*(#[[:word:]]+[[:blank:]]*)+$/.match?(line)

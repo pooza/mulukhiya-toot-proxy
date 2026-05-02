@@ -105,6 +105,32 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    def test_update_entry_clears_key_when_value_is_nil
+      key = "test_clear_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'subtitle' => 'old', 'episode' => 3})
+      entry = @program.update_entry(key, 'subtitle' => nil)
+
+      assert_not_includes(entry.keys, 'subtitle')
+      assert_equal('A', entry['series'])
+      assert_equal(3, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_add_entry_drops_nil_attributes
+      key = "test_addnil_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'A', 'subtitle' => nil, 'episode' => 1)
+
+      assert_equal('A', entry['series'])
+      assert_equal(1, entry['episode'])
+      assert_not_includes(entry.keys, 'subtitle')
+    ensure
+      @program.save(original) if original
+    end
+
     def test_delete_entry_removes_key
       key = "test_delete_#{Time.now.to_i}"
       original = @program.data
@@ -167,6 +193,29 @@ module Mulukhiya
 
     def test_auto_update_default_true
       assert_true(@program.auto_update?)
+    end
+
+    def test_update_cache_invalidates_on_redis_write_failure
+      original = @program.data
+      @program.save({'sentinel' => {'series' => 'sentinel'}})
+
+      failing_redis = Object.new
+      unlinks = []
+      failing_redis.define_singleton_method(:[]=) {|_k, _v| raise 'simulated redis failure'}
+      failing_redis.define_singleton_method(:unlink) do |k|
+        unlinks << k
+        1
+      end
+      original_redis = @program.instance_variable_get(:@redis)
+      @program.instance_variable_set(:@redis, failing_redis)
+
+      result = @program.send(:update_cache, {'after' => {'series' => 'after'}})
+
+      assert_nil(result)
+      assert_equal([Program::REDIS_KEY], unlinks)
+    ensure
+      @program.instance_variable_set(:@redis, original_redis)
+      @program.save(original) if original
     end
   end
 end

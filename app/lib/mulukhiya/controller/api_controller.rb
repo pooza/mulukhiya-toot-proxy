@@ -611,7 +611,8 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.except(:key, 'key')
+      attributes = params.to_h.transform_keys(&:to_sym)
+        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
       key = params[:key].to_s
       key = Program.instance.generate_key(attributes) if key.empty?
       entry = Program.instance.add_entry(key, attributes)
@@ -627,13 +628,14 @@ module Mulukhiya
     put '/admin/program/entry/:key' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
-      errors = ProgramEntryContract.new.exec(params)
+      errors = ProgramEntryUpdateContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.except(:key, 'key')
+      attributes = params.to_h.transform_keys(&:to_sym)
+        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
       entry = Program.instance.update_entry(params[:key], attributes)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
@@ -783,14 +785,9 @@ module Mulukhiya
     end
 
     def token
-      if (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
-        bearer = Regexp.last_match(1)
-        plain = bearer.decrypt rescue bearer
-        return plain
-      end
-      return params[:token].decrypt
-    rescue
-      return params[:token]
+      return nil unless (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
+      bearer = Regexp.last_match(1)
+      return bearer.decrypt rescue bearer
     end
 
     def self.default_type

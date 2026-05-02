@@ -197,6 +197,13 @@ module Mulukhiya
       return handler_config(:toggleable) == true
     end
 
+    def non_federated_payload?
+      return false unless payload
+      return true if payload[:channelId].present? || payload['channelId'].present?
+      return true if payload[:localOnly] == true || payload['localOnly'] == true
+      return false
+    end
+
     def payload=(payload)
       @payload = payload
       @status = payload[text_field] || payload[text_field.to_sym] || ''

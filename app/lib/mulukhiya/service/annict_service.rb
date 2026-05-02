@@ -51,21 +51,30 @@ module Mulukhiya
 
     def episodes(ids)
       return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      all_episodes = entries.flat_map {|v| v.dig('episodes', 'nodes')}
+      return [] if entries.empty?
+      all_episodes = entries.flat_map do |work|
+        work.dig('episodes', 'nodes').map {|ep| ep.merge('work_annict_id' => work['annictId'])}
+      end
+      work_title = entries.first['title']
       return Parallel.map(all_episodes, in_threads: Parallel.processor_count * 2) do |episode|
-        next unless subtitle = episode['title']
-        episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
-        episode.merge(
-          'hashtag' => episode['title'].to_hashtag,
-          'hashtag_uri' => sns.create_tag_uri(episode['title']),
-          'command_toot' => self.class.create_command_toot(
-            title: entries.first['title'],
-            subtitle: episode['title'],
-            number_text: episode['numberText'],
-            minutes: config['/webui/episode/minutes'],
-          ),
-        )
+        enrich_episode(episode, work_title)
       end.compact
+    end
+
+    def enrich_episode(episode, work_title)
+      return nil unless subtitle = episode['title']
+      episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
+      return episode.merge(
+        'hashtag' => episode['title'].to_hashtag,
+        'hashtag_uri' => sns.create_tag_uri(episode['title']),
+        'url' => self.class.create_episode_uri(episode['work_annict_id'], episode['annictId']),
+        'command_toot' => self.class.create_command_toot(
+          title: work_title,
+          subtitle: episode['title'],
+          number_text: episode['numberText'],
+          minutes: config['/webui/episode/minutes'],
+        ),
+      )
     end
 
     def crawl(params = {})
@@ -240,6 +249,11 @@ module Mulukhiya
 
     def self.create_record_uri(work_id, episode_id)
       return new.service.create_uri("/works/#{work_id}/episodes/#{episode_id}")
+    end
+
+    def self.create_episode_uri(work_id, episode_id)
+      return nil unless work_id.present? && episode_id.present?
+      return create_record_uri(work_id, episode_id)
     end
 
     def self.create_review_uri(work_id)

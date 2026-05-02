@@ -56,5 +56,69 @@ module Mulukhiya
 
       assert_false(errors.empty?)
     end
+
+    def test_clearable_optionals_accept_nil
+      errors = @contract.call(@valid.merge(
+        minutes: nil,
+        episode: nil,
+        episode_suffix: nil,
+        subtitle: nil,
+        extra_tags: nil,
+        annict_work_id: nil,
+        annict_episode_id: nil,
+        source_type: nil,
+        source_url: nil,
+      )).errors
+
+      assert_empty(errors)
+    end
+
+    def test_params_keys_match_schema_definition
+      schema_keys = ProgramEntryContract.schema.key_map.map(&:name).to_set(&:to_sym)
+
+      assert_equal(schema_keys, ProgramEntryContract::PARAMS_KEYS.to_set)
+    end
+
+    def test_series_max_length
+      errors = @contract.call(@valid.merge(series: 'a' * 201)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_subtitle_max_length
+      errors = @contract.call(@valid.merge(subtitle: 'a' * 201)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_key_format_rejects_invalid_chars
+      errors = @contract.call(@valid.merge(key: 'invalid key!')).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_key_format_accepts_alphanumeric
+      errors = @contract.call(@valid.merge(key: 'abc-123_XYZ')).errors
+
+      assert_empty(errors)
+    end
+
+    def test_key_max_length
+      errors = @contract.call(@valid.merge(key: 'a' * 65)).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_max_count
+      errors = @contract.call(@valid.merge(extra_tags: Array.new(33, 'tag'))).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_extra_tags_element_max_length
+      errors = @contract.call(@valid.merge(extra_tags: ['a' * 65])).errors
+
+      assert_false(errors.empty?)
+    end
   end
 end

@@ -49,9 +49,16 @@ module Mulukhiya
 
     error do |e|
       @renderer = default_renderer_class.new
-      @renderer.status = e.status
-      @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
-      e.alert
+      if e.is_a?(Ginseng::Error)
+        @renderer.status = e.status
+        @renderer.message = e.to_h.except(:backtrace).merge(error: e.message)
+        e.alert
+      else
+        @renderer.status = 500
+        @renderer.message = {error: 'Internal Server Error'}
+        e.log(path: request.path)
+        Sentry.capture_exception(e) if Sentry.initialized?
+      end
       return @renderer.to_s
     end
 
