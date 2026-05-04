@@ -23,8 +23,9 @@ module Mulukhiya
 
     def data
       raw = cached_data || load_from_yaml
-      return raw.transform_values do |entry|
-        entry.merge('extra_tags' => entry['extra_tags'] || [])
+      return raw.each_with_object({}) do |(key, entry), result|
+        next unless entry.is_a?(Hash)
+        result[key] = entry.merge('extra_tags' => entry['extra_tags'] || [])
       end
     end
 
