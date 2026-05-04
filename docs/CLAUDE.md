@@ -149,14 +149,14 @@ git diff Gemfile.lock
 - #4309 APIController#token の Bearer 経路で復号後の nil/空チェック（size:S）— **2026-05-04 develop 反映済み**
 - #4310 AnnictService#enrich_episode の dup ガード（size:S）— **2026-05-04 develop 反映済み**
 - #4311 Handler#non_federated_payload? の真偽判定・key 判定正規化（size:S）— **2026-05-04 develop 反映済み**
-- #4312 ProgramEntryContract source_url にスキーム検証（size:S）
+- #4312 ProgramEntryContract source_url にスキーム検証（size:S）— **2026-05-04 develop 反映済み**
 - #4315 AnnictService#episodes 戻り値を nil/[] に統一（size:S）— **2026-05-04 develop 反映済み**
 - #4317 Controller#error の Sentry.capture_exception を rescue で防御（size:S）— **2026-05-04 develop 反映済み**
 
 ### 番組表系・運用品質
 
 - #4271 /sw/register SSRF allowlist に DNS 解決検証 / IDN 対策（size:M）
-- #4277 RateLimitStorage#increment の TTL 取り残しを防ぐ（size:S）
+- #4277 RateLimitStorage#increment の TTL 取り残しを防ぐ（size:S）— **2026-05-04 develop 反映済み**
 - #4278 番組表エディタの重複キー登録を 409 Conflict（ginseng-core 改修要、size:M）
 - #4279 Program#fetch_remote にレスポンスサイズ・スキーマ検証（size:M）
 
@@ -166,7 +166,7 @@ git diff Gemfile.lock
 
 ### docs・機能
 
-- #4269 logger.mask_fields に endpoint を追加（Push URL ログ漏れ対策、size:S）
+- #4269 logger.mask_fields に endpoint を追加（Push URL ログ漏れ対策、size:S）— **2026-05-04 develop 反映済み**
 
 ## 次々期マイルストーン: 5.23.0
 
