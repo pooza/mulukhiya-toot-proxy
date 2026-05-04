@@ -50,8 +50,8 @@ module Mulukhiya
     end
 
     def episodes(ids)
-      return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      return [] if entries.empty?
+      entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
+      return [] unless entries.is_a?(Array) && entries.any?
       all_episodes = entries.flat_map do |work|
         work.dig('episodes', 'nodes').map {|ep| ep.merge('work_annict_id' => work['annictId'])}
       end
@@ -63,6 +63,7 @@ module Mulukhiya
 
     def enrich_episode(episode, work_title)
       return nil unless subtitle = episode['title']
+      episode = episode.dup
       episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
       return episode.merge(
         'hashtag' => episode['title'].to_hashtag,
