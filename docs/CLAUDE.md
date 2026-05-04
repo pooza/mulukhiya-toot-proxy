@@ -131,7 +131,7 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.22.0
 
-テーマ: **番組表リニューアル フェーズ4 達成**（Annict 感想投稿 API） + 5.21 レビュー黄送りの掃き出し + 番組表エディタ品質強化（15 件 / 25 重み）
+テーマ: **番組表リニューアル フェーズ4 達成**（Annict 感想投稿 API） + 5.21 レビュー黄送りの掃き出し + 番組表エディタ品質強化 + 5.21.x ホットフィックス Codex 指摘対応（17 件 / 29 重み — 予算超過 +4、Annict 主軸の進捗を見て #4271/#4278/#4279 のいずれかを 5.23.0 へ送る含み）
 
 ### 主軸: 番組表リニューアル フェーズ4
 
@@ -140,16 +140,18 @@ git diff Gemfile.lock
 ### バグ修正・継続対応
 
 - #4322 perf: media_catalog 専用 Sidekiq キュー分離（default キュー詰まり防止、#4306 中期2、size:M）— 5.21.2 で cursor 化済み、本リリースで専用キュー分離
+- #4325 fix: MediaCatalogUpdateWorker の cursor が Misskey の非ユニーク順序で添付欠落（5.21.2 PR #4324 への Codex P1、size:M）
+- #4326 fix: Program#data の extra_tags 正規化を非 Hash entry でも安全にする（5.21.1 PR #4321 への Codex P1、size:S）— **2026-05-04 develop 反映済み**
 - #4308 ProgramEntryContract の未使用 source_type / source_url 整理と /program/urls 棚卸し（#4237 後始末、size:S）
 
 ### セキュリティ・堅牢化（5.21 黄送り）
 
-- #4309 APIController#token の Bearer 経路で復号後の nil/空チェック（size:S）
-- #4310 AnnictService#enrich_episode の dup ガード（size:S）
-- #4311 Handler#non_federated_payload? の真偽判定・key 判定正規化（size:S）
+- #4309 APIController#token の Bearer 経路で復号後の nil/空チェック（size:S）— **2026-05-04 develop 反映済み**
+- #4310 AnnictService#enrich_episode の dup ガード（size:S）— **2026-05-04 develop 反映済み**
+- #4311 Handler#non_federated_payload? の真偽判定・key 判定正規化（size:S）— **2026-05-04 develop 反映済み**
 - #4312 ProgramEntryContract source_url にスキーム検証（size:S）
-- #4315 AnnictService#episodes 戻り値を nil/[] に統一（size:S）
-- #4317 Controller#error の Sentry.capture_exception を rescue で防御（size:S）
+- #4315 AnnictService#episodes 戻り値を nil/[] に統一（size:S）— **2026-05-04 develop 反映済み**
+- #4317 Controller#error の Sentry.capture_exception を rescue で防御（size:S）— **2026-05-04 develop 反映済み**
 
 ### 番組表系・運用品質
 
