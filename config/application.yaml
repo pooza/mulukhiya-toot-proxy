@@ -303,6 +303,7 @@ iceshrimp:
 logger:
   mask_fields:
     - auth
+    - endpoint
     - password
     - publickey
     - secret
