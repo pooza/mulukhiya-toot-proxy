@@ -10,6 +10,7 @@ module Mulukhiya
     MAX_TAGS = 32
     MAX_TAG_SIZE = 64
     KEY_FORMAT = /\A[A-Za-z0-9_-]+\z/
+    URL_FORMAT = %r{\Ahttps?://}
 
     params do
       optional(:key).value(:string, max_size?: MAX_KEY_SIZE)
@@ -42,6 +43,11 @@ module Mulukhiya
       unless value.all? {|s| s.is_a?(String) && s.size <= MAX_TAG_SIZE}
         key.failure("文字列 (各要素 #{MAX_TAG_SIZE} 文字以下) の配列で指定してください。")
       end
+    end
+
+    rule(:source_url) do
+      next unless value.is_a?(String)
+      key.failure('http(s):// で始まる URL を指定してください。') unless URL_FORMAT.match?(value)
     end
   end
 end

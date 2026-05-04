@@ -120,5 +120,16 @@ module Mulukhiya
 
       assert_false(errors.empty?)
     end
+
+    def test_source_url_rejects_non_http_scheme
+      errors = @contract.call(@valid.merge(source_url: 'javascript:alert(1)')).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_source_url_accepts_http_and_https
+      assert_empty(@contract.call(@valid.merge(source_url: 'http://example.com/')).errors)
+      assert_empty(@contract.call(@valid.merge(source_url: 'https://example.com/')).errors)
+    end
   end
 end
