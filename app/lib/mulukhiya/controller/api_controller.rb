@@ -787,7 +787,9 @@ module Mulukhiya
     def token
       return nil unless (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
       bearer = Regexp.last_match(1)
-      return bearer.decrypt rescue bearer
+      plain = bearer.decrypt rescue bearer
+      return nil if plain.to_s.empty?
+      return plain
     end
 
     def self.default_type
