@@ -57,7 +57,7 @@ module Mulukhiya
         @renderer.status = 500
         @renderer.message = {error: 'Internal Server Error'}
         e.log(path: request.path)
-        Sentry.capture_exception(e) if Sentry.initialized?
+        Sentry.capture_exception(e) rescue nil if Sentry.initialized?
       end
       return @renderer.to_s
     end
