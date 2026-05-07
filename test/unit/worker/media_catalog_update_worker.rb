@@ -13,5 +13,9 @@ module Mulukhiya
 
       assert_boolean(result)
     end
+
+    def test_uses_dedicated_queue
+      assert_equal('media_catalog', MediaCatalogUpdateWorker.sidekiq_options['queue'])
+    end
   end
 end

@@ -302,6 +302,15 @@ properties:
           user:
             type: string
         type: object
+      capsule:
+        properties:
+          media_catalog:
+            properties:
+              concurrency:
+                minimum: 1
+                type: integer
+            type: object
+        type: object
       concurrency:
         minimum: 1
         type: integer

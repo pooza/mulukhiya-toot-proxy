@@ -1,6 +1,6 @@
 module Mulukhiya
   class MediaCatalogUpdateWorker < Worker
-    sidekiq_options retry: false
+    sidekiq_options retry: false, queue: 'media_catalog'
 
     def disable?
       return true unless controller_class.media_catalog?

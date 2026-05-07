@@ -13,6 +13,12 @@ module Mulukhiya
     sidekiq.server_middleware do |chain|
       chain.add WorkerLoggingMiddleware
     end
+    if (capsule_config = config.dig(:capsule, :media_catalog))
+      sidekiq.capsule(:media_catalog) do |cap|
+        cap.queues = ['media_catalog']
+        cap.concurrency = capsule_config[:concurrency] || 1
+      end
+    end
   end
   Sidekiq::Scheduler.enabled = true
   Sidekiq::Scheduler.dynamic = true

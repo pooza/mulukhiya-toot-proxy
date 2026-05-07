@@ -582,6 +582,9 @@ sidekiq:
   auth:
     password: null
     user: admin
+  capsule:
+    media_catalog:
+      concurrency: 1
   concurrency: 5
   dashboard:
     session:
