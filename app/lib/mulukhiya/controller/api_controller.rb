@@ -476,6 +476,31 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/annict/record' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      annict = sns.account.annict
+      raise Ginseng::AuthError, 'Annict authentication required' unless annict
+      errors = AnnictRecordContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      record = annict.create_record(
+        episode_id: params[:episode_id].to_i,
+        comment: params[:comment].presence,
+        rating_state: params[:rating_state].presence,
+      )
+      @renderer.message = {record:}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?

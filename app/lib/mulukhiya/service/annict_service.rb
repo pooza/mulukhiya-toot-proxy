@@ -78,6 +78,19 @@ module Mulukhiya
       )
     end
 
+    def create_record(episode_id:, comment: nil, rating_state: nil)
+      variables = {
+        episodeId: episode_id.to_s,
+        comment:,
+        ratingState: rating_state,
+      }.compact
+      response = query(:create_record, variables)
+      if response['errors'].present?
+        raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
+      end
+      return response.dig('data', 'createRecord', 'record')
+    end
+
     def crawl(params = {})
       return unless webhook = params[:webhook]
       touch unless updated_at
@@ -341,6 +354,11 @@ module Mulukhiya
       return true unless account = params[:account]
       return true unless account.user_config['/service/annict/theme_works_only']
       return keywords.any? {|v| activity.to_json.include?(v)}
+    end
+
+    def format_graphql_errors(errors)
+      messages = Array(errors).filter_map {|e| e.is_a?(Hash) ? e['message'] : e.to_s}
+      return messages.join('; ').presence || 'Annict GraphQL error'
     end
 
     def query(template, variables = nil)

@@ -524,6 +524,7 @@ service:
       scopes:
         default:
           - read
+          - write
     review:
       suffixes:
         bad: （評価:良くない）

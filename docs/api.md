@@ -957,6 +957,48 @@ Annict の OAuth 認可コードをアクセストークンに交換し、ユー
 }
 ```
 
+#### POST /mulukhiya/api/annict/record
+
+Annict にエピソード視聴記録（感想・レーティング）を投稿する。capsicum エピソードブラウザの感想エディタから呼び出すことを想定。
+
+- **認証**: 必須（SNS アカウントのトークン → モロヘイヤが保持する Annict トークンに解決）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ、ユーザーが Annict OAuth で **`write` スコープ込みで再認可済み**であること（5.22.0 で `write` をデフォルトスコープに追加。5.21.x までに認可済みのユーザーは再認可が必要）
+- **リクエストボディ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `episode_id` | integer | 必須 | Annict エピソード ID（正の整数） |
+| `comment` | string | 任意 | 感想テキスト。長さの上限は API レイヤでは設けない（Annict 側のサーバーバリデーションに委ねる） |
+| `rating_state` | string | 任意 | レーティング。`GREAT` / `GOOD` / `AVERAGE` / `BAD` のいずれか |
+
+- **レスポンス**: `{record}` の JSON。`record` は Annict GraphQL の `Record` オブジェクト（`id`, `annictId`, `comment`, `ratingState`, `rating`, `createdAt`）
+- **エラー**: バリデーション失敗時は 422、Annict 認証未設定時は 401、Annict GraphQL から `errors` が返った場合は 502 Bad Gateway
+
+**リクエスト例**:
+
+```json
+{
+  "episode_id": 63162,
+  "comment": "本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。",
+  "rating_state": "GREAT"
+}
+```
+
+**レスポンス例**:
+
+```json
+{
+  "record": {
+    "id": "gid://annict/Record/4141053",
+    "annictId": 4141053,
+    "comment": "本日の朝実況。...",
+    "ratingState": "GREAT",
+    "rating": null,
+    "createdAt": "2026-05-07T12:00:00Z"
+  }
+}
+```
+
 #### GET /mulukhiya/api/program/works
 
 Annict の作品をキーワード検索する。パラメータ・レスポンスの詳細は上記 P4 セクションを参照。
