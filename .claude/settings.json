@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git fetch *)"
+      "Bash(git fetch *)",
+      "Bash(sentry-cli *)",
+      "Bash(python3 -c ' *)",
+      "Bash(grep *)",
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec ruby *)",
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rake *)"
     ],
     "defaultMode": "auto"
   }
