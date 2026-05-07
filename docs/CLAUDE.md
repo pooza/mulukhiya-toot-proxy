@@ -155,7 +155,7 @@ git diff Gemfile.lock
 
 ### 番組表系・運用品質
 
-- #4271 /sw/register SSRF allowlist に DNS 解決検証 / IDN 対策（size:M）
+- #4271 /sw/register SSRF allowlist に DNS 解決検証 / IDN 対策（size:M）— **2026-05-07 develop 反映済み**（Wiki / リリースノートでの「allowed_hosts 空 = allow-all」明記はリリース時）
 - #4277 RateLimitStorage#increment の TTL 取り残しを防ぐ（size:S）— **2026-05-04 develop 反映済み**
 - #4278 番組表エディタの重複キー登録を 409 Conflict（ginseng-core 改修要、size:M）
 - #4279 Program#fetch_remote にレスポンスサイズ・スキーマ検証（size:M）— **2026-05-07 develop 反映済み**
