@@ -13,7 +13,10 @@
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rake *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rubocop *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle install)",
-      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle update *)"
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle update *)",
+      "WebFetch(domain:docs.annict.com)",
+      "WebFetch(domain:developers.annict.jp)",
+      "WebFetch(domain:developers.annict.com)"
     ],
     "defaultMode": "auto"
   }

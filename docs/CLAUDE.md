@@ -135,7 +135,7 @@ git diff Gemfile.lock
 
 ### 主軸: 番組表リニューアル フェーズ4
 
-- **#4227 Annict 視聴記録・感想投稿 API の追加** — `POST /mulukhiya/api/annict/record` 新設、`createRecord` mutation 中継。capsicum エピソードブラウザ（pooza/capsicum#298 v1.26 ペア）からの感想投稿を可能にする。番組表リニューアル #4234 の最終ピース、本リリースのテーマ（size:M）
+- **#4227 Annict 視聴記録・感想投稿 API の追加** — `POST /mulukhiya/api/annict/record` 新設、`createRecord` mutation 中継。capsicum エピソードブラウザ（pooza/capsicum#298 v1.26 ペア）からの感想投稿を可能にする。番組表リニューアル #4234 の最終ピース、本リリースのテーマ（size:M）— **2026-05-07 develop 反映済み**（OAuth scope を `[read, write]` に拡張、5.21.x までの既存ユーザーは再認可必須。capsicum v1.26 で UI 側対応予定）
 
 ### バグ修正・継続対応
 
