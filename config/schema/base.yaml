@@ -258,6 +258,12 @@ properties:
           format: uri
           type: string
         type: array
+      fetch:
+        properties:
+          max_bytes:
+            minimum: 1
+            type: integer
+        type: object
     required:
       - urls
     type: object

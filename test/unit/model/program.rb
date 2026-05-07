@@ -211,6 +211,68 @@ module Mulukhiya
       assert_true(@program.auto_update?)
     end
 
+    def test_fetch_remote_merges_valid_payload
+      return if disable?
+      url = 'http://example.com/programs.json'
+      payload = {'remote_a' => {'series' => 'Remote A'}}
+      stub_remote_program(url, payload.to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_equal(payload, result)
+      end
+    end
+
+    def test_fetch_remote_skips_oversize_body
+      return if disable?
+      url = 'http://example.com/oversize.json'
+      stub_remote_program(url, 'x' * (Program::DEFAULT_FETCH_MAX_BYTES + 1))
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_empty(result)
+      end
+    end
+
+    def test_fetch_remote_skips_non_hash_payload
+      return if disable?
+      url = 'http://example.com/array.json'
+      stub_remote_program(url, [{'series' => 'A'}].to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_empty(result)
+      end
+    end
+
+    def test_fetch_remote_skips_hash_with_non_hash_values
+      return if disable?
+      url = 'http://example.com/scalar_values.json'
+      stub_remote_program(url, {'key' => 'not_a_hash'}.to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_empty(result)
+      end
+    end
+
+    def test_fetch_remote_honors_configured_max_bytes
+      return if disable?
+      url = 'http://example.com/configured.json'
+      payload = {'remote_b' => {'series' => 'Remote B'}}
+      body = payload.to_json
+      stub_remote_program(url, body)
+      original_max = config['/program/fetch/max_bytes']
+      config['/program/fetch/max_bytes'] = body.bytesize - 1
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_empty(result)
+      end
+    ensure
+      config['/program/fetch/max_bytes'] = original_max
+    end
+
     def test_update_cache_invalidates_on_redis_write_failure
       original = @program.data
       @program.save({'sentinel' => {'series' => 'sentinel'}})
@@ -232,6 +294,21 @@ module Mulukhiya
     ensure
       @program.instance_variable_set(:@redis, original_redis)
       @program.save(original) if original
+    end
+
+    private
+
+    def stub_remote_program(url, body)
+      stub_request(:get, url)
+        .to_return(body:, headers: {'Content-Type' => 'application/json'})
+    end
+
+    def with_program_urls(urls)
+      original = config['/program/urls']
+      config['/program/urls'] = urls
+      yield
+    ensure
+      config['/program/urls'] = original
     end
   end
 end

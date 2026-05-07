@@ -5,6 +5,7 @@ module Mulukhiya
 
     YAML_PATH = File.join(Environment.dir, 'var/program.yaml').freeze
     REDIS_KEY = 'program'.freeze
+    DEFAULT_FETCH_MAX_BYTES = 1_048_576
 
     def update
       return nil unless auto_update?
@@ -142,9 +143,40 @@ module Mulukhiya
     end
 
     def fetch_remote
-      return uris.inject({}) do |programs, v|
-        programs.merge(@http.get(v).parsed_response)
+      return uris.each_with_object({}) do |v, programs|
+        response = @http.get(v)
+        next unless valid_response_size?(response, v)
+        parsed = response.parsed_response
+        next unless valid_program_schema?(parsed, v)
+        programs.merge!(parsed)
       end
+    end
+
+    def valid_response_size?(response, uri)
+      bytes = response.body.to_s.bytesize
+      max = fetch_max_bytes
+      return true if bytes <= max
+      logger.error(
+        message: 'program fetch exceeded max bytes',
+        url: uri.to_s,
+        bytes:,
+        max_bytes: max,
+      )
+      return false
+    end
+
+    def valid_program_schema?(parsed, uri)
+      return true if parsed.is_a?(Hash) && parsed.values.all?(Hash)
+      logger.error(
+        message: 'program fetch schema invalid',
+        url: uri.to_s,
+        type: parsed.class.name,
+      )
+      return false
+    end
+
+    def fetch_max_bytes
+      return config['/program/fetch/max_bytes'] || DEFAULT_FETCH_MAX_BYTES
     end
 
     def cached_data

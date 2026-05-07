@@ -473,6 +473,8 @@ postgres:
 program:
   auto_update: true
   urls: []
+  fetch:
+    max_bytes: 1048576
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
