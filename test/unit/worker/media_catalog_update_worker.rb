@@ -17,5 +17,13 @@ module Mulukhiya
     def test_uses_dedicated_queue
       assert_equal('media_catalog', MediaCatalogUpdateWorker.sidekiq_options['queue'])
     end
+
+    def test_cursor_paging_disabled_on_misskey
+      if Environment.misskey_type?
+        assert_false(@worker.send(:cursor_paging?))
+      else
+        assert_true(@worker.send(:cursor_paging?))
+      end
+    end
   end
 end

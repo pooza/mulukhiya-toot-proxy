@@ -19,9 +19,19 @@ module Mulukhiya
           storage.set(key, result)
           log(page:, only_person:, items: result[:items].size)
           break unless result[:has_next]
-          cursor = result[:next_cursor]
+          cursor = result[:next_cursor] if cursor_paging?
         end
       end
+    end
+
+    # Misskey の media_catalog SQL は note_id ベースで unnest を展開するため、
+    # 単一ノートに複数添付があると同 note_id の行が連続して並ぶ。non-unique な
+    # 並びに対して `note_id < cursor` で次ページを取ると、ページ境界に該当した
+    # ノートの残り添付がキャッシュから抜ける (#4325)。短期対処として Misskey
+    # では cursor を更新せず OFFSET ページングのみを使う。SQL 側で複合キー
+    # cursor へ移行するのは将来の改善 (#4323 と合わせて検討)。
+    def cursor_paging?
+      return !Environment.misskey_type?
     end
   end
 end
