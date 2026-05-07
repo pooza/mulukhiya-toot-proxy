@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: e510866901d6d6c72e28d82131151fa176ca7682
+  revision: b2e3d06d7702c6c1e743dd3b4168dda5d74b553e
   branch: main
   specs:
-    ginseng-core (1.15.24)
+    ginseng-core (1.15.25)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -226,7 +226,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.19.4)
+    json (2.19.5)
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -254,8 +254,8 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    multi_json (1.20.1)
-    multi_xml (0.8.1)
+    multi_json (1.21.1)
+    multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     mustermann (3.1.1)
     net-http (0.9.1)

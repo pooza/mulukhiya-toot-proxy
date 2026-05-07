@@ -92,9 +92,10 @@ module Mulukhiya
       original = @program.data
       @program.save(key => {'series' => 'A'})
 
-      assert_raise(Ginseng::ValidateError) do
+      error = assert_raise(Ginseng::ConflictError) do
         @program.add_entry(key, 'series' => 'B')
       end
+      assert_equal(409, error.status)
     ensure
       @program.save(original) if original
     end

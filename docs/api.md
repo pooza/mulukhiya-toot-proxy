@@ -761,7 +761,7 @@ NowPlaying 情報を除去して再投稿する。
 | `source_url` | string | 任意 | audit メタデータ（書き込み専用）。`http(s)://` で始まる URL のみ受け付ける |
 
 - **レスポンス**: `{key, entry}` の JSON
-- **エラー**: 既存キー重複時は 422
+- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）
 
 #### PUT /mulukhiya/api/admin/program/entry/:key
 

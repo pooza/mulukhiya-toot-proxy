@@ -34,7 +34,7 @@ module Mulukhiya
       key = key.to_s
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
-      raise Ginseng::ValidateError, "キー '#{key}' は既に存在します。" if programs.key?(key)
+      raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
       programs[key] = attributes.transform_keys(&:to_s).compact
       save(programs)
       return programs[key]
