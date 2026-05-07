@@ -198,6 +198,20 @@ module Mulukhiya
       end
     end
 
+    def test_create_record_raises_on_non_hash_response
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        status: 200,
+        body: 'maintenance: please try again later',
+        headers: {'Content-Type' => 'text/plain'},
+      )
+
+      assert_raise(Ginseng::GatewayError) do
+        @service.create_record(episode_id: 1)
+      end
+    end
+
     def test_create_payload
       return unless @service
       record = {

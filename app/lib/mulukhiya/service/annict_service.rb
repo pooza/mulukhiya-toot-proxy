@@ -85,6 +85,10 @@ module Mulukhiya
         ratingState: rating_state,
       }.compact
       response = query(:create_record, variables)
+      # response が Hash でない (HTML の 502 / 5xx body 等) と response['errors'] が
+      # NoMethodError → 500 で抜ける経路がある。GraphQL エンドポイントから期待した
+      # 構造が返らない時点で GatewayError に丸める
+      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
       if response['errors'].present?
         raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
       end
@@ -371,7 +375,12 @@ module Mulukhiya
         headers: {Authorization: "Bearer #{@token}"},
         timeout: config['/service/annict/timeout'],
       }).parsed_response
-      @account = self.class.create_viewer_info(response.dig('data', 'viewer')) unless guest?
+      # Annict が 200 OK で JSON 以外 (HTML/プレーンテキスト) を返すケースで
+      # response.dig が NoMethodError を起こす経路を防ぐ。account 反映は
+      # 期待通り Hash の時のみ行い、戻り値はそのまま呼び元に渡して個別判断させる
+      if response.is_a?(Hash) && !guest?
+        @account = self.class.create_viewer_info(response.dig('data', 'viewer'))
+      end
       return response
     end
   end
