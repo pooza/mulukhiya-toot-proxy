@@ -254,6 +254,10 @@ module Mulukhiya
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
+      # only_person は旧来 .to_i 経由で boolean 風文字列 ('true'/'false' 等) を 0/1
+      # に丸める寛容な仕様だった。Contract 検証 (5.22.0 #4283 切出し時に検証順を
+      # 変更) で 422 になる経路を再導入しないよう、検証前に正規化しておく。
+      params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
       params.delete(:q) unless sns.account
       errors = MediaListContract.new.exec(params)
       if errors.present?
@@ -495,7 +499,9 @@ module Mulukhiya
       @renderer.message = {record:}
       return @renderer.to_s
     rescue => e
-      e.log
+      # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
+      # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
+      e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

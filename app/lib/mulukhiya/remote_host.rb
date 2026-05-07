@@ -14,7 +14,10 @@ module Mulukhiya
         addr = IPAddr.new(ip)
         addr.private? || addr.loopback? || addr.link_local?
       end
-    rescue
+    rescue => e
+      # SSRF allowlist の fail-closed 方針は維持しつつ、DNS 障害・タイムアウト・
+      # 内部例外 (IPAddr 等) の切り分けができるよう warn ログだけ残す。
+      Logger.new.warn(remote_host: {host:, error: e.class.name, message: e.message})
       return false
     end
 

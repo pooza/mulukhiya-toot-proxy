@@ -258,12 +258,12 @@ module Mulukhiya
     end
 
     def test_fetch_remote_honors_configured_max_bytes
+      original_max = config['/program/fetch/max_bytes']
       return if disable?
       url = 'http://example.com/configured.json'
       payload = {'remote_b' => {'series' => 'Remote B'}}
       body = payload.to_json
       stub_remote_program(url, body)
-      original_max = config['/program/fetch/max_bytes']
       config['/program/fetch/max_bytes'] = body.bytesize - 1
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
@@ -271,7 +271,7 @@ module Mulukhiya
         assert_empty(result)
       end
     ensure
-      config['/program/fetch/max_bytes'] = original_max
+      config['/program/fetch/max_bytes'] = original_max if defined?(original_max)
     end
 
     def test_update_cache_invalidates_on_redis_write_failure

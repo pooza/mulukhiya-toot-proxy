@@ -149,6 +149,10 @@ module Mulukhiya
         parsed = response.parsed_response
         next unless valid_program_schema?(parsed, v)
         programs.merge!(parsed)
+      rescue => e
+        # 単一 URL の取得失敗 (HTTP error / parse error 等) で update 全体が落ちる
+        # のを防ぐ。失敗した URL のみ skip し、他の URL の取り込みは続ける
+        e.log(url: v.to_s)
       end
     end
 
