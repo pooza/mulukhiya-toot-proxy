@@ -813,17 +813,7 @@ module Mulukhiya
     end
 
     def valid_remote_host?(host)
-      return false unless host.present?
-      return false unless host.include?('.')
-      return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
-      return false if host.match?(/\A\[.*\]\z/)
-      addrs = Addrinfo.getaddrinfo(host, nil, nil, :STREAM).map(&:ip_address)
-      addrs.none? do |ip|
-        addr = IPAddr.new(ip)
-        addr.private? || addr.loopback? || addr.link_local?
-      end
-    rescue
-      return false
+      return RemoteHost.public?(host)
     end
   end
 end
