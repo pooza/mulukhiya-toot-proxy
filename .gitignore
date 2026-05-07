@@ -9,7 +9,7 @@ Desktop.ini
 dist
 *.code-workspace
 .vscode
-.claude
+.claude/settings.local.json
 tmp/
 var/*.yaml
 2
