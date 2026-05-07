@@ -2,14 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(git fetch *)",
+      "Bash(git pull *)",
       "Bash(sentry-cli *)",
       "Bash(python3 -c *)",
       "Bash(grep *)",
       "Bash(sed *)",
       "Bash(awk *)",
+      "Bash(rbenv versions *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec ruby *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rake *)",
-      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rubocop *)"
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rubocop *)",
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle install)",
+      "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle update *)"
     ],
     "defaultMode": "auto"
   }
