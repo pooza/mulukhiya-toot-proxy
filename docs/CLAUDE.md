@@ -162,7 +162,7 @@ git diff Gemfile.lock
 
 ### リファクタ・整理
 
-- #4283 refactor: GET /media を MediaCatalogQueryService に移設（#4233 の 1 件目、size:S）
+- #4283 refactor: GET /media を MediaCatalogQueryService に移設（#4233 の 1 件目、size:S）— **2026-05-07 develop 反映済み**
 
 ### docs・機能
 
