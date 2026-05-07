@@ -757,8 +757,8 @@ NowPlaying 情報を除去して再投稿する。
 | `extra_tags` | string[] | 任意 | 追加タグ |
 | `annict_work_id` | integer | 任意 | Annict 作品 ID |
 | `annict_episode_id` | integer | 任意 | Annict エピソード ID |
-| `source_type` | string | 任意 | `annict` / `youtube` / `manual`。フェーズ3〜4 のメタデータで現状未使用 |
-| `source_url` | string | 任意 | ソース URL（YouTube URL 等）。`source_type` と同じく現状未使用 |
+| `source_type` | string | 任意 | audit メタデータ（書き込み専用）。エディタが Annict 検索結果を選択した際に `annict` を自動設定する。読み出し箇所はないが、記録経路を後追いするため保持される |
+| `source_url` | string | 任意 | audit メタデータ（書き込み専用）。`http(s)://` で始まる URL のみ受け付ける |
 
 - **レスポンス**: `{key, entry}` の JSON
 - **エラー**: 既存キー重複時は 422

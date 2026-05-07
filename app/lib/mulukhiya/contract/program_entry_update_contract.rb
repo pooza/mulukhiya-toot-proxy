@@ -13,6 +13,7 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: ProgramEntryContract::MAX_TAGS)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
+      # audit metadata: ProgramEntryContract と同様、書き込み専用で保持する
       optional(:source_type).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:source_url).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
     end

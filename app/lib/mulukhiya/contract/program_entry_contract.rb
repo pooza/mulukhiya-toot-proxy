@@ -25,6 +25,9 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: MAX_TAGS)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
+      # audit metadata: 書き込み専用。エディタが Annict 検索結果を選択した際に
+      # source_type='annict' を自動設定して保存する。読み出し箇所はないが、
+      # 後追いで「どの経路で記録されたか」を辿るため保持している
       optional(:source_type).maybe(:string, max_size?: MAX_TEXT_SIZE)
       optional(:source_url).maybe(:string, max_size?: MAX_TEXT_SIZE)
     end
