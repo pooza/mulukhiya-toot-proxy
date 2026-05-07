@@ -140,7 +140,7 @@ git diff Gemfile.lock
 ### バグ修正・継続対応
 
 - #4322 perf: media_catalog 専用 Sidekiq キュー分離（default キュー詰まり防止、#4306 中期2、size:M）— 5.21.2 で cursor 化済み、本リリースで専用キュー分離 — **2026-05-07 develop 反映済み**（Sidekiq Capsule で media_catalog キュー分離、concurrency 1）
-- #4325 fix: MediaCatalogUpdateWorker の cursor が Misskey の非ユニーク順序で添付欠落（5.21.2 PR #4324 への Codex P1、size:M）
+- #4325 fix: MediaCatalogUpdateWorker の cursor が Misskey の非ユニーク順序で添付欠落（5.21.2 PR #4324 への Codex P1、size:M）— **2026-05-07 develop 反映済み**（短期対処: Misskey では cursor 無効化し OFFSET ページング維持。SQL の複合キー cursor 化は #4323 と合わせて将来検討）
 - #4326 fix: Program#data の extra_tags 正規化を非 Hash entry でも安全にする（5.21.1 PR #4321 への Codex P1、size:S）— **2026-05-04 develop 反映済み**
 - #4308 ProgramEntryContract の未使用 source_type / source_url 整理と /program/urls 棚卸し（#4237 後始末、size:S）— **2026-05-07 develop 反映済み**（audit メタデータとして現状維持＋意図コメント追加。/program/urls は別途棚卸し済み）
 
