@@ -254,19 +254,13 @@ module Mulukhiya
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
-      params[:page] = (params[:page] || 1).to_i unless params[:cursor]
-      params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
-      params.delete(:q) unless params[:q].present?
       params.delete(:q) unless sns.account
       errors = MediaListContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
-      elsif controller_class.media_catalog?
-        params[:rule] = SearchRule.new(params[:q]) if params[:q]
-        @renderer.message = attachment_class.catalog(params)
       else
-        @renderer.status = 404
+        @renderer.message = MediaCatalogQueryService.new.call(params)
       end
       return @renderer.to_s
     rescue => e
