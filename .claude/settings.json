@@ -9,6 +9,8 @@
       "Bash(rbenv *)",
       "Bash(gh api *)",
       "Bash(gh pr *)",
+      "Bash(gh label *)",
+      "Bash(gh issue *)",
       "Bash(git fetch *)",
       "Bash(git pull *)",
       "WebFetch(domain:docs.annict.com)",
