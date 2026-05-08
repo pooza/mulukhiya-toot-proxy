@@ -2,6 +2,26 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.19.1（2026-04-23）
+
+ホットフィックス。モロヘイヤ WebUI / capsicum で認証 Bearer トークンが通らず更新系 API が 401 で失敗する回帰を修正。
+
+- **#4260 fix: APIController#token の Bearer 分岐で暗号化トークンを復号** — `/oauth/callback` が発行する `access_token_crypt` を `Authorization: Bearer` で受けた際に生値のまま `@sns.token` に入り、SNS 本家への API コール (`sns.repost` / `sns.toot` / Misskey の `body[:i]` / Mastodon の `Authorization: Bearer`) で 401 になっていた。影響していた機能: WebUI「削除してタグづけ」、capsicum 予約投稿タグ付け、`/sw/register` / `/unregister`（5.19.0 Codex P1 指摘と同根）。`MastodonController` / `MisskeyController` のプロキシ経路（純正クライアントの平文 Bearer 前提）は無変更
+
+## リリース済み: 5.19.0（2026-04-22）
+
+Misskey Web Push 登録プロキシ API の追加 (capsicum プッシュ通知対応)、WebUI の Bearer ヘッダー化、Poipiku 対応廃止、スキーマバリデーション見直し、段階的リファクタ、リリース前レビュー手順の導入。
+
+- **#4254 feat: Misskey Web Push 登録プロキシ API (POST /mulukhiya/api/sw/register / /unregister)** — Misskey 本家の GHSA-7pxq-6xx9-xpgm 対応を踏まえた境界張り直し。`write:account` スコープ要求 + `sw_subscription` テーブルへ直接 INSERT + Misskey Redis キャッシュ無効化
+- **#4230 feat: WebUI の GET トークン送信を Authorization ヘッダーに移行** — GET クエリ経由のトークン送出を廃止。後方互換として `params[:token]` フォールバックは 5.21.0 で完全廃止予定
+- **#4255 fix: リリース前レビューで検出した赤 7 件を修正** — SSRF ガード / 冪等性仕様整合 / Redis プール漏れ / /tagging/tag/search rescue 復活 / e.alert 昇格 / /health に misskey_redis 追加 / Sentry PII scrub 拡張
+- **#4251 fix: スキーマバリデーションで未設定の任意項目が required エラーになる** — 5.18.0 #4245 の取り残し
+- **#4253 refactor: POST /tagging/tag/search を TagSearchService に移設** — 親 #4233 段階的リファクタ
+- **#4250 chore: ポイピク (Poipiku) 対応機能の全廃止**
+- **is_cat キャッシュ TTL デフォルトを 6h → 1h に変更** — 運用観察のため
+- **リリース前レビュー手順をプロジェクトガイドに導入** — 5 観点並列サブエージェント + Codex リアクション運用 (capsicum 側から移植)
+- **bundle update**
+
 ## リリース済み: 5.18.0（2026-04-17）
 
 番組表永続化・Postgres ヘルスチェック改善・is_cat キャッシュ制御・puma/parallel メジャー更新。
