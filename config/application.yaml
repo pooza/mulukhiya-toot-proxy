@@ -303,6 +303,7 @@ iceshrimp:
 logger:
   mask_fields:
     - auth
+    - endpoint
     - password
     - publickey
     - secret
@@ -438,7 +439,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.21.2
+  version: 5.22.0
 parser:
   note:
     fields:
@@ -472,6 +473,8 @@ postgres:
 program:
   auto_update: true
   urls: []
+  fetch:
+    max_bytes: 1048576
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
@@ -521,6 +524,7 @@ service:
       scopes:
         default:
           - read
+          - write
     review:
       suffixes:
         bad: （評価:良くない）
@@ -579,6 +583,9 @@ sidekiq:
   auth:
     password: null
     user: admin
+  capsule:
+    media_catalog:
+      concurrency: 1
   concurrency: 5
   dashboard:
     session:

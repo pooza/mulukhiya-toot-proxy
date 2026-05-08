@@ -47,7 +47,7 @@ module Mulukhiya
       stats = Sidekiq::Stats.new
       pids = Sidekiq::ProcessSet.new.map {|p| p['pid']}
       values = {
-        queues: stats.queues['default'],
+        queues: stats.queues.slice('default', 'media_catalog').transform_keys(&:to_sym),
         retry: stats.retry_size,
         status: pids.present? ? 'OK' : 'NG',
       }

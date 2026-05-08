@@ -254,19 +254,17 @@ module Mulukhiya
     get '/media' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       sns.token ||= sns.default_token
-      params[:page] = (params[:page] || 1).to_i unless params[:cursor]
+      # only_person は旧来 .to_i 経由で boolean 風文字列 ('true'/'false' 等) を 0/1
+      # に丸める寛容な仕様だった。Contract 検証 (5.22.0 #4283 切出し時に検証順を
+      # 変更) で 422 になる経路を再導入しないよう、検証前に正規化しておく。
       params[:only_person] = (params[:only_person] || 0).to_i.zero? ? 0 : 1
-      params.delete(:q) unless params[:q].present?
       params.delete(:q) unless sns.account
       errors = MediaListContract.new.exec(params)
       if errors.present?
         @renderer.status = 422
         @renderer.message = {errors:}
-      elsif controller_class.media_catalog?
-        params[:rule] = SearchRule.new(params[:q]) if params[:q]
-        @renderer.message = attachment_class.catalog(params)
       else
-        @renderer.status = 404
+        @renderer.message = MediaCatalogQueryService.new.call(params)
       end
       return @renderer.to_s
     rescue => e
@@ -476,6 +474,33 @@ module Mulukhiya
       end
       return @renderer.to_s
     rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/annict/record' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      annict = sns.account.annict
+      raise Ginseng::AuthError, 'Annict authentication required' unless annict
+      errors = AnnictRecordContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      record = annict.create_record(
+        episode_id: params[:episode_id].to_i,
+        comment: params[:comment].presence,
+        rating_state: params[:rating_state].presence,
+      )
+      @renderer.message = {record:}
+      return @renderer.to_s
+    rescue => e
+      # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
+      # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
       e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
@@ -787,7 +812,9 @@ module Mulukhiya
     def token
       return nil unless (header = @headers['Authorization']) && header =~ /\ABearer\s+(\S+)/i
       bearer = Regexp.last_match(1)
-      return bearer.decrypt rescue bearer
+      plain = bearer.decrypt rescue bearer
+      return nil if plain.to_s.empty?
+      return plain
     end
 
     def self.default_type
@@ -817,17 +844,7 @@ module Mulukhiya
     end
 
     def valid_remote_host?(host)
-      return false unless host.present?
-      return false unless host.include?('.')
-      return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
-      return false if host.match?(/\A\[.*\]\z/)
-      addrs = Addrinfo.getaddrinfo(host, nil, nil, :STREAM).map(&:ip_address)
-      addrs.none? do |ip|
-        addr = IPAddr.new(ip)
-        addr.private? || addr.loopback? || addr.link_local?
-      end
-    rescue
-      return false
+      return RemoteHost.public?(host)
     end
   end
 end

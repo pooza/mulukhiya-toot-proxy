@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sentry-cli *)",
+      "Bash(grep *)",
+      "Bash(sed *)",
+      "Bash(find *)",
+      "Bash(gem *)",
+      "Bash(rbenv *)",
+      "Bash(gh api *)",
+      "Bash(gh pr *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "WebFetch(domain:docs.annict.com)",
+      "WebFetch(domain:developers.annict.jp)",
+      "WebFetch(domain:developers.annict.com)"
+    ],
+    "defaultMode": "auto"
+  }
+}

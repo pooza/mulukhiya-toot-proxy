@@ -197,10 +197,14 @@ module Mulukhiya
       return handler_config(:toggleable) == true
     end
 
+    NON_FEDERATED_TRUTHY = [true, 'true', 'TRUE', 1, '1'].freeze
+
     def non_federated_payload?
       return false unless payload
-      return true if payload[:channelId].present? || payload['channelId'].present?
-      return true if payload[:localOnly] == true || payload['localOnly'] == true
+      return true if payload.key?(:channelId) || payload.key?('channelId')
+      local_only = payload[:localOnly]
+      local_only = payload['localOnly'] if local_only.nil?
+      return true if NON_FEDERATED_TRUTHY.include?(local_only)
       return false
     end
 

@@ -92,9 +92,10 @@ module Mulukhiya
       original = @program.data
       @program.save(key => {'series' => 'A'})
 
-      assert_raise(Ginseng::ValidateError) do
+      error = assert_raise(Ginseng::ConflictError) do
         @program.add_entry(key, 'series' => 'B')
       end
+      assert_equal(409, error.status)
     ensure
       @program.save(original) if original
     end
@@ -211,6 +212,95 @@ module Mulukhiya
       assert_true(@program.auto_update?)
     end
 
+    def test_fetch_remote_merges_valid_payload
+      return if disable?
+      url = 'http://example.com/programs.json'
+      payload = {'remote_a' => {'series' => 'Remote A'}}
+      stub_remote_program(url, payload.to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_equal(payload, result)
+      end
+    end
+
+    def test_fetch_remote_skips_oversize_body
+      return if disable?
+      url = 'http://example.com/oversize.json'
+      stub_remote_program(url, 'x' * (Program::DEFAULT_FETCH_MAX_BYTES + 1))
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    end
+
+    def test_fetch_remote_skips_non_hash_payload
+      return if disable?
+      url = 'http://example.com/array.json'
+      stub_remote_program(url, [{'series' => 'A'}].to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    end
+
+    def test_fetch_remote_skips_hash_with_non_hash_values
+      return if disable?
+      url = 'http://example.com/scalar_values.json'
+      stub_remote_program(url, {'key' => 'not_a_hash'}.to_json)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    end
+
+    def test_fetch_remote_honors_configured_max_bytes
+      original_max = config['/program/fetch/max_bytes']
+      return if disable?
+      url = 'http://example.com/configured.json'
+      payload = {'remote_b' => {'series' => 'Remote B'}}
+      body = payload.to_json
+      stub_remote_program(url, body)
+      config['/program/fetch/max_bytes'] = body.bytesize - 1
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    ensure
+      config['/program/fetch/max_bytes'] = original_max if defined?(original_max)
+    end
+
+    def test_fetch_remote_returns_nil_when_all_urls_fail
+      return if disable?
+      url = 'http://example.com/fail.json'
+      stub_request(:get, url).to_raise(StandardError.new('upstream down'))
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    end
+
+    def test_update_preserves_existing_data_when_all_urls_fail
+      return if disable?
+      original = @program.data
+      sentinel_key = "test_sentinel_#{Time.now.to_i}"
+      @program.save(sentinel_key => {'series' => 'Sentinel', 'enable' => true})
+      url = 'http://example.com/fail.json'
+      stub_request(:get, url).to_raise(StandardError.new('upstream down'))
+      with_program_urls([url]) do
+        @program.update
+
+        assert_includes(@program.data.keys, sentinel_key)
+      end
+    ensure
+      @program.save(original) if original
+    end
+
     def test_update_cache_invalidates_on_redis_write_failure
       original = @program.data
       @program.save({'sentinel' => {'series' => 'sentinel'}})
@@ -232,6 +322,21 @@ module Mulukhiya
     ensure
       @program.instance_variable_set(:@redis, original_redis)
       @program.save(original) if original
+    end
+
+    private
+
+    def stub_remote_program(url, body)
+      stub_request(:get, url)
+        .to_return(body:, headers: {'Content-Type' => 'application/json'})
+    end
+
+    def with_program_urls(urls)
+      original = config['/program/urls']
+      config['/program/urls'] = urls
+      yield
+    ensure
+      config['/program/urls'] = original
     end
   end
 end

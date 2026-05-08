@@ -757,11 +757,11 @@ NowPlaying 情報を除去して再投稿する。
 | `extra_tags` | string[] | 任意 | 追加タグ |
 | `annict_work_id` | integer | 任意 | Annict 作品 ID |
 | `annict_episode_id` | integer | 任意 | Annict エピソード ID |
-| `source_type` | string | 任意 | `annict` / `youtube` / `manual`。フェーズ3〜4 のメタデータで現状未使用 |
-| `source_url` | string | 任意 | ソース URL（YouTube URL 等）。`source_type` と同じく現状未使用 |
+| `source_type` | string | 任意 | audit メタデータ（書き込み専用）。エディタが Annict 検索結果を選択した際に `annict` を自動設定する。読み出し箇所はないが、記録経路を後追いするため保持される |
+| `source_url` | string | 任意 | audit メタデータ（書き込み専用）。`http(s)://` で始まる URL のみ受け付ける |
 
 - **レスポンス**: `{key, entry}` の JSON
-- **エラー**: 既存キー重複時は 422
+- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）
 
 #### PUT /mulukhiya/api/admin/program/entry/:key
 
@@ -953,6 +953,48 @@ Annict の OAuth 認可コードをアクセストークンに交換し、ユー
         }
       }
     }
+  }
+}
+```
+
+#### POST /mulukhiya/api/annict/record
+
+Annict にエピソード視聴記録（感想・レーティング）を投稿する。capsicum エピソードブラウザの感想エディタから呼び出すことを想定。
+
+- **認証**: 必須（SNS アカウントのトークン → モロヘイヤが保持する Annict トークンに解決）
+- **前提条件**: `/{controller}/features/annict` が `true` かつ、ユーザーが Annict OAuth で **`write` スコープ込みで再認可済み**であること（5.22.0 で `write` をデフォルトスコープに追加。5.21.x までに認可済みのユーザーは再認可が必要）
+- **リクエストボディ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `episode_id` | integer | 必須 | Annict エピソード ID（正の整数） |
+| `comment` | string | 任意 | 感想テキスト。長さの上限は API レイヤでは設けない（Annict 側のサーバーバリデーションに委ねる） |
+| `rating_state` | string | 任意 | レーティング。`GREAT` / `GOOD` / `AVERAGE` / `BAD` のいずれか |
+
+- **レスポンス**: `{record}` の JSON。`record` は Annict GraphQL の `Record` オブジェクト（`id`, `annictId`, `comment`, `ratingState`, `rating`, `createdAt`）
+- **エラー**: バリデーション失敗時は 422、Annict 認証未設定時は 403（`Ginseng::AuthError`、本リポジトリの認証エラーは全て 403 で統一）、Annict GraphQL から `errors` が返った場合は 502 Bad Gateway
+
+**リクエスト例**:
+
+```json
+{
+  "episode_id": 63162,
+  "comment": "本日の朝実況。\n戯れで雪の城を造り始めたトワの元に、たくさんの仲間が集まってきた。",
+  "rating_state": "GREAT"
+}
+```
+
+**レスポンス例**:
+
+```json
+{
+  "record": {
+    "id": "gid://annict/Record/4141053",
+    "annictId": 4141053,
+    "comment": "本日の朝実況。...",
+    "ratingState": "GREAT",
+    "rating": null,
+    "createdAt": "2026-05-07T12:00:00Z"
   }
 }
 ```

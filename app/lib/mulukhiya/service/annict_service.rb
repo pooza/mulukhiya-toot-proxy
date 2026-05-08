@@ -50,8 +50,8 @@ module Mulukhiya
     end
 
     def episodes(ids)
-      return unless entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
-      return [] if entries.empty?
+      entries = query(:episodes, {ids:}).dig('data', 'searchWorks', 'nodes')
+      return [] unless entries.is_a?(Array) && entries.any?
       all_episodes = entries.flat_map do |work|
         work.dig('episodes', 'nodes').map {|ep| ep.merge('work_annict_id' => work['annictId'])}
       end
@@ -63,6 +63,7 @@ module Mulukhiya
 
     def enrich_episode(episode, work_title)
       return nil unless subtitle = episode['title']
+      episode = episode.dup
       episode['title'] = self.class.trim_ruby(subtitle) if self.class.subtitle_trim_ruby?
       return episode.merge(
         'hashtag' => episode['title'].to_hashtag,
@@ -75,6 +76,23 @@ module Mulukhiya
           minutes: config['/webui/episode/minutes'],
         ),
       )
+    end
+
+    def create_record(episode_id:, comment: nil, rating_state: nil)
+      variables = {
+        episodeId: episode_id.to_s,
+        comment:,
+        ratingState: rating_state,
+      }.compact
+      response = query(:create_record, variables)
+      # response が Hash でない (HTML の 502 / 5xx body 等) と response['errors'] が
+      # NoMethodError → 500 で抜ける経路がある。GraphQL エンドポイントから期待した
+      # 構造が返らない時点で GatewayError に丸める
+      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
+      if response['errors'].present?
+        raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
+      end
+      return response.dig('data', 'createRecord', 'record')
     end
 
     def crawl(params = {})
@@ -342,6 +360,11 @@ module Mulukhiya
       return keywords.any? {|v| activity.to_json.include?(v)}
     end
 
+    def format_graphql_errors(errors)
+      messages = Array(errors).filter_map {|e| e.is_a?(Hash) ? e['message'] : e.to_s}
+      return messages.join('; ').presence || 'Annict GraphQL error'
+    end
+
     def query(template, variables = nil)
       query = File.read(File.join(Environment.dir, 'app/query/annict', "#{template}.graphql"))
       variables&.deep_stringify_keys!
@@ -352,7 +375,12 @@ module Mulukhiya
         headers: {Authorization: "Bearer #{@token}"},
         timeout: config['/service/annict/timeout'],
       }).parsed_response
-      @account = self.class.create_viewer_info(response.dig('data', 'viewer')) unless guest?
+      # Annict が 200 OK で JSON 以外 (HTML/プレーンテキスト) を返すケースで
+      # response.dig が NoMethodError を起こす経路を防ぐ。account 反映は
+      # 期待通り Hash の時のみ行い、戻り値はそのまま呼び元に渡して個別判断させる
+      if response.is_a?(Hash) && !guest?
+        @account = self.class.create_viewer_info(response.dig('data', 'viewer'))
+      end
       return response
     end
   end

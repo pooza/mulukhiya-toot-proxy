@@ -37,16 +37,15 @@ module Mulukhiya
       uri = Ginseng::URI.parse(uri_string)
       return false unless uri.scheme == 'https'
       host = uri.host.to_s.downcase
-      return false unless host.present?
-      return false unless host.include?('.')
-      return false if host.match?(/\A\d{1,3}(\.\d{1,3}){3}\z/)
-      return false if host.match?(/\A\[.*\]\z/)
       return false if RESERVED_TLDS.include?(host.split('.').last)
-      return true
+      return RemoteHost.public?(host)
     rescue
       return false
     end
 
+    # NOTE: allowed_hosts が空配列のときは allow-all となる仕様（運用者の明示的
+    # 設定を尊重するため）。空のままにすると public_http_uri? と TLD 制限のみが
+    # 防御層となるため、本番運用では必ず明示的に設定すること。
     def self.allowed_host?(uri_string)
       allowed = Config.instance['/misskey/sw_subscription/allowed_hosts'] || []
       return true if allowed.empty?

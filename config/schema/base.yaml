@@ -258,6 +258,12 @@ properties:
           format: uri
           type: string
         type: array
+      fetch:
+        properties:
+          max_bytes:
+            minimum: 1
+            type: integer
+        type: object
     required:
       - urls
     type: object
@@ -295,6 +301,15 @@ properties:
             type: string
           user:
             type: string
+        type: object
+      capsule:
+        properties:
+          media_catalog:
+            properties:
+              concurrency:
+                minimum: 1
+                type: integer
+            type: object
         type: object
       concurrency:
         minimum: 1

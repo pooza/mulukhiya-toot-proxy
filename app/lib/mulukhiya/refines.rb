@@ -41,7 +41,11 @@ module Mulukhiya
 
       def alert(values = {})
         log(values)
-        Sentry.capture_exception(self) if Sentry.initialized?
+        # Sentry 到達不能 (DNS 障害・rate limit 等) で capture_exception 自体が例外を
+        # 投げると、上位の rescue がさらに alert/log を呼ぶ経路で再帰的 500 (#4317
+        # の元症状) に逆戻りする。Sinatra error handler だけでなく api_controller
+        # 各 rescue 経路も保護するため、ここで集約防御する。
+        Sentry.capture_exception(self) rescue nil if Sentry.initialized?
         return Event.new(:alert).dispatch(self)
       end
 

@@ -13,6 +13,7 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: ProgramEntryContract::MAX_TAGS)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
+      # audit metadata: ProgramEntryContract と同様、書き込み専用で保持する
       optional(:source_type).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:source_url).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
     end
@@ -26,6 +27,13 @@ module Mulukhiya
       next unless value.is_a?(Array)
       unless value.all? {|s| s.is_a?(String) && s.size <= ProgramEntryContract::MAX_TAG_SIZE}
         key.failure("文字列 (各要素 #{ProgramEntryContract::MAX_TAG_SIZE} 文字以下) の配列で指定してください。")
+      end
+    end
+
+    rule(:source_url) do
+      next unless value.is_a?(String)
+      unless ProgramEntryContract::URL_FORMAT.match?(value)
+        key.failure('http(s):// で始まる URL を指定してください。')
       end
     end
   end

@@ -133,6 +133,85 @@ module Mulukhiya
       end
     end
 
+    def test_create_record_sends_mutation_with_normalized_variables
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      captured = nil
+      stub_request(:post, endpoint).with do |request|
+        captured = JSON.parse(request.body)
+        true
+      end.to_return(
+        body: {
+          data: {
+            createRecord: {
+              record: {
+                id: 'gid://annict/Record/4_141_053',
+                annictId: 4_141_053,
+                comment: 'よかった',
+                ratingState: 'GREAT',
+                rating: nil,
+                createdAt: '2026-05-07T12:00:00Z',
+              },
+            },
+          },
+        }.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      record = @service.create_record(episode_id: 63_162, comment: 'よかった', rating_state: 'GREAT')
+
+      assert_equal(4_141_053, record['annictId'])
+      assert_equal('GREAT', record['ratingState'])
+      assert_match(/createRecord/, captured['query'])
+      assert_equal('63162', captured.dig('variables', 'episodeId'))
+      assert_equal('よかった', captured.dig('variables', 'comment'))
+      assert_equal('GREAT', captured.dig('variables', 'ratingState'))
+    end
+
+    def test_create_record_omits_blank_optional_variables
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      captured = nil
+      stub_request(:post, endpoint).with do |request|
+        captured = JSON.parse(request.body)
+        true
+      end.to_return(
+        body: {data: {createRecord: {record: {annictId: 1}}}}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      @service.create_record(episode_id: 1)
+
+      assert_equal({'episodeId' => '1'}, captured['variables'])
+    end
+
+    def test_create_record_raises_on_graphql_errors
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {errors: [{message: 'Episode not found'}]}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::GatewayError) do
+        @service.create_record(episode_id: 999_999)
+      end
+    end
+
+    def test_create_record_raises_on_non_hash_response
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        status: 200,
+        body: 'maintenance: please try again later',
+        headers: {'Content-Type' => 'text/plain'},
+      )
+
+      assert_raise(Ginseng::GatewayError) do
+        @service.create_record(episode_id: 1)
+      end
+    end
+
     def test_create_payload
       return unless @service
       record = {

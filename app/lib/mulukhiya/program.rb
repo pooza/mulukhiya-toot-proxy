@@ -5,11 +5,14 @@ module Mulukhiya
 
     YAML_PATH = File.join(Environment.dir, 'var/program.yaml').freeze
     REDIS_KEY = 'program'.freeze
+    DEFAULT_FETCH_MAX_BYTES = 1_048_576
 
     def update
       return nil unless auto_update?
       return nil unless uris.any?
-      return save(fetch_remote)
+      programs = fetch_remote
+      return nil unless programs
+      return save(programs)
     end
 
     def auto_update?
@@ -23,8 +26,9 @@ module Mulukhiya
 
     def data
       raw = cached_data || load_from_yaml
-      return raw.transform_values do |entry|
-        entry.merge('extra_tags' => entry['extra_tags'] || [])
+      return raw.each_with_object({}) do |(key, entry), result|
+        next unless entry.is_a?(Hash)
+        result[key] = entry.merge('extra_tags' => entry['extra_tags'] || [])
       end
     end
 
@@ -32,7 +36,7 @@ module Mulukhiya
       key = key.to_s
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
-      raise Ginseng::ValidateError, "キー '#{key}' は既に存在します。" if programs.key?(key)
+      raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
       programs[key] = attributes.transform_keys(&:to_s).compact
       save(programs)
       return programs[key]
@@ -141,9 +145,51 @@ module Mulukhiya
     end
 
     def fetch_remote
-      return uris.inject({}) do |programs, v|
-        programs.merge(@http.get(v).parsed_response)
+      programs = {}
+      success = 0
+      uris.each do |v|
+        response = @http.get(v)
+        next unless valid_response_size?(response, v)
+        parsed = response.parsed_response
+        next unless valid_program_schema?(parsed, v)
+        programs.merge!(parsed)
+        success += 1
+      rescue => e
+        # 単一 URL の取得失敗 (HTTP error / parse error 等) で update 全体が落ちる
+        # のを防ぐ。失敗した URL のみ skip し、他の URL の取り込みは続ける
+        e.log(url: v.to_s)
       end
+      # 全 URL が失敗した場合は last-known-good を保持するため nil を返し
+      # 上位の update() で save をスキップする (一過性障害で YAML 全消失を防ぐ)
+      return nil if success.zero?
+      return programs
+    end
+
+    def valid_response_size?(response, uri)
+      bytes = response.body.to_s.bytesize
+      max = fetch_max_bytes
+      return true if bytes <= max
+      logger.error(
+        message: 'program fetch exceeded max bytes',
+        url: uri.to_s,
+        bytes:,
+        max_bytes: max,
+      )
+      return false
+    end
+
+    def valid_program_schema?(parsed, uri)
+      return true if parsed.is_a?(Hash) && parsed.values.all?(Hash)
+      logger.error(
+        message: 'program fetch schema invalid',
+        url: uri.to_s,
+        type: parsed.class.name,
+      )
+      return false
+    end
+
+    def fetch_max_bytes
+      return config['/program/fetch/max_bytes'] || DEFAULT_FETCH_MAX_BYTES
     end
 
     def cached_data

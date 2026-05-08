@@ -10,6 +10,7 @@ module Mulukhiya
     MAX_TAGS = 32
     MAX_TAG_SIZE = 64
     KEY_FORMAT = /\A[A-Za-z0-9_-]+\z/
+    URL_FORMAT = %r{\Ahttps?://}
 
     params do
       optional(:key).value(:string, max_size?: MAX_KEY_SIZE)
@@ -24,6 +25,9 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: MAX_TAGS)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
+      # audit metadata: 書き込み専用。エディタが Annict 検索結果を選択した際に
+      # source_type='annict' を自動設定して保存する。読み出し箇所はないが、
+      # 後追いで「どの経路で記録されたか」を辿るため保持している
       optional(:source_type).maybe(:string, max_size?: MAX_TEXT_SIZE)
       optional(:source_url).maybe(:string, max_size?: MAX_TEXT_SIZE)
     end
@@ -42,6 +46,11 @@ module Mulukhiya
       unless value.all? {|s| s.is_a?(String) && s.size <= MAX_TAG_SIZE}
         key.failure("文字列 (各要素 #{MAX_TAG_SIZE} 文字以下) の配列で指定してください。")
       end
+    end
+
+    rule(:source_url) do
+      next unless value.is_a?(String)
+      key.failure('http(s):// で始まる URL を指定してください。') unless URL_FORMAT.match?(value)
     end
   end
 end
