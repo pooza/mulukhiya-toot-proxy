@@ -1,15 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git fetch *)",
-      "Bash(git pull *)",
       "Bash(sentry-cli *)",
-      "Bash(wait)",
       "Bash(grep *)",
       "Bash(sed *)",
       "Bash(find *)",
       "Bash(gem *)",
-      "Bash(rbenv versions *)",
+      "Bash(rbenv *)",
+      "Bash(gh api *)",
+      "Bash(gh pr *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rake *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle exec rubocop *)",
       "Bash(DYLD_LIBRARY_PATH=/opt/local/lib bundle install)",
