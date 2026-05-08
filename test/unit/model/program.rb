@@ -231,7 +231,7 @@ module Mulukhiya
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
 
-        assert_empty(result)
+        assert_nil(result)
       end
     end
 
@@ -242,7 +242,7 @@ module Mulukhiya
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
 
-        assert_empty(result)
+        assert_nil(result)
       end
     end
 
@@ -253,7 +253,7 @@ module Mulukhiya
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
 
-        assert_empty(result)
+        assert_nil(result)
       end
     end
 
@@ -268,10 +268,37 @@ module Mulukhiya
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
 
-        assert_empty(result)
+        assert_nil(result)
       end
     ensure
       config['/program/fetch/max_bytes'] = original_max if defined?(original_max)
+    end
+
+    def test_fetch_remote_returns_nil_when_all_urls_fail
+      return if disable?
+      url = 'http://example.com/fail.json'
+      stub_request(:get, url).to_raise(StandardError.new('upstream down'))
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+      end
+    end
+
+    def test_update_preserves_existing_data_when_all_urls_fail
+      return if disable?
+      original = @program.data
+      sentinel_key = "test_sentinel_#{Time.now.to_i}"
+      @program.save(sentinel_key => {'series' => 'Sentinel', 'enable' => true})
+      url = 'http://example.com/fail.json'
+      stub_request(:get, url).to_raise(StandardError.new('upstream down'))
+      with_program_urls([url]) do
+        @program.update
+
+        assert_includes(@program.data.keys, sentinel_key)
+      end
+    ensure
+      @program.save(original) if original
     end
 
     def test_update_cache_invalidates_on_redis_write_failure

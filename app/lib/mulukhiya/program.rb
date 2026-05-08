@@ -10,7 +10,9 @@ module Mulukhiya
     def update
       return nil unless auto_update?
       return nil unless uris.any?
-      return save(fetch_remote)
+      programs = fetch_remote
+      return nil unless programs
+      return save(programs)
     end
 
     def auto_update?
@@ -143,17 +145,24 @@ module Mulukhiya
     end
 
     def fetch_remote
-      return uris.each_with_object({}) do |v, programs|
+      programs = {}
+      success = 0
+      uris.each do |v|
         response = @http.get(v)
         next unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next unless valid_program_schema?(parsed, v)
         programs.merge!(parsed)
+        success += 1
       rescue => e
         # 単一 URL の取得失敗 (HTTP error / parse error 等) で update 全体が落ちる
         # のを防ぐ。失敗した URL のみ skip し、他の URL の取り込みは続ける
         e.log(url: v.to_s)
       end
+      # 全 URL が失敗した場合は last-known-good を保持するため nil を返し
+      # 上位の update() で save をスキップする (一過性障害で YAML 全消失を防ぐ)
+      return nil if success.zero?
+      return programs
     end
 
     def valid_response_size?(response, uri)
