@@ -107,7 +107,9 @@ module Mulukhiya
       end
       nodes = response.dig('data', 'searchEpisodes', 'nodes')
       node = Array(nodes).find {|n| n.is_a?(Hash) && n['annictId'].to_i == annict_id}
-      raise Ginseng::NotFoundError, "Annict episode not found: #{annict_id}" unless node&.dig('id').present?
+      unless node&.dig('id').present?
+        raise Ginseng::NotFoundError, "Annict episode not found: #{annict_id}"
+      end
       return node['id']
     end
 
