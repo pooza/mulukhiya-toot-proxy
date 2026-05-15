@@ -84,14 +84,7 @@ module Mulukhiya
         comment:,
         ratingState: rating_state,
       }.compact
-      response = query(:create_record, variables)
-      # response が Hash でない (HTML の 502 / 5xx body 等) と response['errors'] が
-      # NoMethodError → 500 で抜ける経路がある。GraphQL エンドポイントから期待した
-      # 構造が返らない時点で GatewayError に丸める
-      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
-      if response['errors'].present?
-        raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
-      end
+      response = annict_query!(:create_record, variables)
       return response.dig('data', 'createRecord', 'record')
     end
 
@@ -100,17 +93,38 @@ module Mulukhiya
     # capsicum / 番組表が扱うのは数値 annictId なので、ここで node ID へ解決する。
     def resolve_episode_node_id(annict_id)
       annict_id = annict_id.to_i
-      response = query(:resolve_episode, {annictIds: [annict_id]})
-      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
-      if response['errors'].present?
-        raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
-      end
+      response = annict_query!(:resolve_episode, {annictIds: [annict_id]})
       nodes = response.dig('data', 'searchEpisodes', 'nodes')
       node = Array(nodes).find {|n| n.is_a?(Hash) && n['annictId'].to_i == annict_id}
       unless node&.dig('id').present?
         raise Ginseng::NotFoundError, "Annict episode not found: #{annict_id}"
       end
       return node['id']
+    end
+
+    # query を実行し、Annict 由来の auth/scope 失敗を AuthError (403) に
+    # 正規化する。Annict は write 権限不足トークンを HTTP 401/403
+    # (Ginseng::HTTP が GatewayError "Bad response 40x" に変換) で返すことも、
+    # 200 + GraphQL errors で返すこともあるため、capsicum には「要(再)連携」を
+    # 403 一本で見せられるようここで吸収する (扱いやすいプロキシの責務)。
+    def annict_query!(template, variables)
+      response = begin
+        query(template, variables)
+      rescue Ginseng::GatewayError => e
+        if /Bad response (401|403)/.match?(e.message.to_s)
+          raise Ginseng::AuthError, 'Annict authorization required'
+        end
+        raise
+      end
+      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
+      if response['errors'].present?
+        message = format_graphql_errors(response['errors'])
+        if /unauthor|forbidden|scope|token|permission|credential/i.match?(message)
+          raise Ginseng::AuthError, 'Annict authorization required'
+        end
+        raise Ginseng::GatewayError, message
+      end
+      return response
     end
 
     def crawl(params = {})
