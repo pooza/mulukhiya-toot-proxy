@@ -133,56 +133,112 @@ module Mulukhiya
       end
     end
 
-    def test_create_record_sends_mutation_with_normalized_variables
+    # #4339: create_record は resolve_episode → createRecord の 2 段クエリに
+    # なった。query 種別でレスポンスを出し分けるスタブを張り、捕捉した
+    # リクエストボディを {resolve:, create:} で返す。
+    def stub_annict_create_record(endpoint, resolve:, create:)
+      captured = {}
+      stub_request(:post, endpoint).with do |request|
+        body = JSON.parse(request.body)
+        next false unless body['query'].include?('searchEpisodes')
+        captured[:resolve] = body
+        true
+      end.to_return(body: resolve.to_json, headers: {'Content-Type' => 'application/json'})
+      stub_request(:post, endpoint).with do |request|
+        body = JSON.parse(request.body)
+        next false unless body['query'].include?('createRecord')
+        captured[:create] = body
+        true
+      end.to_return(body: create.to_json, headers: {'Content-Type' => 'application/json'})
+      return captured
+    end
+
+    def test_create_record_resolves_node_id_and_sends_mutation
       return if disable?
       endpoint = config['/service/annict/urls/api/graphql']
-      captured = nil
-      stub_request(:post, endpoint).with do |request|
-        captured = JSON.parse(request.body)
-        true
-      end.to_return(
-        body: {
-          data: {
-            createRecord: {
-              record: {
-                id: 'gid://annict/Record/4_141_053',
-                annictId: 4_141_053,
-                comment: 'よかった',
-                ratingState: 'GREAT',
-                rating: nil,
-                createdAt: '2026-05-07T12:00:00Z',
-              },
-            },
-          },
-        }.to_json,
-        headers: {'Content-Type' => 'application/json'},
+      node_id = 'RXBpc29kZS02MzE2Mg=='
+      captured = stub_annict_create_record(
+        endpoint,
+        resolve: {data: {searchEpisodes: {nodes: [
+          {id: 'RXBpc29kZS05OTk=', annictId: 999},
+          {id: node_id, annictId: 63_162},
+        ]}}},
+        create: {data: {createRecord: {record: {
+          id: 'gid://annict/Record/4_141_053',
+          annictId: 4_141_053,
+          comment: 'よかった',
+          ratingState: 'GREAT',
+          rating: nil,
+          createdAt: '2026-05-07T12:00:00Z',
+        }}}},
       )
 
       record = @service.create_record(episode_id: 63_162, comment: 'よかった', rating_state: 'GREAT')
 
       assert_equal(4_141_053, record['annictId'])
       assert_equal('GREAT', record['ratingState'])
-      assert_match(/createRecord/, captured['query'])
-      assert_equal('63162', captured.dig('variables', 'episodeId'))
-      assert_equal('よかった', captured.dig('variables', 'comment'))
-      assert_equal('GREAT', captured.dig('variables', 'ratingState'))
+      assert_match(/searchEpisodes/, captured.dig(:resolve, 'query'))
+      assert_equal([63_162], captured.dig(:resolve, 'variables', 'annictIds'))
+      assert_match(/createRecord/, captured.dig(:create, 'query'))
+      assert_equal(node_id, captured.dig(:create, 'variables', 'episodeId'))
+      assert_equal('よかった', captured.dig(:create, 'variables', 'comment'))
+      assert_equal('GREAT', captured.dig(:create, 'variables', 'ratingState'))
     end
 
     def test_create_record_omits_blank_optional_variables
       return if disable?
       endpoint = config['/service/annict/urls/api/graphql']
-      captured = nil
-      stub_request(:post, endpoint).with do |request|
-        captured = JSON.parse(request.body)
-        true
-      end.to_return(
-        body: {data: {createRecord: {record: {annictId: 1}}}}.to_json,
-        headers: {'Content-Type' => 'application/json'},
+      node_id = 'RXBpc29kZS0x'
+      captured = stub_annict_create_record(
+        endpoint,
+        resolve: {data: {searchEpisodes: {nodes: [{id: node_id, annictId: 1}]}}},
+        create: {data: {createRecord: {record: {annictId: 1}}}},
       )
 
       @service.create_record(episode_id: 1)
 
-      assert_equal({'episodeId' => '1'}, captured['variables'])
+      assert_equal({'episodeId' => node_id}, captured.dig(:create, 'variables'))
+    end
+
+    def test_create_record_raises_not_found_when_episode_unresolved
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {data: {searchEpisodes: {nodes: []}}}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::NotFoundError) do
+        @service.create_record(episode_id: 20_314)
+      end
+    end
+
+    def test_create_record_normalizes_scope_graphql_error_to_auth_error
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_annict_create_record(
+        endpoint,
+        resolve: {data: {searchEpisodes: {nodes: [{id: 'RXBpc29kZS0yMDMxNA==', annictId: 20_314}]}}},
+        create: {errors: [{message: 'You are not authorized: missing write scope'}]},
+      )
+
+      assert_raise(Ginseng::AuthError) do
+        @service.create_record(episode_id: 20_314)
+      end
+    end
+
+    def test_create_record_normalizes_http_403_to_auth_error
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        status: 403,
+        body: 'Forbidden',
+        headers: {'Content-Type' => 'text/plain'},
+      )
+
+      assert_raise(Ginseng::AuthError) do
+        @service.create_record(episode_id: 20_314)
+      end
     end
 
     def test_create_record_raises_on_graphql_errors
