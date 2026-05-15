@@ -1,0 +1,8 @@
+query ($annictIds: [Int!]) {
+  searchEpisodes(annictIds: $annictIds) {
+    nodes {
+      id
+      annictId
+    }
+  }
+}

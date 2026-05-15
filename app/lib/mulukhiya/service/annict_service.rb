@@ -80,7 +80,7 @@ module Mulukhiya
 
     def create_record(episode_id:, comment: nil, rating_state: nil)
       variables = {
-        episodeId: episode_id.to_s,
+        episodeId: resolve_episode_node_id(episode_id),
         comment:,
         ratingState: rating_state,
       }.compact
@@ -93,6 +93,22 @@ module Mulukhiya
         raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
       end
       return response.dig('data', 'createRecord', 'record')
+    end
+
+    # Annict GraphQL の createRecord は episodeId に Relay グローバルノード ID
+    # (Base64) を要求し、数値 annictId をそのまま渡すと `Invalid input` で弾く。
+    # capsicum / 番組表が扱うのは数値 annictId なので、ここで node ID へ解決する。
+    def resolve_episode_node_id(annict_id)
+      annict_id = annict_id.to_i
+      response = query(:resolve_episode, {annictIds: [annict_id]})
+      raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
+      if response['errors'].present?
+        raise Ginseng::GatewayError, format_graphql_errors(response['errors'])
+      end
+      nodes = response.dig('data', 'searchEpisodes', 'nodes')
+      node = Array(nodes).find {|n| n.is_a?(Hash) && n['annictId'].to_i == annict_id}
+      raise Ginseng::NotFoundError, "Annict episode not found: #{annict_id}" unless node&.dig('id').present?
+      return node['id']
     end
 
     def crawl(params = {})
