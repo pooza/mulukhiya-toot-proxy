@@ -732,7 +732,7 @@ NowPlaying 情報を除去して再投稿する。
 
 ##### 設定キー
 
-- `/program/urls`: マルチインスタンス共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
+- `/program/urls`: マルチサーバー共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
 - `/program/auto_update`: `true` (既定) の場合 `ProgramUpdateWorker` が 1 分ごとに `/program/urls` から pull して YAML を上書きする。**番組表エディタを使うサーバーでは `false` に設定して上書きを防ぐ**こと
 
 #### POST /mulukhiya/api/admin/program/entry
@@ -745,7 +745,7 @@ NowPlaying 情報を除去して再投稿する。
 
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
-| `key` | string | 任意 | エントリ識別子（既存と重複不可）。省略時はサーバが内容ハッシュ + ランダム要素から 12 桁の一意キーを自動生成 |
+| `key` | string | 任意 | エントリ識別子（既存と重複不可）。省略時はサーバーが内容ハッシュ + ランダム要素から 12 桁の一意キーを自動生成 |
 | `series` | string | 必須 | 作品名 |
 | `episode` | integer | 任意 | 話数 |
 | `episode_suffix` | string | 任意 | 話数表記（既定「話」） |
