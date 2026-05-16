@@ -241,15 +241,56 @@ module Mulukhiya
       end
     end
 
-    def test_create_record_raises_on_graphql_errors
+    def test_create_record_raises_gateway_error_on_unclassified_graphql_errors
       return if disable?
       endpoint = config['/service/annict/urls/api/graphql']
       stub_request(:post, endpoint).to_return(
-        body: {errors: [{message: 'Episode not found'}]}.to_json,
+        body: {errors: [{message: 'Internal server error'}]}.to_json,
         headers: {'Content-Type' => 'application/json'},
       )
 
       assert_raise(Ginseng::GatewayError) do
+        @service.create_record(episode_id: 999_999)
+      end
+    end
+
+    # #4329: クライアント起因の Annict GraphQL errors を 502 に丸めず
+    # 404 / 422 に分類する。
+    def test_create_record_classifies_not_found_graphql_error
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {errors: [{message: 'Episode does not exist'}]}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::NotFoundError) do
+        @service.create_record(episode_id: 999_999)
+      end
+    end
+
+    def test_create_record_classifies_validation_graphql_error_by_message
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {errors: [{message: 'Argument is invalid'}]}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::ValidateError) do
+        @service.create_record(episode_id: 999_999)
+      end
+    end
+
+    def test_create_record_classifies_graphql_error_by_extensions_code
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {errors: [{message: 'boom', extensions: {code: 'NOT_FOUND'}}]}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::NotFoundError) do
         @service.create_record(episode_id: 999_999)
       end
     end
