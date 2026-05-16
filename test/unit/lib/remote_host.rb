@@ -46,10 +46,24 @@ module Mulukhiya
       assert_false(RemoteHost.public?('nx.example', resolver: stub_resolver([])))
     end
 
-    def test_returns_false_when_resolver_raises
-      raising = ->(_host) {raise 'getaddrinfo failure'}
+    def test_returns_false_when_resolver_raises_dns_error
+      [SocketError, Resolv::ResolvError, Errno::ENOENT, Errno::ETIMEDOUT].each do |klass|
+        raising = ->(_host) {raise klass, 'getaddrinfo failure'}
 
-      assert_false(RemoteHost.public?('attacker.example', resolver: raising))
+        assert_false(
+          RemoteHost.public?('attacker.example', resolver: raising),
+          "#{klass} は fail-closed で false を返すべき",
+        )
+      end
+    end
+
+    def test_reraises_non_dns_error
+      # IPAddr::Error 等のロジックバグは握り潰さず Sentry へ伝播させる。
+      raising = ->(_host) {raise IPAddr::InvalidAddressError, 'broken resolver'}
+
+      assert_raise(IPAddr::InvalidAddressError) do
+        RemoteHost.public?('attacker.example', resolver: raising)
+      end
     end
 
     def test_returns_true_for_public_address
