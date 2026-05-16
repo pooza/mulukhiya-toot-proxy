@@ -410,7 +410,7 @@ module Mulukhiya
         return Ginseng::NotFoundError
       end
       if codes.any? {|c| /ARGUMENT|VALIDATION|INVALID|UNPROCESSABLE|BAD_REQUEST/.match?(c)} ||
-         /invalid|validation|must be|argument/i.match?(message)
+          /invalid|validation|must be|argument/i.match?(message)
         return Ginseng::ValidateError
       end
       return Ginseng::GatewayError

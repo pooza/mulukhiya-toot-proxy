@@ -11,7 +11,7 @@ module Mulukhiya
       # ユーザー単位の Annict 連携状態を合流させる (#4338)。features の
       # キーは sub_hash 由来の文字列なので合わせる。
       about[:config][:features] = about[:config][:features]
-        .merge('annict_linked' => (sns.account&.annict_linked? || false))
+        .merge('annict_linked' => sns.account&.annict_linked? || false)
       @renderer.message = about
       return @renderer.to_s
     rescue => e
