@@ -121,7 +121,7 @@ module Mulukhiya
     end
 
     def invalidate_cache
-      redis.unlink(REDIS_KEY)
+      return redis.unlink(REDIS_KEY)
     end
 
     alias to_s to_yaml
@@ -232,7 +232,7 @@ module Mulukhiya
       FileUtils.mkdir_p(dir)
       tmp = File.join(dir, ".program.yaml.#{Process.pid}.#{Thread.current.object_id}")
       File.write(tmp, programs.to_yaml)
-      File.rename(tmp, YAML_PATH)
+      return File.rename(tmp, YAML_PATH)
     end
   end
 end
