@@ -208,9 +208,23 @@ module Mulukhiya
     def update_cache(programs)
       return redis[REDIS_KEY] = programs.to_json
     rescue => e
+      # SET が中途半端に値を残したまま例外になった場合に備え、不整合な
+      # キャッシュを除去して以降の read を YAML フォールバックへ倒す保険。
+      # Redis 全断なら UNLINK も失敗するが、その場合は実質キャッシュ無しと
+      # 等価なので無害 (best-effort、例外は握り潰す)。
       invalidate_cache rescue nil
-      e.alert
+      # Redis 書込失敗の根因 (件数・JSON サイズ) を Sentry に残す。
+      e.alert(**cache_failure_context(programs))
       return nil
+    end
+
+    # alert に添える文脈。programs.to_json が失敗要因だった場合に
+    # ここで再 raise すると alert 自体が落ちるため握り潰して空で返す。
+    def cache_failure_context(programs)
+      return {programs_size: programs.size, json_bytes: programs.to_json.bytesize}
+    rescue => e
+      e.log
+      return {}
     end
 
     def write_yaml(programs)

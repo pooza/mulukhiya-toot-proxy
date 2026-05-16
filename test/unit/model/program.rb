@@ -74,6 +74,14 @@ module Mulukhiya
       assert_kind_of(Hash, @program.data)
     end
 
+    def test_cache_failure_context
+      ctx = @program.send(:cache_failure_context, {'k1' => {}, 'k2' => {}})
+
+      assert_equal(2, ctx[:programs_size])
+      assert_kind_of(Integer, ctx[:json_bytes])
+      assert_operator(ctx[:json_bytes], :>, 0)
+    end
+
     def test_add_entry_creates_new_entry
       key = "test_add_#{Time.now.to_i}"
       original = @program.data
