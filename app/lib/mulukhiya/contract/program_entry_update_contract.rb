@@ -20,20 +20,20 @@ module Mulukhiya
 
     rule(:series) do
       next unless key?
-      key.failure('空欄です。') if value.to_s.empty?
+      key.failure('シリーズ名が空欄です。') if value.to_s.empty?
     end
 
     rule(:extra_tags) do
       next unless value.is_a?(Array)
       unless value.all? {|s| s.is_a?(String) && s.size <= ProgramEntryContract::MAX_TAG_SIZE}
-        key.failure("文字列 (各要素 #{ProgramEntryContract::MAX_TAG_SIZE} 文字以下) の配列で指定してください。")
+        key.failure("追加タグは文字列 (各要素 #{ProgramEntryContract::MAX_TAG_SIZE} 文字以下) の配列で指定してください。")
       end
     end
 
     rule(:source_url) do
       next unless value.is_a?(String)
       unless ProgramEntryContract::URL_FORMAT.match?(value)
-        key.failure('http(s):// で始まる URL を指定してください。')
+        key.failure('ソース URL は http(s):// で始まる URL を指定してください。')
       end
     end
   end

@@ -105,5 +105,18 @@ module Mulukhiya
       assert_empty(@contract.call(source_url: 'http://example.com/').errors)
       assert_empty(@contract.call(source_url: 'https://example.com/').errors)
     end
+
+    def test_error_messages_include_field_name
+      assert_match(/シリーズ名/, @contract.exec(series: '').fetch(:series).join)
+      assert_match(
+        /追加タグ/,
+        @contract.exec(extra_tags: ['a' * (ProgramEntryContract::MAX_TAG_SIZE + 1)])
+          .fetch(:extra_tags).join,
+      )
+      assert_match(
+        /ソース URL/,
+        @contract.exec(source_url: 'javascript:alert(1)').fetch(:source_url).join,
+      )
+    end
   end
 end
