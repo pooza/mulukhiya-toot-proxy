@@ -491,17 +491,30 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      record = annict.create_record(
-        episode_id: params[:episode_id].to_i,
-        comment: params[:comment].presence,
-        rating_state: params[:rating_state].presence,
-      )
+      episode_id = params[:episode_id].to_i
+      lock = AnnictRecordLockStorage.new
+      unless lock.acquire(sns.account.id, episode_id)
+        raise Ginseng::ConflictError, 'Duplicate Annict record request is in progress'
+      end
+      begin
+        record = annict.create_record(
+          episode_id:,
+          comment: params[:comment].presence,
+          rating_state: params[:rating_state].presence,
+        )
+      rescue
+        # createRecord 失敗時はロックを解放しリトライ可能にする
+        # (record 未作成のため重複の懸念がない)。
+        lock.release(sns.account.id, episode_id)
+        raise
+      end
       @renderer.message = {record:}
       return @renderer.to_s
     rescue => e
       # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
       # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
-      e.alert
+      # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
+      e.alert unless e.is_a?(Ginseng::ConflictError)
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

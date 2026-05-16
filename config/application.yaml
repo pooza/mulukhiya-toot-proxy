@@ -525,6 +525,9 @@ service:
         default:
           - read
           - write
+    record:
+      idempotency:
+        ttl: 30
     review:
       suffixes:
         bad: （評価:良くない）
