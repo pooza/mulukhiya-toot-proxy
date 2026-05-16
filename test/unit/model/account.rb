@@ -95,6 +95,10 @@ module Mulukhiya
       assert_kind_of(UserConfig, account.user_config)
     end
 
+    def test_annict_linked?
+      assert_boolean(account.annict_linked?)
+    end
+
     def test_webhook
       assert_kind_of([Webhook, NilClass], account.webhook)
     end

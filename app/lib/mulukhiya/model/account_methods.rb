@@ -69,6 +69,18 @@ module Mulukhiya
       return @annict
     end
 
+    # 当該ユーザーに Annict access_token が保管済みか (#4338)。
+    # capsicum が features.annict_linked で感想投稿ボタンの出し分けに使う。
+    # account.annict と同一の token 存在判定で「連携済み」を表す
+    # (liveness/refresh 確認は about を重くするため範囲外)。
+    def annict_linked?
+      token = user_config['/service/annict/token'] || user_config['/annict/token']
+      return token.present?
+    rescue => e
+      e.log(acct: acct.to_s)
+      return false
+    end
+
     def featured_tags
       return TagContainer.new
     end
