@@ -79,6 +79,14 @@ module Mulukhiya
       assert_equal(schema_keys, ProgramEntryContract::PARAMS_KEYS.to_set)
     end
 
+    def test_writable_keys_excludes_key
+      assert_equal(
+        (ProgramEntryContract::PARAMS_KEYS - [:key]).to_set,
+        ProgramEntryContract::WRITABLE_KEYS.to_set,
+      )
+      assert_false(ProgramEntryContract::WRITABLE_KEYS.include?(:key))
+    end
+
     def test_series_max_length
       errors = @contract.call(@valid.merge(series: 'a' * 201)).errors
 

@@ -654,8 +654,9 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.transform_keys(&:to_sym)
-        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
+      attributes = params.to_h
+        .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
+        .transform_keys(&:to_sym)
       key = params[:key].to_s
       key = Program.instance.generate_key(attributes) if key.empty?
       entry = Program.instance.add_entry(key, attributes)
@@ -677,8 +678,9 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.transform_keys(&:to_sym)
-        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
+      attributes = params.to_h
+        .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
+        .transform_keys(&:to_sym)
       entry = Program.instance.update_entry(params[:key], attributes)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s

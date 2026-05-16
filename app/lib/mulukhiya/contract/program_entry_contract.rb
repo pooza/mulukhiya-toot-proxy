@@ -5,6 +5,10 @@ module Mulukhiya
       :air, :livecure, :enable, :extra_tags,
       :annict_work_id, :annict_episode_id, :source_type, :source_url
     ].freeze
+    # 書き込み可能な属性。:key は識別子であり attributes には含めない
+    # （add は別生成、update は URL から取得）。slice の前段で
+    # ホワイトリストする用途。
+    WRITABLE_KEYS = (PARAMS_KEYS - [:key]).freeze
     MAX_KEY_SIZE = 64
     MAX_TEXT_SIZE = 200
     MAX_TAGS = 32
