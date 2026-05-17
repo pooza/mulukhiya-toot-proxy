@@ -1,5 +1,3 @@
-require 'minitest/mock'
-
 module Mulukhiya
   class RemoteHostTest < TestCase
     def stub_resolver(addresses)
@@ -92,8 +90,12 @@ module Mulukhiya
         [Resolv::IPv4.create('93.184.216.34'), Resolv::IPv6.create('2606:2800:220:1::1')]
       end
       fake.define_singleton_method(:close) {nil}
-      result = Resolv::DNS.stub(:new, fake) do
-        RemoteHost.resolve_addresses('example.com')
+      original = Resolv::DNS.method(:new)
+      Resolv::DNS.define_singleton_method(:new) {|*| fake}
+      begin
+        result = RemoteHost.resolve_addresses('example.com')
+      ensure
+        Resolv::DNS.define_singleton_method(:new, original)
       end
 
       assert_equal(RemoteHost.dns_timeout, applied)
