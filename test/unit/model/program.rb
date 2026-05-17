@@ -282,9 +282,51 @@ module Mulukhiya
       config['/program/fetch/max_bytes'] = original_max if defined?(original_max)
     end
 
+    def test_fetch_remote_skips_before_get_when_content_length_exceeds_max
+      return if disable?
+      url = 'http://example.com/huge.json'
+      payload = {'remote_c' => {'series' => 'Remote C'}}
+      stub_remote_program(url, payload.to_json, content_length: Program::DEFAULT_FETCH_MAX_BYTES + 1)
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_nil(result)
+        assert_not_requested(:get, url)
+      end
+    end
+
+    def test_fetch_remote_proceeds_when_head_unsupported
+      return if disable?
+      url = 'http://example.com/no_head.json'
+      payload = {'remote_d' => {'series' => 'Remote D'}}
+      stub_request(:head, url).to_return(status: 405)
+      stub_request(:get, url)
+        .to_return(body: payload.to_json, headers: {'Content-Type' => 'application/json'})
+      with_program_urls([url]) do
+        result = @program.send(:fetch_remote)
+
+        assert_equal(payload, result)
+      end
+    end
+
+    def test_fetch_timeout_returns_configured_value
+      assert_kind_of(Integer, @program.send(:fetch_timeout))
+      assert_equal(config['/program/fetch/timeout'], @program.send(:fetch_timeout))
+    end
+
+    def test_fetch_timeout_honors_config
+      original = config['/program/fetch/timeout']
+      config['/program/fetch/timeout'] = 7
+
+      assert_equal(7, @program.send(:fetch_timeout))
+    ensure
+      config['/program/fetch/timeout'] = original
+    end
+
     def test_fetch_remote_returns_nil_when_all_urls_fail
       return if disable?
       url = 'http://example.com/fail.json'
+      stub_request(:head, url).to_raise(StandardError.new('upstream down'))
       stub_request(:get, url).to_raise(StandardError.new('upstream down'))
       with_program_urls([url]) do
         result = @program.send(:fetch_remote)
@@ -299,6 +341,7 @@ module Mulukhiya
       sentinel_key = "test_sentinel_#{Time.now.to_i}"
       @program.save(sentinel_key => {'series' => 'Sentinel', 'enable' => true})
       url = 'http://example.com/fail.json'
+      stub_request(:head, url).to_raise(StandardError.new('upstream down'))
       stub_request(:get, url).to_raise(StandardError.new('upstream down'))
       with_program_urls([url]) do
         @program.update
@@ -334,7 +377,9 @@ module Mulukhiya
 
     private
 
-    def stub_remote_program(url, body)
+    def stub_remote_program(url, body, content_length: body.bytesize)
+      stub_request(:head, url)
+        .to_return(headers: {'Content-Length' => content_length.to_s})
       stub_request(:get, url)
         .to_return(body:, headers: {'Content-Type' => 'application/json'})
     end

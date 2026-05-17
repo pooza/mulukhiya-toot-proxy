@@ -263,6 +263,9 @@ properties:
           max_bytes:
             minimum: 1
             type: integer
+          timeout:
+            minimum: 1
+            type: integer
         type: object
     required:
       - urls

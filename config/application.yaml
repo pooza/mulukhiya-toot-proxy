@@ -475,6 +475,7 @@ program:
   urls: []
   fetch:
     max_bytes: 1048576
+    timeout: 30
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008

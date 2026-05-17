@@ -1,11 +1,12 @@
 module Mulukhiya
-  class Program
+  class Program # rubocop:disable Metrics/ClassLength
     include Singleton
     include Package
 
     YAML_PATH = File.join(Environment.dir, 'var/program.yaml').freeze
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
+    DEFAULT_FETCH_TIMEOUT = 30
 
     def update
       return nil unless auto_update?
@@ -148,7 +149,8 @@ module Mulukhiya
       programs = {}
       success = 0
       uris.each do |v|
-        response = @http.get(v)
+        next unless valid_content_length?(v)
+        response = @http.get(v, timeout: fetch_timeout)
         next unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next unless valid_program_schema?(parsed, v)
@@ -165,17 +167,30 @@ module Mulukhiya
       return programs
     end
 
+    # HTTParty がレスポンス本文を丸ごとメモリへ読み込む前に、相手が申告した
+    # Content-Length が max を超えていれば GET せず弾く。Content-Length 不在や
+    # HEAD 非対応 (GatewayError) の場合は判定不能としてそのまま GET へ進み、
+    # 受信後の valid_response_size? を最終防衛線とする。
+    def valid_content_length?(uri)
+      length = @http.head(uri, timeout: fetch_timeout).headers['content-length']
+      return true if length.nil? || length.to_i <= fetch_max_bytes
+      log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
+      return false
+    rescue => e
+      # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する
+      e.log(url: uri.to_s)
+      return true
+    end
+
     def valid_response_size?(response, uri)
       bytes = response.body.to_s.bytesize
-      max = fetch_max_bytes
-      return true if bytes <= max
-      logger.error(
-        message: 'program fetch exceeded max bytes',
-        url: uri.to_s,
-        bytes:,
-        max_bytes: max,
-      )
+      return true if bytes <= fetch_max_bytes
+      log_oversize(uri, bytes, 'program fetch exceeded max bytes')
       return false
+    end
+
+    def log_oversize(uri, bytes, message)
+      logger.error(message:, url: uri.to_s, bytes:, max_bytes: fetch_max_bytes)
     end
 
     def valid_program_schema?(parsed, uri)
@@ -190,6 +205,10 @@ module Mulukhiya
 
     def fetch_max_bytes
       return config['/program/fetch/max_bytes'] || DEFAULT_FETCH_MAX_BYTES
+    end
+
+    def fetch_timeout
+      return config['/program/fetch/timeout'] || DEFAULT_FETCH_TIMEOUT
     end
 
     def cached_data
