@@ -19,6 +19,10 @@ module Mulukhiya
     end
 
     def test_cursor_pagination_delegated_to_attachment_class
+      # attachment_class は Sequel::Model のため、DB 未接続環境で参照すると
+      # クラスロード時に Sequel::Error になる。AttachmentTest と同じ DB
+      # 構成ガードで保護する。
+      return unless Environment.dbms_class&.config?
       if Environment.misskey_type?
         assert_false(@worker.attachment_class.cursor_pagination?)
       else
