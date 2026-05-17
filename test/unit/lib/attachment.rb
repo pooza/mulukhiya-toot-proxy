@@ -114,5 +114,10 @@ module Mulukhiya
 
       assert_kind_of(Hash, result[:items].first)
     end
+
+    def test_cursor_pagination
+      assert_boolean(attachment_class.cursor_pagination?)
+      assert_equal(!Environment.misskey_type?, attachment_class.cursor_pagination?)
+    end
   end
 end

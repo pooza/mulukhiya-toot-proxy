@@ -18,11 +18,11 @@ module Mulukhiya
       assert_equal('media_catalog', MediaCatalogUpdateWorker.sidekiq_options['queue'])
     end
 
-    def test_cursor_paging_disabled_on_misskey
+    def test_cursor_pagination_delegated_to_attachment_class
       if Environment.misskey_type?
-        assert_false(@worker.send(:cursor_paging?))
+        assert_false(@worker.attachment_class.cursor_pagination?)
       else
-        assert_true(@worker.send(:cursor_paging?))
+        assert_true(@worker.attachment_class.cursor_pagination?)
       end
     end
   end

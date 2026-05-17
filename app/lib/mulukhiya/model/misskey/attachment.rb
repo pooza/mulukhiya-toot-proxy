@@ -34,6 +34,16 @@ module Mulukhiya
         return nil
       end
 
+      # Misskey の media_catalog SQL は note_id ベースで unnest を展開するため、
+      # 単一ノートに複数添付があると同 note_id の行が連続して並ぶ。non-unique な
+      # 並びに対して `note_id < cursor` で次ページを取ると、ページ境界に該当した
+      # ノートの残り添付がキャッシュから抜ける (#4325)。短期対処として cursor を
+      # 更新せず OFFSET ページングのみを使う。SQL 側で複合キー cursor へ移行する
+      # のは将来の改善 (#4323 と合わせて検討)。
+      def self.cursor_pagination?
+        return false
+      end
+
       def self.catalog(params = {})
         params[:limit] ||= config['/webui/media/catalog/limit']
         unless params[:rule] || params[:skip_cache]

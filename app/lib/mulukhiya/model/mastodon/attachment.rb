@@ -56,6 +56,12 @@ module Mulukhiya
         return MastodonService.new.create_uri(path(size))
       end
 
+      # media_catalog SQL は media_attachments.id (unique) を cursor に使えるため
+      # 安定したキーセットページングが可能。
+      def self.cursor_pagination?
+        return true
+      end
+
       def self.catalog(params = {})
         params[:limit] ||= config['/webui/media/catalog/limit']
         unless params[:rule] || params[:skip_cache]
