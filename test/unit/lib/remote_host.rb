@@ -1,3 +1,5 @@
+require 'minitest/mock'
+
 module Mulukhiya
   class RemoteHostTest < TestCase
     def stub_resolver(addresses)
@@ -75,6 +77,27 @@ module Mulukhiya
       # resolved IP, not the visible name. If DNS returns a private address we
       # block regardless of how legitimate the hostname looks.
       assert_false(RemoteHost.public?('xn--google-yvc.com', resolver: stub_resolver(['10.0.0.5'])))
+    end
+
+    def test_dns_timeout_returns_configured_value
+      assert_kind_of(Numeric, RemoteHost.dns_timeout)
+      assert_equal(Config.instance['/remote_host/dns/timeout'], RemoteHost.dns_timeout)
+    end
+
+    def test_resolve_addresses_applies_timeout_and_maps_to_strings
+      applied = nil
+      fake = Object.new
+      fake.define_singleton_method(:timeouts=) {|v| applied = v}
+      fake.define_singleton_method(:getaddresses) do |_host|
+        [Resolv::IPv4.create('93.184.216.34'), Resolv::IPv6.create('2606:2800:220:1::1')]
+      end
+      fake.define_singleton_method(:close) {nil}
+      result = Resolv::DNS.stub(:new, fake) do
+        RemoteHost.resolve_addresses('example.com')
+      end
+
+      assert_equal(RemoteHost.dns_timeout, applied)
+      assert_equal(['93.184.216.34', '2606:2800:220:1::1'], result)
     end
   end
 end

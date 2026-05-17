@@ -270,6 +270,15 @@ properties:
     required:
       - urls
     type: object
+  remote_host:
+    properties:
+      dns:
+        properties:
+          timeout:
+            minimum: 1
+            type: integer
+        type: object
+    type: object
   puma:
     properties:
       port:

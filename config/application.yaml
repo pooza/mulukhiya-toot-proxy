@@ -476,6 +476,9 @@ program:
   fetch:
     max_bytes: 1048576
     timeout: 30
+remote_host:
+  dns:
+    timeout: 3
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
