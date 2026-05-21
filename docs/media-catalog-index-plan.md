@@ -4,6 +4,10 @@
 > ローカルに DB がない環境で SQL 構造のみから設計した候補であり、適用前に
 > ステージング（dev04 等）または本番相当データでの `EXPLAIN (ANALYZE, BUFFERS)`
 > 検証が必須。検証・適用は chubo2 側のオプス作業（[chubo2#37](https://github.com/pooza/chubo2/issues/37) 隣接）として扱う。
+>
+> 検証手順は [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql)
+> にスクリプト化済み（棚卸し → ベースライン EXPLAIN → 候補 DDL → 再計測 → 撤去）。
+> 残るのは実機での実行と結果に基づく候補の取捨選択のみ。
 
 ## 背景
 
@@ -36,6 +40,22 @@ WHERE statuses.local = true
 ORDER BY attachments.id DESC
 LIMIT :limit
 ```
+
+WHERE には他に 2 つの条件分岐がある:
+
+- **`rule` 時**: `concat_ws(statuses.text, statuses.spoiler_text, attachments.description)
+  LIKE '%keyword%'`。カスタムフィード（rule 付き、利用者 2 名）専用の経路。
+  前方ワイルドカード LIKE は btree index で加速できず、加速するなら pg_trgm GIN が
+  必要になるが、底値 10 秒問題は **rule なしのカタログ表示**で起きているため
+  本 issue のスコープ外。候補 index は rule なしクエリの改善に閉じる。
+- **`test_account` 時**: `accounts.id <> :test_account_id`。常時付与の等値否定で
+  selectivity への寄与は無視できる。
+
+候補 index（特に候補 A の partial 述語）には**常時付与される 4 条件
+（local / reblog_of_id / visibility / deleted_at）のみ**を含める。
+only_person / cursor / rule / test_account はクエリにより有無が変わるため
+partial 述語に入れると一部の変種で index が使えなくなる。4 条件はどの変種でも
+必ず付くため、partial index の述語として全変種から共用できる。
 
 ## 推定される病理（要 EXPLAIN 検証）
 
@@ -108,9 +128,14 @@ WHERE silenced_at IS NULL AND suspended_at IS NULL;
 
 ## 検証手順（実機 / ステージング）
 
+検証・適用は [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql)
+にスクリプト化済み（§1 棚卸し → §2 ベースライン EXPLAIN → §3 候補 DDL →
+§4 再計測 → §5 サイズ → §6 撤去）。`psql -d <mastodon_db> -f` で流す。
+以下はその実行手順の要約:
+
 1. ベースライン取得: 代表的なパラメータ（page=1, only_person=0 / 1, cursor あり/なし）で
    `EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)` を採取し、プラン・実時間・
-   shared read を記録。
+   shared read を記録（スクリプト §1–§2）。
 2. **まず既存 index の効きを確認**（候補追加前）。`index_statuses_local` 等が
    採用されていれば、本 issue の主因の再定義が必要。
 3. 候補 A を `CONCURRENTLY` で追加 → 同一クエリ群を再計測。底値（10 秒級）が
