@@ -133,7 +133,7 @@ git diff Gemfile.lock
 
 テーマ: 5.22 リリース前レビュー送り消化 + 観測性・docs 改善 + 番組表エディタ補助機能（17 件 / 25 重み — 予算 25 内）。番組表リニューアル全フェーズ完了後の最初のリリースで、主軸は据えず「滞留した小粒の整理回」と位置付ける。
 
-**進捗（develop 着地済み・未リリース）**: 15/17 件完了（CI 緑、最終 tip 3efc5371 success）。#4280 #4314 #4319 #4313 #4316 #4333 #4334 #4335 は手動検証価値が薄いためリリース前倒しで **closed**（#4334 #4335 は 2026-05-18 着地後クローズ）。#4336 #4329 #4330 #4338 #4318 #4328 #4331 は実装済みだがステージング/実機検証のため **open 維持**（#4328 #4331 は 2026-05-18 着地、各 Issue にテスト観点メモ済み。#4335 #4331 は CI で test-unit 環境差由来の追従修正あり）。残: #4323 は実機 EXPLAIN 未検証のため調査ドラフト（[media-catalog-index-plan.md](media-catalog-index-plan.md)）のみ・実装は検証待ちで open 維持、#4332 は本番全台 allowed_hosts 確認が前提のためユーザー判断で **保留**。
+**進捗（develop 着地済み・未リリース）**: 16/17 件決着（CI 緑）。#4280 #4314 #4319 #4313 #4316 #4333 #4334 #4335 は手動検証価値が薄いためリリース前倒しで **closed**（#4334 #4335 は 2026-05-18 着地後クローズ）。#4336 #4329 #4330 #4338 #4318 #4328 #4331 は実装済みだがステージング/実機検証のため **open 維持**（#4328 #4331 は 2026-05-18 着地、各 Issue にテスト観点メモ済み。#4335 #4331 は CI で test-unit 環境差由来の追従修正あり）。#4332 は allow-all デフォルトが妥当（endpoint がベンダー管理で allowlist 列挙不能・内部宛 SSRF は #4271 で対応済み）と判断し **wontfix でクローズ**（NOTE コメントに理由明記）。残 1 件: #4323 は実機 EXPLAIN 未検証のため open 維持（検証スクリプト [bin/diag/media_catalog_index.sql](../bin/diag/media_catalog_index.sql) は用意済み、実機実行待ち。調査ドラフトは [media-catalog-index-plan.md](media-catalog-index-plan.md)）。
 
 ### 5.22 リリース前レビュー送り（8 件）
 
@@ -142,7 +142,7 @@ git diff Gemfile.lock
 - #4333 refactor: RemoteHost.public? の bare rescue を具体例外に絞る（G2、size:S）
 - #4329 feat: AnnictService の GraphQL エラーをカテゴリ別 status code で返す（Y5、size:S）
 - #4330 feat: POST /annict/record に冪等性を持たせて重複 record 投稿を防ぐ（Y6、size:M）
-- #4332 feat: SwSubscriptionContract の allowed_hosts 空配列を deny-all に反転（G1、運用変更要、size:S）
+- #4332 feat: SwSubscriptionContract の allowed_hosts 空配列を deny-all に反転（G1、運用変更要、size:S）→ **wontfix クローズ**（allow-all デフォルトが妥当と判断）
 - #4334 perf: RateLimitStorage を EVALSHA + NOSCRIPT フォールバックに移行（G3、size:S）
 - #4335 refactor: MediaCatalogUpdateWorker の cursor_pagination? を Attachment 側に移譲（G4、#4323 と連動、size:S）
 
