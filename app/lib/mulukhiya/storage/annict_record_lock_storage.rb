@@ -21,7 +21,7 @@ module Mulukhiya
     end
 
     def ttl
-      return config['/service/annict/record/idempotency/ttl'] || 30
+      return @ttl ||= (config['/service/annict/record/idempotency/ttl'] || 30)
     end
 
     def prefix

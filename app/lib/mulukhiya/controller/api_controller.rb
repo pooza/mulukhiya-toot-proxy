@@ -265,10 +265,11 @@ module Mulukhiya
 
     get '/media' do
       # media_catalog 無効時は 404 ではなく 503 + 空リスト + available:false を返す
-      # (#4343)。404 = 「このサーバではエンドポイント自体が提供されていない」、
+      # (#4343)。404 = 「このサーバーではエンドポイント自体が提供されていない」、
       # 503 = 「機能はあるが現在 OFF」をクライアント（capsicum 等）が区別できるよう
       # にするため。features.media_catalog と組合せて利用する想定。
       unless controller_class.media_catalog?
+        Logger.new.info(media_catalog: {event: 'disabled_response', endpoint: '/media'})
         @renderer.status = 503
         @renderer.message = {available: false, items: [], has_next: false}
         return @renderer.to_s

@@ -19,7 +19,10 @@ module Mulukhiya
       @renderer = MediaFeedRenderer.new
       # media_catalog 無効時は MediaFeedRenderer#fetch が空の channel を返す。
       # 404 ではなく 503 を返してフィードの「現在 OFF」状態を明示する (#4343)。
-      @renderer.status = 503 unless controller_class.media_catalog?
+      unless controller_class.media_catalog?
+        Logger.new.info(media_catalog: {event: 'disabled_response', endpoint: '/feed/media'})
+        @renderer.status = 503
+      end
       return @renderer.to_s
     rescue => e
       e.log
