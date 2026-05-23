@@ -323,7 +323,7 @@ mastodon:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: true
+    media_catalog: false
   dbms: postgres
   display_name: Mastodon
   features:
@@ -381,7 +381,7 @@ misskey:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: true
+    media_catalog: false
   dbms: postgres
   display_name: Misskey
   redis:

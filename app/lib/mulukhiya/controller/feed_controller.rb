@@ -15,9 +15,11 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.feed?
       @renderer = MediaFeedRenderer.new
+      # media_catalog 無効時は MediaFeedRenderer#fetch が空の channel を返す。
+      # 404 ではなく 503 を返してフィードの「現在 OFF」状態を明示する (#4343)。
+      @renderer.status = 503 unless controller_class.media_catalog?
       return @renderer.to_s
     rescue => e
       e.log

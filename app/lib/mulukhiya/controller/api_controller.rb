@@ -10,8 +10,15 @@ module Mulukhiya
       # server レベルの features に、当該リクエストの SNS token に紐付く
       # ユーザー単位の Annict 連携状態を合流させる (#4338)。features の
       # キーは sub_hash 由来の文字列なので合わせる。
+      # media_catalog は /{controller}/data 配下の機能フラグだが、クライアント
+      # （capsicum 等）からの discovery を features 一本に集約するため合流させる
+      # (#4343)。disabled 時の 503 応答と組合せて「機能未提供」(404) と
+      # 「現在 OFF」を区別可能にする。
       about[:config][:features] = about[:config][:features]
-        .merge('annict_linked' => sns.account&.annict_linked? || false)
+        .merge(
+          'annict_linked' => sns.account&.annict_linked? || false,
+          'media_catalog' => controller_class.media_catalog?,
+        )
       @renderer.message = about
       return @renderer.to_s
     rescue => e
@@ -257,7 +264,15 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
+      # media_catalog 無効時は 404 ではなく 503 + 空リスト + available:false を返す
+      # (#4343)。404 = 「このサーバではエンドポイント自体が提供されていない」、
+      # 503 = 「機能はあるが現在 OFF」をクライアント（capsicum 等）が区別できるよう
+      # にするため。features.media_catalog と組合せて利用する想定。
+      unless controller_class.media_catalog?
+        @renderer.status = 503
+        @renderer.message = {available: false, items: [], has_next: false}
+        return @renderer.to_s
+      end
       sns.token ||= sns.default_token
       # only_person は旧来 .to_i 経由で boolean 風文字列 ('true'/'false' 等) を 0/1
       # に丸める寛容な仕様だった。Contract 検証 (5.22.0 #4283 切出し時に検証順を
