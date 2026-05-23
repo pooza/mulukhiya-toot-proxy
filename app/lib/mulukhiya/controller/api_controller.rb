@@ -537,7 +537,11 @@ module Mulukhiya
       # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
       # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
       if e.is_a?(Ginseng::ConflictError)
-        Logger.new.info(annict_record: {event: 'conflict', account_id: sns.account&.id, episode_id: params[:episode_id]})
+        Logger.new.info(annict_record: {
+          event: 'conflict',
+          account_id: sns.account&.id,
+          episode_id: params[:episode_id],
+        })
       else
         e.alert
       end
