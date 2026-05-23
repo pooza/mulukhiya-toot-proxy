@@ -17,6 +17,8 @@ module Mulukhiya
     rescue RedisClient::NoScriptError
       # Redis 再起動 / failover でスクリプトキャッシュが揮発したケース。
       # EVAL は実行と同時に SHA を再登録するため、以降は EVALSHA に戻る。
+      # 発火頻度から Redis インスタンスの揮発検知に使えるため warn を残す。
+      Logger.new.warn(rate_limit: {event: 'noscript_fallback', key: created})
       return redis.call('EVAL', INCREMENT_SCRIPT, 1, created, window).to_i
     end
 

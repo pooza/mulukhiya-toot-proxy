@@ -534,7 +534,12 @@ module Mulukhiya
       # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
       # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
       # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
-      e.alert unless e.is_a?(Ginseng::ConflictError)
+      # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(annict_record: {event: 'conflict', account_id: sns.account&.id, episode_id: params[:episode_id]})
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

@@ -1,6 +1,6 @@
 # メディアカタログ機能
 
-モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該インスタンスのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
+モロヘイヤが提供する **メディアカタログ** （`/mulukhiya/api/media`、`/mulukhiya/feed/media`、`MediaCatalogUpdateWorker`）は、当該サーバーのローカル投稿に添付されたメディア（画像・動画・音声）をページング可能なカタログとして配信する機能。capsicum などのクライアントがメディア一覧画面を提供するために利用する。
 
 **5.23.0 (#4343) から デフォルト無効** に変更された。実験的機能として扱い、性能影響を理解したサーバー管理者だけが明示的にオプトインする運用に切り替えている。
 
@@ -20,7 +20,7 @@
 サーバーがメディアカタログを **無効** にしている場合:
 
 - `GET /mulukhiya/api/about` の `config.features.media_catalog` が `false`。クライアントは事前にこの値を見て UI を「メンテナンス中」相当に切替可能。
-- `GET /mulukhiya/api/media`（旧 404）→ **HTTP 503** + body `{"available": false, "items": [], "has_next": false}`。404 = 「このサーバではエンドポイント自体が提供されていない」と区別し、503 = 「機能はあるが現在 OFF」 を明示する。
+- `GET /mulukhiya/api/media`（旧 404）→ **HTTP 503** + body `{"available": false, "items": [], "has_next": false}`。404 = 「このサーバーではエンドポイント自体が提供されていない」と区別し、503 = 「機能はあるが現在 OFF」 を明示する。
 - `GET /mulukhiya/feed/media`（旧 404）→ **HTTP 503** + 空 channel の RSS。
 - `MediaCatalogUpdateWorker` は schedule（30 分毎）には登録されているが、`disable?` が短絡して何もしない。
 
@@ -30,13 +30,13 @@ capsicum 側のクライアント対応は [`pooza/capsicum#606`](https://github
 
 ## 機能を有効化する手順（オプトイン）
 
-「本番規模のローカル投稿数 × 連合経由メディア数」が大きいインスタンスでは、有効化前に partial index 適用を推奨する（後述）。
+「本番規模のローカル投稿数 × 連合経由メディア数」が大きいサーバーでは、有効化前に partial index 適用を推奨する（後述）。
 
 ### 設定
 
 サーバーの `config/local.yaml`（または `/usr/local/etc/mulukhiya-toot-proxy/local.yaml`）に追記:
 
-**Mastodon インスタンス**:
+**Mastodon サーバー**:
 
 ```yaml
 mastodon:
@@ -44,7 +44,7 @@ mastodon:
     media_catalog: true
 ```
 
-**Misskey インスタンス**:
+**Misskey サーバー**:
 
 ```yaml
 misskey:
@@ -73,7 +73,7 @@ curl -s https://your.instance/mulukhiya/api/about | jq '.config.features.media_c
 
 ## 再開判断のチェックリスト
 
-性能影響を踏まえ、本番規模のインスタンスで有効化する場合は以下を段階的に確認することを推奨する:
+性能影響を踏まえ、本番規模のサーバーで有効化する場合は以下を段階的に確認することを推奨する:
 
 1. **本番データ規模の把握** — `statuses` 行数、`media_attachments` 行数、local 比率（`SELECT count(*) FILTER (WHERE local) * 1.0 / count(*) FROM statuses`）。
 2. **ベースライン EXPLAIN 取得** — [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql) §1–§2 を本番 DB で実行。底値が数百 ms 級なら有効化リスクは低い。10 秒級以上なら index 適用を先行。

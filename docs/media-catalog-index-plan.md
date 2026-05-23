@@ -59,7 +59,7 @@ partial 述語に入れると一部の変種で index が使えなくなる。4 
 
 ## 推定される病理（要 EXPLAIN 検証）
 
-ローカル投稿が連合受信に対して少数派のインスタンス（zugoga / shallu）では
+ローカル投稿が連合受信に対して少数派のサーバー（zugoga / shallu）では
 `statuses.local = true` の selectivity が（media_attachments 全体に対しては）
 極めて低い。プランナーは `ORDER BY attachments.id DESC LIMIT n` を満たすために
 `media_attachments` の PK を id 降順 backward scan し、各行を statuses へ
