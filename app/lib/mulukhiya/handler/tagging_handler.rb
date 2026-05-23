@@ -7,7 +7,7 @@ module Mulukhiya
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return if non_federated_payload?
-      rebuild_status_with_tags
+      return rebuild_status_with_tags
     end
 
     def self.normalize_rules
@@ -25,7 +25,9 @@ module Mulukhiya
       tags.text = lines.join("\n")
       lines.push('') if tags.text.present? && lines.last.present? # 1行アキはMastodon 4.2対応
       lines.push(tags.create_tags.join(' '))
-      parser.text = payload[text_field] = lines.join("\n")
+      text = lines.join("\n")
+      parser.text = payload[text_field] = text
+      return text
     end
 
     def tags_line?(line)

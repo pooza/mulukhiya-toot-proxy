@@ -43,9 +43,13 @@ module Mulukhiya
       return false
     end
 
-    # NOTE: allowed_hosts が空配列のときは allow-all となる仕様（運用者の明示的
-    # 設定を尊重するため）。空のままにすると public_http_uri? と TLD 制限のみが
-    # 防御層となるため、本番運用では必ず明示的に設定すること。
+    # NOTE: allowed_hosts が空配列のとき allow-all となるのは意図したデフォルト
+    # （#4332 wontfix）。endpoint は W3C Push API がブラウザ/OS の push サービス
+    # （FCM / Mozilla / Apple / WNS 等）から払い出す URL で、ホスト集合はベンダー
+    # 管理かつ可変のため安定した allowlist を列挙できない。内部宛 SSRF は
+    # public_http_uri?（RESERVED_TLDS + RemoteHost.public? の DNS 解決、#4271）で
+    # 別途遮断済み。allowed_hosts は既知 push ゲートウェイに絞りたい運用者向けの
+    # opt-in な二次防御として残す。
     def self.allowed_host?(uri_string)
       allowed = Config.instance['/misskey/sw_subscription/allowed_hosts'] || []
       return true if allowed.empty?

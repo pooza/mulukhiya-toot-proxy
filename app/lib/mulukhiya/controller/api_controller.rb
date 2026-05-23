@@ -7,6 +7,18 @@ module Mulukhiya
       about[:config][:handlers] = (Handler.all_names || [])
         .reject {|name| config["/handler/#{name}/disable"] == true rescue false}
         .sort.to_a
+      # server レベルの features に、当該リクエストの SNS token に紐付く
+      # ユーザー単位の Annict 連携状態を合流させる (#4338)。features の
+      # キーは sub_hash 由来の文字列なので合わせる。
+      # media_catalog は /{controller}/data 配下の機能フラグだが、クライアント
+      # （capsicum 等）からの discovery を features 一本に集約するため合流させる
+      # (#4343)。disabled 時の 503 応答と組合せて「機能未提供」(404) と
+      # 「現在 OFF」を区別可能にする。
+      about[:config][:features] = about[:config][:features]
+        .merge(
+          'annict_linked' => sns.account&.annict_linked? || false,
+          'media_catalog' => controller_class.media_catalog?,
+        )
       @renderer.message = about
       return @renderer.to_s
     rescue => e
@@ -252,7 +264,16 @@ module Mulukhiya
     end
 
     get '/media' do
-      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.media_catalog?
+      # media_catalog 無効時は 404 ではなく 503 + 空リスト + available:false を返す
+      # (#4343)。404 = 「このサーバーではエンドポイント自体が提供されていない」、
+      # 503 = 「機能はあるが現在 OFF」をクライアント（capsicum 等）が区別できるよう
+      # にするため。features.media_catalog と組合せて利用する想定。
+      unless controller_class.media_catalog?
+        Logger.new.info(media_catalog: {event: 'disabled_response', endpoint: '/media'})
+        @renderer.status = 503
+        @renderer.message = {available: false, items: [], has_next: false}
+        return @renderer.to_s
+      end
       sns.token ||= sns.default_token
       # only_person は旧来 .to_i 経由で boolean 風文字列 ('true'/'false' 等) を 0/1
       # に丸める寛容な仕様だった。Contract 検証 (5.22.0 #4283 切出し時に検証順を
@@ -491,17 +512,39 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      record = annict.create_record(
-        episode_id: params[:episode_id].to_i,
-        comment: params[:comment].presence,
-        rating_state: params[:rating_state].presence,
-      )
+      episode_id = params[:episode_id].to_i
+      lock = AnnictRecordLockStorage.new
+      unless lock.acquire(sns.account.id, episode_id)
+        raise Ginseng::ConflictError, 'Duplicate Annict record request is in progress'
+      end
+      begin
+        record = annict.create_record(
+          episode_id:,
+          comment: params[:comment].presence,
+          rating_state: params[:rating_state].presence,
+        )
+      rescue
+        # createRecord 失敗時はロックを解放しリトライ可能にする
+        # (record 未作成のため重複の懸念がない)。
+        lock.release(sns.account.id, episode_id)
+        raise
+      end
       @renderer.message = {record:}
       return @renderer.to_s
     rescue => e
       # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
       # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
-      e.alert
+      # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
+      # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(annict_record: {
+          event: 'conflict',
+          account_id: sns.account&.id,
+          episode_id: params[:episode_id],
+        })
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -636,8 +679,9 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.transform_keys(&:to_sym)
-        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
+      attributes = params.to_h
+        .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
+        .transform_keys(&:to_sym)
       key = params[:key].to_s
       key = Program.instance.generate_key(attributes) if key.empty?
       entry = Program.instance.add_entry(key, attributes)
@@ -659,8 +703,9 @@ module Mulukhiya
         @renderer.message = {errors:}
         return @renderer.to_s
       end
-      attributes = params.to_h.transform_keys(&:to_sym)
-        .slice(*ProgramEntryContract::PARAMS_KEYS).except(:key)
+      attributes = params.to_h
+        .slice(*ProgramEntryContract::WRITABLE_KEYS.map(&:to_s))
+        .transform_keys(&:to_sym)
       entry = Program.instance.update_entry(params[:key], attributes)
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s

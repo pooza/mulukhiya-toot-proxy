@@ -323,7 +323,7 @@ mastodon:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: true
+    media_catalog: false
   dbms: postgres
   display_name: Mastodon
   features:
@@ -381,7 +381,7 @@ misskey:
     account_timeline: true
     favorite_tags: true
     futured_tag: true
-    media_catalog: true
+    media_catalog: false
   dbms: postgres
   display_name: Misskey
   redis:
@@ -439,7 +439,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.22.1
+  version: 5.23.0
 parser:
   note:
     fields:
@@ -475,6 +475,10 @@ program:
   urls: []
   fetch:
     max_bytes: 1048576
+    timeout: 30
+remote_host:
+  dns:
+    timeout: 3
 puma:
   pidfile: tmp/pids/puma.pid
   port: 3008
@@ -525,6 +529,9 @@ service:
         default:
           - read
           - write
+    record:
+      idempotency:
+        ttl: 30
     review:
       suffixes:
         bad: （評価:良くない）

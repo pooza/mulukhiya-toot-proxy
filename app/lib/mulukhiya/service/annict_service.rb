@@ -118,11 +118,12 @@ module Mulukhiya
       end
       raise Ginseng::GatewayError, 'Unexpected Annict GraphQL response' unless response.is_a?(Hash)
       if response['errors'].present?
-        message = format_graphql_errors(response['errors'])
+        errors = response['errors']
+        message = format_graphql_errors(errors)
         if /unauthor|forbidden|scope|token|permission|credential/i.match?(message)
           raise Ginseng::AuthError, 'Annict authorization required'
         end
-        raise Ginseng::GatewayError, message
+        raise classify_graphql_error(errors, message), message
       end
       return response
     end
@@ -395,6 +396,24 @@ module Mulukhiya
     def format_graphql_errors(errors)
       messages = Array(errors).filter_map {|e| e.is_a?(Hash) ? e['message'] : e.to_s}
       return messages.join('; ').presence || 'Annict GraphQL error'
+    end
+
+    # Annict GraphQL の errors を HTTP セマンティクスへ寄せて分類する (Y3)。
+    # errors[].extensions.code があれば優先し、なければ message のパターンで
+    # 判定。クライアント起因 (404/422) を 502 に丸めず capsicum 側で
+    # 区別できるようにする。auth 系は呼び出し元で先に AuthError へ正規化済み。
+    def classify_graphql_error(errors, message)
+      codes = Array(errors).filter_map do |e|
+        e.dig('extensions', 'code').to_s.upcase.presence if e.is_a?(Hash)
+      end
+      if codes.include?('NOT_FOUND') || /not found|does not exist|no such/i.match?(message)
+        return Ginseng::NotFoundError
+      end
+      if codes.any? {|c| /ARGUMENT|VALIDATION|INVALID|UNPROCESSABLE|BAD_REQUEST/.match?(c)} ||
+          /invalid|validation|must be|argument/i.match?(message)
+        return Ginseng::ValidateError
+      end
+      return Ginseng::GatewayError
     end
 
     def query(template, variables = nil)

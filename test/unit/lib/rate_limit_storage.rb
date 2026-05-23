@@ -32,5 +32,18 @@ module Mulukhiya
 
       assert_equal(3, @storage.increment(@key, window: 60))
     end
+
+    def test_sha_matches_server_script_load
+      loaded = @storage.redis.call('SCRIPT', 'LOAD', RateLimitStorage::INCREMENT_SCRIPT)
+
+      assert_equal(RateLimitStorage::INCREMENT_SCRIPT_SHA, loaded)
+    end
+
+    def test_increment_recovers_from_flushed_script_cache
+      @storage.increment(@key, window: 60)
+      @storage.redis.call('SCRIPT', 'FLUSH')
+
+      assert_equal(2, @storage.increment(@key, window: 60))
+    end
   end
 end

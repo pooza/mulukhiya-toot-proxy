@@ -79,6 +79,28 @@ module Mulukhiya
       assert_equal(schema_keys, ProgramEntryContract::PARAMS_KEYS.to_set)
     end
 
+    def test_writable_keys_excludes_key
+      assert_equal(
+        (ProgramEntryContract::PARAMS_KEYS - [:key]).to_set,
+        ProgramEntryContract::WRITABLE_KEYS.to_set,
+      )
+      assert_false(ProgramEntryContract::WRITABLE_KEYS.include?(:key))
+    end
+
+    def test_error_messages_include_field_name
+      assert_match(/シリーズ名/, @contract.exec(@valid.merge(series: '')).fetch(:series).join)
+      assert_match(/キー/, @contract.exec(@valid.merge(key: 'bad key!')).fetch(:key).join)
+      assert_match(
+        /追加タグ/,
+        @contract.exec(@valid.merge(extra_tags: ['a' * (ProgramEntryContract::MAX_TAG_SIZE + 1)]))
+          .fetch(:extra_tags).join,
+      )
+      assert_match(
+        /ソース URL/,
+        @contract.exec(@valid.merge(source_url: 'javascript:alert(1)')).fetch(:source_url).join,
+      )
+    end
+
     def test_series_max_length
       errors = @contract.call(@valid.merge(series: 'a' * 201)).errors
 

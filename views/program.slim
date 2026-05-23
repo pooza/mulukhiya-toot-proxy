@@ -114,6 +114,8 @@ html lang='ja' data-theme='light'
                     | {{entry.annict_work_id}}
                   span
                     | {{entry.series}}
+                  button.small @click.stop='copyText(entry.series, "作品名")' v-if='entry.series' v-tooltip.top="'作品名をコピー'"
+                    i class='fa fa-copy'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
@@ -124,6 +126,8 @@ html lang='ja' data-theme='light'
                     | {{entry.annict_episode_id}}
                   span
                     | {{entry.subtitle}}
+                  button.small @click.stop='copyEpisodeSubtitle(entry)' v-if='entry.episode || entry.subtitle' v-tooltip.top="'話数+サブタイトルをコピー'"
+                    i class='fa fa-copy'
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
@@ -262,6 +266,17 @@ html lang='ja' data-theme='light'
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+            },
+            copyText (text, label) {
+              navigator.clipboard.writeText(text)
+                .then(_ => Swal.fire({title: `${label}をコピーしました。`, toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000}))
+                .catch(_ => Swal.fire({text: 'クリップボードにコピーできませんでした。', icon: 'error'}))
+            },
+            copyEpisodeSubtitle (entry) {
+              const parts = []
+              if (entry.episode) parts.push(`${entry.episode}${entry.episode_suffix || '話'}`)
+              if (entry.subtitle) parts.push(entry.subtitle)
+              this.copyText(parts.join(' '), '話数+サブタイトル')
             },
             searchAnnictWorks () {
               if (!this.annict.keyword) return

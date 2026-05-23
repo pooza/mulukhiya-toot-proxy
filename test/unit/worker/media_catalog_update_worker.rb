@@ -18,11 +18,15 @@ module Mulukhiya
       assert_equal('media_catalog', MediaCatalogUpdateWorker.sidekiq_options['queue'])
     end
 
-    def test_cursor_paging_disabled_on_misskey
+    def test_cursor_pagination_delegated_to_attachment_class
+      # attachment_class は Sequel::Model のため、DB 未接続環境で参照すると
+      # クラスロード時に Sequel::Error になる。AttachmentTest と同じ DB
+      # 構成ガードで保護する。
+      return unless Environment.dbms_class&.config?
       if Environment.misskey_type?
-        assert_false(@worker.send(:cursor_paging?))
+        assert_false(@worker.attachment_class.cursor_pagination?)
       else
-        assert_true(@worker.send(:cursor_paging?))
+        assert_true(@worker.attachment_class.cursor_pagination?)
       end
     end
   end

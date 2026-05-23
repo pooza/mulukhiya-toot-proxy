@@ -1,11 +1,12 @@
 module Mulukhiya
-  class Program
+  class Program # rubocop:disable Metrics/ClassLength
     include Singleton
     include Package
 
     YAML_PATH = File.join(Environment.dir, 'var/program.yaml').freeze
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
+    DEFAULT_FETCH_TIMEOUT = 30
 
     def update
       return nil unless auto_update?
@@ -121,7 +122,7 @@ module Mulukhiya
     end
 
     def invalidate_cache
-      redis.unlink(REDIS_KEY)
+      return redis.unlink(REDIS_KEY)
     end
 
     alias to_s to_yaml
@@ -148,7 +149,8 @@ module Mulukhiya
       programs = {}
       success = 0
       uris.each do |v|
-        response = @http.get(v)
+        next unless valid_content_length?(v)
+        response = @http.get(v, timeout: fetch_timeout)
         next unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next unless valid_program_schema?(parsed, v)
@@ -165,17 +167,30 @@ module Mulukhiya
       return programs
     end
 
+    # HTTParty がレスポンス本文を丸ごとメモリへ読み込む前に、相手が申告した
+    # Content-Length が max を超えていれば GET せず弾く。Content-Length 不在や
+    # HEAD 非対応 (GatewayError) の場合は判定不能としてそのまま GET へ進み、
+    # 受信後の valid_response_size? を最終防衛線とする。
+    def valid_content_length?(uri)
+      length = @http.head(uri, timeout: fetch_timeout).headers['content-length']
+      return true if length.nil? || length.to_i <= fetch_max_bytes
+      log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
+      return false
+    rescue => e
+      # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する
+      e.log(url: uri.to_s)
+      return true
+    end
+
     def valid_response_size?(response, uri)
       bytes = response.body.to_s.bytesize
-      max = fetch_max_bytes
-      return true if bytes <= max
-      logger.error(
-        message: 'program fetch exceeded max bytes',
-        url: uri.to_s,
-        bytes:,
-        max_bytes: max,
-      )
+      return true if bytes <= fetch_max_bytes
+      log_oversize(uri, bytes, 'program fetch exceeded max bytes')
       return false
+    end
+
+    def log_oversize(uri, bytes, message)
+      logger.error(message:, url: uri.to_s, bytes:, max_bytes: fetch_max_bytes)
     end
 
     def valid_program_schema?(parsed, uri)
@@ -190,6 +205,10 @@ module Mulukhiya
 
     def fetch_max_bytes
       return config['/program/fetch/max_bytes'] || DEFAULT_FETCH_MAX_BYTES
+    end
+
+    def fetch_timeout
+      return config['/program/fetch/timeout'] || DEFAULT_FETCH_TIMEOUT
     end
 
     def cached_data
@@ -208,9 +227,23 @@ module Mulukhiya
     def update_cache(programs)
       return redis[REDIS_KEY] = programs.to_json
     rescue => e
+      # SET が中途半端に値を残したまま例外になった場合に備え、不整合な
+      # キャッシュを除去して以降の read を YAML フォールバックへ倒す保険。
+      # Redis 全断なら UNLINK も失敗するが、その場合は実質キャッシュ無しと
+      # 等価なので無害 (best-effort、例外は握り潰す)。
       invalidate_cache rescue nil
-      e.alert
+      # Redis 書込失敗の根因 (件数・JSON サイズ) を Sentry に残す。
+      e.alert(**cache_failure_context(programs))
       return nil
+    end
+
+    # alert に添える文脈。programs.to_json が失敗要因だった場合に
+    # ここで再 raise すると alert 自体が落ちるため握り潰して空で返す。
+    def cache_failure_context(programs)
+      return {programs_size: programs.size, json_bytes: programs.to_json.bytesize}
+    rescue => e
+      e.log
+      return {}
     end
 
     def write_yaml(programs)
@@ -218,7 +251,7 @@ module Mulukhiya
       FileUtils.mkdir_p(dir)
       tmp = File.join(dir, ".program.yaml.#{Process.pid}.#{Thread.current.object_id}")
       File.write(tmp, programs.to_yaml)
-      File.rename(tmp, YAML_PATH)
+      return File.rename(tmp, YAML_PATH)
     end
   end
 end
