@@ -8,6 +8,10 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # sidekiq-scheduler は Sidekiq::Client.push を直叩きするため Worker.perform_async
+      # 側の disable? gate を通らない。media_catalog 無効サーバ (5.23.0 デフォルト) で
+      # も schedule (every: 30m) 経由で perform が起動するので、ここでも短絡する (#4343)。
+      return if disable?
       storage = MediaCatalogStorage.new
       pages = worker_config(:pages) || 3
       cursor_pagination = attachment_class.cursor_pagination?
