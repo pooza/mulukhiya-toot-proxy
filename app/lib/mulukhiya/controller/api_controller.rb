@@ -512,7 +512,8 @@ module Mulukhiya
       end
       episode_id = params[:episode_id].to_i
       lock = AnnictRecordLockStorage.new
-      unless lock.acquire(sns.account.id, episode_id)
+      lock_token = lock.acquire(sns.account.id, episode_id)
+      unless lock_token
         raise Ginseng::ConflictError, 'Duplicate Annict record request is in progress'
       end
       begin
@@ -523,8 +524,9 @@ module Mulukhiya
         )
       rescue
         # createRecord 失敗時はロックを解放しリトライ可能にする
-        # (record 未作成のため重複の懸念がない)。
-        lock.release(sns.account.id, episode_id)
+        # (record 未作成のため重複の懸念がない)。token を渡すことで TTL 跨ぎ後の
+        # 他者ロック誤削除を防ぐ (#4345)。
+        lock.release(sns.account.id, episode_id, lock_token)
         raise
       end
       @renderer.message = {record:}
