@@ -269,9 +269,7 @@ module Mulukhiya
       # 503 = 「機能はあるが現在 OFF」をクライアント（capsicum 等）が区別できるよう
       # にするため。features.media_catalog と組合せて利用する想定。
       unless controller_class.media_catalog?
-        Logger.new.info(media_catalog: {event: 'disabled_response', endpoint: '/media'})
-        @renderer.status = 503
-        @renderer.message = {available: false, items: [], has_next: false}
+        MediaCatalogDisabledRenderer.apply!(@renderer, endpoint: '/media')
         return @renderer.to_s
       end
       sns.token ||= sns.default_token
