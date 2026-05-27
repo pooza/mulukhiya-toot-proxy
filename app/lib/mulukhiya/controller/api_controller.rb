@@ -562,6 +562,21 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # capsicum-relay (capsicum-relay#14) からの公開キャッシュ参照用 (#4355)。
+    # Redis にキャッシュ済みの SNS announcement 一覧を array で返す。認証不要。
+    # shape は SNS 種別に依存し (Mastodon: content / published_at、Misskey:
+    # title / text / createdAt)、capsicum-relay 側で正規化する。
+    get '/announcement/list' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
+      @renderer.message = Announcement.new.load.values
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/tagging/favorites' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.favorite_tags?
       sns.token ||= sns.default_token
