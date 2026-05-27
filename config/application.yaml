@@ -329,6 +329,7 @@ mastodon:
   features:
     annict: true
     announcement: true
+    announcement_push: true
     feed: true
     webhook: true
   oauth:
@@ -389,6 +390,7 @@ misskey:
   features:
     annict: true
     announcement: true
+    announcement_push: true
     feed: true
     webhook: true
   oauth:
