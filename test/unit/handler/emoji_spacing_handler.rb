@@ -65,5 +65,23 @@ module Mulukhiya
 
       assert_nil(@handler.debug_info)
     end
+
+    def test_handle_pre_toot_skips_time_format
+      payload = {status_field => '集合 12:34:56 です'}
+      @handler.clear
+      @handler.handle_pre_toot(payload)
+
+      assert_equal('集合 12:34:56 です', payload[status_field])
+      assert_nil(@handler.debug_info)
+    end
+
+    def test_handle_pre_toot_skips_digit_only_pattern
+      payload = {status_field => 'ポートは host:8080:443 です'}
+      @handler.clear
+      @handler.handle_pre_toot(payload)
+
+      assert_equal('ポートは host:8080:443 です', payload[status_field])
+      assert_nil(@handler.debug_info)
+    end
   end
 end
