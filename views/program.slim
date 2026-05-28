@@ -97,6 +97,10 @@ html lang='ja' data-theme='light'
             button.cancel @click='cancelForm' キャンセル
         section
           h3 エントリ一覧
+          .field-update-button-container v-if='Object.keys(entries).length'
+            button @click='copySummary' v-tooltip.top="'有効エントリ全体を作品名・話数+サブタイトル形式でクリップボードにコピー'"
+              i class='fa fa-copy'
+              |  まとめをコピー
           p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
           table.program-entries v-if='Object.keys(entries).length'
             thead
@@ -281,6 +285,23 @@ html lang='ja' data-theme='light'
               if (entry.episode) parts.push(`${entry.episode}${entry.episode_suffix || '話'}`)
               if (entry.subtitle) parts.push(entry.subtitle)
               this.copyText(parts.join(' '), '話数+サブタイトル')
+            },
+            copySummary () {
+              const blocks = Object.values(this.entries)
+                .filter(entry => entry.enable)
+                .map(entry => {
+                  const lines = [entry.series]
+                  const episodeLine = []
+                  if (entry.episode) episodeLine.push(`${entry.episode}${entry.episode_suffix || '話'}`)
+                  if (entry.subtitle) episodeLine.push(entry.subtitle)
+                  if (episodeLine.length) lines.push(episodeLine.join(' '))
+                  return lines.join('\n')
+                })
+              if (!blocks.length) {
+                Swal.fire({text: 'コピー対象のエントリがありません。', icon: 'warning'})
+                return
+              }
+              this.copyText(blocks.join('\n\n'), '番組表まとめ')
             },
             searchAnnictWorks () {
               if (!this.annict.keyword) return

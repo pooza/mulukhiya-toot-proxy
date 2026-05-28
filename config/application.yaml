@@ -233,6 +233,7 @@ handler:
         - group_tag
         - removal_rule_tag
         - image_copyright
+        - emoji_spacing
         - tagging
         - invalid_command
       pre_webhook:
@@ -258,6 +259,7 @@ handler:
         - group_tag
         - removal_rule_tag
         - image_copyright
+        - emoji_spacing
         - tagging
       post_thumbnail:
         - result_notification
@@ -284,11 +286,13 @@ handler:
           - itunes_image
           - spotify_image
           - you_tube_image
+          - emoji_spacing
       pre_webhook:
         exclude:
           - itunes_image
           - spotify_image
           - you_tube_image
+          - emoji_spacing
 http:
   retry:
     limit: 3
