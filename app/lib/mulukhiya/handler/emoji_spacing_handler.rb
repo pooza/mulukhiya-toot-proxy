@@ -1,7 +1,7 @@
 module Mulukhiya
   class EmojiSpacingHandler < Handler
     SHORTCODE_PATTERN = /:([A-Za-z0-9_]+):/
-    ZWSP = "​".freeze
+    ZWSP = '​'.freeze
     SEPARATOR_PATTERN = /[\s​]/
 
     def handle_pre_toot(payload, params = {})

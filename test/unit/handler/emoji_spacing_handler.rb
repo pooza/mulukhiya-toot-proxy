@@ -1,13 +1,13 @@
 module Mulukhiya
   class EmojiSpacingHandlerTest < TestCase
-    ZWSP = "​".freeze
+    ZWSP = '​'.freeze
 
     def setup
       @handler = Handler.create(:emoji_spacing)
     end
 
     def test_handle_pre_toot_inserts_zwsp_around_shortcode
-      payload = {status_field => "あ:smile:い"}
+      payload = {status_field => 'あ:smile:い'}
       @handler.clear
       @handler.handle_pre_toot(payload)
 
@@ -15,7 +15,7 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot_only_inserts_missing_separators
-      payload = {status_field => "あ :smile: い"}
+      payload = {status_field => 'あ :smile: い'}
       @handler.clear
       @handler.handle_pre_toot(payload)
 
@@ -33,7 +33,7 @@ module Mulukhiya
     end
 
     def test_handle_pre_toot_handles_multiple_shortcodes
-      payload = {status_field => "今日は:cake:と:tea:で休憩"}
+      payload = {status_field => '今日は:cake:と:tea:で休憩'}
       @handler.clear
       @handler.handle_pre_toot(payload)
 
