@@ -76,9 +76,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_upload_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -131,6 +129,18 @@ module Mulukhiya
       return @headers['Authorization'].split(/\s+/).last if @headers['Authorization']
       return @headers['HTTP_AUTHORIZATION'].split(/\s+/).last if @headers['HTTP_AUTHORIZATION']
       return params[:i]
+    end
+
+    # 413 はユーザーのファイルサイズ超過であり系の不具合ではないため Sentry alert を抑止する。
+    # 401 は既存どおりトークン期限切れ等で頻繁に起きるため除外する。
+    def handle_upload_gateway_error(error)
+      error.alert unless [401, 413].include?(error.source_status)
+      if error.source_status == 413
+        @renderer.message = {error: 'アップロードしたファイルがサーバーの上限サイズを超過しています。'}
+      else
+        @renderer.message = {error: error.message}
+      end
+      @renderer.status = error.source_status
     end
   end
 end
