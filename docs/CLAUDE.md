@@ -244,7 +244,7 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.25.0
 
-テーマ: APIController 段階的リファクタの締め + 5.23/5.24 レビュー送りの構造改善 + メディアカタログ段階的再有効化 + 5.24 繰越（番組表 iCalendar / Annict review API）+ 運用ログ整備（10 件 / 27 重み、+2 超過容認）。
+テーマ: APIController 段階的リファクタの締め + 5.23/5.24 レビュー送りの構造改善 + メディアカタログ段階的再有効化 + 5.24 繰越（番組表 iCalendar / Annict review API）+ 運用ログ整備（9 件 / 24 重み、budget 内）。
 
 ### APIController 段階的リファクタ
 
@@ -265,7 +265,6 @@ git diff Gemfile.lock
 
 ### 構造改善（5.23/5.24 レビュー送り）
 
-- #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.23 レビュー送り、size:M）
 - #4348 refactor: /about の features 動的合流を Config#about 側にフック化（5.23 レビュー送り、annict_linked / media_catalog / announcement_push 等の集約、size:S）
 - #4364 5.24.0 リリース前 5観点レビュー 5.25 送り（黄 3 件 + 緑 3 件まとめ: episode_id alert payload, 暗黙 return, shortcode 単一文字コメント, EMPTY_PAYLOAD freeze, lock&. ノイズ, EVALSHA キャッシュ、size:S）
 - #4360 test: ProgramTest auto_update 一律 false 設定の順序依存修正（PR #4356 Codex P2 follow-up、size:S）
@@ -276,10 +275,11 @@ git diff Gemfile.lock
 
 ## 次々期マイルストーン: 5.26.0
 
-主軸候補: Spotify 連携（capsicum #465 ペア）+ メディアカタログ再有効化の横展開（2 件 / 11 重み）。
+主軸候補: Spotify 連携（capsicum #465 ペア）+ メディアカタログ再有効化の横展開 + 構造改善（3 件 / 14 重み）。
 
 - #4337 feat: Spotify user-level OAuth + currently-playing API（capsicum #465 連携、size:L）— 主軸候補
 - #4352 perf: media_catalog を shallu / lbock に横展開（#4323 ロードマップ B、#4351 完了後着手、size:M）
+- #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.25 から送り、size:M）
 
 ## ロードマップ仮置き
 
