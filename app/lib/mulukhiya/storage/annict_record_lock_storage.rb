@@ -41,8 +41,28 @@ module Mulukhiya
       e.log(account_id:, episode_id:)
     end
 
+    # 直近 1 分間の冪等性ロック衝突回数をアカウント単位で計上し、しきい値
+    # (alert_threshold) に到達した瞬間だけ true を返す。capsicum 等が同一
+    # episode_id へリトライループに陥った異常を Sentry alert に昇格する判定に
+    # 使う (#4346)。bucket は `Time.now.to_i / 60` の minute_bucket。発火後の
+    # 同一 bucket では false を返し続け、bucket 切替時にリセットされる。
+    # Redis 障害時は fail-open (alert しない)。
+    def record_conflict(account_id, episode_id)
+      key = create_key(conflict_key(account_id))
+      count = redis.call('INCR', key).to_i
+      redis.call('EXPIRE', key, conflict_window) if count == 1
+      return count == alert_threshold
+    rescue => e
+      e.log(account_id:, episode_id:)
+      return false
+    end
+
     def ttl
       return @ttl ||= config['/service/annict/record/idempotency/ttl'] || 30
+    end
+
+    def alert_threshold
+      return @alert_threshold ||= config['/service/annict/record/idempotency/alert_threshold'] || 10
     end
 
     def prefix
@@ -53,6 +73,14 @@ module Mulukhiya
 
     def lock_key(account_id, episode_id)
       return [account_id, episode_id].join(':')
+    end
+
+    def conflict_key(account_id)
+      return ['conflict', account_id, Time.now.to_i / conflict_window].join(':')
+    end
+
+    def conflict_window
+      return 60
     end
   end
 end

@@ -534,6 +534,7 @@ service:
     record:
       idempotency:
         ttl: 30
+        alert_threshold: 10
     review:
       suffixes:
         bad: （評価:良くない）
