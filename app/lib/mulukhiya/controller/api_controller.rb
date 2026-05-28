@@ -366,14 +366,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        status.parser.footer_tags.clear
-        status.parser.footer_tags.concat(params[:tags])
-        body = [
-          status.parser.body,
-          '',
-          status.parser.footer_tags.map(&:to_hashtag).join(' '),
-        ].join("\n")
-        @renderer.message = sns.repost(status, body)
+        @renderer.message = StatusTagAddService.new(sns).call(status, params[:tags])
       end
       return @renderer.to_s
     rescue => e
