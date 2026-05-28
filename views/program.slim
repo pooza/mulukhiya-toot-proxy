@@ -11,11 +11,13 @@ html lang='ja' data-theme='light'
       h2 番組表エディタ
       p.alert v-if='!account.is_admin' 管理者のみ利用できます。
       section v-if='account.is_admin'
-        .field-update-button-container
+        p.alert v-if='!editable'
+          | 自動更新が有効のため、編集できません。 #[code config/local.yaml] の #[code /program/auto_update] を #[code false] に設定すると編集可能になります。
+        .field-update-button-container v-if='editable'
           button @click='openAdd' v-if='!form.open'
             i class='fa fa-plus'
             |  新規追加
-        section.config v-if='form.open'
+        section.config v-if='editable && form.open'
           h3
             | {{form.editKey ? `エントリ編集: ${form.editKey}` : '新規エントリ'}}
           .annict-search
@@ -95,6 +97,10 @@ html lang='ja' data-theme='light'
             button.cancel @click='cancelForm' キャンセル
         section
           h3 エントリ一覧
+          .field-update-button-container v-if='Object.keys(entries).length'
+            button @click='copySummary' v-tooltip.top="'有効エントリ全体を作品名・話数+サブタイトル形式でクリップボードにコピー'"
+              i class='fa fa-copy'
+              |  まとめをコピー
           p.alert v-if='!Object.keys(entries).length' エントリがありません。「新規追加」から登録してください。
           table.program-entries v-if='Object.keys(entries).length'
             thead
@@ -108,7 +114,7 @@ html lang='ja' data-theme='light'
                 th 有効
                 th
             tbody
-              tr v-for='(entry, key) in entries' :key='key' :class="{disabled: !entry.enable, clickable: true}" @click='openEdit(key)'
+              tr v-for='(entry, key) in entries' :key='key' :class="{disabled: !entry.enable, clickable: editable}" @click='editable && openEdit(key)'
                 td
                   code v-if='entry.annict_work_id'
                     | {{entry.annict_work_id}}
@@ -119,7 +125,7 @@ html lang='ja' data-theme='light'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click.stop='incrementEpisode(key)' v-tooltip.top="'次回'"
+                  button.small @click.stop='incrementEpisode(key)' v-if='editable' v-tooltip.top="'次回'"
                     i class='fa fa-plus'
                 td
                   code v-if='entry.annict_episode_id'
@@ -138,7 +144,7 @@ html lang='ja' data-theme='light'
                 td
                   span.tag.enable v-if='entry.enable' ✔
                 td.actions
-                  button.small.danger @click.stop='deleteEntry(key)' v-tooltip.top="'削除'"
+                  button.small.danger @click.stop='deleteEntry(key)' v-if='editable' v-tooltip.top="'削除'"
                     i class='fa fa-trash'
     == slim.render 'fragment/footer'
     script type='module'
@@ -152,6 +158,7 @@ html lang='ja' data-theme='light'
           data () {
             return {
               account: {},
+              editable: false,
               entries: {},
               annict: {keyword: null, works: [], episodes: []},
               form: {
@@ -169,6 +176,7 @@ html lang='ja' data-theme='light'
           },
           created () {
             this.methods.getConfig().then(e => {this.account = this.methods.createAccountInfo(e)})
+            this.methods.getAbout().then(e => {this.editable = !!e?.config?.features?.program_editable})
             this.loadEntries()
           },
           methods: {
@@ -277,6 +285,23 @@ html lang='ja' data-theme='light'
               if (entry.episode) parts.push(`${entry.episode}${entry.episode_suffix || '話'}`)
               if (entry.subtitle) parts.push(entry.subtitle)
               this.copyText(parts.join(' '), '話数+サブタイトル')
+            },
+            copySummary () {
+              const blocks = Object.values(this.entries)
+                .filter(entry => entry.enable)
+                .map(entry => {
+                  const lines = [entry.series]
+                  const episodeLine = []
+                  if (entry.episode) episodeLine.push(`${entry.episode}${entry.episode_suffix || '話'}`)
+                  if (entry.subtitle) episodeLine.push(entry.subtitle)
+                  if (episodeLine.length) lines.push(episodeLine.join(' '))
+                  return lines.join('\n')
+                })
+              if (!blocks.length) {
+                Swal.fire({text: 'コピー対象のエントリがありません。', icon: 'warning'})
+                return
+              }
+              this.copyText(blocks.join('\n\n'), '番組表まとめ')
             },
             searchAnnictWorks () {
               if (!this.annict.keyword) return

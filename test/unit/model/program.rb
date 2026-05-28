@@ -8,6 +8,16 @@ module Mulukhiya
     def setup
       return if disable?
       @program = Program.instance
+      # 既存テストは auto_update 無効を前提に書き込み系メソッドを呼ぶため、
+      # デフォルト (auto_update=true) を一時的に false に倒す。auto_update=true
+      # 配下の挙動を検証するテストは with_auto_update(true) で局所的に切り替える。
+      @original_auto_update = config['/program/auto_update']
+      config['/program/auto_update'] = false
+    end
+
+    def teardown
+      return if disable?
+      config['/program/auto_update'] = @original_auto_update
     end
 
     def test_uris
@@ -217,7 +227,45 @@ module Mulukhiya
     end
 
     def test_auto_update_default_true
-      assert_true(@program.auto_update?)
+      with_auto_update(nil) do
+        assert_true(@program.auto_update?)
+      end
+    end
+
+    def test_add_entry_rejected_when_auto_update_enabled
+      with_auto_update(true) do
+        error = assert_raise(Ginseng::ConflictError) do
+          @program.add_entry('any_key', 'series' => 'A')
+        end
+        assert_equal(409, error.status)
+      end
+    end
+
+    def test_update_entry_rejected_when_auto_update_enabled
+      with_auto_update(true) do
+        error = assert_raise(Ginseng::ConflictError) do
+          @program.update_entry('any_key', 'episode' => 1)
+        end
+        assert_equal(409, error.status)
+      end
+    end
+
+    def test_delete_entry_rejected_when_auto_update_enabled
+      with_auto_update(true) do
+        error = assert_raise(Ginseng::ConflictError) do
+          @program.delete_entry('any_key')
+        end
+        assert_equal(409, error.status)
+      end
+    end
+
+    def test_increment_episode_rejected_when_auto_update_enabled
+      with_auto_update(true) do
+        error = assert_raise(Ginseng::ConflictError) do
+          @program.increment_episode('any_key')
+        end
+        assert_equal(409, error.status)
+      end
     end
 
     def test_fetch_remote_merges_valid_payload
@@ -376,6 +424,14 @@ module Mulukhiya
     end
 
     private
+
+    def with_auto_update(value)
+      original = config['/program/auto_update']
+      config['/program/auto_update'] = value
+      yield
+    ensure
+      config['/program/auto_update'] = original
+    end
 
     def stub_remote_program(url, body, content_length: body.bytesize)
       stub_request(:head, url)

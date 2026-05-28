@@ -1,27 +1,68 @@
+require 'securerandom'
+
 module Mulukhiya
   class AnnictRecordLockStorage < Redis
-    # SET key value NX EX ttl で原子的にロックを獲得する。獲得できれば true。
-    # capsicum 等の network blip リトライによる同一 (account, episode) への
-    # 重複 createRecord を TTL 窓で抑止する (#4330)。
+    # release で誤って他人のロックを削除しないため compare-and-delete する。
+    # TTL 切れで A の自然解放後に B が同一 key で acquire したケースで、A の遅延
+    # rescue が呼ぶ release が B の新ロックを消さないようにする (#4345)。
+    RELEASE_SCRIPT = <<~LUA.freeze
+      if redis.call('GET', KEYS[1]) == ARGV[1] then
+        return redis.call('DEL', KEYS[1])
+      else
+        return 0
+      end
+    LUA
+
+    # SET key value NX EX ttl で原子的にロックを獲得する。獲得できれば token を
+    # 返す（nil なら他者保有または Redis 障害を伴う失敗）。capsicum 等の
+    # network blip リトライによる同一 (account, episode) への重複 createRecord を
+    # TTL 窓で抑止する (#4330)。
     def acquire(account_id, episode_id)
       key = create_key(lock_key(account_id, episode_id))
-      return redis.call('SET', key, Time.now.to_i.to_s, 'NX', 'EX', ttl) == 'OK'
+      token = SecureRandom.uuid
+      return token if redis.call('SET', key, token, 'NX', 'EX', ttl) == 'OK'
+      return nil
     rescue => e
       e.log(account_id:, episode_id:)
       # Redis 障害時は冪等性を諦め、本来の record 投稿を阻害しない (fail-open)。
-      return true
+      # 戻り値の token を持ったまま release が呼ばれても、Redis 側にエントリは
+      # ないため compare-and-delete は no-op で害がない。
+      return SecureRandom.uuid
     end
 
     # createRecord 失敗時に呼び、リトライを即座に許可する。成功時は解放せず
-    # TTL 切れまでロックを残し、短時間の重複投稿を抑止する。
-    def release(account_id, episode_id)
-      unlink(lock_key(account_id, episode_id))
+    # TTL 切れまでロックを残し、短時間の重複投稿を抑止する。token は acquire
+    # の戻り値（一致した時だけ DEL される）。
+    def release(account_id, episode_id, token)
+      return unless token
+      key = create_key(lock_key(account_id, episode_id))
+      redis.call('EVAL', RELEASE_SCRIPT, 1, key, token)
     rescue => e
       e.log(account_id:, episode_id:)
+    end
+
+    # 直近 1 分間の冪等性ロック衝突回数をアカウント単位で計上し、しきい値
+    # (alert_threshold) に到達した瞬間だけ true を返す。capsicum 等が同一
+    # episode_id へリトライループに陥った異常を Sentry alert に昇格する判定に
+    # 使う (#4346)。bucket は `Time.now.to_i / 60` の minute_bucket。発火後の
+    # 同一 bucket では false を返し続け、bucket 切替時にリセットされる。
+    # Redis 障害時は fail-open (alert しない)。
+    def record_conflict(account_id, episode_id)
+      key = create_key(conflict_key(account_id))
+      count = redis.call('INCR', key).to_i
+      redis.call('EXPIRE', key, conflict_window) if count == 1
+      return count == alert_threshold
+    rescue => e
+      e.log(account_id:, episode_id:)
+      return false
     end
 
     def ttl
       return @ttl ||= config['/service/annict/record/idempotency/ttl'] || 30
+    end
+
+    def alert_threshold
+      return @alert_threshold ||= config['/service/annict/record/idempotency/alert_threshold'] || 10
     end
 
     def prefix
@@ -32,6 +73,14 @@ module Mulukhiya
 
     def lock_key(account_id, episode_id)
       return [account_id, episode_id].join(':')
+    end
+
+    def conflict_key(account_id)
+      return ['conflict', account_id, Time.now.to_i / conflict_window].join(':')
+    end
+
+    def conflict_window
+      return 60
     end
   end
 end

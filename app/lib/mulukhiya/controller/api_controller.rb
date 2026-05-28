@@ -14,10 +14,13 @@ module Mulukhiya
       # （capsicum 等）からの discovery を features 一本に集約するため合流させる
       # (#4343)。disabled 時の 503 応答と組合せて「機能未提供」(404) と
       # 「現在 OFF」を区別可能にする。
+      # program_editable は番組表エディタ (livecure かつ auto_update 無効) で
+      # 書き込み API が利用可能か。WebUI 側で UI 出し分けに使う (#4272)。
       about[:config][:features] = about[:config][:features]
         .merge(
           'annict_linked' => sns.account&.annict_linked? || false,
           'media_catalog' => controller_class.media_catalog?,
+          'program_editable' => controller_class.livecure? && !Program.instance.auto_update?,
         )
       @renderer.message = about
       return @renderer.to_s
@@ -269,9 +272,7 @@ module Mulukhiya
       # 503 = 「機能はあるが現在 OFF」をクライアント（capsicum 等）が区別できるよう
       # にするため。features.media_catalog と組合せて利用する想定。
       unless controller_class.media_catalog?
-        Logger.new.info(media_catalog: {event: 'disabled_response', endpoint: '/media'})
-        @renderer.status = 503
-        @renderer.message = {available: false, items: [], has_next: false}
+        MediaCatalogDisabledRenderer.apply!(@renderer, endpoint: '/media')
         return @renderer.to_s
       end
       sns.token ||= sns.default_token
@@ -365,14 +366,7 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        status.parser.footer_tags.clear
-        status.parser.footer_tags.concat(params[:tags])
-        body = [
-          status.parser.body,
-          '',
-          status.parser.footer_tags.map(&:to_hashtag).join(' '),
-        ].join("\n")
-        @renderer.message = sns.repost(status, body)
+        @renderer.message = StatusTagAddService.new(sns).call(status, params[:tags])
       end
       return @renderer.to_s
     rescue => e
@@ -514,7 +508,8 @@ module Mulukhiya
       end
       episode_id = params[:episode_id].to_i
       lock = AnnictRecordLockStorage.new
-      unless lock.acquire(sns.account.id, episode_id)
+      lock_token = lock.acquire(sns.account.id, episode_id)
+      unless lock_token
         raise Ginseng::ConflictError, 'Duplicate Annict record request is in progress'
       end
       begin
@@ -525,8 +520,9 @@ module Mulukhiya
         )
       rescue
         # createRecord 失敗時はロックを解放しリトライ可能にする
-        # (record 未作成のため重複の懸念がない)。
-        lock.release(sns.account.id, episode_id)
+        # (record 未作成のため重複の懸念がない)。token を渡すことで TTL 跨ぎ後の
+        # 他者ロック誤削除を防ぐ (#4345)。
+        lock.release(sns.account.id, episode_id, lock_token)
         raise
       end
       @renderer.message = {record:}
@@ -536,12 +532,21 @@ module Mulukhiya
       # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
       # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
       # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
+      # ただし同一アカウントが 1 分間に alert_threshold 件 (既定 10) に達した
+      # 場合はリトライループ等の異常として alert に昇格する (#4346)。
       if e.is_a?(Ginseng::ConflictError)
         Logger.new.info(annict_record: {
           event: 'conflict',
           account_id: sns.account&.id,
           episode_id: params[:episode_id],
         })
+        if sns.account && lock&.record_conflict(sns.account.id, params[:episode_id].to_i)
+          e.alert(annict_record: {
+            event: 'conflict_threshold_exceeded',
+            account_id: sns.account.id,
+            threshold: lock.alert_threshold,
+          })
+        end
       else
         e.alert
       end
@@ -554,6 +559,21 @@ module Mulukhiya
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       AnnouncementWorker.perform_async
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    # capsicum-relay (capsicum-relay#14) からの公開キャッシュ参照用 (#4355)。
+    # Redis にキャッシュ済みの SNS announcement 一覧を array で返す。認証不要。
+    # shape は SNS 種別に依存し (Mastodon: content / published_at、Misskey:
+    # title / text / createdAt)、capsicum-relay 側で正規化する。
+    get '/announcement/list' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
+      @renderer.message = Announcement.new.load.values
       return @renderer.to_s
     rescue => e
       e.log

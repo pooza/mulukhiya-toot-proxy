@@ -39,6 +39,8 @@ properties:
         type: boolean
       announcement:
         type: boolean
+      announcement_push:
+        type: boolean
       feed:
         type: boolean
       webhook:
