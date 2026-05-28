@@ -201,7 +201,7 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.24.0
 
-テーマ: 番組表エディタ拡張 + 調査・運用検証 + リファクタ + 5.23 レビュー送り消化 + 報告ベース新規対応（11 件 / 27 重み、+2 超過容認）。
+テーマ: 番組表エディタ拡張 + 調査・運用検証 + リファクタ + 5.23 レビュー送り消化 + 報告ベース新規対応 + capsicum お知らせ通知対応（飛び込み）。当初 11 件 / 27 重み計画に capsicum お知らせ通知の軽微対応 2 件（#4354 / #4355）が飛び込み、#4345 / #4349 / #4354 / #4355 が `develop` に直コミットで先行着地済み。
 
 ### 番組表エディタ拡張
 
@@ -221,12 +221,13 @@ git diff Gemfile.lock
 ### capsicum 連携
 
 - #4342 feat: Annict review (作品全体感想) 投稿 API（capsicum #592 / v1.34 連携、size:M）。#4227 record API の作品単位版。劇場版など episode 非分割作品向け。capsicum 側が v1.34（v1.27 から先）なので時間的余裕あり、5.24.0 内で先行着地でも可
+- **着地済み**: #4354 feat: features.announcement_push を /api/about で公開（capsicum お知らせ通知対応、b5d1d81d）/ #4355 feat: GET /announcement/list を追加（capsicum-relay 公開キャッシュ参照、8630e965）。いずれも軽微対応として直コミット
 
 ### 5.23 レビュー送り
 
-- #4345 fix: AnnictRecordLockStorage#release を compare-and-delete に変更（TTL 跨ぎで他人ロック削除を防ぐ、5観点並列レビュー並行性観点、size:S）
+- **着地済み**: #4345 fix: AnnictRecordLockStorage#release を compare-and-delete に変更（TTL 跨ぎで他人ロック削除を防ぐ、ab2dffa4）
 - #4346 feat: AnnictRecordLockStorage 冪等性ロックの異常頻度を Sentry alert（#4345 と同系統で同時消化、size:M）
-- #4349 refactor: /media disabled 応答を MediaCatalogDisabledRenderer に切り出し（#4343 整理、size:S）
+- **着地済み**: #4349 refactor: /media disabled 応答を MediaCatalogDisabledRenderer に切り出し（#4343 整理、3bf8ef71）
 
 ### 報告ベース新規
 
