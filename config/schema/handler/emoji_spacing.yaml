@@ -1,0 +1,9 @@
+label: 絵文字スペーシング
+description: カスタム絵文字ショートコードの前後にゼロ幅スペース (ZWSP) を挿入し、隣接文字との視覚的衝突やショートコード認識失敗を防ぎます
+properties:
+  disabled:
+    type: boolean
+  timeout:
+    minimum: 1
+    type: integer
+type: object
