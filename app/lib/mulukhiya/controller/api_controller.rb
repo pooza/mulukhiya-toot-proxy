@@ -539,12 +539,21 @@ module Mulukhiya
       # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
       # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
       # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
+      # ただし同一アカウントが 1 分間に alert_threshold 件 (既定 10) に達した
+      # 場合はリトライループ等の異常として alert に昇格する (#4346)。
       if e.is_a?(Ginseng::ConflictError)
         Logger.new.info(annict_record: {
           event: 'conflict',
           account_id: sns.account&.id,
           episode_id: params[:episode_id],
         })
+        if sns.account && lock&.record_conflict(sns.account.id, params[:episode_id].to_i)
+          e.alert(annict_record: {
+            event: 'conflict_threshold_exceeded',
+            account_id: sns.account.id,
+            threshold: lock.alert_threshold,
+          })
+        end
       else
         e.alert
       end

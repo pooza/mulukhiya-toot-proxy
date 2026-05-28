@@ -82,5 +82,55 @@ module Mulukhiya
 
       assert_nil(@storage.acquire(@account_id, @episode_id))
     end
+
+    def test_alert_threshold_default
+      assert_kind_of(Integer, @storage.alert_threshold)
+      assert_operator(@storage.alert_threshold, :>, 0)
+    end
+
+    def test_record_conflict_below_threshold_returns_false
+      return if disable?
+      original = config['/service/annict/record/idempotency/alert_threshold']
+      config['/service/annict/record/idempotency/alert_threshold'] = 3
+      @storage.instance_variable_set(:@alert_threshold, nil)
+
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+    ensure
+      config['/service/annict/record/idempotency/alert_threshold'] = original
+      @storage.instance_variable_set(:@alert_threshold, nil)
+    end
+
+    def test_record_conflict_returns_true_only_when_threshold_reached
+      return if disable?
+      original = config['/service/annict/record/idempotency/alert_threshold']
+      config['/service/annict/record/idempotency/alert_threshold'] = 3
+      @storage.instance_variable_set(:@alert_threshold, nil)
+
+      # 1, 2 件目は false、3 件目で true、それ以降は同一 bucket では false
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+      assert_true(@storage.record_conflict(@account_id, @episode_id))
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+    ensure
+      config['/service/annict/record/idempotency/alert_threshold'] = original
+      @storage.instance_variable_set(:@alert_threshold, nil)
+    end
+
+    def test_record_conflict_counts_per_account
+      return if disable?
+      original = config['/service/annict/record/idempotency/alert_threshold']
+      config['/service/annict/record/idempotency/alert_threshold'] = 2
+      @storage.instance_variable_set(:@alert_threshold, nil)
+      other_account = "test_#{SecureRandom.hex(8)}"
+
+      # 別アカウントは別カウンタなので干渉しない
+      assert_false(@storage.record_conflict(@account_id, @episode_id))
+      assert_false(@storage.record_conflict(other_account, @episode_id))
+      assert_true(@storage.record_conflict(@account_id, @episode_id))
+    ensure
+      config['/service/annict/record/idempotency/alert_threshold'] = original
+      @storage.instance_variable_set(:@alert_threshold, nil)
+    end
   end
 end
