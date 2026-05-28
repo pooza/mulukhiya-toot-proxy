@@ -244,7 +244,7 @@ git diff Gemfile.lock
 
 ## 次期マイルストーン: 5.25.0
 
-テーマ: APIController 段階的リファクタの締め + 5.23/5.24 レビュー送りの構造改善 + メディアカタログ段階的再有効化 + 5.24 繰越（番組表 iCalendar / Annict review API）+ 運用ログ整備（9 件 / 26 重み、+1 超過容認）。
+テーマ: APIController 段階的リファクタの締め + 5.23/5.24 レビュー送りの構造改善 + メディアカタログ段階的再有効化 + 5.24 繰越（番組表 iCalendar / Annict review API）+ 運用ログ整備（10 件 / 27 重み、+2 超過容認）。
 
 ### APIController 段階的リファクタ
 
@@ -252,7 +252,8 @@ git diff Gemfile.lock
 
 ### 番組表エディタ拡張（5.24 繰越）
 
-- #4287 feat: 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4286 で start_time 追加を見送ったため整合して送り、size:M）
+- #4366 feat: 番組表エディタに開始時刻 (start_time) 欄を追加（#4286 で見送った分の再起票、#4287 iCal の前提、size:S）
+- #4287 feat: 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4366 依存、size:M）
 
 ### capsicum 連携（5.24 繰越）
 
