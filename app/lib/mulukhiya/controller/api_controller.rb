@@ -708,7 +708,12 @@ module Mulukhiya
       @renderer.message = {key:, entry:}
       return @renderer.to_s
     rescue => e
-      e.alert
+      if e.is_a?(Ginseng::ConflictError)
+        # 409 (auto_update? 有効時 or 重複キー) は期待動作のため Sentry alert 不要
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -730,7 +735,12 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.alert
+      if e.is_a?(Ginseng::ConflictError)
+        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -744,7 +754,12 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.alert
+      if e.is_a?(Ginseng::ConflictError)
+        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s
@@ -758,7 +773,12 @@ module Mulukhiya
       @renderer.message = {key: params[:key], entry:}
       return @renderer.to_s
     rescue => e
-      e.alert
+      if e.is_a?(Ginseng::ConflictError)
+        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

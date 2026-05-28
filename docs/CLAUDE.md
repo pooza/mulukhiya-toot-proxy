@@ -152,6 +152,49 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.24.0（2026-05-28）
+
+5.23 レビュー送り消化 + 番組表エディタ拡張 + 報告ベース新規対応 + capsicum お知らせ通知連携を中心とする整理・小粒着地回。テーマ性は薄いが capsicum 側の機能解放に必要な API 改善（#4354 / #4355）と毎晩ルーチン補助（#4286 番組表まとめコピー）を組み合わせた。
+
+- **#4272 feat: auto_update 有効時は番組表エディタを参照専用にする** — 書き込み 4 ルートが 409 Conflict を返し、WebUI 側は `features.program_editable` で編集 UI を出し分け
+- **#4286 feat: 番組表エディタの有効エントリをまとめてクリップボードへコピー** — 毎朝の挨拶投稿運用支援。最小スコープ実装（`start_time` 欄追加は見送り、貼り付け後に手編集する運用）。Issue 本来スコープの開始時刻フィールド + iCalendar 出力 (#4287) は 5.25.0 送り
+- **#4284 refactor: POST /status/tags を StatusTagAddService に移設** — #4233 段階的リファクタの 2 件目（26 行）
+- **#4344 feat: status post の custom emoji shortcode 前後に ZWSP 自動挿入ハンドラを追加** — fedibird ユーザー報告起点。Mastodon target のみ介入。Codex P2 指摘で時刻形式 `12:34:56` 等の誤マッチを回避するため SHORTCODE_PATTERN を英字/`_` 始まりに限定
+- **#4265 fix: メディアアップロードの 413 を Sentry alert 対象から外しユーザー向けメッセージへ変換** — `Ginseng::HTTP#upload` 経由の本家 413 (MAX_ATTACHMENT_FILE_SIZE 超過) をユーザー入力起因として扱い、Sentry MULUKHIYA-TOOT-PROXY-1T を抑止。本家 mastodon/misskey 両 controller に `handle_upload_gateway_error` ヘルパを追加
+- **#4264 daemon 調査** — 本番 4 台に SSH 確認し production モード起動・stdio 状態・Environment.type すべて対応不要と判定してクローズ。副次発見の Sidekiq ログ消失 (FreeBSD 3 台で no-reader pipe へ書き込み) は #4362 として 5.25.0 送り
+- **#4354 feat: features.announcement_push を /api/about で公開** — capsicum お知らせ通知連携。フラグ参照で push 配信 UI を出し分け
+- **#4355 feat: GET /announcement/list を追加** — capsicum-relay (capsicum-relay#14) からの公開キャッシュ参照用、認証不要
+- **#4345 fix: AnnictRecordLockStorage#release を compare-and-delete に変更** — TTL 跨ぎで他人ロックを誤削除しない、Lua CAS
+- **#4346 feat: AnnictRecordLockStorage 冪等性ロックの異常頻度を Sentry alert に昇格** — 1 分 bucket / account_id 単位で `alert_threshold` (既定 10) 到達時に alert
+- **#4349 refactor: /media disabled 応答を MediaCatalogDisabledRenderer に切り出し** — #4343 整理の継続
+- **リリース前 5観点レビュー赤近い黄インライン対応** — EmojiSpacingHandler の `result.push(rewritten:)` が投稿本文 (DM 含む) を info ログへ流出させていたのを `inserted: count` メタ情報のみに圧縮。Program editor 4 ルートで `Ginseng::ConflictError` (409) が `e.alert` で Sentry alert spam を生んでいたのを ConflictError 限定で info ログ + alert 抑止する分岐に変更
+- **リリース前 5観点レビュー docs 追記** — docs/api.md に `features.announcement_push` と `GET /announcement/list` を追記
+- **5観点レビュー次リリース送り** — #4364 で黄 (episode_id alert payload, 暗黙 return 3 箇所, shortcode 単一文字コメント) + 緑 (EMPTY_PAYLOAD freeze, `lock&.` ノイズ, EVALSHA キャッシュ) をまとめて 5.25.0 へ
+- **bundle update** — json 2.19.7
+- 本番デプロイ: 4 台（zugoga / lbock / shallu / sweep）
+
+### 振り返り
+
+**期間**: 5.23.0 リリース 2026-05-23 → 5.24.0 リリース 2026-05-28（5 日間）。本リリース 8 PR + 5観点赤・黄インライン 1 コミット + bundle update + version bump。
+
+**消化**: 11 Issue（番組表系 2 + capsicum 連携 2 + 5.23 レビュー送り 3 + 段階的リファクタ 1 + 調査 1 + 報告ベース 1 + 413 適正化 1）。#4287 / #4342 は 5.25.0 送り。
+
+**主軸**: 当初「テーマレス回」と宣言、結果としては (1) 番組表エディタ系 (#4272/#4286)、(2) capsicum お知らせ通知連携 (#4354/#4355)、(3) ZWSP ハンドラ (#4344)、(4) 413 適正化 (#4265) の 4 系統が並列で着地。`pooza` 側の deploy 要求 (4354/4355) を起点に 5/28 中の短期リリースに向けて 1 セッション完結で残作業をすべて捌いた。
+
+**5観点レビュー仕分け**: 真の赤なし。赤近い黄 2 件 (emoji_spacing 本文ログ流出 / Program editor ConflictError Sentry spam) を hotfix インライン、docs 追記 (announcement_push / announcement_list) もインライン、残り黄 3 件 + 緑 3 件は #4364 にまとめて 5.25.0 送り。
+
+**Codex 仕分け**: PR #4356 (#4272) 上の P2 は #4360 として 5.25.0 送り。PR #4361 (#4344) 上の P2 (時刻形式誤マッチ) はインライン即修正してリアクション付与。
+
+**運用観察**:
+
+- `#4264` 調査で本番 FreeBSD 3 台の Sidekiq ログが no-reader pipe へ書き込まれ完全消失していることが判明。これまで Sentry の致命エラーしか観測できていなかった。#4362 で Mulukhiya::Logger (syslog) 経由へ切替検討
+- PR ベース指定漏れ事故 — `gh pr create` が repo default (main) をベースに採用する仕様で、3 PR が main 起点でマージされ main / develop が diverge。merge commit で修復したが、次回以降 `gh pr create --base develop` の指定を徹底する必要
+
+**反省**:
+
+- `gh pr create --base develop` の指定漏れで意図しない main 起点マージが 3 件発生。CI が通っただけでマージしてしまったため気づくのが遅れた。PR 作成直後に `gh pr view <num> --json baseRefName` を確認するワークフローを徹底
+- EmojiSpacingHandler の本文ログ流出は新ハンドラ開発時のテンプレ判断 (`result.push(text:)` で text の中身をどこまで残すか) の問題。今後新ハンドラを書く際は「Reporter に乗る値が info ログへ流れる」点を意識する
+
 ## リリース済み: 5.23.0（2026-05-23）
 
 5.22 リリース前 5観点並列レビューの黄送り掃き出しと、本リリース前 5観点並列レビュー対応を主とする「整理回」。あわせて本番で観測された重 SQL 病理（2026-05-19 障害、底値レイテンシ 175 秒級）を受け、メディアカタログ機能を実験的扱いとしデフォルト無効化する運用判断を反映（#4343）。
@@ -199,54 +242,40 @@ git diff Gemfile.lock
 
 - #4343 で本番停止に駆け込んだが、scheduler 直叩き経路の穴を 5観点レビューが拾わなかったら本番で「local.yaml で false にしたつもりが止まっていない」が継続するところだった。並列レビューを規定どおり実施する価値を再確認
 
-## 次期マイルストーン: 5.24.0
+## 次期マイルストーン: 5.25.0
 
-テーマ: 番組表エディタ拡張 + 調査・運用検証 + リファクタ + 5.23 レビュー送り消化 + 報告ベース新規対応 + capsicum お知らせ通知対応（飛び込み）。当初 11 件 / 27 重み計画に capsicum お知らせ通知の軽微対応 2 件（#4354 / #4355）が飛び込み、#4345 / #4349 / #4354 / #4355 が `develop` に直コミットで先行着地済み。
-
-### 番組表エディタ拡張
-
-- #4272 feat: auto_update 有効時は番組表エディタを参照専用にする（size:S）
-- #4286 feat: 番組表エディタに開始時刻欄を追加 + 当日まとめクリップボードコピー（#4336 運用結果を見て要否判断、size:M）
-- #4287 feat: 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4286 依存、size:M）
-
-### 調査・運用検証
-
-- #4264 daemon: production 起動確認と stdio reopen / Environment.type ENV 優先 override（cure-api v3.0.2/v3.0.3 同等、size:M）
-- #4265 大容量メディアアップロードで Mastodon 本家が 413（Sentry MULUKHIYA-TOOT-PROXY-1T、size:M）
+テーマ: APIController 段階的リファクタの締め + 5.23/5.24 レビュー送りの構造改善 + メディアカタログ段階的再有効化 + 5.24 繰越（番組表 iCalendar / Annict review API）+ 運用ログ整備（9 件 / 26 重み、+1 超過容認）。
 
 ### APIController 段階的リファクタ
 
-- #4284 refactor: POST /status/tags を StatusTagAddService に移設（#4233 の 2 件目、中規模 26 行、size:M）
-
-### capsicum 連携
-
-- #4342 feat: Annict review (作品全体感想) 投稿 API（capsicum #592 / v1.34 連携、size:M）。#4227 record API の作品単位版。劇場版など episode 非分割作品向け。capsicum 側が v1.34（v1.27 から先）なので時間的余裕あり、5.24.0 内で先行着地でも可
-- **着地済み**: #4354 feat: features.announcement_push を /api/about で公開（capsicum お知らせ通知対応、b5d1d81d）/ #4355 feat: GET /announcement/list を追加（capsicum-relay 公開キャッシュ参照、8630e965）。いずれも軽微対応として直コミット
-
-### 5.23 レビュー送り
-
-- **着地済み**: #4345 fix: AnnictRecordLockStorage#release を compare-and-delete に変更（TTL 跨ぎで他人ロック削除を防ぐ、ab2dffa4）
-- #4346 feat: AnnictRecordLockStorage 冪等性ロックの異常頻度を Sentry alert（#4345 と同系統で同時消化、size:M）
-- **着地済み**: #4349 refactor: /media disabled 応答を MediaCatalogDisabledRenderer に切り出し（#4343 整理、3bf8ef71）
-
-### 報告ベース新規
-
-- #4344 feat: status post の custom emoji shortcode 前後に ZWSP 自動挿入ハンドラ（fedibird ユーザー報告起点、capsicum #609 並走、プロキシ位置で全クライアント横断介入、size:M）
-
-## 次々期マイルストーン: 5.25.0
-
-テーマ: APIController 段階的リファクタの締め + 5.23 レビュー送りの構造改善 + メディアカタログ段階的再有効化（4 件 / 16 重み）。
-
 - #4285 refactor: PUT /scheduled_status/:id/tags を Service に移設（#4233 段階的リファクタの 3 件目、最大、size:L）
-- #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5観点レビュー送り、size:M）
-- #4348 refactor: /about の features 動的合流を Config#about 側にフック化（5観点レビュー送り、annict_linked / media_catalog 等の集約、size:S）
+
+### 番組表エディタ拡張（5.24 繰越）
+
+- #4287 feat: 番組表を iCalendar (.ics) 形式で出力（tomato-shrieker 連携、#4286 で start_time 追加を見送ったため整合して送り、size:M）
+
+### capsicum 連携（5.24 繰越）
+
+- #4342 feat: Annict review (作品全体感想) 投稿 API（capsicum #592 / v1.34 連携、size:M）。capsicum 側余裕あり
+
+### メディアカタログ再有効化
+
 - #4351 perf: media_catalog を zugoga で段階的に再有効化（#4323 ロードマップ A、partial index 適用 + 効果計測 + overlay 切替、size:M）
 
-5.23 レビュー送りの残りは 5.24.0 で吸収完了。
+### 構造改善（5.23/5.24 レビュー送り）
 
-## 次々々期マイルストーン: 5.26.0
+- #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.23 レビュー送り、size:M）
+- #4348 refactor: /about の features 動的合流を Config#about 側にフック化（5.23 レビュー送り、annict_linked / media_catalog / announcement_push 等の集約、size:S）
+- #4364 5.24.0 リリース前 5観点レビュー 5.25 送り（黄 3 件 + 緑 3 件まとめ: episode_id alert payload, 暗黙 return, shortcode 単一文字コメント, EMPTY_PAYLOAD freeze, lock&. ノイズ, EVALSHA キャッシュ、size:S）
+- #4360 test: ProgramTest auto_update 一律 false 設定の順序依存修正（PR #4356 Codex P2 follow-up、size:S）
 
-主軸候補: Spotify 連携（capsicum #465 ペア）+ メディアカタログ再有効化の横展開（2 件 / 8 重み）。
+### 運用観察起点
+
+- #4362 ops: Sidekiq ログが no-reader pipe へ書き込まれ消失している（FreeBSD 3 台、#4264 副次発見、Mulukhiya::Logger 経由への切替検討、size:M）
+
+## 次々期マイルストーン: 5.26.0
+
+主軸候補: Spotify 連携（capsicum #465 ペア）+ メディアカタログ再有効化の横展開（2 件 / 11 重み）。
 
 - #4337 feat: Spotify user-level OAuth + currently-playing API（capsicum #465 連携、size:L）— 主軸候補
 - #4352 perf: media_catalog を shallu / lbock に横展開（#4323 ロードマップ B、#4351 完了後着手、size:M）
@@ -256,7 +285,7 @@ git diff Gemfile.lock
 Issue #4233 の APIController 段階的リファクタは「1〜2 マイルストーンに 1 件」の方針でサブ Issue 化済み。残ペースで進める想定:
 
 - 5.22.0: #4283 GET /media（最小 24 行）— **完了**
-- 5.24.0: #4284 POST /status/tags（中規模 26 行）— **アサイン済み**
+- 5.24.0: #4284 POST /status/tags（中規模 26 行）— **完了**
 - 5.25.0: #4285 PUT /scheduled_status/:id/tags（最大 64 行、ロールバック含む、size:L）— **アサイン済み**
 
 番組表リニューアル（#4234）はフェーズ4 #4227 を 5.22.0 で達成し全フェーズ完了。capsicum 側は pooza/capsicum#298（v1.26）で対応中。
