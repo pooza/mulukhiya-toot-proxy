@@ -14,7 +14,9 @@ module Mulukhiya
       rewritten = inject_separators(@status)
       return if rewritten == @status
       parser.text = payload[text_field] = rewritten
-      result.push(rewritten:)
+      # 投稿本文 (非公開・DM を含む) を info ログへ流出させないため、結果には
+      # 挿入文字数のみメタ情報として記録する。
+      result.push(inserted: rewritten.length - @status.length)
       return rewritten
     end
 
