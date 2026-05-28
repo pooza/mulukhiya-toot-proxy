@@ -34,6 +34,7 @@ module Mulukhiya
     end
 
     def add_entry(key, attributes)
+      raise auto_update_conflict if auto_update?
       key = key.to_s
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
@@ -59,6 +60,7 @@ module Mulukhiya
     end
 
     def update_entry(key, attributes)
+      raise auto_update_conflict if auto_update?
       key = key.to_s
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
@@ -74,6 +76,7 @@ module Mulukhiya
     end
 
     def delete_entry(key)
+      raise auto_update_conflict if auto_update?
       key = key.to_s
       programs = data
       return nil unless programs.key?(key)
@@ -83,6 +86,7 @@ module Mulukhiya
     end
 
     def increment_episode(key, annict: nil)
+      raise auto_update_conflict if auto_update?
       key = key.to_s
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
@@ -131,6 +135,13 @@ module Mulukhiya
 
     def initialize
       @http = HTTP.new
+    end
+
+    # auto_update 有効時は外部 (GAS 等) が番組表データの正本。エディタからの
+    # 書き込みは次の pull で上書き消失するので、書き込み API 自体を 409 で
+    # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
+    def auto_update_conflict
+      Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
     end
 
     def next_annict_episode(annict, work_id, episode_number)

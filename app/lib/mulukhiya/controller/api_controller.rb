@@ -14,10 +14,13 @@ module Mulukhiya
       # （capsicum 等）からの discovery を features 一本に集約するため合流させる
       # (#4343)。disabled 時の 503 応答と組合せて「機能未提供」(404) と
       # 「現在 OFF」を区別可能にする。
+      # program_editable は番組表エディタ (livecure かつ auto_update 無効) で
+      # 書き込み API が利用可能か。WebUI 側で UI 出し分けに使う (#4272)。
       about[:config][:features] = about[:config][:features]
         .merge(
           'annict_linked' => sns.account&.annict_linked? || false,
           'media_catalog' => controller_class.media_catalog?,
+          'program_editable' => controller_class.livecure? && !Program.instance.auto_update?,
         )
       @renderer.message = about
       return @renderer.to_s
