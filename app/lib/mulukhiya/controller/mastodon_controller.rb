@@ -143,7 +143,7 @@ module Mulukhiya
       else
         @renderer.message = {error: error.message}
       end
-      @renderer.status = error.source_status
+      return @renderer.status = error.source_status
     end
   end
 end

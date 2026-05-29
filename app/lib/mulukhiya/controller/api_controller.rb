@@ -528,10 +528,11 @@ module Mulukhiya
           account_id: sns.account&.id,
           episode_id: params[:episode_id],
         })
-        if sns.account && lock&.record_conflict(sns.account.id, params[:episode_id].to_i)
+        if sns.account && lock.record_conflict(sns.account.id, params[:episode_id].to_i)
           e.alert(annict_record: {
             event: 'conflict_threshold_exceeded',
             account_id: sns.account.id,
+            episode_id: params[:episode_id],
             threshold: lock.alert_threshold,
           })
         end

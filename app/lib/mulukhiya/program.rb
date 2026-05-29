@@ -141,7 +141,7 @@ module Mulukhiya
     # 書き込みは次の pull で上書き消失するので、書き込み API 自体を 409 で
     # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
     def auto_update_conflict
-      Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
+      return Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
     end
 
     def next_annict_episode(annict, work_id, episode_number)
