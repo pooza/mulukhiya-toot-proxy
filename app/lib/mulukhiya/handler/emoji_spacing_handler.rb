@@ -3,6 +3,8 @@ module Mulukhiya
     # Mastodon の custom emoji shortcode は仕様上 [a-zA-Z0-9_]{2,} だが、
     # 純数字 (例 :34:) は時刻 12:34:56 やポート host:8080 等との誤認源になる。
     # 実用上の shortcode は英字または _ 始まりが圧倒的多数なため、こちらに限定する。
+    # また後続 [A-Za-z0-9_]+ により 2 文字以上のみ介入対象とし、単一文字 shortcode
+    # (:a: 等) は素通しする (誤マッチ抑制を優先、実害は軽微)。
     SHORTCODE_PATTERN = /:([A-Za-z_][A-Za-z0-9_]+):/
     ZWSP = '​'.freeze
     SEPARATOR_PATTERN = /[\s​]/
