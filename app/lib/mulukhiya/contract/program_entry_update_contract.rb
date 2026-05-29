@@ -4,6 +4,7 @@ module Mulukhiya
       optional(:key).value(:string)
       optional(:series).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:minutes).maybe(:integer)
+      optional(:start_time).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:episode).maybe(:integer)
       optional(:episode_suffix).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:subtitle).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
@@ -34,6 +35,14 @@ module Mulukhiya
       next unless value.is_a?(String)
       unless ProgramEntryContract::URL_FORMAT.match?(value)
         key.failure('ソース URL は http(s):// で始まる URL を指定してください。')
+      end
+    end
+
+    rule(:start_time) do
+      next unless value.is_a?(String)
+      next if value.empty?
+      unless ProgramEntryContract::TIME_FORMAT.match?(value)
+        key.failure('開始時刻は HH:MM 形式 (例 21:00) で指定してください。')
       end
     end
   end

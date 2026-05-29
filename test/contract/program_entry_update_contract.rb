@@ -43,6 +43,7 @@ module Mulukhiya
     def test_clearable_optionals_accept_nil
       errors = @contract.call(
         minutes: nil,
+        start_time: nil,
         episode: nil,
         episode_suffix: nil,
         subtitle: nil,
@@ -104,6 +105,17 @@ module Mulukhiya
     def test_source_url_accepts_http_and_https
       assert_empty(@contract.call(source_url: 'http://example.com/').errors)
       assert_empty(@contract.call(source_url: 'https://example.com/').errors)
+    end
+
+    def test_start_time_accepts_valid_and_unset
+      assert_empty(@contract.call(start_time: '21:00').errors)
+      assert_empty(@contract.call(start_time: '').errors)
+      assert_empty(@contract.call(start_time: nil).errors)
+    end
+
+    def test_start_time_rejects_invalid_format
+      assert_false(@contract.call(start_time: '24:00').errors.empty?)
+      assert_false(@contract.call(start_time: 'morning').errors.empty?)
     end
 
     def test_error_messages_include_field_name

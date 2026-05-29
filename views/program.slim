@@ -80,6 +80,10 @@ html lang='ja' data-theme='light'
               input type='number' v-model.number='form.values.minutes' min='0' placeholder='30'
           .field-container
             label
+              span 開始時刻
+              input type='time' v-model='form.values.start_time'
+          .field-container
+            label
               span 追加タグ
               textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
           .inline-field-container
@@ -108,6 +112,7 @@ html lang='ja' data-theme='light'
                 th 作品
                 th 話数
                 th サブタイトル
+                th 開始時刻
                 th 放送時間
                 th エア番組
                 th 実況
@@ -134,6 +139,9 @@ html lang='ja' data-theme='light'
                     | {{entry.subtitle}}
                   button.small @click.stop='copyEpisodeSubtitle(entry)' v-if='entry.episode || entry.subtitle' v-tooltip.top="'話数+サブタイトルをコピー'"
                     i class='fa fa-copy'
+                td
+                  small v-if='entry.start_time'
+                    | {{entry.start_time}}
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
@@ -167,7 +175,7 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: 30, subtitle: '',
+                  minutes: 30, start_time: null, subtitle: '',
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                 },
@@ -187,6 +195,7 @@ html lang='ja' data-theme='light'
                 episode: null,
                 episode_suffix: '',
                 minutes: 30,
+                start_time: null,
                 subtitle: '',
                 air: false,
                 livecure: true,
@@ -235,6 +244,7 @@ html lang='ja' data-theme='light'
                 .split(/\r?\n/).map(s => s.trim()).filter(Boolean)
               v.extra_tags = extraTags.length ? extraTags : null
               if (!v.subtitle) v.subtitle = null
+              if (!v.start_time) v.start_time = null
               if (!v.episode_suffix) v.episode_suffix = null
               if (!Number.isFinite(v.episode)) v.episode = null
               if (!Number.isFinite(v.minutes)) v.minutes = null
