@@ -29,9 +29,25 @@ module Mulukhiya
     end
 
     def test_update
-      @program.update
+      return if disable?
+      original = @program.data
+      url = 'http://example.com/programs.json'
+      payload = {'updated_program' => {'series' => 'Updated'}}
+      stub_remote_program(url, payload.to_json)
+      # update は auto_update? が false だと即 no-op (#4272) のため、setup の
+      # 一律 false 下では「先に save 系テストが走った時だけ yaml が存在する」順序
+      # 依存になっていた (#4360)。auto_update=true + スタブ URL で実際に fetch+save
+      # を走らせ、ネットワーク非依存に決定化する。
+      with_auto_update(true) do
+        with_program_urls([url]) do
+          @program.update
 
-      assert_predicate(@program, :yaml_exist?)
+          assert_predicate(@program, :yaml_exist?)
+          assert_includes(@program.data.keys, 'updated_program')
+        end
+      end
+    ensure
+      @program.save(original) if defined?(original) && original
     end
 
     def test_save
