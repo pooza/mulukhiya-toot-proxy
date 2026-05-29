@@ -758,6 +758,22 @@ NowPlaying 情報を除去して再投稿する。
 - `/program/urls`: マルチサーバー共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
 - `/program/auto_update`: `true` (既定) の場合 `ProgramUpdateWorker` が 1 分ごとに `/program/urls` から pull して YAML を上書きする。**番組表エディタを使うサーバーでは `false` に設定して上書きを防ぐ**こと
 
+#### GET /mulukhiya/api/program.ics
+
+番組表を iCalendar (.ics) 形式で出力する（#4287）。tomato-shrieker の `IcalendarSource` から購読される想定。
+
+- **認証**: 不要（公開）
+- **前提条件**: `livecure?` が `true` の controller のみ（未対応サーバーでは 404）
+- **パラメータ**: なし
+- **Content-Type**: `text/calendar; charset=UTF-8`
+- **対象エントリ**: `air: true` かつ `enable: true` かつ妥当な `start_time`（`HH:MM`）を持つもののみ。それ以外（非エア・無効・時刻未設定・書式不正）はスキップ
+- **VEVENT マッピング**:
+  - `SUMMARY`: `{作品名} {話数}{話数表記} {サブタイトル}`（存在する要素のみ空白連結）
+  - `DTSTART`: `start_time`（JST）の「次回発生」。当日の当該時刻が既に過ぎていれば翌日に送る。出力は UTC（末尾 `Z`）
+  - `DTEND`: `DTSTART + minutes`（`minutes` 未設定時は 30 分）
+  - `UID`: `program-{key}@mulukhiya`（エントリ単位で安定。購読のたびに次回放送へ更新される）
+- **補足**: 現状エントリは放送曜日を持たないため繰り返し（`RRULE`）は付けず、単発 VEVENT を出力する MVP。曜日欄が追加されれば週次 `RRULE` へ拡張できる
+
 #### POST /mulukhiya/api/admin/program/entry
 
 番組表エントリを追加する。
