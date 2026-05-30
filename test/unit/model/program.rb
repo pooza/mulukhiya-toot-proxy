@@ -182,6 +182,65 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    def test_add_entry_drops_blank_string_attributes
+      key = "test_addblank_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '', 'episode' => 1)
+
+      assert_equal('A', entry['series'])
+      assert_equal(1, entry['episode'])
+      assert_not_includes(entry.keys, 'start_time')
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_update_entry_clears_key_when_value_is_blank_string
+      key = "test_updateblank_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'start_time' => '21:00', 'episode' => 3})
+      entry = @program.update_entry(key, 'start_time' => '')
+
+      assert_not_includes(entry.keys, 'start_time')
+      assert_equal('A', entry['series'])
+      assert_equal(3, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_add_entry_zero_pads_start_time_hour
+      key = "test_addzeropad_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '9:00')
+
+      assert_equal('09:00', entry['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_add_entry_keeps_already_padded_start_time
+      key = "test_addpadded_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '21:00')
+
+      assert_equal('21:00', entry['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_update_entry_zero_pads_start_time_hour
+      key = "test_updatezeropad_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A'})
+      entry = @program.update_entry(key, 'start_time' => '9:30')
+
+      assert_equal('09:30', entry['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
     def test_delete_entry_removes_key
       key = "test_delete_#{Time.now.to_i}"
       original = @program.data

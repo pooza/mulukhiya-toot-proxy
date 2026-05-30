@@ -774,6 +774,7 @@ NowPlaying 情報を除去して再投稿する。
 | `episode_suffix` | string | 任意 | 話数表記（既定「話」）。**200 文字以下** |
 | `subtitle` | string | 任意 | サブタイトル。**200 文字以下** |
 | `minutes` | integer | 任意 | 放送時間（分） |
+| `start_time` | string | 任意 | 放送開始時刻。24 時間制 `HH:MM`（時は先頭 0 省略可、例 `9:00` / `21:00`）。#4287 iCalendar 出力での機械可読な開始時刻として使う。書式違反は 422 |
 | `air` | boolean | 任意 | エア番組（実在しない／TV 放送のない番組）フラグ。`true` で「エア番組」タグが付与される |
 | `livecure` | boolean | 任意 | 実況対象フラグ |
 | `enable` | boolean | 任意 | 有効フラグ |
