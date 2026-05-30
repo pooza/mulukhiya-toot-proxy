@@ -166,6 +166,32 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    def test_add_entry_drops_blank_string_attributes
+      key = "test_addblank_#{Time.now.to_i}"
+      original = @program.data
+      @program.save({})
+      entry = @program.add_entry(key, 'series' => 'A', 'start_time' => '', 'episode' => 1)
+
+      assert_equal('A', entry['series'])
+      assert_equal(1, entry['episode'])
+      assert_not_includes(entry.keys, 'start_time')
+    ensure
+      @program.save(original) if original
+    end
+
+    def test_update_entry_clears_key_when_value_is_blank_string
+      key = "test_updateblank_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'start_time' => '21:00', 'episode' => 3})
+      entry = @program.update_entry(key, 'start_time' => '')
+
+      assert_not_includes(entry.keys, 'start_time')
+      assert_equal('A', entry['series'])
+      assert_equal(3, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
+
     def test_delete_entry_removes_key
       key = "test_delete_#{Time.now.to_i}"
       original = @program.data
