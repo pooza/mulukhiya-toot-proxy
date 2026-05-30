@@ -766,7 +766,7 @@ NowPlaying 情報を除去して再投稿する。
 - **前提条件**: `livecure?` が `true` の controller のみ（未対応サーバーでは 404）
 - **パラメータ**: なし
 - **Content-Type**: `text/calendar; charset=UTF-8`
-- **対象エントリ**: `air: true` かつ `enable: true` かつ妥当な `start_time`（`HH:MM`）を持つもののみ。それ以外（非エア・無効・時刻未設定・書式不正）はスキップ
+- **対象エントリ**: `enable: true` かつ妥当な `start_time`（`HH:MM`）を持つもののみ。それ以外（無効・時刻未設定・書式不正）はスキップ。`air`（エア番組）は抽出条件に含めない
 - **VEVENT マッピング**:
   - `SUMMARY`: `{作品名} {話数}{話数表記} {サブタイトル}`（存在する要素のみ空白連結）
   - `DTSTART`: `start_time`（JST）の「次回発生」。当日の当該時刻が既に過ぎていれば翌日に送る。出力は UTC（末尾 `Z`）

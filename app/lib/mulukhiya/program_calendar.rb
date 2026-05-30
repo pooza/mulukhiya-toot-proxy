@@ -31,11 +31,11 @@ module Mulukhiya
 
     private
 
-    # エア対象 (air) かつ有効 (enable) で、妥当な start_time を持つエントリのみ。
+    # 有効 (enable) かつ妥当な start_time を持つエントリのみ。
+    # air (エア番組) は抽出条件に含めない。
     def entries
       return @data.select do |_key, entry|
         entry.is_a?(Hash) &&
-            entry['air'] == true &&
             entry['enable'] == true &&
             valid_start_time?(entry['start_time'])
       end

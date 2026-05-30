@@ -13,6 +13,8 @@ module Mulukhiya
         'late' => {'series' => '深夜アニメ', 'start_time' => '23:00', 'air' => true, 'enable' => true},
         # episode_suffix 未設定 → 既定「話」
         'nosuffix' => {'series' => '無印', 'episode' => 5, 'start_time' => '15:00', 'air' => true, 'enable' => true},
+        # air (エア番組) は抽出条件に含めない。air:false でも有効かつ妥当な
+        # start_time を持てば出力される。
         'noair' => {'series' => '非エア', 'start_time' => '09:00', 'air' => false, 'enable' => true},
         'disabled' => {'series' => '無効', 'start_time' => '10:00', 'air' => true, 'enable' => false},
         'notime' => {'series' => '時刻なし', 'air' => true, 'enable' => true},
@@ -24,13 +26,13 @@ module Mulukhiya
       return ProgramCalendar.new(data, now: @now).to_ics
     end
 
-    def test_includes_only_aired_enabled_with_valid_start_time
+    def test_includes_only_enabled_with_valid_start_time
       result = ics
 
       assert_match(/UID:program-aired@mulukhiya/, result)
       assert_match(/UID:program-late@mulukhiya/, result)
       assert_match(/UID:program-nosuffix@mulukhiya/, result)
-      assert_no_match(/program-noair/, result)
+      assert_match(/UID:program-noair@mulukhiya/, result) # air は無関係なので出力される
       assert_no_match(/program-disabled/, result)
       assert_no_match(/program-notime/, result)
       assert_no_match(/program-badtime/, result)
