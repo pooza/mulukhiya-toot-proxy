@@ -39,7 +39,7 @@ module Mulukhiya
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
       raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
-      programs[key] = attributes.transform_keys(&:to_s).compact
+      programs[key] = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
       save(programs)
       return programs[key]
     end
@@ -65,7 +65,7 @@ module Mulukhiya
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
       attributes.each do |k, v|
-        if v.nil?
+        if blank_value?(v)
           programs[key].delete(k.to_s)
         else
           programs[key][k.to_s] = v
@@ -135,6 +135,14 @@ module Mulukhiya
 
     def initialize
       @http = HTTP.new
+    end
+
+    # nil または空白のみの文字列は「未設定」として扱い、保存対象から除く。
+    # contract で start_time: "" を許容している (#4366) ため、空文字が
+    # machine-readable な start_time 欄にそのまま永続化されるのを防ぐ。
+    # 空配列 (extra_tags のクリア) は正当値なので String のみ対象とする。
+    def blank_value?(value)
+      value.nil? || (value.is_a?(String) && value.strip.empty?)
     end
 
     # auto_update 有効時は外部 (GAS 等) が番組表データの正本。エディタからの
