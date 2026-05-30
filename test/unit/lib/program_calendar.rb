@@ -46,6 +46,30 @@ module Mulukhiya
       assert_match(/DTSTART:20260530T233000Z/, ics)
     end
 
+    def broadcasting_data
+      return {
+        'aired' => {
+          'series' => 'プリキュア', 'start_time' => '08:30', 'minutes' => 60,
+          'air' => true, 'enable' => true
+        },
+      }
+    end
+
+    def test_dtstart_keeps_today_event_at_start_minute
+      # Codex #4370 P1 回帰: 開始分ちょうど (08:30:01) に取得しても、放送終了
+      # (09:30 JST) 前なので当日イベントを維持する。当日 08:30 JST = 前日 23:30 UTC
+      now = Time.new(2026, 5, 30, 8, 30, 1, '+09:00')
+      result = ProgramCalendar.new(broadcasting_data, now: now).to_ics
+      assert_match(/DTSTART:20260529T233000Z/, result)
+    end
+
+    def test_dtstart_rolls_after_broadcast_ends
+      # 放送終了 (09:30 JST) を過ぎたら翌日へ送る。翌 05-31 08:30 JST = 05-30 23:30 UTC
+      now = Time.new(2026, 5, 30, 9, 31, 0, '+09:00')
+      result = ProgramCalendar.new(broadcasting_data, now: now).to_ics
+      assert_match(/DTSTART:20260530T233000Z/, result)
+    end
+
     def test_dtend_uses_explicit_minutes
       # aired: 翌日 08:30 JST (= 23:30 UTC) + 60 分 = 翌 00:30 UTC
       assert_match(/DTEND:20260531T003000Z/, ics)

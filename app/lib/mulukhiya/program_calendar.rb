@@ -46,12 +46,13 @@ module Mulukhiya
     end
 
     def build_event(key, entry)
-      start = next_occurrence(entry['start_time'])
+      minutes = duration_minutes(entry)
+      start = next_occurrence(entry['start_time'], minutes)
       event = Icalendar::Event.new
       event.uid = "program-#{key}@mulukhiya"
       event.dtstamp = utc_value(@now)
       event.dtstart = utc_value(start)
-      event.dtend = utc_value(start + (duration_minutes(entry) * 60))
+      event.dtend = utc_value(start + (minutes * 60))
       event.summary = summary(entry)
       return event
     end
@@ -66,13 +67,15 @@ module Mulukhiya
       return minutes.is_a?(Integer) && minutes.positive? ? minutes : DEFAULT_DURATION_MINUTES
     end
 
-    # start_time (HH:MM, JST) の「次に訪れる時刻」を返す。今日の当該時刻が
-    # 既に過ぎていれば翌日に送る。
-    def next_occurrence(start_time)
+    # start_time (HH:MM, JST) の「次に訪れる時刻」を返す。放送中 (開始済みかつ
+    # 終了前) は今日のイベントを残し、終了時刻 (start + duration) を過ぎて初めて
+    # 翌日へ送る。これにより放送開始分ちょうどに取得しても当日イベントが欠落せず、
+    # start_time 通知の取り逃しを防ぐ (#4287)。
+    def next_occurrence(start_time, duration_minutes)
       hour, minute = start_time.split(':').map(&:to_i)
       now_jst = @now.getlocal(TZ_OFFSET)
       candidate = Time.new(now_jst.year, now_jst.month, now_jst.day, hour, minute, 0, TZ_OFFSET)
-      candidate += 86_400 if candidate <= now_jst
+      candidate += 86_400 if (candidate + (duration_minutes * 60)) <= now_jst
       return candidate
     end
 
