@@ -390,45 +390,8 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        saved_params = entry[:params].deep_stringify_keys
-        original_body = saved_params[status_field]
-        parser = parser_class.new(original_body)
-        body = [
-          parser.body,
-          '',
-          params[:tags].map(&:to_hashtag).join(' '),
-        ].join("\n")
-        saved_params[status_field] = body
-        delete_response = sns.delete_scheduled_status(params[:id])
-        unless delete_response.code.between?(200, 299)
-          message = delete_response.parsed_response&.dig('error') || 'delete failed'
-          raise Ginseng::GatewayError, message
-        end
-        response = sns.toot(saved_params.merge(
-          'scheduled_at' => entry[:scheduled_at],
-        ).compact)
-        if response.code.between?(200, 299)
-          new_entry = response.parsed_response
-          storage.unlink(params[:id])
-          margin = ScheduledStatusSaveHandler::MARGIN
-          expires_in = (Time.parse(new_entry['scheduled_at']) - Time.now).to_i
-          ttl = [expires_in + margin, margin].max
-          storage.set(new_entry['id'], {
-            account_id: sns.account.id,
-            params: saved_params,
-            scheduled_at: new_entry['scheduled_at'],
-          }, ttl:)
-          @renderer.message = {
-            id: new_entry['id'],
-            scheduled_at: new_entry['scheduled_at'],
-            tags: params[:tags],
-          }
-        else
-          saved_params[status_field] = original_body
-          sns.toot(saved_params.merge('scheduled_at' => entry[:scheduled_at]).compact)
-          message = response.parsed_response['error'] || 'recreate failed'
-          raise Ginseng::GatewayError, message
-        end
+        updater = ScheduledStatusTagUpdater.new(sns, storage)
+        @renderer.message = updater.call(params[:id], entry, params[:tags])
       end
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
