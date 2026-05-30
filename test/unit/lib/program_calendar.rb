@@ -62,6 +62,7 @@ module Mulukhiya
       # (09:30 JST) 前なので当日イベントを維持する。当日 08:30 JST = 前日 23:30 UTC
       now = Time.new(2026, 5, 30, 8, 30, 1, '+09:00')
       result = ProgramCalendar.new(broadcasting_data, now: now).to_ics
+
       assert_match(/DTSTART:20260529T233000Z/, result)
     end
 
@@ -69,6 +70,7 @@ module Mulukhiya
       # 放送終了 (09:30 JST) を過ぎたら翌日へ送る。翌 05-31 08:30 JST = 05-30 23:30 UTC
       now = Time.new(2026, 5, 30, 9, 31, 0, '+09:00')
       result = ProgramCalendar.new(broadcasting_data, now: now).to_ics
+
       assert_match(/DTSTART:20260530T233000Z/, result)
     end
 
