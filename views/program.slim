@@ -297,10 +297,25 @@ html lang='ja' data-theme='light'
               this.copyText(parts.join(' '), '話数+サブタイトル')
             },
             copySummary () {
+              const startMinutes = entry => {
+                const [h, m] = String(entry.start_time).split(':')
+                return Number(h) * 60 + Number(m)
+              }
               const blocks = Object.values(this.entries)
                 .filter(entry => entry.enable)
+                .sort((a, b) => {
+                  if (a.start_time && b.start_time) return startMinutes(a) - startMinutes(b)
+                  if (a.start_time) return -1
+                  if (b.start_time) return 1
+                  return 0
+                })
                 .map(entry => {
-                  const lines = [entry.series]
+                  let head = entry.series
+                  if (entry.start_time) {
+                    const [h, m] = entry.start_time.split(':')
+                    head = `${String(h).padStart(2, '0')}:${m} ${entry.series}`
+                  }
+                  const lines = [head]
                   const episodeLine = []
                   if (entry.episode) episodeLine.push(`${entry.episode}${entry.episode_suffix || '話'}`)
                   if (entry.subtitle) episodeLine.push(entry.subtitle)
