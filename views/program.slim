@@ -81,7 +81,7 @@ html lang='ja' data-theme='light'
           .field-container
             label
               span 開始時刻
-              input type='time' v-model='form.values.start_time'
+              input type='text' v-model.trim='form.values.start_time' pattern='([01]?\d|2[0-3]):[0-5]\d' placeholder='21:00' title='24 時間制 HH:MM（例 21:00）'
           .field-container
             label
               span 追加タグ
