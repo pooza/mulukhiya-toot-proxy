@@ -154,7 +154,7 @@ module Mulukhiya
       return value unless key.to_s == 'start_time' && value.is_a?(String)
       hour, minute = value.split(':', 2)
       return value unless minute && hour.match?(/\A\d{1,2}\z/)
-      return format('%02d:%s', hour.to_i, minute)
+      return '%02d:%s' % [hour.to_i, minute]
     end
 
     # auto_update 有効時は外部 (GAS 等) が番組表データの正本。エディタからの

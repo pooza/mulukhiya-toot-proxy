@@ -228,6 +228,12 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
+    icalendar (2.12.3)
+      base64
+      ice_cube (~> 0.16)
+      logger
+      ostruct
+    ice_cube (0.17.0)
     json (2.19.7)
     json-schema (6.2.0)
       addressable (~> 2.8)
@@ -477,6 +483,7 @@ DEPENDENCIES
   ginseng-redis!
   ginseng-web!
   ginseng-youtube!
+  icalendar
   marcel
   optparse
   ostruct

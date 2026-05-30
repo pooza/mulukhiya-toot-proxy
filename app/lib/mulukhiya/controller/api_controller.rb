@@ -204,6 +204,20 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # 番組表を iCalendar で公開する (#4287)。tomato-shrieker の IcalendarSource
+    # から購読される想定で認証不要。GET /program と同じく livecure? でゲートする。
+    get '/program.ics' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      @renderer = ProgramCalendarRenderer.new
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer = default_renderer_class.new
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/program/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       ProgramUpdateWorker.perform_async
