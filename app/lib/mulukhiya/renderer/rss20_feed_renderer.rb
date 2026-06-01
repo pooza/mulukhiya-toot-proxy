@@ -22,7 +22,7 @@ module Mulukhiya
         raise Ginseng::Error,
           "CustomFeed command failed (exit #{command.status}): #{command.stderr}"
       end
-      self.entries = JSON.parse(command.stdout)
+      self.entries = parse_entries(command.stdout)
       render_storage[command] = feed.to_s
     end
 
@@ -41,6 +41,15 @@ module Mulukhiya
     end
 
     private
+
+    def parse_entries(stdout)
+      entries = JSON.parse(stdout)
+      return entries if entries.is_a?(Array)
+      raise Ginseng::Error, "CustomFeed command returned non-array (#{entries.class})"
+    rescue JSON::ParserError, Ginseng::Error => e
+      e.log
+      return []
+    end
 
     def fetch_image(uri)
       return nil unless uri
