@@ -88,6 +88,16 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
+      # お気に入りは冪等操作。上流が 400 (大半は ALREADY_FAVORITED) を返しても、
+      # 呼び出し後 note は必ずお気に入り状態にあるため成功として扱う。
+      # Ginseng::HTTP は上流ボディを捨てて "Bad response 400" にするため
+      # ALREADY_FAVORITED か否かは判別できないが、favorites/create の 400 は
+      # 実質これに限られる (capsicum #565)。
+      if e.source_status == 400
+        @renderer.message = {}
+        @renderer.status = 200
+        return @renderer.to_s
+      end
       e.alert unless e.source_status == 401
       @renderer.message = {error: e.message}
       @renderer.status = e.source_status
