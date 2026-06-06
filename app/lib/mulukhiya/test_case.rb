@@ -38,6 +38,7 @@ module Mulukhiya
 
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
+      TestHarness.apply!
       Sidekiq::Testing.fake!
       file_map(cases).each do |name, path|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
