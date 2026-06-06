@@ -88,6 +88,40 @@ module Mulukhiya
       return response.dig('data', 'createRecord', 'record')
     end
 
+    # rubocop:disable Metrics/ParameterLists
+    def create_review(work_id:, body:, rating_overall_state: nil, rating_animation_state: nil,
+      rating_music_state: nil, rating_story_state: nil, rating_character_state: nil,
+      share_twitter: nil, share_facebook: nil)
+      variables = {
+        workId: resolve_work_node_id(work_id),
+        body:,
+        ratingOverallState: rating_overall_state,
+        ratingAnimationState: rating_animation_state,
+        ratingMusicState: rating_music_state,
+        ratingStoryState: rating_story_state,
+        ratingCharacterState: rating_character_state,
+        shareTwitter: share_twitter,
+        shareFacebook: share_facebook,
+      }.compact
+      response = annict_query!(:create_review, variables)
+      return response.dig('data', 'createReview', 'review')
+    end
+    # rubocop:enable Metrics/ParameterLists
+
+    # createReview は workId に Relay グローバルノード ID を要求する。capsicum /
+    # 番組表が扱うのは数値 annictId なので、resolve_episode_node_id と同じ要領で
+    # 数値 workId を node ID へ解決する (#4339 と同じ落とし穴の予防)。
+    def resolve_work_node_id(annict_id)
+      annict_id = annict_id.to_i
+      response = annict_query!(:resolve_work, {annictIds: [annict_id]})
+      nodes = response.dig('data', 'searchWorks', 'nodes')
+      node = Array(nodes).find {|n| n.is_a?(Hash) && n['annictId'].to_i == annict_id}
+      unless node&.dig('id').present?
+        raise Ginseng::NotFoundError, "Annict work not found: #{annict_id}"
+      end
+      return node['id']
+    end
+
     # Annict GraphQL の createRecord は episodeId に Relay グローバルノード ID
     # (Base64) を要求し、数値 annictId をそのまま渡すと `Invalid input` で弾く。
     # capsicum / 番組表が扱うのは数値 annictId なので、ここで node ID へ解決する。

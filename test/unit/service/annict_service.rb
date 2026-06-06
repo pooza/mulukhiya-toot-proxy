@@ -309,6 +309,113 @@ module Mulukhiya
       end
     end
 
+    # create_review は resolve_work → createReview の 2 段クエリ (#4342)。
+    def stub_annict_create_review(endpoint, resolve:, create:)
+      captured = {}
+      stub_request(:post, endpoint).with do |request|
+        body = JSON.parse(request.body)
+        next false unless body['query'].include?('searchWorks')
+        captured[:resolve] = body
+        true
+      end.to_return(body: resolve.to_json, headers: {'Content-Type' => 'application/json'})
+      stub_request(:post, endpoint).with do |request|
+        body = JSON.parse(request.body)
+        next false unless body['query'].include?('createReview')
+        captured[:create] = body
+        true
+      end.to_return(body: create.to_json, headers: {'Content-Type' => 'application/json'})
+      return captured
+    end
+
+    def test_create_review_resolves_node_id_and_sends_mutation
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      node_id = 'V29yay03ODc5'
+      captured = stub_annict_create_review(
+        endpoint,
+        resolve: {data: {searchWorks: {nodes: [
+          {id: 'V29yay05OTk=', annictId: 999},
+          {id: node_id, annictId: 7879},
+        ]}}},
+        create: {data: {createReview: {review: {
+          id: 'gid://annict/Review/123',
+          annictId: 123,
+          body: '劇場版よかった',
+          ratingOverallState: 'GREAT',
+          createdAt: '2026-06-06T12:00:00Z',
+        }}}},
+      )
+
+      review = @service.create_review(
+        work_id: 7879, body: '劇場版よかった', rating_overall_state: 'GREAT',
+      )
+
+      assert_equal(123, review['annictId'])
+      assert_equal('GREAT', review['ratingOverallState'])
+      assert_match(/searchWorks/, captured.dig(:resolve, 'query'))
+      assert_equal([7879], captured.dig(:resolve, 'variables', 'annictIds'))
+      assert_match(/createReview/, captured.dig(:create, 'query'))
+      assert_equal(node_id, captured.dig(:create, 'variables', 'workId'))
+      assert_equal('劇場版よかった', captured.dig(:create, 'variables', 'body'))
+      assert_equal('GREAT', captured.dig(:create, 'variables', 'ratingOverallState'))
+    end
+
+    def test_create_review_omits_blank_optional_variables
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      node_id = 'V29yay0x'
+      captured = stub_annict_create_review(
+        endpoint,
+        resolve: {data: {searchWorks: {nodes: [{id: node_id, annictId: 1}]}}},
+        create: {data: {createReview: {review: {annictId: 1}}}},
+      )
+
+      @service.create_review(work_id: 1, body: '本文')
+
+      assert_equal({'workId' => node_id, 'body' => '本文'}, captured.dig(:create, 'variables'))
+    end
+
+    def test_create_review_raises_not_found_when_work_unresolved
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        body: {data: {searchWorks: {nodes: []}}}.to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+
+      assert_raise(Ginseng::NotFoundError) do
+        @service.create_review(work_id: 20_314, body: '本文')
+      end
+    end
+
+    def test_create_review_normalizes_scope_graphql_error_to_auth_error
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_annict_create_review(
+        endpoint,
+        resolve: {data: {searchWorks: {nodes: [{id: 'V29yay0yMDMxNA==', annictId: 20_314}]}}},
+        create: {errors: [{message: 'You are not authorized: missing write scope'}]},
+      )
+
+      assert_raise(Ginseng::AuthError) do
+        @service.create_review(work_id: 20_314, body: '本文')
+      end
+    end
+
+    def test_create_review_normalizes_http_403_to_auth_error
+      return if disable?
+      endpoint = config['/service/annict/urls/api/graphql']
+      stub_request(:post, endpoint).to_return(
+        status: 403,
+        body: 'Forbidden',
+        headers: {'Content-Type' => 'text/plain'},
+      )
+
+      assert_raise(Ginseng::AuthError) do
+        @service.create_review(work_id: 20_314, body: '本文')
+      end
+    end
+
     def test_create_payload
       return unless @service
       record = {

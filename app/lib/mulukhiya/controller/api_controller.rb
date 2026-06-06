@@ -521,6 +521,69 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/annict/review' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      annict = sns.account.annict
+      raise Ginseng::AuthError, 'Annict authentication required' unless annict
+      errors = AnnictReviewContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      work_id = params[:work_id].to_i
+      lock = AnnictReviewLockStorage.new
+      lock_token = lock.acquire(sns.account.id, work_id)
+      unless lock_token
+        raise Ginseng::ConflictError, 'Duplicate Annict review request is in progress'
+      end
+      begin
+        review = annict.create_review(
+          work_id:,
+          body: params[:body],
+          rating_overall_state: params[:rating_overall_state].presence,
+          rating_animation_state: params[:rating_animation_state].presence,
+          rating_music_state: params[:rating_music_state].presence,
+          rating_story_state: params[:rating_story_state].presence,
+          rating_character_state: params[:rating_character_state].presence,
+          share_twitter: params[:share_twitter],
+          share_facebook: params[:share_facebook],
+        )
+      rescue
+        # createReview 失敗時はロックを解放しリトライ可能にする (review 未作成のため
+        # 重複の懸念がない)。token を渡し TTL 跨ぎ後の他者ロック誤削除を防ぐ (#4345)。
+        lock.release(sns.account.id, work_id, lock_token)
+        raise
+      end
+      @renderer.message = {review:}
+      return @renderer.to_s
+    rescue => e
+      # /annict/record と同じ扱い: 書き込み系の失敗は Sentry に到達させる。ただし
+      # 冪等性ロック由来の 409 は期待動作なので info ログのみ。同一アカウントが
+      # 1 分間に alert_threshold 件に達したらリトライループ異常として alert 昇格。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(annict_review: {
+          event: 'conflict',
+          account_id: sns.account&.id,
+          work_id: params[:work_id],
+        })
+        if sns.account && lock.record_conflict(sns.account.id, params[:work_id].to_i)
+          e.alert(annict_review: {
+            event: 'conflict_threshold_exceeded',
+            account_id: sns.account.id,
+            work_id: params[:work_id],
+            threshold: lock.alert_threshold,
+          })
+        end
+      else
+        e.alert
+      end
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/announcement/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.announcement?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?

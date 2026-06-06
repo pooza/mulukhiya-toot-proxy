@@ -540,6 +540,9 @@ service:
         ttl: 30
         alert_threshold: 10
     review:
+      idempotency:
+        ttl: 30
+        alert_threshold: 10
       suffixes:
         bad: （評価:良くない）
         spoiler: （ネタバレ）
