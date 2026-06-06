@@ -9,10 +9,13 @@ module Mulukhiya
     def setup
       @saved = ENV_KEYS.to_h {|key| [key, ENV.fetch(key, nil)]}
       ENV_KEYS.each {|key| ENV.delete(key)}
+      # apply! は raw['local'] を恒久変更するため、退避して後続テストへの漏れを防ぐ。
+      @saved_local = config.raw['local']&.dup
     end
 
     def teardown
       @saved.each {|key, value| value.nil? ? ENV.delete(key) : ENV[key] = value}
+      config.raw['local'] = @saved_local
       super
     end
 
