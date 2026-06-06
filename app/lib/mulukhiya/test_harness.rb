@@ -21,21 +21,35 @@ module Mulukhiya
       info = connections
       return nil unless type = target_controller(info)
       return nil unless conn = info[type]
-      merge_local(
-        'controller' => type,
-        type => {'url' => conn[:url]},
-        'agent' => {'test' => {'token' => conn[:token]}},
-      )
+      agent = {'test' => {'token' => conn[:token]}}
+      agent['info'] = {'token' => conn[:info_token]} if conn[:info_token]
+      values = {'controller' => type, type => {'url' => conn[:url]}, 'agent' => agent}
+      # mulukhiya は Mastodon の DB を直読みするため DSN があれば postgres.dsn も配線。
+      values['postgres'] = {'dsn' => conn[:db_dsn]} if conn[:db_dsn]
+      merge_local(values)
+      # DB 接続はブート時 (apply! より前) に確立されるため、DSN を後から差した場合は
+      # Sequel のデフォルト DB を張り直す（モデルがロードされる前に必要）。
+      # 到達不可でも apply! 自体は落とさない（DB 依存テストは従来どおりスキップされる）。
+      begin
+        environment_class.dbms_class&.connect if conn[:db_dsn]
+      rescue => e
+        warn "TestHarness: DB 接続に失敗したためスキップ: #{e.message}"
+      end
       return conn
     end
 
-    # 利用可能な接続情報を {'mastodon' => {url:, token:}, ...} で返す。
+    # 利用可能な接続情報を {'mastodon' => {url:, token:, info_token:, db_dsn:}, ...} で返す。
     def connections
       env = harness_env
       return PREFIXES.each_with_object({}) do |(type, prefix), dest|
         url = env["#{prefix}_URL"]
         token = env["#{prefix}_ACCESS_TOKEN"]
-        dest[type] = {url:, token:} if url.present? && token.present?
+        next unless url.present? && token.present?
+        dest[type] = {
+          url:, token:,
+          info_token: env["#{prefix}_INFO_ACCESS_TOKEN"].presence,
+          db_dsn: env["#{prefix}_DB_DSN"].presence
+        }
       end
     end
 

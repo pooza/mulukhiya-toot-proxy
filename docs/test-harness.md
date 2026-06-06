@@ -34,20 +34,24 @@ Postgres を直接読む** Sequel モデルを持つ。そのため `account` / 
 （`config['/postgres/dsn']`）も必要になる（tomato-shrieker 直接経路は純 HTTP なので
 この差がある）。
 
-ハーネスの `compose.yml` は既定では proxy(3000) のみを host に公開し Postgres を
-公開しない。ローカルで DB 依存テストまで動かすには:
+chubo2#48 で harness 側が **db / redis を host に公開**（`127.0.0.1:5433` /
+`127.0.0.1:6380`）し、`.env.test` に接続情報を出力するようになった:
 
-1. ハーネスの DB を host に公開する（compose override で `127.0.0.1:5433:5432` を publish）。
-2. `config/local.yaml` に DSN を設定:
+```sh
+MASTODON_INFO_ACCESS_TOKEN=...   # info エージェント (config['/agent/info/token'])
+MASTODON_DB_DSN=postgres://mastodon:mastodon@127.0.0.1:5433/mastodon_production
+MASTODON_REDIS_DSN=redis://127.0.0.1:6380
+```
 
-   ```yaml
-   postgres:
-     dsn: postgres://mastodon:mastodon@127.0.0.1:5433/mastodon_production
-   ```
+`Mulukhiya::TestHarness` はこれらを読み取り、`postgres.dsn` と `agent.info.token` も
+自動で配線する（DSN を差した後に Sequel のデフォルト DB を張り直す）。したがって
+**`config/local.yaml` への DSN 手書きは不要**で、harness を `setup.sh` で立てて
+`MULUKHIYA_HARNESS_DIR` を渡すだけで DB 依存テストまで動く。local.yaml に要るのは
+harness が用意しないもの（`crypt.password` 等）のみ。
 
-> ハーネス側で Postgres を公開し `.env.test` に DB DSN を出力する恒久対応、
-> および `info` エージェントアカウント・公開投稿の provisioning は chubo2 側の
-> 後続課題（harness を mulukhiya の全テスト要件に合わせる）。
+> 既知: ローカル Mastodon の status は `uri` カラムが null のことがあり、
+> `StatusTest#test_uri` が落ちる（harness 起因か mulukhiya テスト側で吸収すべきか
+> 要切り分け。chubo2#48 で追跡）。
 
 ## 手順（Mastodon）
 
