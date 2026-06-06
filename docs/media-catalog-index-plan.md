@@ -208,10 +208,15 @@ EXPLAIN 改善を確認してから、chubo2 配下の zugoga overlay で
 
 ## ロールアウト方針
 
-daisskey 先行事例に準拠:
+daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補適用の検証は本番で先行する**
+（ステージング dev 系は本番と桁違いに少データで性能・index 検証に使えないため。
+本ドキュメント冒頭および「実行 runbook（#4351）」Gate 0〜2 と同じ方針）:
 
-- 検証は dev 系（ステージング）で先行。効果確認後に本番 Mastodon 3 台
-  （shallu / zugoga / lbock）へ `CREATE INDEX CONCURRENTLY` を SQL 直適用。
+- 検証〜適用は **zugoga 本番で先行**（Gate 0 で本番 EXPLAIN ベースライン取得 →
+  Gate 1 で候補 A を `CREATE INDEX CONCURRENTLY` 直適用・再計測 → Gate 2 で
+  overlay flip と観測）。dev 系での事前検証は行わない。
+- zugoga で効果を確認後、残る本番 Mastodon（shallu / lbock）へ同手順を
+  横展開（#4352）。各台で本番 EXPLAIN を取り直す。
 - 恒久反映が必要なら `pooza/mastodon` の feature ブランチに
   `IF NOT EXISTS` 化した migration を起票（直適用済みインデックスと冪等共存）。
   **upstream Mastodon の migration / `db/schema.rb` と名前衝突しないこと**を
