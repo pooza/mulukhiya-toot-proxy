@@ -12,6 +12,20 @@ module Mulukhiya
       return instance if config?
     end
 
+    # singleton インスタンスが生成済みか。reconnect の張り直し判定に使う。
+    def self.connected?
+      return !instance_variable_get(:@singleton__instance__).nil?
+    end
+
+    # config 変更後に DB 接続を張り直す。Postgres は Singleton のため、既存
+    # インスタンスは生成時の DSN を保持し続け connect では更新されない。既存接続を
+    # 切ってから singleton をリセットし、現在の config['/postgres/dsn'] で繋ぎ直す。
+    def self.reconnect
+      instance.connection.disconnect if connected?
+      Singleton.__init__(self)
+      return connect
+    end
+
     def self.exec(name, params = {})
       return instance.exec(name, params)
     end

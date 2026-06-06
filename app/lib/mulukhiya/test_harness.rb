@@ -27,11 +27,12 @@ module Mulukhiya
       # mulukhiya は Mastodon の DB を直読みするため DSN があれば postgres.dsn も配線。
       values['postgres'] = {'dsn' => conn[:db_dsn]} if conn[:db_dsn]
       merge_local(values)
-      # DB 接続はブート時 (apply! より前) に確立されるため、DSN を後から差した場合は
-      # Sequel のデフォルト DB を張り直す（モデルがロードされる前に必要）。
+      # DB 接続はブート時 (apply! より前、mulukhiya.rb の dbms_class&.connect) に
+      # 確立される。Postgres は Singleton のため connect では既存インスタンスが返るだけで
+      # 後から差した DSN を反映しない。reconnect で singleton を張り直し注入 DSN を使わせる。
       # 到達不可でも apply! 自体は落とさない（DB 依存テストは従来どおりスキップされる）。
       begin
-        environment_class.dbms_class&.connect if conn[:db_dsn]
+        environment_class.dbms_class&.reconnect if conn[:db_dsn]
       rescue => e
         warn "TestHarness: DB 接続に失敗したためスキップ: #{e.message}"
       end
