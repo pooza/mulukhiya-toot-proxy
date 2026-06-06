@@ -26,6 +26,29 @@ MASTODON_ACCESS_TOKEN=xxxxxxxx...
 - **`MULUKHIYA_HARNESS_DIR`**: ハーネスのルートを指すと、`<controller>/.env.test`
   を自動で読み込む（直接 ENV があればそちらを優先）。
 
+## Mastodon DB への直接接続（重要）
+
+mulukhiya は `Mastodon::Account < Sequel::Model(:accounts)` のように **Mastodon の
+Postgres を直接読む** Sequel モデルを持つ。そのため `account` / `status` 系をはじめ
+多くの実インスタンステストは、HTTP（URL+トークン）だけでなく **Mastodon の DB 接続**
+（`config['/postgres/dsn']`）も必要になる（tomato-shrieker 直接経路は純 HTTP なので
+この差がある）。
+
+ハーネスの `compose.yml` は既定では proxy(3000) のみを host に公開し Postgres を
+公開しない。ローカルで DB 依存テストまで動かすには:
+
+1. ハーネスの DB を host に公開する（compose override で `127.0.0.1:5433:5432` を publish）。
+2. `config/local.yaml` に DSN を設定:
+
+   ```yaml
+   postgres:
+     dsn: postgres://mastodon:mastodon@127.0.0.1:5433/mastodon_production
+   ```
+
+> ハーネス側で Postgres を公開し `.env.test` に DB DSN を出力する恒久対応、
+> および `info` エージェントアカウント・公開投稿の provisioning は chubo2 側の
+> 後続課題（harness を mulukhiya の全テスト要件に合わせる）。
+
 ## 手順（Mastodon）
 
 ```sh

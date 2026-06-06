@@ -14,13 +14,18 @@ module Mulukhiya
     end
 
     # 接続情報を config に流し込む。適用したコントローラの接続情報を返す（無ければ nil）。
+    # TestCase#teardown の `config.reload` を跨いで残るよう、フラットキー代入ではなく
+    # raw['local'] 層へ deep-merge してから reload する。reload は raw のキャッシュから
+    # 再適用するため、フラットキー代入だけだと毎テスト巻き戻ってしまう。
     def apply!
       info = connections
       return nil unless type = target_controller(info)
       return nil unless conn = info[type]
-      config['/controller'] = type
-      config["/#{type}/url"] = conn[:url]
-      config['/agent/test/token'] = conn[:token]
+      merge_local(
+        'controller' => type,
+        type => {'url' => conn[:url]},
+        'agent' => {'test' => {'token' => conn[:token]}},
+      )
       return conn
     end
 
@@ -35,6 +40,13 @@ module Mulukhiya
     end
 
     private
+
+    # raw['local'] 層に deep-merge して reload する（config.reload を跨いで残す）。
+    def merge_local(values)
+      raw = config.raw
+      raw['local'] = Ginseng::Config.deep_merge(raw['local'] || {}, values)
+      config.reload
+    end
 
     # 直接 ENV (README 推奨の `source .env.test`) を優先し、足りない分を
     # MULUKHIYA_HARNESS_DIR 配下の <controller>/.env.test から補う。
