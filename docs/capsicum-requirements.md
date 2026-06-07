@@ -384,9 +384,10 @@ capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）
 
 `GET /mulukhiya/api/about` の `features` に `word_suggest`（仮称）を載せる。capsicum はこれで UI 出し分け（annict / tagging と同じ検出パターン）。
 
-### 関連・確認したい点
+### 前提・補足
 
-- **モロヘイヤ内部辞書が読みを保持しているか**（保持していれば露出のみ。落としているなら再取り込みが要るか）を確認したい。これで規模が変わる。
+- **読みのデータは大元の辞書（dic.json, MeCab 形式）に存在し、モロヘイヤは取り込み済み**。タグ検索 API が読みを落としているだけで、API に surface させるだけの話。内部でどう surface するか（既存 store に読みを持たせる / dic を引き直す等）はモロヘイヤ側判断。
+- **前提となるコンテンツ作業**: デルムリン丼・ダイスキーには読み付き辞書が未整備で、~1,000 語の辞書を用意する必要がある（pooza 作業、本 API 実装とは独立）。キュアスタ！・きゅあすきーは dic.json あり。
 - 視聴中作品の話数サジェストは既存 `tagging/dic/annict/episodes` を利用予定（本節とは別系統）。
 - 本節の実装 Issue: #4397
 - capsicum 側 Issue: [capsicum#614](https://github.com/pooza/capsicum/issues/614) / 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/compose-suggest-design.md>
