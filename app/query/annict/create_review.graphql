@@ -1,0 +1,35 @@
+mutation (
+  $workId: ID!
+  $body: String!
+  $ratingOverallState: RatingState
+  $ratingAnimationState: RatingState
+  $ratingMusicState: RatingState
+  $ratingStoryState: RatingState
+  $ratingCharacterState: RatingState
+  $shareTwitter: Boolean
+  $shareFacebook: Boolean
+) {
+  createReview(input: {
+    workId: $workId
+    body: $body
+    ratingOverallState: $ratingOverallState
+    ratingAnimationState: $ratingAnimationState
+    ratingMusicState: $ratingMusicState
+    ratingStoryState: $ratingStoryState
+    ratingCharacterState: $ratingCharacterState
+    shareTwitter: $shareTwitter
+    shareFacebook: $shareFacebook
+  }) {
+    review {
+      id
+      annictId
+      body
+      ratingOverallState
+      ratingAnimationState
+      ratingMusicState
+      ratingStoryState
+      ratingCharacterState
+      createdAt
+    }
+  }
+}

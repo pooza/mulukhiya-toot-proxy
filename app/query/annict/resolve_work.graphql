@@ -1,0 +1,8 @@
+query ($annictIds: [Int!]) {
+  searchWorks(annictIds: $annictIds) {
+    nodes {
+      id
+      annictId
+    }
+  }
+}

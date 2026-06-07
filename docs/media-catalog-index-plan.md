@@ -1,13 +1,16 @@
-# media_catalog index 見直し計画（#4323 ドラフト）
+# media_catalog index 見直し計画 & 実行 runbook（#4323 / #4351）
 
-> **ステータス**: 調査ドラフト。**実機 EXPLAIN 未検証**。本ドキュメントの DDL は
-> ローカルに DB がない環境で SQL 構造のみから設計した候補であり、適用前に
-> ステージング（dev04 等）または本番相当データでの `EXPLAIN (ANALYZE, BUFFERS)`
-> 検証が必須。検証・適用は chubo2 側のオプス作業（[chubo2#37](https://github.com/pooza/chubo2/issues/37) 隣接）として扱う。
+> **ステータス**: 実行 runbook。候補 index の設計（背景・病理仮説・候補 A/B/C）は
+> 確定済みだが、**実機 EXPLAIN は未検証**。本ドキュメントの DDL は SQL 構造から
+> 設計した候補であり、適用前に**本番相当データでの `EXPLAIN (ANALYZE, BUFFERS)`
+> 検証が必須**（ステージング dev04 等は本番と桁違いに少データで性能・index 検証に
+> 使えないため、最初から zugoga 本番で EXPLAIN を取る）。検証・適用は chubo2 側の
+> オプス作業（[chubo2#37](https://github.com/pooza/chubo2/issues/37) 隣接）。
 >
 > 検証手順は [`bin/diag/media_catalog_index.sql`](../bin/diag/media_catalog_index.sql)
 > にスクリプト化済み（棚卸し → ベースライン EXPLAIN → 候補 DDL → 再計測 → 撤去）。
-> 残るのは実機での実行と結果に基づく候補の取捨選択のみ。
+> 実行は下記「実行 runbook（#4351）」の決定ゲートに従う。Misskey 側は別ルート
+> （`drive_file`/`note`、#4375）で扱う。
 
 ## 背景
 
@@ -145,12 +148,75 @@ WHERE silenced_at IS NULL AND suspended_at IS NULL;
 6. 効果のなかった候補は `DROP INDEX CONCURRENTLY` で撤去（index 肥大回避）。
 7. インデックスサイズ（`pg_relation_size`）と書き込み影響を記録。
 
+## 実行 runbook（#4351 zugoga 再有効化）
+
+「自信を持って送り出す」ため、各段に go/no-go を置き、仮説が外れたら止まる。
+再有効化に **mulukhiya 側のコード変更は不要**（経路は 5.23.0 #4343 で完成・ゲート
+済み。`media_catalog?` フラグ＝`config["/{name}/data/media_catalog"]` を overlay で
+`true` にするだけ）。唯一の不可逆要素はなく、flip は即時 revert 可能。
+
+### Gate 0 — 仮説の検証（read-only、安全）
+
+`bin/diag/media_catalog_index.sql` の §1〜§2 を **zugoga 本番で直接**実行する。
+
+- 確認: ① `statuses.local` selectivity が低いか（§1-3） ② §2 のプランが実際に
+  `media_attachments` の PK backward scan ＋大量フィルタアウトか ③ **Mastodon 本体
+  既存の `index_statuses_local` が既に効いていないか**（§1-1 / §2 のプラン）
+- ⚠️ **no-go**: 既存 index で底値が出ている／別ノードが主因なら、候補 A は冗長。
+  **追加せず病理の再定義に戻る**（これが最重要ゲート）。
+- §2 の代表クエリは `rule` なし・`test_account` なしで展開してある。実運用では
+  `accounts.id <> :test_account_id` が常時付くが selectivity 寄与は無視できる前提
+  （[計画書「対象クエリ」参照]）。気になる場合は test_account 条件を足して再取得。
+
+### Gate 1 — 候補 A 適用と効果判定
+
+§3 候補 A を `CREATE INDEX CONCURRENTLY` で適用 → §4 で §2 と同一クエリを再計測。
+
+- **go 基準**: 底値 175 秒級が明確に低下（daisskey は ms 級、最低でも秒以下を目標）。
+  あわせて Sort ノードの有無を確認。
+- A で `ORDER BY attachments.id DESC` の Sort が残り効果不足 → **候補 B を追加**して
+  再計測（A+B 前提）。
+- `accounts` フィルタが §2 で上位コスト → **候補 C**（通常は不要）。
+- 効果のなかった候補は §6 で `DROP INDEX CONCURRENTLY`（index 肥大・書き込み負荷回避）。
+- ⚠️ **CONCURRENTLY の失敗時**: 中断・失敗すると INVALID な index が残る。
+  `\d statuses`（または `pg_index.indisvalid = false` を検索）で確認し、INVALID なら
+  `DROP INDEX CONCURRENTLY idx_mlkhy_...` してから再実行する。CONCURRENTLY は
+  オンライン（テーブルロックなし）だが、適用直後に `ANALYZE`（§3 末尾）で統計を更新。
+
+### Gate 2 — overlay flip と観測（最低 24 時間）
+
+EXPLAIN 改善を確認してから、chubo2 配下の zugoga overlay で
+`/mastodon/data/media_catalog: true` に切替・デプロイ。
+
+- 観測指標: `/feed/media` レイテンシ / `MediaCatalogUpdateWorker` 実行時間 /
+  **DB 接続プール使用率**。
+- ⚠️ **プール監視が「自信」の核心**: 2026-05-19 の全サーバー投稿不可障害は
+  この SQL による **DB 接続プール枯渇**が最有力（#4323 隣接 / chubo2#37）。index で
+  底値を削っても、遅いクエリが 1 本でも滑り込めばプールを食う。観測にプール飽和を
+  必ず含め、閾値を超えたら Gate 2 の rollback を即実行する。
+
+### Rollback
+
+- 劣化検知 → overlay を `/mastodon/data/media_catalog: false` に戻すだけで即時収束
+  （データ損失なし。`/feed/media` は 503 + `available:false` に戻る）。
+- index は残しても無害だが、不要と判断したら `DROP INDEX CONCURRENTLY`。
+
+### 記録（完了条件）
+
+- §2 / §4 の EXPLAIN 比較と再有効化後の観測値を **#4323 にコメント**。
+- 適用記録を chubo2 `docs/infra-note.md` に daisskey と同フォーマットで残す。
+
 ## ロールアウト方針
 
-daisskey 先行事例に準拠:
+daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補適用の検証は本番で先行する**
+（ステージング dev 系は本番と桁違いに少データで性能・index 検証に使えないため。
+本ドキュメント冒頭および「実行 runbook（#4351）」Gate 0〜2 と同じ方針）:
 
-- 検証は dev 系（ステージング）で先行。効果確認後に本番 Mastodon 3 台
-  （shallu / zugoga / lbock）へ `CREATE INDEX CONCURRENTLY` を SQL 直適用。
+- 検証〜適用は **zugoga 本番で先行**（Gate 0 で本番 EXPLAIN ベースライン取得 →
+  Gate 1 で候補 A を `CREATE INDEX CONCURRENTLY` 直適用・再計測 → Gate 2 で
+  overlay flip と観測）。dev 系での事前検証は行わない。
+- zugoga で効果を確認後、残る本番 Mastodon（shallu / lbock）へ同手順を
+  横展開（#4352）。各台で本番 EXPLAIN を取り直す。
 - 恒久反映が必要なら `pooza/mastodon` の feature ブランチに
   `IF NOT EXISTS` 化した migration を起票（直適用済みインデックスと冪等共存）。
   **upstream Mastodon の migration / `db/schema.rb` と名前衝突しないこと**を
@@ -160,8 +226,11 @@ daisskey 先行事例に準拠:
 ## 関連
 
 - 親 issue: #4306（cursor ページング切替、5.21.2 で完了）
-- 連動: #4335（`cursor_pagination?` の Attachment 移譲、5.23.0 で完了）。
-  本 issue で Misskey 側 SQL を複合キー cursor に移行できれば
-  `Misskey::Attachment.cursor_pagination?` を true へ反転可能。
+- 連動: #4335（`cursor_pagination?` の Attachment 移譲、closed）。
+- サブ Issue: #4351（A: zugoga 再有効化）/ #4352（B: shallu/lbock 横展開）/
+  #4353（C: pooza/mastodon migration 恒久化）/ **#4375（D: Misskey track
+  — `drive_file` index + 複合キー cursor 化で `Misskey::Attachment.cursor_pagination?`
+  を true 反転）**。
 - 先行事例: chubo2 `docs/infra-note.md`「daisskey drive_file partial index
-  追加 (2026-05-01)」、`pooza/misskey` PR #418
+  追加 (2026-05-01)」、`pooza/misskey` PR #418（Misskey 側が partial index 手法の
+  先行実証。本 Mastodon 計画はこれを `statuses` スキーマへ移植したもの）

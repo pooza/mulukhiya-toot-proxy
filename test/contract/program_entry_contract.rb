@@ -19,6 +19,7 @@ module Mulukhiya
         episode: 12,
         episode_suffix: '話',
         minutes: 30,
+        start_time: '21:00',
         subtitle: 'サブタイトル',
         air: false,
         livecure: true,
@@ -60,6 +61,7 @@ module Mulukhiya
     def test_clearable_optionals_accept_nil
       errors = @contract.call(@valid.merge(
         minutes: nil,
+        start_time: nil,
         episode: nil,
         episode_suffix: nil,
         subtitle: nil,
@@ -111,6 +113,30 @@ module Mulukhiya
       errors = @contract.call(@valid.merge(subtitle: 'a' * 201)).errors
 
       assert_false(errors.empty?)
+    end
+
+    def test_start_time_accepts_valid_formats
+      ['0:00', '09:05', '9:05', '21:00', '23:59'].each do |time|
+        assert_empty(@contract.call(@valid.merge(start_time: time)).errors, time)
+      end
+    end
+
+    def test_start_time_accepts_empty_and_nil_as_unset
+      assert_empty(@contract.call(@valid.merge(start_time: '')).errors)
+      assert_empty(@contract.call(@valid.merge(start_time: nil)).errors)
+    end
+
+    def test_start_time_rejects_invalid_formats
+      ['24:00', '12:60', '9', '9:5', 'morning', '21:00:00'].each do |time|
+        assert_false(@contract.call(@valid.merge(start_time: time)).errors.empty?, time)
+      end
+    end
+
+    def test_start_time_error_message_includes_field_name
+      assert_match(
+        /開始時刻/,
+        @contract.exec(@valid.merge(start_time: '24:99')).fetch(:start_time).join,
+      )
     end
 
     def test_key_format_rejects_invalid_chars

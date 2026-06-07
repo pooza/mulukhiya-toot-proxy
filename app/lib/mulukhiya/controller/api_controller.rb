@@ -7,21 +7,9 @@ module Mulukhiya
       about[:config][:handlers] = (Handler.all_names || [])
         .reject {|name| config["/handler/#{name}/disable"] == true rescue false}
         .sort.to_a
-      # server レベルの features に、当該リクエストの SNS token に紐付く
-      # ユーザー単位の Annict 連携状態を合流させる (#4338)。features の
-      # キーは sub_hash 由来の文字列なので合わせる。
-      # media_catalog は /{controller}/data 配下の機能フラグだが、クライアント
-      # （capsicum 等）からの discovery を features 一本に集約するため合流させる
-      # (#4343)。disabled 時の 503 応答と組合せて「機能未提供」(404) と
-      # 「現在 OFF」を区別可能にする。
-      # program_editable は番組表エディタ (livecure かつ auto_update 無効) で
-      # 書き込み API が利用可能か。WebUI 側で UI 出し分けに使う (#4272)。
-      about[:config][:features] = about[:config][:features]
-        .merge(
-          'annict_linked' => sns.account&.annict_linked? || false,
-          'media_catalog' => controller_class.media_catalog?,
-          'program_editable' => controller_class.livecure? && !Program.instance.auto_update?,
-        )
+      # server レベルの静的 features に、ユーザー単位・実行時状態の動的フラグを
+      # 合流させる。フラグの定義は DynamicFeatures::REGISTRY に集約 (#4348)。
+      about[:config][:features] = about[:config][:features].merge(DynamicFeatures.new(sns).to_h)
       @renderer.message = about
       return @renderer.to_s
     rescue => e
@@ -216,6 +204,20 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # 番組表を iCalendar で公開する (#4287)。tomato-shrieker の IcalendarSource
+    # から購読される想定で認証不要。GET /program と同じく livecure? でゲートする。
+    get '/program.ics' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      @renderer = ProgramCalendarRenderer.new
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer = default_renderer_class.new
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/program/update' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       ProgramUpdateWorker.perform_async
@@ -388,45 +390,8 @@ module Mulukhiya
         @renderer.status = 422
         @renderer.message = {errors:}
       else
-        saved_params = entry[:params].deep_stringify_keys
-        original_body = saved_params[status_field]
-        parser = parser_class.new(original_body)
-        body = [
-          parser.body,
-          '',
-          params[:tags].map(&:to_hashtag).join(' '),
-        ].join("\n")
-        saved_params[status_field] = body
-        delete_response = sns.delete_scheduled_status(params[:id])
-        unless delete_response.code.between?(200, 299)
-          message = delete_response.parsed_response&.dig('error') || 'delete failed'
-          raise Ginseng::GatewayError, message
-        end
-        response = sns.toot(saved_params.merge(
-          'scheduled_at' => entry[:scheduled_at],
-        ).compact)
-        if response.code.between?(200, 299)
-          new_entry = response.parsed_response
-          storage.unlink(params[:id])
-          margin = ScheduledStatusSaveHandler::MARGIN
-          expires_in = (Time.parse(new_entry['scheduled_at']) - Time.now).to_i
-          ttl = [expires_in + margin, margin].max
-          storage.set(new_entry['id'], {
-            account_id: sns.account.id,
-            params: saved_params,
-            scheduled_at: new_entry['scheduled_at'],
-          }, ttl:)
-          @renderer.message = {
-            id: new_entry['id'],
-            scheduled_at: new_entry['scheduled_at'],
-            tags: params[:tags],
-          }
-        else
-          saved_params[status_field] = original_body
-          sns.toot(saved_params.merge('scheduled_at' => entry[:scheduled_at]).compact)
-          message = response.parsed_response['error'] || 'recreate failed'
-          raise Ginseng::GatewayError, message
-        end
+        updater = ScheduledStatusTagUpdater.new(sns, storage)
+        @renderer.message = updater.call(params[:id], entry, params[:tags])
       end
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
@@ -540,13 +505,85 @@ module Mulukhiya
           account_id: sns.account&.id,
           episode_id: params[:episode_id],
         })
-        if sns.account && lock&.record_conflict(sns.account.id, params[:episode_id].to_i)
+        if sns.account && lock.record_conflict(sns.account.id, params[:episode_id].to_i)
           e.alert(annict_record: {
             event: 'conflict_threshold_exceeded',
             account_id: sns.account.id,
+            episode_id: params[:episode_id],
             threshold: lock.alert_threshold,
           })
         end
+      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
+        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
+        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
+        e.log
+      else
+        e.alert
+      end
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/annict/review' do
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      annict = sns.account.annict
+      raise Ginseng::AuthError, 'Annict authentication required' unless annict
+      errors = AnnictReviewContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      work_id = params[:work_id].to_i
+      lock = AnnictReviewLockStorage.new
+      lock_token = lock.acquire(sns.account.id, work_id)
+      unless lock_token
+        raise Ginseng::ConflictError, 'Duplicate Annict review request is in progress'
+      end
+      begin
+        review = annict.create_review(
+          work_id:,
+          body: params[:body],
+          rating_overall_state: params[:rating_overall_state].presence,
+          rating_animation_state: params[:rating_animation_state].presence,
+          rating_music_state: params[:rating_music_state].presence,
+          rating_story_state: params[:rating_story_state].presence,
+          rating_character_state: params[:rating_character_state].presence,
+          share_twitter: params[:share_twitter],
+          share_facebook: params[:share_facebook],
+        )
+      rescue
+        # createReview 失敗時はロックを解放しリトライ可能にする (review 未作成のため
+        # 重複の懸念がない)。token を渡し TTL 跨ぎ後の他者ロック誤削除を防ぐ (#4345)。
+        lock.release(sns.account.id, work_id, lock_token)
+        raise
+      end
+      @renderer.message = {review:}
+      return @renderer.to_s
+    rescue => e
+      # /annict/record と同じ扱い: 書き込み系の失敗は Sentry に到達させる。ただし
+      # 冪等性ロック由来の 409 は期待動作なので info ログのみ。同一アカウントが
+      # 1 分間に alert_threshold 件に達したらリトライループ異常として alert 昇格。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(annict_review: {
+          event: 'conflict',
+          account_id: sns.account&.id,
+          work_id: params[:work_id],
+        })
+        if sns.account && lock.record_conflict(sns.account.id, params[:work_id].to_i)
+          e.alert(annict_review: {
+            event: 'conflict_threshold_exceeded',
+            account_id: sns.account.id,
+            work_id: params[:work_id],
+            threshold: lock.alert_threshold,
+          })
+        end
+      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
+        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
+        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
+        e.log
       else
         e.alert
       end

@@ -288,7 +288,44 @@ API は到達・認証成功しているが、`pooza@misskey.delmulin.com`（`is
 
 - `pooza/capsicum#148`（isCat 対応）
 
-## 8. 今後の API 変更時の連携
+## 8. ナウプレ enrich プロキシ（メタデータ → 共有可能 URL）
+
+> **#4382 の再定義（2026-06-05）**: 当初 #4382 は「文字情報 → 整形済みナウプレテキストを返す**整形器**」として要件を出していたが、**整形はクライアント（capsicum）側で行う方針に確定**した。本節がその新しい要件であり、#4382 の「テキスト整形器」案は破棄する。設計の全体像は capsicum [docs/nowplaying-design.md](https://github.com/pooza/capsicum/blob/develop/docs/nowplaying-design.md) §責務分担 を参照。
+
+### 背景・責務分担
+
+capsicum が OS から構造化メタデータ（title / artist / album）を pull できるようになった（Linux MPRIS / Windows SMTC / Apple Music）。これにより:
+
+- **整形（`#nowplaying` タグ・Title/Album/Artist のレイアウト・行構成）はクライアント側**で行う。構造化データを持つ側が組むのが筋で、サーバー側整形はクライアントと干渉する（サーバーの `#nowplaying` 行正規化がクライアント整形を壊し、capsicum 側でタグを末尾へ逃がす回避が必要になった = [capsicum#466](https://github.com/pooza/capsicum/issues/466)）。
+- **モロヘイヤに残すべきは「外部 API の秘密情報・fetch が要る部分」= メタデータ → 共有可能 URL の解決**。Spotify / iTunes の API キーはサーバー保持なので、capsicum が title/artist を渡し、サーバーが検索して共有 URL を返す（フロントの処理を軽くする本来のプロキシ設計）。
+
+### 要件: enrich エンドポイント（新規）
+
+- **エンドポイント案**: `POST /mulukhiya/api/nowplaying/resolve`（命名は要相談）
+- **入力**: `title` / `artist`（任意）/ `album`（任意）/ `sourceAppName`（例 `VLC` / `Rhythmbox` / `Apple Music`）。**URL は持たない源向け**
+- **出力**: 検索でヒットした **共有可能 URL**（`https://open.spotify.com/track/...` or iTunes トラック URL）。任意で正規化済み title/artist/album も返せると、capsicum が表記ゆれを揃えられて望ましい。ヒットしなければ URL は null（capsicum はクライアント整形のみで投稿）。
+- capsicum 側はレスポンスの URL を**クライアント整形のテキストに足すだけ**（整形そのものはサーバーに依存しない）。
+
+### 既存ハンドラの扱い
+
+既存の `itunes_nowplaying_handler` / `spotify_nowplaying_handler`（`#nowplaying 曲名` のキーワード検索）/ `*_url_nowplaying_handler`（貼られた URL からのメタデータ抽出）は、投稿を `handle_pre_toot` で**暗黙に横取り**して検索・補完・整形を一括で行う旧設計。本要件への移行に伴い:
+
+- **URL 検索の中核ロジック**は上記 enrich エンドポイントへ移す（明示的に capsicum が叩く形へ）。
+- **暗黙の pre-toot 横取り・サーバー側整形**は段階的に廃止してよい。
+- ただし **capsicum 非利用クライアント（WebUI 等）から素で `#nowplaying 曲名` / URL を投稿するユーザー**への影響範囲はモロヘイヤ側で判断（彼らにはサーバー側補完が唯一の手段なので、完全廃止か capsicum 由来のみかは運用判断）。
+
+### features フラグ
+
+`GET /mulukhiya/api/about` の `features` に `nowplaying_resolver`（仮称）の有無を載せてもらえると、capsicum がボタンの「URL 補完を試みるか」の判定に使える（Spotify / Annict と同様）。enrich がなくてもクライアント整形で投稿は成立するため、必須ではない。
+
+### 関連
+
+- [capsicum#466](https://github.com/pooza/capsicum/issues/466) Linux MPRIS / [capsicum#484](https://github.com/pooza/capsicum/issues/484) Windows SMTC（本要件の利用元、整形はクライアント確定）
+- [capsicum#668](https://github.com/pooza/capsicum/issues/668) Apple Music / [capsicum#570](https://github.com/pooza/capsicum/issues/570) Spotify（URL を返せる源 / enrich の利用先）
+- [#4337](https://github.com/pooza/mulukhiya-toot-proxy/issues/4337) Spotify user OAuth（currently-playing。URL を返せる別経路）
+- 本節は #4382 を置き換える。capsicum 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/nowplaying-design.md>
+
+## 9. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 

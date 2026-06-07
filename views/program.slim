@@ -80,6 +80,10 @@ html lang='ja' data-theme='light'
               input type='number' v-model.number='form.values.minutes' min='0' placeholder='30'
           .field-container
             label
+              span 開始時刻
+              input type='text' v-model.trim='form.values.start_time' pattern='([01]?\d|2[0-3]):[0-5]\d' placeholder='21:00' title='24 時間制 HH:MM（例 21:00）'
+          .field-container
+            label
               span 追加タグ
               textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
           .inline-field-container
@@ -97,6 +101,14 @@ html lang='ja' data-theme='light'
             button.cancel @click='cancelForm' キャンセル
         section
           h3 エントリ一覧
+          - if Mulukhiya::Environment.controller_class.livecure?
+            - ics_uri = Mulukhiya::ProgramCalendarRenderer.uri
+            p.program-ics
+              i class='fa fa-calendar'
+              ' &nbsp;iCalendar 購読 URL:
+              a href=ics_uri target='_blank' rel='noreferrer' = ics_uri
+              br
+              small 有効で開始時刻を設定したエントリを配信します。カレンダーアプリや tomato-shrieker で購読できます。
           .field-update-button-container v-if='Object.keys(entries).length'
             button @click='copySummary' v-tooltip.top="'有効エントリ全体を作品名・話数+サブタイトル形式でクリップボードにコピー'"
               i class='fa fa-copy'
@@ -108,6 +120,7 @@ html lang='ja' data-theme='light'
                 th 作品
                 th 話数
                 th サブタイトル
+                th 開始時刻
                 th 放送時間
                 th エア番組
                 th 実況
@@ -134,6 +147,9 @@ html lang='ja' data-theme='light'
                     | {{entry.subtitle}}
                   button.small @click.stop='copyEpisodeSubtitle(entry)' v-if='entry.episode || entry.subtitle' v-tooltip.top="'話数+サブタイトルをコピー'"
                     i class='fa fa-copy'
+                td
+                  small v-if='entry.start_time'
+                    | {{entry.start_time}}
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
@@ -167,7 +183,7 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: 30, subtitle: '',
+                  minutes: 30, start_time: null, subtitle: '',
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                 },
@@ -187,6 +203,7 @@ html lang='ja' data-theme='light'
                 episode: null,
                 episode_suffix: '',
                 minutes: 30,
+                start_time: null,
                 subtitle: '',
                 air: false,
                 livecure: true,
@@ -235,6 +252,7 @@ html lang='ja' data-theme='light'
                 .split(/\r?\n/).map(s => s.trim()).filter(Boolean)
               v.extra_tags = extraTags.length ? extraTags : null
               if (!v.subtitle) v.subtitle = null
+              if (!v.start_time) v.start_time = null
               if (!v.episode_suffix) v.episode_suffix = null
               if (!Number.isFinite(v.episode)) v.episode = null
               if (!Number.isFinite(v.minutes)) v.minutes = null
@@ -287,10 +305,25 @@ html lang='ja' data-theme='light'
               this.copyText(parts.join(' '), '話数+サブタイトル')
             },
             copySummary () {
+              const startMinutes = entry => {
+                const [h, m] = String(entry.start_time).split(':')
+                return Number(h) * 60 + Number(m)
+              }
               const blocks = Object.values(this.entries)
                 .filter(entry => entry.enable)
+                .sort((a, b) => {
+                  if (a.start_time && b.start_time) return startMinutes(a) - startMinutes(b)
+                  if (a.start_time) return -1
+                  if (b.start_time) return 1
+                  return 0
+                })
                 .map(entry => {
-                  const lines = [entry.series]
+                  let head = entry.series
+                  if (entry.start_time) {
+                    const [h, m] = entry.start_time.split(':')
+                    head = `${String(h).padStart(2, '0')}:${m} ${entry.series}`
+                  }
+                  const lines = [head]
                   const episodeLine = []
                   if (entry.episode) episodeLine.push(`${entry.episode}${entry.episode_suffix || '話'}`)
                   if (entry.subtitle) episodeLine.push(entry.subtitle)

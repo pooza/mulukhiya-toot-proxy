@@ -39,7 +39,8 @@ module Mulukhiya
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
       programs = data
       raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
-      programs[key] = attributes.transform_keys(&:to_s).compact
+      attrs = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
+      programs[key] = attrs.to_h {|k, v| [k, normalize_value(k, v)]}
       save(programs)
       return programs[key]
     end
@@ -65,10 +66,10 @@ module Mulukhiya
       programs = data
       raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
       attributes.each do |k, v|
-        if v.nil?
+        if blank_value?(v)
           programs[key].delete(k.to_s)
         else
-          programs[key][k.to_s] = v
+          programs[key][k.to_s] = normalize_value(k.to_s, v)
         end
       end
       save(programs)
@@ -137,11 +138,30 @@ module Mulukhiya
       @http = HTTP.new
     end
 
+    # nil または空白のみの文字列は「未設定」として扱い、保存対象から除く。
+    # contract で start_time: "" を許容している (#4366) ため、空文字が
+    # machine-readable な start_time 欄にそのまま永続化されるのを防ぐ。
+    # 空配列 (extra_tags のクリア) は正当値なので String のみ対象とする。
+    def blank_value?(value)
+      value.nil? || (value.is_a?(String) && value.strip.empty?)
+    end
+
+    # start_time は 24 時間制 HH:MM。contract は時の先頭ゼロ省略 (例 9:00) を
+    # 許容するため、保存時に 2 桁ゼロ埋め (09:00) へ正規化し、表示・データの
+    # ゆれをなくす (#4372)。contract 検証後に呼ばれる前提で、想定外の値は
+    # 触らず素通しする。
+    def normalize_value(key, value)
+      return value unless key.to_s == 'start_time' && value.is_a?(String)
+      hour, minute = value.split(':', 2)
+      return value unless minute && hour.match?(/\A\d{1,2}\z/)
+      return '%02d:%s' % [hour.to_i, minute]
+    end
+
     # auto_update 有効時は外部 (GAS 等) が番組表データの正本。エディタからの
     # 書き込みは次の pull で上書き消失するので、書き込み API 自体を 409 で
     # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
     def auto_update_conflict
-      Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
+      return Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
     end
 
     def next_annict_episode(annict, work_id, episode_number)
