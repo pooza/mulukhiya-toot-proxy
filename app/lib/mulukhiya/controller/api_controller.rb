@@ -513,6 +513,10 @@ module Mulukhiya
             threshold: lock.alert_threshold,
           })
         end
+      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
+        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
+        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
+        e.log
       else
         e.alert
       end
@@ -576,6 +580,10 @@ module Mulukhiya
             threshold: lock.alert_threshold,
           })
         end
+      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
+        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
+        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
+        e.log
       else
         e.alert
       end

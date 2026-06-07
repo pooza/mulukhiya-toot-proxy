@@ -3,7 +3,7 @@ module Mulukhiya
   # テスト用 config に注入する。ハーネスの setup.sh が出力する .env.test
   # (MASTODON_URL / MASTODON_ACCESS_TOKEN, MISSKEY_URL / MISSKEY_ACCESS_TOKEN) を
   # 読み込み、対象コントローラの url と agent.test.token を上書きする。
-  # 接続情報が無ければ何もしない（従来どおり実インスタンス依存テストはスキップ）。
+  # 接続情報が無ければ何もしない（従来どおり実サーバー依存テストはスキップ）。
   class TestHarness
     include Package
 
