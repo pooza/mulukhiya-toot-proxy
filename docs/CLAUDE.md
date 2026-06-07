@@ -170,11 +170,12 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 - **リリース前 5観点レビュー赤近い黄インライン (#4395)** — annict record/review の rescue でユーザー入力起因の AuthError(403)/NotFoundError(404) まで Sentry alert していたのを log のみに抑止（反 alert-spam 方針）。廃止語「インスタンス」→「サーバー」整理。残り黄・緑は #4394 で 5.26.0 送り
 - **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
 - ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）デプロイ済み（5.25.0 / health 全 OK / WebUI 200 / 新規 program.ics 200 text/calendar）
-- **本番デプロイ: 保留**（2026-06-07 リリース時点。実況中のため後日手動。zugoga / shallu / lbock / sweep 未適用）
+- **本番デプロイ: 4 台完了**（2026-06-07、zugoga / shallu / lbock / sweep、全台 version 5.25.0 / health 200 / 公開エンドポイント 200）。実況終了後に実施。本デプロイで Sentry MULUKHIYA-TOOT-PROXY-26 が解消
+- **デプロイ時の教訓**（[chubo2 infra-history](https://github.com/pooza/chubo2) 参照）: 5.25.0 で `.ruby-version` が 4.0.5 に上がっており、未導入サーバー（今回 shallu）は `rbenv install 4.0.5` が前提。フレッシュ gemset での `bundle install` は rb_sysopen 一過性エラーが出ることがあり再実行で解消。SSH 越しは `bash -lc`（rbenv 読込）必須・サービス再起動は `</dev/null >/dev/null 2>&1` 必須・`bundle install` は省略不可
 
 ### 振り返り
 
-**期間**: 5.24.0 リリース 2026-05-28 → 5.25.0 リリース（タグ）2026-06-07（10 日間）。本番デプロイは保留。
+**期間**: 5.24.0 リリース 2026-05-28 → 5.25.0 リリース・本番デプロイ 2026-06-07（10 日間）。
 
 **消化**: 5.25.0 マイルストーン Issue 全消化（#4285/#4287/#4342/#4348/#4360/#4362/#4366/#4372/#4377/#4383/#4389 + #4379 関連サブ群）。当初計画の #4351 media_catalog 再有効化は 5.26.0 へ移動 — Gate 検証で partial index だけでは sub-second に届かず、前提として #4393（query 再構成/非正規化、size:L）が必要と判明しブロック。
 
