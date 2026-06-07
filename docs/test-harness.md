@@ -1,6 +1,6 @@
-# fedi-test-harness を使った実インスタンステスト（#4379）
+# fedi-test-harness を使った実サーバーテスト（#4379）
 
-`test/contract/` `test/integration/` など、実インスタンス（アクセストークン・SNS URL）が
+`test/contract/` `test/integration/` など、実サーバー（アクセストークン・SNS URL）が
 無いとスキップされるテストを、chubo2 の
 [fedi-test-harness](https://github.com/pooza/chubo2/tree/main/fedi-test-harness)
 （バニラ Mastodon / Misskey のローカル環境, chubo2#31 / chubo2#44）相手に動かす手順。
@@ -30,7 +30,7 @@ MASTODON_ACCESS_TOKEN=xxxxxxxx...
 
 mulukhiya は `Mastodon::Account < Sequel::Model(:accounts)` のように **Mastodon の
 Postgres を直接読む** Sequel モデルを持つ。そのため `account` / `status` 系をはじめ
-多くの実インスタンステストは、HTTP（URL+トークン）だけでなく **Mastodon の DB 接続**
+多くの実サーバーテストは、HTTP（URL+トークン）だけでなく **Mastodon の DB 接続**
 （`config['/postgres/dsn']`）も必要になる（tomato-shrieker 直接経路は純 HTTP なので
 この差がある）。
 
