@@ -346,7 +346,51 @@ enrich の `prefer` パラメータの供給元として、capsicum 側に **「
 - [#4337](https://github.com/pooza/mulukhiya-toot-proxy/issues/4337) Spotify user OAuth（currently-playing。URL を返せる別経路）
 - 本節は #4382 を置き換える。capsicum 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/nowplaying-design.md>
 
-## 9. 今後の API 変更時の連携
+## 9. 読み付き単語サジェスト API（劇中ワード補完）
+
+### 背景
+
+capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）で、投稿フォームに**劇中ワード・キャラ名・必殺技名のサジェスト**を実装する。実況用途で、辞書登録のない環境だと専門ワード（例: `閃華裂光拳`）が IME の変換候補に出ず入力できないため、capsicum 側のアプリ独立サジェスト UI で補う。
+
+ユーザーが打鍵できるのは**ひらがな読み**だけなので、**読みから表層形を引ける**ことが必須。
+
+### 現状と課題
+
+- 既存 `tagging/tag/search` は**タグ検索が目的で「読み」を返さない**ため、IME 問題（字面を打てない）を解けない。
+- 劇中ワード辞書の大元は MeCab IPADic 形式の単語辞書（例: precure.ml `/api/dic/v1/dic.json`、表層形 + 読みカタカナ付き）で、モロヘイヤはこれを含む複数ソースから辞書を組んでいる＝**読みは内部に存在するが API に露出していない**だけ。
+
+→ capsicum は dic.json を直叩きせず（proxy 哲学・サーバー検出を `/about` に乗せ全プリセット一律カバー）、**モロヘイヤに読みで引けるサジェストを露出してもらう**。
+
+### エンドポイント（案）
+
+既存 `tagging/tag/search` に `reading` を足すか、`GET /mulukhiya/api/word/suggest`（仮称）を新設するかはモロヘイヤ側判断。
+
+- **入力**: `q`（ユーザー入力。**ひらがな/カタカナの読み**を主に想定。表層の前方一致も拾えると望ましい）、`limit`
+- **出力（案）**:
+  ```json
+  { "candidates": [
+    { "surface": "愛崎えみる", "reading": "アイサキメグミ",
+      "category": "人名", "tags": ["#プリキュア"] }
+  ] }
+  ```
+  - `surface`: 挿入する表層形
+  - `reading`: 並べ替え・ハイライト用（カタカナ）
+  - `category`: 品詞細分類（人名 / 地域 / 一般 等）。capsicum 側のカテゴリ別ブラウズに使う
+  - `tags`: 任意。挿入時のタグ自動付与に繋げられる（別レイヤ）
+- **読み正規化**: capsicum 入力ひらがなをカタカナ化して送る／モロヘイヤが両対応するか、どちらが吸収するかを確定したい（proxy 哲学的にはモロヘイヤ寄せが自然）
+- 読み取り専用（DB 書き込みなし）
+
+### features フラグ
+
+`GET /mulukhiya/api/about` の `features` に `word_suggest`（仮称）を載せる。capsicum はこれで UI 出し分け（annict / tagging と同じ検出パターン）。
+
+### 関連・確認したい点
+
+- **モロヘイヤ内部辞書が読みを保持しているか**（保持していれば露出のみ。落としているなら再取り込みが要るか）を確認したい。これで規模が変わる。
+- 視聴中作品の話数サジェストは既存 `tagging/dic/annict/episodes` を利用予定（本節とは別系統）。
+- capsicum 側 Issue: [capsicum#614](https://github.com/pooza/capsicum/issues/614) / 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/compose-suggest-design.md>
+
+## 10. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 
