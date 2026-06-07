@@ -388,6 +388,7 @@ capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）
 
 - **モロヘイヤ内部辞書が読みを保持しているか**（保持していれば露出のみ。落としているなら再取り込みが要るか）を確認したい。これで規模が変わる。
 - 視聴中作品の話数サジェストは既存 `tagging/dic/annict/episodes` を利用予定（本節とは別系統）。
+- 本節の実装 Issue: #4397
 - capsicum 側 Issue: [capsicum#614](https://github.com/pooza/capsicum/issues/614) / 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/compose-suggest-design.md>
 
 ## 10. 今後の API 変更時の連携
