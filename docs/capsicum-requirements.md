@@ -299,24 +299,45 @@ capsicum が OS から構造化メタデータ（title / artist / album）を pu
 - **整形（`#nowplaying` タグ・Title/Album/Artist のレイアウト・行構成）はクライアント側**で行う。構造化データを持つ側が組むのが筋で、サーバー側整形はクライアントと干渉する（サーバーの `#nowplaying` 行正規化がクライアント整形を壊し、capsicum 側でタグを末尾へ逃がす回避が必要になった = [capsicum#466](https://github.com/pooza/capsicum/issues/466)）。
 - **モロヘイヤに残すべきは「外部 API の秘密情報・fetch が要る部分」= メタデータ → 共有可能 URL の解決**。Spotify / iTunes の API キーはサーバー保持なので、capsicum が title/artist を渡し、サーバーが検索して共有 URL を返す（フロントの処理を軽くする本来のプロキシ設計）。
 
-### 要件: enrich エンドポイント（新規）
+### 要件: enrich エンドポイント（新規・仕様確定 2026-06-07）
 
-- **エンドポイント案**: `POST /mulukhiya/api/nowplaying/resolve`（命名は要相談）
-- **入力**: `title` / `artist`（任意）/ `album`（任意）/ `sourceAppName`（例 `VLC` / `Rhythmbox` / `Apple Music`）。**URL は持たない源向け**
-- **出力**: 検索でヒットした **共有可能 URL**（`https://open.spotify.com/track/...` or iTunes トラック URL）。任意で正規化済み title/artist/album も返せると、capsicum が表記ゆれを揃えられて望ましい。ヒットしなければ URL は null（capsicum はクライアント整形のみで投稿）。
-- capsicum 側はレスポンスの URL を**クライアント整形のテキストに足すだけ**（整形そのものはサーバーに依存しない）。
+`POST /mulukhiya/api/nowplaying/resolve` — **Bearer（SNS token）必須**（外部 API 濫用防止）
 
-### 既存ハンドラの扱い
+**入力**:
 
-既存の `itunes_nowplaying_handler` / `spotify_nowplaying_handler`（`#nowplaying 曲名` のキーワード検索）/ `*_url_nowplaying_handler`（貼られた URL からのメタデータ抽出）は、投稿を `handle_pre_toot` で**暗黙に横取り**して検索・補完・整形を一括で行う旧設計。本要件への移行に伴い:
+| フィールド | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `title` | string | 必須 | 曲名 |
+| `artist` | string | 任意 | アーティスト名 |
+| `album` | string | 任意 | アルバム名 |
+| `source_app_name` | string | 任意 | 再生中アプリ名（`Spotify` / `VLC` / `Apple Music` 等）。プロバイダ優先のヒント |
+| `prefer` | string | 任意 | `apple_music` \| `spotify`。capsicum のユーザートグル値（下記 §8.1） |
 
-- **URL 検索の中核ロジック**は上記 enrich エンドポイントへ移す（明示的に capsicum が叩く形へ）。
-- **暗黙の pre-toot 横取り・サーバー側整形**は段階的に廃止してよい。
-- ただし **capsicum 非利用クライアント（WebUI 等）から素で `#nowplaying 曲名` / URL を投稿するユーザー**への影響範囲はモロヘイヤ側で判断（彼らにはサーバー側補完が唯一の手段なので、完全廃止か capsicum 由来のみかは運用判断）。
+**プロバイダ優先順位（3段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定（`/nowplaying/resolve/default_provider`、**既定値 = `apple_music`**）。優先側でヒットなしなら他方へフォールバックして URL を返す。
+
+**出力**: ヒット時 `{ url, provider, normalized:{title,artist,album} }`、ヒットなしは `{ url: null }`（200）。外部 API の癖（文字化け・余分な括弧情報）の正規化はモロヘイヤ側で吸収。capsicum はレスポンスの URL を**クライアント整形のテキストに足すだけ**。読み取り専用。
+
+### 既存ハンドラの扱い（確定）
+
+旧 nowplaying ハンドラを2系統に分類して扱いを確定（モロヘイヤ #4382）:
+
+- **系統①（キーワード → 検索 → URL）`itunes_nowplaying` / `spotify_nowplaying`** → **モロヘイヤ 5.26.0 で削除**。現場で未使用。検索ロジックは enrich エンドポイントの resolver へ集約（暗黙横取りは廃止、能力は明示 API へ昇格）。
+- **系統②（URL → Title/Album/Artist 展開）`*_url_nowplaying` 4本** → **据え置き**。現役で、capsicum に対応物のない明示 URL 貼付け展開。`NowplayingHandler.trim` / `DELETE /status/nowplaying` も②と連動して維持。
 
 ### features フラグ
 
-`GET /mulukhiya/api/about` の `features` に `nowplaying_resolver`（仮称）の有無を載せてもらえると、capsicum がボタンの「URL 補完を試みるか」の判定に使える（Spotify / Annict と同様）。enrich がなくてもクライアント整形で投稿は成立するため、必須ではない。
+`GET /mulukhiya/api/about` の `features` に `nowplaying_resolver` を載せる（capsicum がボタンの「URL 補完を試みるか」の判定に使う）。enrich なしでもクライアント整形で投稿は成立するため capsicum 側では必須ではない。
+
+## 8.1 capsicum 側: ナウプレ プロバイダ優先トグル（要実装）
+
+enrich の `prefer` パラメータの供給元として、capsicum 側に **「ナウプレ URL の優先プロバイダ」設定トグル**が必要。
+
+- **設定 UI**: 設定画面（Spotify 連携セクション近辺）に `Apple Music` / `Spotify` のラジオ or トグル
+- **保持**: capsicum **ローカル設定**（端末ローカル嗜好。mulukhiya はステートレスに保つ＝ per-user storage を持たない）
+- **送出**: `nowplaying/resolve` 呼び出し時に `prefer` パラメータとして毎回送る
+- **既定**: 未設定時はパラメータ省略 → サーバー既定（`apple_music`）が効く。capsicum 側で既定値を `apple_music` に寄せてもよい
+- **背景**: Spotify 派 / Apple Music 派がコミュニティで明確に分かれる想定のためユーザー選択にする。運営者（pooza）の価値観（アーティスト還元）からサーバー既定は Apple Music
+- capsicum 側 Issue: [pooza/capsicum#681](https://github.com/pooza/capsicum/issues/681)
 
 ### 関連
 

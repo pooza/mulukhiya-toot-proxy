@@ -275,23 +275,24 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 
 ## 次期マイルストーン: 5.26.0
 
-主軸候補: Spotify 連携（capsicum #465 ペア）/ ナウプレ enrich プロキシ (#4382) / メディアカタログ再有効化（#4351、ただし前提の sub-second 化 #4393 次第）。
+主軸: ナウプレ enrich プロキシ (#4382) + 旧キーワード検索ハンドラ（系統①）削除。ナウプレ基盤見直しの土台回。重み合計 9（予算 20〜25 に対し軽め＝薄く速くの方針）。2026-06-07 にスコープ・設計を確定（[[project_4382-nowplaying-redesign]] / capsicum docs/nowplaying-design.md §責務分担）。
 
-### 主軸候補
+### 主軸
 
-- #4337 feat: Spotify user-level OAuth + currently-playing API（capsicum #465 連携、size:L）
-- #4382 feat: ナウプレ enrich プロキシ（メタデータ → 共有可能 URL 解決、capsicum #466/#484/#668/#570 連携、ナウプレ基盤の設計見直し、size 未定）
-
-### メディアカタログ再有効化（#4323 ロードマップ）
-
-- #4393 perf: media_catalog を sub-second 化する query 再構成 / 非正規化（#4351 Gate 2 の前提、partial index 単独では底値レイテンシが届かないと zugoga 本番 EXPLAIN で判明、size:L）
-- #4351 perf: media_catalog を zugoga で段階的に再有効化（partial index 適用 + 効果計測 + overlay 切替、#4393 完了が前提、size:M）
-- #4352 perf: media_catalog を shallu / lbock に横展開（#4351 完了後着手、size:M）
+- #4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`（Bearer 必須、メタ→共有URL、capsicum #466/#484/#668/#570/#669 連携、size:M）。**確定仕様**: 入力 title/artist/album/source_app_name/prefer、プロバイダ優先 `prefer`(capsicum トグル) > source_app_name ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（**既定 apple_music**、フォールバック許可）、`features.nowplaying_resolver` 露出、嗜好は capsicum ローカル保持でモロヘイヤはステートレス。**系統①（`itunes_nowplaying`/`spotify_nowplaying`、現場未使用）を本回で削除**し検索ロジックを resolver へ集約。系統②（`*_url_nowplaying` 4本）と `NowplayingHandler.trim`/`DELETE /status/nowplaying` は据え置き。整形は capsicum 側（モロヘイヤに整形器は新設しない、capsicum#680 で doc 訂正済み）。capsicum 側プロバイダ優先トグルは capsicum#681
 
 ### 構造改善 / レビュー送り
 
 - #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.25 から送り、size:M）
 - #4394 5.25.0 リリース前 5観点レビュー 5.26.0 送り（黄 4 + 緑 4 まとめ: favorites 400 ログ, program.ics alert 昇格, harness test? ガード, lock storage/rescue 重複の共通化, request ログ本文 scrub, start_time 二段検証, slim 記法ゆれ, api.md 補記、size:M）
+
+### 5.26.0 では触らない（緊急性低下で据え置き）
+
+メディアカタログ再有効化（#4393 sub-second 化 / #4351 zugoga / #4352 横展開）は緊急性が下がり、5.26.0 から外して #4323 ロードマップ管理へ戻した。再開判断は #4323 / docs/media-catalog-index-plan.md 参照。
+
+## 次々期マイルストーン: 5.27.0
+
+主軸: #4337 feat: Spotify user-level OAuth + currently-playing API（capsicum #465/#570 連携、size:L）。#4382 enrich とは別経路（URL を自前で返せる源）。currently-playing 取得・per-user token 暗号化保管・refresh 自動化・`SpotifyUserService`(仮) 新設。capsicum #570/#669 をアンブロック。ナウプレは番組表級の長期計画として段階的に進める（[[project_4382-nowplaying-redesign]]）。
 
 ## ロードマップ仮置き
 
