@@ -925,29 +925,34 @@ module Mulukhiya
     # する (#4346)。未認証・未連携等ユーザー入力起因の 403/404 は alert spam を避け log
     # のみ (#4265)。kind は :annict_record / :annict_review、id_label/id_value は
     # episode_id / work_id の文脈。
-    def handle_annict_write_error(e, kind:, lock:, id_label:, id_value:)
-      if e.is_a?(Ginseng::ConflictError)
-        Logger.new.info(kind => {
-          event: 'conflict',
-          account_id: sns.account&.id,
-          id_label => id_value,
-        })
-        if sns.account && lock.record_conflict(sns.account.id, id_value.to_i)
-          e.alert(kind => {
-            event: 'conflict_threshold_exceeded',
-            account_id: sns.account.id,
-            id_label => id_value,
-            threshold: lock.alert_threshold,
-          })
-        end
-      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
-        e.log
+    def handle_annict_write_error(error, kind:, lock:, id_label:, id_value:)
+      if error.is_a?(Ginseng::ConflictError)
+        handle_annict_conflict(error, kind:, lock:, id_label:, id_value:)
+      elsif error.is_a?(Ginseng::AuthError) || error.is_a?(Ginseng::NotFoundError)
+        error.log
       else
-        e.alert
+        error.alert
       end
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
+      @renderer.status = error.status
+      @renderer.message = {error: error.message}
       return @renderer.to_s
+    end
+
+    # 冪等性ロック由来の 409 は info ログのみ。同一アカウントが 1 分間に
+    # alert_threshold 件に達したらリトライループ異常として alert 昇格する (#4346)。
+    def handle_annict_conflict(error, kind:, lock:, id_label:, id_value:)
+      Logger.new.info(kind => {
+        event: 'conflict',
+        account_id: sns.account&.id,
+        id_label => id_value,
+      })
+      return unless sns.account && lock.record_conflict(sns.account.id, id_value.to_i)
+      error.alert(kind => {
+        event: 'conflict_threshold_exceeded',
+        account_id: sns.account.id,
+        id_label => id_value,
+        threshold: lock.alert_threshold,
+      })
     end
 
     def fetch_actor(http, acct)

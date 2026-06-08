@@ -7,6 +7,10 @@ module Mulukhiya
 
     attr_reader :sns, :reporter
 
+    # 投稿本文系フィールドを info ログに平文で残さない (#4394)。処理には素の
+    # @params を使うため、ログ用の複製だけ top-level の該当キーをマスクする。
+    SCRUBBED_LOG_PARAMS = ['status', 'text', 'body', 'comment', 'spoiler_text', 'cw'].freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -104,10 +108,6 @@ module Mulukhiya
     end
 
     private
-
-    # 投稿本文系フィールドを info ログに平文で残さない (#4394)。処理には素の
-    # @params を使うため、ログ用の複製だけ top-level の該当キーをマスクする。
-    SCRUBBED_LOG_PARAMS = %w[status text body comment spoiler_text cw].freeze
 
     def scrub_log_params(params)
       scrubbed = params.deep_dup
