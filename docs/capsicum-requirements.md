@@ -357,9 +357,12 @@ enrich の `prefer` パラメータの供給元として、capsicum 側に **「
 - **読み正規化**: **モロヘイヤ側**で吸収（NFKC + ひらがな→カタカナ）。capsicum は素の読みを送ればよい。
 - **データソース**: dic.json（MeCab 形式）を再パースせず、**サーバー固有の専用エンドポイント**（precure.ml `/api/dic/v1/pron.json` / mstdn.delmulin.com `/api/dic/v1/pronunciations.json`）の `[{word, pronunciation, category?}]` を取り込む。各サーバーの正本は**1 枚のスプレッドシート**で、GAS が dic.json と pron.json を同一シートから投影（**二重管理を作らない**ことを設計の不変条件とする）。モロヘイヤは Redis の揮発キャッシュのみ保持（`PronunciationDictionaryUpdateWorker` が 10 分毎更新、全 URL 失敗時は last-known-good 保持）。
 - **features フラグ**: `features.word_suggest` を `word_suggest/urls` 設定の有無から動的導出（`DynamicFeatures`）。フラグの正本を URL 設定に一本化し二重管理を回避。
-- **category の語彙**: スプレッドシートに**プルダウン列を 1 本追加**する運用（寄稿者がメンバーに広がるため複雑なルールを避ける）。値は `人名 / 技名 / 作品名 / 一般`、**空欄=一般**。MeCab の品詞列からは `技名`/`作品名` を判別できない（MeCab 体系に無い）ため、category は**シートに直接入力**し MeCab からの自動導出はしない。
+- **category の語彙**: 値は `人名 / 技名 / 作品名 / 一般`、**空欄=一般**（寄稿者がメンバーに広がるため複雑なルールを避ける）。MeCab の品詞列からは `技名`/`作品名` を判別できない（MeCab 体系に無い）ため、category は**シートに直接入力**し MeCab からの自動導出はしない。
+- **category 列の置き場**:
+  - デルムリン丼（簡易シート）: **プルダウン列を 1 本追加**。
+  - キュアスタ!（MeCab 形式シート）: **CSV 14 列目（発音の後ろ）に category 専用列を追記**する。MeCab は cost より後ろを不透明な素性文字列として扱う（`mecab-dict-index` は列数・値を検証しない）ため標準 13 列（idx0–12）は不変で、他システムや MeCab 解析は無影響。タグ付け（`MecabRemoteDictionary` の `slice(4..9)`）も末尾列を見ないので非干渉。標準の品詞細分類列（idx5–7）に `技名`/`作品名` を混ぜるのは他システム解釈を乱すため**避ける**。pron.json を吐く GAS が末尾の category 列を読んで `category` に載せる。これで 1 シート・1 行に集約され二重管理ゼロ。
 - **辞書整備状況**: デルムリン丼 `pronunciations.json` は 997 語整備済み（当初「~1,000 語が必要」だった前提作業は完了）。
-- **MeCab 形式辞書は存続**: タグ付けパイプライン（`MecabRemoteDictionary`）と dic.json（MeCab 形式）は他システムでも利用されており廃止しない。pron.json／category は MeCab dic と**同一スプレッドシートから投影される別ビュー**として並存させ、suggest 専用に使う。category がタグ付けの採用判定に影響することはない（タグ付けは従来通り MeCab の品詞列で判定）。
+- **MeCab 形式辞書は存続**: タグ付けパイプライン（`MecabRemoteDictionary`）と dic.json（MeCab 形式）は他システムでも利用されており廃止しない。pron.json／category は MeCab dic と**同一スプレッドシートから投影される別ビュー**（上記の末尾 category 列を含む同一行）として並存させ、suggest 専用に使う。category がタグ付けの採用判定に影響することはない（タグ付けは従来通り MeCab の品詞列で判定）。
 
 ### 背景
 
