@@ -482,6 +482,11 @@ program:
   fetch:
     max_bytes: 1048576
     timeout: 30
+word_suggest:
+  urls: []
+  fetch:
+    max_bytes: 1048576
+    timeout: 30
 remote_host:
   dns:
     timeout: 3
@@ -635,6 +640,9 @@ sidekiq:
     program_update:
       class: Mulukhiya::ProgramUpdateWorker
       every: 1m
+    pronunciation_dictionary_update:
+      class: Mulukhiya::PronunciationDictionaryUpdateWorker
+      every: 10m
     startup_notification:
       class: Mulukhiya::StartupNotificationWorker
       every: 5m

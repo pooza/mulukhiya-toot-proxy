@@ -348,6 +348,19 @@ enrich の `prefer` パラメータの供給元として、capsicum 側に **「
 
 ## 9. 読み付き単語サジェスト API（劇中ワード補完）
 
+### 実装方針（5.26.0 確定・#4397）
+
+設計相談の結果、以下で確定し実装した。詳細仕様は [api.md](api.md) の `GET /mulukhiya/api/word/suggest` を正本とする。
+
+- **エンドポイント**: 新設 `GET /mulukhiya/api/word/suggest`（`tagging/tag/search` 拡張ではなく、読み専用・read-only で別系統）。
+- **v1 出力**: `surface` + `reading`（カタカナ）。`category` は**ソースにあれば付く任意フィールド**。`tags`（挿入時タグ自動付与）は別レイヤとして見送り。
+- **読み正規化**: **モロヘイヤ側**で吸収（NFKC + ひらがな→カタカナ）。capsicum は素の読みを送ればよい。
+- **データソース**: dic.json（MeCab 形式）を再パースせず、**サーバー固有の専用エンドポイント**（precure.ml `/api/dic/v1/pron.json` / mstdn.delmulin.com `/api/dic/v1/pronunciations.json`）の `[{word, pronunciation, category?}]` を取り込む。各サーバーの正本は**1 枚のスプレッドシート**で、GAS が dic.json と pron.json を同一シートから投影（**二重管理を作らない**ことを設計の不変条件とする）。モロヘイヤは Redis の揮発キャッシュのみ保持（`PronunciationDictionaryUpdateWorker` が 10 分毎更新、全 URL 失敗時は last-known-good 保持）。
+- **features フラグ**: `features.word_suggest` を `word_suggest/urls` 設定の有無から動的導出（`DynamicFeatures`）。フラグの正本を URL 設定に一本化し二重管理を回避。
+- **category の語彙**: スプレッドシートに**プルダウン列を 1 本追加**する運用（寄稿者がメンバーに広がるため複雑なルールを避ける）。値は `人名 / 技名 / 作品名 / 一般`、**空欄=一般**。MeCab の品詞列からは `技名`/`作品名` を判別できない（MeCab 体系に無い）ため、category は**シートに直接入力**し MeCab からの自動導出はしない。
+- **辞書整備状況**: デルムリン丼 `pronunciations.json` は 997 語整備済み（当初「~1,000 語が必要」だった前提作業は完了）。
+- **将来フェーズ（別 Issue）**: タグ付けパイプライン（`MecabRemoteDictionary`）を同じ簡易スプレッドシート＋category へ寄せ、サーバーごとの MeCab 形式辞書を廃止する。本節の範囲外。
+
 ### 背景
 
 capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）で、投稿フォームに**劇中ワード・キャラ名・必殺技名のサジェスト**を実装する。実況用途で、辞書登録のない環境だと専門ワード（例: `閃華裂光拳`）が IME の変換候補に出ず入力できないため、capsicum 側のアプリ独立サジェスト UI で補う。

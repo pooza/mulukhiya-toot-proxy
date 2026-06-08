@@ -92,6 +92,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
 | `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
+| `/word_suggest/urls`（features.word_suggest に合流） | `/word/suggest` |
 
 ## モロヘイヤ検出プロトコル
 
@@ -634,6 +635,38 @@ Web Push サブスクリプションを解除する。
   }
 }
 ```
+
+#### GET /mulukhiya/api/word/suggest
+
+読み付き単語サジェスト（劇中ワード補完）。ユーザーが入力したひらがな/カタカナの読みから、辞書登録済みの表層形を引く。IME に変換候補が出ない専門ワード（例: `閃華裂光拳`）を capsicum の投稿サジェスト UI（capsicum#614）から補うための API（#4397）。
+
+`tagging/tag/search` がタグ検索目的で「読み」を返さないのに対し、本 API は読みで引けることが目的。辞書の正本は各サーバー 1 枚のスプレッドシート（GAS が dic.json と pron.json を同一シートから投影）で、モロヘイヤは GAS の出力を Redis に揮発キャッシュするだけ（`PronunciationDictionaryUpdateWorker` が 10 分毎更新）。読み取り専用（DB 書き込みなし）。
+
+- **認証**: 不要
+- **前提条件**: `features.word_suggest` が `true`（= `word_suggest/urls` が設定済み）。未設定サーバーは 404
+- **パラメータ**（クエリ文字列）:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `q` | string | 必須 | 入力（主にひらがな読み。表層の前方一致も拾う） |
+| `limit` | integer | 任意 | 最大件数（既定 20、上限 100） |
+
+- **読み正規化**: ひらがな↔カタカナ・全半角の揺れはモロヘイヤ側で吸収（NFKC + ひらがな→カタカナ）。クライアントは素の読みを渡せばよい。
+- **並び順**: 読みの前方一致 → 表層の前方一致 → 読みの部分一致の順、同点は読みが短い順。
+
+**レスポンス例**:
+
+```json
+{
+  "candidates": [
+    { "surface": "愛崎えみる", "reading": "アイサキエミル", "category": "人名" }
+  ]
+}
+```
+
+- `surface`: 挿入する表層形
+- `reading`: 並べ替え・ハイライト用（カタカナ）
+- `category`: 品詞細分類（人名 / 技名 / 作品名 / 一般 等）。スプレッドシートに列がある場合のみ付く**任意**フィールド。capsicum 側のカテゴリ別ブラウズ用。空欄・未整備のサーバーでは省略される
 
 #### GET /mulukhiya/api/announcement/list
 
