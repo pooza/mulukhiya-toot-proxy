@@ -53,6 +53,14 @@ module Mulukhiya
       assert_operator(@dic.suggest('あい', limit: 1).size, :<=, 1)
     end
 
+    def test_suggest_tolerates_non_scalar_limit
+      # limit[]=1 のような配列・非数値でも 500 にせず既定動作へ倒す。
+      assert_nothing_raised do
+        @dic.suggest('あい', limit: ['1'])
+        @dic.suggest('あい', limit: 'abc')
+      end
+    end
+
     def test_suggest_no_match_returns_empty
       assert_empty(@dic.suggest('ぞんざいしないよみ'))
     end

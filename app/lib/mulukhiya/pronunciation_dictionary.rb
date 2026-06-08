@@ -98,6 +98,9 @@ module Mulukhiya
     end
 
     def clamp_limit(limit)
+      # limit[]=1 のように配列/ハッシュで渡されると to_i が無く 500 になるため、
+      # スカラー以外・非正値は既定値に倒す (公開クエリを 500 にしない)。
+      return DEFAULT_LIMIT unless limit.respond_to?(:to_i)
       limit = limit.to_i
       return DEFAULT_LIMIT unless limit.positive?
       return [limit, MAX_LIMIT].min
