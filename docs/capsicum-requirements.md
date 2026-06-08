@@ -359,7 +359,7 @@ enrich の `prefer` パラメータの供給元として、capsicum 側に **「
 - **features フラグ**: `features.word_suggest` を `word_suggest/urls` 設定の有無から動的導出（`DynamicFeatures`）。フラグの正本を URL 設定に一本化し二重管理を回避。
 - **category の語彙**: スプレッドシートに**プルダウン列を 1 本追加**する運用（寄稿者がメンバーに広がるため複雑なルールを避ける）。値は `人名 / 技名 / 作品名 / 一般`、**空欄=一般**。MeCab の品詞列からは `技名`/`作品名` を判別できない（MeCab 体系に無い）ため、category は**シートに直接入力**し MeCab からの自動導出はしない。
 - **辞書整備状況**: デルムリン丼 `pronunciations.json` は 997 語整備済み（当初「~1,000 語が必要」だった前提作業は完了）。
-- **将来フェーズ（別 Issue）**: タグ付けパイプライン（`MecabRemoteDictionary`）を同じ簡易スプレッドシート＋category へ寄せ、サーバーごとの MeCab 形式辞書を廃止する。本節の範囲外。
+- **MeCab 形式辞書は存続**: タグ付けパイプライン（`MecabRemoteDictionary`）と dic.json（MeCab 形式）は他システムでも利用されており廃止しない。pron.json／category は MeCab dic と**同一スプレッドシートから投影される別ビュー**として並存させ、suggest 専用に使う。category がタグ付けの採用判定に影響することはない（タグ付けは従来通り MeCab の品詞列で判定）。
 
 ### 背景
 
