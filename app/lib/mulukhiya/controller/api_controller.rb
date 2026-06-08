@@ -211,7 +211,13 @@ module Mulukhiya
       @renderer = ProgramCalendarRenderer.new
       return @renderer.to_s
     rescue => e
-      e.log
+      # 404 (非対応サーバー) は期待動作なので log のみ。tomato-shrieker が定期 GET する
+      # 外部購読先なので、5xx の恒常失敗は検知できるよう alert に昇格する (#4394)。
+      if e.is_a?(Ginseng::NotFoundError)
+        e.log
+      else
+        e.alert
+      end
       @renderer = default_renderer_class.new
       @renderer.status = e.status
       @renderer.message = {error: e.message}
@@ -493,36 +499,9 @@ module Mulukhiya
       @renderer.message = {record:}
       return @renderer.to_s
     rescue => e
-      # 書き込み系 (Annict createRecord) なので /admin/program/entry 系 (#4255 で
-      # e.alert に昇格済み) と整合させ、失敗を Sentry に到達させる。
-      # ただし冪等性ロック由来の 409 は期待動作なので Sentry に流さない (#4330)。
-      # 完全無音だと capsicum リトライ頻度や偏りを追えないため info ログは残す。
-      # ただし同一アカウントが 1 分間に alert_threshold 件 (既定 10) に達した
-      # 場合はリトライループ等の異常として alert に昇格する (#4346)。
-      if e.is_a?(Ginseng::ConflictError)
-        Logger.new.info(annict_record: {
-          event: 'conflict',
-          account_id: sns.account&.id,
-          episode_id: params[:episode_id],
-        })
-        if sns.account && lock.record_conflict(sns.account.id, params[:episode_id].to_i)
-          e.alert(annict_record: {
-            event: 'conflict_threshold_exceeded',
-            account_id: sns.account.id,
-            episode_id: params[:episode_id],
-            threshold: lock.alert_threshold,
-          })
-        end
-      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
-        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
-        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
-        e.log
-      else
-        e.alert
-      end
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return handle_annict_write_error(
+        e, kind: :annict_record, lock:, id_label: :episode_id, id_value: params[:episode_id]
+      )
     end
 
     post '/annict/review' do
@@ -563,33 +542,9 @@ module Mulukhiya
       @renderer.message = {review:}
       return @renderer.to_s
     rescue => e
-      # /annict/record と同じ扱い: 書き込み系の失敗は Sentry に到達させる。ただし
-      # 冪等性ロック由来の 409 は期待動作なので info ログのみ。同一アカウントが
-      # 1 分間に alert_threshold 件に達したらリトライループ異常として alert 昇格。
-      if e.is_a?(Ginseng::ConflictError)
-        Logger.new.info(annict_review: {
-          event: 'conflict',
-          account_id: sns.account&.id,
-          work_id: params[:work_id],
-        })
-        if sns.account && lock.record_conflict(sns.account.id, params[:work_id].to_i)
-          e.alert(annict_review: {
-            event: 'conflict_threshold_exceeded',
-            account_id: sns.account.id,
-            work_id: params[:work_id],
-            threshold: lock.alert_threshold,
-          })
-        end
-      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
-        # 未認証・未連携／非対応サーバー等ユーザー入力起因の 403/404 は期待動作なので
-        # alert spam を避け log のみ (#4265 / #4330 と同じ反 alert-spam 方針)。
-        e.log
-      else
-        e.alert
-      end
-      @renderer.status = e.status
-      @renderer.message = {error: e.message}
-      return @renderer.to_s
+      return handle_annict_write_error(
+        e, kind: :annict_review, lock:, id_label: :work_id, id_value: params[:work_id]
+      )
     end
 
     post '/announcement/update' do
@@ -962,6 +917,38 @@ module Mulukhiya
     end
 
     private
+
+    # Annict record/review の rescue 共通処理。書き込み系 (createRecord/createReview)
+    # の失敗は /admin/program/entry 系 (#4255) と整合させ Sentry へ到達させる。ただし
+    # 冪等性ロック由来の 409 は期待動作なので info ログのみとし (#4330)、同一アカウントが
+    # 1 分間に alert_threshold 件 (既定 10) に達したらリトライループ異常として alert 昇格
+    # する (#4346)。未認証・未連携等ユーザー入力起因の 403/404 は alert spam を避け log
+    # のみ (#4265)。kind は :annict_record / :annict_review、id_label/id_value は
+    # episode_id / work_id の文脈。
+    def handle_annict_write_error(e, kind:, lock:, id_label:, id_value:)
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(kind => {
+          event: 'conflict',
+          account_id: sns.account&.id,
+          id_label => id_value,
+        })
+        if sns.account && lock.record_conflict(sns.account.id, id_value.to_i)
+          e.alert(kind => {
+            event: 'conflict_threshold_exceeded',
+            account_id: sns.account.id,
+            id_label => id_value,
+            threshold: lock.alert_threshold,
+          })
+        end
+      elsif e.is_a?(Ginseng::AuthError) || e.is_a?(Ginseng::NotFoundError)
+        e.log
+      else
+        e.alert
+      end
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
 
     def fetch_actor(http, acct)
       return nil unless valid_remote_host?(acct.host)

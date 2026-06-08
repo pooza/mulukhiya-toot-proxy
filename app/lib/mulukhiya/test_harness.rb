@@ -18,6 +18,9 @@ module Mulukhiya
     # raw['local'] 層へ deep-merge してから reload する。reload は raw のキャッシュから
     # 再適用するため、フラットキー代入だけだと毎テスト巻き戻ってしまう。
     def apply!
+      # 本番 app/lib 常駐で ENV から DSN/トークンを config に注入し DB を reconnect する
+      # 破壊的処理。テスト環境以外からの誤呼び出しを多層防御で弾く (#4394)。
+      return nil unless Environment.test?
       info = connections
       return nil unless type = target_controller(info)
       return nil unless conn = info[type]

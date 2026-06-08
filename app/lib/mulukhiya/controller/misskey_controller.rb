@@ -94,6 +94,12 @@ module Mulukhiya
       # ALREADY_FAVORITED か否かは判別できないが、favorites/create の 400 は
       # 実質これに限られる (capsicum #565)。
       if e.source_status == 400
+        # 完全無音だと冪等吸収の頻度・偏りを追えないため info ログを残す (#4394)。
+        Logger.new.info(misskey_favorite: {
+          event: 'idempotent_400',
+          account_id: sns.account&.id,
+          note_id: params[:noteId],
+        })
         @renderer.message = {}
         @renderer.status = 200
         return @renderer.to_s
