@@ -11,6 +11,7 @@ module Mulukhiya
     def test_perform_when_disabled
       # word_suggest/urls 未設定 (テスト既定) では disable? が true で no-op。
       return unless @worker.disable?
+
       assert_nil(@worker.perform)
     end
   end

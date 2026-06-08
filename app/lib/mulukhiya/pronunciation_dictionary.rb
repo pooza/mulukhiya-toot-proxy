@@ -51,10 +51,8 @@ module Mulukhiya
         next unless rank
         [rank, entry['reading'].to_s.length, entry]
       end
-      return scored
-        .sort_by {|rank, length, entry| [rank, length, entry['reading'].to_s]}
-        .first(limit)
-        .map {|_, _, entry| present(entry)}
+      ranked = scored.sort_by {|rank, length, entry| [rank, length, entry['reading'].to_s]}
+      return ranked.first(limit).map {|_, _, entry| present(entry)}
     end
 
     def update
