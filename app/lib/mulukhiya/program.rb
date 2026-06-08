@@ -208,8 +208,11 @@ module Mulukhiya
       log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
       return false
     rescue => e
-      # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する
-      e.log(url: uri.to_s)
+      # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する。GAS など HEAD を
+      # 受け付けないホストは 403/405 を返すが、これは想定内なので黙ってフォール
+      # バックし、timeout・5xx 等の異常のみログする (#4397)。
+      status = e.respond_to?(:source_status) ? e.source_status : nil
+      e.log(url: uri.to_s) unless [403, 405].include?(status)
       return true
     end
 

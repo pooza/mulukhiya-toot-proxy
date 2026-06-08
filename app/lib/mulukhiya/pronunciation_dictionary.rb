@@ -161,7 +161,11 @@ module Mulukhiya
       log_oversize(uri, length.to_i, 'word_suggest fetch content-length exceeded max bytes')
       return false
     rescue => e
-      e.log(url: uri.to_s)
+      # GAS など HEAD 非対応のホストは 403/405 を返す。これは想定内なので黙って GET へ
+      # フォールバックし (GET 側 valid_response_size? が最終防衛線)、timeout・5xx 等の
+      # 異常のみログする。GAS は Content-Length も返さず事前チェックは効かない (#4397)。
+      status = e.respond_to?(:source_status) ? e.source_status : nil
+      e.log(url: uri.to_s) unless [403, 405].include?(status)
       return true
     end
 
