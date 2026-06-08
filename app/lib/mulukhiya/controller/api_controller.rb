@@ -690,6 +690,24 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    get '/word/suggest' do
+      dictionary = PronunciationDictionary.new
+      raise Ginseng::NotFoundError, 'Not Found' unless dictionary.enabled?
+      errors = WordSuggestContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        @renderer.message = {candidates: dictionary.suggest(params[:q], limit: params[:limit])}
+      end
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/piefed/communities' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.piefed?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account
