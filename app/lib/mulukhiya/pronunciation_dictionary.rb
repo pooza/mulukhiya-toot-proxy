@@ -231,9 +231,15 @@ module Mulukhiya
       redis[REDIS_KEY] = entries.to_json
       return entries
     rescue => e
-      # 中途半端なキャッシュを除去し以降の read を fetch フォールバックへ倒す保険。
+      # Redis 書き込み失敗。公開 /word/suggest の cold-cache fallthrough
+      # (entries → update → save) からも到達するため、alert すると read 側の
+      # 抑制と同様に Redis 全断時に per-request で Sentry スパム化する。
+      # Ginseng::Redis::Service が接続障害を一律ラップして型で切り分けられない
+      # うえ、save の失敗は実質的に Redis インフラ障害なので log に倒す。
+      # 定期ワーカーが次サイクルで再書き込みする (#4404 Codex P2)。
+      # 中途半端なキャッシュは除去し以降の read を fetch フォールバックへ倒す。
       invalidate_cache rescue nil
-      e.alert(entries_size: entries.size)
+      e.log(entries_size: entries.size)
       return nil
     end
   end
