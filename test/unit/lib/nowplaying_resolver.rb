@@ -54,5 +54,17 @@ module Mulukhiya
 
       assert_equal(['apple_music', 'spotify'], resolver.send(:provider_order))
     end
+
+    def test_keyword_includes_all_metadata
+      resolver = NowplayingResolver.new(title: 'song', artist: 'a', album: 'b')
+
+      assert_equal('song a b', resolver.send(:keyword))
+    end
+
+    def test_keyword_skips_blank_fields
+      resolver = NowplayingResolver.new(title: 'song', album: 'b')
+
+      assert_equal('song b', resolver.send(:keyword))
+    end
   end
 end

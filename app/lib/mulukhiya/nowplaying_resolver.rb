@@ -91,8 +91,10 @@ module Mulukhiya
       return nil
     end
 
+    # クライアントが渡した構造化メタデータをすべて検索語に含める。artist が欠落
+    # していても album で曲を絞り込めるようにする (#4382 Codex P2)。
     def keyword
-      return [@title, @artist].reject(&:empty?).join(' ')
+      return [@title, @artist, @album].reject(&:empty?).join(' ')
     end
 
     # source_app_name から優先プロバイダを推定する。判定できなければ nil。
