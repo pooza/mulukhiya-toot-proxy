@@ -45,6 +45,13 @@ module Mulukhiya
       assert_includes(surfaces, 'アイス')
     end
 
+    def test_suggest_orders_same_rank_by_reading
+      # 同ランク (読み前方一致) 内は読みの五十音順で並ぶ。アイサ... < アイス。
+      surfaces = @dic.suggest('あい').map {|r| r[:surface]}
+
+      assert_equal(['愛崎えみる', 'アイス'], surfaces)
+    end
+
     def test_suggest_empty_query_returns_empty
       assert_empty(@dic.suggest(''))
     end
