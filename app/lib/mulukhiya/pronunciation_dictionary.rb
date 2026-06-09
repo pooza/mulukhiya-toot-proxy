@@ -49,9 +49,11 @@ module Mulukhiya
       scored = entries.filter_map do |entry|
         rank = match_rank(entry, reading_query, surface_query)
         next unless rank
-        [rank, entry['reading'].to_s.length, entry]
+        [rank, entry['reading'].to_s, entry]
       end
-      ranked = scored.sort_by {|rank, length, entry| [rank, length, entry['reading'].to_s]}
+      # 同ランク内は読み (カタカナ) の五十音順 → 短い順。前方一致優先 (rank) は
+      # 維持しつつ、同ランクではふりがな辞書順で安定して並べる (#4397)。
+      ranked = scored.sort_by {|rank, reading, _entry| [rank, reading, reading.length]}
       return ranked.first(limit).map {|_, _, entry| present(entry)}
     end
 
