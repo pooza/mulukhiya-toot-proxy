@@ -11,6 +11,8 @@ module Mulukhiya
   #   - word_suggest     : 読み付き単語サジェスト (#4397)。word_suggest/urls が設定
   #                        されているか。capsicum の UI 出し分けに使う。フラグの正本を
   #                        URL 設定の有無に一本化し二重管理を避ける
+  #   - nowplaying_resolver : ナウプレ enrich (#4382)。メタデータ → 共有 URL 解決
+  #                        エンドポイントの可否。capsicum が enrich を試みるか判定に使う
   #
   # 新しい動的フラグ (例: spotify_linked) を増やす際は REGISTRY に 1 行追加する。
   class DynamicFeatures
@@ -23,6 +25,7 @@ module Mulukhiya
         Environment.controller_class.livecure? && !Program.instance.auto_update?
       },
       'word_suggest' => ->(_sns) {PronunciationDictionary.new.enabled?},
+      'nowplaying_resolver' => ->(_sns) {NowplayingResolver.enabled?},
     }.freeze
 
     def initialize(sns)

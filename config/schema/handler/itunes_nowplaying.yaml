@@ -1,9 +1,0 @@
-label: iTunes NowPlaying
-description: NowPlayingタグからiTunesの楽曲リンクを挿入します
-properties:
-  disabled:
-    type: boolean
-  timeout:
-    minimum: 1
-    type: integer
-type: object

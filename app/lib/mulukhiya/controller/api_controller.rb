@@ -432,6 +432,30 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/nowplaying/resolve' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = NowplayingResolveContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      resolver = NowplayingResolver.new(
+        title: params[:title],
+        artist: params[:artist],
+        album: params[:album],
+        source_app_name: params[:source_app_name],
+        prefer: params[:prefer],
+      )
+      @renderer.message = resolver.resolve
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/annict/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}
