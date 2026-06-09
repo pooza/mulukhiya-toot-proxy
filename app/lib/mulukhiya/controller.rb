@@ -7,6 +7,13 @@ module Mulukhiya
 
     attr_reader :sns, :reporter
 
+    # 投稿本文系フィールドを info ログに平文で残さない (#4394)。処理には素の
+    # @params を使うため、ログ用の複製だけ top-level の該当キーをマスクする。
+    SCRUBBED_LOG_PARAMS = [
+      'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
+      'q', 'title', 'artist', 'album' # word/suggest・nowplaying のユーザー入力 (#4394)
+    ].freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -24,7 +31,7 @@ module Mulukhiya
       logger.info(request: {
         method: request.request_method,
         path: request.path,
-        params: @params.deep_dup,
+        params: scrub_log_params(@params),
         remote: request.ip,
       })
       @reporter = Reporter.new
@@ -104,6 +111,14 @@ module Mulukhiya
     end
 
     private
+
+    def scrub_log_params(params)
+      scrubbed = params.deep_dup
+      SCRUBBED_LOG_PARAMS.each do |key|
+        scrubbed[key] = '[FILTERED]' if scrubbed.key?(key)
+      end
+      return scrubbed
+    end
 
     def default_renderer_class
       return Ginseng::Web::JSONRenderer

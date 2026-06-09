@@ -270,6 +270,25 @@ properties:
     required:
       - urls
     type: object
+  word_suggest:
+    properties:
+      urls:
+        items:
+          format: uri
+          type: string
+        type: array
+      fetch:
+        properties:
+          max_bytes:
+            minimum: 1
+            type: integer
+          timeout:
+            minimum: 1
+            type: integer
+        type: object
+    required:
+      - urls
+    type: object
   remote_host:
     properties:
       dns:

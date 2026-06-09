@@ -98,7 +98,6 @@ module Mulukhiya
       reporter = create_event.dispatch(payload)
       executed_handlers = reporter.filter_map {|entry| entry[:handler]}
 
-      assert_false(executed_handlers.include?('spotify_nowplaying'), 'spotify should be disabled in CI')
       assert_false(executed_handlers.include?('you_tube_image'), 'youtube should be disabled in CI')
     end
 

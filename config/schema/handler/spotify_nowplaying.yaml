@@ -1,9 +1,0 @@
-label: Spotify NowPlaying
-description: NowPlayingタグからSpotifyの楽曲リンクを挿入します
-properties:
-  disabled:
-    type: boolean
-  timeout:
-    minimum: 1
-    type: integer
-type: object

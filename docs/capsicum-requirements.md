@@ -299,24 +299,45 @@ capsicum が OS から構造化メタデータ（title / artist / album）を pu
 - **整形（`#nowplaying` タグ・Title/Album/Artist のレイアウト・行構成）はクライアント側**で行う。構造化データを持つ側が組むのが筋で、サーバー側整形はクライアントと干渉する（サーバーの `#nowplaying` 行正規化がクライアント整形を壊し、capsicum 側でタグを末尾へ逃がす回避が必要になった = [capsicum#466](https://github.com/pooza/capsicum/issues/466)）。
 - **モロヘイヤに残すべきは「外部 API の秘密情報・fetch が要る部分」= メタデータ → 共有可能 URL の解決**。Spotify / iTunes の API キーはサーバー保持なので、capsicum が title/artist を渡し、サーバーが検索して共有 URL を返す（フロントの処理を軽くする本来のプロキシ設計）。
 
-### 要件: enrich エンドポイント（新規）
+### 要件: enrich エンドポイント（新規・仕様確定 2026-06-07）
 
-- **エンドポイント案**: `POST /mulukhiya/api/nowplaying/resolve`（命名は要相談）
-- **入力**: `title` / `artist`（任意）/ `album`（任意）/ `sourceAppName`（例 `VLC` / `Rhythmbox` / `Apple Music`）。**URL は持たない源向け**
-- **出力**: 検索でヒットした **共有可能 URL**（`https://open.spotify.com/track/...` or iTunes トラック URL）。任意で正規化済み title/artist/album も返せると、capsicum が表記ゆれを揃えられて望ましい。ヒットしなければ URL は null（capsicum はクライアント整形のみで投稿）。
-- capsicum 側はレスポンスの URL を**クライアント整形のテキストに足すだけ**（整形そのものはサーバーに依存しない）。
+`POST /mulukhiya/api/nowplaying/resolve` — **Bearer（SNS token）必須**（外部 API 濫用防止）
 
-### 既存ハンドラの扱い
+**入力**:
 
-既存の `itunes_nowplaying_handler` / `spotify_nowplaying_handler`（`#nowplaying 曲名` のキーワード検索）/ `*_url_nowplaying_handler`（貼られた URL からのメタデータ抽出）は、投稿を `handle_pre_toot` で**暗黙に横取り**して検索・補完・整形を一括で行う旧設計。本要件への移行に伴い:
+| フィールド | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `title` | string | 必須 | 曲名 |
+| `artist` | string | 任意 | アーティスト名 |
+| `album` | string | 任意 | アルバム名 |
+| `source_app_name` | string | 任意 | 再生中アプリ名（`Spotify` / `VLC` / `Apple Music` 等）。プロバイダ優先のヒント |
+| `prefer` | string | 任意 | `apple_music` \| `spotify`。capsicum のユーザートグル値（下記 §8.1） |
 
-- **URL 検索の中核ロジック**は上記 enrich エンドポイントへ移す（明示的に capsicum が叩く形へ）。
-- **暗黙の pre-toot 横取り・サーバー側整形**は段階的に廃止してよい。
-- ただし **capsicum 非利用クライアント（WebUI 等）から素で `#nowplaying 曲名` / URL を投稿するユーザー**への影響範囲はモロヘイヤ側で判断（彼らにはサーバー側補完が唯一の手段なので、完全廃止か capsicum 由来のみかは運用判断）。
+**プロバイダ優先順位（3段連鎖）**: ① 明示 `prefer` → ② `source_app_name` ヒント → ③ サーバー既定（`/nowplaying/resolve/default_provider`、**既定値 = `apple_music`**）。優先側でヒットなしなら他方へフォールバックして URL を返す。
+
+**出力**: ヒット時 `{ url, provider, normalized:{title,artist,album} }`、ヒットなしは `{ url: null }`（200）。外部 API の癖（文字化け・余分な括弧情報）の正規化はモロヘイヤ側で吸収。capsicum はレスポンスの URL を**クライアント整形のテキストに足すだけ**。読み取り専用。
+
+### 既存ハンドラの扱い（確定）
+
+旧 nowplaying ハンドラを2系統に分類して扱いを確定（モロヘイヤ #4382）:
+
+- **系統①（キーワード → 検索 → URL）`itunes_nowplaying` / `spotify_nowplaying`** → **モロヘイヤ 5.26.0 で削除**。現場で未使用。検索ロジックは enrich エンドポイントの resolver へ集約（暗黙横取りは廃止、能力は明示 API へ昇格）。
+- **系統②（URL → Title/Album/Artist 展開）`*_url_nowplaying` 4本** → **据え置き**。現役で、capsicum に対応物のない明示 URL 貼付け展開。`NowplayingHandler.trim` / `DELETE /status/nowplaying` も②と連動して維持。
 
 ### features フラグ
 
-`GET /mulukhiya/api/about` の `features` に `nowplaying_resolver`（仮称）の有無を載せてもらえると、capsicum がボタンの「URL 補完を試みるか」の判定に使える（Spotify / Annict と同様）。enrich がなくてもクライアント整形で投稿は成立するため、必須ではない。
+`GET /mulukhiya/api/about` の `features` に `nowplaying_resolver` を載せる（capsicum がボタンの「URL 補完を試みるか」の判定に使う）。enrich なしでもクライアント整形で投稿は成立するため capsicum 側では必須ではない。
+
+## 8.1 capsicum 側: ナウプレ プロバイダ優先トグル（要実装）
+
+enrich の `prefer` パラメータの供給元として、capsicum 側に **「ナウプレ URL の優先プロバイダ」設定トグル**が必要。
+
+- **設定 UI**: 設定画面（Spotify 連携セクション近辺）に `Apple Music` / `Spotify` のラジオ or トグル
+- **保持**: capsicum **ローカル設定**（端末ローカル嗜好。mulukhiya はステートレスに保つ＝ per-user storage を持たない）
+- **送出**: `nowplaying/resolve` 呼び出し時に `prefer` パラメータとして毎回送る
+- **既定**: 未設定時はパラメータ省略 → サーバー既定（`apple_music`）が効く。capsicum 側で既定値を `apple_music` に寄せてもよい
+- **背景**: Spotify 派 / Apple Music 派がコミュニティで明確に分かれる想定のためユーザー選択にする。運営者（pooza）の価値観（アーティスト還元）からサーバー既定は Apple Music
+- capsicum 側 Issue: [pooza/capsicum#681](https://github.com/pooza/capsicum/issues/681)
 
 ### 関連
 
@@ -325,7 +346,69 @@ capsicum が OS から構造化メタデータ（title / artist / album）を pu
 - [#4337](https://github.com/pooza/mulukhiya-toot-proxy/issues/4337) Spotify user OAuth（currently-playing。URL を返せる別経路）
 - 本節は #4382 を置き換える。capsicum 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/nowplaying-design.md>
 
-## 9. 今後の API 変更時の連携
+## 9. 読み付き単語サジェスト API（劇中ワード補完）
+
+### 実装方針（5.26.0 確定・#4397）
+
+設計相談の結果、以下で確定し実装した。詳細仕様は [api.md](api.md) の `GET /mulukhiya/api/word/suggest` を正本とする。
+
+- **エンドポイント**: 新設 `GET /mulukhiya/api/word/suggest`（`tagging/tag/search` 拡張ではなく、読み専用・read-only で別系統）。
+- **v1 出力**: `surface` + `reading`（カタカナ）。`category` は**ソースにあれば付く任意フィールド**。`tags`（挿入時タグ自動付与）は別レイヤとして見送り。
+- **読み正規化**: **モロヘイヤ側**で吸収（NFKC + ひらがな→カタカナ）。capsicum は素の読みを送ればよい。
+- **データソース**: dic.json（MeCab 形式）を再パースせず、**サーバー固有の専用エンドポイント**（precure.ml `/api/dic/v1/pron.json` / mstdn.delmulin.com `/api/dic/v1/pronunciations.json`）の `[{word, pronunciation, category?}]` を取り込む。各サーバーの正本は**1 枚のスプレッドシート**で、GAS が dic.json と pron.json を同一シートから投影（**二重管理を作らない**ことを設計の不変条件とする）。モロヘイヤは Redis の揮発キャッシュのみ保持（`PronunciationDictionaryUpdateWorker` が 10 分毎更新、全 URL 失敗時は last-known-good 保持）。
+- **features フラグ**: `features.word_suggest` を `word_suggest/urls` 設定の有無から動的導出（`DynamicFeatures`）。フラグの正本を URL 設定に一本化し二重管理を回避。
+- **category の語彙**: 値は `人名 / 技名 / 作品名 / 一般`、**空欄=一般**（寄稿者がメンバーに広がるため複雑なルールを避ける）。MeCab の品詞列からは `技名`/`作品名` を判別できない（MeCab 体系に無い）ため、category は**シートに直接入力**し MeCab からの自動導出はしない。
+- **category 列の置き場**:
+  - デルムリン丼（簡易シート）: **プルダウン列を 1 本追加**。
+  - キュアスタ!（MeCab 形式シート）: **CSV 14 列目（発音の後ろ）に category 専用列を追記**する。MeCab は cost より後ろを不透明な素性文字列として扱う（`mecab-dict-index` は列数・値を検証しない）ため標準 13 列（idx0–12）は不変で、他システムや MeCab 解析は無影響。タグ付け（`MecabRemoteDictionary` の `slice(4..9)`）も末尾列を見ないので非干渉。標準の品詞細分類列（idx5–7）に `技名`/`作品名` を混ぜるのは他システム解釈を乱すため**避ける**。pron.json を吐く GAS が末尾の category 列を読んで `category` に載せる。これで 1 シート・1 行に集約され二重管理ゼロ。
+- **辞書整備状況**: デルムリン丼 `pronunciations.json` は 997 語整備済み（当初「~1,000 語が必要」だった前提作業は完了）。
+- **MeCab 形式辞書は存続**: タグ付けパイプライン（`MecabRemoteDictionary`）と dic.json（MeCab 形式）は他システムでも利用されており廃止しない。pron.json／category は MeCab dic と**同一スプレッドシートから投影される別ビュー**（上記の末尾 category 列を含む同一行）として並存させ、suggest 専用に使う。category がタグ付けの採用判定に影響することはない（タグ付けは従来通り MeCab の品詞列で判定）。
+
+### 背景
+
+capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）で、投稿フォームに**劇中ワード・キャラ名・必殺技名のサジェスト**を実装する。実況用途で、辞書登録のない環境だと専門ワード（例: `閃華裂光拳`）が IME の変換候補に出ず入力できないため、capsicum 側のアプリ独立サジェスト UI で補う。
+
+ユーザーが打鍵できるのは**ひらがな読み**だけなので、**読みから表層形を引ける**ことが必須。
+
+### 現状と課題
+
+- 既存 `tagging/tag/search` は**タグ検索が目的で「読み」を返さない**ため、IME 問題（字面を打てない）を解けない。
+- 劇中ワード辞書の大元は MeCab IPADic 形式の単語辞書（例: precure.ml `/api/dic/v1/dic.json`、表層形 + 読みカタカナ付き）で、モロヘイヤはこれを含む複数ソースから辞書を組んでいる＝**読みは内部に存在するが API に露出していない**だけ。
+
+→ capsicum は dic.json を直叩きせず（proxy 哲学・サーバー検出を `/about` に乗せ全プリセット一律カバー）、**モロヘイヤに読みで引けるサジェストを露出してもらう**。
+
+### エンドポイント（案）
+
+既存 `tagging/tag/search` に `reading` を足すか、`GET /mulukhiya/api/word/suggest`（仮称）を新設するかはモロヘイヤ側判断。
+
+- **入力**: `q`（ユーザー入力。**ひらがな/カタカナの読み**を主に想定。表層の前方一致も拾えると望ましい）、`limit`
+- **出力（案）**:
+  ```json
+  { "candidates": [
+    { "surface": "愛崎えみる", "reading": "アイサキメグミ",
+      "category": "人名", "tags": ["#プリキュア"] }
+  ] }
+  ```
+  - `surface`: 挿入する表層形
+  - `reading`: 並べ替え・ハイライト用（カタカナ）
+  - `category`: 品詞細分類（人名 / 地域 / 一般 等）。capsicum 側のカテゴリ別ブラウズに使う
+  - `tags`: 任意。挿入時のタグ自動付与に繋げられる（別レイヤ）
+- **読み正規化**: capsicum 入力ひらがなをカタカナ化して送る／モロヘイヤが両対応するか、どちらが吸収するかを確定したい（proxy 哲学的にはモロヘイヤ寄せが自然）
+- 読み取り専用（DB 書き込みなし）
+
+### features フラグ
+
+`GET /mulukhiya/api/about` の `features` に `word_suggest`（仮称）を載せる。capsicum はこれで UI 出し分け（annict / tagging と同じ検出パターン）。
+
+### 前提・補足
+
+- **読みのデータは大元の辞書（dic.json, MeCab 形式）に存在し、モロヘイヤは取り込み済み**。タグ検索 API が読みを落としているだけで、API に surface させるだけの話。内部でどう surface するか（既存 store に読みを持たせる / dic を引き直す等）はモロヘイヤ側判断。
+- **前提となるコンテンツ作業**: デルムリン丼・ダイスキーには読み付き辞書が未整備で、~1,000 語の辞書を用意する必要がある（pooza 作業、本 API 実装とは独立）。キュアスタ！・きゅあすきーは dic.json あり。
+- 視聴中作品の話数サジェストは既存 `tagging/dic/annict/episodes` を利用予定（本節とは別系統）。
+- 本節の実装 Issue: #4397
+- capsicum 側 Issue: [capsicum#614](https://github.com/pooza/capsicum/issues/614) / 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/compose-suggest-design.md>
+
+## 10. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 
