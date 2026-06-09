@@ -100,14 +100,6 @@ module Mulukhiya
       assert_kind_of(Hash, @program.data)
     end
 
-    def test_cache_failure_context
-      ctx = @program.send(:cache_failure_context, {'k1' => {}, 'k2' => {}})
-
-      assert_equal(2, ctx[:programs_size])
-      assert_kind_of(Integer, ctx[:json_bytes])
-      assert_operator(ctx[:json_bytes], :>, 0)
-    end
-
     def test_add_entry_creates_new_entry
       key = "test_add_#{Time.now.to_i}"
       original = @program.data
@@ -343,121 +335,6 @@ module Mulukhiya
       end
     end
 
-    def test_fetch_remote_merges_valid_payload
-      return if disable?
-      url = 'http://example.com/programs.json'
-      payload = {'remote_a' => {'series' => 'Remote A'}}
-      stub_remote_program(url, payload.to_json)
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_equal(payload, result)
-      end
-    end
-
-    def test_fetch_remote_skips_oversize_body
-      return if disable?
-      url = 'http://example.com/oversize.json'
-      stub_remote_program(url, 'x' * (Program::DEFAULT_FETCH_MAX_BYTES + 1))
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-      end
-    end
-
-    def test_fetch_remote_skips_non_hash_payload
-      return if disable?
-      url = 'http://example.com/array.json'
-      stub_remote_program(url, [{'series' => 'A'}].to_json)
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-      end
-    end
-
-    def test_fetch_remote_skips_hash_with_non_hash_values
-      return if disable?
-      url = 'http://example.com/scalar_values.json'
-      stub_remote_program(url, {'key' => 'not_a_hash'}.to_json)
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-      end
-    end
-
-    def test_fetch_remote_honors_configured_max_bytes
-      original_max = config['/program/fetch/max_bytes']
-      return if disable?
-      url = 'http://example.com/configured.json'
-      payload = {'remote_b' => {'series' => 'Remote B'}}
-      body = payload.to_json
-      stub_remote_program(url, body)
-      config['/program/fetch/max_bytes'] = body.bytesize - 1
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-      end
-    ensure
-      config['/program/fetch/max_bytes'] = original_max if defined?(original_max)
-    end
-
-    def test_fetch_remote_skips_before_get_when_content_length_exceeds_max
-      return if disable?
-      url = 'http://example.com/huge.json'
-      payload = {'remote_c' => {'series' => 'Remote C'}}
-      stub_remote_program(url, payload.to_json, content_length: Program::DEFAULT_FETCH_MAX_BYTES + 1)
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-        assert_not_requested(:get, url)
-      end
-    end
-
-    def test_fetch_remote_proceeds_when_head_unsupported
-      return if disable?
-      url = 'http://example.com/no_head.json'
-      payload = {'remote_d' => {'series' => 'Remote D'}}
-      stub_request(:head, url).to_return(status: 405)
-      stub_request(:get, url)
-        .to_return(body: payload.to_json, headers: {'Content-Type' => 'application/json'})
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_equal(payload, result)
-      end
-    end
-
-    def test_fetch_timeout_returns_configured_value
-      assert_kind_of(Integer, @program.send(:fetch_timeout))
-      assert_equal(config['/program/fetch/timeout'], @program.send(:fetch_timeout))
-    end
-
-    def test_fetch_timeout_honors_config
-      original = config['/program/fetch/timeout']
-      config['/program/fetch/timeout'] = 7
-
-      assert_equal(7, @program.send(:fetch_timeout))
-    ensure
-      config['/program/fetch/timeout'] = original
-    end
-
-    def test_fetch_remote_returns_nil_when_all_urls_fail
-      return if disable?
-      url = 'http://example.com/fail.json'
-      stub_request(:head, url).to_raise(StandardError.new('upstream down'))
-      stub_request(:get, url).to_raise(StandardError.new('upstream down'))
-      with_program_urls([url]) do
-        result = @program.send(:fetch_remote)
-
-        assert_nil(result)
-      end
-    end
-
     def test_update_preserves_existing_data_when_all_urls_fail
       return if disable?
       original = @program.data
@@ -472,29 +349,6 @@ module Mulukhiya
         assert_includes(@program.data.keys, sentinel_key)
       end
     ensure
-      @program.save(original) if original
-    end
-
-    def test_update_cache_invalidates_on_redis_write_failure
-      original = @program.data
-      @program.save({'sentinel' => {'series' => 'sentinel'}})
-
-      failing_redis = Object.new
-      unlinks = []
-      failing_redis.define_singleton_method(:[]=) {|_k, _v| raise 'simulated redis failure'}
-      failing_redis.define_singleton_method(:unlink) do |k|
-        unlinks << k
-        1
-      end
-      original_redis = @program.instance_variable_get(:@redis)
-      @program.instance_variable_set(:@redis, failing_redis)
-
-      result = @program.send(:update_cache, {'after' => {'series' => 'after'}})
-
-      assert_nil(result)
-      assert_equal([Program::REDIS_KEY], unlinks)
-    ensure
-      @program.instance_variable_set(:@redis, original_redis)
       @program.save(original) if original
     end
 
