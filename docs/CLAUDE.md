@@ -152,6 +152,30 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.26.0（2026-06-09）
+
+ナウプレ enrich プロキシ (#4382) と読み付き単語サジェスト API (#4397) の新設を主軸に、capsicum 連携（投稿サジェスト・ナウプレ共有 URL 解決）の土台を整えた回。あわせて Program の ProgramFetcher 分割 (#4347)、5.25.0 レビュー送り (#4394) の構造改善、本リリース前 5観点レビュー由来のログ/アラート整備を含む。
+
+- **#4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`** — Bearer 必須。構造化メタ（title/artist/album）→ Spotify/iTunes 検索 → 共有可能 URL 解決の読み取り専用 enrich。プロバイダ優先 `prefer`（capsicum トグル）> `source_app_name` ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（既定 apple_music、フォールバック許可）。`features.nowplaying_resolver` 露出、整形は capsicum 側でモロヘイヤはステートレス。未使用の旧系統①（`itunes_nowplaying`/`spotify_nowplaying`）を削除し検索ロジックを resolver へ集約（capsicum #466/#484/#668/#570 連携）
+- **#4397 feat: 読み付き単語サジェスト API `GET /mulukhiya/api/word/suggest`** — capsicum #614 投稿サジェスト連携。`PronunciationDictionary` が GAS の pron.json を Redis キャッシュし、読み（ひらがな→カタカナ正規化はモロヘイヤ側で吸収）前方一致 → 表層前方一致 → 部分一致でランク付け、同ランクは五十音順タイブレーク（#4403）。`features.word_suggest` を `/word_suggest/urls` 設定有無で `DynamicFeatures::REGISTRY` から動的導出。本体 API #4398、HEAD 非対応ホスト（GAS）の content-length 事前チェック 403 ログ抑止 #4400
+- **#4347 refactor: Program クラスを ProgramFetcher へ分割** — fetch/キャッシュ責務を切り出し、rubocop Metrics/ClassLength disable 解除（5.25.0 から送り）
+- **#4394 5.25.0 リリース前 5観点レビュー 5.26.0 送り（黄・緑まとめ）** — favorites 400 ログ、program.ics alert 昇格、harness の `test?` ガード、冪等ロック storage/rescue 重複の共通化（`AnnictIdempotencyLockStorage` 抽出）、request ログ本文 scrub、start_time 二段検証、slim 記法ゆれ、api.md 補記
+- **本リリース前 5観点レビュー赤近い黄インライン (#4404/#4406)** — 公開 `/word/suggest` 由来の Sentry スパム抑止: `PronunciationDictionary` の Redis 読み/書き失敗（接続障害）を alert→log に倒し、破損（不正 JSON/非配列）のみ alert+invalidate に限定（read #4404 / write は Codex P2 を受け #4406 で対称化）。`nowplaying/resolve`・`word/suggest` のユーザー入力（曲名・検索語）ログ scrub 追加。残り黄・緑は #4405 で 5.27.0 送り
+- **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
+- **運用向け設定変更**: word/suggest を有効化するサーバーは `config/local.yaml` に `/word_suggest/urls`（GAS pron.json）設定が必要。未設定なら `features.word_suggest=false` で無効（既定で無害）。`PronunciationDictionaryUpdateWorker` が 10 分毎更新
+- ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）で develop=5.26.0 を確認（dev15/dev22 はメンテ外につき対象外）
+- **本番デプロイ: pooza 実施予定**（辞書設定 `/word_suggest/urls` の書き込みを伴うため。日付・結果は後追記）
+
+### 振り返り
+
+**期間**: 5.25.0 リリース・本番デプロイ 2026-06-07 → 5.26.0 リリース 2026-06-09（2 日間）。
+
+**消化**: 5.26.0 マイルストーン Issue 全消化（#4382/#4347/#4394/#4397）。
+
+**5観点レビュー仕分け**: 真の赤 0 件。赤近い黄 2 系統（word/suggest の Redis 障害 Sentry スパム / 入力ログ scrub）をインライン (#4404)、Codex P2（save 側 write の alert スパム）を追い fix (#4406)、残り黄・緑（リダイレクト SSRF 非対称、cold-cache 同期 fetch、docs 表記揺れ・タイポ等）は #4405 にまとめて 5.27.0 送り。
+
+**Codex 仕分け**: ドラフト解除した release PR #4396 に届く Codex レビューは 5観点と重複見込み。#4404 上の P2（Redis 全断時の write 側 alert スパム）は #4406 でインライン対応しリリースに同梱。
+
 ## リリース済み: 5.25.0（2026-06-07）
 
 APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー送りの構造改善 + 番組表の iCalendar 出力・開始時刻欄 + Annict review API + 運用ログ整備 + 報告ベース修正を組み合わせた着地回。
@@ -226,75 +250,7 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 - `gh pr create --base develop` の指定漏れで意図しない main 起点マージが 3 件発生。CI が通っただけでマージしてしまったため気づくのが遅れた。PR 作成直後に `gh pr view <num> --json baseRefName` を確認するワークフローを徹底
 - EmojiSpacingHandler の本文ログ流出は新ハンドラ開発時のテンプレ判断 (`result.push(text:)` で text の中身をどこまで残すか) の問題。今後新ハンドラを書く際は「Reporter に乗る値が info ログへ流れる」点を意識する
 
-## リリース済み: 5.23.0（2026-05-23）
-
-5.22 リリース前 5観点並列レビューの黄送り掃き出しと、本リリース前 5観点並列レビュー対応を主とする「整理回」。あわせて本番で観測された重 SQL 病理（2026-05-19 障害、底値レイテンシ 175 秒級）を受け、メディアカタログ機能を実験的扱いとしデフォルト無効化する運用判断を反映（#4343）。
-
-- **#4343 feat: media_catalog をデフォルト無効化し disabled シグナルを返す** — `data.media_catalog` のデフォルトを `false` に反転（実験的機能扱い）。disabled 時の `/mulukhiya/api/media`・`/mulukhiya/feed/media` は **404 ではなく 503** + body `{"available": false, ...}` を返し、`/about` の `features.media_catalog` で discovery 可能にした。経緯と再開判断は [docs/media_catalog.md](media_catalog.md) を参照。capsicum 側 gate は [pooza/capsicum#606](https://github.com/pooza/capsicum/issues/606)
-- **#4338 feat: features API に `annict_linked` を追加** — ユーザー単位の Annict 連携状態を `/about` の features に動的合流（capsicum 連携）
-- **#4336 feat: 番組表エディタの各エントリにコピーボタン**（作品名・話数+サブタイトル、毎朝の挨拶投稿運用の手数削減、#4286 の代替最小実装）
-- **#4331 feat: Addrinfo.getaddrinfo にタイムアウト** — Puma スレッド枯渇防止
-- **#4330 feat: POST /annict/record に冪等性** — 重複 record 投稿を抑止
-- **#4329 feat: AnnictService の GraphQL エラーをカテゴリ別 status code で返す**
-- **#4318 feat: ProgramEntryContract のエラーメッセージにフィールド名を含める**
-- **#4316 fix: Program#update_cache の rescue 整理と失敗文脈付与**
-- **#4334 perf: RateLimitStorage を EVALSHA + NOSCRIPT フォールバックに移行**
-- **#4328 perf: HTTP fetch のサイズ検証を Content-Length 事前判定に切替え**
-- **#4335 refactor: MediaCatalogUpdateWorker の `cursor_pagination?` を Attachment 側に移譲**（#4343 の前提整理）
-- **#4333 refactor: RemoteHost.public? の bare rescue を具体例外に絞る**
-- **#4319 refactor: tagging_handler.rb / program.rb の暗黙 return を明示**
-- **#4313 refactor: ProgramEntryUpdateContract の params 抽出順序整理**
-- **#4314 docs: docs/api.md に ProgramEntryContract の上限値・null セマンティクスを補記**
-- **#4280 docs: docs/api.md の表記揺れ修正**（インスタンス→サーバー）
-- **#4332 wontfix クローズ** — SwSubscriptionContract allowed_hosts は allow-all デフォルトが妥当（endpoint がベンダー管理で allowlist 列挙不能、内部宛 SSRF は #4271 で対応済み、NOTE コメントに理由明記）
-- **リリース前 5観点レビュー赤対応** — MediaCatalogUpdateWorker の scheduler 直叩き経路で `disable?` が効かない穴（sidekiq-scheduler が `Sidekiq::Client.push` を直接呼ぶため `Worker.perform_async` 側 gate を通らない）を `perform` 先頭ガード追加で封じ込め。docs 表記揺れ追加修正、`/feed/media` の disabled 時挙動を `docs/api.md` で明確化
-- **リリース前 5観点レビュー黄インライン** — ConflictError 経路に info ログ、RateLimitStorage NoScriptError フォールバックに warn ログ、`/media`・`/feed/media` の disabled 応答にも構造化 info ログ、AnnictRecordLockStorage#ttl の memoize
-- **5観点レビュー次リリース送り** — #4345（fix: AnnictRecordLockStorage release の compare-and-delete、5.24.0）、#4346（feat: alert しきい値）、#4347（refactor: Program 分割）、#4348（refactor: /about 動的合流フック化）、#4349（refactor: MediaCatalogDisabledRenderer 切り出し）。後者 4 件は未設定
-- **Ruby 4.0.4 に更新**
-- **bundle update**
-- 本番デプロイ: 4 台（zugoga / lbock / shallu / sweep）
-
-### 振り返り
-
-**期間**: 5.22.1 リリース 2026-05-15 → 5.23.0 リリース 2026-05-23（8 日間）。本リリース 7 コミット（#4343 関連 + 5観点対応 + version bump）。
-
-**消化**: 17 Issue（5.22 レビュー送り 8 件 + 番組表エディタ補助 1 件 + media_catalog #4343 + 諸 docs/refactor 7 件）。
-
-**主軸**: #4343 が事実上の主軸として急遽組み込まれた。当初計画は「滞留した小粒の整理回」で主軸なしだったが、2026-05-19 障害（zugoga 等の DB プール枯渇で全サーバー投稿不可）と zugoga 本番ベースライン EXPLAIN で確証した 175 秒級病理を受け、当該機能の実験的扱い化に切替。本来の最適化 #4323（partial index `idx_mlkhy_statuses_local_catalog` 追加）は on-hold へ移動（ベースラインと candidate A は再開時の起点として残す）。
-
-**5観点レビュー仕分け**: 真の赤 1 件（scheduler 経路）を hotfix インライン、黄 2 件と自明赤 7 件（docs 表記等）をまとめて対応、緑容易分 2 件もインライン。残り構造改善 5 件は #4345〜#4349 で次リリース送り。誤検知 2 件（AAAA 取得・`e.alert(**hash)` kwargs）は実証で覆して対応外とした。
-
-**運用観察**:
-
-- sidekiq-scheduler は `Sidekiq::Client.push` を直叩きするため、`Worker.perform_async` 側 gate は scheduler 経由では効かない（本リリースで判明）。今後 `disable?` を持つ worker は `perform` 先頭でも評価する必要がある
-- 本番病理（重 SQL の DB プール枯渇）は本番規模特有で、ステージング dev04 等では再現不能（n_live_tup の桁が違う）。性能検証は本番で `EXPLAIN ANALYZE` を取る必要がある（#4323 で実証）
-
-**反省**:
-
-- #4343 で本番停止に駆け込んだが、scheduler 直叩き経路の穴を 5観点レビューが拾わなかったら本番で「local.yaml で false にしたつもりが止まっていない」が継続するところだった。並列レビューを規定どおり実施する価値を再確認
-
-## 次期マイルストーン: 5.26.0
-
-主軸: ナウプレ enrich プロキシ (#4382) + 旧キーワード検索ハンドラ（系統①）削除。ナウプレ基盤見直しの土台回。重み合計 9（予算 20〜25 に対し軽め＝薄く速くの方針）。2026-06-07 にスコープ・設計を確定（[[project_4382-nowplaying-redesign]] / capsicum docs/nowplaying-design.md §責務分担）。
-
-### 主軸
-
-- #4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`（Bearer 必須、メタ→共有URL、capsicum #466/#484/#668/#570/#669 連携、size:M）。**確定仕様**: 入力 title/artist/album/source_app_name/prefer、プロバイダ優先 `prefer`(capsicum トグル) > source_app_name ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（**既定 apple_music**、フォールバック許可）、`features.nowplaying_resolver` 露出、嗜好は capsicum ローカル保持でモロヘイヤはステートレス。**系統①（`itunes_nowplaying`/`spotify_nowplaying`、現場未使用）を本回で削除**し検索ロジックを resolver へ集約。系統②（`*_url_nowplaying` 4本）と `NowplayingHandler.trim`/`DELETE /status/nowplaying` は据え置き。整形は capsicum 側（モロヘイヤに整形器は新設しない、capsicum#680 で doc 訂正済み）。capsicum 側プロバイダ優先トグルは capsicum#681
-
-### capsicum 連携
-
-- #4397 feat: 読み付き単語サジェスト API `GET /mulukhiya/api/word/suggest`（capsicum #614 / 投稿サジェスト連携、size:M）。`PronunciationDictionary` が GAS の pron.json を Redis キャッシュ、読み（ひらがな→カタカナ正規化はモロヘイヤ側で吸収）前方一致 → 表層前方一致 → 部分一致でランク付け。`config.features.word_suggest` を `DynamicFeatures::REGISTRY` から `word_suggest/urls` 設定有無で動的導出。本体 API は #4398、HEAD 非対応ホスト(GAS)の content-length 事前チェック 403 ログ抑止は #4400。capsicum 実測で API・フラグ・正規化すべて充足を確認（v1.35 はフラット読み検索リストで出荷可、category/tags は後追い）。利用者要望でソートの同ランク内タイブレーカーを五十音順に改善（#4403）
-
-### 構造改善 / レビュー送り
-
-- #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.25 から送り、size:M）
-- #4394 5.25.0 リリース前 5観点レビュー 5.26.0 送り（黄 4 + 緑 4 まとめ: favorites 400 ログ, program.ics alert 昇格, harness test? ガード, lock storage/rescue 重複の共通化, request ログ本文 scrub, start_time 二段検証, slim 記法ゆれ, api.md 補記、size:M）
-
-### 5.26.0 では触らない（緊急性低下で据え置き）
-
-メディアカタログ再有効化（#4393 sub-second 化 / #4351 zugoga / #4352 横展開）は緊急性が下がり、5.26.0 から外して #4323 ロードマップ管理へ戻した。再開判断は #4323 / docs/media-catalog-index-plan.md 参照。
-
-## 次々期マイルストーン: 5.27.0
+## 次期マイルストーン: 5.27.0
 
 主軸: #4337 feat: Spotify user-level OAuth + currently-playing API（capsicum #465/#570 連携、size:L）。#4382 enrich とは別経路（URL を自前で返せる源）。currently-playing 取得・per-user token 暗号化保管・refresh 自動化・`SpotifyUserService`(仮) 新設。capsicum #570/#669 をアンブロック。ナウプレは番組表級の長期計画として段階的に進める（[[project_4382-nowplaying-redesign]]）。
 

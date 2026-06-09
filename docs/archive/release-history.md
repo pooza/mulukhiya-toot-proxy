@@ -2,6 +2,53 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.23.0（2026-05-23）
+
+5.22 リリース前 5観点並列レビューの黄送り掃き出しと、本リリース前 5観点並列レビュー対応を主とする「整理回」。あわせて本番で観測された重 SQL 病理（2026-05-19 障害、底値レイテンシ 175 秒級）を受け、メディアカタログ機能を実験的扱いとしデフォルト無効化する運用判断を反映（#4343）。
+
+- **#4343 feat: media_catalog をデフォルト無効化し disabled シグナルを返す** — `data.media_catalog` のデフォルトを `false` に反転（実験的機能扱い）。disabled 時の `/mulukhiya/api/media`・`/mulukhiya/feed/media` は **404 ではなく 503** + body `{"available": false, ...}` を返し、`/about` の `features.media_catalog` で discovery 可能にした。経緯と再開判断は [docs/media_catalog.md](media_catalog.md) を参照。capsicum 側 gate は [pooza/capsicum#606](https://github.com/pooza/capsicum/issues/606)
+- **#4338 feat: features API に `annict_linked` を追加** — ユーザー単位の Annict 連携状態を `/about` の features に動的合流（capsicum 連携）
+- **#4336 feat: 番組表エディタの各エントリにコピーボタン**（作品名・話数+サブタイトル、毎朝の挨拶投稿運用の手数削減、#4286 の代替最小実装）
+- **#4331 feat: Addrinfo.getaddrinfo にタイムアウト** — Puma スレッド枯渇防止
+- **#4330 feat: POST /annict/record に冪等性** — 重複 record 投稿を抑止
+- **#4329 feat: AnnictService の GraphQL エラーをカテゴリ別 status code で返す**
+- **#4318 feat: ProgramEntryContract のエラーメッセージにフィールド名を含める**
+- **#4316 fix: Program#update_cache の rescue 整理と失敗文脈付与**
+- **#4334 perf: RateLimitStorage を EVALSHA + NOSCRIPT フォールバックに移行**
+- **#4328 perf: HTTP fetch のサイズ検証を Content-Length 事前判定に切替え**
+- **#4335 refactor: MediaCatalogUpdateWorker の `cursor_pagination?` を Attachment 側に移譲**（#4343 の前提整理）
+- **#4333 refactor: RemoteHost.public? の bare rescue を具体例外に絞る**
+- **#4319 refactor: tagging_handler.rb / program.rb の暗黙 return を明示**
+- **#4313 refactor: ProgramEntryUpdateContract の params 抽出順序整理**
+- **#4314 docs: docs/api.md に ProgramEntryContract の上限値・null セマンティクスを補記**
+- **#4280 docs: docs/api.md の表記揺れ修正**（インスタンス→サーバー）
+- **#4332 wontfix クローズ** — SwSubscriptionContract allowed_hosts は allow-all デフォルトが妥当（endpoint がベンダー管理で allowlist 列挙不能、内部宛 SSRF は #4271 で対応済み、NOTE コメントに理由明記）
+- **リリース前 5観点レビュー赤対応** — MediaCatalogUpdateWorker の scheduler 直叩き経路で `disable?` が効かない穴（sidekiq-scheduler が `Sidekiq::Client.push` を直接呼ぶため `Worker.perform_async` 側 gate を通らない）を `perform` 先頭ガード追加で封じ込め。docs 表記揺れ追加修正、`/feed/media` の disabled 時挙動を `docs/api.md` で明確化
+- **リリース前 5観点レビュー黄インライン** — ConflictError 経路に info ログ、RateLimitStorage NoScriptError フォールバックに warn ログ、`/media`・`/feed/media` の disabled 応答にも構造化 info ログ、AnnictRecordLockStorage#ttl の memoize
+- **5観点レビュー次リリース送り** — #4345（fix: AnnictRecordLockStorage release の compare-and-delete、5.24.0）、#4346（feat: alert しきい値）、#4347（refactor: Program 分割）、#4348（refactor: /about 動的合流フック化）、#4349（refactor: MediaCatalogDisabledRenderer 切り出し）。後者 4 件は未設定
+- **Ruby 4.0.4 に更新**
+- **bundle update**
+- 本番デプロイ: 4 台（zugoga / lbock / shallu / sweep）
+
+### 振り返り
+
+**期間**: 5.22.1 リリース 2026-05-15 → 5.23.0 リリース 2026-05-23（8 日間）。本リリース 7 コミット（#4343 関連 + 5観点対応 + version bump）。
+
+**消化**: 17 Issue（5.22 レビュー送り 8 件 + 番組表エディタ補助 1 件 + media_catalog #4343 + 諸 docs/refactor 7 件）。
+
+**主軸**: #4343 が事実上の主軸として急遽組み込まれた。当初計画は「滞留した小粒の整理回」で主軸なしだったが、2026-05-19 障害（zugoga 等の DB プール枯渇で全サーバー投稿不可）と zugoga 本番ベースライン EXPLAIN で確証した 175 秒級病理を受け、当該機能の実験的扱い化に切替。本来の最適化 #4323（partial index `idx_mlkhy_statuses_local_catalog` 追加）は on-hold へ移動（ベースラインと candidate A は再開時の起点として残す）。
+
+**5観点レビュー仕分け**: 真の赤 1 件（scheduler 経路）を hotfix インライン、黄 2 件と自明赤 7 件（docs 表記等）をまとめて対応、緑容易分 2 件もインライン。残り構造改善 5 件は #4345〜#4349 で次リリース送り。誤検知 2 件（AAAA 取得・`e.alert(**hash)` kwargs）は実証で覆して対応外とした。
+
+**運用観察**:
+
+- sidekiq-scheduler は `Sidekiq::Client.push` を直叩きするため、`Worker.perform_async` 側 gate は scheduler 経由では効かない（本リリースで判明）。今後 `disable?` を持つ worker は `perform` 先頭でも評価する必要がある
+- 本番病理（重 SQL の DB プール枯渇）は本番規模特有で、ステージング dev04 等では再現不能（n_live_tup の桁が違う）。性能検証は本番で `EXPLAIN ANALYZE` を取る必要がある（#4323 で実証）
+
+**反省**:
+
+- #4343 で本番停止に駆け込んだが、scheduler 直叩き経路の穴を 5観点レビューが拾わなかったら本番で「local.yaml で false にしたつもりが止まっていない」が継続するところだった。並列レビューを規定どおり実施する価値を再確認
+
 ## リリース済み: 5.22.1（2026-05-15）
 
 ホットフィックス。5.22.0 #4227 で追加した `POST /mulukhiya/api/annict/record` が、capsicum エピソードブラウザの送る数値 annictId をそのまま Annict GraphQL `createRecord(episodeId: ID!)` に渡しており、Annict が要求する Relay グローバルノード ID と不一致で `Invalid input` 失敗していた回帰を修正（dev04 ステージングで観測）。capsicum 側からの直接コミット（#4339）をリリース体裁に整えて出荷。
