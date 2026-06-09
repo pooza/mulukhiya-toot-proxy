@@ -281,6 +281,10 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 
 - #4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`（Bearer 必須、メタ→共有URL、capsicum #466/#484/#668/#570/#669 連携、size:M）。**確定仕様**: 入力 title/artist/album/source_app_name/prefer、プロバイダ優先 `prefer`(capsicum トグル) > source_app_name ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（**既定 apple_music**、フォールバック許可）、`features.nowplaying_resolver` 露出、嗜好は capsicum ローカル保持でモロヘイヤはステートレス。**系統①（`itunes_nowplaying`/`spotify_nowplaying`、現場未使用）を本回で削除**し検索ロジックを resolver へ集約。系統②（`*_url_nowplaying` 4本）と `NowplayingHandler.trim`/`DELETE /status/nowplaying` は据え置き。整形は capsicum 側（モロヘイヤに整形器は新設しない、capsicum#680 で doc 訂正済み）。capsicum 側プロバイダ優先トグルは capsicum#681
 
+### capsicum 連携
+
+- #4397 feat: 読み付き単語サジェスト API `GET /mulukhiya/api/word/suggest`（capsicum #614 / 投稿サジェスト連携、size:M）。`PronunciationDictionary` が GAS の pron.json を Redis キャッシュ、読み（ひらがな→カタカナ正規化はモロヘイヤ側で吸収）前方一致 → 表層前方一致 → 部分一致でランク付け。`config.features.word_suggest` を `DynamicFeatures::REGISTRY` から `word_suggest/urls` 設定有無で動的導出。本体 API は #4398、HEAD 非対応ホスト(GAS)の content-length 事前チェック 403 ログ抑止は #4400。capsicum 実測で API・フラグ・正規化すべて充足を確認（v1.35 はフラット読み検索リストで出荷可、category/tags は後追い）。利用者要望でソートの同ランク内タイブレーカーを五十音順に改善（#4403）
+
 ### 構造改善 / レビュー送り
 
 - #4347 refactor: Program クラスを ProgramFetcher へ分割（rubocop Metrics/ClassLength の disable 解除、5.25 から送り、size:M）
