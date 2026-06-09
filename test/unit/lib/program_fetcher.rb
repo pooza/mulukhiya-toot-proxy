@@ -32,7 +32,7 @@ module Mulukhiya
 
     def test_fetch_returns_nil_without_urls
       return if disable?
-      result = with_program_urls([]) { @fetcher.fetch }
+      result = with_program_urls([]) {@fetcher.fetch}
 
       assert_nil(result)
     end
