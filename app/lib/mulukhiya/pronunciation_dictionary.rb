@@ -206,9 +206,22 @@ module Mulukhiya
     def cached_entries
       raw = redis[REDIS_KEY]
       return nil unless raw
+      return parse_cached_entries(raw)
+    rescue => e
+      # Redis 接続障害などの読み取り失敗。公開 /word/suggest から per-request で
+      # 呼ばれるため alert すると Redis 全断時に Sentry スパム化する。ログのみに
+      # 留め、上位 (entries) を update → fetch フォールバックへ倒す (#4397)。
+      e.log
+      return nil
+    end
+
+    def parse_cached_entries(raw)
       parsed = JSON.parse(raw)
       return parsed.is_a?(Array) ? parsed : nil
     rescue => e
+      # キャッシュ本体の破損 (不正 JSON / 非配列)。一過性ではなく要対処なので
+      # alert し、壊れたキャッシュを除去して以降の read を fetch へ倒す。
+      invalidate_cache rescue nil
       e.alert
       return nil
     end
