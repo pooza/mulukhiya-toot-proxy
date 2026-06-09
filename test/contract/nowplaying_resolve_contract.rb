@@ -8,7 +8,7 @@ module Mulukhiya
       assert_empty(@contract.call(title: 'song').errors)
       assert_empty(
         @contract.call(
-          title: 'song', artist: 'a', album: 'b', source_app_name: 'Spotify', prefer: 'spotify'
+          title: 'song', artist: 'a', album: 'b', source_app_name: 'Spotify', prefer: 'spotify',
         ).errors,
       )
 

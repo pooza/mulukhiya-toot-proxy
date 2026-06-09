@@ -31,7 +31,7 @@ module Mulukhiya
 
     def test_provider_order_prefers_explicit_prefer
       resolver = NowplayingResolver.new(
-        title: 'x', source_app_name: 'Apple Music', prefer: 'spotify'
+        title: 'x', source_app_name: 'Apple Music', prefer: 'spotify',
       )
 
       assert_equal(['spotify', 'apple_music'], resolver.send(:provider_order))
