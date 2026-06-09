@@ -107,8 +107,6 @@ handler:
     disable: true
     pixel: 480
     timeout: 10
-  itunes_nowplaying:
-    timeout: 10
   itunes_url_nowplaying:
     timeout: 10
   line_alert:
@@ -156,8 +154,6 @@ handler:
     hooks: []
   spotify_image:
     disable: true
-    timeout: 10
-  spotify_nowplaying:
     timeout: 10
   spotify_url_nowplaying:
     timeout: 10
@@ -211,8 +207,6 @@ handler:
         - user_config_command
         - piefed_clipping_command
         - mention_visibility
-        - itunes_nowplaying
-        - spotify_nowplaying
         - itunes_image
         - spotify_image
         - you_tube_image
@@ -237,8 +231,6 @@ handler:
         - tagging
         - invalid_command
       pre_webhook:
-        - itunes_nowplaying
-        - spotify_nowplaying
         - itunes_image
         - spotify_image
         - you_tube_image
@@ -435,6 +427,8 @@ nowplaying:
     - itunes.apple.com
     - spotify.com
     - youtube.com
+  resolve:
+    default_provider: apple_music
   track:
     prefix: 'Title:'
 package:
