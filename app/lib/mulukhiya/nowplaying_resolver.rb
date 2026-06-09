@@ -69,7 +69,8 @@ module Mulukhiya
         }.compact,
       }
     rescue => e
-      e.log(provider: 'apple_music', keyword:)
+      # keyword は曲名・アーティスト等のユーザー入力なのでログに残さない (#4394)。
+      e.log(provider: 'apple_music')
       return nil
     end
 
@@ -87,7 +88,8 @@ module Mulukhiya
         }.compact,
       }
     rescue => e
-      e.log(provider: 'spotify', keyword:)
+      # keyword は曲名・アーティスト等のユーザー入力なのでログに残さない (#4394)。
+      e.log(provider: 'spotify')
       return nil
     end
 
