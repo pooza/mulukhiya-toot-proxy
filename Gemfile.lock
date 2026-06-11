@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: b2e3d06d7702c6c1e743dd3b4168dda5d74b553e
+  revision: 98a72b02e5c560e7bf9914fe5b13e89bfbff51b6
   branch: main
   specs:
-    ginseng-core (1.15.25)
+    ginseng-core (1.15.26)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -268,7 +268,7 @@ GEM
     mustermann (3.1.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.4)
+    net-imap (0.6.4.1)
       date
       net-protocol
     net-pop (0.1.2)
@@ -356,7 +356,7 @@ GEM
       netrc (~> 0.8)
     rexml (3.4.4)
     ricecream (0.2.1)
-    rss (0.3.2)
+    rss (0.3.3)
       rexml
     rubocop (1.87.0)
       json (~> 2.3)
@@ -398,12 +398,12 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sentry-ruby (6.6.1)
+    sentry-ruby (6.6.2)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
-    sentry-sidekiq (6.6.1)
-      sentry-ruby (~> 6.6.1)
+    sentry-sidekiq (6.6.2)
+      sentry-ruby (~> 6.6.2)
       sidekiq (>= 5.0)
     sequel (5.105.0)
       bigdecimal
@@ -513,4 +513,4 @@ RUBY VERSION
   ruby 4.0.5
 
 BUNDLED WITH
-  4.0.13
+  4.0.14
