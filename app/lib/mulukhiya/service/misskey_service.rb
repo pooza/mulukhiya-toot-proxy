@@ -155,13 +155,9 @@ module Mulukhiya
       # auth / publickey は端末側で再生成され得る（再インストール・鍵ローテ等）ため
       # キーに含めず、再登録時は既存行を UPDATE で置換して行を増やさない (#4408)。
       send_read_message = params[:sendReadMessage] == true
-      existing = Misskey::SwSubscription.first(
-        userId: account.id,
-        endpoint: params[:endpoint],
-      )
-      if existing
-        replace_sw_subscription(existing, params, send_read_message)
-        subscription = existing
+      rows = sw_subscriptions(account, params).all
+      if rows.any?
+        subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
         state = :already_subscribed
       else
         subscription = create_sw_subscription(account, params, send_read_message)
@@ -172,14 +168,12 @@ module Mulukhiya
     end
 
     def unregister_sw_subscription(account, params)
-      row = Misskey::SwSubscription.first(
-        userId: account.id,
-        endpoint: params[:endpoint],
-      )
-      return nil unless row
-      row.delete
+      rows = sw_subscriptions(account, params).all
+      return nil if rows.empty?
+      # pre-fix の鍵ローテ蓄積で複数行残り得るため、endpoint 単位で全行削除する。
+      rows.each(&:delete)
       invalidate_sw_subscription_cache(account.id)
-      return row
+      return rows.first
     end
 
     def self.parse_aid(aid)
@@ -213,6 +207,24 @@ module Mulukhiya
     end
 
     private
+
+    def sw_subscriptions(account, params)
+      return Misskey::SwSubscription.where(
+        userId: account.id,
+        endpoint: params[:endpoint],
+      )
+    end
+
+    # pre-fix の鍵ローテ蓄積で同一 (userId, endpoint) に複数行ある場合、先頭を
+    # canonical として残し他を削除する。1 行しか更新しないと残った重複行が
+    # Misskey の購読キャッシュ再構築後も配信され、再登録後も重複プッシュが
+    # 続くため、再登録経路で必ず全行を 1 行へ集約する (#4408 Codex P1)。
+    def consolidate_sw_subscriptions(rows, params, send_read_message)
+      canonical, *stale = rows
+      stale.each(&:delete)
+      replace_sw_subscription(canonical, params, send_read_message)
+      return canonical
+    end
 
     def create_sw_subscription(account, params, send_read_message)
       return Misskey::SwSubscription.create(
