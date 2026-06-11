@@ -126,6 +126,33 @@ module Mulukhiya
       assert_equal({id: 'p2', name: 'パレ2', emojis: []}, entries[1])
     end
 
+    def test_register_sw_subscription_dedup_on_key_rotation
+      return unless Environment.misskey? && account
+
+      endpoint = "https://push.test/#{SecureRandom.hex(8)}"
+      cleanup = -> {Misskey::SwSubscription.where(userId: account.id, endpoint:).delete}
+      cleanup.call
+      begin
+        first = @service.register_sw_subscription(account, {
+          endpoint:, auth: 'auth_a', publickey: 'key_a', sendReadMessage: true
+        })
+        second = @service.register_sw_subscription(account, {
+          endpoint:, auth: 'auth_b', publickey: 'key_b', sendReadMessage: false
+        })
+
+        assert_equal(:subscribed, first[:state])
+        assert_equal(:already_subscribed, second[:state])
+        rows = Misskey::SwSubscription.where(userId: account.id, endpoint:).all
+
+        assert_equal(1, rows.size)
+        assert_equal('auth_b', rows.first.auth)
+        assert_equal('key_b', rows.first.publickey)
+        refute(rows.first.sendReadMessage)
+      ensure
+        cleanup.call
+      end
+    end
+
     def test_parse_emoji_palette_entries_with_nil
       assert_equal([], @service.send(:parse_emoji_palette_entries, nil))
     end

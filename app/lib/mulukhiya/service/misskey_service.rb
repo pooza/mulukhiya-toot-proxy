@@ -151,21 +151,21 @@ module Mulukhiya
     end
 
     def register_sw_subscription(account, params)
-      key = {
+      # endpoint は配信先を一意に指すアドレスなので (userId, endpoint) で dedup する。
+      # auth / publickey は端末側で再生成され得る（再インストール・鍵ローテ等）ため
+      # キーに含めず、再登録時は既存行を UPDATE で置換して行を増やさない (#4408)。
+      send_read_message = params[:sendReadMessage] == true
+      existing = Misskey::SwSubscription.first(
         userId: account.id,
         endpoint: params[:endpoint],
-        auth: params[:auth],
-        publickey: params[:publickey],
-      }
-      send_read_message = params[:sendReadMessage] == true
-      existing = Misskey::SwSubscription.first(key)
-      state = existing ? :already_subscribed : :subscribed
-      subscription = existing || Misskey::SwSubscription.create(key.merge(
-        id: self.class.create_aid,
-        sendReadMessage: send_read_message,
-      ))
-      if existing && existing.sendReadMessage != send_read_message
-        subscription.update(sendReadMessage: send_read_message)
+      )
+      if existing
+        replace_sw_subscription(existing, params, send_read_message)
+        subscription = existing
+        state = :already_subscribed
+      else
+        subscription = create_sw_subscription(account, params, send_read_message)
+        state = :subscribed
       end
       invalidate_sw_subscription_cache(account.id)
       return {subscription:, state:}
@@ -175,8 +175,6 @@ module Mulukhiya
       row = Misskey::SwSubscription.first(
         userId: account.id,
         endpoint: params[:endpoint],
-        auth: params[:auth],
-        publickey: params[:publickey],
       )
       return nil unless row
       row.delete
@@ -215,6 +213,30 @@ module Mulukhiya
     end
 
     private
+
+    def create_sw_subscription(account, params, send_read_message)
+      return Misskey::SwSubscription.create(
+        id: self.class.create_aid,
+        userId: account.id,
+        endpoint: params[:endpoint],
+        auth: params[:auth],
+        publickey: params[:publickey],
+        sendReadMessage: send_read_message,
+      )
+    end
+
+    def replace_sw_subscription(row, params, send_read_message)
+      changed =
+        row.auth != params[:auth] ||
+        row.publickey != params[:publickey] ||
+        row.sendReadMessage != send_read_message
+      return unless changed
+      row.update(
+        auth: params[:auth],
+        publickey: params[:publickey],
+        sendReadMessage: send_read_message,
+      )
+    end
 
     def invalidate_sw_subscription_cache(user_id)
       key = "kvcache:userSwSubscriptions:#{user_id}"
