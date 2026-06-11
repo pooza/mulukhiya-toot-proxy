@@ -92,7 +92,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
 | `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
-| `/word_suggest/urls`（features.word_suggest に合流） | `/word/suggest` |
+| `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 
 ## モロヘイヤ検出プロトコル

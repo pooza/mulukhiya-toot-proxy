@@ -71,5 +71,16 @@ module Mulukhiya
     def test_suggest_no_match_returns_empty
       assert_empty(@dic.suggest('ぞんざいしないよみ'))
     end
+
+    def test_cold_cache_returns_empty_and_enqueues_worker
+      return if disable?
+      @dic.invalidate_cache
+      PronunciationDictionaryUpdateWorker.jobs.clear
+      dic = PronunciationDictionary.new
+
+      # cold-cache 時は同期 fetch せず空候補を即返し、充填はワーカーに委ねる (#4405)。
+      assert_empty(dic.suggest('あい'))
+      assert_equal(1, PronunciationDictionaryUpdateWorker.jobs.size)
+    end
   end
 end

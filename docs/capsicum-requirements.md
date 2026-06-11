@@ -385,7 +385,7 @@ capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）
 - **出力（案）**:
   ```json
   { "candidates": [
-    { "surface": "愛崎えみる", "reading": "アイサキメグミ",
+    { "surface": "愛崎えみる", "reading": "アイサキエミル",
       "category": "人名", "tags": ["#プリキュア"] }
   ] }
   ```
