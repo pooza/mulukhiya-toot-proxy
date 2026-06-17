@@ -408,7 +408,43 @@ capsicum v1.35（[capsicum#614](https://github.com/pooza/capsicum/issues/614)）
 - 本節の実装 Issue: #4397
 - capsicum 側 Issue: [capsicum#614](https://github.com/pooza/capsicum/issues/614) / 設計 doc: <https://github.com/pooza/capsicum/blob/develop/docs/compose-suggest-design.md>
 
-## 10. 今後の API 変更時の連携
+## 10. Spotify user OAuth（現在再生中の取得）
+
+### 背景・責務分担
+
+capsicum の macOS Share Extension（capsicum #422）によるナウプレ投稿は OS 共有機構依存の push 型で Linux / Windows では使えない。Spotify Web API の `GET /me/player/currently-playing` を使えば OS 非依存で同等機能を提供できる。capsicum に `client_secret` を置きたくないため、Annict と同じく**モロヘイヤ経由のサーバー保管型 OAuth**で実装する（#4337 / capsicum #465）。app-level の `SpotifyService`（§8 enrich でも使う track 検索）とは別系統の user-level（Authorization Code Flow）。
+
+### エンドポイント（5.27.0 実装・code-post 方式）
+
+| メソッド | パス | 用途 | 認証 |
+| --- | --- | --- | --- |
+| GET | `/spotify/oauth_uri` | OAuth 認可 URL 取得 | 不要 |
+| POST | `/spotify/auth` | 認可コードを token に交換・保管（body: `code`） | SNS token |
+| GET | `/spotify/currently_playing` | 現在再生中の URL（`{url}` / 無再生は `{url: null}`） | SNS token |
+| DELETE | `/spotify/auth` | 連携解除 | SNS token |
+
+- **認証フロー**: capsicum がブラウザで認可 URL を開き、Redirect URI で捕捉した認可コードを `POST /spotify/auth` に渡す。ユーザー特定は SNS トークンで行うため `state` は不要。詳細は `docs/api.md` の「Spotify user OAuth」節。
+- **トークン管理**: access_token（3600s 失効）と refresh_token をモロヘイヤが暗号化保管し、失効・401 時に自動リフレッシュ。capsicum は意識不要。refresh_token 失効時は 403（要再連携）。
+- **エラー**: 未連携・refresh 失効 → 403、Spotify API 障害 → 502、無再生／広告／プライベートセッション → `{url: null}`（200）。
+
+### features フラグ
+
+`GET /mulukhiya/api/about` の `features` に 2 つ追加（capsicum が連携導線の出し分けに使う）:
+
+- `spotify_enabled`: サーバーで user OAuth が有効か（資格情報設定 + `/service/spotify/oauth/user_oauth_enabled`）。Spotify Developer Dashboard 登録が済むまで `false`。
+- `spotify_linked`: 当該ユーザーが連携済みか。
+
+### pooza 作業（モロヘイヤ実装とは独立）
+
+Spotify Developer Dashboard で Redirect URI（`/service/spotify/oauth/redirect_uri`、capsicum が捕捉できる値）と `user-read-currently-playing` スコープを登録し、config の `user_oauth_enabled` を `true` にする。
+
+### 関連
+
+- 本節の実装 Issue: #4337（5.27.0）
+- capsicum 側 Issue: pooza/capsicum（本 API 実装後に着手予定）
+- capsicum 側設計: <https://github.com/pooza/capsicum/blob/develop/docs/spotify-nowplaying-design.md>
+
+## 11. 今後の API 変更時の連携
 
 モロヘイヤ側でエンドポイントの追加・変更・廃止がある場合:
 

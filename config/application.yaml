@@ -581,6 +581,15 @@ service:
         - /videos/watch/
   spotify:
     language: ja,en-US;q=0.9,en;q=0.8
+    oauth:
+      # capsicum がブラウザ認可後の code を受け取れる Redirect URI。Spotify Developer
+      # Dashboard 側にも同値を登録する必要がある (#4337)。
+      redirect_uri: capsicum://spotify/callback
+      scopes:
+        - user-read-currently-playing
+      # Dashboard の Redirect URI / Scope 登録が済むまでは false。true で
+      # features.spotify_enabled が有効化され capsicum に連携導線が出る。
+      user_oauth_enabled: false
     patterns:
       - pattern: /track/([[:alnum:]]+)
         type: track
@@ -589,6 +598,8 @@ service:
     retry:
       seconds: 1
     urls:
+      accounts: https://accounts.spotify.com
+      api: https://api.spotify.com
       track: https://open.spotify.com/
 sharkey:
   capabilities:
@@ -655,6 +666,7 @@ spoiler:
 user_config:
   encrypt_fields:
     - token
+    - refresh_token
     - password
     - secret
   valid_keys:
