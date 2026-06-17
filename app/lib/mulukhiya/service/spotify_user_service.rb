@@ -13,9 +13,9 @@ module Mulukhiya
   class SpotifyUserService
     include Package
 
-    AUTHORIZE_PATH = '/authorize'
-    TOKEN_PATH = '/api/token'
-    CURRENTLY_PLAYING_PATH = '/v1/me/player/currently-playing'
+    AUTHORIZE_PATH = '/authorize'.freeze
+    TOKEN_PATH = '/api/token'.freeze
+    CURRENTLY_PLAYING_PATH = '/v1/me/player/currently-playing'.freeze
 
     # account は currently_playing / auth / unlink で必要 (refresh したトークンを
     # UserConfig へ書き戻すため)。oauth_uri のみ account なしでも使える。
@@ -67,8 +67,8 @@ module Mulukhiya
     # 連携解除。保管した access/refresh/expires_at を除去する (deep_compact で nil は
     # 削除されるため、これで未連携状態に戻る)。
     def unlink
-      @account.user_config.update(service: {spotify: {token: nil, refresh_token: nil, expires_at: nil}})
-      return true
+      cleared = {token: nil, refresh_token: nil, expires_at: nil}
+      return @account.user_config.update(service: {spotify: cleared})
     end
 
     def self.client_id

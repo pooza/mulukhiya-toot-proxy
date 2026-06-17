@@ -15,19 +15,23 @@ module Mulukhiya
 
     def test_config_false_when_user_oauth_disabled
       config['/service/spotify/oauth/user_oauth_enabled'] = false
+
       assert_false(SpotifyUserService.config?)
     end
 
     def test_config_false_without_client_id
       config['/service/spotify/client/id'] = nil
+
       assert_false(SpotifyUserService.config?)
     end
 
     def test_oauth_uri
       uri = SpotifyUserService.new.oauth_uri
+
       assert_equal('accounts.spotify.com', uri.host)
       assert_equal('/authorize', uri.path)
       query = uri.query_values
+
       assert_equal('test_client_id', query['client_id'])
       assert_equal('code', query['response_type'])
       assert_equal('user-read-currently-playing', query['scope'])
@@ -36,7 +40,7 @@ module Mulukhiya
 
     def test_auth_exchanges_code_and_stores_tokens
       stub = stub_token_endpoint(
-        access_token: 'access-1', refresh_token: 'refresh-1', expires_in: 3600
+        access_token: 'access-1', refresh_token: 'refresh-1', expires_in: 3600,
       )
       account = account_double
 
@@ -127,7 +131,7 @@ module Mulukhiya
       )
       stub_request(:post, token_url).to_return(
         status: 400, body: {error: 'invalid_grant'}.to_json,
-        headers: {'Content-Type' => 'application/json'},
+        headers: {'Content-Type' => 'application/json'}
       )
 
       assert_raises(Ginseng::AuthError) do
@@ -163,14 +167,14 @@ module Mulukhiya
       body = {access_token:, token_type: 'Bearer', expires_in:}
       body[:refresh_token] = refresh_token if refresh_token
       return stub_request(:post, token_url).to_return(
-        status: 200, body: body.to_json, headers: {'Content-Type' => 'application/json'}
+        status: 200, body: body.to_json, headers: {'Content-Type' => 'application/json'},
       )
     end
 
     def stub_currently_playing(status:, body:)
       payload = body.is_a?(String) ? body : body.to_json
       return stub_request(:get, currently_playing_url).to_return(
-        status:, body: payload, headers: {'Content-Type' => 'application/json'}
+        status:, body: payload, headers: {'Content-Type' => 'application/json'},
       )
     end
 
