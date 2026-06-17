@@ -582,9 +582,11 @@ service:
   spotify:
     language: ja,en-US;q=0.9,en;q=0.8
     oauth:
-      # capsicum がブラウザ認可後の code を受け取れる Redirect URI。Spotify Developer
-      # Dashboard 側にも同値を登録する必要がある (#4337)。
-      redirect_uri: capsicum://spotify/callback
+      # capsicum がブラウザ認可後の code を受け取る Redirect URI。デスクトップ向けに
+      # Spotify 公式推奨の loopback を採用。capsicum がクライアント機の 127.0.0.1 で
+      # 受けるためサーバー非依存の共通値。Spotify Developer Dashboard にも同値の登録が
+      # 必要 (#4337)。ポートは capsicum 側実装に合わせる (capsicum #570)。
+      redirect_uri: http://127.0.0.1:8888/spotify/callback
       scopes:
         - user-read-currently-playing
       # Dashboard の Redirect URI / Scope 登録が済むまでは false。true で

@@ -869,7 +869,7 @@ Spotify 連携を解除する（保管トークンを削除）。
 ##### 設定キー
 
 - `/service/spotify/client/{id,secret}`: Spotify アプリの資格情報（app-level の `SpotifyService` と共用）
-- `/service/spotify/oauth/redirect_uri`: Redirect URI（Dashboard 登録値と一致させる。既定 `capsicum://spotify/callback`）
+- `/service/spotify/oauth/redirect_uri`: Redirect URI（Dashboard 登録値・capsicum の捕捉先と一致させる。既定 `http://127.0.0.1:8888/spotify/callback` = デスクトップ向け loopback）
 - `/service/spotify/oauth/scopes`: 要求スコープ（既定 `user-read-currently-playing`）
 - `/service/spotify/oauth/user_oauth_enabled`: user OAuth の有効化フラグ（既定 `false`。Dashboard 登録完了後に `true`）
 
