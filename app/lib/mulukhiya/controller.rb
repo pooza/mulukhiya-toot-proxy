@@ -11,7 +11,8 @@ module Mulukhiya
     # @params を使うため、ログ用の複製だけ top-level の該当キーをマスクする。
     SCRUBBED_LOG_PARAMS = [
       'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
-      'q', 'title', 'artist', 'album' # word/suggest・nowplaying のユーザー入力 (#4394)
+      'q', 'title', 'artist', 'album', # word/suggest・nowplaying のユーザー入力 (#4394)
+      'code' # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
     ].freeze
 
     set :root, Environment.dir
