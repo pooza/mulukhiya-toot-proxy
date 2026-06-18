@@ -456,6 +456,23 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/nowplaying/resolve-url' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = NowplayingResolveUrlContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      @renderer.message = NowplayingUrlResolver.new(url: params[:url]).resolve
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/annict/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}

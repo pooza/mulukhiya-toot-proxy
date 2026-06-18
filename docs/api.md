@@ -808,6 +808,23 @@ NowPlaying 情報を除去して再投稿する。
   - `/nowplaying/resolve/default_provider`: 優先指定・ヒントが無いときの既定プロバイダ（`apple_music` / `spotify`、既定 `apple_music`）
 - **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes Search API は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_resolver`（下記）で enrich を試みるか判定する。
 
+#### POST /mulukhiya/api/nowplaying/resolve-url
+
+ナウプレ enrich プロキシの**逆方向**（#4415）。共有 URL を受け取り、URL からメタデータ（曲名・アーティスト名・アルバム名）を逆引きする。共有（Share）経路は ShareExtension から URL しか受け取らずメタを持たないため、capsicum が in-app と同じ formatter で整形できるようにする。`/nowplaying/resolve`（メタ → URL）と対になる読み取り専用エンドポイント。外部 API 濫用防止のため Bearer 必須。
+
+- **認証**: 必須（Bearer / SNS token）
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `url` | string | 必須 | 楽曲の共有 URL（`http(s)://` 始まり、最大 2048 文字） |
+
+- **プロバイダ振り分け（host）**: `*.spotify.com` → Spotify、`music.apple.com` / `itunes.apple.com` → iTunes、それ以外 → 解決なし。
+- **レスポンス**:
+  - 解決時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." } }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
+  - 解決なし（未対応 host / メタ取得不可）: `{ "url": null }`（404 ではなく 200）
+- **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_url_resolver`（下記）で Share 経路 enrich を試みるか判定する。
+
 #### Spotify user OAuth（現在再生中の取得）
 
 capsicum が Spotify Web API 経由で「現在再生中」を OS 非依存に取得するための user-level OAuth（#4337 / capsicum #465）。app-level の `SpotifyService`（track 検索・lookup、`/nowplaying/resolve` でも使用）とは別系統で、**Authorization Code Flow** により当該ユーザーの `GET /me/player/currently-playing` を呼ぶ。capsicum に `client_secret` を置かず、モロヘイヤがアクセストークン／リフレッシュトークンを暗号化保管する点は Annict 連携と同方針。アクセストークンは 3600 秒で失効するため、モロヘイヤが失効時・401 時に自動でリフレッシュする（capsicum は意識不要）。
@@ -833,13 +850,12 @@ Spotify の OAuth 認可 URL を取得する。
 
 認可コードをアクセストークン＋リフレッシュトークンに交換し、ユーザー設定に暗号化保存する。
 
-- **認証**: 必須（SNS アカウントのトークン）
+- **認証**: 必須（Bearer / SNS token）。ユーザー特定は Authorization ヘッダで行うため、認可コードのみ送ればよい。
 - **前提条件**: `features.spotify_enabled` が `true`
 - **パラメータ**:
 
 | 名前 | 型 | 必須 | 説明 |
 |------|-----|------|------|
-| `token` | string | 必須 | SNS アカウントのアクセストークン |
 | `code` | string | 必須 | Spotify OAuth 認可コード |
 
 - **レスポンス**: `{ "config": { ... } }`（更新後のユーザー設定）
@@ -853,7 +869,7 @@ Spotify の OAuth 認可 URL を取得する。
 - **パラメータ**: なし
 - **レスポンス**:
   - 再生中: `{ "url": "https://open.spotify.com/track/..." }`
-  - 無再生・広告再生中・プライベートセッション: `{ "url": null }`（200）
+  - 無再生・広告再生中・プライベートセッション・一時停止: `{ "url": null }`（200）
 - **エラー**:
   - **403**（`Ginseng::AuthError`）: 未連携、またはリフレッシュトークン失効・revoke（要再連携）
   - **502 Bad Gateway**: Spotify API ダウン・ネットワーク失敗

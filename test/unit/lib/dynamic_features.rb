@@ -3,7 +3,8 @@ module Mulukhiya
     def test_registry_keys
       assert_equal(
         ['annict_linked', 'media_catalog', 'program_editable', 'word_suggest',
-          'nowplaying_resolver', 'spotify_enabled', 'spotify_linked'].to_set,
+          'nowplaying_resolver', 'nowplaying_url_resolver',
+          'spotify_enabled', 'spotify_linked'].to_set,
         DynamicFeatures::REGISTRY.keys.to_set,
       )
     end
