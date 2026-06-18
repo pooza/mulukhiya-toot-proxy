@@ -1,3 +1,5 @@
+require 'base64'
+
 module Mulukhiya
   # capsicum のナウプレ投稿 (capsicum #465) 向けの user-level OAuth サービス (#4337)。
   #
@@ -138,13 +140,21 @@ module Mulukhiya
     end
 
     def token_request(params)
+      # Authorization Code Flow の /api/token は client 認証を HTTP Basic ヘッダで行う。
+      # client_id/secret を body にだけ入れると invalid_client で弾かれうるため、
+      # 認証はヘッダ、grant 固有パラメータのみ body に置く。
+      # https://developer.spotify.com/documentation/web-api/tutorials/code-flow#request-an-access-token
       return accounts_service.post(TOKEN_PATH, {
-        headers: {'Content-Type' => 'application/x-www-form-urlencoded'},
-        body: {
-          'client_id' => self.class.client_id,
-          'client_secret' => self.class.client_secret,
-        }.merge(params),
+        headers: {
+          'Content-Type' => 'application/x-www-form-urlencoded',
+          'Authorization' => "Basic #{basic_credentials}",
+        },
+        body: params,
       })
+    end
+
+    def basic_credentials
+      return Base64.strict_encode64("#{self.class.client_id}:#{self.class.client_secret}")
     end
 
     def store_tokens(body)
@@ -160,6 +170,9 @@ module Mulukhiya
 
     def extract_track_url(body)
       return nil unless body.is_a?(Hash)
+      # 一時停止中 (is_playing:false) は item が直前の選択トラックのまま 200 で返るため、
+      # ポーリング側が停止中トラックを再生中扱いしないよう再生中のみ URL を返す。
+      return nil unless body['is_playing'] == true
       item = body['item']
       return nil unless item.is_a?(Hash)
       return item.dig('external_urls', 'spotify').presence

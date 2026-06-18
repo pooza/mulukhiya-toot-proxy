@@ -83,6 +83,33 @@ module Mulukhiya
       assert_nil(SpotifyUserService.new(account).currently_playing)
     end
 
+    def test_currently_playing_returns_nil_when_paused
+      account = account_double(
+        '/service/spotify/token' => 'access-1',
+        '/service/spotify/refresh_token' => 'refresh-1',
+        '/service/spotify/expires_at' => Time.now.to_i + 3600,
+      )
+      # 一時停止中は item が直前トラックのまま 200 で返るが is_playing:false。
+      stub_currently_playing(status: 200, body: {
+        is_playing: false,
+        item: {external_urls: {spotify: 'https://open.spotify.com/track/paused'}},
+      })
+
+      assert_nil(SpotifyUserService.new(account).currently_playing)
+    end
+
+    def test_auth_sends_client_credentials_via_basic_header
+      stub = stub_token_endpoint(access_token: 'a', refresh_token: 'r', expires_in: 3600)
+      expected = Base64.strict_encode64('test_client_id:test_client_secret')
+
+      SpotifyUserService.new(account_double).auth('the-code')
+
+      assert_requested(stub.with do |req|
+        req.headers['Authorization'] == "Basic #{expected}" &&
+          !URI.decode_www_form(req.body).to_h.key?('client_secret')
+      end)
+    end
+
     def test_currently_playing_refreshes_when_token_expired
       account = account_double(
         '/service/spotify/token' => 'stale',
@@ -91,6 +118,7 @@ module Mulukhiya
       )
       token_stub = stub_token_endpoint(access_token: 'access-2', expires_in: 3600)
       stub_currently_playing(status: 200, body: {
+        is_playing: true,
         item: {external_urls: {spotify: 'https://open.spotify.com/track/xyz'}},
       })
 
@@ -112,7 +140,7 @@ module Mulukhiya
       stub_token_endpoint(access_token: 'access-2', expires_in: 3600)
       stub_request(:get, currently_playing_url).to_return(
         {status: 401, body: '{}', headers: {'Content-Type' => 'application/json'}},
-        {status: 200, body: {item: {external_urls: {spotify: 'https://open.spotify.com/track/r'}}}.to_json,
+        {status: 200, body: {is_playing: true, item: {external_urls: {spotify: 'https://open.spotify.com/track/r'}}}.to_json,
          headers: {'Content-Type' => 'application/json'}},
       )
 

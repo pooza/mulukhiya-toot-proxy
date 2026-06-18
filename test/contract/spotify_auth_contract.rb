@@ -5,15 +5,16 @@ module Mulukhiya
     end
 
     def test_call
-      errors = @contract.call(token: 'sns-token', code: 'auth-code').errors
+      # ユーザー特定は bearer 認証で行うため code のみ必須・token は不要。
+      errors = @contract.call(code: 'auth-code').errors
 
       assert_empty(errors)
 
-      errors = @contract.call(token: 'sns-token', code: nil).errors
+      errors = @contract.call(code: nil).errors
 
       assert_false(errors.empty?)
 
-      errors = @contract.call(code: 'auth-code').errors
+      errors = @contract.call({}).errors
 
       assert_false(errors.empty?)
     end
