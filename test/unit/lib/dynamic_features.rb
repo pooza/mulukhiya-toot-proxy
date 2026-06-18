@@ -3,7 +3,8 @@ module Mulukhiya
     def test_registry_keys
       assert_equal(
         ['annict_linked', 'media_catalog', 'program_editable', 'word_suggest',
-          'nowplaying_resolver', 'nowplaying_url_resolver'].to_set,
+          'nowplaying_resolver', 'nowplaying_url_resolver',
+          'spotify_enabled', 'spotify_linked'].to_set,
         DynamicFeatures::REGISTRY.keys.to_set,
       )
     end
@@ -23,6 +24,14 @@ module Mulukhiya
       assert_true(DynamicFeatures.new(sns_double(linked_account)).to_h['annict_linked'])
     end
 
+    def test_spotify_linked_is_false_without_account
+      assert_false(DynamicFeatures.new(sns_double(nil)).to_h['spotify_linked'])
+    end
+
+    def test_spotify_linked_reflects_linked_account
+      assert_true(DynamicFeatures.new(sns_double(linked_account)).to_h['spotify_linked'])
+    end
+
     private
 
     # 実 SNS/Account モデル (DB 依存) を読み込まないための最小ダブル。
@@ -33,6 +42,7 @@ module Mulukhiya
     def linked_account
       account = Object.new
       def account.annict_linked? = true
+      def account.spotify_linked? = true
       return account
     end
   end

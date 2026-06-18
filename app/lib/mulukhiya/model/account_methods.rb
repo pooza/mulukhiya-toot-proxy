@@ -81,6 +81,23 @@ module Mulukhiya
       return false
     end
 
+    def spotify
+      return nil unless user_config['/service/spotify/refresh_token']
+      @spotify ||= SpotifyUserService.new(self)
+      return @spotify
+    end
+
+    # 当該ユーザーに Spotify refresh_token が保管済みか (#4337)。
+    # capsicum が features.spotify_linked でナウプレ取得導線の出し分けに使う。
+    # access_token は失効するため refresh_token の有無で「連携済み」を表す
+    # (liveness/refresh 確認は about を重くするため範囲外)。
+    def spotify_linked?
+      return user_config['/service/spotify/refresh_token'].present?
+    rescue => e
+      e.log(acct: acct.to_s)
+      return false
+    end
+
     def featured_tags
       return TagContainer.new
     end
