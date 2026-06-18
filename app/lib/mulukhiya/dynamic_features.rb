@@ -13,6 +13,8 @@ module Mulukhiya
   #                        URL 設定の有無に一本化し二重管理を避ける
   #   - nowplaying_resolver : ナウプレ enrich (#4382)。メタデータ → 共有 URL 解決
   #                        エンドポイントの可否。capsicum が enrich を試みるか判定に使う
+  #   - nowplaying_url_resolver : ナウプレ enrich の逆方向 (#4415)。共有 URL → メタ解決
+  #                        エンドポイントの可否。capsicum の Share 経路 enrich 判定に使う
   #
   # 新しい動的フラグ (例: spotify_linked) を増やす際は REGISTRY に 1 行追加する。
   class DynamicFeatures
@@ -26,6 +28,7 @@ module Mulukhiya
       },
       'word_suggest' => ->(_sns) {PronunciationDictionary.new.enabled?},
       'nowplaying_resolver' => ->(_sns) {NowplayingResolver.enabled?},
+      'nowplaying_url_resolver' => ->(_sns) {NowplayingUrlResolver.enabled?},
     }.freeze
 
     def initialize(sns)
