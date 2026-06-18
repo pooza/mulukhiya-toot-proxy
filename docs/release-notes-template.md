@@ -66,6 +66,8 @@
 [更新手順](https://github.com/pooza/mulukhiya-toot-proxy/wiki/%E6%9B%B4%E6%96%B0%E6%89%8B%E9%A0%86)を参照してください。
 4.x系からのアップグレードは[4.x → 5.0 アップグレードガイド](https://github.com/pooza/mulukhiya-toot-proxy/wiki/4.x-%E2%86%92-5.0-%E3%82%A2%E3%83%83%E3%83%97%E3%82%B0%E3%83%AC%E3%83%BC%E3%83%89%E3%82%AC%E3%82%A4%E3%83%89)も参照してください。
 
+**必要 Ruby: X.Y.Z**（`.ruby-version`。前リリースから据え置きでも毎回明記する）。未導入のサーバーは `rbenv install X.Y.Z` が前提（無いと puma 起動が `rbenv: version 'X.Y.Z' is not installed` で失敗する）。
+
 <起動スクリプト変更がない場合>
 本リリースに起動スクリプトの変更はありません。通常の更新手順（git pull + bundle install + サービス再起動）で適用できます。
 
@@ -77,5 +79,6 @@
 
 - セキュリティ更新（gem パッチ）は実害がなくてもリリースノートに記載する
 - 「アップグレード手順」のリンク 2 種は毎回必ず含める（4.x 系利用者向けは当面継続）
+- **「必要 Ruby」は `.ruby-version` の値を毎回明記する**（前リリースから据え置きでも）。フレッシュなサーバーは `rbenv install` が前提で、書いておかないと puma 起動失敗（`rbenv: version '...' is not installed`）の原因になる
 - ホットフィックス（5.x.1 等）でも同フォーマットを使う。「概要」は「ホットフィックス。〜の回帰を修正」程度で短く
 - 設定キーは Ginseng のスラッシュ表記（`/ruby/jit` 等）で統一

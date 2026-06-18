@@ -71,5 +71,28 @@ module Mulukhiya
     def test_suggest_no_match_returns_empty
       assert_empty(@dic.suggest('ぞんざいしないよみ'))
     end
+
+    def test_cold_cache_returns_empty_and_defers_fill_to_worker
+      return if disable?
+      url = 'https://dic.test/pron.json'
+      original_urls = config['/word_suggest/urls']
+      config['/word_suggest/urls'] = [url]
+      stub_request(:head, url).to_return(status: 200)
+      stub_request(:get, url).to_return(
+        status: 200,
+        body: [{'word' => '相生', 'pronunciation' => 'アイオイ'}].to_json,
+        headers: {'Content-Type' => 'application/json'},
+      )
+      @dic.invalidate_cache
+
+      # cold-cache の当該リクエストは同期 fetch せず空を即返す (#4405)。旧実装なら
+      # ここで同期 fetch して候補が返るが、新実装は充填をワーカーへ委ねる。test モード
+      # では perform_async が perform を同期実行するため、直後は別インスタンスから
+      # 充填済みキャッシュで引ける。
+      assert_empty(PronunciationDictionary.new.suggest('あいおい'))
+      assert_equal('相生', PronunciationDictionary.new.suggest('あいおい').first[:surface])
+    ensure
+      config['/word_suggest/urls'] = original_urls if defined?(original_urls)
+    end
   end
 end

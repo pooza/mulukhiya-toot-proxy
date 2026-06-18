@@ -13,3 +13,6 @@ dist
 tmp/
 var/*.yaml
 2
+
+# ローカル Redis ダンプ
+dump.rdb

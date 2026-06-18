@@ -32,7 +32,7 @@ module Mulukhiya
     end
 
     def entries
-      @entries ||= cached_entries || (update && cached_entries) || []
+      @entries ||= cached_entries || enqueue_update_and_empty
     end
 
     def size
@@ -74,6 +74,22 @@ module Mulukhiya
     end
 
     private
+
+    # cold-cache (Redis 未充填) 時のフォールバック。同期 remote fetch すると公開
+    # /word/suggest のリクエストスレッド (Puma) を GAS 取得の間ブロックするため、
+    # 充填は非同期ワーカーへ委ね、当該リクエストは空候補で即返す。cold-window は
+    # Redis flush / 再起動直後等に限られ、数秒後にはワーカーが充填する (#4405)。
+    # 短時間に複数リクエストが来ると enqueue が重複し得るが、update は冪等
+    # (再 fetch して SET するだけ) かつ retry:false なので実害はない。
+    def enqueue_update_and_empty
+      PronunciationDictionaryUpdateWorker.perform_async
+      return []
+    rescue => e
+      # enqueue 先 (Sidekiq Redis) 障害等。public エンドポイントから per-request で
+      # 呼ばれるため alert せず log に留め、空候補で返す。
+      e.log
+      return []
+    end
 
     # 候補マッチの優先度。小さいほど上位。マッチしなければ nil。
     def match_rank(entry, reading_query, surface_query)

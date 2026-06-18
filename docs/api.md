@@ -92,8 +92,10 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
 | `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
-| `/word_suggest/urls`（features.word_suggest に合流） | `/word/suggest` |
+| `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
+| `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
+| `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
 ## モロヘイヤ検出プロトコル
 
@@ -805,6 +807,87 @@ NowPlaying 情報を除去して再投稿する。
 - **設定キー**:
   - `/nowplaying/resolve/default_provider`: 優先指定・ヒントが無いときの既定プロバイダ（`apple_music` / `spotify`、既定 `apple_music`）
 - **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes Search API は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_resolver`（下記）で enrich を試みるか判定する。
+
+#### POST /mulukhiya/api/nowplaying/resolve-url
+
+ナウプレ enrich プロキシの**逆方向**（#4415）。共有 URL を受け取り、URL からメタデータ（曲名・アーティスト名・アルバム名）を逆引きする。共有（Share）経路は ShareExtension から URL しか受け取らずメタを持たないため、capsicum が in-app と同じ formatter で整形できるようにする。`/nowplaying/resolve`（メタ → URL）と対になる読み取り専用エンドポイント。外部 API 濫用防止のため Bearer 必須。
+
+- **認証**: 必須（Bearer / SNS token）
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `url` | string | 必須 | 楽曲の共有 URL（`http(s)://` 始まり、最大 2048 文字） |
+
+- **プロバイダ振り分け（host）**: `*.spotify.com` → Spotify、`music.apple.com` / `itunes.apple.com` → iTunes、それ以外 → 解決なし。
+- **レスポンス**:
+  - 解決時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." } }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
+  - 解決なし（未対応 host / メタ取得不可）: `{ "url": null }`（404 ではなく 200）
+- **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_url_resolver`（下記）で Share 経路 enrich を試みるか判定する。
+
+#### Spotify user OAuth（現在再生中の取得）
+
+capsicum が Spotify Web API 経由で「現在再生中」を OS 非依存に取得するための user-level OAuth（#4337 / capsicum #465）。app-level の `SpotifyService`（track 検索・lookup、`/nowplaying/resolve` でも使用）とは別系統で、**Authorization Code Flow** により当該ユーザーの `GET /me/player/currently-playing` を呼ぶ。capsicum に `client_secret` を置かず、モロヘイヤがアクセストークン／リフレッシュトークンを暗号化保管する点は Annict 連携と同方針。アクセストークンは 3600 秒で失効するため、モロヘイヤが失効時・401 時に自動でリフレッシュする（capsicum は意識不要）。
+
+- **前提条件**: `features.spotify_enabled` が `true`（= `/service/spotify/client/{id,secret}` 設定済み **かつ** `/service/spotify/oauth/user_oauth_enabled` が `true`）。Spotify Developer Dashboard 側で Redirect URI と `user-read-currently-playing` スコープの登録が必要。
+- **認証フロー（code-post 方式）**:
+  1. クライアントが `GET /spotify/oauth_uri` で認可 URL を取得する
+  2. クライアントが認可 URL をブラウザで開き、ユーザーが Spotify で認可する
+  3. Spotify が Redirect URI（`/service/spotify/oauth/redirect_uri`、capsicum が捕捉できる URL／カスタムスキーム）へ認可コード付きでリダイレクトする
+  4. クライアントが捕捉した認可コードを `POST /spotify/auth` に送信（ユーザー特定は SNS トークンで行うため `state` は不要）
+  5. 以降クライアントは `GET /spotify/currently_playing` で現在再生中の URL を取得できる
+
+##### GET /mulukhiya/api/spotify/oauth_uri
+
+Spotify の OAuth 認可 URL を取得する。
+
+- **認証**: 不要
+- **前提条件**: `features.spotify_enabled` が `true`（false 時は 404）
+- **パラメータ**: なし
+- **レスポンス例**: `{ "oauth_uri": "https://accounts.spotify.com/authorize?client_id=...&response_type=code&redirect_uri=...&scope=user-read-currently-playing" }`
+
+##### POST /mulukhiya/api/spotify/auth
+
+認可コードをアクセストークン＋リフレッシュトークンに交換し、ユーザー設定に暗号化保存する。
+
+- **認証**: 必須（Bearer / SNS token）。ユーザー特定は Authorization ヘッダで行うため、認可コードのみ送ればよい。
+- **前提条件**: `features.spotify_enabled` が `true`
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `code` | string | 必須 | Spotify OAuth 認可コード |
+
+- **レスポンス**: `{ "config": { ... } }`（更新後のユーザー設定）
+
+##### GET /mulukhiya/api/spotify/currently_playing
+
+現在再生中トラックの共有 URL を返す。
+
+- **認証**: 必須（SNS アカウントのトークン → モロヘイヤが保持する Spotify トークンに解決）
+- **前提条件**: `features.spotify_enabled` が `true` かつ当該ユーザーが連携済み（`features.spotify_linked`）
+- **パラメータ**: なし
+- **レスポンス**:
+  - 再生中: `{ "url": "https://open.spotify.com/track/..." }`
+  - 無再生・広告再生中・プライベートセッション・一時停止: `{ "url": null }`（200）
+- **エラー**:
+  - **403**（`Ginseng::AuthError`）: 未連携、またはリフレッシュトークン失効・revoke（要再連携）
+  - **502 Bad Gateway**: Spotify API ダウン・ネットワーク失敗
+
+##### DELETE /mulukhiya/api/spotify/auth
+
+Spotify 連携を解除する（保管トークンを削除）。
+
+- **認証**: 必須（SNS アカウントのトークン）
+- **前提条件**: `features.spotify_enabled` が `true`
+- **レスポンス**: `{ "config": { ... } }`（更新後のユーザー設定）
+
+##### 設定キー
+
+- `/service/spotify/client/{id,secret}`: Spotify アプリの資格情報（app-level の `SpotifyService` と共用）
+- `/service/spotify/oauth/redirect_uri`: Redirect URI（Dashboard 登録値・capsicum の捕捉先と一致させる。既定 `http://127.0.0.1:8888/spotify/callback` = デスクトップ向け loopback）
+- `/service/spotify/oauth/scopes`: 要求スコープ（既定 `user-read-currently-playing`）
+- `/service/spotify/oauth/user_oauth_enabled`: user OAuth の有効化フラグ（既定 `false`。Dashboard 登録完了後に `true`）
 
 #### GET /mulukhiya/api/program
 

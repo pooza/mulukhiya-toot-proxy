@@ -13,8 +13,14 @@ module Mulukhiya
   #                        URL 設定の有無に一本化し二重管理を避ける
   #   - nowplaying_resolver : ナウプレ enrich (#4382)。メタデータ → 共有 URL 解決
   #                        エンドポイントの可否。capsicum が enrich を試みるか判定に使う
+  #   - nowplaying_url_resolver : ナウプレ enrich の逆方向 (#4415)。共有 URL → メタ解決
+  #                        エンドポイントの可否。capsicum の Share 経路 enrich 判定に使う
+  #   - spotify_enabled  : Spotify user OAuth (#4337) がサーバーで有効か。Developer
+  #                        Dashboard 登録 + user_oauth_enabled を満たすか。capsicum が
+  #                        連携導線を出すか判定に使う
+  #   - spotify_linked   : リクエストの SNS アカウント単位の Spotify 連携状態 (#4337)
   #
-  # 新しい動的フラグ (例: spotify_linked) を増やす際は REGISTRY に 1 行追加する。
+  # 新しい動的フラグを増やす際は REGISTRY に 1 行追加する。
   class DynamicFeatures
     include Package
 
@@ -26,6 +32,9 @@ module Mulukhiya
       },
       'word_suggest' => ->(_sns) {PronunciationDictionary.new.enabled?},
       'nowplaying_resolver' => ->(_sns) {NowplayingResolver.enabled?},
+      'nowplaying_url_resolver' => ->(_sns) {NowplayingUrlResolver.enabled?},
+      'spotify_enabled' => ->(_sns) {SpotifyUserService.config?},
+      'spotify_linked' => ->(sns) {sns.account&.spotify_linked? || false},
     }.freeze
 
     def initialize(sns)

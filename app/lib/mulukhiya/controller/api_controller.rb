@@ -456,6 +456,23 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/nowplaying/resolve-url' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = NowplayingResolveUrlContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      @renderer.message = NowplayingUrlResolver.new(url: params[:url]).resolve
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/annict/oauth_uri' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.annict?
       @renderer.message = {oauth_uri: AnnictService.new.oauth_uri.to_s}
@@ -482,6 +499,75 @@ module Mulukhiya
         @renderer.status = response.code
         @renderer.message = {config: sns.account.user_config.to_h}
       end
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    get '/spotify/oauth_uri' do
+      raise Ginseng::NotFoundError, 'Not Found' unless SpotifyUserService.config?
+      @renderer.message = {oauth_uri: SpotifyUserService.new.oauth_uri.to_s}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/spotify/auth' do
+      raise Ginseng::NotFoundError, 'Not Found' unless SpotifyUserService.config?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = SpotifyAuthContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+      else
+        SpotifyUserService.new(sns.account).auth(params[:code])
+        @renderer.message = {config: sns.account.user_config.to_h}
+      end
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    get '/spotify/currently_playing' do
+      raise Ginseng::NotFoundError, 'Not Found' unless SpotifyUserService.config?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      spotify = sns.account.spotify
+      raise Ginseng::AuthError, 'Spotify authentication required' unless spotify
+      @renderer.message = {url: spotify.currently_playing}
+      return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      e.log
+      @renderer.status = e.respond_to?(:source_status) ? e.source_status : 502
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    rescue Ginseng::AuthError => e
+      # 未連携・refresh_token 失効は想定内のユーザー状態。capsicum が定期ポーリング
+      # するため alert すると Sentry スパム化する。log に留め 403 で返す。
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    rescue => e
+      e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    delete '/spotify/auth' do
+      raise Ginseng::NotFoundError, 'Not Found' unless SpotifyUserService.config?
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      sns.account.spotify&.unlink
+      @renderer.message = {config: sns.account.user_config.to_h}
       return @renderer.to_s
     rescue => e
       e.alert
