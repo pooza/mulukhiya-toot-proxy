@@ -806,6 +806,23 @@ NowPlaying 情報を除去して再投稿する。
   - `/nowplaying/resolve/default_provider`: 優先指定・ヒントが無いときの既定プロバイダ（`apple_music` / `spotify`、既定 `apple_music`）
 - **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes Search API は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_resolver`（下記）で enrich を試みるか判定する。
 
+#### POST /mulukhiya/api/nowplaying/resolve-url
+
+ナウプレ enrich プロキシの**逆方向**（#4415）。共有 URL を受け取り、URL からメタデータ（曲名・アーティスト名・アルバム名）を逆引きする。共有（Share）経路は ShareExtension から URL しか受け取らずメタを持たないため、capsicum が in-app と同じ formatter で整形できるようにする。`/nowplaying/resolve`（メタ → URL）と対になる読み取り専用エンドポイント。外部 API 濫用防止のため Bearer 必須。
+
+- **認証**: 必須（Bearer / SNS token）
+- **パラメータ**:
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `url` | string | 必須 | 楽曲の共有 URL（`http(s)://` 始まり、最大 2048 文字） |
+
+- **プロバイダ振り分け（host）**: `*.spotify.com` → Spotify、`music.apple.com` / `itunes.apple.com` → iTunes、それ以外 → 解決なし。
+- **レスポンス**:
+  - 解決時: `{ "url": "https://music.apple.com/...", "provider": "apple_music", "normalized": { "title": "...", "artist": "...", "album": "..." } }`（`normalized` は外部 API が返した値のみ。欠落要素は省く）
+  - 解決なし（未対応 host / メタ取得不可）: `{ "url": null }`（404 ではなく 200）
+- **備考**: Spotify は `/service/spotify` の資格情報が設定済みのときのみ候補。iTunes は資格情報不要のため常時利用可能。capsicum は `features.nowplaying_url_resolver`（下記）で Share 経路 enrich を試みるか判定する。
+
 #### GET /mulukhiya/api/program
 
 番組情報を取得する。
