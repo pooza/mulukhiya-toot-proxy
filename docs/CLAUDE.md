@@ -232,12 +232,18 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 
 ## 次期マイルストーン: 5.28.0
 
-主軸未確定（テーマレス回想定）。現時点の候補・繰越:
+**主軸: #4393 perf: media_catalog を sub-second 化（query 再構成/非正規化、size:L）**（2026-06-21 スコープ確定）。複数リリース繰り越してきた media_catalog 再有効化トラック（#4351/#4352/#4375）全体の前提ブロッカーで、これを片付けて後続を解凍する。実行 runbook は docs/media-catalog-index-plan.md（Gate 0〜2 + rollback）。本番 EXPLAIN で partial index 単独では sub-second に届かないと判明済みのため query 再構成/非正規化が本丸。
 
-- **#4414 security: Spotify OAuth ハードニング（size:M）** — 5.27.0 リリース前 5観点レビュー + Codex P2 の繰越集約先。token refresh 同時実行のロストアップデート（真の赤）、refresh 失効時の stale トークンクリア、auth/oauth_uri/delete の alert→log 対称化、Spotify HTTP timeout 明示、state(CSRF)。**capsicum #570（Spotify クォータ規約で塩漬け）の復活＝機能有効化と歩調を合わせて着手**。それまでは `user_oauth_enabled:false` で全台 OFF のためライブ露出なし
+**確定スコープ（重み 約15〜18）:**
+- **#4393 media_catalog sub-second 化（size:L）** — 主軸
 - **#4420 concurrency: sw_subscription 集約の非トランザクション race（size:S）** — #4408 の後始末。同時 register の狭い窓を `db.transaction` or canonical 決定論化で塞ぐ
-- **#4323 perf: media_attachments 関連 index 見直し** — サブ #4393（sub-second 化 query 再構成/非正規化、size:L）が #4351 zugoga 再有効化の前提。実行 runbook は docs/media-catalog-index-plan.md
+- **#4423 test: AnnictReviewLockStorageTest フレーキー（size:S）** — record_conflict 内 TypeError で fail-open → CI ノイズ赤。Redis 相互作用/bucket 境界の安定化
+
+**見送り（次期以降）:**
+- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570（Spotify クォータ規約で塩漬け）の復活＝機能有効化と歩調を合わせる方針。`user_oauth_enabled:false` で全台 OFF＝ライブ露出が無いため 5.28.0 では着手しない
 - #4233 APIController 段階的リファクタは残る長大エンドポイントがあれば随時サブ化（直近サブ #4283/#4284/#4285 は全着地）
+
+**develop 既取り込み（5.28.0 同梱）:** ginseng-fediverse 1.8.25（Mastodon numeric_ap_id 対応、#4422）／ナウプレ ユニバーサルリンク(Odesli) 対応計画の追記／fedi-test-harness upstream チェックの同期手順組み込み（#4424/#4425）。
 
 ## ロードマップ仮置き
 
