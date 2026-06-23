@@ -1,0 +1,40 @@
+# fedi-test-harness 互換性検証済み upstream バージョン台帳
+#
+# モロヘイヤ (mulukhiya-toot-proxy) が chubo2 の fedi-test-harness を使って
+# 「バニラ Mastodon / Misskey との互換性を実機検証した最新バージョン」と
+# 「upstream リリースを最後にチェックした日」を記録する。
+#
+# 用途（セッション組み込み方式。専用の cloud/cron ジョブは使わない）:
+#   - docs/CLAUDE.md の「セッション開始時の同期手順」で、last_checked から一定
+#     日数（既定: 4 日）以上経過していたら upstream 最新リリースを確認し、
+#     verified より新しい stable / RC があれば検証を促す。確認したら last_checked
+#     を当日に更新する。
+#   - chubo2 側 fedi-test-harness/{mastodon,misskey}/.env.example の
+#     MASTODON_VERSION / MISSKEY_VERSION と対になる値。互換性検証を終えて
+#     harness の既定を bump したら、verified もこのファイルで同じ版に更新する。
+#
+# upstream リリースの参照先（GitHub）:
+#   - Mastodon : mastodon/mastodon      （stable は vX.Y.Z、RC は vX.Y.Z-rc.N）
+#   - Misskey  : misskey-dev/misskey    （stable は YYYY.M.P、alpha/beta は prerelease）
+#     ※ Docker Hub の misskey/misskey とは別。GitHub では misskey-dev/misskey。
+#
+# 検証フロー（新バージョン検知時）:
+#   1. cd ~/repos/chubo2/fedi-test-harness/<mastodon|misskey>
+#   2. ./scripts/update-version.sh   # upstream 最新に追従
+#   3. ./scripts/reset.sh            # 新イメージ + クリーン DB で再構築
+#   4. mulukhiya 側で account / status / controller 等の harness テストを実走
+#      (要 mulukhiya 自前 Redis localhost:6379)
+#   5. 緑なら chubo2 .env.example と本ファイルの verified を新バージョンに更新
+#
+# 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
+
+mastodon:
+  verified: v4.6.0
+  verified_at: '2026-06-21'
+
+misskey:
+  verified: 2026.6.0
+  verified_at: '2026-06-23'
+
+# upstream 最新リリースを最後に確認した日（同期手順が更新する）。
+last_checked: '2026-06-23'
