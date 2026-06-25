@@ -56,6 +56,38 @@ module Mulukhiya
       assert_empty(@dic.suggest(''))
     end
 
+    def test_all_returns_every_entry_in_present_format
+      surfaces = @dic.all.map {|r| r[:surface]}
+
+      assert_equal(ENTRIES.size, @dic.all.size)
+      assert_includes(surfaces, '愛崎えみる')
+      assert_includes(surfaces, '閃華裂光拳')
+      assert_includes(surfaces, 'アイス')
+      first = @dic.all.find {|r| r[:surface] == '愛崎えみる'}
+
+      assert_equal('アイサキエミル', first[:reading])
+      assert_equal('人名', first[:category])
+    end
+
+    def test_all_omits_category_when_absent
+      entry = @dic.all.find {|r| r[:surface] == 'アイス'}
+
+      assert_not_nil(entry)
+      assert_false(entry.key?(:category))
+    end
+
+    def test_digest_is_stable_for_same_entries
+      assert_equal(@dic.digest, PronunciationDictionary.new.digest)
+    end
+
+    def test_digest_changes_when_entries_change
+      before = @dic.digest
+      @dic.redis[PronunciationDictionary::REDIS_KEY] =
+        (ENTRIES + [{'surface' => '相生', 'reading' => 'アイオイ'}]).to_json
+
+      assert_not_equal(before, PronunciationDictionary.new.digest)
+    end
+
     def test_suggest_respects_limit
       assert_operator(@dic.suggest('あい', limit: 1).size, :<=, 1)
     end
