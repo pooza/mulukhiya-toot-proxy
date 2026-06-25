@@ -57,6 +57,21 @@ module Mulukhiya
       return ranked.first(limit).map {|_, _, entry| present(entry)}
     end
 
+    # 全候補を suggest と同じ present 形式で返す。capsicum 投稿サジェストの
+    # 一括取得 + ローカル絞り込み (capsicum#687) 向け。読み取り専用で、suggest と
+    # 同じ entries キャッシュ (Redis) をそのまま全件投影するだけ。cold-cache 時は
+    # suggest と同様に空配列 + 非同期ワーカー充填へ倒れる (リクエストをブロックしない)。
+    def all
+      return entries.map {|entry| present(entry)}
+    end
+
+    # 辞書内容のダイジェスト。capsicum が一括取得キャッシュの更新検知
+    # (ETag / If-None-Match による再検証) に用いる。entries が変わらない限り安定し、
+    # 辞書 (スプレッドシート) の増減で値が変わる。cold-cache (空) でも安定値を返す。
+    def digest
+      return Digest::SHA256.hexdigest(entries.to_json)
+    end
+
     def update
       entries = fetch_remote
       return nil unless entries

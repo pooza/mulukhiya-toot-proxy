@@ -673,6 +673,33 @@ Web Push サブスクリプションを解除する。
 - `reading`: 並べ替え・ハイライト用（カタカナ）
 - `category`: 品詞細分類（人名 / 技名 / 作品名 / 一般 等）。スプレッドシートに列がある場合のみ付く**任意**フィールド。capsicum 側のカテゴリ別ブラウズ用。空欄・未整備のサーバーでは省略される
 
+#### GET /mulukhiya/api/word/all
+
+読み付き単語辞書の**全件取得**（capsicum#687 / #4430）。`word/suggest` が読みごとの都度クエリなのに対し、本 API は辞書を丸ごと返す。capsicum が一度取得してローカルで絞り込むことで、実況の打鍵テンポを損なわず往復ゼロにするための最適化用。`word/suggest` と同じ辞書（`PronunciationDictionary` の Redis キャッシュ）をそのまま投影するだけで、新規データ源・DB 書き込みはない（読み取り専用）。
+
+- **認証**: 不要
+- **前提条件**: `features.word_suggest` が `true`（= `word_suggest/urls` が設定済み）。未設定サーバーは 404
+- **パラメータ**: なし
+- **キャッシュ再検証**: レスポンスに `ETag`（辞書ダイジェスト）を付与する。`If-None-Match` に同じ値を送ると本文を返さず `304 Not Modified` を返す。body 内の `digest` も同値で、ヘッダを使えないクライアントはこちらで更新検知できる
+- **cold-cache**: Redis 未充填時（flush / 再起動直後）は `word/suggest` と同じく空の `words` を即返し、`PronunciationDictionaryUpdateWorker` の充填を待つ（同期 fetch でリクエストをブロックしない）
+
+**レスポンス例**:
+
+```json
+{
+  "words": [
+    { "surface": "愛崎えみる", "reading": "アイサキエミル", "category": "人名" },
+    { "surface": "閃華裂光拳", "reading": "センカレッコウケン", "category": "技名" }
+  ],
+  "size": 2,
+  "digest": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+}
+```
+
+- `words`: 候補の配列。各要素は `word/suggest` の `candidates` と同一の形（`surface` / `reading` / 任意 `category`）
+- `size`: `words` の件数
+- `digest`: 辞書内容の SHA256。`ETag` と同値。辞書（スプレッドシート）の増減で変わる
+
 #### GET /mulukhiya/api/announcement/list
 
 サーバーのお知らせ一覧を取得する（Redis キャッシュ参照、SNS への問い合わせは発生しない）。capsicum-relay (capsicum-relay#14) のお知らせ push 配信パイプラインから利用する想定で公開している（#4355）。
