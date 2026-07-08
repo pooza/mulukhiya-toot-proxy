@@ -386,6 +386,8 @@ properties:
     type: string
   founded_on:
     type: string
+  preopened_on:
+    type: string
   spotify:
     properties:
       client:
