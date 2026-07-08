@@ -29,12 +29,21 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.6.0
-  verified_at: '2026-06-21'
+  verified: v4.6.3
+  verified_at: '2026-07-08'
 
 misskey:
   verified: 2026.6.0
   verified_at: '2026-06-23'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-06-23'
+last_checked: '2026-07-08'
+
+# 2026-07-08 チェック結果:
+#   - Mastodon: stable v4.6.3（2026-07-03）を fedi-test-harness で検証・verified 昇格。
+#     v4.6.3 と v4.6.0 で mulukhiya フルスイートを clean 再構築のうえ実走・比較し
+#     結果が完全一致（831 tests / 6 failures / 41 errors、失敗集合も 45 件同一）。
+#     残存失敗は streaming/listener・メディア/タグ seed 無し・media_catalog 既定OFF
+#     起因の既存ギャップで Mastodon 版とは無関係、contract テストは全緑＝退行ゼロ。
+#     chubo2 .env.example も v4.6.3 へ更新済み（pooza/chubo2#61）。
+#   - Misskey: verified 2026.6.0 が依然最新 stable（2026.6.1 は alpha 止まり）。対応不要。
