@@ -2,8 +2,8 @@ module Mulukhiya
   class DynamicFeaturesTest < TestCase
     def test_registry_keys
       assert_equal(
-        ['annict_linked', 'media_catalog', 'program_editable', 'word_suggest',
-          'nowplaying_resolver', 'nowplaying_url_resolver',
+        ['annict_linked', 'annict_review', 'media_catalog', 'program_editable',
+          'word_suggest', 'nowplaying_resolver', 'nowplaying_url_resolver',
           'spotify_enabled', 'spotify_linked'].to_set,
         DynamicFeatures::REGISTRY.keys.to_set,
       )
@@ -22,6 +22,14 @@ module Mulukhiya
 
     def test_annict_linked_reflects_linked_account
       assert_true(DynamicFeatures.new(sns_double(linked_account)).to_h['annict_linked'])
+    end
+
+    # annict_review は SNS アカウント非依存で、サーバーの annict? 稼働可否を映す (#4433)。
+    def test_annict_review_reflects_controller_annict
+      assert_equal(
+        Environment.controller_class.annict?,
+        DynamicFeatures.new(sns_double(nil)).to_h['annict_review'],
+      )
     end
 
     def test_spotify_linked_is_false_without_account
