@@ -39,6 +39,7 @@ module Mulukhiya
           admin_role_ids: admin_role_ids,
           info_bot: info_bot_profile,
           status_url: (self['/status_url'] rescue nil),
+          founded_at: founded_at,
         },
       }
     end
@@ -53,6 +54,19 @@ module Mulukhiya
     end
 
     private
+
+    # サーバーの正式オープン日を ISO 8601 date (YYYY-MM-DD) で返す (#4434)。
+    # `/founded_on` が設定されていればそれを、無ければ最古ローカルアカウントの
+    # 作成日で近似する (capsicum はヒューリスティックを持たず /about を単純採用する)。
+    # 取得不能・未設定・DB 未接続なら nil。
+    def founded_at
+      configured = self['/founded_on'] rescue nil
+      return Date.parse(configured.to_s).iso8601 if configured.present?
+      date = Environment.account_class&.founded_at
+      return date&.to_date&.iso8601
+    rescue
+      return nil
+    end
 
     def detect_unknown_keys(data, sch, prefix = '')
       if data.is_a?(Array)
