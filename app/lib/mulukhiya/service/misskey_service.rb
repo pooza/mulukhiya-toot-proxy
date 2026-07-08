@@ -157,11 +157,12 @@ module Mulukhiya
       send_read_message = params[:sendReadMessage] == true
       # 同一 (userId, endpoint) への同時 register で read-then-write が交錯すると、
       # 互いの canonical を stale と見なして相互削除し購読が一時消失する窓がある。
-      # 行取得〜集約/新規作成を 1 トランザクションに括り、canonical を order(:id)
-      # で決定化（sw_subscriptions 側）して並行リクエストが同一行を canonical に
-      # 選ぶことを保証する (#4420)。
+      # 行取得〜集約/新規作成を 1 トランザクションに括り、SELECT ... FOR UPDATE で
+      # 対象行を order(:id) 順に先取りロックする。これで canonical を並行 register
+      # 間で決定化しつつ、canonical が無変更で UPDATE されない場合でも SELECT 時点で
+      # ロック済みとなり、unregister との重なりで購読が消失する窓を塞ぐ (#4420)。
       result = Misskey::SwSubscription.db.transaction do
-        rows = sw_subscriptions(account, params).all
+        rows = locked_sw_subscriptions(account, params)
         if rows.any?
           subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
           next {subscription:, state: :already_subscribed}
@@ -175,9 +176,11 @@ module Mulukhiya
 
     def unregister_sw_subscription(account, params)
       # pre-fix の鍵ローテ蓄積で複数行残り得るため endpoint 単位で全行削除する。
-      # 同時 register との交錯を避けるためトランザクション内で取得→削除する (#4420)。
+      # 同時 register との交錯を避けるためトランザクション内で FOR UPDATE 取得→削除する。
+      # register と同じ order(:id) 順にロックを取り、ロック順不一致による ABBA
+      # デッドロックを避ける (#4420)。
       removed = Misskey::SwSubscription.db.transaction do
-        rows = sw_subscriptions(account, params).all
+        rows = locked_sw_subscriptions(account, params)
         next nil if rows.empty?
         rows.each(&:delete)
         rows.first
@@ -227,6 +230,14 @@ module Mulukhiya
         userId: account.id,
         endpoint: params[:endpoint],
       ).order(:id)
+    end
+
+    # トランザクション内で対象行を id 昇順に FOR UPDATE ロックして配列で返す。
+    # register / unregister が同一のロック順で全対象行を先取りするため、
+    # 相互削除・ロック順不一致デッドロック・無変更 canonical 未ロックの窓を塞ぐ。
+    # 必ず db.transaction ブロック内から呼ぶこと (#4420)。
+    def locked_sw_subscriptions(account, params)
+      return sw_subscriptions(account, params).for_update.all
     end
 
     # pre-fix の鍵ローテ蓄積で同一 (userId, endpoint) に複数行ある場合、先頭を

@@ -91,8 +91,8 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/data/media_catalog` | `/media`（無効時は 503 + JSON `{available: false, ...}`）, `/feed/media`（無効時は 503 + 空 RSS チャネル） |
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
-| `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
-| `features.annict_review`（サーバーが `annict?` を満たすとき `true`。#4342 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定できる） | `/annict/review`, `/annict/record` |
+| `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/annict/record`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
+| `features.annict_review`（サーバーが `annict?` を満たすとき `true`。#4342 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定できる） | `/annict/review` |
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
