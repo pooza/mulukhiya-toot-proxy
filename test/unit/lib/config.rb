@@ -59,5 +59,18 @@ module Mulukhiya
 
       assert_nil(config.send(:preopened_at))
     end
+
+    # 設定済みだがパース不能（typo 等）なら log を残して nil に倒す (#4420 レビュー)。
+    def test_founded_at_nil_when_config_malformed
+      config['/founded_on'] = 'not-a-date'
+
+      assert_nil(config.send(:founded_at))
+    end
+
+    def test_preopened_at_nil_when_config_malformed
+      config['/preopened_on'] = 'not-a-date'
+
+      assert_nil(config.send(:preopened_at))
+    end
   end
 end

@@ -80,11 +80,14 @@ module Mulukhiya
       return nil
     end
 
-    # config 値を ISO 8601 date (YYYY-MM-DD) 文字列へ正規化する。空・パース不能は nil。
+    # config 値を ISO 8601 date (YYYY-MM-DD) 文字列へ正規化する。空は nil。
+    # 設定済みだがパース不能（typo など）の場合は運用者の切り分け用に log を
+    # 残して nil に倒す（未設定と typo を区別できるようにする）。alert はしない。
     def normalize_iso_date(value)
       return nil unless value.present?
       return Date.parse(value.to_s).iso8601
-    rescue
+    rescue => e
+      e.log(value: value.to_s)
       return nil
     end
 
