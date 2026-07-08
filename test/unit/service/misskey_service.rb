@@ -182,6 +182,33 @@ module Mulukhiya
       end
     end
 
+    def test_register_sw_subscription_keeps_lowest_id_canonical
+      return unless Environment.misskey? && account
+
+      # canonical 選択が order(:id) で決定化されていること（#4420）。既存重複行の
+      # うち最小 id 行が残り、同時 register 間で相互削除が起きないことを担保する。
+      endpoint = "https://push.test/#{SecureRandom.hex(8)}"
+      cleanup = -> {Misskey::SwSubscription.where(userId: account.id, endpoint:).delete}
+      cleanup.call
+      begin
+        ids = Array.new(3) do |i|
+          Misskey::SwSubscription.create(
+            id: MisskeyService.create_aid, userId: account.id, endpoint:,
+            auth: "old_#{i}", publickey: "oldkey_#{i}", sendReadMessage: true
+          ).id
+        end
+        @service.register_sw_subscription(account, {
+          endpoint:, auth: 'auth_new', publickey: 'key_new', sendReadMessage: false
+        })
+        rows = Misskey::SwSubscription.where(userId: account.id, endpoint:).all
+
+        assert_equal(1, rows.size)
+        assert_equal(ids.min, rows.first.id)
+      ensure
+        cleanup.call
+      end
+    end
+
     def test_parse_emoji_palette_entries_with_nil
       assert_equal([], @service.send(:parse_emoji_palette_entries, nil))
     end

@@ -155,25 +155,36 @@ module Mulukhiya
       # auth / publickey は端末側で再生成され得る（再インストール・鍵ローテ等）ため
       # キーに含めず、再登録時は既存行を UPDATE で置換して行を増やさない (#4408)。
       send_read_message = params[:sendReadMessage] == true
-      rows = sw_subscriptions(account, params).all
-      if rows.any?
-        subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
-        state = :already_subscribed
-      else
+      # 同一 (userId, endpoint) への同時 register で read-then-write が交錯すると、
+      # 互いの canonical を stale と見なして相互削除し購読が一時消失する窓がある。
+      # 行取得〜集約/新規作成を 1 トランザクションに括り、canonical を order(:id)
+      # で決定化（sw_subscriptions 側）して並行リクエストが同一行を canonical に
+      # 選ぶことを保証する (#4420)。
+      result = Misskey::SwSubscription.db.transaction do
+        rows = sw_subscriptions(account, params).all
+        if rows.any?
+          subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
+          next {subscription:, state: :already_subscribed}
+        end
         subscription = create_sw_subscription(account, params, send_read_message)
-        state = :subscribed
+        {subscription:, state: :subscribed}
       end
       invalidate_sw_subscription_cache(account.id)
-      return {subscription:, state:}
+      return result
     end
 
     def unregister_sw_subscription(account, params)
-      rows = sw_subscriptions(account, params).all
-      return nil if rows.empty?
-      # pre-fix の鍵ローテ蓄積で複数行残り得るため、endpoint 単位で全行削除する。
-      rows.each(&:delete)
+      # pre-fix の鍵ローテ蓄積で複数行残り得るため endpoint 単位で全行削除する。
+      # 同時 register との交錯を避けるためトランザクション内で取得→削除する (#4420)。
+      removed = Misskey::SwSubscription.db.transaction do
+        rows = sw_subscriptions(account, params).all
+        next nil if rows.empty?
+        rows.each(&:delete)
+        rows.first
+      end
+      return nil unless removed
       invalidate_sw_subscription_cache(account.id)
-      return rows.first
+      return removed
     end
 
     def self.parse_aid(aid)
@@ -209,10 +220,13 @@ module Mulukhiya
     private
 
     def sw_subscriptions(account, params)
+      # canonical 選択（consolidate の先頭行）を並行リクエスト間で決定化するため
+      # order(:id) を必ず付す。無序だと同時 register が別々の行を canonical に
+      # 選び相互削除する余地が残る (#4420)。
       return Misskey::SwSubscription.where(
         userId: account.id,
         endpoint: params[:endpoint],
-      )
+      ).order(:id)
     end
 
     # pre-fix の鍵ローテ蓄積で同一 (userId, endpoint) に複数行ある場合、先頭を
