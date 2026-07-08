@@ -10,15 +10,16 @@ module Mulukhiya
       attr_accessor :token
 
       # 最古のローカルアカウント作成日を「設立日」の近似として返す (#4434)。
-      # ローカル (domain IS NULL) を作成日昇順で 1 件。created_at は GMT 保存なので
-      # Status#date / Attachment#date と同じく getlocal してから返し、東経サーバーで
-      # 現地深夜作成のアカウントが暦日 1 日前にずれるのを防ぐ (#4437 Codex P2)。
+      # ローカル (domain IS NULL) を作成日昇順で 1 件。Sequel が返す created_at は
+      # 既に zone 付き Time（本番実測で +0900）なので getlocal で系のローカルへ
+      # 正規化するだけでよい。#4437 で入れた strftime('...GMT') 経由の再解釈は、
+      # 既にローカルな壁時計を UTC と偽って +9h する二重シフトになり設立日が翌日に
+      # ずれていたため撤回する（実測: pooza 2017-04-19 22:46 JST が 04-20 化）。
       # 値は不変のためプロセス内でメモ化する。DB 未接続・不在時は nil。
       def self.founded_at
         return @founded_at if defined?(@founded_at) && @founded_at
         return nil unless account = where(domain: nil).order(:created_at).first
-        gmt = account.created_at.strftime('%Y/%m/%d %H:%M:%S GMT')
-        return @founded_at = Time.parse(gmt).getlocal
+        return @founded_at = account.created_at.getlocal
       rescue => e
         e.log
         return nil
