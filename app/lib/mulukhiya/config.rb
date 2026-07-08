@@ -39,6 +39,8 @@ module Mulukhiya
           admin_role_ids: admin_role_ids,
           info_bot: info_bot_profile,
           status_url: (self['/status_url'] rescue nil),
+          founded_at: founded_at,
+          preopened_at: preopened_at,
         },
       }
     end
@@ -53,6 +55,41 @@ module Mulukhiya
     end
 
     private
+
+    # サーバーの正式オープン日を ISO 8601 date (YYYY-MM-DD) で返す (#4434)。
+    # `/founded_on` が設定されていればそれを、無ければ最古ローカルアカウントの
+    # 作成日で近似する (capsicum はヒューリスティックを持たず /about を単純採用する)。
+    # 取得不能・未設定・DB 未接続なら nil。
+    def founded_at
+      configured = self['/founded_on'] rescue nil
+      return normalize_iso_date(configured) if configured.present?
+      date = Environment.account_class&.founded_at
+      return date&.to_date&.iso8601
+    rescue
+      return nil
+    end
+
+    # プレ公開（限定公開）を経たサーバーの、正式オープン前の公開開始日を ISO 8601
+    # date で返す (#4434)。config `/preopened_on` が設定されている場合のみ値を返し、
+    # プレ公開の無いサーバーでは nil。founded_at と違い最古アカウント fallback は
+    # 持たない（プレ公開の有無は運用者しか知り得ず、最古アカウント≒プレ公開日を
+    # 一律にプレ公開扱いすると誤りになるため）。
+    def preopened_at
+      return normalize_iso_date(self['/preopened_on'])
+    rescue
+      return nil
+    end
+
+    # config 値を ISO 8601 date (YYYY-MM-DD) 文字列へ正規化する。空は nil。
+    # 設定済みだがパース不能（typo など）の場合は運用者の切り分け用に log を
+    # 残して nil に倒す（未設定と typo を区別できるようにする）。alert はしない。
+    def normalize_iso_date(value)
+      return nil unless value.present?
+      return Date.parse(value.to_s).iso8601
+    rescue => e
+      e.log(value: value.to_s)
+      return nil
+    end
 
     def detect_unknown_keys(data, sch, prefix = '')
       if data.is_a?(Array)

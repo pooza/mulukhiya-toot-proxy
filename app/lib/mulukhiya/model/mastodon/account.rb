@@ -9,6 +9,21 @@ module Mulukhiya
       one_to_many :attachment, key: :account_id
       attr_accessor :token
 
+      # 最古のローカルアカウント作成日を「設立日」の近似として返す (#4434)。
+      # ローカル (domain IS NULL) を作成日昇順で 1 件。created_at は GMT 保存なので
+      # Status#date / Attachment#date と同じく getlocal してから返し、東経サーバーで
+      # 現地深夜作成のアカウントが暦日 1 日前にずれるのを防ぐ (#4437 Codex P2)。
+      # 値は不変のためプロセス内でメモ化する。DB 未接続・不在時は nil。
+      def self.founded_at
+        return @founded_at if defined?(@founded_at) && @founded_at
+        return nil unless account = where(domain: nil).order(:created_at).first
+        gmt = account.created_at.strftime('%Y/%m/%d %H:%M:%S GMT')
+        return @founded_at = Time.parse(gmt).getlocal
+      rescue => e
+        e.log
+        return nil
+      end
+
       def to_h
         return super.except(:private_key, :public_key)
       end

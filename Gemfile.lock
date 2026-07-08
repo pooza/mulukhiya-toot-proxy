@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: bfb0dc260c8a74ff4e7bdde559a9167ce3b8d3a9
+  revision: 60a38dae2e80096734e408ced2d322b994e4c624
   branch: main
   specs:
-    ginseng-fediverse (1.8.24)
+    ginseng-fediverse (1.8.25)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -138,8 +138,10 @@ GEM
       uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
+    anonymous_loader (0.1.2)
+      version_gem (~> 1.1, >= 1.1.13)
     ast (2.4.3)
-    auth-sanitizer (0.2.1)
+    auth-sanitizer (0.2.2)
       version_gem (~> 1.1, >= 1.1.10)
     base64 (0.3.0)
     bigdecimal (4.1.2)
@@ -147,13 +149,13 @@ GEM
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
       thor (~> 1.0)
-    cgi (0.5.1)
+    cgi (0.5.2)
     concurrent-ruby (1.3.7)
     connection_pool (3.0.2)
     crack (1.0.1)
       bigdecimal
       rexml
-    crass (1.0.6)
+    crass (1.0.7)
     csv (3.3.5)
     date (3.5.1)
     domain_name (0.6.20240107)
@@ -212,7 +214,7 @@ GEM
     ffi (1.17.4-x86_64-linux-gnu)
     fileutils (1.7.3)
     find (0.2.0)
-    fugit (1.12.2)
+    fugit (1.12.3)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
     gli (2.21.5)
@@ -226,7 +228,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.15.1)
+    i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     icalendar (2.12.3)
       base64
@@ -234,19 +236,19 @@ GEM
       logger
       ostruct
     ice_cube (0.17.0)
-    json (2.19.9)
+    json (2.20.0)
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
     jwt (3.2.0)
       base64
-    language_server-protocol (3.17.0.5)
+    language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.9.0)
+    mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
       net-imap
@@ -256,7 +258,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0414)
+    mime-types-data (3.2026.0701)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.6)
@@ -279,24 +281,25 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.5)
-    nokogiri (1.19.3)
+    nokogiri (1.19.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.19.3-aarch64-linux-gnu)
+    nokogiri (1.19.4-aarch64-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.19.3-arm64-darwin)
+    nokogiri (1.19.4-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.19.3-x86_64-linux-gnu)
+    nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
-    oauth2 (2.0.23)
-      auth-sanitizer (~> 0.2, >= 0.2.1)
+    oauth2 (2.0.24)
+      anonymous_loader (~> 0.1, >= 0.1.1)
+      auth-sanitizer (~> 0.2, >= 0.2.2)
       faraday (>= 0.17.3, < 4.0)
       jwt (>= 1.0, < 4.0)
       logger (~> 1.2)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.6)
-      version_gem (~> 1.1, >= 1.1.11)
+      version_gem (~> 1.1, >= 1.1.12)
     omniauth (2.1.4)
       hashie (>= 3.4.6)
       logger
@@ -358,7 +361,7 @@ GEM
     ricecream (0.2.1)
     rss (0.3.3)
       rexml
-    rubocop (1.88.0)
+    rubocop (1.88.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -369,7 +372,7 @@ GEM
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.49.1)
+    rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
     rubocop-minitest (0.39.1)
@@ -405,7 +408,7 @@ GEM
     sentry-sidekiq (6.6.2)
       sentry-ruby (~> 6.6.2)
       sidekiq (>= 5.0)
-    sequel (5.105.0)
+    sequel (5.106.0)
       bigdecimal
     set (1.1.3)
     sidekiq (8.1.6)
@@ -427,7 +430,7 @@ GEM
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    slim_lint (0.34.0)
+    slim_lint (0.35.0)
       rexml (~> 3.2)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
@@ -452,12 +455,12 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    version_gem (1.1.12)
+    version_gem (1.1.13)
     webmock (3.26.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket-driver (0.8.1)
+    websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -513,4 +516,4 @@ RUBY VERSION
   ruby 4.0.5
 
 BUNDLED WITH
-  4.0.14
+  4.0.15

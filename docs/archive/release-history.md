@@ -2,6 +2,49 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.24.0（2026-05-28）
+
+5.23 レビュー送り消化 + 番組表エディタ拡張 + 報告ベース新規対応 + capsicum お知らせ通知連携を中心とする整理・小粒着地回。テーマ性は薄いが capsicum 側の機能解放に必要な API 改善（#4354 / #4355）と毎晩ルーチン補助（#4286 番組表まとめコピー）を組み合わせた。
+
+- **#4272 feat: auto_update 有効時は番組表エディタを参照専用にする** — 書き込み 4 ルートが 409 Conflict を返し、WebUI 側は `features.program_editable` で編集 UI を出し分け
+- **#4286 feat: 番組表エディタの有効エントリをまとめてクリップボードへコピー** — 毎朝の挨拶投稿運用支援。最小スコープ実装（`start_time` 欄追加は見送り、貼り付け後に手編集する運用）。Issue 本来スコープの開始時刻フィールド + iCalendar 出力 (#4287) は 5.25.0 送り
+- **#4284 refactor: POST /status/tags を StatusTagAddService に移設** — #4233 段階的リファクタの 2 件目（26 行）
+- **#4344 feat: status post の custom emoji shortcode 前後に ZWSP 自動挿入ハンドラを追加** — fedibird ユーザー報告起点。Mastodon target のみ介入。Codex P2 指摘で時刻形式 `12:34:56` 等の誤マッチを回避するため SHORTCODE_PATTERN を英字/`_` 始まりに限定
+- **#4265 fix: メディアアップロードの 413 を Sentry alert 対象から外しユーザー向けメッセージへ変換** — `Ginseng::HTTP#upload` 経由の本家 413 (MAX_ATTACHMENT_FILE_SIZE 超過) をユーザー入力起因として扱い、Sentry MULUKHIYA-TOOT-PROXY-1T を抑止。本家 mastodon/misskey 両 controller に `handle_upload_gateway_error` ヘルパを追加
+- **#4264 daemon 調査** — 本番 4 台に SSH 確認し production モード起動・stdio 状態・Environment.type すべて対応不要と判定してクローズ。副次発見の Sidekiq ログ消失 (FreeBSD 3 台で no-reader pipe へ書き込み) は #4362 として 5.25.0 送り
+- **#4354 feat: features.announcement_push を /api/about で公開** — capsicum お知らせ通知連携。フラグ参照で push 配信 UI を出し分け
+- **#4355 feat: GET /announcement/list を追加** — capsicum-relay (capsicum-relay#14) からの公開キャッシュ参照用、認証不要
+- **#4345 fix: AnnictRecordLockStorage#release を compare-and-delete に変更** — TTL 跨ぎで他人ロックを誤削除しない、Lua CAS
+- **#4346 feat: AnnictRecordLockStorage 冪等性ロックの異常頻度を Sentry alert に昇格** — 1 分 bucket / account_id 単位で `alert_threshold` (既定 10) 到達時に alert
+- **#4349 refactor: /media disabled 応答を MediaCatalogDisabledRenderer に切り出し** — #4343 整理の継続
+- **リリース前 5観点レビュー赤近い黄インライン対応** — EmojiSpacingHandler の `result.push(rewritten:)` が投稿本文 (DM 含む) を info ログへ流出させていたのを `inserted: count` メタ情報のみに圧縮。Program editor 4 ルートで `Ginseng::ConflictError` (409) が `e.alert` で Sentry alert spam を生んでいたのを ConflictError 限定で info ログ + alert 抑止する分岐に変更
+- **リリース前 5観点レビュー docs 追記** — docs/api.md に `features.announcement_push` と `GET /announcement/list` を追記
+- **5観点レビュー次リリース送り** — #4364 で黄 (episode_id alert payload, 暗黙 return 3 箇所, shortcode 単一文字コメント) + 緑 (EMPTY_PAYLOAD freeze, `lock&.` ノイズ, EVALSHA キャッシュ) をまとめて 5.25.0 へ
+- **bundle update** — json 2.19.7
+- 本番デプロイ: 4 台（zugoga / lbock / shallu / sweep）
+
+### 振り返り
+
+**期間**: 5.23.0 リリース 2026-05-23 → 5.24.0 リリース 2026-05-28（5 日間）。本リリース 8 PR + 5観点赤・黄インライン 1 コミット + bundle update + version bump。
+
+**消化**: 11 Issue（番組表系 2 + capsicum 連携 2 + 5.23 レビュー送り 3 + 段階的リファクタ 1 + 調査 1 + 報告ベース 1 + 413 適正化 1）。#4287 / #4342 は 5.25.0 送り。
+
+**主軸**: 当初「テーマレス回」と宣言、結果としては (1) 番組表エディタ系 (#4272/#4286)、(2) capsicum お知らせ通知連携 (#4354/#4355)、(3) ZWSP ハンドラ (#4344)、(4) 413 適正化 (#4265) の 4 系統が並列で着地。`pooza` 側の deploy 要求 (4354/4355) を起点に 5/28 中の短期リリースに向けて 1 セッション完結で残作業をすべて捌いた。
+
+**5観点レビュー仕分け**: 真の赤なし。赤近い黄 2 件 (emoji_spacing 本文ログ流出 / Program editor ConflictError Sentry spam) を hotfix インライン、docs 追記 (announcement_push / announcement_list) もインライン、残り黄 3 件 + 緑 3 件は #4364 にまとめて 5.25.0 送り。
+
+**Codex 仕分け**: PR #4356 (#4272) 上の P2 は #4360 として 5.25.0 送り。PR #4361 (#4344) 上の P2 (時刻形式誤マッチ) はインライン即修正してリアクション付与。
+
+**運用観察**:
+
+- `#4264` 調査で本番 FreeBSD 3 台の Sidekiq ログが no-reader pipe へ書き込まれ完全消失していることが判明。これまで Sentry の致命エラーしか観測できていなかった。#4362 で Mulukhiya::Logger (syslog) 経由へ切替検討
+- PR ベース指定漏れ事故 — `gh pr create` が repo default (main) をベースに採用する仕様で、3 PR が main 起点でマージされ main / develop が diverge。merge commit で修復したが、次回以降 `gh pr create --base develop` の指定を徹底する必要
+
+**反省**:
+
+- `gh pr create --base develop` の指定漏れで意図しない main 起点マージが 3 件発生。CI が通っただけでマージしてしまったため気づくのが遅れた。PR 作成直後に `gh pr view <num> --json baseRefName` を確認するワークフローを徹底
+- EmojiSpacingHandler の本文ログ流出は新ハンドラ開発時のテンプレ判断 (`result.push(text:)` で text の中身をどこまで残すか) の問題。今後新ハンドラを書く際は「Reporter に乗る値が info ログへ流れる」点を意識する
+
 ## リリース済み: 5.23.0（2026-05-23）
 
 5.22 リリース前 5観点並列レビューの黄送り掃き出しと、本リリース前 5観点並列レビュー対応を主とする「整理回」。あわせて本番で観測された重 SQL 病理（2026-05-19 障害、底値レイテンシ 175 秒級）を受け、メディアカタログ機能を実験的扱いとしデフォルト無効化する運用判断を反映（#4343）。

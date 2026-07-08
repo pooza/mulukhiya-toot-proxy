@@ -9,6 +9,18 @@ module Mulukhiya
       one_to_many :attachment, key: :userId
       many_to_many :roles, left_key: :userId, right_key: :roleId, join_table: :role_assignment
 
+      # Misskey は作成時刻を持たず id (aid) に埋め込むため、最古 id = 最古アカウント。
+      # 「設立日」の近似として最古ローカルアカウントの作成日を返す (#4434)。値は不変の
+      # ためメモ化する。DB 未接続・不在時は nil。
+      def self.founded_at
+        return @founded_at if defined?(@founded_at) && @founded_at
+        account = where(host: nil).order(:id).first
+        return @founded_at = account && MisskeyService.parse_aid(account.id)
+      rescue => e
+        e.log
+        return nil
+      end
+
       def to_h
         return super.except(:token)
       end

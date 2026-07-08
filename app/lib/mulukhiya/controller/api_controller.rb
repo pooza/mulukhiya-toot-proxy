@@ -773,6 +773,28 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # 辞書全件取得 (capsicum 投稿サジェストの一括取得 + ローカル絞り込み #687 /
+    # mulukhiya#4430)。word/suggest と同じ feature gate・公開・読み取り専用。
+    # ETag (= digest) を付与し、If-None-Match 一致時は 304 で本文を返さない
+    # (capsicum の一括取得キャッシュの再検証用)。
+    get '/word/all' do
+      dictionary = PronunciationDictionary.new
+      raise Ginseng::NotFoundError, 'Not Found' unless dictionary.enabled?
+      digest = dictionary.digest
+      headers 'ETag' => %("#{digest}")
+      if request.env['HTTP_IF_NONE_MATCH'].to_s.delete('"') == digest
+        @renderer.status = 304
+        return ''
+      end
+      @renderer.message = {words: dictionary.all, size: dictionary.size, digest:}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/piefed/communities' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.piefed?
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account

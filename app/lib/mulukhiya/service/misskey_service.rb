@@ -155,25 +155,39 @@ module Mulukhiya
       # auth / publickey は端末側で再生成され得る（再インストール・鍵ローテ等）ため
       # キーに含めず、再登録時は既存行を UPDATE で置換して行を増やさない (#4408)。
       send_read_message = params[:sendReadMessage] == true
-      rows = sw_subscriptions(account, params).all
-      if rows.any?
-        subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
-        state = :already_subscribed
-      else
+      # 同一 (userId, endpoint) への同時 register で read-then-write が交錯すると、
+      # 互いの canonical を stale と見なして相互削除し購読が一時消失する窓がある。
+      # 行取得〜集約/新規作成を 1 トランザクションに括り、SELECT ... FOR UPDATE で
+      # 対象行を order(:id) 順に先取りロックする。これで canonical を並行 register
+      # 間で決定化しつつ、canonical が無変更で UPDATE されない場合でも SELECT 時点で
+      # ロック済みとなり、unregister との重なりで購読が消失する窓を塞ぐ (#4420)。
+      result = Misskey::SwSubscription.db.transaction do
+        rows = locked_sw_subscriptions(account, params)
+        if rows.any?
+          subscription = consolidate_sw_subscriptions(rows, params, send_read_message)
+          next {subscription:, state: :already_subscribed}
+        end
         subscription = create_sw_subscription(account, params, send_read_message)
-        state = :subscribed
+        {subscription:, state: :subscribed}
       end
       invalidate_sw_subscription_cache(account.id)
-      return {subscription:, state:}
+      return result
     end
 
     def unregister_sw_subscription(account, params)
-      rows = sw_subscriptions(account, params).all
-      return nil if rows.empty?
-      # pre-fix の鍵ローテ蓄積で複数行残り得るため、endpoint 単位で全行削除する。
-      rows.each(&:delete)
+      # pre-fix の鍵ローテ蓄積で複数行残り得るため endpoint 単位で全行削除する。
+      # 同時 register との交錯を避けるためトランザクション内で FOR UPDATE 取得→削除する。
+      # register と同じ order(:id) 順にロックを取り、ロック順不一致による ABBA
+      # デッドロックを避ける (#4420)。
+      removed = Misskey::SwSubscription.db.transaction do
+        rows = locked_sw_subscriptions(account, params)
+        next nil if rows.empty?
+        rows.each(&:delete)
+        rows.first
+      end
+      return nil unless removed
       invalidate_sw_subscription_cache(account.id)
-      return rows.first
+      return removed
     end
 
     def self.parse_aid(aid)
@@ -209,10 +223,21 @@ module Mulukhiya
     private
 
     def sw_subscriptions(account, params)
+      # canonical 選択（consolidate の先頭行）を並行リクエスト間で決定化するため
+      # order(:id) を必ず付す。無序だと同時 register が別々の行を canonical に
+      # 選び相互削除する余地が残る (#4420)。
       return Misskey::SwSubscription.where(
         userId: account.id,
         endpoint: params[:endpoint],
-      )
+      ).order(:id)
+    end
+
+    # トランザクション内で対象行を id 昇順に FOR UPDATE ロックして配列で返す。
+    # register / unregister が同一のロック順で全対象行を先取りするため、
+    # 相互削除・ロック順不一致デッドロック・無変更 canonical 未ロックの窓を塞ぐ。
+    # 必ず db.transaction ブロック内から呼ぶこと (#4420)。
+    def locked_sw_subscriptions(account, params)
+      return sw_subscriptions(account, params).for_update.all
     end
 
     # pre-fix の鍵ローテ蓄積で同一 (userId, endpoint) に複数行ある場合、先頭を
@@ -221,8 +246,13 @@ module Mulukhiya
     # 続くため、再登録経路で必ず全行を 1 行へ集約する (#4408 Codex P1)。
     def consolidate_sw_subscriptions(rows, params, send_read_message)
       canonical, *stale = rows
-      stale.each(&:delete)
+      # unregister は行を id 昇順に削除するため、集約側も canonical（rows は
+      # order(:id) 済みなので最小 id）を先に UPDATE してから stale を削除し、
+      # 両経路のロック取得順を id 昇順に統一する。逆順（stale 削除→canonical
+      # 更新）だと同時 register↔unregister で ABBA デッドロックの余地が生じる
+      # (#4420 リリース前レビュー指摘)。
       replace_sw_subscription(canonical, params, send_read_message)
+      stale.each(&:delete)
       return canonical
     end
 

@@ -4,6 +4,10 @@ module Mulukhiya
   # サーバーレベルの静的 features (`/{controller}/features/*` の sub_hash) に対し、
   # 以下の実行時状態を合流させる:
   #   - annict_linked    : リクエストの SNS アカウント単位の Annict 連携状態 (#4338)
+  #   - annict_review    : Annict 感想投稿エンドポイント `POST /annict/review` (#4342)
+  #                        が稼働可能か (= サーバーが annict? を満たすか)。#4342 未デプロイの
+  #                        バージョンではキー自体が無く capsicum は false 判定できる (#4433)。
+  #                        capsicum の review 投稿ボタン出し分けに使う (pooza/capsicum#677)
   #   - media_catalog    : /{controller}/data 配下の機能フラグ。discovery を features
   #                        に一本化するため合流 (#4343)
   #   - program_editable : 番組表エディタ (livecure かつ auto_update 無効) で書き込み
@@ -26,6 +30,7 @@ module Mulukhiya
 
     REGISTRY = {
       'annict_linked' => ->(sns) {sns.account&.annict_linked? || false},
+      'annict_review' => ->(_sns) {Environment.controller_class.annict?},
       'media_catalog' => ->(_sns) {Environment.controller_class.media_catalog?},
       'program_editable' => lambda {|_sns|
         Environment.controller_class.livecure? && !Program.instance.auto_update?

@@ -91,7 +91,8 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `/{controller}/data/media_catalog` | `/media`（無効時は 503 + JSON `{available: false, ...}`）, `/feed/media`（無効時は 503 + 空 RSS チャネル） |
 | `/{controller}/features/feed` | `/feed/list` |
 | `/{controller}/features/announcement` | `/announcement/update` |
-| `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
+| `/{controller}/features/annict` | `/annict/oauth_uri`, `/annict/auth`, `/annict/record`, `/tagging/dic/annict/episodes`, `/program/works`, `/program/works/:id/episodes` |
+| `features.annict_review`（サーバーが `annict?` を満たすとき `true`。#4342 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定できる） | `/annict/review` |
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
@@ -272,6 +273,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
     "features": {
       "annict": true,
       "annict_linked": true,
+      "annict_review": true,
       "announcement": true,
       "announcement_push": false,
       "feed": true,
@@ -287,7 +289,9 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "url": "https://precure.ml/@info",
       "display_name": "モロヘイヤからのお知らせ"
     },
-    "status_url": "https://uptime.b-shock.org/status/bshockdon"
+    "status_url": "https://uptime.b-shock.org/status/bshockdon",
+    "founded_at": "2018-04-01",
+    "preopened_at": null
   }
 }
 ```
@@ -297,6 +301,10 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 **`info_bot`**: お知らせボットのプロフィール情報。`username`、`acct`（@user@domain 形式）、`url`（プロフィールページURL）、`display_name` を含む。お知らせボットのトークンが未設定の環境では `null` を返す。capsicum のお知らせ画面でボットのプロフィールリンク表示に利用する（`pooza/capsicum#189`）。
 
 **`status_url`**: ステータスページの URL。`config/local.yaml` の `/status_url` で設定する。未設定時は `null`。Mastodon は `/api/v2/instance` から取得可能だが、Misskey には該当 API がないため、モロヘイヤ経由で統一的に提供する（`pooza/capsicum#247`）。
+
+**`founded_at`**: サーバーの正式オープン日（本公開日。ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/founded_on` で設定する。**未設定時は最古ローカルアカウントの作成日で近似**（Mastodon は `accounts` の最古ローカル行、Misskey は最古 `user` の aid から復号）。DB 未接続時は `null`。最古アカウントの作成日が正式オープン日とずれるサーバー（プレ公開を経た台、管理者アカウントを開設前に作った台など）は `/founded_on` を明示設定する。capsicum はヒューリスティックを持たず本値を単純採用する（`pooza/capsicum#818`）。
+
+**`preopened_at`**: プレ公開（限定公開）を経たサーバーの、正式オープン前の公開開始日（ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/preopened_on` で設定する。`founded_at` と違い**最古アカウント fallback は持たず**、設定時のみ値を返す（プレ公開の有無は運用者しか判定できないため）。プレ公開の無いサーバーでは `null`。`preopened_at ≤ founded_at` の関係になる。capsicum は両値を並べてサーバー沿革を表示する（`pooza/capsicum#818`）。
 
 **`features.annict` / `features.annict_linked`**: `features.annict` は **サーバーレベル**の設定（当該モロヘイヤサーバーで Annict の client_id/secret が設定済みか）。`features.annict_linked` は **ユーザーレベル**の状態で、リクエストの Bearer トークンに紐付く SNS アカウントに Annict access_token が保管済みなら `true`（未連携・トークン無しは `false`、無認証リクエストでも `false`）。token 存在のみで判定し liveness/refresh の確認は行わない。capsicum は両者を組み合わせ、「サーバーは Annict 対応かつ当該ユーザーが連携済み」のときのみ感想投稿ボタンを表示する（`pooza/capsicum#298`）。
 
@@ -672,6 +680,33 @@ Web Push サブスクリプションを解除する。
 - `surface`: 挿入する表層形
 - `reading`: 並べ替え・ハイライト用（カタカナ）
 - `category`: 品詞細分類（人名 / 技名 / 作品名 / 一般 等）。スプレッドシートに列がある場合のみ付く**任意**フィールド。capsicum 側のカテゴリ別ブラウズ用。空欄・未整備のサーバーでは省略される
+
+#### GET /mulukhiya/api/word/all
+
+読み付き単語辞書の**全件取得**（capsicum#687 / #4430）。`word/suggest` が読みごとの都度クエリなのに対し、本 API は辞書を丸ごと返す。capsicum が一度取得してローカルで絞り込むことで、実況の打鍵テンポを損なわず往復ゼロにするための最適化用。`word/suggest` と同じ辞書（`PronunciationDictionary` の Redis キャッシュ）をそのまま投影するだけで、新規データ源・DB 書き込みはない（読み取り専用）。
+
+- **認証**: 不要
+- **前提条件**: `features.word_suggest` が `true`（= `word_suggest/urls` が設定済み）。未設定サーバーは 404
+- **パラメータ**: なし
+- **キャッシュ再検証**: レスポンスに `ETag`（辞書ダイジェスト）を付与する。`If-None-Match` に同じ値を送ると本文を返さず `304 Not Modified` を返す。body 内の `digest` も同値で、ヘッダを使えないクライアントはこちらで更新検知できる
+- **cold-cache**: Redis 未充填時（flush / 再起動直後）は `word/suggest` と同じく空の `words` を即返し、`PronunciationDictionaryUpdateWorker` の充填を待つ（同期 fetch でリクエストをブロックしない）
+
+**レスポンス例**:
+
+```json
+{
+  "words": [
+    { "surface": "愛崎えみる", "reading": "アイサキエミル", "category": "人名" },
+    { "surface": "閃華裂光拳", "reading": "センカレッコウケン", "category": "技名" }
+  ],
+  "size": 2,
+  "digest": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+}
+```
+
+- `words`: 候補の配列。各要素は `word/suggest` の `candidates` と同一の形（`surface` / `reading` / 任意 `category`）
+- `size`: `words` の件数
+- `digest`: 辞書内容の SHA256。`ETag` と同値。辞書（スプレッドシート）の増減で変わる
 
 #### GET /mulukhiya/api/announcement/list
 
