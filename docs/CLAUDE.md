@@ -152,6 +152,28 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.28.1（2026-07-09、ホットフィックス）
+
+5.28.0 本番適用後に判明した設立日まわりの是正ホットフィックス。**5.28.0 でステージング検証を省略（再構築中で使えず）したため本番で顕在化した**教訓つき（詳細は MEMORY `project_5280-staging-skip-postmortem`）。
+
+- **fix: founded_at fallback の 1 日ズレ** — 5.28.0 の #4437（Codex P2）で入れた `created_at.strftime('...GMT')→getlocal` が、Sequel が既に zone 付き（実測 +0900）で返す created_at を二重シフトし設立日が翌日化していた（美食丼 2017-04-20 ← 実際 2017-04-19）。`account.created_at.getlocal` へ是正
+- **fix: 未クォート日付での起動クラッシュ（footgun）** — ginseng-core 1.15.27 で Config の YAML ロードに `permitted_classes: [Date, Time, DateTime]` を許可。`founded_on: 2021-03-14` をクォート無しで書いても `Psych::DisallowedClass` で落ちない（従来はクォート必須）。delmulin/daisskey/lbock で実害が出ていた
+- **ops: 誤設定 GitHub webhook 4 件削除** — GitHub 生イベントを mulukhiya の Slack 形式 webhook 受け口へ送っていた hook（ginseng-core/ginseng-fediverse/ginseng-web/cure-api）が全て 422 を返し美食丼で「webhook エラー連発」に見えていた。mulukhiya 無関係のため hook 削除で解消
+- **本番デプロイ: 4 台完了**（2026-07-09、shallu / zugoga / lbock / sweep、全台 version 5.28.1 / health 200。美食丼 founded_at が 2017-04-19 に是正、各台 founded_at/preopened_at 確認済み）
+
+## リリース済み: 5.28.0（2026-07-08）
+
+capsicum 開発を実ブロックしていた `/about`・API 表層の急ぎ小物を束ねた快速リリース。#4393 media_catalog sub-second 化（size:L）は 5.29.0 の単独テーマへ分離。
+
+- **#4430 feat: 読み付き単語辞書一括取得 `GET /word/all`** — capsicum 投稿サジェスト最適化（pooza/capsicum#687）。ETag/If-None-Match + digest フォールバック
+- **#4433 feat: /about features に `annict_review` capability 露出** — #4342 未デプロイ台での review 投稿 404 を capsicum が feature-gate 可能に（pooza/capsicum#677）
+- **#4434 feat: /about に `founded_at`（正式オープン日）+ `preopened_at`（プレ公開日）追加** — config `/founded_on`・`/preopened_on` 優先、founded_at は未設定時に最古ローカルアカウント作成日で近似（pooza/capsicum#818）
+- **#4420 concurrency: sw_subscription 集約の race を決定化＋トランザクション化** — `order(:id)` 決定化＋`SELECT ... FOR UPDATE` 先取りロック。register↔unregister ABBA デッドロック・無変更 canonical ロック漏れも解消
+- **#4423 test: AnnictReviewLockStorageTest フレーキー解消** — record_conflict 計上テストの minute_bucket 境界を Timecop.freeze で決定化
+- **#4429 chore: nokogiri 1.19.4** — Dependabot 8 alert 解消
+- **リリース前 5 観点レビュー / Codex 対応** — 真の赤 0。並行性 🟡（ABBA デッドロック #4441）、観測性 🟢（config 日付 typo 可視化）、Codex P2 3 件（TZ・FOR UPDATE・api.md #4443）を同梱。既存 `invalidate_sw_subscription_cache` の alert→log は #4442 へ繰越
+- **本番デプロイ: 4 台**（2026-07-08、staging 検証省略のまま出したため上記 5.28.1 の是正が必要になった）
+
 ## リリース済み: 5.27.0（2026-06-19）
 
 capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張した回。Spotify user-level OAuth + currently-playing API (#4337) と URL→メタ逆引き `/nowplaying/resolve-url` (#4415) を新設。あわせて Misskey プッシュ購読の重複蓄積修正 (#4408)、5.26.0 リリース前レビュー繰越 (#4405)、本リリース前 5観点レビュー由来のログ scrub (#4418)。
@@ -199,58 +221,16 @@ capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張し�
 
 **Codex 仕分け**: ドラフト解除した release PR #4396 に届く Codex レビューは 5観点と重複見込み。#4404 上の P2（Redis 全断時の write 側 alert スパム）は #4406 でインライン対応しリリースに同梱。
 
-## リリース済み: 5.25.0（2026-06-07）
-
-APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー送りの構造改善 + 番組表の iCalendar 出力・開始時刻欄 + Annict review API + 運用ログ整備 + 報告ベース修正を組み合わせた着地回。
-
-- **#4287 feat: 番組表を iCalendar (.ics) 形式で出力** — `GET /mulukhiya/api/program.ics` 新設。tomato-shrieker IcalendarSource 購読想定で認証不要・livecure? ゲート。有効かつ妥当な start_time のエントリを単発イベント化。icalendar gem が SUMMARY 等を自動エスケープ
-- **#4366 / #4372 feat: 番組表エディタに開始時刻 (start_time) 欄** — 24 時間制テキスト入力、保存時 `HH:MM` ゼロ埋め正規化。#4286 で見送った分の再実装、#4287 iCalendar の前提
-- **#4342 feat: Annict review (作品全体感想) 投稿 API** — `POST /mulukhiya/api/annict/review`、createReview mutation 中継（searchWorks で数値 annictId → Relay node ID 解決、#4339 の前科を review 側で再発させない）。capsicum #592 連携。冪等ロック（Lua CAS、異常頻度の Sentry alert 昇格）を record API と同型実装
-- **#4348 refactor: /about の features 動的合流を DynamicFeatures に集約**（5.23 レビュー送り、annict_linked / media_catalog / program_editable の集約）
-- **#4285 refactor: PUT /scheduled_status/:id/tags を ScheduledStatusTagUpdater に移設** — #4233 段階的リファクタの 3 件目（最大、ロールバック含む）。ロードマップ完了
-- **#4362 ops: Sidekiq 内部ログを syslog へ出し no-reader pipe 消失を防ぐ** — FreeBSD 3 台のログ消失を `Syslog::Logger` 切替 + stdio `/dev/null` reopen で解消（#4264 副次発見）
-- **#4377 fix: CustomFeed が null/非配列を返すと FeedUpdateWorker クラッシュ** — RSS20FeedRenderer で防御し空配列フォールバック（Sentry MULUKHIYA-TOOT-PROXY-26 根治）
-- **#4383 fix: Misskey favorites/create 冪等 400 パスの副作用非発火を明記・整合**（post_bookmark の PieFed ミラー等を冪等成功時に発火させない）
-- **#4389 fix: TestHarness が DSN 上書き後に Postgres singleton を張り直す**（#4379 後続、stale 接続除去）
-- **#4379 test: fedi-test-harness 接続情報の test config 注入導線**（DSN/info トークン自動配線、`config.reload` 跨ぎ保持）
-- **#4360 test: ProgramTest の auto_update 順序依存修正**
-- **リリース前 5観点レビュー赤近い黄インライン (#4395)** — annict record/review の rescue でユーザー入力起因の AuthError(403)/NotFoundError(404) まで Sentry alert していたのを log のみに抑止（反 alert-spam 方針）。廃止語「インスタンス」→「サーバー」整理。残り黄・緑は #4394 で 5.26.0 送り
-- **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
-- ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）デプロイ済み（5.25.0 / health 全 OK / WebUI 200 / 新規 program.ics 200 text/calendar）
-- **本番デプロイ: 4 台完了**（2026-06-07、zugoga / shallu / lbock / sweep、全台 version 5.25.0 / health 200 / 公開エンドポイント 200）。実況終了後に実施。本デプロイで Sentry MULUKHIYA-TOOT-PROXY-26 が解消
-- **デプロイ時の教訓**（[chubo2 infra-history](https://github.com/pooza/chubo2) 参照）: 5.25.0 で `.ruby-version` が 4.0.5 に上がっており、未導入サーバー（今回 shallu）は `rbenv install 4.0.5` が前提。フレッシュ gemset での `bundle install` は rb_sysopen 一過性エラーが出ることがあり再実行で解消。SSH 越しは `bash -lc`（rbenv 読込）必須・サービス再起動は `</dev/null >/dev/null 2>&1` 必須・`bundle install` は省略不可
-
-### 振り返り
-
-**期間**: 5.24.0 リリース 2026-05-28 → 5.25.0 リリース・本番デプロイ 2026-06-07（10 日間）。
-
-**消化**: 5.25.0 マイルストーン Issue 全消化（#4285/#4287/#4342/#4348/#4360/#4362/#4366/#4372/#4377/#4383/#4389 + #4379 関連サブ群）。当初計画の #4351 media_catalog 再有効化は 5.26.0 へ移動 — Gate 検証で partial index だけでは sub-second に届かず、前提として #4393（query 再構成/非正規化、size:L）が必要と判明しブロック。
-
-**5観点レビュー仕分け**: 真の赤 0 件。赤近い黄 2 件（alert spam 抑止 / 廃止語）をインライン (#4395)、残り黄 4 + 緑 4（favorites 400 ログ、program.ics alert 昇格、harness の test? ガード、lock storage/rescue 重複の共通化、request ログ本文 scrub、start_time 二段検証、slim 記法ゆれ、api.md 補記）は #4394 にまとめて 5.26.0 送り。
-
-**運用観察**: media_catalog 再有効化 (#4351) は zugoga 本番 EXPLAIN で partial index 単独では底値レイテンシが sub-second に届かず、query 再構成/非正規化 (#4393) を前提化。5.26.0 主軸候補に昇格。
-
-## 次期マイルストーン: 5.28.0（capsicum 統合 + 衛生の快速リリース）
-
-テーマ薄めの複数系統集積回。**capsicum 側が待っている「/about・API 表層」の急ぎ小物を束ねて速く出す**方針（2026-07-08 組み替え）。当初 #4393 media_catalog sub-second 化（size:L）を主軸に据えていたが、#4433/#4434 という capsicum 開発を実ブロックしている急ぎ2件が持ち込まれ、緊急性ゼロ・experimental 既定OFF の size:L に足止めされる構造を避けるため、**#4393 は 5.29.0 の単独テーマへ送り出し、5.28.0 を快速リリースに組み替えた**。表層中心で低リスク・短期出荷向き。
-
-**確定スコープ（重み 約20）:**
-- **#4430/#4431 feat: 読み付き単語辞書一括取得 `GET /word/all`（size:M）** — capsicum 投稿サジェスト最適化（pooza/capsicum#687）。PR #4431 は CI 緑・mergeable。ETag/If-None-Match + digest フォールバック、cold-cache は word/suggest 同様に空+worker 充填へ倒す
-- **#4433 feat: /about features に `annict_review` capability 露出（size:S）** — #4342 未デプロイ台での review 投稿 404 を capsicum が feature-gate できるようにする（pooza/capsicum#677）。`DynamicFeatures::REGISTRY` に1件追加
-- **#4434 feat: /about に `founded_at`（正式オープン日）追加（size:M）** — capsicum サーバー情報表示（pooza/capsicum#818）。config `/founded_on` 設定時はそれ、**未設定時はローカル最古アカウント作成日を近似として返す**フォールバック方式で確定（capsicum はヒューリスティックを持たず単純採用）。about キャッシュに乗せ upstream 到達性に依存させない
-- **#4420 concurrency: sw_subscription 集約の非トランザクション race（size:S）** — #4408 の後始末。同時 register の狭い窓を `db.transaction` or canonical 決定論化で塞ぐ
-- **#4423 test: AnnictReviewLockStorageTest フレーキー（size:S）** — record_conflict 内 TypeError で fail-open → CI ノイズ赤。Redis 相互作用/bucket 境界の安定化
-
-**develop 既取り込み（5.28.0 同梱）:** ginseng-fediverse 1.8.25（Mastodon numeric_ap_id 対応、#4422）／ナウプレ ユニバーサルリンク(Odesli) 対応計画の追記／fedi-test-harness upstream チェックの同期手順組み込み（#4424/#4425）／nokogiri 1.19.4（Dependabot PR #4429、8 alert 解消）。
-
-**見送り（次期以降）:**
-- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層）** — テーマ（衛生）は合うが M 級で重み超過のため保留。5.29.0 以降で拾う
-- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570（Spotify クォータ規約で塩漬け）の復活＝機能有効化と歩調を合わせる方針。`user_oauth_enabled:false` で全台 OFF＝ライブ露出が無いため着手しない
-- #4233 APIController 段階的リファクタは残る長大エンドポイントがあれば随時サブ化（直近サブ #4283/#4284/#4285 は全着地）
-
-## 次々期マイルストーン: 5.29.0（テーマ）
+## 次期マイルストーン: 5.29.0（テーマ）
 
 **主軸: #4393 perf: media_catalog を sub-second 化（query 再構成/非正規化、size:L）**。複数リリース繰り越してきた media_catalog 再有効化トラック（#4351/#4352/#4375）全体の前提ブロッカーで、これを片付けて後続を解凍する。実行 runbook は docs/media-catalog-index-plan.md（Gate 0〜2 + rollback）。本番 EXPLAIN で partial index 単独では sub-second に届かないと判明済みのため query 再構成/非正規化が本丸。5.28.0 快速リリースの出荷ペースに引きずられないよう単独テーマとして分離した。
+
+**最優先の実務ブロッカー（テーマ外・並行）: ステージング再建**。5.28.0 でステージング再構築中に検証を省略して本番障害を出した（MEMORY `project_5280-staging-skip-postmortem`）。Proxmox + chubo2 itamae 構想（MEMORY `project_proxmox-staging-rebuild`）を進め、以後のリリースで「ステージング検証省略不可」を必ず満たせる状態に戻す。
+
+**5.28.0 からの繰越（見送り分）:**
+- **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）** — 5.28.0 リリース前レビュー 🟢
+- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層、size:M）**
+- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
 
 ## ロードマップ仮置き
 
