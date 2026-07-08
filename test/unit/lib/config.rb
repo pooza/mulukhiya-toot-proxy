@@ -39,5 +39,25 @@ module Mulukhiya
         klass.define_singleton_method(:founded_at, original)
       end
     end
+
+    # /preopened_on 設定時は ISO 8601 date に正規化して返す (#4434)。
+    def test_preopened_at_from_config
+      config['/preopened_on'] = '2021-03-14'
+
+      assert_equal('2021-03-14', config.send(:preopened_at))
+    end
+
+    def test_preopened_at_normalizes_non_iso_input
+      config['/preopened_on'] = '2021/03/14'
+
+      assert_equal('2021-03-14', config.send(:preopened_at))
+    end
+
+    # founded_at と違い最古アカウント fallback を持たず、未設定なら nil を返す。
+    def test_preopened_at_nil_when_unset
+      config['/preopened_on'] = nil
+
+      assert_nil(config.send(:preopened_at))
+    end
   end
 end

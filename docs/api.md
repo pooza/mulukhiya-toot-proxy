@@ -290,7 +290,8 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "display_name": "モロヘイヤからのお知らせ"
     },
     "status_url": "https://uptime.b-shock.org/status/bshockdon",
-    "founded_at": "2018-04-01"
+    "founded_at": "2018-04-01",
+    "preopened_at": null
   }
 }
 ```
@@ -301,7 +302,9 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`status_url`**: ステータスページの URL。`config/local.yaml` の `/status_url` で設定する。未設定時は `null`。Mastodon は `/api/v2/instance` から取得可能だが、Misskey には該当 API がないため、モロヘイヤ経由で統一的に提供する（`pooza/capsicum#247`）。
 
-**`founded_at`**: サーバーの正式オープン日（ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/founded_on` で設定する。**未設定時は最古ローカルアカウントの作成日で近似**（Mastodon は `accounts` の最古ローカル行、Misskey は最古 `user` の aid から復号）。DB 未接続時は `null`。「サーバーが物理起動した日」と「正式オープン日」が異なるサーバー（きゅあすきー / ダイスキー / デルムリン丼）は `/founded_on` を明示設定する。capsicum はヒューリスティックを持たず本値を単純採用する（`pooza/capsicum#818`）。
+**`founded_at`**: サーバーの正式オープン日（本公開日。ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/founded_on` で設定する。**未設定時は最古ローカルアカウントの作成日で近似**（Mastodon は `accounts` の最古ローカル行、Misskey は最古 `user` の aid から復号）。DB 未接続時は `null`。最古アカウントの作成日が正式オープン日とずれるサーバー（プレ公開を経た台、管理者アカウントを開設前に作った台など）は `/founded_on` を明示設定する。capsicum はヒューリスティックを持たず本値を単純採用する（`pooza/capsicum#818`）。
+
+**`preopened_at`**: プレ公開（限定公開）を経たサーバーの、正式オープン前の公開開始日（ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/preopened_on` で設定する。`founded_at` と違い**最古アカウント fallback は持たず**、設定時のみ値を返す（プレ公開の有無は運用者しか判定できないため）。プレ公開の無いサーバーでは `null`。`preopened_at ≤ founded_at` の関係になる。capsicum は両値を並べてサーバー沿革を表示する（`pooza/capsicum#818`）。
 
 **`features.annict` / `features.annict_linked`**: `features.annict` は **サーバーレベル**の設定（当該モロヘイヤサーバーで Annict の client_id/secret が設定済みか）。`features.annict_linked` は **ユーザーレベル**の状態で、リクエストの Bearer トークンに紐付く SNS アカウントに Annict access_token が保管済みなら `true`（未連携・トークン無しは `false`、無認証リクエストでも `false`）。token 存在のみで判定し liveness/refresh の確認は行わない。capsicum は両者を組み合わせ、「サーバーは Annict 対応かつ当該ユーザーが連携済み」のときのみ感想投稿ボタンを表示する（`pooza/capsicum#298`）。
 
