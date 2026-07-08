@@ -37,4 +37,9 @@ misskey:
   verified_at: '2026-06-23'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-06-23'
+last_checked: '2026-07-08'
+
+# 2026-07-08 チェック結果:
+#   - Mastodon: verified v4.6.0 に対し stable v4.6.3 が 2026-07-03 リリース
+#     （4.6.1/4.6.2/4.6.3 のパッチ 3 本、RC 窓は経過済み）。要検証（未実施）。
+#   - Misskey: verified 2026.6.0 が依然最新 stable（2026.6.1 は alpha 止まり）。対応不要。

@@ -230,20 +230,27 @@ APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー
 
 **運用観察**: media_catalog 再有効化 (#4351) は zugoga 本番 EXPLAIN で partial index 単独では底値レイテンシが sub-second に届かず、query 再構成/非正規化 (#4393) を前提化。5.26.0 主軸候補に昇格。
 
-## 次期マイルストーン: 5.28.0
+## 次期マイルストーン: 5.28.0（capsicum 統合 + 衛生の快速リリース）
 
-**主軸: #4393 perf: media_catalog を sub-second 化（query 再構成/非正規化、size:L）**（2026-06-21 スコープ確定）。複数リリース繰り越してきた media_catalog 再有効化トラック（#4351/#4352/#4375）全体の前提ブロッカーで、これを片付けて後続を解凍する。実行 runbook は docs/media-catalog-index-plan.md（Gate 0〜2 + rollback）。本番 EXPLAIN で partial index 単独では sub-second に届かないと判明済みのため query 再構成/非正規化が本丸。
+テーマ薄めの複数系統集積回。**capsicum 側が待っている「/about・API 表層」の急ぎ小物を束ねて速く出す**方針（2026-07-08 組み替え）。当初 #4393 media_catalog sub-second 化（size:L）を主軸に据えていたが、#4433/#4434 という capsicum 開発を実ブロックしている急ぎ2件が持ち込まれ、緊急性ゼロ・experimental 既定OFF の size:L に足止めされる構造を避けるため、**#4393 は 5.29.0 の単独テーマへ送り出し、5.28.0 を快速リリースに組み替えた**。表層中心で低リスク・短期出荷向き。
 
-**確定スコープ（重み 約15〜18）:**
-- **#4393 media_catalog sub-second 化（size:L）** — 主軸
+**確定スコープ（重み 約20）:**
+- **#4430/#4431 feat: 読み付き単語辞書一括取得 `GET /word/all`（size:M）** — capsicum 投稿サジェスト最適化（pooza/capsicum#687）。PR #4431 は CI 緑・mergeable。ETag/If-None-Match + digest フォールバック、cold-cache は word/suggest 同様に空+worker 充填へ倒す
+- **#4433 feat: /about features に `annict_review` capability 露出（size:S）** — #4342 未デプロイ台での review 投稿 404 を capsicum が feature-gate できるようにする（pooza/capsicum#677）。`DynamicFeatures::REGISTRY` に1件追加
+- **#4434 feat: /about に `founded_at`（正式オープン日）追加（size:M）** — capsicum サーバー情報表示（pooza/capsicum#818）。config `/founded_on` 設定時はそれ、**未設定時はローカル最古アカウント作成日を近似として返す**フォールバック方式で確定（capsicum はヒューリスティックを持たず単純採用）。about キャッシュに乗せ upstream 到達性に依存させない
 - **#4420 concurrency: sw_subscription 集約の非トランザクション race（size:S）** — #4408 の後始末。同時 register の狭い窓を `db.transaction` or canonical 決定論化で塞ぐ
 - **#4423 test: AnnictReviewLockStorageTest フレーキー（size:S）** — record_conflict 内 TypeError で fail-open → CI ノイズ赤。Redis 相互作用/bucket 境界の安定化
 
+**develop 既取り込み（5.28.0 同梱）:** ginseng-fediverse 1.8.25（Mastodon numeric_ap_id 対応、#4422）／ナウプレ ユニバーサルリンク(Odesli) 対応計画の追記／fedi-test-harness upstream チェックの同期手順組み込み（#4424/#4425）／nokogiri 1.19.4（Dependabot PR #4429、8 alert 解消）。
+
 **見送り（次期以降）:**
-- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570（Spotify クォータ規約で塩漬け）の復活＝機能有効化と歩調を合わせる方針。`user_oauth_enabled:false` で全台 OFF＝ライブ露出が無いため 5.28.0 では着手しない
+- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層）** — テーマ（衛生）は合うが M 級で重み超過のため保留。5.29.0 以降で拾う
+- **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570（Spotify クォータ規約で塩漬け）の復活＝機能有効化と歩調を合わせる方針。`user_oauth_enabled:false` で全台 OFF＝ライブ露出が無いため着手しない
 - #4233 APIController 段階的リファクタは残る長大エンドポイントがあれば随時サブ化（直近サブ #4283/#4284/#4285 は全着地）
 
-**develop 既取り込み（5.28.0 同梱）:** ginseng-fediverse 1.8.25（Mastodon numeric_ap_id 対応、#4422）／ナウプレ ユニバーサルリンク(Odesli) 対応計画の追記／fedi-test-harness upstream チェックの同期手順組み込み（#4424/#4425）。
+## 次々期マイルストーン: 5.29.0（テーマ）
+
+**主軸: #4393 perf: media_catalog を sub-second 化（query 再構成/非正規化、size:L）**。複数リリース繰り越してきた media_catalog 再有効化トラック（#4351/#4352/#4375）全体の前提ブロッカーで、これを片付けて後続を解凍する。実行 runbook は docs/media-catalog-index-plan.md（Gate 0〜2 + rollback）。本番 EXPLAIN で partial index 単独では sub-second に届かないと判明済みのため query 再構成/非正規化が本丸。5.28.0 快速リリースの出荷ペースに引きずられないよう単独テーマとして分離した。
 
 ## ロードマップ仮置き
 
