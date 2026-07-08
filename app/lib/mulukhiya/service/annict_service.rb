@@ -424,7 +424,11 @@ module Mulukhiya
       return true unless keywords.present?
       return true unless account = params[:account]
       return true unless account.user_config['/service/annict/theme_works_only']
+      # activity.to_json は String で include? は部分一致。Array#intersect? では
+      # 代替できない（キーワードが JSON 文字列中に部分文字列として現れるか判定）。
+      # rubocop:disable Style/ArrayIntersect
       return keywords.any? {|v| activity.to_json.include?(v)}
+      # rubocop:enable Style/ArrayIntersect
     end
 
     def format_graphql_errors(errors)
