@@ -92,10 +92,15 @@ module Mulukhiya
       config['/service/annict/review/idempotency/alert_threshold'] = 3
       @storage.instance_variable_set(:@alert_threshold, nil)
 
-      assert_false(@storage.record_conflict(@account_id, @work_id))
-      assert_false(@storage.record_conflict(@account_id, @work_id))
-      assert_true(@storage.record_conflict(@account_id, @work_id))
-      assert_false(@storage.record_conflict(@account_id, @work_id))
+      # conflict_key の minute_bucket (Time.now.to_i / 60) が計上シーケンスの途中で
+      # 切り替わると 2 回目以降の INCR が別キー count=1 になり期待値が崩れフレーキー
+      # 化する。時刻を固定して全 INCR を同一 bucket に載せる (#4423)。
+      Timecop.freeze do
+        assert_false(@storage.record_conflict(@account_id, @work_id))
+        assert_false(@storage.record_conflict(@account_id, @work_id))
+        assert_true(@storage.record_conflict(@account_id, @work_id))
+        assert_false(@storage.record_conflict(@account_id, @work_id))
+      end
     ensure
       config['/service/annict/review/idempotency/alert_threshold'] = original
       @storage.instance_variable_set(:@alert_threshold, nil)
@@ -108,9 +113,13 @@ module Mulukhiya
       @storage.instance_variable_set(:@alert_threshold, nil)
       other_account = "test_#{SecureRandom.hex(8)}"
 
-      assert_false(@storage.record_conflict(@account_id, @work_id))
-      assert_false(@storage.record_conflict(other_account, @work_id))
-      assert_true(@storage.record_conflict(@account_id, @work_id))
+      # minute_bucket 切替でカウントがリセットされるフレーキーを避けるため時刻を
+      # 固定して同一 bucket に載せる (#4423)。
+      Timecop.freeze do
+        assert_false(@storage.record_conflict(@account_id, @work_id))
+        assert_false(@storage.record_conflict(other_account, @work_id))
+        assert_true(@storage.record_conflict(@account_id, @work_id))
+      end
     ensure
       config['/service/annict/review/idempotency/alert_threshold'] = original
       @storage.instance_variable_set(:@alert_threshold, nil)
