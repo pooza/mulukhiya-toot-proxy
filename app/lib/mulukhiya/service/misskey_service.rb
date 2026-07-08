@@ -235,8 +235,13 @@ module Mulukhiya
     # 続くため、再登録経路で必ず全行を 1 行へ集約する (#4408 Codex P1)。
     def consolidate_sw_subscriptions(rows, params, send_read_message)
       canonical, *stale = rows
-      stale.each(&:delete)
+      # unregister は行を id 昇順に削除するため、集約側も canonical（rows は
+      # order(:id) 済みなので最小 id）を先に UPDATE してから stale を削除し、
+      # 両経路のロック取得順を id 昇順に統一する。逆順（stale 削除→canonical
+      # 更新）だと同時 register↔unregister で ABBA デッドロックの余地が生じる
+      # (#4420 リリース前レビュー指摘)。
       replace_sw_subscription(canonical, params, send_read_message)
+      stale.each(&:delete)
       return canonical
     end
 
