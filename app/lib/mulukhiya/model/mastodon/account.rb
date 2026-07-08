@@ -9,6 +9,18 @@ module Mulukhiya
       one_to_many :attachment, key: :account_id
       attr_accessor :token
 
+      # 最古のローカルアカウント作成日を「設立日」の近似として返す (#4434)。
+      # ローカル (domain IS NULL) を作成日昇順で 1 件。値は不変のためプロセス内で
+      # メモ化する。DB 未接続・不在時は nil。
+      def self.founded_at
+        return @founded_at if defined?(@founded_at) && @founded_at
+        account = where(domain: nil).order(:created_at).first
+        return @founded_at = account&.created_at
+      rescue => e
+        e.log
+        return nil
+      end
+
       def to_h
         return super.except(:private_key, :public_key)
       end

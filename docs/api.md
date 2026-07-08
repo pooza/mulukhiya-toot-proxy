@@ -287,7 +287,8 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
       "url": "https://precure.ml/@info",
       "display_name": "モロヘイヤからのお知らせ"
     },
-    "status_url": "https://uptime.b-shock.org/status/bshockdon"
+    "status_url": "https://uptime.b-shock.org/status/bshockdon",
+    "founded_at": "2018-04-01"
   }
 }
 ```
@@ -297,6 +298,8 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 **`info_bot`**: お知らせボットのプロフィール情報。`username`、`acct`（@user@domain 形式）、`url`（プロフィールページURL）、`display_name` を含む。お知らせボットのトークンが未設定の環境では `null` を返す。capsicum のお知らせ画面でボットのプロフィールリンク表示に利用する（`pooza/capsicum#189`）。
 
 **`status_url`**: ステータスページの URL。`config/local.yaml` の `/status_url` で設定する。未設定時は `null`。Mastodon は `/api/v2/instance` から取得可能だが、Misskey には該当 API がないため、モロヘイヤ経由で統一的に提供する（`pooza/capsicum#247`）。
+
+**`founded_at`**: サーバーの正式オープン日（ISO 8601 date, `YYYY-MM-DD`）。`config/local.yaml` の `/founded_on` で設定する。**未設定時は最古ローカルアカウントの作成日で近似**（Mastodon は `accounts` の最古ローカル行、Misskey は最古 `user` の aid から復号）。DB 未接続時は `null`。「サーバーが物理起動した日」と「正式オープン日」が異なるサーバー（きゅあすきー / ダイスキー / デルムリン丼）は `/founded_on` を明示設定する。capsicum はヒューリスティックを持たず本値を単純採用する（`pooza/capsicum#818`）。
 
 **`features.annict` / `features.annict_linked`**: `features.annict` は **サーバーレベル**の設定（当該モロヘイヤサーバーで Annict の client_id/secret が設定済みか）。`features.annict_linked` は **ユーザーレベル**の状態で、リクエストの Bearer トークンに紐付く SNS アカウントに Annict access_token が保管済みなら `true`（未連携・トークン無しは `false`、無認証リクエストでも `false`）。token 存在のみで判定し liveness/refresh の確認は行わない。capsicum は両者を組み合わせ、「サーバーは Annict 対応かつ当該ユーザーが連携済み」のときのみ感想投稿ボタンを表示する（`pooza/capsicum#298`）。
 
