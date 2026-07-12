@@ -214,7 +214,7 @@ GEM
     ffi (1.17.4-x86_64-linux-gnu)
     fileutils (1.7.3)
     find (0.2.0)
-    fugit (1.12.3)
+    fugit (1.13.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
     gli (2.21.5)
@@ -236,7 +236,7 @@ GEM
       logger
       ostruct
     ice_cube (0.17.0)
-    json (2.20.0)
+    json (2.21.0)
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -516,4 +516,4 @@ RUBY VERSION
   ruby 4.0.5
 
 BUNDLED WITH
-  4.0.15
+  4.0.16
