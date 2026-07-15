@@ -14,6 +14,9 @@ module Mulukhiya
 
     def teardown
       WebMock.allow_net_connect!
+      # pipeline 実行で GroupTagHandler が空 community-map を CACHE_KEY に書くため、
+      # 後続テストへ汚染しないよう掃除する。
+      Redis.new.del(GroupTagHandler::CACHE_KEY)
     end
 
     def test_plain_text
