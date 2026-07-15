@@ -13,7 +13,9 @@ module Mulukhiya
     end
 
     def test_to_s
-      assert(@template.to_s.chomp.end_with?('へようこそ。'))
+      # welcome.erb は「<node_name>へようこそ。」の挨拶行に続けて案内行を持つ複数行
+      # テンプレなので、末尾でなく挨拶行（1行目）が正しくレンダーされることを検証する。
+      assert(@template.to_s.lines.first.chomp.end_with?('へようこそ。'))
     end
   end
 end
