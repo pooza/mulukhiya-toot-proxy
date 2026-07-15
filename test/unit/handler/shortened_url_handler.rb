@@ -14,7 +14,9 @@ module Mulukhiya
       url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
       @handler.handle_pre_toot(status_field => url)
 
-      assert_equal({result: [], errors: []}, @handler.debug_info)
+      # 非ホワイトリスト URL は rewritable? false でスキップされ result/errors とも空。
+      # debug_info は両者空なら nil を返す契約（handler.rb）なので nil を検証する。
+      assert_nil(@handler.debug_info)
     end
   end
 end
