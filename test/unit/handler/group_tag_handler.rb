@@ -4,7 +4,10 @@ module Mulukhiya
   class GroupTagHandlerTest < TestCase
     def setup
       return if disable?
-      WebMock.disable_net_connect!
+      # community-map は下でスタブする一方、GroupTagHandler は local instance 解決で
+      # harness の SNS（localhost）へ実アクセスする。allow_localhost で harness を通し、
+      # 外部（pf.korako.me）はスタブに閉じる。
+      WebMock.disable_net_connect!(allow_localhost: true)
       @handler = Handler.create(:group_tag)
       stub_community_map
     end

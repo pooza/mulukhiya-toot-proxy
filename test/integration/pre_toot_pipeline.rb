@@ -1,10 +1,19 @@
+require 'webmock/test_unit'
+
 module Mulukhiya
   class PreTootPipelineTest < TestCase
     def setup
       WebMock.disable_net_connect!(allow_localhost: true)
+      # pipeline は GroupTagHandler を含み、community-map を外部（pf.korako.me）から取得する。
+      # 実サーバー非依存にするためスタブに閉じる（harness=localhost は allow_localhost で通す）。
+      stub_community_map
       @sns = sns_class.new('https://sns.test', 'test_token')
       def @sns.account = nil
       config['/agent/accts'] = ['@relayctl@hashtag-relay.dtp-mstdn.jp']
+    end
+
+    def teardown
+      WebMock.allow_net_connect!
     end
 
     def test_plain_text
@@ -105,6 +114,12 @@ module Mulukhiya
 
     def create_event
       Event.new(:pre_toot, sns: @sns)
+    end
+
+    def stub_community_map
+      body = {communities: []}.to_json
+      stub_request(:get, 'https://pf.korako.me/plugins/community-hashtag-map.json')
+        .to_return(status: 200, body:, headers: {'Content-Type' => 'application/json'})
     end
   end
 end
