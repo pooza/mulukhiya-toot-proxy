@@ -8,7 +8,16 @@ module Mulukhiya
     def setup
       return if disable?
       @listener_class = Environment.listener_class
-      @listener = @listener_class.new if Environment.daemon_classes.member?(ListenerDaemon)
+      return unless Environment.daemon_classes.member?(ListenerDaemon)
+
+      # Listener 構築は Mastodon instance info の urls.streaming_api を要する。harness は
+      # streaming を提供せず nil のため構築できない（create_streaming_uri が nil.path= で落ちる）。
+      # streaming 未提供環境では precondition 明示 omit（silent skip ではない）。
+      # harness 側の streaming provisioning は chubo2#63。
+      omit('streaming_api 未提供（harness は streaming を持たない・chubo2#63）') \
+        if info_agent_service&.info&.dig('urls', 'streaming_api').blank?
+
+      @listener = @listener_class.new
     end
 
     def teardown
