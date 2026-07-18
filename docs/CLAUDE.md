@@ -421,7 +421,7 @@ test/
 1. **マイルストーンのIssueをすべて消化**
 2. **リリース前レビュー**: 下記「リリース前レビュー」の 5 観点並列レビューを実施。必修（赤）のみ本リリースで対応し、残り（黄・緑）は Issue 起票して次リリース以降へ
 3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
-4. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev04 / dev15 / dev22 / dev23）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）
+4. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
 5. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version` を更新
 6. **リリースPR作成**: `develop` → `main` へPRを作成
 7. **CI緑を確認してマージ**: `gh run list` でステータス確認、`in_progress` なら `gh run watch` で待つ。コードが同一でも CI 結果を踏んでからマージする
