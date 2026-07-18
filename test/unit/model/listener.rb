@@ -12,12 +12,21 @@ module Mulukhiya
 
       # Listener 構築は Mastodon instance info の urls.streaming_api を要する。harness は
       # streaming を提供せず nil のため構築できない（create_streaming_uri が nil.path= で落ちる）。
-      # streaming 未提供環境では precondition 明示 omit（silent skip ではない）。
-      # harness 側の streaming provisioning は chubo2#63。
-      omit('streaming_api 未提供（harness は streaming を持たない・chubo2#63）') \
-        if info_agent_service&.info&.dig('urls', 'streaming_api').blank?
+      # ここでは omit せず @listener を nil のままにする。omit を setup に置くと @listener を
+      # 使わない class-only テスト（retry_delay 系）まで巻き込むため、@listener を実際に使う
+      # テストだけが require_listener! でゲートする（#4447）。streaming provisioning は chubo2#63。
+      return if info_agent_service&.info&.dig('urls', 'streaming_api').blank?
 
       @listener = @listener_class.new
+    end
+
+    # @listener を要するテストの前提ガード。streaming_api を広告する環境（フルスタック）でのみ
+    # @listener が構築でき、標準の config プロパティを実アサートする。streaming 未提供の環境
+    # （standalone / harness いずれも）では live streaming ではなくこれら config 検証自体が
+    # 成立しないため、silent な `return`（fake pass）ではなく可視 omit でスキップする（#4447）。
+    # harness の streaming provisioning は chubo2#63。
+    def require_listener!
+      omit('streaming_api 未提供（Listener を構築できない・harness は chubo2#63）') unless @listener
     end
 
     def teardown
@@ -28,7 +37,7 @@ module Mulukhiya
     end
 
     def test_verify_peer?
-      return false unless @listener
+      require_listener!
       expected = config["/#{Environment.controller_name}/streaming/verify_peer"]
 
       assert_boolean(@listener.verify_peer?)
@@ -36,19 +45,19 @@ module Mulukhiya
     end
 
     def test_root_cert_file
-      return unless @listener
+      require_listener!
 
       assert_path_exist(@listener.root_cert_file)
     end
 
     def test_keepalive
-      return unless @listener
+      require_listener!
 
       assert_predicate(@listener.keepalive, :positive?)
     end
 
     def test_underscore
-      return unless @listener
+      require_listener!
 
       assert_kind_of(String, @listener.underscore)
     end

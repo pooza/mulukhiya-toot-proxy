@@ -13,6 +13,15 @@ module Mulukhiya
       return new.apply!
     end
 
+    # harness 由来の接続情報が注入された run かを表すシグナル。テストの omit を
+    # 「本番・フルスタックの実退行」から切り分けるために使う (#4447)。本番の通常 run では
+    # harness 固有 ENV（MULUKHIYA_HARNESS_DIR / <PREFIX>_URL + <PREFIX>_ACCESS_TOKEN）が
+    # 無いため false になり、各テストは症状ではなく実アサートで退行を検出する。
+    def self.active?
+      return @active unless @active.nil?
+      return @active = new.connections.present?
+    end
+
     # 接続情報を config に流し込む。適用したコントローラの接続情報を返す（無ければ nil）。
     # TestCase#teardown の `config.reload` を跨いで残るよう、フラットキー代入ではなく
     # raw['local'] 層へ deep-merge してから reload する。reload は raw のキャッシュから
