@@ -439,7 +439,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.28.1
+  version: 5.29.0
 parser:
   note:
     fields:
@@ -681,6 +681,7 @@ user_config:
     - annict
     - service
     - piefed
+    - compose
   redis:
     dsn: redis://localhost:6379/1
 webhook:

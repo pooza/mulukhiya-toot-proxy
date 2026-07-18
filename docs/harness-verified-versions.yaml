@@ -37,8 +37,12 @@ misskey:
   verified_at: '2026-06-23'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-07-08'
+last_checked: '2026-07-13'
 
+# 2026-07-13 チェック結果:
+#   - Mastodon: 最新 stable は v4.6.3 のままで verified と同一。RC もなし。対応不要。
+#   - Misskey: 最新 stable は 2026.6.0 のままで verified と同一。対応不要。
+#
 # 2026-07-08 チェック結果:
 #   - Mastodon: stable v4.6.3（2026-07-03）を fedi-test-harness で検証・verified 昇格。
 #     v4.6.3 と v4.6.0 で mulukhiya フルスイートを clean 再構築のうえ実走・比較し

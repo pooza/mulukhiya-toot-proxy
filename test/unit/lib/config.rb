@@ -13,11 +13,18 @@ module Mulukhiya
       assert_equal('2021-04-01', config.send(:founded_at))
     end
 
-    # 未設定かつ最古アカウント取得不能（DB 未接続）なら nil に倒す。
+    # 未設定かつ最古アカウント取得不能（DB 未接続 = account_class が nil）なら nil に倒す。
+    # harness では DB 接続済み・最古アカウントが存在し fallback が日付を返すため、
+    # account_class を nil に stub して DB 有無に依存せず決定的に検証する。
     def test_founded_at_nil_when_unset_and_no_db
       config['/founded_on'] = nil
-
-      assert_nil(config.send(:founded_at))
+      original = Environment.method(:account_class)
+      Environment.define_singleton_method(:account_class) {nil}
+      begin
+        assert_nil(config.send(:founded_at))
+      ensure
+        Environment.define_singleton_method(:account_class, original)
+      end
     end
 
     # 未設定時は account_class の最古アカウント作成日で近似する (#4434)。

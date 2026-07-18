@@ -2,6 +2,37 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.25.0（2026-06-07）
+
+APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー送りの構造改善 + 番組表の iCalendar 出力・開始時刻欄 + Annict review API + 運用ログ整備 + 報告ベース修正を組み合わせた着地回。
+
+- **#4287 feat: 番組表を iCalendar (.ics) 形式で出力** — `GET /mulukhiya/api/program.ics` 新設。tomato-shrieker IcalendarSource 購読想定で認証不要・livecure? ゲート。有効かつ妥当な start_time のエントリを単発イベント化。icalendar gem が SUMMARY 等を自動エスケープ
+- **#4366 / #4372 feat: 番組表エディタに開始時刻 (start_time) 欄** — 24 時間制テキスト入力、保存時 `HH:MM` ゼロ埋め正規化。#4286 で見送った分の再実装、#4287 iCalendar の前提
+- **#4342 feat: Annict review (作品全体感想) 投稿 API** — `POST /mulukhiya/api/annict/review`、createReview mutation 中継（searchWorks で数値 annictId → Relay node ID 解決、#4339 の前科を review 側で再発させない）。capsicum #592 連携。冪等ロック（Lua CAS、異常頻度の Sentry alert 昇格）を record API と同型実装
+- **#4348 refactor: /about の features 動的合流を DynamicFeatures に集約**（5.23 レビュー送り、annict_linked / media_catalog / program_editable の集約）
+- **#4285 refactor: PUT /scheduled_status/:id/tags を ScheduledStatusTagUpdater に移設** — #4233 段階的リファクタの 3 件目（最大、ロールバック含む）。ロードマップ完了
+- **#4362 ops: Sidekiq 内部ログを syslog へ出し no-reader pipe 消失を防ぐ** — FreeBSD 3 台のログ消失を `Syslog::Logger` 切替 + stdio `/dev/null` reopen で解消（#4264 副次発見）
+- **#4377 fix: CustomFeed が null/非配列を返すと FeedUpdateWorker クラッシュ** — RSS20FeedRenderer で防御し空配列フォールバック（Sentry MULUKHIYA-TOOT-PROXY-26 根治）
+- **#4383 fix: Misskey favorites/create 冪等 400 パスの副作用非発火を明記・整合**（post_bookmark の PieFed ミラー等を冪等成功時に発火させない）
+- **#4389 fix: TestHarness が DSN 上書き後に Postgres singleton を張り直す**（#4379 後続、stale 接続除去）
+- **#4379 test: fedi-test-harness 接続情報の test config 注入導線**（DSN/info トークン自動配線、`config.reload` 跨ぎ保持）
+- **#4360 test: ProgramTest の auto_update 順序依存修正**
+- **リリース前 5観点レビュー赤近い黄インライン (#4395)** — annict record/review の rescue でユーザー入力起因の AuthError(403)/NotFoundError(404) まで Sentry alert していたのを log のみに抑止（反 alert-spam 方針）。廃止語「インスタンス」→「サーバー」整理。残り黄・緑は #4394 で 5.26.0 送り
+- **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
+- ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）デプロイ済み（5.25.0 / health 全 OK / WebUI 200 / 新規 program.ics 200 text/calendar）
+- **本番デプロイ: 4 台完了**（2026-06-07、zugoga / shallu / lbock / sweep、全台 version 5.25.0 / health 200 / 公開エンドポイント 200）。実況終了後に実施。本デプロイで Sentry MULUKHIYA-TOOT-PROXY-26 が解消
+- **デプロイ時の教訓**（[chubo2 infra-history](https://github.com/pooza/chubo2) 参照）: 5.25.0 で `.ruby-version` が 4.0.5 に上がっており、未導入サーバー（今回 shallu）は `rbenv install 4.0.5` が前提。フレッシュ gemset での `bundle install` は rb_sysopen 一過性エラーが出ることがあり再実行で解消。SSH 越しは `bash -lc`（rbenv 読込）必須・サービス再起動は `</dev/null >/dev/null 2>&1` 必須・`bundle install` は省略不可
+
+### 振り返り
+
+**期間**: 5.24.0 リリース 2026-05-28 → 5.25.0 リリース・本番デプロイ 2026-06-07（10 日間）。
+
+**消化**: 5.25.0 マイルストーン Issue 全消化（#4285/#4287/#4342/#4348/#4360/#4362/#4366/#4372/#4377/#4383/#4389 + #4379 関連サブ群）。当初計画の #4351 media_catalog 再有効化は 5.26.0 へ移動 — Gate 検証で partial index だけでは sub-second に届かず、前提として #4393（query 再構成/非正規化、size:L）が必要と判明しブロック。
+
+**5観点レビュー仕分け**: 真の赤 0 件。赤近い黄 2 件（alert spam 抑止 / 廃止語）をインライン (#4395)、残り黄 4 + 緑 4（favorites 400 ログ、program.ics alert 昇格、harness の test? ガード、lock storage/rescue 重複の共通化、request ログ本文 scrub、start_time 二段検証、slim 記法ゆれ、api.md 補記）は #4394 にまとめて 5.26.0 送り。
+
+**運用観察**: media_catalog 再有効化 (#4351) は zugoga 本番 EXPLAIN で partial index 単独では底値レイテンシが sub-second に届かず、query 再構成/非正規化 (#4393) を前提化。5.26.0 主軸候補に昇格。
+
 ## リリース済み: 5.24.0（2026-05-28）
 
 5.23 レビュー送り消化 + 番組表エディタ拡張 + 報告ベース新規対応 + capsicum お知らせ通知連携を中心とする整理・小粒着地回。テーマ性は薄いが capsicum 側の機能解放に必要な API 改善（#4354 / #4355）と毎晩ルーチン補助（#4286 番組表まとめコピー）を組み合わせた。

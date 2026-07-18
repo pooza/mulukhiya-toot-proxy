@@ -8,6 +8,10 @@ module Mulukhiya
   #                        が稼働可能か (= サーバーが annict? を満たすか)。#4342 未デプロイの
   #                        バージョンではキー自体が無く capsicum は false 判定できる (#4433)。
   #                        capsicum の review 投稿ボタン出し分けに使う (pooza/capsicum#677)
+  #   - compose_templates : 投稿テンプレート CRUD `/compose/templates` (#4457) が使えるか。
+  #                        サーバー設定を要さず、デプロイされていれば常に利用可能なので
+  #                        presence ベース (true 固定)。未デプロイのバージョンではキー自体が
+  #                        無く capsicum は false 判定して導線を出さない (pooza/capsicum#767)
   #   - media_catalog    : /{controller}/data 配下の機能フラグ。discovery を features
   #                        に一本化するため合流 (#4343)
   #   - program_editable : 番組表エディタ (livecure かつ auto_update 無効) で書き込み
@@ -31,6 +35,7 @@ module Mulukhiya
     REGISTRY = {
       'annict_linked' => ->(sns) {sns.account&.annict_linked? || false},
       'annict_review' => ->(_sns) {Environment.controller_class.annict?},
+      'compose_templates' => ->(_sns) {true},
       'media_catalog' => ->(_sns) {Environment.controller_class.media_catalog?},
       'program_editable' => lambda {|_sns|
         Environment.controller_class.livecure? && !Program.instance.auto_update?

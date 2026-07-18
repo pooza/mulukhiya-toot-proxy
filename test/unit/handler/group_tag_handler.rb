@@ -4,7 +4,14 @@ module Mulukhiya
   class GroupTagHandlerTest < TestCase
     def setup
       return if disable?
-      WebMock.disable_net_connect!
+      # community-map は下でスタブする一方、GroupTagHandler は local instance 解決で
+      # harness の SNS（localhost）へ実アクセスする。allow_localhost で harness を通し、
+      # 外部（pf.korako.me）はスタブに閉じる。
+      WebMock.disable_net_connect!(allow_localhost: true)
+      # community_map は redis(CACHE_KEY)にキャッシュされ他テストと共有される。前段のテスト
+      # （例 PreTootPipelineTest）が空マップを残していると cache_valid? が true になり本テストの
+      # スタブが fetch されない。setup で必ず消して毎回スタブから引き直す（順序非依存化）。
+      redis.del(GroupTagHandler::CACHE_KEY)
       @handler = Handler.create(:group_tag)
       stub_community_map
     end
