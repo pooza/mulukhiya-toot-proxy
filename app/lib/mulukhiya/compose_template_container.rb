@@ -13,14 +13,14 @@ module Mulukhiya
     # ブロッキング）を伴うため、青天井の blob をサーバー側で止める (#4457)。
     MAX_COUNT = 50
     # 保存・出力で保持するフィールド。`id` はサーバー採番なので照合対象に含めない。
-    FIELDS = %w[name body cw].freeze
+    FIELDS = ['name', 'body', 'cw'].freeze
 
     def initialize(account)
       @account = account
     end
 
     def all
-      return Array(user_config['/compose/templates']).select {|v| v.is_a?(Hash)}
+      return Array(user_config['/compose/templates']).grep(Hash)
     end
 
     def find(id)
@@ -32,9 +32,7 @@ module Mulukhiya
     def create(attributes)
       lock.synchronize(@account.id) do
         templates = all
-        if templates.size >= MAX_COUNT
-          raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。"
-        end
+        raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。" if templates.size >= MAX_COUNT
         template = normalize(attributes).merge('id' => SecureRandom.uuid)
         persist(templates + [template])
         saved = find(template['id'])

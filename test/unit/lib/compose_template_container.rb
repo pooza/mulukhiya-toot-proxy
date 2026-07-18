@@ -24,7 +24,7 @@ module Mulukhiya
     def test_create
       template = @container.create(name: '実況開始', body: 'はじまるよ')
 
-      assert(template['id'].present?)
+      assert_predicate(template['id'], :present?)
       assert_equal('実況開始', template['name'])
       assert_equal('はじまるよ', template['body'])
       assert_nil(template['cw'])
@@ -104,7 +104,7 @@ module Mulukhiya
         lock.send(:release, account.id, token)
       end
       # 解放後は通常どおり作成できる。
-      assert(@container.create(name: 'x', body: 'y')['id'].present?)
+      assert_predicate(@container.create(name: 'x', body: 'y')['id'], :present?)
     end
 
     def test_max_count

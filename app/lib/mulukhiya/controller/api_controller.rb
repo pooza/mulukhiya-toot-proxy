@@ -64,7 +64,9 @@ module Mulukhiya
       @renderer.message = {templates: ComposeTemplateContainer.new(sns.account).all}
       return @renderer.to_s
     rescue => e
-      e.log
+      # 認証失敗 (403) 等の想定内 4xx は log、read 経路の真の 5xx（Redis 障害等）は
+      # write 系と対称に alert する。
+      e.status < 500 ? e.log : e.alert
       @renderer.status = e.status
       @renderer.message = {error: e.message}
       return @renderer.to_s

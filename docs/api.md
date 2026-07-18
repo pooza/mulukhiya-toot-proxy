@@ -95,6 +95,7 @@ SNS 本体への転送が失敗した場合、SNS が返したステータスコ
 | `features.annict_review`（サーバーが `annict?` を満たすとき `true`。#4342 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定できる） | `/annict/review` |
 | `features.word_suggest`（`/word_suggest/urls` 設定時に有効） | `/word/suggest` |
 | `features.nowplaying_resolver`（常時 `true`） | `/nowplaying/resolve` |
+| `features.compose_templates`（常時 `true`。#4457 未デプロイのバージョンではキー自体が欠落し capsicum は false 判定して導線を出さない） | `/compose/templates`（GET/POST/PUT/DELETE） |
 | `features.spotify_enabled`（`/service/spotify/oauth/user_oauth_enabled` + 資格情報設定時に有効） | `/spotify/oauth_uri`, `/spotify/auth`, `/spotify/currently_playing` |
 | `features.spotify_linked`（当該ユーザーが Spotify 連携済みか） | `/spotify/currently_playing` |
 
@@ -567,6 +568,66 @@ Web Push サブスクリプションを解除する。
   }
 }
 ```
+
+#### GET /mulukhiya/api/compose/templates
+
+投稿テンプレート（定形投稿）の一覧を取得する (#4457)。保存先はユーザーごとの設定（モロヘイヤ自身の Redis）で、端末をまたいで共有される。
+
+- **認証**: 必須（`token` パラメータ・per-user）
+- **パラメータ**: なし
+
+**レスポンス例**:
+
+```json
+{
+  "templates": [
+    {"id": "1f0c…（UUID）", "name": "定期告知", "body": "本日の配信は…", "cw": null}
+  ]
+}
+```
+
+各テンプレートは `id`（サーバー採番の UUID）/ `name` / `body` / `cw` の4フィールド。`cw` 未設定時は `null`。
+
+#### POST /mulukhiya/api/compose/templates
+
+投稿テンプレートを新規作成する。
+
+- **認証**: 必須（`token` パラメータ・per-user）
+- **リクエストパラメータ**:
+  - `name`（必須・非空・最大100文字）
+  - `body`（必須・空文字許容・最大5000文字）
+  - `cw`（任意・最大200文字）
+- **上限**: 1ユーザーあたり50件。超過時は 409。
+- **ステータス**: 検証エラー 422 / 上限超過・同時更新の競合 409 / 保存の read-back 検証失敗 502。
+
+**レスポンス例**:
+
+```json
+{
+  "template": {"id": "1f0c…", "name": "定期告知", "body": "本日の配信は…", "cw": null},
+  "templates": [{"id": "1f0c…", "name": "定期告知", "body": "本日の配信は…", "cw": null}]
+}
+```
+
+#### PUT /mulukhiya/api/compose/templates/:id
+
+既存の投稿テンプレートを全置換で更新する。`:id` はサーバー採番の UUID。
+
+- **認証**: 必須（`token` パラメータ・per-user）
+- **リクエストパラメータ**: POST と同一（`name` 必須非空 / `body` 必須空可 / `cw` 任意）。指定フィールドで全置換される。
+- **ステータス**: 検証エラー 422 / 該当なし 404 / 同時更新の競合 409 / read-back 検証失敗 502。
+
+**レスポンス**: POST と同形（`{template, templates}`）。
+
+#### DELETE /mulukhiya/api/compose/templates/:id
+
+投稿テンプレートを削除する。`:id` はサーバー採番の UUID。
+
+- **認証**: 必須（`token` パラメータ・per-user）
+- **パラメータ**: なし
+- **ステータス**: 該当なし 404（削除競合で起こりうる想定内）/ 同時更新の競合 409 / 削除失敗 502。
+
+**レスポンス**: 削除したテンプレートと残存一覧（`{template, templates}`）。
 
 #### GET /mulukhiya/api/admin/config/audit
 
