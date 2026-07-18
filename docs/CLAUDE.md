@@ -223,11 +223,17 @@ capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張し�
 
 ## 次期マイルストーン: 5.29.0（テーマ）
 
-**主軸: #4393 perf: media_catalog を sub-second 化（query 再構成/非正規化、size:L）**。複数リリース繰り越してきた media_catalog 再有効化トラック（#4351/#4352/#4375）全体の前提ブロッカーで、これを片付けて後続を解凍する。実行 runbook は docs/media-catalog-index-plan.md（Gate 0〜2 + rollback）。本番 EXPLAIN で partial index 単独では sub-second に届かないと判明済みのため query 再構成/非正規化が本丸。5.28.0 快速リリースの出荷ペースに引きずられないよう単独テーマとして分離した。
+**主軸: #4457 feat: 投稿テンプレート（定形投稿）per-user CRUD API（size:M〜L）**。capsicum の投稿テンプレート機能（pooza/capsicum#767）の保存先を「端末をまたいで共有」するための API 新設。capsicum 側が並行実装中で、モロヘイヤ側 API が着手律速。実装ベースは PR #4459（`ComposeTemplateContainer` ＋ `/compose/templates` 4 エンドポイント。id サーバー採番・read-back 永続化検証・件数上限50・`/about` feature 露出）で、harness 全件 green（862t/0f/0e）まで確認済み。フィールドは id/name/body/cw の 4 つで確定（scope/position は持たない＝capsicum 現行設計）。多端末同時書き込みの lost update は #4460 で追跡（v1 は per-user・低頻度で許容、v2 で optimistic lock）。
+
+**併せて（harness 信頼性 ＋ 実バグ修正）:**
+- **#4448 fix: StartupNotificationWorker の redis.incr 未定義でヒステリシス通知が本番沈黙**（ginseng-redis 2.0.4、PR#4449）— harness が炙り出した実バグ。5.29.0 唯一の運用影響のある修正
+- **#4447 test: fedi-test-harness で Mastodon 系エラー0**（PR#4449–#4455 マージ済 ＋ Codex P2×5 follow-up PR#4458）— 実バグ分類・stale/env/seed gap の honest 隔離・omit を harness? シグナルでゲート。0 failures/0 errors の green baseline。残 omission は chubo2#63/#64 で追跡
+
+**優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ、5.29.0 マイルストーンから外した（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media-catalog-index-plan.md）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
 
 **最優先の実務ブロッカー（テーマ外・並行）: ステージング再建**。5.28.0 でステージング再構築中に検証を省略して本番障害を出した（MEMORY `project_5280-staging-skip-postmortem`）。Proxmox + chubo2 itamae 構想（MEMORY `project_proxmox-staging-rebuild`）を進め、以後のリリースで「ステージング検証省略不可」を必ず満たせる状態に戻す。
 
-**5.28.0 からの繰越（見送り分）:**
+**5.28.0 からの繰越（見送り分・据え置き）:**
 - **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）** — 5.28.0 リリース前レビュー 🟢
 - **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層、size:M）**
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
