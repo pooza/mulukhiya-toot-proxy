@@ -2,9 +2,9 @@ module Mulukhiya
   class DynamicFeaturesTest < TestCase
     def test_registry_keys
       assert_equal(
-        ['annict_linked', 'annict_review', 'media_catalog', 'program_editable',
-          'word_suggest', 'nowplaying_resolver', 'nowplaying_url_resolver',
-          'spotify_enabled', 'spotify_linked'].to_set,
+        ['annict_linked', 'annict_review', 'compose_templates', 'media_catalog',
+          'program_editable', 'word_suggest', 'nowplaying_resolver',
+          'nowplaying_url_resolver', 'spotify_enabled', 'spotify_linked'].to_set,
         DynamicFeatures::REGISTRY.keys.to_set,
       )
     end

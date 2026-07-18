@@ -56,6 +56,74 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # 投稿テンプレート（定形投稿）の per-user CRUD (#4457, pooza/capsicum#767)。
+    # 保存先は user_config の `/compose/templates`。書き込み結果は
+    # ComposeTemplateContainer が read-back で検証し、失敗時は 5xx を返す。
+    get '/compose/templates' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      @renderer.message = {templates: ComposeTemplateContainer.new(sns.account).all}
+      return @renderer.to_s
+    rescue => e
+      e.log
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    post '/compose/templates' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = ComposeTemplateContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      container = ComposeTemplateContainer.new(sns.account)
+      template = container.create(params)
+      @renderer.message = {template:, templates: container.all}
+      return @renderer.to_s
+    rescue => e
+      # 上限超過 (409) 等の想定内クライアントエラーは log に留め、保存失敗 (5xx) だけ
+      # alert する（想定内 4xx で Sentry を汚さない）。
+      e.status < 500 ? e.log : e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    put '/compose/templates/:id' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      errors = ComposeTemplateContract.new.exec(params)
+      if errors.present?
+        @renderer.status = 422
+        @renderer.message = {errors:}
+        return @renderer.to_s
+      end
+      container = ComposeTemplateContainer.new(sns.account)
+      template = container.update(params[:id], params)
+      @renderer.message = {template:, templates: container.all}
+      return @renderer.to_s
+    rescue => e
+      e.status < 500 ? e.log : e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    delete '/compose/templates/:id' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account
+      container = ComposeTemplateContainer.new(sns.account)
+      template = container.delete(params[:id])
+      @renderer.message = {template:, templates: container.all}
+      return @renderer.to_s
+    rescue => e
+      # 既に削除済み (404) は race で起こる想定内。log に留める。
+      e.status < 500 ? e.log : e.alert
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     post '/mastodon/auth' do
       raise Ginseng::NotFoundError, 'Not Found' unless Environment.mastodon_type?
       errors = MastodonAuthContract.new.exec(params)
