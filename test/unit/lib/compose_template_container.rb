@@ -92,6 +92,21 @@ module Mulukhiya
       end
     end
 
+    # 別リクエストがロック保持中は 409 で弾き、lost update を防ぐ（#4457/#4460）。
+    def test_write_conflicts_while_locked
+      lock = ComposeTemplateLockStorage.new
+      token = lock.send(:acquire, account.id)
+      begin
+        assert_raise(Ginseng::ConflictError) do
+          @container.create(name: 'x', body: 'y')
+        end
+      ensure
+        lock.send(:release, account.id, token)
+      end
+      # 解放後は通常どおり作成できる。
+      assert(@container.create(name: 'x', body: 'y')['id'].present?)
+    end
+
     def test_max_count
       templates = Array.new(ComposeTemplateContainer::MAX_COUNT) do |i|
         {'id' => SecureRandom.uuid, 'name' => "t#{i}", 'body' => 'x'}

@@ -27,40 +27,52 @@ module Mulukhiya
       return all.find {|v| v['id'].to_s == id.to_s}
     end
 
+    # 以下 3 メソッドは read-modify-write なので、多端末同時書き込みの lost update
+    # を防ぐため account 単位のロックで直列化する（保持中は 409、#4457/#4460）。
     def create(attributes)
-      templates = all
-      if templates.size >= MAX_COUNT
-        raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。"
+      lock.synchronize(@account.id) do
+        templates = all
+        if templates.size >= MAX_COUNT
+          raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。"
+        end
+        template = normalize(attributes).merge('id' => SecureRandom.uuid)
+        persist(templates + [template])
+        saved = find(template['id'])
+        raise Ginseng::GatewayError, 'テンプレートを保存できませんでした。' unless persisted?(saved, template)
+        next saved
       end
-      template = normalize(attributes).merge('id' => SecureRandom.uuid)
-      persist(templates + [template])
-      saved = find(template['id'])
-      raise Ginseng::GatewayError, 'テンプレートを保存できませんでした。' unless persisted?(saved, template)
-      return saved
     end
 
     def update(id, attributes)
-      templates = all
-      index = templates.index {|v| v['id'].to_s == id.to_s}
-      raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless index
-      template = normalize(attributes).merge('id' => id.to_s)
-      templates[index] = template
-      persist(templates)
-      saved = find(id)
-      raise Ginseng::GatewayError, 'テンプレートを保存できませんでした。' unless persisted?(saved, template)
-      return saved
+      lock.synchronize(@account.id) do
+        templates = all
+        index = templates.index {|v| v['id'].to_s == id.to_s}
+        raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless index
+        template = normalize(attributes).merge('id' => id.to_s)
+        templates[index] = template
+        persist(templates)
+        saved = find(id)
+        raise Ginseng::GatewayError, 'テンプレートを保存できませんでした。' unless persisted?(saved, template)
+        next saved
+      end
     end
 
     def delete(id)
-      templates = all
-      target = templates.find {|v| v['id'].to_s == id.to_s}
-      raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless target
-      persist(templates.reject {|v| v['id'].to_s == id.to_s})
-      raise Ginseng::GatewayError, 'テンプレートを削除できませんでした。' if find(id)
-      return target
+      lock.synchronize(@account.id) do
+        templates = all
+        target = templates.find {|v| v['id'].to_s == id.to_s}
+        raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless target
+        persist(templates.reject {|v| v['id'].to_s == id.to_s})
+        raise Ginseng::GatewayError, 'テンプレートを削除できませんでした。' if find(id)
+        next target
+      end
     end
 
     private
+
+    def lock
+      return @lock ||= ComposeTemplateLockStorage.new
+    end
 
     def user_config
       return @account.user_config
