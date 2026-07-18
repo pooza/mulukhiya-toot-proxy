@@ -20,10 +20,11 @@ module Mulukhiya
 
       # sidekiq / streaming / 総合ステータス 200 は mulukhiya デーモン層の常駐を前提とする。
       # harness は proxy=nginx・web/sidekiq=Mastodon 自身のみで mulukhiya のデーモンを持たず、
-      # sidekiq は構造的に NG になる。デーモン未提供の環境では precondition で明示 omit する
-      # （silent skip ではない）。harness 側の provisioning は chubo2#63。
+      # sidekiq は構造的に NG になる。harness 駆動時のみ明示 omit する（silent skip ではない）。
+      # 非 harness（本番/フルスタックのスモーク）で sidekiq NG なら実退行として下の assert で
+      # 落とす。harness 側の provisioning は chubo2#63。
       omit('mulukhiya sidekiq 未常駐（harness はデーモン層を提供しない・chubo2#63）') \
-        unless SidekiqDaemon.health[:status] == 'OK'
+        if harness? && SidekiqDaemon.health[:status] != 'OK'
 
       assert_equal('OK', health.dig(:sidekiq, :status))
       assert_equal('OK', health.dig(:streaming, :status)) if environment_class.daemon_classes.member?(ListenerDaemon)

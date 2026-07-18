@@ -36,6 +36,13 @@ module Mulukhiya
       return @http
     end
 
+    # chubo2 fedi-test-harness 駆動の run か。harness の構造的未提供（デーモン層・webhook・
+    # streaming・nodeinfo・seed 等）を omit する条件を、本番/フルスタックの実退行と切り分ける
+    # ためのゲート。非 harness では症状が出たら omit せず実アサートで落とす (#4447)。
+    def harness?
+      return TestHarness.active?
+    end
+
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       TestHarness.apply!

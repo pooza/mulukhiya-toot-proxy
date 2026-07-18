@@ -15,10 +15,11 @@ module Mulukhiya
 
       # node_name / maintainer_name は nodeinfo(metadata) 由来。harness の Mastodon は
       # nodeinfo href を https://localhost:3000 で広告するが 3000 は平文 http のみ提供のため
-      # 取得に失敗し info が空 {} になる（node_name も nil に倒れる）。nodeinfo 未取得の
-      # 環境では precondition 明示 omit（silent skip ではない）。
-      # harness 側の nodeinfo 到達性（https/http 不整合）改善は chubo2#63。
-      omit('harness で nodeinfo を取得できない（https/http 不整合・chubo2#63）') if @sns.node_name.nil?
+      # 取得に失敗し info が空 {} になる（node_name も nil に倒れる）。harness 駆動時のみ
+      # 明示 omit する（silent skip ではない）。非 harness（本番等）で node_name が nil なのは
+      # 実退行なので下の assert で落とす。harness 側の nodeinfo 到達性改善は chubo2#63。
+      omit('harness で nodeinfo を取得できない（https/http 不整合・chubo2#63）') \
+        if harness? && @sns.node_name.nil?
 
       assert_kind_of(String, @sns.node_name)
       assert_kind_of(String, @sns.maintainer_name)
