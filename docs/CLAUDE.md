@@ -209,22 +209,49 @@ capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張し�
 
 **Codex 仕分け**: release PR #4412 に P2 1 件（refresh 失効時の stale トークンクリア）。機能 OFF のため #4414 へ集約し、返信 + リアクション付与済み。
 
-## 次期マイルストーン: 5.30.0（テーマ・仮）
+## 次期マイルストーン: 5.30.0（主軸: 投稿レイテンシ / pre_toot 直列処理の最適化）
 
-主軸は未確定。5.29.0 からの繰越・受け皿を仮置きする（正式ゴールは GitHub マイルストーン作成＋割り当てで確定）。
+GitHub マイルストーン作成・割り当て済み（2026-07-20）。重み合計 **22**。
+
+**主軸: 投稿レイテンシ（pre_toot 26 ハンドラの直列処理）**
+
+投稿ボタン押下 → 自分の TL に載るまで体感で数秒（relay 約1.5秒の倍以上）。relay ~1.5s 部分は Mastodon 本体の status 生成と確定済み（proxy 無罪）で、**残る超過分が pre_toot の直列処理側**という仮説を計装で裏付けてから最適化する。
+
+狙いは二つで、どちらも本命:
+
+1. **UX 改善** — 投稿してから自分の TL に載るまでの体感待ち時間を縮める。実況中は特に効く
+2. **移行ブロッカーの解消** — キュアスタ！(lbock, さくら VPS) を gomander (Linode/FreeBSD 15) へ移す後続タスクのブロッカーになっている可能性がある
+
+2 について: MRI/GVL のため pre_toot 直列処理は 1 コア律速であり、**ハード増強では単投稿は速くならない**。移行先の性能で吸収できる問題ではなく、移行前にコード側で解消しておく必要がある。既知の CPU ボトルネックを抱えたまま新機へ載せると、移行由来の劣化と切り分けがつかなくなる。
+
+- **#4464 perf: `pre_toot` ハンドラの所要時間を計装する（size:M）** — #4463 の実測基盤。**まず現行 lbock でベースラインを取る**（移行後の比較対象がないと gomander 側の劣化を検出できない）
+- **#4463 perf: DictionaryTagHandler の投稿同期スキャン最適化（size:M）** — A. `addition_tags` メモ化（3回→1回）/ B. 解析済み辞書のプロセス内キャッシュ / C. `short?` の Regexp 事前コンパイル
+- **#4465 perf: `TaggingDictionary#matches` のアルゴリズム刷新（size:L）** — 線形スイープ O(語数 × テキスト長) を索引化（trie / Aho-Corasick）。**#4464 の計装結果を見て着手可否を決めるゲート付き**。寄与が小さい／A/B/C で足りるなら 5.31.0 へ緑送り
+
+順序性の制約（`pre_toot` パイプライン順、`matches` の「長い語から先に消し込む」順序）は仕様であり、**並列化を安易な特効薬として扱わない**（MEMORY `feedback_handler-order-no-casual-parallel`）。
+
+**進行順**: #4464 計装 → 実測 → #4463 A/B/C → 再計装で判断 → #4465 着手 or 緑送り。5.30.0 は lbock → gomander カットオーバーより前に着地させるのが望ましい。
 
 **5.29.0 リリース前レビューの送り:**
-- **#4461 obs/並行性: 5.29.0 リリース前 5観点レビュー 黄まとめ** — save 二重 alert（read-back GatewayError × UserConfig#update の alert）、StartupNotificationWorker の rescue deadman、compose RMW の user_config メモ化 fresh-read 強制、lock TTL 10s→30s。いずれも非ブロック
-- **#4460 concurrency: compose テンプレ lost update の optimistic lock 化（v2）** — v1 は per-account ロックで直列化済み
+
+- **#4461 obs/並行性: 5.29.0 リリース前 5観点レビュー 黄まとめ（size:M）** — save 二重 alert（read-back GatewayError × UserConfig#update の alert）、StartupNotificationWorker の rescue deadman、compose RMW の user_config メモ化 fresh-read 強制、lock TTL 10s→30s。いずれも非ブロック
+- **#4460 concurrency: compose テンプレ lost update の optimistic lock 化（v2）** — **クローズ済み**（v1 の per-account ロック直列化で用が足りると判断）
+
+**同梱の繰越（小物・セキュリティ）:**
+
+- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（size:M）**
+- **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）**
+- **#4446 config: `founded_on`/`preopened_on` の schema を Date 値に整合させる（size:S）**
 
 **優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ 5.29.0 から除外（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media-catalog-index-plan.md）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
 
 **ステージング再建（進捗＝実質解消）**: Proxmox ステージング dev24-27（美食丼/キュアスタ！/デルムリン丼=Mastodon、ダイスキー=Misskey）が稼働し、5.29.0 で「ステージング検証省略不可」を実運用で満たせる状態に復帰（旧 dev04/15/22/23 は退役、現行構成は chubo2 `docs/infra-note.md`「ステージング」節が正）。5.28.0 の省略障害（MEMORY `project_5280-staging-skip-postmortem`）は解消。構成乖離#36/Linode 移行#35 等の長期構想は MEMORY `project_proxmox-staging-rebuild` 継続。
 
-**過去リリースからの繰越（見送り分・据え置き）:**
-- **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）** — 5.28.0 リリース前レビュー 🟢
-- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層、size:M）**
+**過去リリースからの繰越（さらに据え置き・5.30.0 未割当）:**
+
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
+- **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63（harness に sidekiq + webhook エンドポイントを provisioning）と対。chubo2 側の着地待ち
+- **#4373 番組表に繰り返し情報（頻度・曜日）を追加し iCalendar を曜日対応にする（size:L）** — 5.31.0 以降の主軸候補
 
 ## ロードマップ仮置き
 
