@@ -251,6 +251,24 @@ properties:
     required:
       - dsn
     type: object
+  profile:
+    properties:
+      handler:
+        properties:
+          enable:
+            type: boolean
+          threshold:
+            minimum: 0
+            type: number
+          floor:
+            minimum: 0
+            type: number
+        required:
+          - enable
+        type: object
+    required:
+      - handler
+    type: object
   program:
     properties:
       urls:

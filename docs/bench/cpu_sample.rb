@@ -11,7 +11,7 @@ LOG = File.expand_path('~/cpu_sample.tsv')
 
 elapsed = Benchmark.realtime do
   x = 0
-  30_000_000.times { |i| x = (x + i) % 1_000_003 }
+  30_000_000.times {|i| x = (x + i) % 1_000_003}
 end
 
 load1 = begin
@@ -25,7 +25,7 @@ File.open(LOG, 'a') do |f|
   f.puts([
     Time.now.strftime('%Y-%m-%dT%H:%M:%S%z'),
     `hostname`.strip,
-    format('%.1f', elapsed * 1000),
+    '%.1f' % (elapsed * 1000),
     load1,
   ].join("\t"))
 end
