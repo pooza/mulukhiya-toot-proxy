@@ -265,7 +265,9 @@ GitHub マイルストーン作成・割り当て済み（2026-07-20）。重み
 | ホスト | Rust | Ruby 4.0.5 の YJIT |
 | --- | --- | --- |
 | lbock / zugoga / shallu | あり（1.94〜1.96） | ✅ ビルド済み・有効 |
-| gomander | **なし** | 4.0.5 未導入。積むと YJIT なしになる |
+| gomander | あり（1.96.1、2026-07-20 導入済み） | **rbenv 自体が未導入**（`~/.rbenv` なし）。Ruby は OS の 3.4.9 のみ |
+
+※ 2026-07-20 に gomander へ Rust 1.96.1 を導入済みのため「Rust なし」の記述は解消した（07-20 実機確認）。残る欠落は rbenv + Ruby 4.0.5 で、これは chubo2#68 カットオーバーの前提作業。
 
 **YJIT の効果は `raw_cpu` で 24〜25% 短縮**（lbock 1558→1184ms、zugoga 1603→1202ms）。ただし `regexp_compile` / `sweep` / `marshal_load` はほぼ不変で、正規表現エンジンも Marshal も C 実装のため YJIT の対象外。
 
