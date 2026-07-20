@@ -59,11 +59,13 @@ module Mulukhiya
         counter = profile&.create_counter
         started = HandlerProfile.clock if profile
         run_handler(handler, payload, counter)
-        profile&.record(handler, started, counter)
         break if handler.break?
       rescue => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure
+        # 例外で終わったハンドラも記録する。Thread#join は例外を再送出するため、
+        # ここに置かないと「遅いうえに失敗するハンドラ」がプロファイルから消える。
+        profile&.record(handler, started, counter) if started
         reporter.push(handler)
       end
       profile&.flush(payload)

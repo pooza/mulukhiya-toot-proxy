@@ -23,15 +23,15 @@ module Mulukhiya
 
     # ハンドラのスレッドへ渡す集計先。nil を渡すと計測しない。
     def create_counter
-      return {count: 0, seconds: 0.0}
+      return Counter.new
     end
 
     def record(handler, started, counter)
       @entries.push({
         handler: handler.underscore,
         seconds: (HandlerProfile.clock - started).round(3),
-        http_count: counter[:count],
-        http_seconds: counter[:seconds].round(3),
+        http_count: counter&.count || 0,
+        http_seconds: (counter&.seconds || 0.0).round(3),
       })
     end
 
@@ -67,10 +67,7 @@ module Mulukhiya
 
       # ハンドラのスレッド内から呼ばれる。Ginseng::HTTP#log の prepend 経由。
       def record_http(seconds)
-        counter = Thread.current[HTTP_KEY]
-        return unless counter
-        counter[:count] += 1
-        counter[:seconds] += seconds.to_f
+        Thread.current[HTTP_KEY]&.record(seconds)
       end
 
       # 「トゥートの種類別に内訳が見られること」(#4464) のための分類キー。
@@ -122,6 +119,42 @@ module Mulukhiya
 
     DEFAULT_THRESHOLD = 1.0
     DEFAULT_FLOOR = 0.001
+
+    # ハンドラ 1 つぶんの HTTP 集計。URLHandler や RemoteTagHandler は
+    # Parallel の worker スレッドから並行に叩くため、排他が要る。
+    class Counter
+      attr_reader :count, :seconds
+
+      def initialize
+        @mutex = Thread::Mutex.new
+        @count = 0
+        @seconds = 0.0
+      end
+
+      def record(seconds)
+        @mutex.synchronize do
+          @count += 1
+          @seconds += seconds.to_f
+        end
+      end
+    end
+
+    # Ruby のスレッドローカルは子スレッドへ継承されない。URLHandler#handle_pre_toot は
+    # rewrite を Parallel.each(in_threads:) で回すため、これを補わないと
+    # 「1 URL あたり最大 8 回の直列リクエスト」という最大の調査対象そのものが
+    # http_count: 0 として記録されてしまう。
+    module ParallelProbe
+      [:each, :map, :each_with_index, :map_with_index, :flat_map].each do |name|
+        define_method(name) do |*args, **opts, &block|
+          counter = Thread.current[HandlerProfile::HTTP_KEY]
+          next super(*args, **opts, &block) unless counter && block
+          super(*args, **opts) do |*values|
+            Thread.current[HandlerProfile::HTTP_KEY] = counter
+            block.call(*values)
+          end
+        end
+      end
+    end
 
     # Ginseng::HTTP は全リクエストの所要時間を #log で算出しているため、
     # ここを唯一のフック点にできる。呼び出し側（handler / service）に手を入れずに

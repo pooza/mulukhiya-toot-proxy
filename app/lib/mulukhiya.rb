@@ -59,6 +59,7 @@ module Mulukhiya
   # /profile/handler/enable が false のため、集計先が無く実質ノーオペになる。
   def self.setup_profile
     Ginseng::HTTP.prepend(HandlerProfile::HTTPProbe)
+    Parallel.singleton_class.prepend(HandlerProfile::ParallelProbe)
   end
 
   def self.setup_debug

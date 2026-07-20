@@ -23,17 +23,17 @@ module Mulukhiya
     end
 
     test 'record_http がスレッドローカルへ積算される' do
-      counter = {count: 0, seconds: 0.0}
+      counter = HandlerProfile::Counter.new
       Thread.current[HandlerProfile::HTTP_KEY] = counter
       HandlerProfile.record_http(0.25)
       HandlerProfile.record_http(0.5)
 
-      assert_equal(2, counter[:count])
-      assert_in_delta(0.75, counter[:seconds], 0.001)
+      assert_equal(2, counter.count)
+      assert_in_delta(0.75, counter.seconds, 0.001)
     end
 
     test 'HTTP の集計はハンドラのスレッドごとに分離される' do
-      counters = Array.new(2) {{count: 0, seconds: 0.0}}
+      counters = Array.new(2) {HandlerProfile::Counter.new}
       counters.each_with_index do |counter, i|
         Thread.new do
           Thread.current[HandlerProfile::HTTP_KEY] = counter
@@ -41,8 +41,37 @@ module Mulukhiya
         end.join
       end
 
-      assert_equal(1, counters[0][:count])
-      assert_equal(2, counters[1][:count])
+      assert_equal(1, counters[0].count)
+      assert_equal(2, counters[1].count)
+    end
+
+    test 'Counter は並行に叩かれても数え落とさない' do
+      counter = HandlerProfile::Counter.new
+      threads = Array.new(8) do
+        Thread.new {100.times {counter.record(0.01)}}
+      end
+      threads.each(&:join)
+
+      assert_equal(800, counter.count)
+      assert_in_delta(8.0, counter.seconds, 0.001)
+    end
+
+    test 'ParallelProbe が Parallel の worker スレッドへ集計先を伝播する' do
+      counter = HandlerProfile::Counter.new
+      Thread.current[HandlerProfile::HTTP_KEY] = counter
+      Parallel.each([1, 2, 3], in_threads: 3) do |_|
+        HandlerProfile.record_http(0.1)
+      end
+
+      assert_equal(3, counter.count)
+    end
+
+    test 'ParallelProbe は集計先が無いときに素通しする' do
+      Thread.current[HandlerProfile::HTTP_KEY] = nil
+      results = []
+      Parallel.each([1, 2, 3], in_threads: 3) {|v| results.push(v)}
+
+      assert_equal([1, 2, 3], results.sort)
     end
 
     # Handler.create は SNSService 経由で DB を要求するため、record が実際に使う
@@ -52,7 +81,8 @@ module Mulukhiya
     test 'record がハンドラ単位のエントリを作る' do
       profile = HandlerProfile.new(Event.new(:pre_toot))
       handler = HandlerDouble.new('default_tag')
-      counter = {count: 3, seconds: 1.5}
+      counter = HandlerProfile::Counter.new
+      3.times {counter.record(0.5)}
       profile.record(handler, HandlerProfile.clock - 2, counter)
       entry = profile.entries.first
 
@@ -87,6 +117,17 @@ module Mulukhiya
 
     test 'HTTPProbe が Ginseng::HTTP に prepend されている' do
       assert_true(Ginseng::HTTP <= HandlerProfile::HTTPProbe)
+    end
+
+    test 'ParallelProbe が Parallel に prepend されている' do
+      assert_true(Parallel.singleton_class <= HandlerProfile::ParallelProbe)
+    end
+
+    test 'record は集計先が無くても壊れない' do
+      profile = HandlerProfile.new(Event.new(:pre_toot))
+      profile.record(HandlerDouble.new('default_tag'), HandlerProfile.clock, nil)
+
+      assert_equal(0, profile.entries.first[:http_count])
     end
 
     test 'flush は閾値未満のイベントを記録しない' do
