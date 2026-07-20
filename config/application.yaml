@@ -470,6 +470,11 @@ postgres:
   query_log: false
   slow_query:
     seconds: 3
+profile:
+  handler:
+    enable: false
+    threshold: 1.0
+    floor: 0.001
 program:
   auto_update: true
   urls: []

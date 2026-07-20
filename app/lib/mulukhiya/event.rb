@@ -53,17 +53,20 @@ module Mulukhiya
     end
 
     def dispatch(payload)
+      profile = HandlerProfile.create(self)
       handlers do |handler|
         next if handler.disable?
-        unless Thread.new {handler.send(method, payload, params)}.join(handler.timeout)
-          handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
-        end
+        counter = profile&.create_counter
+        started = HandlerProfile.clock if profile
+        run_handler(handler, payload, counter)
+        profile&.record(handler, started, counter)
         break if handler.break?
       rescue => e
         handler.errors.push(class: e.class.to_s, message: e.message)
       ensure
         reporter.push(handler)
       end
+      profile&.flush(payload)
       return reporter
     end
 
@@ -79,6 +82,17 @@ module Mulukhiya
     end
 
     private
+
+    # counter を渡すとハンドラのスレッドで HTTP が集計される (#4464)。
+    # nil のときは計装なし＝従来どおりの挙動。
+    def run_handler(handler, payload, counter)
+      thread = Thread.new do
+        Thread.current[HandlerProfile::HTTP_KEY] = counter
+        handler.send(method, payload, params)
+      end
+      return if thread.join(handler.timeout)
+      handler.errors.push(message: 'timeout', timeout: "#{handler.timeout}s")
+    end
 
     def resolve_pipeline
       base = config["/handler/pipeline/base/#{label}"] rescue nil

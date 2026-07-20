@@ -55,6 +55,12 @@ module Mulukhiya
     return event
   end
 
+  # ハンドラ計装 (#4464) の HTTP フックを仕込む。既定では
+  # /profile/handler/enable が false のため、集計先が無く実質ノーオペになる。
+  def self.setup_profile
+    Ginseng::HTTP.prepend(HandlerProfile::HTTPProbe)
+  end
+
   def self.setup_debug
     Ricecream.disable
     return unless Environment.development?
@@ -106,6 +112,7 @@ module Mulukhiya
   loader.setup
   setup_sidekiq
   setup_sentry
+  setup_profile
   setup_debug
   ENV['RACK_ENV'] ||= Environment.type
   Environment.dbms_class&.connect
