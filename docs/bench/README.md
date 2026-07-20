@@ -2,6 +2,28 @@
 
 投稿レイテンシ（#4464）とサーバー性能比較のための計測スクリプト置き場。
 
+## verify_host.sh — Linode ホストの当たり外れ判定
+
+gomander は「遅い物理ホストに着地した個体」と特定されている（pooza/chubo2#68）。**作り直した直後にこれを流して着地の成否を判定する。**
+
+```sh
+docs/bench/verify_host.sh gomander.b-shock.co.jp
+# exit 0 = 合格 / 1 = 不合格（作り直し直し）/ 2 = 実行エラー
+```
+
+判定は 2 つ。**① `host_uuid` が既知の遅いホスト（`a6f7baf2…`）と違うこと ② チャンクベンチの `min` が 15ms 未満であること。**
+
+2026-07-20 の実測値は zugoga 14.22 / lbock 15.11 / **gomander 20.05** ms。判定が両方向で効くことは、遅い側（gomander→不合格）と速い側（zugoga→合格）の両方で確認済み。
+
+## chunk_bench.c — 「素で遅い」と「奪われている」の切り分け
+
+3M 回の整数ループを 400 チャンクに分割し、ms の分布を出す。
+
+- **`min`** … 誰にも邪魔されない最良ケース。**ここが遅ければホストの素の速度が遅い**
+- **`max/min`** … テール。大きければ隣人輻輳（steal）を食らっている
+
+Ruby を通さない素の C なので、Ruby のビルド差や OS メジャーの差を交絡から外せる。gomander の特定はこれが決め手になった（min が 1.41 倍遅く、かつ max/min 1.04 でテール皆無＝競合ではなく素の速度）。
+
 ## bench_pre_toot.rb
 
 `TaggingDictionary#matches` 相当の単スレッド CPU ベンチ。lbock / gomander / zugoga / shallu の per-core 性能比較に使った。
