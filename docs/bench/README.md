@@ -19,6 +19,8 @@ ssh pooza@<host> '/usr/local/bin/ruby34 -' < docs/bench/bench_pre_toot.rb
 
 per-core 性能の**定期サンプラ**。Shared プランの隣人輻輳による**分散**を可視化する。
 
+**2026-07-20 に lbock / zugoga / gomander の 3 台へ仕込み済み**（cron `*/10`、初回発火・TSV 追記まで確認）。07-26（日）のニチアサを捕まえる目的。
+
 ```sh
 # 配置
 ssh pooza@<host> 'cat > ~/cpu_sample.rb' < docs/bench/cpu_sample.rb
@@ -26,6 +28,8 @@ ssh pooza@<host> 'cat > ~/cpu_sample.rb' < docs/bench/cpu_sample.rb
 */10 * * * * /usr/local/bin/ruby34 $HOME/cpu_sample.rb
 # 結果
 ssh pooza@<host> 'cat ~/cpu_sample.tsv'
+# 撤収（観測が済んだら）
+ssh pooza@<host> 'crontab -l | grep -v cpu_sample.rb | crontab -'
 ```
 
 **Ruby は全台 `ruby34`（3.4.9）で揃える。** 本番の実行環境は 4.0.5 + YJIT だが、目的が「時間帯による揺れの検出」であり、隣人輻輳はホスト側の性質なので版が違っても検出できる。gomander には 4.0.5 が未導入で、条件を揃えるほうを優先する。**絶対性能の結論には使わない**（それは `bench_pre_toot.rb` の 4.0.5 系列で採る）。
