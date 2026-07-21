@@ -1,72 +1,70 @@
 #!/bin/sh
-# Linode ホストの当たり外れを判定する (pooza/chubo2#68)
-#
-# gomander は 2026-07-20 時点で「遅い物理ホストに着地した個体」と特定されている。
-# 作り直し後にこれを流し、別ホストへ移れたか・速度が出ているかを機械的に判定する。
+# 構築済みの Linode 機が健全かを判定する (pooza/chubo2#68)
 #
 #   docs/bench/verify_host.sh [host]        # 既定 gomander.b-shock.co.jp
 #
-# 判定基準:
-#   1. host_uuid が既知の遅いホスト (KNOWN_BAD_HOST) と違うこと
-#   2. チャンクベンチの min が THRESHOLD_MS 未満であること
-#      （2026-07-20 実測: zugoga 14.22 / lbock 15.11 / gomander 20.05 ms）
+#   exit 0 = 合格。この個体で進めてよい
+#   exit 1 = 不合格。作り直して別の個体を狙う
+#   exit 2 = 実行エラー
 #
-# min を見るのは、最小値が「誰にも邪魔されない最良ケース」だから。
-# ここが遅ければ隣人輻輳ではなくホストの素の速度が遅い。
+# 判定は stlf_probe の ratio ただ一つ（ratio <= 0.30 が健全）。
+#
+# かつては「host_uuid が既知の遅いホストと違うこと」と「chunk_bench の min が
+# 15ms 未満であること」で判定していたが、どちらも無効と判明した (#4471)。
+#
+#   - host_uuid: 旧 gomander の遅さを物理ホストのせいと見ていたが、Cold Resize で
+#     host_uuid が変わっても数字が動かず反証された。既知の 1 台と UUID を比べる
+#     方式は「別の遅い個体」を検出できないので、そもそも判定にならない。
+#   - chunk_bench の生スループット: C の速度は Ruby の速度を予測しない。
+#     新 gomander は C では lbock より 6% 速いのに Ruby では 10% 遅い。
+#
+# 残った症状の形は「同一アドレスへの store->load だけ 6 倍遅い」で、これは
+# stlf_probe が直接測る。健全な個体 (0.098〜0.153) と病んだ個体 (0.569) は
+# 5 倍以上離れており、閾値 0.30 に対して十分な余裕がある。
 set -u
 
 HOST="${1:-gomander.b-shock.co.jp}"
-KNOWN_BAD_HOST='a6f7baf248a8c508184174f3e75b5c1a30b551ae'
-THRESHOLD_MS='15.0'
-SRC="$(dirname "$0")/chunk_bench.c"
+DIR="$(dirname "$0")"
+PROBE="$DIR/stlf_probe.c"
+CHUNK="$DIR/chunk_bench.c"
 
-[ -f "$SRC" ] || { echo "chunk_bench.c が見つかりません: $SRC" >&2; exit 2; }
+[ -f "$PROBE" ] || { echo "stlf_probe.c が見つかりません: $PROBE" >&2; exit 2; }
 
 echo "=== $HOST"
 
+ssh -o ConnectTimeout=10 "pooza@$HOST" true || { echo "SSH 失敗" >&2; exit 2; }
+
+# 記録用。判定には使わない。Linode 以外（さくら VPS 等）ではメタデータサービスが
+# 無く空になるが、それで止めない（末尾の : で必ず成功させる）。
 meta=$(ssh -o ConnectTimeout=10 "pooza@$HOST" '
   T=$(curl -s -m 5 -X PUT http://169.254.169.254/v1/token \
         -H "Metadata-Token-Expiry-Seconds: 120" 2>/dev/null)
   [ -n "$T" ] && curl -s -m 5 http://169.254.169.254/v1/instance -H "Metadata-Token: $T" 2>/dev/null
-') || { echo "SSH 失敗" >&2; exit 2; }
+  :
+')
 
-uuid=$(echo "$meta" | sed -n 's/^host_uuid: //p')
-type=$(echo "$meta" | sed -n 's/^type: //p')
-region=$(echo "$meta" | sed -n 's/^region: //p')
-echo "  plan      : ${type:-?} / ${region:-?}"
-echo "  host_uuid : ${uuid:-取得できず}"
-
-bench=$(ssh -o ConnectTimeout=10 "pooza@$HOST" \
-  'cat > /tmp/chunk.c && cc -O2 -o /tmp/chunk /tmp/chunk.c && /tmp/chunk' < "$SRC") \
-  || { echo "ベンチ実行に失敗" >&2; exit 2; }
-echo "  $bench"
-
-min=$(echo "$bench" | sed -n 's/^min *\([0-9.]*\).*/\1/p')
-
-fail=0
-if [ -z "$uuid" ]; then
-  echo "  ⚠ host_uuid を取得できず、ホスト変更を確認できません"
-  fail=1
-elif [ "$uuid" = "$KNOWN_BAD_HOST" ]; then
-  echo "  ✗ 既知の遅いホストのままです"
-  fail=1
+if [ -n "$meta" ]; then
+  echo "  plan      : $(echo "$meta" | sed -n 's/^type: //p') / $(echo "$meta" | sed -n 's/^region: //p')"
+  echo "  host_uuid : $(echo "$meta" | sed -n 's/^host_uuid: //p')  (記録用・判定には使わない)"
 else
-  echo "  ✓ 既知の遅いホストとは別のホストです"
+  echo "  metadata  : 取得できず（Linode 以外のホストか、メタデータサービス不通）"
 fi
 
-if [ -z "$min" ]; then
-  echo "  ⚠ min を取得できませんでした"
-  fail=1
-elif awk "BEGIN{exit !($min < $THRESHOLD_MS)}"; then
-  echo "  ✓ min ${min}ms < ${THRESHOLD_MS}ms"
-else
-  echo "  ✗ min ${min}ms >= ${THRESHOLD_MS}ms（同じ質のホストに着地しています）"
-  fail=1
+# 参考値。合否には使わない。
+if [ -f "$CHUNK" ]; then
+  chunk=$(ssh -o ConnectTimeout=10 "pooza@$HOST" \
+    'cat > /tmp/chunk.c && cc -O2 -o /tmp/chunk /tmp/chunk.c && /tmp/chunk; rm -f /tmp/chunk /tmp/chunk.c' < "$CHUNK") \
+    && echo "  参考 (chunk_bench): $chunk"
 fi
 
-if [ "$fail" -eq 0 ]; then
-  echo "  → 合格。この個体で進めてよい"
-  exit 0
-fi
-echo "  → 不合格。もう一度作り直して別ホストへの着地を狙う"
-exit 1
+probe=$(ssh -o ConnectTimeout=10 "pooza@$HOST" \
+  'cat > /tmp/stlf.c && cc -O2 -o /tmp/stlf /tmp/stlf.c && /tmp/stlf; s=$?; rm -f /tmp/stlf /tmp/stlf.c; exit $s' < "$PROBE")
+status=$?
+echo "$probe" | sed 's/^/  /'
+
+case "$status" in
+  0) echo "  → 合格。この個体で進めてよい"; exit 0 ;;
+  1) echo "  → 不合格。作り直して別の個体を狙う"; exit 1 ;;
+  2) echo "  → 判定不能（基準値の中間）。時間を空けて再測定する"; exit 1 ;;
+  *) echo "  ✗ stlf_probe の実行に失敗しました (exit $status)" >&2; exit 2 ;;
+esac
