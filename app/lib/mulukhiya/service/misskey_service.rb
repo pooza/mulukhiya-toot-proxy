@@ -286,7 +286,9 @@ module Mulukhiya
       key = "#{prefix}:#{key}" if prefix
       self.class.sns_redis.del(key)
     rescue => e
-      e.alert(user_id:)
+      # SNS-Redis の一過性の断で Sentry を鳴らさない。キャッシュは self-rebuild
+      # するので削除失敗の実害が薄く、alert に値しない。
+      e.log(user_id:)
     end
 
     def sns_redis_prefix
