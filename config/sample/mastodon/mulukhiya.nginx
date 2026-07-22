@@ -7,12 +7,17 @@ map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
   "~^PUT:$"  http://localhost:3008;
   default    http://localhost:3000;
 }
-# PUT /api/v1/statuses/:id（ステータス編集）は、モロヘイヤが自分の用途を
-# X-Mulukhiya-Purpose で名乗った場合だけ通す。名乗りの無い素の編集要求は
-# reject に落として 405 を返す（下の location 参照）。
-map "${request_method}:${http_x_mulukhiya}" $status_put_backend {
-  "~^PUT:$"  reject;
-  default    http://localhost:3000;
+# PUT /api/v1/statuses/:id（ステータス編集）は、用途を X-Mulukhiya-Purpose で
+# 名乗った場合だけモロヘイヤへ通す。名乗りの無い素の編集要求は reject に落として
+# 405 を返す（下の location 参照）。
+#
+# 判定は必ず map のキー側で行う。location に if を 2 つ並べて振り分けようとすると、
+# proxy_pass はコンテンツフェーズのハンドラを登録するだけで rewrite フェーズを
+# 終端しないため、後続の if の return が勝って Purpose 付きまで 405 になる (#4474)。
+map "${request_method}:${http_x_mulukhiya}:${http_x_mulukhiya_purpose}" $status_put_backend {
+  "~^PUT::.+"  http://localhost:3008;
+  "~^PUT::$"   reject;
+  default      http://localhost:3000;
 }
 
 # === server context に追加 ===
@@ -31,9 +36,6 @@ location ~ ^/api/v[0-9]+/media/[0-9]+$ {
 }
 location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
   include /path/to/mulukhiya_proxy.conf;
-  if ($http_x_mulukhiya_purpose != '') {
-    proxy_pass http://localhost:3008;
-  }
   if ($status_put_backend = reject) {
     return 405;
   }
