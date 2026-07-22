@@ -23,6 +23,11 @@
 # FreeBSD の clang・同一ソースで測った**相対比較**だったから。ここでも同じ
 # ソースを両方へ送って測り、比だけを見る。
 #
+# 構築後の機体は OS もアーキテクチャもまちまちなので、probe_host.sh のように
+# 手元の 1 バイナリを配ることはできない（各機体でビルドするしかない）。
+# 代わりに**両者の cc が同一であることを確認**し、違えば合否を出さない。
+# 同一ツールチェーンという前提を暗黙に置かず、実際に検査する。
+#
 # かつての host_uuid 判定も無効（Cold Resize で uuid が変わっても数字が動かず
 # 反証済み。既知の 1 台と比べる方式では別の遅い個体を検出できない）。
 # chunk_bench の生スループットも合否には使わない（C の速度は Ruby の速度を
@@ -42,26 +47,49 @@ AFFLICTED_MIN='3.0'
 
 [ -f "$PROBE" ] || { echo "stlf_probe.c が見つかりません: $PROBE" >&2; exit 2; }
 
-# 同じソースを送ってその場でビルドし、ratio だけを拾う。測れなければ空を返す。
+# 同じソースを送ってその場でビルドし、cc の版と ratio を拾う。測れなければ空を返す。
 measure() {
   ssh -o ConnectTimeout=10 "pooza@$1" \
-    'cat > /tmp/stlf.c && cc -O2 -o /tmp/stlf /tmp/stlf.c 2>/dev/null && /tmp/stlf; rm -f /tmp/stlf /tmp/stlf.c' \
-    < "$PROBE" 2>/dev/null | sed -n 's/^ *ratio *: *\([0-9.]*\).*/\1/p'
+    'cat > /tmp/stlf.c && cc -O2 -o /tmp/stlf /tmp/stlf.c 2>/dev/null &&
+     { cc --version | sed -n "1s/^/cc: /p"; /tmp/stlf; }; rm -f /tmp/stlf /tmp/stlf.c' \
+    < "$PROBE" 2>/dev/null
+}
+
+ratio_of() {
+  printf '%s\n' "$1" | sed -n 's/^ *ratio *: *\([0-9.]*\).*/\1/p'
+}
+
+cc_of() {
+  printf '%s\n' "$1" | sed -n 's/^cc: *//p'
 }
 
 echo "=== target    : $TARGET"
-t_ratio=$(measure "$TARGET")
+t_out=$(measure "$TARGET")
+t_ratio=$(ratio_of "$t_out")
+t_cc=$(cc_of "$t_out")
 [ -n "$t_ratio" ] || { echo "  ✗ 測定に失敗しました（SSH か cc を確認）" >&2; exit 2; }
+echo "  cc          : $t_cc"
 echo "  ratio       : $t_ratio"
 
 echo "=== reference : $REFERENCE"
-r_ratio=$(measure "$REFERENCE")
+r_out=$(measure "$REFERENCE")
+r_ratio=$(ratio_of "$r_out")
+r_cc=$(cc_of "$r_out")
 if [ -z "$r_ratio" ]; then
   echo "  ⚠ 参照を測れませんでした。絶対値では判定できないので合否は出しません。"
   echo "  → 健全と分かっている同系の機体を指定して測り直してください。"
   exit 2
 fi
+echo "  cc          : $r_cc"
 echo "  ratio       : $r_ratio"
+
+if [ "$t_cc" != "$r_cc" ]; then
+  echo "  ⚠ ツールチェーンが違うので比較できません（コード生成の差で ratio が 3〜5 倍動きます）。"
+  echo "    target    : $t_cc"
+  echo "    reference : $r_cc"
+  echo "  → cc を揃えられる機体を参照に指定して測り直してください。"
+  exit 2
+fi
 
 rel=$(awk "BEGIN{printf \"%.2f\", $t_ratio / $r_ratio}")
 echo "=== target / reference = ${rel}x"
