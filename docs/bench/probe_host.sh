@@ -1,28 +1,35 @@
 #!/bin/sh
-# 作った直後の Linode（素の Linux イメージ）が健全かを、何も構築する前に判定する。
+# 作った直後の素の Linux イメージを、何も構築する前に測る (pooza/chubo2#68)。
 #
-# 病んだ個体に構築の手間を払わないための事前チェック (pooza/chubo2#68)。
-# 遅ければその場で削除して作り直す。判定は 2 分で済む。
-#
+#   docs/bench/probe_host.sh <target> [reference]
 #   docs/bench/probe_host.sh root@203.0.113.10
+#   docs/bench/probe_host.sh root@203.0.113.10 root@203.0.113.11
 #
-#   exit 0 = 健全。このホストの上で OS 構築を始めてよい
-#   exit 1 = 異常。削除して作り直す
+#   exit 0 = 参照と同等、または参照なしで数値のみ出力（合否は出していない）
+#   exit 1 = 参照より明らかに遅い。削除して作り直す
 #   exit 2 = 実行エラー
 #
-# 判定基準と、かつての host_uuid / chunk_bench 方式を捨てた理由は
-# verify_host.sh の冒頭コメントを参照 (#4471)。
+# ⚠ 参照を渡さない限り合否は出さない (#4476)。
 #
-# 素のイメージにはコンパイラが無いので、ローカルで静的バイナリを作って送り込む。
+# stlf_probe の ratio に不変な絶対閾値は置けない。健全な機体でもコンパイラや
+# CPU が変われば 3〜5 倍動く。詳しい実測は verify_host.sh の冒頭コメント参照。
+#
+# ここではローカルで静的バイナリを 1 つ作り、target と reference の**両方に
+# 同じバイナリ**を送って測る。コード生成の差が消えるので、残る変数は CPU だけ
+# になる。判定できるのは「同じイメージで作った 2 台のどちらかが遅い」形。
+#
 # 構築後の FreeBSD 機に対しては verify_host.sh のほうを使うこと。
 set -u
 
 TARGET="${1:-}"
-[ -n "$TARGET" ] || { echo "usage: $0 <user@host>" >&2; exit 2; }
+REFERENCE="${2:-}"
+[ -n "$TARGET" ] || { echo "usage: $0 <target> [reference]" >&2; exit 2; }
 
 DIR="$(dirname "$0")"
 PROBE="$DIR/stlf_probe.c"
 SSH_OPTS='-o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new'
+SAME_MAX='2.0'
+AFFLICTED_MIN='3.0'
 
 [ -f "$PROBE" ] || { echo "stlf_probe.c が見つかりません: $PROBE" >&2; exit 2; }
 
@@ -31,38 +38,44 @@ trap 'rm -f "$BIN"' EXIT
 cc -O2 -static -o "$BIN" "$PROBE" 2>/dev/null \
   || { echo "静的バイナリのビルドに失敗（cc と静的 libc が要ります）" >&2; exit 2; }
 
-echo "=== $TARGET"
+# 同一バイナリを送って ratio だけを拾う。測れなければ空を返す。
+measure() {
+  # shellcheck disable=SC2086
+  scp $SSH_OPTS -q "$BIN" "$1:/tmp/stlf_probe" 2>/dev/null || return 0
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "$1" 'chmod +x /tmp/stlf_probe && /tmp/stlf_probe; rm -f /tmp/stlf_probe' 2>/dev/null \
+    | sed -n 's/^ *ratio *: *\([0-9.]*\).*/\1/p'
+}
 
-# shellcheck disable=SC2086
-ssh $SSH_OPTS "$TARGET" true || { echo "SSH 失敗" >&2; exit 2; }
+echo "=== target    : $TARGET"
+t_ratio=$(measure "$TARGET")
+[ -n "$t_ratio" ] || { echo "  ✗ 測定に失敗しました（SSH を確認）" >&2; exit 2; }
+echo "  ratio       : $t_ratio"
 
-# 記録用。判定には使わない。メタデータが取れなくても止めない。
-# shellcheck disable=SC2086
-meta=$(ssh $SSH_OPTS "$TARGET" '
-  T=$(curl -s -m 5 -X PUT http://169.254.169.254/v1/token \
-        -H "Metadata-Token-Expiry-Seconds: 120" 2>/dev/null)
-  [ -n "$T" ] && curl -s -m 5 http://169.254.169.254/v1/instance -H "Metadata-Token: $T" 2>/dev/null
-  :
-')
-
-if [ -n "$meta" ]; then
-  echo "  plan      : $(echo "$meta" | sed -n 's/^type: //p') / $(echo "$meta" | sed -n 's/^region: //p')"
-  echo "  host_uuid : $(echo "$meta" | sed -n 's/^host_uuid: //p')  (記録用・判定には使わない)"
-else
-  echo "  metadata  : 取得できず（Linode 以外のホストか、メタデータサービス不通）"
+if [ -z "$REFERENCE" ]; then
+  echo "  ⚠ 参照が指定されていないので合否は出しません。"
+  echo "  → 同じイメージで作ったもう 1 台を第 2 引数に渡すと比較できます。"
+  exit 0
 fi
 
-# shellcheck disable=SC2086
-scp $SSH_OPTS -q "$BIN" "$TARGET:/tmp/stlf_probe" \
-  || { echo "バイナリの転送に失敗" >&2; exit 2; }
-# shellcheck disable=SC2086
-probe=$(ssh $SSH_OPTS "$TARGET" 'chmod +x /tmp/stlf_probe && /tmp/stlf_probe; s=$?; rm -f /tmp/stlf_probe; exit $s')
-status=$?
-echo "$probe" | sed 's/^/  /'
+echo "=== reference : $REFERENCE"
+r_ratio=$(measure "$REFERENCE")
+if [ -z "$r_ratio" ]; then
+  echo "  ⚠ 参照を測れませんでした。合否は出しません。" >&2
+  exit 2
+fi
+echo "  ratio       : $r_ratio"
 
-case "$status" in
-  0) echo "  → 健全。このホストで OS 構築を始めてよい"; exit 0 ;;
-  1) echo "  → 異常。削除して作り直す（まだ何も構築していないので損失なし）"; exit 1 ;;
-  2) echo "  → 判定不能（基準値の中間）。時間を空けて再測定する"; exit 1 ;;
-  *) echo "  ✗ stlf_probe の実行に失敗しました (exit $status)" >&2; exit 2 ;;
-esac
+rel=$(awk "BEGIN{printf \"%.2f\", $t_ratio / $r_ratio}")
+echo "=== target / reference = ${rel}x"
+
+if awk "BEGIN{exit !($rel <= $SAME_MAX)}"; then
+  echo "  → 参照と同等。このホストで OS 構築を始めてよい"
+  exit 0
+fi
+if awk "BEGIN{exit !($rel >= $AFFLICTED_MIN)}"; then
+  echo "  → 参照より明らかに遅い。削除して作り直す（まだ何も構築していないので損失なし）"
+  exit 1
+fi
+echo "  → 判定不能（${SAME_MAX}x〜${AFFLICTED_MIN}x の中間）。時間を空けて測り直す"
+exit 2
