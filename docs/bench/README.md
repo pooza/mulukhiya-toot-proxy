@@ -105,3 +105,21 @@ ssh pooza@<host> 'crontab -l | grep -v cpu_sample.rb | crontab -'
 2. zugoga と lbock が**ニチアサ実況の時間帯**に劣化するか（＝ Shared 契約が実況ウィンドウで牙を剥くか）
 
 2026-07-20 時点の基準値（`raw_cpu`、3.4.9・単発）: lbock 1408ms / zugoga 1624ms / shallu 2056ms / gomander 2515ms。
+
+**07-26（日）の観測は完了**し、結果は [data/](data/) へ退避した。実況ウィンドウ（08〜09時台）の平均は lbock 1502ms / zugoga 1776ms / gomander 1637ms で、いずれも同日深夜（02〜04時台）と 1〜2% 差＝**実況時間帯の劣化は観測されなかった**。
+
+## analyze_handler_profile.rb
+
+`HandlerProfile`（#4464）が出したログを集計する。データは [data/](data/) にあり、ホストからの取得はもう要らない。
+
+```sh
+DATE=2026-07-26 HOURS=8-9 ruby docs/bench/analyze_handler_profile.rb \
+  docs/bench/data/handler_profile-lbock-20260723-20260726.jsonl.gz
+```
+
+稼働中のホストから採り直す場合は syslog から抜く（本番は `profile.handler.enable: true` が必要）。
+
+```sh
+ssh pooza@<host> 'sudo grep "\"profile\"" /var/log/mulukhiya-toot-proxy.log'
+ssh pooza@<host> 'sudo zgrep -h "\"profile\"" /var/log/mulukhiya-toot-proxy.log.*.gz'
+```
