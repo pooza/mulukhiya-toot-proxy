@@ -108,6 +108,24 @@ ssh pooza@<host> 'crontab -l | grep -v cpu_sample.rb | crontab -'
 
 **07-26（日）の観測は完了**し、結果は [data/](data/) へ退避した。実況ウィンドウ（08〜09時台）の平均は lbock 1502ms / zugoga 1776ms / gomander 1637ms で、いずれも同日深夜（02〜04時台）と 1〜2% 差＝**実況時間帯の劣化は観測されなかった**。
 
+## probe_localhost_connect.rb — `localhost` 接続の HEv2 遅延を検出する
+
+Ruby 3.4 以降の `TCPSocket.new` は Happy Eyeballs v2 で A / AAAA を並行解決する。**`/etc/hosts` に `::1 localhost` が無いホストでは AAAA だけ DNS へ出て行き、その決着を待つあいだ固定ディレイ（実測 305ms）を払う。** lbock ではこれが投稿レイテンシの主因だった（#4481）。
+
+```sh
+ssh pooza@<host> '/usr/local/bin/ruby34 -' < docs/bench/probe_localhost_connect.rb
+# exit 0 = 健全 / 1 = localhost が 127.0.0.1 より 50ms 以上遅い＝地雷を踏んでいる
+```
+
+実測（2026-07-26）:
+
+| ホスト | `::1 localhost` | redis 6379 | pgbouncer 6432 | postgres 5432 |
+| --- | --- | --- | --- | --- |
+| lbock | なし | 306.5 ms | 307.2 ms | 310.5 ms |
+| gomander | あり | 0.3 ms | 0.2 ms | 0.2 ms |
+
+**新規機を建てたら必ず通すこと。** 対策は `/etc/hosts` へ `::1 localhost` を足すか、DSN をホスト名でなく IP で書くか（#4481 / pooza/chubo2#87）。
+
 ## analyze_handler_profile.rb
 
 `HandlerProfile`（#4464）が出したログを集計する。データは [data/](data/) にあり、ホストからの取得はもう要らない。
