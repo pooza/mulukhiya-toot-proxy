@@ -4,7 +4,11 @@
 # `::1 localhost` が無いホストでは AAAA だけ DNS へ出て行き、その決着を待つあいだ
 # 固定ディレイ（実測 305ms）を払う。lbock ではこれが投稿レイテンシの主因だった。
 #
-#   ssh pooza@<host> '/usr/local/bin/ruby34 -' < docs/bench/probe_localhost_connect.rb
+#   ssh pooza@<host> '~/.rbenv/versions/4.0.5/bin/ruby -' < docs/bench/probe_localhost_connect.rb
+#
+# **モロヘイヤが実際に使う Ruby で通すこと。** 他の bench スクリプトはホスト間比較のため
+# ruby34 で揃えるが、これはホストの設定を見る道具なのでランタイムを揃える意味がない。
+# なお 3.4.9 / 4.0.5 のどちらでも同じ数字が出る（HEv2 は 3.4 からの挙動）。
 #
 # 判定: localhost が 127.0.0.1 より 50ms 以上遅ければ地雷を踏んでいる。
 # 対策は /etc/hosts へ `::1 localhost` を足すか、DSN をホスト名でなく IP で書くか。
