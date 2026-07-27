@@ -37,8 +37,21 @@ misskey:
   verified_at: '2026-06-23'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-07-20'
+last_checked: '2026-07-28'
 
+# 2026-07-28 チェック結果:
+#   - Mastodon: stable v4.6.4（2026-07-27）が出た。セキュリティリリース（権限判定の不備
+#     GHSA-7jvv-fhmg-wpfw / GHSA-hx34-2pfw-2qfj、IPv4-compatible IPv6 経由の SSRF 保護
+#     バイパス GHSA-vwhj-3g83-v276）で、4.5.14 / 4.4.21 も同時リリース。assets 再コンパイル必須。
+#     **本番 3 台には 2026-07-28 に適用済み**（pooza/mastodon の bshockdon → delmulin / curesta
+#     へ 07-27 にマージ済み）。セキュリティ修正のため harness 検証より先に本番適用した。
+#     harness 検証（+ chubo2 .env.example と本ファイルの bump）は**キュアスタ！カットオーバー
+#     (lbock → gomander, 07-28) 後に実施**する。変更ログ上モロヘイヤに効きうるのは Web Push
+#     subscription 削除の CSRF 期待値変更 (#39918) のみだが、モロヘイヤの sw_subscription 経路は
+#     Misskey 専用なので影響なしと判断。
+#   - Misskey: 最新 stable は 2026.6.0（2026-06-22）のままで verified と同一。2026.7.0 は
+#     beta.6 まで進んだが prerelease。対応不要（stable 化したらリリース後数日で検証）。
+#
 # 2026-07-20 チェック結果:
 #   - Mastodon: 最新 stable は v4.6.3（2026-07-03）のままで verified と同一。RC もなし。対応不要。
 #   - Misskey: 最新 stable は 2026.6.0 のまま。2026.7.0 は alpha.6 まで出ているが prerelease。対応不要。
