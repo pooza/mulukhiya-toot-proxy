@@ -215,7 +215,7 @@ daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補�
 - 検証〜適用は **zugoga 本番で先行**（Gate 0 で本番 EXPLAIN ベースライン取得 →
   Gate 1 で候補 A を `CREATE INDEX CONCURRENTLY` 直適用・再計測 → Gate 2 で
   overlay flip と観測）。dev 系での事前検証は行わない。
-- zugoga で効果を確認後、残る本番 Mastodon（shallu / lbock）へ同手順を
+- zugoga で効果を確認後、残る本番 Mastodon（shallu / gomander）へ同手順を
   横展開（#4352）。各台で本番 EXPLAIN を取り直す。
 - 恒久反映が必要なら `pooza/mastodon` の feature ブランチに
   `IF NOT EXISTS` 化した migration を起票（直適用済みインデックスと冪等共存）。
@@ -227,7 +227,7 @@ daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補�
 
 - 親 issue: #4306（cursor ページング切替、5.21.2 で完了）
 - 連動: #4335（`cursor_pagination?` の Attachment 移譲、closed）。
-- サブ Issue: #4351（A: zugoga 再有効化）/ #4352（B: shallu/lbock 横展開）/
+- サブ Issue: #4351（A: zugoga 再有効化）/ #4352（B: shallu/gomander 横展開）/
   #4353（C: pooza/mastodon migration 恒久化）/ **#4375（D: Misskey track
   — `drive_file` index + 複合キー cursor 化で `Misskey::Attachment.cursor_pagination?`
   を true 反転）**。

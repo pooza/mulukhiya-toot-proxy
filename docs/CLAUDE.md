@@ -69,7 +69,7 @@ cure-api 側を触るときに「カスタムフィードも一緒に整理」�
 **機能再開を判断する場合の手順**:
 
 1. #4323 を on-hold から外す
-2. [media-catalog-index-plan.md](media-catalog-index-plan.md) に従い zugoga / shallu / lbock の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
+2. [media-catalog-index-plan.md](media-catalog-index-plan.md) に従い zugoga / shallu / gomander の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
 3. 効果計測（同じ EXPLAIN 比較）後、対象サーバーの overlay yaml で `/mastodon/data/media_catalog: true` を設定
 4. `pooza/mastodon` migration PR で index を恒久化（[chubo2 docs/infra-note.md](https://github.com/pooza/chubo2) の daisskey drive_file 先行事例と同パターン）
 
@@ -422,13 +422,13 @@ Linode metadata service で **プラン・リージョン・vCPU・RAM がすべ
 
 ### キュアスタ！ (lbock) → gomander 移行との関係
 
-受け皿は chubo2#68。**移行して現状より悪化させないことが絶対条件**であり、コストはそのために受け入れてきた要素（gomander と lbock の二重ランニングコストが数ヶ月以上発生しているが、期限で急かす材料にはしない）。
+受け皿は chubo2#68。**2026-07-28 にカットオーバー完了**（ダウンタイム約 2 時間）。移行の記録は chubo2 `docs/infra-history.md` の同日の節、移行後の構成は `docs/infra-note.md`「キュアスタ！本番 (gomander)」節。
 
-作り直した gomander は per-core で lbock の約 1.1 倍遅い程度に収まり、**コアは 4 で同数・RAM は 8.5GB（2.15 倍）**。lbock は swap を 1.3GB 使い page-in が続く状態（CPU 利用率は 10% 前後）なので、律速は CPU ではなく RAM と判断し、プランアップではなく**現行プランのままカットオーバーする**方針で確定した。
+移行判断の前提だったのは「**移行して現状より悪化させないことが絶対条件**」で、コストはそのために受け入れてきた要素（二重ランニングコストが数ヶ月発生したが、期限で急かす材料にはしない）。作り直した gomander は per-core で lbock の約 1.1 倍遅い程度に収まり、**コアは 4 で同数・RAM は 8.5GB（2.15 倍）**。lbock は swap を 1.3GB 使い page-in が続く状態だったので、律速は CPU ではなく RAM と判断し、プランアップせず現行プランのまま切り替えた。
 
-**日程は確定済み（2026-07-23）**: 07-24（金）lbock へ計装投入 → 07-26（日）lbock で最後の実況・内訳採取 → **07-28（火）メンテ当日** → 07-31 lbock 解約 → 08-02（日）新サーバーで初の実況。手順は chubo2 `docs/infra-note.md`「キュアスタ！カットオーバー手順」。
+**残っている段取り**: 07-31 lbock 解約 → **08-02（日）gomander で初の実況・計装の再採取**。移行前（07-26 の lbock）と突き合わせて初めて比較になるので、それまで本番は `develop`（計装入り）で動かし続ける。**5.30.0 のリリースは 08-02 の突き合わせ後**。
 
-**進行順**: #4464 計装 → **lbock 実負荷で実測（07-26）** → カットオーバー（07-28）→ gomander で再測（08-02）→ 内訳を見て対策 Issue を起こす。**5.30.0 のリリースはカットオーバー後**になる。移行前後を同じコードで比較する必要があるため、07-24 から 5.30.0 リリースまでの間だけ本番が `develop` で動く（gomander も当日 `develop` を clone する）。
+⚠ **`localhost` 接続の 305ms（下記）は lbock 固有の `/etc/hosts` 起因で、gomander は `::1 localhost` を持つ（2026-07-29 実機確認）＝移行しただけで消える。** 08-02 に投稿レイテンシが改善しても gomander の RAM やプランの手柄と読み違えないこと。
 
 **5.29.0 リリース前レビューの送り:**
 
