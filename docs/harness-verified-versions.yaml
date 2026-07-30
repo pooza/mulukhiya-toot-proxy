@@ -29,15 +29,32 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.6.3
-  verified_at: '2026-07-08'
+  verified: v4.6.4
+  verified_at: '2026-07-30'
 
 misskey:
   verified: 2026.6.0
   verified_at: '2026-06-23'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-07-28'
+last_checked: '2026-07-30'
+
+# 2026-07-30 チェック結果:
+#   - Mastodon: stable v4.6.4（2026-07-27）を fedi-test-harness で検証・verified 昇格。
+#     07-28 に「キュアスタ！カットオーバー後に実施」として保留していた分の消化。
+#     v4.6.4 イメージ + クリーン DB で再構築（update-version.sh → reset.sh）し、mulukhiya
+#     フルスイートを実走して **879 tests / 1767 assertions / 0 failures / 0 errors /
+#     11 omissions（100% passed）**＝退行ゼロ。omission 11 件はすべて既知の harness 側
+#     ギャップ（chubo2#63 デーモン層・HTTP/webhook エンドポイント・streaming_api・nodeinfo の
+#     https/http 不整合、chubo2#64 メディア/ハッシュタグ seed 未整備）で Mastodon 版とは無関係。
+#     DB 直読み経路（status / account / postgres）は omission ゼロで全緑。失敗が 1 件も無い
+#     ため v4.6.3 との差分実走（07-08 のような比較）は不要と判断した。
+#     chubo2 .env.example も v4.6.4 へ更新済み（pooza/chubo2#96）。
+#     参考: 07-08 の baseline は 831 tests / 6 failures / 41 errors だったが、その後の
+#     #4447 triage・PR#4450 で環境起因の失敗が omission に整理され 0 failures / 0 errors に
+#     なった（MEMORY の project_harness-zero-error-goal の目標を達成）。
+#   - Misskey: 最新 stable は 2026.6.0（2026-06-22）のままで verified と同一。**2026.7.0-rc.0 が
+#     07-28 に出た**が prerelease。Misskey は stable リリース後数日で検証する方針なので対応不要。
 
 # 2026-07-28 チェック結果:
 #   - Mastodon: stable v4.6.4（2026-07-27）が出た。セキュリティリリース（権限判定の不備
