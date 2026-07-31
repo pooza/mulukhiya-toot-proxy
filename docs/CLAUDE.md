@@ -541,11 +541,34 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - `$TOKEN` は `~/.sentryclirc` の `[auth]` セクションから取得する
 - Sentry 未導入のプロジェクトではこのステップをスキップする
 
-### 6. 外部リポジトリの同期確認（chubo2）
+### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
+
+対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*` 7 リポジトリ（モロヘイヤが依存する自作 gem 群）。
+
+#### 6-1. 毎セッション
 
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
-- `gh issue list --state open` で open Issue の変動を確認
+- `gh issue list --state open` で open Issue の変動を確認（chubo2 / ginseng-* とも）
+
+#### 6-2. 30 日ごとの棚卸し
+
+chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) 冒頭にある
+「最終棚卸し」の日付を見る。**当日から 30 日以上経過していれば**以下を実行（経過していなければスキップ）。
+
+- 各リポジトリの open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
+- **一覧を眺めるだけでは不十分。** 2026-07-31 の初回棚卸しでは 30 件中 6 件が「既に終わっている」
+  または「対象が消滅している」状態で、最古は 5 か月放置されていた（#4488）。実装が chubo-core 側の
+  コミットで着地していると、タイトルからは終わっているか分からない
+- 判定の取り方の例:
+  - レシピ化系 → 該当 cookbook を開いて実装の有無を確認（`git log -- <path>` でコミットも辿る）
+  - 移行・撤退系 → 実機に SSH、または `curl` / DNS 解決で新旧の状態を確認
+  - ステージング関連 → `docs/infra-note.md` の現況表と突き合わせる。**旧ステージング
+    （`drime` + dev04/15/22/23）は退役済み**なので、これらを対象とする Issue は陳腐化している
+- close 候補は**証拠を添えて提示する**。close するかどうかの判断はユーザーに残す
+- 棚卸しが済んだら `docs/infra-note.md` の「最終棚卸し」を当日に更新してコミット（close 候補が 0 件でも更新する）
+- 専用の cloud/cron ジョブは使わない（§8 と同じ理由。スケジュール実行は途中で止まって手で起こす運用に
+  なりがちで、セッションに織り込むほうが確実に回る）
 
 ### 7. マイルストーンの状態確認
 
