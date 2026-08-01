@@ -33,11 +33,43 @@ mastodon:
   verified_at: '2026-07-30'
 
 misskey:
-  verified: 2026.6.0
-  verified_at: '2026-06-23'
+  verified: 2026.7.0
+  verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-07-30'
+last_checked: '2026-08-01'
+
+# 2026-08-01 チェック結果:
+#   - Misskey: stable 2026.7.0（2026-07-31）を fedi-test-harness で検証・verified 昇格。
+#     07-30 に決めた「stable 後に 1 回だけ検証する」方針の消化。**2026.7.0 と 2026.6.0 を
+#     それぞれクリーン再構築（update-version.sh → reset.sh）して mulukhiya フルスイートを
+#     実走・比較し、結果が完全一致＝退行ゼロ**を確認した:
+#       882 tests / 1820 assertions / 3 failures / 0 errors / 9 omissions（両版とも同一）
+#     失敗集合も同じ 3 件で、いずれも Misskey のバージョンとは無関係な既存の harness ギャップ:
+#       - SNSServiceTest#test_access_token — harness の access_token テーブルは 0 行
+#         （実測確認済み）。setup.sh のトークンは /api/admin/accounts/create と /api/signup が
+#         返す user.token で、`Misskey::AccessToken`（Sequel::Model(:access_token)）が
+#         引く行が存在しない。構造的な provisioning ギャップ
+#       - WebhookTest#test_command — omit ガードが stdout の HTML（`<` 始まり）を条件に
+#         しているが、Misskey は同じ状況で JSON の {"message":...} を返すためガードが
+#         素通りする。Mastodon 形に書かれたガードが Misskey で効いていない
+#       - WebhookImageHandlerTest#test_handle_pre_webhook — Amazon の画像 URL 取得に
+#         依存する外部依存の失敗。Misskey とは無関係
+#     この 3 件は #4492 で追跡する（2026.7.0 の昇格自体はブロックしない）。
+#     chubo2 .env.example も 2026.7.0 へ更新済み（pooza/chubo2#109）。
+#   - upstream 変更のうちモロヘイヤに効きうる点の事前確認:
+#     センシティブ判定の外部サービス（sensitive-detector）分離は、本番 sweep・staging dev27 とも
+#     meta.sensitiveMediaDetection = none のため影響なし。YAML パーサ厳格化は両機の
+#     .config/default.yml に allowPrivateNetworks の記述が無いため影響なし。マイグレーション 4 本は
+#     hashtag の DEFAULT 追加・index 追加等で、mulukhiya の app/query/misskey/*.sql.erb
+#     （user / user_profile / registry_item / app）と HashTag モデルに破壊的影響なし。
+#     misskey_service.rb が叩く /api/i, /api/i/update, /api/meta, /api/get-avatar-decorations,
+#     /api/notes/drafts/{create,update} はいずれも削除・変更なし。
+#   - **2026.7.0 は実質セキュリティリリース**。CHANGELOG の「Fix: セキュリティに関する修正」に
+#     対応するのは 07-28 の Merge commit from fork 2 本（GitHub Security Advisory の私有
+#     フォーク由来）で、いずれも未認証エンドポイント fetch-rss / RSS ウィジェット。
+#     GHSA は 08-01 時点で未公開。Node の最低動作版が 22.22.2 / 24.17.0 / 26.4.0 に
+#     上がった点は pooza/chubo2#107 を参照。
 
 # 2026-07-30 チェック結果:
 #   - Mastodon: stable v4.6.4（2026-07-27）を fedi-test-harness で検証・verified 昇格。
