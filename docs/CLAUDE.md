@@ -63,6 +63,19 @@
 
 `DefaultTagHandler` は実装としてはシンプルだが、コミュニティ運用の基盤を支える重要なハンドラー。
 
+### デフォルトハッシュタグは upstream で却下済み（再提案しない）
+
+タグの**付与**はモロヘイヤ（`DefaultTagHandler`）が担うが、**読み取り経路**——ローカルタイムライン・streaming チャンネル・検索がそのタグでコミュニティを構成する部分——はプロキシの射程外で、`pooza/misskey` の `daisskey` ブランチ（および `pooza/mastodon`、[pooza/mastodon#925](https://github.com/pooza/mastodon/issues/925)）の fork が担っている。
+
+**この機能は misskey-dev へ PR 済みで、却下されている。** 理由は 2 点:
+
+1. **既存機能のふるまいを変えてはならず、完全な追加機能でなければならない** — 現行 fork は `local-timeline` の `note.userHost IS NULL` をタグ条件に置き換え、`SearchService` の `host: '.'` を同様に分岐させ、`NoteCreateService` の fanout でリモート投稿を `localTimeline` へ流している。いずれも既存の意味を変えている
+2. **設定はファイルではなくコントロールパネルから行えなければならない** — 現行 fork は `.config/default.yml` の `defaultTag` を読む
+
+**config ゲートで未設定時にバニラ挙動へ倒れる書き方になっているが、それはマージ衛生の話であって upstream の受け入れ基準とは別物。** 満たしていない。再提案するなら上記 2 点を満たす設計（既存エンドポイントに触れない新規タイムラインを、`meta` テーブル経由の設定で追加する等）から作り直しになる。**現状の形のまま出し直しても通らない。**
+
+なお `CleanRemoteNotesProcessorService` の fork のうち、statement_timeout 耐性（upstream #17057 の回避策）にあたる部分は挙動も設定も変えないため、この 2 基準に抵触せず upstream 化の余地がある。fork の中で唯一 upstream の既存行を大きく書き換えている箇所（+78/−25）でもあり、マージ痛を減らす効果も大きい。
+
 ## カスタムフィードの残置（cure-api との切り分け）
 
 cure-api 独立化（#4144）でカスタム API（`/api/custom`）は完全削除されたが、**カスタムフィード**（`/feed/custom`、`custom_feed.rb` + `command_line.rb`）はモロヘイヤ側に残置されている。利用者は2名。`Open3.capture3` を使うが Bundler 環境切替が無いため EPIPE 系の問題は起きていない。
