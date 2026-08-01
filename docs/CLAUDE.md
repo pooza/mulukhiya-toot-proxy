@@ -36,6 +36,23 @@
 - TOCTOU レース等、本体と同じ race を抱えている場合はむしろ「本体と揃っている」ことをもって受容する（例: Misskey `/api/sw/register` の SELECT-then-INSERT、5.19.0 R8 判断）
 - 例外として PGroonga 採用（pooza/mastodon, pooza/misskey 双方に起票済み）は検討対象。緊急ではないため折を見て実施予定
 
+## 設計方針: SNS の状態ストアには SELECT しかしない
+
+モロヘイヤは Mastodon / Misskey の Postgres を Sequel で直読みするが、**書き込まない**。SNS の Redis に対しても同様。スキーマの所有者は SNS 側であり、SNS 自身のマイグレーションが与り知らない書き込みを外から入れると、アップグレード時の整合が壊れる。
+
+**唯一の例外: Misskey の `sw_subscription`**（[misskey_service.rb](../app/lib/mulukhiya/service/misskey_service.rb)）。
+
+- 行の `create` / `update` / `delete`（`for_update` + トランザクション）
+- あわせて Misskey の Redis キャッシュ `kvcache:userSwSubscriptions:<userId>` を `del`（行を書き換えたら飛ばさないと Misskey が古い値を読むため）
+
+やむを得なかった理由は、Misskey の `/api/sw/register` が重複 subscription を溜め込むうえ、**それを修復する API が無い**こと。#4408 で導入し、#4420 で決定化・トランザクション化した。
+
+### 二つの方針が衝突したら、本体改造を採る
+
+「本体改造の最小化」（上節）と本節は衝突しうる。**本体を触らずに済ませる代償がモロヘイヤ側の非 SELECT なら、本体改造のほうを採る。** モロヘイヤは本体改造を減らすための仕組みだが、そのために SNS の状態ストアを外から書き換えるのでは目的と手段が逆転する。非 SELECT は「他に手が無いとき」の選択肢に留める。
+
+**判断の前例（2026-08-01）**: ダイスキーのリモート `drive_file` 期限切れ（195 万行・うち 97.1% が誰もフォローしていない著者のもの）を、モロヘイヤの Sidekiq ワーカーでやるか Misskey 本体の fork でやるかを検討し、**fork を採った**。行削除と Object Storage の実体削除を伴い、非 SELECT を二重に踏むため。`CleanRemoteNotesProcessorService` の改造版（デフォルトタグ付き投稿を削除対象から除外）という前例が既に daisskey ブランチにあり、`CleanRemoteFilesProcessorService` を同じ形で拡張できる。詳細は pooza/chubo2#35。
+
 ## 姉妹サーバーとコミュニティ設計
 
 モロヘイヤは複数の SNS サーバーで稼働しており、一部は「姉妹サーバー」の関係にある。
