@@ -477,6 +477,15 @@ Linode metadata service で **プラン・リージョン・vCPU・RAM がすべ
 
 ⚠ **`localhost` 接続の 305ms（下記）は lbock 固有の `/etc/hosts` 起因で、gomander は `::1 localhost` を持つ（2026-07-29 実機確認）＝移行しただけで消える。** 08-02 に投稿レイテンシが改善しても gomander の RAM やプランの手柄と読み違えないこと。
 
+⚠ **08-02 の実況は特殊条件下だった。比較に交絡因子が 2 つ乗る。**
+
+1. **早朝の分散ボット流入**（05:00〜06:20）。単一 UA・2,922 IP / 319 ネットに分散したスクレイパーがピーク約 5,000 req/分で gomander を叩き、load 24.6・当日 504 が 808 件（前日 18 件）。06:20 に自然収束したが、実況時間帯に再来する可能性がある。受け皿は chubo2#118
+2. **`tags` のインデックス是正**（06:1x〜06:3x）。上記の調査中に `index_tags_on_name_lower_btree` の欠損が発覚し、本番 3 台へ非 UNIQUE で投入 + `ANALYZE`。タグ検索が **3,086ms → 0.078ms**。受け皿は chubo2#117
+
+**この欠損は 07-26 の lbock 時点でも存在していた**（gomander の DB は lbock 由来で、移行後も欠けていた）。実況はハッシュタグを大量に使い、モロヘイヤの自動タグ付与がそれを増幅するため、**07-26 の p50 4.9 秒にはこのフルスキャン分が乗っていた可能性がある**。08-02 との単純比較で「移行で速くなった」と結論しないこと。
+
+切り分けの指針: タグ検索は Mastodon 本体の status 生成（relay ~1.5s と確定済みの部分）の中で起き、モロヘイヤのハンドラ側には乗らない。したがって **relay 部分の低下＝インデックス是正の効果、ハンドラ部分の変化＝移行・HEv2 の効果**として読む。
+
 **5.29.0 リリース前レビューの送り:**
 
 - **#4461 obs/並行性: 5.29.0 リリース前 5観点レビュー 黄まとめ（size:M）** — save 二重 alert（read-back GatewayError × UserConfig#update の alert）、StartupNotificationWorker の rescue deadman、compose RMW の user_config メモ化 fresh-read 強制、lock TTL 10s→30s。いずれも非ブロック
