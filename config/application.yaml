@@ -506,6 +506,10 @@ redis:
   retry:
     limit: 3
     seconds: 1
+runtime:
+  # true にすると YJIT が有効でないサーバーの /health を NG (503) にする (#4466)。
+  # 既定は false ＝ health には情報として出すだけ。
+  require_yjit: false
 sentry:
   dsn: null
   traces_sample_rate: 0
