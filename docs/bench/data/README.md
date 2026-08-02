@@ -34,7 +34,22 @@ DATE=2026-07-29 HOURS=19-21 ruby docs/bench/analyze_handler_profile.rb \
   docs/bench/data/handler_profile-gomander-20260729.jsonl.gz
 ```
 
-**本命は 08-02（日）のニチアサ**。同じ手順でもう一度採取し、`handler_profile-lbock-20260723-20260726.jsonl.gz` の 07-26 8〜10 時台と突き合わせる。
+## handler_profile-gomander-20260802.jsonl.gz
+
+**gomander で初のニチアサ実況＝本命の突き合わせ。** 形式・注意点は上と同じ。
+
+- **99 行**（00:07〜09:03）。うち実況の 08 時台が 80 行（`pre_toot` 79 / `pre_webhook` 1）
+- 08 時台のローカル投稿は **130 件**で、**07-26（lbock）の 133 件とほぼ同量**＝そのまま比較できる（両日とも移行後の gomander の `statuses` から取得）
+- 08 時台: `min=1.0 / p50=1.1 / p90=1.5 / max=1.9s`。lbock 07-26 08 時台は `min=4.3 / p50=4.8 / p90=5.5 / max=6.3s`
+- ⚠ **閾値 1.0 秒が分布を切っている。** lbock は最速 4.3 秒＝ほぼ全件が閾値の上（119/133＝89%）だったが、gomander は **61%（79/130）しか記録対象にならない**。**両日の p50 を同じ母集団の代表値として並べないこと**。改善幅を語るときは 1 秒超の割合（89% → 61%）を併記する
+- 処理内容の変わっていない `spoiler` / `user_config_command` が 0.652s / 0.632s → **0.026s / 0.023s**。305ms × 接続回数の消滅が実況の実負荷でも再現した
+- 残る所要の 76% は `dictionary_tag` 0.457s + `remote_tag` 0.454s。HTTP 待ちは 0.1%＝**辞書スキャンの CPU 時間**（#4463 / #4465 / #4482）
+- 交絡因子（早朝のボット流入 / `tags` インデックス是正）はいずれもこの比較に効いていない。詳細は `docs/CLAUDE.md`「2026-08-02 実測」節
+
+```sh
+DATE=2026-08-02 HOURS=8-8 ruby docs/bench/analyze_handler_profile.rb \
+  docs/bench/data/handler_profile-gomander-20260802.jsonl.gz
+```
 
 ## cpu_sample-{lbock,zugoga,gomander}-20260726.tsv
 
@@ -44,3 +59,5 @@ DATE=2026-07-29 HOURS=19-21 ruby docs/bench/analyze_handler_profile.rb \
 - gomander … 07-23 05:23 〜 07-26 21:30（530 行、作り直しに伴い再設置）
 
 Ruby は 3 台とも条件統一のため `ruby34`（3.4.9・YJIT なし）で、本番の実行条件（Ruby 4.0.5 + YJIT）とは異なる。**絶対性能の結論には使わない**（`docs/CLAUDE.md`「本番 Ruby での per-core 再測定」参照）。
+
+サンプラは **撤収済み**（2026-08-02 に gomander / zugoga とも cron・TSV の不在を実機確認）。lbock は解約済み。
