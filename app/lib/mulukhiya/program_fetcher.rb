@@ -56,7 +56,7 @@ module Mulukhiya
       success = 0
       uris.each do |v|
         next unless valid_content_length?(v)
-        response = @http.get(v, timeout: fetch_timeout)
+        response = @http.get(v, timeout: fetch_timeout, host_validator: RemoteHost.validator)
         next unless valid_response_size?(response, v)
         parsed = response.parsed_response
         next unless valid_program_schema?(parsed, v)

@@ -159,7 +159,7 @@ module Mulukhiya
 
     def fetch_one(uri)
       return nil unless valid_content_length?(uri)
-      response = @http.get(uri, timeout: fetch_timeout)
+      response = @http.get(uri, timeout: fetch_timeout, host_validator: RemoteHost.validator)
       return nil unless valid_response_size?(response, uri)
       parsed = response.parsed_response
       return nil unless valid_schema?(parsed, uri)
