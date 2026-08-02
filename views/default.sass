@@ -1012,10 +1012,14 @@ a:hover
     margin: 0
   input.short
     width: 10em
+  // 幅を与えたうえで縮小を止める。上の `input, select` が flex-grow: 1 を
+  // 付けているためチェックボックスも flex item になり、幅指定なしで
+  // flex-shrink: 1 だと行が詰まったときに 0 幅まで潰れて消える (#4483)。
   input[type="checkbox"]
     margin:
       left: 0.5em
-    flex-shrink: 1
+    width: 1.5em
+    flex-shrink: 0
   label
     display: flex
     gap: 0.5em
