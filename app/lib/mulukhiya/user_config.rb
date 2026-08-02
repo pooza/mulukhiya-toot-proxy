@@ -21,15 +21,27 @@ module Mulukhiya
       return @values[key]
     end
 
+    # 設定を更新する。書き込みに失敗しても例外は伝播させず、alert して nil を返す
+    # （呼び出し側の多くはハンドラ・ワーカーの途中で、ここで落とすと投稿処理ごと
+    # 巻き添えになるため）。
+    #
+    # ⚠ 成否を自前で検証して通知する呼び出し側は update! を使うこと。両方が通知
+    # すると Redis の一過性障害 1 回で alert が 2 発飛ぶ (#4461)。
     def update(values)
+      return update!(values)
+    rescue => e
+      e.alert
+      return nil
+    end
+
+    # 失敗の扱いを呼び出し側へ委ねる版。alert せずそのまま raise する。
+    def update!(values)
       values.deep_stringify_keys!
       handle_user_tags(values)
       handle_decorations(values)
       values = encrypt(values)
       @storage.update(@account.id, values)
       @values = @storage[@account.id]
-    rescue => e
-      e.alert
     end
 
     def token
