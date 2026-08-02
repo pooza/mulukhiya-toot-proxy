@@ -108,6 +108,10 @@ module Mulukhiya
       return if disable?
       url = 'https://dic.test/pron.json'
       original_urls = config['/word_suggest/urls']
+      # fetch は SSRF allowlist を通る (#4410)。`.test` は解決できず fail-closed で
+      # 弾かれるため、ここでは検証を通す callable に差し替える（teardown で復元）。
+      original_validator = RemoteHost.validator
+      RemoteHost.validator = ->(_host) {true}
       config['/word_suggest/urls'] = [url]
       stub_request(:head, url).to_return(status: 200)
       stub_request(:get, url).to_return(
@@ -125,6 +129,7 @@ module Mulukhiya
       assert_equal('相生', PronunciationDictionary.new.suggest('あいおい').first[:surface])
     ensure
       config['/word_suggest/urls'] = original_urls if defined?(original_urls)
+      RemoteHost.validator = original_validator if defined?(original_validator)
     end
   end
 end

@@ -35,6 +35,21 @@ module Mulukhiya
       return false
     end
 
+    # Ginseng::HTTP#get の host_validator へ渡す callable (#4410)。
+    # リダイレクトの各ホップがこれを通る。
+    #
+    # ⚠ writer はテストの差し替え専用。実行時に緩めてはいけない。差し替えた
+    # テストは teardown で必ず元へ戻すこと（残すと以後のテストで SSRF ガードが
+    # 効かなくなり、守れているつもりの緑になる）。
+    def self.validator
+      @validator ||= ->(host) {public?(host)}
+      return @validator
+    end
+
+    class << self
+      attr_writer :validator
+    end
+
     # Addrinfo.getaddrinfo は timeout を持てず、攻撃者が応答を引き延ばす権威
     # DNS を立てると Sinatra リクエストスレッド (Puma 5 本) を飽和させられる。
     # Resolv::DNS#timeouts= で 1 回あたりの解決待ちを上限化する。タイムアウト
