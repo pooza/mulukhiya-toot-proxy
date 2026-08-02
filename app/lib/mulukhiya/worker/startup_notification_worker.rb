@@ -11,6 +11,12 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # sidekiq-scheduler は Sidekiq::Client.push を直叩きするため Worker.perform_async
+      # 側の disable? gate を通らない。info agent が無いサーバーでも schedule
+      # (every: 5m) 経由で perform が起動するので、ここでも短絡する (#4343)。
+      # これを欠くと send_notification が nil を叩き、下の deadman が 5 分ごとに
+      # alert する。
+      return if disable?
       notify(Environment.health)
       clear_failure
     rescue => e
