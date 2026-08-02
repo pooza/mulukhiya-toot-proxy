@@ -6,7 +6,7 @@ module Mulukhiya
     end
 
     def addition_tags
-      return TaggingDictionary.new.matches(flatten_payload)
+      return dictionary.matches(flatten_payload)
     end
 
     def without_kanji_pattern

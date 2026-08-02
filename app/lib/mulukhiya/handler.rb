@@ -251,6 +251,15 @@ module Mulukhiya
       return @reporter.tags
     end
 
+    # 同一イベントの全ハンドラで TaggingDictionary を共有する (#4482)。
+    # 構築は Redis GET + Marshal.load（実辞書 725KB）で、投稿ごとに何度も
+    # 払うようなものではない。@params は Event#handlers が全ハンドラへ渡す
+    # 同一の Hash なので、メモ化のスコープは 1 イベント＝1 投稿に閉じる。
+    def dictionary
+      @params[:tagging_dictionary] ||= TaggingDictionary.new
+      return @params[:tagging_dictionary]
+    end
+
     def self.create(name, params = {})
       return "Mulukhiya::#{name.to_s.sub(/_handler$/, '').camelize}Handler".constantize.new(params)
     rescue => e
@@ -358,6 +367,7 @@ module Mulukhiya
     end
 
     def initialize(params = {})
+      @params = params
       @result = Concurrent::Array.new
       @errors = Concurrent::Array.new
       @sns = params[:sns] || sns_class.new
