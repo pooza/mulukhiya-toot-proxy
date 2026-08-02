@@ -18,11 +18,17 @@ module Mulukhiya
       end
     LUA
 
-    # ロック保持の TTL 秒。テンプレ CRUD は一瞬で完了するため短くてよい。
+    # ロック保持の TTL 秒。テンプレ CRUD 自体は一瞬で終わるが、TTL は「処理時間の
+    # 見積り」ではなく「Ruby 側がストールしてもロックを失わない余裕」で決める。
+    # GC・Redis の応答遅延で RMW の途中に TTL が切れると、ロック無しで書き込む
+    # 別リクエストが現れて lost update が黙って復活するため（確率は低いが検知も
+    # できない）。CRUD は低頻度で、プロセスが死んでロックが残っても待たされるのは
+    # 当人だけなので、Annict 系ロック（既定 30 秒）と同水準に揃える (#4461)。
+    #
     # 定数にして config ルックアップを持たない（存在しないパスは ConfigError を
     # raise し、acquire の rescue に飲まれてロックが黙って無効化される footgun を
     # 避けるため。rescue は Redis 障害のみを対象に保つ）。
-    LOCK_TTL_SECONDS = 10
+    LOCK_TTL_SECONDS = 30
 
     # account 単位で block を直列化して実行する。保持中は ConflictError(409)。
     def synchronize(account_id)

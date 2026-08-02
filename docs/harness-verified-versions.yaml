@@ -29,16 +29,85 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.6.3
-  verified_at: '2026-07-08'
+  verified: v4.6.4
+  verified_at: '2026-07-30'
 
 misskey:
-  verified: 2026.6.0
-  verified_at: '2026-06-23'
+  verified: 2026.7.0
+  verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-07-13'
+last_checked: '2026-08-01'
 
+# 2026-08-01 チェック結果:
+#   - Misskey: stable 2026.7.0（2026-07-31）を fedi-test-harness で検証・verified 昇格。
+#     07-30 に決めた「stable 後に 1 回だけ検証する」方針の消化。**2026.7.0 と 2026.6.0 を
+#     それぞれクリーン再構築（update-version.sh → reset.sh）して mulukhiya フルスイートを
+#     実走・比較し、結果が完全一致＝退行ゼロ**を確認した:
+#       882 tests / 1820 assertions / 3 failures / 0 errors / 9 omissions（両版とも同一）
+#     失敗集合も同じ 3 件で、いずれも Misskey のバージョンとは無関係な既存の harness ギャップ:
+#       - SNSServiceTest#test_access_token — harness の access_token テーブルは 0 行
+#         （実測確認済み）。setup.sh のトークンは /api/admin/accounts/create と /api/signup が
+#         返す user.token で、`Misskey::AccessToken`（Sequel::Model(:access_token)）が
+#         引く行が存在しない。構造的な provisioning ギャップ
+#       - WebhookTest#test_command — omit ガードが stdout の HTML（`<` 始まり）を条件に
+#         しているが、Misskey は同じ状況で JSON の {"message":...} を返すためガードが
+#         素通りする。Mastodon 形に書かれたガードが Misskey で効いていない
+#       - WebhookImageHandlerTest#test_handle_pre_webhook — Amazon の画像 URL 取得に
+#         依存する外部依存の失敗。Misskey とは無関係
+#     この 3 件は #4492 で追跡する（2026.7.0 の昇格自体はブロックしない）。
+#     chubo2 .env.example も 2026.7.0 へ更新済み（pooza/chubo2#109）。
+#   - upstream 変更のうちモロヘイヤに効きうる点の事前確認:
+#     センシティブ判定の外部サービス（sensitive-detector）分離は、本番 sweep・staging dev27 とも
+#     meta.sensitiveMediaDetection = none のため影響なし。YAML パーサ厳格化は両機の
+#     .config/default.yml に allowPrivateNetworks の記述が無いため影響なし。マイグレーション 4 本は
+#     hashtag の DEFAULT 追加・index 追加等で、mulukhiya の app/query/misskey/*.sql.erb
+#     （user / user_profile / registry_item / app）と HashTag モデルに破壊的影響なし。
+#     misskey_service.rb が叩く /api/i, /api/i/update, /api/meta, /api/get-avatar-decorations,
+#     /api/notes/drafts/{create,update} はいずれも削除・変更なし。
+#   - **2026.7.0 は実質セキュリティリリース**。CHANGELOG の「Fix: セキュリティに関する修正」に
+#     対応するのは 07-28 の Merge commit from fork 2 本（GitHub Security Advisory の私有
+#     フォーク由来）で、いずれも未認証エンドポイント fetch-rss / RSS ウィジェット。
+#     GHSA は 08-01 時点で未公開。Node の最低動作版が 22.22.2 / 24.17.0 / 26.4.0 に
+#     上がった点は pooza/chubo2#107 を参照。
+
+# 2026-07-30 チェック結果:
+#   - Mastodon: stable v4.6.4（2026-07-27）を fedi-test-harness で検証・verified 昇格。
+#     07-28 に「キュアスタ！カットオーバー後に実施」として保留していた分の消化。
+#     v4.6.4 イメージ + クリーン DB で再構築（update-version.sh → reset.sh）し、mulukhiya
+#     フルスイートを実走して **879 tests / 1767 assertions / 0 failures / 0 errors /
+#     11 omissions（100% passed）**＝退行ゼロ。omission 11 件はすべて既知の harness 側
+#     ギャップ（chubo2#63 デーモン層・HTTP/webhook エンドポイント・streaming_api・nodeinfo の
+#     https/http 不整合、chubo2#64 メディア/ハッシュタグ seed 未整備）で Mastodon 版とは無関係。
+#     DB 直読み経路（status / account / postgres）は omission ゼロで全緑。失敗が 1 件も無い
+#     ため v4.6.3 との差分実走（07-08 のような比較）は不要と判断した。
+#     chubo2 .env.example も v4.6.4 へ更新済み（pooza/chubo2#96）。
+#     参考: 07-08 の baseline は 831 tests / 6 failures / 41 errors だったが、その後の
+#     #4447 triage・PR#4450 で環境起因の失敗が omission に整理され 0 failures / 0 errors に
+#     なった（MEMORY の project_harness-zero-error-goal の目標を達成）。
+#   - Misskey: 最新 stable は 2026.6.0（2026-06-22）のままで verified と同一。**2026.7.0-rc.0 が
+#     07-28 に出た**が prerelease。Misskey は stable リリース後数日で検証する方針なので対応不要。
+#     **2026.7.0 は beta.1 の時点で一度確認済みで大きな変化は見込まれないため、RC 期間中の
+#     追加検証は行わず stable リリース後に 1 回やれば十分**（2026-07-30 ユーザー判断）。
+#     Mastodon の RC は約1週間の RC 期間中に検証する方針のままで、こちらとは区別する。
+
+# 2026-07-28 チェック結果:
+#   - Mastodon: stable v4.6.4（2026-07-27）が出た。セキュリティリリース（権限判定の不備
+#     GHSA-7jvv-fhmg-wpfw / GHSA-hx34-2pfw-2qfj、IPv4-compatible IPv6 経由の SSRF 保護
+#     バイパス GHSA-vwhj-3g83-v276）で、4.5.14 / 4.4.21 も同時リリース。assets 再コンパイル必須。
+#     **本番 3 台には 2026-07-28 に適用済み**（pooza/mastodon の bshockdon → delmulin / curesta
+#     へ 07-27 にマージ済み）。セキュリティ修正のため harness 検証より先に本番適用した。
+#     harness 検証（+ chubo2 .env.example と本ファイルの bump）は**キュアスタ！カットオーバー
+#     (lbock → gomander, 07-28) 後に実施**する。変更ログ上モロヘイヤに効きうるのは Web Push
+#     subscription 削除の CSRF 期待値変更 (#39918) のみだが、モロヘイヤの sw_subscription 経路は
+#     Misskey 専用なので影響なしと判断。
+#   - Misskey: 最新 stable は 2026.6.0（2026-06-22）のままで verified と同一。2026.7.0 は
+#     beta.6 まで進んだが prerelease。対応不要（stable 化したらリリース後数日で検証）。
+#
+# 2026-07-20 チェック結果:
+#   - Mastodon: 最新 stable は v4.6.3（2026-07-03）のままで verified と同一。RC もなし。対応不要。
+#   - Misskey: 最新 stable は 2026.6.0 のまま。2026.7.0 は alpha.6 まで出ているが prerelease。対応不要。
+#
 # 2026-07-13 チェック結果:
 #   - Mastodon: 最新 stable は v4.6.3 のままで verified と同一。RC もなし。対応不要。
 #   - Misskey: 最新 stable は 2026.6.0 のままで verified と同一。対応不要。

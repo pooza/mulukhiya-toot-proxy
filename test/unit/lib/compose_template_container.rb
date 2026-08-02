@@ -107,6 +107,37 @@ module Mulukhiya
       assert_predicate(@container.create(name: 'x', body: 'y')['id'], :present?)
     end
 
+    # ロック取得前にメモ化された user_config を掴んでいても、ロック内で読み直す
+    # ため他リクエストの書き込みを踏み潰さない (#4461)。
+    def test_write_reloads_user_config_inside_lock
+      # 古いスナップショットを掴ませる（@account.user_config はメモ化される）。
+      @container.all
+      other = ComposeTemplateContainer.new(account)
+      other.create(name: '別リクエスト', body: 'x')
+      @container.create(name: 'こちら', body: 'y')
+
+      names = ComposeTemplateContainer.new(account).all.map {|v| v['name']}
+
+      assert_equal(2, names.size)
+      assert_includes(names, '別リクエスト')
+      assert_includes(names, 'こちら')
+    end
+
+    # 保存失敗は UserConfig 側で alert させず GatewayError 一本に畳む（二重 alert
+    # を避ける）。呼び出し側から見た挙動＝5xx は従来どおり (#4461)。
+    def test_persist_failure_raises_gateway_error
+      container = ComposeTemplateContainer.new(account)
+      stub = UserConfig.new(account)
+      stub.define_singleton_method(:update!) {|*| raise 'boom'}
+      # alert する側 (update) を踏まないこと自体を検証する。
+      stub.define_singleton_method(:update) {|*| raise '二重 alert になる update を呼んでいる'}
+      container.instance_variable_set(:@user_config, stub)
+
+      assert_raise(Ginseng::GatewayError) do
+        container.send(:persist, [])
+      end
+    end
+
     def test_max_count
       templates = Array.new(ComposeTemplateContainer::MAX_COUNT) do |i|
         {'id' => SecureRandom.uuid, 'name' => "t#{i}", 'body' => 'x'}

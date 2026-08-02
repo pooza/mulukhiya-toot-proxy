@@ -382,7 +382,7 @@ misskey:
   dbms: postgres
   display_name: Misskey
   redis:
-    dsn: redis://localhost:6379/0
+    dsn: redis://127.0.0.1:6379/0 # localhost にしないこと (#4481)
   features:
     annict: true
     announcement: true
@@ -439,7 +439,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.29.0
+  version: 5.30.0
 parser:
   note:
     fields:
@@ -470,6 +470,11 @@ postgres:
   query_log: false
   slow_query:
     seconds: 3
+profile:
+  handler:
+    enable: false
+    threshold: 1.0
+    floor: 0.001
 program:
   auto_update: true
   urls: []
@@ -493,9 +498,18 @@ puma:
   threads: 5
   workers: 0
 redis:
+  # DSN のホストは 127.0.0.1 を既定にする。localhost にすると、/etc/hosts に
+  # `::1 localhost` を持たないホストで Happy Eyeballs v2 が AAAA の決着を待ち、
+  # 1 接続あたり 305ms を払う (#4481)。ホスト名を書きたい場合は、そのホストが
+  # A / AAAA の両方を files から引けることを docs/bench/probe_localhost_connect.rb
+  # で確認すること。
   retry:
     limit: 3
     seconds: 1
+runtime:
+  # true にすると YJIT が有効でないサーバーの /health を NG (503) にする (#4466)。
+  # 既定は false ＝ health には情報として出すだけ。
+  require_yjit: false
 sentry:
   dsn: null
   traces_sample_rate: 0
@@ -624,7 +638,7 @@ sidekiq:
   logger:
     level: 1 # info
   redis:
-    dsn: redis://localhost:6379/2
+    dsn: redis://127.0.0.1:6379/2 # localhost にしないこと (#4481)
   schedule:
     annict_polling:
       class: Mulukhiya::AnnictPollingWorker
@@ -683,7 +697,7 @@ user_config:
     - piefed
     - compose
   redis:
-    dsn: redis://localhost:6379/1
+    dsn: redis://127.0.0.1:6379/1 # localhost にしないこと (#4481)
 webhook:
   sample: |
     あんなの、戦いのうちに入らないわ。

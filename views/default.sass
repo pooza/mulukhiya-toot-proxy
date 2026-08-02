@@ -1012,10 +1012,19 @@ a:hover
     margin: 0
   input.short
     width: 10em
+  // 幅を与えたうえで縮小を止める。上の `input, select` が flex-grow: 1 を
+  // 付けているためチェックボックスも flex item になり、幅指定なしだと行が
+  // 詰まったときに潰れうる。
+  //
+  // ⚠ これは #4483（一覧の ✔ が見えない）の原因ではなかった。真因は素の
+  // U+2714 が Linux の絵文字フォント環境で描画されないことで、program.slim
+  // 側を Font Awesome の fa-check に置き換えて解決している。ここは整合のための
+  // 予防的な指定として残しているだけ。
   input[type="checkbox"]
     margin:
       left: 0.5em
-    flex-shrink: 1
+    width: 1.5em
+    flex-shrink: 0
   label
     display: flex
     gap: 0.5em

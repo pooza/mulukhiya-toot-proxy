@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 0a3a69c93c9fc1bab3edc4232f53a28d7e89034a
+  revision: edaa47a69e21ccb5645b785fe46515510f376974
   branch: main
   specs:
-    ginseng-core (1.15.27)
+    ginseng-core (1.15.31)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -42,10 +42,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-fediverse.git
-  revision: 60a38dae2e80096734e408ced2d322b994e4c624
+  revision: 442c49d486cbf87ea89848f0abd6ccde21edca44
   branch: main
   specs:
-    ginseng-fediverse (1.8.25)
+    ginseng-fediverse (1.8.26)
 
 GIT
   remote: https://github.com/pooza/ginseng-piefed.git
@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-redis.git
-  revision: 91e9a516451b3001e4b65ed36132390343f9e9bc
+  revision: ce1d0bf17380f9e7a563745bfe635c233a121904
   branch: main
   specs:
-    ginseng-redis (2.0.4)
+    ginseng-redis (2.0.5)
       redis-client
 
 GIT
@@ -107,9 +107,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (8.1.3)
-      actionview (= 8.1.3)
-      activesupport (= 8.1.3)
+    actionpack (8.1.3.1)
+      actionview (= 8.1.3.1)
+      activesupport (= 8.1.3.1)
       nokogiri (>= 1.8.5)
       rack (>= 2.2.4)
       rack-session (>= 1.0.1)
@@ -117,13 +117,13 @@ GEM
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
       useragent (~> 0.16)
-    actionview (8.1.3)
-      activesupport (= 8.1.3)
+    actionview (8.1.3.1)
+      activesupport (= 8.1.3.1)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (8.1.3)
+    activesupport (8.1.3.1)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.3.1)
@@ -150,13 +150,13 @@ GEM
       bundler (>= 1.2.0)
       thor (~> 1.0)
     cgi (0.5.2)
-    concurrent-ruby (1.3.7)
+    concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
     crack (1.0.1)
       bigdecimal
       rexml
     crass (1.0.7)
-    csv (3.3.5)
+    csv (3.3.6)
     date (3.5.1)
     domain_name (0.6.20240107)
     drb (2.2.3)
@@ -195,9 +195,9 @@ GEM
       dry-initializer (~> 3.2)
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
-    erb (6.0.5)
+    erb (6.0.6)
     erubi (1.13.1)
-    et-orbi (1.4.0)
+    et-orbi (1.4.1)
       tzinfo
     etc (1.4.6)
     eventmachine (1.2.7)
@@ -230,13 +230,13 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.12.3)
+    icalendar (2.12.4)
       base64
       ice_cube (~> 0.16)
       logger
       ostruct
     ice_cube (0.17.0)
-    json (2.21.1)
+    json (2.21.2)
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -270,7 +270,7 @@ GEM
     mustermann (3.1.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.4.1)
+    net-imap (0.6.6)
       date
       net-protocol
     net-pop (0.1.2)
@@ -323,7 +323,7 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.2)
       nio4r (~> 2.0)
-    raabro (1.4.0)
+    raabro (1.5.0)
     racc (1.8.1)
     rack (3.2.6)
     rack-protection (4.1.1)
@@ -349,7 +349,7 @@ GEM
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     rainbow (3.1.1)
     rake (13.3.1)
-    redis-client (0.30.0)
+    redis-client (0.30.1)
       connection_pool
     regexp_parser (2.12.0)
     rest-client (2.1.0)
@@ -375,7 +375,7 @@ GEM
     rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
-    rubocop-minitest (0.39.1)
+    rubocop-minitest (0.40.0)
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
@@ -408,7 +408,7 @@ GEM
     sentry-sidekiq (6.6.2)
       sentry-ruby (~> 6.6.2)
       sidekiq (>= 5.0)
-    sequel (5.106.0)
+    sequel (5.107.0)
       bigdecimal
     set (1.1.3)
     sidekiq (8.1.6)
@@ -427,10 +427,10 @@ GEM
       rack-protection (= 4.1.1)
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
-    slim (5.2.1)
+    slim (5.2.2)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    slim_lint (0.35.0)
+    slim_lint (0.36.0)
       rexml (~> 3.2)
       rubocop (>= 1.0, < 2.0)
       slim (>= 3.0, < 6.0)
@@ -455,7 +455,7 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    version_gem (1.1.14)
+    version_gem (1.1.15)
     webmock (3.26.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -465,7 +465,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
-    zeitwerk (2.8.2)
+    zeitwerk (2.8.3)
     zlib (3.2.3)
 
 PLATFORMS
@@ -488,6 +488,7 @@ DEPENDENCIES
   ginseng-web!
   ginseng-youtube!
   icalendar
+  json-schema
   marcel
   optparse
   ostruct
@@ -514,7 +515,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-  ruby 4.0.5
+  ruby 4.0.6
 
 BUNDLED WITH
-  4.0.16
+  4.0.17

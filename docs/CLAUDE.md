@@ -36,6 +36,23 @@
 - TOCTOU レース等、本体と同じ race を抱えている場合はむしろ「本体と揃っている」ことをもって受容する（例: Misskey `/api/sw/register` の SELECT-then-INSERT、5.19.0 R8 判断）
 - 例外として PGroonga 採用（pooza/mastodon, pooza/misskey 双方に起票済み）は検討対象。緊急ではないため折を見て実施予定
 
+## 設計方針: SNS の状態ストアには SELECT しかしない
+
+モロヘイヤは Mastodon / Misskey の Postgres を Sequel で直読みするが、**書き込まない**。SNS の Redis に対しても同様。スキーマの所有者は SNS 側であり、SNS 自身のマイグレーションが与り知らない書き込みを外から入れると、アップグレード時の整合が壊れる。
+
+**唯一の例外: Misskey の `sw_subscription`**（[misskey_service.rb](../app/lib/mulukhiya/service/misskey_service.rb)）。
+
+- 行の `create` / `update` / `delete`（`for_update` + トランザクション）
+- あわせて Misskey の Redis キャッシュ `kvcache:userSwSubscriptions:<userId>` を `del`（行を書き換えたら飛ばさないと Misskey が古い値を読むため）
+
+やむを得なかった理由は、Misskey の `/api/sw/register` が重複 subscription を溜め込むうえ、**それを修復する API が無い**こと。#4408 で導入し、#4420 で決定化・トランザクション化した。
+
+### 二つの方針が衝突したら、本体改造を採る
+
+「本体改造の最小化」（上節）と本節は衝突しうる。**本体を触らずに済ませる代償がモロヘイヤ側の非 SELECT なら、本体改造のほうを採る。** モロヘイヤは本体改造を減らすための仕組みだが、そのために SNS の状態ストアを外から書き換えるのでは目的と手段が逆転する。非 SELECT は「他に手が無いとき」の選択肢に留める。
+
+**判断の前例（2026-08-01）**: ダイスキーのリモート `drive_file` 期限切れ（195 万行・うち 97.1% が誰もフォローしていない著者のもの）を、モロヘイヤの Sidekiq ワーカーでやるか Misskey 本体の fork でやるかを検討し、**fork を採った**。行削除と Object Storage の実体削除を伴い、非 SELECT を二重に踏むため。`CleanRemoteNotesProcessorService` の改造版（デフォルトタグ付き投稿を削除対象から除外）という前例が既に daisskey ブランチにあり、`CleanRemoteFilesProcessorService` を同じ形で拡張できる。詳細は pooza/chubo2#35。
+
 ## 姉妹サーバーとコミュニティ設計
 
 モロヘイヤは複数の SNS サーバーで稼働しており、一部は「姉妹サーバー」の関係にある。
@@ -45,6 +62,19 @@
 - **姉妹関係**: デルムリン丼 ↔ ダイスキー（同一管理者）、キュアスタ！ ↔ 外部管理のダイスキー（異なる管理者）
 
 `DefaultTagHandler` は実装としてはシンプルだが、コミュニティ運用の基盤を支える重要なハンドラー。
+
+### デフォルトハッシュタグは upstream で却下済み（再提案しない）
+
+タグの**付与**はモロヘイヤ（`DefaultTagHandler`）が担うが、**読み取り経路**——ローカルタイムライン・streaming チャンネル・検索がそのタグでコミュニティを構成する部分——はプロキシの射程外で、`pooza/misskey` の `daisskey` ブランチ（および `pooza/mastodon`、[pooza/mastodon#925](https://github.com/pooza/mastodon/issues/925)）の fork が担っている。
+
+**この機能は misskey-dev へ PR 済みで、却下されている。** 理由は 2 点:
+
+1. **既存機能のふるまいを変えてはならず、完全な追加機能でなければならない** — 現行 fork は `local-timeline` の `note.userHost IS NULL` をタグ条件に置き換え、`SearchService` の `host: '.'` を同様に分岐させ、`NoteCreateService` の fanout でリモート投稿を `localTimeline` へ流している。いずれも既存の意味を変えている
+2. **設定はファイルではなくコントロールパネルから行えなければならない** — 現行 fork は `.config/default.yml` の `defaultTag` を読む
+
+**config ゲートで未設定時にバニラ挙動へ倒れる書き方になっているが、それはマージ衛生の話であって upstream の受け入れ基準とは別物。** 満たしていない。再提案するなら上記 2 点を満たす設計（既存エンドポイントに触れない新規タイムラインを、`meta` テーブル経由の設定で追加する等）から作り直しになる。**現状の形のまま出し直しても通らない。**
+
+なお `CleanRemoteNotesProcessorService` の fork のうち、statement_timeout 耐性（upstream #17057 の回避策）にあたる部分は挙動も設定も変えないため、この 2 基準に抵触せず upstream 化の余地がある。fork の中で唯一 upstream の既存行を大きく書き換えている箇所（+78/−25）でもあり、マージ痛を減らす効果も大きい。
 
 ## カスタムフィードの残置（cure-api との切り分け）
 
@@ -69,7 +99,7 @@ cure-api 側を触るときに「カスタムフィードも一緒に整理」�
 **機能再開を判断する場合の手順**:
 
 1. #4323 を on-hold から外す
-2. [media-catalog-index-plan.md](media-catalog-index-plan.md) に従い zugoga / shallu / lbock の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
+2. [media-catalog-index-plan.md](media-catalog-index-plan.md) に従い zugoga / shallu / gomander の本番 DB に candidate A の partial index を `CONCURRENTLY` 適用
 3. 効果計測（同じ EXPLAIN 比較）後、対象サーバーの overlay yaml で `/mastodon/data/media_catalog: true` を設定
 4. `pooza/mastodon` migration PR で index を恒久化（[chubo2 docs/infra-note.md](https://github.com/pooza/chubo2) の daisskey drive_file 先行事例と同パターン）
 
@@ -152,6 +182,18 @@ git diff Gemfile.lock
 # 5. 問題なければコミット
 ```
 
+## リリース済み: 5.29.0（2026-07-18）
+
+投稿テンプレート（定形投稿）per-user CRUD API を主軸に、fedi-test-harness のテスト信頼性向上と本番で沈黙していた実バグ1件の修正を束ねた回。**5.28.0 で省略したステージング検証を Proxmox ステージング dev24-27 で全台実施できた最初のリリース**（前回の教訓 `project_5280-staging-skip-postmortem` を実運用で解消）。
+
+- **#4457 feat: 投稿テンプレート（定形投稿）per-user CRUD API** — capsicum の投稿テンプレート（pooza/capsicum#767）の端末またぎ共有のため `GET/POST/PUT/DELETE /mulukhiya/api/compose/templates[/:id]` を新設。保存先は user_config（per-user Redis）、id サーバー採番 UUID・件数上限50・書き込み後 read-back で永続化検証（「保存したのに消えた」検知＝専用エンドポイントの主目的）。多端末同時書き込みの lost update は `ComposeTemplateLockStorage` の per-account ロックで直列化（保持中 409、Codex P2 / #4460）。フィールドは id/name/body/cw の 4 つ（scope/position は持たない）。`features.compose_templates` 露出。
+- **#4448 fix: StartupNotificationWorker のヒステリシス通知が本番沈黙** — `bump_ng_count` の `redis.incr` が `Mulukhiya::Redis` 未実装で NoMethodError、ヘルス NG 時の再通知が沈黙していたのを ginseng-redis 2.0.4（`Service#incr` 追加）で復旧。harness が炙り出した実バグで 5.29.0 唯一の運用影響修正
+- **#4447 test: fedi-test-harness で Mastodon/Misskey 両系エラー0** — stale/DB依存の是正、構造的未提供の honest omit、`harness?` シグナルで omit をゲート（非 harness では実退行を検出）、GroupTag community-map キャッシュのテスト間汚染解消。0 failures/0 errors baseline、残 omission は chubo2#63/#64 で追跡
+- **リリース前 5観点レビュー** — 真の赤は CI lint（rubocop 5件）のみで是正。docs/api.md への compose エンドポイント追従・`GET /compose/templates` の alert 対称化・bundler-audit（loofah 2.25.2 / rails-html-sanitizer 1.7.1）をインライン同梱。残る黄（save 二重 alert・worker deadman・compose RMW の user_config メモ化 fresh-read・lock TTL）は #4461 へ送り
+- **bundle update** — json 2.21.1 / oauth2 2.0.25 / parser 3.3.12.0 / fugit 1.13.0 等のルーチン更新（bundler-audit クリーン、Dependabot 0）
+- **ステージング検証（省略不可・復活）**: dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/ dev27 ダイスキー（Misskey）全4台で develop=5.29.0・health 200・`compose_templates:true` を確認。旧 dev04/15/22/23 は退役済み（現行構成は chubo2 `docs/infra-note.md`「ステージング」節が正）
+- **本番デプロイ: 4 台完了**（2026-07-18、shallu / zugoga / lbock / sweep、全台 version 5.29.0 / health 200 / `compose_templates:true`）
+
 ## リリース済み: 5.28.1（2026-07-09、ホットフィックス）
 
 5.28.0 本番適用後に判明した設立日まわりの是正ホットフィックス。**5.28.0 でステージング検証を省略（再構築中で使えず）したため本番で顕在化した**教訓つき（詳細は MEMORY `project_5280-staging-skip-postmortem`）。
@@ -197,46 +239,309 @@ capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張し�
 
 **Codex 仕分け**: release PR #4412 に P2 1 件（refresh 失効時の stale トークンクリア）。機能 OFF のため #4414 へ集約し、返信 + リアクション付与済み。
 
-## リリース済み: 5.26.0（2026-06-09）
+## 次期マイルストーン: 5.30.0（主軸: 投稿レイテンシの内訳確定）
 
-ナウプレ enrich プロキシ (#4382) と読み付き単語サジェスト API (#4397) の新設を主軸に、capsicum 連携（投稿サジェスト・ナウプレ共有 URL 解決）の土台を整えた回。あわせて Program の ProgramFetcher 分割 (#4347)、5.25.0 レビュー送り (#4394) の構造改善、本リリース前 5観点レビュー由来のログ/アラート整備を含む。
+GitHub マイルストーン作成・割り当て済み（2026-07-20）。重み合計 **14**（`size:M` × 4、`size:S` × 2）。
 
-- **#4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`** — Bearer 必須。構造化メタ（title/artist/album）→ Spotify/iTunes 検索 → 共有可能 URL 解決の読み取り専用 enrich。プロバイダ優先 `prefer`（capsicum トグル）> `source_app_name` ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（既定 apple_music、フォールバック許可）。`features.nowplaying_resolver` 露出、整形は capsicum 側でモロヘイヤはステートレス。未使用の旧系統①（`itunes_nowplaying`/`spotify_nowplaying`）を削除し検索ロジックを resolver へ集約（capsicum #466/#484/#668/#570 連携）
-- **#4397 feat: 読み付き単語サジェスト API `GET /mulukhiya/api/word/suggest`** — capsicum #614 投稿サジェスト連携。`PronunciationDictionary` が GAS の pron.json を Redis キャッシュし、読み（ひらがな→カタカナ正規化はモロヘイヤ側で吸収）前方一致 → 表層前方一致 → 部分一致でランク付け、同ランクは五十音順タイブレーク（#4403）。`features.word_suggest` を `/word_suggest/urls` 設定有無で `DynamicFeatures::REGISTRY` から動的導出。本体 API #4398、HEAD 非対応ホスト（GAS）の content-length 事前チェック 403 ログ抑止 #4400
-- **#4347 refactor: Program クラスを ProgramFetcher へ分割** — fetch/キャッシュ責務を切り出し、rubocop Metrics/ClassLength disable 解除（5.25.0 から送り）
-- **#4394 5.25.0 リリース前 5観点レビュー 5.26.0 送り（黄・緑まとめ）** — favorites 400 ログ、program.ics alert 昇格、harness の `test?` ガード、冪等ロック storage/rescue 重複の共通化（`AnnictIdempotencyLockStorage` 抽出）、request ログ本文 scrub、start_time 二段検証、slim 記法ゆれ、api.md 補記
-- **本リリース前 5観点レビュー赤近い黄インライン (#4404/#4406)** — 公開 `/word/suggest` 由来の Sentry スパム抑止: `PronunciationDictionary` の Redis 読み/書き失敗（接続障害）を alert→log に倒し、破損（不正 JSON/非配列）のみ alert+invalidate に限定（read #4404 / write は Codex P2 を受け #4406 で対称化）。`nowplaying/resolve`・`word/suggest` のユーザー入力（曲名・検索語）ログ scrub 追加。残り黄・緑は #4405 で 5.27.0 送り
-- **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
-- **運用向け設定変更**: word/suggest を有効化するサーバーは `config/local.yaml` に `/word_suggest/urls`（GAS pron.json）設定が必要。未設定なら `features.word_suggest=false` で無効（既定で無害）。`PronunciationDictionaryUpdateWorker` が 10 分毎更新
-- ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）で develop=5.26.0 を確認（dev15/dev22 はメンテ外につき対象外）
-- **本番デプロイ: 4 台完了**（2026-06-09、shallu / zugoga / lbock / sweep。辞書設定 `/word_suggest/urls`（GAS pron.json）を各サーバー `config/local.yaml` へ投入、全台 `features.word_suggest=true` / version 5.26.0 / health 200）
+### 主軸: #4464 pre_toot ハンドラの所要時間を計装する
 
-### 振り返り
+**是正したい対象は、キュアスタ！のメインコンテンツであるニチアサ実況（日曜朝）で投稿に数秒かかること。** relay ~1.5s 部分は Mastodon 本体の status 生成と確定済み（proxy 無罪）で、残る超過分が `pre_toot` 26 ハンドラの直列処理側にあるという仮説。
 
-**期間**: 5.25.0 リリース・本番デプロイ 2026-06-07 → 5.26.0 リリース 2026-06-09（2 日間）。
+**5.30.0 のゴールは「数秒の内訳をハンドラ単位で説明できる状態にすること」だけ。** 対策の実装は内訳が出てから別 Issue で行う。以下の実測により、当初主軸に据えかけた辞書まわりの最適化が的外れと判明したため。
 
-**消化**: 5.26.0 マイルストーン Issue 全消化（#4382/#4347/#4394/#4397）。
+### 2026-07-20 実測: lbock / gomander の単スレッド性能
 
-**5観点レビュー仕分け**: 真の赤 0 件。赤近い黄 2 系統（word/suggest の Redis 障害 Sentry スパム / 入力ログ scrub）をインライン (#4404)、Codex P2（save 側 write の alert スパム）を追い fix (#4406)、残り黄・緑（リダイレクト SSRF 非対称、cold-cache 同期 fetch、docs 表記揺れ・タイポ等）は #4405 にまとめて 5.27.0 送り。
+同一 Ruby 3.4.9、`TaggingDictionary#matches` 相当の合成ベンチ（語数 3000、実況相当の短文）。
 
-**Codex 仕分け**: ドラフト解除した release PR #4396 に届く Codex レビューは 5観点と重複見込み。#4404 上の P2（Redis 全断時の write 側 alert スパム）は #4406 でインライン対応しリリースに同梱。
+| ベンチ | lbock | gomander | 比 |
+| --- | --- | --- | --- |
+| `raw_cpu`（素の整数演算） | 1408 ms | 2411 ms | **1.71x 遅い** |
+| `regexp_compile_3000`（`short?` の再コンパイル） | 8.2 ms | 9.8 ms | 1.20x |
+| `sweep_3000_x1`（辞書スイープ本体） | 0.7 ms | 0.8 ms | 1.14x |
+| `sweep_x3_current`（`addition_tags` 3回呼び） | 2.1 ms | 2.4 ms | 1.14x |
+| `marshal_load`（辞書読み直し） | 3.7 ms | 4.0 ms | 1.08x |
 
-## 次期マイルストーン: 5.29.0（テーマ）
+| ホスト | CPU | コア | RAM | FreeBSD |
+| --- | --- | --- | --- | --- |
+| lbock（現行・さくら VPS） | Intel Xeon Sapphire Rapids（2023） | **4** | 4GB | 14.4 |
+| gomander（移行先・Linode） | AMD EPYC 7713（Milan, 2021） | **2** | 4GB | 15.1 |
 
-**主軸: #4457 feat: 投稿テンプレート（定形投稿）per-user CRUD API（size:M〜L）**。capsicum の投稿テンプレート機能（pooza/capsicum#767）の保存先を「端末をまたいで共有」するための API 新設。capsicum 側が並行実装中で、モロヘイヤ側 API が着手律速。実装ベースは PR #4459（`ComposeTemplateContainer` ＋ `/compose/templates` 4 エンドポイント。id サーバー採番・read-back 永続化検証・件数上限50・`/about` feature 露出）で、harness 全件 green（862t/0f/0e）まで確認済み。フィールドは id/name/body/cw の 4 つで確定（scope/position は持たない＝capsicum 現行設計）。多端末同時書き込みの lost update は #4460 で追跡（v1 は per-user・低頻度で許容、v2 で optimistic lock）。
+**判明した二つのこと:**
 
-**併せて（harness 信頼性 ＋ 実バグ修正）:**
-- **#4448 fix: StartupNotificationWorker の redis.incr 未定義でヒステリシス通知が本番沈黙**（ginseng-redis 2.0.4、PR#4449）— harness が炙り出した実バグ。5.29.0 唯一の運用影響のある修正
-- **#4447 test: fedi-test-harness で Mastodon 系エラー0**（PR#4449–#4455 マージ済 ＋ Codex P2×5 follow-up PR#4458）— 実バグ分類・stale/env/seed gap の honest 隔離・omit を harness? シグナルでゲート。0 failures/0 errors の green baseline。残 omission は chubo2#63/#64 で追跡
+1. **「数秒」の原因は辞書スキャンではない。** `DictionaryTagHandler` の総コストは lbock 約 12ms / gomander 約 15ms で、数秒に対して三桁足りない。#4463 / #4465 をやり切っても体感は変わらないため、両者はマイルストーンから外し判断保留とした
+2. **gomander へそのまま移すと悪化する公算が高い。** per-core 1.7 倍遅く、コアも 4→2。実況バーストの同時処理能力は半減する
 
-**優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ、5.29.0 マイルストーンから外した（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media-catalog-index-plan.md）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
+### 真犯人の候補: pre_toot の直列 HTTP（**2026-07-26 の実測で否定された**）
 
-**最優先の実務ブロッカー（テーマ外・並行）: ステージング再建**。5.28.0 でステージング再構築中に検証を省略して本番障害を出した（MEMORY `project_5280-staging-skip-postmortem`）。Proxmox + chubo2 itamae 構想（MEMORY `project_proxmox-staging-rebuild`）を進め、以後のリリースで「ステージング検証省略不可」を必ず満たせる状態に戻す。
+**後述の実測により、直列 HTTP 仮説は棄却された。** 実況ウィンドウの HTTP 待ちは総所要の 0.1% しかなく、対策の方向はメモ化・キャッシュではない。以下は当時の仮説として残す。
 
-**5.28.0 からの繰越（見送り分・据え置き）:**
-- **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）** — 5.28.0 リリース前レビュー 🟢
-- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（ginseng-core HTTP 層、size:M）**
+`pre_toot` 26 ハンドラのうち **11 個が外部 HTTP を打ちうる**（itunes/spotify/you_tube の image と nowplaying、shortened_url、amazon_url、peer_tube_url_nowplaying）。特に `ShortenedURLHandler#resolve_redirects` は **1 URL あたり最大 8 回の HTTP リクエストを直列**で投げる（`app/lib/mulukhiya/handler/shortened_url_handler.rb:37-48`、`MAX_REDIRECTS = 8`）。数秒はここに居る公算が大きく、**CPU ではなく I/O**。
+
+これが正しければ対策はメモ化・キャッシュ・タイムアウト見直しであり、移行先に関わらず効く。順序性の制約（`pre_toot` パイプライン順、`matches` の「長い語から先に消し込む」順序）は仕様なので、**並列化を安易な特効薬として扱わない**（MEMORY `feedback_handler-order-no-casual-parallel`）。
+
+### 計装の要件
+
+- **ハンドラ別の壁時計時間**（CPU 時間ではなく HTTP 待ちを含む実時間）
+- 発行した**外部 HTTP の回数と各所要**
+- **ニチアサ実況の実負荷で採る**（アイドル時の合成負荷で判断しない）
+- **トゥートの種類別**に内訳が見られること（URL 有無・ナウプレ・短文で通るハンドラが変わる）
+
+### 2026-07-26 実測: lbock 最後のニチアサ実況（#4464 のゴール達成）
+
+計装は 07-23 05:40 の再起動から稼働（計画の 07-24 より 1 日早い）。**生データは lbock 解約前に `docs/bench/data/` へ退避済み**で、集計は `docs/bench/analyze_handler_profile.rb`。
+
+実況ウィンドウ（08〜09時台）で閾値 1.0 秒を超えたのは **168 件**（`pre_toot` 129 / `pre_webhook` 39）。総所要は min 4.3 / **p50 4.9** / p90 7.5 / max 9.7 秒で、**1〜4 秒帯が 1 件も無い**。
+
+| handler | 件数 | 合計s | 平均s | 最大s | HTTP回 | HTTP秒 |
+| --- | --- | --- | --- | --- | --- | --- |
+| dictionary_tag | 168 | 240.2 | 1.429 | 3.874 | 0 | 0.0 |
+| remote_tag | 168 | 230.8 | 1.374 | 3.547 | 0 | 0.0 |
+| spoiler | 168 | 109.5 | 0.652 | 1.245 | 0 | 0.0 |
+| user_tag | 129 | 88.8 | 0.688 | 0.849 | 0 | 0.0 |
+| user_config_command | 129 | 81.6 | 0.632 | 0.958 | 0 | 0.0 |
+| group_tag | 168 | 53.6 | 0.319 | 0.508 | 6 | 0.7 |
+| shortened_url | 124 | 26.6 | 0.214 | 0.940 | 0 | 0.0 |
+
+**判明したこと:**
+
+1. **直列 HTTP は無罪。** 合計イベント秒 923.0 に対し HTTP 待ちは **0.7 秒（0.1%）**。最大の調査対象だった `shortened_url` すら**この日は一度も HTTP を打っていない**（0.214 秒はリダイレクト解決ではない何かで待っている）
+2. **ハンドラ固有の仕事でもない。** 07-20 のベンチで 12ms だった `dictionary_tag` が壁時計 1.43 秒。**HTTP を打たないハンドラが軒並み 0.6〜1.4 秒で横並び**になっており、各ハンドラが「自分の仕事」で遅いのではなく**全員が同じ何かを待っている**形
+3. その「同じ何か」は同日中に特定できた（次節）。当初疑ったスレッド競合（GVL・swap の page-in）ではない
+
+### 真犯人: `localhost` への TCP 接続 1 回につき 305ms（#4481 / #4482 / pooza/chubo2#87）
+
+lbock 実機（Ruby 4.0.5・YJIT 有効・実辞書 3950 語 / 725KB）で `TaggingDictionary.new` を割ると、辞書処理ではなく **Redis への接続**が支配項だった。
+
+| 対象 | 所要 |
+| --- | --- |
+| `Redis.new`（接続は遅延） | 0.7 ms |
+| `Redis.new` + 小さい GET | 309.8 ms |
+| 接続を使い回した GET | 0.95 ms |
+| `Marshal.load`（辞書 725KB） | 23.8 ms |
+| `TaggingDictionary#matches` | 116.4 ms |
+
+さらに割ると `TCPSocket.new('localhost', 6379)` そのものが **305ms**。
+
+```text
+localhost:6379  既定=305.4ms  HEv2無効=0.2ms  addrs=127.0.0.1
+precure.ml:443  既定= 20.2ms  HEv2無効=118.3ms
+127.0.0.1:6379  既定=  0.0ms
+```
+
+**原因は Ruby 3.4 以降の Happy Eyeballs v2 と、lbock の `/etc/hosts` に `::1 localhost` が無いことの組み合わせ。** A は files から即引けるのに AAAA は files に無いため DNS（1.1.1.1）へ出て行き、HEv2 がその決着を待つあいだ固定ディレイを払う。`fast_fallback: false` で 0.2ms、IP 直指定で 0.0ms になることで確定。**AAAA を正しく持つ実在ホスト（precure.ml 等）では HEv2 はむしろ速い**ので、地雷は「`::1` を持たない `localhost`」に限られる。
+
+| ホスト | `/etc/hosts` の `::1` | localhost:6379 connect |
+| --- | --- | --- |
+| **lbock** | **無し** | **305 ms** |
+| zugoga / shallu / gomander | あり | 0.3〜0.7 ms |
+
+**これでログの形がすべて説明できる。** `Event#dispatch` の `run_handler` はハンドラごとに Thread を立てるが `join` で待つ＝**実質直列**なので、投稿の総所要 ≒ ハンドラ時間の総和（実測 4.9 秒と一致）。そして各ハンドラの平均が 305ms の整数倍に並ぶ。
+
+- `group_tag` 0.319s ≒ 接続 1 回
+- `spoiler` 0.652 / `user_config_command` 0.632 / `user_tag` 0.688 ≒ 接続 2 回
+- `dictionary_tag` 1.429 / `remote_tag` 1.374 ≒ 接続 2 回 + 辞書処理 140ms
+
+**1〜4 秒帯が空白だったのも同じ理由**（投稿ごとに固定回数の 305ms を必ず払うため値が量子化される）。検出は `docs/bench/probe_localhost_connect.rb` で 1 コマンド。
+
+**効いてくること:**
+
+- **カットオーバー（07-28）だけで大半が消える。** gomander には `::1` があるため、コードを 1 行も変えずに投稿が数秒速くなる見込み
+- 逆に **08-02 の再測で出る劇的な改善を「RAM 2.15 倍のおかげ」と誤帰属しないこと。** 主因はこれで、RAM ではない
+- `config/application.yaml` の既定 DSN が 3 箇所とも `redis://localhost:...`＝**`::1` を持たないホストを新設すれば誰でも踏む**。lbock 固有の事故ではなく出荷設定側の地雷（#4481）
+
+**lbock は直さない。** 07-28 に退役し、それまでに実況も無いため利用者の得が無く、08-02 比較のベースラインが変わるだけ。
+
+**次にやること:** #4481（既定 DSN の IP 化）・#4482（`TaggingDictionary` の二重構築解消）・pooza/chubo2#87（`/etc/hosts` の `::1` をレシピで保証）。ただし**コード側の着手はカットオーバー後**（移行前後を同じコードで比較する必要があるため）。
+
+### 2026-07-29 実測: gomander 移行翌日（暫定・予測どおり）
+
+**少人数の実況（19〜21時台・ローカル投稿 32 件）なのでニチアサとは比較にならない**が、予測の方向は出た。生データは `docs/bench/data/handler_profile-gomander-20260729.jsonl.gz`。
+
+| | lbock 07-26 ニチアサ | gomander 07-29 夜 |
+| --- | --- | --- |
+| 1 秒超えイベント | 176 件 | 16 件（32 投稿中） |
+| 総所要 min / p50 / max | 4.3 / 4.9 / 9.7 秒 | **1.0 / 1.1 / 1.6 秒** |
+
+**分布が重ならない**（gomander の最遅 1.6s が lbock の最速 4.3s に届かない）。決め手は**処理内容が変わっていない `spoiler` と `user_config_command`** で、平均が 0.651s → **0.020s** / 0.632s → **0.016s**。lbock でのこの値は ≒ 305ms × 2 の接続遅延そのものだったので、**305ms 説の実データ裏取りになっている**（RAM でもプランでもない）。
+
+残る 1.0〜1.6 秒は `dictionary_tag` + `remote_tag` で 87%、HTTP 待ちは 0.3% しかない＝**辞書スキャンの CPU 時間**（#4463 / #4465）。
+
+⚠ 日全体では `p90=3.6s / max=6.5s` になるが、上位は 00:14:07 に同時発火した `pre_webhook` 5 件で、**並行実行時に `dictionary_tag` / `remote_tag` が 3 秒級へ膨らむ**という別の現象。実況の投稿レイテンシと混ぜて読まないこと。
+
+**本命は 08-02（日）のニチアサ**で、同じ手順で採取して 07-26 と突き合わせる。
+
+### 2026-08-02 実測: gomander で初のニチアサ（#4464 の突き合わせ完了）
+
+生データは `docs/bench/data/handler_profile-gomander-20260802.jsonl.gz`（99 行、うち実況の 08 時台が 80 行）。
+
+**投稿量がほぼ同じ 08 時台どうしで比較できた**（ローカル投稿 07-26 133 件 / 08-02 130 件。件数は移行後の gomander の `statuses` から両日とも取得）。
+
+| | lbock 07-26 08時台 | gomander 08-02 08時台 |
+| --- | --- | --- |
+| ローカル投稿 | 133 件 | 130 件 |
+| 1 秒超の `pre_toot` | 119 件（**89%**） | 79 件（**61%**） |
+| 総所要 min / p50 / p90 / max | 4.3 / **4.8** / 5.5 / 6.3 秒 | 1.0 / **1.1** / 1.5 / 1.9 秒 |
+
+ハンドラ別（08〜09 時台、平均秒）:
+
+| handler | lbock 07-26 | gomander 08-02 | 効いたもの |
+| --- | --- | --- | --- |
+| dictionary_tag | 1.429 | **0.457** | 接続 2 回分が消え、辞書処理だけが残った |
+| remote_tag | 1.374 | **0.454** | 同上 |
+| user_tag | 0.688 | **0.073** | 接続 2 回 → ほぼゼロ |
+| spoiler | 0.652 | **0.026** | 同上（処理内容は不変） |
+| user_config_command | 0.632 | **0.023** | 同上（処理内容は不変） |
+| group_tag | 0.319 | **0.006** | 接続 1 回 → ほぼゼロ |
+| shortened_url | 0.214 | **0.002** | 同上 |
+
+**確定したこと:**
+
+1. **305ms 説は実況の実負荷でも裏づけられた。** 処理内容が変わっていない `spoiler` / `user_config_command` が 0.65s / 0.63s → 0.026s / 0.023s。lbock での値が接続回数 × 305ms そのものだったことが、07-29 の少人数実況に続いて本番相当の流量でも再現した
+2. **残る 1.1 秒の 76% は `dictionary_tag` + `remote_tag`**（0.457 + 0.454 = 0.911 秒）。HTTP 待ちは 0.1% で、これは**辞書スキャンの CPU 時間**。次に削るならここ（#4463 / #4465 / #4482）
+3. **交絡因子 2 件は今回の比較には効いていない。** ボット流入は実況窓に再来せず（当日の 504 は **808 件すべて 06 時台**、08 時台は 12,687 req・ピーク 518 req/分・load 0.54 で平常）。`tags` のインデックス是正は Mastodon 本体の status 生成側に乗るためハンドラ計装には現れない（切り分けの指針どおり）
+
+⚠ **`p50 1.1s` は「1 秒超だけの p50」であって全投稿の p50 ではない。** lbock は最速でも 4.3 秒＝全件が閾値の上にいたので母集団と実質同じだったが、gomander は分布が閾値をまたぐ（08 時台の 61% だけが記録対象）。**閾値 1.0 秒が分布を切っている**ので、両日の p50 を「同じ母集団の代表値」として並べない。改善幅の主張には 1 秒超の**割合**（89% → 61%）を併記する。
+
+**実況そのものは負荷イベントではない。** 08 時台のピークは 518 req/分・load 0.54 で、同日早朝のボット流入（約 5,000 req/分・load 24.6）とは二桁違う。投稿が遅かったのは負荷ではなく、投稿 1 件あたりに固定で払っていた接続遅延だった。
+
+`docs/bench/cpu_sample.rb` のサンプラは gomander / zugoga とも cron・TSV とも既に無く、撤収済み（実機確認）。
+
+### 同梱: Ruby ランタイムの能力欠落を検知する（#4466 / chubo2#69）
+
+**本番 4 台は YJIT 有効**（lbock / zugoga / shallu / sweep、いずれも `built=true enabled=true`、Ruby 4.0.5。2026-07-20 実機確認）。
+
+有効化は `app/lib/mulukhiya.rb:113` の `RubyVM::YJIT.enable if defined?(RubyVM::YJIT)` による。これは module 本体の**末尾**にある実行文で、`require 'mulukhiya'` 時点で必ず走る。**初期化を終えてから YJIT を有効にするのがプラクティス**で、プロセス起動時（`RUBYOPT` に `--yjit`）から有効にすると一度しか通らない初期化コードのコンパイルに YJIT の予算を費やしてしまうため。`RUBYOPT` に `--yjit` が無いのは手落ちではなく設計意図。
+
+**問題は、このガードがサイレントであること。** `if defined?(RubyVM::YJIT)` は YJIT なしビルドでも起動できるようにするために必要で実装として正しいが、裏返すと **Rust 不在でビルドされた Ruby では黙って false 側に倒れ、誰にも気づかれないまま 24〜25% 遅い状態で動き続ける**。YJIT は Rust がないとビルド時に黙って外れ、エラーにならない。
+
+| ホスト | Rust | Ruby 4.0.5 の YJIT |
+| --- | --- | --- |
+| lbock / zugoga / shallu | あり（1.94〜1.96） | ✅ ビルド済み・有効 |
+| gomander | あり（1.96.1、2026-07-20 導入） | ✅ ビルド済み（2026-07-20、chubo2#72） |
+
+※ 07-20 に gomander へ Rust 1.96.1 と rbenv + Ruby 4.0.5 を導入し、`ruby --yjit -e 'RubyVM::YJIT.enabled?'` → true を実機確認。**4 台すべてで YJIT が乗る状態になった**ため「移行で 24〜25% を失う」リスクは解消。
+
+**YJIT の効果は `raw_cpu` で 24〜25% 短縮**（lbock 1558→1184ms、zugoga 1603→1202ms）。ただし `regexp_compile` / `sweep` / `marshal_load` はほぼ不変で、正規表現エンジンも Marshal も C 実装のため YJIT の対象外。
+
+つまり 24〜25% は「これから取れる利得」ではなく **既に全台で得ている利得**。当初は「Rust なしの gomander へ移ればこれを失う」ことが最大のリスクだったが、**2026-07-20 に gomander へ Rust + Ruby 4.0.5 (YJIT) を導入して解消済み**（chubo2#72）。残るリスクはホスト個体の遅さのみ（上記「ハズレ個体」節）。
+
+- **#4466 obs: health に Ruby ランタイム情報（version / YJIT）を含める（size:M）** — 既定では NG 判定に含めず情報として出す（能力欠落は障害ではないため 503 にしない）。`runtime.require_yjit` による opt-in アサーションを併設。config 参照を fail-open にしないこと（MEMORY `feedback_fail-open-guard-footgun`）
+- **chubo2#69** — rbenv レシピで Rust を前提化し、ビルド直後に `ruby --yjit -e 'exit RubyVM::YJIT.enabled?'` でアサートして失敗させる
+- ~~#4467 perf: 本番で YJIT を有効化する~~ — **前提が誤りだったためクローズ**（既に有効だった）
+
+### 本番 Ruby での per-core 再測定（重要な訂正）
+
+上表のベンチは `ruby34`（3.4.9・YJIT なし）で全台統一して測ったもので、ホスト間比較としては有効。ただし**本番の実行環境は Ruby 4.0.5** であり、そちらで測り直すと結論が変わる。
+
+| ホスト | 3.4.9 | 4.0.5 YJIT なし | **4.0.5 YJIT あり＝本番の実行条件** |
+| --- | --- | --- | --- |
+| lbock（さくら） | 1408 ms | 1558 ms | **1181 ms** |
+| zugoga（Linode） | 1624 ms | 1603 ms | **1157〜1194 ms** |
+| gomander（Linode） | 2412〜2450 ms | — | **1764〜1841 ms** |
+
+**本番 Ruby では lbock と zugoga の差は 1.03 倍＝実質同等。** 3.4.9 で見えた 1.15 倍の Linode ペナルティは本番条件ではほぼ消える。「さくらは価格性能比で優れる」は、少なくとも per-core CPU については本番条件で裏付けられない。
+
+### gomander は物理ホストのハズレ（2026-07-20 確定）
+
+gomander に rbenv + Ruby 4.0.5（YJIT built=true）を導入し（chubo2#72）、本番条件で測り直すと **gomander だけ 1.52 倍遅い**。ここから交絡を順に潰して、原因を**着地した物理ホスト**に特定した。
+
+| 疑い | 検証 | 結果 |
+| --- | --- | --- |
+| Ruby / ビルドの差 | 素の C（同一ソース・clang 19.1.7・`-O2`、[chunk_bench.c](bench/chunk_bench.c)） | **差は残る**（1.35〜1.41 倍） |
+| FreeBSD 15 vs 14 の緩和策 | ループはシステムコールを呼ばない＝緩和策が効く境界を通らない | 除外 |
+| シリコン世代 | dmesg | **完全一致**（Family 0x19 / Model 0x1 / Stepping 1、TSC 2.000GHz） |
+| 隣人輻輳 (steal) | チャンク 400 分割の分布 | **除外**（下記） |
+| プラン種別 | Linode metadata service | **同一** `g6-standard-2` / `jp-tyo-3` |
+
+**分布（3M 回 × 400 チャンク、ms）:**
+
+| ホスト | min | p50 | max | max/min |
+| --- | --- | --- | --- | --- |
+| gomander | **20.05** | 20.10 | 20.82 | **1.04** |
+| zugoga | **14.22** | 14.31 | 148.89 | 10.5 |
+| lbock | 15.11 | 15.16 | 15.73 | 1.04 |
+
+**gomander は最小値そのものが 1.41 倍遅い。** 最小値は誰にも邪魔されない最良ケースなので、これは競合ではなく素の速度。かつ max/min 1.04 で**テールが皆無＝まったく競合していない**。実際に steal を食らっているのは zugoga のほう（max 148ms）で、それでも baseline は gomander より速い。
+
+Linode metadata service で **プラン・リージョン・vCPU・RAM がすべて同一、違うのは `host_uuid` だけ**と確認できた（gomander `a6f7baf2…` / zugoga `550683b0…`）。
+
+**対処はプランアップではなく作り直し**（破棄・再作成して別ホストへ着地させる）。受け皿は chubo2#68。**gomander は 2026-07-20 に作り直し済みで、この病状は解消した**（`raw_cpu` 2412 → 1646.9ms、zugoga 1632ms と同等。2026-07-23 再確認）。
+
+なお **`raw_cpu` の分散が小さいこと（gomander 約 1.6%）は「隣人輻輳ではない」の根拠にならない**。OS や設定由来の一定の差でも分散は小さく出るため。切り分けたのは上記の C ベンチと分布のほう。
+
+#### ⚠ 当時の受け入れ基準は両方とも無効（#4471 / #4476）
+
+作り直しの合否に使っていた ①`host_uuid` が変わること ②チャンクベンチの min < 15ms は、**どちらも後に反証された**。
+
+- **`host_uuid`** — Cold Resize で uuid が変わっても数字が動かず反証。そもそも既知の 1 台と UUID を比べる方式では「別の遅い個体」を検出できない
+- **チャンクベンチの min** — **C の速度は Ruby の速度を予測しない**。作り直した gomander は C では lbock より 6% 速いのに Ruby では 10% 遅い。生スループットで門番をすると誤った結論に導く
+
+現行の判定は `stlf_probe` の ratio を**参照ホストとの相対比較**で見る（[docs/bench/README.md](bench/README.md)）。ratio に不変な絶対閾値は置けない（コンパイラを変えるだけで健全な機体が 3〜5 倍動く）ため、`verify_host.sh` は参照が測れないとき・両者の `cc` が違うときは**合否を出さない**。インスタンスの引き直しは stlf_probe が異常を示したときだけで、per-core 数％〜十数％の差では引き直さない。
+
+### per-core 分散サンプリング（2026-07-20 仕込み済み・観測中）
+
+上記の単発ベンチは「その瞬間の per-core 性能」しか見ていない。Shared プランは隣人輻輳で揺れるため、**07-26（日）のニチアサ実況ウィンドウを含む定期サンプリング**を lbock / zugoga / gomander の 3 台に仕込んだ（`docs/bench/cpu_sample.rb`、cron `*/10`、`~/cpu_sample.tsv` に追記）。Ruby は条件統一のため全台 `ruby34`（3.4.9）で、絶対性能の結論には使わない。
+
+初回サンプル（2026-07-20 10:10、`raw_cpu` ms）: lbock 1404〜1408 / zugoga 1625〜1630 / gomander 2418〜2450。いずれも 07-20 の単発ベンチ基準値と整合。
+
+**2026-07-23 時点**: lbock 1416.8 / zugoga 1632.1 / gomander **1646.9**（作り直し後）。gomander のサンプラは作り直しで消えていたため再設置した。lbock / zugoga は継続稼働中。
+
+判定したいこと: ~~①gomander は安定して遅いのか揺れているのか~~（作り直しで解消）②zugoga / lbock が実況時間帯に劣化するか（Shared 契約が実況ウィンドウで牙を剥くか）。**カットオーバー（chubo2#68）の判断材料**であり、07-26 の観測後に読む。
+
+**2026-07-26 の観測結果（②の答えは No）:**
+
+| ホスト | 実況 08-09時台 平均 | 同 最悪 | 同日 02-04時台 平均 |
+| --- | --- | --- | --- |
+| lbock | 1502ms | 1763ms | 1488ms |
+| zugoga | 1776ms | 2243ms | 1751ms |
+| gomander | 1637ms | 1674ms | 1639ms |
+
+**3 台とも実況時間帯の劣化は無い**（lbock で +1%）。Shared 契約の隣人輻輳はカットオーバーの阻害要因にならない。**投稿が数秒かかる原因も per-core CPU ではない**（実況中も平常値）ことが裏づけられ、上記「2026-07-26 実測」のスレッド競合説と整合する。生データは `docs/bench/data/` に退避済み。サンプラの撤収は lbock 解約（07-31）と gomander での再測（08-02）の後でよい。
+
+### 保留中（マイルストーン外）
+
+- **#4463 perf: DictionaryTagHandler の投稿同期スキャン最適化（size:M）** — 実測で 12ms と判明し主軸から外れた。無駄が無駄であることは変わらないので安い改善として後日消化の余地はある（`regexp_compile` の 8〜10ms が単独では最大項）。**推測で実装を進めない**
+- **#4465 perf: `TaggingDictionary#matches` のアルゴリズム刷新（size:L）** — 索引化で削れる上限がミリ秒未満と判明。辞書の語数が桁で増えた場合に再検討
+
+### キュアスタ！ (lbock) → gomander 移行との関係
+
+受け皿は chubo2#68。**2026-07-28 にカットオーバー完了**（ダウンタイム約 2 時間）。移行の記録は chubo2 `docs/infra-history.md` の同日の節、移行後の構成は `docs/infra-note.md`「キュアスタ！本番 (gomander)」節。
+
+移行判断の前提だったのは「**移行して現状より悪化させないことが絶対条件**」で、コストはそのために受け入れてきた要素（二重ランニングコストが数ヶ月発生したが、期限で急かす材料にはしない）。作り直した gomander は per-core で lbock の約 1.1 倍遅い程度に収まり、**コアは 4 で同数・RAM は 8.5GB（2.15 倍）**。lbock は swap を 1.3GB 使い page-in が続く状態だったので、律速は CPU ではなく RAM と判断し、プランアップせず現行プランのまま切り替えた。
+
+**残っている段取り**: ~~07-31 lbock 解約~~（07-29 夜に前倒しで停止・DNS 削除済み）→ ~~**08-02（日）gomander で初の実況・計装の再採取**~~ → **2026-08-02 に採取・突き合わせ完了**（上記「2026-08-02 実測」節）。**#4464 のゴール（数秒の内訳をハンドラ単位で説明できる状態）は達成**。次は 5.30.0 のリリースと、本番を `main` 運用へ戻すこと。
+
+⚠ **`localhost` 接続の 305ms（下記）は lbock 固有の `/etc/hosts` 起因で、gomander は `::1 localhost` を持つ（2026-07-29 実機確認）＝移行しただけで消える。** 08-02 に投稿レイテンシが改善しても gomander の RAM やプランの手柄と読み違えないこと。
+
+⚠ **08-02 の実況は特殊条件下だった。比較に交絡因子が 2 つ乗る**（採取後の評価は上記「2026-08-02 実測」節。**どちらもハンドラ計装の比較には効いていなかった**）。
+
+1. **早朝の分散ボット流入**（05:00〜06:20）。単一 UA・2,922 IP / 319 ネットに分散したスクレイパーがピーク約 5,000 req/分で gomander を叩き、load 24.6・当日 504 が 808 件（前日 18 件）。受け皿は chubo2#118。→ **実況時間帯に再来せず**（504 は 808 件すべて 06 時台、08 時台は 12,687 req・ピーク 518 req/分・load 0.54）
+2. **`tags` のインデックス是正**（06:1x〜06:3x）。上記の調査中に `index_tags_on_name_lower_btree` の欠損が発覚し、本番 3 台へ非 UNIQUE で投入 + `ANALYZE`。タグ検索が **3,086ms → 0.078ms**。受け皿は chubo2#117
+
+**この欠損は 07-26 の lbock 時点でも存在していた**（gomander の DB は lbock 由来で、移行後も欠けていた）。実況はハッシュタグを大量に使い、モロヘイヤの自動タグ付与がそれを増幅するため、**07-26 の p50 4.9 秒にはこのフルスキャン分が乗っていた可能性がある**。08-02 との単純比較で「移行で速くなった」と結論しないこと。
+
+切り分けの指針: タグ検索は Mastodon 本体の status 生成（relay ~1.5s と確定済みの部分）の中で起き、モロヘイヤのハンドラ側には乗らない。したがって **relay 部分の低下＝インデックス是正の効果、ハンドラ部分の変化＝移行・HEv2 の効果**として読む。
+
+**5.29.0 リリース前レビューの送り:**
+
+- **#4461 obs/並行性: 5.29.0 リリース前 5観点レビュー 黄まとめ（size:M）** — save 二重 alert（read-back GatewayError × UserConfig#update の alert）、StartupNotificationWorker の rescue deadman、compose RMW の user_config メモ化 fresh-read 強制、lock TTL 10s→30s。いずれも非ブロック
+- **#4460 concurrency: compose テンプレ lost update の optimistic lock 化（v2）** — **クローズ済み**（v1 の per-account ロック直列化で用が足りると判断）
+
+**同梱の繰越（小物・セキュリティ）:**
+
+- **#4410 security: リダイレクト経由 SSRF を per-hop ホスト検証で塞ぐ（size:M）**
+- **#4442 obs: `invalidate_sw_subscription_cache` の Redis blip を e.alert→e.log に下げる（size:S）**
+- **#4446 config: `founded_on`/`preopened_on` の schema を Date 値に整合させる（size:S）**
+
+**優先度ダウン（後ろ倒し）: #4393 media_catalog sub-second 化**。2026-07-18 に優先度を下げ 5.29.0 から除外（「落ち着いた頃に」）。media_catalog 再有効化トラック（#4323/#4351/#4352/#4375/#4393、runbook=docs/media-catalog-index-plan.md）は生きているが着手時期を後ろ倒し。#4393（query 再構成/非正規化、size:L）が #4351 Gate 2 の前提ブロッカーである構図は不変。
+
+**ステージング再建（進捗＝実質解消）**: Proxmox ステージング dev24-27（美食丼/キュアスタ！/デルムリン丼=Mastodon、ダイスキー=Misskey）が稼働し、5.29.0 で「ステージング検証省略不可」を実運用で満たせる状態に復帰（旧 dev04/15/22/23 は退役、現行構成は chubo2 `docs/infra-note.md`「ステージング」節が正）。5.28.0 の省略障害（MEMORY `project_5280-staging-skip-postmortem`）は解消。構成乖離#36/Linode 移行#35 等の長期構想は MEMORY `project_proxmox-staging-rebuild` 継続。
+
+**過去リリースからの繰越（さらに据え置き・5.30.0 未割当）:**
+
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
+- **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63（harness に sidekiq + webhook エンドポイントを provisioning）と対。chubo2 側の着地待ち
+- **#4373 番組表に繰り返し情報（頻度・曜日）を追加し iCalendar を曜日対応にする（size:L）** — 5.31.0 以降の主軸候補
 
 ## ロードマップ仮置き
 
@@ -311,11 +616,34 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - `$TOKEN` は `~/.sentryclirc` の `[auth]` セクションから取得する
 - Sentry 未導入のプロジェクトではこのステップをスキップする
 
-### 6. 外部リポジトリの同期確認（chubo2）
+### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
+
+対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*` 7 リポジトリ（モロヘイヤが依存する自作 gem 群）。
+
+#### 6-1. 毎セッション
 
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
-- `gh issue list --state open` で open Issue の変動を確認
+- `gh issue list --state open` で open Issue の変動を確認（chubo2 / ginseng-* とも）
+
+#### 6-2. 30 日ごとの棚卸し
+
+chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) 冒頭にある
+「最終棚卸し」の日付を見る。**当日から 30 日以上経過していれば**以下を実行（経過していなければスキップ）。
+
+- 各リポジトリの open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
+- **一覧を眺めるだけでは不十分。** 2026-07-31 の初回棚卸しでは 30 件中 6 件が「既に終わっている」
+  または「対象が消滅している」状態で、最古は 5 か月放置されていた（#4488）。実装が chubo-core 側の
+  コミットで着地していると、タイトルからは終わっているか分からない
+- 判定の取り方の例:
+  - レシピ化系 → 該当 cookbook を開いて実装の有無を確認（`git log -- <path>` でコミットも辿る）
+  - 移行・撤退系 → 実機に SSH、または `curl` / DNS 解決で新旧の状態を確認
+  - ステージング関連 → `docs/infra-note.md` の現況表と突き合わせる。**旧ステージング
+    （`drime` + dev04/15/22/23）は退役済み**なので、これらを対象とする Issue は陳腐化している
+- close 候補は**証拠を添えて提示する**。close するかどうかの判断はユーザーに残す
+- 棚卸しが済んだら `docs/infra-note.md` の「最終棚卸し」を当日に更新してコミット（close 候補が 0 件でも更新する）
+- 専用の cloud/cron ジョブは使わない（§8 と同じ理由。スケジュール実行は途中で止まって手で起こす運用に
+  なりがちで、セッションに織り込むほうが確実に回る）
 
 ### 7. マイルストーンの状態確認
 

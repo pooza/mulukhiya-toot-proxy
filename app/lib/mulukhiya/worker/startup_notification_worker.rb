@@ -3,6 +3,7 @@ module Mulukhiya
     sidekiq_options retry: false
 
     FAIL_THRESHOLD = 2
+    FAILURE_COUNT_KEY = 'startup_notification_failure_count'.freeze
 
     def disable?
       return true unless info_agent_service
@@ -10,7 +11,21 @@ module Mulukhiya
     end
 
     def perform(params = {})
-      health = Environment.health
+      # sidekiq-scheduler は Sidekiq::Client.push を直叩きするため Worker.perform_async
+      # 側の disable? gate を通らない。info agent が無いサーバーでも schedule
+      # (every: 5m) 経由で perform が起動するので、ここでも短絡する (#4343)。
+      # これを欠くと send_notification が nil を叩き、下の deadman が 5 分ごとに
+      # alert する。
+      return if disable?
+      notify(Environment.health)
+      clear_failure
+    rescue => e
+      notify_failure(e)
+    end
+
+    private
+
+    def notify(health)
       observed = extract_status(health)
       if notified?
         reported = previous_status || {}
@@ -24,11 +39,29 @@ module Mulukhiya
         save_status(observed)
         redis['startup_notified_pid'] = sidekiq_pid
       end
+    end
+
+    # このワーカー自身の失敗を扱う。log 止めにすると、ロジックエラー（#4448 の
+    # redis.incr 未定義 NoMethodError 等）でヘルス通知が止まったこと自体が無音に
+    # なる＝異常を知らせる仕組みが黙って死ぬ。かといって 5 分毎に alert すると
+    # 障害中は Sentry がスパム化するので、連続失敗の 1 回目だけ alert し、成功で
+    # 解除するデッドマンにする (#4461)。
+    #
+    # カウンタ更新自体が落ちる（Redis 全断）場合は log へ倒す。Redis の死は
+    # health/redis 側で観測されるため、ここで二重に鳴らす価値がない。
+    def notify_failure(error)
+      count = redis.incr(FAILURE_COUNT_KEY).to_i
+      count <= 1 ? error.alert : error.log(failures: count)
     rescue => e
+      error.log
       e.log
     end
 
-    private
+    def clear_failure
+      redis.del(FAILURE_COUNT_KEY)
+    rescue => e
+      e.log
+    end
 
     def notified?
       return redis['startup_notified_pid'] == sidekiq_pid

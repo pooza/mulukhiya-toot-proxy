@@ -188,9 +188,44 @@ module Mulukhiya
       values[dbms_name.to_sym] = "Mulukhiya::#{dbms_name.camelize}".constantize.health
       values[:streaming] = ListenerDaemon.health if daemon_classes.member?(ListenerDaemon)
       values[:misskey_redis] = MisskeyService.sns_redis_health if misskey_type?
+      values[:ruby] = ruby_health
       values[:status] = 503 if values.values.any? {|v| v[:status] == 'NG'}
       values[:status] ||= 200
       return values
+    end
+
+    # ランタイムの能力欠落を検知する (#4466)。YJIT は Rust の無い環境では
+    # ビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが
+    # 出来上がる。全台の /health を叩く運用が既にあるので、そこへ出す。
+    def self.ruby_health
+      enabled = yjit_enabled?
+      return {
+        version: RUBY_VERSION,
+        yjit_available: defined?(RubyVM::YJIT) ? true : false,
+        yjit_enabled: enabled,
+        status: ruby_status(enabled),
+      }
+    end
+
+    def self.yjit_enabled?
+      return false unless defined?(RubyVM::YJIT)
+      return RubyVM::YJIT.enabled? == true
+    end
+
+    # 既定では情報として出すだけで NG にしない。能力の欠落は障害ではなく、
+    # health が 503 になるとサーバーが「停止」扱いになるため。
+    # 確実に検知したいサーバーは /runtime/require_yjit で opt-in する。
+    #
+    # config の参照を rescue で握り潰さないこと。既定値は application.yaml が
+    # 必ず持つので、引けない状態は設定の破損であり黙って無効化してはいけない
+    # (MEMORY feedback_fail-open-guard-footgun)。
+    def self.ruby_status(yjit_enabled)
+      return 'NG' if require_yjit? && !yjit_enabled
+      return 'OK'
+    end
+
+    def self.require_yjit?
+      return config['/runtime/require_yjit'] == true
     end
   end
 end

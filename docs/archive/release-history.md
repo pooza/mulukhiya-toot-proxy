@@ -2,6 +2,30 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.26.0（2026-06-09）
+
+ナウプレ enrich プロキシ (#4382) と読み付き単語サジェスト API (#4397) の新設を主軸に、capsicum 連携（投稿サジェスト・ナウプレ共有 URL 解決）の土台を整えた回。あわせて Program の ProgramFetcher 分割 (#4347)、5.25.0 レビュー送り (#4394) の構造改善、本リリース前 5観点レビュー由来のログ/アラート整備を含む。
+
+- **#4382 feat: ナウプレ enrich プロキシ `POST /mulukhiya/api/nowplaying/resolve`** — Bearer 必須。構造化メタ（title/artist/album）→ Spotify/iTunes 検索 → 共有可能 URL 解決の読み取り専用 enrich。プロバイダ優先 `prefer`（capsicum トグル）> `source_app_name` ヒント > サーバー既定 `/nowplaying/resolve/default_provider`（既定 apple_music、フォールバック許可）。`features.nowplaying_resolver` 露出、整形は capsicum 側でモロヘイヤはステートレス。未使用の旧系統①（`itunes_nowplaying`/`spotify_nowplaying`）を削除し検索ロジックを resolver へ集約（capsicum #466/#484/#668/#570 連携）
+- **#4397 feat: 読み付き単語サジェスト API `GET /mulukhiya/api/word/suggest`** — capsicum #614 投稿サジェスト連携。`PronunciationDictionary` が GAS の pron.json を Redis キャッシュし、読み（ひらがな→カタカナ正規化はモロヘイヤ側で吸収）前方一致 → 表層前方一致 → 部分一致でランク付け、同ランクは五十音順タイブレーク（#4403）。`features.word_suggest` を `/word_suggest/urls` 設定有無で `DynamicFeatures::REGISTRY` から動的導出。本体 API #4398、HEAD 非対応ホスト（GAS）の content-length 事前チェック 403 ログ抑止 #4400
+- **#4347 refactor: Program クラスを ProgramFetcher へ分割** — fetch/キャッシュ責務を切り出し、rubocop Metrics/ClassLength disable 解除（5.25.0 から送り）
+- **#4394 5.25.0 リリース前 5観点レビュー 5.26.0 送り（黄・緑まとめ）** — favorites 400 ログ、program.ics alert 昇格、harness の `test?` ガード、冪等ロック storage/rescue 重複の共通化（`AnnictIdempotencyLockStorage` 抽出）、request ログ本文 scrub、start_time 二段検証、slim 記法ゆれ、api.md 補記
+- **本リリース前 5観点レビュー赤近い黄インライン (#4404/#4406)** — 公開 `/word/suggest` 由来の Sentry スパム抑止: `PronunciationDictionary` の Redis 読み/書き失敗（接続障害）を alert→log に倒し、破損（不正 JSON/非配列）のみ alert+invalidate に限定（read #4404 / write は Codex P2 を受け #4406 で対称化）。`nowplaying/resolve`・`word/suggest` のユーザー入力（曲名・検索語）ログ scrub 追加。残り黄・緑は #4405 で 5.27.0 送り
+- **bundle update** — Gemfile.lock 変更なし（既に最新、bundler-audit クリーン、Dependabot 0）
+- **運用向け設定変更**: word/suggest を有効化するサーバーは `config/local.yaml` に `/word_suggest/urls`（GAS pron.json）設定が必要。未設定なら `features.word_suggest=false` で無効（既定で無害）。`PronunciationDictionaryUpdateWorker` が 10 分毎更新
+- ステージング: dev04（FreeBSD・美食丼）/ dev23（Misskey・ダイスキー）で develop=5.26.0 を確認（dev15/dev22 はメンテ外につき対象外）
+- **本番デプロイ: 4 台完了**（2026-06-09、shallu / zugoga / lbock / sweep。辞書設定 `/word_suggest/urls`（GAS pron.json）を各サーバー `config/local.yaml` へ投入、全台 `features.word_suggest=true` / version 5.26.0 / health 200）
+
+### 振り返り
+
+**期間**: 5.25.0 リリース・本番デプロイ 2026-06-07 → 5.26.0 リリース 2026-06-09（2 日間）。
+
+**消化**: 5.26.0 マイルストーン Issue 全消化（#4382/#4347/#4394/#4397）。
+
+**5観点レビュー仕分け**: 真の赤 0 件。赤近い黄 2 系統（word/suggest の Redis 障害 Sentry スパム / 入力ログ scrub）をインライン (#4404)、Codex P2（save 側 write の alert スパム）を追い fix (#4406)、残り黄・緑（リダイレクト SSRF 非対称、cold-cache 同期 fetch、docs 表記揺れ・タイポ等）は #4405 にまとめて 5.27.0 送り。
+
+**Codex 仕分け**: ドラフト解除した release PR #4396 に届く Codex レビューは 5観点と重複見込み。#4404 上の P2（Redis 全断時の write 側 alert スパム）は #4406 でインライン対応しリリースに同梱。
+
 ## リリース済み: 5.25.0（2026-06-07）
 
 APIController 段階的リファクタの締め (#4285) + 5.23/5.24 レビュー送りの構造改善 + 番組表の iCalendar 出力・開始時刻欄 + Annict review API + 運用ログ整備 + 報告ベース修正を組み合わせた着地回。
