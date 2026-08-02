@@ -30,7 +30,7 @@ module Mulukhiya
     # 以下 3 メソッドは read-modify-write なので、多端末同時書き込みの lost update
     # を防ぐため account 単位のロックで直列化する（保持中は 409、#4457/#4460）。
     def create(attributes)
-      lock.synchronize(@account.id) do
+      synchronize do
         templates = all
         raise Ginseng::ConflictError, "テンプレートは最大 #{MAX_COUNT} 件までです。" if templates.size >= MAX_COUNT
         template = normalize(attributes).merge('id' => SecureRandom.uuid)
@@ -42,7 +42,7 @@ module Mulukhiya
     end
 
     def update(id, attributes)
-      lock.synchronize(@account.id) do
+      synchronize do
         templates = all
         index = templates.index {|v| v['id'].to_s == id.to_s}
         raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless index
@@ -56,7 +56,7 @@ module Mulukhiya
     end
 
     def delete(id)
-      lock.synchronize(@account.id) do
+      synchronize do
         templates = all
         target = templates.find {|v| v['id'].to_s == id.to_s}
         raise Ginseng::NotFoundError, "テンプレート '#{id}' が見つかりません。" unless target
@@ -68,12 +68,24 @@ module Mulukhiya
 
     private
 
+    # ロックを取り、その内側で user_config を読み直してから block を実行する。
+    # @account.user_config はメモ化された UserConfig（構築時点の値のスナップショット）
+    # を返すため、ロック取得前に誰かがそれを参照していると、古い値の上で
+    # read-modify-write することになり lost update が黙って復活する。ロック内で
+    # fresh read を強制して構造的に防ぐ (#4461)。
+    def synchronize
+      lock.synchronize(@account.id) do
+        @user_config = UserConfig.new(@account)
+        next yield
+      end
+    end
+
     def lock
       return @lock ||= ComposeTemplateLockStorage.new
     end
 
     def user_config
-      return @account.user_config
+      return @user_config ||= @account.user_config
     end
 
     def normalize(attributes)
@@ -94,8 +106,14 @@ module Mulukhiya
       return FIELDS.all? {|k| saved[k] == expected[k]}
     end
 
+    # UserConfig#update は書き込み失敗を自前で alert して握りつぶすため、read-back
+    # 由来の GatewayError と合わせると Redis の一過性障害 1 回で alert が 2 発飛ぶ。
+    # ここは alert しない update! を使い、GatewayError に包み直して通知を controller
+    # の 1 本にまとめる。根因の例外は Exception#cause として Sentry に残る (#4461)。
     def persist(templates)
-      user_config.update(compose: {templates: templates})
+      user_config.update!(compose: {templates: templates})
+    rescue => e
+      raise Ginseng::GatewayError, "テンプレートを保存できませんでした。(#{e.class})"
     end
   end
 end

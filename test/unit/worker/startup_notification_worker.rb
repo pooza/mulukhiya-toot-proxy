@@ -133,6 +133,28 @@ module Mulukhiya
       @worker&.send(:reset_ng_count, :postgres)
     end
 
+    # 自エラーは log 止めにせず、連続失敗の 1 回目だけ alert する。5 分毎に走る
+    # ワーカーなので毎回 alert すると Sentry がスパム化する (#4461)。
+    def test_notify_failure_alerts_once_per_streak
+      return if disable?
+      calls = []
+      error = RuntimeError.new('boom')
+      error.define_singleton_method(:alert) {|**| calls.push(:alert)}
+      error.define_singleton_method(:log) {|**| calls.push(:log)}
+      @worker.send(:clear_failure)
+      3.times {@worker.send(:notify_failure, error)}
+
+      assert_equal([:alert, :log, :log], calls)
+
+      # 成功したら解除され、次の失敗で再び alert される（デッドマン）。
+      @worker.send(:clear_failure)
+      @worker.send(:notify_failure, error)
+
+      assert_equal([:alert, :log, :log, :alert], calls)
+    ensure
+      @worker&.send(:clear_failure)
+    end
+
     def test_apply_hysteresis_warn_passes_through
       return if disable?
       observed = {redis: 'OK', postgres: 'WARN'}

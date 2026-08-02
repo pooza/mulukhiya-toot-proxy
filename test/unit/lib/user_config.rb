@@ -51,6 +51,18 @@ module Mulukhiya
       assert_equal('bbb', values.dig('sample', 'password').decrypt)
     end
 
+    # update は失敗を alert して握りつぶすが、update! は呼び出し側へ委ねる。
+    # read-back で成否を検証する呼び出し側（ComposeTemplateContainer）が二重に
+    # alert しないための入口 (#4461)。
+    def test_update_bang_propagates_error
+      storage = @user_config.instance_variable_get(:@storage)
+      storage.define_singleton_method(:update) {|*| raise 'boom'}
+
+      assert_raise(RuntimeError) do
+        @user_config.update!(@key1 => {@key2 => '焼きのり'})
+      end
+    end
+
     def test_disable?
       assert_false(@user_config.disable?('yakinori'))
       assert_boolean(@user_config.disable?('you_tube_url_nowplaying'))
