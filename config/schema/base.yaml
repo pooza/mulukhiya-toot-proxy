@@ -374,6 +374,13 @@ properties:
       schedule:
         type: object
     type: object
+  runtime:
+    properties:
+      require_yjit:
+        type: boolean
+    required:
+      - require_yjit
+    type: object
   sentry:
     properties:
       dsn:

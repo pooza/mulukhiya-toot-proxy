@@ -437,9 +437,14 @@ Web Push サブスクリプションを解除する。
   "sidekiq": {"status": "OK"},
   "streaming": {"status": "OK"},
   "postgres": {"status": "OK"},
+  "ruby": {"version": "4.0.6", "yjit_available": true, "yjit_enabled": true, "status": "OK"},
   "status": 200
 }
 ```
+
+**`ruby` は構成乖離の検知用** (#4466)。YJIT は Rust の無い環境ではビルド時に黙って外れ、エラーにならないまま 24〜25% 遅いサーバーが出来上がるため、能力を可視化する。
+
+**既定では `status` が `NG` になることはない**（能力の欠落は障害ではなく、health が 503 になるとサーバーが「停止」扱いになるため）。確実に検知したいサーバーは `/runtime/require_yjit` を `true` にすると、YJIT が有効でない場合に `NG`（＝全体 503）になる。
 
 **WARN を含むレスポンス例**（プール枯渇を検出した場合）:
 
