@@ -1,12 +1,18 @@
 module Mulukhiya
   class TagHandler < Handler
+    # addition_tags / removal_tags は 1 回だけ評価してローカルに束ねる (#4494)。
+    # `result.push(addition_tags:)` の短縮記法は同名のローカルが無ければメソッド
+    # 呼び出しになるため、素直に書くと if の分と合わせて 1 投稿に 3 回走る。
+    # これらは純粋な getter ではなく Redis 読み・辞書スイープ・リモート照会を伴う。
     def handle_pre_toot(payload, params = {})
       self.payload = payload
       return unless executable?
-      tags.merge(addition_tags)
-      result.push(addition_tags:) if addition_tags.present?
-      removal_tags.each {|v| tags.delete(v)}
-      result.push(removal_tags:) if removal_tags.present?
+      addition = addition_tags
+      tags.merge(addition)
+      result.push(addition_tags: addition) if addition.present?
+      removal = removal_tags
+      removal.each {|v| tags.delete(v)}
+      result.push(removal_tags: removal) if removal.present?
     end
 
     def executable?
