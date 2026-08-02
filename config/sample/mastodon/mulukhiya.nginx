@@ -1,11 +1,27 @@
+# バックエンドは 127.0.0.1 で書く。localhost に戻さないこと。
+#
+# proxy_pass のホスト名は設定読み込み時に解決され、解決された全アドレスが
+# 暗黙の upstream になる。/etc/hosts に 127.0.0.1 と ::1 の両方がある一方で
+# モロヘイヤも Mastodon の puma も IPv4 でしか listen しないため、約半分の確率で
+# ::1 を選んで必ず Connection refused になる。平常時は「片方失敗 → もう片方で
+# 成功」で 200 が返るので気づけないが、負荷時は ::1 が fail_timeout の間 down
+# 扱いのままとなり、127.0.0.1 側も backlog 溢れで一度 refused になった瞬間に
+# 全ピア down ＝ nginx が無条件に 502 を返す（本番実測 refused 1 万件/日超）。
+#
+# /etc/hosts の `::1 localhost` を消す方向で直してはいけない。Ruby 3.4+ の
+# Happy Eyeballs v2 対策として必須で、無いと localhost への接続 1 回につき
+# 305ms を払う (#4481)。参照側を 127.0.0.1 にするのが解。
+# 単一ピアの upstream では nginx は max_fails / fail_timeout を無視するため、
+# ピア down 判定そのものが起きなくなる。
+
 # === http context に追加 ===
 map $http_x_mulukhiya $mulukhiya_backend {
-  default http://localhost:3008;
-  "~.+"   http://localhost:3000;
+  default http://127.0.0.1:3008;
+  "~.+"   http://127.0.0.1:3000;
 }
 map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
-  "~^PUT:$"  http://localhost:3008;
-  default    http://localhost:3000;
+  "~^PUT:$"  http://127.0.0.1:3008;
+  default    http://127.0.0.1:3000;
 }
 # PUT /api/v1/statuses/:id（ステータス編集）は、用途を X-Mulukhiya-Purpose で
 # 名乗った場合だけモロヘイヤへ通す。名乗りの無い素の編集要求は reject に落として
@@ -15,9 +31,9 @@ map "${request_method}:${http_x_mulukhiya}" $media_put_backend {
 # proxy_pass はコンテンツフェーズのハンドラを登録するだけで rewrite フェーズを
 # 終端しないため、後続の if の return が勝って Purpose 付きまで 405 になる (#4474)。
 map "${request_method}:${http_x_mulukhiya}:${http_x_mulukhiya_purpose}" $status_put_backend {
-  "~^PUT::.+"  http://localhost:3008;
+  "~^PUT::.+"  http://127.0.0.1:3008;
   "~^PUT::$"   reject;
-  default      http://localhost:3000;
+  default      http://127.0.0.1:3000;
 }
 
 # === server context に追加 ===
@@ -43,7 +59,7 @@ location ~ ^/api/v[0-9]+/statuses/[0-9]+$ {
 }
 location = /api/v1/timelines/public {
   if ($arg_local !~* ^(true|t|1|on)$) {
-    proxy_pass http://localhost:3000;
+    proxy_pass http://127.0.0.1:3000;
   }
   if ($arg_local ~* ^(true|t|1|on)$) {
     return 302 /api/v1/timelines/tag/your_default_hashtag?max_id=$arg_max_id;
@@ -51,13 +67,13 @@ location = /api/v1/timelines/public {
 }
 location ^~ /mulukhiya {
   include /path/to/mulukhiya_proxy.conf;
-  proxy_pass http://localhost:3008;
+  proxy_pass http://127.0.0.1:3008;
 }
 location ^~ /mulukhiya/sidekiq {
   allow YOUR_IP_OR_CIDR;
   deny all;
   include /path/to/mulukhiya_proxy.conf;
-  proxy_pass http://localhost:3008;
+  proxy_pass http://127.0.0.1:3008;
 }
 location ^~ /nodeinfo {
   include /path/to/mulukhiya_proxy.conf;
