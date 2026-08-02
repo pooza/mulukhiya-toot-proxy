@@ -109,11 +109,15 @@ module Mulukhiya
     # UserConfig#update は書き込み失敗を自前で alert して握りつぶすため、read-back
     # 由来の GatewayError と合わせると Redis の一過性障害 1 回で alert が 2 発飛ぶ。
     # ここは alert しない update! を使い、GatewayError に包み直して通知を controller
-    # の 1 本にまとめる。根因の例外は Exception#cause として Sentry に残る (#4461)。
+    # の 1 本にまとめる。
+    #
+    # メッセージには例外クラス名を混ぜない（read-back 失敗時と同じ文言に揃え、
+    # 内部実装をクライアントへ出さない）。根因は Exception#cause として Sentry に
+    # 残るので、切り分けはそちらで行う (#4461)。
     def persist(templates)
       user_config.update!(compose: {templates: templates})
-    rescue => e
-      raise Ginseng::GatewayError, "テンプレートを保存できませんでした。(#{e.class})"
+    rescue
+      raise Ginseng::GatewayError, 'テンプレートを保存できませんでした。'
     end
   end
 end
