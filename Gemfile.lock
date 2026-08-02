@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 31ed7b79ca53647b5dbba6abe307a38259d8ce6a
+  revision: 4b134cebaf80c6ba0267363d5f729b59bdaf6c36
   branch: main
   specs:
-    ginseng-core (1.15.27)
+    ginseng-core (1.15.28)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -236,7 +236,7 @@ GEM
       logger
       ostruct
     ice_cube (0.17.0)
-    json (2.21.1)
+    json (2.21.2)
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
@@ -465,7 +465,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
-    zeitwerk (2.8.2)
+    zeitwerk (2.8.3)
     zlib (3.2.3)
 
 PLATFORMS
