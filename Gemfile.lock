@@ -488,6 +488,7 @@ DEPENDENCIES
   ginseng-web!
   ginseng-youtube!
   icalendar
+  json-schema
   marcel
   optparse
   ostruct

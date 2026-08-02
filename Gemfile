@@ -11,6 +11,11 @@ gem 'ginseng-redis', github: 'pooza/ginseng-redis', branch: 'main', require: 'gi
 gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main', require: 'ginseng/web'
 gem 'ginseng-youtube', github: 'pooza/ginseng-youtube', branch: 'main', require: 'ginseng/you_tube'
 gem 'icalendar'
+# JSON::Validator を app/lib/mulukhiya.rb で直に使う。ginseng-core の推移依存で
+# 入ってはいるが、Bundler.require が読むのは Gemfile に書いた gem だけで、
+# ginseng-core 側は Ginseng::Config が autoload された副作用で require していた。
+# その副作用に頼ると、Config を触らない起動経路で NameError になる (#4509)。
+gem 'json-schema'
 gem 'marcel'
 gem 'optparse'
 gem 'parallel', '~> 2.0'
