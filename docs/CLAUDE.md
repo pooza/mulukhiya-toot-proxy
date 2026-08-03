@@ -663,7 +663,7 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 - **一次対策は棚卸しではない。**インフラの調査・変更を終えたら、**その作業の一部として**
   chubo2 の `docs/infra-note.md`（現在の状態・手順・罠・運用方針）または
   `docs/infra-history.md`（日付のある出来事）に落とす。Issue とメモリだけで済ませない。
-  リリース時の docs 更新（§9）と同じ扱いにする
+  「リリース運用 → 通常リリース手順」10.「リリース後の更新」と同じ扱いにする
 - 取りこぼしの回収は chubo2 の [docs/doc-maintenance.md](https://github.com/pooza/chubo2/blob/main/docs/doc-maintenance.md) の手順で行う。
   `docs/infra-note.md` 冒頭の「最終ドキュメント棚卸し」が起点。**§6-2 の Issue 棚卸しとは軸が違う**
   （あちらは open Issue の生死、こちらは知見の置き場所）。大きめの作業トラックが終わったとき、
