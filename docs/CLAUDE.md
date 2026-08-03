@@ -654,6 +654,28 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 - 専用の cloud/cron ジョブは使わない（§8 と同じ理由。スケジュール実行は途中で止まって手で起こす運用に
   なりがちで、セッションに織り込むほうが確実に回る）
 
+#### 6-3. ドキュメント・メモリの棚卸し
+
+**インフラ作業は「Mastodon / Misskey / モロヘイヤに触るか」で本セッションと chubo2 セッションに
+分かれて依頼されている。セッションメモリは共有されないので、片方のメモリにだけ事実が残ると
+もう片方が同じ調査を繰り返す。**
+
+- **一次対策は棚卸しではない。**インフラの調査・変更を終えたら、**その作業の一部として**
+  chubo2 の `docs/infra-note.md`（現在の状態・手順・罠・運用方針）または
+  `docs/infra-history.md`（日付のある出来事）に落とす。Issue とメモリだけで済ませない。
+  リリース時の docs 更新（§9）と同じ扱いにする
+- 取りこぼしの回収は chubo2 の [docs/doc-maintenance.md](https://github.com/pooza/chubo2/blob/main/docs/doc-maintenance.md) の手順で行う。
+  `docs/infra-note.md` 冒頭の「最終ドキュメント棚卸し」が起点。**§6-2 の Issue 棚卸しとは軸が違う**
+  （あちらは open Issue の生死、こちらは知見の置き場所）。大きめの作業トラックが終わったとき、
+  またはユーザーの指示で回す
+- 昇格の判定は**目視でなく grep**。メモリの中の固有名詞を `infra-note.md` / `infra-history.md` に
+  投げ、ヒット 0 のものが対象。2026-08-03 の初回実施では `loop6` / `delmulin-misskey` /
+  `index_tags_on_name_lower` がいずれもヒット 0 だった（#4512、pooza/chubo2#129）
+- 昇格したメモリは**削除せずポインタに書き換える**（正本のパス＋なぜ非自明か）。
+  メモリは git 管理外なので消すと復元できない
+- **昇格しないもの**: 進め方の好み、提案の抑制（「〇〇を勧めない」）、私的判断。
+  これらはセッションごとの作業ルールなので docs に上げない
+
 ### 7. マイルストーンの状態確認
 
 - `docs/CLAUDE.md` と MEMORY.md に記載された次期マイルストーンの Issue が、実際の GitHub 上の状態（open/closed）と一致しているか確認
