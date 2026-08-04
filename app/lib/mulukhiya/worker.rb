@@ -4,6 +4,19 @@ module Mulukhiya
     include Package
     include SNSMethods
 
+    # 🔴 disable? を override した worker は、**perform 冒頭でも `return if disable?`
+    # を書くこと** (#4343 / #4506)。
+    #
+    # 下の Worker.perform_async は disable? を見て enqueue を止めるが、
+    # **sidekiq-scheduler は perform_async を介さず Sidekiq::Client.push を直叩きする**
+    # ため、schedule 経由の起動はこの gate を一切通らない。schedule を持つ worker で
+    # perform 側の短絡を欠くと、機能を無効にしたサーバーでも本体が 1〜10 分おきに走る。
+    #
+    # 基底側で perform を一律ラップする案もあるが、disable? の中身は worker ごとに
+    # DB / 外部 API を叩くものがあり（例: FeedUpdateWorker の CustomFeed.all）、
+    # 全 worker の毎回の起動でその評価コストを払うことになるので採らない。
+    # 代わりに test/unit/worker/disable_gate.rb が「disable? を override している
+    # 全 worker が perform で短絡すること」を機械的に検査する。
     def disable?
       return false
     end

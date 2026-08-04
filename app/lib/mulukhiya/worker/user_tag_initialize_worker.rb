@@ -8,6 +8,10 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # cron 2 3 * * *。🔴 user_tag ハンドラを無効にしたサーバーでも
+      # clear_tags が走り、**利用者が設定済みのタグを毎日消してしまう**。
+      # 7 本のうち唯一データを破壊する (#4506)。
+      return if disable?
       initialize_params(params)
       if id = params[:account_id]
         log(mode: 'single')

@@ -8,6 +8,9 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # schedule は無く enqueue 経路のみだが、perform_async 以外から呼ばれても
+      # 成立するよう他の worker と同じ形に揃える (#4506)。
+      return if disable?
       initialize_params(params)
       account = account_class[params[:account_id]]
       apply_decoration(account)

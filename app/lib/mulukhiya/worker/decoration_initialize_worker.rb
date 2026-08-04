@@ -8,6 +8,10 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # cron 2 3 * * *。Misskey 以外のサーバーでも decoration_owners を引いて
+      # Misskey 固有の update_account を全アカウント分呼び、rescue でログだけが
+      # 積み上がる (#4506)。
+      return if disable?
       initialize_params(params)
       if id = params[:account_id]
         log(mode: 'single')
