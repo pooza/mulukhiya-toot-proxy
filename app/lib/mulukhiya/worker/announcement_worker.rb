@@ -8,6 +8,9 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # every 10m。info agent が無いサーバーでも Announcement#announce が走り、
+      # 通知先の無いまま告知処理を回してしまう (#4506)。
+      return if disable?
       announcement = Announcement.new
       announcement.announce
       log(cached: announcement.count)
