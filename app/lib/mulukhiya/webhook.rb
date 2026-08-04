@@ -5,7 +5,14 @@ module Mulukhiya
 
     attr_reader :sns, :reporter
 
+    # ⚠ トークンが無いまま digest を作ってはいけない (#4487)。
+    # {sns:, token: nil, salt:} の SHA256 は「URL の形をしているのに誰のものでもない」
+    # 幽霊 webhook URL になる。find_token_by_digest は oauth_access_tokens を舐めて
+    # token.webhook_digest（＝トークン文字列から作った値）と突き合わせるので、
+    # nil から作った値に一致するレコードは存在しない。設定はできたのに何も起きない、
+    # という静かな失敗になるため、URL を出す前に落とす。
     def digest
+      raise Ginseng::ConfigError, 'token not found' if sns.token.blank?
       return self.class.create_digest(sns.uri, sns.token)
     end
 
@@ -14,6 +21,12 @@ module Mulukhiya
     rescue => e
       e.log
       return parser_class.visibility_name(:public)
+    end
+
+    # digest / uri を取れる状態か。トークンを持たないアカウントでも
+    # Account#webhook は Webhook を返すので、呼び出し側はこれで判定する (#4487)。
+    def available?
+      return sns.token.present?
     end
 
     def uri
@@ -61,7 +74,11 @@ module Mulukhiya
     # /crypt/salt は #4083 で廃止済みだが、本番サーバーの過半数で
     # /crypt/salt と /crypt/password が異なる値を持っており、
     # Crypt.password に統一すると digest が変化する。(#4106)
+    #
+    # 空トークンの拒否は digest 側と二重に持つ。ここは webhook_digest（AccessToken 側）
+    # からも呼ばれる入口なので、値の計算に入る前に止める (#4487)。
     def self.create_digest(uri, token)
+      raise Ginseng::ConfigError, 'token not found' if token.blank?
       return {
         sns: uri.to_s,
         token:,
@@ -78,9 +95,15 @@ module Mulukhiya
       return nil
     end
 
+    # トークンを持たないアカウントの「幽霊 webhook」は列挙しない (#4487)。
+    # 混ざっていると digest / uri を呼んだ時点で落ちるうえ、そもそも照合できないので
+    # webhook として意味を持たない。
     def self.all(&block)
       return enum_for(__method__) unless block
-      controller_class.webhook_entries.filter_map {|v| v[:account]&.webhook}.each(&block)
+      controller_class.webhook_entries
+        .filter_map {|v| v[:account]&.webhook}
+        .select(&:available?)
+        .each(&block)
     end
 
     def self.find_token_by_digest(digest)
