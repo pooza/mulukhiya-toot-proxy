@@ -855,6 +855,45 @@ Web Push サブスクリプションを解除する。
 | `id` | string | 必須 | 投稿 ID |
 | `tags` | string[] | 必須 | タグの配列 |
 
+- **レスポンス（成功時 200）**: **SNS 本体の投稿 API のレスポンスをそのまま返す。**モロヘイヤ独自のラップは無い。
+  したがって**形は SNS 種別で異なる**（#4491）。
+
+| controller | 形 | 新しい投稿の ID |
+|---|---|---|
+| Mastodon | `POST /api/v1/statuses` と同じ status オブジェクト（トップレベルがそのまま status） | `id` |
+| Misskey | `POST /api/notes/create` と同じ `{"createdNote": {...}}` | `createdNote.id` |
+
+  **本文・添付・可視性を含む完全なオブジェクトが返る**ので、クライアントは再取得なしにタイムラインへ反映できる。
+  元の投稿は削除済みで、返るのは**新しく作られた投稿**（ID は元と異なる）。
+
+```jsonc
+// Mastodon
+{"id": "117039311685380513", "created_at": "...", "content": "<p>本文</p><p><a ...>#<span>tag1</span></a></p>",
+ "visibility": "direct", "account": {...}, "media_attachments": [], ...}
+
+// Misskey
+{"createdNote": {"id": "apiq4gr6k0", "createdAt": "...", "text": "本文\n\n#tag1 #tag2",
+                 "tags": ["tag1", "tag2"], "user": {...}, ...}}
+```
+
+- **削除と再投稿の順序が SNS で逆**なので、失敗時に残るものが違う。
+  - **Mastodon**: 削除 → 投稿。投稿側で失敗すると**元の投稿は消えたまま**になる
+  - **Misskey**: 投稿 → 削除。削除側で失敗すると**新旧が両方残る**
+
+- **エラー**:
+
+| 状況 | ステータス | body |
+|---|---|---|
+| 認証なし・トークン不正 | **403** | `{"error":"Unauthorized"}` |
+| 他人の投稿・存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
+| `/{controller}/capabilities/repost` が false | **404** | 同上 |
+| `tags` 未指定・不正 | **422** | `{"errors":{"tags":["空欄です。"]}}` |
+| 上流 SNS のエラー | 上流のステータス | `{"error":"Bad response NNN"}`（#4480 で改善予定） |
+
+  ⚠ **404 の body だけ他と形が違う。**コントローラは `{"error":"Not Found"}` を組み立てているが、
+  Sinatra の `not_found` ハンドラがステータス 404 を見て body を差し替えるため、個別のメッセージが
+  失われる。**`error` キーを持たないので、クライアントは `error` の有無で分岐してはいけない**（#4520）。
+
 #### GET /mulukhiya/api/media
 
 メディアカタログを取得する。
