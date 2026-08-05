@@ -138,6 +138,21 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # ⚠ 一覧の「有効」トグル (#4484) は enable だけを送る。false は blank_value?
+    # ではないので、キーごと消えず false として残らなければならない。
+    def test_update_entry_keeps_false_enable
+      key = "test_enable_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'enable' => true})
+      entry = @program.update_entry(key, 'enable' => false)
+
+      assert_includes(entry.keys, 'enable')
+      assert_false(entry['enable'])
+      assert_true(@program.update_entry(key, 'enable' => true)['enable'])
+    ensure
+      @program.save(original) if original
+    end
+
     def test_update_entry_raises_when_missing
       original = @program.data
 

@@ -592,6 +592,15 @@ section.disabled h3::after
           background-color: papayawhip !important
     td.actions
       text-align: right
+    // 一覧上で有効/無効をその場で切り替えるトグル (#4484)。
+    // 無効側は「押していない」ことが色でも分かるよう淡く落とす。
+    button.enable-toggle
+      &.off
+        background:
+          color: transparent
+        border:
+          color: gray
+        color: gray
 
 nav.search-form-container
   display: block

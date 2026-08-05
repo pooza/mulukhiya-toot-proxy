@@ -22,6 +22,15 @@ module Mulukhiya
       assert_empty(errors)
     end
 
+    # 一覧の「有効」トグルは enable だけを送る (#4484)。false も通ること。
+    def test_partial_enable_only
+      [true, false].each do |value|
+        errors = @contract.call(enable: value).errors
+
+        assert_empty(errors, "enable=#{value} を拒否している")
+      end
+    end
+
     def test_series_when_provided_must_not_be_empty
       errors = @contract.call(series: '').errors
 

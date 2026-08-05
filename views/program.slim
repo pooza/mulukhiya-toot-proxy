@@ -162,7 +162,11 @@ html lang='ja' data-theme='light'
                     i class='fa fa-check' aria-hidden='true'
                     span.sr-only 実況対象
                 td
-                  span.tag.enable v-if='entry.enable'
+                  button.small.enable-toggle :class="{off: !entry.enable}" @click.stop='toggleEnable(key, entry)' v-if='editable' :aria-pressed="entry.enable ? 'true' : 'false'" v-tooltip.top="entry.enable ? '無効にする' : '有効にする'"
+                    i class='fa' :class="entry.enable ? 'fa-check' : 'fa-xmark'" aria-hidden='true'
+                    span.sr-only
+                      | {{entry.enable ? '有効' : '無効'}}
+                  span.tag.enable v-else-if='entry.enable'
                     i class='fa fa-check' aria-hidden='true'
                     span.sr-only 有効
                 td.actions
@@ -289,6 +293,22 @@ html lang='ja' data-theme='light'
                       this.loadEntries()
                     })
                     .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                })
+            },
+            toggleEnable (key, entry) {
+              const next = !entry.enable
+              // 楽観更新。放送前後にまとめて切り替えるので、往復を待たずに
+              // 行の見た目 (disabled クラス) が追従するほうが手数が減る (#4484)。
+              // 失敗したら loadEntries() でサーバーの値へ巻き戻す。
+              entry.enable = next
+              this.methods.updateProgramEntry(key, {enable: next})
+                .then(_ => {
+                  Swal.fire({title: next ? '有効にしました。' : '無効にしました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  this.loadEntries()
+                })
+                .catch(e => {
+                  entry.enable = !next
+                  Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
                 })
             },
             incrementEpisode (key) {
