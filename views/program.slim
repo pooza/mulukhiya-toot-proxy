@@ -155,13 +155,16 @@ html lang='ja' data-theme='light'
                     | {{entry.minutes}}分
                 td
                   span.tag.air v-if='entry.air'
-                    i class='fa fa-check'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only エア番組
                 td
                   span.tag.livecure v-if='entry.livecure'
-                    i class='fa fa-check'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only 実況対象
                 td
                   span.tag.enable v-if='entry.enable'
-                    i class='fa fa-check'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only 有効
                 td.actions
                   button.small.danger @click.stop='deleteEntry(key)' v-if='editable' v-tooltip.top="'削除'"
                     i class='fa fa-trash'

@@ -106,11 +106,19 @@ module Mulukhiya
         .each(&block)
     end
 
+    # ⚠ 1 行の失敗でループを抜けてはいけない。
+    #
+    # webhook_digest は空トークンで ConfigError を投げる (#4487)。valid? は
+    # `to_s.empty?` しか見ないので、空白だけのトークン行はここまで到達する。
+    # 例外がループの外へ出ると Webhook.create の rescue が nil を返し、
+    # **その行より後ろにある正しい webhook URL が「見つからない」ことになる**。
+    # 壊れた行は次へ送るだけにして、走査自体は最後まで続ける (#4487 / PR #4522)。
     def self.find_token_by_digest(digest)
       Postgres.exec(:webhook_tokens).each do |row|
         token = Environment.access_token_class[row[:id]] rescue next
         next unless token.valid?
-        return token if token.webhook_digest == digest
+        token_digest = token.webhook_digest rescue next
+        return token if token_digest == digest
       end
       return nil
     end
