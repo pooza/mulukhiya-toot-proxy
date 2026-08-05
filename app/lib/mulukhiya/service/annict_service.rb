@@ -145,7 +145,10 @@ module Mulukhiya
       response = begin
         query(template, variables)
       rescue Ginseng::GatewayError => e
-        if /Bad response (401|403)/.match?(e.message.to_s)
+        # ⚠ かつては e.message を `/Bad response (401|403)/` で舐めていた。
+        # ginseng-core のメッセージ書式に依存した壊れやすい実装なので、
+        # source_status で判定する (#4480)。
+        if [401, 403].include?(e.source_status)
           raise Ginseng::AuthError, 'Annict authorization required'
         end
         raise

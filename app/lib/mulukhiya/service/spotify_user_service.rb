@@ -19,6 +19,15 @@ module Mulukhiya
     TOKEN_PATH = '/api/token'.freeze
     CURRENTLY_PLAYING_PATH = '/v1/me/player/currently-playing'.freeze
 
+    # token endpoint が返す OAuth 2.0 の error のうち、**こちら側の設定ミス**を
+    # 指すもの。ユーザーが再連携しても直らないので「要再認証」に倒さない (#4480)。
+    OPERATOR_FAULT_OAUTH_ERRORS = [
+      'invalid_client',
+      'unauthorized_client',
+      'unsupported_grant_type',
+      'invalid_scope',
+    ].freeze
+
     # account は currently_playing / auth / unlink で必要 (refresh したトークンを
     # UserConfig へ書き戻すため)。oauth_uri のみ account なしでも使える。
     def initialize(account = nil)
@@ -135,7 +144,14 @@ module Mulukhiya
       # これは再認証が必要なユーザー起因エラーなので AuthError (401) に倒し、
       # capsicum に再連携フローを誘導させる。5xx/timeout は Spotify 障害なので
       # GatewayError (502) のまま上げる。
+      #
+      # ⚠ 4xx を一括で「再認証が必要」に倒してはいけない。invalid_client は
+      # **こちらの client_id/secret の設定ミス**で、ユーザーが何度再連携しても
+      # 直らない。ユーザーのせいにせず GatewayError のまま上げて Sentry に
+      # 出す (#4480)。上流の error は OAuth 2.0 の `{"error": "..."}` 形式。
       raise unless e.source_status&.between?(400, 499)
+      body = e.source_body
+      raise if body.is_a?(Hash) && OPERATOR_FAULT_OAUTH_ERRORS.include?(body['error'])
       raise Ginseng::AuthError, 'Spotify re-authentication required'
     end
 

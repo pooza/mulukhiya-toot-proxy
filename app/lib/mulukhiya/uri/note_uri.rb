@@ -20,6 +20,9 @@ module Mulukhiya
       template[:url] = self
       return template.to_s
     rescue => e
+      # 内側が既に GatewayError（上流の取得失敗）なら包み直さない。
+      # 包み直すと上流のレスポンス (#4480) が落ちる。
+      raise e if e.is_a?(Ginseng::GatewayError)
       raise Ginseng::GatewayError, e.message, e.backtrace
     end
 
