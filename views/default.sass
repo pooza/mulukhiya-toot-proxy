@@ -23,6 +23,20 @@ $monospace: Inconsolata, monospace
 [v-cloak]
   display: none
 
+// アイコンだけのセル・ボタンに添える、目に見えないラベル。
+// Font Awesome のグリフは private-use なのでアクセシビリティツリーに何も残らず、
+// スクリーンリーダーや FA 未読み込み時に真偽が区別できなくなる (PR #4498 の Codex 指摘)。
+.sr-only
+  position: absolute
+  width: 1px
+  height: 1px
+  margin: -1px
+  padding: 0
+  overflow: hidden
+  white-space: nowrap
+  border: 0
+  clip-path: inset(50%)
+
 body
   font:
     family: $serif

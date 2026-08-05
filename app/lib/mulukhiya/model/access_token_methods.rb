@@ -2,8 +2,10 @@ module Mulukhiya
   module AccessTokenMethods
     include SNSMethods
 
+    # 空白だけのトークンも無効とする。`empty?` だと素通りして webhook_digest
+    # (空トークンで ConfigError) まで到達する (#4487)。
     def valid?
-      return false if to_s.empty?
+      return false if to_s.blank?
       return false unless account
       return true
     end

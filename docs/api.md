@@ -885,10 +885,15 @@ Web Push サブスクリプションを解除する。
 | 状況 | ステータス | body |
 |---|---|---|
 | 認証なし・トークン不正 | **403** | `{"error":"Unauthorized"}` |
-| 他人の投稿・存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
+| **他人の投稿**（ID は存在するが所有者が違う） | **403** | `{"error":"Unauthorized"}` |
+| 存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
 | `/{controller}/capabilities/repost` が false | **404** | 同上 |
 | `tags` 未指定・不正 | **422** | `{"errors":{"tags":["空欄です。"]}}` |
 | 上流 SNS のエラー | 上流のステータス | `{"error":"Bad response NNN"}`（#4480 で改善予定） |
+
+  ⚠ **所有者違いは 404 ではなく 403。**ルートは先に status を引いてから
+  `status.updatable_by?(sns.account)` を見るので、**存在する他人の投稿は「無い」ではなく
+  「権限が無い」になる**。クライアントは 404 を「消えた」、403 を「触れない」として扱ってよい。
 
   ⚠ **404 の body だけ他と形が違う。**コントローラは `{"error":"Not Found"}` を組み立てているが、
   Sinatra の `not_found` ハンドラがステータス 404 を見て body を差し替えるため、個別のメッセージが
