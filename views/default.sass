@@ -581,6 +581,12 @@ section.disabled h3::after
     margin-right: 0.5em
   .annict-search .indented
     display: block
+  // 入力欄の下に添える補足 (#4373)。
+  .field-note
+    display: block
+    margin:
+      left: 10em
+    color: dimgray
   table.program-entries
     tbody
       tr
@@ -592,6 +598,18 @@ section.disabled h3::after
           background-color: papayawhip !important
     td.actions
       text-align: right
+    // next_on が過去のエントリ (#4373)。カレンダーに出なくなっているので、
+    // 数字が読めるだけでは気づけない。色とバッジの両方で出す。
+    small.stale
+      color: firebrick
+      text:
+        decoration: line-through
+    small.muted
+      color: gray
+    .tag.stale
+      color: firebrick
+      border:
+        color: firebrick
     // 一覧上で有効/無効をその場で切り替えるトグル (#4484)。
     // 無効側は「押していない」ことが色でも分かるよう淡く落とす。
     button.enable-toggle

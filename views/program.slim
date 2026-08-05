@@ -84,6 +84,11 @@ html lang='ja' data-theme='light'
               input type='text' v-model.trim='form.values.start_time' pattern='([01]?\d|2[0-3]):[0-5]\d' placeholder='21:00' title='24 時間制 HH:MM（例 21:00）'
           .field-container
             label
+              span 次回放送日
+              input type='date' v-model='form.values.next_on' title='空欄なら毎日。日付を入れるとその日に1回だけ通知し、過ぎたら止まります'
+            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（「次回」ボタンで自動的に1週進みます）。
+          .field-container
+            label
               span 追加タグ
               textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
           .inline-field-container
@@ -121,6 +126,7 @@ html lang='ja' data-theme='light'
                 th 話数
                 th サブタイトル
                 th 開始時刻
+                th 次回放送日
                 th 放送時間
                 th エア番組
                 th 実況
@@ -150,6 +156,14 @@ html lang='ja' data-theme='light'
                 td
                   small v-if='entry.start_time'
                     | {{entry.start_time}}
+                td
+                  template v-if='entry.next_on'
+                    small :class="{stale: isStaleNextOn(entry)}"
+                      | {{entry.next_on}}
+                    span.tag.stale v-if='isStaleNextOn(entry)' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
+                      i class='fa fa-circle-exclamation' aria-hidden='true'
+                      span.sr-only 次回放送日が過去
+                  small.muted v-else 毎日
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
@@ -193,7 +207,7 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: 30, start_time: null, subtitle: '',
+                  minutes: 30, start_time: null, subtitle: '', next_on: null,
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                 },
@@ -215,6 +229,7 @@ html lang='ja' data-theme='light'
                 minutes: 30,
                 start_time: null,
                 subtitle: '',
+                next_on: null,
                 air: false,
                 livecure: true,
                 enable: true,
@@ -263,6 +278,7 @@ html lang='ja' data-theme='light'
               v.extra_tags = extraTags.length ? extraTags : null
               if (!v.subtitle) v.subtitle = null
               if (!v.start_time) v.start_time = null
+              if (!v.next_on) v.next_on = null
               if (!v.episode_suffix) v.episode_suffix = null
               if (!Number.isFinite(v.episode)) v.episode = null
               if (!Number.isFinite(v.minutes)) v.minutes = null
@@ -294,6 +310,18 @@ html lang='ja' data-theme='light'
                     })
                     .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
                 })
+            },
+            // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
+            // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
+            isStaleNextOn (entry) {
+              if (!entry.next_on) return false
+              const today = new Date()
+              const todayKey = [
+                today.getFullYear(),
+                String(today.getMonth() + 1).padStart(2, '0'),
+                String(today.getDate()).padStart(2, '0'),
+              ].join('-')
+              return entry.next_on < todayKey
             },
             toggleEnable (key, entry) {
               const next = !entry.enable

@@ -10,6 +10,12 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
     DEFAULT_FETCH_TIMEOUT = 30
+    # ⚠ Date を許可しないと、**手書きでクォート無しの日付を書いた瞬間に番組表
+    # 全体が読めなくなる** (`next_on: 2026-08-08` → Psych::DisallowedClass)。
+    # var/program.yaml は git 管理外で手編集もありうる。5.28.0 の founded_on と
+    # 同型の footgun なので、読めるようにしたうえで Program 側で文字列へ寄せる
+    # (#4373)。エディタ経由なら to_yaml が '2026-08-08' とクォートする。
+    PERMITTED_YAML_CLASSES = [Symbol, Date].freeze
 
     def initialize
       @http = HTTP.new
@@ -135,7 +141,7 @@ module Mulukhiya
 
     def load_from_yaml
       return {} unless yaml_exist?
-      programs = YAML.safe_load_file(YAML_PATH, permitted_classes: [Symbol]) || {}
+      programs = YAML.safe_load_file(YAML_PATH, permitted_classes: PERMITTED_YAML_CLASSES) || {}
       update_cache(programs)
       return programs
     end
