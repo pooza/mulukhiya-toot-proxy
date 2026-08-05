@@ -14,9 +14,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -72,9 +70,7 @@ module Mulukhiya
       @renderer.status = 422
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -87,9 +83,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -102,9 +96,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -117,9 +109,7 @@ module Mulukhiya
       @renderer.status = reporter.response.code
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      e.alert unless e.source_status == 401
-      @renderer.message = {error: e.message}
-      @renderer.status = e.source_status
+      handle_gateway_error(e)
       return @renderer.to_s
     end
 
@@ -136,14 +126,16 @@ module Mulukhiya
 
     # 413 はユーザーのファイルサイズ超過であり系の不具合ではないため Sentry alert を抑止する。
     # 401 は既存どおりトークン期限切れ等で頻繁に起きるため除外する。
+    #
+    # 413 だけはモロヘイヤ側の文言を出す。上流（nginx）が HTML を返すことが多く
+    # 透過しても読めないうえ、「上限を超過している」はクライアント共通で
+    # 出せる説明だから (#4480 で透過へ寄せた後もここは残す)。
     def handle_upload_gateway_error(error)
-      error.alert unless [401, 413].include?(error.source_status)
-      if error.source_status == 413
-        @renderer.message = {error: 'アップロードしたファイルがサーバーの上限サイズを超過しています。'}
-      else
-        @renderer.message = {error: error.message}
+      unless error.source_status == 413
+        return handle_gateway_error(error, silent_statuses: [401, 413])
       end
-      return @renderer.status = error.source_status
+      @renderer.message = {error: 'アップロードしたファイルがサーバーの上限サイズを超過しています。'}
+      return @renderer.status = 413
     end
   end
 end

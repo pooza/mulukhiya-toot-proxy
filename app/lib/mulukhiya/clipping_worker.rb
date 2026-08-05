@@ -20,6 +20,8 @@ module Mulukhiya
       return uri.to_md if uri.local?
       return uri.to_s
     rescue => e
+      # 内側が既に GatewayError なら包み直さない（上流のレスポンスが落ちる、#4480）。
+      raise e if e.is_a?(Ginseng::GatewayError) && uri.nil?
       raise Ginseng::GatewayError, e.message, e.backtrace unless uri
       e.log(uri: uri.to_s)
       return uri.to_s
