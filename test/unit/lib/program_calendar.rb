@@ -112,5 +112,74 @@ module Mulukhiya
     def test_renderer_content_type
       assert_equal('text/calendar; charset=UTF-8', ProgramCalendarRenderer.new.type)
     end
+
+    # ---- next_on (次回放送日) ---- (#4373)
+    #
+    # 曜日ルールを持たないので、ウィークリー枠は next_on で「次はいつか」だけを
+    # 指す。**過ぎたら出力しない**（fail-closed）のが肝で、翌日へ送ってしまうと
+    # 週次枠が毎日誤発火する従来の不具合に戻る。
+
+    def weekly(next_on, start_time: '20:30', minutes: 60)
+      return {
+        'weekly' => {
+          'series' => '振り返り実況', 'episode' => 3, 'start_time' => start_time,
+          'minutes' => minutes, 'next_on' => next_on, 'enable' => true
+        },
+      }
+    end
+
+    # 正のケース: 未来の next_on はその日に 1 件出る。
+    def test_next_on_future_emits_event_on_that_date
+      # 2026-06-06 (土) 20:30 JST = 11:30 UTC
+      result = ics(weekly('2026-06-06'))
+
+      assert_match(/UID:program-weekly@mulukhiya/, result)
+      assert_match(/DTSTART:20260606T113000Z/, result)
+      assert_match(/SUMMARY:振り返り実況 3話/, result)
+    end
+
+    # ⚠ ここが本体。過ぎた next_on は**翌日へ送らず消える**。
+    def test_next_on_past_emits_nothing
+      result = ics(weekly('2026-05-23'))
+
+      assert_no_match(/BEGIN:VEVENT/, result)
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 当日の放送中は残す（#4287 の取り逃し防止と同じ扱い）。
+    def test_next_on_today_keeps_event_while_broadcasting
+      # now は 12:00。11:30 開始 60 分なので 12:30 まで放送中
+      result = ics(weekly('2026-05-30', start_time: '11:30', minutes: 60))
+
+      assert_match(/DTSTART:20260530T023000Z/, result)
+    end
+
+    # 当日でも終了済みなら消える（翌日へは送らない）。
+    def test_next_on_today_disappears_after_end
+      result = ics(weekly('2026-05-30', start_time: '08:30', minutes: 60))
+
+      assert_no_match(/BEGIN:VEVENT/, result)
+    end
+
+    # next_on 未設定は従来どおり毎日扱い。既存枠の移行を不要にするための保証。
+    def test_without_next_on_keeps_daily_behaviour
+      result = ics
+
+      assert_match(/DTSTART:20260530T140000Z/, result) # late 23:00 当日
+      assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
+    end
+
+    # 不正な日付で番組表全体を落とさない。毎日扱いへ倒す。
+    def test_invalid_next_on_falls_back_to_daily
+      result = ics(weekly('2026-02-31', start_time: '23:00'))
+
+      assert_match(/DTSTART:20260530T140000Z/, result)
+    end
+
+    def test_blank_next_on_falls_back_to_daily
+      result = ics(weekly('', start_time: '23:00'))
+
+      assert_match(/DTSTART:20260530T140000Z/, result)
+    end
   end
 end

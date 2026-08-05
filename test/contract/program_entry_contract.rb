@@ -179,5 +179,28 @@ module Mulukhiya
       assert_empty(@contract.call(@valid.merge(source_url: 'http://example.com/')).errors)
       assert_empty(@contract.call(@valid.merge(source_url: 'https://example.com/')).errors)
     end
+
+    # 次回放送日 (#4373)。
+    def test_next_on_accepts_iso_date
+      errors = @contract.call(series: 'テスト', next_on: '2026-08-08').errors
+
+      assert_empty(errors)
+    end
+
+    def test_next_on_rejects_nonexistent_date
+      errors = @contract.call(series: 'テスト', next_on: '2026-02-31').errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_next_on_is_optional
+      errors = @contract.call(series: 'テスト').errors
+
+      assert_empty(errors)
+    end
+
+    def test_writable_keys_include_next_on
+      assert_includes(ProgramEntryContract::WRITABLE_KEYS, :next_on)
+    end
   end
 end

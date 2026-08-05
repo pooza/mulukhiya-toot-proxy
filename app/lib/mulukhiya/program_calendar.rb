@@ -4,9 +4,20 @@ module Mulukhiya
   # 番組表 (Program) を iCalendar (.ics) へ変換する。tomato-shrieker の
   # IcalendarSource から購読され、放送開始通知に使われる (#4287)。
   #
-  # 現状エントリは放送曜日を持たないため、繰り返し (RRULE) は付けず、
-  # start_time の「次回発生」を 1 件の VEVENT として出力する MVP 実装。
-  # 曜日欄が追加されれば週次 RRULE へ拡張できる。
+  # 出力は常に「次回発生 1 件」の VEVENT で、**RRULE は付けない**。話数は動的値で
+  # 未来分が確定しないため、先々まで繰り返しイベントを出しても中身を埋められない。
+  # 用途は tomato-shrieker への直前/開始通知に限定で、Google カレンダー等への購読
+  # リマインダーは非対応 (取得ラグ + 話数を載せられない)。
+  #
+  # 次回がいつかは `next_on` (次回放送日) で決まる (#4373)。
+  #
+  #   next_on 未設定 → 毎日扱い。今日 (放送中なら今日) か明日の start_time
+  #   next_on あり   → その日の start_time に 1 件だけ。**過ぎたら出力しない**
+  #
+  # ⚠ 曜日ルール (frequency + weekday) は採らなかった。ズレを検出できないうえ
+  # fail-open で、**古い話数のまま毎週誤発火する**。価値が話数である以上、
+  # 間違った話数で鳴るのは鳴らないより悪い。next_on は fail-closed で黙る
+  # (気づけるよう番組表エディタが過去日に警告を出す)。
   class ProgramCalendar
     include Package
 
@@ -24,7 +35,10 @@ module Mulukhiya
     def to_ics
       cal = Icalendar::Calendar.new
       cal.prodid = PRODID
-      entries.each {|key, entry| cal.add_event(build_event(key, entry))}
+      entries.each do |key, entry|
+        event = build_event(key, entry)
+        cal.add_event(event) if event
+      end
       cal.publish
       return cal.to_ical
     end
@@ -45,9 +59,11 @@ module Mulukhiya
       return value.is_a?(String) && ProgramEntryContract::TIME_FORMAT.match?(value)
     end
 
+    # 次回発生が無い (next_on を過ぎた) エントリは nil を返し、出力しない。
     def build_event(key, entry)
       minutes = duration_minutes(entry)
-      start = next_occurrence(entry['start_time'], minutes)
+      start = next_occurrence(entry, minutes)
+      return nil unless start
       event = Icalendar::Event.new
       event.uid = "program-#{key}@mulukhiya"
       event.dtstamp = utc_value(@now)
@@ -67,16 +83,34 @@ module Mulukhiya
       return minutes.is_a?(Integer) && minutes.positive? ? minutes : DEFAULT_DURATION_MINUTES
     end
 
-    # start_time (HH:MM, JST) の「次に訪れる時刻」を返す。放送中 (開始済みかつ
-    # 終了前) は今日のイベントを残し、終了時刻 (start + duration) を過ぎて初めて
-    # 翌日へ送る。これにより放送開始分ちょうどに取得しても当日イベントが欠落せず、
-    # start_time 通知の取り逃しを防ぐ (#4287)。
-    def next_occurrence(start_time, duration_minutes)
-      hour, minute = start_time.split(':').map(&:to_i)
+    # 次回発生時刻 (JST)。無ければ nil。
+    #
+    # 放送中 (開始済みかつ終了前) は当日のイベントを残し、終了時刻
+    # (start + duration) を過ぎて初めて次へ送る。これにより放送開始分ちょうどに
+    # 取得しても当日イベントが欠落せず、start_time 通知の取り逃しを防ぐ (#4287)。
+    def next_occurrence(entry, duration_minutes)
       now_jst = @now.getlocal(TZ_OFFSET)
+      hour, minute = entry['start_time'].split(':').map(&:to_i)
+      if (date = scheduled_date(entry))
+        # next_on 指定あり: その日に 1 回だけ。終了済みなら翌日へ送らず消す。
+        candidate = Time.new(date.year, date.month, date.day, hour, minute, 0, TZ_OFFSET)
+        return nil if (candidate + (duration_minutes * 60)) <= now_jst
+        return candidate
+      end
       candidate = Time.new(now_jst.year, now_jst.month, now_jst.day, hour, minute, 0, TZ_OFFSET)
       candidate += 86_400 if (candidate + (duration_minutes * 60)) <= now_jst
       return candidate
+    end
+
+    # next_on を Date で返す。未設定・不正値は nil (= 従来の毎日扱いへ倒す)。
+    # 不正値で番組表全体を落とさない。
+    def scheduled_date(entry)
+      value = entry['next_on']
+      return nil unless value.is_a?(String) && value.present?
+      return Date.strptime(value, '%Y-%m-%d')
+    rescue Date::Error
+      logger.error(message: 'program next_on invalid', next_on: value)
+      return nil
     end
 
     def summary(entry)

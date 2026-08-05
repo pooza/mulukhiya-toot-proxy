@@ -2,7 +2,7 @@ module Mulukhiya
   class ProgramEntryContract < Contract
     PARAMS_KEYS = [
       :key, :series, :minutes, :start_time, :episode, :episode_suffix, :subtitle,
-      :air, :livecure, :enable, :extra_tags,
+      :air, :livecure, :enable, :extra_tags, :next_on,
       :annict_work_id, :annict_episode_id, :source_type, :source_url
     ].freeze
     # 書き込み可能な属性。:key は識別子であり attributes には含めない
@@ -18,6 +18,9 @@ module Mulukhiya
     # 開始時刻は 24 時間制 HH:MM。時は先頭 0 省略可 (例 9:00 / 09:00 / 21:00)。
     # #4287 iCalendar 出力での機械可読な放送開始時刻として使う。
     TIME_FORMAT = /\A([01]?\d|2[0-3]):[0-5]\d\z/
+    # 次回放送日は YYYY-MM-DD (#4373)。書式だけでは 2026-02-31 を弾けないので
+    # rule 側で Date.parse も通す。
+    DATE_FORMAT = /\A\d{4}-\d{2}-\d{2}\z/
 
     params do
       optional(:key).value(:string, max_size?: MAX_KEY_SIZE)
@@ -31,6 +34,8 @@ module Mulukhiya
       optional(:livecure).value(:bool)
       optional(:enable).value(:bool)
       optional(:extra_tags).maybe(:array, max_size?: MAX_TAGS)
+      # 次回放送日 (#4373)。未設定なら「毎日」扱いで従来どおり。
+      optional(:next_on).maybe(:string, max_size?: MAX_TEXT_SIZE)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
       # audit metadata: 書き込み専用。エディタが Annict 検索結果を選択した際に
@@ -65,6 +70,22 @@ module Mulukhiya
       next unless value.is_a?(String)
       next if value.empty?
       key.failure('開始時刻は HH:MM 形式 (例 21:00) で指定してください。') unless TIME_FORMAT.match?(value)
+    end
+
+    rule(:next_on) do
+      next unless value.is_a?(String)
+      next if value.empty?
+      key.failure('次回放送日は YYYY-MM-DD 形式 (例 2026-08-08) で指定してください。') unless
+        ProgramEntryContract.valid_date?(value)
+    end
+
+    # 書式 + 実在する日付であること。2026-02-31 は書式を満たすが存在しない。
+    def self.valid_date?(value)
+      return false unless DATE_FORMAT.match?(value)
+      Date.strptime(value, '%Y-%m-%d')
+      return true
+    rescue Date::Error
+      return false
     end
   end
 end
