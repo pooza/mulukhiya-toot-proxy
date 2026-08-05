@@ -247,12 +247,16 @@ capsicum 開発を実ブロックしていた `/about`・API 表層の急ぎ小�
 GitHub マイルストーン作成・割り当て済み。**スコープは 2026-08-03 のセッションで確定した。**
 優先順は「**重篤な不具合 → capsicum の後続タスクがあるもの → 番組表関連**」で、この順に消化する。
 
+**2026-08-06 時点で実装は全項目着地済み（#4373 を除く）。本番未デプロイ。** open PR は #4525 / #4526 / #4527 と
+pooza/ginseng-core#495 / #497。**ginseng-core → モロヘイヤの順にマージし、`bundle update ginseng-core` が要る。**
+
 ### 1. 重篤な不具合（主軸）
 
-- **#4474 nginx が `X-Mulukhiya-Purpose` 付きの PUT を 405 で弾く** — **本番3台で capsicum の ALT 編集が実際に不通**。原因（nginx の `if` 内 `proxy_pass` は rewrite フェーズを終端せず、後続の `return 405` が勝つ）まで確定済みで、サンプル vhost の修正は #4475 で着地済み。残るは zugoga / shallu / gomander の本番 vhost への適用。**capsicum の後続でもあるので筆頭**
-- **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — `mask_fields` はキー名で判定するため、`url` の値に埋まったトークンは素通り。#4418（OAuth code）と同型。**対処時に既存のローテート済みログの扱いと info エージェントのトークン再発行を判断すること**
-- **#4506 並行性: `disable?` を持つ定期 worker 7 本が perform で短絡していない** — sidekiq-scheduler は `Sidekiq::Client.push` 直叩きで `Worker.perform_async` 側の gate を通らない（#4343 と同型）。機能を無効にしたサーバーでも本体が 1〜10 分おきに走っている。実害は worker ごとに違うので 1 本ずつ確認が要る
-- **#4487 bug: トークン未設定のアカウントでも webhook URL が生成される（size:S）** — 照合できない「幽霊 URL」になる
+- **#4474 nginx が `X-Mulukhiya-Purpose` 付きの PUT を 405 で弾く** — ✅ **本番3台 + ステージングで復旧済み（2026-08-05）**。サンプル vhost（#4475）・docs（#4517）も着地。capsicum から実際に ALT 編集して通ったらクローズ（モンキーテスト待ちで open）
+- **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — ✅ コード着地（ginseng-core 1.15.32 + application.yaml の `mask_query_params`、#4518）。**デプロイ後にログの再掃除が要る**
+- **#4506 並行性: `disable?` を持つ定期 worker 7 本が perform で短絡していない** — ✅ クローズ済み（#4519）
+- **#4487 bug: トークン未設定のアカウントでも webhook URL が生成される（size:S）** — ✅ #4522 で着地、Codex P2（壊れた行で走査が止まる）を #4525 で追加是正
+- **#4523 security: リモート取得の HEAD プリフライトが SSRF allowlist を通っていない** — 2026-08-06 起票。#4410 で GET は塞いだが、その 1 行上の HEAD が素通りしていた。pooza/ginseng-core#495 + #4523 のブランチで対処済み（PR 未マージ）
 
 インフラ側の対の課題として **pooza/chubo2#131**（pgbouncer の `max_client_conn` / `default_pool_size` が未管理・既定 100 のまま）がある。
 2026-08-02 06:09 JST に `FeedUpdateWorker` が `no more connections allowed (max_client_conn)` で全滅した実績があり、**ニチアサ窓の約 2.5 時間前**だった。
@@ -260,19 +264,20 @@ GitHub マイルストーン作成・割り当て済み。**スコープは 2026
 
 ### 2. capsicum の後続タスク
 
-- **#4491 docs/api.md に `POST /mulukhiya/api/status/tags` のレスポンス仕様を明記する** — **capsicum#909 が仕様確定待ちで on-hold＝こちらが向こうを止めている**。「削除してタグづけ」は本体側で削除＋再投稿するため capsicum が新しい status の id を知れず、TL 即時反映ができない
-- **#4480 refactor: 上流エラー包絡を捨てず透過する（size:M）** — capsicum#879（Misskey の `TOO_MANY_DRAFTS` を親切な文言に差し替えられない）の受け皿。`Ginseng::HTTP` が 400 以上でレスポンスごと捨てて `"Bad response NNN"` に潰す。同型は #4380 で既に一度踏んでいて 2 回目なので、根治と横展開の棚卸しをまとめて扱う
+- **#4491 docs/api.md に `POST /mulukhiya/api/status/tags` のレスポンス仕様を明記する** — ✅ #4521 で着地（capsicum#909 のブロック解除）。Codex P2（**他人の投稿は 404 ではなく 403**）を #4525 で追加是正
+- **#4480 refactor: 上流エラー包絡を捨てず透過する（size:M）** — ✅ 第 1 層 pooza/ginseng-core#497（`GatewayError#response` / `#source_body`）+ 第 2・3 層 #4527。棚卸し 5 件すべて回収。**⚠ `APIController`（モロヘイヤ独自 API）の rescue は scope 外で未着手**なので Issue は open のまま
 
 ### 3. 番組表関連
 
-- **#4373 番組表に繰り返し情報（頻度・曜日）を追加し iCalendar を曜日対応の話数入り単発通知にする（size:L）** — **仕様の検討込みの案件。固めきれなければ 5.32.0 へ先送りする**（2026-08-03 のユーザー判断）。実装を先に走らせない
-- **#4484 番組表エディタの一覧表に「有効」トグルボタンを付ける（size:S）**
+- **#4373 番組表に繰り返し情報（頻度・曜日）を追加し iCalendar を曜日対応の話数入り単発通知にする（size:L）** — **仕様の検討込みの案件。固めきれなければ 5.32.0 へ先送りする**（2026-08-03 のユーザー判断）。実装を先に走らせない。**5.31.0 で唯一未着手**
+- **#4484 番組表エディタの一覧表に「有効」トグルボタンを付ける（size:S）** — ✅ #4526。WebUI なのでモンキーテスト後にクローズ
 
 ### 5.32.0 へ送ったもの（2026-08-03 判断）
 
 - **#4503 test: アカウント依存のテスト 304 件が CI・手元のいずれでも実行されていない** — `/agent/test/token` が現存アカウントに解決しない。**5.30.0 のリリース判断でも、この範囲は CI の緑を根拠にできなかった**
 - **#4508 chore: sinatra 4.2 系 / mustermann 4.0 / tilt 2.8 への更新** — 全リクエストが通る層のメジャー更新なのに、#4503 のせいでコントローラ層のテストが CI で 1 件も走らず**緑を検証根拠にできない**。5.32.0 で **#4503 → #4508 の順**に土台テーマとして扱う
 - **#4516 test/bug: media seed の追加で露見した 2 件** — catalog の戻り値がキャッシュ経路で形違い・`MediaFeedRenderer` の omit ガードが実描画条件と不一致。#4503 でテストが動くようになってから扱うのが自然なので同じマイルストーン
+- **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — 2026-08-06 起票。`RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証したIPで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
 
 ### マイルストーン外の繰越（着手条件待ち）
 
