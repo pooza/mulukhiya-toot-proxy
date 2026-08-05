@@ -247,8 +247,9 @@ capsicum 開発を実ブロックしていた `/about`・API 表層の急ぎ小�
 GitHub マイルストーン作成・割り当て済み。**スコープは 2026-08-03 のセッションで確定した。**
 優先順は「**重篤な不具合 → capsicum の後続タスクがあるもの → 番組表関連**」で、この順に消化する。
 
-**2026-08-06 時点で実装は全項目着地済み（#4373 を除く）。本番未デプロイ。** open PR は #4525 / #4526 / #4527 と
-pooza/ginseng-core#495 / #497。**ginseng-core → モロヘイヤの順にマージし、`bundle update ginseng-core` が要る。**
+**2026-08-06 時点で #4373 を除く全項目が develop にマージ済み。本番未デプロイ・ステージング未検証。**
+依存する ginseng-core 1.15.34（pooza/ginseng-core#495 / #498）も取り込み済み。
+`rake test` 845 件 0 failures / 0 errors（305 omissions は #4503 の既知分）、rubocop クリーン。
 
 ### 1. 重篤な不具合（主軸）
 
@@ -256,7 +257,7 @@ pooza/ginseng-core#495 / #497。**ginseng-core → モロヘイヤの順にマ�
 - **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — ✅ コード着地（ginseng-core 1.15.32 + application.yaml の `mask_query_params`、#4518）。**デプロイ後にログの再掃除が要る**
 - **#4506 並行性: `disable?` を持つ定期 worker 7 本が perform で短絡していない** — ✅ クローズ済み（#4519）
 - **#4487 bug: トークン未設定のアカウントでも webhook URL が生成される（size:S）** — ✅ #4522 で着地、Codex P2（壊れた行で走査が止まる）を #4525 で追加是正
-- **#4523 security: リモート取得の HEAD プリフライトが SSRF allowlist を通っていない** — 2026-08-06 起票。#4410 で GET は塞いだが、その 1 行上の HEAD が素通りしていた。pooza/ginseng-core#495 + #4523 のブランチで対処済み（PR 未マージ）
+- **#4523 security: リモート取得の HEAD プリフライトが SSRF allowlist を通っていない** — ✅ #4528 + pooza/ginseng-core#495（1.15.33）。#4410 で GET は塞いだが、**その 1 行上の HEAD が素通り**していた。Codex レビューの取り残しから発見（[[feedback_codex-review-window-too-narrow]]）
 
 インフラ側の対の課題として **pooza/chubo2#131**（pgbouncer の `max_client_conn` / `default_pool_size` が未管理・既定 100 のまま）がある。
 2026-08-02 06:09 JST に `FeedUpdateWorker` が `no more connections allowed (max_client_conn)` で全滅した実績があり、**ニチアサ窓の約 2.5 時間前**だった。
@@ -265,12 +266,19 @@ pooza/ginseng-core#495 / #497。**ginseng-core → モロヘイヤの順にマ�
 ### 2. capsicum の後続タスク
 
 - **#4491 docs/api.md に `POST /mulukhiya/api/status/tags` のレスポンス仕様を明記する** — ✅ #4521 で着地（capsicum#909 のブロック解除）。Codex P2（**他人の投稿は 404 ではなく 403**）を #4525 で追加是正
-- **#4480 refactor: 上流エラー包絡を捨てず透過する（size:M）** — ✅ 第 1 層 pooza/ginseng-core#497（`GatewayError#response` / `#source_body`）+ 第 2・3 層 #4527。棚卸し 5 件すべて回収。**⚠ `APIController`（モロヘイヤ独自 API）の rescue は scope 外で未着手**なので Issue は open のまま
+- **#4480 refactor: 上流エラー包絡を捨てず透過する（size:M）** — ✅ 第 1 層 pooza/ginseng-core#498（`GatewayError#response` / `#source_body`）+ 第 2・3 層 #4527。棚卸し 5 件すべて回収。**⚠ `APIController`（モロヘイヤ独自 API）の rescue は scope 外で未着手**なので Issue は open のまま
 
 ### 3. 番組表関連
 
 - **#4373 番組表に繰り返し情報（頻度・曜日）を追加し iCalendar を曜日対応の話数入り単発通知にする（size:L）** — **仕様の検討込みの案件。固めきれなければ 5.32.0 へ先送りする**（2026-08-03 のユーザー判断）。実装を先に走らせない。**5.31.0 で唯一未着手**
 - **#4484 番組表エディタの一覧表に「有効」トグルボタンを付ける（size:S）** — ✅ #4526。WebUI なのでモンキーテスト後にクローズ
+
+### 次にやること
+
+1. **ステージング検証（省略不可）** — dev24-27 全 4 台。省略した回に本番障害を出している（MEMORY `project_5280-staging-skip-postmortem`）
+2. **#4373 の仕様を固めるか 5.32.0 へ送るかの判断**
+3. リリース前 5 観点レビュー → 本番 4 台デプロイ
+4. 🔴 **デプロイ後に #4511 のログ掃除を再実行**
 
 ### 5.32.0 へ送ったもの（2026-08-03 判断）
 
