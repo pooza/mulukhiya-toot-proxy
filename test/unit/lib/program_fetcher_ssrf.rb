@@ -53,5 +53,40 @@ module Mulukhiya
       assert_false(RemoteHost.validator.call('localhost'))
       assert_false(RemoteHost.validator.call(''))
     end
+
+    # Content-Length のプリフライト (HEAD) も同じ allowlist を通ること (#4523)。
+    # GET だけ守っても、その 1 行上で無検証の HEAD が飛ぶなら SSRF 対策にならない。
+    # 拒否されたホストへは **HEAD も GET も出ない**ことを、実リクエストの不在で見る。
+    def test_program_fetcher_blocks_head_preflight_to_internal_host
+      original = config['/program/urls']
+      config['/program/urls'] = [METADATA]
+
+      assert_nil(ProgramFetcher.new.fetch)
+      assert_not_requested(:head, METADATA)
+      assert_not_requested(:get, METADATA)
+    ensure
+      config['/program/urls'] = original if defined?(original)
+    end
+
+    def test_pronunciation_dictionary_blocks_head_preflight_to_internal_host
+      original = config['/word_suggest/urls']
+      config['/word_suggest/urls'] = [METADATA]
+
+      assert_nil(PronunciationDictionary.new.send(:fetch_remote))
+      assert_not_requested(:head, METADATA)
+      assert_not_requested(:get, METADATA)
+    ensure
+      config['/word_suggest/urls'] = original if defined?(original)
+    end
+
+    # HEAD のリダイレクト先が内部ホストでも、そこへは飛ばない。
+    def test_blocks_head_redirect_to_link_local_metadata
+      stub_request(:head, GAS).to_return(status: 302, headers: {'Location' => METADATA})
+
+      assert_raise(Ginseng::GatewayError) do
+        @http.head(GAS, host_validator: validator('script.google.com'))
+      end
+      assert_not_requested(:head, METADATA)
+    end
   end
 end
