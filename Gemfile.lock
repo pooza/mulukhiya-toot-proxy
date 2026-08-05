@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: ecb2f9040f06034f8d0ebc1d5c6d8e5b4cf8c858
+  revision: de82ea13eb9d174121bc550bc45cb67d902c0efc
   branch: main
   specs:
-    ginseng-core (1.15.32)
+    ginseng-core (1.15.34)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -195,7 +195,7 @@ GEM
       dry-initializer (~> 3.2)
       dry-schema (~> 1.14)
       zeitwerk (~> 2.6)
-    erb (6.0.6)
+    erb (6.0.7)
     erubi (1.13.1)
     et-orbi (1.4.1)
       tzinfo
