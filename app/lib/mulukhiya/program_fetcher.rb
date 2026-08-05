@@ -77,8 +77,15 @@ module Mulukhiya
     # Content-Length が max を超えていれば GET せず弾く。Content-Length 不在や
     # HEAD 非対応 (GatewayError) の場合は判定不能としてそのまま GET へ進み、
     # 受信後の valid_response_size? を最終防衛線とする。
+    #
+    # host_validator は GET と同じものを渡す。プリフライトだけ無検証だと、GET 側の
+    # SSRF ガード (#4410) が「見せかけの安全」になる (#4523)。
     def valid_content_length?(uri)
-      length = @http.head(uri, timeout: fetch_timeout).headers['content-length']
+      length = @http.head(
+        uri,
+        timeout: fetch_timeout,
+        host_validator: RemoteHost.validator,
+      ).headers['content-length']
       return true if length.nil? || length.to_i <= fetch_max_bytes
       log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
       return false
