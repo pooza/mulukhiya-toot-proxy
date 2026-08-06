@@ -110,17 +110,17 @@ module Mulukhiya
 
     # next_on を Date で返す。不正値は nil (呼び出し側がイベントごと落とす)。
     # 不正値で番組表全体を落とさない。
+    #
+    # ⚠ Date.strptime は寛容で `2026-08-08junk` や `2026-8-8` を通す。書式は
+    # contract と同じ判定で先に見る (Codex P2 / PR #4529)。
     def scheduled_date(entry)
       value = entry['next_on']
-      unless value.is_a?(String)
-        # YAML の手編集で `next_on: 20260808` と書くと Integer で入る。
+      # YAML の手編集で `next_on: 20260808` と書くと Integer で入る。
+      unless value.is_a?(String) && ProgramEntryContract.valid_date?(value)
         logger.error(message: 'program next_on invalid', next_on: value)
         return nil
       end
       return Date.strptime(value, '%Y-%m-%d')
-    rescue Date::Error
-      logger.error(message: 'program next_on invalid', next_on: value)
-      return nil
     end
 
     def summary(entry)
