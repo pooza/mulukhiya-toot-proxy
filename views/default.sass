@@ -567,14 +567,6 @@ section.disabled h3::after
       left: 0.5em
     margin: 0
     height: 2em
-    font:
-      family: $serif
-      size: 1rem
-    // Chrome の日付入力は内側の疑似要素が本文を持つので、そちらにも指定する。
-    &::-webkit-datetime-edit
-      font:
-        family: $serif
-        size: 1rem
   input[type='search']
     width: 30em
     padding: 0 0.5em
@@ -789,7 +781,13 @@ nav.search-form-container
       border:
         radius: 3px
 
-input[type='search'],input[type='number'],input[type='text'],input[type='password']
+input[type='search'],input[type='number'],input[type='text'],input[type='password'],input[type='date']
+  font:
+    family: $monospace
+
+// 日付は数字しか入らないので、他の入力欄と同じ等幅で揃える (#4373)。
+// Chrome は日付入力の本文を内側の疑似要素が持つため、そちらにも指定が要る。
+input[type='date']::-webkit-datetime-edit
   font:
     family: $monospace
 
