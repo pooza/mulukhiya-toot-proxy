@@ -337,11 +337,24 @@ html lang='ja' data-theme='light'
                 date.getUTCMonth() + 1 !== month ||
                 date.getUTCDate() !== day
             },
-            // 今日 (JST)。⚠ ブラウザのローカル日付では組まない。ProgramCalendar は
-            // next_on を +09:00 固定で解釈するので、国外の端末で日付境界をまたぐと
-            // 「カレンダーからは消えているのに警告が出ない」がありうる。
+            // 今日 (JST) を YYYY-MM-DD で。⚠ ブラウザのローカル日付では組まない。
+            // ProgramCalendar は next_on を +09:00 固定で解釈するので、国外の端末で
+            // 日付境界をまたぐと「カレンダーからは消えているのに警告が出ない」が
+            // ありうる。⚠ toLocaleDateString('en-CA') は ISO 形式を保証しない。
+            // Intl データ次第で M/D/YYYY へ落ちると、下の字句比較が未来日を過去日と
+            // 誤読する（2027-01-01 < 8/6/2026）ので、年月日を取り出して自分で組む。
             todayKeyJst () {
-              return new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Tokyo'})
+              const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Tokyo',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+              }).formatToParts(new Date())
+              const value = (type, digits) => {
+                const part = parts.find(entry => entry.type === type)
+                return String(Number(part && part.value)).padStart(digits, '0')
+              }
+              return `${value('year', 4)}-${value('month', 2)}-${value('day', 2)}`
             },
             // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
             // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
