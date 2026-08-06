@@ -163,7 +163,7 @@ html lang='ja' data-theme='light'
                     span.tag.stale v-if='isStaleNextOn(entry)' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
                       i class='fa fa-circle-exclamation' aria-hidden='true'
                       span.sr-only 次回放送日が過去
-                  small.muted v-else 毎日
+                  small.muted v-else='' 毎日
                 td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
