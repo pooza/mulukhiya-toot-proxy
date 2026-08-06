@@ -10,6 +10,12 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
     DEFAULT_FETCH_TIMEOUT = 30
+    # ⚠ Date を許可しないと、**手書きでクォート無しの日付を書いた瞬間に番組表
+    # 全体が読めなくなる** (`next_on: 2026-08-08` → Psych::DisallowedClass)。
+    # var/program.yaml は git 管理外で手編集もありうる。5.28.0 の founded_on と
+    # 同型の footgun なので、読めるようにしたうえで Program 側で文字列へ寄せる
+    # (#4373)。エディタ経由なら to_yaml が '2026-08-08' とクォートする。
+    PERMITTED_YAML_CLASSES = [Symbol, Date].freeze
 
     def initialize
       @http = HTTP.new
@@ -77,8 +83,15 @@ module Mulukhiya
     # Content-Length が max を超えていれば GET せず弾く。Content-Length 不在や
     # HEAD 非対応 (GatewayError) の場合は判定不能としてそのまま GET へ進み、
     # 受信後の valid_response_size? を最終防衛線とする。
+    #
+    # host_validator は GET と同じものを渡す。プリフライトだけ無検証だと、GET 側の
+    # SSRF ガード (#4410) が「見せかけの安全」になる (#4523)。
     def valid_content_length?(uri)
-      length = @http.head(uri, timeout: fetch_timeout).headers['content-length']
+      length = @http.head(
+        uri,
+        timeout: fetch_timeout,
+        host_validator: RemoteHost.validator,
+      ).headers['content-length']
       return true if length.nil? || length.to_i <= fetch_max_bytes
       log_oversize(uri, length.to_i, 'program fetch content-length exceeded max bytes')
       return false
@@ -128,7 +141,7 @@ module Mulukhiya
 
     def load_from_yaml
       return {} unless yaml_exist?
-      programs = YAML.safe_load_file(YAML_PATH, permitted_classes: [Symbol]) || {}
+      programs = YAML.safe_load_file(YAML_PATH, permitted_classes: PERMITTED_YAML_CLASSES) || {}
       update_cache(programs)
       return programs
     end

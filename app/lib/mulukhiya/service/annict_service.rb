@@ -145,7 +145,10 @@ module Mulukhiya
       response = begin
         query(template, variables)
       rescue Ginseng::GatewayError => e
-        if /Bad response (401|403)/.match?(e.message.to_s)
+        # ⚠ かつては e.message を `/Bad response (401|403)/` で舐めていた。
+        # ginseng-core のメッセージ書式に依存した壊れやすい実装なので、
+        # source_status で判定する (#4480)。
+        if [401, 403].include?(e.source_status)
           raise Ginseng::AuthError, 'Annict authorization required'
         end
         raise
@@ -426,9 +429,7 @@ module Mulukhiya
       return true unless account.user_config['/service/annict/theme_works_only']
       # activity.to_json は String で include? は部分一致。Array#intersect? では
       # 代替できない（キーワードが JSON 文字列中に部分文字列として現れるか判定）。
-      # rubocop:disable Style/ArrayIntersect
       return keywords.any? {|v| activity.to_json.include?(v)}
-      # rubocop:enable Style/ArrayIntersect
     end
 
     def format_graphql_errors(errors)

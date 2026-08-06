@@ -37,8 +37,12 @@ misskey:
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-01'
+last_checked: '2026-08-05'
 
+# 2026-08-05 チェック結果:
+#   - Mastodon: 最新 stable は v4.6.4（2026-07-27）のままで verified と同一。RC もなし。対応不要。
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。
+#
 # 2026-08-01 チェック結果:
 #   - Misskey: stable 2026.7.0（2026-07-31）を fedi-test-harness で検証・verified 昇格。
 #     07-30 に決めた「stable 後に 1 回だけ検証する」方針の消化。**2026.7.0 と 2026.6.0 を

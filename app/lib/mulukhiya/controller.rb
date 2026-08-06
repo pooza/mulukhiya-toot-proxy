@@ -12,7 +12,11 @@ module Mulukhiya
     SCRUBBED_LOG_PARAMS = [
       'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
       'q', 'title', 'artist', 'album', # word/suggest・nowplaying のユーザー入力 (#4394)
-      'code' # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
+      'code', # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
+      # ⚠ アクセストークン本体。`i` は Misskey がボディで渡す（MisskeyController#token
+      #   のフォールバック）。/logger/mask_query_params は URL のクエリにしか効かない
+      #   ので、ボディ側はここで落とす。両方揃って #4511 の掃討が完成する。
+      'i', 'access_token'
     ].freeze
 
     set :root, Environment.dir
@@ -95,6 +99,47 @@ module Mulukhiya
         path: request.path,
       )
       raise Ginseng::AuthError, 'Token integrity check failed'
+    end
+
+    # 上流のエラー包絡をそのままクライアントへ返す (#4480)。
+    #
+    # モロヘイヤはプロキシなので、上流が返した理由——Misskey の
+    # `{"error":{"code":"TOO_MANY_DRAFTS", ...}}`、Mastodon の
+    # `{"error":"Validation failed: ..."}`——を素通しするのが本来の姿。
+    # ここに文言テーブルを持つ必要はない。従来は `Ginseng::HTTP` が上流ボディを
+    # 捨てて `"Bad response NNN"` に潰していたため、クライアント（capsicum）は
+    # 理由で出し分けられなかった（pooza/capsicum#879 / #4380）。
+    #
+    # ⚠ 透過するのは **上流が JSON として返したものだけ**。`source_body` は
+    # HTML エラーページ（nginx の 502 等）や巨大ボディで nil を返すので、
+    # その場合は従来どおり `{error: e.message}` に倒れる。モロヘイヤ内部の
+    # 例外メッセージを混ぜてはいけない（内部情報の露出）。
+    #
+    # silent_statuses / silent_codes は Sentry alert を抑止する条件。401 は
+    # トークン期限切れで頻繁に起きるため既定で含める。silent_codes は上流の
+    # エラーコード（Misskey の `error.code`）で、ユーザー起因の失敗まで
+    # Sentry イベントを立てないための口。
+    def handle_gateway_error(error, silent_statuses: [401], silent_codes: [])
+      silent = silent_statuses.include?(error.source_status) ||
+        silent_codes.include?(upstream_error_code(error))
+      # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
+      # 「上流の仕様変更で全投稿が弾かれる」ような事故の頻度・偏りを追えない。
+      silent ? error.log : error.alert
+      @renderer.message = error.source_body || {error: error.message}
+      return @renderer.status = error.source_status
+    end
+
+    # 上流の `{"error": {"code": "..."}}` から code を取る。取れなければ nil。
+    #
+    # ⚠ Mastodon の包絡は `{"error": "Validation failed: ..."}` で error が
+    # **文字列**。Hash 前提で dig すると TypeError になる。上流の形を決め打ち
+    # できないので、各段で型を確かめる。
+    def upstream_error_code(error)
+      body = error.source_body
+      return nil unless body.is_a?(Hash)
+      envelope = body['error']
+      return nil unless envelope.is_a?(Hash)
+      return envelope['code']
     end
 
     def verify_account_integrity!(response)

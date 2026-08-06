@@ -138,6 +138,101 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # ---- next_on (次回放送日) ---- (#4373)
+
+    # 「次回」ボタンは話数と一緒に放送日も 1 週進める。ウィークリー枠の日付更新を
+    # 既存操作へ相乗りさせるのが next_on 案の前提なので、ここが崩れると毎週
+    # 打ち直しになる。
+    def test_increment_episode_advances_next_on_by_a_week
+      key = "test_nexton_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => '2026-08-08'})
+      entry = @program.increment_episode(key)
+
+      assert_equal(2, entry['episode'])
+      assert_equal('2026-08-15', entry['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # ⚠ next_on を持たないエントリに日付を生やしてはいけない。生やすと翌日から
+    # 単発扱いになり、毎日出ていたイベントが消える。
+    def test_increment_episode_does_not_create_next_on
+      key = "test_nonexton_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 1})
+      entry = @program.increment_episode(key)
+
+      assert_equal(2, entry['episode'])
+      assert_not_includes(entry.keys, 'next_on')
+    ensure
+      @program.save(original) if original
+    end
+
+    # 不正な日付で話数の +1 まで巻き添えにしない。
+    def test_increment_episode_keeps_going_with_invalid_next_on
+      key = "test_badnexton_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => 'not a date'})
+      entry = @program.increment_episode(key)
+
+      assert_equal(2, entry['episode'])
+      assert_equal('not a date', entry['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # ⚠ YAML を手書きしてクォートを忘れた場合の受け。permitted_classes に Date を
+    # 足していないと **番組表全体が Psych::DisallowedClass で読めなくなる**
+    # （5.28.0 の founded_on と同型）。読めたうえで文字列へ寄ること。
+    def test_data_coerces_unquoted_yaml_date
+      key = "test_yamldate_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'next_on' => Date.new(2026, 8, 8)})
+
+      assert_equal('2026-08-08', @program.data[key]['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # 同じく、無クォートの start_time は YAML の 60 進数解釈で Integer になる。
+    def test_data_coerces_sexagesimal_start_time
+      key = "test_sexa_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'start_time' => 73_800})
+
+      assert_equal('20:30', @program.data[key]['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # ⚠ ただの整数は 60 進数ではない。'00:00' へ寄せると深夜 0 時のイベントとして
+    # 出てしまうので、Integer のまま残して抽出条件で弾かせる (Codex P2 / PR #4529)。
+    def test_data_keeps_plain_integer_start_time
+      key = "test_plainint_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'start_time' => 20})
+
+      assert_equal(20, @program.data[key]['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # ⚠ 一覧の「有効」トグル (#4484) は enable だけを送る。false は blank_value?
+    # ではないので、キーごと消えず false として残らなければならない。
+    def test_update_entry_keeps_false_enable
+      key = "test_enable_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'enable' => true})
+      entry = @program.update_entry(key, 'enable' => false)
+
+      assert_includes(entry.keys, 'enable')
+      assert_false(entry['enable'])
+      assert_true(@program.update_entry(key, 'enable' => true)['enable'])
+    ensure
+      @program.save(original) if original
+    end
+
     def test_update_entry_raises_when_missing
       original = @program.data
 

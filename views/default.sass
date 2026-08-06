@@ -23,6 +23,20 @@ $monospace: Inconsolata, monospace
 [v-cloak]
   display: none
 
+// アイコンだけのセル・ボタンに添える、目に見えないラベル。
+// Font Awesome のグリフは private-use なのでアクセシビリティツリーに何も残らず、
+// スクリーンリーダーや FA 未読み込み時に真偽が区別できなくなる (PR #4498 の Codex 指摘)。
+.sr-only
+  position: absolute
+  width: 1px
+  height: 1px
+  margin: -1px
+  padding: 0
+  overflow: hidden
+  white-space: nowrap
+  border: 0
+  clip-path: inset(50%)
+
 body
   font:
     family: $serif
@@ -541,6 +555,18 @@ section.disabled h3::after
     padding: 0 0.5em
     margin: 0
     height: 2em
+  // 次回放送日 (#4373)。放送時間などの数値欄と同じ見た目に揃える。
+  // ⚠ padding を一括指定してはいけない。Pico はカレンダーアイコンの領域を
+  // padding-right で確保し、そこへ透明な ::-webkit-calendar-picker-indicator を
+  // 重ねている。右パディングを潰すとアイコンごと枠外へ出てピッカーが開かなくなる。
+  input[type='date']
+    width: 10em
+    padding:
+      top: 0
+      bottom: 0
+      left: 0.5em
+    margin: 0
+    height: 2em
   input[type='search']
     width: 30em
     padding: 0 0.5em
@@ -567,6 +593,12 @@ section.disabled h3::after
     margin-right: 0.5em
   .annict-search .indented
     display: block
+  // 入力欄の下に添える補足 (#4373)。
+  .field-note
+    display: block
+    margin:
+      left: 10em
+    color: dimgray
   table.program-entries
     tbody
       tr
@@ -578,6 +610,37 @@ section.disabled h3::after
           background-color: papayawhip !important
     td.actions
       text-align: right
+    // next_on が過去のエントリ (#4373)。カレンダーに出なくなっているので、
+    // 数字が読めるだけでは気づけない。色とバッジの両方で出す。
+    small.stale
+      color: firebrick
+      text:
+        decoration: line-through
+    small.muted
+      color: gray
+    // 日付として読めない next_on。過去日とは別物として出す (fail-closed で
+    // 通知は止まっているが、直し方が違う)。
+    small.invalid
+      color: darkorange
+      text:
+        decoration: none
+    .tag.stale
+      color: firebrick
+      border:
+        color: firebrick
+    .tag.invalid
+      color: darkorange
+      border:
+        color: darkorange
+    // 一覧上で有効/無効をその場で切り替えるトグル (#4484)。
+    // 無効側は「押していない」ことが色でも分かるよう淡く落とす。
+    button.enable-toggle
+      &.off
+        background:
+          color: transparent
+        border:
+          color: gray
+        color: gray
 
 nav.search-form-container
   display: block
@@ -728,7 +791,13 @@ nav.search-form-container
       border:
         radius: 3px
 
-input[type='search'],input[type='number'],input[type='text'],input[type='password']
+input[type='search'],input[type='number'],input[type='text'],input[type='password'],input[type='date']
+  font:
+    family: $monospace
+
+// 日付は数字しか入らないので、他の入力欄と同じ等幅で揃える (#4373)。
+// Chrome は日付入力の本文を内側の疑似要素が持つため、そちらにも指定が要る。
+input[type='date']::-webkit-datetime-edit
   font:
     family: $monospace
 

@@ -12,6 +12,8 @@ module Mulukhiya
       optional(:livecure).value(:bool)
       optional(:enable).value(:bool)
       optional(:extra_tags).maybe(:array, max_size?: ProgramEntryContract::MAX_TAGS)
+      # 次回放送日 (#4373)。nil で解除できる。
+      optional(:next_on).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
       # audit metadata: ProgramEntryContract と同様、書き込み専用で保持する
@@ -43,6 +45,14 @@ module Mulukhiya
       next if value.empty?
       unless ProgramEntryContract::TIME_FORMAT.match?(value)
         key.failure('開始時刻は HH:MM 形式 (例 21:00) で指定してください。')
+      end
+    end
+
+    rule(:next_on) do
+      next unless value.is_a?(String)
+      next if value.empty?
+      unless ProgramEntryContract.valid_date?(value)
+        key.failure('次回放送日は YYYY-MM-DD 形式 (例 2026-08-08) で指定してください。')
       end
     end
   end

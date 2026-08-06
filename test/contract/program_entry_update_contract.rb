@@ -22,6 +22,43 @@ module Mulukhiya
       assert_empty(errors)
     end
 
+    # 次回放送日 (#4373)。
+    def test_partial_next_on_only
+      errors = @contract.call(next_on: '2026-08-08').errors
+
+      assert_empty(errors)
+    end
+
+    def test_next_on_can_be_cleared_with_nil
+      errors = @contract.call(next_on: nil).errors
+
+      assert_empty(errors)
+    end
+
+    def test_next_on_rejects_bad_format
+      ['2026/08/08', '08-08', '2026-8-8', 'tomorrow'].each do |value|
+        errors = @contract.call(next_on: value).errors
+
+        assert_false(errors.empty?, "next_on=#{value.inspect} を通している")
+      end
+    end
+
+    # ⚠ 書式だけでは実在しない日付を弾けない。
+    def test_next_on_rejects_nonexistent_date
+      errors = @contract.call(next_on: '2026-02-31').errors
+
+      assert_false(errors.empty?)
+    end
+
+    # 一覧の「有効」トグルは enable だけを送る (#4484)。false も通ること。
+    def test_partial_enable_only
+      [true, false].each do |value|
+        errors = @contract.call(enable: value).errors
+
+        assert_empty(errors, "enable=#{value} を拒否している")
+      end
+    end
+
     def test_series_when_provided_must_not_be_empty
       errors = @contract.call(series: '').errors
 

@@ -112,5 +112,107 @@ module Mulukhiya
     def test_renderer_content_type
       assert_equal('text/calendar; charset=UTF-8', ProgramCalendarRenderer.new.type)
     end
+
+    # ---- next_on (次回放送日) ---- (#4373)
+    #
+    # 曜日ルールを持たないので、ウィークリー枠は next_on で「次はいつか」だけを
+    # 指す。**過ぎたら出力しない**（fail-closed）のが肝で、翌日へ送ってしまうと
+    # 週次枠が毎日誤発火する従来の不具合に戻る。
+
+    def weekly(next_on, start_time: '20:30', minutes: 60)
+      return {
+        'weekly' => {
+          'series' => '振り返り実況', 'episode' => 3, 'start_time' => start_time,
+          'minutes' => minutes, 'next_on' => next_on, 'enable' => true
+        },
+      }
+    end
+
+    # 正のケース: 未来の next_on はその日に 1 件出る。
+    def test_next_on_future_emits_event_on_that_date
+      # 2026-06-06 (土) 20:30 JST = 11:30 UTC
+      result = ics(weekly('2026-06-06'))
+
+      assert_match(/UID:program-weekly@mulukhiya/, result)
+      assert_match(/DTSTART:20260606T113000Z/, result)
+      assert_match(/SUMMARY:振り返り実況 3話/, result)
+    end
+
+    # ⚠ ここが本体。過ぎた next_on は**翌日へ送らず消える**。
+    def test_next_on_past_emits_nothing
+      result = ics(weekly('2026-05-23'))
+
+      assert_no_match(/BEGIN:VEVENT/, result)
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 当日の放送中は残す（#4287 の取り逃し防止と同じ扱い）。
+    def test_next_on_today_keeps_event_while_broadcasting
+      # now は 12:00。11:30 開始 60 分なので 12:30 まで放送中
+      result = ics(weekly('2026-05-30', start_time: '11:30', minutes: 60))
+
+      assert_match(/DTSTART:20260530T023000Z/, result)
+    end
+
+    # 当日でも終了済みなら消える（翌日へは送らない）。
+    def test_next_on_today_disappears_after_end
+      result = ics(weekly('2026-05-30', start_time: '08:30', minutes: 60))
+
+      assert_no_match(/BEGIN:VEVENT/, result)
+    end
+
+    # next_on 未設定は従来どおり毎日扱い。既存枠の移行を不要にするための保証。
+    def test_without_next_on_keeps_daily_behaviour
+      result = ics
+
+      assert_match(/DTSTART:20260530T140000Z/, result) # late 23:00 当日
+      assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
+    end
+
+    # ⚠ 不正な日付は**毎日扱いへ倒さない**。倒すと「日付を間違えた」が
+    # 「古い話数で毎日鳴る」に化け、曜日ルールを却下した理由がそのまま当たる。
+    # 番組表全体は落とさず、そのエントリだけ黙る。
+    def test_invalid_next_on_emits_nothing
+      result = ics(weekly('2026-02-31', start_time: '23:00'))
+
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 書式違い（YAML 手編集で `2026/08/08` と書く等）も同じく黙る。
+    def test_malformed_next_on_emits_nothing
+      result = ics(weekly('2026/08/08', start_time: '23:00'))
+
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 文字列ですらない値（`next_on: 20260808` は Integer で入る）も黙る。
+    def test_non_string_next_on_emits_nothing
+      result = ics(weekly(20_260_808, start_time: '23:00'))
+
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # ⚠ Date.strptime は寛容で末尾のゴミやゼロ埋め無しを通す。素で渡すと
+    # 「不正なのにイベントが出る」に戻る (Codex P2 / PR #4529)。
+    def test_lenient_next_on_emits_nothing
+      ['2026-08-08junk', '2026-8-8', ' 2026-08-08', '2026-08-08 '].each do |value|
+        assert_no_match(/program-weekly/, ics(weekly(value, start_time: '23:00')), "#{value} を通している")
+      end
+    end
+
+    # 空文字は「未設定」と同じ。日付を消す操作を毎日扱いへ戻すため。
+    def test_blank_next_on_falls_back_to_daily
+      result = ics(weekly('', start_time: '23:00'))
+
+      assert_match(/DTSTART:20260530T140000Z/, result)
+    end
+
+    # 番組表全体を巻き込まないこと（不正エントリ以外は従来どおり出る）。
+    def test_invalid_next_on_keeps_other_entries
+      result = ics(@data.merge(weekly('2026-02-31', start_time: '23:00')))
+
+      assert_no_match(/program-weekly/, result)
+      assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
+    end
   end
 end

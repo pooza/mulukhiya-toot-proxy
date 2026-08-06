@@ -72,9 +72,24 @@ capsicum 等のクライアントアプリが、モロヘイヤ固有の機能�
 
 SNS 本体への転送が失敗した場合、SNS が返したステータスコードをそのまま返す。
 
-```json
-{"error": "エラーメッセージ"}
-```
+**⚠ 5.31.0 (#4480) から、上流が返した包絡をそのまま透過する。`error` の型が SNS 種別で変わる。**
+従来はどの上流でも `{"error": "Bad response NNN"}`（`error` は文字列）に潰れていた。
+
+| 上流 | ボディ | 例 |
+|---|---|---|
+| Misskey | `error` は**オブジェクト** | `{"error":{"code":"TOO_MANY_DRAFTS","message":"...","id":"...","kind":"client"}}` |
+| Mastodon | `error` は**文字列** | `{"error":"Validation failed: Text is too long"}` |
+
+クライアントは `error` の型を確かめてから読むこと。以下の場合は従来どおり
+`{"error": "Bad response NNN"}`（文字列）に倒れる。
+
+- 上流が JSON を返さない（nginx の HTML 502 等）
+- 上流ボディが 65,536 バイトを超える
+- **413（アップロード上限超過）** — 透過せずモロヘイヤの文言を返す。上流（nginx）が HTML を返すことが多く、そのまま出しても利用者に伝わらないため
+
+**⚠ 上流が 404 を返した場合は透過が効かない。** Sinatra の `not_found` ハンドラが
+ボディを差し替えるため、`{"package":"ginseng-core","class":"Ginseng::NotFoundError",...}`
+になる（#4520）。「モロヘイヤのルートが無い」という意味ではない点に注意。
 
 ### 機能フラグ
 
@@ -181,6 +196,12 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 - Purpose が `tag`: モロヘイヤ自身がハッシュタグを書き換える際に使用（将来の #3877 対応）
 - 不明な Purpose: 422 Unprocessable Entity を返す
 
+> **nginx 前段がある構成では「Purpose なし」は外部から使えない（#4474）。**
+> `$status_put_backend` map が Purpose の無い外部 PUT を `reject` に落として **405** を返すため、
+> 上表の「（なし / 空）」行に到達できるのは、モロヘイヤ自身が `X-Mulukhiya` を付けて転送する
+> 内部リクエストか、nginx を経由せず :3008 を直接叩いた場合だけ。**capsicum のような外部
+> クライアントは `media_update` の明示が必須。**素の `PUT` は本体の編集要求として 405 で弾かれる。
+
 ### パイプライン処理
 
 以下の処理が**透過的に**適用される。クライアントは標準 API を呼ぶだけでよい。
@@ -222,7 +243,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 | `/api/notes/favorites/create` | POST | お気に入り（SNS → post_bookmark） |
 | `/api/notes/reactions/create` | POST | リアクション（SNS → post_reaction） |
 
-> **`favorites/create` の冪等挙動（#4380 / #4383）**: お気に入りは冪等操作のため、上流 Misskey が 400（大半は `ALREADY_FAVORITED`）を返した場合も成功（200・空ボディ）として扱う。**この冪等成功パスでは `post_bookmark` 副作用（PieFed ミラー `piefed_bookmark` / `result_notification`）を発火しない**。PieFed ミラーは `piefed.clip` が呼び出しごとに新規投稿を作る非冪等操作で、再お気に入りのたびに dispatch すると PieFed 重複投稿・重複通知を生むため。副作用は初回お気に入り（上流 200）時にのみ走る。mulukhiya を経由せず（直接 Misskey 等で）先にお気に入り済みの note は PieFed ミラー対象外となる。
+> **`favorites/create` の冪等挙動（#4380 / #4383 / #4480）**: お気に入りは冪等操作のため、上流 Misskey が `ALREADY_FAVORITED`（既にお気に入り済み）を返した場合は成功（200・空ボディ `{}`）として扱う。**⚠ 5.31.0 から条件が「400 のすべて」ではなく `error.code == "ALREADY_FAVORITED"` に絞られた。** それ以外の 400（`NO_SUCH_NOTE` 等）は上流の包絡をそのまま透過する（従来は成功に丸めており、不正な `noteId` が 200 で返っていた）。**この冪等成功パスでは `post_bookmark` 副作用（PieFed ミラー `piefed_bookmark` / `result_notification`）を発火しない**。PieFed ミラーは `piefed.clip` が呼び出しごとに新規投稿を作る非冪等操作で、再お気に入りのたびに dispatch すると PieFed 重複投稿・重複通知を生むため。副作用は初回お気に入り（上流 200）時にのみ走る。mulukhiya を経由せず（直接 Misskey 等で）先にお気に入り済みの note は PieFed ミラー対象外となる。
 
 ### クライアント側での制御
 
@@ -849,6 +870,50 @@ Web Push サブスクリプションを解除する。
 | `id` | string | 必須 | 投稿 ID |
 | `tags` | string[] | 必須 | タグの配列 |
 
+- **レスポンス（成功時 200）**: **SNS 本体の投稿 API のレスポンスをそのまま返す。**モロヘイヤ独自のラップは無い。
+  したがって**形は SNS 種別で異なる**（#4491）。
+
+| controller | 形 | 新しい投稿の ID |
+|---|---|---|
+| Mastodon | `POST /api/v1/statuses` と同じ status オブジェクト（トップレベルがそのまま status） | `id` |
+| Misskey | `POST /api/notes/create` と同じ `{"createdNote": {...}}` | `createdNote.id` |
+
+  **本文・添付・可視性を含む完全なオブジェクトが返る**ので、クライアントは再取得なしにタイムラインへ反映できる。
+  元の投稿は削除済みで、返るのは**新しく作られた投稿**（ID は元と異なる）。
+
+```jsonc
+// Mastodon
+{"id": "117039311685380513", "created_at": "...", "content": "<p>本文</p><p><a ...>#<span>tag1</span></a></p>",
+ "visibility": "direct", "account": {...}, "media_attachments": [], ...}
+
+// Misskey
+{"createdNote": {"id": "apiq4gr6k0", "createdAt": "...", "text": "本文\n\n#tag1 #tag2",
+                 "tags": ["tag1", "tag2"], "user": {...}, ...}}
+```
+
+- **削除と再投稿の順序が SNS で逆**なので、失敗時に残るものが違う。
+  - **Mastodon**: 削除 → 投稿。投稿側で失敗すると**元の投稿は消えたまま**になる
+  - **Misskey**: 投稿 → 削除。削除側で失敗すると**新旧が両方残る**
+
+- **エラー**:
+
+| 状況 | ステータス | body |
+|---|---|---|
+| 認証なし・トークン不正 | **403** | `{"error":"Unauthorized"}` |
+| **他人の投稿**（ID は存在するが所有者が違う） | **403** | `{"error":"Unauthorized"}` |
+| 存在しない ID | **404** | `{"package":"ginseng-core","class":"Ginseng::NotFoundError","message":"Resource /mulukhiya/api/status/tags not found."}` |
+| `/{controller}/capabilities/repost` が false | **404** | 同上 |
+| `tags` 未指定・不正 | **422** | `{"errors":{"tags":["空欄です。"]}}` |
+| 上流 SNS のエラー | **上流のステータス**（422・400 等） | `{"error":"Bad response NNN"}` |
+
+  ⚠ **所有者違いは 404 ではなく 403。**ルートは先に status を引いてから
+  `status.updatable_by?(sns.account)` を見るので、**存在する他人の投稿は「無い」ではなく
+  「権限が無い」になる**。クライアントは 404 を「消えた」、403 を「触れない」として扱ってよい。
+
+  ⚠ **404 の body だけ他と形が違う。**コントローラは `{"error":"Not Found"}` を組み立てているが、
+  Sinatra の `not_found` ハンドラがステータス 404 を見て body を差し替えるため、個別のメッセージが
+  失われる。**`error` キーを持たないので、クライアントは `error` の有無で分岐してはいけない**（#4520）。
+
 #### GET /mulukhiya/api/media
 
 メディアカタログを取得する。
@@ -1014,10 +1079,25 @@ Spotify 連携を解除する（保管トークンを削除）。
 - **対象エントリ**: `enable: true` かつ妥当な `start_time`（`HH:MM`）を持つもののみ。それ以外（無効・時刻未設定・書式不正）はスキップ。`air`（エア番組）は抽出条件に含めない
 - **VEVENT マッピング**:
   - `SUMMARY`: `{作品名} {話数}{話数表記} {サブタイトル}`（存在する要素のみ空白連結）
-  - `DTSTART`: `start_time`（JST）の「次回発生」。当日の当該時刻が既に過ぎていれば翌日に送る。出力は UTC（末尾 `Z`）
+  - `DTSTART`: 次回発生（下表）。出力は UTC（末尾 `Z`）
   - `DTEND`: `DTSTART + minutes`（`minutes` 未設定時は 30 分）
   - `UID`: `program-{key}@mulukhiya`（エントリ単位で安定。購読のたびに次回放送へ更新される）
-- **補足**: 現状エントリは放送曜日を持たないため繰り返し（`RRULE`）は付けず、単発 VEVENT を出力する MVP。曜日欄が追加されれば週次 `RRULE` へ拡張できる
+
+**次回発生の決まり方**（`next_on` = 次回放送日、#4373）:
+
+| `next_on` | `DTSTART` | 用途 |
+|---|---|---|
+| 未設定（空欄） | 今日の `start_time`。終了時刻を過ぎていれば翌日 | デイリー枠（毎晩の実況など） |
+| 日付あり | その日の `start_time`。**終了時刻を過ぎたら VEVENT を出力しない** | ウィークリー枠・不定枠 |
+| **不正な値** | **VEVENT を出力しない** | `2026-02-31`・`2026/08/08` 等。毎日扱いへは倒さない |
+
+放送中（開始済みかつ終了前）は当日のイベントを残す。放送開始分ちょうどに取得しても当日イベントが欠落せず、通知を取り逃さないため（#4287）。
+
+`next_on` が過ぎたエントリは**黙って出力から消える**（翌日へ送らない）。日付を進めるのは「次回」ボタン（`POST .../episode/increment`。番組表エディタの一覧で話数欄にある ＋ ボタン）で、番組表エディタは過去日のエントリに警告バッジを出す。**⚠ 進むのは保存値 +7 日なので、2 週以上放置したエントリは 1 回押しても過去日のまま。その場合は日付を直接編集する。**
+
+**不正な値も同じく出力しない**（fail-closed）。書き込み API は contract が弾くので、これに該当するのは `var/program.yaml` の手編集と外部データソース由来のもの。毎日扱いへ倒すと「日付を間違えた」が「古い話数で毎日鳴る」に化けるため、黙るほうを選んでいる。番組表エディタは過去日とは別の**不正バッジ**（橙）で出す。
+
+- **⚠ 繰り返し（`RRULE`）は出力しない。** 話数は動的値で未来分が確定せず、先々までイベントを出しても中身を埋められないため。**Google カレンダー等への購読リマインダー用途は非対応**（取得ラグに加え、話数を載せられない）。用途は tomato-shrieker のような高頻度ポーリングによる直前/開始通知に限定される
 
 #### POST /mulukhiya/api/admin/program/entry
 
@@ -1036,6 +1116,7 @@ Spotify 連携を解除する（保管トークンを削除）。
 | `subtitle` | string | 任意 | サブタイトル。**200 文字以下** |
 | `minutes` | integer | 任意 | 放送時間（分） |
 | `start_time` | string | 任意 | 放送開始時刻。24 時間制 `HH:MM`（時は先頭 0 省略可、例 `9:00` / `21:00`）。#4287 iCalendar 出力での機械可読な開始時刻として使う。書式違反は 422。**保存時に `HH:MM`（2 桁ゼロ埋め、例 `9:00`→`09:00`）へ正規化される**（#4372） |
+| `next_on` | string | 任意 | 次回放送日。`YYYY-MM-DD`。**未設定なら「毎日」扱い**（`program.ics` の項参照）。書式違反・実在しない日付（`2026-02-31` 等）は 422。「次回」ボタンで 7 日進む（#4373） |
 | `air` | boolean | 任意 | エア番組（実在しない／TV 放送のない番組）フラグ。`true` で「エア番組」タグが付与される |
 | `livecure` | boolean | 任意 | 実況対象フラグ |
 | `enable` | boolean | 任意 | 有効フラグ |
@@ -1084,6 +1165,7 @@ Spotify 連携を解除する（保管トークンを削除）。
 - **認証**: 必要（管理者のみ）
 - **前提条件**: `livecure?` が `true`
 - **パスパラメータ**: `key` (string)
+- **`next_on` の前進**: エントリが `next_on` を持つ場合、**話数と同時に 7 日進む**（#4373）。ウィークリー枠の日付更新を既存操作へ相乗りさせるため。`next_on` を持たないエントリには**日付を生やさない**（生やすと毎日枠が単発扱いになりイベントが消える）。不正な値が入っていた場合は触らず、話数の +1 だけ行う
 - **レスポンス**: `{key, entry}` (更新後)
 - **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict
 

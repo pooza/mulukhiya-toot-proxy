@@ -84,6 +84,11 @@ html lang='ja' data-theme='light'
               input type='text' v-model.trim='form.values.start_time' pattern='([01]?\d|2[0-3]):[0-5]\d' placeholder='21:00' title='24 時間制 HH:MM（例 21:00）'
           .field-container
             label
+              span 次回放送日
+              input type='date' v-model='form.values.next_on' title='空欄なら毎日。日付を入れるとその日に1回だけ通知し、過ぎたら止まります'
+            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（一覧の話数欄にある ＋ ボタンで、話数と一緒に1週進みます）。
+          .field-container
+            label
               span 追加タグ
               textarea v-model='form.extraTagsText' rows='3' placeholder='改行区切りでタグを列挙（タグ先頭の # は省略）'
           .inline-field-container
@@ -121,6 +126,7 @@ html lang='ja' data-theme='light'
                 th 話数
                 th サブタイトル
                 th 開始時刻
+                th 次回放送日
                 th 放送時間
                 th エア番組
                 th 実況
@@ -138,7 +144,7 @@ html lang='ja' data-theme='light'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click.stop='incrementEpisode(key)' v-if='editable' v-tooltip.top="'次回'"
+                  button.small @click.stop='incrementEpisode(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'次回（話数を1つ、次回放送日を1週進める）'"
                     i class='fa fa-plus'
                 td
                   code v-if='entry.annict_episode_id'
@@ -151,20 +157,39 @@ html lang='ja' data-theme='light'
                   small v-if='entry.start_time'
                     | {{entry.start_time}}
                 td
+                  template v-if='entry.next_on'
+                    small :class="{stale: isStaleNextOn(entry), invalid: isInvalidNextOn(entry)}"
+                      | {{entry.next_on}}
+                    span.tag.stale v-if='isStaleNextOn(entry)' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
+                      i class='fa fa-circle-exclamation' aria-hidden='true'
+                      span.sr-only 次回放送日が過去
+                    span.tag.invalid v-if='isInvalidNextOn(entry)' v-tooltip.top="'次回放送日が日付として読めません。通知は止まっています'"
+                      i class='fa fa-triangle-exclamation' aria-hidden='true'
+                      span.sr-only 次回放送日が不正
+                  small.muted v-else='' 毎日
+                td
                   small v-if='entry.minutes'
                     | {{entry.minutes}}分
                 td
                   span.tag.air v-if='entry.air'
-                    i class='fa fa-check'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only エア番組
                 td
                   span.tag.livecure v-if='entry.livecure'
-                    i class='fa fa-check'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only 実況対象
                 td
-                  span.tag.enable v-if='entry.enable'
-                    i class='fa fa-check'
+                  button.small.enable-toggle :class="{off: !entry.enable}" @click.stop='toggleEnable(key, entry)' v-if='editable' :disabled='isBusy(key)' :aria-pressed="entry.enable ? 'true' : 'false'" v-tooltip.top="entry.enable ? '無効にする' : '有効にする'"
+                    i class='fa' :class="entry.enable ? 'fa-check' : 'fa-xmark'" aria-hidden='true'
+                    span.sr-only
+                      | {{entry.enable ? '有効' : '無効'}}
+                  span.tag.enable v-else-if='entry.enable'
+                    i class='fa fa-check' aria-hidden='true'
+                    span.sr-only 有効
                 td.actions
-                  button.small.danger @click.stop='deleteEntry(key)' v-if='editable' v-tooltip.top="'削除'"
-                    i class='fa fa-trash'
+                  button.small.danger @click.stop='deleteEntry(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'削除'"
+                    i class='fa fa-trash' aria-hidden='true'
+                    span.sr-only 削除
     == slim.render 'fragment/footer'
     script type='module'
       |
@@ -179,6 +204,10 @@ html lang='ja' data-theme='light'
               account: {},
               editable: false,
               entries: {},
+              // 送信中のエントリ。番組表の更新は無ロックの read-modify-write なので、
+              // 「次回」の二度押しは話数 +2・次回放送日 +14 日になり、その週の
+              // 通知が丸ごと消える。往復が終わるまでボタンを止める (#4373)。
+              busy: {},
               annict: {keyword: null, works: [], episodes: []},
               form: {
                 open: false,
@@ -186,7 +215,7 @@ html lang='ja' data-theme='light'
                 extraTagsText: '',
                 values: {
                   key: '', series: '', episode: null, episode_suffix: '',
-                  minutes: 30, start_time: null, subtitle: '',
+                  minutes: 30, start_time: null, subtitle: '', next_on: null,
                   air: false, livecure: true, enable: true,
                   annict_work_id: null, annict_episode_id: null,
                 },
@@ -208,6 +237,7 @@ html lang='ja' data-theme='light'
                 minutes: 30,
                 start_time: null,
                 subtitle: '',
+                next_on: null,
                 air: false,
                 livecure: true,
                 enable: true,
@@ -256,6 +286,7 @@ html lang='ja' data-theme='light'
               v.extra_tags = extraTags.length ? extraTags : null
               if (!v.subtitle) v.subtitle = null
               if (!v.start_time) v.start_time = null
+              if (!v.next_on) v.next_on = null
               if (!v.episode_suffix) v.episode_suffix = null
               if (!Number.isFinite(v.episode)) v.episode = null
               if (!Number.isFinite(v.minutes)) v.minutes = null
@@ -277,24 +308,93 @@ html lang='ja' data-theme='light'
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
             },
             deleteEntry (key) {
+              if (this.isBusy(key)) return
               Swal.fire({title: `エントリ '${key}' を削除しますか？`, icon: 'warning', showCancelButton: true, confirmButtonText: '削除', cancelButtonText: 'キャンセル'})
                 .then(result => {
                   if (!result.isConfirmed) return
+                  this.busy[key] = true
                   this.methods.deleteProgramEntry(key)
                     .then(_ => {
                       Swal.fire({title: '削除しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
                       this.loadEntries()
                     })
                     .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                    .finally(_ => {delete this.busy[key]})
                 })
             },
+            // 日付として読めない next_on。サーバーは fail-closed で通知を出さない
+            // ので、一覧でも「過去日」ではなく「不正」として区別する。文字列比較
+            // だけだと 2026-02-31 を過去日、2026/08/08 を未来日と誤って読む。
+            isInvalidNextOn (entry) {
+              if (!entry.next_on) return false
+              const value = String(entry.next_on)
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return true
+              // 実在する日付か。2026-02-31 は Date が 3/3 へ繰り上げるので往復で見る。
+              // ⚠ ここは端末のタイムゾーンを混ぜてはいけないので UTC で組む。
+              const [year, month, day] = value.split('-').map(Number)
+              const date = new Date(Date.UTC(year, month - 1, day))
+              return date.getUTCFullYear() !== year ||
+                date.getUTCMonth() + 1 !== month ||
+                date.getUTCDate() !== day
+            },
+            // 今日 (JST) を YYYY-MM-DD で。⚠ ブラウザのローカル日付では組まない。
+            // ProgramCalendar は next_on を +09:00 固定で解釈するので、国外の端末で
+            // 日付境界をまたぐと「カレンダーからは消えているのに警告が出ない」が
+            // ありうる。⚠ toLocaleDateString('en-CA') は ISO 形式を保証しない。
+            // Intl データ次第で M/D/YYYY へ落ちると、下の字句比較が未来日を過去日と
+            // 誤読する（2027-01-01 < 8/6/2026）ので、年月日を取り出して自分で組む。
+            todayKeyJst () {
+              const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Tokyo',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+              }).formatToParts(new Date())
+              const value = (type, digits) => {
+                const part = parts.find(entry => entry.type === type)
+                return String(Number(part && part.value)).padStart(digits, '0')
+              }
+              return `${value('year', 4)}-${value('month', 2)}-${value('day', 2)}`
+            },
+            // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
+            // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
+            isStaleNextOn (entry) {
+              if (!entry.next_on) return false
+              if (this.isInvalidNextOn(entry)) return false
+              return entry.next_on < this.todayKeyJst()
+            },
+            isBusy (key) {
+              return !!this.busy[key]
+            },
+            toggleEnable (key, entry) {
+              if (this.isBusy(key)) return
+              const next = !entry.enable
+              this.busy[key] = true
+              // 楽観更新。放送前後にまとめて切り替えるので、往復を待たずに
+              // 行の見た目 (disabled クラス) が追従するほうが手数が減る (#4484)。
+              // 失敗したら loadEntries() でサーバーの値へ巻き戻す。
+              entry.enable = next
+              this.methods.updateProgramEntry(key, {enable: next})
+                .then(_ => {
+                  Swal.fire({title: next ? '有効にしました。' : '無効にしました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
+                  this.loadEntries()
+                })
+                .catch(e => {
+                  entry.enable = !next
+                  Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
+                })
+                .finally(_ => {delete this.busy[key]})
+            },
             incrementEpisode (key) {
+              if (this.isBusy(key)) return
+              this.busy[key] = true
               this.methods.incrementProgramEpisode(key)
                 .then(_ => {
                   Swal.fire({title: '話数を+1しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                .finally(_ => {delete this.busy[key]})
             },
             copyText (text, label) {
               navigator.clipboard.writeText(text)

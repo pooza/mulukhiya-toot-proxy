@@ -297,6 +297,7 @@ iceshrimp:
   display_name: Iceshrimp
   sns_type: misskey
 logger:
+  # ログに出す Hash の「キー名」で落とすもの
   mask_fields:
     - auth
     - endpoint
@@ -304,6 +305,31 @@ logger:
     - publickey
     - secret
     - token
+  # URL のクエリに現れたら [FILTERED] へ落とす「パラメータ名」(#4511)。
+  # mask_fields はキー名でしか判定できないため、`url: "...?access_token=xxx"` の
+  # ように値の文字列へ埋まった資格情報はこちらで落とす。
+  #
+  # ⚠ `i` は Misskey のトークンパラメータ。汎用名だが、判定は URL のクエリに
+  #   限られる（ginseng-core 側の実装）ので Hash のキー `i` は巻き込まない。
+  #   裏を返すと**ボディのキー `i` はここでは落ちない**。Misskey はトークンを
+  #   ボディで渡すので、そちらは Controller::SCRUBBED_LOG_PARAMS が担当する。
+  # ⚠ 未設定なら ginseng-core の既定リストへ倒れる（マスクしない方向へは倒れない）。
+  #   ここに書くのは、増減させたいときの編集点を明示するため。
+  mask_query_params:
+    - access_token
+    - api_key
+    - apikey
+    - client_secret
+    - code
+    - i
+    - key
+    - password
+    - refresh_token
+    - secret
+    - token
+    # 辞書 API (Google Apps Script) のリダイレクト先に付く capability key。
+    # 本番のログに実際に出ている。
+    - user_content_key
 mastodon:
   attachment:
     types:
@@ -439,7 +465,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/mulukhiya-toot-proxy
-  version: 5.30.0
+  version: 5.31.0
 parser:
   note:
     fields:

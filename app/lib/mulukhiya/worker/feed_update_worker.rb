@@ -9,6 +9,9 @@ module Mulukhiya
     end
 
     def perform(params = {})
+      # every 5m。CustomFeed はサブプロセス (bin/*.rb) を起動するため、フィードを
+      # 持たないサーバーでも 5 分おきにプロセス生成と DB 接続を試みる (#4506)。
+      return if disable?
       CustomFeed.all(&:update)
       log(feeds: CustomFeed.count)
     end
