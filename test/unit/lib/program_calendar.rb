@@ -169,17 +169,42 @@ module Mulukhiya
       assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
     end
 
-    # 不正な日付で番組表全体を落とさない。毎日扱いへ倒す。
-    def test_invalid_next_on_falls_back_to_daily
+    # ⚠ 不正な日付は**毎日扱いへ倒さない**。倒すと「日付を間違えた」が
+    # 「古い話数で毎日鳴る」に化け、曜日ルールを却下した理由がそのまま当たる。
+    # 番組表全体は落とさず、そのエントリだけ黙る。
+    def test_invalid_next_on_emits_nothing
       result = ics(weekly('2026-02-31', start_time: '23:00'))
 
-      assert_match(/DTSTART:20260530T140000Z/, result)
+      assert_no_match(/program-weekly/, result)
     end
 
+    # 書式違い（YAML 手編集で `2026/08/08` と書く等）も同じく黙る。
+    def test_malformed_next_on_emits_nothing
+      result = ics(weekly('2026/08/08', start_time: '23:00'))
+
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 文字列ですらない値（`next_on: 20260808` は Integer で入る）も黙る。
+    def test_non_string_next_on_emits_nothing
+      result = ics(weekly(20_260_808, start_time: '23:00'))
+
+      assert_no_match(/program-weekly/, result)
+    end
+
+    # 空文字は「未設定」と同じ。日付を消す操作を毎日扱いへ戻すため。
     def test_blank_next_on_falls_back_to_daily
       result = ics(weekly('', start_time: '23:00'))
 
       assert_match(/DTSTART:20260530T140000Z/, result)
+    end
+
+    # 番組表全体を巻き込まないこと（不正エントリ以外は従来どおり出る）。
+    def test_invalid_next_on_keeps_other_entries
+      result = ics(@data.merge(weekly('2026-02-31', start_time: '23:00')))
+
+      assert_no_match(/program-weekly/, result)
+      assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
     end
   end
 end

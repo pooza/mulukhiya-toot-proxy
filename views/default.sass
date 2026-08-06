@@ -618,10 +618,20 @@ section.disabled h3::after
         decoration: line-through
     small.muted
       color: gray
+    // 日付として読めない next_on。過去日とは別物として出す (fail-closed で
+    // 通知は止まっているが、直し方が違う)。
+    small.invalid
+      color: darkorange
+      text:
+        decoration: none
     .tag.stale
       color: firebrick
       border:
         color: firebrick
+    .tag.invalid
+      color: darkorange
+      border:
+        color: darkorange
     // 一覧上で有効/無効をその場で切り替えるトグル (#4484)。
     // 無効側は「押していない」ことが色でも分かるよう淡く落とす。
     button.enable-toggle

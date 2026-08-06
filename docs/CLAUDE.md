@@ -261,12 +261,12 @@ GitHub マイルストーン作成・割り当て済み。**スコープは 2026
 - **#4511** — dev24-27 のログに生トークン 0 件、`access_token=[FILTERED]` / `i=[FILTERED]` を確認
 - **#4487** — dev25 で `Webhook.all` が全て `available?`、nil / 空白トークンを `ConfigError` で拒否
 
-残りは目視のモンキーテスト（#4474 / #4484 / #4373 の UI / #4487 の実アカウント経路）。
+残りは目視のモンキーテスト（#4474 / #4484 / #4373 の WebUI / #4487 の実アカウント経路）。
 
 ### 1. 重篤な不具合（主軸）
 
 - **#4474 nginx が `X-Mulukhiya-Purpose` 付きの PUT を 405 で弾く** — ✅ **本番3台 + ステージングで復旧済み（2026-08-05）**。サンプル vhost（#4475）・docs（#4517）も着地。capsicum から実際に ALT 編集して通ったらクローズ（モンキーテスト待ちで open）
-- **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — ✅ コード着地（ginseng-core 1.15.32 + application.yaml の `mask_query_params`、#4518）。**デプロイ後にログの再掃除が要る**
+- **#4511 security/obs: listener が streaming URL をアクセストークン付きで平文ログに書く（size:M）** — ✅ コード着地（ginseng-core 1.15.32 + `config/application.yaml` の `/logger/mask_query_params`、#4518）。**デプロイ後にログの再掃除が要る**
 - **#4506 並行性: `disable?` を持つ定期 worker 7 本が perform で短絡していない** — ✅ クローズ済み（#4519）
 - **#4487 bug: トークン未設定のアカウントでも webhook URL が生成される（size:S）** — ✅ #4522 で着地、Codex P2（壊れた行で走査が止まる）を #4525 で追加是正
 - **#4523 security: リモート取得の HEAD プリフライトが SSRF allowlist を通っていない** — ✅ #4528 + pooza/ginseng-core#495（1.15.33）。#4410 で GET は塞いだが、**その 1 行上の HEAD が素通り**していた。Codex レビューの取り残しから発見（[[feedback_codex-review-window-too-narrow]]）
@@ -307,7 +307,7 @@ GitHub マイルストーン作成・割り当て済み。**スコープは 2026
 - **#4503 test: アカウント依存のテスト 304 件が CI・手元のいずれでも実行されていない** — `/agent/test/token` が現存アカウントに解決しない。**5.30.0 のリリース判断でも、この範囲は CI の緑を根拠にできなかった**
 - **#4508 chore: sinatra 4.2 系 / mustermann 4.0 / tilt 2.8 への更新** — 全リクエストが通る層のメジャー更新なのに、#4503 のせいでコントローラ層のテストが CI で 1 件も走らず**緑を検証根拠にできない**。5.32.0 で **#4503 → #4508 の順**に土台テーマとして扱う
 - **#4516 test/bug: media seed の追加で露見した 2 件** — catalog の戻り値がキャッシュ経路で形違い・`MediaFeedRenderer` の omit ガードが実描画条件と不一致。#4503 でテストが動くようになってから扱うのが自然なので同じマイルストーン
-- **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — 2026-08-06 起票。`RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証したIPで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
+- **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — 2026-08-06 起票。`RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証した IP アドレスで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
 
 ### マイルストーン外の繰越（着手条件待ち）
 

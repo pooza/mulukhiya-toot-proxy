@@ -13,6 +13,7 @@ module Mulukhiya
   #
   #   next_on 未設定 → 毎日扱い。今日 (放送中なら今日) か明日の start_time
   #   next_on あり   → その日の start_time に 1 件だけ。**過ぎたら出力しない**
+  #   next_on 不正   → **出力しない**。毎日扱いへ倒すと古い話数で毎日鳴る
   #
   # ⚠ 曜日ルール (frequency + weekday) は採らなかった。ズレを検出できないうえ
   # fail-open で、**古い話数のまま毎週誤発火する**。価値が話数である以上、
@@ -91,7 +92,12 @@ module Mulukhiya
     def next_occurrence(entry, duration_minutes)
       now_jst = @now.getlocal(TZ_OFFSET)
       hour, minute = entry['start_time'].split(':').map(&:to_i)
-      if (date = scheduled_date(entry))
+      if entry['next_on'].present?
+        # ⚠ 値がある以上、解釈できなければ毎日扱いへ倒さず黙る (fail-closed)。
+        # 倒すと「日付を間違えた」が「古い話数で毎日鳴る」に化ける。曜日ルールを
+        # 却下した理由 (冒頭コメント) が、そのまま不正値の経路にも効く。
+        date = scheduled_date(entry)
+        return nil unless date
         # next_on 指定あり: その日に 1 回だけ。終了済みなら翌日へ送らず消す。
         candidate = Time.new(date.year, date.month, date.day, hour, minute, 0, TZ_OFFSET)
         return nil if (candidate + (duration_minutes * 60)) <= now_jst
@@ -102,11 +108,15 @@ module Mulukhiya
       return candidate
     end
 
-    # next_on を Date で返す。未設定・不正値は nil (= 従来の毎日扱いへ倒す)。
+    # next_on を Date で返す。不正値は nil (呼び出し側がイベントごと落とす)。
     # 不正値で番組表全体を落とさない。
     def scheduled_date(entry)
       value = entry['next_on']
-      return nil unless value.is_a?(String) && value.present?
+      unless value.is_a?(String)
+        # YAML の手編集で `next_on: 20260808` と書くと Integer で入る。
+        logger.error(message: 'program next_on invalid', next_on: value)
+        return nil
+      end
       return Date.strptime(value, '%Y-%m-%d')
     rescue Date::Error
       logger.error(message: 'program next_on invalid', next_on: value)

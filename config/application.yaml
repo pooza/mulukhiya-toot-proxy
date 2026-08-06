@@ -311,6 +311,8 @@ logger:
   #
   # ⚠ `i` は Misskey のトークンパラメータ。汎用名だが、判定は URL のクエリに
   #   限られる（ginseng-core 側の実装）ので Hash のキー `i` は巻き込まない。
+  #   裏を返すと**ボディのキー `i` はここでは落ちない**。Misskey はトークンを
+  #   ボディで渡すので、そちらは Controller::SCRUBBED_LOG_PARAMS が担当する。
   # ⚠ 未設定なら ginseng-core の既定リストへ倒れる（マスクしない方向へは倒れない）。
   #   ここに書くのは、増減させたいときの編集点を明示するため。
   mask_query_params:

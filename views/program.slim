@@ -144,7 +144,7 @@ html lang='ja' data-theme='light'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click.stop='incrementEpisode(key)' v-if='editable' v-tooltip.top="'次回（話数を1つ、次回放送日を1週進める）'"
+                  button.small @click.stop='incrementEpisode(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'次回（話数を1つ、次回放送日を1週進める）'"
                     i class='fa fa-plus'
                 td
                   code v-if='entry.annict_episode_id'
@@ -158,11 +158,14 @@ html lang='ja' data-theme='light'
                     | {{entry.start_time}}
                 td
                   template v-if='entry.next_on'
-                    small :class="{stale: isStaleNextOn(entry)}"
+                    small :class="{stale: isStaleNextOn(entry), invalid: isInvalidNextOn(entry)}"
                       | {{entry.next_on}}
                     span.tag.stale v-if='isStaleNextOn(entry)' v-tooltip.top="'次回放送日が過ぎています。通知は止まっています'"
                       i class='fa fa-circle-exclamation' aria-hidden='true'
                       span.sr-only 次回放送日が過去
+                    span.tag.invalid v-if='isInvalidNextOn(entry)' v-tooltip.top="'次回放送日が日付として読めません。通知は止まっています'"
+                      i class='fa fa-triangle-exclamation' aria-hidden='true'
+                      span.sr-only 次回放送日が不正
                   small.muted v-else='' 毎日
                 td
                   small v-if='entry.minutes'
@@ -176,7 +179,7 @@ html lang='ja' data-theme='light'
                     i class='fa fa-check' aria-hidden='true'
                     span.sr-only 実況対象
                 td
-                  button.small.enable-toggle :class="{off: !entry.enable}" @click.stop='toggleEnable(key, entry)' v-if='editable' :aria-pressed="entry.enable ? 'true' : 'false'" v-tooltip.top="entry.enable ? '無効にする' : '有効にする'"
+                  button.small.enable-toggle :class="{off: !entry.enable}" @click.stop='toggleEnable(key, entry)' v-if='editable' :disabled='isBusy(key)' :aria-pressed="entry.enable ? 'true' : 'false'" v-tooltip.top="entry.enable ? '無効にする' : '有効にする'"
                     i class='fa' :class="entry.enable ? 'fa-check' : 'fa-xmark'" aria-hidden='true'
                     span.sr-only
                       | {{entry.enable ? '有効' : '無効'}}
@@ -184,8 +187,9 @@ html lang='ja' data-theme='light'
                     i class='fa fa-check' aria-hidden='true'
                     span.sr-only 有効
                 td.actions
-                  button.small.danger @click.stop='deleteEntry(key)' v-if='editable' v-tooltip.top="'削除'"
-                    i class='fa fa-trash'
+                  button.small.danger @click.stop='deleteEntry(key)' v-if='editable' :disabled='isBusy(key)' v-tooltip.top="'削除'"
+                    i class='fa fa-trash' aria-hidden='true'
+                    span.sr-only 削除
     == slim.render 'fragment/footer'
     script type='module'
       |
@@ -200,6 +204,10 @@ html lang='ja' data-theme='light'
               account: {},
               editable: false,
               entries: {},
+              // 送信中のエントリ。番組表の更新は無ロックの read-modify-write なので、
+              // 「次回」の二度押しは話数 +2・次回放送日 +14 日になり、その週の
+              // 通知が丸ごと消える。往復が終わるまでボタンを止める (#4373)。
+              busy: {},
               annict: {keyword: null, works: [], episodes: []},
               form: {
                 open: false,
@@ -300,31 +308,53 @@ html lang='ja' data-theme='light'
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
             },
             deleteEntry (key) {
+              if (this.isBusy(key)) return
               Swal.fire({title: `エントリ '${key}' を削除しますか？`, icon: 'warning', showCancelButton: true, confirmButtonText: '削除', cancelButtonText: 'キャンセル'})
                 .then(result => {
                   if (!result.isConfirmed) return
+                  this.busy[key] = true
                   this.methods.deleteProgramEntry(key)
                     .then(_ => {
                       Swal.fire({title: '削除しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
                       this.loadEntries()
                     })
                     .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                    .finally(_ => {delete this.busy[key]})
                 })
+            },
+            // 日付として読めない next_on。サーバーは fail-closed で通知を出さない
+            // ので、一覧でも「過去日」ではなく「不正」として区別する。文字列比較
+            // だけだと 2026-02-31 を過去日、2026/08/08 を未来日と誤って読む。
+            isInvalidNextOn (entry) {
+              if (!entry.next_on) return false
+              const value = String(entry.next_on)
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return true
+              const date = new Date(`${value}T00:00:00`)
+              if (Number.isNaN(date.getTime())) return true
+              // 2026-02-31 を繰り上げて解釈する実装向けの往復チェック。
+              return this.toDateKey(date) !== value
+            },
+            toDateKey (date) {
+              return [
+                date.getFullYear(),
+                String(date.getMonth() + 1).padStart(2, '0'),
+                String(date.getDate()).padStart(2, '0'),
+              ].join('-')
             },
             // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
             // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
             isStaleNextOn (entry) {
               if (!entry.next_on) return false
-              const today = new Date()
-              const todayKey = [
-                today.getFullYear(),
-                String(today.getMonth() + 1).padStart(2, '0'),
-                String(today.getDate()).padStart(2, '0'),
-              ].join('-')
-              return entry.next_on < todayKey
+              if (this.isInvalidNextOn(entry)) return false
+              return entry.next_on < this.toDateKey(new Date())
+            },
+            isBusy (key) {
+              return !!this.busy[key]
             },
             toggleEnable (key, entry) {
+              if (this.isBusy(key)) return
               const next = !entry.enable
+              this.busy[key] = true
               // 楽観更新。放送前後にまとめて切り替えるので、往復を待たずに
               // 行の見た目 (disabled クラス) が追従するほうが手数が減る (#4484)。
               // 失敗したら loadEntries() でサーバーの値へ巻き戻す。
@@ -338,14 +368,18 @@ html lang='ja' data-theme='light'
                   entry.enable = !next
                   Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
                 })
+                .finally(_ => {delete this.busy[key]})
             },
             incrementEpisode (key) {
+              if (this.isBusy(key)) return
+              this.busy[key] = true
               this.methods.incrementProgramEpisode(key)
                 .then(_ => {
                   Swal.fire({title: '話数を+1しました。', toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
                   this.loadEntries()
                 })
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
+                .finally(_ => {delete this.busy[key]})
             },
             copyText (text, label) {
               navigator.clipboard.writeText(text)
