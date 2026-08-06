@@ -168,9 +168,11 @@ module Mulukhiya
       return unless entry['next_on'].is_a?(String) && entry['next_on'].present?
       entry['next_on'] = (Date.strptime(entry['next_on'], '%Y-%m-%d') + NEXT_ON_INTERVAL_DAYS)
         .strftime('%Y-%m-%d')
+      return entry['next_on']
     rescue Date::Error
       # 不正値は触らずそのまま残す。話数の +1 まで巻き添えで落とさない。
       logger.error(message: 'program next_on invalid', next_on: entry['next_on'])
+      return entry['next_on']
     end
 
     # ⚠ YAML を手書きすると、クォートを付け忘れたスカラーが意図しない型で入る。

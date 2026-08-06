@@ -113,14 +113,23 @@ module Mulukhiya
     # 例外がループの外へ出ると Webhook.create の rescue が nil を返し、
     # **その行より後ろにある正しい webhook URL が「見つからない」ことになる**。
     # 壊れた行は次へ送るだけにして、走査自体は最後まで続ける (#4487 / PR #4522)。
+    # ⚠ ただし黙ってスキップもしない。DB 断や /crypt/salt の設定崩れは全行を
+    # 落とすので、無音だと「全 webhook が 404」だけが症状になる。
     def self.find_token_by_digest(digest)
       Postgres.exec(:webhook_tokens).each do |row|
-        token = Environment.access_token_class[row[:id]] rescue next
-        next unless token.valid?
-        token_digest = token.webhook_digest rescue next
-        return token if token_digest == digest
+        token = find_valid_token(row)
+        return token if token && token.webhook_digest == digest
+      rescue => e
+        e.log(id: row[:id])
+        next
       end
       return nil
+    end
+
+    def self.find_valid_token(row)
+      token = Environment.access_token_class[row[:id]]
+      return nil unless token&.valid?
+      return token
     end
 
     private

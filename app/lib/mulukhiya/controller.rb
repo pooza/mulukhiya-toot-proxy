@@ -12,7 +12,11 @@ module Mulukhiya
     SCRUBBED_LOG_PARAMS = [
       'status', 'text', 'body', 'comment', 'spoiler_text', 'cw',
       'q', 'title', 'artist', 'album', # word/suggest・nowplaying のユーザー入力 (#4394)
-      'code' # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
+      'code', # OAuth 認可コード (spotify/auth・annict/auth)。短命だが資格情報なので伏せる
+      # ⚠ アクセストークン本体。`i` は Misskey がボディで渡す（MisskeyController#token
+      #   のフォールバック）。/logger/mask_query_params は URL のクエリにしか効かない
+      #   ので、ボディ側はここで落とす。両方揃って #4511 の掃討が完成する。
+      'i', 'access_token'
     ].freeze
 
     set :root, Environment.dir
@@ -118,7 +122,9 @@ module Mulukhiya
     def handle_gateway_error(error, silent_statuses: [401], silent_codes: [])
       silent = silent_statuses.include?(error.source_status) ||
         silent_codes.include?(upstream_error_code(error))
-      error.alert unless silent
+      # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
+      # 「上流の仕様変更で全投稿が弾かれる」ような事故の頻度・偏りを追えない。
+      silent ? error.log : error.alert
       @renderer.message = error.source_body || {error: error.message}
       return @renderer.status = error.source_status
     end

@@ -447,6 +447,13 @@ module Mulukhiya
         @renderer.message = StatusTagAddService.new(sns).call(status, params[:tags])
       end
       return @renderer.to_s
+    rescue Ginseng::GatewayError => e
+      # 上流の 4xx を 502 に潰さない。潰すと capsicum が「本文が長すぎる」と
+      # 「SNS が落ちている」を区別できない (#4491 の docs 記述に実装を揃える)。
+      e.log
+      @renderer.status = e.respond_to?(:source_status) ? e.source_status : 502
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
     rescue => e
       e.log
       @renderer.status = e.status
