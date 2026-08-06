@@ -206,6 +206,18 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # ⚠ ただの整数は 60 進数ではない。'00:00' へ寄せると深夜 0 時のイベントとして
+    # 出てしまうので、Integer のまま残して抽出条件で弾かせる (Codex P2 / PR #4529)。
+    def test_data_keeps_plain_integer_start_time
+      key = "test_plainint_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'start_time' => 20})
+
+      assert_equal(20, @program.data[key]['start_time'])
+    ensure
+      @program.save(original) if original
+    end
+
     # ⚠ 一覧の「有効」トグル (#4484) は enable だけを送る。false は blank_value?
     # ではないので、キーごと消えず false として残らなければならない。
     def test_update_entry_keeps_false_enable

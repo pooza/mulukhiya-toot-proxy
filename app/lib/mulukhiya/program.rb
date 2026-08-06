@@ -164,14 +164,19 @@ module Mulukhiya
     # 翌日以降そのエントリが単発扱いになり、毎日出ていたイベントが消える。
     #
     # ズレたら日付を直接編集する。ここは既定値の前進であって規則ではない。
+    #
+    # ⚠ 書式は contract と同じ判定で見る。Date.strptime は `2026-08-08junk` を
+    # 通すので、素で渡すと壊れた値を黙って別の壊れた値へ書き換える
+    # (Codex P2 / PR #4529)。
     def advance_next_on(entry)
-      return unless entry['next_on'].is_a?(String) && entry['next_on'].present?
+      return entry['next_on'] unless entry['next_on'].is_a?(String) && entry['next_on'].present?
+      unless ProgramEntryContract.valid_date?(entry['next_on'])
+        # 不正値は触らずそのまま残す。話数の +1 まで巻き添えで落とさない。
+        logger.error(message: 'program next_on invalid', next_on: entry['next_on'])
+        return entry['next_on']
+      end
       entry['next_on'] = (Date.strptime(entry['next_on'], '%Y-%m-%d') + NEXT_ON_INTERVAL_DAYS)
         .strftime('%Y-%m-%d')
-      return entry['next_on']
-    rescue Date::Error
-      # 不正値は触らずそのまま残す。話数の +1 まで巻き添えで落とさない。
-      logger.error(message: 'program next_on invalid', next_on: entry['next_on'])
       return entry['next_on']
     end
 
@@ -185,8 +190,17 @@ module Mulukhiya
       coerced = entry.dup
       coerced['next_on'] = coerced['next_on'].strftime('%Y-%m-%d') if coerced['next_on'].is_a?(Date)
       coerced['start_time'] = format_sexagesimal(coerced['start_time']) if
-        coerced['start_time'].is_a?(Integer)
+        sexagesimal_time?(coerced['start_time'])
       return coerced
+    end
+
+    # ⚠ ただの整数 (`start_time: 20`) は 60 進数ではない。'00:00' へ寄せると
+    # 深夜 0 時のイベントとして出てしまうので、Integer のまま残して
+    # valid_start_time? に弾かせる (Codex P2 / PR #4529)。
+    def sexagesimal_time?(value)
+      return false unless value.is_a?(Integer)
+      return false unless (0...86_400).cover?(value)
+      return (value % 60).zero?
     end
 
     # YAML が 60 進数として読んだ 20:30 (= 73800) を 'HH:MM' へ戻す。

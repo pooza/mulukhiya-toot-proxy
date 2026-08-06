@@ -329,24 +329,26 @@ html lang='ja' data-theme='light'
               if (!entry.next_on) return false
               const value = String(entry.next_on)
               if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return true
-              const date = new Date(`${value}T00:00:00`)
-              if (Number.isNaN(date.getTime())) return true
-              // 2026-02-31 を繰り上げて解釈する実装向けの往復チェック。
-              return this.toDateKey(date) !== value
+              // 実在する日付か。2026-02-31 は Date が 3/3 へ繰り上げるので往復で見る。
+              // ⚠ ここは端末のタイムゾーンを混ぜてはいけないので UTC で組む。
+              const [year, month, day] = value.split('-').map(Number)
+              const date = new Date(Date.UTC(year, month - 1, day))
+              return date.getUTCFullYear() !== year ||
+                date.getUTCMonth() + 1 !== month ||
+                date.getUTCDate() !== day
             },
-            toDateKey (date) {
-              return [
-                date.getFullYear(),
-                String(date.getMonth() + 1).padStart(2, '0'),
-                String(date.getDate()).padStart(2, '0'),
-              ].join('-')
+            // 今日 (JST)。⚠ ブラウザのローカル日付では組まない。ProgramCalendar は
+            // next_on を +09:00 固定で解釈するので、国外の端末で日付境界をまたぐと
+            // 「カレンダーからは消えているのに警告が出ない」がありうる。
+            todayKeyJst () {
+              return new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Tokyo'})
             },
             // next_on が過去日か。過ぎるとカレンダーに出なくなる (#4373) ので、
             // 一覧で気づけるようにする。日付だけで比較する（当日は過去扱いしない）。
             isStaleNextOn (entry) {
               if (!entry.next_on) return false
               if (this.isInvalidNextOn(entry)) return false
-              return entry.next_on < this.toDateKey(new Date())
+              return entry.next_on < this.todayKeyJst()
             },
             isBusy (key) {
               return !!this.busy[key]

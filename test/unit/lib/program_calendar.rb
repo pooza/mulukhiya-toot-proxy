@@ -192,6 +192,14 @@ module Mulukhiya
       assert_no_match(/program-weekly/, result)
     end
 
+    # ⚠ Date.strptime は寛容で末尾のゴミやゼロ埋め無しを通す。素で渡すと
+    # 「不正なのにイベントが出る」に戻る (Codex P2 / PR #4529)。
+    def test_lenient_next_on_emits_nothing
+      ['2026-08-08junk', '2026-8-8', ' 2026-08-08', '2026-08-08 '].each do |value|
+        assert_no_match(/program-weekly/, ics(weekly(value, start_time: '23:00')), "#{value} を通している")
+      end
+    end
+
     # 空文字は「未設定」と同じ。日付を消す操作を毎日扱いへ戻すため。
     def test_blank_next_on_falls_back_to_daily
       result = ics(weekly('', start_time: '23:00'))
