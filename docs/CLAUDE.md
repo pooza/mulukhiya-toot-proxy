@@ -261,7 +261,17 @@ GitHub マイルストーン作成・割り当て済み。**スコープは 2026
 - **#4511** — dev24-27 のログに生トークン 0 件、`access_token=[FILTERED]` / `i=[FILTERED]` を確認
 - **#4487** — dev25 で `Webhook.all` が全て `available?`、nil / 空白トークンを `ConfigError` で拒否
 
-残りは目視のモンキーテスト（#4474 / #4484 / #4373 の WebUI / #4487 の実アカウント経路）。
+**ステージング再検証（2026-08-07・レビュー修正 #4533 / #4539 込み）**: dev24-27 全 4 台を `51d96f47` へ更新し、
+sidekiq → puma → listener の順に再起動。`Gemfile` / `Gemfile.lock` に差分が無いため再 bundle は不要。
+
+- 4 台とも **health 200**（redis / sidekiq / postgres / streaming すべて OK）・`about` の version = **5.31.0**
+- 外部 HTTPS 200: st2.mstdn.b-shock.org / st2.precure.ml / st3.mstdn.delmulin.com / st2.misskey.delmulin.com
+- **#4511 の再確認（5 観点レビューで足した項目）** — 4 台とも**生トークン 0 件**。
+  - dev24/26 の listener: `wss://.../streaming?access_token=[FILTERED]`
+  - dev24-26 の request ログ: `params: {"access_token":"[FILTERED]"}`
+  - **dev27（Misskey）で `/api/notes/create` を実投稿し、ボディの `i` が `"i":"[FILTERED]"` になることを確認**（5 観点レビューで見つけた赤の実機実証）。検証用ノートは削除済み
+- **#4539** — dev25 の `/mulukhiya/app/program` が 200 で、`formatToParts` を含む新しい JS が配信されていることを確認
+- ⚠ dev27 は `yjit_available: false` のまま（既知・pooza/chubo2#123）
 
 ### 1. 重篤な不具合（主軸）
 
@@ -310,12 +320,12 @@ GitHub マイルストーン作成・割り当て済み。**スコープは 2026
 
 ### 次にやること
 
-1. **ステージング再デプロイ・再検証（省略不可）** — dev24-27 全 4 台。**#4533 + #4539 を載せた状態で通す**。
-   省略した回に本番障害を出している（MEMORY `project_5280-staging-skip-postmortem`）。
-   08-06 午前の検証はレビュー前の develop に対するもので、これの代わりにはならない。
-   ⚠ 検証項目に **dev27 のログに `"i":"` が出なくなったこと**を追加する
-2. バージョンバンプ → リリース PR → 本番 4 台デプロイ
+1. ~~**ステージング再デプロイ・再検証（省略不可）**~~ — ✅ **2026-08-07 完了**（上記「ステージング再検証」節）。
+   バージョンバンプは 5.31.0 着手時に済んでいるので改めては不要
+2. **リリース PR #4515（develop → main）の CI 緑を確認してマージ → タグ・リリースノート → 本番 4 台デプロイ**。
+   ⚠ リリースノートのアップグレード手順に **必要 Ruby 版（rbenv install）を明記**する（[[feedback_release-notes-ruby-version]]）
 3. 🔴 **デプロイ後に #4511 のログ掃除を再実行**（Misskey 系は `"i":"` も対象）
+4. リリース後の更新 4 項目（本体 docs・Wiki・インフラノート・MEMORY）
 
 ### 5.32.0 へ送ったもの（2026-08-03 判断）
 
