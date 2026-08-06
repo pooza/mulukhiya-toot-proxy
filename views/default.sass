@@ -556,11 +556,25 @@ section.disabled h3::after
     margin: 0
     height: 2em
   // 次回放送日 (#4373)。放送時間などの数値欄と同じ見た目に揃える。
+  // ⚠ padding を一括指定してはいけない。Pico はカレンダーアイコンの領域を
+  // padding-right で確保し、そこへ透明な ::-webkit-calendar-picker-indicator を
+  // 重ねている。右パディングを潰すとアイコンごと枠外へ出てピッカーが開かなくなる。
   input[type='date']
     width: 10em
-    padding: 0 0.5em
+    padding:
+      top: 0
+      bottom: 0
+      left: 0.5em
     margin: 0
     height: 2em
+    font:
+      family: $serif
+      size: 1rem
+    // Chrome の日付入力は内側の疑似要素が本文を持つので、そちらにも指定する。
+    &::-webkit-datetime-edit
+      font:
+        family: $serif
+        size: 1rem
   input[type='search']
     width: 30em
     padding: 0 0.5em

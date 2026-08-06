@@ -86,7 +86,7 @@ html lang='ja' data-theme='light'
             label
               span 次回放送日
               input type='date' v-model='form.values.next_on' title='空欄なら毎日。日付を入れるとその日に1回だけ通知し、過ぎたら止まります'
-            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（「次回」ボタンで自動的に1週進みます）。
+            small.field-note 空欄＝毎日。ウィークリー枠は日付を入れる（一覧の話数欄にある ＋ ボタンで、話数と一緒に1週進みます）。
           .field-container
             label
               span 追加タグ
@@ -144,7 +144,7 @@ html lang='ja' data-theme='light'
                 td
                   span v-if='entry.episode'
                     | {{entry.episode}}{{entry.episode_suffix || '話'}}
-                  button.small @click.stop='incrementEpisode(key)' v-if='editable' v-tooltip.top="'次回'"
+                  button.small @click.stop='incrementEpisode(key)' v-if='editable' v-tooltip.top="'次回（話数を1つ、次回放送日を1週進める）'"
                     i class='fa fa-plus'
                 td
                   code v-if='entry.annict_episode_id'
