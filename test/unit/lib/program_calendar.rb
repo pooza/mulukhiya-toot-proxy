@@ -245,6 +245,25 @@ module Mulukhiya
       assert_no_match(/DESCRIPTION:##/, result)
     end
 
+    # ⚠ `#` を素で前置しない。約物の扱いは Mastodon (`_ · ・ ZWNJ` 以外を削除) と
+    # Misskey (無加工) で割れるので、素のままだと両系で別のタグに落ちる。
+    # to_hashtag が非英数字を一律 `_` へ寄せた形だけが、双方を無変換で通る。
+    def test_hashtags_are_normalized_through_to_hashtag
+      # ⚠ 75 オクテットで折り返されるので、1 行に収まる長さで確かめる。
+      result = ics(described(extra_tags: ['名探偵プリキュア！', 'ふたり・はぐ']))
+
+      assert_match(/DESCRIPTION:#名探偵プリキュア #ふたり_はぐ\r?\n/, result)
+    end
+
+    # 正規化すると空になる値 (記号だけ) は落とす。`#` だけの裸のタグを出さない。
+    def test_symbol_only_tags_are_dropped
+      assert_no_match(/DESCRIPTION/, ics(described(extra_tags: ['！？', '＃'])))
+      assert_match(
+        /DESCRIPTION:#プリキュア\r?\n/,
+        ics(described(extra_tags: ['！？', 'プリキュア'])),
+      )
+    end
+
     # 説明があれば置き換える。注意書きをタグに埋もれさせない。
     def test_description_replaces_hashtags
       result = ics(described(description: '本日は特番のため 30 分繰り下げ', extra_tags: ['プリキュア']))

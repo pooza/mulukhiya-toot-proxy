@@ -96,14 +96,21 @@ module Mulukhiya
       return hashtags(entry)
     end
 
-    # extra_tags をハッシュタグ行にする。エディタが「タグ先頭の # は省略」と
-    # 案内しているので、ここで付ける。既に # が付いている値は二重にしない。
+    # extra_tags をハッシュタグ行にする。
+    #
+    # ⚠ `#` を素で前置しない。`String#to_hashtag` を通す。約物は Mastodon と
+    # Misskey で扱いが割れる (Mastodon は `_ · ・ ZWNJ` 以外を削除、Misskey は
+    # 無加工) ので、素の `#名探偵プリキュア！` は両系で別のタグに落ちる。
+    # to_hashtag は非英数字を一律 `_` へ寄せる = 双方が無変換で通す唯一の形。
+    # 先頭の `#` も落としてから付け直すので二重にならない。
     def hashtags(entry)
       tags = entry['extra_tags']
       return nil unless tags.is_a?(Array)
-      values = tags.grep(String).map(&:strip).reject(&:empty?)
+      # 正規化すると空になる値 (記号だけのタグ) は落とす。判定は
+      # StatusTagContract と同じ to_hashtag_base で揃える。
+      values = tags.grep(String).reject {|tag| tag.to_hashtag_base.empty?}
       return nil if values.empty?
-      return values.map {|tag| tag.start_with?('#') ? tag : "##{tag}"}.join(' ')
+      return values.map(&:to_hashtag).join(' ')
     end
 
     # UTC 値として出力させ、末尾 Z を付与する (tzid: 'UTC' 指定が必要)。
