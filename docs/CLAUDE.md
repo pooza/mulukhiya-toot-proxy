@@ -232,7 +232,7 @@ git diff Gemfile.lock
 
 - **#4527 P1 / #4528 P1（`Gemfile.lock` が ginseng-core 1.15.32 のまま）** — lock は既に **1.15.34** なので解消済み。👍 を付けて処理済みに
 - **#4538 P2（`toLocaleDateString('en-CA')` が ISO を保証しない）** — #4539 で是正。`M/D/YYYY` へ落ちると `isStaleNextOn` の字句比較が逆転し、未来日を「過去日」と誤表示する（`2027-01-01` < `8/6/2026`）。`Intl.DateTimeFormat#formatToParts` で明示的に組む
-- **#4527 P2（`ClippingWorker#create_body` が上流の `GatewayError` を握り潰す）** — ⏸ **未決のまま 5.32.0 へ持ち越し**（下記「次期マイルストーン」節）
+- **#4527 P2（`ClippingWorker#create_body` が上流の `GatewayError` を握り潰す）** — **2026-08-07 に却下（👎）**。詳細は 5.32.0 節
 
 ### ステージング検証（省略不可・2 回実施）
 
@@ -317,9 +317,9 @@ GitHub マイルストーン作成済み。**土台テーマは「テストが�
 - **#4516 test/bug: media seed の追加で露見した 2 件** — catalog の戻り値がキャッシュ経路で形違い・`MediaFeedRenderer` の omit ガードが実描画条件と不一致。#4503 でテストが動くようになってから扱うのが自然なので同じマイルストーン
 - **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — `RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証した IP アドレスで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
 
-### 5.31.0 からの持ち越し（未決）
+### 5.31.0 からの持ち越し（決着済み）
 
-- **Codex #4527 P2: `ClippingWorker#create_body` が上流の `GatewayError` を握り潰す** — 指摘自体は正しい（`uri` は `to_md` 呼び出し前に代入済みなので `&& uri.nil?` のガードは必ず false）。ただし**非同期ワーカーで上流が落ちた時に生 URL へ倒すのは意図した耐性**とも読め、再 raise すると retry 3 回で dead 送りになり何も投稿されない。#4480 の透過性はリクエスト層の要求なので、ワーカー層まで及ぼすかは別判断。**方針を決めたら 👍 / 👎 を付けて棚卸しから外す**
+- **Codex #4527 P2: `ClippingWorker#create_body` が上流の `GatewayError` を握り潰す** — **却下（👎、2026-08-07）**。事実関係は正しい（`uri.to_md` 由来の `GatewayError` はガードを通らず生 URL へ倒れる）が、**非対称なのは意図的**。戻り値は投稿本文なので、上流が落ちたら「リンクだけの投稿」を残すほうがよく、再 raise すると `retry: 3` を使い切って dead 送り＝投稿そのものが消える。#4480 の透過は返す相手（API クライアント）がいるリクエスト層の要求で、ワーカーには及ぼさない。ガード自体は死んでおらず、`create_status_uri` 由来（`uri` が nil）の経路で `GatewayError` の二重包絡を防いでいる。同じ指摘が再発しないよう[コード側にも理由を明記](../app/lib/mulukhiya/clipping_worker.rb)
 
 ### 5.31.0 リリース前レビューの黄・緑（受け皿 Issue）
 
