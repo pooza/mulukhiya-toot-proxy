@@ -265,7 +265,10 @@ module Mulukhiya
     get '/program' do
       raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
       sns.token ||= sns.default_token
-      @renderer.message = Program.instance.data
+      # 放送順 (next_on → start_time) で返す (#4540)。キーは SHA256 の先頭 12 桁
+      # 固定で JS の配列インデックス (2**32-1 以下) にならないため、オブジェクトの
+      # ままでもクライアント側で挿入順が保たれる。
+      @renderer.message = Program.instance.sorted_data
       return @renderer.to_s
     rescue => e
       e.log

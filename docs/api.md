@@ -1063,6 +1063,34 @@ Spotify 連携を解除する（保管トークンを削除）。
 - **前提条件**: `/program/urls` が設定されていること（未設定時は 404）
 - **パラメータ**: なし
 
+##### レスポンス
+
+エントリのキーをキーにしたオブジェクト。値は `var/program.yaml` のフィールドがそのまま載る（`start_time` / `next_on` を含む）。
+
+```json
+{
+  "34cc5457e423": {
+    "series": "名探偵プリキュア！",
+    "minutes": 30,
+    "episode": 28,
+    "subtitle": "謎の怪盗デッチ・アゲイン",
+    "air": false,
+    "livecure": true,
+    "enable": true,
+    "annict_work_id": 16745,
+    "annict_episode_id": 181735,
+    "source_type": "annict",
+    "start_time": "08:30",
+    "next_on": "2026-08-09",
+    "extra_tags": []
+  }
+}
+```
+
+**順序は放送順（`next_on` 昇順 → `start_time` 昇順）**（5.32.0〜 / #4540）。`next_on` を持たない「毎日」枠は末尾へ送る。`next_on` は `YYYY-MM-DD` 固定なので字句比較でそのまま日付順になり、手編集で入った不正値は「値がある」側として日付群の中に字句順で混ざる。同値のときはキーで決める。
+
+JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 の先頭 12 桁固定で JS の配列インデックス（2³²-1 以下）にならないため、`JSON.parse` を通しても挿入順が保たれる。
+
 ##### 設定キー
 
 - `/program/urls`: マルチサーバー共有用に外部 URL から番組表を pull するエンドポイント一覧（未設定時は無効）
@@ -1082,6 +1110,7 @@ Spotify 連携を解除する（保管トークンを削除）。
   - `DTSTART`: 次回発生（下表）。出力は UTC（末尾 `Z`）
   - `DTEND`: `DTSTART + minutes`（`minutes` 未設定時は 30 分）
   - `UID`: `program-{key}@mulukhiya`（エントリ単位で安定。購読のたびに次回放送へ更新される）
+- **VEVENT の順序**: `GET /mulukhiya/api/program` と同じ放送順（`next_on` 昇順 → `start_time` 昇順、5.32.0〜 / #4540）。購読側の挙動には影響しないが、目視でのデバッグのために揃えている
 
 **次回発生の決まり方**（`next_on` = 次回放送日、#4373）:
 

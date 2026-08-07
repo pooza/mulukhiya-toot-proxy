@@ -35,6 +35,41 @@ module Mulukhiya
       end
     end
 
+    # 放送順に並べた番組表 (#4540)。外部へ出す面 (API・iCalendar・エディタ) は
+    # これを使う。
+    #
+    # ⚠ data 自体は並べ替えない。data は編集の read-modify-write にも使われる
+    # ので、ここで並べると var/program.yaml の行順まで書き換わる。
+    def sorted_data
+      return data.sort_by {|key, entry| self.class.sort_key(key, entry)}.to_h
+    end
+
+    # 番組表の標準の並び順 = next_on 昇順 → start_time 昇順 (#4540)。
+    #
+    # next_on は YYYY-MM-DD 固定なので字句比較でそのまま日付順になる。日付を
+    # 持たない「毎日」枠は次回がいつか決まらないので末尾へ送る。手編集で入った
+    # 不正値 (`20260808` 等) は「値がある」側として日付群の直後に寄るが、
+    # エディタが警告バッジを出す位置には残るのでこれでよい。
+    #
+    # 同値のときはキーで決める。並びが実行のたびに揺れると差分が読めなくなる。
+    def self.sort_key(key, entry)
+      return [
+        entry['next_on'].present? ? 0 : 1,
+        entry['next_on'].to_s,
+        start_minutes(entry['start_time']),
+        key.to_s,
+      ]
+    end
+
+    # 開始時刻を 0 時からの分に直す。HH:MM として読めない値 (未設定、手編集で
+    # 入った Integer 等) はその日の末尾へ送る。
+    def self.start_minutes(value)
+      return Float::INFINITY unless value.is_a?(String)
+      return Float::INFINITY unless ProgramEntryContract::TIME_FORMAT.match?(value)
+      hour, minute = value.split(':').map(&:to_i)
+      return (hour * 60) + minute
+    end
+
     def add_entry(key, attributes)
       raise auto_update_conflict if auto_update?
       key = key.to_s

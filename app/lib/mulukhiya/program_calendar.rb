@@ -48,12 +48,16 @@ module Mulukhiya
 
     # 有効 (enable) かつ妥当な start_time を持つエントリのみ。
     # air (エア番組) は抽出条件に含めない。
+    #
+    # VEVENT の順序は購読側 (tomato-shrieker) の挙動に影響しないが、他の面と
+    # 揃えておくと目視でのデバッグが読める (#4540)。
     def entries
-      return @data.select do |_key, entry|
+      selected = @data.select do |_key, entry|
         entry.is_a?(Hash) &&
-            entry['enable'] == true &&
-            valid_start_time?(entry['start_time'])
+          entry['enable'] == true &&
+          valid_start_time?(entry['start_time'])
       end
+      return selected.sort_by {|key, entry| Program.sort_key(key, entry)}.to_h
     end
 
     def valid_start_time?(value)

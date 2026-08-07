@@ -447,6 +447,24 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # 並び順 (#4540)。Program.sort_key 単体の検証は番組表機能を持たない
+    # controller でも走らせたいので ProgramSortKeyTest に置いている。
+    def test_sorted_data_orders_the_api_payload
+      return if disable?
+      original = @program.data
+      @program.save(
+        'later' => {'series' => '後', 'next_on' => '2036-12-31', 'start_time' => '20:00', 'enable' => true},
+        'daily' => {'series' => '毎日', 'start_time' => '19:00', 'enable' => true},
+        'sooner' => {'series' => '先', 'next_on' => '2036-12-30', 'start_time' => '21:00', 'enable' => true},
+      )
+
+      assert_equal(['sooner', 'later', 'daily'], @program.sorted_data.keys)
+      # data 自体は並べ替えない (編集の read-modify-write が yaml の行順を書き換える)。
+      assert_equal(['later', 'daily', 'sooner'], @program.data.keys)
+    ensure
+      @program.save(original) if original
+    end
+
     private
 
     def with_auto_update(value)

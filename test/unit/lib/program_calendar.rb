@@ -214,5 +214,24 @@ module Mulukhiya
       assert_no_match(/program-weekly/, result)
       assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
     end
+
+    # VEVENT の順序は購読側の挙動に影響しないが、他の面と揃える (#4540)。
+    def test_events_are_ordered_by_next_on_then_start_time
+      data = {
+        'daily' => {'series' => '毎日', 'start_time' => '23:00', 'enable' => true},
+        'later' => {
+          'series' => '後', 'next_on' => '2026-06-02', 'start_time' => '20:00', 'enable' => true
+        },
+        'sooner_late' => {
+          'series' => '先の遅い枠', 'next_on' => '2026-06-01', 'start_time' => '21:00', 'enable' => true
+        },
+        'sooner_early' => {
+          'series' => '先の早い枠', 'next_on' => '2026-06-01', 'start_time' => '19:00', 'enable' => true
+        },
+      }
+      order = ics(data).scan(/UID:program-(\w+)@mulukhiya/).flatten
+
+      assert_equal(['sooner_early', 'sooner_late', 'later', 'daily'], order)
+    end
   end
 end
