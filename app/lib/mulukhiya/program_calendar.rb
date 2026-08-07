@@ -75,7 +75,35 @@ module Mulukhiya
       event.dtstart = utc_value(start)
       event.dtend = utc_value(start + (minutes * 60))
       event.summary = summary(entry)
+      text = description(entry)
+      event.description = text if text
       return event
+    end
+
+    # DESCRIPTION (#4541)。RFC 5545 の標準プロパティで、Google カレンダーの
+    # 「説明」欄もこれ。プレーンテキストのみ (改行・カンマのエスケープと
+    # 75 オクテット折り返しは icalendar gem がやる)。
+    #
+    # description があればそれで完全に置き換える。実況準備の注意書きを書く欄
+    # なので、自動生成分と混ぜて埋もれさせない。
+    #
+    # ⚠ 自動生成側に作品名・話数・日時は載せない。SUMMARY と DTSTART/DTEND に
+    # あり、購読側 (tomato-shrieker の calendar.erb) がそれらを本文の前へ出す
+    # ので、重ねると投稿が二重になる。載せるのは他に出所のない extra_tags だけ。
+    def description(entry)
+      value = entry['description']
+      return value.strip if value.is_a?(String) && value.strip.present?
+      return hashtags(entry)
+    end
+
+    # extra_tags をハッシュタグ行にする。エディタが「タグ先頭の # は省略」と
+    # 案内しているので、ここで付ける。既に # が付いている値は二重にしない。
+    def hashtags(entry)
+      tags = entry['extra_tags']
+      return nil unless tags.is_a?(Array)
+      values = tags.grep(String).map(&:strip).reject(&:empty?)
+      return nil if values.empty?
+      return values.map {|tag| tag.start_with?('#') ? tag : "##{tag}"}.join(' ')
     end
 
     # UTC 値として出力させ、末尾 Z を付与する (tzid: 'UTC' 指定が必要)。

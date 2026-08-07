@@ -2,7 +2,7 @@ module Mulukhiya
   class ProgramEntryContract < Contract
     PARAMS_KEYS = [
       :key, :series, :minutes, :start_time, :episode, :episode_suffix, :subtitle,
-      :air, :livecure, :enable, :extra_tags, :next_on,
+      :air, :livecure, :enable, :extra_tags, :next_on, :description,
       :annict_work_id, :annict_episode_id, :source_type, :source_url
     ].freeze
     # 書き込み可能な属性。:key は識別子であり attributes には含めない
@@ -11,6 +11,9 @@ module Mulukhiya
     WRITABLE_KEYS = (PARAMS_KEYS - [:key]).freeze
     MAX_KEY_SIZE = 64
     MAX_TEXT_SIZE = 200
+    # 説明 (#4541) は program.ics の DESCRIPTION になる本文なので、
+    # 1 行もののフィールドと同じ 200 文字では足りない。
+    MAX_DESCRIPTION_SIZE = 1000
     MAX_TAGS = 32
     MAX_TAG_SIZE = 64
     KEY_FORMAT = /\A[A-Za-z0-9_-]+\z/
@@ -36,6 +39,10 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: MAX_TAGS)
       # 次回放送日 (#4373)。未設定なら「毎日」扱いで従来どおり。
       optional(:next_on).maybe(:string, max_size?: MAX_TEXT_SIZE)
+      # 説明 (#4541)。program.ics の DESCRIPTION になる。実況の準備のための
+      # 注意書きを想定。⚠ .ics は無認証で公開され tomato-shrieker が投稿にも
+      # 載せるので、内輪メモを置く欄ではない。
+      optional(:description).maybe(:string, max_size?: MAX_DESCRIPTION_SIZE)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
       # audit metadata: 書き込み専用。エディタが Annict 検索結果を選択した際に

@@ -215,6 +215,66 @@ module Mulukhiya
       assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
     end
 
+    # ---- DESCRIPTION (説明) ---- (#4541)
+
+    def described(description: nil, extra_tags: nil)
+      entry = {'series' => '振り返り実況', 'start_time' => '23:00', 'enable' => true}
+      entry['description'] = description unless description.nil?
+      entry['extra_tags'] = extra_tags unless extra_tags.nil?
+      return {'weekly' => entry}
+    end
+
+    def test_description_is_emitted_when_set
+      result = ics(described(description: '実況は 5 分前集合'))
+
+      assert_match(/DESCRIPTION:実況は 5 分前集合/, result)
+    end
+
+    # 説明が無いときは extra_tags をハッシュタグ行として出す。
+    def test_description_falls_back_to_hashtags
+      result = ics(described(extra_tags: ['プリキュア', 'YouTube']))
+
+      assert_match(/DESCRIPTION:#プリキュア #YouTube/, result)
+    end
+
+    # 既に # が付いている値は二重にしない。
+    def test_hashtags_are_not_double_prefixed
+      result = ics(described(extra_tags: ['#プリキュア']))
+
+      assert_match(/DESCRIPTION:#プリキュア\r?\n/, result)
+      assert_no_match(/DESCRIPTION:##/, result)
+    end
+
+    # 説明があれば置き換える。注意書きをタグに埋もれさせない。
+    def test_description_replaces_hashtags
+      result = ics(described(description: '本日は特番のため 30 分繰り下げ', extra_tags: ['プリキュア']))
+
+      assert_match(/DESCRIPTION:本日は特番のため 30 分繰り下げ/, result)
+      assert_no_match(/#プリキュア/, result)
+    end
+
+    # どちらも無ければ DESCRIPTION 自体を出さない。空の本文を送らない。
+    def test_description_is_omitted_when_empty
+      assert_no_match(/DESCRIPTION/, ics(described))
+      assert_no_match(/DESCRIPTION/, ics(described(description: '   ')))
+      assert_no_match(/DESCRIPTION/, ics(described(extra_tags: [])))
+      assert_no_match(/DESCRIPTION/, ics(described(extra_tags: ['', '  '])))
+    end
+
+    # 文字列でない値 (YAML 手編集) で落ちない。
+    def test_non_string_description_is_ignored
+      assert_no_match(/DESCRIPTION/, ics(described(description: 12_345)))
+      assert_no_match(/DESCRIPTION/, ics(described(extra_tags: 'プリキュア')))
+    end
+
+    # RFC 5545 のエスケープは icalendar gem に任せている。改行とカンマが
+    # 素通しされると購読側のパースが壊れるので、任せきりでよいことを確かめる。
+    def test_description_escapes_newline_and_comma
+      result = ics(described(description: "1 行目,カンマ\n2 行目"))
+
+      assert_match(/DESCRIPTION:1 行目\\,カンマ\\n2 行目/, result)
+    end
+
     # VEVENT の順序は購読側の挙動に影響しないが、他の面と揃える (#4540)。
     def test_events_are_ordered_by_next_on_then_start_time
       data = {
