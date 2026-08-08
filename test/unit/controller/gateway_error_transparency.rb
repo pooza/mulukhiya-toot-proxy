@@ -91,6 +91,36 @@ module Mulukhiya
       )
     end
 
+    # ALT 編集 (PUT /api/:version/statuses/:id) の 404 はクライアント起因なので
+    # alert しない (#4542)。抑止側は「実際に抑止していること」を正で押さえる。
+    def test_alert_is_suppressed_for_status_update_not_found
+      error = build_error(404, {error: 'Record not found'}.to_json)
+
+      assert_false(
+        alerted?(error) do
+          @controller.handle_gateway_error(
+            error,
+            silent_statuses: MastodonController::STATUS_UPDATE_SILENT_STATUSES,
+          )
+        end,
+      )
+    end
+
+    # ⚠ 黙らせるのは 401 / 404 だけ。上流の 5xx まで抑止すると、
+    # 「/source が廃止されて ALT 編集が全滅」を Sentry で拾えなくなる。
+    def test_alert_fires_for_status_update_server_error
+      error = build_error(500, {error: 'Internal Server Error'}.to_json)
+
+      assert_true(
+        alerted?(error) do
+          @controller.handle_gateway_error(
+            error,
+            silent_statuses: MastodonController::STATUS_UPDATE_SILENT_STATUSES,
+          )
+        end,
+      )
+    end
+
     def test_user_fault_codes_covers_known_misskey_codes
       ['TOO_MANY_DRAFTS', 'ALREADY_FAVORITED', 'NO_SUCH_NOTE', 'MAX_FILE_SIZE_EXCEEDED'].each do |code|
         assert_includes(MisskeyController::USER_FAULT_CODES, code)
