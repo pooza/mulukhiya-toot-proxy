@@ -219,14 +219,28 @@ module Mulukhiya
     # 読み込み時にここで文字列へ寄せ、以降の層は常に文字列だけを見ればよくする
     # (#4373)。エディタ経由の書き込みは to_yaml がクォートするので無害。
     #
-    #   next_on: 2026-08-08  → Date（許可しないと番組表全体が読めない）
-    #   start_time: 20:30    → 73800（YAML の 60 進数解釈）
+    #   next_on: 2026-08-08          → Date（許可しないと番組表全体が読めない）
+    #   next_on: 2026-08-08 09:00:00 → Time（同上・#4537）
+    #   start_time: 20:30            → 73800（YAML の 60 進数解釈）
     def coerce_scalars(entry)
       coerced = entry.dup
-      coerced['next_on'] = coerced['next_on'].strftime('%Y-%m-%d') if coerced['next_on'].is_a?(Date)
+      coerced['next_on'] = format_date(coerced['next_on'])
       coerced['start_time'] = format_sexagesimal(coerced['start_time']) if
         sexagesimal_time?(coerced['start_time'])
       return coerced
+    end
+
+    # next_on を 'YYYY-MM-DD' へ寄せる。日付として読めない値 (String・Integer 等)
+    # はそのまま返し、妥当性の判定は contract / ProgramCalendar に任せる。
+    #
+    # ⚠ Time はゾーンを付けずに書くと Psych が **UTC として** 読み、ローカル
+    # (JST) へ変換された Time が返る。そのまま strftime すると
+    # `2026-08-08 23:30:00` が 2026-08-09 になってしまうので、UTC 側で日付を採る
+    # = 書いたとおりの日付を拾う (#4537)。
+    def format_date(value)
+      return value.strftime('%Y-%m-%d') if value.is_a?(Date) # DateTime も含む
+      return value.getutc.strftime('%Y-%m-%d') if value.is_a?(Time)
+      return value
     end
 
     # ⚠ ただの整数 (`start_time: 20`) は 60 進数ではない。'00:00' へ寄せると

@@ -169,6 +169,43 @@ module Mulukhiya
       assert_match(/DTSTART:20260530T233000Z/, result) # aired 08:30 翌日
     end
 
+    # 落ちたエントリのログ (#4537)。next_on を過ぎて出力から消えたことを、
+    # 番組表エディタの警告バッジ以外でも検知できるようにする。
+    def warnings(data)
+      calendar = ProgramCalendar.new(data, now: @now)
+      logged = []
+      calendar.send(:logger).define_singleton_method(:warn) {|message| logged.push(message)}
+      calendar.to_ics
+      return logged
+    end
+
+    # ⚠ ここが本体。黙って落とすと実況が沈黙したことに誰も気づけない。
+    # .ics は tomato-shrieker が定期 GET するので、放置されていれば日次で出る。
+    def test_expired_next_on_is_logged
+      logged = warnings(weekly('2026-05-23'))
+
+      assert_equal(1, logged.size)
+      assert_equal('program next_on expired', logged.first[:message])
+      assert_equal('2026-05-23', logged.first[:next_on])
+      assert_equal('weekly', logged.first[:key])
+    end
+
+    # 書式違反は scheduled_date が既に error を出している。warn を重ねない
+    # (同じ事象で 2 行出すとどちらも読まれなくなる)。
+    def test_invalid_next_on_is_not_warned
+      assert_empty(warnings(weekly('2026/08/08', start_time: '23:00')))
+    end
+
+    # 出力されたエントリでは鳴らさない。毎回鳴るログは読まれなくなる。
+    def test_future_next_on_is_not_warned
+      assert_empty(warnings(weekly('2026-06-06')))
+    end
+
+    # 毎日枠 (next_on 未設定) は落ちないので鳴らない。
+    def test_daily_entries_are_not_warned
+      assert_empty(warnings(@data))
+    end
+
     # ⚠ 不正な日付は**毎日扱いへ倒さない**。倒すと「日付を間違えた」が
     # 「古い話数で毎日鳴る」に化け、曜日ルールを却下した理由がそのまま当たる。
     # 番組表全体は落とさず、そのエントリだけ黙る。

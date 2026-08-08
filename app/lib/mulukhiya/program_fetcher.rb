@@ -10,12 +10,17 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
     DEFAULT_FETCH_TIMEOUT = 30
-    # ⚠ Date を許可しないと、**手書きでクォート無しの日付を書いた瞬間に番組表
-    # 全体が読めなくなる** (`next_on: 2026-08-08` → Psych::DisallowedClass)。
-    # var/program.yaml は git 管理外で手編集もありうる。5.28.0 の founded_on と
-    # 同型の footgun なので、読めるようにしたうえで Program 側で文字列へ寄せる
-    # (#4373)。エディタ経由なら to_yaml が '2026-08-08' とクォートする。
-    PERMITTED_YAML_CLASSES = [Symbol, Date].freeze
+    # ⚠ Date / Time を許可しないと、**手書きでクォート無しの日付を書いた瞬間に
+    # 番組表全体が読めなくなる** (Psych::DisallowedClass)。var/program.yaml は
+    # git 管理外で手編集もありうる。5.28.0 の founded_on と同型の footgun なので、
+    # 読めるようにしたうえで Program 側で文字列へ寄せる (#4373 / #4537)。
+    #
+    #   next_on: 2026-08-08          → Date
+    #   next_on: 2026-08-08 09:00:00 → Time（時刻まで書くとこちらに落ちる）
+    #
+    # エディタ経由なら to_yaml が '2026-08-08' とクォートするので無害。
+    # 許可クラスは Ginseng::Config::PERMITTED_YAML_CLASSES に揃えてある。
+    PERMITTED_YAML_CLASSES = [Symbol, Date, Time].freeze
 
     def initialize
       @http = HTTP.new
