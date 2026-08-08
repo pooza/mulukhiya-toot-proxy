@@ -202,5 +202,43 @@ module Mulukhiya
     def test_writable_keys_include_next_on
       assert_includes(ProgramEntryContract::WRITABLE_KEYS, :next_on)
     end
+
+    # 説明 (#4541)。program.ics の DESCRIPTION になる本文。
+    def test_description_accepts_multiline_text
+      errors = @contract.call(series: 'テスト', description: "1 行目\n2 行目").errors
+
+      assert_empty(errors)
+    end
+
+    # ⚠ 1 行もののフィールド (200 文字) とは別枠。同じ上限にすると注意書きが
+    # 書けない。
+    def test_description_accepts_up_to_its_own_limit
+      errors = @contract.call(
+        series: 'テスト',
+        description: 'あ' * ProgramEntryContract::MAX_DESCRIPTION_SIZE,
+      ).errors
+
+      assert_empty(errors)
+      assert_operator(ProgramEntryContract::MAX_DESCRIPTION_SIZE, :>, ProgramEntryContract::MAX_TEXT_SIZE)
+    end
+
+    def test_description_rejects_oversized_text
+      errors = @contract.call(
+        series: 'テスト',
+        description: 'あ' * (ProgramEntryContract::MAX_DESCRIPTION_SIZE + 1),
+      ).errors
+
+      assert_false(errors.empty?)
+    end
+
+    def test_description_is_optional
+      errors = @contract.call(series: 'テスト', description: nil).errors
+
+      assert_empty(errors)
+    end
+
+    def test_writable_keys_include_description
+      assert_includes(ProgramEntryContract::WRITABLE_KEYS, :description)
+    end
   end
 end

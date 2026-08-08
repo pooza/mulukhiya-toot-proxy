@@ -2,6 +2,28 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.28.1（2026-07-09、ホットフィックス）
+
+5.28.0 本番適用後に判明した設立日まわりの是正ホットフィックス。**5.28.0 でステージング検証を省略（再構築中で使えず）したため本番で顕在化した**教訓つき（詳細は MEMORY `project_5280-staging-skip-postmortem`）。
+
+- **fix: founded_at fallback の 1 日ズレ** — 5.28.0 の #4437（Codex P2）で入れた `created_at.strftime('...GMT')→getlocal` が、Sequel が既に zone 付き（実測 +0900）で返す created_at を二重シフトし設立日が翌日化していた（美食丼 2017-04-20 ← 実際 2017-04-19）。`account.created_at.getlocal` へ是正
+- **fix: 未クォート日付での起動クラッシュ（footgun）** — ginseng-core 1.15.27 で Config の YAML ロードに `permitted_classes: [Date, Time, DateTime]` を許可。`founded_on: 2021-03-14` をクォート無しで書いても `Psych::DisallowedClass` で落ちない（従来はクォート必須）。delmulin/daisskey/lbock で実害が出ていた
+- **ops: 誤設定 GitHub webhook 4 件削除** — GitHub 生イベントを mulukhiya の Slack 形式 webhook 受け口へ送っていた hook（ginseng-core/ginseng-fediverse/ginseng-web/cure-api）が全て 422 を返し美食丼で「webhook エラー連発」に見えていた。mulukhiya 無関係のため hook 削除で解消
+- **本番デプロイ: 4 台完了**（2026-07-09、shallu / zugoga / lbock / sweep、全台 version 5.28.1 / health 200。美食丼 founded_at が 2017-04-19 に是正、各台 founded_at/preopened_at 確認済み）
+
+## リリース済み: 5.28.0（2026-07-08）
+
+capsicum 開発を実ブロックしていた `/about`・API 表層の急ぎ小物を束ねた快速リリース。#4393 media_catalog sub-second 化（size:L）は 5.29.0 の単独テーマへ分離。
+
+- **#4430 feat: 読み付き単語辞書一括取得 `GET /word/all`** — capsicum 投稿サジェスト最適化（pooza/capsicum#687）。ETag/If-None-Match + digest フォールバック
+- **#4433 feat: /about features に `annict_review` capability 露出** — #4342 未デプロイ台での review 投稿 404 を capsicum が feature-gate 可能に（pooza/capsicum#677）
+- **#4434 feat: /about に `founded_at`（正式オープン日）+ `preopened_at`（プレ公開日）追加** — config `/founded_on`・`/preopened_on` 優先、founded_at は未設定時に最古ローカルアカウント作成日で近似（pooza/capsicum#818）
+- **#4420 concurrency: sw_subscription 集約の race を決定化＋トランザクション化** — `order(:id)` 決定化＋`SELECT ... FOR UPDATE` 先取りロック。register↔unregister ABBA デッドロック・無変更 canonical ロック漏れも解消
+- **#4423 test: AnnictReviewLockStorageTest フレーキー解消** — record_conflict 計上テストの minute_bucket 境界を Timecop.freeze で決定化
+- **#4429 chore: nokogiri 1.19.4** — Dependabot 8 alert 解消
+- **リリース前 5 観点レビュー / Codex 対応** — 真の赤 0。並行性 🟡（ABBA デッドロック #4441）、観測性 🟢（config 日付 typo 可視化）、Codex P2 3 件（TZ・FOR UPDATE・api.md #4443）を同梱。既存 `invalidate_sw_subscription_cache` の alert→log は #4442 へ繰越
+- **本番デプロイ: 4 台**（2026-07-08、staging 検証省略のまま出したため上記 5.28.1 の是正が必要になった）
+
 ## リリース済み: 5.27.0（2026-06-19）
 
 capsicum ナウプレ連携の「URL を自前で返せる経路」を拡張した回。Spotify user-level OAuth + currently-playing API (#4337) と URL→メタ逆引き `/nowplaying/resolve-url` (#4415) を新設。あわせて Misskey プッシュ購読の重複蓄積修正 (#4408)、5.26.0 リリース前レビュー繰越 (#4405)、本リリース前 5観点レビュー由来のログ scrub (#4418)。

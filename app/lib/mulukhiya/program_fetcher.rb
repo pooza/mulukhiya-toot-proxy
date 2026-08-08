@@ -10,12 +10,17 @@ module Mulukhiya
     REDIS_KEY = 'program'.freeze
     DEFAULT_FETCH_MAX_BYTES = 1_048_576
     DEFAULT_FETCH_TIMEOUT = 30
-    # ⚠ Date を許可しないと、**手書きでクォート無しの日付を書いた瞬間に番組表
-    # 全体が読めなくなる** (`next_on: 2026-08-08` → Psych::DisallowedClass)。
-    # var/program.yaml は git 管理外で手編集もありうる。5.28.0 の founded_on と
-    # 同型の footgun なので、読めるようにしたうえで Program 側で文字列へ寄せる
-    # (#4373)。エディタ経由なら to_yaml が '2026-08-08' とクォートする。
-    PERMITTED_YAML_CLASSES = [Symbol, Date].freeze
+    # ⚠ Date / Time を許可しないと、**手書きでクォート無しの日付を書いた瞬間に
+    # 番組表全体が読めなくなる** (Psych::DisallowedClass)。var/program.yaml は
+    # git 管理外で手編集もありうる。5.28.0 の founded_on と同型の footgun なので、
+    # 読めるようにしたうえで Program 側で文字列へ寄せる (#4373 / #4537)。
+    #
+    #   next_on: 2026-08-08          → Date
+    #   next_on: 2026-08-08 09:00:00 → Time（時刻まで書くとこちらに落ちる）
+    #
+    # エディタ経由なら to_yaml が '2026-08-08' とクォートするので無害。
+    # 許可クラスは Ginseng::Config::PERMITTED_YAML_CLASSES に揃えてある。
+    PERMITTED_YAML_CLASSES = [Symbol, Date, Time].freeze
 
     def initialize
       @http = HTTP.new
@@ -61,6 +66,9 @@ module Mulukhiya
       programs = {}
       success = 0
       uris.each do |v|
+        # allowlist 拒否は HEAD を撃つ前に確定させる。プリフライトの rescue へ
+        # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
+        RemoteHost.validate!(v)
         next unless valid_content_length?(v)
         response = @http.get(v, timeout: fetch_timeout, host_validator: RemoteHost.validator)
         next unless valid_response_size?(response, v)
@@ -99,6 +107,8 @@ module Mulukhiya
       # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する。GAS など HEAD を
       # 受け付けないホストは 403/405 を返すが、これは想定内なので黙ってフォール
       # バックし、timeout・5xx 等の異常のみログする (#4397)。
+      # ⚠ allowlist 拒否はここへ来ない (呼び出し元の RemoteHost.validate! で
+      # 確定済み)。ここを通る = ホストは通ってよい、が保たれている (#4535)。
       status = e.respond_to?(:source_status) ? e.source_status : nil
       e.log(url: uri.to_s) unless [403, 405].include?(status)
       return true

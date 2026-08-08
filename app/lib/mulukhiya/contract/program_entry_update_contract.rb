@@ -14,6 +14,8 @@ module Mulukhiya
       optional(:extra_tags).maybe(:array, max_size?: ProgramEntryContract::MAX_TAGS)
       # 次回放送日 (#4373)。nil で解除できる。
       optional(:next_on).maybe(:string, max_size?: ProgramEntryContract::MAX_TEXT_SIZE)
+      # 説明 (#4541)。nil / 空文字で解除できる。
+      optional(:description).maybe(:string, max_size?: ProgramEntryContract::MAX_DESCRIPTION_SIZE)
       optional(:annict_work_id).maybe(:integer)
       optional(:annict_episode_id).maybe(:integer)
       # audit metadata: ProgramEntryContract と同様、書き込み専用で保持する

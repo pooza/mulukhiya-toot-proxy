@@ -2,6 +2,18 @@ module Mulukhiya
   class MastodonController < Controller
     include ControllerMethods
 
+    # ALT 編集 (PUT /api/:version/statuses/:id) で Sentry alert を抑止する
+    # 上流ステータス (#4542)。
+    #
+    # 404 は「編集対象が存在しない・削除済み・リモートの投稿」で出る
+    # **クライアントエラー**。capsicum の操作次第で常時発生しうるので、
+    # alert に乗せるとノイズが積み上がるだけで運用判断に使えない。
+    #
+    # ⚠ 抑止するのは Sentry だけで syslog には残る (controller.rb の
+    # handle_gateway_error)。「上流が /source を廃止して全滅」のような事故は
+    # 頻度・偏りで追える。
+    STATUS_UPDATE_SILENT_STATUSES = [401, 404].freeze
+
     post '/api/:version/statuses' do
       verify_token_integrity!
       tags = TootParser.new(params[:status]).tags
@@ -70,7 +82,7 @@ module Mulukhiya
       @renderer.status = 422
       return @renderer.to_s
     rescue Ginseng::GatewayError => e
-      handle_gateway_error(e)
+      handle_gateway_error(e, silent_statuses: STATUS_UPDATE_SILENT_STATUSES)
       return @renderer.to_s
     end
 

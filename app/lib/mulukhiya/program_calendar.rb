@@ -48,12 +48,16 @@ module Mulukhiya
 
     # 有効 (enable) かつ妥当な start_time を持つエントリのみ。
     # air (エア番組) は抽出条件に含めない。
+    #
+    # VEVENT の順序は購読側 (tomato-shrieker) の挙動に影響しないが、他の面と
+    # 揃えておくと目視でのデバッグが読める (#4540)。
     def entries
-      return @data.select do |_key, entry|
+      selected = @data.select do |_key, entry|
         entry.is_a?(Hash) &&
-            entry['enable'] == true &&
-            valid_start_time?(entry['start_time'])
+          entry['enable'] == true &&
+          valid_start_time?(entry['start_time'])
       end
+      return selected.sort_by {|key, entry| Program.sort_key(key, entry)}.to_h
     end
 
     def valid_start_time?(value)
@@ -64,14 +68,52 @@ module Mulukhiya
     def build_event(key, entry)
       minutes = duration_minutes(entry)
       start = next_occurrence(entry, minutes)
-      return nil unless start
+      unless start
+        log_expired(key, entry)
+        return nil
+      end
       event = Icalendar::Event.new
       event.uid = "program-#{key}@mulukhiya"
       event.dtstamp = utc_value(@now)
       event.dtstart = utc_value(start)
       event.dtend = utc_value(start + (minutes * 60))
       event.summary = summary(entry)
+      text = description(entry)
+      event.description = text if text
       return event
+    end
+
+    # DESCRIPTION (#4541)。RFC 5545 の標準プロパティで、Google カレンダーの
+    # 「説明」欄もこれ。プレーンテキストのみ (改行・カンマのエスケープと
+    # 75 オクテット折り返しは icalendar gem がやる)。
+    #
+    # description があればそれで完全に置き換える。実況準備の注意書きを書く欄
+    # なので、自動生成分と混ぜて埋もれさせない。
+    #
+    # ⚠ 自動生成側に作品名・話数・日時は載せない。SUMMARY と DTSTART/DTEND に
+    # あり、購読側 (tomato-shrieker の calendar.erb) がそれらを本文の前へ出す
+    # ので、重ねると投稿が二重になる。載せるのは他に出所のない extra_tags だけ。
+    def description(entry)
+      value = entry['description']
+      return value.strip if value.is_a?(String) && value.strip.present?
+      return hashtags(entry)
+    end
+
+    # extra_tags をハッシュタグ行にする。
+    #
+    # ⚠ `#` を素で前置しない。`String#to_hashtag` を通す。約物は Mastodon と
+    # Misskey で扱いが割れる (Mastodon は `_ · ・ ZWNJ` 以外を削除、Misskey は
+    # 無加工) ので、素の `#名探偵プリキュア！` は両系で別のタグに落ちる。
+    # to_hashtag は非英数字を一律 `_` へ寄せる = 双方が無変換で通す唯一の形。
+    # 先頭の `#` も落としてから付け直すので二重にならない。
+    def hashtags(entry)
+      tags = entry['extra_tags']
+      return nil unless tags.is_a?(Array)
+      # 正規化すると空になる値 (記号だけのタグ) は落とす。判定は
+      # StatusTagContract と同じ to_hashtag_base で揃える。
+      values = tags.grep(String).reject {|tag| tag.to_hashtag_base.empty?}
+      return nil if values.empty?
+      return values.map(&:to_hashtag).join(' ')
     end
 
     # UTC 値として出力させ、末尾 Z を付与する (tzid: 'UTC' 指定が必要)。
@@ -106,6 +148,27 @@ module Mulukhiya
       candidate = Time.new(now_jst.year, now_jst.month, now_jst.day, hour, minute, 0, TZ_OFFSET)
       candidate += 86_400 if (candidate + (duration_minutes * 60)) <= now_jst
       return candidate
+    end
+
+    # next_on を過ぎて出力から落ちた有効エントリを 1 行 warn する (#4537)。
+    #
+    # 落とすこと自体は fail-closed として正しいが、検知が「誰かが番組表エディタを
+    # 開いて警告バッジを見る」ことだけに依存していた。実況が沈黙する唯一の新経路
+    # なので、ログにだけは残す。.ics は tomato-shrieker が定期 GET するため、
+    # 放置されていれば日次で必ず出る。
+    #
+    # ⚠ 不正値 (書式違反) は scheduled_date が既に error を出しているので、
+    # ここでは鳴らさない (同じ事象で 2 行出すとどちらも読まれなくなる)。
+    def log_expired(key, entry)
+      value = entry['next_on']
+      return unless value.present?
+      return unless ProgramEntryContract.valid_date?(value.to_s)
+      logger.warn(
+        message: 'program next_on expired',
+        key:,
+        next_on: value,
+        series: entry['series'],
+      )
     end
 
     # next_on を Date で返す。不正値は nil (呼び出し側がイベントごと落とす)。

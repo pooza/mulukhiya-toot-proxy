@@ -167,5 +167,20 @@ module Mulukhiya
         @contract.exec(source_url: 'javascript:alert(1)').fetch(:source_url).join,
       )
     end
+
+    # 説明 (#4541)。部分更新なので、送らない・nil で消す・本文を入れるの 3 通り。
+    def test_description_accepts_text_and_unset
+      assert_empty(@contract.call(description: "1 行目\n2 行目").errors)
+      assert_empty(@contract.call(description: nil).errors)
+      assert_empty(@contract.call(series: 'テスト').errors)
+    end
+
+    def test_description_rejects_oversized_text
+      errors = @contract.call(
+        description: 'あ' * (ProgramEntryContract::MAX_DESCRIPTION_SIZE + 1),
+      ).errors
+
+      assert_false(errors.empty?)
+    end
   end
 end

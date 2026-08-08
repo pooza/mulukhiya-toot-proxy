@@ -195,6 +195,18 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # 時刻まで書くと Date ではなく Time で入る。こちらを許可クラスに足していないと
+    # 同じく番組表全体が読めなくなる (#4537)。日付部分だけ拾って文字列へ寄ること。
+    def test_data_coerces_unquoted_yaml_timestamp
+      key = "test_yamltime_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'next_on' => Time.utc(2026, 8, 8, 23, 30)})
+
+      assert_equal('2026-08-08', @program.data[key]['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
     # 同じく、無クォートの start_time は YAML の 60 進数解釈で Integer になる。
     def test_data_coerces_sexagesimal_start_time
       key = "test_sexa_#{Time.now.to_i}"
@@ -443,6 +455,24 @@ module Mulukhiya
 
         assert_includes(@program.data.keys, sentinel_key)
       end
+    ensure
+      @program.save(original) if original
+    end
+
+    # 並び順 (#4540)。Program.sort_key 単体の検証は番組表機能を持たない
+    # controller でも走らせたいので ProgramSortKeyTest に置いている。
+    def test_sorted_data_orders_the_api_payload
+      return if disable?
+      original = @program.data
+      @program.save(
+        'later' => {'series' => '後', 'next_on' => '2036-12-31', 'start_time' => '20:00', 'enable' => true},
+        'daily' => {'series' => '毎日', 'start_time' => '19:00', 'enable' => true},
+        'sooner' => {'series' => '先', 'next_on' => '2036-12-30', 'start_time' => '21:00', 'enable' => true},
+      )
+
+      assert_equal(['sooner', 'later', 'daily'], @program.sorted_data.keys)
+      # data 自体は並べ替えない (編集の read-modify-write が yaml の行順を書き換える)。
+      assert_equal(['later', 'daily', 'sooner'], @program.data.keys)
     ensure
       @program.save(original) if original
     end
