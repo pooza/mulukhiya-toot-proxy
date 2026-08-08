@@ -401,12 +401,12 @@ GEM
     sassc (2.4.0)
       ffi (~> 1.9)
     securerandom (0.4.1)
-    sentry-ruby (6.6.2)
+    sentry-ruby (6.7.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
-    sentry-sidekiq (6.6.2)
-      sentry-ruby (~> 6.6.2)
+    sentry-sidekiq (6.7.0)
+      sentry-ruby (~> 6.7.0)
       sidekiq (>= 5.0)
     sequel (5.107.0)
       bigdecimal
@@ -439,7 +439,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.14)
     syslog (0.4.0)
       logger
-    temple (0.10.4)
+    temple (0.10.6)
     test-unit (3.7.8)
       power_assert
     thor (1.5.0)
