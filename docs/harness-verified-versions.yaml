@@ -37,8 +37,16 @@ misskey:
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-05'
+last_checked: '2026-08-08'
 
+# 2026-08-08 チェック結果:
+#   - Mastodon: **stable v4.6.5（2026-08-06）が出ており verified（v4.6.4）より新しい**。
+#     本番 4 台は 2026-08-07 に 4.6.5 へアップグレード済み（infra-note の Mastodon アップグレード節）。
+#     harness 側はピンだけ 4.6.5 へ上げてあり**実行が未了**で、追跡は pooza/chubo2#153。
+#     verified の昇格はその検証が緑になってから行う（ここでは bump しない）。
+#     ⚠ harness の update-version.sh が .env.example を更新せずピンが 2 箇所でずれる既知問題あり（pooza/chubo2#152）。
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。
+#
 # 2026-08-05 チェック結果:
 #   - Mastodon: 最新 stable は v4.6.4（2026-07-27）のままで verified と同一。RC もなし。対応不要。
 #   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。

@@ -337,6 +337,10 @@ GitHub マイルストーン作成済み。**土台テーマは「テストが�
 - **#4536** `disable_gate` テストの盲点
 - **#4537** 緑まとめ
 
+### マイルストーン未割当（2026-08-08 のセッション同期で起票）
+
+- **#4542 obs: ALT 編集の PUT でクライアント起因の 404 が Sentry に alert される（size:S）** — Sentry `MULUKHIYA-TOOT-PROXY-2D`（08-04・4 件）と `2E`（08-07・1 件）が同一シグネチャ。`fetch_status_source` の 404 は編集対象が存在しない／削除済み／リモート、つまりクライアントエラーなのに `handle_gateway_error` の既定 `silent_statuses: [401]` のまま alert に乗る。**#4480 のトリアージで「alert 条件に 404 を含めるかは #4480 で判断」としたまま、#4480 が透過の話だけで閉じた取り残し**。抑止するのは Sentry だけで syslog には残す（`app/lib/mulukhiya/controller.rb` の設計どおり）。マイルストーンは未割当
+
 ### マイルストーン外の繰越（着手条件待ち）
 
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
