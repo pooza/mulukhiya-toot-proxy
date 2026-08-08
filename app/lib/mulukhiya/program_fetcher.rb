@@ -61,6 +61,9 @@ module Mulukhiya
       programs = {}
       success = 0
       uris.each do |v|
+        # allowlist 拒否は HEAD を撃つ前に確定させる。プリフライトの rescue へ
+        # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
+        RemoteHost.validate!(v)
         next unless valid_content_length?(v)
         response = @http.get(v, timeout: fetch_timeout, host_validator: RemoteHost.validator)
         next unless valid_response_size?(response, v)
@@ -99,6 +102,8 @@ module Mulukhiya
       # HEAD 非対応・一過性障害は判定不能。GET 側で再評価する。GAS など HEAD を
       # 受け付けないホストは 403/405 を返すが、これは想定内なので黙ってフォール
       # バックし、timeout・5xx 等の異常のみログする (#4397)。
+      # ⚠ allowlist 拒否はここへ来ない (呼び出し元の RemoteHost.validate! で
+      # 確定済み)。ここを通る = ホストは通ってよい、が保たれている (#4535)。
       status = e.respond_to?(:source_status) ? e.source_status : nil
       e.log(url: uri.to_s) unless [403, 405].include?(status)
       return true

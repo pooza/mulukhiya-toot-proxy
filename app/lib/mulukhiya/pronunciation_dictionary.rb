@@ -158,6 +158,9 @@ module Mulukhiya
     end
 
     def fetch_one(uri)
+      # allowlist 拒否は HEAD を撃つ前に確定させる。プリフライトの rescue へ
+      # 渡すと「判定不能」として GET へ倒れてしまう (#4535)。
+      RemoteHost.validate!(uri)
       return nil unless valid_content_length?(uri)
       response = @http.get(uri, timeout: fetch_timeout, host_validator: RemoteHost.validator)
       return nil unless valid_response_size?(response, uri)
@@ -204,6 +207,8 @@ module Mulukhiya
       # GAS など HEAD 非対応のホストは 403/405 を返す。これは想定内なので黙って GET へ
       # フォールバックし (GET 側 valid_response_size? が最終防衛線)、timeout・5xx 等の
       # 異常のみログする。GAS は Content-Length も返さず事前チェックは効かない (#4397)。
+      # ⚠ allowlist 拒否はここへ来ない (呼び出し元の RemoteHost.validate! で確定済み)。
+      # ここを通る = ホストは通ってよい、が保たれている (#4535)。
       status = e.respond_to?(:source_status) ? e.source_status : nil
       e.log(url: uri.to_s) unless [403, 405].include?(status)
       return true

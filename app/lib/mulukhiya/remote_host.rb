@@ -50,6 +50,19 @@ module Mulukhiya
       attr_writer :validator
     end
 
+    # allowlist を通らないホストで GatewayError を投げる (#4535)。
+    #
+    # HEAD プリフライトの rescue は「HEAD 非対応・一過性障害 = 判定不能」を
+    # GET へ倒すためのもの。allowlist 拒否まで同じ rescue が飲むと
+    # 「プリフライトが true = GET してよい」が成り立たなくなり、GET 側の
+    # host_validator が外れた瞬間に無検証へ戻る。拒否は HEAD を撃つ前に
+    # ここで確定させ、URL 単位の rescue へ渡す（拒否 1 件につきログも 1 本）。
+    def self.validate!(uri)
+      host = uri.respond_to?(:host) ? uri.host.to_s : uri.to_s
+      return true if validator.call(host)
+      raise Ginseng::GatewayError, "Rejected host '#{host}'"
+    end
+
     # Addrinfo.getaddrinfo は timeout を持てず、攻撃者が応答を引き延ばす権威
     # DNS を立てると Sinatra リクエストスレッド (Puma 5 本) を飽和させられる。
     # Resolv::DNS#timeouts= で 1 回あたりの解決待ちを上限化する。タイムアウト

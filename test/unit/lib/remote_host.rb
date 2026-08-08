@@ -101,5 +101,26 @@ module Mulukhiya
       assert_equal(RemoteHost.dns_timeout, applied)
       assert_equal(['93.184.216.34', '2606:2800:220:1::1'], result)
     end
+
+    # validate! は allowlist 拒否を「判定不能」と区別するための入口 (#4535)。
+    # 拒否したときに **実際に例外になる**ことを正で押さえる。
+    def test_validate_raises_for_rejected_host
+      RemoteHost.validator = ->(_host) {false}
+
+      assert_raise(Ginseng::GatewayError) do
+        RemoteHost.validate!(Ginseng::URI.parse('http://169.254.169.254/latest/meta-data/'))
+      end
+    ensure
+      RemoteHost.validator = nil
+    end
+
+    def test_validate_passes_for_permitted_host
+      RemoteHost.validator = ->(host) {host == 'www.example.jp'}
+
+      assert_true(RemoteHost.validate!(Ginseng::URI.parse('https://www.example.jp/foo')))
+      assert_true(RemoteHost.validate!('www.example.jp'))
+    ensure
+      RemoteHost.validator = nil
+    end
   end
 end

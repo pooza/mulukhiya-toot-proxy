@@ -23,17 +23,44 @@ module Mulukhiya
 
     private
 
+    # ⚠ 各ホップを必ず SSRF allowlist に通す (#4535)。
+    #
+    # ホップ追従は Ginseng::HTTP の host_validator に任せられない。あちらは
+    # 追従まで肩代わりして最終レスポンスだけ返すので、**最終 URL が取れず**
+    # 短縮 URL の展開そのものが成立しない。追うのがこちらである以上、検証も
+    # こちらの責務になる。
+    #
+    # 通さないと、rewritable? が無条件で許す t.co の短縮 URL 1 本で
+    # `http://169.254.169.254/...` 等へ GET を撃たせられる（本文は捨てるので
+    # ブラインドだが、内部エンドポイントへの到達は成立する）。#4410 / #4523 の
+    # 掃討の続き。
     def resolve_redirects(source)
+      return source unless permitted_host?(source)
       dest = source.clone
       redirects = 0
       while redirects < MAX_REDIRECTS
         next_uri, status = fetch_redirect(dest)
         break unless next_uri
         break unless (status / 100) == 3
+        # ⚠ GET を撃たないだけでは足りない。dest にしてしまうと、投稿本文が
+        # 内部 URL へ書き換わったまま連合に流れる。
+        break unless permitted_host?(next_uri)
         dest = next_uri
         redirects += 1
       end
       return dest
+    end
+
+    # 検証は「GET する直前の 1 回」で足りる。あるホップの next_uri は次の
+    # ホップの src なので、ここで通したものだけが fetch_redirect へ渡る。
+    def permitted_host?(uri)
+      return true if RemoteHost.validator.call(uri.host.to_s)
+      errors.push(
+        class: Ginseng::GatewayError.to_s,
+        message: "Rejected host '#{uri.host}'",
+        url: uri.to_s,
+      )
+      return false
     end
 
     def fetch_redirect(src)
