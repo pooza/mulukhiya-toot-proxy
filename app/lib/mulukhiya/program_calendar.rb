@@ -68,7 +68,10 @@ module Mulukhiya
     def build_event(key, entry)
       minutes = duration_minutes(entry)
       start = next_occurrence(entry, minutes)
-      return nil unless start
+      unless start
+        log_expired(key, entry)
+        return nil
+      end
       event = Icalendar::Event.new
       event.uid = "program-#{key}@mulukhiya"
       event.dtstamp = utc_value(@now)
@@ -145,6 +148,27 @@ module Mulukhiya
       candidate = Time.new(now_jst.year, now_jst.month, now_jst.day, hour, minute, 0, TZ_OFFSET)
       candidate += 86_400 if (candidate + (duration_minutes * 60)) <= now_jst
       return candidate
+    end
+
+    # next_on を過ぎて出力から落ちた有効エントリを 1 行 warn する (#4537)。
+    #
+    # 落とすこと自体は fail-closed として正しいが、検知が「誰かが番組表エディタを
+    # 開いて警告バッジを見る」ことだけに依存していた。実況が沈黙する唯一の新経路
+    # なので、ログにだけは残す。.ics は tomato-shrieker が定期 GET するため、
+    # 放置されていれば日次で必ず出る。
+    #
+    # ⚠ 不正値 (書式違反) は scheduled_date が既に error を出しているので、
+    # ここでは鳴らさない (同じ事象で 2 行出すとどちらも読まれなくなる)。
+    def log_expired(key, entry)
+      value = entry['next_on']
+      return unless value.present?
+      return unless ProgramEntryContract.valid_date?(value.to_s)
+      logger.warn(
+        message: 'program next_on expired',
+        key:,
+        next_on: value,
+        series: entry['series'],
+      )
     end
 
     # next_on を Date で返す。不正値は nil (呼び出し側がイベントごと落とす)。

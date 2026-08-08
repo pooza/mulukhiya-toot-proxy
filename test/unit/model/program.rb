@@ -195,6 +195,18 @@ module Mulukhiya
       @program.save(original) if original
     end
 
+    # 時刻まで書くと Date ではなく Time で入る。こちらを許可クラスに足していないと
+    # 同じく番組表全体が読めなくなる (#4537)。日付部分だけ拾って文字列へ寄ること。
+    def test_data_coerces_unquoted_yaml_timestamp
+      key = "test_yamltime_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'next_on' => Time.utc(2026, 8, 8, 23, 30)})
+
+      assert_equal('2026-08-08', @program.data[key]['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
     # 同じく、無クォートの start_time は YAML の 60 進数解釈で Integer になる。
     def test_data_coerces_sexagesimal_start_time
       key = "test_sexa_#{Time.now.to_i}"
