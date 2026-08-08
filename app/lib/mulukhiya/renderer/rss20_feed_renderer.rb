@@ -23,10 +23,27 @@ module Mulukhiya
           "CustomFeed command failed (exit #{command.status}): #{command.stderr}"
       end
       self.entries = parse_entries(command.stdout)
-      render_storage[command] = feed.to_s
+      rendered = feed.to_s
+      log_unresolved_enclosures
+      render_storage[command] = rendered
     end
 
     alias save cache
+
+    # 相対 URL を base で絶対化する (#4549)。絶対化できなければ nil。
+    #
+    # ⚠ インスタンスメソッドにしない。インスタンスは SNS (DB) と Redis を掴むので、
+    # DB の無い環境ではテストがケースごと omit され、**この判定が一度も走らない**。
+    def self.absolute_uri(value, base)
+      return nil if value.blank?
+      uri = Ginseng::URI.parse(value.to_s)
+      return uri.to_s if uri.absolute?
+      return nil if base.blank?
+      return ::URI.join(base.to_s, value.to_s).to_s
+    rescue
+      # 相対解決に失敗する値 (制御文字入り等) は enclosure ごと落とす。
+      return nil
+    end
 
     def clear
       render_storage.unlink(command)
@@ -51,13 +68,50 @@ module Mulukhiya
       return []
     end
 
+    # ⚠ 相対 URL はここで絶対化する (#4549)。
+    #
+    # 基底クラスは `@http.base_uri = channel[:link]` を置いて Ginseng::HTTP#create_uri に
+    # 解決させていたが、こちらは fetch_image を上書きして MediaMetadataStorage
+    # (base_uri を持たない別の HTTP) へ委譲したので、その解決だけが落ちていた。
+    # サイト相対の画像 URL を返すフィード (dqdai-anime) は **サムネイルが全滅**したうえ、
+    # 5 分おきに `base_uri undefined` をエントリ数ぶん吐き続けていた (日 2 万行)。
     def fetch_image(uri)
-      return nil unless uri
+      return nil unless uri = absolute_uri(uri)
       metadata_storage.push(uri) unless metadata_storage.key?(uri)
       return metadata_storage[uri]
     rescue => e
-      e.log
+      e.log(uri: uri.to_s)
       return nil
+    end
+
+    # channel の link を基準に絶対 URL へ寄せる。絶対化できない値は nil を返して
+    # enclosure ごと落とす (壊れた URL を enclosure に載せない)。
+    def absolute_uri(value)
+      return nil if value.blank?
+      return self.class.absolute_uri(value, @http.base_uri) || unresolved_enclosure(value)
+    end
+
+    # 絶対化できなかった値を覚えておく。⚠ **ここで 1 件ずつログを出さない。**
+    # エントリごとに出すと 5 分おきにエントリ数ぶん積み上がる (#4549 の再来)。
+    # まとめて 1 行にするのは log_unresolved_enclosures の仕事。
+    def unresolved_enclosure(value)
+      unresolved_enclosures.push(value.to_s)
+      return nil
+    end
+
+    def unresolved_enclosures
+      @unresolved_enclosures ||= []
+      return @unresolved_enclosures
+    end
+
+    def log_unresolved_enclosures
+      return if unresolved_enclosures.empty?
+      logger.warn(
+        message: 'feed enclosure url unresolved',
+        link: channel[:link].to_s,
+        count: unresolved_enclosures.size,
+        sample: unresolved_enclosures.first,
+      )
     end
   end
 end
