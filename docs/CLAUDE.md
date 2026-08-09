@@ -390,8 +390,12 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
   - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
 - **#4508 chore: sinatra 4.2.1 / rack-protection 4.2.1 / tilt 2.8.0 へ更新** — PR #4556。pin はモロヘイヤ側でなく **`pooza/ginseng-web` の gemspec** にあったので、そちらを `~>` から `>=` へ緩めるのが前提作業だった（pooza/ginseng-web#116 / 1.3.46。CVE-2024-21510 の下限 4.1.0 は保つ）
   - ⚠ **起票時の前提が 1 つ違っていた。`mustermann 4.0.0` はこの更新では入らない**（sinatra 4.2.1 が `~>3.0` を要求する）。**メジャー跨ぎを含まない更新**だった
-  - **#4503 のゲートの初適用。**Mastodon（v4.6.5）1001 tests / 0 failures / 0 errors / 152 omissions ＝基準値と完全一致、Misskey（2026.7.0）1004 tests / 3 failures（#4492 の既知集合と完全一致）/ 0 errors / 139 omissions。新規の失敗ゼロ
-  - 副産物: **ゲート文言「両系 0 failures」が #4492 のせいで今日時点では満たせない**ことが露見し、[test-harness.md](test-harness.md) に既知例外として名指しした（#4492 が閉じたら消す）
+  - **#4503 のゲートの初適用。**Mastodon（v4.6.5）1001 tests / 0 failures / 0 errors / 152 omissions ＝基準値と完全一致、Misskey（2026.7.0）1004 tests / 3 failures（当時の #4492 の既知集合と完全一致）/ 0 errors / 139 omissions。新規の失敗ゼロ
+  - 副産物: **ゲート文言「両系 0 failures」が #4492 のせいで満たせない**ことが露見した。直後に #4492 を解消したので例外は残っていない
+- **#4492 test: Misskey harness で恒常的に落ちる 3 件を解消** — PR #4557。**3 件のうち 1 件は harness 側の実バグ**で pooza/chubo2#161 / #162 で直した。これで **`project_harness-zero-error-goal`（両系エラー 0）を達成**
+  - ⚠ **`WebhookImageHandlerTest#test_handle_pre_webhook` は製品もテストも変更していない。**Misskey harness の `files` ボリュームが root 所有で、uid 991 の misskey が書けず drive アップロードが `EACCES` → 500 で全滅していた。**起票時の「Amazon の外部依存が原因」は誤り**（当該 URL は 200 を返していた）。harness が drive を一度も通していなかったので露見しなかった
+  - `SNSServiceTest#test_access_token` — Misskey の `access_token` 行は MiAuth / OAuth の認可時にしか作られず、harness が発行するのは**ユーザー固有トークン**なのでテーブルは 0 行。honest omit に。⚠ **Mastodon は Doorkeeper のトークン行を持つので対象外**にし、素通しさせている
+  - `WebhookTest#test_command` — omit ガードが HTML エラーページ前提だった。⚠ **Misskey harness は nginx を挟まない**ので Fastify が 404 の JSON 包絡を返し、ガードが素通りしていた
 - **#4516 / #4552 test/bug: harness 実走で常態化していた失敗 5 件をテスト側から解消** — PR #4553。5 件とも product の退行ではなく**検証側の前提ズレ**だったので、テスト側に寄せて **1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）** にした
   - `SNSServiceTest#test_info` — ⚠ **`metadata.maintainer` を出すのは Misskey だけ**。Mastodon はフォークの `pooza/mastodon` も `nodeName` / `nodeDescription` しか返さないので、**本番 3 台でも `maintainer_name` は nil**。harness 固有の欠落ではない（起票時の「harness に contact account を設定すれば直る」は誤り）。副次的に `MediaFeedRenderer` の RSS author は Mastodon で常に nil
   - `MediaFeedRendererTest#test_to_s` — omit ガードを `#fetch` の描画条件と同じ順に並べ直した。`media_catalog?` が false なら entries は空のまま返る（既定 OFF・#4343）。**harness では依然 `<item>` の描画が検証されない**ので、通したければ harness 側で `media_catalog` を有効にする必要がある（chubo2#64 の続き）
@@ -403,13 +407,12 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 
 **Mastodon v4.6.5 を 2026-08-09 に検証・verified 昇格**（pooza/chubo2#153 クローズ）。同一の mulukhiya HEAD を v4.6.5 / v4.6.4 でクリーン再構築して実走・比較し、**失敗集合の一致＝退行ゼロ**を確認した（1001 tests / 0 errors、両版で omission 完全一致）。詳細は [harness-verified-versions.yaml](harness-verified-versions.yaml) の 2026-08-09 節。
 
-⚠ **07-30 の 879 tests / 0 failures とは比較にならない。** #4503 の可視化と harness のトークン供給で実行本数が増え、これまで走っていなかったテストが初めてアサートしている。**「前回 0 failures だったのに増えた」を退行と読まないこと。**上記 5 件の解消で Mastodon 側は再び 0 failures / 0 errors。**Misskey 側は #4492 の 3 件が残っている。**
+⚠ **07-30 の 879 tests / 0 failures とは比較にならない。** #4503 の可視化と harness のトークン供給で実行本数が増え、これまで走っていなかったテストが初めてアサートしている。**「前回 0 failures だったのに増えた」を退行と読まないこと。**上記 5 件の解消で Mastodon 側は再び 0 failures / 0 errors になり、**#4492 の解消で Misskey 側も 0 failures / 0 errors**（1004 tests / 141 omissions）。両系エラー 0 の目標を達成した。
 
 ### マイルストーン外の繰越（着手条件待ち）
 
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
 - **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63 と対。chubo2 側の着地待ち
-- **#4492 test: Misskey ハーネスで恒常的に落ちる 3 件を omit / 是正する（size:S）**
 
 ## 投稿レイテンシ調査の記録（#4464・2026-08-02 完了）
 
@@ -733,7 +736,6 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - **辞書スキャンの最適化** — #4463（メモ化・辞書キャッシュ・regex 事前コンパイル）/ #4465（`TaggingDictionary#matches` の索引化）。5.30.0 で「次に削るなら辞書スキャンの CPU」と結論したが、**推測で着手しない**（計装で裏を取ってから）
 - **stlf_probe まわり** — #4471 / #4476。インフラ寄りで chubo2 側の判定と対
 - **#4478** FreeBSD の rc スクリプトが SSH 越しの restart で戻ってこない
-- **#4492** Misskey ハーネスで恒常的に落ちる 3 件の omit / 是正（size:S）
 - **on-hold 群** — #3157 / #3877 / #4195 / #4196 / #4197 / #4229 / #4298 / #4301
 
 5.22.x 以前のリリースノートは [release-history.md](archive/release-history.md) を参照。
