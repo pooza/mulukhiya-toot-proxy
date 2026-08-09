@@ -8,7 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        controller: [mastodon, misskey]
+        # omission_baseline は「CI（実インスタンス非保持）で omission になるテストの
+        # 上限件数」。CI には SNS も Mastodon の Postgres も無いため、アカウント依存の
+        # テストは実行されず omission になる。この件数が黙って増えると
+        # 「守れているつもりの緑」が広がるので、超えたら CI を落とす (#4503)。
+        # 意図してテストを増やしたときは、この数値を実測に合わせて更新する。
+        include:
+          - controller: mastodon
+            omission_baseline: 313
+          - controller: misskey
+            omission_baseline: 302
     services:
       redis:
         image: redis:7
@@ -42,4 +51,38 @@ jobs:
           bundle exec rake lint
       - name: Run test (${{ matrix.controller }})
         run: |
-          bundle exec rake test
+          set -o pipefail
+          bundle exec rake test 2>&1 | tee test-result.log
+      - name: Report omissions (${{ matrix.controller }})
+        if: always()
+        env:
+          BASELINE: ${{ matrix.omission_baseline }}
+        run: |
+          if [ ! -f test-result.log ]; then
+            echo "::warning::テストが実行されなかったため omission を集計できません"
+            exit 0
+          fi
+          summary="$(grep -E '^[0-9]+ tests, ' test-result.log | tail -1 || true)"
+          omissions="$(printf '%s' "$summary" | sed -nE 's/.*, ([0-9]+) omissions.*/\1/p')"
+          {
+            echo "## ${{ matrix.controller }}"
+            echo
+            echo '```'
+            echo "${summary:-集計行が見つかりませんでした}"
+            echo '```'
+            echo
+            echo "CI は実インスタンス（SNS + Mastodon の Postgres）を持たないため、"
+            echo "**アカウント依存のテストは実行されず omission になる（${omissions:-?} 件 / 上限 ${BASELINE}）。**"
+            echo "test-unit はこの状態でも \`100% passed\` と出すので、**CI の緑だけをリリース判断の根拠にできない**。"
+            echo "リリース前に chubo2 fedi-test-harness で実走し、Mastodon / Misskey 両系で"
+            echo "0 failures / 0 errors を確認すること（手順は docs/test-harness.md、経緯は #4503）。"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$omissions" ]; then
+            echo "::warning::omission 件数を集計できませんでした"
+            exit 0
+          fi
+          if [ "$omissions" -gt "$BASELINE" ]; then
+            echo "::error::omission が ${omissions} 件で上限 ${BASELINE} を超えました。実行されていないテストが増えています (#4503)"
+            exit 1
+          fi
+          echo "::notice::omission ${omissions} 件 / 上限 ${BASELINE}"

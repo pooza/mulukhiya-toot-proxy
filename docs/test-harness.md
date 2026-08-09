@@ -89,6 +89,30 @@ set -a; source ~/repos/chubo2/fedi-test-harness/misskey/.env.test; set +a
 bundle exec rake test
 ```
 
+## リリースゲートとしての実走（省略不可）
+
+**この実走はリリース手順の必須ステップ**（docs/CLAUDE.md「リリース運用 → 通常リリース手順」）。
+CI には実インスタンスが無く、アカウント依存のテスト 300 件超が omission のまま
+`100% passed` と出るため、**CI の緑はこのゲートの代わりにならない**（#4503）。
+
+判定基準:
+
+- **Mastodon 系・Misskey 系の両方で `0 failures / 0 errors`。**片系だけでは不可
+- 両系とも `develop` の同一 HEAD で走らせる
+- omission は許容する（harness が構造的に提供しない範囲 = デーモン層・webhook・streaming・
+  nodeinfo・seed 等を `harness?` で omit しているため）。ただし**件数が前回から大きく増えて
+  いたら中身を見る**。無害な omit の増加と、前提が壊れて実行されなくなった退行は区別がつかない
+
+失敗が出たときの切り分け:
+
+- **product の退行か、検証側の前提ズレか**を先に決める。2026-08-09 の 5 件（#4516 / #4552）は
+  **5 件とも検証側**だった。「harness で落ちた = 本番が壊れている」ではない
+- 疑わしいときは、**上流バージョンを 1 つ落として同一 HEAD でクリーン再構築**し、失敗集合が
+  一致するかを見る（2026-08-09 の Mastodon v4.6.5 検証で使った手）。一致すれば上流起因ではない
+
+記録先: [harness-verified-versions.yaml](harness-verified-versions.yaml)。上流バージョンの
+`verified` 昇格を伴う実走は、この台帳に日付つきで残す。
+
 ## 後片付け
 
 ```sh

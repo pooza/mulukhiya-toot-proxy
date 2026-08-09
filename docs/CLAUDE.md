@@ -363,12 +363,12 @@ shallu / zugoga / sweep / gomander、全台 version 5.31.0 / health 200 / `yjit_
 ## 次期マイルストーン: 5.33.0
 
 **土台テーマは「テストが実際に走っていない」の解消**で、#4503 → #4508 の順に扱う（5.32.0 から丸ごと繰り越し）。
+**#4503 は 2026-08-09 に着地**（CI で走らせる方向は採らず、harness 実走のゲート化で決着）。次は #4508。
 GitHub マイルストーン作成済み（#631）。バージョンバンプは 2026-08-08 に実施。
 
 ### 未着手
 
-- **#4503 test: アカウント依存のテスト 311 件が CI・手元のいずれでも実行されていない** — `/agent/test/token` が現存アカウントに解決しない。**5.30.0 / 5.31.0 のリリース判断でも、この範囲は CI の緑を根拠にできなかった**
-- **#4508 chore: sinatra 4.2 系 / mustermann 4.0 / tilt 2.8 への更新** — 全リクエストが通る層のメジャー更新なのに、#4503 のせいでコントローラ層のテストが CI で 1 件も走らず**緑を検証根拠にできない**。#4503 の後に置く
+- **#4508 chore: sinatra 4.2 系 / mustermann 4.0 / tilt 2.8 への更新** — 全リクエストが通る層のメジャー更新。コントローラ層は CI では走らない（omission）ので、**harness 実走を検証根拠にする**（#4503 で正式ゲート化済み）
 - **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — `RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証した IP アドレスで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
 
 ### 5.31.0 レビュー由来の受け皿 Issue（残り）
@@ -385,6 +385,10 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 
 ### 着地済み（2026-08-09）
 
+- **#4503 test: アカウント依存のテストが CI・手元で 1 件も走っていない** — **CI で走らせる方向は採らず、harness 実走をリリースゲートとして正式化する形で決着**した。CI には SNS の実インスタンスも Mastodon の Postgres も無く、`config['/mastodon/url']` は `https://ci.example.com` のダミーなので、アカウント依存テストは**構造的に**走らない。3 点で着地:
+  - **報告の是正（済）**: pooza/ginseng-core#488 / #489 で `disable?` を omission 報告に。実測 **929 tests 中 313 件が omission**（それまでは pass に混ざっていた）
+  - **可視化とラチェット**: CI がジョブサマリに集計行と omission 件数を出し、`.github/workflows/test.yml` の `omission_baseline` を超えたら落ちる。⚠ **test-unit は 313 件 omission でも `100% passed` と出す**ので、集計行を読まないと気づけない
+  - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
 - **#4516 / #4552 test/bug: harness 実走で常態化していた失敗 5 件をテスト側から解消** — PR #4553。5 件とも product の退行ではなく**検証側の前提ズレ**だったので、テスト側に寄せて **1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）** にした
   - `SNSServiceTest#test_info` — ⚠ **`metadata.maintainer` を出すのは Misskey だけ**。Mastodon はフォークの `pooza/mastodon` も `nodeName` / `nodeDescription` しか返さないので、**本番 3 台でも `maintainer_name` は nil**。harness 固有の欠落ではない（起票時の「harness に contact account を設定すれば直る」は誤り）。副次的に `MediaFeedRenderer` の RSS author は Mastodon で常に nil
   - `MediaFeedRendererTest#test_to_s` — omit ガードを `#fetch` の描画条件と同じ順に並べ直した。`media_catalog?` が false なら entries は空のまま返る（既定 OFF・#4343）。**harness では依然 `<item>` の描画が検証されない**ので、通したければ harness 側で `media_catalog` を有効にする必要がある（chubo2#64 の続き）
@@ -810,7 +814,7 @@ chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/i
 - **一次対策は棚卸しではない。**インフラの調査・変更を終えたら、**その作業の一部として**
   chubo2 の `docs/infra-note.md`（現在の状態・手順・罠・運用方針）または
   `docs/infra-history.md`（日付のある出来事）に落とす。Issue とメモリだけで済ませない。
-  「リリース運用 → 通常リリース手順」10.「リリース後の更新」と同じ扱いにする
+  「リリース運用 → 通常リリース手順」の「リリース後の更新」と同じ扱いにする
 - 取りこぼしの回収は chubo2 の [docs/doc-maintenance.md](https://github.com/pooza/chubo2/blob/main/docs/doc-maintenance.md) の手順で行う。
   `docs/infra-note.md` 冒頭の「最終ドキュメント棚卸し」が起点。**§6-2 の Issue 棚卸しとは軸が違う**
   （あちらは open Issue の生死、こちらは知見の置き場所）。大きめの作業トラックが終わったとき、
@@ -885,6 +889,22 @@ GitHub Actions (`.github/workflows/test.yml`):
 - 個別テスト実行: `bin/test.rb ケース名`
 - 依存: ffmpeg, libidn11-dev, libvips-dev
 
+### CI の緑が意味しないこと（#4503）
+
+CI には SNS の実インスタンスも Mastodon の Postgres も無い。`Ginseng::TestCase#run_test` は
+`disable?` のケースを **omission** として報告する（pooza/ginseng-core#488）ので実行されていない
+ことは出力に現れるが、**test-unit はそれでも `100% passed` と表示する**。実測で
+**929 tests 中 313 件が omission**（= 一度も実行されていない。2026-08-09 の CI 実測は
+mastodon 313 件 / misskey 302 件）。
+
+- **CI の緑をリリース判断の根拠にしない。**実インスタンスを要する範囲（`user_config` /
+  `compose_template` / handler 系など）は、chubo2 fedi-test-harness の実走でしか検証できない。
+  リリース手順に必須ゲートとして組み込んである
+- CI は毎回ジョブサマリに集計行と omission 件数を出す。**omission が
+  `.github/workflows/test.yml` の `omission_baseline` を超えると CI が落ちる**。
+  実行されないテストが黙って増えるのを止めるためのラチェットなので、意図して増やしたときは
+  baseline を実測に合わせて更新する
+
 ## ディレクトリ構成（主要）
 
 ```text
@@ -927,13 +947,14 @@ test/
 1. **マイルストーンのIssueをすべて消化**
 2. **リリース前レビュー**: 下記「リリース前レビュー」の 5 観点並列レビューを実施。必修（赤）のみ本リリースで対応し、残り（黄・緑）は Issue 起票して次リリース以降へ
 3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
-4. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
-5. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version` を更新
-6. **リリースPR作成**: `develop` → `main` へPRを作成
-7. **CI緑を確認してマージ**: `gh run list` でステータス確認、`in_progress` なら `gh run watch` で待つ。コードが同一でも CI 結果を踏んでからマージする
-8. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`。フォーマットは [release-notes-template.md](release-notes-template.md) 参照
-9. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
-10. **リリース後の更新**:
+4. **harness 実走（省略不可）**: chubo2 fedi-test-harness で `develop` の HEAD を実走し、**Mastodon 系・Misskey 系の両方で 0 failures / 0 errors** を確認する。手順は [test-harness.md](test-harness.md)「リリースゲートとしての実走」節。**CI の緑はこのゲートの代わりにならない**（CI は実インスタンスを持たないため、アカウント依存のテスト 300 件超が omission のまま `100% passed` と出る。#4503）
+5. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
+6. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version` を更新
+7. **リリースPR作成**: `develop` → `main` へPRを作成
+8. **CI緑を確認してマージ**: `gh run list` でステータス確認、`in_progress` なら `gh run watch` で待つ。コードが同一でも CI 結果を踏んでからマージする
+9. **タグ・リリースノート作成**: `gh release create vX.Y.Z --target main --title "X.Y.Z"`。フォーマットは [release-notes-template.md](release-notes-template.md) 参照
+10. **本番デプロイ**: 全サーバーにデプロイ（sidekiq → puma → listener の順で再起動。monit停止 → restart → monit開始）
+11. **リリース後の更新**:
     - docs/CLAUDE.md: 「開発中」→「リリース済み」に変更、次バージョンのセクション追加。**直近 3 マイナーのみ残し、4 マイナー前以前は [archive/release-history.md](archive/release-history.md) へ移動する**（例: 5.20.0 リリース時に 5.17.x をアーカイブへ）
     - Wiki: リリース内容に応じて [Wiki](https://github.com/pooza/mulukhiya-toot-proxy/wiki) の更新が必要か確認（設定変更、API追加、廃止機能など）。**当該バージョンだけでなく直近 2〜3 バージョン分の反映漏れも合わせてチェックする**
     - インフラノート（`pooza/chubo2` の `docs/infra-note.md`）: 作業履歴セクションにデプロイ記録を追記（デプロイ日・バージョン・主な変更内容・特記事項）
