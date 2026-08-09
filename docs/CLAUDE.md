@@ -363,12 +363,11 @@ shallu / zugoga / sweep / gomander、全台 version 5.31.0 / health 200 / `yjit_
 ## 次期マイルストーン: 5.33.0
 
 **土台テーマは「テストが実際に走っていない」の解消**で、#4503 → #4508 の順に扱う（5.32.0 から丸ごと繰り越し）。
-**#4503 は 2026-08-09 に着地**（CI で走らせる方向は採らず、harness 実走のゲート化で決着）。次は #4508。
+**#4503 / #4508 とも 2026-08-09 に着地し、土台テーマは完了。**残りは #4524 と受け皿 Issue。
 GitHub マイルストーン作成済み（#631）。バージョンバンプは 2026-08-08 に実施。
 
 ### 未着手
 
-- **#4508 chore: sinatra 4.2 系 / mustermann 4.0 / tilt 2.8 への更新** — 全リクエストが通る層のメジャー更新。コントローラ層は CI では走らない（omission）ので、**harness 実走を検証根拠にする**（#4503 で正式ゲート化済み）
 - **#4524 security: SSRF allowlist が DNS リバインディングを防げない** — `RemoteHost.public?` が**名前で検証して名前で接続する**構造。検証した IP アドレスで接続する（pinning）のが本筋で `Ginseng::HTTP` 側の変更になる。到達には管理者が設定した URL のホスト（またはリダイレクト先）の DNS を握る必要があり外部からの直撃はできないが、番組表 URL は外部ドメイン（GAS 等）なので前提が崩れうる
 
 ### 5.31.0 レビュー由来の受け皿 Issue（残り）
@@ -389,6 +388,10 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
   - **報告の是正（済）**: pooza/ginseng-core#488 / #489 で `disable?` を omission 報告に。実測 **929 tests 中 313 件が omission**（それまでは pass に混ざっていた）
   - **可視化とラチェット**: CI がジョブサマリに集計行と omission 件数を出し、`.github/workflows/test.yml` の `omission_baseline` を超えたら落ちる。⚠ **test-unit は 313 件 omission でも `100% passed` と出す**ので、集計行を読まないと気づけない
   - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
+- **#4508 chore: sinatra 4.2.1 / rack-protection 4.2.1 / tilt 2.8.0 へ更新** — PR #4556。pin はモロヘイヤ側でなく **`pooza/ginseng-web` の gemspec** にあったので、そちらを `~>` から `>=` へ緩めるのが前提作業だった（pooza/ginseng-web#116 / 1.3.46。CVE-2024-21510 の下限 4.1.0 は保つ）
+  - ⚠ **起票時の前提が 1 つ違っていた。`mustermann 4.0.0` はこの更新では入らない**（sinatra 4.2.1 が `~>3.0` を要求する）。**メジャー跨ぎを含まない更新**だった
+  - **#4503 のゲートの初適用。**Mastodon（v4.6.5）1001 tests / 0 failures / 0 errors / 152 omissions ＝基準値と完全一致、Misskey（2026.7.0）1004 tests / 3 failures（#4492 の既知集合と完全一致）/ 0 errors / 139 omissions。新規の失敗ゼロ
+  - 副産物: **ゲート文言「両系 0 failures」が #4492 のせいで今日時点では満たせない**ことが露見し、[test-harness.md](test-harness.md) に既知例外として名指しした（#4492 が閉じたら消す）
 - **#4516 / #4552 test/bug: harness 実走で常態化していた失敗 5 件をテスト側から解消** — PR #4553。5 件とも product の退行ではなく**検証側の前提ズレ**だったので、テスト側に寄せて **1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）** にした
   - `SNSServiceTest#test_info` — ⚠ **`metadata.maintainer` を出すのは Misskey だけ**。Mastodon はフォークの `pooza/mastodon` も `nodeName` / `nodeDescription` しか返さないので、**本番 3 台でも `maintainer_name` は nil**。harness 固有の欠落ではない（起票時の「harness に contact account を設定すれば直る」は誤り）。副次的に `MediaFeedRenderer` の RSS author は Mastodon で常に nil
   - `MediaFeedRendererTest#test_to_s` — omit ガードを `#fetch` の描画条件と同じ順に並べ直した。`media_catalog?` が false なら entries は空のまま返る（既定 OFF・#4343）。**harness では依然 `<item>` の描画が検証されない**ので、通したければ harness 側で `media_catalog` を有効にする必要がある（chubo2#64 の続き）
