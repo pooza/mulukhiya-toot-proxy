@@ -894,7 +894,8 @@ GitHub Actions (`.github/workflows/test.yml`):
 CI には SNS の実インスタンスも Mastodon の Postgres も無い。`Ginseng::TestCase#run_test` は
 `disable?` のケースを **omission** として報告する（pooza/ginseng-core#488）ので実行されていない
 ことは出力に現れるが、**test-unit はそれでも `100% passed` と表示する**。実測で
-**929 tests 中 313 件が omission**（= 一度も実行されていない）。
+**929 tests 中 313 件が omission**（= 一度も実行されていない。2026-08-09 の CI 実測は
+mastodon 313 件 / misskey 302 件）。
 
 - **CI の緑をリリース判断の根拠にしない。**実インスタンスを要する範囲（`user_config` /
   `compose_template` / handler 系など）は、chubo2 fedi-test-harness の実走でしか検証できない。

@@ -17,7 +17,7 @@ jobs:
           - controller: mastodon
             omission_baseline: 313
           - controller: misskey
-            omission_baseline: 313
+            omission_baseline: 302
     services:
       redis:
         image: redis:7
