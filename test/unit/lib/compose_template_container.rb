@@ -116,7 +116,12 @@ module Mulukhiya
       other.create(name: '別リクエスト', body: 'x')
       @container.create(name: 'こちら', body: 'y')
 
-      names = ComposeTemplateContainer.new(account).all.map {|v| v['name']}
+      # ⚠ 読み直しは**新しい account** から行う。`Account#user_config` は account
+      # オブジェクト側でメモ化されるので、`TestCase#account`（`@account ||=`）が返す
+      # 同じインスタンスを渡すと 1 行目の `@container.all` で掴んだ空スナップショットを
+      # そのまま読んでしまい、書き込みが成功していても 0 件に見える。本番は 1 リクエスト
+      # 1 account なのでこれは検証側の作り込みの問題で、product の退行ではない (#4552)。
+      names = ComposeTemplateContainer.new(account_class.test_account).all.map {|v| v['name']}
 
       assert_equal(2, names.size)
       assert_includes(names, '別リクエスト')
