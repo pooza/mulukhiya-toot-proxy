@@ -103,6 +103,18 @@ CI には実インスタンスが無く、アカウント依存のテスト 300 
   nodeinfo・seed 等を `harness?` で omit しているため）。ただし**件数が前回から大きく増えて
   いたら中身を見る**。無害な omit の増加と、前提が壊れて実行されなくなった退行は区別がつかない
 
+⚠ **現在の既知例外: Misskey 系の 3 件（#4492）。**`SNSServiceTest#test_access_token` /
+`WebhookTest#test_command` / `WebhookImageHandlerTest#test_handle_pre_webhook` は harness の
+provisioning ギャップと omit ガードの不備で恒常的に落ちる。**この 3 件と完全に一致する限りは
+通過扱い**にし、1 件でも増減したら中身を見る。#4492 が閉じたらこの例外も消す。
+
+参考値（2026-08-09 実測・両系とも同一 HEAD）:
+
+| 系 | 結果 |
+| --- | --- |
+| Mastodon（harness v4.6.5） | 1001 tests / 2008 assertions / **0 failures / 0 errors** / 152 omissions |
+| Misskey（harness 2026.7.0） | 1004 tests / 2002 assertions / **3 failures**（#4492 の既知集合）/ 0 errors / 139 omissions |
+
 失敗が出たときの切り分け:
 
 - **product の退行か、検証側の前提ズレか**を先に決める。2026-08-09 の 5 件（#4516 / #4552）は
