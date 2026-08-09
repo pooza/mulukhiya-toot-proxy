@@ -48,10 +48,12 @@ module Mulukhiya
     end
 
     # RemoteHost.validator が実際に内部アドレスを弾く callable であること。
+    # ⚠ 拒否は false でなく **nil**（#4524 以降、許可時は接続先の IP を返す）。
+    # 呼び出し側はいずれも真偽で判定しているので、拒否は falsy であればよい。
     def test_remote_host_validator_rejects_private_address
-      assert_false(RemoteHost.validator.call('127.0.0.1'))
-      assert_false(RemoteHost.validator.call('localhost'))
-      assert_false(RemoteHost.validator.call(''))
+      assert_nil(RemoteHost.validator.call('127.0.0.1'))
+      assert_nil(RemoteHost.validator.call('localhost'))
+      assert_nil(RemoteHost.validator.call(''))
     end
 
     # Content-Length のプリフライト (HEAD) も同じ allowlist を通ること (#4523)。
