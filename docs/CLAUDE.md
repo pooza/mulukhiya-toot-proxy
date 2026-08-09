@@ -367,7 +367,7 @@ shallu / zugoga / sweep / gomander、全台 version 5.31.0 / health 200 / `yjit_
 2026-08-10 に **#4559 / #4560**（Codex 棚卸し由来）・**#4537**（5.31.0 レビューの受け皿）・**#4524**（SSRF）も着地。
 残りは **#4534** と、保留中の **#4558**。
 GitHub マイルストーン作成済み（#631）。バージョンバンプは 2026-08-08 に実施。
-依存する ginseng-core は 1.15.34 → **1.16.1**（pooza/ginseng-core#499 / #503）。
+依存する ginseng-core は 1.15.34 → **1.16.2**（pooza/ginseng-core#499 / #503）。
 
 ⚠ **本番のバージョンは 5.32.0（3 台）と 5.32.1（zugoga）で不揃いのまま。**5.33.0 で揃えるので、リリースを先送りするほどこの状態が伸びる。
 
@@ -385,7 +385,8 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 **マージ後に Codex の P1 が 2 件届き、同日中に是正した（PR #4565 / pooza/ginseng-core#505、1.16.1）。どちらも「塞いだつもりで開いていた」型。**
 
 - **短縮 URL の展開だけ pinning を素通りしていた** — `ShortenedURLHandler#permitted_host?` が validator の戻り（IP）を捨て、`fetch_redirect` は名前で GET し直していた。⚠ **ここは `host_validator` に任せられない**（あちらは追従まで肩代わりして最終レスポンスだけ返すので展開先が取れない）。**追うのがこちらである以上、pinning もこちらの責務**
-- **プロキシ経由では pinning が効かない** — `Net::HTTP#connect` は `proxy?` のとき `@ipaddr` を見ずプロキシへ繋ぎ、平文なら絶対 URI・HTTPS なら CONNECT でホスト名を渡す。**名前を解決するのはプロキシ**なのでリバインディングは成立する。fail-closed（`GatewayError`）にした。⚠ `Net::HTTP.new` の proxy 引数は既定が `:ENV` なので、`http_proxy` を置いた環境では**明示していなくても**該当する
+- **プロキシ経由では pinning が効かない** — `Net::HTTP#connect` は `proxy?` のとき `@ipaddr` を見ずプロキシへ繋ぎ、平文なら絶対 URI・HTTPS なら CONNECT でホスト名を渡す。**名前を解決するのはプロキシ**なのでリバインディングは成立する。fail-closed にした。⚠ `Net::HTTP.new` の proxy 引数は既定が `:ENV` なので、`http_proxy` を置いた環境では**明示していなくても**該当する
+  - さらに P2 で「その拒否を `repeat` が 5 回叩き直す」（上流レスポンスの無い `GatewayError` は `source_status` が 502 = 一時障害と読まれる）ことが判明し、`Ginseng::PinningError` を新設して非再送に（pooza/ginseng-core#506、**1.16.2**）。⚠ **設定起因の失敗を再送で解決しようとしない**
 
 ### 5.31.0 レビュー由来の受け皿 Issue
 
