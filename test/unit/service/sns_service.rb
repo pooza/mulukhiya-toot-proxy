@@ -37,6 +37,17 @@ module Mulukhiya
     end
 
     def test_access_token
+      # Misskey の `access_token` 行は MiAuth / OAuth でアプリを認可したときにしか
+      # 作られない。harness の setup.sh が発行するのは `/api/admin/accounts/create` /
+      # `/api/signup` が返す**ユーザー固有トークン**（Misskey の `user.token`）なので、
+      # テーブルは 0 行のまま。構造的な provisioning ギャップなので harness 駆動時のみ
+      # 明示 omit する（silent skip ではない）。非 harness で nil なのは実退行なので
+      # 下の assert で落とす (#4492 / chubo2#63)。
+      # ⚠ Mastodon は Doorkeeper のトークン行を持つので**対象外**。harness でも
+      # 素通しさせて、失われたら落ちるようにしておく。
+      omit('harness の Misskey は access_token 行を持たない（MiAuth 未実施・chubo2#63）') \
+        if harness? && Environment.misskey_type? && @sns.access_token.nil?
+
       assert_kind_of(access_token_class, @sns.access_token)
     end
 
