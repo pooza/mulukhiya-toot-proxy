@@ -206,6 +206,72 @@ EXPLAIN 改善を確認してから、chubo2 配下の zugoga overlay で
 - §2 / §4 の EXPLAIN 比較と再有効化後の観測値を **#4323 にコメント**。
 - 適用記録を chubo2 `docs/infra-note.md` に daisskey と同フォーマットで残す。
 
+## #4393 フェーズ: sub-second 化の設計決着（Gate 2 の前提）
+
+**現在地**: Gate 0 / 1 は zugoga 本番で消化済み。候補 A の適用で `/feed/media` は
+**170s → 約 10s**。ただし約 10s では同時実行時に接続プールを圧迫するため
+**Gate 2（overlay flip）は保留**（2026-06-06 判断）。ここを sub-second まで
+落とすのが #4393。
+
+⚠ **「index をもう 1 本足す」では届かないことは検証済み。**プランナは
+`ORDER BY attachments.id DESC LIMIT n` の短絡見積りで media_attachments の
+backward PK scan を選び、`statuses.local`（selectivity 0.271%）を probe で
+捨てる。この駆動表の選択が変わらない限り、probe が速くなるだけで終わる。
+候補 B（`media_attachments (status_id, id DESC)`）は効果なしで撤去済み、
+`WITH ... MATERIALIZED` 版も約 4.9s。
+
+### 先に決める設計判断
+
+案を絞る前に、**どこまで触ってよいか**を確定させる。docs/CLAUDE.md の 2 方針が
+ここで衝突する。
+
+- 「SNS の状態ストアには SELECT しかしない」→ モロヘイヤから列や行を足すのは論外
+- 「本体改造の最小化」→ フォークにマイグレーションを持つのは摩擦を増やす
+
+**裁定は docs/CLAUDE.md「二つの方針が衝突したら、本体改造を採る」に従う。**
+したがって許されるのは **`pooza/mastodon` の migration として index を持つ**ところまで
+（#4353 と同じ道）。⚠ **media_attachments に locality 列を足す案は採らない。**
+upstream の書き込み経路に手を入れることになり、アップグレード摩擦が index の比ではない。
+
+### 候補 3 案
+
+| 案 | 中身 | 触るもの | 見立て |
+| --- | --- | --- | --- |
+| **A** | local status を id DESC で先読みしてから attachments を引く | モロヘイヤのクエリのみ | ⚠ **先読み窓の正確性**が要る。attachment の id はアップロード時に振られるので status より古くなりうる |
+| **B** | **ローカルアカウント駆動の LATERAL merge** + `media_attachments (account_id, id DESC)` | index 1 本（恒久化は #4353 と同じ道） | **第一候補。**ローカルアカウントは数百のはずで、各々 index scan 101 行 → merge。SELECT のみを崩さない |
+| **C** | モロヘイヤ自前ストアへの増分キャッシュ（`MediaCatalogUpdateWorker` 起点） | モロヘイヤ側だけ | 最後の手段。実装量と整合性の維持コストが大きい。⚠ **SNS の DB には書かない** |
+
+### 取るべき EXPLAIN
+
+[`bin/diag/media_catalog_subsecond.sql`](../bin/diag/media_catalog_subsecond.sql)
+にスクリプト化済み。VPN 復旧後、**zugoga 本番**で上から流す。
+
+| § | 内容 | 何を判断するか |
+| --- | --- | --- |
+| §0-2 | ローカルアカウント数 | 数百なら B 案が現実的。数万に育っていたら **B 案を棄却** |
+| §0-3 | attachment.id と status.id の乖離 | 大きいほど A 案の先読み窓を広く取る必要がある |
+| §1 | **現行の再ベースライン**（page1 / only_person / cursor） | ⚠ #4351 の計測から時間が経っている。**必ず取り直す** |
+| §2 | A 案の EXPLAIN | 駆動表が statuses 側へ移るか |
+| §3 | B 案の EXPLAIN（index 適用前後） | 標準の `index_media_attachments_on_account_id` だけで足りるか、id DESC 付き複合が要るか |
+| §4 | 理論上の下限 | B 案がここに近ければ勝ち |
+| §6 | **正確性の照合** | ⚠ **飛ばさない。**速いが違う結果を返す案を採らないため、現行クエリと id 列を突き合わせて差分 0 を確認する |
+
+### go / no-go
+
+- **go**: 代表 3 パターン（page1 / only_person / cursor）**すべてで 1000ms 未満**、
+  かつ §6 の差分が 0 行。→ #4351 の Gate 2 へ進み、恒久化を #4353 に渡す
+- **no-go**: どの案も届かない → **C 案（自前ストアへの増分キャッシュ）に切り替えるか、
+  media_catalog を無効のまま畳むかを判断する。**⚠ 「もう少し index を足す」で
+  引き延ばさない。ここまでで index 単独の限界は 2 度確認している
+
+### 実施上の注意
+
+- ⚠ **本番でしか測れない。**ステージングは桁違いに少データでプランが変わる
+  （このドキュメント冒頭の方針と同じ）
+- zugoga はデルムリン丼なのでニチアサ窓の直撃はないが、**横展開（#4352）の
+  gomander はキュアスタ！本番**。overlay flip の観測は日曜午前を外す
+- 記録先は #4323 のコメント（EXPLAIN 比較）と chubo2 `docs/infra-note.md`（適用記録）
+
 ## ロールアウト方針
 
 daisskey 先行事例に準拠しつつ、**EXPLAIN ベースライン・候補適用の検証は本番で先行する**
