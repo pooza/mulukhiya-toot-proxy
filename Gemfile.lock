@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 47e97be7b962e823caa6cf89eec34608ec7e39e1
+  revision: a9fada1788a92cbaa99c19c0ed817607707fc5b8
   branch: main
   specs:
-    ginseng-core (1.15.36)
+    ginseng-core (1.15.37)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)

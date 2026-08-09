@@ -136,16 +136,16 @@ module Mulukhiya
       return nil
     end
 
-    # 413 はユーザーのファイルサイズ超過であり系の不具合ではないため Sentry alert を抑止する。
-    # 401 は既存どおりトークン期限切れ等で頻繁に起きるため除外する。
+    # 413 はユーザーのファイルサイズ超過であり系の不具合ではないため、モロヘイヤ側の
+    # 文言を出して alert も立てない。上流（nginx）が HTML を返すことが多く透過しても
+    # 読めないうえ、「上限を超過している」はクライアント共通で出せる説明だから
+    # (#4480 で透過へ寄せた後もここは残す)。
     #
-    # 413 だけはモロヘイヤ側の文言を出す。上流（nginx）が HTML を返すことが多く
-    # 透過しても読めないうえ、「上限を超過している」はクライアント共通で
-    # 出せる説明だから (#4480 で透過へ寄せた後もここは残す)。
+    # ⚠ **413 を silent_statuses に並べない** (#4537)。ここへ来る時点で 413 は
+    # 下の分岐で処理済みなので効かず、並べてあると「413 も抑止対象」と誤読する。
+    # 401 の抑止は handle_gateway_error の既定に含まれている。
     def handle_upload_gateway_error(error)
-      unless error.source_status == 413
-        return handle_gateway_error(error, silent_statuses: [401, 413])
-      end
+      return handle_gateway_error(error) unless error.source_status == 413
       @renderer.message = {error: 'アップロードしたファイルがサーバーの上限サイズを超過しています。'}
       return @renderer.status = 413
     end

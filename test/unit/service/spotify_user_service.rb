@@ -167,6 +167,30 @@ module Mulukhiya
       end
     end
 
+    # ⚠ **運用側の設定ミスをユーザーのせいにしない** (#4480 / #4537)。
+    # invalid_client / invalid_request はこちらの client 認証の不備なので、
+    # 再連携を促しても直らない。GatewayError (502) のまま Sentry へ出す。
+    data('invalid_client', 'invalid_client')
+    data('invalid_request', 'invalid_request')
+    data('unauthorized_client', 'unauthorized_client')
+    data('unsupported_grant_type', 'unsupported_grant_type')
+    data('invalid_scope', 'invalid_scope')
+    def test_currently_playing_keeps_gateway_error_for_operator_fault(oauth_error)
+      account = account_double(
+        '/service/spotify/token' => 'access-1',
+        '/service/spotify/refresh_token' => 'refresh-1',
+        '/service/spotify/expires_at' => Time.now.to_i - 1,
+      )
+      stub_request(:post, token_url).to_return(
+        status: 400, body: {error: oauth_error}.to_json,
+        headers: {'Content-Type' => 'application/json'}
+      )
+
+      assert_raises(Ginseng::GatewayError) do
+        SpotifyUserService.new(account).currently_playing
+      end
+    end
+
     def test_unlink_clears_tokens
       account = account_double(
         '/service/spotify/token' => 'access-1',
