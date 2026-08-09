@@ -383,6 +383,13 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 
 - **#4543 obs: Sentry の未トリアージ unresolved 16 件を棚卸しする（size:M）** — `is:unresolved` 27 件のうち **16 件がコメント 0 のまま滞留**していた。§5 の手順は**新規イシューだけを見る**構造なので、手順が入る前の分がそのまま残っている。Redis 接続系 174 件 / 上流 4xx・5xx 100 件 / 単発 2 件の 3 群に分けて群ごとに判断する。上流 4xx 群には #4542 と同型（クライアント起因なのに alert）が混ざっている可能性が高い
 - **syslog 側のノイズ棚卸し（未起票）** — zugoga の `base_uri undefined` のように `e.log` 止まりで Sentry に出ない大量ログがある。#4543 の対象外なので別建てが要る
+- **#4552 test/bug: #4503 の可視化で初めて走ったテストが露見させた 2 件（size:S）** — compose テンプレートの read が memo 化された `user_config` を返す（#4461 の回帰テストそのものが落ちている）／`SNSServiceTest` の omit ガードが「nodeName はあるが maintainer が無い」harness を拾えない。**#4516 と同性質**（あちらは seed、こちらはトークンが引き金）なので 5.33.0 に載せるなら一緒が自然
+
+### fedi-test-harness の検証状況
+
+**Mastodon v4.6.5 を 2026-08-09 に検証・verified 昇格**（pooza/chubo2#153 クローズ）。同一の mulukhiya HEAD を v4.6.5 / v4.6.4 でクリーン再構築して実走・比較し、**失敗集合の一致＝退行ゼロ**を確認した（1001 tests / 0 errors / 151 omissions、両版で omission 完全一致）。差分 1 件は Amazon 画像取得の外部依存 flaky。詳細は [harness-verified-versions.yaml](harness-verified-versions.yaml) の 2026-08-09 節。
+
+⚠ **07-30 の 879 tests / 0 failures とは比較にならない。** #4503 の可視化と harness のトークン供給で実行本数が増え、これまで走っていなかったテストが初めてアサートしている（露見分は #4516 / #4552）。**「前回 0 failures だったのに増えた」を退行と読まないこと。**
 
 ### マイルストーン外の繰越（着手条件待ち）
 
