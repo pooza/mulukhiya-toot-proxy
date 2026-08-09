@@ -60,6 +60,8 @@ last_checked: '2026-08-09'
 #     （ginseng-core 1.15.30、5.31.0 で取り込み）と harness のトークン供給で実行本数が 1001 件へ増え、
 #     これまで走っていなかったテストが初めてアサートした結果として上記 4 件が現れている。
 #     **版間 diff で見る限り Mastodon 4.6.5 による退行は無い。**
+#     → **同日 PR #4553 で 5 件（flaky 含む）すべてテスト側から解消**し、v4.6.5 harness で
+#     1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）になった。
 #   - 4.6.5 の非テスト差分を実コードでも確認: 5 本が JS/SCSS、5 本が AP **受信**側
 #     （`collection.rb` / `merging.rb` / `process_featured_item_service` /
 #     `process_status_update_service` / `activity/create.rb`）、DB マイグレーションなし。
