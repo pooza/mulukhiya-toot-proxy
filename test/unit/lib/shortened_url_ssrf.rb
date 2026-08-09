@@ -67,5 +67,44 @@ module Mulukhiya
       assert_equal(METADATA, resolve(METADATA).to_s)
       assert_not_requested(:get, METADATA)
     end
+
+    # ⚠ **検証で通したアドレスを捨てない** (#4524)。ここは自前でホップを追う経路
+    # なので、Ginseng::HTTP の host_validator は使えず pinning も自前で渡す。
+    # 捨てると GET のたびに名前を引き直し、権威 DNS を握った相手に
+    # 「検証は公開 IP・接続は 127.0.0.1」を返される（DNS リバインディング）。
+    def test_pins_validated_address_on_every_hop
+      addresses = {'t.co' => '203.0.113.1', 'www.example.jp' => '198.51.100.2'}
+      RemoteHost.validator = ->(host) {addresses[host]}
+      stub_request(:get, SHORTENED).to_return(status: 301, headers: {'Location' => PUBLIC_DEST})
+      stub_request(:get, PUBLIC_DEST).to_return(status: 200, body: 'ok')
+
+      assert_equal(['203.0.113.1', '198.51.100.2'], recorded_pins {resolve})
+    end
+
+    # 真偽値を返す validator でも壊れないこと（pinning しないだけ）。
+    def test_boolean_validator_still_resolves
+      stub_request(:get, SHORTENED).to_return(status: 301, headers: {'Location' => PUBLIC_DEST})
+      stub_request(:get, PUBLIC_DEST).to_return(status: 200, body: 'ok')
+
+      assert_equal(PUBLIC_DEST, resolve.to_s)
+    end
+
+    private
+
+    # PinnedAddressAdapter.pin に渡ったアドレスを順に記録する。
+    def recorded_pins
+      recorded = []
+      original = Ginseng::PinnedAddressAdapter.method(:pin)
+      Ginseng::PinnedAddressAdapter.define_singleton_method(:pin) do |options, address|
+        recorded.push(address)
+        original.call(options, address)
+      end
+      begin
+        yield
+      ensure
+        Ginseng::PinnedAddressAdapter.define_singleton_method(:pin, original)
+      end
+      return recorded
+    end
   end
 end
