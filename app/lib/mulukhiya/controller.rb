@@ -125,7 +125,18 @@ module Mulukhiya
       # ⚠ 抑止するのは Sentry だけ。silent でも syslog には残す。完全に無音だと
       # 「上流の仕様変更で全投稿が弾かれる」ような事故の頻度・偏りを追えない。
       silent ? error.log : error.alert
-      @renderer.message = error.source_body || {error: error.message}
+      # ⚠ 透過してよいのは**自分の上流**が返したものだけ (#4537)。引用元の他人の
+      # サーバー由来 (ForeignGatewayError) は、ステータスもボディも返さず 502 +
+      # 自前の文言に倒す。他人のサーバーの応答を返すと、クライアントからは
+      # 「モロヘイヤの上流がそう言っている」ように読めてしまう。
+      if error.is_a?(ForeignGatewayError)
+        @renderer.message = {error: error.message}
+        return @renderer.status = error.status
+      end
+      # ⚠ 透過するのは Hash のときだけ。`source_body` は JSON の配列も返しうるが、
+      # クライアントは `{"error": ...}` を期待しているので配列を渡すと読めない。
+      body = error.source_body
+      @renderer.message = body.is_a?(Hash) ? body : {error: error.message}
       return @renderer.status = error.source_status
     end
 
