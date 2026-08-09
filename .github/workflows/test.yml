@@ -50,6 +50,7 @@ jobs:
         run: |
           bundle exec rake lint
       - name: Run test (${{ matrix.controller }})
+        id: test
         run: |
           set -o pipefail
           bundle exec rake test 2>&1 | tee test-result.log
@@ -57,10 +58,22 @@ jobs:
         if: always()
         env:
           BASELINE: ${{ matrix.omission_baseline }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
         run: |
+          # 集計できないときは fail closed (#4559)。test-unit がサマリの書式を
+          # 変えただけでラチェットが黙って無効化されると、#4503 で塞いだ
+          # 「守れているつもりの緑」がそのまま戻る。
+          # ⚠ テスト自体が落ちている run では既にジョブが赤なので追撃しない。
+          abort_unless_test_failed () {
+            if [ "$TEST_OUTCOME" != "success" ]; then
+              echo "::warning::$1（テストが失敗しているため、ここでは落とさない）"
+              exit 0
+            fi
+            echo "::error::$1"
+            exit 1
+          }
           if [ ! -f test-result.log ]; then
-            echo "::warning::テストが実行されなかったため omission を集計できません"
-            exit 0
+            abort_unless_test_failed "テスト結果のログが無いため omission を集計できません"
           fi
           summary="$(grep -E '^[0-9]+ tests, ' test-result.log | tail -1 || true)"
           omissions="$(printf '%s' "$summary" | sed -nE 's/.*, ([0-9]+) omissions.*/\1/p')"
@@ -78,8 +91,7 @@ jobs:
             echo "0 failures / 0 errors を確認すること（手順は docs/test-harness.md、経緯は #4503）。"
           } >> "$GITHUB_STEP_SUMMARY"
           if [ -z "$omissions" ]; then
-            echo "::warning::omission 件数を集計できませんでした"
-            exit 0
+            abort_unless_test_failed "omission 件数を集計できませんでした (集計行: ${summary:-なし})"
           fi
           if [ "$omissions" -gt "$BASELINE" ]; then
             echo "::error::omission が ${omissions} 件で上限 ${BASELINE} を超えました。実行されていないテストが増えています (#4503)"

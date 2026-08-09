@@ -82,6 +82,9 @@ Misskey ハーネス（`fedi-test-harness/misskey`）でも同様。コントロ
 `config/local.yaml` を編集しなくても自動で Misskey が選択される。Mastodon と Misskey の
 両方を同時に source した場合は `config['/controller']` の値が優先される。
 
+⚠ **これはリリースゲートの取り違えの原因になる。**後述「リリースゲートとしての実走」の
+「系ごとにシェルを分ける」を必ず読むこと（#4559）。
+
 ```sh
 cd ~/repos/chubo2/fedi-test-harness/misskey && ./scripts/setup.sh
 cd ~/repos/mulukhiya-toot-proxy
@@ -95,9 +98,27 @@ bundle exec rake test
 CI には実インスタンスが無く、アカウント依存のテスト 300 件超が omission のまま
 `100% passed` と出るため、**CI の緑はこのゲートの代わりにならない**（#4503）。
 
+### ⚠ 系ごとにシェルを分ける（同じシェルで両系を source しない）
+
+`source .env.test` した変数は**シェルに残る**。Mastodon → Misskey の順に同じシェルで
+source すると `MASTODON_*` と `MISSKEY_*` が両方揃い、コントローラ選択は
+`config['/controller']`（既定 `mastodon`）に倒れる。つまり **Misskey のつもりで
+Mastodon をもう一度走らせたまま「両系緑」とゲートを通せてしまう**（#4559）。
+
+- 系ごとに**別のシェル**（別タブ・`bash -c` の中・`env -i`）で回す
+- 実走の頭で `TestHarness` が **選択したコントローラを stderr に出す**ので、source した
+  `.env.test` と一致しているかを毎回見る:
+
+  ```text
+  TestHarness: controller=misskey url=http://localhost:3001
+  ```
+
+- 結果を記録するときは、この行もセットで残す（後から取り違えを検証できる）
+
 判定基準:
 
 - **Mastodon 系・Misskey 系の両方で `0 failures / 0 errors`。**片系だけでは不可
+- **実走ごとの `TestHarness: controller=...` が、狙った系と一致している**
 - 両系とも `develop` の同一 HEAD で走らせる
 - omission は許容する（harness が構造的に提供しない範囲 = デーモン層・webhook・streaming・
   nodeinfo・seed 等を `harness?` で omit しているため）。ただし**件数が前回から大きく増えて
