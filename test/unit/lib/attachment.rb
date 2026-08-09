@@ -115,8 +115,13 @@ module Mulukhiya
       assert_kind_of(Hash, result)
       assert_kind_of(Array, result[:items])
       assert_kind_of(Hash, result[:items].first)
-      assert_equal(1, result[:page])
       assert_includes([true, false], result[:has_next])
+
+      # `:page` は「呼び出し側が渡したページ番号のエコー」で、既定値 1 の補完は
+      # API 境界の MediaCatalogQueryService#normalize が持つ（`cursor` 指定時は
+      # 付けない、という docs/api.md の仕様もそちらで担保している）。モデルを直接
+      # 叩く経路では渡さない限り付かないので、渡して確かめる (#4516)。
+      assert_equal(1, attachment_class.catalog(page: 1)[:page])
 
       result = attachment_class.catalog(only_person: 1)
 

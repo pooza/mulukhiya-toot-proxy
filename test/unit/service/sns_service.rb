@@ -22,6 +22,13 @@ module Mulukhiya
         if harness? && @sns.node_name.nil?
 
       assert_kind_of(String, @sns.node_name)
+
+      # maintainer は nodeinfo の `metadata.maintainer.name` だが、**これを出すのは
+      # Misskey だけ**。Mastodon は NodeInfo::Serializer#metadata が nodeName /
+      # nodeDescription しか返さず（フォークの pooza/mastodon も同じ）、設定でも
+      # 生やせないため、Mastodon で nil なのは実装どおりで退行ではない (#4552)。
+      return unless Environment.misskey_type?
+
       assert_kind_of(String, @sns.maintainer_name)
     end
 
