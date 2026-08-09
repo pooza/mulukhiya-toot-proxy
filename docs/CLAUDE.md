@@ -776,7 +776,20 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - **辞書スキャンの最適化** — #4463（メモ化・辞書キャッシュ・regex 事前コンパイル）/ #4465（`TaggingDictionary#matches` の索引化）。5.30.0 で「次に削るなら辞書スキャンの CPU」と結論したが、**推測で着手しない**（計装で裏を取ってから）
 - **stlf_probe まわり** — #4471 / #4476。インフラ寄りで chubo2 側の判定と対
 - **#4478** FreeBSD の rc スクリプトが SSH 越しの restart で戻ってこない
+- **Pleroma 系（Akkoma）対応の復活** — #4566（+ 検証環境 pooza/chubo2#164）。下記の専用節を参照
 - **on-hold 群** — #3157 / #3877 / #4195 / #4196 / #4197 / #4229 / #4298 / #4301
+
+### Pleroma 系（Akkoma）対応の復活トラック（2026-08-10 起票）
+
+5.0 で「削除ではなく未対応」として保留した Pleroma 系を、**Akkoma を対象に**戻す趣味枠。正本は #4566。
+**動機は実用ではなく「少しずつ元の形に戻す」こと**なので、リリース作業・番組表・実況まわりより常に後回しでよい。
+
+- ⚠ **対象は Akkoma で確定。Pleroma ではない。**2026-08-10 実測で Akkoma は v3.20.0（08-08）と 2〜3 か月ごと、Pleroma 本体は 2.10.2（2026-05-03）止まり。API・DB スキーマとも互換なので**実装は Pleroma 互換 1 系統・検証は Akkoma**
+- ⚠ **めいすきーは見送り（再提案しない）。**10.102.x は Misskey v10 ベース＝**MongoDB** で、復活は `ginseng-mongo` と Mongo スタックを Gemfile へ戻すことを意味する
+- **足りないのは DB 直読み層だけ。**v5-plan は Akkoma を「Mastodon 系（`MastodonController` 担当）」に分類しており API はほぼ互換。一方 DB は `users` / `objects` / `activities` / `oauth_tokens` で Mastodon の `accounts` / `statuses` とは別物
+- 抽象化の縫い目は生きている（`controller_name.camelize` → constantize、`sns_type` 分岐は app 全体で 20 箇所）。除去コミット #4031 / #4033 / #4034 から `git show 46c4f4e2^:<path>` で復元できる
+- ⚠ **`Ginseng::Fediverse::PleromaService` は gem 側に残っているが最終更新 2024-09-16。**この 2 年ぶんの `MastodonService` の変化に追随できているかは未検証
+- **CT が先。**検証環境（pooza/chubo2#164、pve の LXC）が無いまま足すと、3 系統目が「走っていないのに緑」になり #4503 で潰した状態が復活する
 
 5.22.x 以前のリリースノートは [release-history.md](archive/release-history.md) を参照。
 
