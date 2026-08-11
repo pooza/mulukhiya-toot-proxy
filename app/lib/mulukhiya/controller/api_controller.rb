@@ -935,7 +935,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 or 重複キー) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534) は
+        # 期待動作のため Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -962,7 +963,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -981,7 +983,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -1000,7 +1003,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert

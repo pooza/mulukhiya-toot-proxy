@@ -24,8 +24,13 @@ module Mulukhiya
       return config['/program/auto_update'] != false
     end
 
+    # 番組表全体の差し替え。auto_update の pull（ProgramUpdateWorker）と rake から
+    # 呼ばれる。エディタ経由の書き込みと同じロックで直列化する (#4534)。
+    #
+    # ⚠ 編集 4 メソッドはロックを取ったうえで persist を呼ぶ。ここを経由させると
+    # 自分自身のロックと衝突して ConflictError になる。
     def save(programs)
-      return fetcher.save(programs)
+      return lock.synchronize {persist(programs)}
     end
 
     def data
@@ -74,12 +79,14 @@ module Mulukhiya
       raise auto_update_conflict if auto_update?
       key = key.to_s
       raise Ginseng::ValidateError, 'キーが空です。' if key.empty?
-      programs = data
-      raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
-      attrs = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
-      programs[key] = attrs.to_h {|k, v| [k, normalize_value(k, v)]}
-      save(programs)
-      return programs[key]
+      return lock.synchronize do
+        programs = data
+        raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
+        attrs = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
+        programs[key] = attrs.to_h {|k, v| [k, normalize_value(k, v)]}
+        persist(programs)
+        next programs[key]
+      end
     end
 
     def generate_key(attributes = {})
@@ -100,47 +107,63 @@ module Mulukhiya
     def update_entry(key, attributes)
       raise auto_update_conflict if auto_update?
       key = key.to_s
-      programs = data
-      raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
-      attributes.each do |k, v|
-        if blank_value?(v)
-          programs[key].delete(k.to_s)
-        else
-          programs[key][k.to_s] = normalize_value(k.to_s, v)
+      return lock.synchronize do
+        programs = data
+        raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
+        attributes.each do |k, v|
+          if blank_value?(v)
+            programs[key].delete(k.to_s)
+          else
+            programs[key][k.to_s] = normalize_value(k.to_s, v)
+          end
         end
+        persist(programs)
+        next programs[key]
       end
-      save(programs)
-      return programs[key]
     end
 
     def delete_entry(key)
       raise auto_update_conflict if auto_update?
       key = key.to_s
-      programs = data
-      return nil unless programs.key?(key)
-      entry = programs.delete(key)
-      save(programs)
-      return entry
+      return lock.synchronize do
+        programs = data
+        next nil unless programs.key?(key)
+        entry = programs.delete(key)
+        persist(programs)
+        next entry
+      end
     end
 
+    # ⚠ Annict の GraphQL 呼び出し（/service/annict/timeout: 5 秒 × 最大 3 回）を
+    # **ロックの内側に置いている**のは意図的 (#4534)。話数の +1 と、その話数に
+    # 対応するサブタイトル・annict_episode_id の解決は 1 つの不可分な更新で、
+    # 分けると「解決している間に別の +1 が入り、古い話数のサブタイトルを
+    # 上書きする」という別の lost update を作る。
+    #
+    # 代わりに、Annict が詰まっている間は他の編集が最大十数秒 409 を受ける。
+    # ⚠ これは黙って巻き戻るより良い、という判断であって無害ではない。エディタは
+    # 409 をトーストで見せて再試行させる。TTL(30 秒) は Annict の最悪値に
+    # 余裕を足した値なので、ここを縮めるなら TTL も見直すこと。
     def increment_episode(key, annict: nil)
       raise auto_update_conflict if auto_update?
       key = key.to_s
-      programs = data
-      raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
-      entry = programs[key]
-      entry['episode'] = (entry['episode'] || 0).to_i + 1
-      entry['annict_episode_id'] = nil
-      advance_next_on(entry)
-      if annict && entry['annict_work_id']
-        next_ep = next_annict_episode(annict, entry['annict_work_id'], entry['episode'])
-        if next_ep
-          entry['annict_episode_id'] = next_ep['annictId']
-          entry['subtitle'] = next_ep['title'] if next_ep['title']
+      return lock.synchronize do
+        programs = data
+        raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
+        entry = programs[key]
+        entry['episode'] = (entry['episode'] || 0).to_i + 1
+        entry['annict_episode_id'] = nil
+        advance_next_on(entry)
+        if annict && entry['annict_work_id']
+          next_ep = next_annict_episode(annict, entry['annict_work_id'], entry['episode'])
+          if next_ep
+            entry['annict_episode_id'] = next_ep['annictId']
+            entry['subtitle'] = next_ep['title'] if next_ep['title']
+          end
         end
+        persist(programs)
+        next entry
       end
-      save(programs)
-      return entry
     end
 
     def count
@@ -169,6 +192,20 @@ module Mulukhiya
 
     def fetcher
       @fetcher ||= ProgramFetcher.new
+    end
+
+    # 書き込みの直列化ロック (#4534)。⚠ Program は Singleton なので、この
+    # インスタンスはプロセス内で共有される。ロックの実体は Redis 側なので
+    # プロセスをまたいでも効く。
+    def lock
+      @lock ||= ProgramLockStorage.new
+    end
+
+    # ロックを取らずに書き戻す。⚠ 直接呼ばないこと。呼び出し元はいずれも
+    # lock.synchronize の内側にいる前提で、外から呼ぶと #4534 で塞いだ
+    # lost update がそのまま復活する。
+    def persist(programs)
+      return fetcher.save(programs)
     end
 
     # nil または空白のみの文字列は「未設定」として扱い、保存対象から除く。
