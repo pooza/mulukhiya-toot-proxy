@@ -152,8 +152,28 @@ module Mulukhiya
     def load_from_yaml
       return {} unless yaml_exist?
       programs = YAML.safe_load_file(YAML_PATH, permitted_classes: PERMITTED_YAML_CLASSES) || {}
-      update_cache(programs)
+      warm_cache(programs)
       return programs
+    end
+
+    # 読み経路のキャッシュ温め (#4575)。
+    #
+    # ⚠ **書き経路の update_cache と違い NX。**load はロックを取らないので、
+    # ここを無条件 SET にすると「YAML を読んでから SET するまで」の間に完走した
+    # 書き込みを、読み手が古い内容で上書きできる。program キャッシュには TTL が
+    # 無く load はキャッシュを優先するため、以後すべての面が旧データを返し続け、
+    # 次の編集がそれを read-modify-write して YAML まで巻き戻る（#4534 が塞いだ
+    # 症状が、書き手同士でなく「書き手 × 読み手」で復活する）。
+    #
+    # ⚠ **読み経路をロックに載せる方向は採らない。**読みは書きより桁違いに多く
+    # （ProgramUpdateWorker が毎分・API・iCalendar）、409 が跳ね上がる。
+    #
+    # 温めの失敗は無害（次の read が YAML へ倒れるだけ）なので alert しない。
+    def warm_cache(programs)
+      return redis.setnx(REDIS_KEY, programs.to_json)
+    rescue => e
+      e.log(program: {event: 'warm_cache_failed'})
+      return false
     end
 
     def update_cache(programs)
