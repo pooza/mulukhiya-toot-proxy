@@ -93,7 +93,7 @@ module Mulukhiya
       # （silent skip ではない）。非 harness で同じものが返るのは実退行なので、下の
       # JSON.parse / assert で落とす。harness 側の provisioning は chubo2#63。
       omit('mulukhiya webhook エンドポイント未提供（chubo2#63）') \
-        if harness? && endpoint_missing?(command.stdout)
+        if harness? && endpoint_missing?(command.stdout, @test_hook.uri.path)
 
       assert_predicate(command.status, :zero?)
       status = JSON.parse(command.stdout)
@@ -106,13 +106,22 @@ module Mulukhiya
 
     # harness が mulukhiya の webhook ルートを提供していないことの検出。
     # ⚠ 「JSON が返らなかった」で広く倒すと実退行まで飲むので、**HTML エラーページ**と
-    # **Fastify の 404 包絡**（`{"message":..., "error":"Not Found", "statusCode":404}`）に
-    # 限定する。それ以外の応答は omit せず assert で落とす。
-    def endpoint_missing?(body)
+    # **Fastify の route-not-found 包絡**（`{"message":"Route POST:<path> not found",
+    # "error":"Not Found","statusCode":404}`）に限定する。それ以外の応答は omit せず
+    # assert で落とす。
+    #
+    # ⚠ `statusCode == 404` だけでは足りない (PR #4557 の Codex P2)。ルートには届いた
+    # うえで参照先が無い 404 も同じ形を取りうるので、**ルートが無いこと**まで確かめる。
+    # `error` の文字列と、message が叩いた path そのものを名指していることを見る。
+    # ここが将来 Fastify の文言変更で外れた場合は omit されず assert で赤くなる
+    # （実退行を飲むより、検証条件のズレに気づけるほうを採る）。
+    def endpoint_missing?(body, path)
       return true if body.lstrip.start_with?('<')
       parsed = JSON.parse(body) rescue nil
       return false unless parsed.is_a?(Hash)
-      return parsed['statusCode'] == 404
+      return false unless parsed['statusCode'] == 404
+      return false unless parsed['error'] == 'Not Found'
+      return parsed['message'].to_s.include?(path)
     end
   end
 end
