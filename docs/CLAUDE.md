@@ -376,7 +376,27 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 4 PR ぶんでテストは 954 → 970 に増えたが **omission は 313 のまま**（新規 16 件はすべて実際に走っている）なので、
 CI の `omission_baseline`（mastodon 313 / misskey 302）は据え置きでよい。
 
-**リリースまでに残る手順**: ステージング dev24-27 → 本番 4 台。手順の正本は「リリース運用 → 通常リリース手順」。
+**リリースまでに残る手順**: **リリース前 5 観点レビュー（手順 2・未実施）** → 本番 4 台。手順の正本は「リリース運用 → 通常リリース手順」。
+ステージング（手順 5）は 2026-08-12 に 4 台とも完了済み（下記）。
+
+### ステージング検証（2026-08-12・**4 台とも緑**）
+
+`develop` の HEAD（`640ee959`）を dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/ dev27 ダイスキー（Misskey）へ適用。
+**4 台とも version 5.33.0・`/mulukhiya/api/health` 200（redis / sidekiq / postgres / streaming すべて OK）・WebUI 200**、
+番組表エディタ（`/mulukhiya/app/program`）と `.ics`（`/mulukhiya/api/program.ics`）も 200。
+**再起動後のプロセスが吐いたログにエラーは 1 行も無い**（生存 pid で grep して確認。再起動前の pid が吐いた辞書取得エラーは 5.32.0 時点からの既存事象）。
+
+- ⚠ **`Gemfile.lock` の `BUNDLED WITH` が 4.0.18 に上がっている**（`640ee959`）のに 4 台の bundler は 4.0.17 だった。
+  **FreeBSD では bundler の自己インストール → 再 exec が `/bin/sh` へフォールバックして落ちる**（[[project_staging-app-deploy-runbook]] の既知の罠）ので、
+  `bundle install` の前に `gem install bundler -v 4.0.18` を明示した。**`bundle update` を含む回のデプロイでは毎回この確認が要る**
+- ⚠ **ssh 越しに `service mulukhiya-listener restart` を素で叩くとセッションが返ってこない**。
+  デーモンが ssh の stdout を握ったままになるため。`</dev/null >/dev/null 2>&1` を付けること（health は別セッションから叩けば確認できる）
+- dev24-26 は monit が `/mulukhiya/api/health` を 3 サイクル監視して 3 サービスを再起動する構成なので、
+  デプロイ中は `monit unmonitor mulukhiya` → 完了後 `monit monitor mulukhiya` で挟んだ。⚠ **`monit monitor` の反映は次サイクル**（直後の summary は `monitor pending` と出る）
+- dev27 の `yjit_enabled: false` は既知の欠落（pooza/chubo2#123）で退行ではない。dev24-26 は `yjit_enabled: true`
+
+**モンキーテスト待ち**: #4534（番組表の書き込みロック）と #4560（`warn` の JSON 化・マスキング）は
+ステージングで目視できるためクローズせず開けてある。確認項目は各 Issue のコメントが正本。
 
 ### harness 実走ゲート（2026-08-11・**両系緑で通過**）
 
