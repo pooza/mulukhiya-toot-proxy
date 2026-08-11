@@ -44,8 +44,8 @@ module Mulukhiya
     # 許可できるなら**接続に使う IP アドレス**を、拒否なら nil を返す (#4524)。
     #
     # ⚠ **真偽値ではなくアドレスを返すのが肝。**名前で検証して名前で接続すると、
-    # 権威 DNS を握った相手が検証時だけ公開 IP を返し、接続時に 127.0.0.1 を
-    # 返せる（DNS リバインディング / TOCTOU）。ここで通した IP をそのまま接続先へ
+    # 権威 DNS を握った相手が検証時だけ公開 IP アドレスを返し、接続時に 127.0.0.1 を
+    # 返せる（DNS リバインディング / TOCTOU）。ここで通した IP アドレスをそのまま接続先へ
     # 固定する（pinning は pooza/ginseng-core#503）。
     #
     # ⚠ **1 本に固定するので Net::HTTP の複数アドレスへのフォールバックは効かなく
@@ -59,7 +59,7 @@ module Mulukhiya
       return nil if IPV6_BRACKET.match?(host)
       addrs = resolver.call(host)
       return nil if addrs.empty?
-      # ⚠ 1 本でも内部アドレスを含むなら拒否する。「公開 IP のほうを選べばよい」
+      # ⚠ 1 本でも内部アドレスを含むなら拒否する。「公開 IP アドレスのほうを選べばよい」
       # ではない。混ぜて返してくるのはリバインディングそのもの。
       return nil if addrs.any? {|ip| internal_address?(ip)}
       return preferred_address(addrs)
@@ -94,7 +94,7 @@ module Mulukhiya
     # リダイレクトの各ホップがこれを通る。
     #
     # ⚠ **返すのは真偽値ではなく IP アドレス**（拒否なら nil）。ginseng-core は
-    # 文字列が返るとその IP へ接続を固定する (pooza/ginseng-core#503)。名前で
+    # 文字列が返るとその IP アドレスへ接続を固定する (pooza/ginseng-core#503)。名前で
     # 検証して名前で接続していると DNS リバインディングで抜けられる (#4524)。
     #
     # ⚠ writer はテストの差し替え専用。実行時に緩めてはいけない。差し替えた

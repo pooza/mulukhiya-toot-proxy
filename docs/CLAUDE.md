@@ -457,9 +457,9 @@ PR #4557 の Codex P2。**2026-08-10 の棚卸し（直近 8 PR 横断）でも�
 
 ### 着地済み: #4524 SSRF allowlist の DNS リバインディング（2026-08-10）
 
-**「名前で検証して名前で接続する」構造そのものを畳んだ。**`RemoteHost.public?` は解決結果を真偽値に潰していたので、権威 DNS を握った相手が検証時だけ公開 IP を返し、接続時に 127.0.0.1 を返せた（TOCTOU）。**#4410 のホップ検証も #4523 のプリフライト検証も、この構造がある限り素通りできる。**
+**「名前で検証して名前で接続する」構造そのものを畳んだ。**`RemoteHost.public?` は解決結果を真偽値に潰していたので、権威 DNS を握った相手が検証時だけ公開 IP アドレスを返し、接続時に 127.0.0.1 を返せた（TOCTOU）。**#4410 のホップ検証も #4523 のプリフライト検証も、この構造がある限り素通りできる。**
 
-- `RemoteHost.allowed_address` を新設し、`validator` は**真偽値でなく接続先の IP** を返す。ginseng-core 1.16.0 が文字列を受けると `Net::HTTP#ipaddr=` で接続先を固定する（pooza/ginseng-core#503 / PR #504、`Ginseng::PinnedAddressAdapter`）
+- `RemoteHost.allowed_address` を新設し、`validator` は**真偽値でなく接続先の IP アドレス** を返す。ginseng-core 1.16.0 が文字列を受けると `Net::HTTP#ipaddr=` で接続先を固定する（pooza/ginseng-core#503 / PR #504、`Ginseng::PinnedAddressAdapter`）
 - ⚠ **`ipaddr=` は接続先だけを差し替える。**`Host:` ヘッダと TLS の SNI・証明書検証はホスト名のままなので HTTPS の検証は壊れない
 - ⚠ **pinning はホップごとに付け替える**（リダイレクト先は別ホスト）
 - ⚠ **IPv4 があれば IPv4 を採る。**`getaddresses` は A と AAAA を混ぜて返すので素直に先頭を採ると IPv6 を掴む（#4464 で踏んだ `::1` の 305ms と同型）
@@ -502,7 +502,7 @@ PR #4557 の Codex P2。**2026-08-10 の棚卸し（直近 8 PR 横断）でも�
 
 ### 着地済み（2026-08-09）
 
-- **#4503 test: アカウント依存のテストが CI・手元で 1 件も走っていない** — **CI で走らせる方向は採らず、harness 実走をリリースゲートとして正式化する形で決着**した。CI には SNS の実インスタンスも Mastodon の Postgres も無く、`config['/mastodon/url']` は `https://ci.example.com` のダミーなので、アカウント依存テストは**構造的に**走らない。3 点で着地:
+- **#4503 test: アカウント依存のテストが CI・手元で 1 件も走っていない** — **CI で走らせる方向は採らず、harness 実走をリリースゲートとして正式化する形で決着**した。CI には SNS の実サーバーも Mastodon の Postgres も無く、`config['/mastodon/url']` は `https://ci.example.com` のダミーなので、アカウント依存テストは**構造的に**走らない。3 点で着地:
   - **報告の是正（済）**: pooza/ginseng-core#488 / #489 で `disable?` を omission 報告に。実測 **929 tests 中 313 件が omission**（それまでは pass に混ざっていた）
   - **可視化とラチェット**: CI がジョブサマリに集計行と omission 件数を出し、`.github/workflows/test.yml` の `omission_baseline` を超えたら落ちる。⚠ **test-unit は 313 件 omission でも `100% passed` と出す**ので、集計行を読まないと気づけない
   - **ゲートの明文化**: 通常リリース手順に「harness 実走（省略不可・両系 0 failures / 0 errors）」を追加。判定基準と切り分けは [test-harness.md](test-harness.md)「リリースゲートとしての実走」
@@ -1048,13 +1048,13 @@ GitHub Actions (`.github/workflows/test.yml`):
 
 ### CI の緑が意味しないこと（#4503）
 
-CI には SNS の実インスタンスも Mastodon の Postgres も無い。`Ginseng::TestCase#run_test` は
+CI には SNS の実サーバーも Mastodon の Postgres も無い。`Ginseng::TestCase#run_test` は
 `disable?` のケースを **omission** として報告する（pooza/ginseng-core#488）ので実行されていない
 ことは出力に現れるが、**test-unit はそれでも `100% passed` と表示する**。実測で
 **929 tests 中 313 件が omission**（= 一度も実行されていない。2026-08-09 の CI 実測は
 mastodon 313 件 / misskey 302 件）。
 
-- **CI の緑をリリース判断の根拠にしない。**実インスタンスを要する範囲（`user_config` /
+- **CI の緑をリリース判断の根拠にしない。**実サーバーを要する範囲（`user_config` /
   `compose_template` / handler 系など）は、chubo2 fedi-test-harness の実走でしか検証できない。
   リリース手順に必須ゲートとして組み込んである
 - CI は毎回ジョブサマリに集計行と omission 件数を出す。**omission が
@@ -1104,7 +1104,7 @@ test/
 1. **マイルストーンのIssueをすべて消化**
 2. **リリース前レビュー**: 下記「リリース前レビュー」の 5 観点並列レビューを実施。必修（赤）のみ本リリースで対応し、残り（黄・緑）は Issue 起票して次リリース以降へ
 3. **セキュリティレビュー**: Dependabotアラート確認、`bundle update`、bundler-audit実行。問題があれば修正コミット
-4. **harness 実走（省略不可）**: chubo2 fedi-test-harness で `develop` の HEAD を実走し、**Mastodon 系・Misskey 系の両方で 0 failures / 0 errors** を確認する。手順は [test-harness.md](test-harness.md)「リリースゲートとしての実走」節。**CI の緑はこのゲートの代わりにならない**（CI は実インスタンスを持たないため、アカウント依存のテスト 300 件超が omission のまま `100% passed` と出る。#4503）
+4. **harness 実走（省略不可）**: chubo2 fedi-test-harness で `develop` の HEAD を実走し、**Mastodon 系・Misskey 系の両方で 0 failures / 0 errors** を確認する。手順は [test-harness.md](test-harness.md)「リリースゲートとしての実走」節。**CI の緑はこのゲートの代わりにならない**（CI は実サーバーを持たないため、アカウント依存のテスト 300 件超が omission のまま `100% passed` と出る。#4503）
 5. **ステージング検証（省略不可）**: `develop` をステージング全4台（dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼 = Mastodon、dev27 ダイスキー = Misskey）にデプロイし、ヘルスチェック・`/mulukhiya/api/about`・WebUI を目視確認する。緊急ホットフィックス以外で省略しない（5.7.0 で省略 → #4159 が発生した教訓）。※旧ステージング（dev04/15/22/23 + drime）は退役済み。現行の Proxmox ステージング構成は chubo2 `docs/infra-note.md`「ステージング」節を正とする
 6. **バージョンバンプ**: `config/application.yaml` の `/mulukhiya/version` を更新
 7. **リリースPR作成**: `develop` → `main` へPRを作成

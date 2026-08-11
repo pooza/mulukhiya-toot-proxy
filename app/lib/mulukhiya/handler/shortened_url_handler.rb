@@ -56,7 +56,7 @@ module Mulukhiya
     # ホップの src なので、ここで通したものだけが fetch_redirect へ渡る。
     #
     # ⚠ **戻り値のアドレスを捨てない** (#4524)。名前で検証して名前で接続すると、
-    # 権威 DNS を握った相手が検証時だけ公開 IP を返し、GET のときに 127.0.0.1 を
+    # 権威 DNS を握った相手が検証時だけ公開 IP アドレスを返し、GET のときに 127.0.0.1 を
     # 返せる。ここは自前でホップを追う経路なので、pinning も自前で渡す必要がある。
     def permitted_address(uri)
       address = RemoteHost.validator.call(uri.host.to_s)

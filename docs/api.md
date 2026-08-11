@@ -334,7 +334,7 @@ URL 正規化、短縮 URL 展開、NowPlaying URL 展開（iTunes/Spotify/YouTu
 
 **`features.media_catalog`**: メディアカタログ機能の現在のオン/オフ状態。実体は `/{controller}/data/media_catalog` を `/about` で features 側に合流させたもの（discovery を features 一本に集約するため、`annict_linked` と同じ動的合流パターン、#4343）。5.23.0 から デフォルト `false`（実験的扱い）。`false` のとき `/media`・`/feed/media` はいずれも **404 ではなく 503** を返す。`/media`（JSON）は body に `{"available": false, "items": [], "has_next": false}` を含める。`/feed/media`（RSS 2.0）は body 形式維持のため空 channel のみを返し（JSON フィールドは付かない）、HTTP ステータスのみで状態を示す。capsicum 等のクライアントは本フラグを参照して「メンテナンス中」表示に切り替える（`pooza/capsicum#606`）。`Retry-After` ヘッダは付与しない（再開タイミングが運用判断ベースで見積もり不能なため、クライアントは `/about` を polling して features を見る）。「機能未提供」(404) と「現在 OFF」(503) の区別が目的。
 
-**`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 4 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 4 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。
+**`features.program_editable`**: 番組表エディタ（`/admin/program/entry/*` 4 ルート）の書き込み API が現在利用可能か。`livecure?` が `true`（番組表機能対応 controller）かつ `/program/auto_update` が `false`（自動更新無効）のときのみ `true`（#4272）。`true` でも管理者権限が必要なのは従来通り。`false` のとき書き込み 4 ルートは 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）を返す。WebUI 側は本フラグを見て編集ボタン類を非表示・案内表示に切り替える。`livecure?` 自体が `false` のサーバーでは番組表機能が無いので常に `false`。⚠ **`true` でも 409 は起こりうる**（5.33.0〜 / #4534 の書き込みロック競合）。**本フラグと 409 を「編集不可」として同一視しないこと**——ロック競合の 409 は一過性で、再試行すれば通る。
 
 **`features.nowplaying_resolver`**: ナウプレ enrich プロキシ（`POST /nowplaying/resolve`）の利用可否（#4382）。iTunes Search API が資格情報不要で常時利用可能なため恒常的に `true`。capsicum はこのフラグを見てナウプレ投稿時に URL 補完（enrich）を試みるか判定する。enrich なしでもクライアント整形のみで投稿は成立するため、フラグが無い旧サーバーでも degrade して動作する。プロバイダ既定は `/nowplaying/resolve/default_provider`（既定 `apple_music`）。
 
@@ -1165,7 +1165,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 
 - **`null` 値の扱い**: POST / PUT とも任意フィールドに `null` を渡すと保存前に `compact` で除去され、当該キーはエントリに保存されない。POST では「未設定」として、PUT では「既存キーの削除」（部分更新セマンティクス）として作用する
 - **レスポンス**: `{key, entry}` の JSON
-- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）。バリデーション違反は 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）
+- **エラー**: 既存キー重複時は 409 Conflict（5.21.x までは 422 で返していた、5.22.0 から 409）。バリデーション違反は 422。`/program/auto_update: true` のとき (#4272) は 409 Conflict（メッセージ「自動更新が有効のため、編集できません。」）。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
 
 #### PUT /mulukhiya/api/admin/program/entry/:key
 
@@ -1178,7 +1178,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **任意キーのクリア**: 任意フィールド（`subtitle` 等）の値に `null` を渡すとそのキーがエントリから削除される
 - **`series` の扱い**: 送らなければ既存値を維持。送る場合は空文字 / `null` 不可（既存エントリの `series` をクリアする操作は提供しない。エントリ自体を削除する場合は DELETE を使う）
 - **レスポンス**: `{key, entry}`
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
 
 #### DELETE /mulukhiya/api/admin/program/entry/:key
 
@@ -1188,7 +1188,7 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 - **前提条件**: `livecure?` が `true`
 - **パスパラメータ**: `key` (string)
 - **レスポンス**: `{key, entry}` (削除した内容を返す)
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
 
 #### POST /mulukhiya/api/admin/program/entry/:key/episode/increment
 
@@ -1197,12 +1197,23 @@ JSON オブジェクトは仕様上「順序なし」だが、キーは SHA256 �
 を更新する。Annict が未設定または該当エピソードが見つからない場合は
 `annict_episode_id` のみクリアする（subtitle は手動更新）。
 
+⚠ **`annict_episode_id` がクリアされたまま返るケースは 3 つある。**(1) Annict 未連携、(2) 該当話数が Annict に無い、
+(3) **5.33.0〜 / #4534**: Annict の解決はロックの外で先に行うため、その間に別の書き込みが割り込むと
+「引いた時点の話数・作品 ID」と一致しなくなり、**古い結果を載せずに捨てる**（lost update を防ぐための正しい挙動）。
+
+⚠ **(3) で本エンドポイントを再実行してはいけない。**話数の +1 と `next_on` の 7 日前進は
+**この呼び出しで既に成功して保存されている**（`annict_applicable?` が閉じるのは Annict メタデータを載せるかどうかだけ）。
+再実行すると**話数がもう 1 つ進み `next_on` もさらに 7 日進む**ため、話数を飛ばして日付がずれる。
+不足しているのは `annict_episode_id` と `subtitle` だけなので、**`PUT /admin/program/entry/:key` で補う**。
+⚠ **レスポンス上は (1)(2)(3) を区別できない**ので、クライアントは 3 つとも「増分は成功、メタデータは未設定」として
+同じ扱いにするのが安全（構造の是正は #4579）。
+
 - **認証**: 必要（管理者のみ）
 - **前提条件**: `livecure?` が `true`
 - **パスパラメータ**: `key` (string)
 - **`next_on` の前進**: エントリが `next_on` を持つ場合、**話数と同時に 7 日進む**（#4373）。ウィークリー枠の日付更新を既存操作へ相乗りさせるため。`next_on` を持たないエントリには**日付を生やさない**（生やすと毎日枠が単発扱いになりイベントが消える）。不正な値が入っていた場合は触らず、話数の +1 だけ行う
 - **レスポンス**: `{key, entry}` (更新後)
-- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict
+- **エラー**: 該当エントリなしの場合 404。`/program/auto_update: true` のとき (#4272) は 409 Conflict。書き込みが同時に走った場合も 409 Conflict（メッセージ「別の更新が進行中です。少し待って再試行してください。」、5.33.0〜 / #4534）。**こちらは一過性**なので、クライアントは再取得のうえ再試行してよい（ロック TTL は 30 秒）。`/program/auto_update: true` 由来の 409 は**恒久**なので、両者はメッセージで区別する
 
 #### GET /mulukhiya/api/program/works
 

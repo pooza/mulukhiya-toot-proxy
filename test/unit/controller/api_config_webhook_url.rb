@@ -1,7 +1,7 @@
 module Mulukhiya
   # GET /mulukhiya/api/config の `webhook.url` は nullable (#4487 / #4537)。
   #
-  # ⚠ 本物の Account は DB を掴むのでダブルを差す。実インスタンスに依存させると
+  # ⚠ 本物の Account は DB を掴むのでダブルを差す。実サーバーに依存させると
   # DBMS の無い環境でケースごと omit され、この判定が一度も走らない。
   class APIConfigWebhookURLTest < TestCase
     WebhookDouble = Struct.new(:available, :url) do
