@@ -42,6 +42,36 @@ module Mulukhiya
       assert_false(RemoteHost.public?('attacker.example', resolver: stub_resolver(mixed)))
     end
 
+    # ⚠ ゼロアドレスは private? / loopback? / link_local? のいずれも false を返すのに、
+    # connect(2) はローカルホスト宛として扱う。pinning が効いているぶん確実に届く (#4574)。
+    def test_returns_false_when_resolver_returns_zero_address
+      ['0.0.0.0', '::', '::ffff:0.0.0.0', '0.1.2.3'].each do |address|
+        assert_false(
+          RemoteHost.public?('attacker.example', resolver: stub_resolver([address])),
+          "#{address} を許可してはいけない",
+        )
+      end
+    end
+
+    def test_returns_false_when_resolver_returns_reserved_range
+      ['100.64.0.1', '192.0.0.1', '198.18.0.1', '224.0.0.1', '255.255.255.255', '64:ff9b::7f00:1'].each do |address|
+        assert_false(
+          RemoteHost.public?('attacker.example', resolver: stub_resolver([address])),
+          "#{address} を許可してはいけない",
+        )
+      end
+    end
+
+    # 予約レンジを足したせいで正当な公開アドレスまで落ちていないこと。
+    def test_returns_true_for_public_addresses_outside_reserved_ranges
+      ['8.8.8.8', '93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946'].each do |address|
+        assert_true(
+          RemoteHost.public?('example.com', resolver: stub_resolver([address])),
+          "#{address} は許可されるべき",
+        )
+      end
+    end
+
     def test_returns_false_when_resolver_returns_empty
       assert_false(RemoteHost.public?('nx.example', resolver: stub_resolver([])))
     end
