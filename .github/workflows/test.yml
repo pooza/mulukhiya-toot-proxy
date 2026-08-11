@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # omission_baseline は「CI（実インスタンス非保持）で omission になるテストの
+        # omission_baseline は「CI（実サーバー非保持）で omission になるテストの
         # 上限件数」。CI には SNS も Mastodon の Postgres も無いため、アカウント依存の
         # テストは実行されず omission になる。この件数が黙って増えると
         # 「守れているつもりの緑」が広がるので、超えたら CI を落とす (#4503)。
@@ -84,7 +84,7 @@ jobs:
             echo "${summary:-集計行が見つかりませんでした}"
             echo '```'
             echo
-            echo "CI は実インスタンス（SNS + Mastodon の Postgres）を持たないため、"
+            echo "CI は実サーバー（SNS + Mastodon の Postgres）を持たないため、"
             echo "**アカウント依存のテストは実行されず omission になる（${omissions:-?} 件 / 上限 ${BASELINE}）。**"
             echo "test-unit はこの状態でも \`100% passed\` と出すので、**CI の緑だけをリリース判断の根拠にできない**。"
             echo "リリース前に chubo2 fedi-test-harness で実走し、Mastodon / Misskey 両系で"
