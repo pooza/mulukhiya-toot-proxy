@@ -1,7 +1,12 @@
 module Mulukhiya
   # 番組表データの参照・編集 (ドメインロジック) を担う。HTTP 取得・YAML/Redis
   # 永続化といった I/O は ProgramFetcher へ委譲する (#4347)。
-  class Program
+  #
+  # ⚠ ClassLength の上限（200 行）を 1 行超えている。**参照系と編集系という 2 つの
+  # 関心を抱えているのが本体**で、編集系を別クラスへ出すのが正しい直し方なので
+  # #4570 として起票してある。⚠ **無関係なメソッドを詰めて行数を捻出しない**
+  # （#4534 で persist を潰したのがそれで、設計判断ではなく上限合わせだった）。
+  class Program # rubocop:disable Metrics/ClassLength
     include Singleton
     include Package
 
@@ -144,14 +149,14 @@ module Mulukhiya
     # そのまま戻る**（PR #4569 の Codex P2）。TTL を伸ばす手もあるが、プロセスが
     # 死んだときに編集が止まる時間もそのまま伸びるので採らない。
     #
-    # ⚠ 代わりに「引いた時点の話数」を持ち回り、**ロックの中で話数が一致したときだけ
-    # 載せる**。一致しない = 待っている間に別の +1 が入った、ということなので、
-    # 古い話数のサブタイトルで上書きしてはいけない。載せなかった場合は
-    # annict_episode_id が nil のまま（Annict が引けなかったときと同じ状態）になる。
+    # ⚠ 代わりに「引いた時点の話数と作品 ID」を持ち回り、**ロックの中で両方とも
+    # 一致したときだけ載せる**。一致しない = 待っている間に別の +1 が入ったか作品を
+    # 差し替えられた、ということなので、古い内容で上書きしてはいけない。載せなかった
+    # 場合は annict_episode_id が nil のまま（Annict が引けなかったときと同じ状態）。
     def increment_episode(key, annict: nil)
       raise auto_update_conflict if auto_update?
       key = key.to_s
-      next_episode, next_ep = prepare_annict_increment(key, annict)
+      prepared = prepare_annict_increment(key, annict)
       return lock.synchronize do
         programs = data
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
@@ -159,9 +164,9 @@ module Mulukhiya
         entry['episode'] = (entry['episode'] || 0).to_i + 1
         entry['annict_episode_id'] = nil
         advance_next_on(entry)
-        if annict_applicable?(next_ep, next_episode, entry['episode'])
-          entry['annict_episode_id'] = next_ep['annictId']
-          entry['subtitle'] = next_ep['title'] if next_ep['title']
+        if annict_applicable?(prepared, entry)
+          entry['annict_episode_id'] = prepared[:episode_data]['annictId']
+          entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
         end
         fetcher.save(programs)
         next entry
@@ -304,8 +309,9 @@ module Mulukhiya
     def prepare_annict_increment(key, annict)
       current = data[key] || {}
       episode = (current['episode'] || 0).to_i + 1
-      return [episode, nil] unless annict && current['annict_work_id']
-      return [episode, next_annict_episode(annict, current['annict_work_id'], episode)]
+      work_id = current['annict_work_id']
+      return {episode:, work_id:} unless annict && work_id
+      return {episode:, work_id:, episode_data: next_annict_episode(annict, work_id, episode)}
     end
 
     # ロックの外で引いた Annict の結果を、ロックの中で確定した話数に載せてよいか。
@@ -313,11 +319,17 @@ module Mulukhiya
     # ⚠ 待っている間に別の +1 が入っていたら**載せない**。載せると古い話数の
     # サブタイトル・annict_episode_id で新しい話数を上書きしてしまう（#4534 で
     # 塞いだ lost update と同じ壊れ方を、別経路で作ることになる）。
+    #
+    # ⚠ **話数だけでなく作品 ID も見る** (PR #4571 の Codex P2)。
+    # ProgramEntryUpdateContract は annict_work_id の変更を許しているので、
+    # 待っている間に作品を差し替えられると「話数は同じだが別作品」になる。
+    # そこへ旧作品のサブタイトルを載せてはいけない。
+    #
     # 載せなかった場合は annict_episode_id が nil のまま = Annict を引けなかった
     # ときと同じ状態になる。
-    def annict_applicable?(next_ep, expected_episode, actual_episode)
-      return false unless next_ep
-      return expected_episode == actual_episode
+    def annict_applicable?(prepared, entry)
+      return false unless prepared[:episode_data]
+      return prepared.values_at(:episode, :work_id) == entry.values_at('episode', 'annict_work_id')
     end
 
     def next_annict_episode(annict, work_id, episode_number)
