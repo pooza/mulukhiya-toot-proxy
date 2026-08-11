@@ -27,10 +27,12 @@ module Mulukhiya
     # 番組表全体の差し替え。auto_update の pull（ProgramUpdateWorker）と rake から
     # 呼ばれる。エディタ経由の書き込みと同じロックで直列化する (#4534)。
     #
-    # ⚠ 編集 4 メソッドはロックを取ったうえで persist を呼ぶ。ここを経由させると
-    # 自分自身のロックと衝突して ConflictError になる。
+    # ⚠ 編集 4 メソッドは lock.synchronize の内側で fetcher.save を直接呼ぶ。
+    # ここを経由させると自分自身のロックと衝突して ConflictError になる。
+    # 逆に、ロックの外から fetcher.save を呼ぶと #4534 で塞いだ lost update が
+    # そのまま復活する。
     def save(programs)
-      return lock.synchronize {persist(programs)}
+      return lock.synchronize {fetcher.save(programs)}
     end
 
     def data
@@ -84,7 +86,7 @@ module Mulukhiya
         raise Ginseng::ConflictError, "キー '#{key}' は既に存在します。" if programs.key?(key)
         attrs = attributes.transform_keys(&:to_s).reject {|_, v| blank_value?(v)}
         programs[key] = attrs.to_h {|k, v| [k, normalize_value(k, v)]}
-        persist(programs)
+        fetcher.save(programs)
         next programs[key]
       end
     end
@@ -117,7 +119,7 @@ module Mulukhiya
             programs[key][k.to_s] = normalize_value(k.to_s, v)
           end
         end
-        persist(programs)
+        fetcher.save(programs)
         next programs[key]
       end
     end
@@ -129,24 +131,27 @@ module Mulukhiya
         programs = data
         next nil unless programs.key?(key)
         entry = programs.delete(key)
-        persist(programs)
+        fetcher.save(programs)
         next entry
       end
     end
 
-    # ⚠ Annict の GraphQL 呼び出し（/service/annict/timeout: 5 秒 × 最大 3 回）を
-    # **ロックの内側に置いている**のは意図的 (#4534)。話数の +1 と、その話数に
-    # 対応するサブタイトル・annict_episode_id の解決は 1 つの不可分な更新で、
-    # 分けると「解決している間に別の +1 が入り、古い話数のサブタイトルを
-    # 上書きする」という別の lost update を作る。
+    # ⚠ Annict の GraphQL 呼び出しは**ロックの外**で先に済ませる (#4534)。
     #
-    # 代わりに、Annict が詰まっている間は他の編集が最大十数秒 409 を受ける。
-    # ⚠ これは黙って巻き戻るより良い、という判断であって無害ではない。エディタは
-    # 409 をトーストで見せて再試行させる。TTL(30 秒) は Annict の最悪値に
-    # 余裕を足した値なので、ここを縮めるなら TTL も見直すこと。
+    # 当初はロックの内側に置いていたが、それだと **TTL を超えうる**（open と read で
+    # 各 5 秒 × 最大 3 回 + リトライ待ち ≧ 30 秒）。ロックが先に失効すると別の編集が
+    # 獲得でき、そこへ元のリクエストが書き戻して**塞いだはずの lost update が
+    # そのまま戻る**（PR #4569 の Codex P2）。TTL を伸ばす手もあるが、プロセスが
+    # 死んだときに編集が止まる時間もそのまま伸びるので採らない。
+    #
+    # ⚠ 代わりに「引いた時点の話数」を持ち回り、**ロックの中で話数が一致したときだけ
+    # 載せる**。一致しない = 待っている間に別の +1 が入った、ということなので、
+    # 古い話数のサブタイトルで上書きしてはいけない。載せなかった場合は
+    # annict_episode_id が nil のまま（Annict が引けなかったときと同じ状態）になる。
     def increment_episode(key, annict: nil)
       raise auto_update_conflict if auto_update?
       key = key.to_s
+      next_episode, next_ep = prepare_annict_increment(key, annict)
       return lock.synchronize do
         programs = data
         raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
@@ -154,14 +159,11 @@ module Mulukhiya
         entry['episode'] = (entry['episode'] || 0).to_i + 1
         entry['annict_episode_id'] = nil
         advance_next_on(entry)
-        if annict && entry['annict_work_id']
-          next_ep = next_annict_episode(annict, entry['annict_work_id'], entry['episode'])
-          if next_ep
-            entry['annict_episode_id'] = next_ep['annictId']
-            entry['subtitle'] = next_ep['title'] if next_ep['title']
-          end
+        if annict_applicable?(next_ep, next_episode, entry['episode'])
+          entry['annict_episode_id'] = next_ep['annictId']
+          entry['subtitle'] = next_ep['title'] if next_ep['title']
         end
-        persist(programs)
+        fetcher.save(programs)
         next entry
       end
     end
@@ -199,13 +201,6 @@ module Mulukhiya
     # プロセスをまたいでも効く。
     def lock
       @lock ||= ProgramLockStorage.new
-    end
-
-    # ロックを取らずに書き戻す。⚠ 直接呼ばないこと。呼び出し元はいずれも
-    # lock.synchronize の内側にいる前提で、外から呼ぶと #4534 で塞いだ
-    # lost update がそのまま復活する。
-    def persist(programs)
-      return fetcher.save(programs)
     end
 
     # nil または空白のみの文字列は「未設定」として扱い、保存対象から除く。
@@ -299,6 +294,30 @@ module Mulukhiya
     # 拒否し「auto_update を切ってから編集する」運用に倒す (#4272)。
     def auto_update_conflict
       return Ginseng::ConflictError.new('自動更新が有効のため、編集できません。')
+    end
+
+    # ロックを取る前に Annict を引く。annict が無い / 作品 ID が紐づいていない
+    # エントリではネットワークへ出ない。
+    #
+    # ⚠ ここでの読みは Annict を先に引くためだけのもの。**存在チェックの正本は
+    # ロックの中**（外で raise すると、ロック競合より先に 404 を返してしまう）。
+    def prepare_annict_increment(key, annict)
+      current = data[key] || {}
+      episode = (current['episode'] || 0).to_i + 1
+      return [episode, nil] unless annict && current['annict_work_id']
+      return [episode, next_annict_episode(annict, current['annict_work_id'], episode)]
+    end
+
+    # ロックの外で引いた Annict の結果を、ロックの中で確定した話数に載せてよいか。
+    #
+    # ⚠ 待っている間に別の +1 が入っていたら**載せない**。載せると古い話数の
+    # サブタイトル・annict_episode_id で新しい話数を上書きしてしまう（#4534 で
+    # 塞いだ lost update と同じ壊れ方を、別経路で作ることになる）。
+    # 載せなかった場合は annict_episode_id が nil のまま = Annict を引けなかった
+    # ときと同じ状態になる。
+    def annict_applicable?(next_ep, expected_episode, actual_episode)
+      return false unless next_ep
+      return expected_episode == actual_episode
     end
 
     def next_annict_episode(annict, work_id, episode_number)
