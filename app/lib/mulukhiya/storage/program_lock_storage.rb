@@ -33,10 +33,12 @@ module Mulukhiya
     # してもロックを失わない余裕」で決める。RMW の途中に TTL が切れると、
     # ロック無しで書き込む別リクエストが現れて lost update が黙って復活する。
     #
-    # increment_episode は Annict の GraphQL を挟むが、その呼び出しは
-    # ロックの外へ出してある（Program#increment_episode 参照）ので、ロックを
-    # 持っている区間は Redis と YAML の書き込みだけ。他のロック（既定 30 秒）と
-    # 水準を揃える。
+    # ⚠ **ロックを持っている区間にネットワーク I/O を入れないこと。**
+    # increment_episode の Annict 呼び出し（open / read で各 5 秒 × 最大 3 回 +
+    # リトライ待ち）は素でこの TTL を超えうる。超えると別の編集がロックを獲得でき、
+    # そこへ元のリクエストが書き戻して lost update が復活する（PR #4569 の Codex P2）。
+    # 現状 Annict はロックの外で先に解決してあるので、区間は Redis と YAML の
+    # 書き込みだけ。他のロック（既定 30 秒）と水準を揃える。
     #
     # 定数にして config ルックアップを持たない（存在しないパスは ConfigError を
     # raise し、acquire の rescue に飲まれてロックが黙って無効化される footgun を

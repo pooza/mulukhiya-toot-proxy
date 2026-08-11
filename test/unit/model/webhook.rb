@@ -112,7 +112,12 @@ module Mulukhiya
     #
     # ⚠ `statusCode == 404` だけでは足りない (PR #4557 の Codex P2)。ルートには届いた
     # うえで参照先が無い 404 も同じ形を取りうるので、**ルートが無いこと**まで確かめる。
-    # `error` の文字列と、message が叩いた path そのものを名指していることを見る。
+    #
+    # ⚠ path を含むかどうかでも足りない (PR #4568 の Codex P2)。ハンドラが同じ包絡で
+    # `Webhook /mulukhiya/webhook/<digest> not found` を返せば部分一致してしまい、
+    # **ルートは在るのに omit する**。Fastify の route-miss の文面ごと突き合わせる。
+    # Webhook#command は必ず POST なのでメソッド名も固定でよい。
+    #
     # ここが将来 Fastify の文言変更で外れた場合は omit されず assert で赤くなる
     # （実退行を飲むより、検証条件のズレに気づけるほうを採る）。
     def endpoint_missing?(body, path)
@@ -121,7 +126,7 @@ module Mulukhiya
       return false unless parsed.is_a?(Hash)
       return false unless parsed['statusCode'] == 404
       return false unless parsed['error'] == 'Not Found'
-      return parsed['message'].to_s.include?(path)
+      return parsed['message'].to_s == "Route POST:#{path} not found"
     end
   end
 end
