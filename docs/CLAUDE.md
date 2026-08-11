@@ -497,6 +497,9 @@ PR #4557 の Codex P2。**2026-08-10 の棚卸し（直近 8 PR 横断）でも�
 
 - **#4543 obs: Sentry の未トリアージ unresolved 16 件を棚卸しする（size:M）** — `is:unresolved` 27 件のうち **16 件がコメント 0 のまま滞留**していた。§5 の手順は**新規イシューだけを見る**構造なので、手順が入る前の分がそのまま残っている。Redis 接続系 174 件 / 上流 4xx・5xx 100 件 / 単発 2 件の 3 群に分けて群ごとに判断する。上流 4xx 群には #4542 と同型（クライアント起因なのに alert）が混ざっている可能性が高い
 - **syslog 側のノイズ棚卸し（未起票）** — zugoga の `base_uri undefined` のように `e.log` 止まりで Sentry に出ない大量ログがある。#4543 の対象外なので別建てが要る
+- **#4573 obs/bug: リモート辞書が 200-with-HTML を掴むと黙って空になる（size:S）** — 2026-08-12 のステージング検証で発見。GAS の `/exec` が失効すると **HTTP 200 のまま `text/html`** を返し、`RemoteDictionary#fetch` は型を見ていないので String が通る。`RelatedRemoteDictionary#parse` の `fetch.to_h` が `String#to_h` で倒れ、外側の rescue が `{}` を返して**辞書が空になる**。⚠ **美食丼（shallu）は `related` 辞書 3 本とも死んでおり、関連語タグ付けが機能していない**（10 分ごとに 87 行）。`e.log` 止まりなので Sentry には出ない（#4549 / #4560 と同型）。直し方の前例は `PronunciationDictionary#valid_schema?`。**5.33.0 とは無関係の既存事象**なので本リリースには積んでいない
+  - 付随して 3 サブクラスで異常時の挙動が割れている（`Related` / `Mecab` は fail-open で `{}`、`MultiField` だけ外側 rescue が無く例外が抜ける）
+- **pooza/chubo2#166 ops: sweep の unattended-upgrades が itamae 管理外** — 2026-08-12 06:40 に systemd 更新の巻き添えで `redis-server` が再起動し、Sidekiq が Sentry へ 8 イベント（一過性・復旧済み・triage コメント済み）。⚠ **sweep は「再起動で PG が上がらない地雷」を抱えているのに `postgresql-16` が自動更新の射程内**なのが本題。モロヘイヤ側の作業は無い
 
 ### 着地済み（2026-08-09）
 
