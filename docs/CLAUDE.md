@@ -372,8 +372,8 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 
 ⚠ **本番のバージョンは 5.32.0（3 台）と 5.32.1（zugoga）で不揃いのまま。**5.33.0 で揃えるので、リリースを先送りするほどこの状態が伸びる。
 
-**2026-08-11 時点の実測**: `rake test` **964 tests / 1320 assertions / 0 failures / 0 errors / 313 omissions**。
-2 PR ぶんでテストは 954 → 964 に増えたが **omission は 313 のまま**（新規 10 件はすべて実際に走っている）なので、
+**2026-08-11 時点の実測**: `rake test` **970 tests / 1326 assertions / 0 failures / 0 errors / 313 omissions**。
+4 PR ぶんでテストは 954 → 970 に増えたが **omission は 313 のまま**（新規 16 件はすべて実際に走っている）なので、
 CI の `omission_baseline`（mastodon 313 / misskey 302）は据え置きでよい。
 
 **リリースまでに残る手順**: **harness 実走ゲート（両系 0 failures / 0 errors・省略不可）**
