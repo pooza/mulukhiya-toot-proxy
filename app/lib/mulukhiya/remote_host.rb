@@ -32,7 +32,8 @@ module Mulukhiya
       '224.0.0.0/4',        # multicast
       '240.0.0.0/4',        # reserved (255.255.255.255 を含む)
       '::/128',             # unspecified
-      '64:ff9b::/96',       # NAT64 (RFC 6146)
+      '64:ff9b::/96',       # NAT64 well-known prefix (RFC 6146)
+      '64:ff9b:1::/48',     # NAT64 local-use prefix (RFC 8215)
       'ff00::/8',           # IPv6 multicast
     ].map {|v| IPAddr.new(v)}.freeze
 

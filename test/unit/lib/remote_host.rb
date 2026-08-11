@@ -54,7 +54,14 @@ module Mulukhiya
     end
 
     def test_returns_false_when_resolver_returns_reserved_range
-      ['100.64.0.1', '192.0.0.1', '198.18.0.1', '224.0.0.1', '255.255.255.255', '64:ff9b::7f00:1'].each do |address|
+      # ⚠ NAT64 は well-known (RFC 6146) と local-use (RFC 8215) で別レンジ。
+      # 前者だけ塞ぐと、local-use を使う環境で内部 IPv4 へ変換されて抜ける。
+      addresses = [
+        '100.64.0.1', '192.0.0.1', '198.18.0.1', '224.0.0.1', '255.255.255.255',
+        '64:ff9b::7f00:1', '64:ff9b:1::7f00:1'
+      ]
+
+      addresses.each do |address|
         assert_false(
           RemoteHost.public?('attacker.example', resolver: stub_resolver([address])),
           "#{address} を許可してはいけない",
