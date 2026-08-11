@@ -106,12 +106,25 @@ source すると `MASTODON_*` と `MISSKEY_*` が両方揃い、コントロー�
 Mastodon をもう一度走らせたまま「両系緑」とゲートを通せてしまう**（#4559）。
 
 - 系ごとに**別のシェル**（別タブ・`bash -c` の中・`env -i`）で回す
+  - ⚠ **`env -i` を使うなら `LANG` / `LC_ALL` を残す**（2026-08-11 に踏んだ）。落とすと Ruby の
+    外部エンコーディングが US-ASCII になり、**製品と無関係な
+    `invalid byte sequence in US-ASCII` が 1 failures / 5 errors 出る**。退行と読み違える。
+    `env -i HOME="$HOME" PATH="$PATH" TERM=dumb LANG="$LANG" LC_ALL="$LC_ALL" bash -c ...` で足りる
+  - 分離できたかは実走の前に `env | grep -c '^MASTODON_'` などで数えると確実（0 であること）
 - 実走の頭で `TestHarness` が **選択したコントローラを stderr に出す**ので、source した
   `.env.test` と一致しているかを毎回見る:
 
   ```text
-  TestHarness: controller=misskey url=http://localhost:3001
+  TestHarness: controller=misskey url=http://localhost:3000
   ```
+
+  ⚠ **`url=` は取り違えの判別に使えない。**Misskey ハーネスも既定が `MISSKEY_PORT=3000` で、
+  両系とも `localhost:3000` を出す（2026-08-11 に確認。以前ここに書いていた `:3001` は誤り）。
+  **見るのは `controller=` の側**。
+
+⚠ **両ハーネスは同時に起動できない**（ポート 3000 が衝突する）。片方を `teardown.sh` してから
+もう片方を `setup.sh` する。`setup.sh` は 1 系あたり 8〜9 分かかるので、ゲート 1 回に
+20 分前後は見ておくこと（pooza/chubo2#165）。
 
 - 結果を記録するときは、この行もセットで残す（後から取り違えを検証できる）
 

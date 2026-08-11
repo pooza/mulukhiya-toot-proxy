@@ -376,8 +376,24 @@ GitHub マイルストーン作成済み（#631）。バージョンバンプは
 4 PR ぶんでテストは 954 → 970 に増えたが **omission は 313 のまま**（新規 16 件はすべて実際に走っている）なので、
 CI の `omission_baseline`（mastodon 313 / misskey 302）は据え置きでよい。
 
-**リリースまでに残る手順**: **harness 実走ゲート（両系 0 failures / 0 errors・省略不可）**
-→ ステージング dev24-27 → 本番 4 台。手順の正本は「リリース運用 → 通常リリース手順」。
+**リリースまでに残る手順**: ステージング dev24-27 → 本番 4 台。手順の正本は「リリース運用 → 通常リリース手順」。
+
+### harness 実走ゲート（2026-08-11・**両系緑で通過**）
+
+同一 HEAD（`develop` = #4572 マージ後）で両系を実走。**判定基準（両系 0 failures / 0 errors、`TestHarness: controller=` が狙った系と一致）をいずれも満たす。**
+
+| 系 | 結果 | announce |
+| --- | --- | --- |
+| Mastodon（harness v4.6.5） | **1042 tests / 2079 assertions / 0 failures / 0 errors / 152 omissions** | `controller=mastodon url=http://localhost:3000` |
+| Misskey（harness 2026.7.0） | **1045 tests / 2112 assertions / 0 failures / 0 errors / 141 omissions** | `controller=misskey url=http://localhost:3000` |
+
+omission は両系とも 2026-08-09 の参考値（152 / 141）と**完全一致**。tests が参考値（1001 / 1004）より増えているのは #4534 系列で 16 件足したぶんとシード差。上流バージョンの昇格は伴わないので台帳（harness-verified-versions.yaml）は据え置き。
+
+#### ⚠ この日踏んだ落とし穴 3 つ（次回も踏む）
+
+- **両ハーネスは同時に起動できない。**Misskey ハーネスも `MISSKEY_PORT=3000` で Mastodon と衝突する。**片方を `teardown.sh` してからもう片方を `setup.sh`**（`setup.sh` は 1 系あたり 8〜9 分）。⚠ **`url=` は両系とも `localhost:3000` なので取り違えの判別に使えない。`controller=` の側を見ること**（#4559 のドキュメント例にある `:3001` は実態と違う）
+- ⚠ **系の分離に `env -i` を使うなら `LANG` を残す。**落とすと Ruby の外部エンコーディングが US-ASCII になり、**製品と無関係な `invalid byte sequence in US-ASCII` が 6 件（1 failures / 5 errors）出る**。退行と読み違えかけた。`env -i HOME PATH TERM LANG LC_ALL` で足りる（`MASTODON_count=0` を実走前に出して分離も確かめた）
+- ⚠ **Mastodon 実走中に出る `TestHarness: DB 接続に失敗したためスキップ: ... password authentication failed for user "u"` は正常。**`TestHarnessTest` が配線を検証するために**わざと偽 DSN（`postgres://u:p@…`）を差している**もので、環境の不備ではない。DB 依存テストは実際に走っている（omission が 313 → 152 に減っているのが証拠）
 
 ### 着地済み: #4534 番組表の書き込みが無ロックの read-modify-write（2026-08-11）
 
