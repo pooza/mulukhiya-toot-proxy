@@ -2,6 +2,18 @@
 
 CLAUDE.md から分離した過去のリリースノート。直近リリースは [CLAUDE.md](../CLAUDE.md) を参照。
 
+## リリース済み: 5.29.0（2026-07-18）
+
+投稿テンプレート（定形投稿）per-user CRUD API を主軸に、fedi-test-harness のテスト信頼性向上と本番で沈黙していた実バグ1件の修正を束ねた回。**5.28.0 で省略したステージング検証を Proxmox ステージング dev24-27 で全台実施できた最初のリリース**（前回の教訓 `project_5280-staging-skip-postmortem` を実運用で解消）。
+
+- **#4457 feat: 投稿テンプレート（定形投稿）per-user CRUD API** — capsicum の投稿テンプレート（pooza/capsicum#767）の端末またぎ共有のため `GET/POST/PUT/DELETE /mulukhiya/api/compose/templates[/:id]` を新設。保存先は user_config（per-user Redis）、id サーバー採番 UUID・件数上限50・書き込み後 read-back で永続化検証（「保存したのに消えた」検知＝専用エンドポイントの主目的）。多端末同時書き込みの lost update は `ComposeTemplateLockStorage` の per-account ロックで直列化（保持中 409、Codex P2 / #4460）。フィールドは id/name/body/cw の 4 つ（scope/position は持たない）。`features.compose_templates` 露出。
+- **#4448 fix: StartupNotificationWorker のヒステリシス通知が本番沈黙** — `bump_ng_count` の `redis.incr` が `Mulukhiya::Redis` 未実装で NoMethodError、ヘルス NG 時の再通知が沈黙していたのを ginseng-redis 2.0.4（`Service#incr` 追加）で復旧。harness が炙り出した実バグで 5.29.0 唯一の運用影響修正
+- **#4447 test: fedi-test-harness で Mastodon/Misskey 両系エラー0** — stale/DB依存の是正、構造的未提供の honest omit、`harness?` シグナルで omit をゲート（非 harness では実退行を検出）、GroupTag community-map キャッシュのテスト間汚染解消。0 failures/0 errors baseline、残 omission は chubo2#63/#64 で追跡
+- **リリース前 5観点レビュー** — 真の赤は CI lint（rubocop 5件）のみで是正。docs/api.md への compose エンドポイント追従・`GET /compose/templates` の alert 対称化・bundler-audit（loofah 2.25.2 / rails-html-sanitizer 1.7.1）をインライン同梱。残る黄（save 二重 alert・worker deadman・compose RMW の user_config メモ化 fresh-read・lock TTL）は #4461 へ送り
+- **bundle update** — json 2.21.1 / oauth2 2.0.25 / parser 3.3.12.0 / fugit 1.13.0 等のルーチン更新（bundler-audit クリーン、Dependabot 0）
+- **ステージング検証（省略不可・復活）**: dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/ dev27 ダイスキー（Misskey）全4台で develop=5.29.0・health 200・`compose_templates:true` を確認。旧 dev04/15/22/23 は退役済み（現行構成は chubo2 `docs/infra-note.md`「ステージング」節が正）
+- **本番デプロイ: 4 台完了**（2026-07-18、shallu / zugoga / lbock / sweep、全台 version 5.29.0 / health 200 / `compose_templates:true`）
+
 ## リリース済み: 5.28.1（2026-07-09、ホットフィックス）
 
 5.28.0 本番適用後に判明した設立日まわりの是正ホットフィックス。**5.28.0 でステージング検証を省略（再構築中で使えず）したため本番で顕在化した**教訓つき（詳細は MEMORY `project_5280-staging-skip-postmortem`）。

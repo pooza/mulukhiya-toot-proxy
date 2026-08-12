@@ -126,7 +126,7 @@ ssh pooza@<host> '~/.rbenv/versions/4.0.5/bin/ruby -' < docs/bench/probe_localho
 | lbock | なし | 305.2 ms | 305.3 ms | 306.3 ms |
 | gomander | あり | 0.3 ms | 0.2 ms | 0.1 ms |
 
-**新規機を建てたら必ず通すこと。** 対策は `/etc/hosts` へ `::1 localhost` を足すか、DSN をホスト名でなく IP で書くか（#4481 / pooza/chubo2#87）。
+**新規機を建てたら必ず通すこと。** 対策は `/etc/hosts` へ `::1 localhost` を足すか、DSN をホスト名でなく IP アドレスで書くか（#4481 / pooza/chubo2#87）。
 
 ## analyze_handler_profile.rb
 

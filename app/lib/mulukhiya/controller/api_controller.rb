@@ -32,7 +32,11 @@ module Mulukhiya
       @renderer.message = {
         account: sns.account.to_h,
         config: sns.account.user_config.to_h,
-        webhook: {url: sns.account.webhook.uri.to_s},
+        # ⚠ トークンを持たないアカウントでは `Account#webhook` が Webhook を
+        # 返しても URL は作れない (#4487)。直前の user_config.token 代入が失敗した
+        # 場合に `ConfigError` → 500 へ化けるので、`available?` で分岐して null を
+        # 返す。docs/api.md に nullable と明記してある (#4537)。
+        webhook: {url: webhook_url},
         token: sns.access_token.to_h.except(:account),
         visibility_names: parser_class.visibility_names,
       }
@@ -931,7 +935,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時 or 重複キー) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 重複キー / 書き込みロック競合 #4534) は
+        # 期待動作のため Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -958,7 +963,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -977,7 +983,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -996,7 +1003,8 @@ module Mulukhiya
       return @renderer.to_s
     rescue => e
       if e.is_a?(Ginseng::ConflictError)
-        # 409 (auto_update? 有効時) は期待動作のため Sentry alert 不要
+        # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) は期待動作のため
+        # Sentry alert 不要
         Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
       else
         e.alert
@@ -1129,6 +1137,13 @@ module Mulukhiya
     end
 
     private
+
+    # webhook URL。トークンが無いアカウントでは nil を返す (#4487 / #4537)。
+    def webhook_url
+      webhook = sns.account.webhook
+      return nil unless webhook.available?
+      return webhook.uri.to_s
+    end
 
     # Annict record/review の rescue 共通処理。書き込み系 (createRecord/createReview)
     # の失敗は /admin/program/entry 系 (#4255) と整合させ Sentry へ到達させる。ただし

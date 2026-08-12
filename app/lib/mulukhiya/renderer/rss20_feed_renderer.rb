@@ -23,9 +23,7 @@ module Mulukhiya
           "CustomFeed command failed (exit #{command.status}): #{command.stderr}"
       end
       self.entries = parse_entries(command.stdout)
-      rendered = feed.to_s
-      log_unresolved_enclosures
-      render_storage[command] = rendered
+      render_storage[command] = render
     end
 
     alias save cache
@@ -50,14 +48,30 @@ module Mulukhiya
     end
 
     def to_s
-      return feed.to_s unless render_storage.key?(command)
+      return render(log: false) unless render_storage.key?(command)
       return render_storage[command]
     rescue => e
       e.log
-      return feed.to_s
+      return render(log: false)
     end
 
     private
+
+    # 1 レンダーぶんの描画 (#4560)。
+    #
+    # ⚠ **unresolved はレンダーごとに捨てる。**レンダラは CustomFeed#renderer が
+    # メモ化するので、貯めるとリクエストのたびに配列が伸び、後続の
+    # log_unresolved_enclosures が「そのレンダーぶん」でなく累積の count / sample を
+    # 報告する。
+    #
+    # ⚠ **リクエスト経路 (log: false) ではログを出さない。**5 分おきの更新側が
+    # 1 サイクル 1 行で出すので十分で、リクエストごとに出すと #4549 の再来になる。
+    def render(log: true)
+      unresolved_enclosures.clear
+      rendered = feed.to_s
+      log_unresolved_enclosures if log
+      return rendered
+    end
 
     def parse_entries(stdout)
       entries = JSON.parse(stdout)

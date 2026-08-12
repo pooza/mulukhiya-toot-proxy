@@ -1,3 +1,4 @@
+require 'stringio'
 require 'tmpdir'
 
 module Mulukhiya
@@ -13,11 +14,15 @@ module Mulukhiya
       ENV_KEYS.each {|key| ENV.delete(key)}
       # apply! は raw['local'] を恒久変更するため、退避して後続テストへの漏れを防ぐ。
       @saved_local = config.raw['local']&.dup
+      # announce は一度きりなので、済み扱いにしてテスト出力を汚さない。
+      @saved_announced = TestHarness.announced
+      TestHarness.announced = true
     end
 
     def teardown
       @saved.each {|key, value| value.nil? ? ENV.delete(key) : ENV[key] = value}
       config.raw['local'] = @saved_local
+      TestHarness.announced = @saved_announced
       super
     end
 
@@ -94,6 +99,54 @@ module Mulukhiya
       assert_equal('misskey_token', conn[:token])
       assert_equal('misskey', config['/controller'])
       assert_equal('http://localhost:3001', config['/misskey/url'])
+    end
+
+    # ⚠ 両系の .env.test を同じシェルで source した状態。接続情報が 2 つ揃うと
+    # config['/controller'] が勝つので、Misskey のつもりで Mastodon を走らせられる
+    # (#4559)。この挙動自体は仕様なので、取り違えは announce で気づく。
+    def test_apply_prefers_configured_controller_when_both_available
+      config['/controller'] = 'mastodon'
+      ENV['MASTODON_URL'] = 'http://localhost:3000'
+      ENV['MASTODON_ACCESS_TOKEN'] = 'mastodon_token'
+      ENV['MISSKEY_URL'] = 'http://localhost:3001'
+      ENV['MISSKEY_ACCESS_TOKEN'] = 'misskey_token'
+      conn = TestHarness.apply!
+
+      assert_equal('mastodon_token', conn[:token])
+      assert_equal('mastodon', config['/controller'])
+    end
+
+    def test_apply_announces_selected_controller
+      TestHarness.announced = nil
+      config['/controller'] = 'mastodon'
+      ENV['MISSKEY_URL'] = 'http://localhost:3001'
+      ENV['MISSKEY_ACCESS_TOKEN'] = 'misskey_token'
+      stderr = StringIO.new
+      saved = $stderr
+      begin
+        $stderr = stderr
+        TestHarness.apply!
+      ensure
+        $stderr = saved
+      end
+
+      assert_match(/controller=misskey/, stderr.string)
+      assert_match(%r{url=http://localhost:3001}, stderr.string)
+    end
+
+    def test_announce_is_emitted_once
+      TestHarness.announced = nil
+      conn = {url: 'http://localhost:3000'}
+      stderr = StringIO.new
+      saved = $stderr
+      begin
+        $stderr = stderr
+        2.times {TestHarness.new.announce('mastodon', conn)}
+      ensure
+        $stderr = saved
+      end
+
+      assert_equal(1, stderr.string.lines.size)
     end
 
     def test_apply_is_noop_without_connection_info

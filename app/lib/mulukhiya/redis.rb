@@ -21,6 +21,20 @@ module Mulukhiya
       logger.info({storage: underscore}.merge(message))
     end
 
+    # 既に値があれば書き換えない SET (#4575)。獲得できたとき true。
+    #
+    # ⚠ **キャッシュを「温める」読み経路はこちらを使うこと。**素の SET だと、
+    # 古い内容を読んだ読み手が、その後に完走した書き手の新しい値を上書きできる。
+    # 番組表のように読みがロックの外にある構造では、それが恒久的なロールバックに
+    # なる（読みはキャッシュを優先するので、以後ずっと旧データが返る）。
+    # ⚠ Naming/PredicateMethod を inline disable する。真偽値を返すが、これは
+    # 述語ではなく「獲得できたか」を返す副作用付きコマンド。`setnx?` にすると
+    # 副作用の無い問い合わせに見えるので、Redis のコマンド名のまま残す。
+    def setnx(key, value) # rubocop:disable Naming/PredicateMethod
+      value = '' if value.nil?
+      return redis.call('SET', create_key(key), value, 'NX') == 'OK'
+    end
+
     def clear
       bar = ProgressBar.create(total: all_keys.count)
       all_keys.each do |key|

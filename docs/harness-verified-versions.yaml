@@ -29,16 +29,45 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.6.4
-  verified_at: '2026-07-30'
+  verified: v4.6.5
+  verified_at: '2026-08-09'
 
 misskey:
   verified: 2026.7.0
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-08'
+last_checked: '2026-08-09'
 
+# 2026-08-09 チェック結果:
+#   - Mastodon: stable v4.6.5（2026-08-06）を fedi-test-harness で検証・verified 昇格。
+#     08-08 に「ピンだけ上げて実行が未了」として pooza/chubo2#153 に残していた分の消化。
+#     スモークテスト（投稿 → id 取得 → ホームタイムライン反映＝sidekiq 非同期配送）は成功。
+#     **同一の mulukhiya HEAD（5.33.0 開発中）を v4.6.5 と v4.6.4 でそれぞれクリーン再構築
+#     （.env 書き換え → reset.sh）して実走・比較し、失敗集合が一致＝退行ゼロ**を確認した:
+#       v4.6.5: 1001 tests / 2006 assertions / 5 failures / 0 errors / 151 omissions
+#       v4.6.4: 1001 tests / 2005 assertions / 4 failures / 0 errors / 151 omissions
+#     omission 集合は両版で完全一致。failure の差 1 件は `MediaMetadataStorageTest#test_push` で、
+#     **Amazon の画像 URL を実際に取りに行く外部依存の flaky**（v4.6.5 側の 1 回目の実走では
+#     成功しており、失敗時の実測値は `{}`＝取得そのものが失敗）。Mastodon 版とは無関係。
+#     両版で共通して落ちる 4 件はいずれも既知・追跡済みで、Mastodon 版に依存しない:
+#       - AttachmentTest#test_catalog / MediaFeedRendererTest#test_to_s — #4516（media seed で露見）
+#       - SNSServiceTest#test_info — harness の Mastodon に maintainer が未設定で
+#         `maintainer_name` が nil。omit ガードは `node_name` が nil のときしか効かない（未追跡）
+#       - ComposeTemplateContainerTest#test_write_reloads_user_config_inside_lock — 保存した
+#         テンプレートが 0 件で返る。#4461 で書かれたが #4503 の解消まで一度も走っていなかった回帰テスト（未追跡）
+#     ⚠ **07-30（v4.6.4 昇格時）の 879 tests / 0 failures とは比較にならない。** #4503 の可視化
+#     （ginseng-core 1.15.30、5.31.0 で取り込み）と harness のトークン供給で実行本数が 1001 件へ増え、
+#     これまで走っていなかったテストが初めてアサートした結果として上記 4 件が現れている。
+#     **版間 diff で見る限り Mastodon 4.6.5 による退行は無い。**
+#     → **同日 PR #4553 で 5 件（flaky 含む）すべてテスト側から解消**し、v4.6.5 harness で
+#     1001 tests / 0 failures / 0 errors / 152 omissions（100% passed）になった。
+#   - 4.6.5 の非テスト差分を実コードでも確認: 5 本が JS/SCSS、5 本が AP **受信**側
+#     （`collection.rb` / `merging.rb` / `process_featured_item_service` /
+#     `process_status_update_service` / `activity/create.rb`）、DB マイグレーションなし。
+#     モロヘイヤが叩く REST・直読みするスキーマのいずれにも掛からない（pooza/chubo2#153 の事前判断どおり）。
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。
+#
 # 2026-08-08 チェック結果:
 #   - Mastodon: **stable v4.6.5（2026-08-06）が出ており verified（v4.6.4）より新しい**。
 #     本番 4 台は 2026-08-07 に 4.6.5 へアップグレード済み（infra-note の Mastodon アップグレード節）。

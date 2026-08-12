@@ -85,18 +85,48 @@ module Mulukhiya
       command.exec
 
       # webhook エンドポイント（/mulukhiya/webhook/<digest>）は mulukhiya アプリが処理して
-      # JSON を返す。harness の proxy は nginx→Mastodon をパスするのみで mulukhiya webhook
-      # ルートを提供しないため HTML(エラーページ)が返る。harness 駆動時のみ明示 omit する
-      # （silent skip ではない）。非 harness で HTML が返るのは実退行なので下の JSON.parse で
-      # 落とす。harness 側の provisioning は chubo2#63。
-      omit('mulukhiya webhook エンドポイント未提供（HTML 応答・chubo2#63）') \
-        if harness? && command.stdout.lstrip.start_with?('<')
+      # JSON を返す。harness は SNS 本体をパスするだけで mulukhiya の webhook ルートを
+      # 提供しないため、応答の形が **系によって二通り**になる (#4492):
+      #   - Mastodon: 前段の nginx が HTML のエラーページを返す
+      #   - Misskey: nginx を挟まないので Misskey (Fastify) が 404 の JSON 包絡を返す
+      # どちらも同じ「エンドポイント未提供」なので、harness 駆動時のみ明示 omit する
+      # （silent skip ではない）。非 harness で同じものが返るのは実退行なので、下の
+      # JSON.parse / assert で落とす。harness 側の provisioning は chubo2#63。
+      omit('mulukhiya webhook エンドポイント未提供（chubo2#63）') \
+        if harness? && endpoint_missing?(command.stdout, @test_hook.uri.path)
 
       assert_predicate(command.status, :zero?)
       status = JSON.parse(command.stdout)
 
       assert_kind_of(Hash, status)
       assert_includes(['id', 'account', 'createdNote'], status.keys.first)
+    end
+
+    private
+
+    # harness が mulukhiya の webhook ルートを提供していないことの検出。
+    # ⚠ 「JSON が返らなかった」で広く倒すと実退行まで飲むので、**HTML エラーページ**と
+    # **Fastify の route-not-found 包絡**（`{"message":"Route POST:<path> not found",
+    # "error":"Not Found","statusCode":404}`）に限定する。それ以外の応答は omit せず
+    # assert で落とす。
+    #
+    # ⚠ `statusCode == 404` だけでは足りない (PR #4557 の Codex P2)。ルートには届いた
+    # うえで参照先が無い 404 も同じ形を取りうるので、**ルートが無いこと**まで確かめる。
+    #
+    # ⚠ path を含むかどうかでも足りない (PR #4568 の Codex P2)。ハンドラが同じ包絡で
+    # `Webhook /mulukhiya/webhook/<digest> not found` を返せば部分一致してしまい、
+    # **ルートは在るのに omit する**。Fastify の route-miss の文面ごと突き合わせる。
+    # Webhook#command は必ず POST なのでメソッド名も固定でよい。
+    #
+    # ここが将来 Fastify の文言変更で外れた場合は omit されず assert で赤くなる
+    # （実退行を飲むより、検証条件のズレに気づけるほうを採る）。
+    def endpoint_missing?(body, path)
+      return true if body.lstrip.start_with?('<')
+      parsed = JSON.parse(body) rescue nil
+      return false unless parsed.is_a?(Hash)
+      return false unless parsed['statusCode'] == 404
+      return false unless parsed['error'] == 'Not Found'
+      return parsed['message'].to_s == "Route POST:#{path} not found"
     end
   end
 end

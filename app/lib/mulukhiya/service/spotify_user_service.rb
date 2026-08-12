@@ -21,8 +21,12 @@ module Mulukhiya
 
     # token endpoint が返す OAuth 2.0 の error のうち、**こちら側の設定ミス**を
     # 指すもの。ユーザーが再連携しても直らないので「要再認証」に倒さない (#4480)。
+    # ⚠ `invalid_request` を落とさない (#4537)。Basic ヘッダの組み立てミス等の
+    # **運用側の不備**もこれで返るので、抜けていると「再連携してください」と
+    # ユーザーに誤誘導したうえ、何度やっても直らない。
     OPERATOR_FAULT_OAUTH_ERRORS = [
       'invalid_client',
+      'invalid_request',
       'unauthorized_client',
       'unsupported_grant_type',
       'invalid_scope',
@@ -141,9 +145,9 @@ module Mulukhiya
       return response
     rescue Ginseng::GatewayError => e
       # refresh_token 失効/revoke (invalid_grant) は token endpoint が 4xx を返す。
-      # これは再認証が必要なユーザー起因エラーなので AuthError (401) に倒し、
-      # capsicum に再連携フローを誘導させる。5xx/timeout は Spotify 障害なので
-      # GatewayError (502) のまま上げる。
+      # これは再認証が必要なユーザー起因エラーなので AuthError に倒し、capsicum に
+      # 再連携フローを誘導させる。5xx/timeout は Spotify 障害なので GatewayError
+      # (502) のまま上げる。⚠ `Ginseng::AuthError#status` は **403**（401 ではない）。
       #
       # ⚠ 4xx を一括で「再認証が必要」に倒してはいけない。invalid_client は
       # **こちらの client_id/secret の設定ミス**で、ユーザーが何度再連携しても

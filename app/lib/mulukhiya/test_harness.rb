@@ -9,6 +9,11 @@ module Mulukhiya
 
     PREFIXES = {'mastodon' => 'MASTODON', 'misskey' => 'MISSKEY'}.freeze
 
+    class << self
+      # announce の一度きり判定。run をまたがないのでテストから戻せる。
+      attr_accessor :announced
+    end
+
     def self.apply!
       return new.apply!
     end
@@ -39,6 +44,7 @@ module Mulukhiya
       # mulukhiya は Mastodon の DB を直読みするため DSN があれば postgres.dsn も配線。
       values['postgres'] = {'dsn' => conn[:db_dsn]} if conn[:db_dsn]
       merge_local(values)
+      announce(type, conn)
       # DB 接続はブート時 (apply! より前、mulukhiya.rb の dbms_class&.connect) に
       # 確立される。Postgres は Singleton のため connect では既存インスタンスが返るだけで
       # 後から差した DSN を反映しない。reconnect で singleton を張り直し注入 DSN を使わせる。
@@ -64,6 +70,22 @@ module Mulukhiya
           db_dsn: env["#{prefix}_DB_DSN"].presence
         }
       end
+    end
+
+    # どのコントローラで走っているかを run の頭で stderr に出す (#4559)。返り値は
+    # 出力した文字列（テストから検証するため）。
+    #
+    # ⚠ **両系の .env.test を同じシェルで source すると、1 つ目の <PREFIX>_* が
+    # 残る。**接続情報が 2 つ揃うと target_controller は config['/controller']
+    # (既定 mastodon) を採るので、Misskey のつもりで Mastodon を 2 回走らせたまま
+    # 「両系緑」とゲートを通せてしまう。この行と source した .env.test を
+    # 突き合わせれば取り違えに気づける。
+    def announce(type, conn)
+      message = "TestHarness: controller=#{type} url=#{conn[:url]}"
+      return message if self.class.announced
+      warn message
+      self.class.announced = true
+      return message
     end
 
     private

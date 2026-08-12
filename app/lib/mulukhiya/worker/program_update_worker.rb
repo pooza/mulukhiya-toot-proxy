@@ -13,6 +13,12 @@ module Mulukhiya
       return if disable?
       Program.instance.update
       log(programs: Program.instance.count)
+    rescue Ginseng::ConflictError => e
+      # 書き込みロック (#4534) の競合。every 1m なので取りこぼしても次の周回で
+      # 追いつく。⚠ alert には上げない。設定・運用の誤りではなく、直列化が
+      # 意図どおり働いた結果なので、上げると毎分の Sentry ノイズになる
+      # （#4542 と同型の「クライアント起因なのに alert」）。
+      log(skipped: 'locked', message: e.message)
     end
   end
 end

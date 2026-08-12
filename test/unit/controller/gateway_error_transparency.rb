@@ -63,6 +63,39 @@ module Mulukhiya
       assert_not_includes(@renderer.message.to_s, 'Bad response')
     end
 
+    # ⚠ 配列は透過しない (#4537)。`source_body` は JSON の配列も返しうるが、
+    # クライアントは `{"error": ...}` を期待しているので読めない。
+    def test_falls_back_to_message_for_array_body
+      error = build_error(400, [{code: 'NO_SUCH_NOTE'}].to_json)
+
+      @controller.handle_gateway_error(error)
+
+      assert_equal('Bad response 400', fetch(@renderer.message, 'error'))
+      assert_equal(400, @renderer.status)
+    end
+
+    # ⚠ 透過してよいのは**自分の上流**が返したものだけ (#4537)。引用元の他人の
+    # サーバー由来はステータスもボディも返さない。
+    def test_does_not_pass_foreign_gateway_error_through
+      error = ForeignGatewayError.new('Bad response 451')
+      error.response = ResponseDouble.new(451, {error: 'Unavailable For Legal Reasons'}.to_json)
+
+      @controller.handle_gateway_error(error)
+
+      assert_equal('Bad response 451', fetch(@renderer.message, 'error'))
+      assert_equal(502, @renderer.status, '他人のサーバーのステータスを返さない')
+    end
+
+    # 印を付け替えても上流のレスポンスは保つ（ログに残すため）。
+    def test_foreign_gateway_error_keeps_upstream_response
+      source = build_error(451, {error: 'Unavailable For Legal Reasons'}.to_json)
+      wrapped = ForeignGatewayError.wrap(source)
+
+      assert_equal(451, wrapped.source_status)
+      assert_equal('Unavailable For Legal Reasons', wrapped.source_body['error'])
+      assert_equal(source.message, wrapped.message)
+    end
+
     # Sentry alert の抑止条件。ステータスとコードの両方で効くこと。
     def test_alert_is_suppressed_by_status
       error = build_error(401, '{}')

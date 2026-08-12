@@ -15,10 +15,17 @@ module Mulukhiya
       r = @renderer.to_s
 
       assert_equal('<?xml version="1.0" encoding="UTF-8"?>', r.each_line.to_a.first.chomp)
-      # <item> は media が seed されている時のみ現れる（to_s は attachment_class.feed から描画）。
-      # harness は media を seed しないため harness 駆動時のみ omit する。seed 追加は chubo2#64。
-      # 非 harness（本番等）で media が無いのは実退行なので下の assert で落とす。
-      # feed はブロック無しだと Enumerator を返すため none? で実データの有無を判定する。
+      # ⚠ ガードは #fetch の描画条件と同じ順に並べる。以前は feed の中身だけを見ており、
+      # media_catalog が OFF のときも「seed はあるのに <item> が無い」で落ちていた (#4516)。
+      #
+      # 1. media_catalog が無効なら #fetch は entries を空にして即 return する。
+      #    5.23.0 (#4343) から既定 OFF なので、この状態で <item> が無いのは仕様どおり。
+      omit('media_catalog が無効（5.23.0 から既定 OFF・#4343）') unless controller_class.media_catalog?
+
+      # 2. <item> は media が seed されている時のみ現れる。harness は media を seed
+      #    しないため harness 駆動時のみ omit する。seed 追加は chubo2#64。
+      #    非 harness（本番等）で media が無いのは実退行なので下の assert で落とす。
+      #    feed はブロック無しだと Enumerator を返すため none? で実データの有無を判定する。
       omit('テスト用メディア未 seed（chubo2#64）') if harness? && attachment_class.feed.none?
 
       assert_includes(r, '<item>')
