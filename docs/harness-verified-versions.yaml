@@ -29,15 +29,38 @@
 # 運用方針の詳細は MEMORY の feedback_upstream-release-harness-verification 参照。
 
 mastodon:
-  verified: v4.6.5
-  verified_at: '2026-08-09'
+  verified: v4.6.6
+  verified_at: '2026-08-14'
 
 misskey:
   verified: 2026.7.0
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-09'
+last_checked: '2026-08-14'
+
+# 2026-08-14 チェック結果:
+#   - Mastodon: stable v4.6.6（2026-08-13）を fedi-test-harness で検証・verified 昇格。
+#     **本番 3 台（shallu / zugoga / gomander）とステージング 3 台（dev24-26）は
+#     ユーザーが 2026-08-14 に適用済み**で、harness 検証は後追い。実機は 6 台とも
+#     `v4.6.6-<branch>` で揃っており、rc.d 3 本も 6 台とも配布物と一致（`diff -q` で確認）。
+#     本番 3 台の web / streaming / モロヘイヤ health はいずれも 200。
+#   - **実走は 1050 tests / 2101 assertions / 0 failures / 0 errors / 152 omissions（100% passed）。**
+#     omission 152 件は v4.6.5 の値と一致。**版間 diff を取るまでもなく退行ゼロ**（失敗が 1 件も無い）。
+#     ⚠ 実走前に `redis-cli -n 1 UNLINK tagging_dictionary` を踏んでいる（#4583）。
+#   - 4.6.5 → 4.6.6 の差分は **`db/` マイグレーション無し・`Gemfile.lock` / `package.json` 無変更・
+#     シリアライザ無変更**。大半が locale と WebUI 修正で、バックエンド側は `fediverse:creator`
+#     処理時の Webfinger 接続エラー握り（#40135）・`.zip` 終端 URL で WebUI が開けない件（#40134）・
+#     admin measures のドメインブロック影響クエリ（#40122）のみ。**モロヘイヤが叩く REST・
+#     直読みするスキーマのいずれにも掛からない。**
+#   - 付随: `mastodon:setup` の商標警告が「`masto` にマッチするがサブドメインは無視」に変わった
+#     （#40143）。chubo2 infra-note の「`mstdn.` サブドメインの改名を提案しない」（2026-08-13）と
+#     upstream の挙動が一致した形。
+#   - ⚠ **harness の `update-version.sh` がシークレット無しの `.env` を作る不具合**を踏んだ
+#     （`.env` が無い状態で実行すると `.env.example` をコピーするだけなので、後続の `setup.sh` が
+#     「既存の .env を使用」の分岐に入り `db:prepare` が ACTIVE_RECORD_ENCRYPTION_* 欠落で落ちる）。
+#     今回は手で `.env` へシークレットを追記して回避。恒久対応は pooza/chubo2#168。
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。
 
 # 2026-08-09 チェック結果:
 #   - Mastodon: stable v4.6.5（2026-08-06）を fedi-test-harness で検証・verified 昇格。
