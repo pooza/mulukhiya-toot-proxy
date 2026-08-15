@@ -99,7 +99,7 @@ module Mulukhiya
       body = build_body(status: {'media_attachments' => []})
 
       # ⚠ refute だけだと nil でも通ってしまうので、型で false を名指しする。
-      assert_equal(FalseClass, body[:sensitive].class)
+      assert_instance_of(FalseClass, body[:sensitive])
     end
   end
 end
