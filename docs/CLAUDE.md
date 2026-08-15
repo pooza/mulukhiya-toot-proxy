@@ -621,7 +621,7 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
 - **#4576 security: SSRF 掃討の取り残し 2 件（size:M）** — `is_cat` の webfinger が無検証（リダイレクト未検証 + pinning 無し）と、webhook の `image_url` が **full-read SSRF**。5.33.0 のリリース前レビューで赤に分類したが、**修正が全画像ハンドラと webfinger 経路に及ぶ**ため独立サイクルに分けた（2026-08-12 ユーザー判断）
   - ⚠ **CDN への pinning は「複数 A レコードのフォールバックが効かない」既知のトレードオフ**（#4524）を、いまより広い面へ適用することになる。harness 実走込みで見る
 
-- **#4585 番組表: 「次回」ボタンを「話数 +1」と「日付 +1」に分離する（size:M）** — 2026-08-13 ユーザー要望。現行の ＋ は `episode` の +1 と `next_on` の +7 日を同時に行うため、①2 週以上放置したエントリは 1 回押しても過去日のまま ②話数だけ直したいときに日付が巻き込まれる ③**Annict が載らずに 200 が返ったとき、押し直すと話数が飛んだうえ日付が 7 日ずれる**（[[project_5330-release]] の footgun）
+- **#4585 番組表: 「次回」ボタンを「話数 +1」と「日付 +1」に分離する（size:M・2026-08-15 着地）** — 2026-08-13 ユーザー要望。現行の ＋ は `episode` の +1 と `next_on` の +7 日を同時に行うため、①2 週以上放置したエントリは 1 回押しても過去日のまま ②話数だけ直したいときに日付が巻き込まれる ③**Annict が載らずに 200 が返ったとき、押し直すと話数が飛んだうえ日付が 7 日ずれる**（[[project_5330-release]] の footgun）
   - ⚠ **日付側は +7 日ではなく +1 日**（2026-08-13 ユーザー判断）。**翌日放送であることがある**のと、**+1 日なら 7 回押して翌週も兼ねられる**ため。`NEXT_ON_INTERVAL_DAYS = 7` は用済みになるので消す。⚠ **7 のまま別名で残さない**（週次前提が別の場所へ生き延びる）
   - ⚠ **連打が常用操作になる。**一覧のボタンは `:disabled='isBusy(key)'` なので素朴に作ると 7 往復待たされ、**ロック取得も 7 回**になる（#4534 の 409 が増える）。楽観更新か日数パラメータで往復を減らす方向で決める
   - ⚠ **曜日ルールや RRULE は #4373 で却下済みなので持ち出さない**（[[project_program-ics-shelved]]）
@@ -665,6 +665,38 @@ Sequel のモデルを触るため、既存の `TaggingDictionaryTest` は **DB 
 
 検証: `rake test` 978 → **988 tests / 0 failures / 0 errors / 313 omissions**（omissions は前後で不変・新規 10 件はすべて実走）。
 `rake lint` 通過。CI は mastodon / misskey とも緑。
+
+### 着地済み: #4585 「次回」を「話数 +1」と「日付 +1」に分離（2026-08-15・PR #4588）
+
+| ボタン | 動き | エンドポイント |
+| --- | --- | --- |
+| 話数 ＋ | `episode` のみ +1（Annict のサブタイトル解決は従来どおり） | `POST .../episode/increment`（**日付を触らなくなった**） |
+| 日付 ＋ | `next_on` のみ **+1 日** | `POST .../next_on/advance`（新設） |
+
+`NEXT_ON_INTERVAL_DAYS = 7` は削除した（⚠ **7 を別名で残していない**）。
+`increment_episode` から日付の前進が外れたので、**Annict が載らずに 200 が返ったときの巻き戻し量が半分**になる。
+
+⚠ **`days` は 1〜366 の整数のみ・範囲外と非整数は 422。**素の `to_i` に倒すと `'abc'` が 0 日になり、
+「押したのに進まない」理由が分からなくなる。**クライアント起因なので alert しない**（#4542 と同型）。
+
+⚠ **WebUI は連打を 600ms で畳んで 1 リクエストにする**（`days` に日数を載せる）。1 クリック 1 リクエストだと
+7 往復待たされたうえ #4534 のロックも 7 回取る。⚠ **`entry.next_on` の実体は触らない** ——
+一覧の並びが `next_on` 昇順（#4540）なので、実体を進めると**連打の途中で行が動き、2 回目のクリックが別の行に当たる**。
+
+⚠ **CI の omission baseline を 313→318 / 302→307 へ上げた。**ゲートを緩めたのではなく、
+**CI で実行しようがないテストが 5 件増えた分**（`ProgramTest` は `livecure?` が false だとクラスごと omission になり、
+CI には `var/program.yaml` も `/program/urls` も無いので常に false）。
+
+⚠ **ローカルで `ProgramTest` を実走させるには `var/program.yaml` を一時的に置く**（無いと 40 件超がまるごと omission）。
+これで見つかった**既存の赤 2 件**（本 PR 由来ではない）:
+
+- `test_data_coerces_unquoted_yaml_timestamp` — `Time` が Redis キャッシュ往復で `"2026-08-08T23:30:00.000Z"` になる。**#4558 そのもの**（5.34.0 スコープ内・未着手）
+- `test_auto_update_default_true` — `/program/auto_update` 未設定だと `auto_update?` が `ConfigError` を上げる（「既定 true」が実装されていない）。⚠ **既定値は `config/application.yaml` にあるので通常は踏まない**
+
+`test_increment_episode_does_not_create_next_on` も develop で落ちていた（`coerce_scalars` が `next_on` を必ず
+materialize するのでキーは常に存在する）。**値を見るアサーションへ直した**。
+
+⚠ **`views/program.slim` は #4578 のため `rake lint` の対象外。**個別に `slim-lint` を掛けて確認すること。
 
 ### マイルストーン未割当
 
