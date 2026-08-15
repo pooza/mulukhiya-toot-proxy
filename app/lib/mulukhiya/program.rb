@@ -13,10 +13,17 @@ module Mulukhiya
     # 後方互換: rake task / テストが参照するため委譲先の定数を再公開する。
     YAML_PATH = ProgramFetcher::YAML_PATH
 
-    # 「次回」ボタンが next_on を進める日数 (#4373)。durable な対象がウィークリー
-    # 枠だけなので固定でよい。他の周期が要るようになったら、規則を持たせるのでは
-    # なく日付を直接編集する運用で足りるか先に確かめること。
-    NEXT_ON_INTERVAL_DAYS = 7
+    # 「日付 ＋」ボタンが next_on を進める既定日数 (#4585)。
+    #
+    # ⚠ **週次前提の 7 日は捨てた。**翌日放送であることがあり、週次では表現できない。
+    # +1 日なら 7 回押して翌週も兼ねられるので、粒度の細かいほうへ寄せる。
+    # ⚠ **7 を別名で残さないこと**（週次前提が別の場所へ生き延びる）。
+    NEXT_ON_ADVANCE_DEFAULT_DAYS = 1
+
+    # 1 リクエストで進められる日数の上限 (#4585)。UI は連打を 1 リクエストへ畳んで
+    # 送る（#4534 のロック取得回数を増やさないため）ので、桁を間違えた値で年単位に
+    # 飛ばないよう歯止めを置く。
+    NEXT_ON_ADVANCE_MAX_DAYS = 366
 
     def update
       return nil unless auto_update?
@@ -163,11 +170,32 @@ module Mulukhiya
         entry = programs[key]
         entry['episode'] = (entry['episode'] || 0).to_i + 1
         entry['annict_episode_id'] = nil
-        advance_next_on(entry)
         if annict_applicable?(prepared, entry)
           entry['annict_episode_id'] = prepared[:episode_data]['annictId']
           entry['subtitle'] = prepared[:episode_data]['title'] if prepared[:episode_data]['title']
         end
+        fetcher.save(programs)
+        next entry
+      end
+    end
+
+    # next_on だけを進める (#4585)。話数・サブタイトルには触らない。
+    #
+    # 「次回」ボタンが話数と日付を同時に動かしていたのをやめ、独立した操作にした。
+    # 話数だけ直したいときに日付が巻き込まれず、⚠ **Annict が載らずに 200 が
+    # 返ったときの巻き戻し量も半分になる**（#4585）。
+    #
+    # ⚠ 書き込みは #4534 のロックの内側で行う。ここを `save` 経由にすると自分の
+    # ロックと衝突して 409 になるので、`fetcher.save` を直接呼ぶ。
+    def advance_next_on(key, days: NEXT_ON_ADVANCE_DEFAULT_DAYS)
+      raise auto_update_conflict if auto_update?
+      key = key.to_s
+      days = coerce_advance_days(days)
+      return lock.synchronize do
+        programs = data
+        raise Ginseng::NotFoundError, "キー '#{key}' が見つかりません。" unless programs.key?(key)
+        entry = programs[key]
+        shift_next_on(entry, days)
         fetcher.save(programs)
         next entry
       end
@@ -228,28 +256,37 @@ module Mulukhiya
       return '%02d:%s' % [hour.to_i, minute]
     end
 
-    # 「次回」ボタンで話数を進めるとき、next_on を持つエントリは放送日も 1 週
-    # 進める (#4373)。ウィークリー枠の日付更新を既存の操作へ相乗りさせ、
-    # 「毎週日付を打ち直す」手間を作らないための措置。
+    # next_on を days 日進める (#4585)。
     #
     # ⚠ next_on を持たないエントリ (= 毎日枠) には触らない。日付を勝手に生やすと
     # 翌日以降そのエントリが単発扱いになり、毎日出ていたイベントが消える。
-    #
-    # ズレたら日付を直接編集する。ここは既定値の前進であって規則ではない。
+    # WebUI も同じ判定でボタンを出さないが、正本はこちら。
     #
     # ⚠ 書式は contract と同じ判定で見る。Date.strptime は `2026-08-08junk` を
     # 通すので、素で渡すと壊れた値を黙って別の壊れた値へ書き換える
     # (Codex P2 / PR #4529)。
-    def advance_next_on(entry)
+    def shift_next_on(entry, days)
       return entry['next_on'] unless entry['next_on'].is_a?(String) && entry['next_on'].present?
       unless ProgramEntryContract.valid_date?(entry['next_on'])
-        # 不正値は触らずそのまま残す。話数の +1 まで巻き添えで落とさない。
+        # 不正値は触らずそのまま残す。壊れた値を別の壊れた値へ書き換えない。
         logger.error(message: 'program next_on invalid', next_on: entry['next_on'])
         return entry['next_on']
       end
-      entry['next_on'] = (Date.strptime(entry['next_on'], '%Y-%m-%d') + NEXT_ON_INTERVAL_DAYS)
+      entry['next_on'] = (Date.strptime(entry['next_on'], '%Y-%m-%d') + days)
         .strftime('%Y-%m-%d')
       return entry['next_on']
+    end
+
+    # 進める日数を検証して Integer にする。未指定は既定 (1 日)。
+    #
+    # ⚠ 素の to_i に倒さない。`'abc'.to_i` は 0 なので、壊れた値が「何も起きない
+    # 成功」に化けて、押したのに進まない理由が誰にも分からなくなる。
+    def coerce_advance_days(days)
+      return NEXT_ON_ADVANCE_DEFAULT_DAYS if days.nil? || days.to_s.strip.empty?
+      value = Integer(days.to_s, 10, exception: false)
+      return value if value && (1..NEXT_ON_ADVANCE_MAX_DAYS).cover?(value)
+      raise Ginseng::ValidateError,
+        "日数は 1〜#{NEXT_ON_ADVANCE_MAX_DAYS} の整数で指定してください。"
     end
 
     # ⚠ YAML を手書きすると、クォートを付け忘れたスカラーが意図しない型で入る。

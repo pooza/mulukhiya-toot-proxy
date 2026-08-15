@@ -1014,6 +1014,27 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    post '/admin/program/entry/:key/next_on/advance' do
+      raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
+      raise Ginseng::NotFoundError, 'Not Found' unless controller_class.livecure?
+      entry = Program.instance.advance_next_on(params[:key], days: params[:days])
+      @renderer.message = {key: params[:key], entry:}
+      return @renderer.to_s
+    rescue => e
+      # 409 (auto_update? 有効時 / 書き込みロック競合 #4534) と 422 (days が不正)
+      # はいずれも期待動作。⚠ **クライアント起因を alert に上げない** (#4542 と同型)。
+      if e.is_a?(Ginseng::ConflictError)
+        Logger.new.info(program_entry: {event: 'conflict', key: params[:key], message: e.message})
+      elsif e.is_a?(Ginseng::ValidateError)
+        Logger.new.info(program_entry: {event: 'invalid', key: params[:key], message: e.message})
+      else
+        e.alert
+      end
+      @renderer.status = e.status
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
     get '/admin/handler/list' do
       raise Ginseng::AuthError, 'Unauthorized' unless sns.account&.admin?
       @renderer.message = Handler.all.map do |handler|
