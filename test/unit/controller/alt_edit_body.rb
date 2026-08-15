@@ -64,13 +64,13 @@ module Mulukhiya
         },
       )
 
-      assert_equal(%w[111 222 333], body[:media_ids])
+      assert_equal(['111', '222', '333'], body[:media_ids])
     end
 
     def test_media_ids_are_empty_without_attachments
       body = build_body(status: {'sensitive' => false})
 
-      assert_equal([], body[:media_ids])
+      assert_empty(body[:media_ids])
     end
 
     # CW を消さないために必須。`/source` が返しているのに使っていなかった。
@@ -90,16 +90,16 @@ module Mulukhiya
     end
 
     def test_sensitive_is_restored
-      assert_equal(true, build_body(status: {'sensitive' => true, 'media_attachments' => []})[:sensitive])
-      assert_equal(false, build_body(status: {'sensitive' => false, 'media_attachments' => []})[:sensitive])
+      assert(build_body(status: {'sensitive' => true, 'media_attachments' => []})[:sensitive])
+      refute(build_body(status: {'sensitive' => false, 'media_attachments' => []})[:sensitive])
     end
 
     # ⚠ false と nil を同一視しない。`.compact` で落とすと閲覧注意が意図せず動く。
     def test_sensitive_is_false_not_nil_when_absent
       body = build_body(status: {'media_attachments' => []})
 
-      assert_equal(false, body[:sensitive])
-      assert(body.key?(:sensitive))
+      # ⚠ refute だけだと nil でも通ってしまうので、型で false を名指しする。
+      assert_equal(FalseClass, body[:sensitive].class)
     end
   end
 end

@@ -68,13 +68,12 @@ module Mulukhiya
     put '/api/:version/statuses/:id' do
       verify_token_integrity!
       purpose = request.env['HTTP_X_MULUKHIYA_PURPOSE']
-      raise Ginseng::ValidateError, "unknown purpose: #{purpose}" unless STATUS_UPDATE_PURPOSES.member?(purpose)
-      raise Ginseng::ValidateError, 'media_attributes is required' if params[:media_attributes].blank?
-      body = case purpose
-      when 'tag' then {status: params[:status], media_attributes: params[:media_attributes]}.compact
-      else create_media_update_body(params)
-      end
-      reporter.response = sns.update_status(params[:id], body, {headers: @headers})
+      validate_status_update!(purpose, params)
+      reporter.response = sns.update_status(
+        params[:id],
+        create_status_update_body(purpose, params),
+        {headers: @headers},
+      )
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
       return @renderer.to_s
@@ -129,6 +128,19 @@ module Mulukhiya
     get '/api/v1/mulukhiya/diag' do
       @renderer.message = token_echo_response
       return @renderer.to_s
+    end
+
+    def validate_status_update!(purpose, params)
+      unless STATUS_UPDATE_PURPOSES.member?(purpose)
+        raise Ginseng::ValidateError, "unknown purpose: #{purpose}"
+      end
+      attributes = params[:media_attributes]
+      raise Ginseng::ValidateError, 'media_attributes is required' if attributes.blank?
+    end
+
+    def create_status_update_body(purpose, params)
+      return create_media_update_body(params) unless purpose == 'tag'
+      return {status: params[:status], media_attributes: params[:media_attributes]}.compact
     end
 
     # ALT 編集 (#4589) で SNS へ送る body。
