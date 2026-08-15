@@ -130,11 +130,24 @@ module Mulukhiya
       return @renderer.to_s
     end
 
+    # purpose ごとに必須パラメータが違う。
+    #
+    # ⚠ **`tag` に `media_attributes` を要求しない。** こちらはタグを付け替えた
+    # 本文を送り直す経路で、**添付を持たない投稿にも来る**。一律に要求すると
+    # 本文だけのタグ書き換えが 422 になる（PR #4590 の Codex P2）。
+    #
+    # 逆に ALT 編集側（nil / '' / `media_update`）では必須。欠けると
+    # `flatten_media_attributes` が nil を each して落ちるうえ、そもそも
+    # 「何も変えない PUT」にしかならない。
     def validate_status_update!(purpose, params)
       unless STATUS_UPDATE_PURPOSES.member?(purpose)
         raise Ginseng::ValidateError, "unknown purpose: #{purpose}"
       end
       attributes = params[:media_attributes]
+      if purpose == 'tag'
+        return if params[:status].present? || attributes.present?
+        raise Ginseng::ValidateError, 'status or media_attributes is required'
+      end
       raise Ginseng::ValidateError, 'media_attributes is required' if attributes.blank?
     end
 
