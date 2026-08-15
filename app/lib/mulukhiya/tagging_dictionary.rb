@@ -73,7 +73,7 @@ module Mulukhiya
 
     # いまの dics 設定の指紋。これが変われば以前のキャッシュは別物として捨てる。
     def signature
-      @signature ||= Digest::SHA256.hexdigest(sources.to_json)
+      @signature ||= Digest::SHA256.hexdigest(canonical_sources.to_json)
       return @signature
     end
 
@@ -133,6 +133,22 @@ module Mulukhiya
     def sources
       @sources ||= @handler.all.to_a
       return @sources
+    end
+
+    # 署名の材料。
+    #
+    # ⚠ **設定ハッシュをそのまま食わせない。** `type` の既定値・旧称
+    # (`relative` → `related`) を先に畳み、キーの並びにも依らない形にしてから
+    # ハッシュする。同じ設定が「畳む前」と「畳んだ後」で別の指紋になると、
+    # **キャッシュを書いたプロセスと起動直後のプロセスで署名が食い違い、
+    # 毎回キャッシュを捨てて全辞書を同期取得する**（PR #4587 の Codex P2）。
+    #
+    # ⚠ **並び順は保つ。** dics の順序は取り込みの順序でもあるので、
+    # 並べ替えた設定は別物として扱う。
+    def canonical_sources
+      return sources.map do |source|
+        source.to_h.merge('type' => RemoteDictionary.type(source)).sort.to_h
+      end
     end
 
     def load_cache
