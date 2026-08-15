@@ -3,6 +3,7 @@ require 'sidekiq/api'
 module Mulukhiya
   class SidekiqDaemon < Ginseng::Daemon
     include Package
+    extend DaemonHealthMethods
 
     def command
       return CommandLine.new([
@@ -51,9 +52,7 @@ module Mulukhiya
         retry: stats.retry_size,
         status: pids.present? ? 'OK' : 'NG',
       }
-      pids.each do |pid|
-        raise "PID '#{pid}' not alive" unless Process.alive?(pid)
-      end
+      pids.each {|pid| assert_pid_alive!(pid)}
       return values
     rescue => e
       return {error: e.message, status: 'NG'}
