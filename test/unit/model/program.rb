@@ -140,46 +140,93 @@ module Mulukhiya
 
     # ---- next_on (次回放送日) ---- (#4373)
 
-    # 「次回」ボタンは話数と一緒に放送日も 1 週進める。ウィークリー枠の日付更新を
-    # 既存操作へ相乗りさせるのが next_on 案の前提なので、ここが崩れると毎週
-    # 打ち直しになる。
-    def test_increment_episode_advances_next_on_by_a_week
+    # ⚠ **話数の +1 は next_on を触らない (#4585)。**話数と日付を同時に動かすのは
+    # やめた。話数だけ直したいときに日付が巻き込まれるのと、Annict が載らずに
+    # 200 が返ったときの巻き戻し量を減らすため。
+    def test_increment_episode_does_not_touch_next_on
       key = "test_nexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => '2026-08-08'})
       entry = @program.increment_episode(key)
 
       assert_equal(2, entry['episode'])
-      assert_equal('2026-08-15', entry['next_on'])
+      assert_equal('2026-08-08', entry['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # 「日付 ＋」は既定で 1 日進める。⚠ 週次前提の 7 日ではない (#4585)。
+    def test_advance_next_on_by_a_day
+      key = "test_advance_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => '2026-08-08'})
+      entry = @program.advance_next_on(key)
+
+      assert_equal('2026-08-09', entry['next_on'])
+      assert_equal(1, entry['episode'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # 連打は UI 側で 1 リクエストへ畳んで送る。月をまたいでも正しく進むこと。
+    def test_advance_next_on_with_days
+      key = "test_advance_days_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'next_on' => '2026-08-30'})
+      entry = @program.advance_next_on(key, days: 7)
+
+      assert_equal('2026-09-06', entry['next_on'])
+    ensure
+      @program.save(original) if original
+    end
+
+    # ⚠ 素の to_i に倒すと 'abc' が 0 日になり、押したのに進まない理由が
+    # 分からなくなる。範囲外・非整数は 422 で弾く。
+    def test_advance_next_on_rejects_invalid_days
+      key = "test_advance_bad_#{Time.now.to_i}"
+      original = @program.data
+      @program.save(key => {'series' => 'A', 'next_on' => '2026-08-08'})
+
+      ['abc', 0, -1, Program::NEXT_ON_ADVANCE_MAX_DAYS + 1, '1.5'].each do |days|
+        assert_raise(Ginseng::ValidateError) {@program.advance_next_on(key, days:)}
+      end
+
+      assert_equal('2026-08-08', @program.data[key]['next_on'])
     ensure
       @program.save(original) if original
     end
 
     # ⚠ next_on を持たないエントリに日付を生やしてはいけない。生やすと翌日から
     # 単発扱いになり、毎日出ていたイベントが消える。
-    def test_increment_episode_does_not_create_next_on
+    def test_advance_next_on_does_not_create_next_on
       key = "test_nonexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1})
-      entry = @program.increment_episode(key)
+      entry = @program.advance_next_on(key)
 
-      assert_equal(2, entry['episode'])
-      assert_not_includes(entry.keys, 'next_on')
+      # ⚠ キーの有無では見ない。`coerce_scalars` が読み込み時に next_on を必ず
+      # materialize する（未設定なら nil で生える）ので、キーは常に存在する。
+      # 見るべきは「日付が生えていないこと」。
+      assert_nil(entry['next_on'])
+      assert_equal(1, entry['episode'])
     ensure
       @program.save(original) if original
     end
 
-    # 不正な日付で話数の +1 まで巻き添えにしない。
-    def test_increment_episode_keeps_going_with_invalid_next_on
+    # 不正な日付は触らない。壊れた値を別の壊れた値へ書き換えない。
+    def test_advance_next_on_keeps_invalid_next_on
       key = "test_badnexton_#{Time.now.to_i}"
       original = @program.data
       @program.save(key => {'series' => 'A', 'episode' => 1, 'next_on' => 'not a date'})
-      entry = @program.increment_episode(key)
+      entry = @program.advance_next_on(key)
 
-      assert_equal(2, entry['episode'])
       assert_equal('not a date', entry['next_on'])
     ensure
       @program.save(original) if original
+    end
+
+    def test_advance_next_on_raises_when_missing
+      assert_raise(Ginseng::NotFoundError) {@program.advance_next_on('does_not_exist')}
     end
 
     # ⚠ YAML を手書きしてクォートを忘れた場合の受け。permitted_classes に Date を
@@ -429,6 +476,16 @@ module Mulukhiya
         error = assert_raise(Ginseng::ConflictError) do
           @program.delete_entry('any_key')
         end
+        assert_equal(409, error.status)
+      end
+    end
+
+    def test_advance_next_on_rejected_when_auto_update_enabled
+      with_auto_update(true) do
+        error = assert_raise(Ginseng::ConflictError) do
+          @program.advance_next_on('any_key')
+        end
+
         assert_equal(409, error.status)
       end
     end
