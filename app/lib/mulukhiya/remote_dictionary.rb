@@ -41,12 +41,25 @@ module Mulukhiya
     end
 
     def self.create(params)
-      params['type'] ||= 'multi_field'
-      params['type'] = 'related' if params['type'] == 'relative'
-      return "Mulukhiya::#{params['type'].camelize}RemoteDictionary".constantize.new(params)
+      return "Mulukhiya::#{type(params).camelize}RemoteDictionary".constantize.new(params)
     rescue => e
       e.log
       return nil
+    end
+
+    # 設定の `type` を実装クラスの接頭辞へ揃える。未指定は `multi_field`、
+    # `relative` は `related` の旧称。
+    #
+    # ⚠ **渡された params を書き換えないこと。** 以前はここで `params['type']` を
+    # 直接埋めていたが、`handler_config(:dics)` が返すのは**プロセス共有の設定
+    # ハッシュそのもの**。「一度 fetch を通したか」で設定の見え方が変わり、
+    # TaggingDictionary の署名 (#4583) が writer と起動直後の reader で食い違って、
+    # **新しいプロセスが毎回キャッシュを捨てて全辞書を同期取得していた**
+    # （PR #4587 の Codex P2）。`initialize` は `params.key_flatten` で自前の
+    # コピーを持つので、共有ハッシュを埋める必要はもともと無い。
+    def self.type(params)
+      type = params['type'] || 'multi_field'
+      return type == 'relative' ? 'related' : type
     end
 
     private

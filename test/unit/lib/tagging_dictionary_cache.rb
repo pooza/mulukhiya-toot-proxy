@@ -58,8 +58,50 @@ module Mulukhiya
     end
 
     def test_signature_follows_dics
-      assert_equal(Digest::SHA256.hexdigest(DICS.to_json), @dic.signature)
       assert_not_equal(@dic.signature, create_dictionary(DICS.take(1)).signature)
+      assert_not_equal(
+        @dic.signature,
+        create_dictionary([{'url' => DICS.first['url'], 'type' => 'mecab'}, DICS.last]).signature,
+      )
+    end
+
+    # ⚠ **署名は「畳む前」と「畳んだ後」で同じでなければならない。**
+    # `type` の既定値・旧称 (`relative` → `related`) は `RemoteDictionary.create`
+    # の中で解決されるが、そこで設定ハッシュを書き換えていたので、キャッシュを
+    # 書いたプロセスと起動直後のプロセスで指紋が食い違い、**毎回キャッシュを捨てて
+    # 全辞書を同期取得していた** (PR #4587 の Codex P2)。
+    def test_signature_is_stable_across_type_normalization
+      dics = [
+        {'url' => 'https://example.jp/api/dic/v1/a.json', 'type' => 'relative'},
+        {'url' => 'https://example.jp/api/dic/v1/b.json'},
+      ]
+      before = create_dictionary(dics.map(&:dup)).signature
+      # 本番では fetch (RemoteDictionary.create) が通ったあとの状態にあたる。
+      dics.each {|v| RemoteDictionary.type(v)}
+
+      assert_equal(before, create_dictionary(dics).signature)
+    end
+
+    # 既定値・旧称は同じソースとして扱う。設定の書き方だけでキャッシュが
+    # 捨てられないこと。
+    def test_signature_ignores_type_aliases
+      related = create_dictionary([{'url' => 'https://example.jp/a.json', 'type' => 'related'}])
+      relative = create_dictionary([{'url' => 'https://example.jp/a.json', 'type' => 'relative'}])
+      implicit = create_dictionary([{'url' => 'https://example.jp/b.json'}])
+      explicit = create_dictionary([
+        {'url' => 'https://example.jp/b.json', 'type' => 'multi_field'},
+      ])
+
+      assert_equal(related.signature, relative.signature)
+      assert_equal(implicit.signature, explicit.signature)
+    end
+
+    # ⚠ 設定ハッシュは共有物。`create` が書き換えると署名が動く。
+    def test_create_does_not_mutate_config
+      params = {'url' => 'https://example.jp/a.json', 'type' => 'relative'}
+      RemoteDictionary.create(params)
+
+      assert_equal('relative', params['type'])
     end
 
     # 別の dics 設定で温めたキャッシュを読まない。これが #4583 の芯で、

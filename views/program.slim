@@ -149,7 +149,7 @@ html lang='ja' data-theme='light'
                     span.tag.invalid v-if='isInvalidNextOn(entry.next_on)' v-tooltip.top="'次回放送日が日付として読めません。通知は止まっています'"
                       i class='fa fa-triangle-exclamation' aria-hidden='true'
                       span.sr-only 次回放送日が不正
-                    button.small @click.stop='advanceNextOn(key, entry)' v-if='editable && !isInvalidNextOn(entry.next_on)' :disabled='isBusy(key)' v-tooltip.top="'次回放送日を1日進める（連打でまとめて送信）'"
+                    button.small @click.stop='advanceNextOn(key, entry)' v-if='editable && !isInvalidNextOn(entry.next_on)' :disabled='isLocked(key)' v-tooltip.top="'次回放送日を1日進める（連打でまとめて送信）'"
                       i class='fa fa-plus'
                       span.sr-only 次回放送日を1日進める
                   small.muted v-else='' 毎日
@@ -317,7 +317,7 @@ html lang='ja' data-theme='light'
               }
             },
             loadEntries () {
-              this.methods.getPrograms()
+              return this.methods.getPrograms()
                 .then(e => {this.entries = e || {}})
                 .catch(e => Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'}))
             },
@@ -331,6 +331,15 @@ html lang='ja' data-theme='light'
               this.form.open = true
             },
             openEdit (key) {
+              if (this.isLocked(key)) return
+              // ⚠ **保留中の日付 ＋ を先に送り切る** (PR #4588 の Codex P2)。
+              // ここで開くと古い next_on をフォームへ写し取り、保存でその日付を
+              // 書き戻して、押したはずの ＋ が黙って消える。送信と再読込みを
+              // 待ってから、サーバーの値で開き直す。
+              if (this.pendingDays[key]) {
+                this.flushNextOn(key).then(_ => this.openEdit(key))
+                return
+              }
               const entry = this.entries[key]
               if (!entry) return
               this.form.editKey = key
@@ -436,8 +445,20 @@ html lang='ja' data-theme='light'
               if (this.isInvalidNextOn(nextOn)) return false
               return nextOn < this.todayKeyJst()
             },
-            isBusy (key) {
+            // リクエストが実際に飛んでいる最中か。日付 ＋ の連打はこれで止める
+            // （止めてしまうと 1 クリック 1 往復に戻ってしまうため）。
+            isLocked (key) {
               return !!this.busy[key]
+            },
+            // この行への書き込みを止めるべきか。
+            //
+            // ⚠ **保留中の日付 ＋ も「書き込み中」に数える** (PR #4588 の Codex P2)。
+            // 600ms の debounce 窓では busy がまだ立っていないので、素朴に書くと
+            // その隙に編集フォームが開けて古い next_on を写し取り、保存で
+            // **押したはずの ＋ を黙って書き戻す**。他の行操作も flush と重なって
+            // 409 を踏み、溜めたクリックごと捨てられる。
+            isBusy (key) {
+              return this.isLocked(key) || !!this.pendingDays[key]
             },
             toggleEnable (key, entry) {
               if (this.isBusy(key)) return
@@ -496,7 +517,7 @@ html lang='ja' data-theme='light'
             // まとめて 1 回だけ送る。⚠ 失敗しても loadEntries() でサーバーの値を
             // 取り直すので、表示のズレは残らない。
             advanceNextOn (key, entry) {
-              if (this.isBusy(key)) return
+              if (this.isLocked(key)) return
               if (!entry.next_on || this.isInvalidNextOn(entry.next_on)) return
               this.pendingDays[key] = (this.pendingDays[key] || 0) + 1
               clearTimeout(this.pendingTimers[key])
@@ -508,20 +529,23 @@ html lang='ja' data-theme='light'
               }
               this.pendingTimers[key] = setTimeout(_ => this.flushNextOn(key), 600)
             },
+            // 溜めた日数をまとめて 1 回で送る。⚠ **Promise を返すこと。**
+            // openEdit が「先に送り切ってから開く」ために待つ (PR #4588 の Codex P2)。
             flushNextOn (key) {
               const days = this.pendingDays[key]
               delete this.pendingDays[key]
+              clearTimeout(this.pendingTimers[key])
               delete this.pendingTimers[key]
-              if (!days) return
+              if (!days) return Promise.resolve()
               this.busy[key] = true
-              this.methods.advanceProgramNextOn(key, days)
+              return this.methods.advanceProgramNextOn(key, days)
                 .then(_ => {
                   Swal.fire({title: `次回放送日を+${days}日しました。`, toast: true, position: 'top-end', icon: 'success', showConfirmButton: false, timer: 2000})
-                  this.loadEntries()
+                  return this.loadEntries()
                 })
                 .catch(e => {
                   Swal.fire({text: this.methods.createErrorMessage(e), icon: 'error'})
-                  this.loadEntries()
+                  return this.loadEntries()
                 })
                 .finally(_ => {delete this.busy[key]})
             },
