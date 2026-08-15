@@ -90,6 +90,8 @@ handler:
       - https://pf.korako.me/plugins/community-hashtag-map.json
     cache_ttl: 3600
   dictionary_tag:
+    cache:
+      ttl: 3600
     dics: []
     word:
       min: 2

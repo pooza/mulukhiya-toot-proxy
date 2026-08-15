@@ -46,6 +46,7 @@ module Mulukhiya
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       TestHarness.apply!
+      invalidate_shared_caches
       Sidekiq::Testing.fake!
       file_map(cases).each do |name, path|
         raise 'disabled' if name.end_with?('_handler') && Handler.create(name).disable?
@@ -55,6 +56,19 @@ module Mulukhiya
       rescue => e
         puts "- case: #{name} (#{e.message})" if Environment.test?
       end
+    end
+
+    # プロセスをまたいで居座る共有キャッシュを、スイート開始時に既知の状態へ戻す。
+    #
+    # ⚠ **「実走の前に手で UNLINK する」を手順書に書くだけでは弱い (#4583)。**
+    # タグ辞書は Redis に残り、テストの結果が「前に一度回したか」で変わっていた。
+    # 人間が手順を踏み忘れても効くよう、スイートのロードに織り込む。
+    def self.invalidate_shared_caches
+      TaggingDictionary.invalidate_cache
+    rescue => e
+      # Redis 未起動などで落ちても、ここでスイート全体を止めない。実際に辞書を
+      # 触るテストがその場で落ちる。
+      e.log
     end
 
     def self.names(cases = nil)
