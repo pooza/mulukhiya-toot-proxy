@@ -37,7 +37,42 @@ misskey:
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-14'
+last_checked: '2026-08-16'
+
+# 2026-08-16 チェック結果:
+#   - Mastodon: **v4.7.0-rc.1（2026-08-14）を fedi-test-harness で実走**。RC なので
+#     `verified` は昇格させない（stable が出たら回し直す）。`.env` の MASTODON_VERSION を
+#     手で `v4.7.0-rc.1` に置いてから reset（update-version.sh は最新 stable を拾うため）。
+#     `/api/v2/instance` で `version=4.7.0-rc.1` を確認したうえで実走。
+#   - **1086 tests / 2157 assertions / 0 failures / 0 errors / 157 omissions（100% passed、341 秒）。**
+#     失敗が 1 件も無いので版間 diff は不要（v4.6.5 / v4.6.6 と同じ判断）。
+#     ⚠ **v4.6.6 の 1050 tests / 152 omissions とは母数が違う**（mulukhiya 側が 5.34.0 開発中で
+#     テストが増えている）。tests / omissions の増減を Mastodon 版の影響と読まないこと。
+#   - **DB 直読み層を個別にも実走**（4.7 の変更が当たるならここ）:
+#     account 34 tests / status 27 tests / attachment 17 tests / postgres 5 tests、
+#     **4 本とも 0 failures / 0 errors かつ omission 0**＝素通りではなく実アサートで緑。
+#   - 4.6.6 → 4.7.0-rc.1 の変更のうちモロヘイヤに当たりうる 3 点は、実コードでもすべて空振り:
+#     ① `accounts.uri` が `default:"" / null:false` → nullable、`index_accounts_on_uri` が UNIQUE へ
+#        （post_migrate で local account の `''` → NULL、`domain IS NOT NULL AND uri IS NULL` の
+#        壊れたリモート account は **delete_all**）。⚠ **モロヘイヤの `Mastodon::Account#uri` は
+#        username から組み立てており DB カラムを読まない**。`app/query/mastodon/*.sql.erb` も
+#        `accounts.uri` を select にも条件にも使っていない
+#     ② `account_summaries` / `global_follow_recommendations` がマテリアライズドビュー → 実テーブル
+#        （accounts への FK、`accounts.requested_deletion_at` 追加）。**両方ともモロヘイヤは未参照**
+#     ③ REST `AccountSerializer`: `username` が `pretty_username` に、`invalid_handle` 新設、
+#        `suspended` の出力条件が `suspended?` → `unavailable?`。`pretty_username` が値を変えるのは
+#        username が `"! <id>"` の壊れたリモート handle のときだけで、通常アカウントでは不変
+#     ⚠ **`statuses` テーブルは 4.6.6 から無変更。**「statuses 側にも nullable 化がある」は誤りで、
+#     schema 差分で nullable になるのは `keypairs.uri`。`Status#uri`（`self[:url] || self[:uri]`）は安全。
+#   - beta.1 → rc.1 の差分は小さい（マイグレーション追加 1 本 `remove_index_keypairs_on_account_id`、
+#     モデル/シリアライザは `app/models/remote_follow.rb` のみ。残り 115 ファイルは yarn.lock / locale / spec）。
+#   - ⚠ **ポート 3000 を Misskey ハーネスが握っていて proxy が起動できなかった。**pooza/chubo2#165 で
+#     `MISSKEY_PORT` の既定は 3001 になったが、**変わったのは `.env.example` だけで手元の `.env` は
+#     3000 のまま**（`.env` は gitignore で更新の導線が無い）。さらに、ポート衝突で失敗した proxy
+#     コンテナが**ネットワーク未接続のまま `exited` で残り**、compose がそれを再利用するため
+#     `up -d` を繰り返しても `host not found in upstream "web"` から復旧しない。
+#     `docker compose rm -sf proxy` で作り直して解決。**pooza/chubo2#178 として起票済み。**
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。対応不要。
 
 # 2026-08-14 チェック結果:
 #   - Mastodon: stable v4.6.6（2026-08-13）を fedi-test-harness で検証・verified 昇格。
