@@ -773,6 +773,12 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
     `server_name=mulukhiya` / `release=5.26.0` ＝ **姉妹サーバー管理人のモロヘイヤ**の系統で pooza 側の作業は無い。
     chubo2#41 系統（zugoga のデプロイで bundle install 未走）は 2026-07-17 を最後に静穏
 - **Dependabot** 0 件。**Codex** は open / 直近マージ 25 本を横断してリアクション 0 の指摘ゼロ（[[feedback_codex-review-window-too-narrow]] の広めの窓で確認）
+- ⚠ **同期の初回で PR #4602 の申し送りコメントを落とした。**`pulls/{number}/comments` は行コメントしか返さず、
+  PR 本体のコメント（`issues/{number}/comments`）を見ていなかったため。**投稿者は Codex ではなく `pooza`**
+  （ginseng-style 側を触っていた別セッションの申し送り）。§4 に手順として追記した。
+  内容は「正本側 pooza/ginseng-style#11 / #12 で **test-unit に無いアサーションへ自動修正する 4 cop**
+  （`AssertPathExists` / `RefutePathExists` / `AssertOutput` / `AssertSilent`）をまとめて無効化したので、
+  モロヘイヤ側の `Minitest/RefutePathExists` の固有緩和は落とせる」。b77dd308 で消化（rubocop 471 files / no offenses）
 - **chubo2** は差分なし。**Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
 - **harness の upstream チェック（§8）** — 下の「fedi-test-harness の検証状況」に反映
 
@@ -1223,6 +1229,14 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
   2. **返信済みだがリアクション未付与** → 修正コミットの存在を確認し、+1 リアクションを付与
   3. **返信済み・リアクション済み** → 完了。報告不要
 - 判定方法: `gh api repos/pooza/mulukhiya-toot-proxy/pulls/{number}/comments --jq` で全コメントを取得し、Codex コメントの `id` に対する `in_reply_to_id` を持つ返信の有無、および Codex コメントへのリアクション（`reactions`）を確認する
+
+⚠ **`pulls/{number}/comments` は行に紐づくレビューコメントしか返さない。**PR 本体のコメントは
+`gh api repos/pooza/mulukhiya-toot-proxy/issues/{number}/comments` で別に取る。**open PR も対象に含めること。**
+
+- 他リポジトリ（`ginseng-*` / chubo2）の作業をしている**別セッションが、こちらの PR へ申し送りを置く**ことがある。
+  投稿者は Codex ではなく `pooza` なので、bot だけを見ていると丸ごと落ちる
+- 2026-08-20 の同期で実際に落とした: PR #4602 に「正本側（pooza/ginseng-style#11 / #12）で 4 cop を無効化したので
+  `Minitest/RefutePathExists` の固有緩和を落とせる」という申し送りが 08-19 から置かれていた（b77dd308 で消化）
 
 ### 5. Sentry の新規イシュー確認
 
