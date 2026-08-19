@@ -1,5 +1,10 @@
 module Mulukhiya
   class RelatedRemoteDictionary < RemoteDictionary
+    # `{語: [関連語, ...]}` の Hash。String (200-with-HTML) はここで弾く (#4573)。
+    def expected_class
+      return Hash
+    end
+
     def parse
       return fetch.to_h do |k, words|
         words = Array(words).map {|v| create_key(v)}

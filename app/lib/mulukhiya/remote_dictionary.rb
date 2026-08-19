@@ -10,10 +10,34 @@ module Mulukhiya
       raise Ginseng::ImplementError, "'#{__method__}' not implemented"
     end
 
+    # ⚠ **`present?` だけでは 200-with-HTML を弾けない (#4573)。**HTTParty の
+    # `parsed_response` は Content-Type が JSON でなければ **String をそのまま
+    # 返す**。GAS の `/exec` は失効やアクセス権の変化で **HTTP 200 のまま
+    # `text/html` のログイン誘導ページ**を返すため、HTTP 層は成功・`present?` も
+    # 通り、`String#to_h` / `String#each` の NoMethodError として parse の奥で
+    # 倒れて、外側の rescue が空の辞書に化けさせていた（美食丼の related 辞書 3 本が
+    # 10 分周期で全滅していたのに誰も気付けなかった）。
+    #
+    # 型は**サブクラスが期待する形**で見る。読み辞書の
+    # PronunciationDictionary#valid_schema? と同じく、外れたら型・Content-Type を
+    # 添えて logger.error を残す。
     def fetch
-      response = @http.get(uri).parsed_response
-      raise 'empty' unless response.present?
-      return response
+      response = @http.get(uri)
+      parsed = response.parsed_response
+      raise Ginseng::GatewayError, "empty response (#{uri})" unless parsed.present?
+      return parsed if valid_schema?(parsed)
+      log_invalid_schema(response, parsed)
+      raise Ginseng::GatewayError,
+        "unexpected response type '#{parsed.class.name}' (#{uri})"
+    end
+
+    # サブクラスが `parse` で前提にしている型。
+    def expected_class
+      return Enumerable
+    end
+
+    def valid_schema?(parsed)
+      return parsed.is_a?(expected_class)
     end
 
     def uri
@@ -63,6 +87,22 @@ module Mulukhiya
     end
 
     private
+
+    # ⚠ **本文そのものは残さない。**ログイン誘導ページには URL つきのトークンが
+    # 載りうる (#4511)。型・Content-Type・サイズがあれば「JSON のはずが HTML を
+    # 掴んでいる」は判別できる。
+    def log_invalid_schema(response, parsed)
+      logger.error(
+        message: 'dictionary fetch schema invalid',
+        url: uri.to_s,
+        type: parsed.class.name,
+        expected: expected_class.name,
+        content_type: response.headers['content-type'],
+        bytes: response.body.to_s.bytesize,
+      )
+    rescue => e
+      e.log(dic: uri.to_s)
+    end
 
     def create_entry(word)
       pattern = create_pattern(word)
