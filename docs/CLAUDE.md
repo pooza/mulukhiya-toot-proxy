@@ -821,7 +821,8 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 **ginseng-style（2026-08-19 新設）**。Ruby の書き方・テスト方針・表記規約・RuboCop 設定の正本を切り出した gem リポジトリ。
 モロヘイヤ側の取り込みが #4601 / PR #4602。⚠ **今後「書き方」の指示が出たら正本は ginseng-style の `docs/`**。
-向こうの残件は `pooza/ginseng-style#1`（利用側リポジトリを `inherit_gem` へ移す rollout）・#2（ginseng-* の CI がテストを走らせていない）・#9 / #10 / #14。
+⚠ **ginseng-\* 自体の残件はこのリポジトリの管轄外**（§6 のとおり専任セッションがある）。こちらは
+`inherit_gem` の追随と、送った Issue / PR の結果待ちだけを持つ。
 
 - **pooza/chubo2#166 ops: sweep の unattended-upgrades が itamae 管理外** — 2026-08-12 06:40 に systemd 更新の巻き添えで `redis-server` が再起動し、Sidekiq が Sentry へ 8 イベント（一過性・復旧済み・triage コメント済み）。⚠ **sweep は「再起動で PG が上がらない地雷」を抱えているのに `postgresql-16` が自動更新の射程内**なのが本題。モロヘイヤ側の作業は無い
 
@@ -1249,20 +1250,32 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 
 ### 6. 外部リポジトリの同期確認（chubo2 / ginseng-*）
 
-対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*` 7 リポジトリ（モロヘイヤが依存する自作 gem 群）。
+対象は `pooza/chubo2`（インフラ）と `pooza/ginseng-*`（モロヘイヤが依存する自作 gem 群）。
+
+⚠ **ginseng-\* には専任のセッションがある**（2026-08-20 ユーザー明示）。**こちらが当番のように「担当」しない。**
+モロヘイヤ側で見つけた gem の不具合・要望は**各 gem のリポジトリへ Issue か PR を送って結果を待つ**のが正しい形で、
+向こうの open Issue を棚卸ししたり、こちらのマイルストーンへ引き取ったりしない。
+
+- **やること**: 送った Issue / PR の状況確認、リリースされた gem の `bundle update` 追随、
+  申し送りコメントの消化（§4 の PR 本体コメント）
+- **やらないこと**: ginseng-\* の open Issue の生死判定・優先度付け・実装の肩代わり
+- ⚠ **モロヘイヤ側だけ直しても gem が値を捨てて届かないことがある**（#4589 / #4594 で 2 回踏んだ）。
+  その場合は「gem へ Issue/PR → 向こうで着地 → `bundle update` → 本体 PR」の順で、**依頼側として**回す
 
 #### 6-1. 毎セッション
 
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
-- `gh issue list --state open` で open Issue の変動を確認（chubo2 / ginseng-* とも）
+- chubo2 の `gh issue list --state open` で open Issue の変動を確認
+- ginseng-\* は**こちらが送った Issue / PR の進捗だけ**見る（一覧の棚卸しはしない）
 
 #### 6-2. 30 日ごとの棚卸し
 
 chubo2 の [docs/infra-note.md](https://github.com/pooza/chubo2/blob/main/docs/infra-note.md) 冒頭にある
 「最終棚卸し」の日付を見る。**当日から 30 日以上経過していれば**以下を実行（経過していなければスキップ）。
 
-- 各リポジトリの open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
+- **対象は chubo2（インフラ）のみ。**⚠ **ginseng-\* は専任セッションの持ち物なので棚卸ししない**（上の注記）
+- chubo2 の open Issue を 1 件ずつ、**コード・コミット・実機と突き合わせて**生死を判定する
 - **一覧を眺めるだけでは不十分。** 2026-07-31 の初回棚卸しでは 30 件中 6 件が「既に終わっている」
   または「対象が消滅している」状態で、最古は 5 か月放置されていた（#4488）。実装が chubo-core 側の
   コミットで着地していると、タイトルからは終わっているか分からない
