@@ -1367,21 +1367,14 @@ capsicum 側で先行運用しており、v1.18 のレビューでは 5 観点�
 
 5観点並列レビュー導入（5.19.0〜）以降、レビュー由来の小粒 Issue（仕様補足・docs 修正・単発バリデーション）が大量に発生するようになり、件数では実態を反映しなくなった。**サイズラベル + 重み予算**で管理する。
 
-#### サイズラベル
+#### サイズラベルと重み予算
 
-| ラベル | 想定差分 | 重み |
-| --- | --- | --- |
-| `size:S` | 50 行未満 / 単発バリデーション・小バグ修正・docs 修正 | 1 |
-| `size:M` | 50〜200 行 / 新メソッド・リファクタ単位・契約変更 | 3 |
-| `size:L` | 200 行超 / 新エンドポイント・スキーマ変更・複数ファイル横断 | 8 |
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/workflow.md`**（`size:S` = 1 / `size:M` = 3 / `size:L` = 8、1 マイルストーンの目安 20〜25 重み）。
 
-新規 Issue 起票時にいずれかを付ける。既存 Issue にも遡及付与する。
+モロヘイヤ固有の補足:
 
-#### 重み予算
-
-- 1 マイルストーンの目安: **20〜25 重み**（従来「10 件前後」と接続する感覚値。M を基準に S が混在する想定）
+- 目安の 20〜25 は、従来「10 件前後」と接続する感覚値（M を基準に S が混在する想定）
 - 上限を超えそうな Issue は次のマイナーバージョンへ送る（緑送り扱い）
-- 計画書は作成せず、Issue ＋ マイルストーン ＋ 重み合計で管理する
 
 #### 主軸宣言（任意）
 
@@ -1566,12 +1559,17 @@ SSH経由で操作可能。接続情報は `~/.ssh/config` で管理（リポジ
 
 ## コーディング規約
 
-- rubocop, slim_lint, erb_lint に準拠
-- 機能追加・バグ修正には対応するテストを書くこと（CIで実行可能な範囲で。DB依存・外部API依存のテストは無理に書かなくてよい）
-- テスト: test-unit (Mulukhiya::TestCase 基底クラス)
-- モック: WebMock (`require 'webmock/test_unit'` でtest-unitと統合済み。デフォルトはネット許可、モック使用テストで `WebMock.disable_net_connect!` を明示呼出)
-- 設定アクセス: `config['/path/to/key']` (Ginsengのスラッシュ記法)
-- ハンドラー設定: `handler_config(:key)` (5.0でシンボル記法に統一完了、ネストはYAML構造で表現)
+⚠ **Ruby の書き方・テストの基本方針・表記規約の正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/`。** RuboCop 設定も同リポジトリの `config/rubocop.yml` を `inherit_gem` している（モロヘイヤの `.rubocop.yml` には固有の差分だけがある）。以下はモロヘイヤ固有の項目だけを置く。
+
+- `docs/ruby.md` — 暗黙の return を使わない／論理的 2 スペース／`return` に多行チェインを繋がない理由／`disable?` パターン／文字列のエンコーディング
+- `docs/writing.md` — 用語・パスとキーの書き方・⚠ マーカーの使い方
+- `docs/workflow.md` — Issue 駆動・ブランチ・サイズラベルと重み予算・`ginseng-*` の変更手順
+
+### モロヘイヤ固有
+
+- slim_lint, erb_lint にも準拠する（`rake lint` に含まれる）
+- テストの基底クラスは `Mulukhiya::TestCase`
+- ハンドラー設定: `handler_config(:key)`（5.0でシンボル記法に統一完了、ネストはYAML構造で表現）
 
 ### テスト作成ガイド
 
@@ -1616,17 +1614,10 @@ CIでは `config/local.yaml` に `controller: mastodon|misskey` のみ設定さ�
 
 ### RuboCopに含まれない個人規約
 
-以下はユーザーから都度指示される。指示があり次第ここに追記する。
-
-- メソッド末尾でも `return` を省略しない（暗黙のreturnを使わない）
-- インデントは常に2スペース。見栄えのための位置揃え（代入の右辺にcase/if式を置いて深くインデントする等）は使わない。`x = case ...` ではなく、各分岐内で個別に代入する
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/ruby.md`。** 新しい指示が出たらそちらへ追記する（モロヘイヤだけの話ではないため）。
 
 ### ドキュメント表記規約
 
-- **設定ファイルのパス**: ディレクトリを含めて表記する（`local.yaml` → `config/local.yaml`）
-- **設定キーの参照**: Ginseng のスラッシュ記法で表記する（`service:` や `sidekiq.auth.user` ではなく `/service`、`/sidekiq/auth/user`）
-- **サーバーの呼称**: 「インスタンス」ではなく「サーバー」を使う
-- **UI の呼称**: 「UI」ではなく「WebUI」を使う
-- **IP の表記**: 単独で使わず「IP アドレス」と表記する。**理由: 「IP」はプロトコルの名前であって、アドレスを指す語ではない。**略した結果べつの概念を指してしまう省略は避ける（JavaScript を Java と呼んではいけないのと同じ）。⚠ **文書では例外なく守る。**コード内のコメントは目を瞑るが、揃えられるなら揃える
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style) の `docs/writing.md`**（用語・パスとキーの書き方・⚠ マーカーの使い方・クロスリポジトリの Issue 参照）。以下はモロヘイヤ固有の呼称だけを置く。
+
 - **ボットの呼称**: 英名（`info_bot` 等）ではなく日本語の役割名（「お知らせボット」等）を使う
-- **ファイル参照**: サンプルファイルやテンプレート等への参照はマークダウンリンクにする
