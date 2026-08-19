@@ -636,7 +636,7 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
   - ⚠ **必須パラメータは purpose ごとに違う。**`tag` は本文だけを送り直す経路で添付を持たない投稿にも来るので、`media_attributes` を一律必須にすると本文だけのタグ書き換えが 422 になる（同 Codex P2）
   - ⚠ **実害はまだ出ていない。**この経路を叩くクライアントが無く、capsicum#121 が着手前だったため。**先に塞ぐのが本件の趣旨**
 
-- **#4594 bug: 画像アップロードの 401 がアラート抑止をすり抜ける（size:S・PR #4595 で着地待ち）** — 2026-08-17 に
+- **#4594 bug: 画像アップロードの 401 がアラート抑止をすり抜ける（size:S・2026-08-20 着地・PR #4595）** — 2026-08-17 に
   キュアスタ！本番（gomander）で `POST /api/v1/media` の 401 が 25 分に 13 回、**すべて管理者へのアラートメール
   （＋ Discord ＋ Sentry）として飛んだ**。発生源は Tencent Cloud の分散 IP からのボットで、無効トークンのまま連打していた
   - ⚠ **モロヘイヤ側だけ読んでも辿り着けない**（#4589 と同型）。`ginseng-fediverse` の `MastodonService#upload` が上流の
@@ -644,6 +644,11 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
     `silent_statuses: [401]` に**一度も到達していなかった**。pooza/ginseng-fediverse#246 → #247（1.8.28）と対で入れる
   - ⚠ **同じ理由で 413 の分岐も死んでいた。**「アップロードしたファイルがサーバーの上限サイズを超過しています。」は
     **導入以来一度も出ていない**。クライアントに返るのも上流の 401 / 413 ではなく `ValidateError#status` の 422 だった
+  - ⚠ **Issue は open のまま残している。**効いていることの確認は**本番へ出た後**にしか取れない
+    （同じボットの 401 連打でアラートメールが飛ばず、syslog には残っていること）。5.34.0 デプロイ後に確認してクローズする
+  - 回帰テストは 2 段。`gateway_error_transparency.rb` に 4 本（401 抑止 / 413 文言 / **5xx は鳴らす** /
+    上流ステータス透過）と、**gem 境界の契約テスト** `test/unit/service/mastodon_upload_error_boundary.rb`。
+    ⚠ **後者が無いと `bundle update` で黙って戻る**（前者は gem を通らない）
   - ボット自体の遮断はインフラ層（pooza/chubo2#118）。モロヘイヤ側は alert 条件だけを扱う
 
 - **#4598 bug: `Idempotency-Key` が上流へ転送されず、再送が二重投稿になる（size:M）** — 2026-08-19 に
@@ -657,9 +662,16 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
   「来れば尊重する」形なのに、`SlackWebhookPayload#values` が `visibility` を落としている。
   ⚠ **`Webhook#command` が出す curl サンプルには `visibility` が入っている**＝**効くように見えて効かない**状態
 
-- **#4601 chore: RuboCop 設定と規約の正本を ginseng-style へ寄せる（size:S・PR #4602 で着地待ち）** —
-  新設した [pooza/ginseng-style](https://github.com/pooza/ginseng-style) を `inherit_gem` し、`.rubocop.yml` は
-  モロヘイヤ固有の差分だけにする。docs 側もコーディング規約・表記規約・重み定義を ginseng-style の `docs/` へ委譲する
+- **#4601 chore: RuboCop 設定と規約の正本を ginseng-style へ寄せる（size:S・2026-08-20 着地・PR #4602・Issue クローズ済み）** —
+  新設した [pooza/ginseng-style](https://github.com/pooza/ginseng-style) を `inherit_gem` し、`.rubocop.yml` に残るのは
+  `bin/diag` の除外・`TargetRubyVersion`・Sequel 系（正本が持たないプラグイン）だけになった。
+  docs 側もコーディング規約・表記規約・重み定義を ginseng-style の `docs/` へ委譲
+  - ⚠ **`Minitest/RefutePathExists` の固有緩和も落とした**（`b77dd308`）。これは**モロヘイヤ固有ではなく
+    test-unit を使う全プロジェクト共通**の問題で（minitest は `assert_path_exists`、test-unit は `assert_path_exist` の単数形）、
+    `rubocop-minitest` が**存在しないメソッドへ自動修正する 4 cop**（`AssertPathExists` / `RefutePathExists` /
+    `AssertOutput` / `AssertSilent`）を正本側でまとめて無効化した（pooza/ginseng-style#11 / #12）
+  - ⚠ **この申し送りは PR 本体のコメントに置かれていた**（投稿者は Codex ではなく `pooza`＝別セッション）。
+    同期の初回で落としたので §4 に手順として足してある
 
 **確定スコープの重み合計は 23**（M 3 × 6 + S 1 × 5）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
 ⚠ **メンテナンスリリースを連続させない**というユーザーの意向（2026-08-13）を受けて、**主軸をメディアカタログと番組表に置き、
