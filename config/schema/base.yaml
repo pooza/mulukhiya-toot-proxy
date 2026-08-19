@@ -189,6 +189,15 @@ properties:
     required:
       - api
     type: object
+  media:
+    properties:
+      download:
+        properties:
+          max_bytes:
+            minimum: 1
+            type: integer
+        type: object
+    type: object
   peer_tube:
     properties:
       hosts:
