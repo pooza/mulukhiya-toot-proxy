@@ -19,6 +19,12 @@ module Mulukhiya
       'i', 'access_token'
     ].freeze
 
+    # 上流へそのまま中継してよい受信ヘッダ (#4598)。
+    #
+    # ⚠ **`@headers` の丸投げはしない。**`Host` / `Content-Length` / `Cookie` /
+    # `X-Mulukhiya` まで混ざる。転送してよいものだけを 1 本の許可リストに置く。
+    FORWARDED_HEADERS = ['Idempotency-Key'].freeze
+
     set :root, Environment.dir
     enable :method_override
 
@@ -86,6 +92,23 @@ module Mulukhiya
 
     def api_version
       return params[:version].sub(/^v/, '').to_i
+    end
+
+    # 上流へ中継する受信ヘッダ (#4598)。
+    #
+    # ⚠ **モロヘイヤ側で生成しない。**付いてこなければ付けずに転送する。本文の
+    # ハッシュ等から自前で作ると、実況で意図的に連投される同一本文を上流が
+    # 畳んでしまい、**投稿が黙って消える**。
+    #
+    # ⚠ **`Idempotency-Key` は Mastodon API の仕様**で、Misskey には相当物が無い。
+    # 送っても無害だが、「効いているつもり」を作らないために送らない。
+    #
+    # ⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（mastodon の
+    # `PostStatusService` が `idempotency:status:<account>:<key>` を setex する）。
+    # 秒〜分の再送には効くが、それを超える再実行では効かない。
+    def forwarded_headers
+      return {} unless controller_class.name == 'mastodon'
+      return @headers.to_h.slice(*FORWARDED_HEADERS)
     end
 
     def verify_token_integrity!
