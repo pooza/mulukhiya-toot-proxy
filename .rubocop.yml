@@ -11,9 +11,6 @@ AllCops:
   Exclude:
     - bin/diag/**/*
   TargetRubyVersion: 4.0
-# モロヘイヤ固有の緩和。assert_path_exists への言い換えを強制しない。
-Minitest/RefutePathExists:
-  Enabled: false
 Sequel:
   Exclude:
     - '*'
