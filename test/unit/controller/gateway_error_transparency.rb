@@ -154,6 +154,48 @@ module Mulukhiya
       )
     end
 
+    # 画像アップロード (POST /api/:version/media) の失敗 (#4594)。
+    #
+    # ⚠ ここが通るのは **ginseng-fediverse 1.8.28 以降**。それ以前は
+    # MastodonService#upload が上流の GatewayError を ValidateError に詰め替えて
+    # いたため、source_status ごと失われて以下がすべて到達しなかった
+    # (pooza/ginseng-fediverse#246)。モロヘイヤ側のコードだけ読んでも
+    # 気づけない類なので、経路を正で押さえておく。
+    def test_upload_alert_is_suppressed_for_unauthorized
+      error = build_error(401, {error: 'The access token is invalid'}.to_json)
+
+      assert_false(alerted?(error) {upload_controller.handle_upload_gateway_error(error)})
+    end
+
+    # 413 はユーザーのファイルサイズ超過。モロヘイヤ側の文言を出し alert しない。
+    def test_upload_size_limit_returns_own_message
+      controller = upload_controller
+      error = build_error(413, '<html><body>413 Request Entity Too Large</body></html>')
+
+      assert_false(alerted?(error) {controller.handle_upload_gateway_error(error)})
+      assert_equal(413, @upload_renderer.status)
+      assert_includes(fetch(@upload_renderer.message, 'error'), '上限サイズを超過')
+    end
+
+    # ⚠ 黙らせるのは 401 / 413 だけ。上流の 5xx まで抑止すると、
+    # 「アップロードが全滅している」を Sentry で拾えなくなる。
+    def test_upload_alert_fires_for_server_error
+      error = build_error(500, {error: 'Internal Server Error'}.to_json)
+
+      assert_true(alerted?(error) {upload_controller.handle_upload_gateway_error(error)})
+    end
+
+    # クライアントへ返るのは上流のステータス。ValidateError の 422 ではない。
+    def test_upload_passes_upstream_status_through
+      controller = upload_controller
+      error = build_error(422, {error: 'Validation failed: File type is invalid'}.to_json)
+
+      controller.handle_upload_gateway_error(error)
+
+      assert_equal(422, @upload_renderer.status)
+      assert_equal('Validation failed: File type is invalid', fetch(@upload_renderer.message, 'error'))
+    end
+
     def test_user_fault_codes_covers_known_misskey_codes
       ['TOO_MANY_DRAFTS', 'ALREADY_FAVORITED', 'NO_SUCH_NOTE', 'MAX_FILE_SIZE_EXCEEDED'].each do |code|
         assert_includes(MisskeyController::USER_FAULT_CODES, code)
@@ -161,6 +203,15 @@ module Mulukhiya
     end
 
     private
+
+    # アップロード経路は MastodonController が持つ。renderer は差し替えた側を
+    # @upload_renderer で握っておく（公開アクセサが無いため）。
+    def upload_controller
+      controller = MastodonController.new!
+      @upload_renderer = Ginseng::Web::JSONRenderer.new
+      controller.instance_variable_set(:@renderer, @upload_renderer)
+      return controller
+    end
 
     def build_error(code, body)
       error = Ginseng::GatewayError.new("Bad response #{code}")

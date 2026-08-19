@@ -203,6 +203,14 @@ module Mulukhiya
     # ⚠ **413 を silent_statuses に並べない** (#4537)。ここへ来る時点で 413 は
     # 下の分岐で処理済みなので効かず、並べてあると「413 も抑止対象」と誤読する。
     # 401 の抑止は handle_gateway_error の既定に含まれている。
+    #
+    # ⚠ **このメソッドに届くかどうかは gem 側の実装に握られている** (#4594)。
+    # ginseng-fediverse 1.8.28 より前の `MastodonService#upload` は上流の
+    # `GatewayError` を `ValidateError` に詰め替えていたため、呼び出し元の
+    # `rescue Ginseng::GatewayError` を素通りし、401 の抑止も下の 413 分岐も
+    # **一度も到達していなかった**（ボットの無効トークン連打がそのまま管理者への
+    # アラートメールになった）。境界は
+    # `test/unit/service/mastodon_upload_error_boundary.rb` で押さえてある。
     def handle_upload_gateway_error(error)
       return handle_gateway_error(error) unless error.source_status == 413
       @renderer.message = {error: 'アップロードしたファイルがサーバーの上限サイズを超過しています。'}
