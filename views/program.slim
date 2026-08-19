@@ -240,13 +240,31 @@ html lang='ja' data-theme='light'
           return minutesA < minutesB ? -1 : 1
         }
 
+        // YYYY-MM-DD として実在する日付か (#4558)。
+        // ⚠ Number.isNaN だけでは足りない。Date.UTC(2026, 1, 31) は 3/3 へ
+        // 繰り上がるので NaN にならず、存在しない日付が通ってしまう。
+        // ⚠ 端末のタイムゾーンを混ぜてはいけないので UTC で組む。
+        const isValidDateValue = value => {
+          const text = String(value)
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false
+          const [year, month, day] = text.split('-').map(Number)
+          const date = new Date(Date.UTC(year, month - 1, day))
+          return date.getUTCFullYear() === year &&
+            date.getUTCMonth() + 1 === month &&
+            date.getUTCDate() === day
+        }
+
         // まとめコピーの日付見出し。UTC で組んで UTC で曜日を読むので、端末の
         // タイムゾーンによらず next_on の日付そのものの曜日になる。
         // 日付として読めない値はそのまま出す (見出しごと消さない)。
+        //
+        // ⚠ **曜日を付けるのは実在する日付のときだけ (#4558)。**一覧では
+        // 「不正」バッジを出しているのに、コピーした見出しには
+        // `2026-02-31 (火)` と一見もっともらしい曜日が付いていた。
         const formatDateHeading = value => {
+          if (!isValidDateValue(value)) return String(value)
           const [year, month, day] = String(value).split('-').map(Number)
           const date = new Date(Date.UTC(year, month - 1, day))
-          if (Number.isNaN(date.getTime())) return String(value)
           return `${value} (${WEEKDAYS[date.getUTCDay()]})`
         }
 
@@ -407,17 +425,12 @@ html lang='ja' data-theme='light'
             // 日付として読めない next_on。サーバーは fail-closed で通知を出さない
             // ので、一覧でも「過去日」ではなく「不正」として区別する。文字列比較
             // だけだと 2026-02-31 を過去日、2026/08/08 を未来日と誤って読む。
+            // ⚠ 判定の実体は isValidDateValue に 1 本化してある (#4558)。
+            // まとめコピーの見出しと判定がずれると、「一覧では不正なのに
+            // コピーにはそれらしい曜日が付く」が再発する。
             isInvalidNextOn (nextOn) {
               if (!nextOn) return false
-              const value = String(nextOn)
-              if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return true
-              // 実在する日付か。2026-02-31 は Date が 3/3 へ繰り上げるので往復で見る。
-              // ⚠ ここは端末のタイムゾーンを混ぜてはいけないので UTC で組む。
-              const [year, month, day] = value.split('-').map(Number)
-              const date = new Date(Date.UTC(year, month - 1, day))
-              return date.getUTCFullYear() !== year ||
-                date.getUTCMonth() + 1 !== month ||
-                date.getUTCDate() !== day
+              return !isValidDateValue(nextOn)
             },
             // 今日 (JST) を YYYY-MM-DD で。⚠ ブラウザのローカル日付では組まない。
             // ProgramCalendar は next_on を +09:00 固定で解釈するので、国外の端末で
