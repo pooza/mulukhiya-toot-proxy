@@ -1,124 +1,16 @@
+# 正本は pooza/ginseng-style の config/rubocop.yml。ここにはモロヘイヤ固有の差分だけを書く。
+# ⚠ 共通に見える緩和をここに足さないこと。共通化したい場合は pooza/ginseng-style に Issue を立てる。
+# ⚠ `bundle exec rubocop` で実行すること（inherit_gem は gem のパス解決に Bundler を使う）。
+inherit_gem:
+  ginseng-style: config/rubocop.yml
+
 plugins:
-  - rubocop-performance
-  - rubocop-minitest
-  - rubocop-rake
   - rubocop-sequel
 
 AllCops:
-  AllowSymlinksInCacheRootDirectory: true
-  DisplayCopNames: true
   Exclude:
-    - '**/._*'
-    - '**/.git/**/*'
-    - public/**/*
-    - config/**/*
-    - tmp/**/*
-    - '**/old/**/*'
     - bin/diag/**/*
-  Include:
-    - '**/*.rb'
-    - '**/Rakefile'
-    - '**/config.ru'
-  NewCops: enable
   TargetRubyVersion: 4.0
-Layout/ArgumentAlignment:
-  EnforcedStyle: with_fixed_indentation
-Layout/ArrayAlignment:
-  EnforcedStyle: with_fixed_indentation
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-Layout/EndOfLine:
-  EnforcedStyle: lf
-Layout/FirstArgumentIndentation:
-  EnforcedStyle: consistent
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: consistent
-Layout/LineContinuationLeadingSpace:
-  EnforcedStyle: leading
-Layout/LineEndStringConcatenationIndentation:
-  EnforcedStyle: indented
-Layout/LineLength:
-  Exclude:
-    - test/**/*
-  Max: 100
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-Layout/MultilineOperationIndentation:
-  EnforcedStyle: indented
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-Layout/SpaceBeforeBlockBraces:
-  EnforcedStyle: space
-Layout/SpaceInsideBlockBraces:
-  EnforcedStyle: no_space
-  EnforcedStyleForEmptyBraces: no_space
-  SpaceBeforeBlockParameters: false
-Layout/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
-Lint/AssignmentInCondition:
-  Enabled: false
-Lint/UnusedMethodArgument:
-  Enabled: false
-Metrics/AbcSize:
-  Exclude:
-    - test/**/*
-  Max: 30
-Metrics/BlockLength:
-  Exclude:
-    - test/**/*
-    - '**/contract/*'
-    - '**/controller/*'
-    - app/task/**/*.rb
-    - '*.gemspec'
-Metrics/ClassLength:
-  Exclude:
-    - test/**/*
-    - '**/contract/*'
-    - '**/controller/*'
-    - '**/service/*'
-  Max: 200
-Metrics/CyclomaticComplexity:
-  Exclude:
-    - test/**/*
-    - '**/contract/*'
-  Max: 10
-Metrics/MethodLength:
-  Exclude:
-    - test/**/*
-  Max: 20
-Metrics/ModuleLength:
-  Exclude:
-    - test/**/*
-    - '**/contract/*'
-    - '**/controller/*'
-    - '**/service/*'
-  Max: 200
-Metrics/PerceivedComplexity:
-  Exclude:
-    - test/**/*
-    - '**/contract/*'
-  Max: 10
-Minitest/MultipleAssertions:
-  Enabled: false
-Minitest/RefutePathExists:
-  Enabled: false
-Minitest/ReturnInTestMethod:
-  Enabled: false
-Minitest/TestFileName:
-  Enabled: false
-Naming/RescuedExceptionsVariableName:
-  PreferredName: e
-Rake:
-  Exclude:
-    - '*'
-  Include:
-    - Rakefile
-    - '*.rake'
-    - app/task/**/*.rb
 Sequel:
   Exclude:
     - '*'
@@ -128,44 +20,4 @@ Sequel:
 Sequel/ConcurrentIndex:
   Enabled: false
 Sequel/IrreversibleMigration:
-  Enabled: false
-Style/AsciiComments:
-  Enabled: false
-Style/ConditionalAssignment:
-  Enabled: false
-Style/Documentation:
-  Enabled: false
-Style/EmptyMethod:
-  EnforcedStyle: expanded
-Style/FormatString:
-  EnforcedStyle: percent
-Style/FormatStringToken:
-  EnforcedStyle: template
-Style/FrozenStringLiteralComment:
-  Enabled: false
-Style/IdenticalConditionalBranches:
-  Exclude:
-    - test/**/*
-Style/IfUnlessModifier:
-  Exclude:
-    - test/**/*
-Style/RedundantReturn:
-  Enabled: false
-Style/RescueModifier:
-  Enabled: false
-Style/RescueStandardError:
-  Enabled: false
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-Style/SymbolArray:
-  EnforcedStyle: brackets
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: comma
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: comma
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: comma
-Style/WordArray:
-  EnforcedStyle: brackets
-Style/YodaCondition:
   Enabled: false

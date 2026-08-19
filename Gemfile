@@ -29,14 +29,13 @@ gem 'sidekiq', '~>8.1'
 gem 'sidekiq-scheduler', '~>6.0.1'
 group :development do
   gem 'bundler-audit'
+  # RuboCop 設定の正本。本体と minitest/performance/rake プラグインもこの gem が抱える。
+  gem 'ginseng-style', github: 'pooza/ginseng-style', branch: 'main', require: false
   gem 'ostruct' # https://github.com/pooza/mulukhiya-toot-proxy/issues/4229
   gem 'rack-test'
   gem 'rails-erb-lint'
   gem 'ricecream'
-  gem 'rubocop'
-  gem 'rubocop-minitest'
-  gem 'rubocop-performance'
-  gem 'rubocop-rake'
+  # ⚠ rubocop-sequel はモロヘイヤ固有のプラグインなので、正本ではなくここに置く。
   gem 'rubocop-sequel'
   gem 'slim_lint'
   gem 'test-unit'

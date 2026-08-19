@@ -72,6 +72,17 @@ GIT
       redis-client
 
 GIT
+  remote: https://github.com/pooza/ginseng-style.git
+  revision: 2474936f5598640c9cf8464f71195c2bb03e4309
+  branch: main
+  specs:
+    ginseng-style (1.0.0)
+      rubocop
+      rubocop-minitest
+      rubocop-performance
+      rubocop-rake
+
+GIT
   remote: https://github.com/pooza/ginseng-web.git
   revision: 7f0afdc237786e96e7f847e052bb76246a317bf2
   branch: main
@@ -379,9 +390,9 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
-    rubocop-performance (1.26.1)
+    rubocop-performance (1.27.0)
       lint_roller (~> 1.1)
-      rubocop (>= 1.75.0, < 2.0)
+      rubocop (>= 1.89.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
     rubocop-rake (0.7.1)
       lint_roller (~> 1.1)
@@ -485,6 +496,7 @@ DEPENDENCIES
   ginseng-piefed!
   ginseng-postgres!
   ginseng-redis!
+  ginseng-style!
   ginseng-web!
   ginseng-youtube!
   icalendar
@@ -498,10 +510,6 @@ DEPENDENCIES
   rails-erb-lint
   ricecream
   rspotify!
-  rubocop
-  rubocop-minitest
-  rubocop-performance
-  rubocop-rake
   rubocop-sequel
   ruby-progressbar
   ruby-vips
