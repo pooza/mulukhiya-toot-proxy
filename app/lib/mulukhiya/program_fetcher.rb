@@ -23,7 +23,21 @@ module Mulukhiya
     PERMITTED_YAML_CLASSES = [Symbol, Date, Time].freeze
     NEXT_ON_KEY = 'next_on'.freeze
     # 先頭の YYYY-MM-DD だけを採る。時刻・ゾーンが続いていてもよい (#4558)。
-    LEADING_DATE_PATTERN = /\A(\d{4}-\d{2}-\d{2})(?:[Tt ].*)?\z/
+    #
+    # ⚠ **後続は「Psych が Time にできる形」だけを許す (PR #4607 の Codex P2)。**
+    # `.*` で受けると `next_on: 2026-08-08 garbage` や `2026-08-08 25:99:99` まで
+    # 日付へ書き換えてしまう。これらは**元は無効な String のままで、
+    # ProgramCalendar が fail-closed していた**もの。書き換えると意図しない話数を
+    # 予告・通知しうるので、**壊れた値は壊れたまま残す**（#4585 の shift_next_on と
+    # 同じ方針）。時・分・秒は範囲まで見る（`25:99:99` を通さないため）。
+    LEADING_DATE_PATTERN = /
+      \A(\d{4}-\d{2}-\d{2})
+      (?:[Tt\ ]\s*
+        (?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d
+        (?:\.\d+)?
+        (?:\s*(?:[Zz]|[+-](?:[01]\d|2[0-3])(?::?[0-5]\d)?))?
+      )?\s*\z
+    /x
 
     def initialize
       @http = HTTP.new

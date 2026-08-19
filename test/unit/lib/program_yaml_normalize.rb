@@ -68,6 +68,36 @@ module Mulukhiya
       assert_equal('2026-02-31', next_on('2026-02-31'))
     end
 
+    # ⚠ **日付で始まるだけの壊れた値を、有効な日付へ「直して」しまわないこと**
+    # (PR #4607 の Codex P2)。これらは Psych も Time にできず String のまま残る値で、
+    # ProgramCalendar は fail-closed していた。書き換えると意図しない話数を
+    # 予告・通知しうる。
+    def test_leaves_date_with_garbage_suffix
+      assert_equal('2026-08-08 garbage', next_on('2026-08-08 garbage'))
+    end
+
+    def test_leaves_out_of_range_time
+      assert_equal('2026-08-08 25:99:99', next_on('2026-08-08 25:99:99'))
+    end
+
+    # 秒が無い形は Psych も Time にしない（＝日付として確定していない）。
+    def test_leaves_time_without_seconds
+      assert_equal('2026-08-08 18:00', next_on('2026-08-08 18:00'))
+    end
+
+    # ⚠ 逆に、Psych が Time にできる形は取りこぼさないこと。
+    def test_normalizes_fractional_seconds_with_offset
+      assert_equal('2026-08-08', next_on('2026-08-08 18:00:00.123 +09:00'))
+    end
+
+    def test_normalizes_zulu_timestamp
+      assert_equal('2026-08-08', next_on('2026-08-08 18:00:00Z'))
+    end
+
+    def test_normalizes_compact_offset
+      assert_equal('2026-08-08', next_on('2026-08-08t18:00:00+0900'))
+    end
+
     # ⚠ **潰すのは next_on だけ。**start_time の 60 進数解釈 (`20:30` → 73800) は
     # Program#coerce_scalars の担当なので、ここで型を変えてはいけない。
     def test_keeps_other_keys_untouched
