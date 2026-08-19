@@ -381,6 +381,8 @@ mastodon:
     color: '#6364FF'
   url: https://mstdn.example.com/
 media:
+  download:
+    max_bytes: 33554432
   metadata:
     cache:
       ttl: 8640000

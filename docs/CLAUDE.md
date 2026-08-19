@@ -774,6 +774,41 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 - gem を上げるだけで効く分に `Daemon#run_stop` の順序バグ（`remove_pid` → `Process.kill` だったため、`EPERM` で
   **プロセスは生きたまま pid ファイルだけ消え**、次の start が 2 本目を立てていた）が含まれる
 
+### 5.34.0 の実装状況（2026-08-20 時点）
+
+**着手しやすい順に 5 本を PR 済み・すべて CI 緑（mastodon / misskey 両系）。**
+
+| PR | Issue | 主眼 |
+| --- | --- | --- |
+| #4605 | #4599 (S) | Slack 互換 webhook の公開範囲をリクエストごとに受ける |
+| #4607 | #4558 (S) | `next_on` を「書いたとおりの日付」で読む |
+| #4609 | #4573 (S) | リモート辞書の 200-with-HTML を黙って飲まない |
+| #4610 | #4598 (M) | `Idempotency-Key` を上流へ中継する |
+| #4611 | #4576 (M) | SSRF 掃討の取り残し 2 件 |
+
+判断が要った点（詳細は各 PR 本文）:
+
+- **#4558 は Issue の推奨案では直らない。**⚠ **`Time` に materialize した後ではゾーンレスと明示
+  オフセットを区別できない**（実測でどちらも `utc? == false` / `utc_offset == 32400` の同じ
+  オブジェクト）。**AST 上で `next_on` を `YYYY-MM-DD` の String へ差し替える**方式にしたところ、
+  項目 1（Redis 往復で無効値）も同時に消えた。⚠ 直すのは `format_date` ではなく `parse_yaml`
+- **#4573 は Sentry へ escalation しない。**10 分周期なので `alert` に載せると 1 ソースあたり
+  日 144 件のメール・Discord になる（#4594 と同型）。`logger.error` ＋ 世代ログの `empty_sources`
+  で「何本中何本が死んでいるか」を 1 行で読めるようにし、判断は #4577 へコメントで残した
+- **#4576 は pinning の段階適用を採らなかった。**Issue は「ナウプレのサムネイル取得にも効くので
+  CDN が壊れうる」としていたが、⚠ **`Handler#upload` の呼び出し元は `WebhookImageHandler`
+  1 本だけ**で、ナウプレ系は `upload_remote_resource` を通らないことを全呼び出し元の確認で裏取り
+  した。**fedi-test-harness（Mastodon）実走で 1104 tests / 0 failures / 0 errors / 157 omissions**
+- テストはすべて**両マトリクスで実走する場所**に置いた。⚠ `SlackWebhookPayloadTest`（Slack 未設定で
+  omission）・`ProgramTest`（`livecure?` が false で omission）に相乗りしない。**omissions は
+  318 / 307 のまま不変**
+
+**残るスコープ作業は #4351 のみ**で、これは本番 DB 作業（[#4351 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4351#issuecomment-5349110908)）。
+⚠ **Gate 0 / 1 は消化済み**（候補 A 適用で 170s → 約 10s）で、**Gate 2 は #4393 の sub-second 化
+待ち**。次の一手は `bin/diag/media_catalog_subsecond.sql` を zugoga 本番で流すことだが、
+⚠ **§1〜§3 の `EXPLAIN ANALYZE` は実際にクエリを流す**（1 本あたり約 10s）ので、無人で
+連続実行する性質の作業ではない。VPN 起動とセットで在席時に行う。
+
 ### 2026-08-20 セッション同期の記録
 
 - **Sentry**: 未コメントの新規 3 件を精査した。

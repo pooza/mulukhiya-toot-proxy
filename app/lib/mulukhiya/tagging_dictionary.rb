@@ -10,6 +10,7 @@ module Mulukhiya
   class TaggingDictionary < Hash
     include Package
     include SNSMethods
+    include TaggingDictionaryLogMethods
 
     REDIS_KEY = 'tagging_dictionary'.freeze
     # キャッシュ payload の形式。envelope を変えたら上げる。旧形式は「無い」ものと
@@ -197,29 +198,6 @@ module Mulukhiya
       return cache.present?
     end
 
-    # どの取得回の辞書を使っているかをログに残す。実走のたびに世代が出るので、
-    # 「前の実行が温めたキャッシュを読んでいる」状態を後から突き合わせられる。
-    def log_generation
-      logger.info(
-        message: 'tagging dictionary refreshed',
-        redis_key: REDIS_KEY,
-        signature:,
-        generated_at: generated_at&.iso8601,
-        sources: sources.size,
-        entries: size,
-        ttl: cache_ttl,
-      )
-    end
-
-    def alert_empty_result
-      Ginseng::GatewayError.new('tagging dictionary fetch returned nothing').alert(
-        redis_key: REDIS_KEY,
-        sources: sources.count,
-        cached_entries: cache.to_h.size,
-        generated_at: generated_at&.iso8601,
-      )
-    end
-
     def build_payload(entries)
       return {
         version: CACHE_PAYLOAD_VERSION,
@@ -229,13 +207,22 @@ module Mulukhiya
       }
     end
 
+    # ⚠ **1 本も取れなかったソースは error で残す (#4573)。**サブクラスの parse は
+    # 失敗を握って `{}` を返すので、例外を数えても「死んでいるソース」は見えない。
+    # 空の辞書が返ることと正常に空であることは区別できないが、**タグ辞書として
+    # 設定されているソースが 0 件を返すのは実務上ほぼ壊れている**（美食丼の
+    # related 3 本が 10 分周期で全滅していたのに info ログに `words: 0` が並ぶだけ
+    # だった）。@empty_sources は log_generation の集計に使う。
     def fetch
       result = Concurrent::Array.new
+      @empty_sources = Concurrent::Array.new
       Parallel.each(RemoteDictionary.all, in_threads: Parallel.processor_count * 2) do |dic|
         words = dic.parse
-        logger.info(dic: dic.to_h.merge(words: words.count))
+        @empty_sources.push(dic.uri.to_s) if words.empty?
+        logger.send(words.empty? ? :error : :info, dic: dic.to_h.merge(words: words.count))
         result.push(words)
       rescue => e
+        @empty_sources.push(dic.uri.to_s)
         e.log(dic: dic.to_h)
       end
       return result

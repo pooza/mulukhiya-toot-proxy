@@ -6,6 +6,14 @@ module Mulukhiya
       return super
     end
 
+    # ⚠ **webhook 経路だけ pinning する (#4576)。**ここは第三者が任意の URL を
+    # 送り込める口で、取得したボディがそのままタイムラインへ出る full-read。
+    # CDN のローテーションを心配する相手ではないので、DNS リバインディング
+    # (#4524) を潰すほうを採る。
+    def upload_host_validator
+      return RemoteHost.validator
+    end
+
     def handle_pre_webhook(payload, params = {})
       payload.deep_stringify_keys!
       payload[attachment_field] = Concurrent::Array.new(payload[attachment_field] || [])

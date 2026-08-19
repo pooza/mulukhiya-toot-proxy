@@ -311,6 +311,12 @@ module Mulukhiya
     # (JST) へ変換された Time が返る。そのまま strftime すると
     # `2026-08-08 23:30:00` が 2026-08-09 になってしまうので、UTC 側で日付を採る
     # = 書いたとおりの日付を拾う (#4537)。
+    #
+    # ⚠ **YAML の next_on はここへ来る前に String へ正規化されている**
+    # (`ProgramFetcher#parse_yaml`・#4558)。ここでの `getutc` は最後の保険で、
+    # **明示オフセット付きの Time には日付が 1 日ずれる**（materialize 済みの
+    # Time からはゾーンレスと区別できない）。next_on の読み方を直すときは
+    # この層ではなく parse_yaml を触ること。
     def format_date(value)
       return value.strftime('%Y-%m-%d') if value.is_a?(Date) # DateTime も含む
       return value.getutc.strftime('%Y-%m-%d') if value.is_a?(Time)

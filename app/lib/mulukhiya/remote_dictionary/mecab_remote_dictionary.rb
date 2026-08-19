@@ -1,5 +1,10 @@
 module Mulukhiya
   class MecabRemoteDictionary < RemoteDictionary
+    # MeCab 辞書の行 (Array) の Array。
+    def expected_class
+      return Array
+    end
+
     def parse
       result = {}
       fetch.each do |v|

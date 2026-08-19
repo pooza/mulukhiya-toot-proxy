@@ -21,6 +21,23 @@ module Mulukhiya
     # エディタ経由なら to_yaml が '2026-08-08' とクォートするので無害。
     # 許可クラスは Ginseng::Config::PERMITTED_YAML_CLASSES に揃えてある。
     PERMITTED_YAML_CLASSES = [Symbol, Date, Time].freeze
+    NEXT_ON_KEY = 'next_on'.freeze
+    # 先頭の YYYY-MM-DD だけを採る。時刻・ゾーンが続いていてもよい (#4558)。
+    #
+    # ⚠ **後続は「Psych が Time にできる形」だけを許す (PR #4607 の Codex P2)。**
+    # `.*` で受けると `next_on: 2026-08-08 garbage` や `2026-08-08 25:99:99` まで
+    # 日付へ書き換えてしまう。これらは**元は無効な String のままで、
+    # ProgramCalendar が fail-closed していた**もの。書き換えると意図しない話数を
+    # 予告・通知しうるので、**壊れた値は壊れたまま残す**（#4585 の shift_next_on と
+    # 同じ方針）。時・分・秒は範囲まで見る（`25:99:99` を通さないため）。
+    LEADING_DATE_PATTERN = /
+      \A(\d{4}-\d{2}-\d{2})
+      (?:[Tt\ ]\s*
+        (?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d
+        (?:\.\d+)?
+        (?:\s*(?:[Zz]|[+-](?:[01]\d|2[0-3])(?::?[0-5]\d)?))?
+      )?\s*\z
+    /x
 
     def initialize
       @http = HTTP.new
@@ -151,9 +168,68 @@ module Mulukhiya
 
     def load_from_yaml
       return {} unless yaml_exist?
-      programs = YAML.safe_load_file(YAML_PATH, permitted_classes: PERMITTED_YAML_CLASSES) || {}
+      programs = parse_yaml(File.read(YAML_PATH))
       warm_cache(programs)
       return programs
+    end
+
+    # next_on を「書いたとおりの日付」の String として読む (#4558)。
+    #
+    # ⚠ **Psych が Time にしてしまってからでは、ゾーンレスと明示オフセットを
+    # 区別できない。**ゾーンレスの `2026-08-08 18:00:00` は UTC として読まれた
+    # うえでローカルへ変換され `2026-08-09 03:00:00 +0900` になる。これは
+    # 明示的に `2026-08-09 03:00:00 +09:00` と書いた場合と**同じオブジェクト**で、
+    # `utc?` でも `utc_offset` でも判別できない（実測: どちらも
+    # `utc? == false` / `utc_offset == 32400`）。前者は getutc 側の日付、後者は
+    # 書いたままの日付が正しいので、オブジェクトを見るかぎり両立しない。
+    #
+    # そこで **materialize する前に** AST 上で next_on のスカラーを、先頭の
+    # `YYYY-MM-DD` だけを持つ引用符付きスカラーへ差し替える。時刻もゾーンも
+    # 日付の解釈に関与しなくなり、
+    #
+    #   - `next_on: 2026-08-08 00:30:00 +09:00` が 1 日前へずれる (#4558 項目 2)
+    #   - Time が Redis 往復で `"2026-08-08 18:00:00 +0900"` という無効値に化ける
+    #     (#4558 項目 1。`to_json` は `to_s` 相当なので JSON にすると型が消える)
+    #
+    # の両方が同時に消える。⚠ **`PERMITTED_YAML_CLASSES` から Time を外す方向は
+    # 採らない**（#4537 が塞いだ「クォート忘れで番組表全体が読めなくなる」
+    # footgun が戻る）。ここで潰すのは next_on だけで、他のキーの型は触らない。
+    def parse_yaml(source)
+      # ⚠ Document 単体は to_yaml できない (STREAM-START が無いと Emitter が
+      # 落ちる) ので、Stream として読む。
+      ast = YAML.parse_stream(source)
+      return {} unless ast.children.present?
+      normalize_next_on_nodes(ast)
+      # ⚠ AST を直に to_ruby すると permitted_classes が効かない（無制限の
+      # ToRuby になる）。一度 YAML へ書き戻して safe_load へ通す。
+      return YAML.safe_load(ast.to_yaml, permitted_classes: PERMITTED_YAML_CLASSES) || {}
+    end
+
+    def normalize_next_on_nodes(node)
+      if node.is_a?(Psych::Nodes::Mapping)
+        node.children.each_slice(2) do |key, value|
+          normalize_next_on_scalar(value) if next_on_key?(key)
+        end
+      end
+      node.children&.each {|child| normalize_next_on_nodes(child)}
+      return node
+    end
+
+    def next_on_key?(node)
+      return node.is_a?(Psych::Nodes::Scalar) && node.value == NEXT_ON_KEY
+    end
+
+    # 先頭が YYYY-MM-DD の形をしていない値（`20260808` や `毎週日曜` 等）は
+    # 触らない。妥当性の判定は contract / ProgramCalendar の側にあり、ここで
+    # 壊れた値を別の壊れた値へ書き換えない (#4585 の shift_next_on と同じ方針)。
+    def normalize_next_on_scalar(node)
+      return unless node.is_a?(Psych::Nodes::Scalar)
+      return unless (matches = node.value.match(LEADING_DATE_PATTERN))
+      node.value = matches[1]
+      node.plain = false
+      node.quoted = true
+      node.style = Psych::Nodes::Scalar::SINGLE_QUOTED
+      node.tag = nil
     end
 
     # 読み経路のキャッシュ温め (#4575)。

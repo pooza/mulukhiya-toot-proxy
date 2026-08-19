@@ -1339,9 +1339,41 @@ Webhook エンドポイントは `/mulukhiya/webhook` 配下で提供される�
 | `/mulukhiya/webhook/{digest}` | POST | Webhook 検証 | Slack 互換ペイロードを処理 |
 | `/mulukhiya/webhook/admin` | POST | HMAC-SHA256 / Misskey Secret | 管理 Webhook（アカウント承認等） |
 
-⚠ **`POST /mulukhiya/webhook/{digest}` も `Idempotency-Key` を上流へ中継する**（Mastodon のみ、#4598）。
-Slack 互換ペイロードに idempotency の概念は無いので、**ボディではなく HTTP ヘッダで指定する**。
-挙動と TTL の前提は「[Idempotency-Key ヘッダ](#idempotency-key-ヘッダ)」を参照。
+##### POST /mulukhiya/webhook/{digest}
+
+Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `attachments` に対応。
+
+| 名前 | 型 | 必須 | 説明 |
+|------|-----|------|------|
+| `text` | string | 必須 | 本文。Slack のリンク記法 `<url\|label>` は Markdown リンクへ変換される |
+| `spoiler_text` | string | 任意 | CW（`blocks` を使う場合は `header` ブロックが優先） |
+| `blocks` | array | 任意 | Slack Block Kit。`header` / `section` / `context` / `rich_text` / `image` を解釈 |
+| `attachments` | array | 任意 | Slack legacy attachments。`image_url` / `thumb_url` は添付画像として取り込む |
+| `visibility` | string | 任意 | この投稿の公開範囲（5.34.0〜、#4599） |
+
+`visibility` を省略すると、アカウント設定（WebUI「Slack互換webhook」セクション、`/webhook/visibility`）の
+既定が使われる。**未知の値は `public` へ丸められる**（エラーにはしない）。
+
+| 指定 | Mastodon | Misskey |
+|------|----------|---------|
+| `public` | `public` | `public` |
+| `unlisted` | `unlisted` | `home` |
+| `private` | `private` | `followers` |
+| `direct` | `direct` | `specified` |
+
+⚠ **SNS 側の呼称（`home` / `followers` / `specified`）でも指定できる**が、`public` / `unlisted` /
+`private` / `direct` の 4 語は**両系で同じ意味に解決される**ので、こちらを使うほうが移植性が高い。
+
+```json
+{
+  "text": "告知です",
+  "visibility": "public"
+}
+```
+
+⚠ **`Idempotency-Key` ヘッダも上流へ中継する**（Mastodon のみ、#4598）。Slack 互換ペイロードに
+idempotency の概念は無いので、**ボディではなく HTTP ヘッダで指定する**。挙動と TTL の前提は
+「[Idempotency-Key ヘッダ](#idempotency-key-ヘッダ)」を参照。
 
 ### Annict 連携（エピソードブラウザ）
 

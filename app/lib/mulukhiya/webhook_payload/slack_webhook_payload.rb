@@ -55,6 +55,7 @@ module Mulukhiya
     def values
       values = {status_field => text}
       values[spoiler_field] = header if header
+      values[visibility_field] = raw['visibility'] if raw['visibility'].present?
       values['attachments'] = images
       return values
     end

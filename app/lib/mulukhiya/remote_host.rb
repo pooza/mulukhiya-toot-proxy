@@ -109,6 +109,21 @@ module Mulukhiya
       attr_writer :validator
     end
 
+    # pinning **しない** validator (#4576)。真偽値を返すので ginseng-core は
+    # 各ホップのホスト検証だけを行い、接続先は名前解決に任せる。
+    #
+    # ⚠ **CDN 相手に pinning を効かせないためのもの。**大手 CDN は複数の A
+    # レコードを返してアドレスをローテーションするので、1 本へ固定すると
+    # 「選んだアドレスだけ落ちている」ときに取得できず、添付が黙って落ちる
+    # (#4524 のトレードオフ)。DNS リバインディングは防げないが、**検証を
+    # 一切しない状態よりは強い**（リダイレクト先が内部でも追従しなくなる）。
+    #
+    # ⚠ **判定の実体は validator に委譲する。**テストが validator を差し替えたら
+    # こちらも一緒に効く必要がある。
+    def self.unpinned_validator
+      return ->(host) {validator.call(host).present?}
+    end
+
     # allowlist を通らないホストで GatewayError を投げる (#4535)。
     #
     # HEAD プリフライトの rescue は「HEAD 非対応・一過性障害 = 判定不能」を
