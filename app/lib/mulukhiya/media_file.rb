@@ -2,6 +2,11 @@ module Mulukhiya
   class MediaFile < File
     include Package
 
+    # リモート取得の既定上限 (32MiB)。Mastodon の既定 (動画 40MB / 画像 16MB)
+    # より小さめに置く。webhook から取り込む添付を想定した値で、足りなければ
+    # /media/download/max_bytes で上げる。
+    DEFAULT_DOWNLOAD_MAX_BYTES = 33_554_432
+
     def valid?
       return mediatype == default_mediatype
     end
@@ -154,14 +159,62 @@ module Mulukhiya
       return 30
     end
 
-    def self.download(uri)
+    # リモートの URL を tmp/media へ落とす。
+    #
+    # ⚠ **host_validator を渡すのは呼び出し元の責務 (#4576)。**ここで既定に
+    # するとダウンロード全般へ pinning が効き、複数 A レコードのフォールバックが
+    # 使えない相手 (大手 CDN) で取得できなくなる (#4524 のトレードオフ)。
+    #
+    # ⚠ **サイズ上限を持つ。**以前は Content-Length も本文長も見ずに
+    # `File.write(path, get(uri).body)` していたので、巨大な応答をそのまま
+    # メモリとディスクへ通していた。判定は word_suggest / program と同じ二段
+    # (HEAD の Content-Length → 受信後の実測) で、HEAD 非対応の相手でも
+    # 最終防衛線が残る。
+    def self.download(uri, params = {})
       path = File.join(
         Environment.dir,
         'tmp/media',
         "#{uri.to_s.sha256}#{File.extname(uri.path)}",
       )
-      File.write(path, HTTP.new.get(uri).body)
+      options = {}
+      options[:host_validator] = params[:host_validator] if params[:host_validator]
+      raise Ginseng::GatewayError, "Too large content '#{uri}'" unless
+        valid_content_length?(uri, options)
+      body = HTTP.new.get(uri, options).body.to_s
+      raise Ginseng::GatewayError, "Too large content '#{uri}'" if
+        body.bytesize > download_max_bytes
+      File.write(path, body)
       return new(path).file
+    end
+
+    # 相手が申告した Content-Length が上限を超えていれば GET せずに弾く。
+    # ⚠ Content-Length 不在・HEAD 非対応 (403 / 405) は「判定不能」として GET へ
+    # 倒す。受信後の実測が最終防衛線 (#4576 / word_suggest と同じ形)。
+    # ⚠ **プリフライトにも同じ host_validator を渡す。**ここだけ無検証だと
+    # GET 側のガードが見せかけの安全になる (#4523)。
+    def self.valid_content_length?(uri, options = {})
+      length = HTTP.new.head(uri, options).headers['content-length']
+      return true if length.nil? || length.to_i <= download_max_bytes
+      Logger.new.error(
+        message: 'media download content-length exceeded max bytes',
+        url: uri.to_s,
+        bytes: length.to_i,
+        max_bytes: download_max_bytes,
+      )
+      return false
+    rescue Ginseng::GatewayError => e
+      # ⚠ allowlist 拒否 (Rejected host) はここで飲まない。飲むと「プリフライトが
+      # true = GET してよい」が成り立たなくなる (#4535)。
+      raise if e.message.start_with?('Rejected host')
+      return true
+    rescue
+      return true
+    end
+
+    def self.download_max_bytes
+      return Config.instance['/media/download/max_bytes'] || DEFAULT_DOWNLOAD_MAX_BYTES
+    rescue Ginseng::ConfigError
+      return DEFAULT_DOWNLOAD_MAX_BYTES
     end
 
     def self.purge

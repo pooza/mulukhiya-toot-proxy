@@ -232,10 +232,25 @@ module Mulukhiya
       return @status.each_line(chomp: true).to_a
     end
 
+    # リモートの URL を取得して SNS へ添付としてアップロードする。
+    #
+    # ⚠ **取得したボディはそのままタイムラインへ出る。**準ブラインドではなく
+    # full-read SSRF になりうる経路なので、内部アドレスは取りに行かない (#4576)。
+    #
+    #   1. 事前判定 (RemoteHost.validate!) — 拒否をここで確定させる
+    #   2. 各ホップ検証 + pinning (host_validator) — リダイレクトで裏へ回られない
+    #
+    # ⚠ **pinning を「CDN に効かせると壊れる」根拠でここだけ外さないこと。**
+    # このメソッドの呼び出し元は WebhookImageHandler の 1 本だけで、YouTube /
+    # iTunes / Spotify のサムネイル経路は upload_remote_resource を通らない
+    # (2026-08-20 に全呼び出し元を確認)。増やすときは #4524 のトレードオフ
+    # （複数 A レコードのフォールバックが効かない）を呼び出し元ごとに判断する。
     def upload(uri, params = {})
       uri = Ginseng::URI.parse(uri) unless uri.is_a?(Ginseng::URI)
       raise "Invalid URL '#{uri}'" unless uri.absolute?
+      RemoteHost.validate!(uri)
       params[:response] ||= :id
+      params[:host_validator] ||= RemoteHost.validator
       return sns.upload_remote_resource(uri, params)
     end
 
