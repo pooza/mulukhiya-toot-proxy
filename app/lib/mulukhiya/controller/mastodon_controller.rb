@@ -23,7 +23,10 @@ module Mulukhiya
       verify_token_integrity!
       tags = TootParser.new(params[:status]).tags
       Event.new(:pre_toot, {reporter:, sns:}).dispatch(params)
-      reporter.response = sns.toot(params)
+      # ⚠ **クライアントの Idempotency-Key を上流へ渡す (#4598)。**渡さないと、
+      # 応答だけ失われたときの再送が二重投稿になる。ハンドラで本文が書き換わって
+      # いても、キーが一致すれば上流は既存の投稿を返すので問題にならない。
+      reporter.response = sns.toot(params, {headers: forwarded_headers})
       verify_account_integrity!(reporter.response)
       Event.new(:post_toot, {reporter:, sns:}).dispatch(params)
       @renderer.message = reporter.response.parsed_response

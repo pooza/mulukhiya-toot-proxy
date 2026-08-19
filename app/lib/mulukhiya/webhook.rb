@@ -44,12 +44,16 @@ module Mulukhiya
       return @json
     end
 
-    def post(payload)
+    # ⚠ **params は上流への中継用 (#4598)。**webhook の口は Slack 互換なので
+    # ボディに idempotency の概念が無く、`Idempotency-Key` は HTTP ヘッダで
+    # 受けて素通しする。許可リストは Controller::FORWARDED_HEADERS が正本で、
+    # ここでは受け取ったものをそのまま gem へ渡すだけ。
+    def post(payload, params = {})
       body = payload.to_h
       body[visibility_field] = parser_class.visibility_name(body[visibility_field] || visibility)
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
-      reporter.response = sns.post(body)
+      reporter.response = sns.post(body, params)
       Event.new(:post_webhook, {reporter:, sns:}).dispatch(body)
       return reporter
     end

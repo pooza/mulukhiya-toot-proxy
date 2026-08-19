@@ -204,6 +204,22 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 > 内部リクエストか、nginx を経由せず :3008 を直接叩いた場合だけ。**capsicum のような外部
 > クライアントは `media_update` の明示が必須。**素の `PUT` は本体の編集要求として 405 で弾かれる。
 
+### Idempotency-Key ヘッダ
+
+再送で二重投稿にならないようにするヘッダ（5.34.0〜、#4598）。**Mastodon のみ。**
+
+- クライアントが付けた `Idempotency-Key` を、モロヘイヤが**そのまま上流へ中継する**
+- 対象は `POST /api/v{version}/statuses`（プロキシ経路）と `POST /mulukhiya/webhook/{digest}`（Slack 互換 webhook）
+- ⚠ **モロヘイヤは自分では生成しない。**付いてこなければ付けずに転送する（本文から自動生成すると、実況の意図的な連投が畳まれて投稿が消える）
+- ⚠ **中継するのはこのヘッダだけ。**`Host` / `Cookie` / `Authorization` 等は転送しない
+- ハンドラで本文が書き換わっても影響しない。キーが一致すれば上流は既存の投稿を返す
+
+⚠ **上流の畳み込みは TTL 1 時間・アカウント単位**（Mastodon の `PostStatusService` が
+`idempotency:status:{account}:{key}` を `setex` する）。**秒〜分の再送には効くが、それを超える
+再実行では効かない。**「1 時間以上あとに同じキーで投げれば重複しない」ことは期待できない。
+
+⚠ **Misskey には相当する仕組みが無い**ため、このヘッダは送信されない。
+
 ### パイプライン処理
 
 以下の処理が**透過的に**適用される。クライアントは標準 API を呼ぶだけでよい。
@@ -1354,6 +1370,10 @@ Slack 互換のペイロードを投稿に変換する。`text` / `blocks` / `at
   "visibility": "public"
 }
 ```
+
+⚠ **`Idempotency-Key` ヘッダも上流へ中継する**（Mastodon のみ、#4598）。Slack 互換ペイロードに
+idempotency の概念は無いので、**ボディではなく HTTP ヘッダで指定する**。挙動と TTL の前提は
+「[Idempotency-Key ヘッダ](#idempotency-key-ヘッダ)」を参照。
 
 ### Annict 連携（エピソードブラウザ）
 
