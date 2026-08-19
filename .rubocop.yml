@@ -7,6 +7,13 @@ inherit_gem:
 plugins:
   - rubocop-sequel
 
+# ⚠⚠ inherit_mode が無いと、下の Exclude が継承した配列を**置換する**
+# （マージされない）。config/**/* や、CI が gem を展開する vendor/**/* の除外が
+# 丸ごと消える。⚠ rubocop は緑のまま通るので気づけない（#4606）。
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   Exclude:
     - bin/diag/**/*
