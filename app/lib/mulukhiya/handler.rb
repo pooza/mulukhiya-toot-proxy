@@ -240,18 +240,24 @@ module Mulukhiya
     #   1. 事前判定 (RemoteHost.validate!) — 拒否をここで確定させる
     #   2. 各ホップ検証 + pinning (host_validator) — リダイレクトで裏へ回られない
     #
-    # ⚠ **pinning を「CDN に効かせると壊れる」根拠でここだけ外さないこと。**
-    # このメソッドの呼び出し元は WebhookImageHandler の 1 本だけで、YouTube /
-    # iTunes / Spotify のサムネイル経路は upload_remote_resource を通らない
-    # (2026-08-20 に全呼び出し元を確認)。増やすときは #4524 のトレードオフ
-    # （複数 A レコードのフォールバックが効かない）を呼び出し元ごとに判断する。
+    # ⚠ **pinning は既定にしない (#4576 / PR #4611 の Codex P2)。**このメソッドは
+    # ImageHandler#upload の `super` 経由で **YouTube / iTunes / Spotify の
+    # サムネイル取得**からも呼ばれる。大手 CDN はアドレスをローテーションするので、
+    # 1 本へ固定すると「選んだアドレスだけ落ちている」ときに添付が黙って落ちる
+    # (#4524 のトレードオフ)。ここでは**各ホップの検証だけ**を効かせ、pinning が
+    # 要る経路 (WebhookImageHandler) が upload_host_validator を上書きする。
     def upload(uri, params = {})
       uri = Ginseng::URI.parse(uri) unless uri.is_a?(Ginseng::URI)
       raise "Invalid URL '#{uri}'" unless uri.absolute?
       RemoteHost.validate!(uri)
       params[:response] ||= :id
-      params[:host_validator] ||= RemoteHost.validator
+      params[:host_validator] ||= upload_host_validator
       return sns.upload_remote_resource(uri, params)
+    end
+
+    # 取得経路の SSRF ガード。既定は pinning 無し（上のコメント）。
+    def upload_host_validator
+      return RemoteHost.unpinned_validator
     end
 
     def parser

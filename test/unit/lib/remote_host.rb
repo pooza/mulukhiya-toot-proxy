@@ -4,6 +4,41 @@ module Mulukhiya
       return ->(_host) {addresses}
     end
 
+    # pinning する / しない 2 種の validator (#4576)。
+    #
+    # ⚠ **既定 (Handler#upload) は pinning しないほう。**ImageHandler#upload の
+    # super 経由で YouTube / iTunes / Spotify のサムネイル取得も通るため、
+    # アドレスを 1 本へ固定すると CDN のローテーションで添付が黙って落ちる。
+    # pinning するのは webhook 経路 (WebhookImageHandler#upload_host_validator) だけ。
+    def test_validator_pins_address
+      with_validator(->(_host) {'93.184.216.34'}) do
+        assert_equal('93.184.216.34', RemoteHost.validator.call('example.com'))
+      end
+    end
+
+    # ⚠ ginseng-core は **String が返れば pinning、真偽値なら検証のみ**。
+    # unpinned_validator が String を返すと CDN も固定されてしまう。
+    def test_unpinned_validator_returns_boolean
+      with_validator(->(_host) {'93.184.216.34'}) do
+        assert_true(RemoteHost.unpinned_validator.call('example.com'))
+      end
+    end
+
+    def test_unpinned_validator_rejects_denied_host
+      with_validator(->(_host) {}) do
+        assert_false(RemoteHost.unpinned_validator.call('attacker.example'))
+      end
+    end
+
+    def with_validator(validator)
+      original = RemoteHost.validator
+      RemoteHost.validator = validator
+      yield
+    ensure
+      # ⚠ 差し替えたら必ず戻す。残すと以後のテストで SSRF ガードが効かない。
+      RemoteHost.validator = original
+    end
+
     def test_returns_false_for_blank_host
       assert_false(RemoteHost.public?(''))
       assert_false(RemoteHost.public?(nil))

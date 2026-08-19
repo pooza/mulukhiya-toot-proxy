@@ -170,6 +170,13 @@ module Mulukhiya
     # メモリとディスクへ通していた。判定は word_suggest / program と同じ二段
     # (HEAD の Content-Length → 受信後の実測) で、HEAD 非対応の相手でも
     # 最終防衛線が残る。
+    #
+    # ⚠⚠ **上限は「受信中」には効かない (#4612)。**受信後の実測に届く時点で
+    # 本文はすべてメモリに載っているので、`Content-Length` を出さない相手
+    # (chunked) や過少申告する相手には上限を無視して読まされる。⚠ **image_url は
+    # webhook から第三者が指定できる**ので、ワーカーのメモリ枯渇に繋がりうる。
+    # 受信中に打ち切るには `Ginseng::HTTP#get` 側の口が要る
+    # (pooza/ginseng-core#526)。着地したら `max_bytes:` へ載せ替えること。
     def self.download(uri, params = {})
       path = File.join(
         Environment.dir,
