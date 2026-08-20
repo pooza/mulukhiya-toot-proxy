@@ -1441,7 +1441,32 @@ Issue #4233 の APIController 段階的リファクタは「1〜2 マイルス�
 - `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
 - `docs/infra-note.md` に変更があれば MEMORY.md のインフラセクションに反映が必要か判断
 - chubo2 の `gh issue list --state open` で open Issue の変動を確認
-- ginseng-\* は**こちらが送った Issue / PR の進捗だけ**見る（一覧の棚卸しはしない）
+- ginseng-\* は**こちらが送った Issue / PR の進捗**と、**下の「ピンのずれ」**だけ見る（一覧の棚卸しはしない）
+
+##### ginseng-\* のピンのずれを見る（2026-08-21 追加）
+
+⚠⚠ **ginseng-\* は依頼が無くても自走で更新される**（2026-08-21 ユーザー明示）。
+`Gemfile.lock` は git gem の **revision 固定**なので、**向こうが直しても `bundle update` するまで
+こちらには 1 バイトも届かない**。「Issue が close された」は**取り込み済みを意味しない**。
+
+```sh
+# ロック済み revision と各リポジトリの main HEAD を突き合わせる
+ruby -e 'File.read("Gemfile.lock").scan(%r{github\.com/pooza/(ginseng-\w+)\.git\s+revision: (\h+)}) {|n,r|
+  head = `gh api repos/pooza/#{n}/commits/main --jq .sha`.strip
+  puts "#{n}\t#{head.start_with?(r) ? "同一" : "ずれ #{r[0,8]} -> #{head[0,8]}"}" }'
+```
+
+- **ずれていたら「何が変わったか」を読む**: `gh api repos/pooza/ginseng-X/compare/<locked>...main --jq '.commits[].commit.message'`。
+  ⚠ **モロヘイヤが触る面**（`HTTP` / `Logger` / `Controller` / `TagContainer` / `Environment`）に
+  当たるかで判断する
+- **判断は 3 択**: ① すぐ取り込む（実害がある・依頼した修正の着地）② 次のマイルストーンで取り込む
+  ③ 見送る。**②③ は理由を台帳に 1 行残す**（次の同期で同じ調査をしないため）
+- ⚠ **`bundle update`（引数なし）は 8 本まとめて動く。**依頼した修正の取り込みは
+  **`bundle update <gem>` と gem 単位で**行う（赤が出たときの切り分けができなくなる）
+- ⚠ **取り込んだら `rake lint` と `rake test` を必ず通す。**「向こうが直した」は
+  「こちらで動く」ではない。逆向き（gem がこちらの値を捨てる）で 2 回踏んでいる（#4589 / #4594）
+- ⚠ **`Gemfile.lock` のルーチン最新化とは別物として扱う。**ルーチンは PR 不要（[[feedback_gemfile-lock-routine]]）
+  だが、**自走更新が混じるようになったので差分を読まずに上げない**
 
 #### 6-2. 30 日ごとの棚卸し
 
