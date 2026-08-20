@@ -45,11 +45,36 @@ module Mulukhiya
     def self.health
       return {status: 'OK', skipped: true} unless config?
       instance.connection.fetch('SELECT 1 AS ok').first
-      return {status: 'OK'}
+      return {status: 'OK'}.merge(pool)
     rescue Sequel::PoolTimeout => e
-      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}
+      return {error: e.message, status: 'WARN', reason: 'pool_exhausted'}.merge(pool)
     rescue => e
       return {error: e.message, status: 'NG'}
+    end
+
+    # 接続プールの使用状況 (#4351 Gate 2)。
+    #
+    # ⚠ **枯渇してからでは遅い。**従来の health は `Sequel::PoolTimeout` を掴んだ
+    # ときだけ `pool_exhausted` を出す＝**もう詰まっている**状態しか見えず、
+    # 「詰まりに近づいている」を観測できなかった。2026-05-19 の全サーバー投稿不可は
+    # 重い media_catalog SQL による接続プール枯渇が最有力で（#4323 / pooza/chubo2#37）、
+    # media_catalog を再有効化する前にここが見えている必要がある。
+    #
+    # ⚠ **`waiting` が本命の指標。**Sequel の TimedQueueConnectionPool は
+    # 「使用中の本数」を持たないが、`num_waiting`（接続を待って**ブロックしている
+    # スレッド数**）は持つ。これが 0 を超えたら、プールが要求に足りていない。
+    # `allocated` が `max` に張り付いているだけなら正常（作った接続を使い回す設計）。
+    def self.pool
+      pool = instance.connection.pool
+      return {pool: {
+        max: pool.max_size,
+        allocated: pool.size,
+        waiting: pool.respond_to?(:num_waiting) ? pool.num_waiting : nil,
+      }.compact}
+    rescue => e
+      # 観測が取れないこと自体で health を落とさない。
+      e.log
+      return {}
     end
   end
 end
