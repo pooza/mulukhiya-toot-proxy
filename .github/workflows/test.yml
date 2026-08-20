@@ -15,9 +15,9 @@ jobs:
         # 意図してテストを増やしたときは、この数値を実測に合わせて更新する。
         include:
           - controller: mastodon
-            omission_baseline: 318
+            omission_baseline: 321
           - controller: misskey
-            omission_baseline: 307
+            omission_baseline: 310
     services:
       redis:
         image: redis:7

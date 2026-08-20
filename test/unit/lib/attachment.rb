@@ -132,5 +132,45 @@ module Mulukhiya
       assert_boolean(attachment_class.cursor_pagination?)
       assert_equal(!Environment.misskey_type?, attachment_class.cursor_pagination?)
     end
+
+    # ⚠ **ページ送りの継ぎ目 (#4393)。**media_catalog はローカルアカウント駆動の
+    # LATERAL merge で、**アカウントごとに top-N を取ってから全体の top-N を採る**。
+    # 内側の LIMIT が足りないと、境界のレコードが**黙って落ちる**。
+    def test_catalog_cursor_has_no_overlap
+      return unless @attachment
+      first = attachment_class.catalog(limit: 2, skip_cache: true)
+      # ⚠ harness は media がほぼ test_account 持ちで、除外すると 1 件しか残らない。
+      # silent skip にせず precondition を明示する（seed の追加は chubo2#64）。
+      omit('ページ送りを検証できるだけの media が未 seed（chubo2#64）') unless first[:has_next]
+      following = attachment_class.catalog(limit: 2, cursor: first[:next_cursor], skip_cache: true)
+      first_ids = first[:items].map {|v| v[:id]}
+      following_ids = following[:items].map {|v| v[:id]}
+
+      assert_equal(first_ids.sort.reverse, first_ids)
+      assert_empty(first_ids & following_ids)
+      assert_operator(following_ids.max, :<, first_ids.min) if following_ids.present?
+    end
+
+    # ⚠ **OFFSET とカーソルが同じ並びを指すこと。**LATERAL の内側 LIMIT は
+    # `limit + offset` でないと、2 ページ目以降で件数が足りなくなる。
+    def test_catalog_page_offset_matches_cursor
+      return unless @attachment
+      first = attachment_class.catalog(limit: 2, skip_cache: true)
+      omit('ページ送りを検証できるだけの media が未 seed（chubo2#64）') unless first[:has_next]
+      by_cursor = attachment_class.catalog(limit: 2, cursor: first[:next_cursor], skip_cache: true)
+      by_offset = attachment_class.catalog(limit: 2, page: 2, skip_cache: true)
+
+      assert_equal(by_cursor[:items].map {|v| v[:id]}, by_offset[:items].map {|v| v[:id]})
+    end
+
+    # only_person は絞り込みなので、結果は常に全体の部分集合。
+    def test_catalog_only_person_is_subset
+      return unless @attachment
+      all_ids = attachment_class.catalog(limit: 10, skip_cache: true)[:items].map {|v| v[:id]}
+      person_ids = attachment_class.catalog(limit: 10, only_person: 1, skip_cache: true)
+        .fetch(:items).map {|v| v[:id]}
+
+      assert_empty(person_ids - all_ids)
+    end
   end
 end

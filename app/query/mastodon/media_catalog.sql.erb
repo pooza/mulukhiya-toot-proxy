@@ -1,48 +1,107 @@
+<%#
+  media_catalog (#4393)。ローカルアカウント駆動の LATERAL merge。
+
+  ⚠ **駆動表を media_attachments から accounts へ移すのが肝。**
+  素直に書くと、プランナは `ORDER BY attachments.id DESC LIMIT n` の短絡見積りで
+  media_attachments の backward PK scan を選び、selectivity 0.271% の
+  `statuses.local` を probe で捨てる。**index を足しても probe が速くなるだけ**で、
+  候補 A / 候補 B / MATERIALIZED はいずれも届かなかった（#4323 / #4351）。
+  ローカルアカウント（zugoga 実測 19 件）ごとに id DESC の top-N を取り、
+  それを merge して全体の top-N を採る形にすると、走査量が桁で落ちる。
+
+  ⚠ **フィルタは LATERAL の内側に置くこと。**外側に置くと「絞る前の top-N」を
+  確定させてしまい、条件で消えた分だけ全体の件数が足りなくなる（A 案の先読み窓と
+  同じ穴。rule 付きで顕在化しうる）。内側で絞ってから top-N を取れば
+  merge-top-N として厳密に正しい。
+
+  ⚠ **内側の LIMIT は limit + offset。**ページ送り（OFFSET）を使う呼び出しでは、
+  捨てるぶんまで各アカウントから取らないと足りなくなる。
+
+  ⚠ **accounts の条件は内外どちらにも要る。**内側（local_accounts）は枝刈りで、
+  外側は従来どおり statuses.account_id 側で見るための保険。Mastodon では添付の
+  account_id と投稿の account_id は一致する（zugoga 本番で差分 0 行を確認済み）が、
+  出力するアカウント列は従来と同じく **statuses 側から引く**。
+
+  2026-08-20 zugoga 本番実測（現行 → 本クエリ）:
+    page1 26,415ms → 56.7ms / cursor 23,234ms → 5.7ms /
+    only_person 25,998ms → 6.5ms / rule つき 8,900ms → 837ms /
+    rule ヒット無し 2,244ms → 14.0ms（いずれも照合の差分 0 行）
+-%>
+<% offset = params[:cursor] ? 0 : (params[:page] ? ((params[:page] - 1) * params[:limit]) : 0) %>
 SELECT
-  attachments.id,
-  attachments.file_file_name AS name,
-  attachments.file_content_type AS type,
-  attachments.file_file_size AS file_size,
-  attachments.file_meta AS meta,
-  attachments.description,
-  attachments.created_at,
-  statuses.id AS status_id,
-  statuses.text AS status_text,
-  statuses.visibility,
+  picked.id,
+  picked.name,
+  picked.type,
+  picked.file_size,
+  picked.meta,
+  picked.description,
+  picked.created_at,
+  picked.status_id,
+  picked.status_text,
+  picked.visibility,
   accounts.username,
   accounts.display_name
-FROM
-  media_attachments AS attachments
-  INNER JOIN statuses ON attachments.status_id = statuses.id
-  INNER JOIN accounts ON statuses.account_id = accounts.id
-WHERE (statuses.local = true)
-  AND (statuses.reblog_of_id IS null)
-  AND (statuses.visibility < 2)
-  AND (statuses.deleted_at IS null)
-  <% if params[:rule] %>
-    <% params[:rule].keywords.each do |keyword| %>
-      AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text, attachments.description) LIKE '%<%= escape(keyword) %>%')
+FROM (
+  SELECT accounts.id AS account_id
+  FROM accounts
+  WHERE (accounts.domain IS null)
+    AND (accounts.silenced_at IS null)
+    AND (accounts.suspended_at IS null)
+    <% unless params[:only_person].to_i.zero? %>
+      AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
     <% end %>
-    <% params[:rule].negative_keywords.each do |keyword| %>
-      AND (coalesce(statuses.text, '') NOT LIKE '%<%= escape(keyword) %>%')
-      AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= escape(keyword) %>%')
-      AND (coalesce(attachments.description, '') NOT LIKE '%<%= escape(keyword) %>%')
+    <% if test_account %>
+      AND (accounts.id <> '<%= test_account.id %>')
     <% end %>
-  <% end %>
+) AS local_accounts
+CROSS JOIN LATERAL (
+  SELECT
+    attachments.id,
+    attachments.file_file_name AS name,
+    attachments.file_content_type AS type,
+    attachments.file_file_size AS file_size,
+    attachments.file_meta AS meta,
+    attachments.description,
+    attachments.created_at,
+    statuses.id AS status_id,
+    statuses.text AS status_text,
+    statuses.visibility,
+    statuses.account_id AS status_account_id
+  FROM media_attachments AS attachments
+    INNER JOIN statuses ON attachments.status_id = statuses.id
+  WHERE (attachments.account_id = local_accounts.account_id)
+    AND (statuses.local = true)
+    AND (statuses.reblog_of_id IS null)
+    AND (statuses.visibility < 2)
+    AND (statuses.deleted_at IS null)
+    <% if params[:rule] %>
+      <% params[:rule].keywords.each do |keyword| %>
+        AND (concat_ws(E'\t', statuses.text, statuses.spoiler_text, attachments.description) LIKE '%<%= escape(keyword) %>%')
+      <% end %>
+      <% params[:rule].negative_keywords.each do |keyword| %>
+        AND (coalesce(statuses.text, '') NOT LIKE '%<%= escape(keyword) %>%')
+        AND (coalesce(statuses.spoiler_text, '') NOT LIKE '%<%= escape(keyword) %>%')
+        AND (coalesce(attachments.description, '') NOT LIKE '%<%= escape(keyword) %>%')
+      <% end %>
+    <% end %>
+    <% if params[:cursor] %>
+      AND (attachments.id < '<%= params[:cursor] %>')
+    <% end %>
+  ORDER BY attachments.id DESC
+  LIMIT <%= params[:limit] + offset %>
+) AS picked
+  INNER JOIN accounts ON picked.status_account_id = accounts.id
+WHERE (accounts.silenced_at IS null)
+  AND (accounts.suspended_at IS null)
   <% unless params[:only_person].to_i.zero? %>
     AND ((accounts.actor_type = 'Person') OR (accounts.actor_type IS null))
   <% end %>
-  AND (accounts.silenced_at IS null)
-  AND (accounts.suspended_at IS null)
   <% if test_account %>
     AND (accounts.id <> '<%= test_account.id %>')
   <% end %>
-  <% if params[:cursor] %>
-    AND (attachments.id < '<%= params[:cursor] %>')
-  <% end %>
 ORDER BY
-  attachments.id DESC
+  picked.id DESC
 LIMIT <%= params[:limit] %>
 <% unless params[:cursor] %>
-  OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+  OFFSET <%= offset %>
 <% end %>
