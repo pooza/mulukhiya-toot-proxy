@@ -776,7 +776,7 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 ### 5.34.0 の実装状況（2026-08-20 時点）
 
-**着手しやすい順に 5 本を PR 済み・すべて CI 緑（mastodon / misskey 両系）。**
+**スコープの実装は #4351 を除いて全て develop へマージ済み。**
 
 | PR | Issue | 主眼 |
 | --- | --- | --- |
@@ -785,6 +785,12 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 | #4609 | #4573 (S) | リモート辞書の 200-with-HTML を黙って飲まない |
 | #4610 | #4598 (M) | `Idempotency-Key` を上流へ中継する |
 | #4611 | #4576 (M) | SSRF 掃討の取り残し 2 件 |
+| #4613 | #4393 | media_catalog を LATERAL merge へ（#4351 Gate 2 の前提） |
+| #4614 | #4351 | `/health` に接続プールの使用状況を出す |
+| #4608 | #4606 | `inherit_mode` を足して継承した `Exclude` を取り戻す |
+
+⚠ **Issue はどれも open のまま。**`Fixes #NNNN` を書いても **base が `develop` なので GitHub は閉じない**
+（デフォルトブランチへのマージでしか閉じない）。リリース後に、モンキーテスト可否で分類して畳む。
 
 判断が要った点（詳細は各 PR 本文）:
 
@@ -800,14 +806,41 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   1 本だけ**で、ナウプレ系は `upload_remote_resource` を通らないことを全呼び出し元の確認で裏取り
   した。**fedi-test-harness（Mastodon）実走で 1104 tests / 0 failures / 0 errors / 157 omissions**
 - テストはすべて**両マトリクスで実走する場所**に置いた。⚠ `SlackWebhookPayloadTest`（Slack 未設定で
-  omission）・`ProgramTest`（`livecure?` が false で omission）に相乗りしない。**omissions は
-  318 / 307 のまま不変**
+  omission）・`ProgramTest`（`livecure?` が false で omission）に相乗りしない
+- ⚠ **CI の omission baseline は 318 / 307 → 321 / 310 になった**（#4613）。ゲートを緩めたのではなく、
+  **DB を持たない CI では `AttachmentTest` がクラスごと omission になる**ため、そこへ足した 3 件が
+  そのまま乗る分。**それ以外の PR では baseline を動かしていない**
 
-**残るスコープ作業は #4351 のみ**で、これは本番 DB 作業（[#4351 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4351#issuecomment-5349110908)）。
-⚠ **Gate 0 / 1 は消化済み**（候補 A 適用で 170s → 約 10s）で、**Gate 2 は #4393 の sub-second 化
-待ち**。次の一手は `bin/diag/media_catalog_subsecond.sql` を zugoga 本番で流すことだが、
-⚠ **§1〜§3 の `EXPLAIN ANALYZE` は実際にクエリを流す**（1 本あたり約 10s）ので、無人で
-連続実行する性質の作業ではない。VPN 起動とセットで在席時に行う。
+### #4351 / #4393 の決着（2026-08-20・zugoga 本番実測）
+
+**sub-second 化は B 案（ローカルアカウント駆動の LATERAL merge）で決着し、PR #4613 で着地した。**
+計測の全文は [#4323 のコメント](https://github.com/pooza/mulukhiya-toot-proxy/issues/4323#issuecomment-5349297730)。
+
+| パターン | 現行 | 本実装 |
+| --- | --- | --- |
+| page1 | 26,415ms | **56.7ms** |
+| only_person | 25,998ms | **6.5ms** |
+| cursor | 23,234ms | **5.7ms** |
+| rule つき | 8,900ms | **837ms** |
+| rule ヒット無し | 2,244ms | **14.0ms** |
+
+- ⚠ **現行のベースラインは劣化していた**（Gate 1 当時の「約 10s」→ 23〜26s）。「10s だから Gate 2 保留」の
+  前提はさらに厳しい側に振れていた
+- ⚠ **A 案は棄却。**速さ（1,593ms）ではなく、照合で **44 行の取りこぼし**が出たのが決め手
+- ⚠ **フィルタは LATERAL の内側・内側 LIMIT は `limit + offset`。**本番でわざと誤り版を作って照合したところ
+  **page2 で 14 行取りこぼした**。正しい版は page1 / only_person / rule / page2 とも差分 0 行
+- **追加 index は不要**（Mastodon 本体の `index_media_attachments_on_account_id_and_status_id` で成立）。
+  ローカルアカウントは **19 件**
+- worker の DB 占有が **30 分ごと 150 秒 → 0.2 秒**。⚠ ここが 2026-05-19 の枯渇の温床だった
+
+**Gate 2 の進め方（2026-08-20 ユーザー確定）**:
+
+1. **順序は「5.34.0 リリース → zugoga デプロイ → flip」。**⚠ 新クエリはコードなので先行 flip はできない
+2. **ステージング（dev26）を挟む。**⚠ ただし**性能検証ではなく機構の確認**
+   （flip が効く・`/feed/media` が 200・worker がキャッシュを載せる・新規エラーが出ない）。
+   ⚠ **dev26 で有意な性能計測はできない**（本番と桁違いでプランが変わる。[[feedback_staging-data-scarcity]]）
+3. **rollback は `/health` の `postgres.pool.waiting` が 0 を超えた状態が数分続いたら**（overlay を false へ戻すだけ）。
+   ⚠ `allocated` が `max` に張り付くのは正常なので、それを理由に戻さない
 
 ### 2026-08-20 セッション同期の記録
 
