@@ -183,15 +183,28 @@ module Mulukhiya
         'tmp/media',
         "#{uri.to_s.sha256}#{File.extname(uri.path)}",
       )
-      options = {}
-      options[:host_validator] = params[:host_validator] if params[:host_validator]
       raise Ginseng::GatewayError, "Too large content '#{uri}'" unless
-        valid_content_length?(uri, options)
-      body = HTTP.new.get(uri, options).body.to_s
+        valid_content_length?(uri, request_options(params))
+      body = HTTP.new.get(uri, request_options(params)).body.to_s
       raise Ginseng::GatewayError, "Too large content '#{uri}'" if
         body.bytesize > download_max_bytes
       File.write(path, body)
       return new(path).file
+    end
+
+    # HTTP 呼び出しごとに**作り直す**オプション。
+    #
+    # ⚠⚠ **同じ hash を head と get で使い回してはいけない (pooza/ginseng-core#528)。**
+    # `Ginseng::HTTP#request` は `options.delete(:host_validator)` で**呼び出し側の
+    # hash を破壊する**ため、プリフライト（HEAD）を通した時点で validator が消え、
+    # **本命の GET が無検証で撃たれる**（＝ HTTParty の自動追従に戻り、リダイレクト先が
+    # 内部アドレスでも追従する）。実測でも validator の呼び出しは HEAD の 1 回だけだった。
+    # ⚠ **「プリフライトを足したせいで GET の検証が外れる」**という、#4523 が塞ごうとした
+    # ものの裏返し。gem 側の是正は pooza/ginseng-core#528 で、こちらは**それが入っても
+    # 壊れない書き方**にしておく。
+    def self.request_options(params)
+      return {} unless params[:host_validator]
+      return {host_validator: params[:host_validator]}
     end
 
     # 相手が申告した Content-Length が上限を超えていれば GET せずに弾く。

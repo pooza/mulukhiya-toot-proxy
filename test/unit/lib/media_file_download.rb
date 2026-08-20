@@ -58,6 +58,27 @@ module Mulukhiya
       assert_path_not_exist(path_for(URL))
     end
 
+    # ⚠⚠ **プリフライトを通したあとの GET も検証されること
+    # (pooza/ginseng-core#528)。**`Ginseng::HTTP#request` は
+    # `options.delete(:host_validator)` で呼び出し側の hash を壊すので、同じ hash を
+    # head と get で使い回すと **GET だけ無検証**になる（＝リダイレクト先が内部でも
+    # 追従する）。呼び出しごとに hash を作り直していることを、validator の
+    # **呼ばれた回数**で押さえる。
+    def test_validator_is_applied_to_both_head_and_get
+      hosts = []
+      RemoteHost.validator = lambda do |host|
+        hosts.push(host)
+        return '93.184.216.34'
+      end
+      stub_request(:head, URL).to_return(status: 200, headers: {'Content-Length' => '5'})
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+
+      download(URL)
+
+      assert_equal(2, hosts.size)
+      assert_equal(['media.example.com'], hosts.uniq)
+    end
+
     # HEAD 非対応 (405) は「判定不能」として GET へ倒す。正常系を塞がないこと。
     def test_head_not_supported_falls_back_to_get
       allow_all
