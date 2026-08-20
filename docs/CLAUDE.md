@@ -785,12 +785,14 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 - gem を上げるだけで効く分に `Daemon#run_stop` の順序バグ（`remove_pid` → `Process.kill` だったため、`EPERM` で
   **プロセスは生きたまま pid ファイルだけ消え**、次の start が 2 本目を立てていた）が含まれる
 
-### 5.34.0 の実装状況（2026-08-20 時点）
+### 5.34.0 の実装状況（2026-08-21 時点）
 
-**スコープの実装は #4351 を除いて全て develop へマージ済み。**
+**スコープの実装は #4351（Gate 2 の flip）を除いて全て develop へマージ済み。**
+**次にやるのはリリース前レビュー → ステージング検証。**
 
 | PR | Issue | 主眼 |
 | --- | --- | --- |
+| #4620 | #4616 (S) | ginseng-core 1.19.0。壊れたバイト列でログのマスクが外れる穴を塞ぐ |
 | #4605 | #4599 (S) | Slack 互換 webhook の公開範囲をリクエストごとに受ける |
 | #4607 | #4558 (S) | `next_on` を「書いたとおりの日付」で読む |
 | #4609 | #4573 (S) | リモート辞書の 200-with-HTML を黙って飲まない |
@@ -818,6 +820,14 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   した。**fedi-test-harness（Mastodon）実走で 1104 tests / 0 failures / 0 errors / 157 omissions**
 - テストはすべて**両マトリクスで実走する場所**に置いた。⚠ `SlackWebhookPayloadTest`（Slack 未設定で
   omission）・`ProgramTest`（`livecure?` が false で omission）に相乗りしない
+- **#4616 は gem 更新なので、判断が要ったのは「何を持ち込まないか」。**`bundle update` には
+  timeout（#4593）・`max_bytes`（#4612）・cert タスク（#4617）・`format: uri` 厳格化も乗ってくるが、
+  **こちら側の載せ替え作業は 5.34.0 でやらない**（2026-08-21 ユーザー判断）。⚠ **gem の挙動が変わることと、
+  こちらが載せ替えることは別**として扱う
+  - ⚠ **`ListenerTest#test_root_cert_file` の是正は退行対応ではなく、地雷が外れた分。**
+    `Faye::WebSocket::SslVerifier` は値があると `cert_store.add_file` を呼ぶので**存在しないパスで落ちる**。
+    旧 gem が `ENV['SSL_CERT_FILE']` に無い `cert/cacert.pem` を立てており、**Listener がそれを掴む
+    唯一の経路**だった（#4586）。1.19.0 は立てないので nil ＝ システムの CA ストアに倒れる
 - ⚠ **CI の omission baseline は 318 / 307 → 321 / 310 になった**（#4613）。ゲートを緩めたのではなく、
   **DB を持たない CI では `AttachmentTest` がクラスごと omission になる**ため、そこへ足した 3 件が
   そのまま乗る分。**それ以外の PR では baseline を動かしていない**
