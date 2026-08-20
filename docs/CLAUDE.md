@@ -673,7 +673,18 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
   - ⚠ **この申し送りは PR 本体のコメントに置かれていた**（投稿者は Codex ではなく `pooza`＝別セッション）。
     同期の初回で落としたので §4 に手順として足してある
 
-**確定スコープの重み合計は 23**（M 3 × 6 + S 1 × 5）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
+- **#4616 chore/security: ginseng-core を更新し、ログのマスクが外れる穴を塞ぐ（size:S・2026-08-21 繰り入れ）** —
+  ⚠⚠ **🔴 依頼（ginseng-core#518）より重かった。**「不正なバイト列でログ 1 行が消える」ではなく、
+  `Logger#mask_url` の `ArgumentError` が `create_message` の rescue まで飛んで**素の src が返る＝
+  `mask_fields` も `mask_query_params` も効かない**状態だった。⚠ **`Controller#before` は受信 params を
+  そのまま `logger.info` に載せる**ので、**外から壊れたバイト列を 1 つ混ぜるだけでその行のマスクを外せる**
+  ＝ #4511（[[project_log-credential-exposure]]）で塞いだものがこの経路で戻っていた
+  - ⚠ **本番で開いている実害なので繰り入れた**（2026-08-21 ユーザー判断）。⚠ **cert タスク（#4617）と
+    `max_bytes`（#4612）は同じ `bundle update` に乗るが、5.34.0 には含めない**
+  - `bundle update ginseng-core` ＋ `Gemfile.lock` のコミット。⚠ **取り込み後に `Controller#before` 側の
+    回避策を畳めるか見る**（gem 側で塞いだため）
+
+**確定スコープの重み合計は 24**（M 3 × 6 + S 1 × 6）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
 ⚠ **メンテナンスリリースを連続させない**というユーザーの意向（2026-08-13）を受けて、**主軸をメディアカタログと番組表に置き、
 検査由来の受け皿は #4583 の 1 本に絞った**。残り 4 件は次リリース以降へ送る。
 なお #4589 / #4594 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
@@ -871,7 +882,7 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 - **Mastodon 4.7.0 が stable リリース（2026-08-20）＝ 本番 3 台・ステージング 3 台へ適用済み（2026-08-21）。**
   インフラ側の記録は pooza/chubo2 の `docs/infra-history.md` / `docs/infra-note.md` が正本（[[project_mastodon-upgrade-runbook]]）。
-  ⚠ **モロヘイヤ側の harness 検証はまだ**＝台帳の `verified` は v4.6.6 のままで、**本番と検証済み版がずれている**。
+  **モロヘイヤ側は同日に harness を stable で実走し、`verified` を v4.7.0 へ昇格した**（全緑）。
   下の「fedi-test-harness の検証状況」参照
 - **Codex**: 前回同期の後に付いた **3 件**を消化（PR #4614 の P1 / P2、PR #4613 の P2）。いずれも妥当と判断し、
   返信 ＋ 👍 のうえ **#4618 / #4619 で受けた**。⚠ **どちらも「ゲートや rollback 信号が、見たいはずのものを
@@ -882,6 +893,11 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   `ab02f5e`（旧）のままで **`bundle update ginseng-core` は未実施**
 - **chubo2** は差分なし（`git fetch` 済み・infra 側の 4.7.0 記録は取り込み済み）。
   **Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
+- **#4616 を 5.34.0 へ繰り入れた**（本番で開いている実害のため。#4617 / #4612 は次リリース以降）。
+  重み合計 23 → 24
+- **harness を v4.7.0 stable で実走し `verified` を昇格**（下の節）。⚠ **踏んだ罠は無し**
+  （`update-version.sh` → `reset.sh` がそのまま通った。08-16 に踏んだポート 3000 衝突は
+  pooza/chubo2#178 の修正が効いていて再発しなかった）
 
 ### マイルストーン未割当
 
@@ -921,14 +937,10 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 **ginseng-core からの取り込み依頼（2026-08-20〜21・向こうが着地させた分）**。⚠ **`Gemfile.lock` は
 まだ旧 revision（`ab02f5e`）で、`bundle update ginseng-core` は未実施**:
 
-- **#4616 chore: ginseng-core を更新する（size:S・security）** — ⚠⚠ **🔴 起票（ginseng-core#518）より重かった。**
-  「不正なバイト列でログ 1 行が消える」ではなく、`Logger#mask_url` の `ArgumentError` が `create_message` の
-  rescue まで飛んで**素の src が返る＝ `mask_fields` も `mask_query_params` も効かない**状態だった。
-  ⚠ **`Controller#before` は受信 params をそのまま `logger.info` に載せる**ので、**外から壊れたバイト列を 1 つ
-  混ぜるだけでその行のマスクを外せた**＝ [[project_log-credential-exposure]]（#4511）で塞いだものがこの経路で戻っていた
-  - 併せて #514（`/http/timeout/seconds` が効いていなかった＝ #4593）・#526 / #534（`max_bytes` ＝ #4612）・
-    #528 / #533（`host_validator` の使い回し）も `main` に入っている
-  - ⚠ **取り込み後は `Controller#before` 側の回避策を畳めるか見る**
+- **#4616 は 5.34.0 へ繰り入れた**（2026-08-21 ユーザー判断・上のスコープ節）。**本番で開いている実害**のため。
+  ⚠ 併せて #514（`/http/timeout/seconds` が効いていなかった＝ #4593）・#526 / #534（`max_bytes` ＝ #4612）・
+  #528 / #533（`host_validator` の使い回し）も `main` に入っており、**同じ `bundle update` に乗ってくる**。
+  ⚠ **乗ってくることと、こちら側の載せ替え作業を 5.34.0 でやることは別**
 - **#4617 chore: ginseng-core の cert タスクを受け取る（size:S）** — `cert:update` / `cert:check` を gem が配るようになった
   （`Ginseng.load_tasks` の 1 行）。#4586 の受け皿。⚠ **急がない**（上流側で「存在しないパスは `SSL_CERT_FILE` に
   立てない」が入ったので**現状は無害**）。⚠ **`cert/cacert.pem` をコミットするかは判断が要る**
@@ -965,15 +977,21 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 ### fedi-test-harness の検証状況
 
-⚠⚠ **Mastodon v4.7.0 stable が出た（2026-08-20）。本番 3 台・ステージング 3 台は 2026-08-21 に適用済みで、
-台帳の `verified`（v4.6.6）と本番がずれている。**検証はモロヘイヤ側の未処理事項。
+**Mastodon v4.7.0 stable を 2026-08-21 に実走・`verified` 昇格**（本番 3 台・ステージング 3 台への適用と同日。
+**本番と検証済み版が揃った**）。**1156 tests / 2250 assertions / 0 failures / 0 errors / 159 omissions
+（100% passed、332 秒）**。
 
-- ⚠ **rc.1 → stable の差分は harness の観点では空**（49 files / 24 commits・**マイグレーションなし・
+- **DB 直読み層は個別にも実走**: account 34 / status 27 / postgres 10 は **omission 0 で全緑**、
+  attachment は 20 tests / 0 failures / **2 omissions**
+- ⚠ **attachment の omission 2 件を 4.7 の影響と読まない。**#4613 で足したページ送りのテストが
+  **ページ 2 を作れるだけの media を harness が seed していない**ため（pooza/chubo2#64）。
+  08-16 の「attachment 17 tests / omission 0」との差は**モロヘイヤ側でテストが増えた分**
+- ⚠ **rc.1 → stable の差分は harness の観点では空だった**（49 files / 24 commits・**マイグレーションなし・
   DB スキーマ変更なし・シリアライザ変更なし**。Ruby 側は `ActivityPub::ProcessAccountService` +3-1 と
-  admin 系の文言のみ、残りは locale / JS / yarn.lock / spec）。**08-16 の rc.1 全緑がそのまま効く見込み**
-- ⚠ **それでも見込みで `verified` を昇格させない。**stable で 1 回回してから台帳と chubo2 の
-  `.env.example` を bump する（[[feedback_upstream-release-harness-verification]]）
-- Misskey は stable 2026.7.0 据え置き。2026.8.0-alpha.0 は prerelease なので**方針どおり動かない**
+  admin 系の文言のみ）。**見込みで昇格させず回し直した結果、08-16 の rc.1 全緑がそのまま再現した**
+- Misskey は stable 2026.7.0 据え置き。2026.8.0-alpha.0 は prerelease なので**方針どおり動かない**。
+  ⚠ **今回は Mastodon 側だけの実走**なので、[[project_harness-zero-error-goal]]（両系エラー 0）の
+  未達（#4584）は解消していない
 
 **Mastodon v4.7.0-rc.1 を 2026-08-16 に実走済み**（RC なので `verified` は昇格させない）。
 **1086 tests / 2157 assertions / 0 failures / 0 errors / 157 omissions（100% passed）**、
