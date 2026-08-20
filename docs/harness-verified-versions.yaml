@@ -37,7 +37,20 @@ misskey:
   verified_at: '2026-08-01'
 
 # upstream 最新リリースを最後に確認した日（同期手順が更新する）。
-last_checked: '2026-08-20'
+last_checked: '2026-08-21'
+
+# 2026-08-21 チェック結果:
+#   - Mastodon: **v4.7.0 stable が出た（2026-08-20 15:39Z）。**⚠ **本番 3 台・ステージング 3 台へは
+#     2026-08-21 に適用済み**（pooza/chubo2 の infra-history.md 参照）＝ **verified(v4.6.6) と本番が
+#     ずれている状態**。harness 実走で昇格させるまで「検証済み」と書かないこと。
+#   - ⚠ **rc.1 → stable の差分は harness の観点では空**: 49 files / 24 commits のうち、
+#     マイグレーションなし・シリアライザ変更なし・DB スキーマ変更なし。Ruby 側で動いたのは
+#     `app/services/activitypub/process_account_service.rb`（+3-1）・admin 系コントローラの
+#     文言・`app/lib/activity_tracker.rb`・`admin/metrics/measure/base_measure.rb` だけで、
+#     残りは locale / JS / yarn.lock / spec。**08-16 の rc.1 実走（下の節・全緑）がそのまま効く見込み**。
+#     ⚠ ただし**方針どおり stable では回し直す**（見込みで昇格させない）。
+#   - Misskey: 最新 stable は 2026.7.0（2026-07-31）のままで verified と同一。
+#     2026.8.0-alpha.0 は prerelease なので方針どおり動かない。
 
 # 2026-08-20 チェック結果:
 #   - Mastodon: 最新 stable は v4.6.6（2026-08-13）のままで verified と同一。RC も

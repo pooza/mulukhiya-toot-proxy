@@ -841,6 +841,11 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
    ⚠ **dev26 で有意な性能計測はできない**（本番と桁違いでプランが変わる。[[feedback_staging-data-scarcity]]）
 3. **rollback は `/health` の `postgres.pool.waiting` が 0 を超えた状態が数分続いたら**（overlay を false へ戻すだけ）。
    ⚠ `allocated` が `max` に張り付くのは正常なので、それを理由に戻さない
+   - ⚠ **この指標は「Puma 1 プロセスの Sequel プール」しか見ていない**（2026-08-21 の Codex 指摘 ＝ #4618）。
+     2026-05-19 に枯れたのは **pgbouncer（全プロセス・Mastodon 本体と共有）**で、重い SQL を流すのは
+     別プロセスの Sidekiq。**flip 中は pgbouncer の `SHOW POOLS`（`cl_waiting`）も人が直接見る**
+   - ⚠ **`/health` は `SELECT 1` の後にプールを読むので、有限のスパイクは取りこぼす。**
+     「waiting が 0 だった」を「詰まらなかった」の証拠にしない
 
 ### 2026-08-20 セッション同期の記録
 
@@ -862,6 +867,22 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 - **chubo2** は差分なし。**Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
 - **harness の upstream チェック（§8）** — 下の「fedi-test-harness の検証状況」に反映
 
+### 2026-08-21 セッション同期の記録
+
+- **Mastodon 4.7.0 が stable リリース（2026-08-20）＝ 本番 3 台・ステージング 3 台へ適用済み（2026-08-21）。**
+  インフラ側の記録は pooza/chubo2 の `docs/infra-history.md` / `docs/infra-note.md` が正本（[[project_mastodon-upgrade-runbook]]）。
+  ⚠ **モロヘイヤ側の harness 検証はまだ**＝台帳の `verified` は v4.6.6 のままで、**本番と検証済み版がずれている**。
+  下の「fedi-test-harness の検証状況」参照
+- **Codex**: 前回同期の後に付いた **3 件**を消化（PR #4614 の P1 / P2、PR #4613 の P2）。いずれも妥当と判断し、
+  返信 ＋ 👍 のうえ **#4618 / #4619 で受けた**。⚠ **どちらも「ゲートや rollback 信号が、見たいはずのものを
+  取りこぼす」型**で 5.34.0 のテーマ（黙って壊れるのをやめる）そのもの
+- **Sentry** 新規なし（最終確認 2026-08-18 の 3 件はいずれも 08-20 にトリアージ済み）。**Dependabot** 0 件
+- **ginseng-core が動いた。**依頼していた 4 件（#518 / #514 / #526 / #528）と #512 が `main` へ着地し、
+  **向こうから取り込み依頼が 2 本来ている（#4616 / #4617）**。⚠ `Gemfile.lock` の revision は
+  `ab02f5e`（旧）のままで **`bundle update ginseng-core` は未実施**
+- **chubo2** は差分なし（`git fetch` 済み・infra 側の 4.7.0 記録は取り込み済み）。
+  **Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ（次回は 2026-08-30 以降）
+
 ### マイルストーン未割当
 
 **5.33.0 のリリース前レビュー・harness ゲート由来の受け皿**（2026-08-12 起票）。
@@ -880,6 +901,42 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   ⚠ **同じ `verify_webhook!` を通す `get '/:digest'` は `e.log`** で、GET と POST で扱いが割れている。
   #4543 の「上流 4xx 群に #4542 と同型が混ざっている」という見立てが、**上流由来ではなく自前の 404 で**当たった形
 - **syslog 側のノイズ棚卸し（未起票）** — zugoga の `base_uri undefined` のように `e.log` 止まりで Sentry に出ない大量ログがある。#4543 の対象外なので別建てが要る
+**5.34.0 の Codex レビュー由来の受け皿（2026-08-21 起票）**:
+
+- **#4618 obs: `/health` のプール指標が Puma プロセスローカルで、pgbouncer と Sidekiq 側の逼迫を取りこぼす（size:M）** —
+  PR #4614 の Codex P1 / P2。⚠ **2026-05-19 に実際に枯れたのは pgbouncer（全プロセス・Mastodon 本体と共有）**で、
+  重い SQL を流すのは別プロセスの `MediaCatalogUpdateWorker`。`/health` が読むのは**そのリクエストを処理した
+  Puma プロセスの Sequel プール 1 つ**なので、どちらも直接は見えない
+  - ⚠ **完全に盲目ではない**（pgbouncer が詰まれば滞留が延びて同プロセスの他スレッドが待つので `waiting` は
+    遅れて上がる）。**症状の代理としては効くが、flip の影響を最初に検知するには遅い・粗い**
+  - ⚠ **P2（`SELECT 1` の前にスナップショットを取る）は P1 と独立に入れられる。**現行は health 自身が
+    待ち行列に並び、**前の待ちが捌けてから `num_waiting` を読む**ので有限のスパイクを取りこぼす
+  - **Gate 2 は「`/health` の `waiting` ＋ flip 中は pgbouncer の `SHOW POOLS` を人が直接見る」で回す**
+- **#4619 test: catalog の `only_person` subset 検証が truncate したベースラインと比較していて偽陽性になりうる（size:S）** —
+  PR #4613 の Codex P2。`all_ids` は「絞り込み無しの最新 10 件」で母集合ではないため、⚠ **最新 10 件に Person 以外が
+  1 件でも混ざると `only_person` 側はより古い Person で 10 件を埋め、SQL が正しいのに落ちる**。
+  いま緑なのはデータの並びがたまたま Person で埋まっているからにすぎない（#4583 と同型）。
+  ⚠ **DB を持たない CI ではクラスごと omission** なので、赤は harness 実走でしか出ない
+
+**ginseng-core からの取り込み依頼（2026-08-20〜21・向こうが着地させた分）**。⚠ **`Gemfile.lock` は
+まだ旧 revision（`ab02f5e`）で、`bundle update ginseng-core` は未実施**:
+
+- **#4616 chore: ginseng-core を更新する（size:S・security）** — ⚠⚠ **🔴 起票（ginseng-core#518）より重かった。**
+  「不正なバイト列でログ 1 行が消える」ではなく、`Logger#mask_url` の `ArgumentError` が `create_message` の
+  rescue まで飛んで**素の src が返る＝ `mask_fields` も `mask_query_params` も効かない**状態だった。
+  ⚠ **`Controller#before` は受信 params をそのまま `logger.info` に載せる**ので、**外から壊れたバイト列を 1 つ
+  混ぜるだけでその行のマスクを外せた**＝ [[project_log-credential-exposure]]（#4511）で塞いだものがこの経路で戻っていた
+  - 併せて #514（`/http/timeout/seconds` が効いていなかった＝ #4593）・#526 / #534（`max_bytes` ＝ #4612）・
+    #528 / #533（`host_validator` の使い回し）も `main` に入っている
+  - ⚠ **取り込み後は `Controller#before` 側の回避策を畳めるか見る**
+- **#4617 chore: ginseng-core の cert タスクを受け取る（size:S）** — `cert:update` / `cert:check` を gem が配るようになった
+  （`Ginseng.load_tasks` の 1 行）。#4586 の受け皿。⚠ **急がない**（上流側で「存在しないパスは `SSL_CERT_FILE` に
+  立てない」が入ったので**現状は無害**）。⚠ **`cert/cacert.pem` をコミットするかは判断が要る**
+  （向こうの推奨は「コミットせずデプロイ時に `rake cert:update`」＝更新の当番を増やさない）
+- **#4612 security: `MediaFile.download` の受信バイト上限が「読み切ってから」しか効かない（size:S）** —
+  #4576（PR #4611）の Codex P1 の受け皿。⚠ **gem 側の `max_bytes` が着地したので着手可能になった**
+  （起票時は「gem 側の対応待ち」だった）。`bundle update` と同じサイクルで載せ替える
+
 **設定検証・入口の堅牢化まわり（2026-08-15〜19 起票・いずれも未スコープ）**。⚠ **`ginseng-*` 側と対になっているものが多い**
 （[[feedback_fix-may-not-reach-through-ginseng]]）。まとめて 1 サイクルにするか個別に散らすかは次期マイルストーン確定時に決める:
 
@@ -908,8 +965,15 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 ### fedi-test-harness の検証状況
 
-**2026-08-20 のチェックでは upstream に動きなし**（Mastodon stable v4.6.6・RC v4.7.0-rc.1 とも据え置き、
-Misskey stable 2026.7.0 据え置き。2026.8.0-alpha.0 は prerelease なので**方針どおり動かない**）。次に回すのは 4.7.0 stable。
+⚠⚠ **Mastodon v4.7.0 stable が出た（2026-08-20）。本番 3 台・ステージング 3 台は 2026-08-21 に適用済みで、
+台帳の `verified`（v4.6.6）と本番がずれている。**検証はモロヘイヤ側の未処理事項。
+
+- ⚠ **rc.1 → stable の差分は harness の観点では空**（49 files / 24 commits・**マイグレーションなし・
+  DB スキーマ変更なし・シリアライザ変更なし**。Ruby 側は `ActivityPub::ProcessAccountService` +3-1 と
+  admin 系の文言のみ、残りは locale / JS / yarn.lock / spec）。**08-16 の rc.1 全緑がそのまま効く見込み**
+- ⚠ **それでも見込みで `verified` を昇格させない。**stable で 1 回回してから台帳と chubo2 の
+  `.env.example` を bump する（[[feedback_upstream-release-harness-verification]]）
+- Misskey は stable 2026.7.0 据え置き。2026.8.0-alpha.0 は prerelease なので**方針どおり動かない**
 
 **Mastodon v4.7.0-rc.1 を 2026-08-16 に実走済み**（RC なので `verified` は昇格させない）。
 **1086 tests / 2157 assertions / 0 failures / 0 errors / 157 omissions（100% passed）**、
