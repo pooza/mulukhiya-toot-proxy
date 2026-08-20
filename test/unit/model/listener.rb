@@ -44,10 +44,20 @@ module Mulukhiya
       assert_equal(expected, @listener.verify_peer?)
     end
 
+    # ⚠ **nil は正解**（#4586 / pooza/ginseng-core#512、ginseng-core 1.19.0 で着地）。
+    # `Faye::WebSocket::SslVerifier` は `root_cert_file` が nil なら
+    # `cert_store.set_default_paths` ＝ **システムの CA ストア**に倒れる。
+    #
+    # 🔴 **駄目なのは「存在しないパス」のほう。**同 verifier は値があると
+    # `cert_store.add_file(path)` を呼ぶので、**無いファイルを渡すと接続時に落ちる**。
+    # かつて gem が `ENV['SSL_CERT_FILE']` に `<root>/cert/cacert.pem` を無条件で立てており
+    # （このリポジトリに `cert/` は無い）、**ここがその地雷を踏む唯一の経路**だった。
+    # 1.19.0 は存在しないパスを立てなくなったので nil に倒れる。
     def test_root_cert_file
       require_listener!
+      path = @listener.root_cert_file
 
-      assert_path_exist(@listener.root_cert_file)
+      assert_true(path.nil? || File.exist?(path), "存在しないパスを渡している: #{path}")
     end
 
     def test_keepalive
