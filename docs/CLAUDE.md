@@ -684,35 +684,14 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
   - `bundle update ginseng-core` ＋ `Gemfile.lock` のコミット。⚠ **取り込み後に `Controller#before` 側の
     回避策を畳めるか見る**（gem 側で塞いだため）
 
-- **#4621 bug: ALT 編集の PUT が Mastodon で 500 になる（size:S・2026-08-22 繰り入れ）** —
-  ステージング実機で ALT 編集がまだ通らなかった件。⚠ **原因は #4589 の直し残しではなく、
-  `ginseng-fediverse` の `flatten_media_attributes` そのものの誤り**。`media_attributes[0][id]=...` と
-  **数字の添字**で form-urlencode していたが、この形は Rack / Rails 側で **`fields_for` 形式の
-  Hash `{"0" => {...}}`** に解釈され**配列にならない**。Mastodon の `UpdateStatusService` は
-  `(@options[:media_attributes] || []).each` と回すので `["0", {...}]`（Array）が渡り、
-  `attributes[:id]` で `TypeError: no implicit conversion of Symbol into Integer` ＝ 500
-  - ⚠ **「#245 が入っている」は「正しく直っている」ではない。**ピンは #245 のマージより先で、
-    それでも崩れていた。[[feedback_fix-may-not-reach-through-ginseng]] の逆パターン
-  - **pooza/ginseng-fediverse#253**（form-urlencoded をやめて JSON で送る）→ 着地後に
-    `bundle update ginseng-fediverse` → 本体 PR **#4622**、の順で回す。
-    ⚠ **PR #4622 だけでは 500 は直らない**（入っているのは Purpose ヘッダの件だけ）
-  - ⚠ **空添字 `media_attributes[][id]` でも配列にはなるが採らなかった。**「同じキーが再出現したら
-    次の要素」という Rack の暗黙のグルーピングに依存し、要素ごとのキーの並びで壊れうる
-  - ⚠ **Content-Type を明示しないと JSON にならない。**ginseng-core の `create_body` は
-    Content-Type が `application/json` のときだけ `to_json` する。無指定だと HTTParty が Hash を
-    form-urlencode し、**同じ数字の添字に戻って同じ 500 になる**
-  - 併せて **内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を出さない**ようにした。
-    #4474 以前の `if ($http_x_mulukhiya_purpose != '')` が残った vhost では**内部 fetch が
-    :3008 へ送り返されてループし GET が 404** になる（ステージングで実際に起きた）。
-    ⚠ **`/source` は location の正規表現に一致せず素通りして 200** だったため、
-    **`/source` は通るのに `fetch_status` だけ落ちる**という非対称で気づきにくい
-  - ⚠ **capsicum#121 の client 実装（`be45003f`）は入っている。**これが直るまで実地では動かない
+⚠ **#4621 は 5.34.0 から外し、5.35.0 へ送った**（2026-08-22 ユーザー判断）。下の「5.35.0」節を参照。
+5.34.0 に載るのは `bundle update ginseng-fediverse` 1.8.29 と Purpose ヘッダの件までで、
+**ALT 編集は通らないまま**。⚠ **リリースノートで「ALT 編集が直った」と書かないこと。**
 
 **確定スコープの重み合計は 24**（M 3 × 6 + S 1 × 6）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
 ⚠ **メンテナンスリリースを連続させない**というユーザーの意向（2026-08-13）を受けて、**主軸をメディアカタログと番組表に置き、
 検査由来の受け皿は #4583 の 1 本に絞った**。残り 4 件は次リリース以降へ送る。
-なお #4589 / #4594 / #4621 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
-⚠ **#4621 は #4589 の直し残しなので、重み目安の外で受ける**（同じ機能を「半分直った」まま出さない）。
+なお #4589 / #4594 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
 
 ### Codex レビューの棚卸し（2026-08-16）
 
@@ -1119,6 +1098,39 @@ DB 直読み層（account / status / attachment / postgres）も **omission 0 �
 
 - **#4414 security: Spotify OAuth ハードニング（size:M）** — capsicum#570 復活と歩調を合わせる（全台 OFF のため単独では着手しない）
 - **#4428 test: fedi-test-harness で webhook 投稿経路をインプロセス検証する（size:M）** — chubo2#63 と対。chubo2 側の着地待ち
+
+## 次々期マイルストーン: 5.35.0
+
+**主軸は #4621（ALT 編集の完遂）。**GitHub マイルストーン作成済み（#633）。
+⚠ **バージョンバンプはまだ**（5.34.0 が進行中のため。着手時に実施する＝[[feedback_bump-version-first]]）。
+
+- **#4621 bug: ALT 編集の PUT が Mastodon で 500 → 405（主軸・size:S・2026-08-22 に 5.34.0 から繰越）** —
+  capsicum#121 の前提。**同じ経路で 2 回続けて別の欠陥を踏んだ**もので、5.34.0 では**上流 PUT が
+  405 のまま**着地させられなかった
+  - ⚠⚠ **「急ぎではないから送った」ではない。**⚠ **急ぎ**（capsicum 側で issue が挙がってから
+    **数か月未解決**）。送った理由は **5.34.0 の枠に収めるのを諦めた**ことだけで、着地に
+    pooza/ginseng-fediverse#254 のマージが要り、**もう一度 ginseng 側をせっつくのは避ける**という
+    判断をしたため（2026-08-22 ユーザー明示）。**優先度は下げていない**
+  - **欠陥 1（着地済み・5.34.0 に載る）**: `flatten_media_attributes` が `media_attributes[0][id]=...` と
+    **数字の添字**で form-urlencode していた。Rack / Rails 側で `fields_for` 形式の Hash になり配列にならず、
+    Mastodon が `TypeError` ＝ **500**。pooza/ginseng-fediverse#253（1.8.29）で JSON 化して解決
+  - **欠陥 2（未着地・#254 待ち）**: **`update_status` だけが `create_headers` を通していない**。
+    そのため**モロヘイヤ自身の PUT が `X-Mulukhiya` を名乗らず**、nginx の map のキーが
+    `PUT::media_update`（**:3008 へループ**）か `PUT::`（**reject → 405**）になる。
+    ⚠ `fetch_status` / `fetch_status_source` は通しているので 200 で返り、
+    **「補完は成功するのに PUT だけ落ちる」**という非対称になる
+  - ⚠ **本番でも同じ 405 のはず。**本番 3 台の map も Purpose を含む 3 要素キー。
+    #4474 を 2026-08-05 に直した時点では capsicum#121 が未実装で**誰も通していなかった**ため
+    表に出ていなかっただけ。**ステージング固有の話ではない**
+  - **残作業**: #254 マージ → `bundle update ginseng-fediverse`（1.8.30）→ dev24 再デプロイ →
+    capsicum と同じ PUT で **200 と ALT 反映**を確認 → クローズ
+  - ⚠ **検証用の投稿は dev24 に残してある**（`117137204800272266`・visibility=direct・
+    CW ＋閲覧注意＋添付 1・ALT は「変更前の説明」のまま）。
+    ⚠ **トークンは revoke 済み**なので再検証時は作り直す（`test` アカウントで
+    `Doorkeeper::AccessToken` を発行 → 使用後 revoke）
+  - **関連して起票**: pooza/chubo2#188（ステージング 3 台の nginx 断片が本番と乖離。
+    ⚠ **dev26 は #4474 修正前のままで外部 PUT が常に 405**・3 台とも map が `localhost`）
+
 
 ## 投稿レイテンシ調査の記録（#4464・2026-08-02 完了）
 
