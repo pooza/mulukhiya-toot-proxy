@@ -163,14 +163,50 @@ module Mulukhiya
       assert_equal(by_cursor[:items].map {|v| v[:id]}, by_offset[:items].map {|v| v[:id]})
     end
 
-    # only_person は絞り込みなので、結果は常に全体の部分集合。
-    def test_catalog_only_person_is_subset
+    # ⚠ **見たいのは「絞り込みが効いていること」。**返ってきたアカウントの種別を
+    # 直接見る (#4619)。subset 検証は代理でしかなく、母集合の取り方に依存する。
+    def test_catalog_only_person_returns_only_person
+      return unless @attachment
+      items = attachment_class.catalog(limit: 10, only_person: 1, skip_cache: true)[:items]
+      omit('only_person の結果が空（media 未 seed・chubo2#64）') if items.empty?
+
+      items.each do |item|
+        username = item.dig(:account, :username)
+
+        assert_true(person_account?(username), "#{username} is not a person")
+      end
+    end
+
+    # ⚠ **「最新 10 件」は母集合ではない (#4619)。**絞り込み無しの最新 10 件に
+    # bot / service が 1 件でも混ざると、only_person 側はその分だけ**より古い
+    # Person で 10 件を埋める**。埋めた分は baseline に無いので、**SQL が正しくても
+    # 素の subset は成り立たない**（緑なのは seed の最新 10 件がたまたま全部
+    # Person だからにすぎない＝ #4583 と同じ「信用できない緑」）。
+    #
+    # baseline が覆う範囲（`min` 以上）に限れば「絞り込みは減らすだけ」は厳密に成り立つ。
+    def test_catalog_only_person_is_subset_within_baseline_range
       return unless @attachment
       all_ids = attachment_class.catalog(limit: 10, skip_cache: true)[:items].map {|v| v[:id]}
+      omit('baseline が空（media 未 seed・chubo2#64）') if all_ids.empty?
       person_ids = attachment_class.catalog(limit: 10, only_person: 1, skip_cache: true)
         .fetch(:items).map {|v| v[:id]}
 
-      assert_empty(person_ids - all_ids)
+      assert_empty(person_ids.select {|id| id >= all_ids.min} - all_ids)
+    end
+
+    private
+
+    # 返ってきたアカウントが Person 扱いか。
+    # ⚠ **判定列は SNS で違う**（Mastodon は `accounts.actor_type`・
+    # Misskey は `user."isBot"`）。catalog はローカルアカウントしか返さないので、
+    # username は `domain` / `userHost` が null の側で一意に引ける。
+    def person_account?(username)
+      if Environment.misskey_type?
+        row = attachment_class.db[:user].where(username:, userHost: nil).first
+        return row.present? && row[:isBot] == false
+      end
+      row = attachment_class.db[:accounts].where(username:, domain: nil).first
+      return row.present? && [nil, 'Person'].include?(row[:actor_type])
     end
   end
 end
