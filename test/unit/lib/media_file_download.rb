@@ -100,6 +100,41 @@ module Mulukhiya
       assert_equal('small', File.read(path_for(URL)))
     end
 
+    # ⚠⚠ **宛先を切り詰めないこと (#4626)。**`path` は URL の sha256 由来の
+    # **固定名**なので、同じ URL を同時に取りに行くと `File.write` の O_TRUNC が
+    # **読み出し中のファイルを 0 バイトへ切り詰める**。上流への送信は gem が
+    # `File.open(file, 'rb')` でストリームしながら読むため、その窓は秒オーダー。
+    #
+    # ⚠ **実装をスタブせず、アトミック性そのものを観測する。**先に開いた読み手が
+    # **古い内容を最後まで読み切れる**なら rename であり、O_TRUNC ではない。
+    def test_destination_is_never_truncated_under_a_reader
+      path = File.join(Environment.dir, 'tmp/media', 'atomic_write_test.txt')
+      @paths.push(path)
+      File.write(path, 'old' * 100)
+
+      File.open(path, 'rb') do |reader|
+        head = reader.read(3)
+        MediaFile.write_atomic(path, 'new')
+        # ⚠ 直接書いていればここが空になる（切り詰められた inode を読むため）。
+        assert_equal('old' * 100, head + reader.read)
+      end
+
+      # 開き直せば新しい内容が見える。
+      assert_equal('new', File.read(path))
+    end
+
+    # ⚠ **一時ファイルを残さない。**残ると `MediaFile.all` の掃除（`*` glob）が
+    # 拾うまで tmp/media に溜まる。
+    def test_temporary_path_is_removed
+      allow_all
+      stub_request(:head, URL).to_return(status: 200, headers: {'Content-Length' => '5'})
+      stub_request(:get, URL).to_return(status: 200, body: 'small')
+
+      download(URL)
+
+      assert_empty(Dir.glob("#{path_for(URL)}.*"))
+    end
+
     private
 
     def allow_all
@@ -109,6 +144,7 @@ module Mulukhiya
     def download(url)
       uri = Ginseng::URI.parse(url)
       @paths.push(path_for(url))
+      @paths.concat(Dir.glob("#{path_for(url)}.*"))
       return MediaFile.download(uri, host_validator: RemoteHost.validator)
     end
 

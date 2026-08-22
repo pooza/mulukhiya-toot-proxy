@@ -32,6 +32,21 @@ module Mulukhiya
       assert_equal('ネタバレ注意', values[spoiler_field])
     end
 
+    # ⚠⚠ **配線ごと押さえる (#4624)。**未知の値のとき、上流へ実際に送られるのが
+    # **アカウント設定の既定**であって `public` ではないこと。
+    def test_unknown_visibility_sends_account_default
+      expected = parser_class.visibility_name('private')
+
+      assert_equal(expected, visibility_for('bogus'))
+      assert_equal(expected, visibility_for('home'))
+      assert_equal(expected, visibility_for(nil))
+    end
+
+    # 既知の値は指定どおりに送る（既定を上書きする）。
+    def test_known_visibility_sends_requested
+      assert_equal(parser_class.visibility_name('unlisted'), visibility_for('unlisted'))
+    end
+
     def test_contract_accepts_visibility
       assert_empty(contract_errors('visibility' => 'private'))
     end
@@ -46,13 +61,40 @@ module Mulukhiya
       assert_empty(contract_errors)
     end
 
-    # ⚠ **未知の値は契約で弾かず、既定へ丸める。**この保証があるので、
-    # SlackWebhookContract 側で値の妥当性を見る必要がない。
-    def test_unknown_visibility_falls_back_to_public
+    # ⚠ **gem の `visibility_name` は未知の値を `public` へ丸める。**これは
+    # fail-open の向きが**最も公開側**だということ。#4624 で `Webhook` 側が
+    # ここへ未知の値を渡さないようにしたので、この性質は「踏んではいけない挙動」
+    # として押さえておく（下の requested_visibility のテストが本丸）。
+    def test_gem_rounds_unknown_visibility_to_public
       assert_equal(
         parser_class.visibility_name(:public),
         parser_class.visibility_name('bogus'),
       )
+    end
+
+    # ⚠⚠ **本丸 (#4624)。**未知の値は**アカウント設定の既定へ倒す**。
+    # 素通しすると `private` に設定した webhook が、綴り誤りや Misskey 語彙
+    # ひとつで**公開投稿になる**。
+    def test_unknown_visibility_falls_back_to_account_default
+      assert_nil(requested_visibility('bogus'))
+      assert_nil(requested_visibility('home'))
+    end
+
+    # 既知の語は通す。⚠ キー（`:public` 等）と値（プラットフォーム名）の
+    # **両方**が既知として扱われること。
+    def test_known_visibility_is_accepted
+      [:public, :unlisted, :private, :direct].each do |name|
+        assert_equal(name.to_s, requested_visibility(name.to_s))
+        platform = parser_class.visibility_name(name)
+
+        assert_equal(platform, requested_visibility(platform))
+      end
+    end
+
+    # 指定なしはそのまま既定へ倒す（未知の値と同じ扱いでよい）。
+    def test_blank_visibility_falls_back_to_account_default
+      assert_nil(requested_visibility(nil))
+      assert_nil(requested_visibility(''))
     end
 
     def test_known_visibility_is_preserved
@@ -71,6 +113,19 @@ module Mulukhiya
         'text' => '本文',
         'spoiler_text' => 'ネタバレ注意',
       }.merge(values.deep_stringify_keys))
+    end
+
+    # `Webhook` の private メソッドを send で叩く。⚠ 実 SNS には触らない
+    # （`visibility_names` も `@user_config` もパーサ・ハッシュを読むだけ）。
+    def requested_visibility(name)
+      return Webhook.allocate.send(:requested_visibility, name)
+    end
+
+    # アカウント設定の既定を `default` にした Webhook で、実際に送られる値を得る。
+    def visibility_for(requested, default: 'private')
+      webhook = Webhook.allocate
+      webhook.instance_variable_set(:@user_config, {'/webhook/visibility' => default})
+      return webhook.send(:visibility_for, requested)
     end
 
     def contract_errors(values = {})

@@ -156,12 +156,36 @@ module Mulukhiya
 
     def create_status_update_body(purpose, params)
       return create_media_update_body(params) unless purpose == 'tag'
-      return {status: params[:status], media_attributes: params[:media_attributes]}.compact
+      return create_tag_update_body(params)
     end
 
-    # ALT 編集 (#4589) で SNS へ送る body。
+    # ALT 編集 (#4589) で SNS へ送る body。復元は `restored_body` が持つ。
     #
-    # ⚠ **現状維持したい値も明示的に送り直すこと。** Mastodon の
+    # ⚠ **`media_attributes` は復元しない。**これだけが呼び出し側の指定を通す値。
+    def create_media_update_body(params)
+      return restored_body(params[:id]).merge(media_attributes: params[:media_attributes])
+    end
+
+    # `tag` purpose の body (#4625)。
+    #
+    # ⚠ **ALT 編集と同じ復元が要る。**#4589 は ALT 編集側しか直しておらず、
+    # 兄弟経路のこちらは `status` と `media_attributes` しか送っていなかったため、
+    # **添付が全部外れ・CW が消え・閲覧注意が外れ・アンケートが票ごと消えた**。
+    #
+    # ⚠ **`status` だけは呼び出し側のものを使う。**タグを付け替えた本文を送り直すのが
+    # この経路の目的なので、そこだけ復元してはいけない。
+    #
+    # ⚠ **`status` を省略できてしまう穴も塞ぐ。**`validate_status_update!` は `tag` で
+    # `media_attributes` だけでも通すので、素朴に `.compact` すると `status` が落ちて
+    # Mastodon 側で `@status.text = ''` ＝ **本文まで空になる**。省略時は復元した本文を使う。
+    def create_tag_update_body(params)
+      body = restored_body(params[:id])
+      body[:status] = params[:status] if params[:status].present?
+      body[:media_attributes] = params[:media_attributes] if params[:media_attributes].present?
+      return body
+    end
+
+    # ⚠ **現状維持したい値も明示的に送り直すための復元 (#4589)。** Mastodon の
     # `UpdateStatusService` は「送らなかったパラメータ」を現状維持ではなく
     # **「空で更新」**として扱う。コントローラの `update_options` がハッシュ
     # リテラルなので、値が nil でも `options.key?` は常に true になるため。
@@ -173,24 +197,72 @@ module Mulukhiya
     #   `ordered_media_attachment_ids = []` で **投稿から添付が全部外れる**
     # - `spoiler_text` … **CW が消える**（`/source` が返しているのに未使用だった）
     # - `sensitive` … **閲覧注意フラグが外れる**
+    # - `poll` … **アンケートが票ごと消える**（`previous_poll.destroy`）
     #
-    # `/source` は本文と CW しか返さないので、添付の順序と閲覧注意は
+    # `/source` は本文と CW しか返さないので、添付の順序と閲覧注意とアンケートは
     # `fetch_status` から取る（リクエストが 1 本増える）。
-    #
-    # ⚠ `poll` も同じ構造（空なら `previous_poll.destroy`）だが、Mastodon は
-    # 添付とアンケートを同時に持てないため ALT 編集では到達しない。`tag` purpose
-    # を実装するときは別途注意すること。
-    def create_media_update_body(params)
+    def restored_body(id)
       headers = upstream_headers
-      source = sns.fetch_status_source(params[:id], {headers:})
-      status = sns.fetch_status(params[:id], {headers:})
-      return {
-        status: source['text'],
+      source = sns.fetch_status_source(id, {headers:})
+      status = sns.fetch_status(id, {headers:})
+      body = {
+        status: source['text'].to_s,
         spoiler_text: source['spoiler_text'].to_s,
         sensitive: status['sensitive'] ? true : false,
         media_ids: Array(status['media_attachments']).map {|v| v['id']},
-        media_attributes: params[:media_attributes],
       }
+      body[:poll] = restored_poll(status)
+      return sanitize_spoiler(body).compact
+    end
+
+    # ⚠ **本文が空の投稿では `spoiler_text` を送ってはいけない (#4623)。**
+    # Mastodon の `update_immediate_attributes!` は
+    #
+    #     @status.text = @options.delete(:spoiler_text) || '' if @status.text.blank? && ...
+    #     @status.spoiler_text = @options[:spoiler_text] || '' if @options.key?(:spoiler_text)
+    #
+    # と書かれているため、**本文が空だと CW が本文へ昇格する**。しかもそのとき
+    # `@options` から `:spoiler_text` が `delete` されるので次の行が発火せず、
+    # **CW も残ったまま**になる（本文と CW に同じ文言が並ぶ）。
+    #
+    # キーごと落とせば `delete` は nil を返して本文は空のまま、`key?` が false に
+    # なるので CW も現状維持になる。⚠ `sensitive` は道連れにならない
+    # （`@options[:spoiler_text]` が nil なら `.present?` は false で、こちらが送った値が勝つ）。
+    #
+    # ⚠ **#4589 が塞いだ「CW が消える」は本文がある場合の話**なので両立する。
+    def sanitize_spoiler(body)
+      return body if body[:status].present?
+      body.delete(:spoiler_text)
+      return body
+    end
+
+    # ⚠ **アンケートは「現状の設問」ではなく編集用の形で送り直す。**status entity の
+    # `poll` は `votes_count` 等を含むが、`UpdateStatusService` が見るのは
+    # `options` / `expires_in` / `multiple` / `hide_totals`。⚠ **`expires_in` は
+    # 残り秒数**（`expires_at` そのものではない）。
+    #
+    # ⚠ **期限切れのアンケートには触らない。**残り秒数が正にならず、送ると
+    # Mastodon 側で検証に落ちる。編集で票が消えるより、アンケートの体裁が
+    # そのまま残るほうが安全。
+    def restored_poll(status)
+      return nil unless poll = status['poll']
+      return nil unless expires_in = poll_expires_in(poll)
+      return {
+        options: Array(poll['options']).map {|v| v['title']},
+        expires_in:,
+        multiple: poll['multiple'] ? true : false,
+        hide_totals: poll['hide_totals'] ? true : false,
+      }
+    end
+
+    def poll_expires_in(poll)
+      return nil if poll['expired']
+      return nil unless poll['expires_at'].present?
+      seconds = (Time.parse(poll['expires_at']) - Time.now).to_i
+      return nil unless seconds.positive?
+      return seconds
+    rescue ArgumentError, TypeError
+      return nil
     end
 
     # モロヘイヤ自身が上流 Mastodon を叩くときのヘッダ (#4621)。
