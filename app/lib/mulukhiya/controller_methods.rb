@@ -1,5 +1,13 @@
 module Mulukhiya
   module ControllerMethods
+    # ALT 編集が通るために必要な ginseng-fediverse の最低版 (#4636)。
+    #
+    # 1.8.29 までは `update_status` だけが `create_headers` を通しておらず、
+    # モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らない。nginx の
+    # `$status_put_backend` map のキーが `PUT::` に落ちて **405** になる (#4621)。
+    # pooza/ginseng-fediverse#254 で是正され 1.8.30 で入った。
+    MEDIA_UPDATE_FEDIVERSE_VERSION = Gem::Version.new('1.8.30')
+
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -19,6 +27,26 @@ module Mulukhiya
 
       def media_catalog?
         return config["/#{name}/data/media_catalog"] == true rescue false
+      end
+
+      # ALT 編集 (`PUT /api/:version/statuses/:id` の `media_update` purpose) が
+      # **この構成で実際に通るか** (#4636)。capsicum の導線出し分けに使う
+      # (pooza/capsicum#999)。
+      #
+      # ⚠ **モロヘイヤの版番号では判定できない。**通るかどうかは刺している
+      # ginseng-fediverse の版で決まるので、同じ 5.34.0 でもピン次第で動いたり
+      # 動かなかったりする。capsicum 側からは観測できない。
+      #
+      # ⚠ **「分からない」は false へ倒す。**壊れる側の代償が
+      # 「投稿から添付が全部外れ CW も消える」(#4589) なので、判定できない構成では
+      # 導線を出させない。
+      def media_update?
+        return false unless config["/#{name}/capabilities/media_update"] == true
+        version = Gem.loaded_specs['ginseng-fediverse']&.version
+        return false unless version
+        return version >= MEDIA_UPDATE_FEDIVERSE_VERSION
+      rescue Ginseng::ConfigError
+        return false
       end
 
       def favorite_tags?

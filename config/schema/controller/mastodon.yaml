@@ -18,6 +18,8 @@ properties:
     type: object
   capabilities:
     properties:
+      media_update:
+        type: boolean
       repost:
         type: boolean
       streaming:
