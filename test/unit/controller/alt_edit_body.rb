@@ -14,28 +14,37 @@ module Mulukhiya
   class AltEditBodyTest < TestCase
     # `fetch_status_source` / `fetch_status` だけ返す SNS のダブル。
     class SnsDouble
+      # 内部 fetch に渡されたヘッダ。#4621 の検証に使う。
+      attr_reader :source_headers, :status_headers
+
       def initialize(source, status)
         @source = source
         @status = status
       end
 
-      def fetch_status_source(_id, _params = {})
+      def fetch_status_source(_id, params = {})
+        @source_headers = params[:headers]
         return @source
       end
 
-      def fetch_status(_id, _params = {})
+      def fetch_status(_id, params = {})
+        @status_headers = params[:headers]
         return @status
       end
     end
 
-    def build_body(source: nil, status: nil, params: nil)
+    def create_controller(source: nil, status: nil, headers: nil)
       controller = MastodonController.new!
-      controller.instance_variable_set(:@headers, {})
+      controller.instance_variable_set(:@headers, headers || {})
       controller.instance_variable_set(:@sns, SnsDouble.new(
         source || {'text' => '本文', 'spoiler_text' => ''},
         status || {'sensitive' => false, 'media_attachments' => [{'id' => '111'}]},
       ))
-      return controller.create_media_update_body(
+      return controller
+    end
+
+    def build_body(source: nil, status: nil, params: nil, headers: nil)
+      return create_controller(source:, status:, headers:).create_media_update_body(
         params || {id: '1', media_attributes: [{id: '111', description: 'ゴメちゃん'}]},
       )
     end
@@ -100,6 +109,46 @@ module Mulukhiya
 
       # ⚠ refute だけだと nil でも通ってしまうので、型で false を名指しする。
       assert_instance_of(FalseClass, body[:sensitive])
+    end
+
+    # ⚠ **内部 fetch にクライアントの `X-Mulukhiya-Purpose` を持ち込まない (#4621)。**
+    # Purpose は nginx への名乗りであって上流に意味は無く、#4474 以前の
+    # `if ($http_x_mulukhiya_purpose != '')` が残った vhost では内部 fetch が
+    # モロヘイヤへ送り返されてループする（ステージングで実際に起きた）。
+    def test_purpose_is_not_carried_into_internal_fetch
+      controller = create_controller(headers: {
+        'Authorization' => 'Bearer ゴメちゃん',
+        'X-Mulukhiya-Purpose' => 'media_update',
+      })
+      controller.create_media_update_body({id: '1', media_attributes: [{id: '111'}]})
+      sns = controller.instance_variable_get(:@sns)
+
+      refute(sns.source_headers.key?('X-Mulukhiya-Purpose'))
+      refute(sns.status_headers.key?('X-Mulukhiya-Purpose'))
+    end
+
+    # ⚠ **Authorization まで落とさない。** 内部 fetch は利用者のトークンで
+    # 読みに行くので、これが欠けると自分の投稿すら 404 になる。
+    def test_authorization_survives_in_internal_fetch
+      controller = create_controller(headers: {
+        'Authorization' => 'Bearer ゴメちゃん',
+        'X-Mulukhiya-Purpose' => 'media_update',
+      })
+      controller.create_media_update_body({id: '1', media_attributes: [{id: '111'}]})
+      sns = controller.instance_variable_get(:@sns)
+
+      assert_equal('Bearer ゴメちゃん', sns.source_headers['Authorization'])
+      assert_equal('Bearer ゴメちゃん', sns.status_headers['Authorization'])
+    end
+
+    # ⚠ **呼び元の @headers を壊さない。**`token` が同じハッシュを読むので、
+    # 破壊的に消すと以後の照合が変わる。
+    def test_original_headers_are_not_mutated
+      headers = {'X-Mulukhiya-Purpose' => 'media_update'}
+      controller = create_controller(headers:)
+      controller.create_media_update_body({id: '1', media_attributes: [{id: '111'}]})
+
+      assert_equal('media_update', headers['X-Mulukhiya-Purpose'])
     end
   end
 end
