@@ -53,5 +53,6 @@ ORDER BY
   note_file.note_id DESC
 LIMIT <%= params[:limit] %>
 <% unless params[:cursor] %>
-  OFFSET <%= params[:page] ? ((params[:page] - 1) * params[:limit]) : 0 %>
+  <%# ページ幅は呼び出し側が計算して渡す。has_next 用の +1 を混ぜない (#4632) -%>
+  OFFSET <%= params[:offset].to_i %>
 <% end %>
