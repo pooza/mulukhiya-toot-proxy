@@ -951,9 +951,15 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   - ⚠ **Content-Type の明示が要る。**ginseng-core の `create_body` は Content-Type が
     `application/json` のときだけ `to_json` する。無指定だと HTTParty が Hash を form-urlencode し、
     そこでも数字の添字（`HashConversions#to_params`）になって**同じ 500 に戻る**
-  - モロヘイヤ側は **PR #4622**（内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を出さない）。
-    ⚠ **500 そのものは #4622 では直らない。**#253 の着地後に
-    `bundle update ginseng-fediverse` を同ブランチへ積む
+  - **#253 は同日 03:26Z に着地し v1.8.29 としてリリース済み。PR #4622 で完結した**
+    （`bundle update ginseng-fediverse` ＋ 内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を
+    出さない ＋ **gem 境界の契約テスト**）
+  - ⚠ **境界テストを別に置いた**（`test/unit/service/mastodon_status_update_boundary.rb`）。
+    `alt_edit_body` は**モロヘイヤが組んだ Hash** しか見ないので gem 側が形を崩しても捕まえられない。
+    #4589 / #4594 と同じ「`bundle update` で黙って戻る」類。**旧 revision へ戻すと 4 件とも落ちる**
+    ことを確認済み
+  - ⚠ **ステージング（dev24）での実地確認が未了。**capsicum と同じ PUT を投げて 200 と ALT 反映を
+    見るところまでがクローズ条件
 - **Codex** は open #4604 ＋直近マージ 8 本を横断して未消化ゼロ。**PR 本体コメントの申し送りも無し**。
   **Dependabot** 0 件
 - **Sentry** 新規 1 件 **MULUKHIYA-TOOT-PROXY-2M**（`AnnictPollingWorker` の
@@ -974,8 +980,21 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
   （#253）が着地したら取り込む**ので、そのときに CI 分も一緒に乗る
 - **ginseng-style** — docs 中心（`inherit_gem` の Include / Exclude が置換になる件・Codex 走査の
   ワンライナー是正・ブランチ規約）。lint の挙動しか変わらない → **② 次のマイルストーンで**
-- **ginseng-core** — `cert:*` の CA ストア検証・`run_stop` の pid・pid 読み取り競合・`cacert.pem` の
-  週次 PR 化。**#4617 の範囲そのもの**なので、そちらで受ける → **② 次リリース以降**
+- **ginseng-core** — 当初は「`cert:*` の CA ストア検証・`run_stop` の pid・`cacert.pem` の週次 PR 化＝
+  **#4617 の範囲**なので ② 次リリース以降」と判定した。⚠ **その後 v1.19.0（同日 03:49Z）が出て
+  🔴 #527 が乗ったので ① へ切り替えた**（2026-08-22 ユーザー判断・PR #4622 に `57b73dc8` で取り込み済み）
+  - 🔴 **#527 リダイレクト追従で別オリジンへ資格情報を渡していた** — `Authorization` / `Cookie` が
+    リダイレクト先へそのまま送られ、初段の query / body も撃ち直されていた。
+    ⚠ **`host_validator` では塞げない**（「公開ホストか」しか見ないので、**リダイレクト先が公開ホスト
+    でありさえすれば通る**）。#4576 / #4524 で固めた SSRF 面と同じ層
+  - ⚠ **モロヘイヤでの実害は小さい**（資格情報を付けて叩く先は自前の Mastodon / Misskey で、
+    辞書・番組表・メディアの外部取得は `Authorization` を持たない）。**急ぐ理由としては使わない**
+    （[[feedback_no-false-urgency]]）。取り込んだのは「`bundle update` 一発で、同じブランチで
+    テストを回している最中だった」から
+  - ⚠ **cert タスクの受け取り（#4617）は含めていない。**`Ginseng.load_tasks` と
+    `cert/cacert.pem` をコミットするかの判断が要るため、次リリース以降のまま
+  - ⚠ **v1.15.26 以降タグが打たれていなかった**ので v1.19.0 は 20 件まとめての回。
+    **「リリースが出た」＝「差分が小さい」ではない**
 
 
 ### マイルストーン未割当
