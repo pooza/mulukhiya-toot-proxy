@@ -1178,10 +1178,18 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
 - **「番組表だけでは拙速」の判断が正しかった**。追加した 4 件のうち #4535 は pre-existing の SSRF で、#4523 の掃討で取り残していた最後の 1 本だった。レビュー由来の受け皿 Issue は溜めると腐るので、主軸が軽い回の埋め草として消化するのが噛み合う
 - **⚠ zugoga の syslog に `base_uri undefined` が 13 時間で 12,720 行出ている**（本リリースとは無関係の既存事象）。Sentry には上がっていない（`e.log` 止まり）ので、Sentry の棚卸し（#4543）だけでは拾えない。syslog 側のノイズ棚卸しは別途必要
 
-## 次期マイルストーン: 5.35.0
+## 開発中: 5.35.0
 
 **主軸は #4621（ALT 編集の完遂）。**GitHub マイルストーン作成済み（#633）。
-⚠ **バージョンバンプはまだ**（5.34.0 が進行中のため。着手時に実施する＝[[feedback_bump-version-first]]）。
+**バージョンバンプ済み**（2026-08-23・`ecaab87b`）。
+
+スコープは 3 件:
+
+| Issue | 状態 | 主眼 |
+| --- | --- | --- |
+| #4621 (S) | ⏳ pooza/ginseng-fediverse#254 待ち | ALT 編集の PUT が Mastodon で 405（主軸） |
+| #4636 | ✅ PR #4637（2026-08-23） | `features.media_update` を `/about` に足す |
+| #4584 (M) | 未着手 | harness で `RemoteTagHandlerTest` の キュアスタ! タグが reject される |
 
 - **#4621 bug: ALT 編集の PUT が Mastodon で 500 → 405（主軸・size:S・2026-08-22 に 5.34.0 から繰越）** —
   capsicum#121 の前提。**同じ経路で 2 回続けて別の欠陥を踏んだ**もので、5.34.0 では**上流 PUT が
@@ -1209,6 +1217,41 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
     `Doorkeeper::AccessToken` を発行 → 使用後 revoke）
   - **関連して起票**: pooza/chubo2#188（ステージング 3 台の nginx 断片が本番と乖離。
     ⚠ **dev26 は #4474 修正前のままで外部 PUT が常に 405**・3 台とも map が `localhost`）
+
+
+### 着地済み: #4636 `features.media_update` を `/about` に足す（2026-08-23・PR #4637）
+
+capsicum が ALT 編集の導線を出してよいかの判定フラグ。**モロヘイヤの版番号では判定できない**
+（同じ `5.34.0` でも刺している ginseng-fediverse のピン次第で動いたり動かなかったりし、
+capsicum 側からは観測できない）ため、**gem の版を実行時に見るゲート**にした。
+
+- `ControllerMethods::MEDIA_UPDATE_FEDIVERSE_VERSION`（`1.8.30`）と
+  `Gem.loaded_specs['ginseng-fediverse'].version` を比較する。定数化＋
+  「**実際にブロックする**」正テスト（1.8.29 → false）は [[feedback_fail-open-guard-footgun]] の形
+- ⚠ **Misskey は常に false。**ALT 編集の経路（`PUT /api/:version/statuses/:id`）は
+  `MastodonController` にしか無いので capability を置いていない
+- ⚠ **「分からない」は false へ倒す。**フラグ欠落・古い gem・gem 未ロードのいずれも false。
+  壊れる側の代償が「投稿から添付が全部外れ CW も消える」（#4589）ため
+- ⚠ **現行ピン（1.8.29）では false のまま出る。**#254 が着地して
+  `bundle update ginseng-fediverse` した時点で true へ変わる＝ **#4621 のクローズと同時**。
+  リリース前に値を確認すること（false のまま出荷すると capsicum は導線を出さない）
+
+### 2026-08-23 セッション同期の記録
+
+- **Codex** は open PR 0 本／直近マージ 8 本を横断。**PR #4622 の P1 が未消化で残っていた**ので処理した
+  （👎 ＋ 返信）。指摘は**初回コミット（`a70978df`）時点のスナップショット**を見たもので、
+  同じ PR の `6c008232` で `bundle update ginseng-fediverse`（1.8.29）が入っており既に解消済み。
+  ⚠ **「マージ済み PR だから消化済み」ではない。**Codex はレビュー時点のツリーしか見ないので、
+  **同一 PR 内の後続コミットで解決した指摘が未返信のまま残る**
+- **Dependabot** 0 件。**chubo2** は差分なし（open Issue に #192〜#194 が増えているが chubo2 セッションの持ち物）
+- **ginseng-\* のピンのずれ**: **8 本すべて「同一」**。前回（08-22）に読んだうえで全部乗せた直後なので想定どおり
+- **Sentry** 新規 2 件 **-2N / -2P**（`RedisClient::CannotConnectError`・`redis://localhost:6379/3`・
+  2026-08-22T09:49 に **-J** と同時発火）をトリアージ。⚠ `server_name=instance-20220704-2044` /
+  `release=5.34.0` ＝ **姉妹サーバー管理人（Oracle 無料枠）のモロヘイヤ**で pooza 本番 4 台ではない。
+  **-2M（08-21・同一ホスト・5.31.0）と同型**の Redis 再起動パターンなので #4543 の群へ合流させた
+  （コメント記録済み）。⚠ **向こうは既に 5.34.0 へ上がっている**
+- **§6-2 chubo2 Issue 棚卸し**は最終 2026-07-31 で 30 日未経過のためスキップ（次回は 2026-08-30 以降）。
+  **§8 harness の upstream チェック**は `last_checked` 2026-08-21 で 2 日のためスキップ（次回は 2026-08-25 以降）
 
 
 ## 投稿レイテンシ調査の記録（#4464・2026-08-02 完了）
