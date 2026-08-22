@@ -1195,7 +1195,7 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
 | --- | --- | --- |
 | #4621 (S) | ⏳ pooza/ginseng-fediverse#254 待ち | ALT 編集の PUT が Mastodon で 405（主軸） |
 | #4636 | ✅ PR #4637（2026-08-23 マージ） | `features.media_update` を `/about` に足す |
-| #4584 (M) | 未着手 | harness で `RemoteTagHandlerTest` の キュアスタ! タグが reject される |
+| #4584 (M) | ✅ **再現しなくなった**（2026-08-23・クローズ候補） | harness で `RemoteTagHandlerTest` の キュアスタ! タグが reject される |
 
 08-23 に合意して積んだ分（すべて size:S）:
 
@@ -1208,7 +1208,7 @@ shallu / gomander / sweep は 5.32.0 のままで、**本番のバージョン�
 | #4631 | 未着手 | ALT 編集の内部 fetch 失敗が 404 に潰れ alert 抑止にも乗る |
 | #4603 | 未着手 | 存在しない digest への webhook POST が alert される（#4629 と同型・**5.33.0 の受け皿**） |
 | #4634 | 未着手 | `api.md` の追随漏れと廃止語の残存 5 件 |
-| #4619 | 🚧 着手中 | catalog の `only_person` subset 検証が偽陽性になりうる（**media_catalog track**） |
+| #4619 | ✅ PR #4640（2026-08-23 マージ） | catalog の `only_person` subset 検証が偽陽性になりうる（**media_catalog track**） |
 
 ⚠ **#4628（M・タグ辞書の観測性）と #4635（M・構造改善 8 件）は入れていない。**小粒に絞る判断。
 
@@ -1268,6 +1268,37 @@ capsicum 側からは観測できない）ため、**gem の版を実行時に�
   確認してから（本番 3 台は 2026-08-05 に是正済み・ステージング 3 台は未是正）
 - ⚠ **デプロイ手順に ② が要る。**Mastodon 3 台（shallu / zugoga / gomander）が対象。
   vulcan は Misskey なので対象外。false のまま出荷すると capsicum は導線を出さない
+
+### 着地済み: #4619 `only_person` は「絞り込みが効いていること」を直接見る（2026-08-23・PR #4640）
+
+subset 検証は「絞り込み無しの**最新 10 件**」を母集合として扱っていた。最新 10 件に bot / service が
+1 件でも混ざると only_person 側はより古い Person で埋めるので、**SQL が正しくても成り立たない**。
+主眼を「返ってきたアカウントが全部 Person か」の直接検証へ移した。
+
+- ⚠ **「テストが新しい欠陥を捕まえるか」を harness で実証した。**`actor_type = 'Service'` の
+  アカウント＋添付を DB に仕込み、`only_person` の条件を無効化すると新テストは
+  **`botty is not a person`** で落ちる。**このとき subset 側は落ちない**＝旧テストの取りこぼしを
+  再現できた。⚠ **仕込みは `jsonb_populate_record(NULL::table, to_jsonb(row) || overrides)`**
+  でテンプレート行から複製すると速い（Mastodon の accounts / statuses / media_attachments は必須列が多い）
+- ⚠ **`docker exec` に `-i` が要る。**付け忘れると psql に heredoc が渡らず、
+  **エラーも出さずに何も実行されない**（「実行したのに状態が変わらない」で 1 往復溶かした）
+- **Codex P1 / P2 が 2 件とも実バグ**: Misskey の `user` テーブルに `userHost` は無い
+  （ローカル判定は `user.host IS NULL`。`userHost` を持つのは `note` / `drive_file` 側だけ）。
+  下限比較は「返る `:id` が並び順のキー」に依存するので **Mastodon 限定**
+- ⚠ **CI の omission 上限を実測へ更新した**（mastodon 321→322 / misskey 310→311）。
+  **テストを増やしたら必ず超える**ので、増やす PR では同時に上げる
+
+### #4584 は再現しなくなった（2026-08-23・クローズ候補）
+
+**Mastodon / Misskey の両ハーネスで `RemoteTagHandlerTest` を 3 回連続実行し、6/6 緑。**
+⚠ **キャッシュを温めた状態で見た**（本 Issue は「Mastodon はキャッシュが空の 1 回だけ通り、
+温まると落ちる」型だったため）。Misskey は当時 3/3 失敗だったので明確に反転している。
+harness フル実走（Mastodon）も **1192 tests / 0 failures / 0 errors**。
+
+- 効いたのは 5.34.0 の **#4583**（辞書キャッシュに署名と TTL）か **#4573**（リモート辞書の
+  200-with-HTML）と見られるが、⚠ **切り分けていない**（同じリリースで両方入った）。
+  `reject` の 3 条件のうちどれが `キュアスタ!` を落としていたかも未特定
+- ⚠ [[project_harness-zero-error-goal]] の「両系エラー 0」は**この時点で達成**している
 
 ### media_catalog track の現在地（2026-08-23 更新）
 
