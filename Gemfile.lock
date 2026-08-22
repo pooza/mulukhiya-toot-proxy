@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 779e8958e93de066e761037b758b055607429494
+  revision: 4a029e9c4d4c14f82c86c3836db830c3144a0e98
   branch: main
   specs:
     ginseng-core (1.19.0)
