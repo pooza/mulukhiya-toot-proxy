@@ -49,6 +49,13 @@ module Mulukhiya
       )
     end
 
+    def build_tag_body(source: nil, status: nil, params: nil)
+      return create_controller(source:, status:).create_status_update_body(
+        'tag',
+        params || {id: '1', status: '本文 #新タグ'},
+      )
+    end
+
     def test_media_attributes_are_passed_through
       body = build_body
 
@@ -109,6 +116,92 @@ module Mulukhiya
 
       # ⚠ refute だけだと nil でも通ってしまうので、型で false を名指しする。
       assert_instance_of(FalseClass, body[:sensitive])
+    end
+
+    # ⚠⚠ **本文が空の投稿では `spoiler_text` を送らない (#4623)。**
+    # Mastodon の `update_immediate_attributes!` は本文が blank のとき
+    # `@options.delete(:spoiler_text)` を**本文へ昇格**させる。しかも `delete` 済みなので
+    # 次の行の `key?(:spoiler_text)` が false になり **CW も残る**＝本文と CW に
+    # 同じ文言が並ぶ。キーごと落とせば本文は空のまま・CW は現状維持になる。
+    def test_spoiler_text_is_omitted_when_status_is_blank
+      body = build_body(source: {'text' => '', 'spoiler_text' => 'ネタバレ'})
+
+      # ⚠ nil ではなく**キーが無い**こと。nil でも gem の compact で落ちるが、
+      # 「送らない」を型で示す。
+      refute(body.key?(:spoiler_text))
+      assert_equal('', body[:status])
+    end
+
+    # ⚠ **本文があるときは従来どおり送る (#4589)。**落とすと CW が消える。
+    def test_spoiler_text_is_sent_when_status_is_present
+      body = build_body(source: {'text' => '本文', 'spoiler_text' => 'ネタバレ'})
+
+      assert_equal('ネタバレ', body[:spoiler_text])
+    end
+
+    # ⚠⚠ **アンケートを持つ投稿は編集を断る (#4625)。**Mastodon は `poll` を
+    # 送らなければ **票ごと destroy** する一方、送って復元することもできない
+    # （`hide_totals` を REST が返さない・残り 5 分未満と期限切れは検証に落ちる）。
+    # 「隠した票が見える」「票が消える」より断るほうが安全。
+    def test_status_with_poll_is_refused
+      assert_raise(Ginseng::ValidateError) do
+        build_body(status: {
+          'sensitive' => false,
+          'media_attachments' => [],
+          'poll' => {'expired' => false, 'options' => [{'title' => 'キュア'}]},
+        })
+      end
+    end
+
+    def test_tag_body_refuses_status_with_poll
+      assert_raise(Ginseng::ValidateError) do
+        build_tag_body(status: {
+          'sensitive' => false,
+          'media_attachments' => [],
+          'poll' => {'expired' => true, 'options' => []},
+        })
+      end
+    end
+
+    # アンケートが無ければ `poll` は送らない（送ると上流が作りに行く）。
+    def test_poll_is_absent_without_poll
+      refute(build_body.key?(:poll))
+    end
+
+    # ⚠⚠ **`tag` purpose も同じ復元を通す (#4625)。**#4589 は ALT 編集側しか
+    # 直しておらず、こちらは `status` と `media_attributes` しか送っていなかったため
+    # **添付が全部外れ・CW が消え・閲覧注意が外れ**ていた。
+    def test_tag_body_restores_everything
+      body = build_tag_body(
+        source: {'text' => 'もとの本文', 'spoiler_text' => 'ネタバレ'},
+        status: {
+          'sensitive' => true,
+          'media_attachments' => [{'id' => '111'}, {'id' => '222'}],
+        },
+      )
+
+      assert_equal(['111', '222'], body[:media_ids])
+      assert_equal('ネタバレ', body[:spoiler_text])
+      assert(body[:sensitive])
+    end
+
+    # ⚠ **`status` だけは呼び出し側のものを使う。**タグを付け替えた本文を
+    # 送り直すのがこの経路の目的なので、そこを復元してはいけない。
+    def test_tag_body_uses_given_status
+      body = build_tag_body(source: {'text' => 'もとの本文', 'spoiler_text' => ''})
+
+      assert_equal('本文 #新タグ', body[:status])
+    end
+
+    # ⚠ **`status` 省略時は復元した本文を使う。**素朴に compact すると
+    # `status` が落ち、Mastodon 側で `@status.text = ''` ＝ **本文まで空になる**。
+    def test_tag_body_falls_back_to_restored_status
+      body = build_tag_body(
+        source: {'text' => 'もとの本文', 'spoiler_text' => ''},
+        params: {id: '1', media_attributes: [{id: '111'}]},
+      )
+
+      assert_equal('もとの本文', body[:status])
     end
 
     # ⚠ **内部 fetch にクライアントの `X-Mulukhiya-Purpose` を持ち込まない (#4621)。**

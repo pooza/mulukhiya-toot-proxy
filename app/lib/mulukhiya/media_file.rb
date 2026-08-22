@@ -188,8 +188,31 @@ module Mulukhiya
       body = HTTP.new.get(uri, request_options(params)).body.to_s
       raise Ginseng::GatewayError, "Too large content '#{uri}'" if
         body.bytesize > download_max_bytes
-      File.write(path, body)
+      write_atomic(path, body)
       return new(path).file
+    end
+
+    # ⚠ **宛先へ直接書かない (#4626)。**`path` は URL の sha256 由来の**固定名**なので、
+    # 同じ URL を同時に取りに行くと `File.write` の O_TRUNC が**読み出し中のファイルを
+    # 0 バイトへ切り詰める**。`WebhookImageHandler` は `Parallel.each(in_threads:)` で
+    # 同一プロセスの複数スレッドから走り、`Handler#upload` 経由の ItunesImage /
+    # SpotifyImage / YouTubeImage も実況中に同じサムネイル URL を同時に掴む。
+    #
+    # 上流への送信は gem の `Ginseng::HTTP#upload` が `File.open(file, 'rb')` で
+    # **ストリームしながら読む**ので、その窓は画像サイズによっては秒オーダーになる。
+    # 切り詰められると**壊れた本文をアップロードする**か、`MediaFile#type` が
+    # 0 バイトを見て `file` が nil を返し、**添付が黙って消えた投稿**になる。
+    #
+    # ⚠ **rename はアトミック。**先に開いた読み手は古い inode を最後まで読み切り、
+    # 後から開く者は完全な新ファイルを見るので、途中の状態は誰にも観測されない。
+    # 形は `ProgramFetcher#write_yaml` と同じ。
+    #
+    # ⚠ **一時ファイル名をドット始まりにしない。**`MediaFile.all` の掃除は `*` glob
+    # なので、ドット始まりだとクラッシュ時の残骸が永久に残る。
+    def self.write_atomic(path, body)
+      tmp = "#{path}.#{Process.pid}.#{Thread.current.object_id}"
+      File.write(tmp, body)
+      return File.rename(tmp, path)
     end
 
     # HTTP 呼び出しごとに**作り直す**オプション。

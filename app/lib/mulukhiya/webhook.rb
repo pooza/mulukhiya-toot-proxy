@@ -23,6 +23,38 @@ module Mulukhiya
       return parser_class.visibility_name(:public)
     end
 
+    # 実際に上流へ送る公開範囲。⚠ **`post` から式を持ち出してここに置いてある。**
+    # 呼び出し側に式を残すと、テストが `requested_visibility` 単体しか見られず
+    # **配線を戻されても緑のまま**になる（#4583 / #4619 と同型）。
+    def visibility_for(requested)
+      return parser_class.visibility_name(requested_visibility(requested) || visibility)
+    end
+
+    # リクエストごとに指定された公開範囲 (#4599)。未知の語なら nil を返し、
+    # `visibility_for` がアカウント設定の既定へ倒す (#4624)。
+    #
+    # ⚠ **素通ししてはいけない。**`parser_class.visibility_name` は未知の名前を
+    # **`public` へ丸める**ので、`private`（フォロワー限定）に設定した webhook が
+    # **綴り誤りや Misskey 語彙（`home` 等）ひとつで公開投稿になる**。
+    # fail-open の向きが最も公開側なので、既知の語かどうかをここで見る。
+    #
+    # ⚠ **契約 (`slack_webhook_contract.rb`) では絞らない。**Mastodon と Misskey で
+    # 語彙が違うため、パーサの `visibility_names` を正本にして二重管理を避ける。
+    # ⚠ このハッシュは**キー（`:public` 等）と値（プラットフォーム名）の両方**を持つ。
+    #
+    # ⚠ **黙って倒さない。**送信側は綴り誤りに気付けないので、必ずログに残す。
+    def requested_visibility(name)
+      return nil if name.blank?
+      names = parser_class.visibility_names
+      return name if names.key?(name.to_sym)
+      return name if names.values.member?(name.to_s)
+      logger.error(error: 'unknown visibility', visibility: name.to_s)
+      return nil
+    rescue => e
+      e.log
+      return nil
+    end
+
     # digest / uri を取れる状態か。トークンを持たないアカウントでも
     # Account#webhook は Webhook を返すので、呼び出し側はこれで判定する (#4487)。
     def available?
@@ -50,7 +82,7 @@ module Mulukhiya
     # ここでは受け取ったものをそのまま gem へ渡すだけ。
     def post(payload, params = {})
       body = payload.to_h
-      body[visibility_field] = parser_class.visibility_name(body[visibility_field] || visibility)
+      body[visibility_field] = visibility_for(body[visibility_field])
       reporter = Reporter.new
       Event.new(:pre_webhook, {reporter:, sns:}).dispatch(body)
       reporter.response = sns.post(body, params)
