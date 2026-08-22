@@ -184,8 +184,13 @@ module Mulukhiya
     # Person だからにすぎない＝ #4583 と同じ「信用できない緑」）。
     #
     # baseline が覆う範囲（`min` 以上）に限れば「絞り込みは減らすだけ」は厳密に成り立つ。
+    #
+    # ⚠ **Mastodon 限定。**この下限比較は「返る `:id` が並び順のキーであること」に
+    # 依存する。Misskey は `note.id` で並べて `drive_file.id` を返すので、
+    # `min` が窓の境界を意味しない。
     def test_catalog_only_person_is_subset_within_baseline_range
       return unless @attachment
+      omit('Misskey は :id が並び順のキーではない') if Environment.misskey_type?
       all_ids = attachment_class.catalog(limit: 10, skip_cache: true)[:items].map {|v| v[:id]}
       omit('baseline が空（media 未 seed・chubo2#64）') if all_ids.empty?
       person_ids = attachment_class.catalog(limit: 10, only_person: 1, skip_cache: true)
@@ -197,12 +202,13 @@ module Mulukhiya
     private
 
     # 返ってきたアカウントが Person 扱いか。
-    # ⚠ **判定列は SNS で違う**（Mastodon は `accounts.actor_type`・
-    # Misskey は `user."isBot"`）。catalog はローカルアカウントしか返さないので、
-    # username は `domain` / `userHost` が null の側で一意に引ける。
+    # ⚠ **判定列も、ローカル判定の列も SNS で違う。**Mastodon は
+    # `accounts.actor_type` / `accounts.domain`、Misskey は `user."isBot"` /
+    # `user.host`（⚠ **`userHost` を持つのは `note` / `drive_file` 側だけ**）。
+    # catalog はローカルアカウントしか返さないので、username で一意に引ける。
     def person_account?(username)
       if Environment.misskey_type?
-        row = attachment_class.db[:user].where(username:, userHost: nil).first
+        row = attachment_class.db[:user].where(username:, host: nil).first
         return row.present? && row[:isBot] == false
       end
       row = attachment_class.db[:accounts].where(username:, domain: nil).first
