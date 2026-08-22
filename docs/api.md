@@ -197,6 +197,15 @@ SNS における「発言の責任」の観点から、本文の自由な編集�
 - Purpose が `media_update`: クライアント（capsicum 等）からの ALT 編集リクエスト。nginx が Purpose ヘッダの有無でルーティングするため、クライアントはこの値を指定する
 - Purpose が `tag`: モロヘイヤ自身がハッシュタグを書き換える際に使用（将来の #3877 対応）
 - 不明な Purpose: 422 Unprocessable Entity を返す
+- ⚠ **アンケートを持つ投稿は編集できない**（5.34.0〜、#4625）。`status with poll is not editable` の
+  422 を返す。Mastodon は `poll` を送らないと**票ごと destroy** する一方、**送って復元することも
+  できない**（`hide_totals` を REST が返さない／残り 5 分未満と期限切れは上流の検証に落ちる）ため、
+  「隠した票が見える」「票が消える」より断るほうを採った。到達するのは `tag` だけ
+  （Mastodon は添付とアンケートを同時に持てないので ALT 編集には来ない）
+- ⚠ **現状維持したい値は上流へ送り直している**（#4589 / #4625）。Mastodon は「送らなかった
+  パラメータ」を現状維持ではなく**空で更新**として扱うため、`media_ids` / `spoiler_text` /
+  `sensitive` をモロヘイヤが復元して送る。⚠ **本文が空の投稿では `spoiler_text` を送らない**
+  （送ると上流が CW を本文へ昇格させる＝#4623）
 
 > **nginx 前段がある構成では「Purpose なし」は外部から使えない（#4474）。**
 > `$status_put_backend` map が Purpose の無い外部 PUT を `reject` に落として **405** を返すため、

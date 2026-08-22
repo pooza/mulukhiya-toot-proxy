@@ -139,38 +139,31 @@ module Mulukhiya
       assert_equal('ネタバレ', body[:spoiler_text])
     end
 
-    # ⚠ **アンケートを復元する (#4625)。**送らないと `previous_poll.destroy` で
-    # 票ごと消える。⚠ `expires_in` は**残り秒数**であって `expires_at` ではない。
-    def test_poll_is_restored
-      body = build_body(status: {
-        'sensitive' => false,
-        'media_attachments' => [],
-        'poll' => {
-          'expired' => false,
-          'expires_at' => (Time.now + 3600).iso8601,
-          'multiple' => true,
-          'hide_totals' => false,
-          'options' => [{'title' => 'キュア'}, {'title' => 'スタ'}],
-        },
-      })
-
-      assert_equal(['キュア', 'スタ'], body[:poll][:options])
-      assert(body[:poll][:multiple])
-      assert_predicate(body[:poll][:expires_in], :positive?)
+    # ⚠⚠ **アンケートを持つ投稿は編集を断る (#4625)。**Mastodon は `poll` を
+    # 送らなければ **票ごと destroy** する一方、送って復元することもできない
+    # （`hide_totals` を REST が返さない・残り 5 分未満と期限切れは検証に落ちる）。
+    # 「隠した票が見える」「票が消える」より断るほうが安全。
+    def test_status_with_poll_is_refused
+      assert_raise(Ginseng::ValidateError) do
+        build_body(status: {
+          'sensitive' => false,
+          'media_attachments' => [],
+          'poll' => {'expired' => false, 'options' => [{'title' => 'キュア'}]},
+        })
+      end
     end
 
-    # ⚠ **期限切れには触らない。**残り秒数が正にならず、送ると上流の検証に落ちる。
-    # 編集で票が消えるより、体裁が残るほうが安全。
-    def test_expired_poll_is_not_sent
-      body = build_body(status: {
-        'sensitive' => false,
-        'media_attachments' => [],
-        'poll' => {'expired' => true, 'expires_at' => (Time.now - 60).iso8601, 'options' => []},
-      })
-
-      refute(body.key?(:poll))
+    def test_tag_body_refuses_status_with_poll
+      assert_raise(Ginseng::ValidateError) do
+        build_tag_body(status: {
+          'sensitive' => false,
+          'media_attachments' => [],
+          'poll' => {'expired' => true, 'options' => []},
+        })
+      end
     end
 
+    # アンケートが無ければ `poll` は送らない（送ると上流が作りに行く）。
     def test_poll_is_absent_without_poll
       refute(build_body.key?(:poll))
     end

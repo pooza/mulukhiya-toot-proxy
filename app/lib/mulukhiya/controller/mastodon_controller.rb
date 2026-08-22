@@ -205,14 +205,37 @@ module Mulukhiya
       headers = upstream_headers
       source = sns.fetch_status_source(id, {headers:})
       status = sns.fetch_status(id, {headers:})
-      body = {
+      reject_poll!(status)
+      return sanitize_spoiler({
         status: source['text'].to_s,
         spoiler_text: source['spoiler_text'].to_s,
         sensitive: status['sensitive'] ? true : false,
         media_ids: Array(status['media_attachments']).map {|v| v['id']},
-      }
-      body[:poll] = restored_poll(status)
-      return sanitize_spoiler(body).compact
+      })
+    end
+
+    # ⚠⚠ **アンケートを持つ投稿は編集させない (#4625)。**
+    #
+    # Mastodon は `poll` を送らなければ `previous_poll.destroy` で**票ごと消す**一方、
+    # **送って復元することもできない**:
+    #
+    # - ⚠ **`hide_totals` を REST が返さない。**`REST::PollSerializer` の属性に無く、
+    #   上流は `poll.hide_totals = @options[:poll][:hide_totals] || false` と書くので、
+    #   復元すると**作者が隠した途中経過が公開される**
+    # - ⚠ **残り 5 分未満は復元できない。**`PollExpirationValidator::MIN_EXPIRATION` が
+    #   5 分なので、残り秒数が正でも 300 未満なら上流が 422 を返す
+    # - ⚠ **期限切れも復元できない。**残り秒数が負になり同じ検証に落ちる
+    #
+    # ⚠ **option の `votes_count` が nil かどうかで `hide_totals` を推測しない。**
+    # `Poll#show_totals_now?` は `expired? || !hide_totals?` なので理屈では読めるが、
+    # 上流の内部実装に依存するうえ**残り 5 分未満と期限切れは結局復元できない**。
+    # 「隠した票が見える」「票が消える」より、**編集を断る**ほうが安全。
+    #
+    # ⚠ 到達するのは `tag` だけ。Mastodon は添付とアンケートを同時に持てないので
+    # ALT 編集には来ない。
+    def reject_poll!(status)
+      return if status['poll'].blank?
+      raise Ginseng::ValidateError, 'status with poll is not editable'
     end
 
     # ⚠ **本文が空の投稿では `spoiler_text` を送ってはいけない (#4623)。**
@@ -234,35 +257,6 @@ module Mulukhiya
       return body if body[:status].present?
       body.delete(:spoiler_text)
       return body
-    end
-
-    # ⚠ **アンケートは「現状の設問」ではなく編集用の形で送り直す。**status entity の
-    # `poll` は `votes_count` 等を含むが、`UpdateStatusService` が見るのは
-    # `options` / `expires_in` / `multiple` / `hide_totals`。⚠ **`expires_in` は
-    # 残り秒数**（`expires_at` そのものではない）。
-    #
-    # ⚠ **期限切れのアンケートには触らない。**残り秒数が正にならず、送ると
-    # Mastodon 側で検証に落ちる。編集で票が消えるより、アンケートの体裁が
-    # そのまま残るほうが安全。
-    def restored_poll(status)
-      return nil unless poll = status['poll']
-      return nil unless expires_in = poll_expires_in(poll)
-      return {
-        options: Array(poll['options']).map {|v| v['title']},
-        expires_in:,
-        multiple: poll['multiple'] ? true : false,
-        hide_totals: poll['hide_totals'] ? true : false,
-      }
-    end
-
-    def poll_expires_in(poll)
-      return nil if poll['expired']
-      return nil unless poll['expires_at'].present?
-      seconds = (Time.parse(poll['expires_at']) - Time.now).to_i
-      return nil unless seconds.positive?
-      return seconds
-    rescue ArgumentError, TypeError
-      return nil
     end
 
     # モロヘイヤ自身が上流 Mastodon を叩くときのヘッダ (#4621)。

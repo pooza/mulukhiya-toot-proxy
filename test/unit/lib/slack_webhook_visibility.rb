@@ -38,7 +38,6 @@ module Mulukhiya
       expected = parser_class.visibility_name('private')
 
       assert_equal(expected, visibility_for('bogus'))
-      assert_equal(expected, visibility_for('home'))
       assert_equal(expected, visibility_for(nil))
     end
 
@@ -76,8 +75,10 @@ module Mulukhiya
     # 素通しすると `private` に設定した webhook が、綴り誤りや Misskey 語彙
     # ひとつで**公開投稿になる**。
     def test_unknown_visibility_falls_back_to_account_default
+      # ⚠ **`home` を未知の値として使わない。**Misskey 設定では `unlisted` の
+      # 別名として**既知**なので、両系で走るテストでは成立しない（CI で踏んだ）。
       assert_nil(requested_visibility('bogus'))
-      assert_nil(requested_visibility('home'))
+      assert_nil(requested_visibility('sekret'))
     end
 
     # 既知の語は通す。⚠ キー（`:public` 等）と値（プラットフォーム名）の
