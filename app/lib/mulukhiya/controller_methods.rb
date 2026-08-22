@@ -1,5 +1,13 @@
 module Mulukhiya
   module ControllerMethods
+    # ALT 編集が通るために必要な ginseng-fediverse の最低版 (#4636)。
+    #
+    # 1.8.29 までは `update_status` だけが `create_headers` を通しておらず、
+    # モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を名乗らない。nginx の
+    # `$status_put_backend` map のキーが `PUT::` に落ちて **405** になる (#4621)。
+    # pooza/ginseng-fediverse#254 で是正され 1.8.30 で入った。
+    MEDIA_UPDATE_FEDIVERSE_VERSION = Gem::Version.new('1.8.30')
+
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -19,6 +27,33 @@ module Mulukhiya
 
       def media_catalog?
         return config["/#{name}/data/media_catalog"] == true rescue false
+      end
+
+      # ALT 編集 (`PUT /api/:version/statuses/:id` の `media_update` purpose) が
+      # **この構成で実際に通るか** (#4636)。capsicum の導線出し分けに使う
+      # (pooza/capsicum#999)。
+      #
+      # 通るには **2 つの前提**が要り、**どちらもモロヘイヤの版番号では判定できない**:
+      #
+      # 1. **nginx 側の経路** … `$status_put_backend` map が Purpose を含む 3 要素キーへ
+      #    是正されていること (#4474)。⚠ **サーバーごとに乖離する**（ステージング 3 台は
+      #    未是正のまま = pooza/chubo2#188）。モロヘイヤからは観測できないので
+      #    **`capabilities/media_update` の明示的な opt-in** として受ける。既定は false
+      # 2. **刺している ginseng-fediverse の版** … 1.8.29 までは `update_status` だけが
+      #    `create_headers` を通しておらず、モロヘイヤ自身の上流 PUT が `X-Mulukhiya` を
+      #    名乗らないため、1. が是正済みでも map のキーが `PUT::` に落ちて 405 になる
+      #    (#4621)。同じ 5.34.0 でもピン次第で動いたり動かなかったりする
+      #
+      # ⚠ **「分からない」は false へ倒す。**壊れる側の代償が
+      # 「投稿から添付が全部外れ CW も消える」(#4589) なので、判定できない構成では
+      # 導線を出させない。
+      def media_update?
+        return false unless config["/#{name}/capabilities/media_update"] == true
+        version = Gem.loaded_specs['ginseng-fediverse']&.version
+        return false unless version
+        return version >= MEDIA_UPDATE_FEDIVERSE_VERSION
+      rescue Ginseng::ConfigError
+        return false
       end
 
       def favorite_tags?

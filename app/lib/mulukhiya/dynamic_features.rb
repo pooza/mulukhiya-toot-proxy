@@ -14,6 +14,10 @@ module Mulukhiya
   #                        無く capsicum は false 判定して導線を出さない (pooza/capsicum#767)
   #   - media_catalog    : /{controller}/data 配下の機能フラグ。discovery を features
   #                        に一本化するため合流 (#4343)
+  #   - media_update     : ALT 編集 (`PUT /statuses/:id` の media_update purpose) が
+  #                        この構成で通るか (#4636)。判定は刺している ginseng-fediverse
+  #                        の版で決まり、モロヘイヤの版番号では代用できない。capsicum の
+  #                        ALT 編集導線の出し分けに使う (pooza/capsicum#999)
   #   - program_editable : 番組表エディタ (livecure かつ auto_update 無効) で書き込み
   #                        API が利用可能か。WebUI の UI 出し分けに使う (#4272)
   #   - word_suggest     : 読み付き単語サジェスト (#4397)。word_suggest/urls が設定
@@ -37,6 +41,7 @@ module Mulukhiya
       'annict_review' => ->(_sns) {Environment.controller_class.annict?},
       'compose_templates' => ->(_sns) {true},
       'media_catalog' => ->(_sns) {Environment.controller_class.media_catalog?},
+      'media_update' => ->(_sns) {Environment.controller_class.media_update?},
       'program_editable' => lambda {|_sns|
         Environment.controller_class.livecure? && !Program.instance.auto_update?
       },
