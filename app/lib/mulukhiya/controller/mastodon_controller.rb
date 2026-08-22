@@ -75,7 +75,7 @@ module Mulukhiya
       reporter.response = sns.update_status(
         params[:id],
         create_status_update_body(purpose, params),
-        {headers: @headers},
+        {headers: upstream_headers},
       )
       @renderer.message = reporter.response.parsed_response
       @renderer.status = reporter.response.code
@@ -181,8 +181,9 @@ module Mulukhiya
     # 添付とアンケートを同時に持てないため ALT 編集では到達しない。`tag` purpose
     # を実装するときは別途注意すること。
     def create_media_update_body(params)
-      source = sns.fetch_status_source(params[:id], {headers: @headers})
-      status = sns.fetch_status(params[:id], {headers: @headers})
+      headers = upstream_headers
+      source = sns.fetch_status_source(params[:id], {headers:})
+      status = sns.fetch_status(params[:id], {headers:})
       return {
         status: source['text'],
         spoiler_text: source['spoiler_text'].to_s,
@@ -190,6 +191,22 @@ module Mulukhiya
         media_ids: Array(status['media_attachments']).map {|v| v['id']},
         media_attributes: params[:media_attributes],
       }
+    end
+
+    # モロヘイヤ自身が上流 Mastodon を叩くときのヘッダ (#4621)。
+    #
+    # ⚠ **クライアントの `X-Mulukhiya-Purpose` を引き継がない。** これは
+    # 「この要求はモロヘイヤへ通してよい」と nginx へ名乗るためのヘッダで、
+    # 上流へ出ていく要求には意味が無い。
+    #
+    # 引き継ぐと、vhost に #4474 以前の `if ($http_x_mulukhiya_purpose != '')`
+    # が残っている環境で **モロヘイヤ自身の内部 fetch が :3008 へ送り返されて
+    # ループし、GET が 404 になる**（ステージングで実際に起きた）。
+    # ⚠ `/source` は location の正規表現に一致せず素通りして 200 だったため、
+    # **`/source` は通るのに `fetch_status` だけ落ちる**という非対称になり
+    # 気づきにくい。正しい nginx なら無害だが、名乗る理由が無いものは出さない。
+    def upstream_headers
+      return @headers.except('X-Mulukhiya-Purpose')
     end
 
     def token
