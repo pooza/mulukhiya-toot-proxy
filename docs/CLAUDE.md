@@ -955,10 +955,15 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 
 - **ginseng-fediverse / piefed / postgres / redis / web / youtube** — 差分は **CI・RuboCop 設定・
   テスト土台のみ**で、モロヘイヤが触る面（`HTTP` / `Logger` / `Controller` / `TagContainer` /
-  `Environment`）に当たらない → **③ 見送り**。⚠ ただし **ginseng-fediverse だけは #4621 の修正
-  （#253）が着地したら取り込む**ので、そのときに CI 分も一緒に乗る
+  `Environment`）に当たらない → **③ 見送り**と判定した
 - **ginseng-style** — docs 中心（`inherit_gem` の Include / Exclude が置換になる件・Codex 走査の
   ワンライナー是正・ブランチ規約）。lint の挙動しか変わらない → **② 次のマイルストーンで**
+- ⚠ **③ / ② と判定した 6 本は、同日の「通常リリース手順」3.（`Gemfile.lock` のルーチン最新化・
+  `57631310`）で結局すべて乗った。**差分は上のとおり読んだうえで無害と確認済みなので問題は無いが、
+  **「見送り」判定はリリース前のルーチン更新までしか保たない**。判定するときはそのつもりで
+  （`bundle update` 引数なしを避ける必要があるのは、**赤が出たときの切り分け**が要る取り込みだけ）
+- **ginseng-fediverse は #253 の着地で 1.8.29（`0129fa5e`）へ、ginseng-core は v1.19.0（`4a029e9c`）へ**
+  個別に取り込み済み
 - **ginseng-core** — 当初は「`cert:*` の CA ストア検証・`run_stop` の pid・`cacert.pem` の週次 PR 化＝
   **#4617 の範囲**なので ② 次リリース以降」と判定した。⚠ **その後 v1.19.0（同日 03:49Z）が出て
   🔴 #527 が乗ったので ① へ切り替えた**（2026-08-22 ユーザー判断・PR #4622 に `57b73dc8` で取り込み済み）
