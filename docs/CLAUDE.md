@@ -684,10 +684,35 @@ GitHub マイルストーン作成済み（#632）。バージョンバンプは
   - `bundle update ginseng-core` ＋ `Gemfile.lock` のコミット。⚠ **取り込み後に `Controller#before` 側の
     回避策を畳めるか見る**（gem 側で塞いだため）
 
+- **#4621 bug: ALT 編集の PUT が Mastodon で 500 になる（size:S・2026-08-22 繰り入れ）** —
+  ステージング実機で ALT 編集がまだ通らなかった件。⚠ **原因は #4589 の直し残しではなく、
+  `ginseng-fediverse` の `flatten_media_attributes` そのものの誤り**。`media_attributes[0][id]=...` と
+  **数字の添字**で form-urlencode していたが、この形は Rack / Rails 側で **`fields_for` 形式の
+  Hash `{"0" => {...}}`** に解釈され**配列にならない**。Mastodon の `UpdateStatusService` は
+  `(@options[:media_attributes] || []).each` と回すので `["0", {...}]`（Array）が渡り、
+  `attributes[:id]` で `TypeError: no implicit conversion of Symbol into Integer` ＝ 500
+  - ⚠ **「#245 が入っている」は「正しく直っている」ではない。**ピンは #245 のマージより先で、
+    それでも崩れていた。[[feedback_fix-may-not-reach-through-ginseng]] の逆パターン
+  - **pooza/ginseng-fediverse#253**（form-urlencoded をやめて JSON で送る）→ 着地後に
+    `bundle update ginseng-fediverse` → 本体 PR **#4622**、の順で回す。
+    ⚠ **PR #4622 だけでは 500 は直らない**（入っているのは Purpose ヘッダの件だけ）
+  - ⚠ **空添字 `media_attributes[][id]` でも配列にはなるが採らなかった。**「同じキーが再出現したら
+    次の要素」という Rack の暗黙のグルーピングに依存し、要素ごとのキーの並びで壊れうる
+  - ⚠ **Content-Type を明示しないと JSON にならない。**ginseng-core の `create_body` は
+    Content-Type が `application/json` のときだけ `to_json` する。無指定だと HTTParty が Hash を
+    form-urlencode し、**同じ数字の添字に戻って同じ 500 になる**
+  - 併せて **内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を出さない**ようにした。
+    #4474 以前の `if ($http_x_mulukhiya_purpose != '')` が残った vhost では**内部 fetch が
+    :3008 へ送り返されてループし GET が 404** になる（ステージングで実際に起きた）。
+    ⚠ **`/source` は location の正規表現に一致せず素通りして 200** だったため、
+    **`/source` は通るのに `fetch_status` だけ落ちる**という非対称で気づきにくい
+  - ⚠ **capsicum#121 の client 実装（`be45003f`）は入っている。**これが直るまで実地では動かない
+
 **確定スコープの重み合計は 24**（M 3 × 6 + S 1 × 6）。目安の 20〜25 の上寄りで、**これ以上の追加は次リリースへ送る**。
 ⚠ **メンテナンスリリースを連続させない**というユーザーの意向（2026-08-13）を受けて、**主軸をメディアカタログと番組表に置き、
 検査由来の受け皿は #4583 の 1 本に絞った**。残り 4 件は次リリース以降へ送る。
-なお #4589 / #4594 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
+なお #4589 / #4594 / #4621 は**バグとして後から繰り入れた**（受け皿の枠ではない）。#4598 / #4599 / #4601 は 2026-08-18〜19 の追加。
+⚠ **#4621 は #4589 の直し残しなので、重み目安の外で受ける**（同じ機能を「半分直った」まま出さない）。
 
 ### Codex レビューの棚卸し（2026-08-16）
 
@@ -908,6 +933,50 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
 - **harness を v4.7.0 stable で実走し `verified` を昇格**（下の節）。⚠ **踏んだ罠は無し**
   （`update-version.sh` → `reset.sh` がそのまま通った。08-16 に踏んだポート 3000 衝突は
   pooza/chubo2#178 の修正が効いていて再発しなかった）
+
+### 2026-08-22 セッション同期の記録
+
+- **#4621（ALT 編集の PUT が 500）の原因を特定した。**⚠ **ステージング実機は要らない**（Rack の
+  パース挙動で手元で再現できる）。`ginseng-fediverse` の `flatten_media_attributes` が
+  `media_attributes[0][id]=...` と**数字の添字**で form-urlencode していたのが原因で、
+  この形は Rack / Rails 側で **`fields_for` 形式の Hash `{"0" => {...}}`** に解釈され**配列にならない**。
+  Mastodon の `UpdateStatusService` は `(@options[:media_attributes] || []).each` と回すので、
+  Hash を each した `["0", {...}]`（Array）が渡り `attributes[:id]` で
+  `TypeError: no implicit conversion of Symbol into Integer` ＝ 500
+  - ⚠ **#245 は入っているのに崩れていた**＝ **#245 の平坦化そのものが誤り**。
+    「gem 側の修正が着地した」は「正しく直っている」ではない
+  - **pooza/ginseng-fediverse#253** を出した（form-urlencoded をやめて **JSON で送る**）。
+    ⚠ **空添字 `media_attributes[][id]` でも配列にはなるが採らなかった**。「同じキーが再出現したら
+    次の要素」という Rack の暗黙のグルーピングに依存し、要素ごとのキーの並びで壊れうるため
+  - ⚠ **Content-Type の明示が要る。**ginseng-core の `create_body` は Content-Type が
+    `application/json` のときだけ `to_json` する。無指定だと HTTParty が Hash を form-urlencode し、
+    そこでも数字の添字（`HashConversions#to_params`）になって**同じ 500 に戻る**
+  - モロヘイヤ側は **PR #4622**（内部 fetch と上流への PUT に `X-Mulukhiya-Purpose` を出さない）。
+    ⚠ **500 そのものは #4622 では直らない。**#253 の着地後に
+    `bundle update ginseng-fediverse` を同ブランチへ積む
+- **Codex** は open #4604 ＋直近マージ 8 本を横断して未消化ゼロ。**PR 本体コメントの申し送りも無し**。
+  **Dependabot** 0 件
+- **Sentry** 新規 1 件 **MULUKHIYA-TOOT-PROXY-2M**（`AnnictPollingWorker` の
+  `RedisClient::CannotConnectError`・単発）をトリアージ。⚠ `server_name=instance-20220704-2044` /
+  `release=5.31.0` ＝ **姉妹サーバー管理人（Oracle 無料枠）のモロヘイヤ**で pooza 本番 4 台ではない。
+  Redis 再起動時の既知パターンで、#4543 の Redis 接続系の群に合流させた（コメント記録済み）
+- **chubo2** は差分なし。**Issue 棚卸し（§6-2）は最終 2026-07-31 で 30 日未経過**なのでスキップ
+  （次回は 2026-08-30 以降）。**harness の upstream チェック（§8）は `last_checked` 2026-08-21 で
+  1 日**なのでスキップ（次回は 2026-08-25 以降）
+
+#### ginseng-\* のピンのずれ（2026-08-22 判定）
+
+⚠ **8 本すべてずれていたが、7 本は取り込まない（③ 見送り）。**次の同期で同じ調査をしないために残す。
+
+- **ginseng-fediverse / piefed / postgres / redis / web / youtube** — 差分は **CI・RuboCop 設定・
+  テスト土台のみ**で、モロヘイヤが触る面（`HTTP` / `Logger` / `Controller` / `TagContainer` /
+  `Environment`）に当たらない → **③ 見送り**。⚠ ただし **ginseng-fediverse だけは #4621 の修正
+  （#253）が着地したら取り込む**ので、そのときに CI 分も一緒に乗る
+- **ginseng-style** — docs 中心（`inherit_gem` の Include / Exclude が置換になる件・Codex 走査の
+  ワンライナー是正・ブランチ規約）。lint の挙動しか変わらない → **② 次のマイルストーンで**
+- **ginseng-core** — `cert:*` の CA ストア検証・`run_stop` の pid・pid 読み取り競合・`cacert.pem` の
+  週次 PR 化。**#4617 の範囲そのもの**なので、そちらで受ける → **② 次リリース以降**
+
 
 ### マイルストーン未割当
 
