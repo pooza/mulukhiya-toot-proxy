@@ -981,6 +981,31 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
     **「リリースが出た」＝「差分が小さい」ではない**
 
 
+### harness 実走ゲート（2026-08-22・**「新規の失敗ゼロ」で通過**）
+
+両系を**別シェル**で実走（#4559 の取り違え対策。`controller=` と `url=` の両方で確認）。
+
+| 系 | harness | 結果 |
+| --- | --- | --- |
+| Mastodon（v4.7.0） | `controller=mastodon url=http://localhost:3000` | **1184 tests / 2299 assertions / 1 failures / 0 errors / 159 omissions** |
+| Misskey（2026.7.0） | `controller=misskey url=http://localhost:3001` | **1187 tests / 2289 assertions / 1 failures / 0 errors / 146 omissions** |
+
+**失敗は両系とも `RemoteTagHandlerTest#test_handle_pre_toot` の 1 件だけ**＝ **#4584**。
+⚠ **新規の失敗はゼロ**で、リリース前レビューの赤 4 件の是正による退行も無い。
+**「新規の失敗ゼロ」で非ブロック化して通した**（2026-08-22 ユーザー判断。5.33.0 と同じ扱い）。
+
+⚠ **ただし今回は放置で終わらせず、#4584 を 5.35.0 へ割り当てた**（同ユーザー判断）。
+[[project_harness-zero-error-goal]] の「両系エラー 0」へ戻すため。
+
+- omissions は参考値（2026-08-09 の 152 / 141）から 159 / 146 へ微増。**テスト総数が
+  1001 → 1184 に増えている**ぶんの範囲で、前提が壊れて実行されなくなった類ではない
+- ⚠ **実走中に出る `DB 接続に失敗したためスキップ: ... user "u"` は意図したテストの出力。**
+  `test_apply_wires_info_token_and_postgres_dsn` が `postgres://u:p@...` という偽 DSN で
+  失敗経路を検証している。ENV は `setup` / `teardown` で退避・復元されるので後続へ漏れない。
+  **退行と読み違えないこと**
+- ⚠ **判定基準の「既知例外は無い」は、この時点で実態と食い違っている**（docs/test-harness.md）。
+  #4584 が着地したら記述を戻す
+
 ### リリース前 5 観点レビュー（2026-08-22 実施・赤 4 件を是正）
 
 対象は `v5.33.0..develop`（64 コミット / 60 ファイル / +3648 -558）。**赤 4 件・黄 11 件・緑 6 件。**
