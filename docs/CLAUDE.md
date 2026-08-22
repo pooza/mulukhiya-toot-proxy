@@ -981,6 +981,49 @@ ginseng-core 1.17.0（pooza/ginseng-core#509 / #510 / #511）への追随。**3 
     **「リリースが出た」＝「差分が小さい」ではない**
 
 
+### ステージング検証（2026-08-22・**4 台とも緑**）
+
+`develop` の HEAD（`03efc95d`）を dev24 美食丼 / dev25 キュアスタ！ / dev26 デルムリン丼（Mastodon）/
+dev27 ダイスキー（Misskey）へ適用。**4 台とも version 5.34.0・`/mulukhiya/api/health` 200
+（redis / sidekiq / postgres / streaming / ruby すべて OK）・`yjit_enabled: true`・
+WebUI 200（`/mulukhiya/` / `app/media` / `app/config` / `app/program`）**。
+
+**再起動後の生存 pid が吐いたログに新規のエラー署名は無い**（dev24 / dev25 は 0 件）。
+⚠ **dev26 / dev27 の 1 件は `/program.ics` を叩いた私の足跡**で、非 livecure サーバーの
+期待動作（`raise NotFoundError unless livecure?` の log のみ）。**退行ではない。**
+
+- **#4351 Gate 2 の前提が 4 台で見えた** — `/health` の `postgres.pool`
+  （dev24 / 25 / 27 は `max: 10`、dev26 は `max: 16`）
+- ⚠ **dev27 の `yjit_enabled` は `true`**（pooza/chubo2#123 の欠落は解消済み）
+
+#### 実機で中身を 1 つ確認した（手順を通っただけで満足しない）
+
+**#4616 の本丸＝「壊れたバイト列でマスクが外れない」を dev25 で確認し、Issue をクローズした。**
+
+```json
+{"request":{"method":"POST","path":"/mulukhiya/webhook/0000...","params":{
+  "access_token":"[FILTERED]","i":"[FILTERED]","text":"[FILTERED]",
+  "url":"https://example.com/?access_token=[FILTERED]&s=%3Fho"},
+  "remote":"127.0.0.1"},"_encoding_error":true}
+```
+
+⚠ **`access_token` / `i` / クエリ内の token とも `[FILTERED]`**、壊れたバイト列だけが `%3Fho` へ、
+`_encoding_error: true` つき、行全体が妥当な UTF-8。
+
+- ⚠ **JSON ボディでは検証できない。**不正なバイト列を含むと `JSON.parse` が倒れ、
+  `Controller#before` は Sinatra の `params`（JSON では空）へ倒れるので**ログに何も出ない**。
+  **form-urlencoded で送ること**
+- ⚠ **marker 文字列を grep で探す設計にしない。**`text` は `SCRUBBED_LOG_PARAMS` に入っており
+  `[FILTERED]` になるので、**marker が出てこないのが正しい**（最初これで「ログが出ていない」と誤読した）
+
+#### 検証できなかったもの
+
+- ⚠ **#4623 / #4625（ALT 編集・`tag` purpose）は実地で確認できない。**上流 PUT が #4621 の 405 で
+  届かないため。**5.35.0 で #4621 が直ってから、この 2 件も併せて実機確認する**
+- ⚠ **dev26 は nginx が #4474 修正前のまま**（pooza/chubo2#188）。外部からの PUT が常に 405 で、
+  vhost に `if ($http_x_mulukhiya_purpose != '')` も残っている。**dev26 で ALT 編集経路の
+  実機確認を取らないこと**
+
 ### harness 実走ゲート（2026-08-22・**「新規の失敗ゼロ」で通過**）
 
 両系を**別シェル**で実走（#4559 の取り違え対策。`controller=` と `url=` の両方で確認）。
